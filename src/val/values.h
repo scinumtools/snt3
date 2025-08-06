@@ -11,6 +11,7 @@
 #include <memory>
 #include <algorithm>
 #include <cmath>
+#include <array>
 
 #include "../settings.h"
 
