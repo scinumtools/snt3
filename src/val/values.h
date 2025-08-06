@@ -6,6 +6,9 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <unordered_map>
+#include <vector>
+#include <memory>
 
 #include "../settings.h"
 
