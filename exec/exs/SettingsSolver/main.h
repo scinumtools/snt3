@@ -1,3 +1,5 @@
+#include <array>
+
 #include "exs/exs.h"
 
 struct Settings {
