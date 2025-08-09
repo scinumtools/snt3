@@ -2,7 +2,6 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
-#include <format>
 #include <algorithm>
 
 #include "magnitude.h"
@@ -90,10 +89,13 @@ namespace puq {
       int exp_diff = std::abs(exp_val-exp_err)+1;
       MAGNITUDE_PRECISION val_mag = value*std::pow(10,-exp_val);
       int val_err  = std::round(error*std::pow(10,1-exp_err));
-      ss << std::vformat("{:.0"+std::to_string(exp_diff)+"f}", std::make_format_args(val_mag));
-      ss << std::format("({:2d})", val_err);
-      if (exp_val!=0)
-	ss << (exp_val>=0 ? "e+" : "e-") << std::format("{:-02d}", std::abs(exp_val));
+      ss << std::fixed << std::setprecision(exp_diff) << val_mag;
+      ss << "(" << std::setw(2) << std::setfill(' ') << val_err << ")";
+      if (exp_val != 0) {
+        ss << (exp_val >= 0 ? "e+" : "e-")
+           << std::setw(2) << std::setfill('0') << std::abs(exp_val);
+        ss << std::setfill(' '); 
+      }
     }
     return ss.str();  
   }

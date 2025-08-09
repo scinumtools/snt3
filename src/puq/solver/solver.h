@@ -2,7 +2,6 @@
 #define PUQ_SOLVER_H
 
 #include <set>
-#include <format>
 #include <cmath>
 
 #include "../../exs/exs.h"

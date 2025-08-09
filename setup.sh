@@ -9,11 +9,12 @@ set +a
 
 DIR_ROOT=$(pwd)
 
-NUM_MAKE_CORES=10
-#CMAKE_BUILD_TYPE=Debug
-CMAKE_BUILD_TYPE=Release
+NUM_MAKE_CORES=$(nproc)
+CMAKE_BUILD_TYPE=Debug
+#CMAKE_BUILD_TYPE=Release
 MODULE_FLAGS="-DCOMPILE_DIP=ON"
 MODULE_FLAGS+=" -DCOMPILE_PUQ=ON -DCOMPILE_PUQ_MAGNITUDE=value"
+OS="$(uname -s)"
 
 function clean_code {
     if [[ -d $DIR_BUILD ]]; then
@@ -44,7 +45,11 @@ function install_code {
 function test_code {
     EXEC_FLAGS=""
     if [[ $CMAKE_BUILD_TYPE == Debug ]]; then
-	EXEC_PROGRAM="lldb -o run --"
+	if [[ "$OS" == "Darwin" ]]; then
+	    EXEC_PROGRAM="lldb -o run --"
+	elif [[ "$OS" == "Linux" ]]; then
+	    EXEC_PROGRAM="gdb -ex run --args"
+	fi
 	EXEC_FLAGS="${EXEC_FLAGS} --gtest_break_on_failure --gtest_catch_exceptions=0"
     fi
     if [[ -n "${1}" ]]; then
