@@ -9,9 +9,9 @@ set +a
 
 DIR_ROOT=$(pwd)
 
-NUM_MAKE_CORES=$(nproc)
-CMAKE_BUILD_TYPE=Debug
-#CMAKE_BUILD_TYPE=Release
+NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
+NUM_MAKE_CORES=$NUM_SYSTEM_CORES
+CMAKE_BUILD_TYPE=Release
 MODULE_FLAGS="-DCOMPILE_DIP=ON"
 MODULE_FLAGS+=" -DCOMPILE_PUQ=ON -DCOMPILE_PUQ_MAGNITUDE=value"
 OS="$(uname -s)"
@@ -96,6 +96,7 @@ function show_help {
     echo " -d|--docs           compile documentation"
     echo " -g|--grep <expr>    find expression in a code"
     echo " -h|--help           show this help"
+    echo " --debug             run in a debug mode"
     echo ""
     echo "Examples:"
     echo "./setup.sh -c -b               clean and build the code"
@@ -124,6 +125,9 @@ while [[ $# -gt 0 ]]; do
 	    grep_code $2; shift; shift;;
 	-h|--help)
 	    show_help; shift;;
+	--debug)
+	    echo "Running in a debug mode";
+	    CMAKE_BUILD_TYPE=Debug; shift;;
 	-*|--*)
 	    show_help; exit 1;;
 	*)
