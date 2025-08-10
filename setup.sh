@@ -118,7 +118,8 @@ while [[ $# -gt 0 ]]; do
 	-r|--run)
 	    run_code $2; shift; shift;;
 	-t|--test)
-	    test_code $2 $3; shift; shift; shift;;
+	    test_code $2 $3;
+	    set +e; shift; shift; shift; set -e;; # shift with no parameters causes exit 1
 	-d|--docs)
 	    compile_docs; shift;;
 	-g|--grep)
