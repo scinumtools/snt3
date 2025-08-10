@@ -80,7 +80,7 @@ namespace puq {
    */
   std::string _to_string(const MAGNITUDE_PRECISION& value, const MAGNITUDE_PRECISION& error, const UnitFormat& format) {
     std::stringstream ss;
-    int exp_val  = std::floor(std::log10(value));
+    int exp_val  = std::floor(std::log10(std::abs(value)));
     if (error==0 || !format.display_error()) {
       ss << std::setprecision(format.precision);
       ss << value << std::scientific;

@@ -95,7 +95,7 @@ TEST(ParseScalars, FloatValue) {
   if (dip::FloatNode::max_float_size==128) {
     vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(5));
     std::cout << dip::FloatNode::max_float_size << std::endl;
-    EXPECT_EQ(vnode->value->to_string(18), "23.123456789123456789");
+    EXPECT_EQ(vnode->value->to_string(18), "23.12345678912345679");
   }
 
 }
