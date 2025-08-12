@@ -26,14 +26,16 @@ namespace puq {
       // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
 #ifdef MAGNITUDE_VALUES
       MAGNITUDE_VALUE value = m1.value->math_max(m2.value.get());
-      if (m1.error && m2.error)
-	return Magnitude(std::move(value), m1.error->where(value->compare_equal(m1.value.get()).get(), m2.error.get()));
-      else if (m1.error)
+      if (m1.error && m2.error) {
+	val::BaseValue::PointerType new_error = m1.error->where(value->compare_equal(m1.value.get()).get(), m2.error.get());
+	return Magnitude(std::move(value), std::move(new_error));
+      } else if (m1.error) {
 	return Magnitude(std::move(value), m1.error->clone());
-      else if (m2.error)
+      } else if (m2.error) {
 	return Magnitude(std::move(value), m2.error->clone());
-      else
+      } else {
 	return Magnitude(std::move(value));
+      }
 #else
       MAGNITUDE_VALUE value = max(m1.value, m2.value);
       return Magnitude(value, (value==m1.value) ? m1.error : m2.error );

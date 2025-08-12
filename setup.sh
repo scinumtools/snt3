@@ -12,8 +12,9 @@ DIR_ROOT=$(pwd)
 NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
 NUM_MAKE_CORES=$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release
-MODULE_FLAGS="-DCOMPILE_DIP=ON"
-MODULE_FLAGS+=" -DCOMPILE_PUQ=ON -DCOMPILE_PUQ_MAGNITUDE=value"
+ENABLE_CLANG_TIDY=OFF
+CMAKE_FLAGS="-DCOMPILE_DIP=ON"
+CMAKE_FLAGS+=" -DCOMPILE_PUQ=ON -DCOMPILE_PUQ_MAGNITUDE=value"
 OS="$(uname -s)"
 
 function clean_code {
@@ -26,11 +27,13 @@ function build_code {
     if [[ ! -d $DIR_BUILD ]]; then
 	    mkdir $DIR_BUILD
     fi
-    if [[ $CMAKE_BUILD_TYPE == Debug ]]; then
-	cmake -B $DIR_BUILD $MODULE_FLAGS -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
-    else
-	cmake -B $DIR_BUILD $MODULE_FLAGS 
+    if [[ $ENABLE_CLANG_TIDY == "ON" ]]; then
+	CMAKE_FLAGS+=" -DENABLE_CLANG_TIDY=${ENABLE_CLANG_TIDY} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_CLANG_TIDY=\"clang-tidy;-warnings-as-errors=*\""
     fi
+    if [[ $CMAKE_BUILD_TYPE == Debug ]]; then
+	CMAKE_FLAGS+=" -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+    fi
+    cmake -B $DIR_BUILD $CMAKE_FLAGS
     cd $DIR_BUILD
     make -j $NUM_MAKE_CORES
     cd $DIR_ROOT
@@ -58,6 +61,8 @@ function test_code {
 	fi
 	$EXEC_PROGRAM ./$DIR_BUILD/GTestModule-$1 $EXEC_FLAGS
     else
+	#cd $DIR_BUILD
+	#ctest -R test
 	EXEC_FLAGS="${EXEC_FLAGS} --gtest_brief=1"
 	echo "Testing EXS"
 	$EXEC_PROGRAM ./$DIR_BUILD/GTestModule-exs $EXEC_FLAGS
@@ -97,6 +102,7 @@ function show_help {
     echo " -g|--grep <expr>    find expression in a code"
     echo " -h|--help           show this help"
     echo " --debug             run in a debug mode"
+    echo " --tidy              run clang-tidy during compilation"
     echo ""
     echo "Examples:"
     echo "./setup.sh -c -b               clean and build the code"
@@ -129,6 +135,9 @@ while [[ $# -gt 0 ]]; do
 	--debug)
 	    echo "Running in a debug mode";
 	    CMAKE_BUILD_TYPE=Debug; shift;;
+	--tidy)
+	    echo "Running with clang-tidy";
+	    ENABLE_CLANG_TIDY=ON; shift;;
 	-*|--*)
 	    show_help; exit 1;;
 	*)

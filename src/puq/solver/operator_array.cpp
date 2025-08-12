@@ -48,12 +48,16 @@ void OperatorArray::operate_group(exs::TokenListBase<UnitAtom> *tokens) {
     }
   }
   std::reverse(nv.begin(), nv.end());
-  group.atom->value.magnitude.value = std::make_unique<val::ArrayValue<double>>(nv);
-  if (group.atom->value.magnitude.error) {
-    std::reverse(ne.begin(), ne.end());
-    group.atom->value.magnitude.error = std::make_unique<val::ArrayValue<double>>(ne);
+  if (group.atom) {
+    group.atom->value.magnitude.value = std::make_unique<val::ArrayValue<double>>(nv);
+    if (group.atom->value.magnitude.error) {
+      std::reverse(ne.begin(), ne.end());
+      group.atom->value.magnitude.error = std::make_unique<val::ArrayValue<double>>(ne);
+    } else {
+      group.atom->value.magnitude.error = nullptr;
+    }
   } else {
-    group.atom->value.magnitude.error = nullptr;
+    throw std::runtime_error("Detected empty atom in a group");
   }
 #else
   std::vector<double> nv;

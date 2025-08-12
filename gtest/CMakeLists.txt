@@ -1,8 +1,3 @@
-# import GTest
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-enable_testing()
-
 # add submodule tests
 if (COMPILE_EXS)
    add_subdirectory(exs)

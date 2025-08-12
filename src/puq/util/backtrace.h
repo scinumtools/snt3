@@ -52,7 +52,7 @@ void print_backtrace() {
 
   size = backtrace (array, 10);
   strings = backtrace_symbols (array, size);
-  if (strings != NULL)
+  if (strings != nullptr)
   {
 
     printf ("Obtained %d stack frames.\n", size);

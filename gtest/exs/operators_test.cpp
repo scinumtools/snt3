@@ -42,7 +42,7 @@ TEST(Operators, OperatorAdd) {
   //tokens.print(true);
 
   // extract first token on the right
-  exs::Token token = tokens.get_right();
+  tokens.get_right();
 
   // get an operator and perform unary operation on the remaining tokens
   exs::OperatorBase<exs::Atom> *op = operators.select(exs::ADD_OPERATOR);
@@ -65,7 +65,6 @@ TEST(Operators, OpearateAdd) {
 
   // create operator list
   std::vector<int> oper = {exs::ADD_OPERATOR};
-  exs::OperatorBase<exs::Atom> *op = operators.select(exs::ADD_OPERATOR);
   
   // operate on tokens
   tokens.operate(oper, exs::UNARY_OPERATION);

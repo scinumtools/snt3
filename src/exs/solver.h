@@ -84,6 +84,8 @@ namespace exs {
         
       Token token = tokens.get_right();
       //std::cout << &token << " " << token.atom << " " << token.atom->value << std::endl;
+      if (!token.atom)
+	throw std::runtime_error("Cannot dereference a null atom pointer");
       return *token.atom;
     };
   private:

@@ -10,5 +10,4 @@ set_target_properties(${EXEC_NAME} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
 
-include(GoogleTest)
-gtest_discover_tests(${EXEC_NAME})
+gtest_discover_tests(${EXEC_NAME} TEST_PREFIX test.)
