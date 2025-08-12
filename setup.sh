@@ -28,7 +28,8 @@ function build_code {
 	    mkdir $DIR_BUILD
     fi
     if [[ $ENABLE_CLANG_TIDY == "ON" ]]; then
-	CMAKE_FLAGS+=' -DENABLE_CLANG_TIDY=${ENABLE_CLANG_TIDY} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_CLANG_TIDY=clang-tidy\;-warnings-as-errors=\*'
+	clang_tidy_flag="clang-tidy;-warnings-as-errors=*"
+	CMAKE_FLAGS+=" -DENABLE_CLANG_TIDY=${ENABLE_CLANG_TIDY} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_CLANG_TIDY=${clang_tidy_flag}"
     fi
     if [[ $CMAKE_BUILD_TYPE == Debug ]]; then
 	CMAKE_FLAGS+=" -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
