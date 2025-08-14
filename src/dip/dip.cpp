@@ -8,9 +8,9 @@
 #include "settings.h"
 
 namespace dip {
-  
+
   int DIP::num_instances = 0;
-  
+
   DIP::DIP() {
     float a;
     // initial settings
@@ -18,7 +18,7 @@ namespace dip {
     source.name = "DIP" + std::to_string(instance_number);
     source.line_number = 0;
     env.sources.append(source.name, "", "", {"", 0});
-    
+
     // populate node lists
     nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_special.begin(), nodes_special.end());
     nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_properties.begin(),
@@ -27,13 +27,13 @@ namespace dip {
     nodes_notypes.insert(nodes_notypes.end(), nodes_properties.begin(), nodes_properties.end());
     nodes_notypes.insert(nodes_notypes.end(), nodes_hierarchy.begin(), nodes_hierarchy.end());
   }
-  
+
   DIP::DIP(const Source& src) {
     // initial settings
     instance_number = DIP::num_instances++;
     source = src;
     env.sources.append(source.name, "", "", {"", 0});
-    
+
     // populate node lists
     nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_special.begin(), nodes_special.end());
     nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_properties.begin(),
@@ -44,22 +44,22 @@ namespace dip {
   }
 
   void DIP::add_string(const std::string& source_code) {
-    
+
     // prepare source data
     std::string source_file = env.sources.at(source.name).path;
     std::string source_name =
-      source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings);
+        source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings);
     num_strings++;
-    
+
     // create a new source
     env.sources.append(source_name, source_file, source_code, {source.name, source.line_number});
-    
+
     // parse lines from the source code
     parse_lines(lines, source_code, source_name);
   }
-  
+
   void DIP::add_file(const std::string& source_file, std::string source_name, const bool absolute) {
-    
+
     // prepare source data
     std::ifstream file(source_file);
     if (!file)
@@ -71,41 +71,41 @@ namespace dip {
       source_name = source.name + "_" + std::string(FILE_SOURCE) + std::to_string(num_files);
       num_files++;
     }
-    
+
     // create a new source
     // TODO: treat source lineno and source_file with respect to where this method is called
     env.sources.append(source_name, source_file, source_code.str(),
                        {source.name, source.line_number});
-    
+
     // parse lines from the source code
     parse_lines(lines, source_code.str(), source_name);
   }
-  
+
   void DIP::add_source(const std::string& sname, const std::string& spath) {
     std::string source_name =
-      source.name + "_" + std::string(DIRECT_SOURCE) + std::to_string(num_sources);
+        source.name + "_" + std::string(DIRECT_SOURCE) + std::to_string(num_sources);
     num_sources++;
     Source sparent = {source_name, 0};
     EnvSource senv = parse_source(sname, spath, sparent);
     env.sources.append(sname, senv);
   }
-  
+
   void DIP::add_unit(const std::string& name, const double value, const std::string& unit) {
     // TODO: implement
   }
-  
+
   void DIP::add_value_function(const std::string& name, FunctionList::ValueFunctionType func) {
     env.functions.append_value(name, func);
   }
-  
+
   void DIP::add_node_function(const std::string& name, FunctionList::TableFunctionType func) {
     env.functions.append_table(name, func);
   }
-  
+
   std::string DIP::to_string() {
     return "DIP";
   }
-  
+
   // Set nodes that can preceeding an option
   static constexpr std::array<NodeDtype, 13> preceeding_nodes = {
       NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table};
@@ -180,7 +180,7 @@ namespace dip {
         for (size_t i = 0; i < target.nodes.size(); i++) {
           if (target.nodes.at(i)->name == node->name) {
             ValueNode::PointerType pnode =
-	      std::dynamic_pointer_cast<ValueNode>(target.nodes.at(i));
+                std::dynamic_pointer_cast<ValueNode>(target.nodes.at(i));
             pnode->validate_constant();
             pnode->modify_value(node, target);
             new_node = false;

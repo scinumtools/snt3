@@ -96,6 +96,7 @@ function show_help {
     echo " -h|--help           show this help"
     echo " --debug             run in a debug mode"
     echo " --tidy              run clang-tidy during compilation"
+    echo " --clang-format      run clang-format"
     echo ""
     echo "Examples:"
     echo "./setup.sh -c -b               clean and build the code"
@@ -131,6 +132,9 @@ while [[ $# -gt 0 ]]; do
 	--tidy)
 	    echo "Running with clang-tidy";
 	    ENABLE_CLANG_TIDY=ON; shift;;
+	--clang-format)
+	    git ls-files 'src/puq/*.cpp' 'src/puq/*.h' | xargs clang-format -i
+	    shift;;
 	-*|--*)
 	    show_help; exit 1;;
 	*)

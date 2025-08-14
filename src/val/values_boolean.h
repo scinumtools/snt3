@@ -8,26 +8,28 @@
 namespace val {
 
   template <>
-  class ArrayValue<bool>: public BaseArrayValue<bool> {
+  class ArrayValue<bool> : public BaseArrayValue<bool> {
   public:
-    ArrayValue(const bool& val): BaseArrayValue(val) {};
-    ArrayValue(const std::vector<bool>&  arr, const Array::ShapeType& sh): BaseArrayValue(arr,sh) {};
-    ArrayValue(const std::vector<bool>&  arr): BaseArrayValue(arr,{static_cast<int>(arr.size())}) {};
-    ArrayValue(const BaseValue* other): BaseArrayValue<bool>(other) {};
+    ArrayValue(const bool& val) : BaseArrayValue(val) {};
+    ArrayValue(const std::vector<bool>& arr, const Array::ShapeType& sh) : BaseArrayValue(arr, sh) {};
+    ArrayValue(const std::vector<bool>& arr) : BaseArrayValue(arr, {static_cast<int>(arr.size())}) {};
+    ArrayValue(const BaseValue* other) : BaseArrayValue<bool>(other) {};
+
   private:
-    void value_to_string(std::ostringstream& oss, size_t& offset, int precision=0) const override {
+    void value_to_string(std::ostringstream& oss, size_t& offset, int precision = 0) const override {
       if (this->value[offset])
-	oss << snt::KEYWORD_TRUE;
+        oss << snt::KEYWORD_TRUE;
       else
-	oss << snt::KEYWORD_FALSE;
+        oss << snt::KEYWORD_FALSE;
     }
+
   public:
-    std::string to_string(int precision=0) const override {
+    std::string to_string(int precision = 0) const override {
       size_t offset = 0;
-      if (precision==0) {
-	return to_string_dim(offset);
+      if (precision == 0) {
+        return to_string_dim(offset);
       } else {
-	throw std::runtime_error("Boolean value does not support precision parameter for to_string() method.");
+        throw std::runtime_error("Boolean value does not support precision parameter for to_string() method.");
       }
     };
     BaseValue::PointerType clone() const override {
@@ -54,6 +56,6 @@ namespace val {
     };
   };
 
-}
+} // namespace val
 
 #endif // VAL_VALUES_BOOLEAN_H

@@ -8,4 +8,19 @@ ColumnLimit: 0             # No automatic line wrapping
 AllowShortFunctionsOnASingleLine: Inline
 DerivePointerAlignment: false
 PointerAlignment: Left
-SortIncludes: true         # Optional: sort #includes
+
+SortIncludes: true
+IncludeBlocks: Preserve   # or 'Regroup' to combine similar includes
+IncludeCategories:
+  - Regex: '^<.*>$'       # system headers
+    Priority: 1
+  - Regex: '^"exs/.*"$'   # project headers
+    Priority: 2
+  - Regex: '^"val/.*"$' 
+    Priority: 2
+  - Regex: '^"puq/.*"$' 
+    Priority: 2
+  - Regex: '^"dip/.*"$' 
+    Priority: 2
+  - Regex: '^".*"$'       # local headers
+    Priority: 3

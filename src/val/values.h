@@ -1,33 +1,45 @@
 #ifndef VAL_VALUES_H
 #define VAL_VALUES_H
 
-#include <typeinfo>
+#include <algorithm>
+#include <array>
+#include <cmath>
 #include <cstdint>
-#include <iostream>
-#include <sstream>
 #include <iomanip>
+#include <iostream>
+#include <memory>
+#include <sstream>
+#include <typeinfo>
 #include <unordered_map>
 #include <vector>
-#include <memory>
-#include <algorithm>
-#include <cmath>
-#include <array>
 
 #include "../settings.h"
 
 namespace val {
 
   enum class DataType { // TODO: INTX and FLOATX should support arbitrary precision types
-    Boolean,     String,      Character,
-    Integer16,   Integer32,   Integer64,    IntegerX,   
-    Integer16_U, Integer32_U, Integer64_U,  
-    Float32,     Float64,     Float128,     FloatX
+    Boolean,
+    String,
+    Character,
+    Integer16,
+    Integer32,
+    Integer64,
+    IntegerX,
+    Integer16_U,
+    Integer32_U,
+    Integer64_U,
+    Float32,
+    Float64,
+    Float128,
+    FloatX
   };
 
   enum class EvalMode {
-    Piecewise, All, Any
+    Piecewise,
+    All,
+    Any
   };
-  
+
   extern std::unordered_map<DataType, std::string> DataTypeNames;
 
   // Define common array types
@@ -36,31 +48,33 @@ namespace val {
       int dmin;
       int dmax;
       bool operator==(const RangeStruct& other) const {
-	return (dmin == other.dmin) && (dmax == other.dmax);
+        return (dmin == other.dmin) && (dmax == other.dmax);
       };
     };
     typedef std::vector<std::string> StringType; // holds raw string values
     typedef std::vector<RangeStruct> RangeType;  // array dimension ranges
     typedef std::vector<int> ShapeType;          // array shape
     constexpr int max_range = -1;                // maximum range value
-  }
+  } // namespace Array
 
   // Forward declaration
-  template <typename T> class ArrayValue;
+  template <typename T>
+  class ArrayValue;
 
   // Define base value class
   class BaseValue {
   protected:
     Array::ShapeType shape;
     DataType dtype;
+
   public:
     typedef std::unique_ptr<BaseValue> PointerType;
-    BaseValue(DataType dt, Array::ShapeType sh): dtype(dt), shape(sh) {};
+    BaseValue(DataType dt, Array::ShapeType sh) : dtype(dt), shape(sh) {};
     virtual ~BaseValue() = default;
     virtual void print() = 0;
-    virtual std::string to_string(const int precision=0) const = 0;
-    Array::ShapeType get_shape() const {return shape;};
-    DataType get_dtype() const {return dtype;};
+    virtual std::string to_string(const int precision = 0) const = 0;
+    Array::ShapeType get_shape() const { return shape; };
+    DataType get_dtype() const { return dtype; };
     virtual size_t get_size() const = 0;
     virtual BaseValue::PointerType clone() const = 0;
     virtual BaseValue::PointerType cast_as(DataType dt) const = 0;
@@ -106,18 +120,18 @@ namespace val {
     virtual bool is_unity() const = 0;
   };
 
-}
+} // namespace val
 
 #include "values_array.h"
 #include "values_boolean.h"
 #include "values_number.h"
 #include "values_string.h"
 
-namespace val {  
+namespace val {
 
   // helper function that create a array value pointer from a C++ data type
   template <typename T>
-  BaseValue::PointerType create_array_value(const std::vector<T>&  arr, Array::ShapeType sh={}) {
+  BaseValue::PointerType create_array_value(const std::vector<T>& arr, Array::ShapeType sh = {}) {
     if (sh.empty())
       sh.push_back(arr.size());
     if constexpr (std::is_same_v<T, bool>)
@@ -142,10 +156,10 @@ namespace val {
       return std::make_unique<ArrayValue<long double>>(ArrayValue<long double>(arr, sh));
     else if constexpr (std::is_same_v<T, std::string>)
       return std::make_unique<ArrayValue<std::string>>(ArrayValue<std::string>(arr, sh));
-    else 
+    else
       static_assert(std::is_integral_v<T>, "Given data type is not associated with any array value");
   };
-  
-}
+
+} // namespace val
 
 #endif // VAL_VALUES_H
