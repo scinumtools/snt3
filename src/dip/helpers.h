@@ -18,7 +18,8 @@ namespace dip {
     constexpr size_t len = N - 1;
     for (size_t i = 0; i < len; ++i) {
       arr[i] = str[i];
-      if (str[i] == '\0') break;
+      if (str[i] == '\0')
+        break;
     }
     return arr;
   }
@@ -28,10 +29,10 @@ namespace dip {
     constexpr size_t len = N - 1;
     for (size_t i = 0; i < len && i < str.size(); ++i) {
       if (i == str.size()) {
-	arr[i] = '\0';
-	break;
+        arr[i] = '\0';
+        break;
       } else {
-	arr[i] = str[i];
+        arr[i] = str[i];
       }
     }
     return arr;
@@ -46,22 +47,24 @@ namespace dip {
   }
   template <size_t N, typename First, typename Second, typename... Rest>
   consteval std::array<char, N> ce_concat(First first, Second second, Rest... rest) {
-    std::array<char,N> first_array = ce_to_array<N>(first);
-    std::array<char,N> second_array = ce_to_array<N>(second);
+    std::array<char, N> first_array = ce_to_array<N>(first);
+    std::array<char, N> second_array = ce_to_array<N>(second);
     size_t first_len = 0;
     size_t second_len = 0;
-    while (first_array[first_len]  != '\0') ++first_len;
-    while (second_array[second_len] != '\0') ++second_len;
+    while (first_array[first_len] != '\0')
+      ++first_len;
+    while (second_array[second_len] != '\0')
+      ++second_len;
     size_t total_len = first_len + second_len;
-    for (size_t i=0; i<second_len; i++)
-      first_array[first_len+i] = second_array[i];
+    for (size_t i = 0; i < second_len; i++)
+      first_array[first_len + i] = second_array[i];
     first_array[total_len] = '\0';
     if constexpr (sizeof...(rest) > 0)
       return ce_concat<N>(first_array, rest...);
     else
       return first_array;
   }
-  
-}
+
+} // namespace dip
 
 #endif // H_HELPERS

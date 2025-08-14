@@ -1,8 +1,8 @@
 /*
  *  Numerical precision
  */
-#define MAGNITUDE_PRECISION     double
-#define EXPONENT_INT_PRECISION  int
+#define MAGNITUDE_PRECISION double
+#define EXPONENT_INT_PRECISION int
 #define EXPONENT_REAL_PRECISION double
 
 /*
@@ -10,9 +10,9 @@
  */
 #define MAGNITUDE_ERRORS
 #if (COMPILE_PUQ_MAGNITUDE_ARRAY)
-  #define MAGNITUDE_ARRAYS
+#define MAGNITUDE_ARRAYS
 #elif (COMPILE_PUQ_MAGNITUDE_VALUE)
-  #define MAGNITUDE_VALUES
+#define MAGNITUDE_VALUES
 #endif
 #define EXPONENT_FRACTIONS
 

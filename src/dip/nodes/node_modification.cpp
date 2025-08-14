@@ -10,6 +10,6 @@ namespace dip {
       return std::make_shared<ModificationNode>(parser);
     }
     return nullptr;
-  }  
-  
-}
+  }
+
+} // namespace dip

@@ -1,10 +1,10 @@
 #include <array>
 #include <fstream>
 
-#include "nodes.h"
-#include "../environment.h"
 #include "../dip.h"
+#include "../environment.h"
 #include "../parsers.h"
+#include "nodes.h"
 
 namespace dip {
 
@@ -20,11 +20,11 @@ namespace dip {
     }
     return nullptr;
   }
-  
+
   BaseNode::NodeListType UnitNode::parse(Environment& env) {
     EnvUnit senv = {value_raw.at(0), value_raw.at(1)};
     env.units.append(value_raw.at(0), senv);
     return {};
-  }  
- 
-}
+  }
+
+} // namespace dip

@@ -1,7 +1,7 @@
 #include <regex>
 
-#include "nodes.h"
 #include "../environment.h"
+#include "nodes.h"
 
 namespace dip {
 
@@ -12,7 +12,7 @@ namespace dip {
       return std::make_shared<CaseNode>(parser);
     }
     return nullptr;
-  }  
+  }
 
   BaseNode::NodeListType CaseNode::parse(Environment& env) {
     std::ostringstream oss;
@@ -23,25 +23,25 @@ namespace dip {
     if (std::regex_search(name, matchResult, pattern)) {
       case_id = env.branching.register_case();
       if (matchResult[2].str() == KEYWORD_CASE) {
-	case_type = CaseType::Case;
+        case_type = CaseType::Case;
       } else if (matchResult[2].str() == KEYWORD_ELSE) {
-	case_type = CaseType::Else;
+        case_type = CaseType::Else;
       } else if (matchResult[2].str() == KEYWORD_END) {
-	case_type = CaseType::End;
+        case_type = CaseType::End;
       } else {
-	throw std::runtime_error("Unsupported case type: "+line.code);
+        throw std::runtime_error("Unsupported case type: " + line.code);
       }
       name = matchResult[1].str() + "C" + std::to_string(case_id);
-      if (case_type==CaseType::Case) {
-	// TODO: use logical solver to solve cases
-	if (value_raw.empty())
-	  throw std::runtime_error("Case node requires an input value: "+line.code);
-	value = (value_raw.at(0)==snt::KEYWORD_TRUE) ? true : false;
-      } else if (case_type==CaseType::Else) {
-	value = true;
+      if (case_type == CaseType::Case) {
+        // TODO: use logical solver to solve cases
+        if (value_raw.empty())
+          throw std::runtime_error("Case node requires an input value: " + line.code);
+        value = (value_raw.at(0) == snt::KEYWORD_TRUE) ? true : false;
+      } else if (case_type == CaseType::Else) {
+        value = true;
       }
     }
     return {};
-  }  
-  
-}
+  }
+
+} // namespace dip

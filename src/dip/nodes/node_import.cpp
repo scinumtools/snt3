@@ -1,8 +1,8 @@
 #include <array>
 #include <fstream>
 
-#include "nodes.h"
 #include "../environment.h"
+#include "nodes.h"
 
 namespace dip {
 
@@ -16,7 +16,7 @@ namespace dip {
     }
     return nullptr;
   }
-  
+
   BaseNode::NodeListType ImportNode::parse(Environment& env) {
     NodeListType nodes;
     switch (value_origin) {
@@ -27,19 +27,19 @@ namespace dip {
       nodes = env.request_nodes(value_raw.at(0), RequestType::Reference);
       break;
     default:
-      throw std::runtime_error("Import nodes could not be parsed: "+line.code);      
+      throw std::runtime_error("Import nodes could not be parsed: " + line.code);
     }
     // update node settings
-    for (auto node: nodes) {
+    for (auto node : nodes) {
       int size = node->value_raw.size();
       node->indent += indent;
       if (!name.empty())
-	node->name = name + std::string(1,SIGN_SEPARATOR) + node->name;
+        node->name = name + std::string(1, SIGN_SEPARATOR) + node->name;
       node->value_shape = {size};
       if (node->dimension.empty())
-	node->dimension = {{size,size}};
+        node->dimension = {{size, size}};
     }
     return nodes;
-  }  
- 
-}
+  }
+
+} // namespace dip

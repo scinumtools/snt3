@@ -1,5 +1,5 @@
-#include "nodes.h"
 #include "../environment.h"
+#include "nodes.h"
 
 namespace dip {
 
@@ -11,13 +11,13 @@ namespace dip {
     else
       parser.kwd_property(ptype);
     // parse rest of the parts
-    if (ptype!=PropertyType::None) {
+    if (ptype != PropertyType::None) {
       parser.part_value();
       parser.part_units();
       parser.part_comment();
-      return std::make_shared<PropertyNode>(parser, ptype);      
+      return std::make_shared<PropertyNode>(parser, ptype);
     }
     return nullptr;
   }
-      
-}
+
+} // namespace dip

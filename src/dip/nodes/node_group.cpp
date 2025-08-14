@@ -7,6 +7,6 @@ namespace dip {
     if (!parser.do_continue())
       return std::make_shared<GroupNode>(parser);
     return nullptr;
-  }  
-  
-}
+  }
+
+} // namespace dip

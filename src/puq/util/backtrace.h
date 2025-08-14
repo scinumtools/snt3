@@ -1,10 +1,10 @@
 #ifndef PUQ_BACKTRACE_H
 #define PUQ_BACKTRACE_H
 
+#include <cstdlib>    // For free
+#include <cxxabi.h>   // For __cxa_demangle (optional)
+#include <execinfo.h> // For backtrace and backtrace_symbols
 #include <iostream>
-#include <execinfo.h>  // For backtrace and backtrace_symbols
-#include <cstdlib>     // For free
-#include <cxxabi.h>    // For __cxa_demangle (optional)
 
 void print_backtrace() {
   /*
@@ -24,13 +24,13 @@ void print_backtrace() {
         char* demangled_name = symbols[i];
         char* left_paren = nullptr;
         char* plus_sign = nullptr;
-        
+
         // Attempt to find the mangled name
         for (char* p = symbols[i]; *p; ++p) {
             if (*p == '(') left_paren = p;
             else if (*p == '+') plus_sign = p;
         }
-        
+
         if (left_paren && plus_sign && left_paren < plus_sign) {
             *plus_sign = '\0';  // Null-terminate before the '+'
             int status;
@@ -46,21 +46,20 @@ void print_backtrace() {
     // Free the symbols buffer
     free(symbols);
   */
-    void *array[10];
-  char **strings;
+  void* array[10];
+  char** strings;
   int size, i;
 
-  size = backtrace (array, 10);
-  strings = backtrace_symbols (array, size);
-  if (strings != nullptr)
-  {
+  size = backtrace(array, 10);
+  strings = backtrace_symbols(array, size);
+  if (strings != nullptr) {
 
-    printf ("Obtained %d stack frames.\n", size);
+    printf("Obtained %d stack frames.\n", size);
     for (i = 0; i < size; i++)
-      printf ("%s\n", strings[i]);
+      printf("%s\n", strings[i]);
   }
 
-  free (strings);
+  free(strings);
 }
 
 #endif
