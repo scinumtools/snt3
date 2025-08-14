@@ -60,19 +60,11 @@ function test_code {
 	if [[ "${2}" != "" ]]; then
 	    EXEC_FLAGS="--gtest_filter="${2}" ${EXEC_FLAGS}"
 	fi
-	$EXEC_PROGRAM ./$DIR_BUILD/GTestModule-$1 $EXEC_FLAGS
+	cd $DIR_BUILD
+	$EXEC_PROGRAM ./GTestModule-$1 $EXEC_FLAGS
     else
-	#cd $DIR_BUILD
-	#ctest -R test
-	EXEC_FLAGS="${EXEC_FLAGS} --gtest_brief=1"
-	echo "Testing EXS"
-	$EXEC_PROGRAM ./$DIR_BUILD/GTestModule-exs $EXEC_FLAGS
-	echo "Testing VAL"
-	$EXEC_PROGRAM ./$DIR_BUILD/GTestModule-val $EXEC_FLAGS
-	echo "Testing PUQ"
-	$EXEC_PROGRAM ./$DIR_BUILD/GTestModule-puq $EXEC_FLAGS
-	echo "Testing DIP"
-	$EXEC_PROGRAM ./$DIR_BUILD/GTestModule-dip $EXEC_FLAGS	
+	cd $DIR_BUILD
+	ctest -R gtest
     fi
 }
 
