@@ -5,7 +5,6 @@ namespace exs {
 
   struct EmptySettings {};
 
-}
+} // namespace exs
 
 #endif // EXS_SETTINGS_H
-

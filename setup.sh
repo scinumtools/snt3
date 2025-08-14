@@ -86,7 +86,7 @@ function grep_code {
 
 function setup_clang_format {
     git ls-files 'exec/*.cpp' 'exec/*.h' | xargs clang-format -i
-    #git ls-files 'src/*.cpp' 'src/*.h' | xargs clang-format -i
+    git ls-files 'src/*.cpp' 'src/*.h' | xargs clang-format -i
 }
 
 function show_help {
@@ -104,6 +104,7 @@ function show_help {
     echo " --debug             run in a debug mode"
     echo " --clang-tidy        run clang-tidy during compilation"
     echo " --clang-format      run clang-format"
+    echo " --num-cores N       number of compiliation cores"
     echo ""
     echo "Examples:"
     echo "./setup.sh -c -b               clean and build the code"
@@ -141,6 +142,8 @@ while [[ $# -gt 0 ]]; do
 	    ENABLE_CLANG_TIDY=ON; shift;;
 	--clang-format)
 	    setup_clang_format; shift;;
+	--num-cores)
+	    NUM_SYSTEM_CORES=$2; shift; shift;;
 	-*|--*)
 	    show_help; exit 1;;
 	*)
