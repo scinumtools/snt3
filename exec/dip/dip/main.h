@@ -1,8 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <iostream>
-#include <iomanip>
 #include <exception>
+#include <iomanip>
+#include <iostream>
 
 #endif // MAIN_H

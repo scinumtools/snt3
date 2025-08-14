@@ -1,7 +1,7 @@
 #import "main.h"
 
-LogicalAtom::LogicalAtom(const LogicalAtom& a): AtomBase(std::make_unique<bool>(*a.value)) {
-};
+LogicalAtom::LogicalAtom(const LogicalAtom& a) : AtomBase(std::make_unique<bool>(*a.value)) {
+                                                 };
 
 LogicalAtom& LogicalAtom::operator=(const LogicalAtom& a) {
   if (this != &a) {
@@ -11,12 +11,12 @@ LogicalAtom& LogicalAtom::operator=(const LogicalAtom& a) {
 }
 
 UniquePtrType LogicalAtom::from_string(std::string s) {
-  if (s==snt::KEYWORD_TRUE)
+  if (s == snt::KEYWORD_TRUE)
     return std::make_unique<bool>(true);
-  else if (s==snt::KEYWORD_FALSE)
+  else if (s == snt::KEYWORD_FALSE)
     return std::make_unique<bool>(false);
   else
-    throw std::runtime_error("Invalid atom value: "+s);
+    throw std::runtime_error("Invalid atom value: " + s);
 }
 
 std::string LogicalAtom::to_string() {

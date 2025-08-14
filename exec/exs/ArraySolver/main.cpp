@@ -14,7 +14,7 @@ int main() {
   exs::StepList steps;
   steps.append(exs::GROUP_OPERATION, {ARRAY_OPERATOR});
   steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
-  
+
   exs::Solver<CustomAtom> solver(operators, steps);
   CustomAtom atom = solver.solve("2 + 3");
   atom.print();
@@ -31,4 +31,3 @@ int main() {
    * # v1 == {5,6,9}
    */
 }
-

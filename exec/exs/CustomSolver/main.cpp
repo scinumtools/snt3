@@ -13,7 +13,7 @@ int main() {
   exs::StepList steps;
   steps.append(exs::GROUP_OPERATION, {LENGTH_OPERATOR});
   steps.append(exs::BINARY_OPERATION, {exs::LESS_OPERATOR});
-  
+
   exs::Solver<CustomAtom> solver(operators, steps);
   CustomAtom atom = solver.solve("apple < len(hospital)");
   atom.print();
@@ -23,4 +23,3 @@ int main() {
    * std::string("apple").size() < std::string("hospital").size() == true
    */
 }
-

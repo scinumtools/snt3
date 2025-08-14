@@ -22,4 +22,4 @@ jobs:
           sudo cp lib/*.a /usr/lib
           
       - name: build
-        run: ./setup.sh --tidy -b
+        run: ./setup.sh --clang-tidy -b

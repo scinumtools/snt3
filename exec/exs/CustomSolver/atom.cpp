@@ -6,12 +6,14 @@ std::string CustomAtom::to_string() {
   } else if (std::holds_alternative<size_t>(value)) {
     return std::to_string(std::get<size_t>(value));
   } else {
-    if (std::get<bool>(value)==0) return "false";
-    else return "true";
+    if (std::get<bool>(value) == 0)
+      return "false";
+    else
+      return "true";
   }
 }
 
-void CustomAtom::comparison_less(CustomAtom *other) {
+void CustomAtom::comparison_less(CustomAtom* other) {
   size_t value_this;
   size_t value_other;
   if (std::holds_alternative<std::string>(value)) {

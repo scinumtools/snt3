@@ -13,8 +13,10 @@ NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
 NUM_MAKE_CORES=$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release
 ENABLE_CLANG_TIDY=OFF
-CMAKE_FLAGS="-DCOMPILE_DIP=ON"
+CMAKE_FLAGS="-DCOMPILE_EXS=ON"
+CMAKE_FLAGS+=" -DCOMPILE_VAL=ON"
 CMAKE_FLAGS+=" -DCOMPILE_PUQ=ON -DCOMPILE_PUQ_MAGNITUDE=value"
+CMAKE_FLAGS+=" -DCOMPILE_DIP=ON"
 OS="$(uname -s)"
 
 function clean_code {
@@ -82,6 +84,11 @@ function grep_code {
     fi
 }
 
+function setup_clang_format {
+    git ls-files 'exec/*.cpp' 'exec/*.h' | xargs clang-format -i
+    #git ls-files 'src/*.cpp' 'src/*.h' | xargs clang-format -i
+}
+
 function show_help {
     echo "Scientific Numerical Tools (SNT, scinumtools)"
     echo ""
@@ -95,7 +102,7 @@ function show_help {
     echo " -g|--grep <expr>    find expression in a code"
     echo " -h|--help           show this help"
     echo " --debug             run in a debug mode"
-    echo " --tidy              run clang-tidy during compilation"
+    echo " --clang-tidy        run clang-tidy during compilation"
     echo " --clang-format      run clang-format"
     echo ""
     echo "Examples:"
@@ -129,12 +136,11 @@ while [[ $# -gt 0 ]]; do
 	--debug)
 	    echo "Running in a debug mode";
 	    CMAKE_BUILD_TYPE=Debug; shift;;
-	--tidy)
+	--clang-tidy)
 	    echo "Running with clang-tidy";
 	    ENABLE_CLANG_TIDY=ON; shift;;
 	--clang-format)
-	    git ls-files 'src/puq/*.cpp' 'src/puq/*.h' | xargs clang-format -i
-	    shift;;
+	    setup_clang_format; shift;;
 	-*|--*)
 	    show_help; exit 1;;
 	*)
