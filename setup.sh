@@ -135,10 +135,8 @@ while [[ $# -gt 0 ]]; do
 	-h|--help)
 	    show_help; shift;;
 	--debug)
-	    echo "Running in a debug mode";
 	    CMAKE_BUILD_TYPE=Debug; shift;;
 	--clang-tidy)
-	    echo "Running with clang-tidy";
 	    ENABLE_CLANG_TIDY=ON; shift;;
 	--clang-format)
 	    setup_clang_format; shift;;

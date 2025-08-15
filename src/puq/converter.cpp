@@ -74,7 +74,7 @@ namespace puq {
           {"Bm", "BmW", 0},
           {"BV", "BuV", 12},
       };
-      for (auto pair : pairs_B_B) {
+      for (auto& pair : pairs_B_B) {
         if (s1 == pair.first && s2 == pair.second) { // BelX -> BelY
           return _convert_B_B(m * n1, pair.exp) / n2;
         } else if (s1 == pair.second && s2 == pair.first) { // BelY -> BelX
@@ -96,7 +96,7 @@ namespace puq {
           {"BOhm", "Ohm", 2, 1e-3},
           {"BSPL", "Pa", 2, 50},
       };
-      for (auto pair : pairs_B_Ratio) {
+      for (auto& pair : pairs_B_Ratio) {
         if (s1 == pair.first && s1 == s2) { // Bel -> Bel
           return _convert_B_B(m * n1) / n2;
         } else if (s1 == pair.first && s2 == pair.second) { // Bel -> Ratio

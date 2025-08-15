@@ -40,16 +40,16 @@ namespace val {
     BaseValue::PointerType logical_or(const BaseValue* other) const override;
     BaseValue::PointerType logical_not() const override;
     bool any_of() const override {
-      return std::any_of(this->value.begin(), this->value.end(), [](std::string b) { return !b.empty(); });
+      return std::any_of(this->value.begin(), this->value.end(), [](const std::string& b) { return !b.empty(); });
     };
     bool all_of() const override {
-      return std::all_of(this->value.begin(), this->value.end(), [](std::string b) { return !b.empty(); });
+      return std::all_of(this->value.begin(), this->value.end(), [](const std::string& b) { return !b.empty(); });
     };
     bool none_of() const override {
-      return std::none_of(this->value.begin(), this->value.end(), [](std::string b) { return !b.empty(); });
+      return std::none_of(this->value.begin(), this->value.end(), [](const std::string& b) { return !b.empty(); });
     };
     bool is_unity() const override {
-      return std::all_of(this->value.begin(), this->value.end(), [](std::string b) { return std::stod(b) == 1; });
+      return std::all_of(this->value.begin(), this->value.end(), [](const std::string& b) { return std::stod(b) == 1; });
     };
   };
 

@@ -23,7 +23,7 @@ namespace puq {
     solver = std::make_unique<exs::Solver<CalculatorAtom>>(operators, steps);
   }
 
-  CalculatorAtom Calculator::solve(std::string expression) {
+  CalculatorAtom Calculator::solve(const std::string& expression) {
 #ifdef DEBUG_CALCULATOR
     std::clog << "CALC:  Solving: " << expression << std::endl;
 #endif

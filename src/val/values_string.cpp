@@ -105,15 +105,15 @@ namespace val {
   };
 
   BaseValue::PointerType ArrayValue<std::string>::logical_and(const BaseValue* other) const {
-    return operate_binary<bool>(other, [](std::string a, std::string b) { return !a.empty() && !b.empty(); });
+    return operate_binary<bool>(other, [](const std::string& a, const std::string& b) { return !a.empty() && !b.empty(); });
   }
 
   BaseValue::PointerType ArrayValue<std::string>::logical_or(const BaseValue* other) const {
-    return operate_binary<bool>(other, [](std::string a, std::string b) { return !a.empty() || !b.empty(); });
+    return operate_binary<bool>(other, [](const std::string& a, const std::string& b) { return !a.empty() || !b.empty(); });
   };
 
   BaseValue::PointerType ArrayValue<std::string>::logical_not() const {
-    return operate_unary<bool>([](std::string a) { return a.empty(); });
+    return operate_unary<bool>([](const std::string& a) { return a.empty(); });
   };
 
 } // namespace val

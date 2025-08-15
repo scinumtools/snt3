@@ -44,7 +44,7 @@ namespace puq {
         if (value.size() > 0) {
           std::stringstream sss;
           bool sep = false;
-          for (auto pref : value) {
+          for (auto& pref : value) {
             sss << (sep ? ", " : "") << pref;
             sep = true;
           }

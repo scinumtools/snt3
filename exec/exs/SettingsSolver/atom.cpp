@@ -1,6 +1,6 @@
 #import "main.h"
 
-int CustomAtom::from_string(std::string s, Settings* set) {
+int CustomAtom::from_string(std::string& s, Settings* set) {
   if (s == set->symbol)
     return set->value;
   else

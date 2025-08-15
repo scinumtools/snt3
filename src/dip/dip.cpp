@@ -12,7 +12,8 @@ namespace dip {
   int DIP::num_instances = 0;
 
   DIP::DIP() {
-    float a;
+    float* a;
+    std::cout << *a << std::endl;
     // initial settings
     instance_number = DIP::num_instances++;
     source.name = "DIP" + std::to_string(instance_number);

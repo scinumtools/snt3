@@ -14,7 +14,7 @@ public:
   LogicalAtom(LogicalAtom&& a) noexcept = default;
   LogicalAtom& operator=(LogicalAtom&& a) noexcept = default;
 
-  static UniquePtrType from_string(std::string s);
+  static UniquePtrType from_string(std::string& s);
   std::string to_string();
   void logical_and(LogicalAtom* other);
 };

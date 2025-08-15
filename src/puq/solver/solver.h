@@ -26,7 +26,7 @@ namespace puq {
   public:
     UnitAtom(UnitAtom& a) : AtomBase(a) {};
     UnitAtom(UnitValue v) : AtomBase(v) {};
-    static UnitValue from_string(std::string s);
+    static UnitValue from_string(const std::string& s);
     std::string to_string();
     void math_power(EXPONENT_TYPE& e);
     void math_multiply(UnitAtom* other);

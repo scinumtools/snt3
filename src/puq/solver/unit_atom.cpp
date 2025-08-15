@@ -61,7 +61,7 @@ namespace puq {
     _parse_exponent(bu, expr, m);
     // determine unit
     std::pair<std::string, UnitStruct> munit; // current candidate unit
-    for (auto unit : UnitSystem::Data->UnitList) {
+    for (auto& unit : UnitSystem::Data->UnitList) {
       if (unit.first.size() > expr.size()) // symbol is longer than the expression
         continue;
       if (unit.first.size() <= munit.first.size()) // symbol is smaller or equal to the current candidate symbol
@@ -90,9 +90,9 @@ namespace puq {
       if (munit.second.allowed_prefixes.size() > 0) {
         if (std::find(munit.second.allowed_prefixes.begin(), munit.second.allowed_prefixes.end(), bu.prefix) == munit.second.allowed_prefixes.end()) {
           std::stringstream ss;
-          ss << "Given prefix is not allowed in unit: " + expr_orig << std::endl;
+          ss << "Given prefix is not allowed in unit: " + expr_orig << '\n';
           ss << "Allowed prefixes are:";
-          for (auto prefix : munit.second.allowed_prefixes) {
+          for (auto& prefix : munit.second.allowed_prefixes) {
             ss << " " << prefix;
           }
           throw AtomParsingExcept(ss.str());
@@ -104,7 +104,7 @@ namespace puq {
     uv.baseunits.append(bu);
   }
 
-  UnitValue UnitAtom::from_string(std::string expr_orig) {
+  UnitValue UnitAtom::from_string(const std::string& expr_orig) {
     std::string expr = expr_orig;
     struct UnitValue uv;
     std::smatch m;

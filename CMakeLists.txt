@@ -50,15 +50,8 @@ include_directories(${GTEST_INCLUDE_DIRS})
 include(GoogleTest)
 enable_testing()
 
-# compile libraries and executables
-###################################
-
 message("Scientific Numerical Tools (SNT)")
 message("Code version: ${CODE_VERSION}")
-
-add_subdirectory(src)        # build dip-cpp library
-add_subdirectory(exec)       # build executables
-add_subdirectory(gtest)      # build gtest executable
 
 # enable clang-tidy during the compilation
 ##########################################
@@ -66,25 +59,26 @@ add_subdirectory(gtest)      # build gtest executable
 option(ENABLE_CLANG_TIDY "Run clang-tidy during build" OFF)
 if(ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY_COMMAND NAMES clang-tidy)
-    if(CLANG_TIDY_COMMAND)
-        set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND};-p=${CMAKE_BINARY_DIR}")
-
-        # Loop over all targets
-        get_property(ALL_TARGETS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
-        foreach(tgt IN LISTS ALL_TARGETS)
-            get_target_property(srcs ${tgt} SOURCES)
-            if(srcs)
-                add_test(
-                    NAME clang-tidy.${tgt}
-                    COMMAND ${CLANG_TIDY_COMMAND}
-                            --quiet
-                            ${srcs}
-                            -p=${CMAKE_BINARY_DIR}
-                )
-            endif()
-        endforeach()
+    if(NOT CLANG_TIDY_COMMAND)
+        message(FATAL_ERROR "clang-tidy not found!")
+    else()
+        message(STATUS "Running with clang-tidy")
     endif()
+
+    # This makes all targets run clang-tidy automatically during compilation
+    set(CMAKE_CXX_CLANG_TIDY	
+        ${CLANG_TIDY_COMMAND}
+        -p=${CMAKE_BINARY_DIR}
+        -checks=clang-analyzer-*,-clang-analyzer-cplusplus*,performance-*)
+	#,modernize-*,cppcoreguidelines-*)
 endif()
+
+# compile libraries and executables
+###################################
+
+add_subdirectory(src)        # build dip-cpp library
+add_subdirectory(exec)       # build executables
+add_subdirectory(gtest)      # build gtest executable
 
 # create cmake export files
 ###########################

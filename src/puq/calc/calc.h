@@ -26,7 +26,7 @@ namespace puq {
   public:
     CalculatorAtom(CalculatorAtom& a) : AtomBase(a) {};
     CalculatorAtom(Quantity v) : AtomBase(v) {};
-    static Quantity from_string(std::string s);
+    static Quantity from_string(std::string& s);
     std::string to_string();
     void math_add(CalculatorAtom* other);
     void math_subtract(CalculatorAtom* other);
@@ -39,7 +39,7 @@ namespace puq {
   public:
     std::unique_ptr<exs::Solver<CalculatorAtom>> solver;
     Calculator();
-    CalculatorAtom solve(std::string expression);
+    CalculatorAtom solve(const std::string& expression);
   };
 
 } // namespace puq
