@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
+#include <gtest/gtest.h>
 
 #include "../../src/dip/dip.h"
 #include "../../src/dip/environment.h"
@@ -21,20 +21,19 @@ TEST(ReferencesRaw, BooleanValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source "+source_name+" = "+source_filename.string());
-  d.add_string("snap bool[2,2] = {"+source_name+"}");
+  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("snap bool[2,2] = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
-  
+
   // remove temporary file
-  std::filesystem::remove(source_filename);  
+  std::filesystem::remove(source_filename);
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "snap");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[[true, false], [false, true]]");
-    
 }
 
 TEST(ReferencesRaw, IntegerValues) {
@@ -52,20 +51,19 @@ TEST(ReferencesRaw, IntegerValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source "+source_name+" = "+source_filename.string());
-  d.add_string("snap int[2,2] = {"+source_name+"}");
+  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("snap int[2,2] = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
-  
+
   // remove temporary file
-  std::filesystem::remove(source_filename);  
+  std::filesystem::remove(source_filename);
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "snap");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3, 4]]");
-    
 }
 
 TEST(ReferencesRaw, FloatValues) {
@@ -83,20 +81,19 @@ TEST(ReferencesRaw, FloatValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source "+source_name+" = "+source_filename.string());
-  d.add_string("snap float[2,2] = {"+source_name+"}");
+  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("snap float[2,2] = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
-  
+
   // remove temporary file
-  std::filesystem::remove(source_filename);  
+  std::filesystem::remove(source_filename);
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "snap");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[[1.0000, 2.0000], [3.4500, 4.5600e+07]]");
-    
 }
 
 TEST(ReferencesRaw, StringValues) {
@@ -114,20 +111,19 @@ TEST(ReferencesRaw, StringValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source "+source_name+" = "+source_filename.string());
-  d.add_string("snap str[2,2] = {"+source_name+"}");
+  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("snap str[2,2] = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
-  
+
   // remove temporary file
-  std::filesystem::remove(source_filename);  
+  std::filesystem::remove(source_filename);
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "snap");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[['jerk', 'snap'], ['crackle', 'pop']]");
-    
 }
 
 TEST(ReferencesRaw, TableNodes) {
@@ -150,13 +146,13 @@ TEST(ReferencesRaw, TableNodes) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source "+source_name+" = "+source_filename.string());
-  d.add_string("snap table = {"+source_name+"}");
+  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("snap table = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
-  
+
   // remove temporary file
-  std::filesystem::remove(source_filename);  
+  std::filesystem::remove(source_filename);
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "snap.bar");
@@ -168,6 +164,5 @@ TEST(ReferencesRaw, TableNodes) {
   EXPECT_EQ(node->name, "snap.baz");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "[true, false]");  
-    
+  EXPECT_EQ(vnode->value->to_string(), "[true, false]");
 }

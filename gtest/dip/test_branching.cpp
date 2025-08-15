@@ -18,7 +18,6 @@ TEST(Branchig, FirstCase) {
   EXPECT_EQ(env.nodes.size(), 1);
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "age");
-
 }
 
 TEST(Branchig, SecondCase) {
@@ -36,7 +35,6 @@ TEST(Branchig, SecondCase) {
   EXPECT_EQ(env.nodes.size(), 1);
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "height");
-
 }
 
 TEST(Branchig, FirstAndSecondCase) {
@@ -54,11 +52,10 @@ TEST(Branchig, FirstAndSecondCase) {
   EXPECT_EQ(env.nodes.size(), 1);
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "age");
-
 }
 
 TEST(Branchig, ElseCase) {
-  
+
   dip::DIP d;
   d.add_string("@case false");
   d.add_string("  age int = 30");
@@ -71,7 +68,6 @@ TEST(Branchig, ElseCase) {
   EXPECT_EQ(env.nodes.size(), 1);
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "weight");
-  
 }
 
 TEST(Branchig, ConsecutiveBranches) {
@@ -93,7 +89,6 @@ TEST(Branchig, ConsecutiveBranches) {
   EXPECT_EQ(node->name, "age");
   node = env.nodes.at(1);
   EXPECT_EQ(node->name, "weight");
-
 }
 
 TEST(Branchig, LowerIndentClosing) {
@@ -122,7 +117,6 @@ TEST(Branchig, LowerIndentClosing) {
   EXPECT_EQ(node->name, "man.age");
   node = env.nodes.at(2);
   EXPECT_EQ(node->name, "weight");
-
 }
 
 TEST(Branchig, NestedBranches) {
@@ -131,7 +125,7 @@ TEST(Branchig, NestedBranches) {
   d.add_string("man");
   d.add_string("  @case true");
   d.add_string("    @case true");
-  d.add_string("      age int = 30");     // this is taken
+  d.add_string("      age int = 30"); // this is taken
   d.add_string("    @else");
   d.add_string("      weight float = 80");
   d.add_string("  @else");
@@ -139,12 +133,12 @@ TEST(Branchig, NestedBranches) {
   d.add_string("  @end");
   d.add_string("@case false");
   d.add_string("  @case true");
-  d.add_string("    age int = 30");       // this should be ignored
+  d.add_string("    age int = 30"); // this should be ignored
   d.add_string("  @else");
   d.add_string("    weight float = 80");
   d.add_string("@else");
   d.add_string("  @case true");
-  d.add_string("    weight float = 40");  // this is taken
+  d.add_string("    weight float = 40"); // this is taken
   d.add_string("  @else");
   d.add_string("    human bool = true");
   d.add_string("@end");
@@ -153,6 +147,5 @@ TEST(Branchig, NestedBranches) {
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "man.age");
   node = env.nodes.at(1);
-  EXPECT_EQ(node->name, "weight");          
-  
+  EXPECT_EQ(node->name, "weight");
 }

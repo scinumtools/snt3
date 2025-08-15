@@ -1,6 +1,6 @@
-#include <gtest/gtest.h> 
-#include <fstream>
 #include <filesystem>
+#include <fstream>
+#include <gtest/gtest.h>
 
 #include "../../src/dip/dip.h"
 #include "../../src/dip/environment.h"
@@ -14,19 +14,18 @@ TEST(ValueSlicing, FixedRanges) {
   d.add_string("pop int[2,2] = {?snap}[0:1,0:1]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 3);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(1);
   EXPECT_EQ(node->name, "crackle");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[5, 6]");
-    
+
   node = env.nodes.at(2);
   EXPECT_EQ(node->name, "pop");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [4, 5]]");
-    
 }
 
 TEST(ValueSlicing, OpenRangesBoolean) {
@@ -36,13 +35,12 @@ TEST(ValueSlicing, OpenRangesBoolean) {
   d.add_string("crackle bool[3] = {?snap}[0,:]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(1);
   EXPECT_EQ(node->name, "crackle");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[true, false, true]");
-    
 }
 
 TEST(ValueSlicing, OpenRangesInteger) {
@@ -52,13 +50,12 @@ TEST(ValueSlicing, OpenRangesInteger) {
   d.add_string("crackle int[3] = {?snap}[0,:]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(1);
   EXPECT_EQ(node->name, "crackle");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[1, 2, 3]");
-    
 }
 
 TEST(ValueSlicing, OpenRangesFloat) {
@@ -68,13 +65,12 @@ TEST(ValueSlicing, OpenRangesFloat) {
   d.add_string("crackle float[3] = {?snap}[0,:]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(1);
   EXPECT_EQ(node->name, "crackle");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[1.0000, 2.0000, 3.0000]");
-    
 }
 
 TEST(ValueSlicing, OpenRangesString) {
@@ -84,13 +80,12 @@ TEST(ValueSlicing, OpenRangesString) {
   d.add_string("crackle str[3] = {?snap}[0,:]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(1);
   EXPECT_EQ(node->name, "crackle");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "['a', 'b', 'c']");
-    
 }
 
 TEST(ValueSlicing, ArrayToScalar) {
@@ -100,11 +95,10 @@ TEST(ValueSlicing, ArrayToScalar) {
   d.add_string("crackle int = {?snap}[1,0]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(1);
   EXPECT_EQ(node->name, "crackle");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "4");
-    
 }

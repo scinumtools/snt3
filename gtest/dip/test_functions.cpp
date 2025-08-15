@@ -20,16 +20,16 @@ val::BaseValue::PointerType get_scalar_string(const dip::Environment& env) {
 
 // array values
 val::BaseValue::PointerType get_array_boolean(const dip::Environment& env) {
-  return val::create_array_value<bool>({false,true,false});
+  return val::create_array_value<bool>({false, true, false});
 }
 val::BaseValue::PointerType get_array_integer(const dip::Environment& env) {
-  return val::create_array_value<int>({2,3,4,5},{2,2});
+  return val::create_array_value<int>({2, 3, 4, 5}, {2, 2});
 }
 val::BaseValue::PointerType get_array_double(const dip::Environment& env) {
-  return val::create_array_value<double>({2.34e5,3.45e6,4.56e7});
+  return val::create_array_value<double>({2.34e5, 3.45e6, 4.56e7});
 }
 val::BaseValue::PointerType get_array_string(const dip::Environment& env) {
-  return val::create_array_value<std::string>({"foo","bar","baz"});
+  return val::create_array_value<std::string>({"foo", "bar", "baz"});
 }
 
 TEST(Functions, BooleanValues) {
@@ -42,7 +42,7 @@ TEST(Functions, BooleanValues) {
   d.add_string("bar bool[3] = (array_value)");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "foo");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
@@ -54,7 +54,6 @@ TEST(Functions, BooleanValues) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(1));
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[false, true, false]");
-
 }
 
 TEST(Functions, IntegerValues) {
@@ -79,7 +78,6 @@ TEST(Functions, IntegerValues) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[[2, 3], [4, 5]]");
-  
 }
 
 TEST(Functions, FloatValues) {
@@ -104,7 +102,6 @@ TEST(Functions, FloatValues) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[2.3400e+05, 3.4500e+06, 4.5600e+07]");
-    
 }
 
 TEST(Functions, StringValues) {
@@ -117,7 +114,7 @@ TEST(Functions, StringValues) {
   d.add_string("bar str[3] = (array_value)");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "foo");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
@@ -129,7 +126,6 @@ TEST(Functions, StringValues) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "['foo', 'bar', 'baz']");
-  
 }
 
 TEST(Functions, ExceptionDataType) {
@@ -146,7 +142,6 @@ TEST(Functions, ExceptionDataType) {
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
-
 }
 
 TEST(Functions, ExceptionDimension) {
@@ -163,24 +158,23 @@ TEST(Functions, ExceptionDimension) {
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
-
 }
 
 dip::BaseNode::NodeListType get_scalar_nodes(const dip::Environment& env) {
   return {
-    dip::create_scalar_node<bool>("scalar_bool", false),
-    dip::create_scalar_node<int>("scalar_int", 1),
-    dip::create_scalar_node<double>("scalar_double", 2.34e5),
-    dip::create_scalar_node<std::string>("scalar_str", "baz_value"),
+      dip::create_scalar_node<bool>("scalar_bool", false),
+      dip::create_scalar_node<int>("scalar_int", 1),
+      dip::create_scalar_node<double>("scalar_double", 2.34e5),
+      dip::create_scalar_node<std::string>("scalar_str", "baz_value"),
   };
 }
 
 dip::BaseNode::NodeListType get_array_nodes(const dip::Environment& env) {
   return {
-    dip::create_array_node<bool>("array_bool", {false,true,false}),
-    dip::create_array_node<int>("array_int", {1,2,3,4}, {2,2}),
-    dip::create_array_node<double>("array_double", {2.34e5, 3.45e6, 4.56e7}),
-    dip::create_array_node<std::string>("array_str", {"foo","bar","baz"}),
+      dip::create_array_node<bool>("array_bool", {false, true, false}),
+      dip::create_array_node<int>("array_int", {1, 2, 3, 4}, {2, 2}),
+      dip::create_array_node<double>("array_double", {2.34e5, 3.45e6, 4.56e7}),
+      dip::create_array_node<std::string>("array_str", {"foo", "bar", "baz"}),
   };
 }
 
@@ -193,7 +187,7 @@ TEST(Functions, TableNodes) {
   d.add_string("bar table = (array_nodes)");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 8);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "foo.scalar_bool");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
@@ -241,7 +235,6 @@ TEST(Functions, TableNodes) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "['foo', 'bar', 'baz']");
-
 }
 
 TEST(Functions, ImportNodes) {
@@ -254,7 +247,7 @@ TEST(Functions, ImportNodes) {
   d.add_string("bar (array_nodes)");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 8);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "foo.scalar_bool");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
@@ -302,5 +295,4 @@ TEST(Functions, ImportNodes) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "['foo', 'bar', 'baz']");
-
 }

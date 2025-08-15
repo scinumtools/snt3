@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
+#include <gtest/gtest.h>
 
 #include "../../src/dip/dip.h"
 #include "../../src/dip/environment.h"
@@ -18,10 +18,10 @@ TEST(SourceList, KeywordSourceCode) {
     ASSERT_TRUE(source_file.is_open()) << "Failed to create temp file.";
     source_file << source_code;
   }
-  
+
   // load a DIP file as a source
   dip::DIP d;
-  d.add_string("$source "+source_name+" = "+source_filename.string());
+  d.add_string("$source " + source_name + " = " + source_filename.string());
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 0);
 
@@ -46,7 +46,6 @@ TEST(SourceList, KeywordSourceCode) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "false");
-
 }
 
 TEST(SourceList, KeywordSourceText) {
@@ -61,10 +60,10 @@ TEST(SourceList, KeywordSourceText) {
     ASSERT_TRUE(source_file.is_open()) << "Failed to create temp file.";
     source_file << source_code;
   }
-  
+
   // load a DIP file as a source
   dip::DIP d;
-  d.add_string("$source "+source_name+" = "+source_filename.string());
+  d.add_string("$source " + source_name + " = " + source_filename.string());
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 0);
 
@@ -77,7 +76,6 @@ TEST(SourceList, KeywordSourceText) {
   EXPECT_EQ(senv.code, source_code);
   EXPECT_FALSE(senv.parent.name.empty());
   EXPECT_EQ(senv.nodes.size(), 0);
-
 }
 
 TEST(SourceList, AddSourceCode) {
@@ -92,7 +90,7 @@ TEST(SourceList, AddSourceCode) {
     ASSERT_TRUE(source_file.is_open()) << "Failed to create temp file.";
     source_file << source_code;
   }
-  
+
   // load a DIP file as a source
   dip::DIP d;
   d.add_source(source_name, source_filename.string());
@@ -120,5 +118,4 @@ TEST(SourceList, AddSourceCode) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "false");
-
 }

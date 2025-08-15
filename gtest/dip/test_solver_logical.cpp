@@ -20,7 +20,6 @@ TEST(SolverLogical, AndOrNot) {
 
   atom = solver.eval("!false");
   EXPECT_EQ(atom.value->to_string(), "true");
-  
 }
 
 TEST(SolverLogical, BoolComparison) {
@@ -32,7 +31,6 @@ TEST(SolverLogical, BoolComparison) {
 
   atom = solver.eval("true != false");
   EXPECT_EQ(atom.value->to_string(), "true");
-  
 }
 
 TEST(SolverLogical, IntegerComparison) {
@@ -44,7 +42,7 @@ TEST(SolverLogical, IntegerComparison) {
 
   atom = solver.eval("2 != 3");
   EXPECT_EQ(atom.value->to_string(), "true");
-  
+
   atom = solver.eval("2 > 3");
   EXPECT_EQ(atom.value->to_string(), "false");
 
@@ -56,7 +54,6 @@ TEST(SolverLogical, IntegerComparison) {
 
   atom = solver.eval("2 <= 2");
   EXPECT_EQ(atom.value->to_string(), "true");
-
 }
 
 TEST(SolverLogical, FloatComparison) {
@@ -68,7 +65,6 @@ TEST(SolverLogical, FloatComparison) {
 
   atom = solver.eval("2.00e3 != 2000.");
   EXPECT_EQ(atom.value->to_string(), "false");
-  
 }
 
 TEST(SolverLogical, StringComparison) {
@@ -80,7 +76,6 @@ TEST(SolverLogical, StringComparison) {
 
   atom = solver.eval("'foo' != 'foo'");
   EXPECT_EQ(atom.value->to_string(), "false");
-  
 }
 
 TEST(SolverLogical, CombinedExpressions) {
@@ -92,5 +87,4 @@ TEST(SolverLogical, CombinedExpressions) {
 
   atom = solver.eval("( true && 2 != 3 ) || false || 2.3 > 4.3");
   EXPECT_EQ(atom.value->to_string(), "true");
-  
 }

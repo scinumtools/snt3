@@ -7,8 +7,8 @@
 TEST(Modifications, DataTypeNode) {
 
   dip::DIP d;
-  d.add_string("foo int = 2"); 
-  d.add_string("foo int32 = 3"); 
+  d.add_string("foo int = 2");
+  d.add_string("foo int32 = 3");
   dip::Environment env = d.parse();
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
@@ -20,14 +20,13 @@ TEST(Modifications, DataTypeNode) {
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
   EXPECT_EQ(vnode->value->to_string(), "3");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
-  
 }
-  
+
 TEST(Modifications, ModificationNode) {
 
   dip::DIP d;
-  d.add_string("foo int = 2"); 
-  d.add_string("foo = 3"); 
+  d.add_string("foo int = 2");
+  d.add_string("foo = 3");
   dip::Environment env = d.parse();
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
@@ -42,7 +41,7 @@ TEST(Modifications, ModificationNode) {
 
   // in case modified node was not defined throw an exception
   d = dip::DIP();
-  d.add_string("foo = 3"); 
+  d.add_string("foo = 3");
   try {
     d.parse();
     FAIL() << "Expected std::runtime_error";
@@ -51,16 +50,15 @@ TEST(Modifications, ModificationNode) {
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
-  
 }
 
 TEST(Modifications, Declarations) {
 
   dip::DIP d;
-  d.add_string("foo int"); 
-  d.add_string("foo = 3"); 
+  d.add_string("foo int");
+  d.add_string("foo = 3");
   dip::Environment env = d.parse();
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->value_raw.at(0), "3");
   EXPECT_EQ(node->dtype, dip::NodeDtype::Integer);
@@ -82,5 +80,4 @@ TEST(Modifications, Declarations) {
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
- 
 }

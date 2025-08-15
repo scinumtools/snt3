@@ -16,7 +16,7 @@ TEST(Expressions, Logical) {
   d.add_string("pop bool = ('{?jerk} || {?snap} == {?crackle}')");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 6);
-  
+
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "foo");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
@@ -34,5 +34,4 @@ TEST(Expressions, Logical) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "true");
-
 }
