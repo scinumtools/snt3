@@ -64,10 +64,10 @@ namespace puq {
     BaseUnits() {}
     BaseUnits(const std::string& s);
     BaseUnits(const BaseUnitsList& bu) : baseunits(bu) {}
-    void append(BaseUnit bu);
-    void append(std::string p, std::string u, EXPONENT_TYPE e);
+    void append(const BaseUnit& bu);
+    void append(const std::string& p, const std::string& u, EXPONENT_TYPE e);
 #ifdef EXPONENT_FRACTIONS
-    void append(std::string p, std::string u, EXPONENT_INT_PRECISION n, EXPONENT_INT_PRECISION d);
+    void append(const std::string& p, const std::string& u, EXPONENT_INT_PRECISION n, EXPONENT_INT_PRECISION d);
 #endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     const BaseUnit& operator[](int index) const;

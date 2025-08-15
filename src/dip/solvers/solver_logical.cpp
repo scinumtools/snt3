@@ -11,7 +11,7 @@ namespace dip {
     return *this;
   }
 
-  val::BaseValue::PointerType LogicalAtom::from_string(std::string s, LogicalSettings* settings) {
+  val::BaseValue::PointerType LogicalAtom::from_string(const std::string& s, LogicalSettings* settings) {
     Parser parser({s, {"LOGICAL_ATOM", 0}});
     if (parser.part_reference()) {
       val::BaseValue::PointerType value =

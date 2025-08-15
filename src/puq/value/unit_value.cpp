@@ -25,7 +25,7 @@ namespace puq {
   UnitValue::UnitValue(const MAGNITUDE_TYPE& m, const Dimensions& dim) {
     magnitude = m * dim.numerical;
     for (int i = 0; i < NUM_BASEDIM; i++) {
-      std::string symbol = SystemData::BaseUnitOrder[i];
+      const std::string& symbol = SystemData::BaseUnitOrder[i];
       baseunits.append("", symbol, dim.physical[i]);
     }
   }
@@ -269,7 +269,7 @@ namespace puq {
   UnitValue UnitValue::rebase_prefixes() {
     MAGNITUDE_TYPE mag = magnitude;
     std::map<std::string, BaseUnit> bumap;
-    for (auto bu : baseunits) {
+    for (const auto& bu : baseunits) {
       if (bumap.find(bu.unit) == bumap.end()) {
         bumap.insert({bu.unit, {bu.prefix, bu.unit, bu.exponent}});
       } else {
@@ -283,7 +283,7 @@ namespace puq {
       }
     }
     BaseUnits bus;
-    for (auto bum : bumap) {
+    for (const auto& bum : bumap) {
       bus.append(bum.second);
     }
     return UnitValue(mag, bus);
@@ -292,7 +292,7 @@ namespace puq {
   UnitValue UnitValue::rebase_dimensions() {
     MAGNITUDE_TYPE mag = magnitude;
     std::map<std::string, BaseUnit> bumap;
-    for (auto bu : baseunits) {
+    for (const auto& bu : baseunits) {
       Dimensions dim = BaseUnits(bu.prefix + bu.unit).dimensions();
       if ((dim.utype & Utype::LOG) == Utype::LOG)
         throw UnitValueExcept("Dimensions of logarithmic units cannot be rebased: " + baseunits.to_string());
@@ -308,7 +308,7 @@ namespace puq {
       }
     }
     BaseUnits bus;
-    for (auto bum : bumap) {
+    for (const auto& bum : bumap) {
       bus.append(bum.second);
     }
     return UnitValue(mag, bus);

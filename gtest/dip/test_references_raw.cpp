@@ -136,11 +136,11 @@ TEST(ReferencesRaw, TableNodes) {
   std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
   std::filesystem::path source_filename = temp_dir / "example_raw_file.txt";
   std::ostringstream source_code;
-  source_code << "bar int" << std::endl;
-  source_code << "baz bool" << std::endl;
-  source_code << "---" << std::endl;
-  source_code << "1 true" << std::endl;
-  source_code << "2 false" << std::endl;
+  source_code << "bar int" << '\n';
+  source_code << "baz bool" << '\n';
+  source_code << "---" << '\n';
+  source_code << "1 true" << '\n';
+  source_code << "2 false" << '\n';
   std::string source_name = "foo_source";
   {
     std::ofstream source_file(source_filename);

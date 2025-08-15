@@ -22,7 +22,7 @@ namespace dip {
     LogicalAtom(LogicalAtom&& a) noexcept = default;
     LogicalAtom& operator=(LogicalAtom&& a) noexcept = default;
 
-    static val::BaseValue::PointerType from_string(std::string s, LogicalSettings* settings);
+    static val::BaseValue::PointerType from_string(const std::string& s, LogicalSettings* settings);
     std::string to_string();
     void comparison_equal(LogicalAtom* other);
     void comparison_not_equal(LogicalAtom* other);

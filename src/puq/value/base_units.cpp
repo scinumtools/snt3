@@ -24,7 +24,7 @@ namespace puq {
     return ss.str();
   }
 
-  void BaseUnits::append(BaseUnit bu) {
+  void BaseUnits::append(const BaseUnit& bu) {
     bool exists = false;
     for (auto it = baseunits.begin(); it != baseunits.end(); ++it) {
       if (it->prefix == bu.prefix && it->unit == bu.unit) {
@@ -42,12 +42,12 @@ namespace puq {
     }
   }
 
-  void BaseUnits::append(std::string p, std::string u, EXPONENT_TYPE e) {
+  void BaseUnits::append(const std::string& p, const std::string& u, EXPONENT_TYPE e) {
     append(BaseUnit(p, u, e));
   }
 
 #ifdef EXPONENT_FRACTIONS
-  void BaseUnits::append(std::string p, std::string u, EXPONENT_INT_PRECISION n, EXPONENT_INT_PRECISION d) {
+  void BaseUnits::append(const std::string& p, const std::string& u, EXPONENT_INT_PRECISION n, EXPONENT_INT_PRECISION d) {
     append(BaseUnit(p, u, n, d));
   }
 #endif
@@ -74,7 +74,7 @@ namespace puq {
     return nbu;
   }
   void BaseUnits::operator+=(const BaseUnits& bu) {
-    for (auto unit : bu) {
+    for (const auto& unit : bu) {
       append(unit);
     }
   }

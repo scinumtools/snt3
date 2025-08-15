@@ -62,7 +62,7 @@ namespace dip {
   val::BaseValue::PointerType BooleanNode::cast_array_value(const Array::StringType& value_inputs,
                                                             const Array::ShapeType& shape) const {
     std::vector<bool> bool_values;
-    for (auto value : value_inputs) {
+    for (const auto& value : value_inputs) {
       if (value == snt::KEYWORD_TRUE)
         bool_values.push_back(true);
       else if (value == snt::KEYWORD_FALSE)

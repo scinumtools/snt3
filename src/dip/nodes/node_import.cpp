@@ -30,7 +30,7 @@ namespace dip {
       throw std::runtime_error("Import nodes could not be parsed: " + line.code);
     }
     // update node settings
-    for (auto node : nodes) {
+    for (const auto& node : nodes) {
       int size = node->value_raw.size();
       node->indent += indent;
       if (!name.empty())

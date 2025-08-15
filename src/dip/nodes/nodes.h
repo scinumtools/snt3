@@ -212,7 +212,7 @@ namespace dip {
     val::BaseValue::PointerType cast_value(Array::StringType& value_input,
                                            const Array::ShapeType& shape);
     void set_value(val::BaseValue::PointerType value_input = nullptr);
-    void modify_value(BaseNode::PointerType node, Environment& env);
+    void modify_value(const BaseNode::PointerType& node, Environment& env);
     virtual BaseNode::PointerType clone(const std::string& nm) const = 0;
     virtual bool set_property(PropertyType property, Array::StringType& values,
                               std::string& units) override;

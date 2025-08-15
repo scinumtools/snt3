@@ -26,7 +26,7 @@ namespace puq {
     solver = std::make_unique<exs::Solver<UnitAtom>>(operators, steps);
   }
 
-  UnitAtom UnitSolver::solve(std::string expression) {
+  UnitAtom UnitSolver::solve(const std::string& expression) {
 #ifdef DEBUG_UNIT_SOLVER
     std::clog << "UNIT:  Solving: " << expression << std::endl;
 #endif

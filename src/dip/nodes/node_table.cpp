@@ -45,7 +45,7 @@ namespace dip {
       throw std::runtime_error("Table nodes could not be parsed: " + line.code);
     }
     // update node settings
-    for (auto node : nodes) {
+    for (const auto& node : nodes) {
       int size = node->value_raw.size();
       node->indent += indent;
       node->name = name + std::string(1, SIGN_SEPARATOR) + node->name;
@@ -57,7 +57,7 @@ namespace dip {
   }
 
   bool TableNode::set_property(PropertyType property, Array::StringType& values, std::string& units) {
-    std::string delimiter_raw = values.at(0);
+    const std::string& delimiter_raw = values.at(0);
     if (property == PropertyType::Delimiter and !delimiter_raw.empty()) {
       delimiter = delimiter_raw[0];
       return true;

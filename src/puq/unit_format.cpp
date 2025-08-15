@@ -16,9 +16,9 @@ namespace puq {
   };
 
   const std::unordered_map<std::string, std::string> UnitFormat::symbol_map = {
-      {SYMBOL_EXPONENT2, SYMBOL_EXPONENT}, // ×10 -> e
-      {SYMBOL_MINUS2, SYMBOL_MINUS},       // −   -> -
-      {SYMBOL_MULTIPLY2, SYMBOL_MULTIPLY}, // ⋅   -> *
+    {SYMBOL_EXPONENT2, std::string(1, SYMBOL_EXPONENT)}, // ×10 -> e
+    {SYMBOL_MINUS2, SYMBOL_MINUS},       // −   -> -
+    {SYMBOL_MULTIPLY2, SYMBOL_MULTIPLY}, // ⋅   -> *
   };
 
   bool UnitFormat::preprocess_system(std::string& expression, const std::string& abbrev) {
@@ -39,7 +39,7 @@ namespace puq {
 
   void UnitFormat::preprocess_symbols(std::string& expression) {
     // convert superscripts
-    for (auto item : UnitFormat::superscript_map) {
+    for (const auto& item : UnitFormat::superscript_map) {
       if (item.second == "")
         continue;
       size_t pos = expression.find(item.second);
@@ -50,7 +50,7 @@ namespace puq {
       }
     }
     // convert mathematical symbols
-    for (auto item : UnitFormat::symbol_map) {
+    for (const auto& item : UnitFormat::symbol_map) {
       size_t pos = expression.find(item.first);
       while (pos != std::string::npos) {
         expression.replace(pos, item.first.size(), item.second);
@@ -93,7 +93,7 @@ namespace puq {
     if (math == Format::Math::UNICODE || math == Format::Math::HTML) {
       size_t pos = expression.find(SYMBOL_EXPONENT);
       if (pos != std::string::npos) {
-        std::string exponent_str = expression.substr(pos + std::string(SYMBOL_EXPONENT).size(), expression.size());
+        std::string exponent_str = expression.substr(pos + std::string(1,SYMBOL_EXPONENT).size(), expression.size());
         expression = expression.substr(0, pos) + std::string(SYMBOL_EXPONENT2) + format_exponents(exponent_str);
       }
     }

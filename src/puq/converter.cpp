@@ -38,7 +38,7 @@ namespace puq {
   inline MAGNITUDE_TYPE _convert_Mo_Mw(const MAGNITUDE_TYPE& value) {
     return 2. / 3. * nostd::log10(value) - (MAGNITUDE_TYPE)10.7;
   }
-  MAGNITUDE_TYPE Converter::_convert_logarithmic(MAGNITUDE_TYPE m) {
+  MAGNITUDE_TYPE Converter::_convert_logarithmic(const MAGNITUDE_TYPE& m) {
     const std::string s1 = baseunits1[0].unit;
     const std::string s2 = baseunits2[0].unit;
     const MAGNITUDE_TYPE n1 = dimensions1.numerical;

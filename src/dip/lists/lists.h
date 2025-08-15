@@ -21,8 +21,8 @@ namespace dip {
     NodeList() {};
     NodeList(const BaseNode::NodeListType& nl) : nodes(nl) {};
     size_t size() const;
-    void push_front(BaseNode::PointerType node);
-    void push_back(BaseNode::PointerType node);
+    void push_front(const BaseNode::PointerType& node);
+    void push_back(const BaseNode::PointerType& node);
     BaseNode::PointerType pop_front();
     BaseNode::PointerType pop_back();
     BaseNode::PointerType at(const size_t index);
@@ -86,7 +86,7 @@ namespace dip {
     std::vector<Parent> parents;
 
   public:
-    void record(BaseNode::PointerType node, const std::vector<NodeDtype>& excluded);
+    void record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded);
   };
 
   // Branching list
@@ -125,8 +125,8 @@ namespace dip {
     BranchingList() : num_cases(0), num_branches(0) {};
     int register_case();
     bool false_case();
-    void solve_case(BaseNode::PointerType node);
-    void prepare_node(BaseNode::PointerType node);
+    void solve_case(const BaseNode::PointerType& node);
+    void prepare_node(const BaseNode::PointerType& node);
     std::string clean_name(const std::string& node);
   };
 

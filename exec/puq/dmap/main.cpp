@@ -70,7 +70,7 @@ bool solve_bu_unit(puq::DimensionMapType& dmap, puq::Dimensions& dim, puq::BaseU
 }
 
 inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq::UnitSolver& solver) {
-  for (auto unit : puq::UnitSystem::Data->UnitList) {
+  for (const auto& unit : puq::UnitSystem::Data->UnitList) {
     if (dmap.find(unit.first) != dmap.end())
       continue;
     if ((unit.second.utype & puq::Utype::BAS) == puq::Utype::BAS)
@@ -101,8 +101,8 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
 }
 
 inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap, puq::UnitSolver& solver) {
-  std::cout << "Solving " << puq::UnitSystem::Data->SystemAbbrev << " system" << std::endl;
-  for (auto quant : puq::UnitSystem::Data->QuantityList) {
+  std::cout << "Solving " << puq::UnitSystem::Data->SystemAbbrev << " system" << '\n';
+  for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
     // solve a quantity definition
     puq::UnitAtom atom = solver.solve(quant.second.definition);
     puq::Dimensions dim(atom.value.magnitude);
@@ -155,12 +155,12 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
   }
 }
 
-void create_map(const std::string file_header) {
+void create_map(const std::string& file_header) {
   puq::UnitSolver solver;
   puq::DimensionMapType dmap;
   std::stringstream ss;
   // add dimension of base units
-  for (auto d : puq::SystemData::_BASE_MAP) {
+  for (const auto& d : puq::SystemData::_BASE_MAP) {
     dmap.insert(d);
     puq::Dimensions dim(d.second.magnitude, d.second.dimensions);
     std::string name;
@@ -186,21 +186,21 @@ void create_map(const std::string file_header) {
   std::time_t now_time = std::chrono::system_clock::to_time_t(now);
   std::ofstream fs;
   fs.open(file_header, std::ios::out | std::ios::trunc);
-  fs << "/*" << std::endl;
-  fs << " * Do not modify this file!" << std::endl;
-  fs << " * This file can be updated using 'dmap' executable." << std::endl;
-  fs << " * " << std::endl;
-  fs << " * Unit system:  " << puq::UnitSystem::Data->SystemName << " (" << puq::UnitSystem::Data->SystemAbbrev << ")" << std::endl;
+  fs << "/*" << '\n';
+  fs << " * Do not modify this file!" << '\n';
+  fs << " * This file can be updated using 'dmap' executable." << '\n';
+  fs << " * " << '\n';
+  fs << " * Unit system:  " << puq::UnitSystem::Data->SystemName << " (" << puq::UnitSystem::Data->SystemAbbrev << ")" << '\n';
   fs << " * Last update:  " << std::ctime(&now_time);
-  fs << " * Code version: " << CODE_VERSION << std::endl;
-  fs << " * " << std::endl;
-  fs << " * Symbol legend:" << std::endl;
-  fs << " * ..    units" << std::endl;
-  fs << " * [..]  constants" << std::endl;
-  fs << " * [#..] collapsed constants" << std::endl;
-  fs << " * <..>  quantities" << std::endl;
-  fs << " * |..|  quantity SI conversion factors" << std::endl;
-  fs << " */" << std::endl;
+  fs << " * Code version: " << CODE_VERSION << '\n';
+  fs << " * " << '\n';
+  fs << " * Symbol legend:" << '\n';
+  fs << " * ..    units" << '\n';
+  fs << " * [..]  constants" << '\n';
+  fs << " * [#..] collapsed constants" << '\n';
+  fs << " * <..>  quantities" << '\n';
+  fs << " * |..|  quantity SI conversion factors" << '\n';
+  fs << " */" << '\n';
   fs << ss.str();
   fs.close();
 }
@@ -237,7 +237,7 @@ int main(int argc, char* argv[]) {
 
   InputParser input(argc, argv);
 
-  std::cout << "Generating dimension maps:" << std::endl;
+  std::cout << "Generating dimension maps:" << '\n';
   for (auto sys : puq::SystemMap) {
     std::string file_header = "src/systems/dmaps/dmap_" + sys.second->SystemAbbrev + ".h";
     if (input.cmdOptionExists("-e")) {
@@ -245,11 +245,11 @@ int main(int argc, char* argv[]) {
       fs.open(file_header, std::ios::out | std::ios::trunc);
       fs << "// Empty file";
       fs.close();
-      std::cout << "Generating empty dmap file: " << file_header << std::endl;
+      std::cout << "Generating empty dmap file: " << file_header << '\n';
     } else {
       puq::UnitSystem us(sys.first);
       create_map(file_header);
-      std::cout << "Generating dmap file: " << file_header << std::endl;
+      std::cout << "Generating dmap file: " << file_header << '\n';
     }
   }
 }

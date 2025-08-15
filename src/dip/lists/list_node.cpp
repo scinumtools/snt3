@@ -6,11 +6,11 @@ namespace dip {
     return nodes.size();
   }
 
-  void NodeList::push_front(BaseNode::PointerType node) {
+  void NodeList::push_front(const BaseNode::PointerType& node) {
     nodes.push_front(node);
   }
 
-  void NodeList::push_back(BaseNode::PointerType node) {
+  void NodeList::push_back(const BaseNode::PointerType& node) {
     nodes.push_back(node);
   }
 

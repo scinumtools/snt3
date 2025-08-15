@@ -77,27 +77,27 @@ namespace dip {
     case val::DataType::Float32: {
       std::vector<float> arr;
       arr.reserve(value_inputs.size());
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         arr.push_back(std::stof(s));
       return std::make_unique<val::ArrayValue<float>>(arr, shape);
     }
     case val::DataType::Float64: {
       std::vector<double> arr;
       arr.reserve(value_inputs.size());
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         arr.push_back(std::stod(s));
       return std::make_unique<val::ArrayValue<double>>(arr, shape);
     }
     case val::DataType::Float128: {
       std::vector<long double> arr;
       arr.reserve(value_inputs.size());
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         arr.push_back(std::stold(s));
       return std::make_unique<val::ArrayValue<long double>>(arr, shape);
     }
     default:
       std::ostringstream oss;
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         oss << s;
       throw std::runtime_error("Value cannot be casted as " + dtype_raw[2] +
                                " bit floating-point type from the given string: " + oss.str());

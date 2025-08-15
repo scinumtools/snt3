@@ -5,7 +5,7 @@
 
 namespace dip {
 
-  void HierarchyList::record(BaseNode::PointerType node, const std::vector<NodeDtype>& excluded) {
+  void HierarchyList::record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded) {
     if (node->name == "")
       return;
     for (auto dtype : excluded)
@@ -21,7 +21,7 @@ namespace dip {
     // set node name according to the hierarchy
     if (parents.size() > 1) {
       std::stringstream ss;
-      for (auto parent : parents)
+      for (const auto& parent : parents)
         ss << parent.name << SIGN_SEPARATOR;
       node->name = ss.str();
       node->name = node->name.substr(0, node->name.size() - 1);

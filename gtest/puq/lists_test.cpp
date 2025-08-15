@@ -5,7 +5,7 @@
 #include "../../src/puq/value/value.h"
 #include "../../src/puq/solver/solver.h"
 
-inline void check_symbol(std::set<std::string>& set, std::string symbol) {
+inline void check_symbol(std::set<std::string>& set, const std::string& symbol) {
   auto result = set.insert(symbol);
   EXPECT_EQ(result.second, true) << "Duplicated symbol: "+symbol;
 }
@@ -14,23 +14,23 @@ void test_unit_symbols() {
   
   // unique prefixes
   std::set<std::string> prefixes;
-  for (auto prefix: puq::UnitPrefixList) {
+  for (const auto& prefix: puq::UnitPrefixList) {
     check_symbol(prefixes, prefix.first);
   }
   // unique unit symbols
   std::set<std::string> units;
-  for (auto unit: puq::UnitSystem::Data->UnitList) {
+  for (const auto& unit: puq::UnitSystem::Data->UnitList) {
     // unique unit symbol without a prefix
     check_symbol(units, unit.first);
     if (unit.second.use_prefixes) {
       if (unit.second.allowed_prefixes.size()>0) {
 	// unique symbols with allowed prefixes
-	for (auto& prefix: unit.second.allowed_prefixes) {
+	for (const auto& prefix: unit.second.allowed_prefixes) {
 	  check_symbol(units, std::string(prefix+unit.first));
 	}	
       } else {
 	// unique symbols with all prefixes
-	for (auto prefix: prefixes) {
+	for (const auto& prefix: prefixes) {
 	  check_symbol(units, std::string(prefix+unit.first));
 	}
       }
@@ -41,7 +41,7 @@ void test_unit_symbols() {
 
 void test_unit_definitions() {
   
-  for (auto unit: puq::UnitSystem::Data->UnitList) {
+  for (const auto& unit: puq::UnitSystem::Data->UnitList) {
     
     //std::cout << "hello " << unit.first << " " << std::bitset<8>((int)unit.second.utype) << std::endl;
     //if ((unit.second.utype & Utype::LIN)!=Utype::LIN) // check only linear units
@@ -88,7 +88,7 @@ void test_unit_definitions() {
 }
 
 void test_quantities() {
-  for (auto quantity: puq::UnitSystem::Data->QuantityList) {
+  for (const auto& quantity: puq::UnitSystem::Data->QuantityList) {
     
     // check if quantity symbol is in the quantity name list
     EXPECT_FALSE(puq::QuantityNames.find(quantity.first)==puq::QuantityNames.end())
@@ -114,7 +114,7 @@ void test_quantities() {
 TEST(Dmaps, QuantitySymbols) {
 
   std::set<std::string> quantities;
-  for (auto quantity: puq::QuantityNames) {
+  for (const auto& quantity: puq::QuantityNames) {
     check_symbol(quantities, quantity.first);
   }  
   

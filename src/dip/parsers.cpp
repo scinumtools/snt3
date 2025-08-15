@@ -173,7 +173,7 @@ namespace dip {
       for (size_t i = 0; i < nodes.size(); i++) {
         // parse delimiter
         if (i > 0) {
-          auto node = nodes.at(i - 1);
+          const auto& node = nodes.at(i - 1);
           if (node->value_raw.back().back() == delimiter) {
             // delimiter was parsed with the first value (e.g. if value was not given in
             // quote marks)
@@ -185,7 +185,7 @@ namespace dip {
           }
         }
         // parse a column value
-        auto node = nodes.at(i);
+        const auto& node = nodes.at(i);
         parser.value_raw.clear();
         if (parser.part_string()) {
           node->value_raw.push_back(parser.value_raw.at(0));

@@ -10,7 +10,7 @@
 #include "puq/quantity.h"
 #include "puq/systems/systems.h"
 
-void display_info(std::string expr);
+void display_info(const std::string& expr);
 void display_lists(std::deque<std::string>& convert);
 
 #endif // MAIN_H

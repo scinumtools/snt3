@@ -59,7 +59,7 @@ namespace puq {
           continue;
         if (unit.first == mgs || unit.first == mks || unit.first == cgs)
           continue;
-        if (unit.first[0] == SYMBOL_QUANTITY_START[0])
+        if (unit.first[0] == SYMBOL_QUANTITY_START)
           continue;
         tab.append({SystemMap[s1]->SystemAbbrev, unit.first,
                     UnitSystem::Data->UnitList.find(unit.first)->second.name});
@@ -70,7 +70,7 @@ namespace puq {
           continue;
         if (unit.first == mgs || unit.first == mks || unit.first == cgs)
           continue;
-        if (unit.first[0] == SYMBOL_QUANTITY_START[0])
+        if (unit.first[0] == SYMBOL_QUANTITY_START)
           continue;
         tab.append({SystemMap[s2]->SystemAbbrev, unit.first,
                     UnitSystem::Data->UnitList.find(unit.first)->second.name});
@@ -89,7 +89,7 @@ namespace puq {
                 continue;
               if (unit.first == mgs || unit.first == mks || unit.first == cgs)
                 continue;
-              if (unit.first[0] == SYMBOL_QUANTITY_START[0])
+              if (unit.first[0] == SYMBOL_QUANTITY_START)
                 continue;
               UnitStruct uinfo = UnitSystem::Data->UnitList[unit.first];
               if ((uinfo.utype & Utype::LOG) == Utype::LOG)
@@ -129,7 +129,7 @@ namespace puq {
     BaseUnits baseunits2;
     MAGNITUDE_TYPE _convert_linear(const MAGNITUDE_TYPE& m1, const MAGNITUDE_TYPE& m2);
 #ifdef UNITS_LOGARITHMIC
-    MAGNITUDE_TYPE _convert_logarithmic(MAGNITUDE_TYPE m);
+    MAGNITUDE_TYPE _convert_logarithmic(const MAGNITUDE_TYPE& m);
 #endif
 #ifdef UNITS_TEMPERATURES
     MAGNITUDE_TYPE _convert_temperature(MAGNITUDE_TYPE m);

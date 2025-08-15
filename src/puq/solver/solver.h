@@ -61,7 +61,7 @@ namespace puq {
   public:
     std::unique_ptr<exs::Solver<UnitAtom>> solver;
     UnitSolver();
-    UnitAtom solve(std::string expression);
+    UnitAtom solve(const std::string& expression);
   };
 
 } // namespace puq

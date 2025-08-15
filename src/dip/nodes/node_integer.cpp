@@ -94,48 +94,48 @@ namespace dip {
     case val::DataType::Integer16_U: {
       std::vector<uint16_t> arr;
       arr.reserve(value_inputs.size());
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         arr.push_back((unsigned short)std::stoul(s));
       return std::make_unique<val::ArrayValue<uint16_t>>(arr, shape);
     }
     case val::DataType::Integer16: {
       std::vector<int16_t> arr;
       arr.reserve(value_inputs.size());
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         arr.push_back((short)std::stoi(s));
       return std::make_unique<val::ArrayValue<int16_t>>(arr, shape);
     }
     case val::DataType::Integer32_U: {
       std::vector<uint32_t> arr;
       arr.reserve(value_inputs.size());
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         arr.push_back(std::stoul(s));
       return std::make_unique<val::ArrayValue<uint32_t>>(arr, shape);
     }
     case val::DataType::Integer32: {
       std::vector<int32_t> arr;
       arr.reserve(value_inputs.size());
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         arr.push_back(std::stoi(s));
       return std::make_unique<val::ArrayValue<int32_t>>(arr, shape);
     }
     case val::DataType::Integer64_U: {
       std::vector<uint64_t> arr;
       arr.reserve(value_inputs.size());
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         arr.push_back(std::stoull(s));
       return std::make_unique<val::ArrayValue<uint64_t>>(arr, shape);
     }
     case val::DataType::Integer64: {
       std::vector<int64_t> arr;
       arr.reserve(value_inputs.size());
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         arr.push_back(std::stoll(s));
       return std::make_unique<val::ArrayValue<int64_t>>(arr, shape);
     }
     default:
       std::ostringstream oss;
-      for (auto s : value_inputs)
+      for (const auto& s : value_inputs)
         oss << s;
       if (dtype_raw[0] == "u") {
         throw std::runtime_error("Value cannot be casted as unsigned " + dtype_raw[0] +

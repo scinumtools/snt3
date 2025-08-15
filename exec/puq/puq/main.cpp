@@ -86,7 +86,7 @@ void solve_expression(std::deque<std::string>& convert) {
   puq::Quantity q = calc.solve(expr1).value;
   if (convert[0] != "")
     convert_quantity(q, convert);
-  std::cout << q.to_string() << std::endl;
+  std::cout << q.to_string() << '\n';
 }
 
 void convert_units(std::deque<std::string>& convert) {
@@ -98,36 +98,36 @@ void convert_units(std::deque<std::string>& convert) {
   else
     q = puq::Quantity(expr1, sys1);
   convert_quantity(q, convert);
-  std::cout << q.to_string() << std::endl;
+  std::cout << q.to_string() << '\n';
 }
 
 int main(int argc, char* argv[]) {
   InputParser input(argc, argv);
   if (input.cmdOptionExists("-h") || input.cmdEmpty()) {
-    std::cout << std::endl;
-    std::cout << "Physical Units and Quantities (PUQ)" << std::endl;
-    std::cout << std::endl;
-    std::cout << "puq -h                            display help" << std::endl;
-    std::cout << "puq -v                            display code version" << std::endl;
-    std::cout << "puq -i [s] <e>                    get information about an expression <e> in a unit system [s]" << std::endl;
-    std::cout << "puq -l [s] <l>                    display list <l>=prefix/base/deriv/log/temp/const/quant in a unit system [s], or all available unit systems <l>=sys" << std::endl;
-    std::cout << "puq -s [s1] <e1> [[s2] <e2> [q]]  solve an arithmetic unit expression <e1> in a unit system [s1], optionally convert into expression <e2> in a system [s2] as a quantity [q]" << std::endl;
-    std::cout << "puq -c [s1] <e1> [s2] <e2> [q]    convert expression <e1> in a unit system [s1] into expression <e2> in a system [s2] as a quantity [q]" << std::endl;
-    std::cout << std::endl;
-    std::cout << "Example of use:" << std::endl;
-    std::cout << std::endl;
-    std::cout << "puq -i \"23*kg*m2/s2\"" << std::endl;
-    std::cout << "puq -i IU \"23*yd\"" << std::endl;
-    std::cout << "puq -l deriv" << std::endl;
-    std::cout << "puq -l IU quant" << std::endl;
-    std::cout << "puq -s \"23*cm + 3*m\"" << std::endl;
-    std::cout << "puq -s US \"23*ft + 3*yd\"" << std::endl;
-    std::cout << "puq -s US \"23*ft + 3*yd\" SI \"cm\"" << std::endl;
-    std::cout << "puq -c \"35*eV\" \"J\"" << std::endl;
-    std::cout << "puq -c ESU \"12*statA\" SI \"A\" \"I\"" << std::endl;
-    std::cout << std::endl;
+    std::cout << '\n';
+    std::cout << "Physical Units and Quantities (PUQ)" << '\n';
+    std::cout << '\n';
+    std::cout << "puq -h                            display help" << '\n';
+    std::cout << "puq -v                            display code version" << '\n';
+    std::cout << "puq -i [s] <e>                    get information about an expression <e> in a unit system [s]" << '\n';
+    std::cout << "puq -l [s] <l>                    display list <l>=prefix/base/deriv/log/temp/const/quant in a unit system [s], or all available unit systems <l>=sys" << '\n';
+    std::cout << "puq -s [s1] <e1> [[s2] <e2> [q]]  solve an arithmetic unit expression <e1> in a unit system [s1], optionally convert into expression <e2> in a system [s2] as a quantity [q]" << '\n';
+    std::cout << "puq -c [s1] <e1> [s2] <e2> [q]    convert expression <e1> in a unit system [s1] into expression <e2> in a system [s2] as a quantity [q]" << '\n';
+    std::cout << '\n';
+    std::cout << "Example of use:" << '\n';
+    std::cout << '\n';
+    std::cout << "puq -i \"23*kg*m2/s2\"" << '\n';
+    std::cout << "puq -i IU \"23*yd\"" << '\n';
+    std::cout << "puq -l deriv" << '\n';
+    std::cout << "puq -l IU quant" << '\n';
+    std::cout << "puq -s \"23*cm + 3*m\"" << '\n';
+    std::cout << "puq -s US \"23*ft + 3*yd\"" << '\n';
+    std::cout << "puq -s US \"23*ft + 3*yd\" SI \"cm\"" << '\n';
+    std::cout << "puq -c \"35*eV\" \"J\"" << '\n';
+    std::cout << "puq -c ESU \"12*statA\" SI \"A\" \"I\"" << '\n';
+    std::cout << '\n';
   } else if (input.cmdOptionExists("-v")) {
-    std::cout << CODE_VERSION << std::endl;
+    std::cout << CODE_VERSION << '\n';
   }
   try {
     std::deque<std::string> convert;
@@ -177,6 +177,6 @@ int main(int argc, char* argv[]) {
       display_lists(convert);
     }
   } catch (std::exception& e) {
-    std::cout << e.what() << std::endl;
+    std::cout << e.what() << '\n';
   }
 }

@@ -59,7 +59,7 @@ namespace dip {
     }
   }
 
-  void ValueNode::modify_value(BaseNode::PointerType node, Environment& env) {
+  void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
     if (node->dtype != NodeDtype::Modification and node->dtype != dtype)
       throw std::runtime_error("Node '" + name + "' with type '" + dtype_raw.at(1) +
                                "' cannot modify node '" + node->name + "' with type '" +
@@ -83,7 +83,7 @@ namespace dip {
   bool ValueNode::set_property(PropertyType property, Array::StringType& values, std::string& units) {
     switch (property) {
     case PropertyType::Options:
-      for (auto value_option : values) {
+      for (const auto& value_option : values) {
         if (dtype == NodeDtype::Boolean)
           throw std::runtime_error("Option property is not implemented for boolean nodes: " +
                                    line.code);

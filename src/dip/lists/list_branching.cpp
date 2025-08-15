@@ -77,7 +77,7 @@ namespace dip {
   }
 
   // Manage condition nodes
-  void BranchingList::solve_case(BaseNode::PointerType node) {
+  void BranchingList::solve_case(const BaseNode::PointerType& node) {
     std::ostringstream oss;
     oss << "(.*[" << SIGN_CONDITION << "])C([0-9]+)";
     std::regex pattern(oss.str());
@@ -103,7 +103,7 @@ namespace dip {
         close_branch();
         return;
       } else {
-        std::cout << cases.size() << " " << path_old << " " << path_new << std::endl;
+        std::cout << cases.size() << " " << path_old << " " << path_new << '\n';
         throw std::runtime_error("Invalid condition type:  " + node->line.code);
       }
       // determine branch part and ID
@@ -143,7 +143,7 @@ namespace dip {
         case_value &= cs.value;
         // std::cout << " " << case_value << " " << parent_branch_id << parent_case_id;
       }
-      // std::cout << std::endl;
+      // std::cout << '\n';
       // register new case
       std::string expr = (cnode->value_raw.empty()) ? "" : cnode->value_raw.at(0);
       cases[case_id] = Case(path_new, cnode->line.code, expr, case_value, branch_id, branch_part,
@@ -154,7 +154,7 @@ namespace dip {
   }
 
   // Manage parameter nodes in a condition
-  void BranchingList::prepare_node(BaseNode::PointerType node) {
+  void BranchingList::prepare_node(const BaseNode::PointerType& node) {
     if (state.empty())
       return;
     size_t case_id = get_case_id();
