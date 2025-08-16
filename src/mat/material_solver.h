@@ -5,7 +5,7 @@ namespace mat {
 
   class MaterialSolver {
   };
-  
-}
+
+} // namespace mat
 
 #endif // MAT_MATERIAL_SOLVER_H

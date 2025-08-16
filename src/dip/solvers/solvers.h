@@ -8,7 +8,7 @@
 namespace dip {
 
   // Logical solver
-  
+
   struct LogicalSettings {
     Environment* env;
   };
@@ -45,7 +45,7 @@ namespace dip {
   };
 
   // Numerical solver
-  
+
   struct NumericalSettings {
     Environment* env;
   };
@@ -63,17 +63,17 @@ namespace dip {
 
     static val::BaseValue::PointerType from_string(const std::string& s, NumericalSettings* settings);
     std::string to_string();
-    //void comparison_equal(NumericalAtom* other);
-    //void comparison_not_equal(NumericalAtom* other);
-    //void comparison_less_equal(NumericalAtom* other);
-    //void comparison_greater_equal(NumericalAtom* other);
-    //void comparison_less(NumericalAtom* other);
-    //void comparison_greater(NumericalAtom* other);
-    //void numerical_not();
-    //void numerical_and(NumericalAtom* other);
-    //void numerical_or(NumericalAtom* other);
+    // void comparison_equal(NumericalAtom* other);
+    // void comparison_not_equal(NumericalAtom* other);
+    // void comparison_less_equal(NumericalAtom* other);
+    // void comparison_greater_equal(NumericalAtom* other);
+    // void comparison_less(NumericalAtom* other);
+    // void comparison_greater(NumericalAtom* other);
+    // void numerical_not();
+    // void numerical_and(NumericalAtom* other);
+    // void numerical_or(NumericalAtom* other);
   };
-  
+
   class NumericalSolver {
   public:
     std::unique_ptr<exs::Solver<NumericalAtom, NumericalSettings>> solver;
@@ -82,7 +82,7 @@ namespace dip {
   };
 
   // Template solver
-  
+
   class TemplateSolver {};
 
 } // namespace dip

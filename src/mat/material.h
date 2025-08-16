@@ -5,7 +5,7 @@ namespace mat {
 
   class Material {
   };
-  
-}
+
+} // namespace mat
 
 #endif // MAT_MATERIAL_H

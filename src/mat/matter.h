@@ -5,7 +5,7 @@ namespace mat {
 
   class Matter {
   };
-  
-}
+
+} // namespace mat
 
 #endif // MAT_MATTER_H

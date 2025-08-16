@@ -5,7 +5,7 @@ namespace mat {
 
   class SubstanceSolver {
   };
-  
-}
+
+} // namespace mat
 
 #endif // MAT_SUBSTANCE_SOLVER_H

@@ -5,7 +5,7 @@ namespace mat {
 
   class Composite {
   };
-  
-}
+
+} // namespace mat
 
 #endif // MAT_COMPOSITE_H
