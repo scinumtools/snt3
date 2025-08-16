@@ -30,6 +30,7 @@ option(COMPILE_EXS "Compile EXS module" ON)
 option(COMPILE_VAL "Compile VAL module" ON)
 option(COMPILE_PUQ "Compile PUQ module" ON)
 option(COMPILE_DIP "Compile DIP module" ON)
+option(COMPILE_MAT "Compile MAT module" ON)
 
 set(COMPILE_PUQ_MAGNITUDE "array" CACHE STRING "Set the type of magnitude in PUQ module (array, value)")
 if(COMPILE_PUQ_MAGNITUDE STREQUAL "array")
