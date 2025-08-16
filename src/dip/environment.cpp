@@ -11,7 +11,7 @@ namespace dip {
       return {request.substr(0, pos), request.substr(pos + 1)};
   }
 
-  Environment::Environment() {}
+  Environment::Environment() = default;
 
   std::string Environment::request_code(const std::string& source_name) const {
     return sources.at(source_name).code;

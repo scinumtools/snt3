@@ -120,7 +120,7 @@ namespace dip {
         ptype = PropertyType::Condition;
       else if (key == KEYWORD_DELIMITER)
         ptype = PropertyType::Delimiter;
-      dimension.push_back({0, Array::max_range});
+      dimension.push_back({0, val::Array::max_range});
       strip(matchResult[0].str());
       return true;
     }

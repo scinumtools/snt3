@@ -5,7 +5,7 @@
 
 namespace dip {
 
-  SourceList::SourceList() {}
+  SourceList::SourceList() = default;
 
   void SourceList::append(const std::string& name, const std::string& path, const std::string& code,
                           const Source& parent) {

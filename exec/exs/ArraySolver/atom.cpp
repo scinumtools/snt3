@@ -37,8 +37,8 @@ void CustomAtom::math_subtract(CustomAtom* other) {
 
 void CustomAtom::math_negate() {
   AtomValueType nv;
-  for (size_t i = 0; i < value.size(); i++) {
-    nv.push_back(-value[i]);
+  for (double val : value) {
+    nv.push_back(-val);
   }
   value = nv;
 }

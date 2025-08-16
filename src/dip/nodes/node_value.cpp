@@ -8,10 +8,10 @@ namespace dip {
                        const val::DataType vdt)
       : constant(false), value_dtype(vdt) {
     name = nm;
-    Array::ShapeType dims = val->get_shape();
+    val::Array::ShapeType dims = val->get_shape();
     if (val->get_size() > 1) {
       dimension.clear();
-      for (int dim : dims)
+      for (size_t dim : dims)
         dimension.push_back({dim, dim});
     }
     set_value(std::move(val));
@@ -21,8 +21,8 @@ namespace dip {
     return cast_value(value_raw, value_shape);
   }
 
-  val::BaseValue::PointerType ValueNode::cast_value(Array::StringType& value_input,
-                                                    const Array::ShapeType& shape) {
+  val::BaseValue::PointerType ValueNode::cast_value(val::Array::StringType& value_input,
+                                                    const val::Array::ShapeType& shape) {
     if (!dimension.empty()) {
       return cast_array_value(value_input, shape);
     } else if (value_input.size() > 1) {
@@ -80,7 +80,7 @@ namespace dip {
     set_value(std::move(value));
   }
 
-  bool ValueNode::set_property(PropertyType property, Array::StringType& values, std::string& units) {
+  bool ValueNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
     switch (property) {
     case PropertyType::Options:
       for (const auto& value_option : values) {
@@ -137,8 +137,8 @@ namespace dip {
   void ValueNode::validate_options() const {
     if (options.size() > 0) {
       bool match = false;
-      for (int i = 0; i < options.size(); i++) {
-        if (options[i].value and value->compare_equal(options[i].value.get())->all_of())
+      for (const auto & option : options) {
+        if (option.value and value->compare_equal(option.value.get())->all_of())
           match = true;
       }
       if (!match) {
@@ -161,15 +161,15 @@ namespace dip {
   }
 
   void ValueNode::validate_dimensions() const {
-    Array::ShapeType vdim = value->get_shape();
+    val::Array::ShapeType vdim = value->get_shape();
     if (dimension.size() != vdim.size())
       throw std::runtime_error("Number of value dimensions does not match that of node: " +
                                std::to_string(vdim.size()) +
                                "!=" + std::to_string(dimension.size()));
     for (size_t i = 0; i < dimension.size(); i++) {
       int dmin = dimension[i].dmin; // must be int and not size_t because
-      int dmax = dimension[i].dmax; // dimension ranges can be -1
-      if (dmax == Array::max_range)
+      int dmax = dimension[i].dmax; // dimension ranges can be max(size_t)
+      if (dmax == val::Array::max_range)
         dmax = vdim[i];
       if (vdim[i] < dmin or dmax < vdim[i]) {
         std::ostringstream nss, vss;
@@ -180,11 +180,11 @@ namespace dip {
           }
           dmin = dimension[j].dmin;
           dmax = dimension[j].dmax;
-          if (dmin == 0 and dmax < 0)
+          if (dmin == 0 and dmax == val::Array::max_range)
             nss << SEPARATOR_SLICE;
           else if (dmin == dmax)
             nss << dmin;
-          else if (dmax < 0)
+          else if (dmax == val::Array::max_range)
             nss << dmin << SEPARATOR_SLICE;
           else if (dmin == 0)
             nss << SEPARATOR_SLICE << dmax;

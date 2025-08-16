@@ -1,10 +1,10 @@
 BasedOnStyle: LLVM
-IndentWidth: 2             # 2 spaces per indent level
+IndentWidth: 2   
 TabWidth: 2
-UseTab: Never              # Always spaces
-NamespaceIndentation: All  # Indent inside namespaces
-BreakBeforeBraces: Attach  # K&R style braces
-ColumnLimit: 0             # No automatic line wrapping
+UseTab: Never    
+NamespaceIndentation: All  
+BreakBeforeBraces: Attach  
+ColumnLimit: 0             
 AllowShortFunctionsOnASingleLine: Inline
 DerivePointerAlignment: false
 PointerAlignment: Left

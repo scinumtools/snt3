@@ -12,7 +12,7 @@ namespace val {
   public:
     ArrayValue(const bool& val) : BaseArrayValue(val) {};
     ArrayValue(const std::vector<bool>& arr, const Array::ShapeType& sh) : BaseArrayValue(arr, sh) {};
-    ArrayValue(const std::vector<bool>& arr) : BaseArrayValue(arr, {static_cast<int>(arr.size())}) {};
+    ArrayValue(const std::vector<bool>& arr) : BaseArrayValue(arr, {arr.size()}) {};
     ArrayValue(const BaseValue* other) : BaseArrayValue<bool>(other) {};
 
   private:

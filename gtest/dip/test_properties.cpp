@@ -316,16 +316,16 @@ TEST(Properties, TableDelimiter) {
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "foo.bar");
-  EXPECT_EQ(node->value_raw, dip::Array::StringType({"1", "2"}));
-  EXPECT_EQ(node->value_shape, dip::Array::ShapeType({2}));
+  EXPECT_EQ(node->value_raw, val::Array::StringType({"1", "2"}));
+  EXPECT_EQ(node->value_shape, val::Array::ShapeType({2}));
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_EQ(vnode->value->to_string(), "[1, 2]");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
 
   node = env.nodes.at(1);
   EXPECT_EQ(node->name, "foo.baz");
-  EXPECT_EQ(node->value_raw, dip::Array::StringType({"true", "false"}));
-  EXPECT_EQ(node->value_shape, dip::Array::ShapeType({2}));
+  EXPECT_EQ(node->value_raw, val::Array::StringType({"true", "false"}));
+  EXPECT_EQ(node->value_shape, val::Array::ShapeType({2}));
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_EQ(vnode->value->to_string(), "[true, false]");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);

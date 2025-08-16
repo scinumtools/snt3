@@ -30,8 +30,8 @@ namespace dip {
       break;
     case ValueOrigin::ReferenceRaw: {
       std::string source_code = env.request_code(value_raw.at(0));
-      Array::StringType source_value_raw;
-      Array::ShapeType source_value_shape;
+      val::Array::StringType source_value_raw;
+      val::Array::ShapeType source_value_shape;
       parse_value(source_code, source_value_raw, source_value_shape);
       set_value(cast_value(source_value_raw, source_value_shape));
       break;
@@ -51,8 +51,8 @@ namespace dip {
     return std::make_unique<val::ArrayValue<std::string>>(value_input);
   }
 
-  val::BaseValue::PointerType StringNode::cast_array_value(const Array::StringType& value_inputs,
-                                                           const Array::ShapeType& shape) const {
+  val::BaseValue::PointerType StringNode::cast_array_value(const val::Array::StringType& value_inputs,
+                                                           const val::Array::ShapeType& shape) const {
     return std::make_unique<val::ArrayValue<std::string>>(value_inputs, shape);
   }
 
@@ -63,7 +63,7 @@ namespace dip {
       return std::make_shared<StringNode>(nm, std::move(value->clone()));
   }
 
-  bool StringNode::set_property(PropertyType property, Array::StringType& values,
+  bool StringNode::set_property(PropertyType property, val::Array::StringType& values,
                                 std::string& units) {
     if (ValueNode::set_property(property, values, units)) {
       return true;

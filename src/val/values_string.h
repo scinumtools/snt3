@@ -12,7 +12,7 @@ namespace val {
   public:
     ArrayValue(const std::string& val) : BaseArrayValue(val) {};
     ArrayValue(const Array::StringType& arr, const Array::ShapeType& sh) : BaseArrayValue(arr, sh) {};
-    ArrayValue(const Array::StringType& arr) : BaseArrayValue(arr, {static_cast<int>(arr.size())}) {};
+    ArrayValue(const Array::StringType& arr) : BaseArrayValue(arr, {arr.size()}) {};
     ArrayValue(const BaseValue* other) : BaseArrayValue<std::string>(other) {};
 
   private:

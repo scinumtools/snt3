@@ -40,7 +40,7 @@ namespace dip {
     Branch& branch = branches.at(branch_id);
     branch.cases.push_back(case_id);
     branch.types.push_back(case_type);
-    return branch.cases.size() - 1;
+    return static_cast<int>(branch.cases.size() - 1);
   }
 
   // Close current branch

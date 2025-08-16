@@ -116,8 +116,8 @@ namespace dip {
         throw std::runtime_error("Could not parse all text on the line: " + line.code);
 
       // convert escape symbols to original characterss
-      for (size_t i = 0; i < node->value_raw.size(); i++)
-        Parser::decode_escape_symbols(node->value_raw.at(i));
+      for (auto & rval : node->value_raw)
+        Parser::decode_escape_symbols(rval);
       Parser::decode_escape_symbols(node->line.code);
 
       // put node into the list
@@ -296,17 +296,19 @@ namespace dip {
       val::Array::RangeStruct range;
       std::size_t pos = dim.find_first_of(SEPARATOR_SLICE);
       if (pos == std::string::npos) {
-        range = {std::stoi(dim), std::stoi(dim)};
+	range = { static_cast<size_t>(std::stoul(dim)),
+		  static_cast<size_t>(std::stoul(dim)) };
       } else {
         std::string dmin = dim.substr(0, pos), dmax = dim.substr(pos + 1);
         if (dmin == "" and dmax == "")
           range = {0, val::Array::max_range};
         else if (dmin == "")
-          range = {0, std::stoi(dmax)};
+	  range = { 0, static_cast<size_t>(std::stoul(dmax)) };
         else if (dmax == "")
-          range = {std::stoi(dmin), val::Array::max_range};
+	  range = { static_cast<size_t>(std::stoul(dmin)), val::Array::max_range };
         else
-          range = {std::stoi(dmin), std::stoi(dmax)};
+	  range = { static_cast<size_t>(std::stoul(dmin)),
+		    static_cast<size_t>(std::stoul(dmax)) };
       }
       if (range.dmax != val::Array::max_range and range.dmax < range.dmin)
         throw std::runtime_error("Maximum range must be higher or equal than minimum range: " +

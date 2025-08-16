@@ -5,7 +5,7 @@
 
 namespace dip {
 
-  UnitList::UnitList() {}
+  UnitList::UnitList() = default;
 
   void UnitList::append(const std::string& name, const std::string& definition) {
     if (units.contains(name))

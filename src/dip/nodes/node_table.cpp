@@ -46,7 +46,7 @@ namespace dip {
     }
     // update node settings
     for (const auto& node : nodes) {
-      int size = node->value_raw.size();
+      size_t size = node->value_raw.size();
       node->indent += indent;
       node->name = name + std::string(1, SIGN_SEPARATOR) + node->name;
       node->value_shape = {size};
@@ -56,7 +56,7 @@ namespace dip {
     return nodes;
   }
 
-  bool TableNode::set_property(PropertyType property, Array::StringType& values, std::string& units) {
+  bool TableNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
     const std::string& delimiter_raw = values.at(0);
     if (property == PropertyType::Delimiter and !delimiter_raw.empty()) {
       delimiter = delimiter_raw[0];

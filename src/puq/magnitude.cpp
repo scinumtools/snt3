@@ -88,7 +88,7 @@ namespace puq {
       int exp_err = std::floor(std::log10(error));
       int exp_diff = std::abs(exp_val - exp_err) + 1;
       MAGNITUDE_PRECISION val_mag = value * std::pow(10, -exp_val);
-      int val_err = std::round(error * std::pow(10, 1 - exp_err));
+      int val_err = static_cast<int>(std::round(error * std::pow(10, 1 - exp_err)));
       ss << std::fixed << std::setprecision(exp_diff) << val_mag;
       ss << "(" << std::setw(2) << std::setfill(' ') << val_err << ")";
       if (exp_val != 0) {
@@ -101,7 +101,7 @@ namespace puq {
   }
   std::string Magnitude::to_string(const UnitFormat& format) const {
     std::stringstream ss;
-    if (error == 0 || !format.display_error()) {
+    if (error == nullptr || !format.display_error()) {
 #if defined(MAGNITUDE_ARRAYS)
       ss << value.to_string(format);
 #elif defined(MAGNITUDE_VALUES)

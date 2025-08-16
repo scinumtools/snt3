@@ -4,7 +4,7 @@ int CustomAtom::from_string(std::string& s, Settings* set) {
   if (s == set->symbol)
     return set->value;
   else
-    return std::stod(s);
+    return std::stoi(s);
 }
 
 std::string CustomAtom::to_string() {

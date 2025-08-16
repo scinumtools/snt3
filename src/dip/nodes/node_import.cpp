@@ -31,7 +31,7 @@ namespace dip {
     }
     // update node settings
     for (const auto& node : nodes) {
-      int size = node->value_raw.size();
+      size_t size = node->value_raw.size();
       node->indent += indent;
       if (!name.empty())
         node->name = name + std::string(1, SIGN_SEPARATOR) + node->name;

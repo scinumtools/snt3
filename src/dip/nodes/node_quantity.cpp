@@ -2,7 +2,7 @@
 
 namespace dip {
 
-  void QuantityNode::set_units(Quantity::PointerType units_input) {
+  void QuantityNode::set_units(puq::Quantity::PointerType units_input) {
     // setting node units
     units = nullptr;
     if (units_input == nullptr and !units_raw.empty()) {
@@ -11,16 +11,16 @@ namespace dip {
       units = std::move(units_input);
     }
     // converting option units if necessary
-    for (size_t i = 0; i < options.size(); i++) {
-      std::string option_units = options[i].units_raw;
+    for (auto & option : options) {
+      std::string option_units = option.units_raw;
       if (!option_units.empty()) {
         if (units == nullptr)
           throw std::runtime_error("Trying to convert '" + option_units +
                                    "' into a nondimensional quantity: " + line.code);
         else {
-          puq::Quantity quantity(std::move(options[i].value), option_units);
+          puq::Quantity quantity(std::move(option.value), option_units);
           quantity = quantity.convert(*units);
-          options[i].value = std::move(quantity.value.magnitude.value);
+          option.value = std::move(quantity.value.magnitude.value);
         }
       }
     }
