@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../../src/puq/magnitude.h"
+#include "puq/magnitude.h"
 
 #ifdef MAGNITUDE_ERRORS
 

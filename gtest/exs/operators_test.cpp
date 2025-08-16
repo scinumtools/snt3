@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "../../src/exs/exs.h"
+#include "exs/exs.h"
 
 // Initialization of the operators map
 TEST(Operators, Initialization) {

@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "../../src/dip/dip.h"
-#include "../../src/dip/environment.h"
-#include "../../src/dip/nodes/nodes.h"
+#include "dip/dip.h"
+#include "dip/environment.h"
+#include "dip/nodes/nodes.h"
 
 TEST(ParseArrays, BooleanValue) {
 

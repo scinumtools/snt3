@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "../../src/puq/array.h"
-#include "../../src/puq/nostd/nostd.h"
+#include "puq/array.h"
+#include "puq/nostd/nostd.h"
 
 #ifdef MAGNITUDE_ARRAYS
 

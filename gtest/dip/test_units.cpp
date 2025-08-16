@@ -3,11 +3,11 @@
 #include <iostream>
 #include <limits>
 
-#include "../../src/dip/dip.h"
-#include "../../src/dip/environment.h"
-#include "../../src/dip/nodes/nodes.h"
-#include "../../src/puq/converter.h"
-#include "../../src/puq/quantity.h"
+#include "dip/dip.h"
+#include "dip/environment.h"
+#include "dip/nodes/nodes.h"
+#include "puq/converter.h"
+#include "puq/quantity.h"
 
 TEST(Units, Definition) {
 

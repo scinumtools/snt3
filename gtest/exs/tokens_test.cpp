@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../../src/exs/exs.h"
+#include "exs/exs.h"
 
 // Initialization of the Tokens class
 TEST(Tokens, Initialization) {

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../../src/puq/solver/solver.h"
+#include "puq/solver/solver.h"
 
 TEST(UnitAtom, FromString) {
 

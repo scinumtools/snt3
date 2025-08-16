@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
-#include "../../src/puq/util/data_table.h"
+#include "puq/util/data_table.h"
 
 TEST(DataTable, TextOutput) {
 

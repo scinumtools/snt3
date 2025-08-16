@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../../src/dip/solvers/solvers.h"
+#include "dip/solvers/solvers.h"
 
 TEST(SolverLogical, AndOrNot) {
 

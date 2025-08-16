@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
-#include "../../src/puq/converter.h"
-#include "../../src/puq/quantity.h"
+#include "puq/converter.h"
+#include "puq/quantity.h"
 
 TEST(Quantity, Initialization) {
 

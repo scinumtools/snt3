@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "../../src/puq/converter.h"
-#include "../../src/puq/quantity.h"
+#include "puq/converter.h"
+#include "puq/quantity.h"
 
 #ifdef UNIT_SYSTEM_CGS
 
