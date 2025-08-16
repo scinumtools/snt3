@@ -167,8 +167,8 @@ namespace dip {
                                std::to_string(vdim.size()) +
                                "!=" + std::to_string(dimension.size()));
     for (size_t i = 0; i < dimension.size(); i++) {
-      int dmin = dimension[i].dmin; // must be int and not size_t because
-      int dmax = dimension[i].dmax; // dimension ranges can be max(size_t)
+      size_t dmin = dimension[i].dmin;
+      size_t dmax = dimension[i].dmax; // dimension ranges can be max(size_t)
       if (dmax == val::Array::max_range)
         dmax = vdim[i];
       if (vdim[i] < dmin or dmax < vdim[i]) {

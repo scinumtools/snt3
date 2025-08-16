@@ -201,7 +201,8 @@ namespace dip {
     size_t i = 0;
     if (trimmed[i] == '+' || trimmed[i] == '-')
       ++i;
-    if (i < trimmed.size() && std::all_of(trimmed.begin() + i, trimmed.end(), ::isdigit)) {
+    std::string::difference_type i_signed = static_cast<std::string::difference_type>(i);
+    if (i < trimmed.size() && std::all_of(trimmed.begin() + i_signed, trimmed.end(), ::isdigit)) {
       dtype_raw = {"", std::string(KEYWORD_INTEGER), ""};
       value_raw.push_back(trimmed);
       value_origin = ValueOrigin::String;

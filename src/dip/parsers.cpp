@@ -263,7 +263,7 @@ namespace dip {
                                value_string);
 
     // Normalize shape and check coherence of nested arrays
-    int coef = 1;
+    size_t coef = 1;
     for (int d = 1; d < value_shape.size(); d++) {
       coef *= value_shape[d - 1];
       if (value_shape[d] % coef != 0)
@@ -293,7 +293,7 @@ namespace dip {
     std::istringstream ss_dims(value_string);
     std::string dim;
     while (getline(ss_dims, dim, SEPARATOR_DIMENSION)) {
-      val::Array::RangeStruct range;
+      val::Array::RangeStruct range = {};
       std::size_t pos = dim.find_first_of(SEPARATOR_SLICE);
       if (pos == std::string::npos) {
 	range = { static_cast<size_t>(std::stoul(dim)),
