@@ -11,7 +11,7 @@ namespace dip {
       units = std::move(units_input);
     }
     // converting option units if necessary
-    for (auto & option : options) {
+    for (auto& option : options) {
       std::string option_units = option.units_raw;
       if (!option_units.empty()) {
         if (units == nullptr)

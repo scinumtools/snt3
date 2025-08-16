@@ -1,13 +1,13 @@
 # build library
 file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
-set(EXEC_NAME scinumtools-dip)
+set(EXEC_NAME snt-dip)
 
 add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
 target_compile_definitions(${EXEC_NAME} PRIVATE)
-target_link_libraries(${EXEC_NAME} PRIVATE scinumtools-puq)
+target_link_libraries(${EXEC_NAME} PRIVATE snt-puq)
 
 set_target_properties(${EXEC_NAME} PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
 # install libraries and executables

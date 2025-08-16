@@ -1,6 +1,6 @@
 # build test
 file(GLOB TEST_FILES "*.cpp")
-set(EXEC_NAME GTestModule-exs)
+set(EXEC_NAME gtest-exs)
 
 add_executable(${EXEC_NAME} ${TEST_FILES})
 target_include_directories(${EXEC_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)

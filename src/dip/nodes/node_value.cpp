@@ -137,7 +137,7 @@ namespace dip {
   void ValueNode::validate_options() const {
     if (options.size() > 0) {
       bool match = false;
-      for (const auto & option : options) {
+      for (const auto& option : options) {
         if (option.value and value->compare_equal(option.value.get())->all_of())
           match = true;
       }
