@@ -25,8 +25,8 @@ namespace dip {
         node = IntegerNode::is_node(parser);
       if (node == nullptr)
         node = FloatNode::is_node(parser);
-      // if (node == nullptr)
-      //   node = StringNode::is_node(parser);
+      if (node == nullptr)
+	node = StringNode::is_node(parser);
       if (node == nullptr)
         throw std::runtime_error("Value could not be determined from : " + s);
       ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node);
@@ -41,76 +41,100 @@ namespace dip {
     return value->to_string();
   }
 
-  //// Comparison operations
-  // void NumericalAtom::comparison_equal(NumericalAtom* other) {
-  //   value = value->compare_equal(other->value.get());
-  // }
-  // void NumericalAtom::comparison_not_equal(NumericalAtom* other) {
-  //   value = value->compare_not_equal(other->value.get());
-  // }
-  // void NumericalAtom::comparison_less_equal(NumericalAtom* other) {
-  //   value = value->compare_less_equal(other->value.get());
-  // }
-  // void NumericalAtom::comparison_greater_equal(NumericalAtom* other) {
-  //   value = value->compare_greater_equal(other->value.get());
-  // }
-  // void NumericalAtom::comparison_less(NumericalAtom* other) {
-  //   value = value->compare_less(other->value.get());
-  // }
-  // void NumericalAtom::comparison_greater(NumericalAtom* other) {
-  //   value = value->compare_greater(other->value.get());
-  // }
-  //
-  //// Numerical operations
-  // void NumericalAtom::numerical_not() {
-  //   value = value->numerical_not();
-  // }
-  // void NumericalAtom::numerical_and(NumericalAtom* other) {
-  //   value = value->numerical_and(other->value.get());
-  // }
-  // void NumericalAtom::numerical_or(NumericalAtom* other) {
-  //   value = value->numerical_or(other->value.get());
-  // }
+  // Mathematical operations
+  //void NumericalAtom::math_cubic_root() {
+  //  value = value->math_cbrt();
+  //}
+  void NumericalAtom::math_square_root() {
+    value = value->math_sqrt();
+  }
+  //void NumericalAtom::math_power_base(NumericalAtom* other) {
+  //  value = value->math_powb(other->value.get());
+  //}
+  //void NumericalAtom::math_logarithm_base(NumericalAtom* other) {
+  //  value = value->math_logb(other->value.get());
+  //}
+  void NumericalAtom::math_logarithm_10() {
+    value = value->math_log10();
+  }
+  void NumericalAtom::math_logarithm() {
+    value = value->math_log();
+  }
+  void NumericalAtom::math_exponent() {
+    value = value->math_exp();
+  }
+  void NumericalAtom::math_power(NumericalAtom* other) {
+    value = value->math_pow(other->value.get());
+  }
+  void NumericalAtom::math_multiply(NumericalAtom* other) {
+    value = value->math_mul(other->value.get());
+  }
+  void NumericalAtom::math_divide(NumericalAtom* other) {
+    value = value->math_div(other->value.get());
+  }
+  void NumericalAtom::math_add(NumericalAtom* other) {
+    value = value->math_add(other->value.get());
+  }
+  void NumericalAtom::math_subtract(NumericalAtom* other) {
+    value = value->math_sub(other->value.get());
+  }
+  void NumericalAtom::math_negate() {
+    value = value->math_neg();
+  }
 
   NumericalSolver::NumericalSolver(Environment& env) {
 
     NumericalSettings settings = {&env};
 
-    exs::OperatorList<NumericalAtom, NumericalSettings> operators;
+    exs::OperatorList<NumericalAtom, NumericalSettings> operators; 
+    //operators.append(
+    //    exs::CUBIC_ROOT_OPERATOR,
+    //    std::make_shared<exs::OperatorCubicRoot<NumericalAtom, NumericalSettings>>("cbrt( ", " )"));
+    operators.append(
+        exs::SQUARE_ROOT_OPERATOR,
+        std::make_shared<exs::OperatorSquareRoot<NumericalAtom, NumericalSettings>>()); //"sqrt( ", " )"));
+    //operators.append(
+    //    exs::POWER_BASE_OPERATOR,
+    //    std::make_shared<exs::OperatorPowerBase<NumericalAtom, NumericalSettings>>("powb( ", " )"));
+    //operators.append(
+    //    exs::LOGARITHM_BASE_OPERATOR,
+    //    std::make_shared<exs::OperatorLogarithmBase<NumericalAtom, NumericalSettings>>("logb( ", " )"));
+    operators.append(
+        exs::LOGARITHM_10_OPERATOR,
+        std::make_shared<exs::OperatorLogarithm10<NumericalAtom, NumericalSettings>>()); //"log10( ", " )"));
+    operators.append(
+        exs::LOGARITHM_OPERATOR,
+        std::make_shared<exs::OperatorLogarithm<NumericalAtom, NumericalSettings>>()); //"log( ", " )"));
+    operators.append(
+        exs::EXPONENT_OPERATOR,
+        std::make_shared<exs::OperatorExponent<NumericalAtom, NumericalSettings>>()); //"exp( ", " )"));
     operators.append(
         exs::PARENTHESES_OPERATOR,
         std::make_shared<exs::OperatorParentheses<NumericalAtom, NumericalSettings>>("( ", " )"));
-    // operators.append(exs::EQUAL_OPERATOR,
-    //                  std::make_shared<exs::OperatorEqual<NumericalAtom, NumericalSettings>>(" == "));
-    // operators.append(exs::NOT_EQUAL_OPERATOR,
-    //                  std::make_shared<exs::OperatorNotEqual<NumericalAtom, NumericalSettings>>(" != "));
-    // operators.append(
-    //     exs::NOT_OPERATOR,
-    //     std::make_shared<exs::OperatorNot<NumericalAtom, NumericalSettings>>()); // needs to be after
-    //                                                                          // NOT_EQUAL
-    // operators.append(
-    //     exs::LESS_EQUAL_OPERATOR,
-    //     std::make_shared<exs::OperatorLessEqual<NumericalAtom, NumericalSettings>>(" <= "));
-    // operators.append(
-    //     exs::GREATER_EQUAL_OPERATOR,
-    //     std::make_shared<exs::OperatorGreaterEqual<NumericalAtom, NumericalSettings>>(" >= "));
-    // operators.append(exs::LESS_OPERATOR,
-    //                  std::make_shared<exs::OperatorLess<NumericalAtom, NumericalSettings>>(" < "));
-    // operators.append(exs::GREATER_OPERATOR,
-    //                  std::make_shared<exs::OperatorGreater<NumericalAtom, NumericalSettings>>(" > "));
-    // operators.append(exs::AND_OPERATOR,
-    //                  std::make_shared<exs::OperatorAnd<NumericalAtom, NumericalSettings>>(" && "));
-    // operators.append(exs::OR_OPERATOR,
-    //                  std::make_shared<exs::OperatorOr<NumericalAtom, NumericalSettings>>(" || "));
+    operators.append(exs::POWER_OPERATOR,
+                     std::make_shared<exs::OperatorPower<NumericalAtom, NumericalSettings>>(" ** "));
+    operators.append(exs::MULTIPLY_OPERATOR,
+                     std::make_shared<exs::OperatorMultiply<NumericalAtom, NumericalSettings>>(" * "));
+    operators.append(exs::DIVIDE_OPERATOR,
+		     std::make_shared<exs::OperatorDivide<NumericalAtom, NumericalSettings>>(" / "));
+    operators.append(exs::ADD_OPERATOR,
+                     std::make_shared<exs::OperatorAdd<NumericalAtom, NumericalSettings>>(" +"));
+    operators.append(exs::SUBTRACT_OPERATOR,
+		     std::make_shared<exs::OperatorSubtract<NumericalAtom, NumericalSettings>>(" -"));
 
     exs::StepList steps;
+    steps.append(exs::GROUP_OPERATION, {exs::EXPONENT_OPERATOR, exs::LOGARITHM_OPERATOR,
+					exs::LOGARITHM_10_OPERATOR,
+					//exs::LOGARITHM_BASE_OPERATOR, exs::POWER_BASE_OPERATOR,
+					exs::SQUARE_ROOT_OPERATOR,
+					//exs::CUBIC_ROOT_OPERATOR,
+					//exs::SINUS_OPERATOR, exs::COSINUS_OPERATOR, exs::TANGENS_OPERATOR
+      });
     steps.append(exs::GROUP_OPERATION, {exs::PARENTHESES_OPERATOR});
-    // steps.append(exs::BINARY_OPERATION, {exs::LESS_EQUAL_OPERATOR, exs::GREATER_EQUAL_OPERATOR,
-    //                                      exs::LESS_OPERATOR, exs::GREATER_OPERATOR});
-    // steps.append(exs::BINARY_OPERATION, {exs::EQUAL_OPERATOR, exs::NOT_EQUAL_OPERATOR});
-    // steps.append(exs::UNARY_OPERATION, {exs::NOT_OPERATOR});
-    // steps.append(exs::BINARY_OPERATION, {exs::AND_OPERATOR});
-    // steps.append(exs::BINARY_OPERATION, {exs::OR_OPERATOR});
+    steps.append(exs::UNARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
+    steps.append(exs::BINARY_OPERATION, {exs::POWER_OPERATOR});
+    steps.append(exs::BINARY_OPERATION, {exs::MULTIPLY_OPERATOR, exs::DIVIDE_OPERATOR});
+    steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 
     solver =
         std::make_unique<exs::Solver<NumericalAtom, NumericalSettings>>(operators, steps, settings);

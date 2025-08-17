@@ -63,7 +63,7 @@ function test_code {
 	    EXEC_FLAGS="--gtest_filter="${2}" ${EXEC_FLAGS}"
 	fi
 	cd $DIR_BUILD
-	$EXEC_PROGRAM ./GTestModule-$1 $EXEC_FLAGS
+	$EXEC_PROGRAM ./bin/gtest-$1 $EXEC_FLAGS
     else
 	cd $DIR_BUILD
 	ctest -R gtest
