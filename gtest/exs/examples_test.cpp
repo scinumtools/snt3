@@ -19,26 +19,26 @@ std::string run_program(const std::string& cmd) {
 }
 
 TEST(Examples, SolverUniquePtr) {
-  std::string output = run_program("./SolverUniquePtr");
+  std::string output = run_program("./bin/SolverUniquePtr");
   EXPECT_EQ(output, "false\n");
 }
 
 TEST(Examples, SolverCustom) {
-  std::string output = run_program("./SolverCustom");
+  std::string output = run_program("./bin/SolverCustom");
   EXPECT_EQ(output, "true\n");
 }
 
 TEST(Examples, SolverDefault) {
-  std::string output = run_program("./SolverDefault");
+  std::string output = run_program("./bin/SolverDefault");
   EXPECT_EQ(output, "797.5\n");
 }
 
 TEST(Examples, SolverArray) {
-  std::string output = run_program("./SolverArray");
+  std::string output = run_program("./bin/SolverArray");
   EXPECT_EQ(output, "{5}\n{5 7 9}\n");
 }
 
 TEST(Examples, SolverSettings) {
-  std::string output = run_program("./SolverSettings");
+  std::string output = run_program("./bin/SolverSettings");
   EXPECT_EQ(output, "3\n");
 }
