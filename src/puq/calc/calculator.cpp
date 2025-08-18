@@ -8,7 +8,7 @@ namespace puq {
   Calculator::Calculator() {
 
     exs::OperatorList<CalculatorAtom> operators;
-    operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<exs::OperatorGroup<CalculatorAtom, 1>>("par", "( ", exs::PARENTHESES_OPERATOR, "( ", " )", " , "));
+    operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<exs::OperatorGroup<CalculatorAtom, 1>>("par", exs::OperatorGroupSybols("", "( ", " )", " , "), exs::PARENTHESES_OPERATOR));
     operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<CalculatorAtom>>(" + "));
     operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract<CalculatorAtom>>(" - "));
     operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply<CalculatorAtom>>(" * "));

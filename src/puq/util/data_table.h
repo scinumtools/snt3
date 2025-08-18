@@ -1,8 +1,8 @@
 #ifndef PUQ_DATA_TABLE_H
 #define PUQ_DATA_TABLE_H
 
-#include <iomanip>
 #include "display_length.h"
+#include <iomanip>
 
 namespace puq {
 

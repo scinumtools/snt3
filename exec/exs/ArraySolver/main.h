@@ -23,6 +23,6 @@ public:
 
 class OperatorArray : public exs::OperatorGroup<CustomAtom> {
 public:
-  OperatorArray() : OperatorGroup<CustomAtom>("arr", "[", ARRAY_OPERATOR, "[", "]") {};
+  OperatorArray() : OperatorGroup<CustomAtom>("arr", {"", "[", "]", ","}, ARRAY_OPERATOR) {};
   void operate_group(exs::TokenListBase<CustomAtom>* tokens);
 };

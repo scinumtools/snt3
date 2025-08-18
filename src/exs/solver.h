@@ -94,9 +94,11 @@ namespace exs {
 
   private:
     void init_steps() {
-      steps.append(GROUP_OPERATION, {PARENTHESES_OPERATOR, EXPONENT_OPERATOR, LOGARITHM_OPERATOR,
-                                     LOGARITHM_10_OPERATOR, LOGARITHM_BASE_OPERATOR, POWER_BASE_OPERATOR,
-                                     SQUARE_ROOT_OPERATOR, SINUS_OPERATOR, COSINUS_OPERATOR, TANGENS_OPERATOR});
+      steps.append(GROUP_OPERATION, {EXPONENT_OPERATOR, LOGARITHM_OPERATOR, LOGARITHM_10_OPERATOR,
+                                     LOGARITHM_BASE_OPERATOR, POWER_BASE_OPERATOR,
+                                     SQUARE_ROOT_OPERATOR, CUBIC_ROOT_OPERATOR,
+                                     SINUS_OPERATOR, COSINUS_OPERATOR, TANGENS_OPERATOR});
+      steps.append(GROUP_OPERATION, {PARENTHESES_OPERATOR});
       steps.append(UNARY_OPERATION, {ADD_OPERATOR, SUBTRACT_OPERATOR});
       steps.append(TERNARY_OPERATION, {CONDITION_OPERATOR});
       steps.append(BINARY_OPERATION, {POWER_OPERATOR});
@@ -113,6 +115,7 @@ namespace exs {
       operators.append(TANGENS_OPERATOR, std::make_shared<OperatorTangens<A, S>>());
       operators.append(COSINUS_OPERATOR, std::make_shared<OperatorCosinus<A, S>>());
       operators.append(SINUS_OPERATOR, std::make_shared<OperatorSinus<A, S>>());
+      operators.append(CUBIC_ROOT_OPERATOR, std::make_shared<OperatorCubicRoot<A, S>>());
       operators.append(SQUARE_ROOT_OPERATOR, std::make_shared<OperatorSquareRoot<A, S>>());
       operators.append(POWER_BASE_OPERATOR, std::make_shared<OperatorPowerBase<A, S>>());
       operators.append(LOGARITHM_BASE_OPERATOR, std::make_shared<OperatorLogarithmBase<A, S>>());

@@ -1,6 +1,6 @@
 #import "main.h"
 
-OperatorLength::OperatorLength() : OperatorGroup<CustomAtom, 1>("len", "len(", LENGTH_OPERATOR) {}
+OperatorLength::OperatorLength() : OperatorGroup<CustomAtom, 1>("len", {"len", "(", ")", ","}, LENGTH_OPERATOR) {}
 
 void OperatorLength::operate_group(exs::TokenListBase<CustomAtom>* tokens) {
   exs::Token<CustomAtom> group1 = tokens->get_left();

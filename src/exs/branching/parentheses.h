@@ -6,7 +6,7 @@ namespace exs {
   template <class A, typename S = EmptySettings>
   class OperatorParentheses : public OperatorGroup<A, 1, S> {
   public:
-    OperatorParentheses(const std::string so = "(", const std::string sc = ")") : OperatorGroup<A, 1, S>("par", so, PARENTHESES_OPERATOR, so, sc, ",") {}
+    OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","}) : OperatorGroup<A, 1, S>("par", s, PARENTHESES_OPERATOR) {}
   };
 
 } // namespace exs

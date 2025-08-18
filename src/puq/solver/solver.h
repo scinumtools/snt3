@@ -36,7 +36,7 @@ namespace puq {
   class OperatorParentheses : public exs::OperatorGroup<UnitAtom, 1> {
   public:
     std::vector<EXPONENT_TYPE> exponent;
-    OperatorParentheses() : OperatorGroup<UnitAtom, 1>("par", "(", exs::PARENTHESES_OPERATOR, "(", ")", ",") {}
+    OperatorParentheses() : OperatorGroup<UnitAtom, 1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
     virtual bool check(exs::Expression& expr);
     virtual void parse(exs::Expression& expr);
     void operate_group(exs::TokenListBase<UnitAtom>* tokens);
@@ -50,8 +50,7 @@ namespace puq {
 
   class OperatorArray : public exs::OperatorGroup<UnitAtom> {
   public:
-    OperatorArray() : OperatorGroup<UnitAtom>("arr", SYMBOL_ARRAY_START, ARRAY_OPERATOR,
-                                              SYMBOL_ARRAY_START, SYMBOL_ARRAY_END) {}
+    OperatorArray() : OperatorGroup<UnitAtom>("arr", {"", std::string(SYMBOL_ARRAY_START), std::string(SYMBOL_ARRAY_END), ","}, ARRAY_OPERATOR) {}
     void operate_group(exs::TokenListBase<UnitAtom>* tokens);
   };
 

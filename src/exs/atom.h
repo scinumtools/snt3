@@ -133,6 +133,9 @@ namespace exs {
     void math_square_root() {
       value = std::sqrt(std::get<float>(value));
     }
+    void math_cubic_root() {
+      value = std::cbrt(std::get<float>(value));
+    }
     void math_sinus() {
       value = std::sin(std::get<float>(value));
     }

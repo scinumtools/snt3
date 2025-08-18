@@ -6,7 +6,7 @@ namespace exs {
   template <class A, typename S = EmptySettings>
   class OperatorPowerBase : public OperatorGroup<A, 2, S> {
   public:
-    OperatorPowerBase() : OperatorGroup<A, 2, S>("powb", "powb(", POWER_BASE_OPERATOR) {}
+    OperatorPowerBase(const OperatorGroupSybols& s = {"powb", "(", ")", ","}) : OperatorGroup<A, 2, S>("powb", s, POWER_BASE_OPERATOR) {}
     void operate_group(TokenListBase<A>* tokens) override {
       Token<A> group2 = tokens->get_left();
       Token<A> group1 = tokens->get_left();

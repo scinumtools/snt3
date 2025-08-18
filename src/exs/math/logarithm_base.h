@@ -6,7 +6,7 @@ namespace exs {
   template <class A, typename S = EmptySettings>
   class OperatorLogarithmBase : public OperatorGroup<A, 2, S> {
   public:
-    OperatorLogarithmBase() : OperatorGroup<A, 2, S>("logb", "logb(", LOGARITHM_BASE_OPERATOR) {}
+    OperatorLogarithmBase(const OperatorGroupSybols& s = {"logb", "(", ")", ","}) : OperatorGroup<A, 2, S>("logb", s, LOGARITHM_BASE_OPERATOR) {}
     void operate_group(TokenListBase<A>* tokens) override {
       Token<A> group2 = tokens->get_left();
       Token<A> group1 = tokens->get_left();

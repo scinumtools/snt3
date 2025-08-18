@@ -17,7 +17,7 @@ TEST(SolverNumerical, AddSubtract) {
 
   atom = solver.eval("+1.23");
   EXPECT_EQ(atom.value->to_string(), "1.2300");
-  
+
   atom = solver.eval("-1.23");
   EXPECT_EQ(atom.value->to_string(), "-1.2300");
 
@@ -37,7 +37,6 @@ TEST(SolverNumerical, MultiplyDivide) {
 
   atom = solver.eval("1.23 * 4.56 / 7.89");
   EXPECT_EQ(atom.value->to_string(), "0.7109");
-
 }
 
 TEST(SolverNumerical, Power) {
@@ -46,5 +45,4 @@ TEST(SolverNumerical, Power) {
   dip::NumericalSolver solver(env);
   dip::NumericalAtom atom = solver.eval("1.23 ** 4.56");
   EXPECT_EQ(atom.value->to_string(), "2.5702");
-
 }

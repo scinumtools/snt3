@@ -63,16 +63,19 @@ namespace exs {
     };
   };
 
+  struct OperatorGroupSybols {
+    std::string prefix = "";
+    std::string open = "(";
+    std::string close = ")";
+    std::string separator = ",";
+  };
+
   template <class A, int N = 0, typename S = EmptySettings>
   class OperatorGroup : public OperatorBase<A, S> {
   public:
     size_t num_groups = N;
-    std::string symbol_open;
-    std::string symbol_close;
-    std::string symbol_separator;
-    OperatorGroup(const std::string n, const std::string s, const int t) : OperatorBase<A, S>(n, s, t), symbol_open("("), symbol_close(")"), symbol_separator(",") {}
-    OperatorGroup(const std::string n, const std::string s, const int t, const std::string so, const std::string sc) : OperatorBase<A, S>(n, s, t), symbol_open(so), symbol_close(sc), symbol_separator(",") {}
-    OperatorGroup(const std::string n, const std::string s, const int t, const std::string so, const std::string sc, const std::string ss) : OperatorBase<A, S>(n, s, t), symbol_open(so), symbol_close(sc), symbol_separator(ss) {}
+    OperatorGroupSybols symbols;
+    OperatorGroup(const std::string& n, const OperatorGroupSybols& s, const int t) : OperatorBase<A, S>(n, s.prefix + s.open, t), symbols(s) {}
     virtual void parse(Expression& expr) override {
       this->groups.clear();
       expr.remove(this->symbol);
@@ -80,15 +83,15 @@ namespace exs {
       while (depth > 0) {
         if (expr.right.length() == 0) {
           throw std::logic_error("Unclosed parentheses: " + expr.expr);
-        } else if (expr.right.rfind(this->symbol, 0) == 0 || expr.right.rfind(symbol_open, 0) == 0) {
+        } else if (expr.right.rfind(this->symbol, 0) == 0 || expr.right.rfind(symbols.open, 0) == 0) {
           depth++;
-        } else if (expr.right.rfind(symbol_separator, 0) == 0 && depth == 1) {
-          expr.remove(symbol_separator);
+        } else if (expr.right.rfind(symbols.separator, 0) == 0 && depth == 1) {
+          expr.remove(symbols.separator);
           this->groups.push_back(expr.pop_left());
-        } else if (expr.right.rfind(symbol_close, 0) == 0) {
+        } else if (expr.right.rfind(symbols.close, 0) == 0) {
           depth--;
           if (depth == 0) {
-            expr.remove(symbol_close);
+            expr.remove(symbols.close);
             this->groups.push_back(expr.pop_left());
             break;
           }
@@ -108,6 +111,7 @@ namespace exs {
 
 #include "math/add.h"
 #include "math/cosinus.h"
+#include "math/cubic_root.h"
 #include "math/divide.h"
 #include "math/exponent.h"
 #include "math/logarithm.h"

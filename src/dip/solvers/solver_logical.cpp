@@ -79,7 +79,7 @@ namespace dip {
     exs::OperatorList<LogicalAtom, LogicalSettings> operators;
     operators.append(
         exs::PARENTHESES_OPERATOR,
-        std::make_shared<exs::OperatorParentheses<LogicalAtom, LogicalSettings>>("( ", " )"));
+        std::make_shared<exs::OperatorParentheses<LogicalAtom, LogicalSettings>>(exs::OperatorGroupSybols("", "( ", " )", ", ")));
     operators.append(exs::EQUAL_OPERATOR,
                      std::make_shared<exs::OperatorEqual<LogicalAtom, LogicalSettings>>(" == "));
     operators.append(exs::NOT_EQUAL_OPERATOR,

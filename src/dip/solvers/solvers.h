@@ -65,9 +65,10 @@ namespace dip {
 
     static val::BaseValue::PointerType from_string(const std::string& s, NumericalSettings* settings);
     std::string to_string();
+    void math_cubic_root();
     void math_square_root();
-    void math_power_base(NumericalAtom* other);
-    void math_logarithm_base(NumericalAtom* other);
+    // void math_power_base(NumericalAtom* other);
+    // void math_logarithm_base(NumericalAtom* other);
     void math_logarithm_10();
     void math_logarithm();
     void math_exponent();

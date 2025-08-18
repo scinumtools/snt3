@@ -26,7 +26,7 @@ namespace dip {
       if (node == nullptr)
         node = FloatNode::is_node(parser);
       if (node == nullptr)
-	node = StringNode::is_node(parser);
+        node = StringNode::is_node(parser);
       if (node == nullptr)
         throw std::runtime_error("Value could not be determined from : " + s);
       ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node);
@@ -42,18 +42,18 @@ namespace dip {
   }
 
   // Mathematical operations
-  //void NumericalAtom::math_cubic_root() {
-  //  value = value->math_cbrt();
-  //}
+  void NumericalAtom::math_cubic_root() {
+    value = value->math_cbrt();
+  }
   void NumericalAtom::math_square_root() {
     value = value->math_sqrt();
   }
-  //void NumericalAtom::math_power_base(NumericalAtom* other) {
-  //  value = value->math_powb(other->value.get());
-  //}
-  //void NumericalAtom::math_logarithm_base(NumericalAtom* other) {
-  //  value = value->math_logb(other->value.get());
-  //}
+  // void NumericalAtom::math_power_base(NumericalAtom* other) {
+  //   value = value->math_powb(other->value.get());
+  // }
+  // void NumericalAtom::math_logarithm_base(NumericalAtom* other) {
+  //   value = value->math_logb(other->value.get());
+  // }
   void NumericalAtom::math_logarithm_10() {
     value = value->math_log10();
   }
@@ -86,50 +86,52 @@ namespace dip {
 
     NumericalSettings settings = {&env};
 
-    exs::OperatorList<NumericalAtom, NumericalSettings> operators; 
-    //operators.append(
-    //    exs::CUBIC_ROOT_OPERATOR,
-    //    std::make_shared<exs::OperatorCubicRoot<NumericalAtom, NumericalSettings>>("cbrt( ", " )"));
+    exs::OperatorList<NumericalAtom, NumericalSettings> operators;
+    operators.append(
+        exs::CUBIC_ROOT_OPERATOR,
+        std::make_shared<exs::OperatorCubicRoot<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("cbrt", "( ", " )", ", ")));
     operators.append(
         exs::SQUARE_ROOT_OPERATOR,
-        std::make_shared<exs::OperatorSquareRoot<NumericalAtom, NumericalSettings>>()); //"sqrt( ", " )"));
-    //operators.append(
-    //    exs::POWER_BASE_OPERATOR,
-    //    std::make_shared<exs::OperatorPowerBase<NumericalAtom, NumericalSettings>>("powb( ", " )"));
-    //operators.append(
-    //    exs::LOGARITHM_BASE_OPERATOR,
-    //    std::make_shared<exs::OperatorLogarithmBase<NumericalAtom, NumericalSettings>>("logb( ", " )"));
+        std::make_shared<exs::OperatorSquareRoot<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("sqrt", "( ", " )", ", ")));
+    // operators.append(
+    //     exs::POWER_BASE_OPERATOR,
+    //     std::make_shared<exs::OperatorPowerBase<NumericalAtom, NumericalSettings>>("powb( ", " )"));
+    // operators.append(
+    //     exs::LOGARITHM_BASE_OPERATOR,
+    //     std::make_shared<exs::OperatorLogarithmBase<NumericalAtom, NumericalSettings>>("logb( ", " )"));
     operators.append(
         exs::LOGARITHM_10_OPERATOR,
-        std::make_shared<exs::OperatorLogarithm10<NumericalAtom, NumericalSettings>>()); //"log10( ", " )"));
+        std::make_shared<exs::OperatorLogarithm10<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("log10", "( ", " )", ", ")));
+    ;
     operators.append(
         exs::LOGARITHM_OPERATOR,
-        std::make_shared<exs::OperatorLogarithm<NumericalAtom, NumericalSettings>>()); //"log( ", " )"));
+        std::make_shared<exs::OperatorLogarithm<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("log", "( ", " )", ", ")));
     operators.append(
         exs::EXPONENT_OPERATOR,
-        std::make_shared<exs::OperatorExponent<NumericalAtom, NumericalSettings>>()); //"exp( ", " )"));
+        std::make_shared<exs::OperatorExponent<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("exp", "( ", " )", ", ")));
     operators.append(
         exs::PARENTHESES_OPERATOR,
-        std::make_shared<exs::OperatorParentheses<NumericalAtom, NumericalSettings>>("( ", " )"));
+        std::make_shared<exs::OperatorParentheses<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("", "( ", " )", ", ")));
     operators.append(exs::POWER_OPERATOR,
                      std::make_shared<exs::OperatorPower<NumericalAtom, NumericalSettings>>(" ** "));
     operators.append(exs::MULTIPLY_OPERATOR,
                      std::make_shared<exs::OperatorMultiply<NumericalAtom, NumericalSettings>>(" * "));
     operators.append(exs::DIVIDE_OPERATOR,
-		     std::make_shared<exs::OperatorDivide<NumericalAtom, NumericalSettings>>(" / "));
+                     std::make_shared<exs::OperatorDivide<NumericalAtom, NumericalSettings>>(" / "));
     operators.append(exs::ADD_OPERATOR,
                      std::make_shared<exs::OperatorAdd<NumericalAtom, NumericalSettings>>(" +"));
     operators.append(exs::SUBTRACT_OPERATOR,
-		     std::make_shared<exs::OperatorSubtract<NumericalAtom, NumericalSettings>>(" -"));
+                     std::make_shared<exs::OperatorSubtract<NumericalAtom, NumericalSettings>>(" -"));
 
     exs::StepList steps;
-    steps.append(exs::GROUP_OPERATION, {exs::EXPONENT_OPERATOR, exs::LOGARITHM_OPERATOR,
-					exs::LOGARITHM_10_OPERATOR,
-					//exs::LOGARITHM_BASE_OPERATOR, exs::POWER_BASE_OPERATOR,
-					exs::SQUARE_ROOT_OPERATOR,
-					//exs::CUBIC_ROOT_OPERATOR,
-					//exs::SINUS_OPERATOR, exs::COSINUS_OPERATOR, exs::TANGENS_OPERATOR
-      });
+    steps.append(exs::GROUP_OPERATION, {
+                                           exs::EXPONENT_OPERATOR, exs::LOGARITHM_OPERATOR,
+                                           exs::LOGARITHM_10_OPERATOR,
+                                           // exs::LOGARITHM_BASE_OPERATOR, exs::POWER_BASE_OPERATOR,
+                                           exs::SQUARE_ROOT_OPERATOR,
+                                           // exs::CUBIC_ROOT_OPERATOR,
+                                           // exs::SINUS_OPERATOR, exs::COSINUS_OPERATOR, exs::TANGENS_OPERATOR
+                                       });
     steps.append(exs::GROUP_OPERATION, {exs::PARENTHESES_OPERATOR});
     steps.append(exs::UNARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
     steps.append(exs::BINARY_OPERATION, {exs::POWER_OPERATOR});
