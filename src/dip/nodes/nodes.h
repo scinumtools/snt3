@@ -1,14 +1,14 @@
 #ifndef DIP_NODES_H
 #define DIP_NODES_H
 
+#include "../../val/values.h"
+#include "../settings.h"
+
 #include <deque>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <vector>
-
-#include "../../val/values.h"
-#include "../settings.h"
 
 namespace dip {
 

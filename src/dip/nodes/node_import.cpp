@@ -1,8 +1,8 @@
-#include <array>
-#include <fstream>
-
 #include "../environment.h"
 #include "nodes.h"
+
+#include <array>
+#include <fstream>
 
 namespace dip {
 

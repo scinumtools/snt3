@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "dip/solvers/solvers.h"
+
+#include <gtest/gtest.h>
 
 TEST(SolverNumerical, AddSubtract) {
 

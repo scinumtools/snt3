@@ -1,10 +1,10 @@
-#include <filesystem>
-#include <fstream>
-#include <gtest/gtest.h>
-
 #include "dip/dip.h"
 #include "dip/environment.h"
 #include "dip/nodes/nodes.h"
+
+#include <filesystem>
+#include <fstream>
+#include <gtest/gtest.h>
 
 TEST(References, BooleanValues) {
 

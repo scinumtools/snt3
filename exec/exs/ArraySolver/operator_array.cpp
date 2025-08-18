@@ -1,6 +1,6 @@
-#import <algorithm>
-
 #import "main.h"
+
+#import <algorithm>
 
 void OperatorArray::operate_group(exs::TokenListBase<CustomAtom>* tokens) {
   exs::Token<CustomAtom> group1 = tokens->get_left();

@@ -1,8 +1,9 @@
-#include <iostream>
+#include "quantity.h"
 
 #include "converter.h"
-#include "quantity.h"
 #include "unit_format.h"
+
+#include <iostream>
 
 namespace puq {
 

@@ -1,10 +1,10 @@
 #ifndef PUQ_VALUE_H
 #define PUQ_VALUE_H
 
-#include <vector>
-
 #include "../settings.h"
 #include "../systems/systems.h"
+
+#include <vector>
 
 namespace puq {
 

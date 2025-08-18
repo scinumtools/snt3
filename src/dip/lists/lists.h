@@ -1,13 +1,13 @@
 #ifndef DIP_LISTS_H
 #define DIP_LISTS_H
 
+#include "../nodes/nodes.h"
+#include "../settings.h"
+
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "../nodes/nodes.h"
-#include "../settings.h"
 
 namespace dip {
 

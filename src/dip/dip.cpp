@@ -1,11 +1,12 @@
+#include "dip.h"
+
+#include "parsers.h"
+#include "settings.h"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include "dip.h"
-#include "parsers.h"
-#include "settings.h"
 
 namespace dip {
 

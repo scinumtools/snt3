@@ -1,4 +1,5 @@
 #include "exs/exs.h"
+
 #include "settings.h"
 
 typedef std::unique_ptr<bool> UniquePtrType;

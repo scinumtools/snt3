@@ -1,6 +1,6 @@
-#include <array>
-
 #include "exs/exs.h"
+
+#include <array>
 
 struct Settings {
   std::string symbol;

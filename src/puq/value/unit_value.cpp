@@ -1,10 +1,10 @@
-#include <iostream>
-#include <memory>
-#include <sstream>
-
 #include "../converter.h"
 #include "../solver/solver.h"
 #include "value.h"
+
+#include <iostream>
+#include <memory>
+#include <sstream>
 
 namespace puq {
 

@@ -1,7 +1,7 @@
+#include "lists.h"
+
 #include <iostream>
 #include <sstream>
-
-#include "lists.h"
 
 namespace dip {
 

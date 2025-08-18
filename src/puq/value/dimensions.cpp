@@ -1,11 +1,11 @@
+#include "../nostd/nostd.h"
+#include "../settings.h"
+#include "value.h"
+
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-
-#include "../nostd/nostd.h"
-#include "../settings.h"
-#include "value.h"
 
 namespace puq {
 

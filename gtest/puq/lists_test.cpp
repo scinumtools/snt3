@@ -1,9 +1,9 @@
-#include <gtest/gtest.h>
-#include <set>
-
 #include "puq/solver/solver.h"
 #include "puq/systems/systems.h"
 #include "puq/value/value.h"
+
+#include <gtest/gtest.h>
+#include <set>
 
 inline void check_symbol(std::set<std::string>& set, const std::string& symbol) {
   auto result = set.insert(symbol);

@@ -1,8 +1,8 @@
-#include <regex>
-
 #include "../parsers.h"
 #include "../solvers/solvers.h"
 #include "nodes.h"
+
+#include <regex>
 
 namespace dip {
 

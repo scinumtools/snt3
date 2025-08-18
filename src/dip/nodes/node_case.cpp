@@ -1,7 +1,7 @@
-#include <regex>
-
 #include "../environment.h"
 #include "nodes.h"
+
+#include <regex>
 
 namespace dip {
 

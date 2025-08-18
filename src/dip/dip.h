@@ -1,11 +1,11 @@
 #ifndef DIP_DIP_H
 #define DIP_DIP_H
 
+#include "environment.h"
+
 #include <array>
 #include <iostream>
 #include <queue>
-
-#include "environment.h"
 
 namespace dip {
 

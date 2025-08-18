@@ -1,7 +1,7 @@
+#include "exponent.h"
+
 #include <numeric>
 #include <sstream>
-
-#include "exponent.h"
 
 #ifdef EXPONENT_FRACTIONS
 

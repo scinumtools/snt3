@@ -2,7 +2,9 @@
 #define PUQ_DATA_TABLE_H
 
 #include "display_length.h"
+
 #include <iomanip>
+#include <sstream>
 
 namespace puq {
 

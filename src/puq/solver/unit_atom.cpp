@@ -1,8 +1,8 @@
-#include <algorithm>
-#include <regex>
-
 #include "../nostd/nostd.h"
 #include "solver.h"
+
+#include <algorithm>
+#include <regex>
 
 namespace puq {
 

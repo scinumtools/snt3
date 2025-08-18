@@ -1,11 +1,11 @@
 #ifndef DIP_SETTINGS_H
 #define DIP_SETTINGS_H
 
-#include <sstream>
-#include <string>
-
 #include "../puq/quantity.h"
 #include "../settings.h"
+
+#include <sstream>
+#include <string>
 
 namespace dip {
 

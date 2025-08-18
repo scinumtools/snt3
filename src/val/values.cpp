@@ -1,6 +1,6 @@
-#include <map>
-
 #include "values.h"
+
+#include <map>
 
 namespace val {
 

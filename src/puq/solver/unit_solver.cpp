@@ -1,7 +1,7 @@
+#include "solver.h"
+
 #include <memory>
 #include <regex>
-
-#include "solver.h"
 
 namespace puq {
 

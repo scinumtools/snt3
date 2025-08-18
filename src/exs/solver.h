@@ -1,13 +1,13 @@
 #ifndef EXS_SOLVER_H
 #define EXS_SOLVER_H
 
-#include <memory>
-#include <stdexcept>
-#include <unordered_map>
-
 #include "settings.h"
 #include "step_list.h"
 #include "token_list.h"
+
+#include <memory>
+#include <stdexcept>
+#include <unordered_map>
 
 namespace exs {
 

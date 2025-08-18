@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
-
 #include "puq/array.h"
 #include "puq/converter.h"
 #include "puq/value/value.h"
+
+#include <gtest/gtest.h>
 
 TEST(UnitValue, Initialization) {
 

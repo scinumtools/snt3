@@ -1,9 +1,9 @@
 #ifndef DIP_PARSERS_H
 #define DIP_PARSERS_H
 
-#include <queue>
-
 #include "lists/lists.h"
+
+#include <queue>
 
 namespace dip {
 

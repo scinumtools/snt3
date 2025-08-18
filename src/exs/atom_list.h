@@ -1,9 +1,9 @@
 #ifndef EXS_ATOM_LIST_H
 #define EXS_ATOM_LIST_H
 
-#include <memory>
-
 #include "settings.h"
+
+#include <memory>
 
 namespace exs {
 

@@ -1,7 +1,7 @@
+#include "calc.h"
+
 #include <memory>
 #include <regex>
-
-#include "calc.h"
 
 namespace puq {
 

@@ -1,10 +1,10 @@
-#include <algorithm>
-#include <regex>
-#include <sstream>
-
 #include "../nostd/nostd.h"
 #include "../value/value.h"
 #include "calc.h"
+
+#include <algorithm>
+#include <regex>
+#include <sstream>
 
 namespace puq {
 

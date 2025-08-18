@@ -1,10 +1,10 @@
 #ifndef PUQ_LISTS_H
 #define PUQ_LISTS_H
 
+#include "systems/systems.h"
+
 #include <string>
 #include <vector>
-
-#include "systems/systems.h"
 
 namespace puq {
 

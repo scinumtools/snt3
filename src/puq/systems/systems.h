@@ -1,14 +1,14 @@
 #ifndef PUQ_SYSTEMS_H
 #define PUQ_SYSTEMS_H
 
+#include "../magnitude.h"
+#include "../settings.h"
+
 #include <map>
 #include <set>
 #include <sstream>
 #include <stack>
 #include <string>
-
-#include "../magnitude.h"
-#include "../settings.h"
 
 namespace puq {
 

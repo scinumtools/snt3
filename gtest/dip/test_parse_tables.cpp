@@ -1,10 +1,9 @@
-#include <gtest/gtest.h>
-
-#include <iostream>
-
 #include "dip/dip.h"
 #include "dip/environment.h"
 #include "dip/nodes/nodes.h"
+
+#include <gtest/gtest.h>
+#include <iostream>
 
 TEST(ParseTables, BasicTable) {
 

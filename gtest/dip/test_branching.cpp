@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
-
 #include "dip/dip.h"
 #include "dip/environment.h"
 #include "dip/nodes/nodes.h"
+
+#include <gtest/gtest.h>
 
 TEST(Branchig, FirstCase) {
 

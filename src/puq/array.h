@@ -1,12 +1,12 @@
 #ifndef PUQ_ARRAY_H
 #define PUQ_ARRAY_H
 
+#include "exponent.h"
+#include "settings.h"
+
 #include <array>
 #include <iostream>
 #include <vector>
-
-#include "exponent.h"
-#include "settings.h"
 
 #ifdef MAGNITUDE_ARRAYS
 

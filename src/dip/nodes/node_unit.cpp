@@ -1,10 +1,10 @@
-#include <array>
-#include <fstream>
-
 #include "../dip.h"
 #include "../environment.h"
 #include "../parsers.h"
 #include "nodes.h"
+
+#include <array>
+#include <fstream>
 
 namespace dip {
 

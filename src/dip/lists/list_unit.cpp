@@ -1,7 +1,7 @@
-#include <stdexcept>
-
 #include "../environment.h"
 #include "lists.h"
+
+#include <stdexcept>
 
 namespace dip {
 

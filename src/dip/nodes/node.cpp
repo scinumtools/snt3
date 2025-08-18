@@ -1,7 +1,7 @@
+#include "nodes.h"
+
 #include <sstream>
 #include <tuple>
-
-#include "nodes.h"
 
 namespace dip {
 

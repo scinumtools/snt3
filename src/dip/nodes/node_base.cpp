@@ -1,6 +1,6 @@
-#include <sstream>
-
 #include "nodes.h"
+
+#include <sstream>
 
 namespace dip {
 

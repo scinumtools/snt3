@@ -9,7 +9,7 @@ AllowShortFunctionsOnASingleLine: Inline
 DerivePointerAlignment: false
 PointerAlignment: Left
 SortIncludes: true
-IncludeBlocks: Preserve   # or 'Regroup' to combine similar includes
+IncludeBlocks: Regroup  
 IncludeCategories:
   - Regex: '^"exs/.*"$'   # project headers
     Priority: 1

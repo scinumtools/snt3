@@ -1,12 +1,12 @@
 #ifndef PUQ_UNIT_FORMAT_H
 #define PUQ_UNIT_FORMAT_H
 
+#include "settings.h"
+
 #include <iostream>
 #include <optional>
 #include <string>
 #include <unordered_map>
-
-#include "settings.h"
 
 namespace puq {
 

@@ -1,12 +1,12 @@
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-
 #include "../nostd/nostd.h"
 #include "../settings.h"
 #include "../solver/solver.h"
 #include "value.h"
+
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 namespace puq {
 

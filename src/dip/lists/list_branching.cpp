@@ -1,6 +1,6 @@
-#include <regex>
-
 #include "lists.h"
+
+#include <regex>
 
 namespace dip {
 

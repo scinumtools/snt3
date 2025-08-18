@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "puq/value/value.h"
+
+#include <gtest/gtest.h>
 
 TEST(BaseUnits, Initialization) {
 

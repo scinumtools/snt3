@@ -1,9 +1,9 @@
 #ifndef VAL_VALUES_NUMBER_H
 #define VAL_VALUES_NUMBER_H
 
-#include <typeinfo>
-
 #include "values.h"
+
+#include <typeinfo>
 
 namespace val {
 

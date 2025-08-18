@@ -1,8 +1,8 @@
-#include <stdexcept>
-
 #include "../environment.h"
 #include "../parsers.h"
 #include "nodes.h"
+
+#include <stdexcept>
 
 namespace dip {
 

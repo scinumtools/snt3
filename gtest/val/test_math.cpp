@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "val/values.h"
+
+#include <gtest/gtest.h>
 
 TEST(Math, Add) {
 

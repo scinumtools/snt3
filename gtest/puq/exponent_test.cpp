@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "puq/exponent.h"
+
+#include <gtest/gtest.h>
 
 #ifdef EXPONENT_FRACTIONS
 

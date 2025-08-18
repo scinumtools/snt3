@@ -1,10 +1,10 @@
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-
 #include "nostd/nostd.h"
 #include "systems/systems.h"
 #include "util/data_table.h"
+
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 namespace puq {
 

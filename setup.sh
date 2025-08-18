@@ -85,9 +85,9 @@ function grep_code {
 }
 
 function setup_clang_format {
-    git ls-files 'src/*.cpp' 'src/*.h' | xargs clang-format -i
-    git ls-files 'exec/*.cpp' 'exec/*.h' | xargs clang-format -i
-    git ls-files 'gtest/*.cpp' 'gtest/*.h' | xargs clang-format -i
+    find src -name '*.cpp' -o -name '*.h' | xargs clang-format -i
+    find exec -name '*.cpp' -o -name '*.h' | xargs clang-format -i
+    find gtest -name '*.cpp' -o -name '*.h' | xargs clang-format -i
 }
 
 function show_help {

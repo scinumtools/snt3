@@ -1,6 +1,8 @@
 #ifndef VAL_VALUES_H
 #define VAL_VALUES_H
 
+#include "../settings.h"
+
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -14,8 +16,6 @@
 #include <typeinfo>
 #include <unordered_map>
 #include <vector>
-
-#include "../settings.h"
 
 namespace val {
 

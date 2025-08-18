@@ -1,6 +1,6 @@
-#include <vector>
-
 #include "exs/exs.h"
+
+#include <vector>
 
 enum CustomOperatorType {
   ARRAY_OPERATOR = exs::NUM_OPERATOR_TYPES

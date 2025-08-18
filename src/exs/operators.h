@@ -1,9 +1,9 @@
 #ifndef EXS_OPERATORS_H
 #define EXS_OPERATORS_H
 
-#include <stdexcept>
-
 #include "settings.h"
+
+#include <stdexcept>
 
 namespace exs {
 
@@ -109,6 +109,17 @@ namespace exs {
 
 } // namespace exs
 
+#include "branching/condition.h"
+#include "branching/parentheses.h"
+#include "comparison/equal.h"
+#include "comparison/greater.h"
+#include "comparison/greater_equal.h"
+#include "comparison/less.h"
+#include "comparison/less_equal.h"
+#include "comparison/not_equal.h"
+#include "logical/and.h"
+#include "logical/not.h"
+#include "logical/or.h"
 #include "math/add.h"
 #include "math/cosinus.h"
 #include "math/cubic_root.h"
@@ -125,19 +136,5 @@ namespace exs {
 #include "math/square_root.h"
 #include "math/subtract.h"
 #include "math/tangens.h"
-
-#include "comparison/equal.h"
-#include "comparison/greater.h"
-#include "comparison/greater_equal.h"
-#include "comparison/less.h"
-#include "comparison/less_equal.h"
-#include "comparison/not_equal.h"
-
-#include "logical/and.h"
-#include "logical/not.h"
-#include "logical/or.h"
-
-#include "branching/condition.h"
-#include "branching/parentheses.h"
 
 #endif // EXS_OPERATORS_H

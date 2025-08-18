@@ -1,9 +1,10 @@
-#include <fstream>
-#include <iostream>
+#include "parsers.h"
 
 #include "dip.h"
 #include "helpers.h"
-#include "parsers.h"
+
+#include <fstream>
+#include <iostream>
 
 namespace dip {
 

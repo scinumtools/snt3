@@ -1,12 +1,13 @@
+#include "main.h"
+
+#include "puq/lists.h"
+
 #include <deque>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
 #include <stdexcept>
-
-#include "puq/lists.h"
-#include "main.h"
 
 class InputParser {
 public:

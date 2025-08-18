@@ -1,6 +1,6 @@
-#include <sstream>
-
 #include "main.h"
+
+#include <sstream>
 
 std::string CustomAtom::to_string() {
   std::stringstream ss;

@@ -1,12 +1,12 @@
 #ifndef EXS_TOKEN_LIST_H
 #define EXS_TOKEN_LIST_H
 
+#include "settings.h"
+
 #include <algorithm>
 #include <deque>
 #include <stdexcept>
 #include <vector>
-
-#include "settings.h"
 
 namespace exs {
 

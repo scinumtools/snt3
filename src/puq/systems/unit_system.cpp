@@ -1,10 +1,10 @@
-#include <fstream>
-#include <sstream>
-#include <sys/stat.h>
-
 #include "../nostd/nostd.h"
 #include "../solver/solver.h"
 #include "systems.h"
+
+#include <fstream>
+#include <sstream>
+#include <sys/stat.h>
 
 namespace puq {
 

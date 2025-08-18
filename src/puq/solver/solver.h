@@ -1,13 +1,13 @@
 #ifndef PUQ_SOLVER_H
 #define PUQ_SOLVER_H
 
-#include <cmath>
-#include <set>
-
 #include "../../exs/exs.h"
 #include "../settings.h"
 #include "../systems/systems.h"
 #include "../value/value.h"
+
+#include <cmath>
+#include <set>
 
 namespace puq {
 

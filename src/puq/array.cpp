@@ -1,10 +1,11 @@
+#include "array.h"
+
+#include "nostd/nostd.h"
+
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include "array.h"
-#include "nostd/nostd.h"
 
 #ifdef MAGNITUDE_ARRAYS
 

@@ -1,11 +1,11 @@
+#include "../helpers.h"
+#include "../parsers.h"
+#include "nodes.h"
+
 #include <iostream>
 #include <regex>
 #include <sstream>
 #include <stdexcept>
-
-#include "../helpers.h"
-#include "../parsers.h"
-#include "nodes.h"
 
 namespace dip {
 

@@ -1,8 +1,8 @@
-#include <stdexcept>
-
 #include "../parsers.h"
 #include "../solvers/solvers.h"
 #include "nodes.h"
+
+#include <stdexcept>
 
 namespace dip {
 

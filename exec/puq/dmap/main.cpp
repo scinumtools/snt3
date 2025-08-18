@@ -1,3 +1,8 @@
+#include "puq/nostd/nostd.h"
+#include "puq/quantity.h"
+#include "puq/solver/solver.h"
+#include "puq/systems/systems.h"
+
 #include <chrono>
 #include <ctime>
 #include <fstream>
@@ -5,11 +10,6 @@
 #include <limits>
 #include <sstream>
 #include <sys/stat.h>
-
-#include "puq/nostd/nostd.h"
-#include "puq/quantity.h"
-#include "puq/solver/solver.h"
-#include "puq/systems/systems.h"
 
 void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions& dim, const std::string& name) {
   ss << "{";

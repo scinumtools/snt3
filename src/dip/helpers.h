@@ -1,6 +1,13 @@
 #ifndef H_HELPERS
 #define H_HELPERS
 
+#include <string>
+#include <string_view>
+#include <array>
+#include <algorithm>
+#include <cctype>
+#include <cstddef> 
+
 namespace dip {
 
   // trim whitespace from the beginning and the end of a string
