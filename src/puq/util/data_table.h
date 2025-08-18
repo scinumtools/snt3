@@ -3,6 +3,7 @@
 
 #include "display_length.h"
 
+#include <vector>
 #include <iomanip>
 #include <sstream>
 
