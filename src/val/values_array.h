@@ -262,6 +262,9 @@ namespace val {
       else
         return std::make_unique<ArrayValue<T>>(new_value[0]);
     };
+    BaseValue::PointerType math_sin() const override { throw std::runtime_error("Function is not implemented for this type."); };
+    BaseValue::PointerType math_cos() const override { throw std::runtime_error("Function is not implemented for this type."); };
+    BaseValue::PointerType math_tan() const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_log() const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_log10() const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_sqrt() const override { throw std::runtime_error("Function is not implemented for this type."); };

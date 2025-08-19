@@ -42,6 +42,15 @@ namespace dip {
   }
 
   // Mathematical operations
+  void NumericalAtom::math_sinus() {
+    value = value->math_sin();
+  }
+  void NumericalAtom::math_cosinus() {
+    value = value->math_cos();
+  }
+  void NumericalAtom::math_tangens() {
+    value = value->math_tan();
+  }
   void NumericalAtom::math_cubic_root() {
     value = value->math_cbrt();
   }
@@ -88,6 +97,15 @@ namespace dip {
 
     exs::OperatorList<NumericalAtom, NumericalSettings> operators;
     operators.append(
+        exs::SINUS_OPERATOR,
+        std::make_shared<exs::OperatorSinus<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("sin", "( ", " )", ", ")));
+    operators.append(
+    	exs::COSINUS_OPERATOR,
+        std::make_shared<exs::OperatorCosinus<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("cos", "( ", " )", ", ")));
+    operators.append(
+    	exs::TANGENS_OPERATOR,
+    	std::make_shared<exs::OperatorTangens<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("tan", "( ", " )", ", ")));
+    operators.append(
         exs::CUBIC_ROOT_OPERATOR,
         std::make_shared<exs::OperatorCubicRoot<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("cbrt", "( ", " )", ", ")));
     operators.append(
@@ -102,7 +120,6 @@ namespace dip {
     operators.append(
         exs::LOGARITHM_10_OPERATOR,
         std::make_shared<exs::OperatorLogarithm10<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("log10", "( ", " )", ", ")));
-    ;
     operators.append(
         exs::LOGARITHM_OPERATOR,
         std::make_shared<exs::OperatorLogarithm<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("log", "( ", " )", ", ")));
@@ -129,8 +146,8 @@ namespace dip {
                                            exs::LOGARITHM_10_OPERATOR,
                                            // exs::LOGARITHM_BASE_OPERATOR, exs::POWER_BASE_OPERATOR,
                                            exs::SQUARE_ROOT_OPERATOR,
-                                           // exs::CUBIC_ROOT_OPERATOR,
-                                           // exs::SINUS_OPERATOR, exs::COSINUS_OPERATOR, exs::TANGENS_OPERATOR
+                                           exs::CUBIC_ROOT_OPERATOR,
+                                           exs::SINUS_OPERATOR, exs::COSINUS_OPERATOR, exs::TANGENS_OPERATOR
                                        });
     steps.append(exs::GROUP_OPERATION, {exs::PARENTHESES_OPERATOR});
     steps.append(exs::UNARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});

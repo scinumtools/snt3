@@ -113,6 +113,15 @@ namespace val {
     BaseValue::PointerType slice(const Array::RangeType& slice) override {
       return this->slice_value(slice);
     };
+    BaseValue::PointerType math_sin() const override {
+      return this->template operate_unary<T>([](T a) { return std::sin(a); });
+    };
+    BaseValue::PointerType math_cos() const override {
+      return this->template operate_unary<T>([](T a) { return std::cos(a); });
+    };
+    BaseValue::PointerType math_tan() const override {
+      return this->template operate_unary<T>([](T a) { return std::tan(a); });
+    };
     BaseValue::PointerType math_log() const override {
       return this->template operate_unary<T>([](T a) { return std::log(a); });
     };

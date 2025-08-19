@@ -65,6 +65,9 @@ namespace dip {
 
     static val::BaseValue::PointerType from_string(const std::string& s, NumericalSettings* settings);
     std::string to_string();
+    void math_sinus();
+    void math_cosinus();
+    void math_tangens();
     void math_cubic_root();
     void math_square_root();
     // void math_power_base(NumericalAtom* other);
