@@ -3,9 +3,9 @@
 
 #include "display_length.h"
 
-#include <vector>
 #include <iomanip>
 #include <sstream>
+#include <vector>
 
 namespace puq {
 

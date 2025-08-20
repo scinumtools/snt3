@@ -46,7 +46,9 @@ namespace dip {
       break;
     }
     case ValueOrigin::Expression: {
-      // TODO: implement numerical expression
+      NumericalSolver solver(env);
+      NumericalAtom result = solver.eval(value_raw.at(0));
+      set_value(std::move(result.value));
       break;
     }
     default:

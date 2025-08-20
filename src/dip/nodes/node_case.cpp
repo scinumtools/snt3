@@ -1,4 +1,5 @@
 #include "../environment.h"
+#include "../solvers/solvers.h"
 #include "nodes.h"
 
 #include <regex>
@@ -33,10 +34,35 @@ namespace dip {
       }
       name = matchResult[1].str() + "C" + std::to_string(case_id);
       if (case_type == CaseType::Case) {
-        // TODO: use logical solver to solve cases
         if (value_raw.empty())
           throw std::runtime_error("Case node requires an input value: " + line.code);
-        value = (value_raw.at(0) == snt::KEYWORD_TRUE) ? true : false;
+        switch (value_origin) {
+        case ValueOrigin::Function:
+          value = env.request_value(value_raw.at(0), RequestType::Function)->all_of();
+          break;
+        case ValueOrigin::Reference: {
+          value = env.request_value(value_raw.at(0), RequestType::Reference, units_raw)->all_of();
+          break;
+        }
+        case ValueOrigin::ReferenceRaw: {
+          throw std::runtime_error("Raw reference value is not implemented: " + line.code);
+          break;
+        }
+        case ValueOrigin::Expression: {
+          LogicalSolver solver(env);
+          LogicalAtom result = solver.eval(value_raw.at(0));
+          value = std::move(result.value)->all_of();
+          break;
+        }
+        default:
+          if (value_raw.at(0) == snt::KEYWORD_TRUE)
+            value = true;
+          else if (value_raw.at(0) == snt::KEYWORD_FALSE)
+            value = false;
+          else
+            throw std::runtime_error("Invalid value: " + line.code);
+          break;
+        }
       } else if (case_type == CaseType::Else) {
         value = true;
       }

@@ -12,12 +12,14 @@
 
 namespace dip {
 
-  enum class ValueOrigin { Keyword,
-                           String,
-                           Reference,
-                           ReferenceRaw,
-                           Function,
-                           Expression };
+  enum class ValueOrigin {
+    Keyword,
+    String,
+    Reference,
+    ReferenceRaw,
+    Function,
+    Expression
+  };
 
   enum class NodeDtype {
     None,

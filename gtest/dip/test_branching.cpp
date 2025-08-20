@@ -2,9 +2,13 @@
 #include "dip/environment.h"
 #include "dip/nodes/nodes.h"
 
+#include "fixtures.h"
+
 #include <gtest/gtest.h>
 
-TEST(Branchig, FirstCase) {
+class Branching : public FixtureFunctions {};
+
+TEST_F(Branching, FirstCase) {
 
   dip::DIP d;
   d.add_string("@case true");
@@ -20,7 +24,7 @@ TEST(Branchig, FirstCase) {
   EXPECT_EQ(node->name, "age");
 }
 
-TEST(Branchig, SecondCase) {
+TEST_F(Branching, SecondCase) {
 
   // second case
   dip::DIP d;
@@ -37,7 +41,7 @@ TEST(Branchig, SecondCase) {
   EXPECT_EQ(node->name, "height");
 }
 
-TEST(Branchig, FirstAndSecondCase) {
+TEST_F(Branching, FirstAndSecondCase) {
 
   // first case
   dip::DIP d;
@@ -54,7 +58,7 @@ TEST(Branchig, FirstAndSecondCase) {
   EXPECT_EQ(node->name, "age");
 }
 
-TEST(Branchig, ElseCase) {
+TEST_F(Branching, ElseCase) {
 
   dip::DIP d;
   d.add_string("@case false");
@@ -70,7 +74,7 @@ TEST(Branchig, ElseCase) {
   EXPECT_EQ(node->name, "weight");
 }
 
-TEST(Branchig, ConsecutiveBranches) {
+TEST_F(Branching, ConsecutiveBranches) {
 
   dip::DIP d;
   d.add_string("@case true");
@@ -91,7 +95,7 @@ TEST(Branchig, ConsecutiveBranches) {
   EXPECT_EQ(node->name, "weight");
 }
 
-TEST(Branchig, LowerIndentClosing) {
+TEST_F(Branching, LowerIndentClosing) {
 
   dip::DIP d;
   d.add_string("man");
@@ -119,7 +123,7 @@ TEST(Branchig, LowerIndentClosing) {
   EXPECT_EQ(node->name, "weight");
 }
 
-TEST(Branchig, NestedBranches) {
+TEST_F(Branching, NestedBranches) {
 
   dip::DIP d;
   d.add_string("man");
@@ -148,4 +152,43 @@ TEST(Branchig, NestedBranches) {
   EXPECT_EQ(node->name, "man.age");
   node = env.nodes.at(1);
   EXPECT_EQ(node->name, "weight");
+}
+
+TEST_F(Branching, ValueFunction) {
+
+  dip::DIP d;
+  d.add_value_function("scalar_value", FixtureFunctions::get_scalar_boolean);
+  d.add_string("@case (scalar_value)");
+  d.add_string("  age int = 30");
+  d.add_string("@end");
+  dip::Environment env = d.parse();
+  EXPECT_EQ(env.nodes.size(), 1);
+  dip::BaseNode::PointerType node = env.nodes.at(0);
+  EXPECT_EQ(node->name, "age");
+}
+
+TEST_F(Branching, ValueInjection) {
+
+  dip::DIP d;
+  d.add_string("foo bool = true");
+  d.add_string("@case {?foo}");
+  d.add_string("  age int = 30");
+  d.add_string("@end");
+  dip::Environment env = d.parse();
+  EXPECT_EQ(env.nodes.size(), 2);
+  dip::BaseNode::PointerType node = env.nodes.at(1);
+  EXPECT_EQ(node->name, "age");
+}
+
+TEST_F(Branching, ValueExpression) {
+
+  dip::DIP d;
+  d.add_string("foo int = 34");
+  d.add_string("@case ('{?foo} <= 50')");
+  d.add_string("  age int = 30");
+  d.add_string("@end");
+  dip::Environment env = d.parse();
+  EXPECT_EQ(env.nodes.size(), 2);
+  dip::BaseNode::PointerType node = env.nodes.at(1);
+  EXPECT_EQ(node->name, "age");
 }

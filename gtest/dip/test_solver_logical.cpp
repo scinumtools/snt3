@@ -1,3 +1,4 @@
+#include "dip/dip.h"
 #include "dip/solvers/solvers.h"
 
 #include <gtest/gtest.h>
@@ -87,4 +88,16 @@ TEST(SolverLogical, CombinedExpressions) {
 
   atom = solver.eval("( true && 2 != 3 ) || false || 2.3 > 4.3");
   EXPECT_EQ(atom.value->to_string(), "true");
+}
+
+TEST(SolverLogical, Injections) {
+
+  dip::DIP d;
+  d.add_string("foo bool = false");
+  d.add_string("bar int = 3");
+  dip::Environment env = d.parse();
+
+  dip::LogicalSolver solver(env);
+  dip::LogicalAtom atom = solver.eval("2 == {?bar} && {?foo}");
+  EXPECT_EQ(atom.value->to_string(), "false");
 }

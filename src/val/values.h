@@ -80,7 +80,7 @@ namespace val {
     virtual size_t get_size() const = 0;
     virtual BaseValue::PointerType clone() const = 0;
     virtual BaseValue::PointerType cast_as(DataType dt) const = 0;
-    virtual BaseValue::PointerType slice(const Array::RangeType& slice) = 0; 
+    virtual BaseValue::PointerType slice(const Array::RangeType& slice) = 0;
     virtual BaseValue::PointerType math_sin() const = 0;
     virtual BaseValue::PointerType math_cos() const = 0;
     virtual BaseValue::PointerType math_tan() const = 0;
