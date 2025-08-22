@@ -9,7 +9,7 @@ set +a
 
 DIR_ROOT=$(pwd)
 
-NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
+NUM_SYSTEM_CORES=1 #$(getconf _NPROCESSORS_ONLN)
 NUM_MAKE_CORES=$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release
 ENABLE_CLANG_TIDY=OFF
@@ -66,7 +66,7 @@ function test_code {
 	$EXEC_PROGRAM ./bin/gtest-$1 $EXEC_FLAGS
     else
 	cd $DIR_BUILD
-	ctest -R gtest
+	ctest -R gtest --output-on-failure
     fi
 }
 
@@ -80,7 +80,7 @@ function compile_docs {
 
 function grep_code {
     if [[ "${1}" != "" ]]; then
-	    grep -Inr --color "${1}" ./src ./gtest ./exec
+	grep -Inr --color "${1}" ./src ./gtest ./exec
     fi
 }
 

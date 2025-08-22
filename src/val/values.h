@@ -2,6 +2,7 @@
 #define VAL_VALUES_H
 
 #include "../settings.h"
+#include "datatypes.h"
 
 #include <algorithm>
 #include <array>
@@ -18,32 +19,7 @@
 #include <vector>
 
 namespace val {
-
-  enum class DataType { // TODO: INTX and FLOATX should support arbitrary precision types
-    Boolean,
-    String,
-    Character,
-    Integer16,
-    Integer32,
-    Integer64,
-    IntegerX,
-    Integer16_U,
-    Integer32_U,
-    Integer64_U,
-    Float32,
-    Float64,
-    Float128,
-    FloatX
-  };
-
-  enum class EvalMode {
-    Piecewise,
-    All,
-    Any
-  };
-
-  extern std::unordered_map<DataType, std::string> DataTypeNames;
-
+    
   // Define common array types
   namespace Array {
     struct RangeStruct {
@@ -131,40 +107,5 @@ namespace val {
 #include "values_boolean.h"
 #include "values_number.h"
 #include "values_string.h"
-
-namespace val {
-
-  // helper function that create a array value pointer from a C++ data type
-  template <typename T>
-  BaseValue::PointerType create_array_value(const std::vector<T>& arr, Array::ShapeType sh = {}) {
-    if (sh.empty())
-      sh.push_back(arr.size());
-    if constexpr (std::is_same_v<T, bool>)
-      return std::make_unique<ArrayValue<bool>>(ArrayValue<bool>(arr, sh));
-    else if constexpr (std::is_same_v<T, int16_t>)
-      return std::make_unique<ArrayValue<int16_t>>(ArrayValue<int16_t>(arr, sh));
-    else if constexpr (std::is_same_v<T, uint16_t>)
-      return std::make_unique<ArrayValue<uint16_t>>(ArrayValue<uint16_t>(arr, sh));
-    else if constexpr (std::is_same_v<T, int32_t>)
-      return std::make_unique<ArrayValue<int32_t>>(ArrayValue<int32_t>(arr, sh));
-    else if constexpr (std::is_same_v<T, uint32_t>)
-      return std::make_unique<ArrayValue<uint32_t>>(ArrayValue<uint32_t>(arr, sh));
-    else if constexpr (std::is_same_v<T, int64_t>)
-      return std::make_unique<ArrayValue<int64_t>>(ArrayValue<int64_t>(arr, sh));
-    else if constexpr (std::is_same_v<T, uint64_t>)
-      return std::make_unique<ArrayValue<uint64_t>>(ArrayValue<uint64_t>(arr, sh));
-    else if constexpr (std::is_same_v<T, float>)
-      return std::make_unique<ArrayValue<float>>(ArrayValue<float>(arr, sh));
-    else if constexpr (std::is_same_v<T, double>)
-      return std::make_unique<ArrayValue<double>>(ArrayValue<double>(arr, sh));
-    else if constexpr (std::is_same_v<T, long double>)
-      return std::make_unique<ArrayValue<long double>>(ArrayValue<long double>(arr, sh));
-    else if constexpr (std::is_same_v<T, std::string>)
-      return std::make_unique<ArrayValue<std::string>>(ArrayValue<std::string>(arr, sh));
-    else
-      static_assert(std::is_integral_v<T>, "Given data type is not associated with any array value");
-  };
-
-} // namespace val
 
 #endif // VAL_VALUES_H
