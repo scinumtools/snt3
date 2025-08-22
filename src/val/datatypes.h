@@ -72,6 +72,10 @@ namespace val {
     return static_cast<DataType>(~static_cast<std::underlying_type_t<DataType>>(f));
   }
 
+  inline bool any(DataType a) {
+    return static_cast<uint16_t>(a) != 0;
+  }
+  
   extern std::unordered_map<DataType, std::string> DataTypeNames;
 
 }

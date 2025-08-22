@@ -73,6 +73,7 @@ namespace val {
     virtual BaseValue::PointerType math_add(const double num) const = 0;
     virtual BaseValue::PointerType math_sub(const BaseValue* other) const = 0;
     virtual BaseValue::PointerType math_sub(const double num) const = 0;
+    virtual BaseValue::PointerType math_inv() const = 0;
     virtual BaseValue::PointerType math_mul(const BaseValue* other) const = 0;
     virtual BaseValue::PointerType math_mul(const double num) const = 0;
     virtual BaseValue::PointerType math_div(const BaseValue* other) const = 0;

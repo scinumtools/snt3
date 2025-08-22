@@ -278,6 +278,7 @@ namespace val {
     BaseValue::PointerType math_add(const double num) const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_sub(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_sub(const double num) const override { throw std::runtime_error("Function is not implemented for this type."); };
+    BaseValue::PointerType math_inv() const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_mul(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_mul(const double num) const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_div(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
