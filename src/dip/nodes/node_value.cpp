@@ -4,9 +4,13 @@
 
 namespace dip {
 
-  ValueNode::ValueNode(const std::string& nm, val::BaseValue::PointerType val,
-                       const val::DataType vdt)
-      : constant(false), value_dtype(vdt) {
+  ValueNode::ValueNode(const std::string& nm, const val::DataType vdt)
+    : constant(false), value_dtype(vdt) {
+    name = nm;
+  };
+
+  ValueNode::ValueNode(const std::string& nm, val::BaseValue::PointerType val)
+    : constant(false), value_dtype(val->get_dtype()) {
     name = nm;
     val::Array::ShapeType dims = val->get_shape();
     if (val->get_size() > 1) {

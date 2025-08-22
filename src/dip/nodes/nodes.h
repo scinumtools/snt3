@@ -184,6 +184,7 @@ namespace dip {
    *  Value nodes
    */
 
+  // Value
   class ValueNode : virtual public BaseNode {
     virtual val::BaseValue::PointerType cast_scalar_value(const std::string& value_input) const = 0;
     virtual val::BaseValue::PointerType cast_array_value(const val::Array::StringType& value_inputs,
@@ -208,7 +209,8 @@ namespace dip {
     std::string format;
     ValueNode() : constant(false) {};
     ValueNode(const val::DataType vdt) : constant(false), value_dtype(vdt) {};
-    ValueNode(const std::string& nm, val::BaseValue::PointerType val, const val::DataType vdt);
+    ValueNode(const std::string& nm, const val::DataType vdt);
+    ValueNode(const std::string& nm, val::BaseValue::PointerType val);
     virtual ~ValueNode() = default;
     val::BaseValue::PointerType cast_value();
     val::BaseValue::PointerType cast_value(val::Array::StringType& value_input,
@@ -228,6 +230,7 @@ namespace dip {
     void validate_dimensions() const;
   };
 
+  // Boolean
   class BooleanNode : public ValueNode {
     val::BaseValue::PointerType cast_scalar_value(const std::string& value_input) const override;
     val::BaseValue::PointerType cast_array_value(const val::Array::StringType& value_inputs,
@@ -236,7 +239,7 @@ namespace dip {
   public:
     static BaseNode::PointerType is_node(Parser& parser);
     BooleanNode(const std::string& nm, val::BaseValue::PointerType val)
-        : BaseNode(NodeDtype::Boolean), ValueNode(nm, std::move(val), val::DataType::Boolean) {};
+        : BaseNode(NodeDtype::Boolean), ValueNode(nm, std::move(val)) {};
     BooleanNode(Parser& parser)
         : BaseNode(parser, NodeDtype::Boolean), ValueNode(val::DataType::Boolean) {};
     BaseNode::NodeListType parse(Environment& env) override;
@@ -244,6 +247,7 @@ namespace dip {
     void validate_options() const override;
   };
 
+  // String
   class StringNode : public ValueNode {
     val::BaseValue::PointerType cast_scalar_value(const std::string& value_input) const override;
     val::BaseValue::PointerType cast_array_value(const val::Array::StringType& value_inputs,
@@ -252,7 +256,7 @@ namespace dip {
   public:
     static BaseNode::PointerType is_node(Parser& parser);
     StringNode(const std::string& nm, val::BaseValue::PointerType val)
-        : BaseNode(NodeDtype::String), ValueNode(nm, std::move(val), val::DataType::String) {};
+        : BaseNode(NodeDtype::String), ValueNode(nm, std::move(val)) {};
     StringNode(Parser& parser)
         : BaseNode(parser, NodeDtype::String), ValueNode(val::DataType::String) {};
     BaseNode::NodeListType parse(Environment& env) override;
@@ -266,6 +270,7 @@ namespace dip {
    *  Quantity nodes
    */
 
+  // Quantity
   class QuantityNode : virtual public ValueNode {
   public:
     typedef std::shared_ptr<QuantityNode> PointerType;
@@ -274,6 +279,7 @@ namespace dip {
     virtual ~QuantityNode() = default;
   };
 
+  // Integer
   class IntegerNode : public QuantityNode {
     val::BaseValue::PointerType cast_scalar_value(const std::string& value_input) const override;
     val::BaseValue::PointerType cast_array_value(const val::Array::StringType& value_inputs,
@@ -282,13 +288,16 @@ namespace dip {
   public:
     static constexpr size_t max_int_size = sizeof(long long) * CHAR_BIT;
     static BaseNode::PointerType is_node(Parser& parser);
-    IntegerNode(const std::string& nm, val::BaseValue::PointerType val, const val::DataType vdt)
-        : BaseNode(NodeDtype::Boolean), ValueNode(nm, std::move(val), vdt) {};
+    IntegerNode(const std::string& nm, const val::DataType vdt)
+        : BaseNode(NodeDtype::Integer), ValueNode(nm, vdt) {};
+    IntegerNode(const std::string& nm, val::BaseValue::PointerType val)
+        : BaseNode(NodeDtype::Integer), ValueNode(nm, std::move(val)) {};
     IntegerNode(Parser& parser);
     BaseNode::NodeListType parse(Environment& env) override;
     BaseNode::PointerType clone(const std::string& nm) const override;
   };
 
+  // Float
   class FloatNode : public QuantityNode {
     val::BaseValue::PointerType cast_scalar_value(const std::string& value_input) const override;
     val::BaseValue::PointerType cast_array_value(const val::Array::StringType& value_inputs,
@@ -297,8 +306,10 @@ namespace dip {
   public:
     static constexpr size_t max_float_size = sizeof(long double) * CHAR_BIT;
     static BaseNode::PointerType is_node(Parser& parser);
-    FloatNode(const std::string& nm, val::BaseValue::PointerType val, const val::DataType vdt)
-        : BaseNode(NodeDtype::Float), ValueNode(nm, std::move(val), vdt) {};
+    FloatNode(const std::string& nm, const val::DataType vdt)
+        : BaseNode(NodeDtype::Float), ValueNode(nm, vdt) {};
+    FloatNode(const std::string& nm, val::BaseValue::PointerType val)
+        : BaseNode(NodeDtype::Float), ValueNode(nm, std::move(val)) {};
     FloatNode(Parser& parser);
     BaseNode::NodeListType parse(Environment& env) override;
     BaseNode::PointerType clone(const std::string& nm) const override;

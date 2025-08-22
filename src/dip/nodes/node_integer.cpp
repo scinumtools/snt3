@@ -151,9 +151,9 @@ namespace dip {
 
   BaseNode::PointerType IntegerNode::clone(const std::string& nm) const {
     if (value == nullptr)
-      return std::make_shared<IntegerNode>(nm, nullptr, value->get_dtype());
+      return std::make_shared<IntegerNode>(nm, value->get_dtype());
     else
-      return std::make_shared<IntegerNode>(nm, std::move(value->clone()), value->get_dtype());
+      return std::make_shared<IntegerNode>(nm, std::move(value->clone()));
   }
 
 } // namespace dip

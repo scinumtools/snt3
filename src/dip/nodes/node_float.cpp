@@ -108,9 +108,9 @@ namespace dip {
 
   BaseNode::PointerType FloatNode::clone(const std::string& nm) const {
     if (value == nullptr)
-      return std::make_shared<FloatNode>(nm, nullptr, value->get_dtype());
+      return std::make_shared<FloatNode>(nm, value->get_dtype());
     else
-      return std::make_shared<FloatNode>(nm, std::move(value->clone()), value->get_dtype());
+      return std::make_shared<FloatNode>(nm, std::move(value->clone()));
   }
 
 } // namespace dip
