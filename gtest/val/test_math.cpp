@@ -177,37 +177,25 @@ TEST(Math, IntFloatConversion) {
 
   std::vector<int> arr1 = {2,3,4};
   std::vector<double> arr2 = {3.4, 4.5, 5.6};
-  double scal = 2.3;
   val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<int>>(arr1);
   val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<double>>(arr2);  
   val::BaseValue::PointerType val3;
 
   // addition
-  
   val3 = val1->math_add(val2.get());     // int + float = float
   EXPECT_EQ(val3->to_string(), "[5.4000, 7.5000, 9.6000]");
-  val3 = val1->math_add(scal);     
-  EXPECT_EQ(val3->to_string(), "[4.3000, 5.3000, 6.3000]");
+  // WARNING: the same is not possible for +=, -=, *= and \=, becaue the type of self is not mutable
 
   // substitution
-  
   val3 = val1->math_sub(val2.get());     // int - float = float
   EXPECT_EQ(val3->to_string(), "[-1.4000, -1.5000, -1.6000]");
-  val3 = val1->math_sub(scal);
-  EXPECT_EQ(val3->to_string(), "[-0.3000, 0.7000, 1.7000]");
 
   // multiplication
-
   val3 = val1->math_mul(val2.get());     // int * float = float
   EXPECT_EQ(val3->to_string(), "[6.8000, 13.500, 22.400]");
-  val3 = val1->math_mul(scal);
-  EXPECT_EQ(val3->to_string(), "[4.6000, 6.9000, 9.2000]");
 
   // division
-
   val3 = val1->math_div(val2.get());     // int / float = float
   EXPECT_EQ(val3->to_string(), "[0.5882, 0.6667, 0.7143]");
-  val3 = val1->math_div(scal);
-  EXPECT_EQ(val3->to_string(), "[0.8696, 1.3043, 1.7391]");
   
 }

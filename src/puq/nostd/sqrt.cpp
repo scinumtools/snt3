@@ -25,7 +25,8 @@ namespace puq {
     Magnitude sqrt(const Magnitude& m) {
       // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
 #ifdef MAGNITUDE_VALUES
-      return Magnitude(m.value->math_sqrt(), m.value->math_pow(-0.5)->math_mul(0.5)->math_mul(m.error.get()));
+      std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(0.5);
+      return Magnitude(m.value->math_sqrt(), m.value->math_pow(-0.5)->math_mul(cst.get())->math_mul(m.error.get()));
 #else
       return Magnitude(sqrt(m.value), 0.5 * pow(m.value, -0.5) * m.error);
 #endif

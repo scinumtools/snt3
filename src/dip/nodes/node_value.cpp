@@ -42,13 +42,10 @@ namespace dip {
     if (value_input == nullptr and !value_raw.empty() and !value_raw.at(0).empty()) {
       value = cast_value();
     } else if (value_input != nullptr) {
-      value = std::move(value_input);
-      if (value->get_dtype() != value_dtype) {
-        std::string d1 = std::string(val::DataTypeNames[value_dtype]);
-        std::string d2 = std::string(val::DataTypeNames[value->get_dtype()]);
-        throw std::runtime_error("Assigning '" + d2 + "' value to the '" + d1 +
-                                 "' node: " + line.code);
-      }
+      if (value_input->get_dtype() == value_dtype)
+	value = std::move(value_input);
+      else
+	value = value_input->cast_as(value_dtype);
     }
     if (value != nullptr) {
       if (!value_slice.empty()) {

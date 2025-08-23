@@ -67,11 +67,11 @@ namespace puq {
 
   // DEBUG: need to implement properly
   val::BaseValue::PointerType Magnitude::abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType e) {
-    return e->math_div(v.get())->math_mul(100);
+    return e->math_div(v.get())->math_mul(std::make_unique<val::ArrayValue<double>>(100).get());
   };
 
   val::BaseValue::PointerType Magnitude::rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType e) {
-    return v->math_mul(e.get())->math_div(100);
+    return v->math_mul(e.get())->math_div(std::make_unique<val::ArrayValue<double>>(100).get());
   };
 
 #endif

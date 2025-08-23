@@ -116,19 +116,20 @@ TEST(References, ExceptionMissingNode) {
   }
 }
 
-TEST(References, ExceptionDataType) {
+TEST(References, DataTypeConversion) {
 
   dip::DIP d;
   d.add_string("foo bool = true");
   d.add_string("bar str = {?foo}");
-  try {
-    d.parse();
-    FAIL() << "Expected std::runtime_error";
-  } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Assigning 'bool' value to the 'str' node: bar str = {?foo}");
-  } catch (...) {
-    FAIL() << "Expected std::runtime_error";
-  }
+  dip::Environment env = d.parse();
+  EXPECT_EQ(env.nodes.size(), 2);
+
+  dip::BaseNode::PointerType node = env.nodes.at(1);
+  EXPECT_EQ(node->name, "bar");
+  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  EXPECT_TRUE(vnode);
+  EXPECT_EQ(vnode->value->to_string(), "'true'");
+  
 }
 
 TEST(References, ExceptionDimension) {

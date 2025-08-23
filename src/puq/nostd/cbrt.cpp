@@ -24,8 +24,9 @@ namespace puq {
     Magnitude cbrt(const Magnitude& m) {
       // y ± Dz = pow(x ± Dx, 1/3) -> Dy = 1/3 * pow(x, -2/3) * Dx
 #ifdef MAGNITUDE_VALUES
-      constexpr MAGNITUDE_PRECISION third = 1. / 3.;
-      return Magnitude(m.value->math_cbrt(), m.value->math_pow(-2 * third)->math_mul(third)->math_mul(m.error.get()));
+      std::unique_ptr<val::ArrayValue<double>> third1 = std::make_unique<val::ArrayValue<double>>(1. / 3.);
+      std::unique_ptr<val::ArrayValue<double>> third2 = std::make_unique<val::ArrayValue<double>>(-2 * 1. / 3.);
+      return Magnitude(m.value->math_cbrt(), m.value->math_pow(third2.get())->math_mul(third1.get())->math_mul(m.error.get()));
 #else
       constexpr MAGNITUDE_PRECISION third = 1. / 3.;
       return Magnitude(cbrt(m.value), third * pow(m.value, -2 * third) * m.error);

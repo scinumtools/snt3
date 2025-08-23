@@ -115,6 +115,12 @@ namespace val {
       return std::make_unique<ArrayValue<R>>(arr, this->shape);
     };
     template <typename R, typename Func>
+    void operate_unary_equal(Func f) {
+      // apply operation
+      for (int i = 0; i < value.size(); i++)
+        value[i] = f(value[i]);
+    };
+    template <typename R, typename Func>
     std::unique_ptr<ArrayValue<R>> operate_binary(const BaseValue* other, Func f) const {
       std::vector<R> arr;
       if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
@@ -275,17 +281,13 @@ namespace val {
     BaseValue::PointerType math_abs() const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_neg() const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_add(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_add(const double num) const override { throw std::runtime_error("Function is not implemented for this type."); };
+    void math_add_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_sub(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_sub(const double num) const override { throw std::runtime_error("Function is not implemented for this type."); };
+    void math_sub_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_inv() const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_mul(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_mul(const double num) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_div(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_div(const double num) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    void math_add_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
-    void math_sub_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
     void math_mul_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
+    BaseValue::PointerType math_div(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
     void math_div_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_pow(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType math_pow(const double exp) const override { throw std::runtime_error("Function is not implemented for this type."); };

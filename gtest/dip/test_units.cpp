@@ -134,8 +134,8 @@ TEST(Units, OptionSetting) {
   EXPECT_TRUE(qnode);
   EXPECT_EQ(qnode->value->to_string(), "2000");
   EXPECT_EQ(qnode->units->to_string(), "m");
-  EXPECT_EQ(qnode->options[0].value->to_string(), "2000");
-  EXPECT_EQ(qnode->options[1].value->to_string(), "3000");
+  EXPECT_EQ(qnode->options[0].value->to_string(), "2000.0");
+  EXPECT_EQ(qnode->options[1].value->to_string(), "3000.0");
 
   d = dip::DIP();
   d.add_string("foo float = 2000 m");

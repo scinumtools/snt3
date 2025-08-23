@@ -161,12 +161,6 @@ namespace val {
       else
 	return this->template operate_binary<T>(other, [](T a, T b) { return a + b; });
     };
-    BaseValue::PointerType math_add(const double num) const override {
-      if (any(this->dtype & DataType::Integer))
-	return this->template operate_unary<double>([&num](double a) { return a + num; });
-      else
-	return this->template operate_unary<T>([&num](T a) { return a + num; });
-    };
     void math_add_equal(const BaseValue* other) override {
       this->template operate_binary_equal<T>(other, [](T a, T b) { return a + b; });
     };
@@ -176,12 +170,6 @@ namespace val {
 	return other->math_neg()->math_add(this);
       else
 	return this->template operate_binary<T>(other, [](T a, T b) { return a - b; });
-    };
-    BaseValue::PointerType math_sub(const double num) const override {
-      if (any(this->dtype & DataType::Integer))
-	return this->template operate_unary<double>([&num](double a) { return a - num; });
-      else
-	return this->template operate_unary<T>([&num](T a) { return a - num; });
     };
     void math_sub_equal(const BaseValue* other) override {
       this->template operate_binary_equal<T>(other, [](T a, T b) { return a - b; });
@@ -197,12 +185,6 @@ namespace val {
       else
 	return this->template operate_binary<T>(other, [](T a, T b) { return a * b; });
     };
-    BaseValue::PointerType math_mul(const double num) const override {
-      if (any(this->dtype & DataType::Integer))
-	return this->template operate_unary<double>([&num](double a) { return a * num; });
-      else
-	return this->template operate_unary<T>([&num](T a) { return a * num; });
-    };
     void math_mul_equal(const BaseValue* other) override {
       this->template operate_binary_equal<T>(other, [](T a, T b) { return a * b; });
     };
@@ -212,12 +194,6 @@ namespace val {
 	return other->math_inv()->math_mul(this);
       else
 	return this->template operate_binary<T>(other, [](T a, T b) { return a / b; });
-    };
-    BaseValue::PointerType math_div(const double num) const override {
-      if (any(this->dtype & DataType::Integer))
-	return this->template operate_unary<double>([&num](double a) { return a / num; });
-      else
-	return this->template operate_unary<T>([&num](T a) { return a / num; });
     };
     void math_div_equal(const BaseValue* other) override {
       this->template operate_binary_equal<T>(other, [](T a, T b) { return a / b; });

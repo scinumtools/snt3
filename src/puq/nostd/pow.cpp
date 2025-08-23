@@ -31,10 +31,12 @@ namespace puq {
     Magnitude pow(const Magnitude& m, const EXPONENT_REAL_PRECISION& e) {
 #ifdef MAGNITUDE_VALUES
       // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
-      if (m.error)
-        return Magnitude(m.value->math_pow(e), m.value->math_pow(e - 1)->math_mul(e)->math_abs()->math_mul(m.error.get()));
-      else
+      if (m.error) {
+	std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(e);
+        return Magnitude(m.value->math_pow(e), m.value->math_pow(e - 1)->math_mul(cst.get())->math_abs()->math_mul(m.error.get()));
+      } else {
         return Magnitude(m.value->math_pow(e));
+      }
 #else
       // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
       return Magnitude(pow(m.value, e), abs(e * pow(m.value, e - 1)) * m.error);
@@ -44,12 +46,13 @@ namespace puq {
       // Dz = sqrt(pow(Dzx,2)+pow(Dzy,2))
       // z ± Dz = pow(x ± Dx, y ± Dy)
 #ifdef MAGNITUDE_VALUES
+      std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(-1);
       if (m.error && e.error) {
-        MAGNITUDE_VALUE Dzx = e.value->math_mul(m.value->math_pow(e.value->math_add(-1).get()).get())->math_mul(m.error.get()); // Dzx = y * pow(x, y-1) * Dx
+        MAGNITUDE_VALUE Dzx = e.value->math_mul(m.value->math_pow(e.value->math_add(cst.get()).get()).get())->math_mul(m.error.get()); // Dzx = y * pow(x, y-1) * Dx
         MAGNITUDE_VALUE Dzy = m.value->math_pow(e.value.get())->math_mul(m.value->math_log().get())->math_mul(e.error.get());   // Dzy = pow(x, y) * log(x) * Dy
         return Magnitude(m.value->math_pow(e.value.get()), Dzx->math_pow(2)->math_add(Dzy->math_pow(2).get())->math_sqrt());
       } else if (m.error) {
-        MAGNITUDE_VALUE Dzx = e.value->math_mul(m.value->math_pow(e.value->math_add(-1).get()).get())->math_mul(m.error.get()); // Dzx = y * pow(x, y-1) * Dx
+        MAGNITUDE_VALUE Dzx = e.value->math_mul(m.value->math_pow(e.value->math_add(cst.get()).get()).get())->math_mul(m.error.get()); // Dzx = y * pow(x, y-1) * Dx
         return Magnitude(m.value->math_pow(e.value.get()), Dzx->math_pow(2)->math_sqrt());
       } else if (e.error) {
         MAGNITUDE_VALUE Dzy = m.value->math_pow(e.value.get())->math_mul(m.value->math_log().get())->math_mul(e.error.get()); // Dzy = pow(x, y) * log(x) * Dy
