@@ -2,7 +2,7 @@
 #define VAL_DATATYPES_H
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <type_traits>
 
 namespace val {
