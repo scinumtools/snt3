@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <type_traits>
+#include <cstdint>
 
 namespace val {
   
