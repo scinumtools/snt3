@@ -13,29 +13,29 @@ TEST(Math, Add) {
 
   // binary
   val4 = val1->math_add(val2.get()); // array + array
-  EXPECT_EQ(val4->to_string(), "[3412.3, 2.3040, 4.0345]");
+  EXPECT_EQ(val4->to_string(), "[3.412e3, 2.304, 4.034]");
 
   val4 = val3->math_add(val3.get()); // scalar + scalar
-  EXPECT_EQ(val4->to_string(), "4.0000");
+  EXPECT_EQ(val4->to_string(), "4");
 
   val4 = val1->math_add(val3.get()); // array + scalar
-  EXPECT_EQ(val4->to_string(), "[14.300, 4.3000, 3.0345]");
+  EXPECT_EQ(val4->to_string(), "[14.3, 4.3, 3.034]");
 
   val4 = val3->math_add(val1.get()); // scalar + array
-  EXPECT_EQ(val4->to_string(), "[14.300, 4.3000, 3.0345]");
+  EXPECT_EQ(val4->to_string(), "[14.3, 4.3, 3.034]");
 
   // binary assignment
   val1->math_add_equal(val2.get()); // array + array
-  EXPECT_EQ(val1->to_string(), "[3412.3, 2.3040, 4.0345]");
+  EXPECT_EQ(val1->to_string(), "[3.412e3, 2.304, 4.034]");
 
   val3->math_add_equal(val3.get()); // scalar + scalar
-  EXPECT_EQ(val3->to_string(), "4.0000");
+  EXPECT_EQ(val3->to_string(), "4");
 
   val1->math_add_equal(val3.get()); // array + scalar
-  EXPECT_EQ(val1->to_string(), "[3416.3, 6.3040, 8.0345]");
+  EXPECT_EQ(val1->to_string(), "[3.416e3, 6.304, 8.034]");
 
   val3->math_add_equal(val1.get()); // scalar + array
-  EXPECT_EQ(val3->to_string(), "[3420.3, 10.304, 12.034]");
+  EXPECT_EQ(val3->to_string(), "[3.42e3, 10.3, 12.03]");
 }
 
 TEST(Math, Sub) {
@@ -47,10 +47,10 @@ TEST(Math, Sub) {
   val::BaseValue::PointerType val4;
 
   val4 = val1->math_sub(val2.get());
-  EXPECT_EQ(val4->to_string(), "[-3387.7, 2.2960, -1.9655]");
+  EXPECT_EQ(val4->to_string(), "[-3.388e3, 2.296, -1.966]");
 
   val1->math_sub_equal(val2.get());
-  EXPECT_EQ(val1->to_string(), "[-3387.7, 2.2960, -1.9655]");
+  EXPECT_EQ(val1->to_string(), "[-3.388e3, 2.296, -1.966]");
 }
 
 TEST(Math, Neg) {
@@ -60,7 +60,7 @@ TEST(Math, Neg) {
   val::BaseValue::PointerType val2;
 
   val2 = val1->math_neg();
-  EXPECT_EQ(val2->to_string(), "[-12.300, -2.3000, -1.0345]");
+  EXPECT_EQ(val2->to_string(), "[-12.3, -2.3, -1.034]");
 }
 
 TEST(Math, Mul) {
@@ -72,10 +72,10 @@ TEST(Math, Mul) {
   val::BaseValue::PointerType val4;
 
   val4 = val1->math_mul(val2.get());
-  EXPECT_EQ(val4->to_string(), "[4.1820e+04, 0.009200, 3.1035]");
+  EXPECT_EQ(val4->to_string(), "[4.182e4, 0.0092, 3.103]");
 
   val1->math_mul_equal(val2.get());
-  EXPECT_EQ(val1->to_string(), "[4.1820e+04, 0.009200, 3.1035]");
+  EXPECT_EQ(val1->to_string(), "[4.182e4, 0.0092, 3.103]");
 }
 
 TEST(Math, Div) {
@@ -87,10 +87,10 @@ TEST(Math, Div) {
   val::BaseValue::PointerType val4;
 
   val4 = val1->math_div(val2.get());
-  EXPECT_EQ(val4->to_string(), "[0.003618, 575.00, 0.3448]");
+  EXPECT_EQ(val4->to_string(), "[0.003618, 575, 0.3448]");
 
   val1->math_div_equal(val2.get());
-  EXPECT_EQ(val1->to_string(), "[0.003618, 575.00, 0.3448]");
+  EXPECT_EQ(val1->to_string(), "[0.003618, 575, 0.3448]");
 }
 
 TEST(Math, Inv) {
@@ -100,7 +100,7 @@ TEST(Math, Inv) {
   val::BaseValue::PointerType val2;
 
   val2 = val1->math_inv();
-  EXPECT_EQ(val2->to_string(), "[0.08130, 0.4348, 0.9667]");
+  EXPECT_EQ(val2->to_string(), "[0.0813, 0.4348, 0.9667]");
 }
 
 TEST(Math, Log) {
@@ -110,7 +110,7 @@ TEST(Math, Log) {
   val::BaseValue::PointerType val2;
 
   val2 = val1->math_log();
-  EXPECT_EQ(val2->to_string(), "[9.3927, 9.9035, 0.03392]");
+  EXPECT_EQ(val2->to_string(), "[9.393, 9.903, 0.03392]");
 }
 
 TEST(Math, Log10) {
@@ -120,7 +120,7 @@ TEST(Math, Log10) {
   val::BaseValue::PointerType val2;
 
   val2 = val1->math_log10();
-  EXPECT_EQ(val2->to_string(), "[1.0899, 0.3617, 0.01473]");
+  EXPECT_EQ(val2->to_string(), "[1.09, 0.3617, 0.01473]");
 }
 
 TEST(Math, Sqrt) {
@@ -130,7 +130,7 @@ TEST(Math, Sqrt) {
   val::BaseValue::PointerType val2;
 
   val2 = val1->math_sqrt();
-  EXPECT_EQ(val2->to_string(), "[109.54, 141.42, 1.0171]");
+  EXPECT_EQ(val2->to_string(), "[109.5, 141.4, 1.017]");
 }
 
 TEST(Math, Cbrt) {
@@ -140,7 +140,7 @@ TEST(Math, Cbrt) {
   val::BaseValue::PointerType val2;
 
   val2 = val1->math_cbrt();
-  EXPECT_EQ(val2->to_string(), "[2.3084, 1.3200, 1.0114]");
+  EXPECT_EQ(val2->to_string(), "[2.308, 1.32, 1.011]");
 }
 
 TEST(Math, Exp) {
@@ -150,7 +150,7 @@ TEST(Math, Exp) {
   val::BaseValue::PointerType val2;
 
   val2 = val1->math_exp();
-  EXPECT_EQ(val2->to_string(), "[2.1970e+05, 9.9742, 2.8137]");
+  EXPECT_EQ(val2->to_string(), "[2.197e5, 9.974, 2.814]");
 }
 
 TEST(Math, Floor) {
@@ -160,7 +160,7 @@ TEST(Math, Floor) {
   val::BaseValue::PointerType val2;
 
   val2 = val1->math_floor();
-  EXPECT_EQ(val2->to_string(), "[12.000, 2.0000, 1.0000]");
+  EXPECT_EQ(val2->to_string(), "[12, 2, 1]");
 }
 
 TEST(Math, Ceil) {
@@ -170,7 +170,7 @@ TEST(Math, Ceil) {
   val::BaseValue::PointerType val2;
 
   val2 = val1->math_ceil();
-  EXPECT_EQ(val2->to_string(), "[13.000, 3.0000, 2.0000]");
+  EXPECT_EQ(val2->to_string(), "[13, 3, 2]");
 }
 
 TEST(Math, IntFloatConversion) {
@@ -183,16 +183,16 @@ TEST(Math, IntFloatConversion) {
 
   // addition
   val3 = val1->math_add(val2.get());     // int + float = float
-  EXPECT_EQ(val3->to_string(), "[5.4000, 7.5000, 9.6000]");
+  EXPECT_EQ(val3->to_string(), "[5.4, 7.5, 9.6]");
   // WARNING: the same is not possible for +=, -=, *= and \=, becaue the type of self is not mutable
 
   // substitution
   val3 = val1->math_sub(val2.get());     // int - float = float
-  EXPECT_EQ(val3->to_string(), "[-1.4000, -1.5000, -1.6000]");
+  EXPECT_EQ(val3->to_string(), "[-1.4, -1.5, -1.6]");
 
   // multiplication
   val3 = val1->math_mul(val2.get());     // int * float = float
-  EXPECT_EQ(val3->to_string(), "[6.8000, 13.500, 22.400]");
+  EXPECT_EQ(val3->to_string(), "[6.8, 13.5, 22.4]");
 
   // division
   val3 = val1->math_div(val2.get());     // int / float = float

@@ -75,17 +75,17 @@ TEST(Definitions, Float) {
   val::BaseValue::PointerType val;
 
   val = std::make_unique<val::ArrayValue<double>>(-1.234e+05);
-  EXPECT_EQ(val->to_string(), "-1.2340e+05");
+  EXPECT_EQ(val->to_string(), "-1.234e5");
   EXPECT_EQ(val->get_dtype(), val::DataType::Float64);
   EXPECT_EQ(val->get_shape(), val::Array::ShapeType({1}));
 
   val = std::make_unique<val::ArrayValue<double>>(arr);
-  EXPECT_EQ(val->to_string(), "[0.0000e+00, 2.0000, 33.300, 4500.0, 340.00, -1.0002e+08]");
+  EXPECT_EQ(val->to_string(), "[0, 2, 33.3, 4.5e3, 340, -1e8]");
   EXPECT_EQ(val->get_dtype(), val::DataType::Float64);
   EXPECT_EQ(val->get_shape(), val::Array::ShapeType({6}));
 
   val = std::make_unique<val::ArrayValue<double>>(arr, sh);
-  EXPECT_EQ(val->to_string(), "[[0.0000e+00, 2.0000, 33.300], [4500.0, 340.00, -1.0002e+08]]");
+  EXPECT_EQ(val->to_string(), "[[0, 2, 33.3], [4.5e3, 340, -1e8]]");
   EXPECT_EQ(val->get_dtype(), val::DataType::Float64);
   EXPECT_EQ(val->get_shape(), sh);
 }

@@ -15,7 +15,7 @@ TEST(Casting, Boolean) {
   EXPECT_EQ(bval->to_string(), "[1, 0, 0, 1, 1]");
 
   bval = val->cast_as(val::DataType::Float64);
-  EXPECT_EQ(bval->to_string(), "[1.0000, 0.0000e+00, 0.0000e+00, 1.0000, 1.0000]");
+  EXPECT_EQ(bval->to_string(), "[1, 0, 0, 1, 1]");
 
   bval = val->cast_as(val::DataType::String);
   EXPECT_EQ(bval->to_string(), "['true', 'false', 'false', 'true', 'true']");
@@ -38,7 +38,7 @@ TEST(Casting, Character) {
   EXPECT_EQ(bval->to_string(), "[65, 66, 67, 68, 69]");
 
   bval = val->cast_as(val::DataType::Float64);
-  EXPECT_EQ(bval->to_string(), "[65.000, 66.000, 67.000, 68.000, 69.000]");
+  EXPECT_EQ(bval->to_string(), "[65, 66, 67, 68, 69]");
 
   bval = val->cast_as(val::DataType::String);
   EXPECT_EQ(bval->to_string(), "['65', '66', '67', '68', '69']");
@@ -60,7 +60,7 @@ TEST(Casting, Integer) {
   EXPECT_EQ(bval->to_string(), "[0, 2, 33, 45, 100023]");
 
   bval = val->cast_as(val::DataType::Float64);
-  EXPECT_EQ(bval->to_string(), "[0.0000e+00, 2.0000, 33.000, 45.000, 1.0002e+05]");
+  EXPECT_EQ(bval->to_string(), "[0, 2, 33, 45, 1e5]");
 
   bval = val->cast_as(val::DataType::String);
   EXPECT_EQ(bval->to_string(), "['0', '2', '33', '45', '100023']");
@@ -83,7 +83,7 @@ TEST(Casting, Float) {
   EXPECT_EQ(bval->to_string(), "[0, 2, 33, 4500, -100023000]");
 
   bval = val->cast_as(val::DataType::Float64);
-  EXPECT_EQ(bval->to_string(), "[0.0000e+00, 2.0000, 33.300, 4500.0, -1.0002e+08]");
+  EXPECT_EQ(bval->to_string(), "[0, 2, 33.3, 4.5e3, -1e8]");
 
   bval = val->cast_as(val::DataType::String);
   EXPECT_EQ(bval->to_string(), "['0.000000', '2.000000', '33.300000', '4500.000000', '-100023000.000000']");
@@ -112,7 +112,7 @@ TEST(Casting, String) {
   arr = {"1", "1.2", "1.23e4"};
   val = std::make_unique<val::ArrayValue<std::string>>(arr);
   bval = val->cast_as(val::DataType::Float64);
-  EXPECT_EQ(bval->to_string(), "[1.0000, 1.2000, 1.2300e+04]");
+  EXPECT_EQ(bval->to_string(), "[1, 1.2, 1.23e4]");
 
   arr = {"a", "b", "c"};
   val = std::make_unique<val::ArrayValue<std::string>>(arr);

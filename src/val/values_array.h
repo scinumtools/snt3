@@ -73,8 +73,8 @@ namespace val {
         static_assert(sizeof(T) == 0, "Unsupported type T");
       }
     }
-    virtual void value_to_string(std::ostringstream& oss, size_t& offset, int precision = 0) const = 0;
-    std::string to_string_dim(size_t& offset, const int& precision = 0, int dim = 0) const {
+    virtual void value_to_string(std::ostringstream& oss, size_t& offset, int precision) const = 0;
+    std::string to_string_dim(size_t& offset, const int& precision, int dim = 0) const {
       std::ostringstream oss;
       if (value.size() > 1)
         oss << "[";
@@ -94,13 +94,9 @@ namespace val {
     }
 
   public:
-    std::string to_string(const int precision = 0) const override {
+    std::string to_string(const int precision = snt::DISPLAY_FLOAT_PRECISION) const override {
       size_t offset = 0;
-      if (precision == 0) {
-        return to_string_dim(offset);
-      } else {
-        return to_string_dim(offset, precision);
-      }
+      return to_string_dim(offset, precision);
     };
     /*
      * Operations
@@ -268,31 +264,6 @@ namespace val {
       else
         return std::make_unique<ArrayValue<T>>(new_value[0]);
     };
-    BaseValue::PointerType math_sin() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_cos() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_tan() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_log() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_log10() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_sqrt() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_cbrt() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_exp() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_floor() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_ceil() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_abs() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_neg() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_add(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    void math_add_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_sub(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    void math_sub_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_inv() const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_mul(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    void math_mul_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_div(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    void math_div_equal(const BaseValue* other) override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_pow(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_pow(const double exp) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_max(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
-    BaseValue::PointerType math_min(const BaseValue* other) const override { throw std::runtime_error("Function is not implemented for this type."); };
     BaseValue::PointerType where(const BaseValue* condition, const BaseValue* other) const override {
       return operate_ternary<bool, T>(condition, other, [](bool c, T a, T b) { return c ? a : b; });
     };

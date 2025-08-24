@@ -16,18 +16,14 @@ namespace val {
     ArrayValue(const BaseValue* other) : BaseArrayValue<std::string>(other) {};
 
   private:
-    void value_to_string(std::ostringstream& oss, size_t& offset, int precision = 0) const override {
+    void value_to_string(std::ostringstream& oss, size_t& offset, int precision) const override {
       oss << "'" << value[offset] << "'";
     }
 
   public:
     std::string to_string(int precision = 0) const override {
       size_t offset = 0;
-      if (precision == 0) {
-        return to_string_dim(offset);
-      } else {
-        throw std::runtime_error("String value does not support precision parameter for to_string() method.");
-      }
+      return to_string_dim(offset, precision);
     };
     BaseValue::PointerType clone() const override {
       return std::make_unique<ArrayValue<std::string>>(this->value, this->shape);

@@ -76,18 +76,18 @@ namespace puq {
     std::stringstream ss;
     if (size() == 1) {
       ss << std::setprecision(format.precision);
-      ss << value[0] << std::scientific;
+      ss << value[0];
     } else if (size() == 2) {
       ss << std::setprecision(format.precision);
       ss << SYMBOL_ARRAY_START << value[0];
       ss << SYMBOL_ARRAY_SEPARATOR << " " << value[1];
-      ss << std::scientific << SYMBOL_ARRAY_END;
+      ss << SYMBOL_ARRAY_END;
     } else if (size() > 2) {
       ss << std::setprecision(format.precision);
       ss << SYMBOL_ARRAY_START << value[0];
       ss << SYMBOL_ARRAY_SEPARATOR << " " << value[1];
       ss << SYMBOL_ARRAY_SEPARATOR << " " << SYMBOL_ARRAY_MORE;
-      ss << std::scientific << SYMBOL_ARRAY_END;
+      ss << SYMBOL_ARRAY_END;
     }
     return ss.str();
   }

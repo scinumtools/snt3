@@ -77,11 +77,11 @@ TEST(Magnitude, ErrorConversionArrays) {
 
   a = puq::Magnitude::abs_to_rel(val::ArrayValue<double>::pointer_from_vector({30, 20}),
                                  val::ArrayValue<double>::pointer_from_vector({0.3, 0.4}));
-  EXPECT_EQ(a->to_string(), "[1.0000, 2.0000]");
+  EXPECT_EQ(a->to_string(), "[1, 2]");
 
   a = puq::Magnitude::rel_to_abs(val::ArrayValue<double>::pointer_from_vector({30, 20}),
                                  val::ArrayValue<double>::pointer_from_vector({20, 10}));
-  EXPECT_EQ(a->to_string(), "[6.0000, 2.0000]");
+  EXPECT_EQ(a->to_string(), "[6, 2]");
 }
 
 #endif

@@ -16,15 +16,8 @@ namespace val {
     ArrayValue(const BaseValue* other) : BaseArrayValue<T>(other) {};
 
   private:
-    void value_to_string(std::ostringstream& oss, size_t& offset, int precision = 0) const override {
-      if (precision == 0)
-        precision = snt::DISPLAY_FLOAT_PRECISION;
-      int exponent = static_cast<int>(std::log10(std::fabs(this->value[offset])));
-      if (exponent > 3 || exponent < -3) {
-        oss << std::scientific << std::setprecision(precision) << this->value[offset];
-      } else {
-        oss << std::fixed << std::setprecision(precision - exponent) << this->value[offset];
-      }
+    void value_to_string(std::ostringstream& oss, size_t& offset, int precision) const override {
+      oss << snt::number_to_string(this->value[offset], precision);
     };
 
   public:
