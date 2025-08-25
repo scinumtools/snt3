@@ -69,13 +69,13 @@ TEST(References, FloatValues) {
   EXPECT_EQ(node->name, "bar");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "2.3450e+06");
+  EXPECT_EQ(vnode->value->to_string(), "2.345e6");
 
   node = env.nodes.at(3);
   EXPECT_EQ(node->name, "crackle");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "[2.3450e+06, 3.4560e+07]");
+  EXPECT_EQ(vnode->value->to_string(), "[2.345e6, 3.456e7]");
 }
 
 TEST(References, StringValues) {

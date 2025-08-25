@@ -92,7 +92,7 @@ TEST(BaseUnits, Dimensions) {
 
   bus = puq::BaseUnits("au2"); // derived units
   dim = bus.dimensions();
-  EXPECT_EQ(dim.to_string(), "2.23795e+22*m2");
+  EXPECT_EQ(dim.to_string(), "2.23795e22*m2");
 
   bus = puq::BaseUnits("<v>"); // quantities
   dim = bus.dimensions();

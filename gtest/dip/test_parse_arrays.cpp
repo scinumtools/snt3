@@ -57,7 +57,7 @@ TEST(ParseArrays, FloatValue) {
   EXPECT_EQ(node->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
-  EXPECT_EQ(vnode->value->to_string(), "[[1.0000, 2.2000, 3300.0], [-4.0000, -5.5000, -6.6000e+06]]");
+  EXPECT_EQ(vnode->value->to_string(), "[[1, 2.2, 3.3e3], [-4, -5.5, -6.6e6]]");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Float64);
 }
 

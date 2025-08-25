@@ -9,10 +9,10 @@ TEST(UnitValue, Initialization) {
   puq::UnitValue value;
 
   value = {3.34e3, {{"k", "m", -1}}}; // list initialization
-  EXPECT_EQ(value.to_string(), "3340*km-1");
+  EXPECT_EQ(value.to_string(), "3.34e3*km-1");
 
   value = puq::UnitValue(3.34e3, "km-1"); // assigning UnitValue
-  EXPECT_EQ(value.to_string(), "3340*km-1");
+  EXPECT_EQ(value.to_string(), "3.34e3*km-1");
 
   puq::BaseUnits bu("km-1/s2");
   value = puq::UnitValue(3, bu); // from BaseUnits
@@ -94,19 +94,19 @@ TEST(UnitValue, RebasePrefixes) {
 
   value = puq::UnitValue("mm*km");
   value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e+06*mm2");
+  EXPECT_EQ(value.to_string(), "1e6*mm2");
 
   value = puq::UnitValue("km*mm");
   value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e-06*km2");
+  EXPECT_EQ(value.to_string(), "1e-6*km2");
 
   value = puq::UnitValue("cm2*m3"); // exponents
   value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e+06*cm5");
+  EXPECT_EQ(value.to_string(), "1e6*cm5");
 
   value = puq::UnitValue("mm2*km3");
   value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e+18*mm5");
+  EXPECT_EQ(value.to_string(), "1e18*mm5");
 
   value = puq::UnitValue("km*mm2*cm3"); // multiple units
   value = value.rebase_prefixes();
@@ -123,7 +123,7 @@ TEST(UnitValue, RebaseDimensions) {
 
   value = puq::UnitValue("km*au2*pc"); // two different units of length
   value = value.rebase_dimensions();
-  EXPECT_EQ(value.to_string(), "6.90565e+29*km4");
+  EXPECT_EQ(value.to_string(), "6.90565e29*km4");
 
   value = puq::UnitValue("kph2*s3/(h*[c]3)"); // multiple dimensions
   value = value.rebase_dimensions();
@@ -141,10 +141,10 @@ TEST(UnitValue, RebaseDimensions) {
 TEST(UnitValue, InitializationFractions) {
 
   puq::UnitValue value1 = {3.34e3, {{"k", "m", -1, 2}}};
-  EXPECT_EQ(value1.to_string(), "3340*km-1:2");
+  EXPECT_EQ(value1.to_string(), "3.34e3*km-1:2");
 
   puq::UnitValue value2(3.34e3, "km-1:2");
-  EXPECT_EQ(value2.to_string(), "3340*km-1:2");
+  EXPECT_EQ(value2.to_string(), "3.34e3*km-1:2");
 
   puq::BaseUnits bu("km-1:2/s2");
   puq::UnitValue value3(3, bu);
@@ -202,24 +202,24 @@ TEST(UnitValue, UnitConversion) {
   v1 = puq::UnitValue("9*cm2");
   v2 = puq::UnitValue("3*m2");
   v3 = v1.convert(v2); // conversion using UnitValue
-  EXPECT_EQ(v3.to_string(), "0.0003*m2");
+  EXPECT_EQ(v3.to_string(), "3e-4*m2");
 
   puq::BaseUnits bu("m2");
   v1 = puq::UnitValue("4*cm2");
   v2 = v1.convert(bu); // conversion using BaseUnits
-  EXPECT_EQ(v2.to_string(), "0.0004*m2");
+  EXPECT_EQ(v2.to_string(), "4e-4*m2");
 
   v1 = puq::UnitValue("4*cm2");
   v2 = v1.convert("2*m2"); // conversion using an expression
-  EXPECT_EQ(v2.to_string(), "0.0002*m2");
+  EXPECT_EQ(v2.to_string(), "2e-4*m2");
 
   v1 = puq::UnitValue("2*J"); // conversion to system base units
   v2 = v1.convert(puq::Format::Base::MGS);
-  EXPECT_EQ(v2.to_string(), "2000*m2*g*s-2"); // code base units
+  EXPECT_EQ(v2.to_string(), "2e3*m2*g*s-2"); // code base units
   v2 = v1.convert(puq::Format::Base::MKS);
   EXPECT_EQ(v2.to_string(), "2*m2*kg*s-2"); // SI
   v2 = v1.convert(puq::Format::Base::CGS);
-  EXPECT_EQ(v2.to_string(), "2e+07*cm2*g*s-2"); // CGS
+  EXPECT_EQ(v2.to_string(), "2e7*cm2*g*s-2"); // CGS
 
 #ifdef UNIT_SYSTEM_EUS // conversion to foot/pound/second
   puq::UnitSystem us(puq::SystemType::US);
@@ -244,9 +244,9 @@ TEST(UnitValue, ArithmeticsAdd) {
   q1 = puq::UnitValue(6, "cm2/s2"); // same dimensions
   q2 = puq::UnitValue(3, "m2/s2");
   q3 = q1 + q2;
-  EXPECT_EQ(q3.to_string(), "30006*cm2*s-2");
+  EXPECT_EQ(q3.to_string(), "3.0006e4*cm2*s-2");
   q1 += q2;
-  EXPECT_EQ(q1.to_string(), "30006*cm2*s-2");
+  EXPECT_EQ(q1.to_string(), "3.0006e4*cm2*s-2");
 
   q3 = puq::UnitValue(3, "cm2"); // different units
   EXPECT_THROW(q1 + q3, puq::ConvDimExcept);

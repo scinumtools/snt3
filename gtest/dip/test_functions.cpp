@@ -71,13 +71,13 @@ TEST_F(Functions, FloatValues) {
   EXPECT_EQ(node->name, "foo");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "2.3400e+05");
+  EXPECT_EQ(vnode->value->to_string(), "2.34e5");
 
   node = env.nodes.at(1);
   EXPECT_EQ(node->name, "bar");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "[2.3400e+05, 3.4500e+06, 4.5600e+07]");
+  EXPECT_EQ(vnode->value->to_string(), "[2.34e5, 3.45e6, 4.56e7]");
 }
 
 TEST_F(Functions, StringValues) {
@@ -162,7 +162,7 @@ TEST_F(Functions, TableNodes) {
   EXPECT_EQ(node->name, "foo.scalar_double");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "2.3400e+05");
+  EXPECT_EQ(vnode->value->to_string(), "2.34e5");
 
   node = env.nodes.at(3);
   EXPECT_EQ(node->name, "foo.scalar_str");
@@ -186,7 +186,7 @@ TEST_F(Functions, TableNodes) {
   EXPECT_EQ(node->name, "bar.array_double");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "[2.3400e+05, 3.4500e+06, 4.5600e+07]");
+  EXPECT_EQ(vnode->value->to_string(), "[2.34e5, 3.45e6, 4.56e7]");
 
   node = env.nodes.at(7);
   EXPECT_EQ(node->name, "bar.array_str");
@@ -222,7 +222,7 @@ TEST_F(Functions, ImportNodes) {
   EXPECT_EQ(node->name, "foo.scalar_double");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "2.3400e+05");
+  EXPECT_EQ(vnode->value->to_string(), "2.34e5");
 
   node = env.nodes.at(3);
   EXPECT_EQ(node->name, "foo.scalar_str");
@@ -246,7 +246,7 @@ TEST_F(Functions, ImportNodes) {
   EXPECT_EQ(node->name, "bar.array_double");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "[2.3400e+05, 3.4500e+06, 4.5600e+07]");
+  EXPECT_EQ(vnode->value->to_string(), "[2.34e5, 3.45e6, 4.56e7]");
 
   node = env.nodes.at(7);
   EXPECT_EQ(node->name, "bar.array_str");

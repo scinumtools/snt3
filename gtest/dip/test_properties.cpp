@@ -241,9 +241,9 @@ TEST(Properties, OptionsFloat) {
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->options.size(), 3);
-  EXPECT_EQ(vnode->options[0].value->to_string(), "1.0000");
-  EXPECT_EQ(vnode->options[1].value->to_string(), "2.3400");
-  EXPECT_EQ(vnode->options[2].value->to_string(), "5.6000e+07");
+  EXPECT_EQ(vnode->options[0].value->to_string(), "1");
+  EXPECT_EQ(vnode->options[1].value->to_string(), "2.34");
+  EXPECT_EQ(vnode->options[2].value->to_string(), "5.6e7");
 
   // TODO: implement unit conversion of units
 
@@ -255,7 +255,7 @@ TEST(Properties, OptionsFloat) {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Value 2.0000 of node 'foo' doesn't match with any option: 1.0000, 2.3400, 5.6000e+07");
+    EXPECT_STREQ(e.what(), "Value 2 of node 'foo' doesn't match with any option: 1, 2.34, 5.6e7");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }

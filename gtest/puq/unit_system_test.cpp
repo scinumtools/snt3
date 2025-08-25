@@ -57,10 +57,10 @@ TEST(UnitSystem, FormatConversion) {
   EXPECT_EQ(r.to_string(), "m2*kg*s-2");
 
   r = q.convert(puq::Format::Base::MGS);
-  EXPECT_EQ(r.to_string(), "1000*m2*g*s-2");
+  EXPECT_EQ(r.to_string(), "1e3*m2*g*s-2");
 
   r = q.convert(puq::Format::Base::CGS);
-  EXPECT_EQ(r.to_string(), "1e+07*cm2*g*s-2");
+  EXPECT_EQ(r.to_string(), "1e7*cm2*g*s-2");
 
 #ifdef UNIT_SYSTEM_EUS
   // q is implicitely converted into MGS format,
@@ -81,17 +81,17 @@ TEST(UnitSystem, DirectConversionESU) {
 
   q1 = puq::Quantity(34, "J", puq::SystemType::SI); // convert using expression
   q2 = q1.convert("erg", puq::SystemType::ESU);
-  EXPECT_EQ(q2.to_string(), "3.4e+08*erg");
+  EXPECT_EQ(q2.to_string(), "3.4e8*erg");
 
   q1 = puq::Quantity(34, "J", puq::SystemType::SI); // convert using Quantity/UnitValue
   q2 = puq::Quantity("erg", puq::SystemType::ESU);
   q3 = q1.convert(q2);
-  EXPECT_EQ(q3.to_string(), "3.4e+08*erg");
+  EXPECT_EQ(q3.to_string(), "3.4e8*erg");
 
 #ifdef PREPROCESS_SYSTEM
   q1 = puq::Quantity(34, "J");
   q2 = q1.convert("ESU_erg");
-  EXPECT_EQ(q2.to_string(), "3.4e+08*erg");
+  EXPECT_EQ(q2.to_string(), "3.4e8*erg");
 #endif
 }
 
@@ -101,7 +101,7 @@ TEST(UnitSystem, ContextConversionESU) {
 
   q1 = puq::Quantity(20, "statA", puq::SystemType::ESU);
   q2 = q1.convert("A", puq::SystemType::SI, "I"); // specify conversion context
-  EXPECT_EQ(q2.to_string(), "6.67128e-09*A");
+  EXPECT_EQ(q2.to_string(), "6.67128e-9*A");
 
   q1 = puq::Quantity("6.671282e-10*A", puq::SystemType::SI);
   q2 = q1.convert("statA", puq::SystemType::ESU, "I"); // inverse conversion
@@ -112,13 +112,13 @@ TEST(UnitSystem, ContextConversionESU) {
 
   q1 = puq::Quantity(1, "statT", puq::SystemType::ESU);
   q2 = q1.convert("T", puq::SystemType::SI, "B"); // specify conversion context
-  EXPECT_EQ(q2.to_string(), "2.99792e+06*T");
+  EXPECT_EQ(q2.to_string(), "2.99792e6*T");
 
   q1 = puq::Quantity(1, "erg", puq::SystemType::ESU); // quantities that do not need a conversion context
   q2 = q1.convert("J", puq::SystemType::SI, "E");     // with a context
-  EXPECT_EQ(q2.to_string(), "1e-07*J");
+  EXPECT_EQ(q2.to_string(), "1e-7*J");
   q2 = q1.convert("J", puq::SystemType::SI); // without a context
-  EXPECT_EQ(q2.to_string(), "1e-07*J");
+  EXPECT_EQ(q2.to_string(), "1e-7*J");
 
 #ifdef PREPROCESS_SYSTEM
   // throw an error if preprocessor system does not match selected system
@@ -137,11 +137,11 @@ TEST(UnitSystem, ContextConversionSRU) {
 
   q1 = puq::Quantity(1, "<E>", puq::SystemType::SRU);
   q2 = q1.convert("<E>", puq::SystemType::SI, "E");
-  EXPECT_EQ(q2.to_string(), "8.98755e+16*<E>");
+  EXPECT_EQ(q2.to_string(), "8.98755e16*<E>");
 
   q1 = puq::Quantity(1, "<L_ome>", puq::SystemType::SRU);
   q2 = q1.convert("<L_ome>", puq::SystemType::SI, "L_ome");
-  EXPECT_EQ(q2.to_string(), "2.99792e+08*<L_ome>");
+  EXPECT_EQ(q2.to_string(), "2.99792e8*<L_ome>");
 }
 
 TEST(UnitSystem, ContextConversionGRU) {

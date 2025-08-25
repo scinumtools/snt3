@@ -26,6 +26,7 @@ configure_file(
     ${CMAKE_BINARY_DIR}/settings.h
 )
 
+option(COMPILE_SNT "Compile SNT module" ON)
 option(COMPILE_EXS "Compile EXS module" ON)
 option(COMPILE_VAL "Compile VAL module" ON)
 option(COMPILE_PUQ "Compile PUQ module" ON)
@@ -63,7 +64,7 @@ if(ENABLE_CLANG_TIDY)
     if(NOT CLANG_TIDY_COMMAND)
         message(FATAL_ERROR "clang-tidy not found!")
     else()
-        message(STATUS "Running with clang-tidy")
+        message(STATUS "Running with clang-tidy ${ENABLE_CLANG_TIDY}")
     endif()
 
     # This makes all targets run clang-tidy automatically during compilation

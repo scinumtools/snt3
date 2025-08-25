@@ -16,13 +16,13 @@ TEST(Converter, LinearConv) {
 
   puq::Converter con;
 
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("erg", "J").convert(1)), "1e-07");      // different units
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("kg*m2/s2", "J").convert(6, 2)), "3");  // different units with magnitudes
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("mg", "g").convert(1)), "0.001");       // different prefixes
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("1/s", "kHz").convert(6, 2)), "0.003"); // different prefixes
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("erg", "J").convert(1)), "1e-7");      // different units
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("kg*m2/s2", "J").convert(6, 2)), "3"); // different units with magnitudes
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("mg", "g").convert(1)), "1e-3");       // different prefixes
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("1/s", "kHz").convert(6, 2)), "3e-3"); // different prefixes
 
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("J/erg", "").convert(2)), "2e+07");  // converting to no units
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("J/erg", "1").convert(2)), "2e+07"); // converting to number
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("J/erg", "").convert(2)), "2e7");  // converting to no units
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("J/erg", "1").convert(2)), "2e7"); // converting to number
 }
 
 #ifdef UNITS_LOGARITHMIC
@@ -47,7 +47,7 @@ TEST(Converter, LogarithmicConv) {
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("Np", "PR").convert(0.115)), "1.2586");
 
   // Decibel-milliwatts (dBm)
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("mW", "W").convert(1)), "0.001");
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("mW", "W").convert(1)), "1e-3");
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("mW", "dBm").convert(1)), "0");
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("W", "dBm").convert(10)), "40");
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("pW", "dBm").convert(10)), "-80");
@@ -99,7 +99,7 @@ TEST(Converter, LogarithmicConv) {
 
   // Sound pressure level (dBSPL)
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("Pa", "dBSPL").convert(110)), "134.807");
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("dBSPL", "Pa").convert(10)), "6.32456e-05");
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("dBSPL", "Pa").convert(10)), "6.32456e-5");
 
   // Sound intensity level (dBSIL)
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("W/m2", "dBSIL").convert(100)), "140");
@@ -113,11 +113,11 @@ TEST(Converter, LogarithmicConv) {
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("dBmW/Hz", "W/Hz").convert(10)), "0.01");
 
   // Conversions of moment magnitude to seismic moment
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("Mw", "Mo").convert(0)), "1.12202e+09");
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("Mw", "Mo").convert(9)), "3.54813e+22");
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("Mw", "Mo").convert(0)), "1.12202e9");
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("Mw", "Mo").convert(9)), "3.54813e22");
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("Mo", "Mw").convert(1.12202e+12)), "2");
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("Mo", "Mw").convert(3.54813e+19)), "7");
-  EXPECT_EQ(puq::nostd::to_string(puq::Converter("Mw", "dyn*cm").convert(0)), "1.12202e+16");
+  EXPECT_EQ(puq::nostd::to_string(puq::Converter("Mw", "dyn*cm").convert(0)), "1.12202e16");
   EXPECT_EQ(puq::nostd::to_string(puq::Converter("dyn*cm", "Mw").convert(1.12202e+19)), "2");
 }
 

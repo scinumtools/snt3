@@ -1,4 +1,7 @@
 # add submodule tests
+if (COMPILE_SNT)
+   add_subdirectory(snt)
+endif()
 if (COMPILE_EXS)
    add_subdirectory(exs)
 endif()

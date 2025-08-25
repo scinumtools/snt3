@@ -69,24 +69,24 @@ TEST(ParseScalars, FloatValue) {
   EXPECT_EQ(node->name, "foo1");
 
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
-  EXPECT_EQ(vnode->value->to_string(), "23.000");
+  EXPECT_EQ(vnode->value->to_string(), "23");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Float64);
 
   node = env.nodes.at(1);
   EXPECT_EQ(node->value_raw.at(0), "23.456");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
-  EXPECT_EQ(vnode->value->to_string(), "23.456");
+  EXPECT_EQ(vnode->value->to_string(), "23.46");
 
   node = env.nodes.at(2);
   EXPECT_EQ(node->value_raw.at(0), "23.456e7");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
-  EXPECT_EQ(vnode->value->to_string(), "2.3456e+08");
+  EXPECT_EQ(vnode->value->to_string(), "2.346e8");
 
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(3));
-  EXPECT_EQ(vnode->value->to_string(7), "23.123457");
+  EXPECT_EQ(vnode->value->to_string(7), "23.12346");
 
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(4));
-  EXPECT_EQ(vnode->value->to_string(13), "23.123456789123");
+  EXPECT_EQ(vnode->value->to_string(13), "23.12345678912");
 
   // TODO: This case needs more testing on other platforms
   if (dip::FloatNode::max_float_size == 128) {

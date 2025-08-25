@@ -72,10 +72,10 @@ TEST(Math, Mul) {
   val::BaseValue::PointerType val4;
 
   val4 = val1->math_mul(val2.get());
-  EXPECT_EQ(val4->to_string(), "[4.182e4, 0.0092, 3.103]");
+  EXPECT_EQ(val4->to_string(), "[4.182e4, 9.2e-3, 3.103]");
 
   val1->math_mul_equal(val2.get());
-  EXPECT_EQ(val1->to_string(), "[4.182e4, 0.0092, 3.103]");
+  EXPECT_EQ(val1->to_string(), "[4.182e4, 9.2e-3, 3.103]");
 }
 
 TEST(Math, Div) {
@@ -87,10 +87,10 @@ TEST(Math, Div) {
   val::BaseValue::PointerType val4;
 
   val4 = val1->math_div(val2.get());
-  EXPECT_EQ(val4->to_string(), "[0.003618, 575, 0.3448]");
+  EXPECT_EQ(val4->to_string(), "[3.618e-3, 575, 0.3448]");
 
   val1->math_div_equal(val2.get());
-  EXPECT_EQ(val1->to_string(), "[0.003618, 575, 0.3448]");
+  EXPECT_EQ(val1->to_string(), "[3.618e-3, 575, 0.3448]");
 }
 
 TEST(Math, Inv) {

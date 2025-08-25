@@ -93,7 +93,7 @@ TEST(ReferencesRaw, FloatValues) {
   EXPECT_EQ(node->name, "snap");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "[[1.0000, 2.0000], [3.4500, 4.5600e+07]]");
+  EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3.45, 4.56e7]]");
 }
 
 TEST(ReferencesRaw, StringValues) {

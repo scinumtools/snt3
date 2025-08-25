@@ -21,7 +21,7 @@ TEST(UnitSolver, Solve) {
   EXPECT_EQ(atom.value.to_string(), "2.4*km*s-1"); // simple arithmetics
 
   atom = solver.solve("3.2e4*kg*m*m/s/s"); // exponent reduction
-  EXPECT_EQ(atom.value.to_string(), "32000*kg*m2*s-2");
+  EXPECT_EQ(atom.value.to_string(), "3.2e4*kg*m2*s-2");
 
   atom = solver.solve("kg/(m*s)"); // simple parentheses
   EXPECT_EQ(atom.value.to_string(), "kg*m-1*s-1");

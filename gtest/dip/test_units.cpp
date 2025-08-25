@@ -31,7 +31,7 @@ TEST(Units, Definition) {
   EXPECT_EQ(node->units_raw, "km");
   qnode = std::dynamic_pointer_cast<dip::QuantityNode>(node);
   EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->value->to_string(), "2.3400e+05");
+  EXPECT_EQ(qnode->value->to_string(), "2.34e5");
   EXPECT_EQ(qnode->units->to_string(), "km");
 }
 
@@ -60,7 +60,7 @@ TEST(Units, ScalarModification) {
   EXPECT_EQ(node->units_raw, "km");
   qnode = std::dynamic_pointer_cast<dip::QuantityNode>(node);
   EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->value->to_string(), "0.02300");
+  EXPECT_EQ(qnode->value->to_string(), "0.023");
   EXPECT_EQ(qnode->units->to_string(), "km");
 }
 
@@ -89,7 +89,7 @@ TEST(Units, ArrayModification) {
   EXPECT_EQ(node->units_raw, "m");
   qnode = std::dynamic_pointer_cast<dip::QuantityNode>(node);
   EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->value->to_string(), "[1.2000e+04, 2.3000e+04]");
+  EXPECT_EQ(qnode->value->to_string(), "[1.2e4, 2.3e4]");
   EXPECT_EQ(qnode->units->to_string(), "m");
 }
 
@@ -118,7 +118,7 @@ TEST(Units, DimlessModification) {
   EXPECT_EQ(node->units_raw, "km");
   qnode = std::dynamic_pointer_cast<dip::QuantityNode>(node);
   EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->value->to_string(), "45.000");
+  EXPECT_EQ(qnode->value->to_string(), "45");
   EXPECT_EQ(qnode->units->to_string(), "km");
 }
 
@@ -134,8 +134,8 @@ TEST(Units, OptionSetting) {
   EXPECT_TRUE(qnode);
   EXPECT_EQ(qnode->value->to_string(), "2000");
   EXPECT_EQ(qnode->units->to_string(), "m");
-  EXPECT_EQ(qnode->options[0].value->to_string(), "2000.0");
-  EXPECT_EQ(qnode->options[1].value->to_string(), "3000.0");
+  EXPECT_EQ(qnode->options[0].value->to_string(), "2e3");
+  EXPECT_EQ(qnode->options[1].value->to_string(), "3e3");
 
   d = dip::DIP();
   d.add_string("foo float = 2000 m");
@@ -145,10 +145,10 @@ TEST(Units, OptionSetting) {
   node = env.nodes.at(0);
   qnode = std::dynamic_pointer_cast<dip::QuantityNode>(node);
   EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->value->to_string(), "2000.0");
+  EXPECT_EQ(qnode->value->to_string(), "2e3");
   EXPECT_EQ(qnode->units->to_string(), "m");
-  EXPECT_EQ(qnode->options[0].value->to_string(), "2000.0");
-  EXPECT_EQ(qnode->options[1].value->to_string(), "3000.0");
+  EXPECT_EQ(qnode->options[0].value->to_string(), "2e3");
+  EXPECT_EQ(qnode->options[1].value->to_string(), "3e3");
 }
 
 TEST(Units, ScalarInjection) {
@@ -172,7 +172,7 @@ TEST(Units, ScalarInjection) {
   node = env.nodes.at(1);
   qnode = std::dynamic_pointer_cast<dip::QuantityNode>(node);
   EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->value->to_string(), "2.0000");
+  EXPECT_EQ(qnode->value->to_string(), "2");
   EXPECT_EQ(qnode->units->to_string(), "km");
 }
 
@@ -197,7 +197,7 @@ TEST(Units, ArrayInjection) {
   node = env.nodes.at(1);
   qnode = std::dynamic_pointer_cast<dip::QuantityNode>(node);
   EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->value->to_string(), "[22.300, 3450.0]");
+  EXPECT_EQ(qnode->value->to_string(), "[22.3, 3.45e3]");
   EXPECT_EQ(qnode->units->to_string(), "km");
 }
 

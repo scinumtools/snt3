@@ -14,7 +14,7 @@ TEST(UnitAtom, FromString) {
   EXPECT_EQ(value.to_string(), "1.23"); // floating point numbers
 
   value = puq::UnitAtom::from_string("1.23e6");
-  EXPECT_EQ(value.to_string(), "1.23e+06"); // numbers in scientific notation
+  EXPECT_EQ(value.to_string(), "1.23e6"); // numbers in scientific notation
 
   value = puq::UnitAtom::from_string("s");
   EXPECT_EQ(value.to_string(), "s"); // units without prefixes

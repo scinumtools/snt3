@@ -177,10 +177,10 @@ TEST(Quantity, UnitConversion) {
   puq::Quantity q;
 
   q = puq::Quantity(6, "cm").convert("km");
-  EXPECT_EQ(q.to_string(), "6e-05*km");
+  EXPECT_EQ(q.to_string(), "6e-5*km");
 
   q = puq::Quantity(1, "au").convert("km");
-  EXPECT_EQ(q.to_string(), "1.49598e+08*km");
+  EXPECT_EQ(q.to_string(), "1.49598e8*km");
 }
 
 TEST(Quantity, ArithmeticsAdd) {

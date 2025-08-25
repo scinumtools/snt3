@@ -25,24 +25,24 @@ TEST(UnitFormat, DimensionsFormat) {
   puq::Dimensions d(2.340342349349823e6, {1, 2, 3, 0, 0, 0, 0, 0});
 
   format = puq::UnitFormat(puq::Format::Precision(10)); // increased output precision
-  EXPECT_EQ(d.to_string(format), "2340342.349*m*g2*s3");
+  EXPECT_EQ(d.to_string(format), "2.340342349e6*m*g2*s3");
 
   format = puq::UnitFormat(puq::Format::Math::UNICODE); // UNICODE math format
   EXPECT_EQ(d.to_string(format), "2.34034×10⁶⋅m⋅g²⋅s³");
 
   format = puq::UnitFormat(puq::Format::Display::MAGNITUDE); // display only magnitudes
-  EXPECT_EQ(d.to_string(format), "2.34034e+06");
+  EXPECT_EQ(d.to_string(format), "2.34034e6");
 
   format = puq::UnitFormat(puq::Format::Display::UNITS); // display only units
   EXPECT_EQ(d.to_string(format), "m*g2*s3");
 
   format = puq::UnitFormat(puq::Format::Base::CGS); // change unit base
-  EXPECT_EQ(d.to_string(format), "2.34034e+08*cm*g2*s3");
+  EXPECT_EQ(d.to_string(format), "2.34034e8*cm*g2*s3");
 
   format = puq::UnitFormat({// change unit base and show only magnitude
                             puq::Format::Base::CGS,
                             puq::Format::Display::MAGNITUDE});
-  EXPECT_EQ(d.to_string(format), "2.34034e+08");
+  EXPECT_EQ(d.to_string(format), "2.34034e8");
 
   format = puq::UnitFormat({// change unit base and show only units
                             puq::Format::Base::CGS,
@@ -75,7 +75,7 @@ TEST(UnitFormat, MagnitudeFormat) {
 
   format = puq::UnitFormat(puq::Format::Precision(10));
   m = puq::Magnitude(3.2340342349349823e3); // increased precision
-  EXPECT_EQ(m.to_string(format), "3234.034235");
+  EXPECT_EQ(m.to_string(format), "3.234034235e3");
 
 #ifdef MAGNITUDE_ERRORS
   format = puq::UnitFormat(puq::Format::Math::UNICODE);
@@ -102,11 +102,11 @@ TEST(UnitFormat, UnitValueFormat) {
 
   format = puq::UnitFormat(puq::Format::Precision(10));
   value = puq::UnitValue("3.2340342349349823e3*m/s2"); // higher precision
-  EXPECT_EQ(value.to_string(format), "3234.034235*m*s-2");
+  EXPECT_EQ(value.to_string(format), "3.234034235e3*m*s-2");
 
   format = puq::UnitFormat(puq::Format::Math::UNICODE, 10); // precision and UNICODE format
   value = puq::UnitValue("3.2340342349349823e3*km-2");
-  EXPECT_EQ(value.to_string(format), "3234.034235⋅km⁻²");
+  EXPECT_EQ(value.to_string(format), "3.234034235×10³⋅km⁻²");
 
   format = puq::UnitFormat(puq::Format::Display::MAGNITUDE); // display only magnitude
   value = puq::UnitValue("3*km/s");
@@ -152,7 +152,7 @@ TEST(UnitFormat, PreprocessSymbols) {
   EXPECT_EQ(q.to_string(), "6.23537e-12*C4*m4*J-3");
 
   q = puq::Quantity("6.23537×1012*C4⋅m4⋅J−3");
-  EXPECT_EQ(q.to_string(), "6.23537e+12*C4*m4*J-3");
+  EXPECT_EQ(q.to_string(), "6.23537e12*C4*m4*J-3");
 
   q = puq::Quantity("6.23537×10⁻²⋅C³"); // exponents
   EXPECT_EQ(q.to_string(), "0.0623537*C3");

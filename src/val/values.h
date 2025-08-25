@@ -1,7 +1,7 @@
 #ifndef VAL_VALUES_H
 #define VAL_VALUES_H
 
-#include "../settings.h"
+#include "../snt/settings.h"
 #include "datatypes.h"
 
 #include <algorithm>

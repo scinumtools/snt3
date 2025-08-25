@@ -64,5 +64,5 @@ TEST(Expressions, Numerical) {
   EXPECT_EQ(node->name, "pop");
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "6.2340");
+  EXPECT_EQ(vnode->value->to_string(), "6.234");
 }

@@ -70,7 +70,7 @@ TEST(ValueSlicing, OpenRangesFloat) {
   EXPECT_EQ(node->name, "crackle");
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "[1.0000, 2.0000, 3.0000]");
+  EXPECT_EQ(vnode->value->to_string(), "[1, 2, 3]");
 }
 
 TEST(ValueSlicing, OpenRangesString) {

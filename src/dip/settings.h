@@ -2,7 +2,7 @@
 #define DIP_SETTINGS_H
 
 #include "../puq/quantity.h"
-#include "../settings.h"
+#include "../snt/settings.h"
 
 #include <sstream>
 #include <string>
