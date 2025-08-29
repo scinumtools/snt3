@@ -20,21 +20,21 @@ namespace nostd {
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-    Magnitude exp(const Magnitude& e) {
+    puq::Magnitude exp(const puq::Magnitude& e) {
       // z ± Dz = pow(e, y ± Dy) -> Dz = pow(e, y) * log(e) * Dy
 #ifdef MAGNITUDE_VALUES
       if (e.error)
-        return Magnitude(e.value->math_exp(), e.value->math_exp()->math_mul(e.error.get()));
+        return puq::Magnitude(e.value->math_exp(), e.value->math_exp()->math_mul(e.error.get()));
       else
-        return Magnitude(e.value->math_exp());
+        return puq::Magnitude(e.value->math_exp());
 #else
-      return Magnitude(exp(e.value), exp(e.value) * e.error);
+      return puq::Magnitude(exp(e.value), exp(e.value) * e.error);
 #endif
     }
 #endif
 
-    UnitValue exp(const UnitValue& uv) {
-      return UnitValue(exp(uv.magnitude), uv.baseunits);
+    puq::UnitValue exp(const puq::UnitValue& uv) {
+      return puq::UnitValue(exp(uv.magnitude), uv.baseunits);
     }
   
 } // namespace nostd

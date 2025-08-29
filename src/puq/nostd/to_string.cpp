@@ -10,7 +10,7 @@ namespace nostd {
     }
 
 #if defined(MAGNITUDE_ARRAYS)
-    std::string to_string(const Array& value, int precision) {
+    std::string to_string(const puq::Array& value, int precision) {
       return value.to_string(precision);
     }
 #elif defined(MAGNITUDE_VALUES)
@@ -22,24 +22,24 @@ namespace nostd {
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-    std::string to_string(const Magnitude& value, int precision) {
+    std::string to_string(const puq::Magnitude& value, int precision) {
       return value.to_string(precision);
     }
 #endif
 
-    std::string to_string(const BaseUnits& value, int precision) {
+  std::string to_string(const puq::BaseUnits& value, int precision) {
       return value.to_string();
     }
 
-    std::string to_string(const Dimensions& value, const UnitFormat& format) {
+    std::string to_string(const puq::Dimensions& value, const puq::UnitFormat& format) {
       return value.to_string(format);
     }
 
-    std::string to_string(const Exponent& value, const UnitFormat& format) {
+    std::string to_string(const puq::Exponent& value, const puq::UnitFormat& format) {
       return value.to_string(format);
     }
 
-    std::string to_string(const bool& use_prefixes, const AllowedPrefixes& value) {
+  std::string to_string(const bool& use_prefixes, const puq::AllowedPrefixes& value) {
       std::stringstream ss;
       if (use_prefixes) {
         if (value.size() > 0) {
@@ -57,7 +57,7 @@ namespace nostd {
     }
 
 #if defined(MAGNITUDE_ARRAYS)
-    std::string to_string(const ArrayShape& shape) {
+  std::string to_string(const puq::ArrayShape& shape) {
       std::stringstream ss;
       ss << "[";
       for (int i = 0; i < shape.size(); i++) {

@@ -21,13 +21,13 @@ namespace nostd {
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-    Magnitude sqrt(const Magnitude& m) {
+    puq::Magnitude sqrt(const puq::Magnitude& m) {
       // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
 #ifdef MAGNITUDE_VALUES
       std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(0.5);
-      return Magnitude(m.value->math_sqrt(), m.value->math_pow(-0.5)->math_mul(cst.get())->math_mul(m.error.get()));
+      return puq::Magnitude(m.value->math_sqrt(), m.value->math_pow(-0.5)->math_mul(cst.get())->math_mul(m.error.get()));
 #else
-      return Magnitude(sqrt(m.value), 0.5 * pow(m.value, -0.5) * m.error);
+      return puq::Magnitude(sqrt(m.value), 0.5 * pow(m.value, -0.5) * m.error);
 #endif
     }
 #endif

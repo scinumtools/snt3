@@ -20,11 +20,11 @@ namespace nostd {
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-    Magnitude floor(const Magnitude& m) {
+    puq::Magnitude floor(const puq::Magnitude& m) {
 #ifdef MAGNITUDE_VALUES
-      return Magnitude(m.value->math_floor());
+      return puq::Magnitude(m.value->math_floor());
 #else
-      return Magnitude(floor(m.value));
+      return puq::Magnitude(floor(m.value));
 #endif
     }
 #endif

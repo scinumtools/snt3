@@ -20,15 +20,15 @@ namespace nostd {
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-    Magnitude log(const Magnitude& m) {
+    puq::Magnitude log(const puq::Magnitude& m) {
       // y ± Dy = log10(x ± Dx) -> Dy = Dx / x
 #ifdef MAGNITUDE_VALUES
       if (m.error)
-        return Magnitude(m.value->math_log(), m.error->math_div(m.value.get()));
+        return puq::Magnitude(m.value->math_log(), m.error->math_div(m.value.get()));
       else
-        return Magnitude(m.value->math_log());
+        return puq::Magnitude(m.value->math_log());
 #else
-      return Magnitude(log(m.value), m.error / m.value);
+      return puq::Magnitude(log(m.value), m.error / m.value);
 #endif
     }
 #endif

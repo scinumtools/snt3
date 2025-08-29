@@ -13,8 +13,8 @@ void display_info(const std::string& expr) {
             << "Expression:  " << expr << '\n'
             << '\n';
   std::cout << "Unit system: " << puq::UnitSystem::Data->SystemAbbrev << " (" << puq::UnitSystem::Data->SystemName << ")" << '\n';
-  std::cout << "Magnitude:   " << puq::nostd::to_string(uv.magnitude) << '\n';
-  std::cout << "Base units:  " << puq::nostd::to_string(uv.baseunits) << '\n';
+  std::cout << "Magnitude:   " << nostd::to_string(uv.magnitude) << '\n';
+  std::cout << "Base units:  " << nostd::to_string(uv.baseunits) << '\n';
   std::stringstream ss;
   bool display = false;
   for (const auto& unit : puq::UnitSystem::Data->DimensionMap) {
@@ -65,11 +65,11 @@ void display_info(const std::string& expr) {
         puq::BaseUnits bu_unit({bu});
         tab.append({bu.prefix,
                     bu.unit,
-                    ((puq::nostd::to_string(bu.exponent) == "") ? "1" : puq::nostd::to_string(bu.exponent)),
+                    ((nostd::to_string(bu.exponent) == "") ? "1" : nostd::to_string(bu.exponent)),
                     unit.second.name,
                     unit.second.definition,
                     bu_unit.dimensions().to_string(),
-                    puq::nostd::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
+                    nostd::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
       }
     }
     for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
@@ -79,7 +79,7 @@ void display_info(const std::string& expr) {
         puq::BaseUnits bu_unit({bu});
         tab.append({bu.prefix,
                     bu.unit,
-                    ((puq::nostd::to_string(bu.exponent) == "") ? "1" : puq::nostd::to_string(bu.exponent)),
+                    ((nostd::to_string(bu.exponent) == "") ? "1" : nostd::to_string(bu.exponent)),
                     puq::QuantityNames.at(quant.first),
                     quant.second.definition,
                     bu_unit.dimensions().to_string(),

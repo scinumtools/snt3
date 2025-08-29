@@ -20,15 +20,15 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
 #if defined(MAGNITUDE_VALUES)
   ss << std::setfill(' ') << std::setw(25) << std::left;
   val::ArrayValue<double> value(dim.numerical.value.get());
-  ss << puq::nostd::to_string(value.get_value(0), precision) + ",";
+  ss << nostd::to_string(value.get_value(0), precision) + ",";
   ss << std::setfill(' ') << std::setw(25) << std::left;
   val::ArrayValue<double> error(dim.numerical.error.get());
-  ss << puq::nostd::to_string(error.get_value(0), precision) + ",";
+  ss << nostd::to_string(error.get_value(0), precision) + ",";
 #else
   ss << std::setfill(' ') << std::setw(25) << std::left;
-  ss << puq::nostd::to_string(dim.numerical.value[0], precision) + ",";
+  ss << nostd::to_string(dim.numerical.value[0], precision) + ",";
   ss << std::setfill(' ') << std::setw(25) << std::left;
-  ss << puq::nostd::to_string(dim.numerical.error[0], precision) + ",";
+  ss << nostd::to_string(dim.numerical.error[0], precision) + ",";
 #endif
   ss << "{";
   for (int i = 0; i < NUM_BASEDIM; i++) {
@@ -48,7 +48,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
 void solve_bu_prefix(puq::Dimensions& dim, puq::BaseUnit& bu) {
   auto prefix = puq::UnitPrefixList.find(bu.prefix);
   if (prefix != puq::UnitPrefixList.end()) {
-    dim.numerical *= puq::nostd::pow(prefix->second.magnitude, (puq::EXPONENT_TYPE)bu.exponent);
+    dim.numerical *= nostd::pow(prefix->second.magnitude, (puq::EXPONENT_TYPE)bu.exponent);
   }
 }
 
@@ -60,7 +60,7 @@ bool solve_bu_unit(puq::DimensionMapType& dmap, puq::Dimensions& dim, puq::BaseU
 #else
     puq::MAGNITUDE_TYPE m(it->second.magnitude);
 #endif
-    dim.numerical *= puq::nostd::pow(m, (puq::EXPONENT_TYPE)bu.exponent);
+    dim.numerical *= nostd::pow(m, (puq::EXPONENT_TYPE)bu.exponent);
     for (int i = 0; i < NUM_BASEDIM; i++) {
       dim.physical[i] += it->second.dimensions[i] * bu.exponent;
     }
@@ -138,7 +138,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
       }
       // account for the conversion from MGS to MKS dimensions
       if (dim.physical[1] != 0)
-        dim.numerical *= puq::nostd::pow(1e-3, dim.physical[1]);
+        dim.numerical *= nostd::pow(1e-3, dim.physical[1]);
       // clear physical dimensions to make conversion factors dimensionless
       std::fill(std::begin(dim.physical), std::end(dim.physical), 0);
       // register the conversion factor

@@ -20,12 +20,12 @@ namespace nostd {
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-    Magnitude abs(const Magnitude& m) {
+    puq::Magnitude abs(const puq::Magnitude& m) {
       // abs(y ± Dy) = abs(y) ± Dy
 #ifdef MAGNITUDE_VALUES
-      return Magnitude(m.value->math_abs(), m.error->clone());
+      return puq::Magnitude(m.value->math_abs(), m.error->clone());
 #else
-      return Magnitude(abs(m.value), m.error);
+      return puq::Magnitude(abs(m.value), m.error);
 #endif
     }
 #endif
