@@ -83,7 +83,9 @@ namespace puq {
     std::stringstream ss;
     int exp_val = std::floor(std::log10(std::abs(value)));
     if (error == 0 || !format.display_error()) {
-      ss << snt::number_to_string(value, format.precision);
+      snt::NumberFormatType fmt;
+      fmt.valuePrecision = format.precision;
+      ss << snt::number_to_string(value, (MAGNITUDE_PRECISION)0, fmt);
     } else {
       int exp_err = std::floor(std::log10(error));
       int exp_diff = std::abs(exp_val - exp_err) + 1;
@@ -107,7 +109,9 @@ namespace puq {
 #elif defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> dvalue(value.get());
       if (dvalue.get_size() == 1) {
-	ss << snt::number_to_string(dvalue.get_value(0), format.precision);
+	snt::NumberFormatType fmt;
+	fmt.valuePrecision = format.precision;
+	ss << snt::number_to_string(dvalue.get_value(0), (MAGNITUDE_PRECISION)0, fmt);
       } else if (dvalue.get_size() == 2) {
         ss << std::setprecision(format.precision);
         ss << SYMBOL_ARRAY_START << dvalue.get_value(0);

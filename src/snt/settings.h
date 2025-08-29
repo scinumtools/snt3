@@ -15,63 +15,93 @@ namespace snt {
   constexpr std::string_view KEYWORD_FALSE = "false";
 
   // Various settings
-  constexpr int DISPLAY_FLOAT_PRECISION  = 4;
-  constexpr int DISPLAY_FLOAT_SCIENTIFIC = 3;
+  constexpr int DISPLAY_FLOAT_PRECISION  = 4;  // numerical value precision
+  constexpr int DISPLAY_FLOAT_SCIENTIFIC = 3;  // threshold exponent for defaultfloat/scientific notation
 
-  /*
-  struct NumberFormat {
-    int VALUE_PRECISION = 4;
-    int EXPONENT_PRECISION = 4;
-    double THRESHOLD_SCIENTIFIC = 1e3;
+  struct NumberFormatType {
+    int valuePrecision      = 4;
+    int errorPrecision      = 2;
+    int thresholdScientific = 3;
   };
-  */
   
   template <typename T>
-  std::string number_to_string(const T& value, int precision = DISPLAY_FLOAT_PRECISION) {
-    if (value==0)
-      return "0";
+  std::string number_to_string(const T& value, const T& error = 0, const NumberFormatType& format = NumberFormatType()) {
     std::stringstream ss;
-    int exp_val = std::floor(std::log10(std::fabs(value)));  // rounded exponent
-    if (std::abs(exp_val) >= DISPLAY_FLOAT_SCIENTIFIC && std::is_floating_point<T>::value) {
-      // if exponent is a floating point number larger or equal than DISPLAY_FLOAT_SCIENTIFIC
-      T val_mag = value * std::pow(10, -exp_val);            // magnitude without x10^ part
-      ss << std::defaultfloat << std::setprecision(precision) << val_mag;
-      if (exp_val)
-	ss << 'e' << exp_val;
-    } else {
-      // in all other cases
-      ss << std::defaultfloat << std::setprecision(precision) << value;
-    }
-    return ss.str();
-  }
-
-  /*
-  template <typename T>
-  std::string number_to_string(const T& value, const T& error, int precision = DISPLAY_FLOAT_PRECISION) {
-    if (error==0) {
-      return number_to_string<T>(value, precision);
-    } else {
-      std::stringstream ss;
-      int abs_val = std::fabs(value);
-      if (std::is_floating_point<T>::value) {
+    if (value==0 && error==0) {
+      return "0";
+    } else if (error==0) {
+      int exp_val = std::floor(std::log10(std::fabs(value)));  // rounded exponent
+      if (std::abs(exp_val) >= format.thresholdScientific && std::is_floating_point_v<T>) {
 	// if exponent is a floating point number larger or equal than DISPLAY_FLOAT_SCIENTIFIC
-	int exp_val = std::floor(std::log10(abs_val));    // rounded exponent of a value
-	T val_mag = value * std::pow(10, -exp_val);       // magnitude without x10^ part
-	int exp_err = std::floor(std::log10(error));      // rounded exponent of an error
-	int exp_diff = std::abs(exp_val - exp_err) + 1;   // difference between value and error exponents
-	int val_err = static_cast<int>(std::round(error * std::pow(10, 1 - exp_err))); // error value
-	ss << std::fixed << std::setprecision(exp_diff) << val_mag;
-	ss << "(" << std::setw(2) << std::setfill(' ') << val_err << ")";      
+	T val_mag = value * std::pow(10, -exp_val);            // magnitude without x10^ part
+	ss << std::defaultfloat << std::setprecision(format.valuePrecision) << val_mag;
 	if (exp_val)
 	  ss << 'e' << exp_val;
       } else {
 	// in all other cases
-	ss << std::defaultfloat << std::setprecision(precision) << value;
+	ss << std::defaultfloat << std::setprecision(format.valuePrecision) << value;
       }
-      return ss.str();
+    } else {
+      int exp_val = std::floor(std::log10(std::fabs(value)));  // rounded exponent
+      int exp_err = std::floor(std::log10(std::fabs(error)));
+      int exp_diff = std::abs(exp_val - exp_err) - 1;
+      if (std::is_integral_v<T>) {
+	int prec = (exp_err)?format.errorPrecision-1:0;
+	int val_err = static_cast<int>(error * std::pow(10, -exp_err+prec));
+	T val_mag = value * std::pow(10, -exp_err+prec);            // magnitude without x10^ part
+	std::cout << value << " " << exp_val << " " << exp_err << " " << exp_diff << " " << val_err << " " << val_mag << std::endl;
+	ss << std::fixed << std::setprecision(exp_diff) << val_mag;
+	ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";
+	if (exp_err-prec)
+	  ss << 'e' << exp_err-prec;
+      } else if (std::is_floating_point_v<T>) {
+	int val_err = static_cast<int>(error * std::pow(10, -exp_err-1+format.errorPrecision));
+	T val_mag = value * std::pow(10, -exp_val);            // magnitude without x10^ part
+	ss << std::fixed << std::setprecision(exp_diff+format.errorPrecision) << val_mag;
+	ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";
+	if (exp_val)
+	  ss << 'e' << exp_val;
+      }
     }
+    return ss.str();
   }
-  */
+  
+  template <typename T>
+  std::string _array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const NumberFormatType& format, size_t& offset, size_t dim) {
+    std::ostringstream oss;
+    if (value.size() > 1)
+      oss << "[";
+    for (size_t i = 0; i < shape[dim]; i++) {
+      std::cout << dim << " " << offset << std::endl;
+      if (i > 0)
+    	oss << ", ";
+      if (dim + 1 < shape.size()) {
+    	oss << _array_to_string(value, shape, format, offset, dim + 1);
+      } else {
+	if constexpr (std::is_same_v<T, bool>) {
+	  oss << (value[offset] ? KEYWORD_TRUE : KEYWORD_FALSE);
+	} else if constexpr (std::is_same_v<T, char>) {
+	  oss << value[offset];
+	} else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) {
+	  oss << number_to_string(value[offset], (T)0, format);
+	} else if constexpr (std::is_same_v<T, std::string>) {
+	  oss << '\'' << value[offset] << '\'';
+	} else {
+	  return "<unsupported_type>";
+	}
+    	offset++;
+      }
+    }
+    if (value.size() > 1)
+      oss << "]";
+    return oss.str();
+  }
+  
+  template <typename T>
+  std::string array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const NumberFormatType& format = NumberFormatType()) {
+    size_t offset = 0;
+    return _array_to_string(value, shape, format, offset, 0);
+  }
   
 } // namespace snt
 

@@ -16,7 +16,9 @@ namespace puq {
     }
 #elif defined(MAGNITUDE_VALUES)
     std::string to_string(val::BaseValue::PointerType value, int precision) {
-      return value->to_string(precision);
+      snt::NumberFormatType fmt;
+      fmt.valuePrecision = precision;
+      return value->to_string(fmt);
     }
 #endif
 

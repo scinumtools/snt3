@@ -73,30 +73,10 @@ namespace val {
         static_assert(sizeof(T) == 0, "Unsupported type T");
       }
     }
-    virtual void value_to_string(std::ostringstream& oss, size_t& offset, int precision) const = 0;
-    std::string to_string_dim(size_t& offset, const int& precision, int dim = 0) const {
-      std::ostringstream oss;
-      if (value.size() > 1)
-        oss << "[";
-      for (int i = 0; i < shape[dim]; i++) {
-        if (i > 0)
-          oss << ", ";
-        if (dim + 1 < shape.size()) {
-          oss << to_string_dim(offset, precision, dim + 1);
-        } else {
-          value_to_string(oss, offset, precision);
-          offset++;
-        }
-      }
-      if (value.size() > 1)
-        oss << "]";
-      return oss.str();
-    }
 
   public:
-    std::string to_string(const int precision = snt::DISPLAY_FLOAT_PRECISION) const override {
-      size_t offset = 0;
-      return to_string_dim(offset, precision);
+    std::string to_string(const snt::NumberFormatType& format = snt::NumberFormatType()) const override {
+      return snt::array_to_string(value, shape, format);
     };
     /*
      * Operations

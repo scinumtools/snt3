@@ -15,11 +15,6 @@ namespace val {
     ArrayValue(const std::vector<T>& arr) : BaseArrayValue<T>(arr, {arr.size()}) {};
     ArrayValue(const BaseValue* other) : BaseArrayValue<T>(other) {};
 
-  private:
-    void value_to_string(std::ostringstream& oss, size_t& offset, int precision) const override {
-      oss << snt::number_to_string(this->value[offset], precision);
-    };
-
   public:
     BaseValue::PointerType clone() const override {
       return std::make_unique<ArrayValue<T>>(this->value, this->shape);
