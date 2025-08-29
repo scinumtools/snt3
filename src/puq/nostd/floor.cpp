@@ -1,7 +1,6 @@
 #include "nostd.h"
 
-namespace puq {
-  namespace nostd {
+namespace nostd {
 
     MAGNITUDE_PRECISION floor(const MAGNITUDE_PRECISION& m) {
       return std::floor(m);
@@ -30,5 +29,4 @@ namespace puq {
     }
 #endif
 
-  } // namespace nostd
-} // namespace puq
+} // namespace nostd

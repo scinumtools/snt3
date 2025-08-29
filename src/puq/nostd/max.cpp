@@ -1,7 +1,6 @@
 #include "nostd.h"
 
-namespace puq {
-  namespace nostd {
+namespace nostd {
 
     extern MAGNITUDE_PRECISION max(const MAGNITUDE_PRECISION& m1, const MAGNITUDE_PRECISION& m2) {
       return std::max(m1, m2);
@@ -43,5 +42,4 @@ namespace puq {
     }
 #endif
 
-  } // namespace nostd
-} // namespace puq
+} // namespace nostd

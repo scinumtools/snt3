@@ -1,7 +1,6 @@
 #include "nostd.h"
 
-namespace puq {
-  namespace nostd {
+namespace nostd {
 
     std::string to_string(const MAGNITUDE_PRECISION& value, int precision) {
       std::stringstream ss;
@@ -83,5 +82,4 @@ namespace puq {
     }
 #endif
 
-  } // namespace nostd
-} // namespace puq
+} // namespace nostd

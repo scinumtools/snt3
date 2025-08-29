@@ -1,7 +1,6 @@
 #include "nostd.h"
 
-namespace puq {
-  namespace nostd {
+namespace nostd {
 
     MAGNITUDE_PRECISION sqrt(const MAGNITUDE_PRECISION& m) {
       return std::sqrt(m);
@@ -33,5 +32,4 @@ namespace puq {
     }
 #endif
 
-  } // namespace nostd
-} // namespace puq
+} // namespace nostd

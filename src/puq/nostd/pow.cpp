@@ -1,7 +1,6 @@
 #include "nostd.h"
 
-namespace puq {
-  namespace nostd {
+namespace nostd {
 
     MAGNITUDE_PRECISION pow(const MAGNITUDE_PRECISION& m, const EXPONENT_REAL_PRECISION& e) {
       return std::pow(m, e);
@@ -67,6 +66,5 @@ namespace puq {
 #endif
     }
 #endif
-
-  } // namespace nostd
-} // namespace puq
+  
+} // namespace nostd
