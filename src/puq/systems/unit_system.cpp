@@ -1,5 +1,4 @@
 #include "../nostd/nostd.h"
-#include "../solver/solver.h"
 #include "systems.h"
 
 #include <fstream>

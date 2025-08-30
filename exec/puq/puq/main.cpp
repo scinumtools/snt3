@@ -1,7 +1,5 @@
 #include "main.h"
 
-#include "puq/lists.h"
-
 #include <deque>
 #include <iostream>
 #include <limits>

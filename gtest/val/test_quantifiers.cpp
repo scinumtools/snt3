@@ -1,8 +1,4 @@
-#include "val/values_boolean.h"
-#include "val/values_number.h"
-#include "val/values_string.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 TEST(Quantifiers, Boolean) {
 

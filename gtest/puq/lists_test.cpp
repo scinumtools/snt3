@@ -1,4 +1,3 @@
-#include "puq/solver/solver.h"
 #include "puq/systems/systems.h"
 #include "puq/value/value.h"
 

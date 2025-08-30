@@ -1,8 +1,8 @@
 #ifndef PUQ_UNIT_ATOM_H
 #define PUQ_UNIT_ATOM_H
 
+#include "../../exs/exs.h"
 #include "../value/value.h"
-#include "../../atom.h"
 
 namespace puq {
 

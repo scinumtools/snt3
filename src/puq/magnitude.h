@@ -1,7 +1,7 @@
 #ifndef PUQ_MAGNITUDE_H
 #define PUQ_MAGNITUDE_H
 
-#include "../val/values_array.h"
+#include "../val/val.h"
 #include "array.h"
 #include "settings.h"
 

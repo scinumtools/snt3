@@ -1,18 +1,18 @@
 #ifndef EXS_H
 #define EXS_H
 
-#include "exs/operator_group.h"
-#include "exs/operator_list.h"
+#include "operator_group.h"
+#include "operator_list.h"
 
-#include "exs/math/add.h"
-#include "exs/math/subtract.h"
+#include "math/add.h"
+#include "math/subtract.h"
 
-#include "exs/logical/not.h"
-#include "exs/logical/and.h"
-#include "exs/logical/or.h"
+#include "logical/not.h"
+#include "logical/and.h"
+#include "logical/or.h"
 
-#include "exs/step_list.h"
-#include "exs/solver.h"
-#include "exs/atom.h"
+#include "step_list.h"
+#include "solver.h"
+#include "atom.h"
 
 #endif // EXS_H

@@ -1,7 +1,7 @@
 #ifndef PUQ_OPERATOR_PARENTHESES_H
 #define PUQ_OPERATOR_PARENTHESES_H
 
-#include "../../exs/operator_group.h"
+#include "../../exs/exs.h"
 #include "unit_atom.h"
 
 namespace puq {

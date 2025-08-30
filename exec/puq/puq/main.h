@@ -1,10 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "puq/calc/calc.h"
-#include "puq/nostd/nostd.h"
-#include "puq/quantity.h"
-#include "puq/systems/systems.h"
+#include "puq/puq.h"
 
 #include <exception>
 #include <iomanip>

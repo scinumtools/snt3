@@ -1,7 +1,4 @@
-#include "puq/nostd/nostd.h"
-#include "puq/quantity.h"
-#include "puq/solver/solver.h"
-#include "puq/systems/systems.h"
+#include "puq/puq.h"
 
 #include <chrono>
 #include <ctime>
