@@ -1,7 +1,7 @@
 #ifndef PUQ_UNIT_SOLVER_H
 #define PUQ_UNIT_SOLVER_H
 
-#include "../../exs/exs.h"
+#include "../../exs/pch_exs.h"
 #include "unit_atom.h"
 
 namespace puq {

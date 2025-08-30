@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "puq/puq.h"
+#include "puq/pch_puq.h"
 
 #include <exception>
 #include <iomanip>

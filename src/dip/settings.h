@@ -1,7 +1,6 @@
 #ifndef DIP_SETTINGS_H
 #define DIP_SETTINGS_H
 
-#include "../puq/quantity.h"
 #include "../snt/settings.h"
 
 #include <sstream>

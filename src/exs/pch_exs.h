@@ -1,5 +1,5 @@
-#ifndef EXS_H
-#define EXS_H
+#ifndef PCH_EXS_H
+#define PCH_EXS_H
 
 #include "operator_group.h"
 #include "operator_list.h"
@@ -15,4 +15,4 @@
 #include "solver.h"
 #include "atom.h"
 
-#endif // EXS_H
+#endif // PCH_EXS_H

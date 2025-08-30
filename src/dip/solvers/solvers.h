@@ -1,7 +1,7 @@
 #ifndef H_SOLVERS
 #define H_SOLVERS
 
-#include "../../val/values_array.h"
+#include "../../val/pch_val.h"
 #include "../environment.h"
 
 namespace dip {

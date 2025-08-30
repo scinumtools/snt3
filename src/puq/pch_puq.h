@@ -1,5 +1,5 @@
-#ifndef PUQ_H
-#define PUQ_H
+#ifndef PCH_PUQ_H
+#define PCH_PUQ_H
 
 #include "nostd/nostd.h"
 #include "systems/systems.h"
@@ -9,4 +9,4 @@
 #include "lists.h"
 #include "quantity.h"
 
-#endif PUQ_H
+#endif // PCH_PUQ_H
