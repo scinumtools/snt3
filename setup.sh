@@ -48,6 +48,12 @@ function install_code {
     cd $DIR_ROOT
 }
 
+function uninstall_code {
+    cd $DIR_BUILD
+    sudo xargs rm < install_manifest.txt
+    cd $DIR_ROOT    
+}
+
 function test_code {
     EXEC_FLAGS=""
     if [[ $CMAKE_BUILD_TYPE == Debug ]]; then
@@ -97,6 +103,7 @@ function show_help {
     echo " -c|--clean          clean the build directory"
     echo " -b|--build          build code"
     echo " -i|--install        install dip"
+    echo " -u|--uninstall      uninstall dip"
     echo " -r|--run <example>  run an example code"
     echo " -t|--test [<test>]  run all/specific tests"
     echo " -d|--docs           compile documentation"
@@ -124,6 +131,8 @@ while [[ $# -gt 0 ]]; do
 	    build_code; shift;;
 	-i|--install)
 	    install_code; shift;;
+	-u|--uninstall)
+	    uninstall_code; shift;;
 	-r|--run)
 	    run_code $2; shift; shift;;
 	-t|--test)
