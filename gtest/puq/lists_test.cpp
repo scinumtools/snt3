@@ -1,7 +1,5 @@
-#include "puq/systems/systems.h"
-#include "puq/value/value.h"
+#include "pch_tests.h"
 
-#include <gtest/gtest.h>
 #include <set>
 
 inline void check_symbol(std::set<std::string>& set, const std::string& symbol) {

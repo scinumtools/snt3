@@ -1,6 +1,5 @@
-#include "puq/util/data_table.h"
+#include "pch_tests.h"
 
-#include <gtest/gtest.h>
 #include <sstream>
 
 TEST(DataTable, TextOutput) {

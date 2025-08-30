@@ -1,6 +1,4 @@
-#include "puq/solver/unit_solver.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 TEST(UnitAtom, FromString) {
 

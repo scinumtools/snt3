@@ -1,7 +1,4 @@
-#include "puq/magnitude.h"
-#include "puq/nostd/nostd.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 // test from https://www.quora.com/How-does-one-calculate-uncertainty-in-an-exponent
 // and checked using http://www.julianibus.de/ online calculator

@@ -1,6 +1,4 @@
-#include "puq/calc/calc.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 TEST(Calculator, Initialization) {
 

@@ -1,7 +1,4 @@
-#include "puq/quantity.h"
-#include "puq/value/value.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 TEST(UnitFormat, ExponentFormat) {
 

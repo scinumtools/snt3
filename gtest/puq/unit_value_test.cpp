@@ -1,8 +1,4 @@
-#include "puq/array.h"
-#include "puq/converter.h"
-#include "puq/value/value.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 TEST(UnitValue, Initialization) {
 

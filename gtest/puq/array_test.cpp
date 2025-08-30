@@ -1,7 +1,5 @@
-#include "puq/array.h"
-#include "puq/nostd/nostd.h"
+#include "pch_tests.h"
 
-#include <gtest/gtest.h>
 #include <vector>
 
 #ifdef MAGNITUDE_ARRAYS
