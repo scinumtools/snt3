@@ -2,8 +2,8 @@
 #define EXS_OPERATOR_ADD_H
 
 #include "../token.h"
-#include "../token_list_base.h"
 #include "../token_list.h"
+#include "../token_list_base.h"
 
 namespace exs {
 

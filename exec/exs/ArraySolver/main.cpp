@@ -1,9 +1,10 @@
 #import "main.h"
-#import "exs/operator_list.h"
+
 #import "exs/math/add.h"
 #import "exs/math/subtract.h"
-#import "exs/step_list.h"
+#import "exs/operator_list.h"
 #import "exs/solver.h"
+#import "exs/step_list.h"
 
 #include <memory>
 

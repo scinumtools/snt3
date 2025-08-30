@@ -99,9 +99,9 @@ namespace puq {
 #elif defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> dvalue(value.get());
       if (dvalue.get_size() == 1) {
-	snt::NumberFormatType fmt;
-	fmt.valuePrecision = format.precision;
-	ss << snt::number_to_string(dvalue.get_value(0), (MAGNITUDE_PRECISION)0, fmt);
+        snt::NumberFormatType fmt;
+        fmt.valuePrecision = format.precision;
+        ss << snt::number_to_string(dvalue.get_value(0), (MAGNITUDE_PRECISION)0, fmt);
       } else if (dvalue.get_size() == 2) {
         ss << std::setprecision(format.precision);
         ss << SYMBOL_ARRAY_START << dvalue.get_value(0);

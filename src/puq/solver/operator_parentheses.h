@@ -14,7 +14,7 @@ namespace puq {
     virtual void parse(exs::Expression& expr);
     void operate_group(exs::TokenListBase<UnitAtom>* tokens);
   };
-  
+
 } // namespace puq
 
 #endif // PUQ_OPERATOR_PARENTHESES_H

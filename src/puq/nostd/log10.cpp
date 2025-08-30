@@ -2,38 +2,38 @@
 
 namespace nostd {
 
-    MAGNITUDE_PRECISION log10(const MAGNITUDE_PRECISION& m) {
-      return std::log10(m);
-    }
+  MAGNITUDE_PRECISION log10(const MAGNITUDE_PRECISION& m) {
+    return std::log10(m);
+  }
 
 #if defined(MAGNITUDE_ARRAYS)
-    Array log10(const Array& a) {
-      ArrayValue av(a.size());
-      for (int i = 0; i < a.size(); i++)
-        av[i] = std::log10(a[i]);
-      return Array(av, a.shape());
-    }
+  Array log10(const Array& a) {
+    ArrayValue av(a.size());
+    for (int i = 0; i < a.size(); i++)
+      av[i] = std::log10(a[i]);
+    return Array(av, a.shape());
+  }
 #elif defined(MAGNITUDE_VALUES)
-    val::BaseValue::PointerType log10(val::BaseValue::PointerType a) {
-      return a->math_log10();
-    }
+  val::BaseValue::PointerType log10(val::BaseValue::PointerType a) {
+    return a->math_log10();
+  }
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-    puq::Magnitude log10(const puq::Magnitude& m) {
-      // y ± Dy = log(x ± Dx) -> Dy = 1 / ln(10) * Dx / x
+  puq::Magnitude log10(const puq::Magnitude& m) {
+    // y ± Dy = log(x ± Dx) -> Dy = 1 / ln(10) * Dx / x
 #ifdef MAGNITUDE_VALUES
-      if (m.error) {
-	std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(std::log(10));
-        return puq::Magnitude(m.value->math_log10(),
-                         m.error->math_div(m.value->math_mul(cst.get()).get()));
-      } else {
-        return puq::Magnitude(m.value->math_log10());
-      }
-#else
-      return puq::Magnitude(log10(m.value), m.error / (m.value * std::log(10)));
-#endif
+    if (m.error) {
+      std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(std::log(10));
+      return puq::Magnitude(m.value->math_log10(),
+                            m.error->math_div(m.value->math_mul(cst.get()).get()));
+    } else {
+      return puq::Magnitude(m.value->math_log10());
     }
+#else
+    return puq::Magnitude(log10(m.value), m.error / (m.value * std::log(10)));
+#endif
+  }
 #endif
 
 } // namespace nostd

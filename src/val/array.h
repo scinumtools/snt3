@@ -2,7 +2,7 @@
 #define VAL_ARRAY_H
 
 namespace val {
-    
+
   // Define common array types
   namespace Array {
     struct RangeStruct {
@@ -18,6 +18,6 @@ namespace val {
     constexpr size_t max_range = std::numeric_limits<size_t>::max();
   } // namespace Array
 
-}
+} // namespace val
 
 #endif // VAL_ARRAY_H

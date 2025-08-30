@@ -129,7 +129,6 @@ TEST(References, DataTypeConversion) {
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "'true'");
-  
 }
 
 TEST(References, ExceptionDimension) {

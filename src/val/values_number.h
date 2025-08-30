@@ -6,10 +6,10 @@
 #include <typeinfo>
 
 namespace val {
-  
+
   template <typename T>
   class ArrayValue;
-  
+
   template <typename T>
   class ArrayValue : public BaseArrayValue<T> {
   public:
@@ -148,9 +148,9 @@ namespace val {
     // addition
     BaseValue::PointerType math_add(const BaseValue* other) const override {
       if (any(this->dtype & DataType::Integer) && any(other->get_dtype() & DataType::Float))
-	return other->math_add(this);
+        return other->math_add(this);
       else
-	return this->template operate_binary<T>(other, [](T a, T b) { return a + b; });
+        return this->template operate_binary<T>(other, [](T a, T b) { return a + b; });
     };
     void math_add_equal(const BaseValue* other) override {
       this->template operate_binary_equal<T>(other, [](T a, T b) { return a + b; });
@@ -158,23 +158,23 @@ namespace val {
     // subtraction
     BaseValue::PointerType math_sub(const BaseValue* other) const override {
       if (any(this->dtype & DataType::Integer) && any(other->get_dtype() & DataType::Float))
-	return other->math_neg()->math_add(this);
+        return other->math_neg()->math_add(this);
       else
-	return this->template operate_binary<T>(other, [](T a, T b) { return a - b; });
+        return this->template operate_binary<T>(other, [](T a, T b) { return a - b; });
     };
     void math_sub_equal(const BaseValue* other) override {
       this->template operate_binary_equal<T>(other, [](T a, T b) { return a - b; });
     };
     // inversion
     BaseValue::PointerType math_inv() const override {
-      return this->template operate_unary<T>([](T a) { return 1./a; });
+      return this->template operate_unary<T>([](T a) { return 1. / a; });
     };
     // multiplication
     BaseValue::PointerType math_mul(const BaseValue* other) const override {
       if (any(this->dtype & DataType::Integer) && any(other->get_dtype() & DataType::Float))
-	return other->math_mul(this);
+        return other->math_mul(this);
       else
-	return this->template operate_binary<T>(other, [](T a, T b) { return a * b; });
+        return this->template operate_binary<T>(other, [](T a, T b) { return a * b; });
     };
     void math_mul_equal(const BaseValue* other) override {
       this->template operate_binary_equal<T>(other, [](T a, T b) { return a * b; });
@@ -182,9 +182,9 @@ namespace val {
     // division
     BaseValue::PointerType math_div(const BaseValue* other) const override {
       if (any(this->dtype & DataType::Integer) && any(other->get_dtype() & DataType::Float))
-	return other->math_inv()->math_mul(this);
+        return other->math_inv()->math_mul(this);
       else
-	return this->template operate_binary<T>(other, [](T a, T b) { return a / b; });
+        return this->template operate_binary<T>(other, [](T a, T b) { return a / b; });
     };
     void math_div_equal(const BaseValue* other) override {
       this->template operate_binary_equal<T>(other, [](T a, T b) { return a / b; });

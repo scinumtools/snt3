@@ -66,7 +66,7 @@ namespace exs {
 
     return str.substr(strBegin, strRange);
   }
-  
+
   struct EmptySettings {};
 
 } // namespace exs

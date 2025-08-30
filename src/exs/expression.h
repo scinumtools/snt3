@@ -3,8 +3,8 @@
 
 #include "settings.h"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 namespace exs {
 

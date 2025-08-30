@@ -1,8 +1,8 @@
 #ifndef EXS_OPERATOR_GROUP_H
 #define EXS_OPERATOR_GROUP_H
 
-#include "settings.h"
 #include "operator_base.h"
+#include "settings.h"
 
 #include <stdexcept>
 

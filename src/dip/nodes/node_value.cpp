@@ -5,12 +5,12 @@
 namespace dip {
 
   ValueNode::ValueNode(const std::string& nm, const val::DataType vdt)
-    : constant(false), value_dtype(vdt) {
+      : constant(false), value_dtype(vdt) {
     name = nm;
   };
 
   ValueNode::ValueNode(const std::string& nm, val::BaseValue::PointerType val)
-    : constant(false), value_dtype(val->get_dtype()) {
+      : constant(false), value_dtype(val->get_dtype()) {
     name = nm;
     val::Array::ShapeType dims = val->get_shape();
     if (val->get_size() > 1) {
@@ -43,9 +43,9 @@ namespace dip {
       value = cast_value();
     } else if (value_input != nullptr) {
       if (value_input->get_dtype() == value_dtype)
-	value = std::move(value_input);
+        value = std::move(value_input);
       else
-	value = value_input->cast_as(value_dtype);
+        value = value_input->cast_as(value_dtype);
     }
     if (value != nullptr) {
       if (!value_slice.empty()) {

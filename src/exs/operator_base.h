@@ -1,14 +1,15 @@
 #ifndef EXS_OPERATOR_BASE_H
 #define EXS_OPERATOR_BASE_H
 
-#include "settings.h"
 #include "expression.h"
+#include "settings.h"
 #include "token_list_base.h"
 
+#include <vector>
 #include <stdexcept>
 
 namespace exs {
-  
+
   template <class A, typename S = EmptySettings>
   class OperatorBase {
   public:

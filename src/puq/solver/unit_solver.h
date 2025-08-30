@@ -5,7 +5,7 @@
 #include "unit_atom.h"
 
 namespace puq {
-  
+
   class UnitSolver {
   public:
     std::unique_ptr<exs::Solver<UnitAtom>> solver;
