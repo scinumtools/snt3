@@ -1,6 +1,8 @@
 #ifndef EXS_OPERATOR_TANGENS_H
 #define EXS_OPERATOR_TANGENS_H
 
+#include "../operator_group.h"
+
 namespace exs {
 
   template <class A, typename S = EmptySettings>

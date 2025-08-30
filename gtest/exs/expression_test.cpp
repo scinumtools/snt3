@@ -1,4 +1,5 @@
 #include "exs/exs.h"
+#include "exs/expression.h"
 
 #include <gtest/gtest.h>
 

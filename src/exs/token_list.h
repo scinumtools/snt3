@@ -2,6 +2,8 @@
 #define EXS_TOKEN_LIST_H
 
 #include "settings.h"
+#include "token_list.h"
+#include "operator_list.h"
 
 #include <algorithm>
 #include <deque>

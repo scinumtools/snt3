@@ -1,4 +1,10 @@
 #include "exs/exs.h"
+#include "exs/operator_group.h"
+#include "exs/operator_list.h"
+#include "exs/math/add.h"
+#include "exs/math/subtract.h"
+#include "exs/step_list.h"
+#include "exs/solver.h"
 
 #include <array>
 

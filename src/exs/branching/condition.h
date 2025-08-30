@@ -1,6 +1,8 @@
 #ifndef EXS_OPERATOR_CONDITION_H
 #define EXS_OPERATOR_CONDITION_H
 
+#include "../operator_ternary.h"
+
 namespace exs {
 
   template <class A, typename S = EmptySettings>

@@ -1,4 +1,6 @@
 #include "exs/exs.h"
+#include "exs/operator_list.h"
+#include "exs/operator_group.h"
 
 enum CustomOperatorType {
   LENGTH_OPERATOR = exs::NUM_OPERATOR_TYPES

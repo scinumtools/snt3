@@ -92,11 +92,4 @@ namespace exs {
 
 } // namespace exs
 
-#include "expression.h"
-#include "operator_list.h"
-#include "operators.h"
-#include "solver.h"
-#include "step_list.h"
-#include "token_list.h"
-
 #endif // EXS_MAIN_H

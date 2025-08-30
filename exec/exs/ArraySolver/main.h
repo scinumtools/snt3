@@ -1,4 +1,5 @@
 #include "exs/exs.h"
+#include "exs/operator_group.h"
 
 #include <vector>
 
