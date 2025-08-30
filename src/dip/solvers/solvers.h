@@ -2,7 +2,7 @@
 #define H_SOLVERS
 
 #include "../../exs/exs.h"
-#include "../../val/values.h"
+#include "../../val/values_array.h"
 #include "../environment.h"
 
 namespace dip {

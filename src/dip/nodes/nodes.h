@@ -1,7 +1,7 @@
 #ifndef DIP_NODES_H
 #define DIP_NODES_H
 
-#include "../../val/values.h"
+#include "../../val/values_array.h"
 #include "../settings.h"
 
 #include <deque>

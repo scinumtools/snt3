@@ -1,7 +1,7 @@
 #ifndef VAL_VALUES_ARRAY_H
 #define VAL_VALUES_ARRAY_H
 
-#include "values.h"
+#include "value_base.h"
 
 #include <typeinfo>
 
@@ -250,5 +250,9 @@ namespace val {
   };
 
 } // namespace val
+
+#include "values_boolean.h"
+#include "values_number.h"
+#include "values_string.h"
 
 #endif // VAL_VALUES_ARRAY_H

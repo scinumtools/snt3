@@ -1,12 +1,15 @@
 #ifndef VAL_VALUES_NUMBER_H
 #define VAL_VALUES_NUMBER_H
 
-#include "values.h"
+#include "values_array.h"
 
 #include <typeinfo>
 
 namespace val {
-
+  
+  template <typename T>
+  class ArrayValue;
+  
   template <typename T>
   class ArrayValue : public BaseArrayValue<T> {
   public:

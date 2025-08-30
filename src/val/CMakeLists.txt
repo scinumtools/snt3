@@ -7,6 +7,8 @@ add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
 set_target_properties(${EXEC_NAME} PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
+target_precompile_headers(${EXEC_NAME} PRIVATE values_array.h)
+target_precompile_headers(${EXEC_NAME} INTERFACE values_array.h)
 
 # install libraries and executables
 install(TARGETS ${EXEC_NAME} EXPORT TargetsSNT

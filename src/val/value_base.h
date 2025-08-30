@@ -1,8 +1,9 @@
-#ifndef VAL_VALUES_H
-#define VAL_VALUES_H
+#ifndef VAL_BASE_VALUE_H
+#define VAL_BASE_VALUE_H
 
 #include "../snt/settings.h"
 #include "datatypes.h"
+#include "array.h"
 
 #include <algorithm>
 #include <array>
@@ -20,21 +21,6 @@
 
 namespace val {
     
-  // Define common array types
-  namespace Array {
-    struct RangeStruct {
-      size_t dmin;
-      size_t dmax;
-      bool operator==(const RangeStruct& other) const {
-        return (dmin == other.dmin) && (dmax == other.dmax);
-      };
-    };
-    typedef std::vector<std::string> StringType; // holds raw string values
-    typedef std::vector<RangeStruct> RangeType;  // array dimension ranges
-    typedef std::vector<size_t> ShapeType;       // array shape
-    constexpr size_t max_range = std::numeric_limits<size_t>::max();
-  } // namespace Array
-
   // Forward declaration
   template <typename T>
   class ArrayValue;
@@ -106,9 +92,4 @@ namespace val {
 
 } // namespace val
 
-#include "values_array.h"
-#include "values_boolean.h"
-#include "values_number.h"
-#include "values_string.h"
-
-#endif // VAL_VALUES_H
+#endif // VAL_BASE_VALUE_H
