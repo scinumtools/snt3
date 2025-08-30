@@ -1,12 +1,5 @@
-#include "exs/operator_list.h"
-#include "exs/math/add.h"
-#include "exs/math/subtract.h"
-#include "exs/math/multiply.h"
-#include "exs/math/divide.h"
-#include "exs/token_list.h"
-#include "exs/atom.h"
+#include "pch_tests.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 
 // Initialization of the operators map

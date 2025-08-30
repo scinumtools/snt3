@@ -1,9 +1,4 @@
-#include "exs/operator_list.h"
-#include "exs/token_list.h"
-#include "exs/atom.h"
-#include "exs/atom_list.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 // Initialization of the Tokens class
 TEST(Tokens, Initialization) {

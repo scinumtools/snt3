@@ -1,6 +1,4 @@
-#include "exs/expression.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 // Initialization of the Expression class
 TEST(Expression, Initialization) {

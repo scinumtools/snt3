@@ -1,6 +1,8 @@
 #ifndef EXS_TOKEN_H
 #define EXS_TOKEN_H
 
+#include "settings.h"
+
 #include <iostream>
 #include <string>
 

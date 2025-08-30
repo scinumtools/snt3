@@ -1,5 +1,4 @@
-#include "snt/settings.h"
-#include "exs/atom.h"
+#include "exs/exs.h"
 
 typedef std::unique_ptr<bool> UniquePtrType;
 

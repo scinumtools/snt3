@@ -1,6 +1,7 @@
+#include "pch_tests.h"
+
 #include <array>
 #include <cstdio>
-#include <gtest/gtest.h>
 #include <memory>
 
 std::string run_program(const std::string& cmd) {

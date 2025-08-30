@@ -1,7 +1,5 @@
-#include "exs/atom.h"
-#include "exs/solver.h"
+#include "pch_tests.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 
 // Basic mathematic expressions
