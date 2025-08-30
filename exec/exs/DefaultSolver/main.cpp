@@ -1,5 +1,5 @@
-#include "exs/exs.h"
 #include "exs/solver.h"
+#include "exs/atom.h"
 
 using namespace exs;
 

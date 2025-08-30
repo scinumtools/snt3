@@ -2,7 +2,7 @@
 #define PUQ_QUANTITY_H
 
 #include "settings.h"
-#include "solver/solver.h"
+#include "solver/unit_solver.h"
 #include "value/value.h"
 
 #include <iomanip>

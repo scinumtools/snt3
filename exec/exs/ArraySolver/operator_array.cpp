@@ -1,5 +1,8 @@
 #import "main.h"
 
+#import "exs/token_list_base.h"
+#import "exs/token.h"
+
 #import <algorithm>
 
 void OperatorArray::operate_group(exs::TokenListBase<CustomAtom>* tokens) {

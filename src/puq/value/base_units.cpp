@@ -1,6 +1,6 @@
 #include "../nostd/nostd.h"
 #include "../settings.h"
-#include "../solver/solver.h"
+#include "../solver/unit_solver.h"
 #include "value.h"
 
 #include <fstream>

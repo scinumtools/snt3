@@ -1,4 +1,4 @@
-#include "solver.h"
+#include "operator_array.h"
 
 namespace puq {
 

@@ -1,4 +1,4 @@
-#include "puq/solver/solver.h"
+#include "puq/solver/unit_solver.h"
 
 #include <gtest/gtest.h>
 

@@ -1,8 +1,8 @@
-#include "exs/exs.h"
 #include "exs/operator_list.h"
 #include "exs/logical/not.h"
 #include "exs/logical/and.h"
 #include "exs/logical/or.h"
+#include "exs/atom.h"
 #include "exs/step_list.h"
 #include "exs/solver.h"
 

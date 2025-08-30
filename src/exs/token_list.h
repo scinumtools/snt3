@@ -1,10 +1,13 @@
 #ifndef EXS_TOKEN_LIST_H
 #define EXS_TOKEN_LIST_H
 
-#include "settings.h"
 #include "token_list.h"
+#include "settings.h"
+#include "token.h"
 #include "operator_list.h"
+#include "atom_list.h"
 
+#include <iostream>
 #include <algorithm>
 #include <deque>
 #include <stdexcept>

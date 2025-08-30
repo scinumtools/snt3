@@ -1,6 +1,7 @@
 #ifndef EXS_TOKEN_H
 #define EXS_TOKEN_H
 
+#include <iostream>
 #include <string>
 
 namespace exs {

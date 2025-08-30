@@ -3,6 +3,7 @@
 
 #include "settings.h"
 #include "expression.h"
+#include "token_list_base.h"
 
 #include <stdexcept>
 

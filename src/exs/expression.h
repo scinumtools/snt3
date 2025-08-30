@@ -1,7 +1,10 @@
 #ifndef EXS_EXPRESSION_H
 #define EXS_EXPRESSION_H
 
+#include "settings.h"
+
 #include <sstream>
+#include <iostream>
 
 namespace exs {
 

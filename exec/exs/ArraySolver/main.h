@@ -1,5 +1,5 @@
-#include "exs/exs.h"
 #include "exs/operator_group.h"
+#include "exs/atom.h"
 
 #include <vector>
 

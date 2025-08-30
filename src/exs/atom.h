@@ -1,6 +1,7 @@
 #ifndef EXS_ATOM_H
 #define EXS_ATOM_H
 
+#include <iostream>
 #include <cmath>
 #include <math.h>
 #include <regex>

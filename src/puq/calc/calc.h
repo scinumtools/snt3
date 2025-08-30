@@ -1,7 +1,6 @@
 #ifndef PUQ_CALC_H
 #define PUQ_CALC_H
 
-#include "../../exs/exs.h"
 #include "../quantity.h"
 #include "../settings.h"
 #include "../systems/systems.h"

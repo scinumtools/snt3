@@ -1,4 +1,4 @@
-#include "exs/exs.h"
+#include "exs/atom.h"
 #include "exs/solver.h"
 
 #include <gtest/gtest.h>

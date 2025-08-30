@@ -1,6 +1,7 @@
-#include "exs/exs.h"
 #include "exs/operator_list.h"
 #include "exs/token_list.h"
+#include "exs/atom.h"
+#include "exs/atom_list.h"
 
 #include <gtest/gtest.h>
 

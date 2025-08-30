@@ -1,6 +1,10 @@
 #ifndef EXS_OPERATOR_SUBTRACT_H
 #define EXS_OPERATOR_SUBTRACT_H
 
+#include "../token.h"
+#include "../token_list.h"
+#include "../token_list_base.h"
+
 namespace exs {
 
   template <class A, typename S = EmptySettings>
