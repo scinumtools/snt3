@@ -7,16 +7,13 @@
 #include <iomanip>
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 namespace snt {
 
   // Keywords
   constexpr std::string_view KEYWORD_TRUE  = "true";
   constexpr std::string_view KEYWORD_FALSE = "false";
-
-  // Various settings
-  constexpr int DISPLAY_FLOAT_PRECISION  = 4;  // numerical value precision
-  constexpr int DISPLAY_FLOAT_SCIENTIFIC = 3;  // threshold exponent for defaultfloat/scientific notation
 
   struct NumberFormatType {
     int valuePrecision      = 4;
@@ -32,7 +29,7 @@ namespace snt {
     } else if (error==0) {
       int exp_val = std::floor(std::log10(std::fabs(value)));  // rounded exponent
       if (std::abs(exp_val) >= format.thresholdScientific && std::is_floating_point_v<T>) {
-	// if exponent is a floating point number larger or equal than DISPLAY_FLOAT_SCIENTIFIC
+	// if exponent is a floating point number larger or equal than thresholdScientific
 	T val_mag = value * std::pow(10, -exp_val);            // magnitude without x10^ part
 	ss << std::defaultfloat << std::setprecision(format.valuePrecision) << val_mag;
 	if (exp_val)
@@ -49,13 +46,12 @@ namespace snt {
 	int prec = (exp_err)?format.errorPrecision-1:0;
 	int val_err = static_cast<int>(error * std::pow(10, -exp_err+prec));
 	T val_mag = value * std::pow(10, -exp_err+prec);            // magnitude without x10^ part
-	std::cout << value << " " << exp_val << " " << exp_err << " " << exp_diff << " " << val_err << " " << val_mag << std::endl;
 	ss << std::fixed << std::setprecision(exp_diff) << val_mag;
 	ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";
 	if (exp_err-prec)
 	  ss << 'e' << exp_err-prec;
       } else if (std::is_floating_point_v<T>) {
-	int val_err = static_cast<int>(error * std::pow(10, -exp_err-1+format.errorPrecision));
+	int val_err = static_cast<int>(std::round(error * std::pow(10, -exp_err-1+format.errorPrecision)));
 	T val_mag = value * std::pow(10, -exp_val);            // magnitude without x10^ part
 	ss << std::fixed << std::setprecision(exp_diff+format.errorPrecision) << val_mag;
 	ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";

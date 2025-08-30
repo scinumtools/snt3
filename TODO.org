@@ -1,15 +1,19 @@
 * SCINUMTOOLS TODO
 
 ** High priority
-- extract nostd function from puq to a global namespace so that also other modules can contribute
-- implement arrays into dip magnitude to_string()
+- substitute includes in header by forward declarations
+- implement arrays into puq magnitude to_string()
 - split .h files with multiple classes
-- move array namespace to snt
 - convert number format into global settings
-
+- switch [] and {} symbols in puq unit notation
+  
 ** Medium priority
 - remove array completely from puq
 
 ** Low priority
 - create sphix documentation
 - start writing doxygen documentation comments
+- move array namespace to snt
+  
+* Task DONE
+- extract nostd function from puq to a global namespace so that also other modules can contribute

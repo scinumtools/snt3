@@ -87,17 +87,7 @@ namespace puq {
       fmt.valuePrecision = format.precision;
       ss << snt::number_to_string(value, (MAGNITUDE_PRECISION)0, fmt);
     } else {
-      int exp_err = std::floor(std::log10(error));
-      int exp_diff = std::abs(exp_val - exp_err) + 1;
-      MAGNITUDE_PRECISION val_mag = value * std::pow(10, -exp_val);
-      int val_err = static_cast<int>(std::round(error * std::pow(10, 1 - exp_err)));
-      ss << std::fixed << std::setprecision(exp_diff) << val_mag;
-      ss << "(" << std::setw(2) << std::setfill(' ') << val_err << ")";
-      if (exp_val != 0) {
-        ss << (exp_val >= 0 ? "e+" : "e-")
-           << std::setw(2) << std::setfill('0') << std::abs(exp_val);
-        ss << std::setfill(' ');
-      }
+      ss << snt::number_to_string(value, error);
     }
     return ss.str();
   }

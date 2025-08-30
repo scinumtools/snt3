@@ -19,7 +19,7 @@ TEST(Magnitude, Initialization) {
   EXPECT_EQ(m.to_string(), "2.34");
 
   m = puq::Magnitude(20, 10);
-  EXPECT_EQ(m.to_string(), "2.0(10)e+01");
+  EXPECT_EQ(m.to_string(), "2.0(10)e1");
 
   m = puq::Magnitude(2, 1);
   EXPECT_EQ(m.to_string(), "2.0(10)");
@@ -28,10 +28,10 @@ TEST(Magnitude, Initialization) {
   EXPECT_EQ(m.to_string(), "2.340(23)");
 
   m = puq::Magnitude(2.34e7, 2.3e4);
-  EXPECT_EQ(m.to_string(), "2.3400(23)e+07");
+  EXPECT_EQ(m.to_string(), "2.3400(23)e7");
 
   m = puq::Magnitude(2.34e-7, 2.3e-9);
-  EXPECT_EQ(m.to_string(), "2.340(23)e-07");
+  EXPECT_EQ(m.to_string(), "2.340(23)e-7");
 
   m = puq::Magnitude(3.234, 0.002);
   std::stringstream ss;
@@ -134,23 +134,23 @@ TEST(Magnitude, ArithmeticsMultiply) {
   m1 = puq::Magnitude(4.0, 0.05);
   m2 = puq::Magnitude(7, 0.1);
   m3 = m1 * m2;
-  EXPECT_EQ(m3.to_string(), "2.800(75)e+01");
+  EXPECT_EQ(m3.to_string(), "2.800(75)e1");
   m1 *= m2;
-  EXPECT_EQ(m1.to_string(), "2.800(75)e+01");
+  EXPECT_EQ(m1.to_string(), "2.800(75)e1");
 
   m1 = puq::Magnitude(4.0, 0.05);
   m2 = puq::Magnitude(5, 0);
   m3 = m1 * m2;
-  EXPECT_EQ(m3.to_string(), "2.000(25)e+01");
+  EXPECT_EQ(m3.to_string(), "2.000(25)e1");
   m1 *= m2;
-  EXPECT_EQ(m1.to_string(), "2.000(25)e+01");
+  EXPECT_EQ(m1.to_string(), "2.000(25)e1");
 
   m1 = puq::Magnitude(5, 0);
   m2 = puq::Magnitude(4.0, 0.05);
   m3 = m1 * m2;
-  EXPECT_EQ(m3.to_string(), "2.000(25)e+01");
+  EXPECT_EQ(m3.to_string(), "2.000(25)e1");
   m1 *= m2;
-  EXPECT_EQ(m1.to_string(), "2.000(25)e+01");
+  EXPECT_EQ(m1.to_string(), "2.000(25)e1");
 }
 
 TEST(Magnitude, ArithmeticsDivide) {
@@ -174,9 +174,9 @@ TEST(Magnitude, ArithmeticsDivide) {
   m1 = puq::Magnitude(6, 0);
   m2 = puq::Magnitude(12.0, 0.2);
   m3 = m1 / m2;
-  EXPECT_EQ(m3.to_string(), "5.000(85)e-01");
+  EXPECT_EQ(m3.to_string(), "5.000(85)e-1");
   m1 /= m2;
-  EXPECT_EQ(m1.to_string(), "5.000(85)e-01");
+  EXPECT_EQ(m1.to_string(), "5.000(85)e-1");
 }
 
 TEST(Magnitude, Comparison) {
@@ -213,11 +213,11 @@ TEST(Magnitude, Arrays) {
 
   m1 = puq::Magnitude(val::ArrayValue<double>::pointer_from_vector({12.1, 22.2}),
                       val::ArrayValue<double>::pointer_from_vector({0.1, 0.2}));
-  EXPECT_EQ(m1.to_string(), "{1.210(10)e+01, 2.220(20)e+01}");
+  EXPECT_EQ(m1.to_string(), "{1.210(10)e1, 2.220(20)e1}");
 
   m1 = puq::Magnitude(val::ArrayValue<double>::pointer_from_vector({12.1, 22.2, 32.3}),
                       val::ArrayValue<double>::pointer_from_vector({0.1, 0.2, 0.3}));
-  EXPECT_EQ(m1.to_string(), "{1.210(10)e+01, 2.220(20)e+01, ...}");
+  EXPECT_EQ(m1.to_string(), "{1.210(10)e1, 2.220(20)e1, ...}");
 }
 
 #endif

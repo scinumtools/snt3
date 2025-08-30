@@ -163,15 +163,15 @@ TEST(UnitSystem, ContextConversionGEO) {
 
   q1 = puq::Quantity(1, "m*[#c]2/[#G]", puq::SystemType::GEO);
   q1 = q1.convert(puq::Format::Base::MKS);
-  EXPECT_EQ(q1.to_string(), "1.346591(30)e+27*kg");
+  EXPECT_EQ(q1.to_string(), "1.346591(30)e27*kg");
 
   q1 = puq::Quantity(1, "<E>", puq::SystemType::GEO);
   q2 = q1.convert("<E>", puq::SystemType::SI, "E");
-  EXPECT_EQ(q2.to_string(), "1.210256(27)e+44*<E>");
+  EXPECT_EQ(q2.to_string(), "1.210256(27)e44*<E>");
 
   q1 = puq::Quantity(1, "<L_ome>", puq::SystemType::GEO);
   q2 = q1.convert("<L_ome>", puq::SystemType::SI, "L_ome");
-  EXPECT_EQ(q2.to_string(), "4.036978(91)e+35*<L_ome>");
+  EXPECT_EQ(q2.to_string(), "4.036978(91)e35*<L_ome>");
 }
 
 #endif

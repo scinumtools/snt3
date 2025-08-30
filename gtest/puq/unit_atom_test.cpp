@@ -46,19 +46,19 @@ TEST(UnitAtom, FromStringErrors) {
   EXPECT_EQ(value.to_string(), "1.2345(67)");
 
   value = puq::UnitAtom::from_string("1.223(23)e+02"); // with an exponent
-  EXPECT_EQ(value.to_string(), "1.223(23)e+02");
+  EXPECT_EQ(value.to_string(), "1.223(23)e2");
 
   value = puq::UnitAtom::from_string("1.223(233)e+02"); // more error digits
-  EXPECT_EQ(value.to_string(), "1.22(23)e+02");
+  EXPECT_EQ(value.to_string(), "1.22(23)e2");
 
   value = puq::UnitAtom::from_string("1.2235(2)e+03"); // less error digits
-  EXPECT_EQ(value.to_string(), "1.22350(20)e+03");
+  EXPECT_EQ(value.to_string(), "1.22350(20)e3");
 
   value = puq::UnitAtom::from_string("122.(23)e+03"); // no decimal digits
-  EXPECT_EQ(value.to_string(), "1.22(23)e+05");
+  EXPECT_EQ(value.to_string(), "1.22(23)e5");
 
   value = puq::UnitAtom::from_string("122(23)e+03"); // no decimal point
-  EXPECT_EQ(value.to_string(), "1.22(23)e+05");
+  EXPECT_EQ(value.to_string(), "1.22(23)e5");
 }
 
 #endif
