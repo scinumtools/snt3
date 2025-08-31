@@ -1,0 +1,13 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+include("${CMAKE_CURRENT_LIST_DIR}/snt-targets.cmake")
+
+include("${CMAKE_CURRENT_LIST_DIR}/snt-config-version.cmake")
+
+include_directories("@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
+
+set(SNT_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
+
+message("-- Found snt: ${SNT_INCLUDE_DIR} ${SNT_VERSION}")
