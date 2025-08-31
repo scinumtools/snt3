@@ -123,13 +123,13 @@ Contributions are welcome — please follow these guidelines:
    ```
 5. Open a Pull Request with a clear description and link to any related issues.
 
-See `CONTRIBUTING.md` for full instructions.
+See [CONTRIBUTING.md](https://github.com/vrtulka23/scinumtools3/blob/main/CONTRIBUTING.md) for full instructions.
 
 ---
 
 ## License
 
-This project is licensed under the **MIT License**. See the `LICENSE` file for full text.
+This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/vrtulka23/scinumtools3/blob/main/LICENSE) file for full text.
 
 ---
 
