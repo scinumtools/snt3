@@ -1,4 +1,4 @@
-# **SciNumTools v3**  
+# **SciNumTools v3 (SNT)**  
 *A modern C++ toolkit for scientific computations with units, expressions, and dimensional parameters.*
 
 [![C/C++ CI](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml)
@@ -12,7 +12,7 @@
 ---
 
 ## Overview
-`scinumtools3` is a C++ library that helps scientists and engineers write safer, clearer numerical code by providing:
+`scinumtools3`, or simply `snt`, is a C++ library that helps scientists and engineers write safer, clearer numerical code by providing:
 
 - **Expression Solver (EXS)** — parse and evaluate mathematical, logical, or custom expressions at runtime.  
 - **Physical Units & Quantities (PUQ)** — represent values with units and perform unit-aware arithmetic.  
@@ -57,10 +57,10 @@ This project is the C++ counterpart to the original Python [scinumtools](https:/
 2) Using setup script
 
    ```bash
-   sudo ./setup.sh -b
+   sudo ./setup.sh -b -t -i  # build, run tests, install
    ```
 
-### Link `SNT` in your `CMAKE` project
+### Link `scinumtools3` in your `CMAKE` project
 
 1) Find the package
 
@@ -77,7 +77,7 @@ This project is the C++ counterpart to the original Python [scinumtools](https:/
 
 ## Quick Example
 
-Below is a quick example how to use the core functionality of `SciNumTools`.
+Below is a quick example how to use the core functionality of `scinumtools3`.
 For more examples and patterns please look into the ``gtest`` and ``exec`` folders.
 
 ```cpp
@@ -123,7 +123,7 @@ API reference and guides are available in the `docs/` directory.
 To generate Doxigen + breathe + Sphinx documentation:
 
 ```bash
-./docs/setup.sh -d
+./docs/setup.sh -b   # build
 ```
 
 See `docs/README.md` for more information.
@@ -145,7 +145,7 @@ Contributions are welcome — please follow these guidelines:
 4. Build and run tests locally:
 
    ```bash
-   ./setup.sh -b -t
+   ./setup.sh -b -t   # build, run tests
    ```
 5. Open a Pull Request with a clear description and link to any related issues.
 
