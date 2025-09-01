@@ -5,6 +5,7 @@ set(EXEC_NAME snt-dip)
 add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
 target_compile_definitions(${EXEC_NAME} PRIVATE)
 target_link_libraries(${EXEC_NAME} PRIVATE snt-puq)
+target_precompile_headers(${EXEC_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../dip.h" INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/../dip.h")
 
 set_target_properties(${EXEC_NAME} PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"

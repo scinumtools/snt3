@@ -1,4 +1,4 @@
-#include "exs/pch_exs.h"
+#include "exs.h"
 
 using namespace snt::exs;
 

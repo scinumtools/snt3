@@ -1,7 +1,7 @@
 #ifndef H_SOLVERS
 #define H_SOLVERS
 
-#include "../../val/pch_val.h"
+#include "../../val.h"
 #include "../environment.h"
 
 namespace snt::dip {

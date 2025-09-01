@@ -1,8 +1,8 @@
 #ifndef DIP_NODES_H
 #define DIP_NODES_H
 
-#include "../../puq/pch_puq.h"
-#include "../../val/pch_val.h"
+#include "../../puq.h"
+#include "../../val.h"
 #include "../settings.h"
 
 #include <deque>
