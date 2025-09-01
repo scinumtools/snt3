@@ -5,7 +5,7 @@
 #include <sstream>
 #include <sys/stat.h>
 
-namespace puq {
+namespace snt::puq {
 
   std::unordered_map<puq::SystemType, SystemDataType*> SystemMap = {
       {puq::SystemType::SI, &puq::SystemData::SI},
@@ -71,4 +71,4 @@ namespace puq {
     closed = true;
   }
 
-} // namespace puq
+} // namespace snt::puq

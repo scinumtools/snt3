@@ -4,7 +4,7 @@
 #include "../../exs/pch_exs.h"
 #include "unit_atom.h"
 
-namespace puq {
+namespace snt::puq {
 
   class OperatorParentheses : public exs::OperatorGroup<UnitAtom, 1> {
   public:
@@ -15,6 +15,6 @@ namespace puq {
     void operate_group(exs::TokenListBase<UnitAtom>* tokens);
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_OPERATOR_PARENTHESES_H

@@ -1,5 +1,7 @@
 #include "exs/pch_exs.h"
 
+using namespace snt;
+
 typedef std::unique_ptr<bool> UniquePtrType;
 
 class LogicalAtom : public exs::AtomBase<UniquePtrType> {

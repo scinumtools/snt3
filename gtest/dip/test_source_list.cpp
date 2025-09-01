@@ -6,6 +6,8 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 TEST(SourceList, KeywordSourceCode) {
 
   // create temporary file

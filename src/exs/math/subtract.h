@@ -5,7 +5,7 @@
 #include "../token_list.h"
 #include "../token_list_base.h"
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class OperatorSubtract : public OperatorBase<A, S> {
@@ -41,6 +41,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_SUBTRACT_H

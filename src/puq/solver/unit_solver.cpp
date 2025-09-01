@@ -6,7 +6,7 @@
 #include <memory>
 #include <regex>
 
-namespace puq {
+namespace snt::puq {
 
   UnitSolver::UnitSolver() {
 
@@ -40,4 +40,4 @@ namespace puq {
     return ua;
   }
 
-} // namespace puq
+} // namespace snt::puq

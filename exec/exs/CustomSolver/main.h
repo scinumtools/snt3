@@ -2,6 +2,8 @@
 
 #include <variant>
 
+using namespace snt;
+
 enum CustomOperatorType {
   LENGTH_OPERATOR = exs::NUM_OPERATOR_TYPES
 };

@@ -1,7 +1,7 @@
 #include "../nodes/nodes.h"
 #include "solvers.h"
 
-namespace dip {
+namespace snt::dip {
 
   LogicalAtom::LogicalAtom(const LogicalAtom& a) : AtomBase(a.value->clone()) {}
 
@@ -123,4 +123,4 @@ namespace dip {
     return ua;
   }
 
-} // namespace dip
+} // namespace snt::dip

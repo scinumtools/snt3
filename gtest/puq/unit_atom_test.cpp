@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(UnitAtom, FromString) {
 
   puq::UnitValue value = puq::UnitAtom::from_string("1");

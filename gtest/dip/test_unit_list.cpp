@@ -6,6 +6,8 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 TEST(UnitList, Keyword) {
 
   std::string unit_name = "B_lam"; // Spectral Radiance

@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 class FixtureFunctions : public ::testing::Test {
 protected:
   // scalar values

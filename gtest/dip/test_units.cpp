@@ -8,6 +8,8 @@
 #include <iostream>
 #include <limits>
 
+using namespace snt;
+
 TEST(Units, Definition) {
 
   dip::DIP d;

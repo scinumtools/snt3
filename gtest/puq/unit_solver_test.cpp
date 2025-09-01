@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(UnitSolver, Initialization) {
 
   puq::UnitSolver solver;

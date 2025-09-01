@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType TableNode::is_node(Parser& parser) {
     if (parser.dtype_raw[1] == "table") {
@@ -65,4 +65,4 @@ namespace dip {
     return false;
   }
 
-} // namespace dip
+} // namespace snt::dip

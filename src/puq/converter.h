@@ -9,7 +9,7 @@
 #include <memory>
 #include <sstream>
 
-namespace puq {
+namespace snt::puq {
 
   class ConvDimExcept : public std::exception {
   private:
@@ -144,6 +144,6 @@ namespace puq {
     MAGNITUDE_TYPE convert(const MAGNITUDE_TYPE& m1, const MAGNITUDE_TYPE& m2 = 1);
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_CONVERTER_H

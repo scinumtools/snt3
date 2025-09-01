@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType BooleanNode::is_node(Parser& parser) {
     if (parser.dtype_raw[1] == "bool") {
@@ -87,4 +87,4 @@ namespace dip {
                                line.code);
   }
 
-} // namespace dip
+} // namespace snt::dip

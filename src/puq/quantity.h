@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace puq {
+namespace snt::puq {
 
   class Quantity {
   public:
@@ -112,6 +112,6 @@ namespace puq {
     Quantity rebase_dimensions();
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_QUANTITY_H

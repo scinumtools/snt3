@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(Casting, Boolean) {
 
   std::vector<bool> arr = {true, false, false, true, true};

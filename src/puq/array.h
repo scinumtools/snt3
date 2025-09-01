@@ -10,7 +10,7 @@
 
 #ifdef MAGNITUDE_ARRAYS
 
-namespace puq {
+namespace snt::puq {
 
   typedef std::vector<MAGNITUDE_PRECISION> ArrayValue;
   typedef std::vector<size_t> ArrayShape;
@@ -77,7 +77,7 @@ namespace puq {
     }
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif
 

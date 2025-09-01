@@ -3,7 +3,7 @@
 
 #include "../operator_group.h"
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class OperatorTangens : public OperatorGroup<A, 1, S> {
@@ -16,6 +16,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_TANGENS_H

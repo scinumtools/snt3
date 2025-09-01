@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(UnitFormat, ExponentFormat) {
 
   puq::UnitFormat format(puq::Format::Math::UNICODE);

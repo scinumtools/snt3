@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-namespace puq {
+namespace snt::puq {
 
   void Quantity::preprocess(std::string& expression, SystemType& system) const {
 #ifdef PREPROCESS_SYSTEM
@@ -542,4 +542,4 @@ namespace puq {
     return Quantity(uv);
   }
 
-} // namespace puq
+} // namespace snt::puq

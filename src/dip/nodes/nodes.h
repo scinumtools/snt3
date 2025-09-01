@@ -11,7 +11,7 @@
 #include <sstream>
 #include <vector>
 
-namespace dip {
+namespace snt::dip {
 
   enum class ValueOrigin {
     Keyword,
@@ -329,6 +329,6 @@ namespace dip {
         : BaseNode(parser, NodeDtype::Property), ptype(pt) {};
   };
 
-} // namespace dip
+} // namespace snt::dip
 
 #endif // DIP_NODES_H

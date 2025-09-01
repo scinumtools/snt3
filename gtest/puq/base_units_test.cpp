@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(BaseUnits, Initialization) {
 
   // Appending BaseUnit-s

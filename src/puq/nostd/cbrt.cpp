@@ -1,6 +1,6 @@
 #include "nostd.h"
 
-namespace nostd {
+namespace snt::nostd {
 
   MAGNITUDE_PRECISION cbrt(const MAGNITUDE_PRECISION& m) {
     return std::cbrt(m);
@@ -33,4 +33,4 @@ namespace nostd {
   }
 #endif
 
-} // namespace nostd
+} // namespace snt::nostd

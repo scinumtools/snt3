@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-namespace puq {
+namespace snt::puq {
 
   static size_t display_length(const std::string& str) {
     size_t length = 0;
@@ -40,6 +40,6 @@ namespace puq {
     return length;
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_DISPLAY_LENGTH_H

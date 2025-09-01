@@ -1,6 +1,6 @@
 #include "lists.h"
 
-namespace dip {
+namespace snt::dip {
 
   void FunctionList::append_value(const std::string& name, ValueFunctionType func) {
     auto result = value_functions.insert({name, func});
@@ -30,4 +30,4 @@ namespace dip {
       return it->second;
   }
 
-} // namespace dip
+} // namespace snt::dip

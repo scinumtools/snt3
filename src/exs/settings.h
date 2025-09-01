@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace exs {
+namespace snt::exs {
 
   enum TokenType {
     EMPTY_TOKEN,
@@ -69,6 +69,6 @@ namespace exs {
 
   struct EmptySettings {};
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_SETTINGS_H

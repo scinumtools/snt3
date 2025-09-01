@@ -1,7 +1,7 @@
 #ifndef VAL_ARRAY_H
 #define VAL_ARRAY_H
 
-namespace val {
+namespace snt::val {
 
   // Define common array types
   namespace Array {
@@ -18,6 +18,6 @@ namespace val {
     constexpr size_t max_range = std::numeric_limits<size_t>::max();
   } // namespace Array
 
-} // namespace val
+} // namespace snt::val
 
 #endif // VAL_ARRAY_H

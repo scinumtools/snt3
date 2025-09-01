@@ -1,6 +1,6 @@
 #include "nostd.h"
 
-namespace nostd {
+namespace snt::nostd {
 
   MAGNITUDE_PRECISION log10(const MAGNITUDE_PRECISION& m) {
     return std::log10(m);
@@ -36,4 +36,4 @@ namespace nostd {
   }
 #endif
 
-} // namespace nostd
+} // namespace snt::nostd

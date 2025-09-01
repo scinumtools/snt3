@@ -4,7 +4,7 @@
 
 #include <regex>
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType CaseNode::is_node(Parser& parser) {
     if (parser.kwd_case()) {
@@ -70,4 +70,4 @@ namespace dip {
     return {};
   }
 
-} // namespace dip
+} // namespace snt::dip

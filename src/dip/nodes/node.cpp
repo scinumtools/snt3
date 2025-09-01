@@ -3,7 +3,7 @@
 #include <sstream>
 #include <tuple>
 
-namespace dip {
+namespace snt::dip {
 
   std::string Node::to_string() {
     std::stringstream ss;
@@ -19,4 +19,4 @@ namespace dip {
     return ss.str();
   }
 
-} // namespace dip
+} // namespace snt::dip

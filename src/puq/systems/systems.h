@@ -10,7 +10,7 @@
 #include <stack>
 #include <string>
 
-namespace puq {
+namespace snt::puq {
 
   /*
    *  Unit types
@@ -201,6 +201,6 @@ namespace puq {
     void close();
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_SYSTEMS_H

@@ -6,7 +6,7 @@
 #include <memory>
 #include <sstream>
 
-namespace puq {
+namespace snt::puq {
 
   UnitValue::UnitValue(const std::string& s) {
     UnitSolver solver;
@@ -314,4 +314,4 @@ namespace puq {
     return UnitValue(mag, bus);
   }
 
-} // namespace puq
+} // namespace snt::puq

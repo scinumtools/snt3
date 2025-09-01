@@ -1,6 +1,6 @@
 #include "operator_array.h"
 
-namespace puq {
+namespace snt::puq {
 
 #if defined(MAGNITUDE_ARRAYS)
 
@@ -74,4 +74,4 @@ namespace puq {
 
 #endif
 
-} // namespace puq
+} // namespace snt::puq

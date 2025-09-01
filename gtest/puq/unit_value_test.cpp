@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(UnitValue, Initialization) {
 
   puq::UnitValue value;

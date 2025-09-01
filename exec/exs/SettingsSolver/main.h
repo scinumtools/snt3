@@ -2,6 +2,8 @@
 
 #include <array>
 
+using namespace snt;
+
 struct Settings {
   std::string symbol;
   int value;

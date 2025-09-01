@@ -6,6 +6,8 @@
 #include <iostream>
 #include <limits>
 
+using namespace snt;
+
 TEST(ParseScalars, BooleanValue) {
 
   dip::DIP d;

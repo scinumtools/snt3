@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class OperatorPower : public OperatorBase<A, S> {
@@ -17,6 +17,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_POWER_H

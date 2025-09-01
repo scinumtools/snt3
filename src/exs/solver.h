@@ -36,7 +36,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class Solver {
@@ -176,6 +176,6 @@ namespace exs {
     }
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_SOLVER_H

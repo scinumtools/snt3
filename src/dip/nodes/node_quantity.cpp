@@ -1,6 +1,6 @@
 #include "nodes.h"
 
-namespace dip {
+namespace snt::dip {
 
   void QuantityNode::set_units(puq::Quantity::PointerType units_input) {
     // setting node units
@@ -26,4 +26,4 @@ namespace dip {
     }
   }
 
-} // namespace dip
+} // namespace snt::dip

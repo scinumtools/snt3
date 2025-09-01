@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 TEST(ParseDimensions, Array2D) {
 
   dip::DIP d;

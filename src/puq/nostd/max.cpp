@@ -1,6 +1,6 @@
 #include "nostd.h"
 
-namespace nostd {
+namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION max(const MAGNITUDE_PRECISION& m1, const MAGNITUDE_PRECISION& m2) {
     return std::max(m1, m2);
@@ -42,4 +42,4 @@ namespace nostd {
   }
 #endif
 
-} // namespace nostd
+} // namespace snt::nostd

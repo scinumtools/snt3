@@ -4,7 +4,7 @@
 #include "../../val/pch_val.h"
 #include "../environment.h"
 
-namespace dip {
+namespace snt::dip {
 
   // Logical solver
   /////////////////
@@ -94,6 +94,6 @@ namespace dip {
 
   class TemplateSolver {};
 
-} // namespace dip
+} // namespace snt::dip
 
 #endif // H_SOLVERS

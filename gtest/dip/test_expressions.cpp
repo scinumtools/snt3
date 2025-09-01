@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 TEST(Expressions, Logical) {
 
   // define scalar

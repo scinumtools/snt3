@@ -1,6 +1,6 @@
 #import "systems.h"
 
-namespace puq {
+namespace snt::puq {
   namespace SystemData {
 
     SystemDataType SI = {
@@ -283,4 +283,4 @@ namespace puq {
     };
 
   } // namespace SystemData
-} // namespace puq
+} // namespace snt::puq

@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 #ifdef UNIT_SYSTEM_CGS
 
 TEST(UnitSystem, PrintUnitSystem) {

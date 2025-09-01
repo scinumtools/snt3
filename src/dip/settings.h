@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-namespace dip {
+namespace snt::dip {
 
   // Source labels
   constexpr std::string_view ROOT_SOURCE = "ROOT";
@@ -86,6 +86,6 @@ namespace dip {
   // Forward declarations
   class Environment;
 
-} // namespace dip
+} // namespace snt::dip
 
 #endif // DIP_SETTINGS_H

@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-namespace exs {
+namespace snt::exs {
 
   typedef std::vector<std::pair<OperationType, std::vector<int>>> StepListType;
 
@@ -16,6 +16,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_STEP_LIST_H

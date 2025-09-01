@@ -7,6 +7,8 @@
 #include <iomanip>
 #include <iostream>
 
+using namespace snt;
+
 void display_info(const std::string& expr);
 void display_lists(std::deque<std::string>& convert);
 

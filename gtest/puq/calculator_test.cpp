@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(Calculator, Initialization) {
 
   puq::Calculator calc;

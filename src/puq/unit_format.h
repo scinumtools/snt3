@@ -8,7 +8,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace puq {
+namespace snt::puq {
 
   template <typename T, typename... Args>
   std::optional<T> get_option(const Args&... args) {
@@ -84,6 +84,6 @@ namespace puq {
     bool display_error() const;
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_UNIT_FORMAT_H

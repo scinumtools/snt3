@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-namespace dip {
+namespace snt::dip {
 
   SourceList::SourceList() = default;
 
@@ -38,4 +38,4 @@ namespace dip {
       return it->second;
   }
 
-} // namespace dip
+} // namespace snt::dip

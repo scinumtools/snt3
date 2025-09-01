@@ -5,7 +5,7 @@
 
 #ifdef EXPONENT_FRACTIONS
 
-namespace puq {
+namespace snt::puq {
 
   void Exponent::operator+=(const Exponent& e) {
     if (denominator == e.denominator) {
@@ -121,6 +121,6 @@ namespace puq {
     }
   }
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // EXPONENT_FRACTIONS

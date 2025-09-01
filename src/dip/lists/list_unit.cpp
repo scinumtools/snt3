@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-namespace dip {
+namespace snt::dip {
 
   UnitList::UnitList() = default;
 
@@ -37,4 +37,4 @@ namespace dip {
       return it->second;
   }
 
-} // namespace dip
+} // namespace snt::dip

@@ -12,7 +12,7 @@
 #include "../settings.h"
 #include "../value/value.h"
 
-namespace nostd {
+namespace snt::nostd {
 
   /*
    *  stof, stod, stold -> to_number
@@ -182,6 +182,6 @@ namespace nostd {
   extern puq::Magnitude max(const puq::Magnitude& m1, const puq::Magnitude& m2);
 #endif
 
-} // namespace nostd
+} // namespace snt::nostd
 
 #endif // PUQ_NOSTD_H

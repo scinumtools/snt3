@@ -3,7 +3,7 @@
 #include <memory>
 #include <regex>
 
-namespace puq {
+namespace snt::puq {
 
   Calculator::Calculator() {
 
@@ -34,4 +34,4 @@ namespace puq {
     return ca;
   }
 
-} // namespace puq
+} // namespace snt::puq

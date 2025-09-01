@@ -2,7 +2,7 @@
 
 #ifdef UNIT_SYSTEM_EUS
 
-namespace puq {
+namespace snt::puq {
   namespace SystemData {
 
     const UnitListType _EUS_UNITS = {
@@ -164,6 +164,6 @@ namespace puq {
         })};
 
   } // namespace SystemData
-} // namespace puq
+} // namespace snt::puq
 
 #endif // UNIT_SYSTEM_EUS

@@ -2,7 +2,7 @@
 
 #include <regex>
 
-namespace dip {
+namespace snt::dip {
 
   // Get ID of a current branch
   size_t BranchingList::get_branch_id() {
@@ -186,4 +186,4 @@ namespace dip {
     return std::regex_replace(name, pattern, "");
   }
 
-} // namespace dip
+} // namespace snt::dip

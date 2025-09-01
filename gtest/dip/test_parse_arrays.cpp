@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 TEST(ParseArrays, BooleanValue) {
 
   dip::DIP d;

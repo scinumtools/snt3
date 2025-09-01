@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <unordered_map>
 
-namespace val {
+namespace snt::val {
 
   template <typename E>
   constexpr auto to_underlying(E e) noexcept {
@@ -79,6 +79,6 @@ namespace val {
 
   extern std::unordered_map<DataType, std::string> DataTypeNames;
 
-} // namespace val
+} // namespace snt::val
 
 #endif // VAL_DATATYPES_H

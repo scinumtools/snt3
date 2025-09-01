@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace puq {
+namespace snt::puq {
 
   std::string table_header(std::string title, std::vector<std::string> header, std::vector<int> width);
 
@@ -25,6 +25,6 @@ namespace puq {
 #endif
   } // namespace lists
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_LISTS_H

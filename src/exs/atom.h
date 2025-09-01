@@ -9,7 +9,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace exs {
+namespace snt::exs {
 
   template <typename T>
   class AtomBase {
@@ -185,6 +185,6 @@ namespace exs {
     }
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_ATOM_H

@@ -91,6 +91,8 @@ For more examples and patterns please look into the ``gtest`` and ``exec`` folde
 #include <snt/dip/environment.h>
 #include <snt/dip/nodes/nodes.h>
 
+using namespace snt;
+
 int main() {
 
   exs::Solver<exs::Atom> solver;

@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <regex>
 
-namespace puq {
+namespace snt::puq {
 
   inline void _parse_number(std::string& expr, UnitValue& uv, const std::smatch& m) {
     if (m[6] == "") {
@@ -167,4 +167,4 @@ namespace puq {
 #endif
   }
 
-} // namespace puq
+} // namespace snt::puq

@@ -7,7 +7,7 @@
 #include <sstream>
 #include <vector>
 
-namespace puq {
+namespace snt::puq {
 
   struct DataTableStruct {
     std::string title;
@@ -68,6 +68,6 @@ namespace puq {
     }
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_DATA_TABLE_H

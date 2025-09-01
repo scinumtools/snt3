@@ -6,6 +6,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 class Functions : public FixtureFunctions {};
 
 TEST_F(Functions, BooleanValues) {

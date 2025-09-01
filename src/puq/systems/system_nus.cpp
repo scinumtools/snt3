@@ -2,7 +2,7 @@
 
 #ifdef UNIT_SYSTEM_NUS
 
-namespace puq {
+namespace snt::puq {
   namespace SystemData {
 
     SystemDataType AU = {
@@ -159,6 +159,6 @@ namespace puq {
         })};
 
   } // namespace SystemData
-} // namespace puq
+} // namespace snt::puq
 
 #endif // UNIT_SYSTEM_NUS

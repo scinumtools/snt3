@@ -19,7 +19,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace val {
+namespace snt::val {
 
   // Forward declaration
   template <typename T>
@@ -90,6 +90,6 @@ namespace val {
     virtual bool is_unity() const = 0;
   };
 
-} // namespace val
+} // namespace snt::val
 
 #endif // VAL_BASE_VALUE_H

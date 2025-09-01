@@ -8,7 +8,7 @@
 #include <sstream>
 #include <string>
 
-namespace dip {
+namespace snt::dip {
 
   int DIP::num_instances = 0;
 
@@ -212,4 +212,4 @@ namespace dip {
     return target;
   }
 
-} // namespace dip
+} // namespace snt::dip

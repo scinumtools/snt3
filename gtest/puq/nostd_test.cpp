@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 // test from https://www.quora.com/How-does-one-calculate-uncertainty-in-an-exponent
 // and checked using http://www.julianibus.de/ online calculator
 

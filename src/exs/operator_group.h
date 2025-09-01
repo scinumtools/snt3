@@ -6,7 +6,7 @@
 
 #include <stdexcept>
 
-namespace exs {
+namespace snt::exs {
 
   struct OperatorGroupSybols {
     std::string prefix = "";
@@ -52,6 +52,6 @@ namespace exs {
     virtual void operate_group(TokenListBase<A>* tokens, S* settings) override { operate_group(tokens); };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_GROUP_H

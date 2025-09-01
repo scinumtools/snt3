@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace dip {
+namespace snt::dip {
 
   void HierarchyList::record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded) {
     if (node->name == "")
@@ -28,4 +28,4 @@ namespace dip {
     }
   }
 
-} // namespace dip
+} // namespace snt::dip

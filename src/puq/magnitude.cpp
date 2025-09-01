@@ -10,7 +10,7 @@
 
 #ifdef MAGNITUDE_ERRORS
 
-namespace puq {
+namespace snt::puq {
 
 #if defined(MAGNITUDE_ARRAYS)
 
@@ -389,6 +389,6 @@ namespace puq {
     return os;
   }
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif

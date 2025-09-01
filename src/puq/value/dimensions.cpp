@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace puq {
+namespace snt::puq {
 
   Dimensions::Dimensions() : utype(Utype::NUL), numerical(1) {
     for (int i = 0; i < NUM_BASEDIM; i++) {
@@ -121,4 +121,4 @@ namespace puq {
     return false;
   }
 
-} // namespace puq
+} // namespace snt::puq

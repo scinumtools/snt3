@@ -1,6 +1,6 @@
 #include "nostd.h"
 
-namespace nostd {
+namespace snt::nostd {
 
   MAGNITUDE_PRECISION exp(const MAGNITUDE_PRECISION& e) {
     return std::exp(e);
@@ -37,4 +37,4 @@ namespace nostd {
     return puq::UnitValue(exp(uv.magnitude), uv.baseunits);
   }
 
-} // namespace nostd
+} // namespace snt::nostd

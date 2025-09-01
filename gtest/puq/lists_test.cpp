@@ -2,6 +2,8 @@
 
 #include <set>
 
+using namespace snt;
+
 inline void check_symbol(std::set<std::string>& set, const std::string& symbol) {
   auto result = set.insert(symbol);
   EXPECT_EQ(result.second, true) << "Duplicated symbol: " + symbol;

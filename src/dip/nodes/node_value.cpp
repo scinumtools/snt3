@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-namespace dip {
+namespace snt::dip {
 
   ValueNode::ValueNode(const std::string& nm, const val::DataType vdt)
       : constant(false), value_dtype(vdt) {
@@ -203,4 +203,4 @@ namespace dip {
     // std::cout << value->dimension().size() << std::endl;
   }
 
-} // namespace dip
+} // namespace snt::dip

@@ -1,6 +1,6 @@
 #include "nostd.h"
 
-namespace nostd {
+namespace snt::nostd {
 
   std::string to_string(const MAGNITUDE_PRECISION& value, int precision) {
     std::stringstream ss;
@@ -82,4 +82,4 @@ namespace nostd {
   }
 #endif
 
-} // namespace nostd
+} // namespace snt::nostd

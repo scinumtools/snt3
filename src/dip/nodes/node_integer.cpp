@@ -2,7 +2,7 @@
 #include "../solvers/solvers.h"
 #include "nodes.h"
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType IntegerNode::is_node(Parser& parser) {
     if (parser.dtype_raw[1] == "int") {
@@ -156,4 +156,4 @@ namespace dip {
       return std::make_shared<IntegerNode>(nm, std::move(value->clone()));
   }
 
-} // namespace dip
+} // namespace snt::dip

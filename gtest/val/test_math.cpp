@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(Math, Add) {
 
   std::vector<double> arr1 = {12.3, 2.3, 1.0345};

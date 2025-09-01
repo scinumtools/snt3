@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class AtomList {
@@ -25,6 +25,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_ATOM_LIST_H

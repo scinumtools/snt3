@@ -8,7 +8,7 @@
 #include <cmath>
 #include <set>
 
-namespace puq {
+namespace snt::puq {
 
   class CalculatorExcept : public std::exception {
   private:
@@ -41,6 +41,6 @@ namespace puq {
     CalculatorAtom solve(const std::string& expression);
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_CALC_H

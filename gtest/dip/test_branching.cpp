@@ -6,6 +6,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 class Branching : public FixtureFunctions {};
 
 TEST_F(Branching, FirstCase) {

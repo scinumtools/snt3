@@ -3,7 +3,7 @@
 
 #include "lists/lists.h"
 
-namespace dip {
+namespace snt::dip {
 
   enum class RequestType { Function,
                            Reference };
@@ -24,6 +24,6 @@ namespace dip {
     BaseNode::NodeListType request_nodes(const std::string& request, const RequestType rtype) const;
   };
 
-} // namespace dip
+} // namespace snt::dip
 
 #endif

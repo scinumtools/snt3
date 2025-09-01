@@ -2,6 +2,8 @@
 
 #include <vector>
 
+using namespace snt;
+
 enum CustomOperatorType {
   ARRAY_OPERATOR = exs::NUM_OPERATOR_TYPES
 };

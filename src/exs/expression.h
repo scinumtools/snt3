@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace exs {
+namespace snt::exs {
 
   class Expression {
   public:
@@ -40,6 +40,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_EXPRESSION_H

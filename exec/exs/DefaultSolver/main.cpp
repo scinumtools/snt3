@@ -1,6 +1,6 @@
 #include "exs/pch_exs.h"
 
-using namespace exs;
+using namespace snt::exs;
 
 int main() {
 

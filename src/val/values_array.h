@@ -5,7 +5,7 @@
 
 #include <typeinfo>
 
-namespace val {
+namespace snt::val {
 
   // here we need a forward declaration
   template <typename T>
@@ -252,7 +252,7 @@ namespace val {
     };
   };
   
-} // namespace val
+} // namespace snt::val
 
 #include "values_boolean.h"
 #include "values_number.h"

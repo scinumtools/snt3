@@ -8,6 +8,8 @@
 #include <sstream>
 #include <sys/stat.h>
 
+using namespace snt;
+
 void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions& dim, const std::string& name) {
   ss << "{";
   ss << std::setfill(' ') << std::setw(15) << std::left;

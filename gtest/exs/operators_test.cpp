@@ -2,6 +2,8 @@
 
 #include <memory>
 
+using namespace snt;
+
 // Initialization of the operators map
 TEST(Operators, Initialization) {
 

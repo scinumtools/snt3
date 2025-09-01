@@ -2,6 +2,8 @@
 
 #include <memory>
 
+using namespace snt;
+
 // Basic mathematic expressions
 TEST(Solver, SolvingMath) {
 

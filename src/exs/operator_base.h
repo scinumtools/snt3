@@ -8,7 +8,7 @@
 #include <vector>
 #include <stdexcept>
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class OperatorBase {
@@ -38,6 +38,6 @@ namespace exs {
     virtual void print() {};
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_BASE_H

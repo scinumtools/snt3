@@ -2,6 +2,8 @@
 
 #include <vector>
 
+using namespace snt;
+
 #ifdef MAGNITUDE_ARRAYS
 
 TEST(Array, Initialization) {

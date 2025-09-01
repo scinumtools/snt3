@@ -2,7 +2,7 @@
 
 #include "unit_atom.h"
 
-namespace puq {
+namespace snt::puq {
 
   bool OperatorParentheses::check(exs::Expression& expr) {
     if (expr.left.size() > 0) {
@@ -54,4 +54,4 @@ namespace puq {
     }
   };
 
-} // namespace puq
+} // namespace snt::puq

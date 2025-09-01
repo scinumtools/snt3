@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace dip {
+namespace snt::dip {
 
   // Node List
 
@@ -146,6 +146,6 @@ namespace dip {
     TableFunctionType get_table(const std::string& name) const;
   };
 
-} // namespace dip
+} // namespace snt::dip
 
 #endif // DIP_LISTS_H

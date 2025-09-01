@@ -6,7 +6,7 @@
 #include <array>
 #include <fstream>
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType SourceNode::is_node(Parser& parser) {
     if (parser.kwd_source()) {
@@ -28,4 +28,4 @@ namespace dip {
     return {};
   }
 
-} // namespace dip
+} // namespace snt::dip

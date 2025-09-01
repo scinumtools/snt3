@@ -4,7 +4,7 @@
 #include <array>
 #include <fstream>
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType ImportNode::is_node(Parser& parser) {
     if (parser.part_function()) {
@@ -42,4 +42,4 @@ namespace dip {
     return nodes;
   }
 
-} // namespace dip
+} // namespace snt::dip

@@ -1,6 +1,6 @@
 #include "lists.h"
 
-namespace dip {
+namespace snt::dip {
 
   size_t NodeList::size() const {
     return nodes.size();
@@ -34,4 +34,4 @@ namespace dip {
     return nodes.at(index);
   }
 
-} // namespace dip
+} // namespace snt::dip

@@ -4,7 +4,7 @@
 #import "settings.h"
 #include "unit_format.h"
 
-namespace puq {
+namespace snt::puq {
 
 #ifdef EXPONENT_FRACTIONS
 
@@ -36,6 +36,6 @@ namespace puq {
 
 #endif
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_EXPONENT_H

@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace puq {
+namespace snt::puq {
 
   class UnitValueExcept : public std::exception {
   private:
@@ -150,6 +150,6 @@ namespace puq {
     UnitValue rebase_dimensions();
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_VALUE_H

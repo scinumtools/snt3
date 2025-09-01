@@ -5,7 +5,7 @@
 
 #include <typeinfo>
 
-namespace val {
+namespace snt::val {
 
   template <typename T>
   class ArrayValue;
@@ -43,6 +43,6 @@ namespace val {
     };
   };
 
-} // namespace val
+} // namespace snt::val
 
 #endif // VAL_VALUES_BOOLEAN_H

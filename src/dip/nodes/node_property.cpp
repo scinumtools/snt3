@@ -1,7 +1,7 @@
 #include "../environment.h"
 #include "nodes.h"
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType PropertyNode::is_node(Parser& parser) {
     PropertyType ptype = PropertyType::None;
@@ -20,4 +20,4 @@ namespace dip {
     return nullptr;
   }
 
-} // namespace dip
+} // namespace snt::dip

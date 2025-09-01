@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::BaseNode(Parser& parser, const NodeDtype dt) : dtype(dt), branch_id(0), case_id(0) {
     line = parser.line;
@@ -26,4 +26,4 @@ namespace dip {
     return false;
   }
 
-} // namespace dip
+} // namespace snt::dip

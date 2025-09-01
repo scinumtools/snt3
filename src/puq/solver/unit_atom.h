@@ -4,7 +4,7 @@
 #include "../../exs/pch_exs.h"
 #include "../value/value.h"
 
-namespace puq {
+namespace snt::puq {
 
   class AtomParsingExcept : public std::exception {
   private:
@@ -28,6 +28,6 @@ namespace puq {
     void math_divide(UnitAtom* other);
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_UNIT_ATOM_H

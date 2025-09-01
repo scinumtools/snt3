@@ -3,7 +3,7 @@
 
 #include "../operator_ternary.h"
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class OperatorCondition : public OperatorTernary<A, S> {
@@ -18,6 +18,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_CONDITION_H

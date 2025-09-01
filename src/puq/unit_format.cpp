@@ -1,6 +1,6 @@
 #include "unit_format.h"
 
-namespace puq {
+namespace snt::puq {
 
   const std::unordered_map<char, std::string> UnitFormat::superscript_map = {
       {'0', "\u2070"}, {'1', "\u00B9"}, {'2', "\u00B2"}, {'3', "\u00B3"}, // 0 1 2 3 -> ⁰ ¹ ² ³
@@ -122,4 +122,4 @@ namespace puq {
     return (error == Format::Error::SHOW);
   }
 
-} // namespace puq
+} // namespace snt::puq

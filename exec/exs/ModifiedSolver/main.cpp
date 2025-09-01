@@ -2,7 +2,7 @@
 
 #include <memory>
 
-using namespace exs;
+using namespace snt::exs;
 
 int main() {
 

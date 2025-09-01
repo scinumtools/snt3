@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(Slicing, Basic) {
 
   std::vector<int> arr = {1, 2, 3, 4, 5, 6};

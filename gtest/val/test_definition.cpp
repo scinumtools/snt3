@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+using namespace snt;
+
 TEST(Definitions, Boolean) {
 
   std::vector<bool> arr = {true, false, false, true, true, false};

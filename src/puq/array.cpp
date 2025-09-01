@@ -9,7 +9,7 @@
 
 #ifdef MAGNITUDE_ARRAYS
 
-namespace puq {
+namespace snt::puq {
 
   Array::Array(const ArrayValue& v, const ArrayShape s) : a_shape(s) {
     // calculate array size
@@ -222,6 +222,6 @@ namespace puq {
   }
 #endif
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif

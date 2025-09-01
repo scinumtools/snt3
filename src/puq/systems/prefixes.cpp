@@ -1,6 +1,6 @@
 #import "systems.h"
 
-namespace puq {
+namespace snt::puq {
 
   const std::vector<std::string> UnitPrefixOrder = {
       "Y", "Z", "E", "P", "T", "G", "M", "k", "h", "da",
@@ -29,4 +29,4 @@ namespace puq {
       {"y", {1.0e-24, "1e-24", "yocto"}},
   };
 
-} // namespace puq
+} // namespace snt::puq

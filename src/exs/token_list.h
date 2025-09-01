@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class TokenList : public TokenListBase<A> {
@@ -143,6 +143,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_TOKEN_LIST_H

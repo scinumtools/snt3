@@ -1,6 +1,6 @@
 #include "values_array.h"
 
-namespace val {
+namespace snt::val {
 
   BaseValue::PointerType ArrayValue<bool>::cast_as(DataType dt) const {
     switch (dt) {
@@ -95,4 +95,4 @@ namespace val {
     return operate_unary<bool>([](bool a) { return !a; });
   };
 
-} // namespace val
+} // namespace snt::val

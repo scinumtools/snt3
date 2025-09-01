@@ -3,7 +3,7 @@
 
 #include "token.h"
 
-namespace exs {
+namespace snt::exs {
 
   template <class A>
   class TokenListBase {
@@ -15,6 +15,6 @@ namespace exs {
     virtual void print(bool details = false) = 0;
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_TOKEN_LIST_BASE_H

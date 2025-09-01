@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-namespace exs {
+namespace snt::exs {
 
   template <class A>
   class Token {
@@ -32,6 +32,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_TOKEN_H

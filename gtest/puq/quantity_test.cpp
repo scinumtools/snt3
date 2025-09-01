@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+using namespace snt;
+
 TEST(Quantity, Initialization) {
 
   puq::Quantity q; // default initialization

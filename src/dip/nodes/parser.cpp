@@ -7,7 +7,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace dip {
+namespace snt::dip {
 
   const std::array<std::string, 3> Parser::ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
 
@@ -436,4 +436,4 @@ namespace dip {
     return false;
   }
 
-} // namespace dip
+} // namespace snt::dip

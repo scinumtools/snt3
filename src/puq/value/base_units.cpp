@@ -8,7 +8,7 @@
 #include <sstream>
 #include <string>
 
-namespace puq {
+namespace snt::puq {
 
   BaseUnits::BaseUnits(const std::string& s) {
     UnitSolver solver;
@@ -181,4 +181,4 @@ namespace puq {
     return dim;
   }
 
-} // namespace puq
+} // namespace snt::puq

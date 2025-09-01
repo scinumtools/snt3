@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 // Initialization of the Expression class
 TEST(Expression, Initialization) {
 

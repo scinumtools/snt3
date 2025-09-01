@@ -1,6 +1,6 @@
 #include "nodes.h"
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType GroupNode::is_node(Parser& parser) {
     parser.part_comment();
@@ -9,4 +9,4 @@ namespace dip {
     return nullptr;
   }
 
-} // namespace dip
+} // namespace snt::dip

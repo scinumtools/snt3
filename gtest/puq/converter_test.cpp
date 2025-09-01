@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(Converter, Initialization) {
 
   puq::BaseUnits bu1("km/s");

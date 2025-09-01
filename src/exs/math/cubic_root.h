@@ -1,7 +1,7 @@
 #ifndef EXS_OPERATOR_CUBIC_ROOT_H
 #define EXS_OPERATOR_CUBIC_ROOT_H
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class OperatorCubicRoot : public OperatorGroup<A, 1, S> {
@@ -14,6 +14,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_CUBIC_ROOT_H

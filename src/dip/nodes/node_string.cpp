@@ -4,7 +4,7 @@
 
 #include <regex>
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType StringNode::is_node(Parser& parser) {
     if (parser.dtype_raw[1] == "str") {
@@ -88,4 +88,4 @@ namespace dip {
     }
   }
 
-} // namespace dip
+} // namespace snt::dip

@@ -1,7 +1,7 @@
 #ifndef PUQ_OPERATOR_ARRAY_H
 #define PUQ_OPERATOR_ARRAY_H
 
-namespace puq {
+namespace snt::puq {
 
 #if defined(MAGNITUDE_ARRAYS) || defined(MAGNITUDE_VALUES)
 
@@ -17,6 +17,6 @@ namespace puq {
 
 #endif
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_OPERATOR_ARRAY_H

@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 TEST(SolverNumerical, AddSubtract) {
 
   dip::Environment env;

@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 // Initialization of the Tokens class
 TEST(Tokens, Initialization) {
 

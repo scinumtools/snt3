@@ -6,7 +6,7 @@
 #include <regex>
 #include <sstream>
 
-namespace puq {
+namespace snt::puq {
 
   Quantity CalculatorAtom::from_string(std::string& expr_orig) {
     std::string& expr = expr_orig;
@@ -77,4 +77,4 @@ namespace puq {
 #endif
   }
 
-} // namespace puq
+} // namespace snt::puq

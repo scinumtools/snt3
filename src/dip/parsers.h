@@ -5,7 +5,7 @@
 
 #include <queue>
 
-namespace dip {
+namespace snt::dip {
 
   EnvSource parse_source(const std::string& source_name, const std::string& source_file,
                          const Source& parent);
@@ -19,6 +19,6 @@ namespace dip {
                    val::Array::ShapeType& value_shape);
   void parse_slices(std::string& value_string, val::Array::RangeType& dimension);
 
-} // namespace dip
+} // namespace snt::dip
 
 #endif // DIP_PARSERS_H

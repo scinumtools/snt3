@@ -7,7 +7,7 @@
 #include <iostream>
 #include <queue>
 
-namespace dip {
+namespace snt::dip {
 
   class DIP {
   private:
@@ -45,6 +45,6 @@ namespace dip {
     std::string to_string();
   };
 
-} // namespace dip
+} // namespace snt::dip
 
 #endif // DIP_DIP_H

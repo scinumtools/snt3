@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+using namespace snt;
+
 TEST(DataTable, TextOutput) {
 
   puq::DataTable tab({{"A", 5}, {"B", 7}, {"C", 10}});

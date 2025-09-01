@@ -1,7 +1,7 @@
 #ifndef EXS_OPERATOR_GREATER_H
 #define EXS_OPERATOR_GREATER_H
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class OperatorGreater : public OperatorBase<A, S> {
@@ -15,6 +15,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_GREATER_H

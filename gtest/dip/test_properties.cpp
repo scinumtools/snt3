@@ -6,6 +6,8 @@
 #include <iostream>
 #include <limits>
 
+using namespace snt;
+
 TEST(Properties, Constant) {
 
   dip::DIP d;

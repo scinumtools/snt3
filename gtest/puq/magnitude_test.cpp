@@ -2,6 +2,8 @@
 
 #ifdef MAGNITUDE_ERRORS
 
+using namespace snt;
+
 TEST(Magnitude, Initialization) {
 
   puq::Magnitude m;

@@ -6,6 +6,8 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
+using namespace snt;
+
 TEST(References, BooleanValues) {
 
   // referencing scalar and array values

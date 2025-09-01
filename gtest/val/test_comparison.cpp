@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(Comparison, Equal) { // ==
 
   std::vector<bool> arr1 = {true, false, false};

@@ -1,6 +1,6 @@
 #include "environment.h"
 
-namespace dip {
+namespace snt::dip {
 
   inline std::tuple<std::string, std::string> parse_request(const std::string& request) {
     size_t pos = request.find(SIGN_QUERY);
@@ -95,4 +95,4 @@ namespace dip {
     return new_nodes;
   }
 
-} // namespace dip
+} // namespace snt::dip

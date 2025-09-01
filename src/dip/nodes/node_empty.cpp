@@ -1,6 +1,6 @@
 #include "nodes.h"
 
-namespace dip {
+namespace snt::dip {
 
   BaseNode::PointerType EmptyNode::is_node(Parser& parser) {
     if (!parser.do_continue())
@@ -10,4 +10,4 @@ namespace dip {
     return nullptr;
   }
 
-} // namespace dip
+} // namespace snt::dip

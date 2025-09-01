@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+using namespace snt;
+
 TEST(Quantifiers, Boolean) {
 
   std::vector<bool> arr = {true, false, false};

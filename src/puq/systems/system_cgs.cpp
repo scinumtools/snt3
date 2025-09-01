@@ -2,7 +2,7 @@
 
 #ifdef UNIT_SYSTEM_CGS
 
-namespace puq {
+namespace snt::puq {
   namespace SystemData {
 
     const UnitListType _CGS_UNITS = {
@@ -154,6 +154,6 @@ namespace puq {
         })};
 
   } // namespace SystemData
-} // namespace puq
+} // namespace snt::puq
 
 #endif // UNIT_SYSTEM_CGS

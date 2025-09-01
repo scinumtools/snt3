@@ -3,7 +3,7 @@
 #include <iostream>
 #include <set>
 
-namespace puq {
+namespace snt::puq {
 
   MAGNITUDE_TYPE Converter::_convert_linear(const MAGNITUDE_TYPE& m1, const MAGNITUDE_TYPE& m2) {
     return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
@@ -214,4 +214,4 @@ namespace puq {
     return mag;
   };
 
-} // namespace puq
+} // namespace snt::puq

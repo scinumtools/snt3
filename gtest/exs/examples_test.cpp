@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <memory>
 
+using namespace snt;
+
 std::string run_program(const std::string& cmd) {
   std::array<char, 128> buffer = {};
   std::string result;

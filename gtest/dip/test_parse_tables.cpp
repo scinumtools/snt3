@@ -5,6 +5,8 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
+using namespace snt;
+
 TEST(ParseTables, BasicTable) {
 
   dip::DIP d;

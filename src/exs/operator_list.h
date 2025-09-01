@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class OperatorList {
@@ -30,6 +30,6 @@ namespace exs {
     };
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_LIST_H

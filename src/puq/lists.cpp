@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace puq {
+namespace snt::puq {
 
   namespace lists {
 
@@ -124,4 +124,4 @@ namespace puq {
 
   } // namespace lists
 
-} // namespace puq
+} // namespace snt::puq

@@ -2,6 +2,8 @@
 
 #ifdef EXPONENT_FRACTIONS
 
+using namespace snt;
+
 TEST(Exponent, Initialization) {
 
   puq::Exponent e = puq::Exponent();

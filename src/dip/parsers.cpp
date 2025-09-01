@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 
-namespace dip {
+namespace snt::dip {
 
   EnvSource parse_source(const std::string& source_name, const std::string& source_file,
                          const Source& parent) {
@@ -318,4 +318,4 @@ namespace dip {
     }
   }
 
-} // namespace dip
+} // namespace snt::dip

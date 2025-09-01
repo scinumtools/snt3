@@ -4,7 +4,7 @@
 #include "../../exs/pch_exs.h"
 #include "unit_atom.h"
 
-namespace puq {
+namespace snt::puq {
 
   class UnitSolver {
   public:
@@ -13,6 +13,6 @@ namespace puq {
     UnitAtom solve(const std::string& expression);
   };
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_UNIT_SOLVER_H

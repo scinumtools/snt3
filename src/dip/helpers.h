@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-namespace dip {
+namespace snt::dip {
 
   // trim whitespace from the beginning and the end of a string
   inline void trim(std::string& str) {
@@ -72,6 +72,6 @@ namespace dip {
       return first_array;
   }
 
-} // namespace dip
+} // namespace snt::dip
 
 #endif // H_HELPERS

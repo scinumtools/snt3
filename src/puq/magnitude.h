@@ -5,7 +5,7 @@
 #include "array.h"
 #include "settings.h"
 
-namespace puq {
+namespace snt::puq {
 
 #ifdef MAGNITUDE_ERRORS
   class Magnitude {
@@ -85,6 +85,6 @@ namespace puq {
   };
 #endif
 
-} // namespace puq
+} // namespace snt::puq
 
 #endif // PUQ_MAGNITUDE_H

@@ -3,7 +3,7 @@
 
 #include "../operator_group.h"
 
-namespace exs {
+namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class OperatorParentheses : public OperatorGroup<A, 1, S> {
@@ -11,6 +11,6 @@ namespace exs {
     OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","}) : OperatorGroup<A, 1, S>("par", s, PARENTHESES_OPERATOR) {}
   };
 
-} // namespace exs
+} // namespace snt::exs
 
 #endif // EXS_OPERATOR_PARENTHESES_H
