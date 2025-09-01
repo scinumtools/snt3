@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+#include <sstream>
+
 TEST(Definitions, Boolean) {
 
   std::vector<bool> arr = {true, false, false, true, true, false};
@@ -108,4 +110,15 @@ TEST(Definitions, String) {
   EXPECT_EQ(val->to_string(), "[['a', 'b', 'c'], ['d', 'e', 'f']]");
   EXPECT_EQ(val->get_dtype(), val::DataType::String);
   EXPECT_EQ(val->get_shape(), val::Array::ShapeType(sh));
+}
+
+TEST(Definitions, ToString) {
+
+  val::ArrayValue<int> val(4);
+  EXPECT_EQ(val.to_string(), "4");
+
+  std::ostringstream oss;
+  oss << val;
+  EXPECT_EQ(oss.str(), "4");
+  
 }

@@ -68,7 +68,6 @@ namespace snt {
     if (value.size() > 1)
       oss << "[";
     for (size_t i = 0; i < shape[dim]; i++) {
-      std::cout << dim << " " << offset << std::endl;
       if (i > 0)
         oss << ", ";
       if (dim + 1 < shape.size()) {

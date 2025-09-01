@@ -75,6 +75,9 @@ namespace val {
     }
 
   public:
+    friend std::ostream& operator<<(std::ostream& os, const ArrayValue<T>& val) {
+      return os << val.to_string();
+    };
     std::string to_string(const snt::NumberFormatType& format = snt::NumberFormatType()) const override {
       return snt::array_to_string(value, shape, format);
     };
@@ -248,7 +251,7 @@ namespace val {
       return operate_ternary<bool, T>(condition, other, [](bool c, T a, T b) { return c ? a : b; });
     };
   };
-
+  
 } // namespace val
 
 #include "values_boolean.h"

@@ -33,58 +33,84 @@ This project is the C++ counterpart to the original Python [scinumtools](https:/
 
 ## Installation
 
-### Using CMake (recommended)
-```bash
-git clone https://github.com/vrtulka23/scinumtools3.git
-cd scinumtools3
-# using custom shell script
-./setup.sh -b -t -i      # build, test and install
-# or manually
-cmake -B build
-cd build
-make -j $(getconf _NPROCESSORS_ONLN)
-# optionally:
-ctest
-```
+### Download and install
 
-Add to your CMake project:
+1) Manually
 
-### Option 1: Add as a subdirectory
-If you have cloned the repository inside your project:
-```cmake
-add_subdirectory(path/to/scinumtools3)
-target_link_libraries(your_project PRIVATE snt-all)
-```
+   ```bash
+   # download repository
+   git clone https://github.com/vrtulka23/scinumtools3.git
+   cd scinumtools3
+   
+   # compile
+   cmake -B build
+   cd build
+   make
+   
+   # run tests
+   ctest
+   
+   # install
+   sudo make install
+   ```
+
+2) Using setup script
+
+   ```bash
+   sudo ./setup.sh -b
+   ```
+
+### Link `SNT` in your `CMAKE` project
+
+1) Find the package
+
+   ```bash
+   # find the `SNT` package
+   find_package(snt REQUIRED)
+
+   # link to your executable
+   add_executable(${EXEC_NAME} ${SOURCE_FILES})
+   target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
+   ```
 
 ---
 
 ## Quick Example
 
+Below is a quick example how to use the core functionality of `SciNumTools`.
+For more examples and patterns please look into the ``gtest`` and ``exec`` folders.
+
 ```cpp
 #include <iostream>
-#include <snt/exs/expression_solver.hpp>
-#include <snt/puq/units.hpp>
-#include <snt/dip/dip.hpp>
 
-using namespace scinumtools;
+#include <snt/exs/solver.h>
+#include <snt/exs/atom.h>
+#include <snt/val/values_array.h>
+#include <snt/puq/quantity.h>
+#include <snt/dip/dip.h>
+#include <snt/dip/environment.h>
+#include <snt/dip/nodes/nodes.h>
 
 int main() {
-    // Expression solver
-    exs::ExpressionSolver solver;
-    double result = solver.evaluate("3 * (2 + 5)");
-    std::cout << "Expression result: " << result << std::endl;
 
-    // Quantities with units
-    puq::Quantity length = 10.0 * units::meter;
-    puq::Quantity time = 2.0 * units::second;
-    puq::Quantity speed = length / time;
-    std::cout << "Speed: " << speed.value() << " m/s" << std::endl;
+  exs::Solver<exs::Atom> solver;
+  exs::Atom atom = solver.solve("23 * 34.5 + 4");
+  std::cout << atom.to_string() << std::endl;
 
-    // Dimensional Input Parameter
-    d = dip::DIP();
-    std::cout << "Pressure: " << pressure.value() << " Pa" << std::endl;
+  val::ArrayValue<double> value({1.23, 4.56e7});
+  std::cout << value.to_string() << std::endl;
 
-    return 0;
+  puq::Quantity length("1*m");
+  length = length.convert("km");
+  std::cout << length.to_string() << std::endl;
+
+  dip::DIP d;
+  d.add_string("foo int m");
+  d.add_string("foo = 3 km");
+  dip::Environment env = d.parse();
+  dip::BaseNode::PointerType node = env.nodes.at(0);
+  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  std::cout << vnode->value->to_string() << std::endl;
 }
 ```
 
@@ -94,10 +120,10 @@ int main() {
 
 API reference and guides are available in the `docs/` directory.
 
-To generate Doxigen + breathe + Sphinx documentation (if configured):
+To generate Doxigen + breathe + Sphinx documentation:
 
 ```bash
-./docs/setup.sh -b
+./docs/setup.sh -d
 ```
 
 See `docs/README.md` for more information.

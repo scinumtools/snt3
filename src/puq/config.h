@@ -8,6 +8,7 @@
 /*
  *  Modules
  */
+
 #define MAGNITUDE_ERRORS
 #if (COMPILE_PUQ_MAGNITUDE_ARRAY)
 #define MAGNITUDE_ARRAYS
