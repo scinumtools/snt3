@@ -1,10 +1,5 @@
-#include "dip/dip.h"
-#include "dip/environment.h"
-#include "dip/nodes/nodes.h"
-
+#include "pch_tests.h"
 #include "fixtures.h"
-
-#include <gtest/gtest.h>
 
 using namespace snt;
 

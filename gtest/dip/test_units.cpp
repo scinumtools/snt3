@@ -1,10 +1,5 @@
-#include "dip/dip.h"
-#include "dip/environment.h"
-#include "dip/nodes/nodes.h"
-#include "puq/converter.h"
-#include "puq/quantity.h"
+#include "pch_tests.h"
 
-#include <gtest/gtest.h>
 #include <iostream>
 #include <limits>
 

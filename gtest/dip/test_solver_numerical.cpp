@@ -1,7 +1,4 @@
-#include "dip/dip.h"
-#include "dip/solvers/solvers.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 using namespace snt;
 

@@ -1,8 +1,4 @@
-#include "dip/dip.h"
-#include "dip/environment.h"
-#include "dip/nodes/nodes.h"
-
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 using namespace snt;
 

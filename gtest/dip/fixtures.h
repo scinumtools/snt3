@@ -1,7 +1,7 @@
 #ifndef GTEST_FIXTURES_H
 #define GTEST_FIXTURES_H
 
-#include <gtest/gtest.h>
+#include "pch_tests.h"
 
 using namespace snt;
 
