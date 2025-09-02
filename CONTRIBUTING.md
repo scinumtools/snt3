@@ -11,7 +11,7 @@ Thank you for considering contributing to **scinumtools3**! We welcome all contr
 
 2. **Clone your fork locally**:
    ```bash
-   git clone https://github.com/your-username/scinumtools3.git
+   git clone https://github.com/vrtulka23/scinumtools3.git
    cd scinumtools3
    ```
 
@@ -31,8 +31,8 @@ Thank you for considering contributing to **scinumtools3**! We welcome all contr
 5. **Build and run tests**:
 
    ```bash
-   mkdir build && cd build
-   cmake ..
+   cmake -B build
+   cd build
    make
    ctest
    ```
