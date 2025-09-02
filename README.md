@@ -81,15 +81,11 @@ Below is a quick example how to use the core functionality of `scinumtools3`.
 For more examples and patterns please look into the ``gtest`` and ``exec`` folders.
 
 ```cpp
+#include <snt/exs.h>
+#include <snt/val.h>
+#include <snt/puq.h>
+#include <snt/dip.h>
 #include <iostream>
-
-#include <snt/exs/solver.h>
-#include <snt/exs/atom.h>
-#include <snt/val/values_array.h>
-#include <snt/puq/quantity.h>
-#include <snt/dip/dip.h>
-#include <snt/dip/environment.h>
-#include <snt/dip/nodes/nodes.h>
 
 using namespace snt;
 
@@ -98,13 +94,16 @@ int main() {
   exs::Solver<exs::Atom> solver;
   exs::Atom atom = solver.solve("23 * 34.5 + 4");
   std::cout << atom.to_string() << std::endl;
+  // 797.5
 
   val::ArrayValue<double> value({1.23, 4.56e7});
   std::cout << value.to_string() << std::endl;
+  // [1.23, 4.56e7]
 
   puq::Quantity length("1*m");
   length = length.convert("km");
   std::cout << length.to_string() << std::endl;
+  // 1e-3*km
 
   dip::DIP d;
   d.add_string("foo int m");
@@ -113,6 +112,7 @@ int main() {
   dip::BaseNode::PointerType node = env.nodes.at(0);
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   std::cout << vnode->value->to_string() << std::endl;
+  // 3000
 }
 ```
 
