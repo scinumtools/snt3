@@ -1,16 +1,16 @@
 #ifndef EXS_PCH_TESTS_H
 #define EXS_PCH_TESTS_H
 
-#include "exs/atom.h"
-#include "exs/atom_list.h"
-#include "exs/expression.h"
-#include "exs/math/add.h"
-#include "exs/math/divide.h"
-#include "exs/math/multiply.h"
-#include "exs/math/subtract.h"
-#include "exs/operator_list.h"
-#include "exs/solver.h"
-#include "exs/token_list.h"
+#include "snt/exs/atom.h"
+#include "snt/exs/atom_list.h"
+#include "snt/exs/expression.h"
+#include "snt/exs/math/add.h"
+#include "snt/exs/math/divide.h"
+#include "snt/exs/math/multiply.h"
+#include "snt/exs/math/subtract.h"
+#include "snt/exs/operator_list.h"
+#include "snt/exs/solver.h"
+#include "snt/exs/token_list.h"
 
 #include <gtest/gtest.h>
 

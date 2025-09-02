@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include <exs.h>
-#include <val.h>
-#include <puq.h>
-#include <dip.h>
+#include <snt/exs.h>
+#include <snt/val.h>
+#include <snt/puq.h>
+#include <snt/dip.h>
 
 using namespace snt;
 

@@ -1,4 +1,4 @@
-#include "puq.h"
+#include "snt/puq.h"
 
 #include <chrono>
 #include <ctime>

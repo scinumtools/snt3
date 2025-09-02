@@ -1,6 +1,6 @@
 #include "main.h"
 
-#include "dip/dip.h"
+#include "snt/dip.h"
 
 int main(int argc, char* argv[]) {
   std::cout << "Hello World" << '\n';

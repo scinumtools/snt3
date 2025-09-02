@@ -1,7 +1,7 @@
 #ifndef VAL_BASE_VALUE_H
 #define VAL_BASE_VALUE_H
 
-#include "../snt/settings.h"
+#include "../settings.h"
 #include "array.h"
 #include "datatypes.h"
 

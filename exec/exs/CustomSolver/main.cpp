@@ -1,8 +1,8 @@
 #import "main.h"
 
-#import "exs/comparison/less.h"
-#import "exs/solver.h"
-#import "exs/step_list.h"
+#import "snt/exs/comparison/less.h"
+#import "snt/exs/solver.h"
+#import "snt/exs/step_list.h"
 
 #include <memory>
 

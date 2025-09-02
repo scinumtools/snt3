@@ -1,12 +1,12 @@
 #ifndef EXS_PCH_TESTS_H
 #define EXS_PCH_TESTS_H
 
-#include "dip/dip.h"
-#include "dip/environment.h"
-#include "dip/nodes/nodes.h"
-#include "dip/solvers/solvers.h"
-#include "puq/converter.h"
-#include "puq/quantity.h"
+#include "snt/dip/dip.h"
+#include "snt/dip/environment.h"
+#include "snt/dip/nodes/nodes.h"
+#include "snt/dip/solvers/solvers.h"
+#include "snt/puq/converter.h"
+#include "snt/puq/quantity.h"
 
 #include <gtest/gtest.h>
 

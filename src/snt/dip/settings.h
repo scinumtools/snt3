@@ -1,7 +1,7 @@
 #ifndef DIP_SETTINGS_H
 #define DIP_SETTINGS_H
 
-#include "../snt/settings.h"
+#include "../settings.h"
 
 #include <sstream>
 #include <string>

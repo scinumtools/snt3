@@ -1,9 +1,9 @@
 #import "main.h"
 
-#import "exs/logical/and.h"
-#import "exs/operator_list.h"
-#import "exs/solver.h"
-#import "exs/step_list.h"
+#import "snt/exs/logical/and.h"
+#import "snt/exs/operator_list.h"
+#import "snt/exs/solver.h"
+#import "snt/exs/step_list.h"
 
 #include <memory>
 
