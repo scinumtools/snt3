@@ -1,5 +1,5 @@
-#include "pch_tests.h"
 #include "fixtures.h"
+#include "pch_tests.h"
 
 using namespace snt;
 

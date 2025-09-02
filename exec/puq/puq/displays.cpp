@@ -1,4 +1,5 @@
 #include "main.h"
+#include "snt/puq/nostd/to_string.h"
 
 void display_info(const std::string& expr) {
   puq::UnitValue uv = puq::Quantity(expr).value;

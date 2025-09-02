@@ -5,8 +5,8 @@
 #include "settings.h"
 #include "token_list_base.h"
 
-#include <vector>
 #include <stdexcept>
+#include <vector>
 
 namespace snt::exs {
 

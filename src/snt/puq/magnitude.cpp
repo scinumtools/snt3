@@ -1,7 +1,5 @@
 #include "magnitude.h"
 
-#include "nostd/nostd.h"
-
 #include <algorithm>
 #include <cmath>
 #include <iomanip>

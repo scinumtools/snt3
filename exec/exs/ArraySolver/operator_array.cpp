@@ -1,7 +1,6 @@
+#import "main.h"
 #import "snt/exs/token.h"
 #import "snt/exs/token_list_base.h"
-
-#import "main.h"
 
 #import <algorithm>
 

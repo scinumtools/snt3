@@ -1,9 +1,7 @@
 #ifndef PUQ_CONVERTER_H
 #define PUQ_CONVERTER_H
 
-#include "nostd/nostd.h"
 #include "util/data_table.h"
-#include "value/value.h"
 
 #include <bitset>
 #include <memory>

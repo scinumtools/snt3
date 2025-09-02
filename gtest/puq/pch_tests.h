@@ -4,14 +4,13 @@
 #include "snt/puq/array.h"
 #include "snt/puq/calc/calc.h"
 #include "snt/puq/converter.h"
+#include "snt/puq/exceptions.h"
 #include "snt/puq/exponent.h"
 #include "snt/puq/magnitude.h"
-#include "snt/puq/nostd/nostd.h"
 #include "snt/puq/quantity.h"
 #include "snt/puq/solver/unit_solver.h"
 #include "snt/puq/systems/systems.h"
 #include "snt/puq/util/data_table.h"
-#include "snt/puq/value/value.h"
 
 #include <gtest/gtest.h>
 

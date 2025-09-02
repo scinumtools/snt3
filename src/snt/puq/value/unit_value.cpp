@@ -1,6 +1,10 @@
+#include "unit_value.h"
+
 #include "../converter.h"
+#include "../exceptions.h"
+#include "../nostd/log10.h"
+#include "../nostd/pow.h"
 #include "../solver/unit_solver.h"
-#include "value.h"
 
 #include <iostream>
 #include <memory>

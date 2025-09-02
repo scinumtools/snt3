@@ -1,13 +1,13 @@
 #ifndef EXS_ATOM_H
 #define EXS_ATOM_H
 
-#include <variant>
 #include <cmath>
 #include <iostream>
 #include <math.h>
 #include <regex>
 #include <sstream>
 #include <stdexcept>
+#include <variant>
 
 namespace snt::exs {
 

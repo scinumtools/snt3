@@ -8,7 +8,7 @@
 - switch [] and {} symbols in puq unit notation
   
 ** Medium priority
-- remove array completely from puq
+
 
 ** Low priority
 - create sphix documentation
@@ -17,3 +17,4 @@
   
 * Task DONE
 - extract nostd function from puq to a global namespace so that also other modules can contribute
+- remove array completely from puq

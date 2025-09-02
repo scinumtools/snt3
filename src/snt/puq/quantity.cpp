@@ -1,6 +1,7 @@
 #include "quantity.h"
 
 #include "converter.h"
+#include "exceptions.h"
 #include "unit_format.h"
 
 #include <iostream>

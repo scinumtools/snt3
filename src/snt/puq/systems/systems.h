@@ -160,46 +160,6 @@ namespace snt::puq {
     GEO,
 #endif
   };
-  extern std::unordered_map<SystemType, SystemDataType*> SystemMap;
-
-  class UnitSystemExcept : public std::exception {
-  private:
-    std::string message;
-
-  public:
-    UnitSystemExcept(const std::string m) : message(m) {}
-    UnitSystemExcept(const SystemType st1, const SystemType st2) {
-      auto it1 = SystemMap.find(st1);
-      auto it2 = SystemMap.find(st2);
-      if (it1 == SystemMap.end() || it2 == SystemMap.end()) {
-        message = "Unknown system type";
-      } else {
-        std::stringstream ss;
-        ss << "Incompatible unit systems: ";
-        ss << it1->second->SystemAbbrev;
-        ss << " != ";
-        ss << it2->second->SystemAbbrev;
-        ss << std::endl;
-        message = ss.str();
-      }
-    }
-    const char* what() const noexcept override {
-      return message.c_str();
-    }
-  };
-
-  class UnitSystem {
-    bool closed;
-    static std::stack<SystemDataType*> systemStack;
-
-  public:
-    static SystemDataType* Data;
-    static SystemType System;
-    UnitSystem(const SystemType st = SystemType::NONE);
-    ~UnitSystem();
-    void change(const SystemType st);
-    void close();
-  };
 
 } // namespace snt::puq
 

@@ -1,4 +1,4 @@
-#include "nostd.h"
+#include "pow.h"
 
 namespace snt::nostd {
 

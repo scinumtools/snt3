@@ -1,7 +1,5 @@
 #include "array.h"
 
-#include "nostd/nostd.h"
-
 #include <iomanip>
 #include <iostream>
 #include <sstream>

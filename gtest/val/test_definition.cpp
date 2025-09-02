@@ -122,5 +122,4 @@ TEST(Definitions, ToString) {
   std::ostringstream oss;
   oss << val;
   EXPECT_EQ(oss.str(), "4");
-  
 }

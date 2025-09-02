@@ -1,9 +1,8 @@
 #include <iostream>
-
-#include <snt/exs.h>
-#include <snt/val.h>
-#include <snt/puq.h>
 #include <snt/dip.h>
+#include <snt/exs.h>
+#include <snt/puq.h>
+#include <snt/val.h>
 
 using namespace snt;
 
@@ -27,5 +26,4 @@ int main() {
   dip::BaseNode::PointerType node = env.nodes.at(0);
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   std::cout << vnode->value->to_string() << std::endl;
-
 }

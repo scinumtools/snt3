@@ -1,4 +1,12 @@
 #include "pch_tests.h"
+#include "snt/puq/nostd/abs.h"
+#include "snt/puq/nostd/cbrt.h"
+#include "snt/puq/nostd/exp.h"
+#include "snt/puq/nostd/log.h"
+#include "snt/puq/nostd/log10.h"
+#include "snt/puq/nostd/max.h"
+#include "snt/puq/nostd/sqrt.h"
+#include "snt/puq/nostd/to_string.h"
 
 using namespace snt;
 

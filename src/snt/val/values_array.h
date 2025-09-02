@@ -251,7 +251,7 @@ namespace snt::val {
       return operate_ternary<bool, T>(condition, other, [](bool c, T a, T b) { return c ? a : b; });
     };
   };
-  
+
 } // namespace snt::val
 
 #include "values_boolean.h"

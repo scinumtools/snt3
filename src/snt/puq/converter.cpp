@@ -1,5 +1,10 @@
 #include "converter.h"
 
+#include "nostd/exp.h"
+#include "nostd/log.h"
+#include "nostd/log10.h"
+#include "nostd/pow.h"
+
 #include <iostream>
 #include <set>
 

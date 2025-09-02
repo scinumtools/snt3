@@ -2,7 +2,7 @@
 #define PUQ_UNIT_ATOM_H
 
 #include "../../exs.h"
-#include "../value/value.h"
+#include "../value/unit_value.h"
 
 namespace snt::puq {
 
