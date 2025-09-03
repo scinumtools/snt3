@@ -1,4 +1,4 @@
-#include "lists.h"
+#include "list_node.h"
 
 namespace snt::dip {
 

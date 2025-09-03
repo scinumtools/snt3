@@ -85,7 +85,7 @@ add_subdirectory(gtest)      # build gtest executable
 
 file(GLOB_RECURSE PROJECT_HEADERS "${CMAKE_SOURCE_DIR}/src/*.h")
 
-set(HEADER_OUTPUT_DIR "${CMAKE_BINARY_DIR}/include/snt")
+set(HEADER_OUTPUT_DIR "${CMAKE_BINARY_DIR}/include")
 
 foreach(header ${PROJECT_HEADERS})
     # Strip "src/" prefix from path
