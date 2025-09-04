@@ -1,4 +1,7 @@
-#include "../nodes/nodes.h"
+#include "../nodes/node_boolean.h"
+#include "../nodes/node_float.h"
+#include "../nodes/node_integer.h"
+#include "../nodes/node_string.h"
 #include "solvers.h"
 
 namespace snt::dip {

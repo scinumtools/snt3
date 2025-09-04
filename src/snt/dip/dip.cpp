@@ -1,5 +1,8 @@
 #include "dip.h"
 
+#include "nodes/node_property.h"
+#include "nodes/node_quantity.h"
+#include "nodes/node_value.h"
 #include "parsers.h"
 #include "settings.h"
 

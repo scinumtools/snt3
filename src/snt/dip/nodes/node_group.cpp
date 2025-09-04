@@ -1,4 +1,4 @@
-#include "nodes.h"
+#include "node_group.h"
 
 namespace snt::dip {
 

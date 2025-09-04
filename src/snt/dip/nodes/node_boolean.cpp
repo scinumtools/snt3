@@ -1,6 +1,8 @@
+#include "node_boolean.h"
+
 #include "../parsers.h"
 #include "../solvers/solvers.h"
-#include "nodes.h"
+#include "node_value.h"
 
 #include <stdexcept>
 

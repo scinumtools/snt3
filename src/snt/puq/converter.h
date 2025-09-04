@@ -1,7 +1,11 @@
 #ifndef PUQ_CONVERTER_H
 #define PUQ_CONVERTER_H
 
+#include "systems/unit_system.h"
 #include "util/data_table.h"
+#include "value/base_units.h"
+#include "value/dimensions.h"
+#include "value/unit_value.h"
 
 #include <bitset>
 #include <memory>

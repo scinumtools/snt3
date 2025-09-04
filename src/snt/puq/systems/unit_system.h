@@ -1,7 +1,11 @@
 #ifndef PUQ_UNIT_SYSTEM_H
 #define PUQ_UNIT_SYSTEM_H
 
+#include "systems.h"
+
 namespace snt::puq {
+
+  enum class SystemType;
 
   extern std::unordered_map<SystemType, SystemDataType*> SystemMap;
 

@@ -1,6 +1,9 @@
 #ifndef VAL_ARRAY_H
 #define VAL_ARRAY_H
 
+#include <cstdlib>
+#include <vector>
+
 namespace snt::val {
 
   // Define common array types

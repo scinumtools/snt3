@@ -1,6 +1,7 @@
+#include "node_table.h"
+
 #include "../environment.h"
 #include "../parsers.h"
-#include "nodes.h"
 
 #include <stdexcept>
 

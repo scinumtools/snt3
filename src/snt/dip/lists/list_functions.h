@@ -3,6 +3,8 @@
 
 namespace snt::dip {
 
+  class Environment;
+
   class FunctionList {
   public:
     typedef val::BaseValue::PointerType (*ValueFunctionType)(const Environment& env);
@@ -19,6 +21,6 @@ namespace snt::dip {
     TableFunctionType get_table(const std::string& name) const;
   };
 
-}
+} // namespace snt::dip
 
 #endif // DIP_FUNCTION_LIST_H

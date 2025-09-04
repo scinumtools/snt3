@@ -1,12 +1,12 @@
 #ifndef DIP_ENVIRONMENT_H
 #define DIP_ENVIRONMENT_H
 
-#include "lists/list_source.h"
-#include "lists/list_unit.h"
-#include "lists/list_node.h"
-#include "lists/list_hierarchy.h"
 #include "lists/list_branching.h"
 #include "lists/list_functions.h"
+#include "lists/list_hierarchy.h"
+#include "lists/list_node.h"
+#include "lists/list_source.h"
+#include "lists/list_unit.h"
 
 namespace snt::dip {
 

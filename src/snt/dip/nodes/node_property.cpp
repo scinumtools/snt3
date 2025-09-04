@@ -1,5 +1,4 @@
-#include "../environment.h"
-#include "nodes.h"
+#include "node_property.h"
 
 namespace snt::dip {
 

@@ -1,6 +1,7 @@
+#include "node_integer.h"
+
 #include "../parsers.h"
 #include "../solvers/solvers.h"
-#include "nodes.h"
 
 namespace snt::dip {
 

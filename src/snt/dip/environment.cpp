@@ -1,5 +1,8 @@
 #include "environment.h"
 
+#include "nodes/node_quantity.h"
+#include "nodes/node_value.h"
+
 namespace snt::dip {
 
   inline std::tuple<std::string, std::string> parse_request(const std::string& request) {

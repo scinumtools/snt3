@@ -1,6 +1,7 @@
 #ifndef H_SOLVERS
 #define H_SOLVERS
 
+#include "../../exs.h"
 #include "../../val.h"
 #include "../environment.h"
 

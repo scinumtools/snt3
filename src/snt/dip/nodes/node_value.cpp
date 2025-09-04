@@ -1,4 +1,6 @@
-#include "nodes.h"
+#include "node_value.h"
+
+#include "node_quantity.h"
 
 #include <sstream>
 

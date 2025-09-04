@@ -3,7 +3,7 @@
 
 #include "dip/dip.h"
 #include "dip/environment.h"
-#include "dip/nodes/nodes.h"
+#include "dip/nodes/node_value.h"
 #include "dip/solvers/solvers.h"
 
 #endif // PCH_DIP_H

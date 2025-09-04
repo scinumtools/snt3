@@ -4,6 +4,7 @@
 #include "../settings.h"
 #include "list_node.h"
 
+#include <map>
 #include <string>
 
 namespace snt::dip {

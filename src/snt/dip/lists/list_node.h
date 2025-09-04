@@ -1,7 +1,10 @@
 #ifndef DIP_LIST_NODE_H
 #define DIP_LIST_NODE_H
 
-#include "../nodes/nodes.h"
+#include "../../val.h"
+#include "../environment.h"
+#include "../nodes/node_base.h"
+#include "../nodes/parser.h"
 
 namespace snt::dip {
 

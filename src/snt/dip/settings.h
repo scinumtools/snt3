@@ -79,12 +79,48 @@ namespace snt::dip {
     };
   };
 
-  enum class CaseType { Case,
-                        Else,
-                        End };
+  enum class CaseType {
+    Case,
+    Else,
+    End
+  };
 
-  // Forward declarations
-  class Environment;
+  enum class ValueOrigin {
+    Keyword,
+    String,
+    Reference,
+    ReferenceRaw,
+    Function,
+    Expression
+  };
+
+  enum class NodeDtype {
+    None,
+    Empty, // empty
+    Unit,
+    Source, // environment
+    Group,
+    Case,
+    Import, // node structure
+    Boolean,
+    Integer,
+    Float,
+    String,
+    Table,
+    Modification, // data handling
+    Property,     // properties
+  };
+
+  enum class PropertyType {
+    None, // not a property
+    Constant,
+    Condition,
+    Tags,
+    Description, // global properties
+    Format,
+    Options,
+    Delimiter // specific properties
+  };
 
 } // namespace snt::dip
 

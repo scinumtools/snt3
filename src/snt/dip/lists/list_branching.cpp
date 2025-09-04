@@ -1,5 +1,7 @@
 #include "list_branching.h"
 
+#include "../nodes/node_case.h"
+
 #include <regex>
 
 namespace snt::dip {
