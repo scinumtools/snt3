@@ -4,6 +4,7 @@
 #include "dip/dip.h"
 #include "dip/environment.h"
 #include "dip/nodes/node_value.h"
-#include "dip/solvers/solvers.h"
+#include "dip/solvers/solver_numerical.h"
+#include "dip/solvers/solver_logical.h"
 
 #endif // PCH_DIP_H

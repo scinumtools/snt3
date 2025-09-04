@@ -1,7 +1,7 @@
 #include "node_case.h"
 
 #include "../environment.h"
-#include "../solvers/solvers.h"
+#include "../solvers/solver_logical.h"
 
 #include <regex>
 

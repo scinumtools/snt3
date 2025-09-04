@@ -2,6 +2,7 @@
 #define VAL_VALUES_STRING_H
 
 #include "values_array.h"
+#include "array.h"
 
 #include <typeinfo>
 
@@ -14,8 +15,8 @@ namespace snt::val {
   class ArrayValue<std::string> : public BaseArrayValue<std::string> {
   public:
     ArrayValue(const std::string& val) : BaseArrayValue(val) {};
-    ArrayValue(const Array::StringType& arr, const Array::ShapeType& sh) : BaseArrayValue(arr, sh) {};
-    ArrayValue(const Array::StringType& arr) : BaseArrayValue(arr, {arr.size()}) {};
+    ArrayValue(const val::Array::StringType& arr, const val::Array::ShapeType& sh) : BaseArrayValue(arr, sh) {};
+    ArrayValue(const val::Array::StringType& arr) : BaseArrayValue(arr, {arr.size()}) {};
     ArrayValue(const BaseValue* other) : BaseArrayValue<std::string>(other) {};
 
   public:

@@ -1,7 +1,7 @@
 #include "node_float.h"
 
 #include "../parsers.h"
-#include "../solvers/solvers.h"
+#include "../solvers/solver_numerical.h"
 
 namespace snt::dip {
 

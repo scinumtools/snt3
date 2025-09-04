@@ -7,7 +7,8 @@
 #include "snt/dip/nodes/node_float.h"
 #include "snt/dip/nodes/node_integer.h"
 #include "snt/dip/nodes/node_string.h"
-#include "snt/dip/solvers/solvers.h"
+#include "snt/dip/solvers/solver_logical.h"
+#include "snt/dip/solvers/solver_numerical.h"
 #include "snt/puq/converter.h"
 #include "snt/puq/quantity.h"
 

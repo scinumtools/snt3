@@ -1,7 +1,6 @@
 #include "node_string.h"
 
 #include "../parsers.h"
-#include "../solvers/solvers.h"
 
 #include <regex>
 
