@@ -5,6 +5,8 @@
 #include "node.h"
 #include "parser.h"
 
+#include <deque>
+
 namespace snt::dip {
 
   class Environment;
