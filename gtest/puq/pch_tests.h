@@ -2,7 +2,7 @@
 #define PUQ_PCH_TESTS_H
 
 #include "snt/puq/array.h"
-#include "snt/puq/calc/calc.h"
+#include "snt/puq/calc/calculator.h"
 #include "snt/puq/converter.h"
 #include "snt/puq/exceptions.h"
 #include "snt/puq/exponent.h"

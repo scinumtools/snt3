@@ -1,7 +1,7 @@
 #ifndef PCH_PUQ_H
 #define PCH_PUQ_H
 
-#include "puq/calc/calc.h"
+#include "puq/calc/calculator.h"
 #include "puq/lists.h"
 #include "puq/nostd/pow.h"
 #include "puq/nostd/to_string.h"

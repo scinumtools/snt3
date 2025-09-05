@@ -5,6 +5,17 @@
 
 namespace snt::puq {
 
+  class CalculatorExcept : public std::exception {
+  private:
+    std::string message;
+
+  public:
+    CalculatorExcept(const std::string& m) : message(m) {}
+    const char* what() const noexcept override {
+      return message.c_str();
+    }
+  };
+  
   class UnitValueExcept : public std::exception {
   private:
     std::string message;

@@ -1,4 +1,4 @@
-#include "calc.h"
+#include "calculator.h"
 
 #include <memory>
 #include <regex>
