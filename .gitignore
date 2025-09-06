@@ -4,6 +4,7 @@ CMakeFiles/*
 CMakeCache.txt
 helpers/*
 docs/build/*
+docs/doxy/*
 
 # Prerequisites
 *.d
