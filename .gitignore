@@ -3,6 +3,7 @@ build/*
 CMakeFiles/*
 CMakeCache.txt
 helpers/*
+docs/build/*
 
 # Prerequisites
 *.d

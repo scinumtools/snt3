@@ -3,8 +3,9 @@
 ** High priority
 - substitute includes in header by forward declarations
 - implement arrays into puq magnitude to_string()
-- split .h files with multiple classes
-- convert number format into global settings
+- create documentation
+- add template solver to dip
+- change puq magnitude array format to the snt::array_to_string
 - switch [] and {} symbols in puq unit notation
   
 ** Medium priority
@@ -18,3 +19,4 @@
 * Task DONE
 - extract nostd function from puq to a global namespace so that also other modules can contribute
 - remove array completely from puq
+- split .h files with multiple classes

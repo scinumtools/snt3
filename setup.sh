@@ -81,7 +81,7 @@ function run_code {
 }
 
 function compile_docs {
-    doxygen
+    sphinx-build -b html docs/source docs/build
 }
 
 function grep_code {

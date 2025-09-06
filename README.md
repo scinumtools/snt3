@@ -124,9 +124,18 @@ API reference and guides are available in the `docs/` directory.
 
 To generate Doxigen + breathe + Sphinx documentation:
 
-```bash
-./docs/setup.sh -b   # build
-```
+* Using the setup script
+
+  ```bash
+  ./setup.sh -d   # build documentation
+  ```
+  
+* Manually
+
+  ```bash
+  cd docs
+  make html
+  ```
 
 See `docs/README.md` for more information.
 
