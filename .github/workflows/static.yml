@@ -35,7 +35,7 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Build documentation
         run:
-          apt install -y doxygen graphviz;
+          sudo apt install -y doxygen graphviz;
           pip3 install -r requirements.txt;
           ./setup.sh -d
       - name: Upload artifact
