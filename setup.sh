@@ -81,7 +81,7 @@ function run_code {
 }
 
 function compile_docs {
-    sphinx-build -b html docs/source docs/build
+    sphinx-build -b html docs/source docs/build/html
 }
 
 function grep_code {
