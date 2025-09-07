@@ -21,8 +21,12 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   val::ArrayValue<double> value(dim.numerical.value.get());
   ss << nostd::to_string(value.get_value(0), precision) + ",";
   ss << std::setfill(' ') << std::setw(25) << std::left;
-  val::ArrayValue<double> error(dim.numerical.error.get());
-  ss << nostd::to_string(error.get_value(0), precision) + ",";
+  if (dim.numerical.error==nullptr) {
+    ss << nostd::to_string(0, precision) + ",";
+  } else {
+    val::ArrayValue<double> error(dim.numerical.error.get());
+    ss << nostd::to_string(error.get_value(0), precision) + ",";
+  }
 #else
   ss << std::setfill(' ') << std::setw(25) << std::left;
   ss << nostd::to_string(dim.numerical.value[0], precision) + ",";
@@ -90,8 +94,12 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
       add_line(ss, unit.first, dim, unit.second.name);
 #if defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> value(dim.numerical.value.get());
-      val::ArrayValue<double> error(dim.numerical.error.get());
-      dmap.insert({unit.first, {value.get_value(0), error.get_value(0), dim.physical}});
+      if (dim.numerical.error==nullptr) {
+	dmap.insert({unit.first, {value.get_value(0), 0., dim.physical}});
+      } else {
+	val::ArrayValue<double> error(dim.numerical.error.get());
+	dmap.insert({unit.first, {value.get_value(0), error.get_value(0), dim.physical}});
+      }
 #else
       dmap.insert({unit.first, {dim.numerical.value[0], dim.numerical.error[0], dim.physical}});
 #endif
@@ -117,8 +125,12 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
     add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first));
 #if defined(MAGNITUDE_VALUES)
     val::ArrayValue<double> value(dim.numerical.value.get());
-    val::ArrayValue<double> error(dim.numerical.error.get());
-    dmap.insert({symbol, {value.get_value(0), error.get_value(0), dim.physical}});
+    if (dim.numerical.error==nullptr) {
+      dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
+    } else {
+      val::ArrayValue<double> error(dim.numerical.error.get());
+      dmap.insert({symbol, {value.get_value(0), error.get_value(0), dim.physical}});
+    }
 #else
     dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.error[0], dim.physical}});
 #endif
@@ -145,8 +157,12 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
       add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first) + " SI factor");
 #if defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> value(dim.numerical.value.get());
-      val::ArrayValue<double> error(dim.numerical.error.get());
-      dmap.insert({symbol, {value.get_value(0), error.get_value(0), dim.physical}});
+      if (dim.numerical.error==nullptr) {
+	dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
+      } else {
+	val::ArrayValue<double> error(dim.numerical.error.get());
+	dmap.insert({symbol, {value.get_value(0), error.get_value(0), dim.physical}});
+      }
 #else
       dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.error[0], dim.physical}});
 #endif
@@ -238,7 +254,7 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Generating dimension maps:" << '\n';
   for (auto sys : puq::SystemMap) {
-    std::string file_header = "src/systems/dmaps/dmap_" + sys.second->SystemAbbrev + ".h";
+    std::string file_header = "src/snt/puq/systems/dmaps/dmap_" + sys.second->SystemAbbrev + ".h";
     if (input.cmdOptionExists("-e")) {
       std::ofstream fs;
       fs.open(file_header, std::ios::out | std::ios::trunc);
