@@ -160,7 +160,7 @@ TEST(UnitSystem, ContextConversionGEO) {
 
   puq::Quantity q1, q2, q3;
 
-  q1 = puq::Quantity(1, "m*[#c]2/[#G]", puq::SystemType::GEO);
+  q1 = puq::Quantity(1, "m*{#c}2/{#G}", puq::SystemType::GEO);
   q1 = q1.convert(puq::Format::Base::MKS);
   EXPECT_EQ(q1.to_string(), "1.346591(30)e27*kg");
 

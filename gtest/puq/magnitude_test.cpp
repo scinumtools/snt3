@@ -199,10 +199,10 @@ TEST(Magnitude, Arrays) {
   puq::Magnitude m1, m2, m3;
 
   m1 = puq::Magnitude(puq::Array({12.1, 22.2}), puq::Array({0.1, 0.2}));
-  EXPECT_EQ(m1.to_string(), "{1.210(10)e+01, 2.220(20)e+01}");
+  EXPECT_EQ(m1.to_string(), "[1.210(10)e+01, 2.220(20)e+01]");
 
   m1 = puq::Magnitude(puq::Array({12.1, 22.2, 32.3}), puq::Array({0.1, 0.2, 0.3}));
-  EXPECT_EQ(m1.to_string(), "{1.210(10)e+01, 2.220(20)e+01, ...}");
+  EXPECT_EQ(m1.to_string(), "[1.210(10)e+01, 2.220(20)e+01, ...]");
 }
 
 #elif defined(MAGNITUDE_VALUES)
@@ -213,11 +213,11 @@ TEST(Magnitude, Arrays) {
 
   m1 = puq::Magnitude(val::ArrayValue<double>::pointer_from_vector({12.1, 22.2}),
                       val::ArrayValue<double>::pointer_from_vector({0.1, 0.2}));
-  EXPECT_EQ(m1.to_string(), "{1.210(10)e1, 2.220(20)e1}");
+  EXPECT_EQ(m1.to_string(), "[1.210(10)e1, 2.220(20)e1]");
 
   m1 = puq::Magnitude(val::ArrayValue<double>::pointer_from_vector({12.1, 22.2, 32.3}),
                       val::ArrayValue<double>::pointer_from_vector({0.1, 0.2, 0.3}));
-  EXPECT_EQ(m1.to_string(), "{1.210(10)e1, 2.220(20)e1, ...}");
+  EXPECT_EQ(m1.to_string(), "[1.210(10)e1, 2.220(20)e1, ...]");
 }
 
 #endif

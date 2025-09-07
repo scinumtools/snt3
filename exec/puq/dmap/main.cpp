@@ -211,8 +211,8 @@ void create_map(const std::string& file_header) {
   fs << " * " << '\n';
   fs << " * Symbol legend:" << '\n';
   fs << " * ..    units" << '\n';
-  fs << " * [..]  constants" << '\n';
-  fs << " * [#..] collapsed constants" << '\n';
+  fs << " * {..}  constants" << '\n';
+  fs << " * {#..} collapsed constants" << '\n';
   fs << " * <..>  quantities" << '\n';
   fs << " * |..|  quantity SI conversion factors" << '\n';
   fs << " */" << '\n';

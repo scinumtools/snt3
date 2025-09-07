@@ -3,13 +3,13 @@
  * This file can be updated using 'dmap' executable.
  * 
  * Unit system:  United States customary units (US)
- * Last update:  Sun Sep  7 22:07:26 2025
+ * Last update:  Sun Sep  7 23:35:40 2025
  * Code version: v0.1.0
  * 
  * Symbol legend:
  * ..    units
- * [..]  constants
- * [#..] collapsed constants
+ * {..}  constants
+ * {#..} collapsed constants
  * <..>  quantities
  * |..|  quantity SI conversion factors
  */

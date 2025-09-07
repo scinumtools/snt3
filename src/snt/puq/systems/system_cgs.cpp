@@ -18,16 +18,16 @@ namespace snt::puq {
         {"Rayl", {Utype::LIN, "g/(cm2*s)", "Rayl", false, {}}},
         {"radd", {Utype::LIN, "100*erg/g", "radiation dose", false, {"d", "h", "k", "M"}}},
         // constants
-        {"[m_u]", {Utype::CST, "1.660539069e-24*g", "atom. mass const.", false, {}}},
-        {"[a_0]", {Utype::CST, "5.291772105e-9*cm", "Bohr radius", false, {}}},
-        {"[k]", {Utype::CST, "1.380649e-16*erg/K", "Boltzmann const.", false, {}}},
-        {"[m_e]", {Utype::CST, "9.10938371e-28*g", "electron mass", false, {}}},
-        {"[alpha]", {Utype::CST, "0.007297352564", "fine-str. const.", false, {}}},
-        {"[G]", {Utype::CST, "6.6743e-8*dyn*cm2/g2", "gravit. const.", false, {}}},
-        {"[h]", {Utype::CST, "6.62607015e-27*erg*s", "Planck const.", false, {}}},
-        {"[hbar]", {Utype::CST, "1.054571817e-27*erg*s", "reduced Pl. con.", false, {}}},
-        {"[c]", {Utype::CST, "2.99792458e10*cm/s", "speed of light", false, {}}},
-        {"[pi]", {UT_LIN_CST, "3.1415926", "pi num.", false, {}}},
+        {"{m_u}", {Utype::CST, "1.660539069e-24*g", "atom. mass const.", false, {}}},
+        {"{a_0}", {Utype::CST, "5.291772105e-9*cm", "Bohr radius", false, {}}},
+        {"{k}", {Utype::CST, "1.380649e-16*erg/K", "Boltzmann const.", false, {}}},
+        {"{m_e}", {Utype::CST, "9.10938371e-28*g", "electron mass", false, {}}},
+        {"{alpha}", {Utype::CST, "0.007297352564", "fine-str. const.", false, {}}},
+        {"{G}", {Utype::CST, "6.6743e-8*dyn*cm2/g2", "gravit. const.", false, {}}},
+        {"{h}", {Utype::CST, "6.62607015e-27*erg*s", "Planck const.", false, {}}},
+        {"{hbar}", {Utype::CST, "1.054571817e-27*erg*s", "reduced Pl. con.", false, {}}},
+        {"{c}", {Utype::CST, "2.99792458e10*cm/s", "speed of light", false, {}}},
+        {"{pi}", {UT_LIN_CST, "3.1415926", "pi num.", false, {}}},
     };
 
     const QuantityListType _CGS_QUANTITIES = {
@@ -59,22 +59,22 @@ namespace snt::puq {
         {"statF", {Utype::LIN, "cm", "Statfarad", false, {}}},
         {"statH", {Utype::LIN, "s2/cm", "Stathenry", false, {}}},
         // constants
-        {"[e]", {Utype::CST, "4.80320471e-10*Fr", "elementary charge", false, {}}},
+        {"{e}", {Utype::CST, "4.80320471e-10*Fr", "elementary charge", false, {}}},
     };
 
     const QuantityListType _GU_ESU_QUANTITIES = {
-        {"q", {"statC", "1e1/([c]*100)"}}, // we need [c]*100 because we convert to MKS during conversions
-        {"I", {"statA", "1e1/([c]*100)"}},
-        {"phi_e", {"statV", "1e-8*([c]*100)"}},
-        {"E_e", {"statV/cm", "1e-6*([c]*100)"}},
-        {"D_e", {"statC/cm2", "1e5/(4*[pi]*([c]*100))"}},
-        {"p_e", {"statC*cm", "1e-1/([c]*100)"}},
-        {"Phi_E", {"statC", "1e1/(4*[pi]*([c]*100))"}},
-        {"eps", {"1", "1e11/(4*[pi]*([c]*100)2)"}},
-        {"R", {"statOhm", "([c]*100)2/1e9"}},
-        {"rho_e", {"statOhm*cm", "([c]*100)2/1e11"}},
-        {"C", {"statF", "1e9/([c]*100)2"}},
-        {"L", {"statH", "([c]*100)2/1e9"}},
+        {"q", {"statC", "1e1/({c}*100)"}}, // we need {c}*100 because we convert to MKS during conversions
+        {"I", {"statA", "1e1/({c}*100)"}},
+        {"phi_e", {"statV", "1e-8*({c}*100)"}},
+        {"E_e", {"statV/cm", "1e-6*({c}*100)"}},
+        {"D_e", {"statC/cm2", "1e5/(4*{pi}*({c}*100))"}},
+        {"p_e", {"statC*cm", "1e-1/({c}*100)"}},
+        {"Phi_E", {"statC", "1e1/(4*{pi}*({c}*100))"}},
+        {"eps", {"1", "1e11/(4*{pi}*({c}*100)2)"}},
+        {"R", {"statOhm", "({c}*100)2/1e9"}},
+        {"rho_e", {"statOhm*cm", "({c}*100)2/1e11"}},
+        {"C", {"statF", "1e9/({c}*100)2"}},
+        {"L", {"statH", "({c}*100)2/1e9"}},
     };
 
     SystemDataType ESU = {
@@ -83,14 +83,14 @@ namespace snt::puq {
                                                        {"statT", {Utype::LIN, "cm-3:2*g1:2", "Stattesla", false, {}}},
                                                        {"statWb", {Utype::LIN, "cm2*g", "Statweber", false, {}}},
                                                        // constants
-                                                       {"[mu_B]", {Utype::CST, "2.780278273e-10*statA*cm2 ", "Bohr magneton", false, {}}},
+                                                       {"{mu_B}", {Utype::CST, "2.780278273e-10*statA*cm2 ", "Bohr magneton", false, {}}},
                                                    }),
         _CGS_QUANTITIES + _GU_ESU_QUANTITIES + QuantityListType({
-                                                   {"B", {"statT", "1e-4*([c]*100)"}}, // we need [c]*100 because we convert to MKS during conversions
-                                                   {"H", {"statA/cm", "1e3/(4*[pi]*([c]*100))"}},
-                                                   {"mm", {"statA*cm2", "1e-3/([c]*100)"}},
-                                                   {"Phi_M", {"statWb", "([c]*100)*1e-8"}},
-                                                   {"mu", {"s2/cm2", "4*[pi]*([c]*100)2*1e-7"}},
+                                                   {"B", {"statT", "1e-4*({c}*100)"}}, // we need {c}*100 because we convert to MKS during conversions
+                                                   {"H", {"statA/cm", "1e3/(4*{pi}*({c}*100))"}},
+                                                   {"mm", {"statA*cm2", "1e-3/({c}*100)"}},
+                                                   {"Phi_M", {"statWb", "({c}*100)*1e-8"}},
+                                                   {"mu", {"s2/cm2", "4*{pi}*({c}*100)2*1e-7"}},
                                                }),
         DimensionMapType({
 #include "dmaps/dmap_ESU.h"
@@ -102,15 +102,15 @@ namespace snt::puq {
         {"Gb", {Utype::LIN, "Oe*cm", "Gilbert", false, {}}},
         {"Mx", {Utype::LIN, "dyn1:2*cm2", "Maxwell", false, {}}},
         // constants
-        {"[mu_B]", {Utype::CST, "9.274010066e-21*erg/G", "Bohr magneton", false, {}}},
+        {"{mu_B}", {Utype::CST, "9.274010066e-21*erg/G", "Bohr magneton", false, {}}},
     };
 
     const QuantityListType _GU_EMU_QUANTITIES = {
         {"B", {"G", "1e-4"}},
-        {"H", {"Oe", "1e3/(4*[pi])"}},
+        {"H", {"Oe", "1e3/(4*{pi})"}},
         {"mm", {"erg/G", "1e-3"}},
         {"Phi_M", {"Mx", "1e-8"}},
-        {"mu", {"1", "4*[pi]*1e-7"}},
+        {"mu", {"1", "4*{pi}*1e-7"}},
     };
 
     SystemDataType GU = {
@@ -133,17 +133,17 @@ namespace snt::puq {
                                                        {"abF", {Utype::LIN, "cm-1*s2", "Abfarad", false, {}}},
                                                        {"abH", {Utype::LIN, "cm", "Abhenry", false, {}}},
                                                        // constants
-                                                       {"[e]", {Utype::CST, "1.602176634e-20*abC", "elementary charge", false, {}}},
+                                                       {"{e}", {Utype::CST, "1.602176634e-20*abC", "elementary charge", false, {}}},
                                                    }),
         _CGS_QUANTITIES + _GU_EMU_QUANTITIES + QuantityListType({
                                                    {"q", {"abC", "1e1"}},
                                                    {"I", {"abA", "1e1"}},
                                                    {"phi_e", {"abV", "1e-8"}},
                                                    {"E_e", {"abV/cm", "1e-6"}},
-                                                   {"D_e", {"abC/cm2", "1e5/(4*[pi])"}},
+                                                   {"D_e", {"abC/cm2", "1e5/(4*{pi})"}},
                                                    {"p_e", {"abC*cm", "1e-1"}},
-                                                   {"Phi_E", {"abC", "1e1/(4*[pi])"}},
-                                                   {"eps", {"s2/cm2", "1e11/(4*[pi])"}},
+                                                   {"Phi_E", {"abC", "1e1/(4*{pi})"}},
+                                                   {"eps", {"s2/cm2", "1e11/(4*{pi})"}},
                                                    {"R", {"abOhm", "1e-9"}},
                                                    {"rho_e", {"abOhm*cm", "1e-11"}},
                                                    {"C", {"abF", "1e9"}},
