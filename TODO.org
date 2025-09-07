@@ -6,17 +6,14 @@
 - create documentation
 - add template solver to dip
 - change puq magnitude array format to the snt::array_to_string
-- switch [] and {} symbols in puq unit notation
   
-** Medium priority
-
-
 ** Low priority
 - create sphix documentation
 - start writing doxygen documentation comments
 - move array namespace to snt
   
 * Task DONE
+- switch [] and {} symbols in puq unit notation
 - extract nostd function from puq to a global namespace so that also other modules can contribute
 - remove array completely from puq
 - split .h files with multiple classes
