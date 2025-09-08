@@ -77,75 +77,16 @@ namespace snt::puq {
   /*
    * Return a string representation of a magnitude
    */
-  std::string _to_string(const MAGNITUDE_PRECISION& value, const MAGNITUDE_PRECISION& error, const UnitFormat& format) {
-    std::stringstream ss;
-    int exp_val = std::floor(std::log10(std::abs(value)));
-    if (error == 0 || !format.display_error()) {
-      snt::NumberFormatType fmt;
-      fmt.valuePrecision = format.precision;
-      ss << snt::number_to_string(value, (MAGNITUDE_PRECISION)0, fmt);
-    } else {
-      ss << snt::number_to_string(value, error);
-    }
-    return ss.str();
-  }
   std::string Magnitude::to_string(const UnitFormat& format) const {
     std::stringstream ss;
+    snt::NumberFormatType fmt;
+    fmt.valuePrecision = format.precision;
     if (error == nullptr || !format.display_error()) {
-#if defined(MAGNITUDE_ARRAYS)
-      ss << value.to_string(format);
-#elif defined(MAGNITUDE_VALUES)
-      val::ArrayValue<double> dvalue(value.get());
-      if (dvalue.get_size() == 1) {
-        snt::NumberFormatType fmt;
-        fmt.valuePrecision = format.precision;
-        ss << snt::number_to_string(dvalue.get_value(0), (MAGNITUDE_PRECISION)0, fmt);
-      } else if (dvalue.get_size() == 2) {
-        ss << std::setprecision(format.precision);
-        ss << SYMBOL_ARRAY_START << dvalue.get_value(0);
-        ss << SYMBOL_ARRAY_SEPARATOR << " " << dvalue.get_value(1);
-        ss << SYMBOL_ARRAY_END;
-      } else if (dvalue.get_size() > 2) {
-        ss << std::setprecision(format.precision);
-        ss << SYMBOL_ARRAY_START << dvalue.get_value(0);
-        ss << SYMBOL_ARRAY_SEPARATOR << " " << dvalue.get_value(1);
-        ss << SYMBOL_ARRAY_SEPARATOR << " " << SYMBOL_ARRAY_MORE;
-        ss << SYMBOL_ARRAY_END;
-      }
-#else
-      ss << std::setprecision(format.precision);
-      ss << value;
-#endif
+      ss << value->to_string(fmt);
     } else {
-#if defined(MAGNITUDE_ARRAYS)
-      if (value.size() == 1)
-        ss << _to_string(value[0], error[0], format);
-      else if (value.size() == 2) {
-        ss << SYMBOL_ARRAY_START << _to_string(value[0], error[0], format);
-        ss << SYMBOL_ARRAY_SEPARATOR << " " << _to_string(value[1], error[1], format);
-        ss << SYMBOL_ARRAY_END;
-      } else {
-        ss << SYMBOL_ARRAY_START << _to_string(value[0], error[0], format);
-        ss << SYMBOL_ARRAY_SEPARATOR << " " << _to_string(value[1], error[1], format);
-        ss << SYMBOL_ARRAY_SEPARATOR << " " << SYMBOL_ARRAY_MORE << SYMBOL_ARRAY_END;
-      }
-#elif defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> dvalue(value.get());
       val::ArrayValue<double> derror(error.get());
-      if (dvalue.get_size() == 1)
-        ss << _to_string(dvalue.get_value(0), derror.get_value(0), format);
-      else if (dvalue.get_size() == 2) {
-        ss << SYMBOL_ARRAY_START << _to_string(dvalue.get_value(0), derror.get_value(0), format);
-        ss << SYMBOL_ARRAY_SEPARATOR << " " << _to_string(dvalue.get_value(1), derror.get_value(1), format);
-        ss << SYMBOL_ARRAY_END;
-      } else {
-        ss << SYMBOL_ARRAY_START << _to_string(dvalue.get_value(0), derror.get_value(0), format);
-        ss << SYMBOL_ARRAY_SEPARATOR << " " << _to_string(dvalue.get_value(1), derror.get_value(1), format);
-        ss << SYMBOL_ARRAY_SEPARATOR << " " << SYMBOL_ARRAY_MORE << SYMBOL_ARRAY_END;
-      }
-#else
-      ss << _to_string(value, error, format);
-#endif
+      ss << snt::array_to_string(dvalue.get_values(), derror.get_values(), dvalue.get_shape(), fmt);
     }
     return format.format_order(ss.str());
   }

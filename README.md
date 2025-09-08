@@ -1,4 +1,4 @@
-# **SciNumTools v3 (SNT)**  
+# **Scientific Numerical Tools v3 (SNT)**  
 *A modern C++ toolkit for scientific computations with units, expressions, and dimensional parameters.*
 
 [![C/C++ CI](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml)

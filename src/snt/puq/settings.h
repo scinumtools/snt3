@@ -36,9 +36,6 @@
  *  Module specific settings
  */
 #if defined(MAGNITUDE_ARRAYS) || defined(MAGNITUDE_VALUES)
-#define SYMBOL_ARRAY_START "["
-#define SYMBOL_ARRAY_END "]"
-#define SYMBOL_ARRAY_SEPARATOR ","
 #define SYMBOL_ARRAY_MORE "..."
 #endif
 #ifdef EXPONENT_FRACTIONS

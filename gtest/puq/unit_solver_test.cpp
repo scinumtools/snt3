@@ -62,13 +62,13 @@ TEST(UnitSolver, SolveArrays) {
 
   puq::UnitSolver solver;
   puq::UnitAtom atom = solver.solve("[20, 40.5, 6.8e1]"); // numerical array only
-  EXPECT_EQ(atom.value.to_string(), "[20, 40.5, ...]");
+  EXPECT_EQ(atom.value.to_string(), "[20, 40.5, 68]");
 
   atom = solver.solve("[20, 40.5, 6.8e1]*kg/s"); // numerical array with units
-  EXPECT_EQ(atom.value.to_string(), "[20, 40.5, ...]*kg*s-1");
+  EXPECT_EQ(atom.value.to_string(), "[20, 40.5, 68]*kg*s-1");
 
   atom = solver.solve("[20, 40.5, 6.8e1]*2"); // multiplied by a scalar
-  EXPECT_EQ(atom.value.to_string(), "[40, 81, ...]");
+  EXPECT_EQ(atom.value.to_string(), "[40, 81, 136]");
 
   atom = solver.solve("[20, 40.5]*[2,3]"); // multiplication of vectors
   EXPECT_EQ(atom.value.to_string(), "[40, 121.5]");

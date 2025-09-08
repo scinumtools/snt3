@@ -41,7 +41,7 @@ TEST(UnitValue, Initialization) {
 
   val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5}); // from Array
   value = puq::UnitValue(std::move(val), "km");
-  EXPECT_EQ(value.to_string(), "[2, 3, ...]*km");
+  EXPECT_EQ(value.to_string(), "[2, 3, 4, 5]*km");
 
 #endif
 
@@ -186,7 +186,7 @@ TEST(UnitValue, InitializationErrors) {
   val::BaseValue::PointerType am = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
   val::BaseValue::PointerType ae = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});
   v = puq::UnitValue(std::move(am), std::move(ae), "km");
-  EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), ...]*km");
+  EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), 4.00(40), 5.00(50)]*km");
 
 #endif
 }
