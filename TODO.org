@@ -1,19 +1,26 @@
 * SCINUMTOOLS TODO
 
 ** High priority
-- substitute includes in header by forward declarations
-- implement arrays into puq magnitude to_string()
-- create documentation
 - add template solver to dip
-- change puq magnitude array format to the snt::array_to_string
+- include pybind11 to dip and puq
+- create sphix documentation
+- rename "float" to "real"
   
 ** Low priority
-- create sphix documentation
+- improve error handling strategy in whole snt
 - start writing doxygen documentation comments
-- move array namespace to snt
+- installation using homebrew
+- implement dip linter
+- installation as a debian package
+- implement materials
+- substitute includes in header by forward declarations
+- implement variable precision in int/float
   
 * Task DONE
+- change puq magnitude array format to the snt::array_to_string
+- implement arrays into puq magnitude to_string()
 - switch [] and {} symbols in puq unit notation
 - extract nostd function from puq to a global namespace so that also other modules can contribute
 - remove array completely from puq
 - split .h files with multiple classes
+- move array namespace to snt
