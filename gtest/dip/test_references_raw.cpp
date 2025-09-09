@@ -65,7 +65,7 @@ TEST(ReferencesRaw, IntegerValues) {
   EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3, 4]]");
 }
 
-TEST(ReferencesRaw, FloatValues) {
+TEST(ReferencesRaw, RealValues) {
 
   // create temporary file
   std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
@@ -81,7 +81,7 @@ TEST(ReferencesRaw, FloatValues) {
   // referencing scalar and array values
   dip::DIP d;
   d.add_string("$source " + source_name + " = " + source_filename.string());
-  d.add_string("snap float[2,2] = {" + source_name + "}");
+  d.add_string("snap real[2,2] = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
 

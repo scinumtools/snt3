@@ -38,10 +38,10 @@ namespace snt::val {
     Integer16_U = 1 << 7,
     Integer32_U = 1 << 8,
     Integer64_U = 1 << 9,
-    Float32 = 1 << 10,
-    Float64 = 1 << 11,
-    Float128 = 1 << 12, // TODO: this is not percise, could be less precision
-    FloatX = 1 << 13,   // TODO: need to implement
+    Real32 = 1 << 10,
+    Real64 = 1 << 11,
+    Real128 = 1 << 12, // TODO: this is not percise, could be less precision
+    RealX = 1 << 13,   // TODO: need to implement
 
     // Define data type groups
     Integer = Integer16 | Integer32 | Integer64 | IntegerX |
@@ -50,7 +50,7 @@ namespace snt::val {
     Integer_S = Integer16 | Integer32 | Integer64 | IntegerX,
     Integer_U = Integer16_U | Integer32_U | Integer64_U,
 
-    Float = Float32 | Float64 | Float128 | FloatX
+    Real = Real32 | Real64 | Real128 | RealX
 
   };
 

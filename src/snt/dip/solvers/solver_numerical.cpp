@@ -1,6 +1,6 @@
 #include "solver_numerical.h"
 #include "../nodes/node_boolean.h"
-#include "../nodes/node_float.h"
+#include "../nodes/node_real.h"
 #include "../nodes/node_integer.h"
 #include "../nodes/node_string.h"
 
@@ -27,7 +27,7 @@ namespace snt::dip {
       if (node == nullptr)
         node = IntegerNode::is_node(parser);
       if (node == nullptr)
-        node = FloatNode::is_node(parser);
+        node = RealNode::is_node(parser);
       if (node == nullptr)
         node = StringNode::is_node(parser);
       if (node == nullptr)

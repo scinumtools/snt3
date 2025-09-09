@@ -20,7 +20,7 @@ TEST(Units, Definition) {
   EXPECT_EQ(qnode->units->to_string(), "km");
 
   d = dip::DIP();
-  d.add_string("foo float = 2.34e5 km");
+  d.add_string("foo real = 2.34e5 km");
   env = d.parse();
 
   node = env.nodes.at(0);
@@ -48,7 +48,7 @@ TEST(Units, ScalarModification) {
   EXPECT_EQ(qnode->units->to_string(), "m");
 
   d = dip::DIP();
-  d.add_string("foo float = 23 km");
+  d.add_string("foo real = 23 km");
   d.add_string("foo = 23 m");
   env = d.parse();
 
@@ -77,7 +77,7 @@ TEST(Units, ArrayModification) {
   EXPECT_EQ(qnode->units->to_string(), "m");
 
   d = dip::DIP();
-  d.add_string("foo float[2] = [23, 45] m");
+  d.add_string("foo real[2] = [23, 45] m");
   d.add_string("foo = [12, 23] km");
   env = d.parse();
 
@@ -106,7 +106,7 @@ TEST(Units, DimlessModification) {
   EXPECT_EQ(qnode->units->to_string(), "km");
 
   d = dip::DIP();
-  d.add_string("foo float = 23 km");
+  d.add_string("foo real = 23 km");
   d.add_string("foo = 45");
   env = d.parse();
 
@@ -135,7 +135,7 @@ TEST(Units, OptionSetting) {
   EXPECT_EQ(qnode->options[1].value->to_string(), "3e3");
 
   d = dip::DIP();
-  d.add_string("foo float = 2000 m");
+  d.add_string("foo real = 2000 m");
   d.add_string("  !options [2, 3] km");
   env = d.parse();
 
@@ -162,8 +162,8 @@ TEST(Units, ScalarInjection) {
   EXPECT_EQ(qnode->units->to_string(), "km");
 
   d = dip::DIP();
-  d.add_string("foo float = 2000 m");
-  d.add_string("bar float = {?foo} km");
+  d.add_string("foo real = 2000 m");
+  d.add_string("bar real = {?foo} km");
   env = d.parse();
 
   node = env.nodes.at(1);
@@ -187,8 +187,8 @@ TEST(Units, ArrayInjection) {
   EXPECT_EQ(qnode->units->to_string(), "km");
 
   d = dip::DIP();
-  d.add_string("foo float[2] = [2.23e4, 3.45e6] m");
-  d.add_string("bar float[2] = {?foo} km");
+  d.add_string("foo real[2] = [2.23e4, 3.45e6] m");
+  d.add_string("bar real[2] = {?foo} km");
   env = d.parse();
 
   node = env.nodes.at(1);
@@ -201,13 +201,13 @@ TEST(Units, ArrayInjection) {
 TEST(Units, DimlessModificationError) {
 
   dip::DIP d;
-  d.add_string("foo float = 23");
+  d.add_string("foo real = 23");
   d.add_string("foo = 23 m");
   try {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Trying to convert 'm' into a nondimensional quantity: foo float = 23");
+    EXPECT_STREQ(e.what(), "Trying to convert 'm' into a nondimensional quantity: foo real = 23");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -216,13 +216,13 @@ TEST(Units, DimlessModificationError) {
 TEST(Units, DimlessInjectionError) {
 
   dip::DIP d;
-  d.add_string("foo float = 23 m");
-  d.add_string("bar float = {?foo}");
+  d.add_string("foo real = 23 m");
+  d.add_string("bar real = {?foo}");
   try {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Trying to convert 'm' into a nondimensional quantity: foo float = 23 m");
+    EXPECT_STREQ(e.what(), "Trying to convert 'm' into a nondimensional quantity: foo real = 23 m");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -231,7 +231,7 @@ TEST(Units, DimlessInjectionError) {
 TEST(Units, UnitConversionError) {
 
   dip::DIP d;
-  d.add_string("foo float = 23 km");
+  d.add_string("foo real = 23 km");
   d.add_string("foo = 23 g");
   EXPECT_THROW(d.parse(), puq::ConvDimExcept);
 }

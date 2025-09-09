@@ -4,7 +4,6 @@
 - add template solver to dip
 - include pybind11 to dip and puq
 - create sphix documentation
-- rename "float" to "real"
   
 ** Low priority
 - improve error handling strategy in whole snt
@@ -17,6 +16,7 @@
 - implement variable precision in int/float
   
 * Task DONE
+- rename "float" to "real"
 - change puq magnitude array format to the snt::array_to_string
 - implement arrays into puq magnitude to_string()
 - switch [] and {} symbols in puq unit notation

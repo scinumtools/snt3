@@ -53,14 +53,14 @@ TEST(References, IntegerValues) {
   EXPECT_EQ(vnode->value->to_string(), "[32, 54]");
 }
 
-TEST(References, FloatValues) {
+TEST(References, RealValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("foo float = 2.345e6");
-  d.add_string("bar float = {?foo}");
-  d.add_string("snap float[2] = [2.345e6, 3.456e7]");
-  d.add_string("crackle float[2] = {?snap}");
+  d.add_string("foo real = 2.345e6");
+  d.add_string("bar real = {?foo}");
+  d.add_string("snap real[2] = [2.345e6, 3.456e7]");
+  d.add_string("crackle real[2] = {?snap}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 4);
 

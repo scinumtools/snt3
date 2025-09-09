@@ -71,7 +71,7 @@ TEST(Properties, Description) {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Only value nodes (bool, int, float and str) can have properties:   !descr 'This is a group node'");
+    EXPECT_STREQ(e.what(), "Only value nodes (bool, int, real and str) can have properties:   !descr 'This is a group node'");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -229,10 +229,10 @@ TEST(Properties, OptionsInteger) {
   }
 }
 
-TEST(Properties, OptionsFloat) {
+TEST(Properties, OptionsReal) {
 
   dip::DIP d;
-  d.add_string("foo float = 2.34");
+  d.add_string("foo real = 2.34");
   d.add_string("  !options [1,2.34,5.6e7]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
@@ -248,7 +248,7 @@ TEST(Properties, OptionsFloat) {
 
   // validate if node value is in options
   d = dip::DIP();
-  d.add_string("foo float = 2");
+  d.add_string("foo real = 2");
   d.add_string("  !options [1,2.34,5.6e7]");
   try {
     d.parse();

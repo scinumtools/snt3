@@ -49,19 +49,19 @@ namespace snt::val {
         arr[i] = static_cast<uint64_t>(this->value[i]);
       return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape);
     }
-    case DataType::Float32: {
+    case DataType::Real32: {
       std::vector<float> arr(this->value.size());
       for (size_t i = 0; i < this->value.size(); i++)
         arr[i] = static_cast<float>(this->value[i]);
       return std::make_unique<ArrayValue<float>>(arr, this->shape);
     }
-    case DataType::Float64: {
+    case DataType::Real64: {
       std::vector<double> arr(this->value.size());
       for (size_t i = 0; i < this->value.size(); i++)
         arr[i] = static_cast<double>(this->value[i]);
       return std::make_unique<ArrayValue<double>>(arr, this->shape);
     }
-    case DataType::Float128: {
+    case DataType::Real128: {
       std::vector<long double> arr(this->value.size());
       for (size_t i = 0; i < this->value.size(); i++)
         arr[i] = static_cast<long double>(this->value[i]);

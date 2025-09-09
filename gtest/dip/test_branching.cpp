@@ -11,9 +11,9 @@ TEST_F(Branching, FirstCase) {
   d.add_string("@case true");
   d.add_string("  age int = 30");
   d.add_string("@case false");
-  d.add_string("  height float = 180");
+  d.add_string("  height real = 180");
   d.add_string("@else");
-  d.add_string("  weight float = 80");
+  d.add_string("  weight real = 80");
   d.add_string("@end");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
@@ -28,9 +28,9 @@ TEST_F(Branching, SecondCase) {
   d.add_string("@case false");
   d.add_string("  age int = 30");
   d.add_string("@case true");
-  d.add_string("  height float = 180");
+  d.add_string("  height real = 180");
   d.add_string("@else");
-  d.add_string("  weight float = 80");
+  d.add_string("  weight real = 80");
   d.add_string("@end");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
@@ -45,9 +45,9 @@ TEST_F(Branching, FirstAndSecondCase) {
   d.add_string("@case true");
   d.add_string("  age int = 30");
   d.add_string("@case true");
-  d.add_string("  height float = 180");
+  d.add_string("  height real = 180");
   d.add_string("@else");
-  d.add_string("  weight float = 80");
+  d.add_string("  weight real = 80");
   d.add_string("@end");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
@@ -61,9 +61,9 @@ TEST_F(Branching, ElseCase) {
   d.add_string("@case false");
   d.add_string("  age int = 30");
   d.add_string("@case false");
-  d.add_string("  height float = 180");
+  d.add_string("  height real = 180");
   d.add_string("@else");
-  d.add_string("  weight float = 80");
+  d.add_string("  weight real = 80");
   d.add_string("@end");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
@@ -77,12 +77,12 @@ TEST_F(Branching, ConsecutiveBranches) {
   d.add_string("@case true");
   d.add_string("  age int = 30");
   d.add_string("@else");
-  d.add_string("  weight float = 80");
+  d.add_string("  weight real = 80");
   d.add_string("@end");
   d.add_string("@case false");
   d.add_string("  age int = 30");
   d.add_string("@else");
-  d.add_string("  weight float = 80");
+  d.add_string("  weight real = 80");
   d.add_string("@end");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
@@ -100,15 +100,15 @@ TEST_F(Branching, LowerIndentClosing) {
   d.add_string("    @case true");
   d.add_string("      age int = 15");
   d.add_string("    @else");
-  d.add_string("      weight float = 40");
+  d.add_string("      weight real = 40");
   d.add_string("  @case true");
   d.add_string("    age int = 30");
   d.add_string("  @else");
-  d.add_string("    weight float = 80");
+  d.add_string("    weight real = 80");
   d.add_string("@case false");
   d.add_string("  age int = 30");
   d.add_string("@else");
-  d.add_string("  weight float = 80");
+  d.add_string("  weight real = 80");
   d.add_string("@end");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 3);
@@ -128,18 +128,18 @@ TEST_F(Branching, NestedBranches) {
   d.add_string("    @case true");
   d.add_string("      age int = 30"); // this is taken
   d.add_string("    @else");
-  d.add_string("      weight float = 80");
+  d.add_string("      weight real = 80");
   d.add_string("  @else");
-  d.add_string("    weight float = 40");
+  d.add_string("    weight real = 40");
   d.add_string("  @end");
   d.add_string("@case false");
   d.add_string("  @case true");
   d.add_string("    age int = 30"); // this should be ignored
   d.add_string("  @else");
-  d.add_string("    weight float = 80");
+  d.add_string("    weight real = 80");
   d.add_string("@else");
   d.add_string("  @case true");
-  d.add_string("    weight float = 40"); // this is taken
+  d.add_string("    weight real = 40"); // this is taken
   d.add_string("  @else");
   d.add_string("    human bool = true");
   d.add_string("@end");

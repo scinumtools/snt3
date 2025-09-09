@@ -4,7 +4,7 @@
 #include "snt/dip/dip.h"
 #include "snt/dip/environment.h"
 #include "snt/dip/nodes/node_boolean.h"
-#include "snt/dip/nodes/node_float.h"
+#include "snt/dip/nodes/node_real.h"
 #include "snt/dip/nodes/node_integer.h"
 #include "snt/dip/nodes/node_string.h"
 #include "snt/dip/solvers/solver_logical.h"

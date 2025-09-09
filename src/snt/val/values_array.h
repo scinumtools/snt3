@@ -62,11 +62,11 @@ namespace snt::val {
       } else if constexpr (std::is_same_v<T, uint64_t>) {
         return DataType::Integer64_U;
       } else if constexpr (std::is_same_v<T, float>) {
-        return DataType::Float32;
+        return DataType::Real32;
       } else if constexpr (std::is_same_v<T, double>) {
-        return DataType::Float64;
+        return DataType::Real64;
       } else if constexpr (std::is_same_v<T, long double>) {
-        return DataType::Float128;
+        return DataType::Real128;
       } else if constexpr (std::is_same_v<T, std::string>) {
         return DataType::String;
       } else {
