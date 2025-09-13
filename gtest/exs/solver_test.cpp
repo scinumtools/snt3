@@ -114,8 +114,8 @@ TEST(Solver, SolvingGroups) {
   atom = solver.solve("sqrt(16)-3");
   EXPECT_EQ(atom.to_string(), "1");
 
-  atom = solver.solve("cbrt(27)-3");
-  EXPECT_EQ(atom.to_string(), "0");
+  atom = solver.solve("cbrt(27)-2");
+  EXPECT_EQ(atom.to_string(), "1");
 
   atom = solver.solve("sin(16)-3");
   EXPECT_EQ(atom.to_string(), "-3.2879");
