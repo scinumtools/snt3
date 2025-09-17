@@ -1,6 +1,8 @@
 #ifndef DIP_NODE_VALUE_H
 #define DIP_NODE_VALUE_H
 
+#include <deque>
+
 namespace snt::dip {
 
   class ValueNode : virtual public BaseNode {
@@ -18,6 +20,7 @@ namespace snt::dip {
 
   public:
     typedef std::shared_ptr<ValueNode> PointerType;
+    typedef std::deque<BaseNode::PointerType> NodeListType;
     val::BaseValue::PointerType value;
     val::Array::StringType tags;
     bool constant;
