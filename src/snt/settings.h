@@ -12,6 +12,7 @@
 namespace snt {
 
   // Keywords
+  constexpr std::string_view KEYWORD_NONE = "none";
   constexpr std::string_view KEYWORD_TRUE = "true";
   constexpr std::string_view KEYWORD_FALSE = "false";
   constexpr std::string_view SYMBOL_ARRAY_START = "[";

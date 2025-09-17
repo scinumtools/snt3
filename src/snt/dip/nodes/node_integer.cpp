@@ -150,11 +150,13 @@ namespace snt::dip {
     }
   }
 
-  BaseNode::PointerType IntegerNode::clone(const std::string& nm) const {
+  ValueNode::PointerType IntegerNode::clone(const std::string& nm) const {
     if (value == nullptr)
       return std::make_shared<IntegerNode>(nm, value->get_dtype());
-    else
+    else if (units == nullptr)
       return std::make_shared<IntegerNode>(nm, std::move(value->clone()));
+    else
+      return std::make_shared<IntegerNode>(nm, std::move(value->clone()), std::move(units->clone()));
   }
 
 } // namespace snt::dip

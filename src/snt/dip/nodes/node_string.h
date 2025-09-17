@@ -17,10 +17,11 @@ namespace snt::dip {
     StringNode(Parser& parser)
         : BaseNode(parser, NodeDtype::String), ValueNode(val::DataType::String) {};
     BaseNode::NodeListType parse(Environment& env) override;
-    BaseNode::PointerType clone(const std::string& nm) const override;
+    ValueNode::PointerType clone(const std::string& nm) const override;
     bool set_property(PropertyType property, val::Array::StringType& values,
                       std::string& units) override;
     void validate_format() const override;
+    std::string to_string() const override;
   };
 
 } // namespace snt::dip

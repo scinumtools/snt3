@@ -57,6 +57,7 @@ namespace snt::puq {
     ArrayShape shape() const;
 #elif defined(MAGNITUDE_VALUES)
     val::Array::ShapeType shape() const;
+    PointerType clone() const;
 #endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     // quantity operations

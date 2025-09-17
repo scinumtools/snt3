@@ -107,11 +107,13 @@ namespace snt::dip {
     }
   }
 
-  BaseNode::PointerType RealNode::clone(const std::string& nm) const {
+  ValueNode::PointerType RealNode::clone(const std::string& nm) const {
     if (value == nullptr)
       return std::make_shared<RealNode>(nm, value->get_dtype());
-    else
+    else if (units == nullptr)
       return std::make_shared<RealNode>(nm, std::move(value->clone()));
+    else
+      return std::make_shared<RealNode>(nm, std::move(value->clone()), std::move(units->clone()));
   }
 
 } // namespace snt::dip

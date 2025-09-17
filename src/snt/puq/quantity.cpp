@@ -188,6 +188,13 @@ namespace snt::puq {
   val::Array::ShapeType Quantity::shape() const {
     return value.shape();
   }
+
+  Quantity::PointerType Quantity::clone() const {
+    if (value.magnitude.error)
+      return std::make_unique<Quantity>(value.magnitude.value->clone(), value.magnitude.error->clone(), value.baseunits.baseunits, stype);
+    else
+      return std::make_unique<Quantity>(value.magnitude.value->clone(), value.baseunits.baseunits, stype);
+  }
 #endif
 
   // strings and streams

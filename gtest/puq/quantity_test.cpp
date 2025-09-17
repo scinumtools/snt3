@@ -333,3 +333,14 @@ TEST(Quantity, RebaseUnits) {
   q = q.rebase_dimensions();
   EXPECT_EQ(q.to_string(), "2.20967e-31*kph-1*s2");
 }
+
+#if defined(MAGNITUDE_VALUES)
+
+TEST(Quantity, Cloning) {
+
+  puq::Quantity q("23*cm*m2*kg*mg");
+  puq::Quantity::PointerType r = q.clone();
+  EXPECT_EQ(q.to_string(), "23*cm*m2*kg*mg");
+
+}
+#endif

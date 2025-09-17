@@ -25,5 +25,14 @@ namespace snt::dip {
       }
     }
   }
+  
+  std::string QuantityNode::to_string() const {
+    std::stringstream ss;
+    ss << value->to_string();
+    if (units)
+      ss << " " << units->to_string();
+    return ss.str();
+  }
 
+  
 } // namespace snt::dip

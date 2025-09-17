@@ -26,10 +26,8 @@ namespace snt::puq {
 
   typedef std::vector<BaseUnit> BaseUnitsList;
   class BaseUnits {
-  private:
-    BaseUnitsList baseunits;
-
   public:
+    BaseUnitsList baseunits;
     BaseUnits() {}
     BaseUnits(const std::string& s);
     BaseUnits(const BaseUnitsList& bu) : baseunits(bu) {}

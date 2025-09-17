@@ -105,7 +105,7 @@ namespace snt::dip {
         close_branch();
         return;
       } else {
-        std::cout << cases.size() << " " << path_old << " " << path_new << '\n';
+        //std::cout << cases.size() << " " << path_old << " " << path_new << '\n';
         throw std::runtime_error("Invalid condition type:  " + node->line.code);
       }
       // determine branch part and ID

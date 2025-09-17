@@ -116,3 +116,32 @@ TEST(ParseScalars, StringValue) {
   EXPECT_EQ(vnode->value->to_string(), "'bar'");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
 }
+
+TEST(ParseScalars, Cloning) {
+
+  dip::DIP d;
+  d.add_string("jerk bool = true");
+  d.add_string("snap int = 3 cm");
+  d.add_string("crackle real = 1.23 J");
+  d.add_string("pop str = 'foo'");
+  dip::Environment env = d.parse();
+
+  dip::ValueNode::PointerType clone;
+  
+  dip::ValueNode::PointerType jerk = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
+  clone = jerk->clone("clone");
+  EXPECT_EQ(clone->to_string(), "true");
+  
+  dip::ValueNode::PointerType snap = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(1));
+  clone = snap->clone("clone");
+  EXPECT_EQ(clone->to_string(), "3 cm");
+  
+  dip::ValueNode::PointerType crackle = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(2));
+  clone = crackle->clone("clone");
+  EXPECT_EQ(clone->to_string(), "1.23 J");
+  
+  dip::ValueNode::PointerType pop = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(3));  
+  clone = pop->clone("clone");
+  EXPECT_EQ(clone->to_string(), "'foo'");
+  
+}

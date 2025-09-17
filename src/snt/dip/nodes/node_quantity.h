@@ -11,7 +11,9 @@ namespace snt::dip {
     typedef std::shared_ptr<QuantityNode> PointerType;
     puq::Quantity::PointerType units;
     void set_units(puq::Quantity::PointerType units_input = nullptr);
+    QuantityNode(puq::Quantity::PointerType unt = nullptr): units(std::move(unt)) {};
     virtual ~QuantityNode() = default;
+    std::string to_string() const override;
   };
 
 } // namespace snt::dip

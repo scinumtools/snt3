@@ -35,9 +35,10 @@ namespace snt::dip {
                                            const val::Array::ShapeType& shape);
     void set_value(val::BaseValue::PointerType value_input = nullptr);
     void modify_value(const BaseNode::PointerType& node, Environment& env);
-    virtual BaseNode::PointerType clone(const std::string& nm) const = 0;
+    virtual ValueNode::PointerType clone(const std::string& nm) const = 0;
     virtual bool set_property(PropertyType property, val::Array::StringType& values,
                               std::string& units) override;
+    virtual std::string to_string() const = 0;
     void validate_constant() const;
     void validate_definition() const;
     void validate_condition() const;

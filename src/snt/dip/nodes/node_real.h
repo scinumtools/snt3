@@ -17,9 +17,11 @@ namespace snt::dip {
         : BaseNode(NodeDtype::Real), ValueNode(nm, vdt) {};
     RealNode(const std::string& nm, val::BaseValue::PointerType val)
         : BaseNode(NodeDtype::Real), ValueNode(nm, std::move(val)) {};
+    RealNode(const std::string& nm, val::BaseValue::PointerType val, puq::Quantity::PointerType quant)
+        : BaseNode(NodeDtype::Real), ValueNode(nm, std::move(val)), QuantityNode(std::move(quant)) {};
     RealNode(Parser& parser);
     BaseNode::NodeListType parse(Environment& env) override;
-    BaseNode::PointerType clone(const std::string& nm) const override;
+    ValueNode::PointerType clone(const std::string& nm) const override;
   };
 
 } // namespace snt::dip

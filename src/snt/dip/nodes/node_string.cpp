@@ -56,7 +56,7 @@ namespace snt::dip {
     return std::make_unique<val::ArrayValue<std::string>>(value_inputs, shape);
   }
 
-  BaseNode::PointerType StringNode::clone(const std::string& nm) const {
+  ValueNode::PointerType StringNode::clone(const std::string& nm) const {
     if (value == nullptr)
       return std::make_shared<StringNode>(nm, nullptr);
     else
@@ -88,4 +88,8 @@ namespace snt::dip {
     }
   }
 
+  std::string StringNode::to_string() const {
+    return value->to_string();
+  }
+  
 } // namespace snt::dip

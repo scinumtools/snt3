@@ -76,7 +76,7 @@ namespace snt::dip {
     return std::make_unique<val::ArrayValue<bool>>(bool_values, shape);
   }
 
-  BaseNode::PointerType BooleanNode::clone(const std::string& nm) const {
+  ValueNode::PointerType BooleanNode::clone(const std::string& nm) const {
     if (value == nullptr)
       return std::make_shared<BooleanNode>(nm, nullptr);
     else
@@ -89,4 +89,8 @@ namespace snt::dip {
                                line.code);
   }
 
+  std::string BooleanNode::to_string() const {
+    return value->to_string();
+  }
+    
 } // namespace snt::dip
