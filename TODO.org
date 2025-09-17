@@ -4,6 +4,7 @@
 - add template solver to dip
 - include pybind11 to dip and puq
 - create sphix documentation
+- change node list in puq environment to NodeValue instead of NodeBase, so that value can be printed out using to_string()
   
 ** Low priority
 - improve error handling strategy in whole snt
