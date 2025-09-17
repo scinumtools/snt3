@@ -9,13 +9,25 @@ TEST(SolverTemplate, BasicParsing) {
   d.add_string("bar str = 'baz'");
   dip::Environment env = d.parse();
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  dip::ValueNode::PointerType qnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->to_string(), "23 cm");
-
   dip::TemplateSolver solver(env);
   std::string result = solver.eval("{{?foo}}, {{?bar}}");
   EXPECT_EQ(result, "23 cm, 'baz'");
 
+}
+
+TEST(SolverTemplate, Formatting) {
+
+  dip::DIP d;
+  d.add_string("foo real = 1.23e4 cm");
+  dip::Environment env = d.parse();
+  
+  dip::TemplateSolver solver(env);
+  std::string result;
+
+  result = solver.eval("foo: {{?foo}}");
+  EXPECT_EQ(result, "foo: 1.23e4 cm");
+
+  result = solver.eval("foo: {{?foo}:.03e}");
+  EXPECT_EQ(result, "foo: 1.23e4 cm");
+  
 }

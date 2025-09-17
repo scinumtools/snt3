@@ -19,9 +19,7 @@ namespace snt::dip {
 	  if (parser.part_reference()) {
 	    parser.part_slice();
 	    parser.part_units();
-	    /*
-	    //parser.part_format();
-	    */
+	    parser.part_format();
 	    BaseNode::NodeListType nodes = environment->request_nodes(parser.value_raw.at(0), RequestType::Reference);
 	    BaseNode::PointerType node = nodes.front();
 	    ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);

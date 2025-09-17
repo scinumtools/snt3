@@ -1,6 +1,8 @@
 #ifndef DIP_PARSER_H
 #define DIP_PARSER_H
 
+#include <array>
+
 namespace snt::dip {
 
   class Parser : public Node {
@@ -11,6 +13,7 @@ namespace snt::dip {
   public:
     std::string code; // in Python this was 'ccode', the original 'code' is now in the 'line' struct
     std::string comment;
+    std::array<std::string,3> formatting;
     Parser(const Line& l) : Node(l), code(l.code) {};
     static void encode_escape_symbols(std::string& str);
     static void decode_escape_symbols(std::string& str);
@@ -34,6 +37,7 @@ namespace snt::dip {
     bool part_keyword(const bool required = true);
     bool part_value();
     bool part_slice();
+    bool part_format();
     bool part_units();
     bool part_comment();
     bool part_delimiter(const char symbol, const bool required = true);

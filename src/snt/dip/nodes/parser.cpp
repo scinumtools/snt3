@@ -398,6 +398,17 @@ namespace snt::dip {
     return false;
   }
 
+  bool Parser::part_format() {
+    std::regex pattern("^:([0-9]*)(?:[.]([0-9]+))?([sdfeb]+)"); //^\\[([0-9:,]*)\\]");
+    std::smatch matchResult;
+    if (std::regex_search(code, matchResult, pattern)) {
+      formatting = {matchResult[1].str(), matchResult[2].str(), matchResult[3].str()};
+      strip(matchResult[0].str());
+      return true;
+    }
+    return false;
+  }  
+
   bool Parser::part_units() {
     // In numerical expressions starting signs +-*/ have to be explicitely excluded
     std::regex pattern1("^[ ]+([^#= ]+)");
