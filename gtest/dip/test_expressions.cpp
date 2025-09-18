@@ -39,10 +39,10 @@ TEST(Expressions, Numerical) {
   // define scalar
   dip::DIP d;
   d.add_string("foo int = ('3 + 4 / sqrt( 4 )')");
-  d.add_string("bar real = ('1.23 - log( 0.43 * 3. ) ')");
-  d.add_string("jerk real = 4.234");
+  d.add_string("bar float = ('1.23 - log( 0.43 * 3. ) ')");
+  d.add_string("jerk float = 4.234");
   d.add_string("snap int = 2");
-  d.add_string("pop real = ('{?jerk} + {?snap}')");
+  d.add_string("pop float = ('{?jerk} + {?snap}')");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 5);
 

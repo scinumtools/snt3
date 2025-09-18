@@ -13,15 +13,15 @@ namespace snt::val {
       {DataType::Integer16_U, "uint16"},
       {DataType::Integer32_U, "uint32"},
       {DataType::Integer64_U, "uint64"},
-      {DataType::Real32, "real32"},
-      {DataType::Real64, "real64"},
-      {DataType::Real128, "real128"},
-      {DataType::RealX, "realx"},
+      {DataType::Float32, "float32"},
+      {DataType::Float64, "float64"},
+      {DataType::Float128, "float128"},
+      {DataType::FloatX, "floatx"},
 
       {DataType::Integer, "int"},
       {DataType::Integer_S, "sint"},
       {DataType::Integer_U, "uint"},
-      {DataType::Real, "real"},
+      {DataType::Float, "float"},
   };
 
 }

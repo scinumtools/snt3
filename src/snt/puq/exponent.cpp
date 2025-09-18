@@ -45,27 +45,27 @@ namespace snt::puq {
   }
 
   bool Exponent::operator==(const Exponent& e) const {
-    return to_real() == e.to_real();
+    return to_float() == e.to_float();
   }
 
   bool Exponent::operator!=(const Exponent& e) const {
-    return to_real() != e.to_real();
+    return to_float() != e.to_float();
   }
 
   bool Exponent::operator==(const EXPONENT_INT_PRECISION& e) const {
-    return to_real() == e;
+    return to_float() == e;
   }
 
   bool Exponent::operator!=(const EXPONENT_INT_PRECISION& e) const {
-    return to_real() != e;
+    return to_float() != e;
   }
 
-  bool Exponent::operator==(const EXPONENT_REAL_PRECISION& e) const {
-    return to_real() == e;
+  bool Exponent::operator==(const EXPONENT_FLOAT_PRECISION& e) const {
+    return to_float() == e;
   }
 
-  bool Exponent::operator!=(const EXPONENT_REAL_PRECISION& e) const {
-    return to_real() != e;
+  bool Exponent::operator!=(const EXPONENT_FLOAT_PRECISION& e) const {
+    return to_float() != e;
   }
 
   std::ostream& operator<<(std::ostream& os, const Exponent& e) {
@@ -74,17 +74,17 @@ namespace snt::puq {
   }
 
   /*
-   *  Convert rational exponents to real numbers
+   *  Convert rational exponents to float numbers
    */
-  EXPONENT_REAL_PRECISION Exponent::to_real() const {
-    return (EXPONENT_REAL_PRECISION)numerator / (EXPONENT_REAL_PRECISION)denominator;
+  EXPONENT_FLOAT_PRECISION Exponent::to_float() const {
+    return (EXPONENT_FLOAT_PRECISION)numerator / (EXPONENT_FLOAT_PRECISION)denominator;
   }
 
   /*
-   *  Cast as a real number
+   *  Cast as a float number
    */
-  Exponent::operator EXPONENT_REAL_PRECISION() const {
-    return to_real();
+  Exponent::operator EXPONENT_FLOAT_PRECISION() const {
+    return to_float();
   }
 
   /*

@@ -165,7 +165,7 @@ namespace snt::dip {
 
   bool Parser::part_type(const bool required) {
     constexpr auto pstr =
-        ce_concat<70>("^[ ]+(u|)(", KEYWORD_BOOLEAN, "|", KEYWORD_INTEGER, "|", KEYWORD_REAL, "|",
+        ce_concat<70>("^[ ]+(u|)(", KEYWORD_BOOLEAN, "|", KEYWORD_INTEGER, "|", KEYWORD_FLOAT, "|",
                       KEYWORD_STRING, "|table)(16|32|64|128|x|)");
     std::regex pattern(pstr.data());
     std::smatch matchResult;
@@ -209,16 +209,16 @@ namespace snt::dip {
       value_origin = ValueOrigin::String;
       return true;
     }
-    // Check Real
+    // Check Float
     bool has_digits = false;
     while (i < trimmed.size() && std::isdigit(trimmed[i])) {
       ++i;
       has_digits = true;
     }
-    bool is_real = false;
+    bool is_float = false;
     if (i < trimmed.size() && trimmed[i] == '.') {
       ++i;
-      is_real = true;
+      is_float = true;
       while (i < trimmed.size() && std::isdigit(trimmed[i])) {
         ++i;
         has_digits = true;
@@ -234,13 +234,13 @@ namespace snt::dip {
         exp_digits = true;
       }
       if (exp_digits && i == trimmed.size()) {
-        dtype_raw = {"", std::string(KEYWORD_REAL), ""};
+        dtype_raw = {"", std::string(KEYWORD_FLOAT), ""};
         value_raw.push_back(trimmed);
         value_origin = ValueOrigin::String;
         return true;
       }
-    } else if (is_real && has_digits && i == trimmed.size()) {
-      dtype_raw = {"", std::string(KEYWORD_REAL), ""};
+    } else if (is_float && has_digits && i == trimmed.size()) {
+      dtype_raw = {"", std::string(KEYWORD_FLOAT), ""};
       value_raw.push_back(trimmed);
       value_origin = ValueOrigin::String;
       return true;

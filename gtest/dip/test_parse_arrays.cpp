@@ -40,23 +40,23 @@ TEST(ParseArrays, IntegerValue) {
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
 }
 
-TEST(ParseArrays, RealValue) {
+TEST(ParseArrays, FloatValue) {
 
   dip::DIP d;
-  d.add_string("foo real[2,3] = [[1,2.2,3.3e3],[-4,-5.5,-6.6e6]]");
+  d.add_string("foo float[2,3] = [[1,2.2,3.3e3],[-4,-5.5,-6.6e6]]");
   dip::Environment env = d.parse();
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->value_raw, val::Array::StringType({"1", "2.2", "3.3e3", "-4", "-5.5", "-6.6e6"}));
   EXPECT_EQ(node->value_shape, val::Array::ShapeType({2, 3}));
-  EXPECT_EQ(node->dtype, dip::NodeDtype::Real);
+  EXPECT_EQ(node->dtype, dip::NodeDtype::Float);
   EXPECT_EQ(node->indent, 0);
   EXPECT_EQ(node->name, "foo");
   EXPECT_EQ(node->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
   EXPECT_EQ(vnode->value->to_string(), "[[1, 2.2, 3.3e3], [-4, -5.5, -6.6e6]]");
-  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Real64);
+  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Float64);
 }
 
 TEST(ParseArrays, StringValue) {

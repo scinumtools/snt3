@@ -2,12 +2,12 @@
 
 namespace snt::nostd {
 
-  MAGNITUDE_PRECISION pow(const MAGNITUDE_PRECISION& m, const EXPONENT_REAL_PRECISION& e) {
+  MAGNITUDE_PRECISION pow(const MAGNITUDE_PRECISION& m, const EXPONENT_FLOAT_PRECISION& e) {
     return std::pow(m, e);
   }
 
 #if defined(MAGNITUDE_ARRAYS)
-  Array pow(const Array& a, const EXPONENT_REAL_PRECISION& e) {
+  Array pow(const Array& a, const EXPONENT_FLOAT_PRECISION& e) {
     ArrayValue av(a.size());
     for (int i = 0; i < a.size(); i++) {
       av[i] = std::pow(a[i], e);
@@ -27,7 +27,7 @@ namespace snt::nostd {
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-  puq::Magnitude pow(const puq::Magnitude& m, const EXPONENT_REAL_PRECISION& e) {
+  puq::Magnitude pow(const puq::Magnitude& m, const EXPONENT_FLOAT_PRECISION& e) {
 #ifdef MAGNITUDE_VALUES
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
     if (m.error) {

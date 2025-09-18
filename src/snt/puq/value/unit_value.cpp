@@ -224,7 +224,7 @@ namespace snt::puq {
 #if defined(MAGNITUDE_ERRORS) || defined(MAGNITUDE_ARRAYS) || defined(MAGNITUDE_VALUES)
     magnitude.pow(e);
 #else
-    magnitude = std::pow(magnitude, (EXPONENT_REAL_PRECISION)e);
+    magnitude = std::pow(magnitude, (EXPONENT_FLOAT_PRECISION)e);
 #endif
     baseunits *= e;
   }

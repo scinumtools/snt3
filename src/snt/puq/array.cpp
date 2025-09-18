@@ -210,7 +210,7 @@ namespace snt::puq {
 
   void Array::pow(const EXPONENT_TYPE& e) {
     for (int i = 0; i < size(); i++)
-      value[i] = std::pow(value[i], (EXPONENT_REAL_PRECISION)e);
+      value[i] = std::pow(value[i], (EXPONENT_FLOAT_PRECISION)e);
   }
 
 #ifdef EXPONENT_FRACTIONS

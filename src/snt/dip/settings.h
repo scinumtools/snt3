@@ -41,7 +41,7 @@ namespace snt::dip {
   // Keywords
   constexpr std::string_view KEYWORD_BOOLEAN = "bool";
   constexpr std::string_view KEYWORD_INTEGER = "int";
-  constexpr std::string_view KEYWORD_REAL = "real";
+  constexpr std::string_view KEYWORD_FLOAT = "float";
   constexpr std::string_view KEYWORD_STRING = "str";
 
   constexpr std::string_view KEYWORD_CONSTANT = "constant";
@@ -106,7 +106,7 @@ namespace snt::dip {
     Import, // node structure
     Boolean,
     Integer,
-    Real,
+    Float,
     String,
     Table,
     Modification, // data handling

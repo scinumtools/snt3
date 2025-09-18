@@ -70,7 +70,7 @@ TEST(Definitions, Integer) {
   EXPECT_EQ(val->get_shape(), sh);
 }
 
-TEST(Definitions, Real) {
+TEST(Definitions, Float) {
 
   std::vector<double> arr = {0, 2, 33.3, 45e2, 3.4e2, -100023e3};
   val::Array::ShapeType sh = {2, 3};
@@ -78,17 +78,17 @@ TEST(Definitions, Real) {
 
   val = std::make_unique<val::ArrayValue<double>>(-1.234e+05);
   EXPECT_EQ(val->to_string(), "-1.234e5");
-  EXPECT_EQ(val->get_dtype(), val::DataType::Real64);
+  EXPECT_EQ(val->get_dtype(), val::DataType::Float64);
   EXPECT_EQ(val->get_shape(), val::Array::ShapeType({1}));
 
   val = std::make_unique<val::ArrayValue<double>>(arr);
   EXPECT_EQ(val->to_string(), "[0, 2, 33.3, 4.5e3, 340, -1e8]");
-  EXPECT_EQ(val->get_dtype(), val::DataType::Real64);
+  EXPECT_EQ(val->get_dtype(), val::DataType::Float64);
   EXPECT_EQ(val->get_shape(), val::Array::ShapeType({6}));
 
   val = std::make_unique<val::ArrayValue<double>>(arr, sh);
   EXPECT_EQ(val->to_string(), "[[0, 2, 33.3], [4.5e3, 340, -1e8]]");
-  EXPECT_EQ(val->get_dtype(), val::DataType::Real64);
+  EXPECT_EQ(val->get_dtype(), val::DataType::Float64);
   EXPECT_EQ(val->get_shape(), sh);
 }
 

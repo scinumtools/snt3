@@ -173,7 +173,7 @@ TEST(Math, Ceil) {
   EXPECT_EQ(val2->to_string(), "[13, 3, 2]");
 }
 
-TEST(Math, IntRealConversion) {
+TEST(Math, IntFloatConversion) {
 
   std::vector<int> arr1 = {2, 3, 4};
   std::vector<double> arr2 = {3.4, 4.5, 5.6};
@@ -182,19 +182,19 @@ TEST(Math, IntRealConversion) {
   val::BaseValue::PointerType val3;
 
   // addition
-  val3 = val1->math_add(val2.get()); // int + real = real
+  val3 = val1->math_add(val2.get()); // int + float = float
   EXPECT_EQ(val3->to_string(), "[5.4, 7.5, 9.6]");
   // WARNING: the same is not possible for +=, -=, *= and \=, becaue the type of self is not mutable
 
   // substitution
-  val3 = val1->math_sub(val2.get()); // int - real = real
+  val3 = val1->math_sub(val2.get()); // int - float = float
   EXPECT_EQ(val3->to_string(), "[-1.4, -1.5, -1.6]");
 
   // multiplication
-  val3 = val1->math_mul(val2.get()); // int * real = real
+  val3 = val1->math_mul(val2.get()); // int * float = float
   EXPECT_EQ(val3->to_string(), "[6.8, 13.5, 22.4]");
 
   // division
-  val3 = val1->math_div(val2.get()); // int / real = real
+  val3 = val1->math_div(val2.get()); // int / float = float
   EXPECT_EQ(val3->to_string(), "[0.5882, 0.6667, 0.7143]");
 }

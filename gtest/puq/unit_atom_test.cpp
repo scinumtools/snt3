@@ -11,7 +11,7 @@ TEST(UnitAtom, FromString) {
   EXPECT_EQ(value.to_string(), "2"); // integer numbers
 
   value = puq::UnitAtom::from_string("1.23");
-  EXPECT_EQ(value.to_string(), "1.23"); // real numbers
+  EXPECT_EQ(value.to_string(), "1.23"); // float numbers
 
   value = puq::UnitAtom::from_string("1.23e6");
   EXPECT_EQ(value.to_string(), "1.23e6"); // numbers in scientific notation

@@ -14,7 +14,7 @@ TEST(Casting, Boolean) {
   bval = val->cast_as(val::DataType::Integer32);
   EXPECT_EQ(bval->to_string(), "[1, 0, 0, 1, 1]");
 
-  bval = val->cast_as(val::DataType::Real64);
+  bval = val->cast_as(val::DataType::Float64);
   EXPECT_EQ(bval->to_string(), "[1, 0, 0, 1, 1]");
 
   bval = val->cast_as(val::DataType::String);
@@ -37,7 +37,7 @@ TEST(Casting, Character) {
   bval = val->cast_as(val::DataType::Integer32);
   EXPECT_EQ(bval->to_string(), "[65, 66, 67, 68, 69]");
 
-  bval = val->cast_as(val::DataType::Real64);
+  bval = val->cast_as(val::DataType::Float64);
   EXPECT_EQ(bval->to_string(), "[65, 66, 67, 68, 69]");
 
   bval = val->cast_as(val::DataType::String);
@@ -59,7 +59,7 @@ TEST(Casting, Integer) {
   bval = val->cast_as(val::DataType::Integer32);
   EXPECT_EQ(bval->to_string(), "[0, 2, 33, 45, 100023]");
 
-  bval = val->cast_as(val::DataType::Real64);
+  bval = val->cast_as(val::DataType::Float64);
   EXPECT_EQ(bval->to_string(), "[0, 2, 33, 45, 1e5]");
 
   bval = val->cast_as(val::DataType::String);
@@ -70,7 +70,7 @@ TEST(Casting, Integer) {
   EXPECT_EQ(bval->to_string(), "B");
 }
 
-TEST(Casting, Real) {
+TEST(Casting, Float) {
 
   std::vector<double> arr = {0, 2, 33.3, 45e2, -100023e3};
   val::BaseValue::PointerType val = std::make_unique<val::ArrayValue<double>>(arr);
@@ -82,7 +82,7 @@ TEST(Casting, Real) {
   bval = val->cast_as(val::DataType::Integer32);
   EXPECT_EQ(bval->to_string(), "[0, 2, 33, 4500, -100023000]");
 
-  bval = val->cast_as(val::DataType::Real64);
+  bval = val->cast_as(val::DataType::Float64);
   EXPECT_EQ(bval->to_string(), "[0, 2, 33.3, 4.5e3, -1e8]");
 
   bval = val->cast_as(val::DataType::String);
@@ -111,7 +111,7 @@ TEST(Casting, String) {
 
   arr = {"1", "1.2", "1.23e4"};
   val = std::make_unique<val::ArrayValue<std::string>>(arr);
-  bval = val->cast_as(val::DataType::Real64);
+  bval = val->cast_as(val::DataType::Float64);
   EXPECT_EQ(bval->to_string(), "[1, 1.2, 1.23e4]");
 
   arr = {"a", "b", "c"};

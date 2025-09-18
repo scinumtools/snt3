@@ -49,27 +49,27 @@ TEST(ParseScalars, IntegerValue) {
   EXPECT_EQ(vnode->value->to_string(), "23456789");
 }
 
-TEST(ParseScalars, RealValue) {
+TEST(ParseScalars, FloatValue) {
 
   dip::DIP d;
-  d.add_string("foo1 real = 23");
-  d.add_string("foo2 real = 23.456");
-  d.add_string("foo3 real = 23.456e7");
-  d.add_string("foo4 real32 = 23.123456789123456789");
-  d.add_string("foo5 real64 = 23.123456789123456789");
-  if (dip::RealNode::max_real_size == 128)
-    d.add_string("foo6 real128 = 23.123456789123456789");
+  d.add_string("foo1 float = 23");
+  d.add_string("foo2 float = 23.456");
+  d.add_string("foo3 float = 23.456e7");
+  d.add_string("foo4 float32 = 23.123456789123456789");
+  d.add_string("foo5 float64 = 23.123456789123456789");
+  if (dip::FloatNode::max_float_size == 128)
+    d.add_string("foo6 float128 = 23.123456789123456789");
   dip::Environment env = d.parse();
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->value_raw.at(0), "23");
-  EXPECT_EQ(node->dtype, dip::NodeDtype::Real);
+  EXPECT_EQ(node->dtype, dip::NodeDtype::Float);
   EXPECT_EQ(node->indent, 0);
   EXPECT_EQ(node->name, "foo1");
 
   dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
   EXPECT_EQ(vnode->value->to_string(), "23");
-  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Real64);
+  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Float64);
 
   node = env.nodes.at(1);
   EXPECT_EQ(node->value_raw.at(0), "23.456");
@@ -92,9 +92,9 @@ TEST(ParseScalars, RealValue) {
   EXPECT_EQ(vnode->value->to_string(fmt), "23.12345678912");
 
   // TODO: This case needs more testing on other platforms
-  if (dip::RealNode::max_real_size == 128) {
+  if (dip::FloatNode::max_float_size == 128) {
     vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(5));
-    std::cout << dip::RealNode::max_real_size << '\n';
+    std::cout << dip::FloatNode::max_float_size << '\n';
     fmt.valuePrecision = 18;
     EXPECT_EQ(vnode->value->to_string(fmt), "23.1234567891234568");
   }
@@ -122,7 +122,7 @@ TEST(ParseScalars, Cloning) {
   dip::DIP d;
   d.add_string("jerk bool = true");
   d.add_string("snap int = 3 cm");
-  d.add_string("crackle real = 1.23 J");
+  d.add_string("crackle float = 1.23 J");
   d.add_string("pop str = 'foo'");
   dip::Environment env = d.parse();
 

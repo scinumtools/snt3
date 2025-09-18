@@ -80,7 +80,7 @@ TEST(SolverNumerical, GroupOperators) {
 TEST(SolverNumerical, Injections) {
 
   dip::DIP d;
-  d.add_string("foo real = 4.52");
+  d.add_string("foo float = 4.52");
   d.add_string("bar int = 3");
   dip::Environment env = d.parse();
 

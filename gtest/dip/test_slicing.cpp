@@ -57,11 +57,11 @@ TEST(ValueSlicing, OpenRangesInteger) {
   EXPECT_EQ(vnode->value->to_string(), "[1, 2, 3]");
 }
 
-TEST(ValueSlicing, OpenRangesReal) {
+TEST(ValueSlicing, OpenRangesFloat) {
 
   dip::DIP d;
-  d.add_string("snap real[2,3] = [[1,2,3], [4,5,6]]");
-  d.add_string("crackle real[3] = {?snap}[0,:]");
+  d.add_string("snap float[2,3] = [[1,2,3], [4,5,6]]");
+  d.add_string("crackle float[3] = {?snap}[0,:]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
 

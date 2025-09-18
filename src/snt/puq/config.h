@@ -3,7 +3,7 @@
  */
 #define MAGNITUDE_PRECISION double
 #define EXPONENT_INT_PRECISION int
-#define EXPONENT_REAL_PRECISION double
+#define EXPONENT_FLOAT_PRECISION double
 
 /*
  *  Modules

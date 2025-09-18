@@ -26,10 +26,10 @@ namespace snt::puq {
     bool operator!=(const Exponent& e) const;
     bool operator==(const EXPONENT_INT_PRECISION& e) const;
     bool operator!=(const EXPONENT_INT_PRECISION& e) const;
-    bool operator==(const EXPONENT_REAL_PRECISION& e) const;
-    bool operator!=(const EXPONENT_REAL_PRECISION& e) const;
-    EXPONENT_REAL_PRECISION to_real() const;
-    operator EXPONENT_REAL_PRECISION() const;
+    bool operator==(const EXPONENT_FLOAT_PRECISION& e) const;
+    bool operator!=(const EXPONENT_FLOAT_PRECISION& e) const;
+    EXPONENT_FLOAT_PRECISION to_float() const;
+    operator EXPONENT_FLOAT_PRECISION() const;
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     void reduce();
   };

@@ -5,7 +5,7 @@ using namespace snt;
 TEST(SolverTemplate, BasicParsing) {
 
   dip::DIP d;
-  d.add_string("foo real = 23 cm");
+  d.add_string("foo float = 23 cm");
   d.add_string("bar str = 'baz'");
   dip::Environment env = d.parse();
 
@@ -18,7 +18,7 @@ TEST(SolverTemplate, BasicParsing) {
 TEST(SolverTemplate, Formatting) {
 
   dip::DIP d;
-  d.add_string("foo real = 1.23e4 cm");
+  d.add_string("foo float = 1.23e4 cm");
   dip::Environment env = d.parse();
   
   dip::TemplateSolver solver(env);

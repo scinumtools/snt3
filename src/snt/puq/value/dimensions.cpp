@@ -37,9 +37,9 @@ namespace snt::puq {
     std::string multiply = format.multiply_symbol();
     std::stringstream ss;
     if (format.base == Format::Base::MKS) {
-      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e-3, (EXPONENT_REAL_PRECISION)physical[1]));
+      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e-3, (EXPONENT_FLOAT_PRECISION)physical[1]));
     } else if (format.base == Format::Base::CGS) {
-      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e2, (EXPONENT_REAL_PRECISION)physical[0]));
+      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e2, (EXPONENT_FLOAT_PRECISION)physical[0]));
     }
 #if defined(MAGNITUDE_ERRORS)
 #if defined(MAGNITUDE_VALUES)

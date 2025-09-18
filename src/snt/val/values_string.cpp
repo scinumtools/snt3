@@ -77,19 +77,19 @@ namespace snt::val {
       }
       return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape);
     }
-    case DataType::Real32: {
+    case DataType::Float32: {
       std::vector<float> arr(this->value.size());
       for (size_t i = 0; i < this->value.size(); i++)
         arr[i] = std::stof(this->value[i]);
       return std::make_unique<ArrayValue<float>>(arr, this->shape);
     }
-    case DataType::Real64: {
+    case DataType::Float64: {
       std::vector<double> arr(this->value.size());
       for (size_t i = 0; i < this->value.size(); i++)
         arr[i] = std::stod(this->value[i]);
       return std::make_unique<ArrayValue<double>>(arr, this->shape);
     }
-    case DataType::Real128: {
+    case DataType::Float128: {
       std::vector<long double> arr(this->value.size());
       for (size_t i = 0; i < this->value.size(); i++)
         arr[i] = std::stold(this->value[i]);

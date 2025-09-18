@@ -53,7 +53,7 @@ protected:
     return {
         std::make_shared<dip::BooleanNode>("scalar_bool", std::move(val_bool)),
         std::make_shared<dip::IntegerNode>("scalar_int", std::move(val_int)),
-        std::make_shared<dip::RealNode>("scalar_double", std::move(val_double)),
+        std::make_shared<dip::FloatNode>("scalar_double", std::move(val_double)),
         std::make_shared<dip::StringNode>("scalar_str", std::move(val_string)),
     };
   }
@@ -75,7 +75,7 @@ protected:
     return {
         std::make_shared<dip::BooleanNode>("array_bool", std::move(val_bool)),
         std::make_shared<dip::IntegerNode>("array_int", std::move(val_int)),
-        std::make_shared<dip::RealNode>("array_double", std::move(val_double)),
+        std::make_shared<dip::FloatNode>("array_double", std::move(val_double)),
         std::make_shared<dip::StringNode>("array_str", std::move(val_string)),
     };
   }

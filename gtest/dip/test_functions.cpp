@@ -53,14 +53,14 @@ TEST_F(Functions, IntegerValues) {
   EXPECT_EQ(vnode->value->to_string(), "[[2, 3], [4, 5]]");
 }
 
-TEST_F(Functions, RealValues) {
+TEST_F(Functions, FloatValues) {
 
   // define scalar
   dip::DIP d;
   d.add_value_function("scalar_value", FixtureFunctions::get_scalar_double);
   d.add_value_function("array_value", FixtureFunctions::get_array_double);
-  d.add_string("foo real = (scalar_value)");
-  d.add_string("bar real[3] = (array_value)");
+  d.add_string("foo float = (scalar_value)");
+  d.add_string("bar float[3] = (array_value)");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
 

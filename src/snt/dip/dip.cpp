@@ -111,7 +111,7 @@ namespace snt::dip {
 
   // Set nodes that can preceeding an option
   static constexpr std::array<NodeDtype, 13> preceeding_nodes = {
-      NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Real, NodeDtype::String, NodeDtype::Table};
+      NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table};
 
   Environment DIP::parse() {
     NodeList queue = parse_code_nodes(lines);
@@ -124,7 +124,7 @@ namespace snt::dip {
         if (std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
             preceeding_nodes.end())
           throw std::runtime_error(
-              "Only value nodes (bool, int, real and str) can have properties: " +
+              "Only value nodes (bool, int, float and str) can have properties: " +
               pnode->line.code);
         if (previous_node->indent >= pnode->indent)
           throw std::runtime_error("The indent '" + std::to_string(pnode->indent) +

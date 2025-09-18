@@ -5,7 +5,7 @@
 #include "nodes/node_boolean.h"
 #include "nodes/node_case.h"
 #include "nodes/node_empty.h"
-#include "nodes/node_real.h"
+#include "nodes/node_float.h"
 #include "nodes/node_group.h"
 #include "nodes/node_import.h"
 #include "nodes/node_integer.h"
@@ -117,7 +117,7 @@ namespace snt::dip {
       if (node == nullptr)
         node = IntegerNode::is_node(parser);
       if (node == nullptr)
-        node = RealNode::is_node(parser);
+        node = FloatNode::is_node(parser);
       if (node == nullptr)
         node = StringNode::is_node(parser);
       if (node == nullptr)
@@ -166,7 +166,7 @@ namespace snt::dip {
       if (node == nullptr)
         node = IntegerNode::is_node(parser);
       if (node == nullptr)
-        node = RealNode::is_node(parser);
+        node = FloatNode::is_node(parser);
       if (node == nullptr)
         node = StringNode::is_node(parser);
       // make sure that everything was parsed
