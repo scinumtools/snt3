@@ -20,7 +20,7 @@ namespace snt::dip {
     BaseNode::NodeListType parse(Environment& env) override;
     ValueNode::PointerType clone(const std::string& nm) const override;
     void validate_options() const override;
-    std::string to_string() const override;
+    std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override;
   };
 
 } // namespace snt::dip

@@ -14,7 +14,7 @@ TEST(StringFormat, Integers) {
   EXPECT_EQ(snt::number_to_string(int(1234567890), int(12345)), "1234567(12)e3");
   EXPECT_EQ(snt::number_to_string(int(-123), int(2)), "-123(2)"); // negative values
 
-  snt::NumberFormatType prec;
+  snt::StringFormatType prec;
   prec.errorPrecision = 5;
   EXPECT_EQ(snt::number_to_string(int(1234567890), int(12345), prec), "1234567890(12345)"); // extened precision
   EXPECT_EQ(snt::number_to_string(int(123), int(2), prec), "123(2)");                       // higher precision
@@ -36,7 +36,7 @@ TEST(StringFormat, Floats) {
   EXPECT_EQ(snt::number_to_string(double(12.67), double(0.02)), "1.2670(20)e1");
   EXPECT_EQ(snt::number_to_string(double(12345.67), double(2.23)), "1.23457(22)e4");
 
-  snt::NumberFormatType prec;
+  snt::StringFormatType prec;
   prec.errorPrecision = 3;
   EXPECT_EQ(snt::number_to_string(double(12.3456), double(0.123), prec), "1.2346(123)e1"); // higher precision
 }

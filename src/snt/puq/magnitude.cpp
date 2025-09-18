@@ -79,7 +79,7 @@ namespace snt::puq {
    */
   std::string Magnitude::to_string(const UnitFormat& format) const {
     std::stringstream ss;
-    snt::NumberFormatType fmt;
+    snt::StringFormatType fmt;
     fmt.valuePrecision = format.precision;
     if (error == nullptr || !format.display_error()) {
       ss << value->to_string(fmt);

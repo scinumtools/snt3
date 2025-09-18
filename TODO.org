@@ -7,6 +7,7 @@
 - change node list in puq environment to NodeValue instead of NodeBase, so that value can be printed out using to_string()
   
 ** Low priority
+- currently there are no uncertaintes in dip values, only in units/Quantities. In the future this should also be possible for values in general.
 - improve error handling strategy in whole snt
 - start writing doxygen documentation comments
 - installation using homebrew

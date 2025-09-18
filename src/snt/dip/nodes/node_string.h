@@ -21,7 +21,7 @@ namespace snt::dip {
     bool set_property(PropertyType property, val::Array::StringType& values,
                       std::string& units) override;
     void validate_format() const override;
-    std::string to_string() const override;
+    std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override;
   };
 
 } // namespace snt::dip

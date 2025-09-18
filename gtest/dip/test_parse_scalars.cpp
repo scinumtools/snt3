@@ -81,7 +81,7 @@ TEST(ParseScalars, FloatValue) {
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
   EXPECT_EQ(vnode->value->to_string(), "2.346e8");
 
-  snt::NumberFormatType fmt;
+  snt::StringFormatType fmt;
 
   vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(3));
   fmt.valuePrecision = 7;

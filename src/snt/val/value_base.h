@@ -36,7 +36,7 @@ namespace snt::val {
     BaseValue(DataType dt, Array::ShapeType sh) : dtype(dt), shape(sh) {};
     virtual ~BaseValue() = default;
     virtual void print() = 0;
-    virtual std::string to_string(const snt::NumberFormatType& format = snt::NumberFormatType()) const = 0;
+    virtual std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const = 0;
     Array::ShapeType get_shape() const { return shape; };
     DataType get_dtype() const { return dtype; };
     virtual size_t get_size() const = 0;

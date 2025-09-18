@@ -41,7 +41,7 @@ namespace snt::dip {
     virtual ValueNode::PointerType clone(const std::string& nm) const = 0;
     virtual bool set_property(PropertyType property, val::Array::StringType& values,
                               std::string& units) override;
-    virtual std::string to_string() const = 0;
+    virtual std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const = 0;
     void validate_constant() const;
     void validate_definition() const;
     void validate_condition() const;

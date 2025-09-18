@@ -19,37 +19,56 @@ namespace snt {
   constexpr std::string_view SYMBOL_ARRAY_END = "]";
   constexpr std::string_view SYMBOL_ARRAY_DELIMITER = ", ";
 
-  struct NumberFormatType {
+  struct StringFormatType {
+    char specifier = 'g';
     int valuePrecision = 4;
     int errorPrecision = 2;
     int thresholdScientific = 3;
+    bool paddingZeros = false;
+    int paddingSize = 0;
   };
 
   // Implementation for value only
   
   template <typename T>
-  std::string number_to_string(const T& value, const NumberFormatType& format = NumberFormatType()) {
+  std::string number_to_string(const T& value, const StringFormatType& format = StringFormatType()) {
     std::stringstream ss;
     if (value == 0) {
       return "0";
     } else {
-      int exp_val = std::floor(std::log10(std::fabs(value))); // rounded exponent
-      if (std::abs(exp_val) >= format.thresholdScientific && std::is_floating_point_v<T>) {
-        // if exponent is a floating point number larger or equal than thresholdScientific
-        T val_mag = value * std::pow(10, -exp_val); // magnitude without x10^ part
-        ss << std::defaultfloat << std::setprecision(format.valuePrecision) << val_mag;
-        if (exp_val)
-          ss << 'e' << exp_val;
-      } else {
-        // in all other cases
-        ss << std::defaultfloat << std::setprecision(format.valuePrecision) << value;
+      ss << std::setprecision(format.valuePrecision);
+      if (format.specifier=='e') {
+	ss << std::scientific << value;
+      } else if (format.specifier=='f') {
+	ss << std::fixed << value;
+      } else if (format.specifier=='g') {
+	ss << std::defaultfloat;
+	int exp_val = std::floor(std::log10(std::fabs(value))); // rounded exponent
+	if (std::abs(exp_val) >= format.thresholdScientific && std::is_floating_point_v<T>) {
+	  // if exponent is a floating point number larger or equal than thresholdScientific
+	  T val_mag = value * std::pow(10, -exp_val); // magnitude without x10^ part
+	  ss << val_mag;
+	  if (exp_val)
+	    ss << 'e' << exp_val;
+	} else {
+	  // in all other cases
+	  ss << value;
+	}
       }
+    }
+    if (format.paddingSize) {
+      std::string str = ss.str();
+      ss.str("");
+      ss.clear(); 
+      if (format.paddingZeros)
+	ss << std::setfill('0');
+      ss << std::setw(format.paddingSize) << str;
     }
     return ss.str();
   }
 
   template <typename T>
-  std::string _array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const NumberFormatType& format, size_t& offset, size_t dim) {
+  std::string _array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const StringFormatType& format, size_t& offset, size_t dim) {
     std::ostringstream oss;
     if (value.size() > 1)
       oss << SYMBOL_ARRAY_START;
@@ -79,7 +98,7 @@ namespace snt {
   }
 
   template <typename T>
-  std::string array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const NumberFormatType& format = NumberFormatType()) {
+  std::string array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const StringFormatType& format = StringFormatType()) {
     size_t offset = 0;
     return _array_to_string(value, shape, format, offset, 0);
   }
@@ -87,7 +106,7 @@ namespace snt {
   // Implementation for value/error 
   
   template <typename T>
-  std::string number_to_string(const T& value, const T& error, const NumberFormatType& format = NumberFormatType()) {
+  std::string number_to_string(const T& value, const T& error, const StringFormatType& format = StringFormatType()) {
     std::stringstream ss;
     if (value == 0 && error == 0) {
       return "0";
@@ -97,28 +116,39 @@ namespace snt {
       int exp_val = std::floor(std::log10(std::fabs(value))); // rounded exponent
       int exp_err = std::floor(std::log10(std::fabs(error)));
       int exp_diff = std::abs(exp_val - exp_err) - 1;
+      ss << std::fixed;
       if (std::is_integral_v<T>) {
         int prec = (exp_err) ? format.errorPrecision - 1 : 0;
         int val_err = static_cast<int>(error * std::pow(10, -exp_err + prec));
         T val_mag = value * std::pow(10, -exp_err + prec); // magnitude without x10^ part
-        ss << std::fixed << std::setprecision(exp_diff) << val_mag;
+	ss << std::setprecision(exp_diff);
+	ss << val_mag;
         ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";
         if (exp_err - prec)
           ss << 'e' << exp_err - prec;
       } else if (std::is_floating_point_v<T>) {
         int val_err = static_cast<int>(std::round(error * std::pow(10, -exp_err - 1 + format.errorPrecision)));
         T val_mag = value * std::pow(10, -exp_val); // magnitude without x10^ part
-        ss << std::fixed << std::setprecision(exp_diff + format.errorPrecision) << val_mag;
+	ss << std::setprecision(exp_diff + format.errorPrecision);
+	ss << val_mag;
         ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";
         if (exp_val)
           ss << 'e' << exp_val;
       }
     }
+    if (format.paddingSize) {
+      std::string str = ss.str();
+      ss.str("");
+      ss.clear(); 
+      if (format.paddingZeros)
+	ss << std::setfill('0');
+      ss << std::setw(format.paddingSize) << str;
+    }
     return ss.str();
   }
   
   template <typename T>
-  std::string _array_to_string(const std::vector<T>& value, const std::vector<T>& error, const std::vector<size_t>& shape, const NumberFormatType& format, size_t& offset, size_t dim) {
+  std::string _array_to_string(const std::vector<T>& value, const std::vector<T>& error, const std::vector<size_t>& shape, const StringFormatType& format, size_t& offset, size_t dim) {
     std::ostringstream oss;
     if (value.size() > 1)
       oss << SYMBOL_ARRAY_START;
@@ -142,7 +172,7 @@ namespace snt {
   }
 
   template <typename T>
-  std::string array_to_string(const std::vector<T>& value, const std::vector<T>& error, const std::vector<size_t>& shape, const NumberFormatType& format = NumberFormatType()) {
+  std::string array_to_string(const std::vector<T>& value, const std::vector<T>& error, const std::vector<size_t>& shape, const StringFormatType& format = StringFormatType()) {
     size_t offset = 0;
     return _array_to_string(value, error, shape, format, offset, 0);
   }

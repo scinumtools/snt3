@@ -78,7 +78,7 @@ namespace snt::val {
     friend std::ostream& operator<<(std::ostream& os, const ArrayValue<T>& val) {
       return os << val.to_string();
     };
-    std::string to_string(const snt::NumberFormatType& format = snt::NumberFormatType()) const override {
+    std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override {
       return snt::array_to_string(value, shape, format);
     };
     /*

@@ -15,7 +15,7 @@ namespace snt::nostd {
   }
 #elif defined(MAGNITUDE_VALUES)
   std::string to_string(val::BaseValue::PointerType value, int precision) {
-    snt::NumberFormatType fmt;
+    snt::StringFormatType fmt;
     fmt.valuePrecision = precision;
     return value->to_string(fmt);
   }

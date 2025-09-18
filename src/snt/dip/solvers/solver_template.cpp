@@ -20,10 +20,31 @@ namespace snt::dip {
 	    parser.part_slice();
 	    parser.part_units();
 	    parser.part_format();
+	    
+	    // request node from the environment and extract its value
 	    BaseNode::NodeListType nodes = environment->request_nodes(parser.value_raw.at(0), RequestType::Reference);
 	    BaseNode::PointerType node = nodes.front();
 	    ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
-	    ss << vnode->to_string();
+	    
+	    // set value string format
+	    snt::StringFormatType format;
+	    if (!parser.formatting[0].empty()) {
+	      if (parser.formatting[0][0]=='0')
+		format.paddingZeros = true;
+	      format.paddingSize = std::stoi(parser.formatting[0]);
+	    }
+	    if (!parser.formatting[2].empty()) {
+	      std::cout << parser.formatting[2][0] << std::endl;
+	      format.specifier = parser.formatting[2][0];
+	    }
+	    if (!parser.formatting[1].empty()) {
+	      format.valuePrecision = std::stoi(parser.formatting[1]);
+	      if (format.specifier=='g')
+		format.valuePrecision += 1;
+	    }
+	    
+	    // parse value as string
+	    ss << vnode->to_string(format);
 	    expression = parser.code;
 	  }
 	} else if (c==SIGN_REFERENCE_CLOSE) {

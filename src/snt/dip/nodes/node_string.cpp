@@ -88,7 +88,7 @@ namespace snt::dip {
     }
   }
 
-  std::string StringNode::to_string() const {
+  std::string StringNode::to_string(const snt::StringFormatType& format) const {
     return value->to_string();
   }
   

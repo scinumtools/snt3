@@ -13,7 +13,7 @@ namespace snt::dip {
     void set_units(puq::Quantity::PointerType units_input = nullptr);
     QuantityNode(puq::Quantity::PointerType unt = nullptr): units(std::move(unt)) {};
     virtual ~QuantityNode() = default;
-    std::string to_string() const override;
+    std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override;
   };
 
 } // namespace snt::dip

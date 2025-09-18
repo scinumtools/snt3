@@ -89,7 +89,7 @@ namespace snt::dip {
                                line.code);
   }
 
-  std::string BooleanNode::to_string() const {
+  std::string BooleanNode::to_string(const snt::StringFormatType& format) const {
     return value->to_string();
   }
     
