@@ -1,4 +1,5 @@
 #include "snt/settings.h"
+#include "snt/string_format.h"
 
 #include <gtest/gtest.h>
 #include <string>
@@ -71,4 +72,19 @@ TEST(StringFormat, StringArrays) {
   std::vector<std::string> value = {"a", "b", "c", "d", "e", "f"};
   std::vector<size_t> shape = {2, 3};
   EXPECT_EQ(snt::array_to_string(value, shape), "[['a', 'b', 'c'], ['d', 'e', 'f']]");
+}
+
+TEST(StringFormat, ToString) {
+
+  snt::StringFormatType format;
+  std::vector<std::string> value = {"foo"};
+  std::vector<size_t> shape = {1};
+
+  // test string settings
+  EXPECT_EQ(snt::array_to_string(value, shape), "'foo'");
+  format.stringQuotes = false;
+  EXPECT_EQ(snt::array_to_string(value, shape, format), "foo");
+
+  // TODO: implement more format tests
+  
 }

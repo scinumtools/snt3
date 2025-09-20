@@ -2,6 +2,7 @@
 #define VAL_BASE_VALUE_H
 
 #include "../settings.h"
+#include "../string_format.h"
 #include "array.h"
 #include "datatypes.h"
 

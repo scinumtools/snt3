@@ -19,6 +19,7 @@ namespace snt::dip {
 	  if (parser.part_reference()) {
 	    parser.part_slice();
 	    parser.part_units();
+	    parser.part_slice();
 	    parser.part_format();
 	    
 	    // request node from the environment and extract its value
@@ -26,15 +27,19 @@ namespace snt::dip {
 	    BaseNode::PointerType node = nodes.front();
 	    ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
 	    
+	    // apply slicing
+	    if (!parser.value_slice.empty())
+	      vnode->value = vnode->value->slice(parser.value_slice);
+	    
 	    // set value string format
 	    snt::StringFormatType format;
+	    format.stringQuotes = false;
 	    if (!parser.formatting[0].empty()) {
 	      if (parser.formatting[0][0]=='0')
 		format.paddingZeros = true;
 	      format.paddingSize = std::stoi(parser.formatting[0]);
 	    }
 	    if (!parser.formatting[2].empty()) {
-	      std::cout << parser.formatting[2][0] << std::endl;
 	      format.specifier = parser.formatting[2][0];
 	    }
 	    if (!parser.formatting[1].empty()) {
