@@ -91,7 +91,7 @@ namespace snt::puq {
       if (munit.second.allowed_prefixes.size() > 0) {
         if (std::find(munit.second.allowed_prefixes.begin(), munit.second.allowed_prefixes.end(), bu.prefix) == munit.second.allowed_prefixes.end()) {
           std::stringstream ss;
-          ss << "Given prefix is not allowed in unit: " + expr_orig << '\n';
+          ss << "Given prefix is not allowed in unit system " + UnitSystem::Data->SystemAbbrev + ": " + expr_orig << '\n';
           ss << "Allowed prefixes are:";
           for (auto& prefix : munit.second.allowed_prefixes) {
             ss << " " << prefix;

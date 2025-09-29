@@ -38,9 +38,31 @@ namespace snt::val {
     static BaseValue::PointerType pointer_from_vector(const std::vector<T>& val) {
       return std::make_unique<val::ArrayValue<T>>(std::vector<T>(val));
     };
+
+    /**
+     * @brief Print object as a string
+     */
     void print() override { std::cout << to_string() << std::endl; };
+    
+    /**
+     * @brief Get copy of the array values
+     */
     std::vector<T> get_values() const { return value; };
+
+    /**
+     * @brief Get copy of a particular value
+     * @param index Index of a value
+     */
     T get_value(const size_t index) const { return value.at(index); };
+    
+    /**
+     * @brief Get pointer to array values
+     */
+    T* get_data() {return value.data(); };
+
+    /**
+     * @brief Get size of an array
+     */
     size_t get_size() const override { return value.size(); };
 
   protected:

@@ -1,7 +1,7 @@
 * SCINUMTOOLS TODO
 
 ** High priority
-- add template solver to dip
+- modify Quantity, so that it receives actual objects of values and not their pointers
 - include pybind11 to dip and puq
 - create sphix documentation
 - change node list in puq environment to NodeValue instead of NodeBase, so that value can be printed out using to_string()
@@ -16,8 +16,10 @@
 - implement materials
 - substitute includes in header by forward declarations
 - implement variable precision in int/float
+- consolide string format and add gtests
   
 * Task DONE
+- add template solver to dip
 - rename "float" to "real"
 - change puq magnitude array format to the snt::array_to_string
 - implement arrays into puq magnitude to_string()

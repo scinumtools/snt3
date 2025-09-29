@@ -14,6 +14,9 @@ set(CMAKE_INSTALL_BINDIR bin)
 set(CMAKE_INSTALL_LIBDIR lib)
 set(CMAKE_INSTALL_INCLUDEDIR include)
 
+# limit error number
+add_compile_options(-ferror-limit=3)
+
 # set environmental variables
 file(READ "settings.env" ENV_CONTENTS)
 string(REGEX MATCH "CODE_VERSION=([^\n\r]*)" _ ${ENV_CONTENTS})
@@ -32,6 +35,12 @@ option(COMPILE_VAL "Compile VAL module" ON)
 option(COMPILE_PUQ "Compile PUQ module" ON)
 option(COMPILE_DIP "Compile DIP module" ON)
 option(COMPILE_MAT "Compile MAT module" ON)
+option(COMPILE_TESTS_SNT "Compile SNT module tests" ON)
+option(COMPILE_TESTS_EXS "Compile EXS module tests" ON)
+option(COMPILE_TESTS_VAL "Compile VAL module tests" ON)
+option(COMPILE_TESTS_PUQ "Compile PUQ module tests" ON)
+option(COMPILE_TESTS_DIP "Compile DIP module tests" ON)
+option(COMPILE_TESTS_MAT "Compile MAT module tests" ON)
 
 set(COMPILE_PUQ_MAGNITUDE "value" CACHE STRING "Set the type of magnitude in PUQ module (array, value)")
 if(COMPILE_PUQ_MAGNITUDE STREQUAL "array")
@@ -79,6 +88,7 @@ endif()
 add_subdirectory(src)        # build dip-cpp library
 add_subdirectory(exec)       # build executables
 add_subdirectory(gtest)      # build gtest executable
+add_subdirectory(pybind)     # build Python bindings
 
 # create include directory
 ##########################
