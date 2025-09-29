@@ -16,7 +16,9 @@ jobs:
     - name: Install and build GTest
       run: |
         sudo apt-get update
-        sudo apt-get install -y libgtest-dev cmake
+        sudo apt-get install -y cmake
+        sudo apt-get install -y libgtest-dev
+        sudo apt-get install -y pybind11-dev
         cd /usr/src/gtest
         sudo cmake .
         sudo make
