@@ -1,4 +1,5 @@
 #include "calculator_atom.h"
+
 #include "../exceptions.h"
 
 #include <algorithm>

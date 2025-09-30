@@ -341,6 +341,5 @@ TEST(Quantity, Cloning) {
   puq::Quantity q("23*cm*m2*kg*mg");
   puq::Quantity::PointerType r = q.clone();
   EXPECT_EQ(q.to_string(), "23*cm*m2*kg*mg");
-
 }
 #endif

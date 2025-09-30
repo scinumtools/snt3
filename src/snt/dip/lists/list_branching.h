@@ -3,8 +3,8 @@
 
 #include "../nodes/node_case.h"
 
-#include <string>
 #include <map>
+#include <string>
 
 namespace snt::dip {
 

@@ -1,4 +1,5 @@
 #include "solver_logical.h"
+
 #include "../nodes/node_boolean.h"
 #include "../nodes/node_float.h"
 #include "../nodes/node_integer.h"

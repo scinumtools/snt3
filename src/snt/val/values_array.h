@@ -43,7 +43,7 @@ namespace snt::val {
      * @brief Print object as a string
      */
     void print() override { std::cout << to_string() << std::endl; };
-    
+
     /**
      * @brief Get copy of the array values
      */
@@ -54,11 +54,11 @@ namespace snt::val {
      * @param index Index of a value
      */
     T get_value(const size_t index) const { return value.at(index); };
-    
+
     /**
      * @brief Get pointer to array values
      */
-    T* get_data() {return value.data(); };
+    T* get_data() { return value.data(); };
 
     /**
      * @brief Get size of an array

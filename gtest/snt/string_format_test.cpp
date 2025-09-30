@@ -86,5 +86,4 @@ TEST(StringFormat, ToString) {
   EXPECT_EQ(snt::array_to_string(value, shape, format), "foo");
 
   // TODO: implement more format tests
-  
 }

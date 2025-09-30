@@ -92,5 +92,5 @@ namespace snt::dip {
   std::string BooleanNode::to_string(const snt::StringFormatType& format) const {
     return value->to_string();
   }
-    
+
 } // namespace snt::dip

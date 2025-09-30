@@ -407,7 +407,7 @@ namespace snt::dip {
       return true;
     }
     return false;
-  }  
+  }
 
   bool Parser::part_units() {
     // In numerical expressions starting signs +-*/ have to be explicitely excluded

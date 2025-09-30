@@ -1,8 +1,8 @@
 #ifndef VAL_VALUES_STRING_H
 #define VAL_VALUES_STRING_H
 
-#include "values_array.h"
 #include "array.h"
+#include "values_array.h"
 
 #include <typeinfo>
 

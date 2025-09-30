@@ -15,7 +15,7 @@ namespace snt::puq {
       return message.c_str();
     }
   };
-  
+
   class UnitValueExcept : public std::exception {
   private:
     std::string message;

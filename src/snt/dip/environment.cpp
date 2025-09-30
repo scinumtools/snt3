@@ -39,9 +39,9 @@ namespace snt::dip {
         if (vnode and vnode->name == node_path) {
           new_value = vnode->value->clone();
           QuantityNode::PointerType qnode = std::dynamic_pointer_cast<QuantityNode>(node);
-          if (qnode && to_unit!=KEYWORD_NONE) {
-	    // NOTE: If unit conversion is not required, the to_unit should be set to "none".
-	    //       This is usefull if we want to simply get a reference node as it is.
+          if (qnode && to_unit != KEYWORD_NONE) {
+            // NOTE: If unit conversion is not required, the to_unit should be set to "none".
+            //       This is usefull if we want to simply get a reference node as it is.
             if (qnode->units == nullptr and !to_unit.empty())
               throw std::runtime_error(
                   "Trying to convert nondimensional quantity into '" + qnode->units_raw +
@@ -79,9 +79,9 @@ namespace snt::dip {
     }
     case RequestType::Reference: {
       auto [source_name, node_path] = parse_request(request);
-      std::string node_path_child = (!node_path.empty()) ? node_path+std::string(1, SIGN_SEPARATOR) : node_path;
+      std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
       const NodeList& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
-      size_t p = node_pool.size();  // parent node index
+      size_t p = node_pool.size(); // parent node index
       for (size_t i = 0; i < node_pool.size(); i++) {
         ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node_pool.at(i));
         if (vnode and vnode->name.rfind(node_path_child, 0) == 0 and
@@ -89,19 +89,19 @@ namespace snt::dip {
           std::string new_name = vnode->name.substr(node_path_child.size(), vnode->name.size());
           new_nodes.push_back(vnode->clone(new_name));
         } else if (vnode and vnode->name == node_path) {
-	  p = i;
-	}
+          p = i;
+        }
       }
       // if node does not have childs, but exists, return it
-      if (new_nodes.empty() && p<node_pool.size()) {
+      if (new_nodes.empty() && p < node_pool.size()) {
         ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node_pool.at(p));
-	size_t pos = node_path.find_last_of('.');
-	if (pos != std::string::npos) {
-	  std::string new_name = vnode->name.substr(pos, node_path.size());
-	  new_nodes.push_back(vnode->clone(new_name));
-	} else {
-	  new_nodes.push_back(vnode->clone(node_path));
-	}
+        size_t pos = node_path.find_last_of('.');
+        if (pos != std::string::npos) {
+          std::string new_name = vnode->name.substr(pos, node_path.size());
+          new_nodes.push_back(vnode->clone(new_name));
+        } else {
+          new_nodes.push_back(vnode->clone(node_path));
+        }
       }
       break;
     }

@@ -13,10 +13,10 @@ NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
 NUM_MAKE_CORES=$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release
 ENABLE_CLANG_TIDY=OFF
-CMAKE_FLAGS="-DCOMPILE_EXS=ON -DCOMPILE_TESTS_EXS=Off "
-CMAKE_FLAGS+="-DCOMPILE_VAL=ON -DCOMPILE_TESTS_VAL=Off "
+CMAKE_FLAGS="-DCOMPILE_EXS=ON -DCOMPILE_TESTS_EXS=ON "
+CMAKE_FLAGS+="-DCOMPILE_VAL=ON -DCOMPILE_TESTS_VAL=ON "
 CMAKE_FLAGS+="-DCOMPILE_PUQ=ON -DCOMPILE_TESTS_PUQ=ON -DCOMPILE_PUQ_MAGNITUDE=value "
-CMAKE_FLAGS+="-DCOMPILE_DIP=Off -DCOMPILE_TESTS_DIP=ON "
+CMAKE_FLAGS+="-DCOMPILE_DIP=ON -DCOMPILE_TESTS_DIP=ON "
 OS="$(uname -s)"
 
 function clean_code {
@@ -96,6 +96,7 @@ function setup_clang_format {
     find src -name '*.cpp' -o -name '*.h' | xargs clang-format -i
     find exec -name '*.cpp' -o -name '*.h' | xargs clang-format -i
     find gtest -name '*.cpp' -o -name '*.h' | xargs clang-format -i
+    find pybind -name '*.cpp' -o -name '*.h' | xargs clang-format -i
 }
 
 function show_help {

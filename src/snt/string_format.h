@@ -16,7 +16,7 @@ namespace snt {
   };
 
   // Implementation for value only
-  
+
   template <typename T>
   std::string number_to_string(const T& value, const StringFormatType& format = StringFormatType()) {
     std::stringstream ss;
@@ -24,31 +24,31 @@ namespace snt {
       return "0";
     } else {
       ss << std::setprecision(format.valuePrecision);
-      if (format.specifier=='e') {
-	ss << std::scientific << value;
-      } else if (format.specifier=='f') {
-	ss << std::fixed << value;
-      } else if (format.specifier=='g') {
-	ss << std::defaultfloat;
-	int exp_val = std::floor(std::log10(std::fabs(value))); // rounded exponent
-	if (std::abs(exp_val) >= format.thresholdScientific && std::is_floating_point_v<T>) {
-	  // if exponent is a floating point number larger or equal than thresholdScientific
-	  T val_mag = value * std::pow(10, -exp_val); // magnitude without x10^ part
-	  ss << val_mag;
-	  if (exp_val)
-	    ss << 'e' << exp_val;
-	} else {
-	  // in all other cases
-	  ss << value;
-	}
+      if (format.specifier == 'e') {
+        ss << std::scientific << value;
+      } else if (format.specifier == 'f') {
+        ss << std::fixed << value;
+      } else if (format.specifier == 'g') {
+        ss << std::defaultfloat;
+        int exp_val = std::floor(std::log10(std::fabs(value))); // rounded exponent
+        if (std::abs(exp_val) >= format.thresholdScientific && std::is_floating_point_v<T>) {
+          // if exponent is a floating point number larger or equal than thresholdScientific
+          T val_mag = value * std::pow(10, -exp_val); // magnitude without x10^ part
+          ss << val_mag;
+          if (exp_val)
+            ss << 'e' << exp_val;
+        } else {
+          // in all other cases
+          ss << value;
+        }
       }
     }
     if (format.paddingSize) {
       std::string str = ss.str();
       ss.str("");
-      ss.clear(); 
+      ss.clear();
       if (format.paddingZeros)
-	ss << std::setfill('0');
+        ss << std::setfill('0');
       ss << std::setw(format.paddingSize) << str;
     }
     return ss.str();
@@ -72,14 +72,14 @@ namespace snt {
         } else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) {
           oss << number_to_string(value[offset], format);
         } else if constexpr (std::is_same_v<T, std::string>) {
-	  if (format.stringQuotes)
-	    oss << '\'';
-	  if (format.paddingSize)
-	    oss << std::setw(format.paddingSize) << value[offset];
-	  else
-	    oss << value[offset];
-	  if (format.stringQuotes)
-	    oss << '\'';
+          if (format.stringQuotes)
+            oss << '\'';
+          if (format.paddingSize)
+            oss << std::setw(format.paddingSize) << value[offset];
+          else
+            oss << value[offset];
+          if (format.stringQuotes)
+            oss << '\'';
         } else {
           return "<unsupported_type>";
         }
@@ -97,8 +97,8 @@ namespace snt {
     return _array_to_string(value, shape, format, offset, 0);
   }
 
-  // Implementation for value/error 
-  
+  // Implementation for value/error
+
   template <typename T>
   std::string number_to_string(const T& value, const T& error, const StringFormatType& format = StringFormatType()) {
     std::stringstream ss;
@@ -115,16 +115,16 @@ namespace snt {
         int prec = (exp_err) ? format.errorPrecision - 1 : 0;
         int val_err = static_cast<int>(error * std::pow(10, -exp_err + prec));
         T val_mag = value * std::pow(10, -exp_err + prec); // magnitude without x10^ part
-	ss << std::setprecision(exp_diff);
-	ss << val_mag;
+        ss << std::setprecision(exp_diff);
+        ss << val_mag;
         ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";
         if (exp_err - prec)
           ss << 'e' << exp_err - prec;
       } else if (std::is_floating_point_v<T>) {
         int val_err = static_cast<int>(std::round(error * std::pow(10, -exp_err - 1 + format.errorPrecision)));
         T val_mag = value * std::pow(10, -exp_val); // magnitude without x10^ part
-	ss << std::setprecision(exp_diff + format.errorPrecision);
-	ss << val_mag;
+        ss << std::setprecision(exp_diff + format.errorPrecision);
+        ss << val_mag;
         ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";
         if (exp_val)
           ss << 'e' << exp_val;
@@ -133,14 +133,14 @@ namespace snt {
     if (format.paddingSize) {
       std::string str = ss.str();
       ss.str("");
-      ss.clear(); 
+      ss.clear();
       if (format.paddingZeros)
-	ss << std::setfill('0');
+        ss << std::setfill('0');
       ss << std::setw(format.paddingSize) << str;
     }
     return ss.str();
   }
-  
+
   template <typename T>
   std::string _array_to_string(const std::vector<T>& value, const std::vector<T>& error, const std::vector<size_t>& shape, const StringFormatType& format, size_t& offset, size_t dim) {
     std::ostringstream oss;
@@ -169,8 +169,8 @@ namespace snt {
   std::string array_to_string(const std::vector<T>& value, const std::vector<T>& error, const std::vector<size_t>& shape, const StringFormatType& format = StringFormatType()) {
     size_t offset = 0;
     return _array_to_string(value, error, shape, format, offset, 0);
-  }  
+  }
 
-}
+} // namespace snt
 
 #endif // SNT_STRING_FORMAT_H

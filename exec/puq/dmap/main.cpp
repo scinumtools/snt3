@@ -21,7 +21,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   val::ArrayValue<double> value(dim.numerical.value.get());
   ss << nostd::to_string(value.get_value(0), precision) + ",";
   ss << std::setfill(' ') << std::setw(25) << std::left;
-  if (dim.numerical.error==nullptr) {
+  if (dim.numerical.error == nullptr) {
     ss << nostd::to_string(0, precision) + ",";
   } else {
     val::ArrayValue<double> error(dim.numerical.error.get());
@@ -94,11 +94,11 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
       add_line(ss, unit.first, dim, unit.second.name);
 #if defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> value(dim.numerical.value.get());
-      if (dim.numerical.error==nullptr) {
-	dmap.insert({unit.first, {value.get_value(0), 0., dim.physical}});
+      if (dim.numerical.error == nullptr) {
+        dmap.insert({unit.first, {value.get_value(0), 0., dim.physical}});
       } else {
-	val::ArrayValue<double> error(dim.numerical.error.get());
-	dmap.insert({unit.first, {value.get_value(0), error.get_value(0), dim.physical}});
+        val::ArrayValue<double> error(dim.numerical.error.get());
+        dmap.insert({unit.first, {value.get_value(0), error.get_value(0), dim.physical}});
       }
 #else
       dmap.insert({unit.first, {dim.numerical.value[0], dim.numerical.error[0], dim.physical}});
@@ -125,7 +125,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
     add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first));
 #if defined(MAGNITUDE_VALUES)
     val::ArrayValue<double> value(dim.numerical.value.get());
-    if (dim.numerical.error==nullptr) {
+    if (dim.numerical.error == nullptr) {
       dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
     } else {
       val::ArrayValue<double> error(dim.numerical.error.get());
@@ -157,11 +157,11 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
       add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first) + " SI factor");
 #if defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> value(dim.numerical.value.get());
-      if (dim.numerical.error==nullptr) {
-	dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
+      if (dim.numerical.error == nullptr) {
+        dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
       } else {
-	val::ArrayValue<double> error(dim.numerical.error.get());
-	dmap.insert({symbol, {value.get_value(0), error.get_value(0), dim.physical}});
+        val::ArrayValue<double> error(dim.numerical.error.get());
+        dmap.insert({symbol, {value.get_value(0), error.get_value(0), dim.physical}});
       }
 #else
       dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.error[0], dim.physical}});

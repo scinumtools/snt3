@@ -2,9 +2,9 @@
 #define VAL_ARRAY_H
 
 #include <cstdlib>
-#include <vector>
-#include <string>
 #include <limits>
+#include <string>
+#include <vector>
 
 namespace snt::val {
 

@@ -25,7 +25,7 @@ namespace snt::dip {
       }
     }
   }
-  
+
   std::string QuantityNode::to_string(const snt::StringFormatType& format) const {
     std::stringstream ss;
     ss << value->to_string(format);
@@ -34,5 +34,4 @@ namespace snt::dip {
     return ss.str();
   }
 
-  
 } // namespace snt::dip

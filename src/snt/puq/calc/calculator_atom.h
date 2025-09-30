@@ -17,8 +17,8 @@ namespace snt::puq {
     void math_negate();
     void math_multiply(CalculatorAtom* other);
     void math_divide(CalculatorAtom* other);
-  };  
-  
-}
+  };
+
+} // namespace snt::puq
 
 #endif // PUQ_CALCULATOR_ATOM_H

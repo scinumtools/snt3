@@ -1,8 +1,8 @@
 #ifndef DIP_NODE_H
 #define DIP_NODE_H
 
-#include "../settings.h"
 #include "../../val.h"
+#include "../settings.h"
 
 namespace snt::dip {
 

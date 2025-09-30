@@ -44,7 +44,7 @@ namespace snt::puq {
       val::ArrayValue<double> value(group.atom->value.magnitude.value.get());
       nv[i] = value.get_value(0);
       if (group.atom->value.magnitude.error) {
-	hasErrors = true;
+        hasErrors = true;
         val::ArrayValue<double> error(group.atom->value.magnitude.error.get());
         ne[i] = error.get_value(0);
       }

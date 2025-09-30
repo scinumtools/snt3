@@ -40,7 +40,7 @@ namespace snt::dip {
     LogicalSolver(Environment& env);
     LogicalAtom eval(const std::string& expression);
   };
-  
-}
+
+} // namespace snt::dip
 
 #endif // DIP_SOLVER_LOGICAL_H

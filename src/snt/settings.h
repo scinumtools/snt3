@@ -18,7 +18,7 @@ namespace snt {
   constexpr std::string_view SYMBOL_ARRAY_START = "[";
   constexpr std::string_view SYMBOL_ARRAY_END = "]";
   constexpr std::string_view SYMBOL_ARRAY_DELIMITER = ", ";
-  
+
 } // namespace snt
 
 #endif // SNT_SETTINGS_H

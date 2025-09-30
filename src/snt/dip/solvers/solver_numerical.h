@@ -47,7 +47,7 @@ namespace snt::dip {
     NumericalSolver(Environment& env);
     NumericalAtom eval(const std::string& expression);
   };
-  
-}
+
+} // namespace snt::dip
 
 #endif // DIP_SOLVER_NUMERICAL_H
