@@ -15,7 +15,11 @@ set(CMAKE_INSTALL_LIBDIR lib)
 set(CMAKE_INSTALL_INCLUDEDIR include)
 
 # limit error number
-add_compile_options(-ferror-limit=3)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-ferror-limit=3)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-fmax-errors=3)
+endif()
 
 # set environmental variables
 file(READ "settings.env" ENV_CONTENTS)
