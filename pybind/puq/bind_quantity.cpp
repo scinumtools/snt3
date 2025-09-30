@@ -31,11 +31,10 @@ py::array_t<MAGNITUDE_PRECISION> array_to_numpy(puq::Array array) {
 #elif defined(MAGNITUDE_VALUE)
 
 py::array_t<MAGNITUDE_PRECISION> array_to_numpy(const val::ArrayValue<MAGNITUDE_PRECISION>& varray) {
-  py::array_t<MAGNITUDE_PRECISION> numpy(varray.get_size());
+  py::array_t<MAGNITUDE_PRECISION> numpy(varray.get_shape());
   py::buffer_info buf_info = numpy.request();
   MAGNITUDE_PRECISION* ptr = static_cast<MAGNITUDE_PRECISION*>(buf_info.ptr);
   std::memcpy(ptr, varray.get_values().data(), varray.get_size() * sizeof(MAGNITUDE_PRECISION));
-  numpy.resize(varray.get_shape());
   return numpy;
 }
 
