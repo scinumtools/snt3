@@ -21,6 +21,9 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-fmax-errors=3)
 endif()
 
+# ensure all targets (executables, static libs, shared libs) are built with -fPIC if required
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # set environmental variables
 file(READ "settings.env" ENV_CONTENTS)
 string(REGEX MATCH "CODE_VERSION=([^\n\r]*)" _ ${ENV_CONTENTS})
