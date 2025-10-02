@@ -61,12 +61,12 @@ std::variant<MAGNITUDE_PRECISION, std::vector<MAGNITUDE_PRECISION>, py::array_t<
 #endif
 }
 
-std::variant<MAGNITUDE_PRECISION, std::vector<MAGNITUDE_PRECISION>, py::array_t<MAGNITUDE_PRECISION>> quantity_get_value(puq::Quantity q, size_t index) {
+std::variant<MAGNITUDE_PRECISION, std::vector<MAGNITUDE_PRECISION>, py::array_t<MAGNITUDE_PRECISION>> quantity_get_value(const puq::Quantity& q, size_t index) {
   val::ArrayValue<MAGNITUDE_PRECISION>* otherT = dynamic_cast<val::ArrayValue<MAGNITUDE_PRECISION>*>(q.value.magnitude.value.get());
   return otherT->get_value(index);
 }
 
-std::variant<MAGNITUDE_PRECISION, std::vector<MAGNITUDE_PRECISION>, py::array_t<MAGNITUDE_PRECISION>> quantity_error(puq::Quantity q, bool numpy) {
+std::variant<MAGNITUDE_PRECISION, std::vector<MAGNITUDE_PRECISION>, py::array_t<MAGNITUDE_PRECISION>> quantity_error(const puq::Quantity& q, bool numpy) {
 #if defined(MAGNITUDE_ARRAY)
   if (numpy) {
     return array_to_numpy(q.value.magnitude.error);
@@ -196,7 +196,7 @@ PYBIND11_MODULE(scinumtools3, m) {
       .def("__exit__", &UnitSystem::exit);
 
   // Exposing calculator object
-  puq.def("Calculator", [](std::string e) -> puq::Quantity {
+  puq.def("Calculator", [](const std::string& e) -> puq::Quantity {
     auto calc = puq::Calculator();
     auto atom = calc.solve(e);
     return atom.value; }, py::arg("expression"));
@@ -226,14 +226,14 @@ PYBIND11_MODULE(scinumtools3, m) {
   /**
    * @brief Initialise Quantity with a value from numpy arrays
    */
-  q.def(py::init([](py::array_t<MAGNITUDE_PRECISION, py::array::c_style | py::array::forcecast> v,
+  q.def(py::init([](const py::array_t<MAGNITUDE_PRECISION, py::array::c_style | py::array::forcecast>& v,
                     std::string s, puq::SystemType sys) {
           py::buffer_info info = v.request();
           val::BaseValue::PointerType value = buffer_to_array(info);
 #if defined(MAGNITUDE_ARRAY)
           return puq::Quantity(value, s, sys);
 #elif defined(MAGNITUDE_VALUE)
-          return puq::Quantity(std::move(value), s, sys);
+          return puq::Quantity(std::move(value), std::move(s), sys);
 #endif
         }),
         py::arg("value"), py::arg("unit") = "", py::arg("system") = puq::SystemType::NONE);
@@ -241,9 +241,9 @@ PYBIND11_MODULE(scinumtools3, m) {
   /**
    * @brief Initialise Quantity with a value/error from numpy arrays
    */
-  q.def(py::init([](py::array_t<MAGNITUDE_PRECISION, py::array::c_style | py::array::forcecast> v,
-                    py::array_t<MAGNITUDE_PRECISION, py::array::c_style | py::array::forcecast> e,
-                    std::string s, puq::SystemType sys) {
+  q.def(py::init([](const py::array_t<MAGNITUDE_PRECISION, py::array::c_style | py::array::forcecast>& v,
+                    const py::array_t<MAGNITUDE_PRECISION, py::array::c_style | py::array::forcecast>& e,
+                    const std::string& s, puq::SystemType sys) {
           py::buffer_info v_info = v.request();
           val::BaseValue::PointerType value = buffer_to_array(v_info);
           py::buffer_info e_info = e.request();
@@ -264,9 +264,9 @@ PYBIND11_MODULE(scinumtools3, m) {
     std::vector<size_t> shape = otherT->get_shape();
     std::vector<ssize_t> strides(shape.size());
     ssize_t stride = sizeof(otherT);
-    for (ssize_t i = shape.size() - 1; i >= 0; --i) {
+    for (ssize_t i = static_cast<ssize_t>(shape.size()) - 1; i >= 0; --i) {
       strides[i] = stride;
-      stride *= shape[i];
+      stride *= static_cast<ssize_t>(shape[i]);
     }
     return py::array_t<MAGNITUDE_PRECISION>(shape, strides, otherT->get_data());
   });
@@ -329,12 +329,12 @@ PYBIND11_MODULE(scinumtools3, m) {
   /**
    * Addition of quantities
    */
-  q.def("__add__", [](const puq::Quantity& quant, py::object other) -> py::object {
+  q.def("__add__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
        val::BaseValue::PointerType varray = parseBaseValue(other);
        if (varray==nullptr)
 	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
        return py::cast(quant + std::move(varray)); }, py::is_operator());
-  q.def("__radd__", [](const puq::Quantity& quant, py::object other) -> py::object {
+  q.def("__radd__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
      val::BaseValue::PointerType varray = parseBaseValue(other);
      if (varray==nullptr)
        py::reinterpret_borrow<py::object>(Py_NotImplemented);
@@ -343,12 +343,12 @@ PYBIND11_MODULE(scinumtools3, m) {
   /**
    * Subtraction of quantities
    */
-  q.def("__sub__", [](const puq::Quantity& quant, py::object other) -> py::object {
+  q.def("__sub__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
        val::BaseValue::PointerType varray = parseBaseValue(other);
        if (varray==nullptr)
 	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
        return py::cast(quant - std::move(varray)); }, py::is_operator());
-  q.def("__rsub__", [](const puq::Quantity& quant, py::object other) -> py::object {
+  q.def("__rsub__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
      val::BaseValue::PointerType varray = parseBaseValue(other);
      if (varray==nullptr)
        py::reinterpret_borrow<py::object>(Py_NotImplemented);
@@ -357,12 +357,12 @@ PYBIND11_MODULE(scinumtools3, m) {
   /**
    * Multiplication of quantities
    */
-  q.def("__mul__", [](const puq::Quantity& quant, py::object other) -> py::object {
+  q.def("__mul__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
        val::BaseValue::PointerType varray = parseBaseValue(other);
        if (varray==nullptr)
 	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
        return py::cast(quant * std::move(varray)); }, py::is_operator());
-  q.def("__rmul__", [](const puq::Quantity& quant, py::object other) -> py::object {
+  q.def("__rmul__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
      val::BaseValue::PointerType varray = parseBaseValue(other);
      if (varray==nullptr)
        py::reinterpret_borrow<py::object>(Py_NotImplemented);
@@ -371,12 +371,12 @@ PYBIND11_MODULE(scinumtools3, m) {
   /**
    * Division of quantities
    */
-  q.def("__truediv__", [](const puq::Quantity& quant, py::object other) -> py::object {
+  q.def("__truediv__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
        val::BaseValue::PointerType varray = parseBaseValue(other);
        if (varray==nullptr)
 	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
        return py::cast(quant / std::move(varray)); }, py::is_operator());
-  q.def("__rtruediv__", [](const puq::Quantity& quant, py::object other) -> py::object {
+  q.def("__rtruediv__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
      val::BaseValue::PointerType varray = parseBaseValue(other);
      if (varray==nullptr)
        py::reinterpret_borrow<py::object>(Py_NotImplemented);
@@ -391,7 +391,7 @@ PYBIND11_MODULE(scinumtools3, m) {
   //.def(py::self * std::vector<double>())
   //.def(py::self / std::vector<double>())
 
-  q.def("__array__", [](const snt::puq::Quantity& q, py::object dtype) {
+  q.def("__array__", [](const snt::puq::Quantity& q, const py::object& dtype) {
     throw std::runtime_error("Convert explicitly: use .to_numpy() or .magnitude");
   });
 }

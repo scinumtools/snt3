@@ -1,6 +1,8 @@
 #ifndef DIP_NODE_TABLE_H
 #define DIP_NODE_TABLE_H
 
+#include "node_base.h"
+
 namespace snt::dip {
 
   class TableNode : public BaseNode {

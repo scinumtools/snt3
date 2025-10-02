@@ -1,6 +1,8 @@
 #ifndef NOSTD_POW_H
 #define NOSTD_POW_H
 
+#include "nostd.h"
+
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION pow(const MAGNITUDE_PRECISION& m, const EXPONENT_FLOAT_PRECISION& e);

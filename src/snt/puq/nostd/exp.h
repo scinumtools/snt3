@@ -1,6 +1,8 @@
 #ifndef NOSTD_EXP_H
 #define NOSTD_EXP_H
 
+#include "nostd.h"
+
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION exp(const MAGNITUDE_PRECISION& e);

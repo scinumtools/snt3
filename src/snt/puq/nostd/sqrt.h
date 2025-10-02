@@ -1,6 +1,8 @@
 #ifndef NOSTD_SQRT_H
 #define NOSTD_SQRT_H
 
+#include "nostd.h"
+
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION sqrt(const MAGNITUDE_PRECISION& m);

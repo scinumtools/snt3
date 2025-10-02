@@ -1,6 +1,8 @@
 #ifndef DIP_NODE_UNIT_H
 #define DIP_NODE_UNIT_H
 
+#include "node_base.h"
+
 namespace snt::dip {
 
   class UnitNode : public BaseNode {

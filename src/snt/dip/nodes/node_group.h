@@ -1,6 +1,8 @@
 #ifndef DIP_NODE_GROUP_H
 #define DIP_NODE_GROUP_H
 
+#include "node_base.h"
+
 namespace snt::dip {
 
   class GroupNode : public BaseNode {

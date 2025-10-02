@@ -1,6 +1,8 @@
 #ifndef NOSTD_ABS_H
 #define NOSTD_ABS_H
 
+#include "nostd.h"
+
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION abs(const MAGNITUDE_PRECISION& m);

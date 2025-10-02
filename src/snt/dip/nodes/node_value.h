@@ -1,6 +1,8 @@
 #ifndef DIP_NODE_VALUE_H
 #define DIP_NODE_VALUE_H
 
+#include "node_base.h"
+
 #include <deque>
 
 namespace snt::dip {

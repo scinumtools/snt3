@@ -1,5 +1,6 @@
 #include "node_integer.h"
 
+#include "../environment.h"
 #include "../parsers.h"
 #include "../solvers/solver_numerical.h"
 

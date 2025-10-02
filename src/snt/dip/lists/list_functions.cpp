@@ -1,5 +1,8 @@
 #include "list_functions.h"
 
+#include <stdexcept>
+#include <string>
+
 namespace snt::dip {
 
   void FunctionList::append_value(const std::string& name, ValueFunctionType func) {

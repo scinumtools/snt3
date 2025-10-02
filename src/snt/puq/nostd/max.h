@@ -1,6 +1,8 @@
 #ifndef NOSTD_MAX_H
 #define NOSTD_MAX_H
 
+#include "nostd.h"
+
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION max(const MAGNITUDE_PRECISION& m1, const MAGNITUDE_PRECISION& m2);

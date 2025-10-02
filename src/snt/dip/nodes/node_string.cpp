@@ -1,5 +1,6 @@
 #include "node_string.h"
 
+#include "../environment.h"
 #include "../parsers.h"
 
 #include <regex>

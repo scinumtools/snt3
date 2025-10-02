@@ -1,6 +1,8 @@
 #ifndef NOSTD_CBRT_H
 #define NOSTD_CBRT_H
 
+#include "nostd.h"
+
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION cbrt(const MAGNITUDE_PRECISION& m);

@@ -1,6 +1,11 @@
 #ifndef DIP_FUNCTION_LIST_H
 #define DIP_FUNCTION_LIST_H
 
+#include "../../val.h"
+#include "../nodes/node_base.h"
+
+#import <map>
+
 namespace snt::dip {
 
   class Environment;

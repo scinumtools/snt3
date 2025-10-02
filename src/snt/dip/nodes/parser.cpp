@@ -10,7 +10,7 @@
 
 namespace snt::dip {
 
-  const std::array<std::string, 3> Parser::ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
+  // constexpr std::array<std::string, 3> Parser::ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
 
   void Parser::strip(const std::string& text) {
     code = code.substr(text.length(), code.length());
@@ -25,23 +25,27 @@ namespace snt::dip {
    */
 
   void Parser::encode_escape_symbols(std::string& str) {
-    for (int i = 0; i < ESCAPE_SYMBOLS.size(); i++) {
+    std::array<std::string, 3> ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
+    for (size_t i = 0; i < ESCAPE_SYMBOLS.size(); i++) {
       std::string replace_symbol = "Z@" + std::to_string(i) + ";";
       size_t pos = 0;
-      while ((pos = str.find(ESCAPE_SYMBOLS[i], pos)) != std::string::npos) {
-        str.replace(pos, ESCAPE_SYMBOLS[i].length(), replace_symbol);
+      const std::string& symbol = ESCAPE_SYMBOLS[i];
+      while ((pos = str.find(symbol, pos)) != std::string::npos) {
+        str.replace(pos, symbol.length(), replace_symbol);
         pos += replace_symbol.length();
       }
     }
   }
 
   void Parser::decode_escape_symbols(std::string& str) {
-    for (int i = 0; i < ESCAPE_SYMBOLS.size(); i++) {
+    std::array<std::string, 3> ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
+    for (size_t i = 0; i < ESCAPE_SYMBOLS.size(); i++) {
       std::string replace_symbol = "Z@" + std::to_string(i) + ";";
       size_t pos = 0;
+      const std::string& symbol = ESCAPE_SYMBOLS[i];
       while ((pos = str.find(replace_symbol, pos)) != std::string::npos) {
-        str.replace(pos, replace_symbol.length(), ESCAPE_SYMBOLS[i]);
-        pos += ESCAPE_SYMBOLS[i].length();
+        str.replace(pos, replace_symbol.length(), symbol);
+        pos += symbol.length();
       }
     }
   }

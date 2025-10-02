@@ -1,6 +1,8 @@
 #ifndef DIP_NODE_SOURCE_H
 #define DIP_NODE_SOURCE_H
 
+#include "node_base.h"
+
 namespace snt::dip {
 
   class SourceNode : public BaseNode {

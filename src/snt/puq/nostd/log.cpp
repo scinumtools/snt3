@@ -1,5 +1,7 @@
 #include "log.h"
 
+#include "../exponent.h"
+
 namespace snt::nostd {
 
   MAGNITUDE_PRECISION log(const MAGNITUDE_PRECISION& m) {

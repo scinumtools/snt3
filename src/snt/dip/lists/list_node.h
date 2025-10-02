@@ -2,14 +2,12 @@
 #define DIP_LIST_NODE_H
 
 #include "../../val.h"
-#include "../environment.h"
 #include "../nodes/node_base.h"
 #include "../nodes/parser.h"
 
 namespace snt::dip {
 
   // Node List
-
   class NodeList {
   private:
     BaseNode::NodeListType nodes;

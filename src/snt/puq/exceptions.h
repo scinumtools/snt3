@@ -1,6 +1,8 @@
 #ifndef PUQ_EXCEPTIONS_H
 #define PUQ_EXCEPTIONS_H
 
+#include "systems/unit_system.h"
+
 #include <string>
 
 namespace snt::puq {

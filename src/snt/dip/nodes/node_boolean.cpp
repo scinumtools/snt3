@@ -1,5 +1,6 @@
 #include "node_boolean.h"
 
+#include "../environment.h"
 #include "../parsers.h"
 #include "../solvers/solver_logical.h"
 #include "node_value.h"

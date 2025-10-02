@@ -5,6 +5,7 @@
 #include "snt/puq/nostd/log.h"
 #include "snt/puq/nostd/log10.h"
 #include "snt/puq/nostd/max.h"
+#include "snt/puq/nostd/pow.h"
 #include "snt/puq/nostd/sqrt.h"
 #include "snt/puq/nostd/to_string.h"
 

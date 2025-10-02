@@ -1,5 +1,7 @@
 #include "to_string.h"
 
+#include <string>
+
 namespace snt::nostd {
 
   std::string to_string(const MAGNITUDE_PRECISION& value, int precision) {

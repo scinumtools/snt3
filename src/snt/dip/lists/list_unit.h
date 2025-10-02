@@ -1,6 +1,9 @@
 #ifndef DIP_LIST_UNIT_H
 #define DIP_LIST_UNIT_H
 
+#include <map>
+#include <string>
+
 namespace snt::dip {
 
   struct EnvUnit {

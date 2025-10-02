@@ -1,7 +1,5 @@
 #include "list_source.h"
 
-#include "../environment.h"
-
 #include <stdexcept>
 
 namespace snt::dip {

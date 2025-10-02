@@ -1,5 +1,6 @@
 #include "solver_template.h"
 
+#include "../nodes/node_value.h"
 #include "../nodes/parser.h"
 
 namespace snt::dip {
@@ -25,7 +26,7 @@ namespace snt::dip {
 
           // request node from the environment and extract its value
           BaseNode::NodeListType nodes = environment->request_nodes(parser.value_raw.at(0), RequestType::Reference);
-          BaseNode::PointerType node = nodes.front();
+          const BaseNode::PointerType& node = nodes.front();
           ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
 
           // apply slicing

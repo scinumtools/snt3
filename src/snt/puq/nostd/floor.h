@@ -1,6 +1,8 @@
 #ifndef NOSTD_FLOOR_H
 #define NOSTD_FLOOR_H
 
+#include "nostd.h"
+
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION floor(const MAGNITUDE_PRECISION& m);

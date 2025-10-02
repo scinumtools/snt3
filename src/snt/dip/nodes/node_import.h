@@ -1,6 +1,8 @@
 #ifndef DIP_NODE_IMPORT_H
 #define DIP_NODE_IMPORT_H
 
+#include "node_base.h"
+
 namespace snt::dip {
 
   class ImportNode : public BaseNode {

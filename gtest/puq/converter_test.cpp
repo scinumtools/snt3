@@ -1,4 +1,5 @@
 #include "pch_tests.h"
+#include "snt/puq/nostd/to_string.h"
 
 using namespace snt;
 

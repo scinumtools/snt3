@@ -1,6 +1,8 @@
 #ifndef NOSTD_LOG10_H
 #define NOSTD_LOG10_H
 
+#include "nostd.h"
+
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION log10(const MAGNITUDE_PRECISION& m);

@@ -1,6 +1,7 @@
 #include "unit_atom.h"
 
 #include "../nostd/to_number.h"
+#include "../systems/unit_system.h"
 
 #include <algorithm>
 #include <regex>

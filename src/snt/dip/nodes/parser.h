@@ -1,6 +1,8 @@
 #ifndef DIP_PARSER_H
 #define DIP_PARSER_H
 
+#include "node.h"
+
 #include <array>
 
 namespace snt::dip {
@@ -8,7 +10,7 @@ namespace snt::dip {
   class Parser : public Node {
   private:
     void strip(const std::string& text);
-    static const std::array<std::string, 3> ESCAPE_SYMBOLS;
+    // static constexpr std::array<std::string, 3> ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
 
   public:
     std::string code; // in Python this was 'ccode', the original 'code' is now in the 'line' struct

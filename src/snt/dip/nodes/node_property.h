@@ -1,6 +1,8 @@
 #ifndef DIP_NODE_PROPERTY_H
 #define DIP_NODE_PROPERTY_H
 
+#include "node_base.h"
+
 namespace snt::dip {
 
   class PropertyNode : public virtual BaseNode {

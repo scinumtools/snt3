@@ -3,6 +3,7 @@
 
 #include "../../exs.h"
 #include "../../val.h"
+#include "../environment.h"
 
 #include <string>
 

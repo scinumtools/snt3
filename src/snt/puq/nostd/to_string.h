@@ -1,6 +1,8 @@
 #ifndef NOSTD_TO_STRING_H
 #define NOSTD_TO_STRING_H
 
+#include "nostd.h"
+
 namespace snt::nostd {
 
   extern std::string to_string(const MAGNITUDE_PRECISION& value, int precision = std::cout.precision());

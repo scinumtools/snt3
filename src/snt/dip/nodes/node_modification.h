@@ -1,6 +1,8 @@
 #ifndef DIP_NODE_MODIFICATION_H
 #define DIP_NODE_MODIFICATION_H
 
+#include "node_base.h"
+
 namespace snt::dip {
 
   class ModificationNode : public BaseNode {
