@@ -23,7 +23,6 @@ int main() {
   d.add_string("foo int m");
   d.add_string("foo = 3 km");
   dip::Environment env = d.parse();
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
   std::cout << vnode->value->to_string() << '\n';
 }

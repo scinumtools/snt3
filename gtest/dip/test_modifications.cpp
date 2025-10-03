@@ -9,13 +9,12 @@ TEST(Modifications, DataTypeNode) {
   d.add_string("foo int32 = 3");
   dip::Environment env = d.parse();
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  EXPECT_EQ(node->value_raw.at(0), "3");
-  EXPECT_EQ(node->dtype, dip::NodeDtype::Integer);
-  EXPECT_EQ(node->indent, 0);
-  EXPECT_EQ(node->name, "foo");
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  EXPECT_EQ(vnode->value_raw.at(0), "3");
+  EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
+  EXPECT_EQ(vnode->indent, 0);
+  EXPECT_EQ(vnode->name, "foo");
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
   EXPECT_EQ(vnode->value->to_string(), "3");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
 }
@@ -27,13 +26,12 @@ TEST(Modifications, ModificationNode) {
   d.add_string("foo = 3");
   dip::Environment env = d.parse();
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  EXPECT_EQ(node->value_raw.at(0), "3");
-  EXPECT_EQ(node->dtype, dip::NodeDtype::Integer);
-  EXPECT_EQ(node->indent, 0);
-  EXPECT_EQ(node->name, "foo");
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  EXPECT_EQ(vnode->value_raw.at(0), "3");
+  EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
+  EXPECT_EQ(vnode->indent, 0);
+  EXPECT_EQ(vnode->name, "foo");
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
   EXPECT_EQ(vnode->value->to_string(), "3");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
 
@@ -57,13 +55,12 @@ TEST(Modifications, Declarations) {
   d.add_string("foo = 3");
   dip::Environment env = d.parse();
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  EXPECT_EQ(node->value_raw.at(0), "3");
-  EXPECT_EQ(node->dtype, dip::NodeDtype::Integer);
-  EXPECT_EQ(node->indent, 0);
-  EXPECT_EQ(node->name, "foo");
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  EXPECT_EQ(vnode->value_raw.at(0), "3");
+  EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
+  EXPECT_EQ(vnode->indent, 0);
+  EXPECT_EQ(vnode->name, "foo");
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
   EXPECT_EQ(vnode->value->to_string(), "3");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
 

@@ -2,7 +2,7 @@
 #define DIP_FUNCTION_LIST_H
 
 #include "../../val.h"
-#include "../nodes/node_base.h"
+#include "../nodes/node_value.h"
 
 #import <map>
 
@@ -13,7 +13,7 @@ namespace snt::dip {
   class FunctionList {
   public:
     typedef val::BaseValue::PointerType (*ValueFunctionType)(const Environment& env);
-    typedef BaseNode::NodeListType (*TableFunctionType)(const Environment& env);
+    typedef ValueNode::NodeListType (*TableFunctionType)(const Environment& env);
 
   private:
     std::map<std::string, ValueFunctionType> value_functions;

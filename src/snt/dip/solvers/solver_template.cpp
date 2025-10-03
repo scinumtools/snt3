@@ -25,9 +25,8 @@ namespace snt::dip {
           parser.part_format();
 
           // request node from the environment and extract its value
-          BaseNode::NodeListType nodes = environment->request_nodes(parser.value_raw.at(0), RequestType::Reference);
-          const BaseNode::PointerType& node = nodes.front();
-          ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+          ValueNode::NodeListType nodes = environment->request_nodes(parser.value_raw.at(0), RequestType::Reference);
+          const ValueNode::PointerType& vnode = nodes.front();
 
           // apply slicing
           if (!parser.value_slice.empty())

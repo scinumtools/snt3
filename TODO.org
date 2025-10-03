@@ -1,7 +1,6 @@
 * SCINUMTOOLS TODO
 
 ** High priority
-- modify Quantity, so that it receives actual objects of values and not their pointers
 - include pybind11 to dip and puq
 - create sphix documentation
 - change node list in puq environment to NodeValue instead of NodeBase, so that value can be printed out using to_string()

@@ -114,7 +114,7 @@ namespace snt::dip {
       NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table};
 
   Environment DIP::parse() {
-    NodeList queue = parse_code_nodes(lines);
+    NodeList<BaseNode> queue = parse_code_nodes(lines);
     // set properties to nodes
     BaseNode::PointerType previous_node = nullptr;
     for (size_t i = 0; i < queue.size(); ++i) {
@@ -195,13 +195,15 @@ namespace snt::dip {
             if (node->line.source.name.compare(0, prefix.size(), prefix) == 0)
               throw std::runtime_error("Modifying undefined node: " + node->line.code);
           }
-          target.nodes.push_back(node);
+          if (vnode == nullptr)
+            throw std::runtime_error("Only value nodes can be inserted into an environment.");
+          target.nodes.push_back(vnode);
         }
       }
     }
     // Validate nodes
     for (ssize_t i = 0; i < target.nodes.size(); i++) {
-      ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(target.nodes.at(i));
+      ValueNode::PointerType vnode = target.nodes.at(i);
       if (vnode) {
         vnode->validate_definition();
         vnode->validate_options();

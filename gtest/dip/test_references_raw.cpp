@@ -28,9 +28,8 @@ TEST(ReferencesRaw, BooleanValues) {
   // remove temporary file
   std::filesystem::remove(source_filename);
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  EXPECT_EQ(node->name, "snap");
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  EXPECT_EQ(vnode->name, "snap");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[[true, false], [false, true]]");
 }
@@ -58,9 +57,8 @@ TEST(ReferencesRaw, IntegerValues) {
   // remove temporary file
   std::filesystem::remove(source_filename);
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  EXPECT_EQ(node->name, "snap");
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  EXPECT_EQ(vnode->name, "snap");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3, 4]]");
 }
@@ -88,9 +86,8 @@ TEST(ReferencesRaw, FloatValues) {
   // remove temporary file
   std::filesystem::remove(source_filename);
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  EXPECT_EQ(node->name, "snap");
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  EXPECT_EQ(vnode->name, "snap");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3.45, 4.56e7]]");
 }
@@ -118,9 +115,8 @@ TEST(ReferencesRaw, StringValues) {
   // remove temporary file
   std::filesystem::remove(source_filename);
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  EXPECT_EQ(node->name, "snap");
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  EXPECT_EQ(vnode->name, "snap");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[['jerk', 'snap'], ['crackle', 'pop']]");
 }
@@ -153,15 +149,13 @@ TEST(ReferencesRaw, TableNodes) {
   // remove temporary file
   std::filesystem::remove(source_filename);
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  EXPECT_EQ(node->name, "snap.bar");
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  EXPECT_EQ(vnode->name, "snap.bar");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[1, 2]");
 
-  node = env.nodes.at(1);
-  EXPECT_EQ(node->name, "snap.baz");
-  vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  vnode = env.nodes.at(1);
+  EXPECT_EQ(vnode->name, "snap.baz");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "[true, false]");
 }

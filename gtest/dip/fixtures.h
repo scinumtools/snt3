@@ -41,7 +41,7 @@ protected:
   }
 
   // node lists
-  static dip::BaseNode::NodeListType get_scalar_nodes(const dip::Environment& env) {
+  static dip::ValueNode::NodeListType get_scalar_nodes(const dip::Environment& env) {
     std::unique_ptr<val::ArrayValue<bool>> val_bool =
         std::make_unique<val::ArrayValue<bool>>(false);
     std::unique_ptr<val::ArrayValue<int>> val_int =
@@ -58,7 +58,7 @@ protected:
     };
   }
 
-  static dip::BaseNode::NodeListType get_array_nodes(const dip::Environment& env) {
+  static dip::ValueNode::NodeListType get_array_nodes(const dip::Environment& env) {
     std::vector<bool> vec_bool = {false, true, false};
     std::vector<int> vec_int = {1, 2, 3, 4};
     std::vector<double> vec_double = {2.34e5, 3.45e6, 4.56e7};

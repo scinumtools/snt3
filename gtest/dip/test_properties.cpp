@@ -13,7 +13,7 @@ TEST(Properties, Constant) {
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // constant declaration is not returned as a separate node
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->constant, true); // foo node is set as a constant
 
@@ -53,7 +53,7 @@ TEST(Properties, Description) {
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // description is not returned as a separate node
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->description, "If foo is true, bar is false");
 
@@ -98,7 +98,7 @@ TEST(Properties, Format) {
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // format is not returned as a separate node
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->format, "[a-z]+");
 
@@ -137,7 +137,7 @@ TEST(Properties, Tags) {
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->tags[0], "baz");
   EXPECT_EQ(vnode->tags[1], "word");
@@ -164,7 +164,7 @@ TEST(Properties, Condition) {
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // condition is not returned as a separate node
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->condition, "true");
 
@@ -206,7 +206,7 @@ TEST(Properties, OptionsInteger) {
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->options.size(), 3);
   EXPECT_EQ(vnode->options[0].value->to_string(), "16");
@@ -237,7 +237,7 @@ TEST(Properties, OptionsFloat) {
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
 
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->options.size(), 3);
   EXPECT_EQ(vnode->options[0].value->to_string(), "1");
@@ -267,7 +267,7 @@ TEST(Properties, OptionsString) {
   d.add_string("  !options ['bar','snap','pow']");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(env.nodes.at(0));
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->options.size(), 3);
   EXPECT_EQ(vnode->options[0].value->to_string(), "'bar'");
@@ -312,19 +312,17 @@ TEST(Properties, TableDelimiter) {
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
 
-  dip::BaseNode::PointerType node = env.nodes.at(0);
-  EXPECT_EQ(node->name, "foo.bar");
-  EXPECT_EQ(node->value_raw, val::Array::StringType({"1", "2"}));
-  EXPECT_EQ(node->value_shape, val::Array::ShapeType({2}));
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  EXPECT_EQ(vnode->name, "foo.bar");
+  EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2"}));
+  EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2}));
   EXPECT_EQ(vnode->value->to_string(), "[1, 2]");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
 
-  node = env.nodes.at(1);
-  EXPECT_EQ(node->name, "foo.baz");
-  EXPECT_EQ(node->value_raw, val::Array::StringType({"true", "false"}));
-  EXPECT_EQ(node->value_shape, val::Array::ShapeType({2}));
-  vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  vnode = env.nodes.at(1);
+  EXPECT_EQ(vnode->name, "foo.baz");
+  EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "false"}));
+  EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2}));
   EXPECT_EQ(vnode->value->to_string(), "[true, false]");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
 }

@@ -30,12 +30,18 @@ namespace snt::dip {
     std::string source_name = line.source.name + "_" + std::string(TABLE_SOURCE);
     NodeListType nodes;
     switch (value_origin) {
-    case ValueOrigin::Function:
-      nodes = env.request_nodes(value_raw.at(0), RequestType::Function);
+    case ValueOrigin::Function: {
+      ValueNode::NodeListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Function);
+      for (const auto& node : vnodes)
+        nodes.push_back(node);
       break;
-    case ValueOrigin::Reference:
-      nodes = env.request_nodes(value_raw.at(0), RequestType::Reference);
+    }
+    case ValueOrigin::Reference: {
+      ValueNode::NodeListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Reference);
+      for (const auto& node : vnodes)
+        nodes.push_back(node);
       break;
+    }
     case ValueOrigin::ReferenceRaw:
       nodes = parse_nodes(env.request_code(value_raw.at(0)), source_name, delimiter);
       break;

@@ -34,15 +34,13 @@ TEST(SourceList, KeywordSourceCode) {
   EXPECT_FALSE(senv.parent.name.empty());
   EXPECT_EQ(senv.nodes.size(), 2);
 
-  dip::BaseNode::PointerType node = senv.nodes.at(0);
-  EXPECT_EQ(node->name, "foo");
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  dip::ValueNode::PointerType vnode = senv.nodes.at(0);
+  EXPECT_EQ(vnode->name, "foo");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "3");
 
-  node = senv.nodes.at(1);
-  EXPECT_EQ(node->name, "bar");
-  vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  vnode = senv.nodes.at(1);
+  EXPECT_EQ(vnode->name, "bar");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "false");
 }
@@ -106,15 +104,13 @@ TEST(SourceList, AddSourceCode) {
   EXPECT_FALSE(senv.parent.name.empty());
   EXPECT_EQ(senv.nodes.size(), 2);
 
-  dip::BaseNode::PointerType node = senv.nodes.at(0);
-  EXPECT_EQ(node->name, "foo");
-  dip::ValueNode::PointerType vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  dip::ValueNode::PointerType vnode = senv.nodes.at(0);
+  EXPECT_EQ(vnode->name, "foo");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "3");
 
-  node = senv.nodes.at(1);
-  EXPECT_EQ(node->name, "bar");
-  vnode = std::dynamic_pointer_cast<dip::ValueNode>(node);
+  vnode = senv.nodes.at(1);
+  EXPECT_EQ(vnode->name, "bar");
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->value->to_string(), "false");
 }

@@ -21,12 +21,18 @@ namespace snt::dip {
   BaseNode::NodeListType ImportNode::parse(Environment& env) {
     NodeListType nodes;
     switch (value_origin) {
-    case ValueOrigin::Function:
-      nodes = env.request_nodes(value_raw.at(0), RequestType::Function);
+    case ValueOrigin::Function: {
+      ValueNode::NodeListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Function);
+      for (const auto& node : vnodes)
+        nodes.push_back(node);
       break;
-    case ValueOrigin::Reference:
-      nodes = env.request_nodes(value_raw.at(0), RequestType::Reference);
+    }
+    case ValueOrigin::Reference: {
+      ValueNode::NodeListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Reference);
+      for (const auto& node : vnodes)
+        nodes.push_back(node);
       break;
+    }
     default:
       throw std::runtime_error("Import nodes could not be parsed: " + line.code);
     }

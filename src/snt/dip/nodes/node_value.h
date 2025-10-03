@@ -22,7 +22,7 @@ namespace snt::dip {
 
   public:
     typedef std::shared_ptr<ValueNode> PointerType;
-    typedef std::deque<BaseNode::PointerType> NodeListType;
+    typedef std::deque<ValueNode::PointerType> NodeListType;
     val::BaseValue::PointerType value;
     val::Array::StringType tags;
     bool constant;

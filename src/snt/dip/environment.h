@@ -7,6 +7,7 @@
 #include "lists/list_node.h"
 #include "lists/list_source.h"
 #include "lists/list_unit.h"
+#include "nodes/node_value.h"
 
 namespace snt::dip {
 
@@ -18,7 +19,7 @@ namespace snt::dip {
   public:
     SourceList sources;
     UnitList units;
-    NodeList nodes;
+    NodeList<ValueNode> nodes;
     HierarchyList hierarchy;
     BranchingList branching;
     FunctionList functions;
@@ -26,7 +27,7 @@ namespace snt::dip {
     std::string request_code(const std::string& source_name) const;
     val::BaseValue::PointerType request_value(const std::string& request, const RequestType rtype,
                                               const std::string& to_unit = "") const;
-    BaseNode::NodeListType request_nodes(const std::string& request, const RequestType rtype) const;
+    ValueNode::NodeListType request_nodes(const std::string& request, const RequestType rtype) const;
   };
 
 } // namespace snt::dip
