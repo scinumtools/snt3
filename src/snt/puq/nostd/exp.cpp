@@ -6,14 +6,7 @@ namespace snt::nostd {
     return std::exp(e);
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-  Array exp(const Array& e) {
-    ArrayValue av(e.size());
-    for (int i = 0; i < e.size(); i++)
-      av[i] = std::exp(e[i]);
-    return Array(av, e.shape());
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   val::BaseValue::PointerType exp(val::BaseValue::PointerType a) {
     return a->math_exp();
   }

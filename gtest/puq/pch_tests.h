@@ -1,7 +1,6 @@
 #ifndef PUQ_PCH_TESTS_H
 #define PUQ_PCH_TESTS_H
 
-#include "snt/puq/array.h"
 #include "snt/puq/calc/calculator.h"
 #include "snt/puq/converter.h"
 #include "snt/puq/exceptions.h"

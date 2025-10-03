@@ -6,21 +6,7 @@ namespace snt::nostd {
     return std::pow(m, e);
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-  Array pow(const Array& a, const EXPONENT_FLOAT_PRECISION& e) {
-    ArrayValue av(a.size());
-    for (int i = 0; i < a.size(); i++) {
-      av[i] = std::pow(a[i], e);
-    }
-    return Array(av, a.shape());
-  }
-  Array pow(const Array& a, const Array& e) {
-    auto fn = [](const MAGNITUDE_PRECISION& v1, const MAGNITUDE_PRECISION& v2) {
-      return std::pow(v1, v2);
-    };
-    return Array::const_operation(a, e, fn);
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   val::BaseValue::PointerType pow(val::BaseValue::PointerType a, val::BaseValue::PointerType e) {
     return a->math_pow(e.get());
   }

@@ -17,18 +17,7 @@ public:
   void exit(const py::object& exc_type, const py::object& exc_value, const py::object& traceback) { close(); }
 };
 
-#if defined(MAGNITUDE_ARRAY)
-
-py::array_t<MAGNITUDE_PRECISION> array_to_numpy(puq::Array array) {
-  py::array_t<MAGNITUDE_PRECISION> numpy(array.value.size());
-  py::buffer_info buf_info = numpy.request();
-  MAGNITUDE_PRECISION* ptr = static_cast<MAGNITUDE_PRECISION*>(buf_info.ptr);
-  std::memcpy(ptr, array.value.data(), array.value.size() * sizeof(MAGNITUDE_PRECISION));
-  numpy.resize(array.shape());
-  return numpy;
-}
-
-#elif defined(MAGNITUDE_VALUE)
+#if defined(MAGNITUDE_VALUE)
 
 py::array_t<MAGNITUDE_PRECISION> array_to_numpy(const val::ArrayValue<MAGNITUDE_PRECISION>& varray) {
   py::array_t<MAGNITUDE_PRECISION> numpy(varray.get_shape());
@@ -41,15 +30,7 @@ py::array_t<MAGNITUDE_PRECISION> array_to_numpy(const val::ArrayValue<MAGNITUDE_
 #endif
 
 std::variant<MAGNITUDE_PRECISION, std::vector<MAGNITUDE_PRECISION>, py::array_t<MAGNITUDE_PRECISION>> quantity_value(puq::Quantity q, bool numpy) {
-#if defined(MAGNITUDE_ARRAY)
-  if (numpy) {
-    return array_to_numpy(q.value.magnitude.value);
-  } else if (q.value.magnitude.value.size() == 1) {
-    return q.value.magnitude.value[0];
-  } else {
-    return q.value.magnitude.value.value;
-  }
-#elif defined(MAGNITUDE_VALUE)
+#if defined(MAGNITUDE_VALUE)
   val::ArrayValue<MAGNITUDE_PRECISION> varray(q.value.magnitude.value.get());
   if (numpy) {
     return array_to_numpy(varray);
@@ -67,15 +48,7 @@ std::variant<MAGNITUDE_PRECISION, std::vector<MAGNITUDE_PRECISION>, py::array_t<
 }
 
 std::variant<MAGNITUDE_PRECISION, std::vector<MAGNITUDE_PRECISION>, py::array_t<MAGNITUDE_PRECISION>> quantity_error(const puq::Quantity& q, bool numpy) {
-#if defined(MAGNITUDE_ARRAY)
-  if (numpy) {
-    return array_to_numpy(q.value.magnitude.error);
-  } else if (q.value.magnitude.value.size() == 1) {
-    return q.value.magnitude.error[0];
-  } else {
-    return q.value.magnitude.error.value;
-  }
-#elif defined(MAGNITUDE_VALUE)
+#if defined(MAGNITUDE_VALUE)
   val::ArrayValue<MAGNITUDE_PRECISION> varray(q.value.magnitude.error.get());
   if (numpy) {
     return array_to_numpy(varray);
@@ -87,24 +60,7 @@ std::variant<MAGNITUDE_PRECISION, std::vector<MAGNITUDE_PRECISION>, py::array_t<
 #endif
 }
 
-#if defined(MAGNITUDE_ARRAY)
-
-puq::Array buffer_to_array(py::buffer_info& info) {
-  puq::ArrayValue a(info.size);
-
-  if (info.format != py::format_descriptor<MAGNITUDE_PRECISION>::format())
-    throw std::runtime_error("Incompatible format: expected a double array!");
-
-  std::copy(static_cast<MAGNITUDE_PRECISION*>(info.ptr),
-            static_cast<MAGNITUDE_PRECISION*>(info.ptr) + info.size,
-            a.begin());
-
-  puq::ArrayShape s(info.shape.size());
-  std::copy(info.shape.begin(), info.shape.end(), s.begin());
-  return puq::Array(a, s);
-}
-
-#elif defined(MAGNITUDE_VALUE)
+#if defined(MAGNITUDE_VALUE)
 
 val::BaseValue::PointerType buffer_to_array(py::buffer_info& info) {
   std::vector<MAGNITUDE_PRECISION> a(info.size);
@@ -230,9 +186,7 @@ PYBIND11_MODULE(scinumtools3, m) {
                     std::string s, puq::SystemType sys) {
           py::buffer_info info = v.request();
           val::BaseValue::PointerType value = buffer_to_array(info);
-#if defined(MAGNITUDE_ARRAY)
-          return puq::Quantity(value, s, sys);
-#elif defined(MAGNITUDE_VALUE)
+#if defined(MAGNITUDE_VALUE)
           return puq::Quantity(std::move(value), std::move(s), sys);
 #endif
         }),
@@ -248,9 +202,7 @@ PYBIND11_MODULE(scinumtools3, m) {
           val::BaseValue::PointerType value = buffer_to_array(v_info);
           py::buffer_info e_info = e.request();
           val::BaseValue::PointerType error = buffer_to_array(e_info);
-#if defined(MAGNITUDE_ARRAY)
-          return puq::Quantity(value, error, s, sys);
-#elif defined(MAGNITUDE_VALUE)
+#if defined(MAGNITUDE_VALUE)
           return puq::Quantity(std::move(value), std::move(error), s, sys);
 #endif
         }),
@@ -271,16 +223,7 @@ PYBIND11_MODULE(scinumtools3, m) {
     return py::array_t<MAGNITUDE_PRECISION>(shape, strides, otherT->get_data());
   });
   //  q.def("to_numpy", [](const puq::Quantity &q) -> py::buffer_info {
-  // #if defined(MAGNITUDE_ARRAY)
-  //      return py::buffer_info(
-  //			     q.value.magnitude.value.value.data(),
-  //			     sizeof(MAGNITUDE_PRECISION),
-  //			     py::format_descriptor<MAGNITUDE_PRECISION>::format(),
-  //			     1,
-  //			     q.value.magnitude.value.shape(),
-  //			     {sizeof(MAGNITUDE_PRECISION)}
-  //			     );
-  // #elif defined(MAGNITUDE_VALUE)
+  // #if defined(MAGNITUDE_VALUE)
   //      val::ArrayValue<MAGNITUDE_PRECISION>* otherT = dynamic_cast<val::ArrayValue<MAGNITUDE_PRECISION>*>(q.value.magnitude.value.get());
   //      return py::buffer_info(
   //			     otherT->get_data(),

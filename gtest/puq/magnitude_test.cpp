@@ -46,24 +46,7 @@ TEST(Magnitude, ErrorConversion) {
   EXPECT_EQ(puq::Magnitude::rel_to_abs(30, 20), 6); // 30*20% = 30/5 = 6
 }
 
-#if defined(MAGNITUDE_ARRAYS)
-
-TEST(Magnitude, Size) {
-
-  puq::Magnitude m(puq::Array({2, 3, 4, 5}));
-  EXPECT_EQ(m.size(), 4);
-}
-
-TEST(Magnitude, ErrorConversionArrays) {
-
-  puq::Array a = puq::Magnitude::abs_to_rel(puq::Array({30, 20}), puq::Array({0.3, 0.4}));
-  EXPECT_EQ(a.to_string(), "{1, 2}");
-
-  a = puq::Magnitude::rel_to_abs(puq::Array({30, 20}), puq::Array({20, 10}));
-  EXPECT_EQ(a.to_string(), "{6, 2}");
-}
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
 TEST(Magnitude, Size) {
 
@@ -192,20 +175,7 @@ TEST(Magnitude, Comparison) {
   EXPECT_EQ(a != b, true);
 }
 
-#if defined(MAGNITUDE_ARRAYS)
-
-TEST(Magnitude, Arrays) {
-
-  puq::Magnitude m1, m2, m3;
-
-  m1 = puq::Magnitude(puq::Array({12.1, 22.2}), puq::Array({0.1, 0.2}));
-  EXPECT_EQ(m1.to_string(), "[1.210(10)e+01, 2.220(20)e+01]");
-
-  m1 = puq::Magnitude(puq::Array({12.1, 22.2, 32.3}), puq::Array({0.1, 0.2, 0.3}));
-  EXPECT_EQ(m1.to_string(), "[1.210(10)e+01, 2.220(20)e+01, ...]");
-}
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
 TEST(Magnitude, Arrays) {
 

@@ -35,14 +35,7 @@ namespace snt::puq {
     Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const SystemType system = UnitSystem::System);
     Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnitsList& bu, const SystemType system = UnitSystem::System);
-#if defined(MAGNITUDE_ARRAYS)
-    Quantity(const Array& m, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const Array& m, const SystemType system = UnitSystem::System);
-    Quantity(const Array& m, const BaseUnitsList& bu, const SystemType system = UnitSystem::System);
-    Quantity(const Array& m, const Array& e, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const Array& m, const Array& e, const SystemType system = UnitSystem::System);
-    Quantity(const Array& m, const Array& e, const BaseUnitsList& bu, const SystemType system = UnitSystem::System);
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
     Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(val::BaseValue::PointerType m, const SystemType system = UnitSystem::System);
     Quantity(val::BaseValue::PointerType m, const BaseUnitsList& bu, const SystemType system = UnitSystem::System);
@@ -53,9 +46,7 @@ namespace snt::puq {
 #endif
     std::string unit_system() const;
     std::size_t size() const;
-#if defined(MAGNITUDE_ARRAYS)
-    ArrayShape shape() const;
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
     val::Array::ShapeType shape() const;
     PointerType clone() const;
 #endif
@@ -74,17 +65,7 @@ namespace snt::puq {
     friend Quantity operator-(const Quantity& q, const MAGNITUDE_PRECISION& m);
     friend Quantity operator*(const Quantity& q, const MAGNITUDE_PRECISION& m);
     friend Quantity operator/(const Quantity& q, const MAGNITUDE_PRECISION& m);
-#if defined(MAGNITUDE_ARRAYS)
-    // array operations
-    friend Quantity operator+(const Array& a, const Quantity& q);
-    friend Quantity operator-(const Array& a, const Quantity& q);
-    friend Quantity operator*(const Array& a, const Quantity& q);
-    friend Quantity operator/(const Array& a, const Quantity& q);
-    friend Quantity operator+(const Quantity& q, const Array& a);
-    friend Quantity operator-(const Quantity& q, const Array& a);
-    friend Quantity operator*(const Quantity& q, const Array& a);
-    friend Quantity operator/(const Quantity& q, const Array& a);
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
     // array operations
     friend Quantity operator+(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator-(val::BaseValue::PointerType a, const Quantity& q);

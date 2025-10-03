@@ -6,10 +6,7 @@
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION pow(const MAGNITUDE_PRECISION& m, const EXPONENT_FLOAT_PRECISION& e);
-#if defined(MAGNITUDE_ARRAYS)
-  extern Array pow(const Array& a, const EXPONENT_FLOAT_PRECISION& e);
-  extern Array pow(const Array& a, const Array& e);
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, const EXPONENT_FLOAT_PRECISION& e);
   extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, val::BaseValue::PointerType e);
 #endif

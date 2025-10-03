@@ -7,7 +7,7 @@
 
 namespace snt::puq {
 
-#if defined(MAGNITUDE_ARRAYS) || defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   enum CustomOperatorType {
     ARRAY_OPERATOR = exs::NUM_OPERATOR_TYPES

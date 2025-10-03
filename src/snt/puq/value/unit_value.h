@@ -28,16 +28,7 @@ namespace snt::puq {
     UnitValue(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e) : magnitude(m, e) {};
     UnitValue(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnits& bu) : magnitude(m, e), baseunits(bu) {};
     UnitValue(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnitsList& bul) : magnitude(m, e), baseunits(bul) {};
-#if defined(MAGNITUDE_ARRAYS)
-    UnitValue(const Array& m, const std::string& s);
-    UnitValue(const Array& m) : magnitude(m) {};
-    UnitValue(const Array& m, const BaseUnits& bu) : magnitude(m), baseunits(bu) {};
-    UnitValue(const Array& m, const BaseUnitsList& bul) : magnitude(m), baseunits(bul) {};
-    UnitValue(const Array& m, const Array& e, const std::string& s);
-    UnitValue(const Array& m, const Array& e) : magnitude(m, e) {};
-    UnitValue(const Array& m, const Array& e, const BaseUnits& bu) : magnitude(m, e), baseunits(bu) {};
-    UnitValue(const Array& m, const Array& e, const BaseUnitsList& bul) : magnitude(m, e), baseunits(bul) {};
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
     UnitValue(val::BaseValue::PointerType m, const std::string& s);
     UnitValue(val::BaseValue::PointerType m) : magnitude(std::move(m)) {};
     UnitValue(val::BaseValue::PointerType m, const BaseUnits& bu) : magnitude(std::move(m)), baseunits(bu) {};
@@ -49,9 +40,7 @@ namespace snt::puq {
 #endif
 #endif
     std::size_t size() const;
-#if defined(MAGNITUDE_ARRAYS)
-    ArrayShape shape() const;
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
     val::Array::ShapeType shape() const;
 #endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;

@@ -92,43 +92,7 @@ namespace snt::puq {
     value = UnitValue(mag, s);
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  Quantity::Quantity(const Array& m, const SystemType system) : stype(system) {
-    UnitSystem us(stype);
-    value = UnitValue(m);
-  }
-
-  Quantity::Quantity(const Array& m, const BaseUnitsList& bu, const SystemType system) : stype(system) {
-    UnitSystem us(stype);
-    value = UnitValue(m, bu);
-  }
-
-  Quantity::Quantity(const Array& m, std::string s, const SystemType system) : stype(system) {
-    preprocess(s, stype);
-    UnitSystem us(stype);
-    Magnitude mag(m);
-    value = UnitValue(mag, s);
-  }
-
-  Quantity::Quantity(const Array& m, const Array& e, const SystemType system) : stype(system) {
-    UnitSystem us(stype);
-    value = UnitValue(m, e);
-  }
-
-  Quantity::Quantity(const Array& m, const Array& e, const BaseUnitsList& bu, const SystemType system) : stype(system) {
-    UnitSystem us(stype);
-    value = UnitValue(m, e, bu);
-  }
-
-  Quantity::Quantity(const Array& m, const Array& e, std::string s, const SystemType system) : stype(system) {
-    preprocess(s, stype);
-    UnitSystem us(stype);
-    Magnitude mag(m, e);
-    value = UnitValue(mag, s);
-  }
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   Quantity::Quantity(val::BaseValue::PointerType m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
@@ -180,11 +144,7 @@ namespace snt::puq {
     return value.size();
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-  ArrayShape Quantity::shape() const {
-    return value.shape();
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   val::Array::ShapeType Quantity::shape() const {
     return value.shape();
   }
@@ -277,44 +237,7 @@ namespace snt::puq {
     return Quantity(q.value / UnitValue(m));
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-  // overloading array/quantity
-  Quantity operator+(const Array& a, const Quantity& q) {
-    UnitSystem us(q.stype);
-    return Quantity(UnitValue(a) + q.value);
-  }
-  Quantity operator-(const Array& a, const Quantity& q) {
-    UnitSystem us(q.stype);
-    return Quantity(UnitValue(a) - q.value);
-  }
-  Quantity operator*(const Array& a, const Quantity& q) {
-    UnitSystem us(q.stype);
-    return Quantity(UnitValue(a) * q.value);
-  }
-  Quantity operator/(const Array& a, const Quantity& q) {
-    UnitSystem us(q.stype);
-    return Quantity(UnitValue(a) / q.value);
-  }
-
-  // overloading quantity/array
-  Quantity operator+(const Quantity& q, const Array& a) {
-    UnitSystem us(q.stype);
-    q.value + UnitValue(a);
-    return Quantity(q.value + UnitValue(a));
-  }
-  Quantity operator-(const Quantity& q, const Array& a) {
-    UnitSystem us(q.stype);
-    return Quantity(q.value - UnitValue(a));
-  }
-  Quantity operator*(const Quantity& q, const Array& a) {
-    UnitSystem us(q.stype);
-    return Quantity(q.value * UnitValue(a));
-  }
-  Quantity operator/(const Quantity& q, const Array& a) {
-    UnitSystem us(q.stype);
-    return Quantity(q.value / UnitValue(a));
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   // overloading array/quantity
   Quantity operator+(val::BaseValue::PointerType a, const Quantity& q) {
     UnitSystem us(q.stype);

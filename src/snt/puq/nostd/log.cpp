@@ -8,14 +8,7 @@ namespace snt::nostd {
     return std::log(m);
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-  Array log(const Array& a) {
-    ArrayValue av(a.size());
-    for (int i = 0; i < a.size(); i++)
-      av[i] = std::log(a[i]);
-    return Array(av, a.shape());
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   val::BaseValue::PointerType log(val::BaseValue::PointerType a) {
     return a->math_log();
   }

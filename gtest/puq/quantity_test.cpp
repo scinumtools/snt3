@@ -28,21 +28,7 @@ TEST(Quantity, Initialization) {
   q = puq::Quantity(1.23, "2*km3"); // magnitude and a unit expression with a number
   EXPECT_EQ(q.to_string(), "2.46*km3");
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  puq::Array a({2, 3, 4});
-  q = puq::Quantity(a, "km"); // magnitude as an array
-  EXPECT_EQ(q.to_string(), "[2, 3, ...]*km");
-
-  puq::ArrayValue av = {2, 3, 4};
-  q = puq::Quantity(av, "km"); // magnitude as an array value
-  EXPECT_EQ(q.to_string(), "[2, 3, ...]*km");
-
-  std::vector<double> v = {2, 3, 4, 5}; // magnitude as a vector
-  q = puq::Quantity(v, "km");
-  EXPECT_EQ(q.to_string(), "[2, 3, ...]*km");
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
   q = puq::Quantity(std::move(val), "km");
@@ -79,24 +65,7 @@ TEST(Quantity, InitializationErrors) {
   EXPECT_EQ(q.to_string(), "8.8541878188(14)e-12*F*m-1");
 #endif
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  puq::Array am({2, 3, 4, 5}); // from Array
-  puq::Array ae({0.2, 0.3, 0.4, 0.5});
-  q = puq::Quantity(am, ae, "km");
-  EXPECT_EQ(q.to_string(), "[2.00(20), 3.00(30), ...]*km");
-
-  puq::ArrayValue avm = {2, 3, 4, 5}; // from ArrayValue
-  puq::ArrayValue ave = {0.2, 0.3, 0.4, 0.5};
-  q = puq::Quantity(avm, ave, "km");
-  EXPECT_EQ(q.to_string(), "[2.00(20), 3.00(30), ...]*km");
-
-  std::vector<double> vm = {2, 3, 4, 5}; // from a vector
-  std::vector<double> ve = {0.2, 0.3, 0.4, 0.5};
-  q = puq::Quantity(vm, ve, "km");
-  EXPECT_EQ(q.to_string(), "[2.00(20), 3.00(30), ...]*km");
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   val::BaseValue::PointerType vm = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
   val::BaseValue::PointerType ve = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});
@@ -107,7 +76,7 @@ TEST(Quantity, InitializationErrors) {
 }
 #endif
 
-#if defined(MAGNITUDE_ARRAYS) || defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 TEST(Quantity, InitializationArrays) {
 
   puq::Quantity q("[2,3.4,5e6]*km/s"); // unit expression
@@ -116,12 +85,7 @@ TEST(Quantity, InitializationArrays) {
   q = puq::Quantity("[2, 3.4, 5e6]*km/s"); // unit expression with an empty space
   EXPECT_EQ(q.to_string(), "[2, 3.4, 5e6]*km*s-1");
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  q = puq::Quantity(puq::Array({2, 3.4, 5e6}), "km2"); // magnitudes and units
-  EXPECT_EQ(q.to_string(), "[2, 3.4, 5e6]*km2");
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3.4, 5e6});
   q = puq::Quantity(std::move(val), "km2"); // magnitudes and units
@@ -136,23 +100,7 @@ TEST(Quantity, InitializationArrays) {
 }
 #endif
 
-#if defined(MAGNITUDE_ARRAYS)
-
-TEST(Quantity, Size) {
-
-  puq::Quantity q(puq::Array({2, 3, 4, 5}));
-  EXPECT_EQ(q.size(), 4);
-}
-
-TEST(Quantity, Shape) {
-
-  puq::ArrayValue v = {2, 3, 4, 5, 6, 7};
-  puq::ArrayShape s = {2, 3};
-  puq::Quantity q(puq::Array(v, s));
-  EXPECT_EQ(q.shape(), s);
-}
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
 TEST(Quantity, Size) {
 
@@ -204,14 +152,7 @@ TEST(Quantity, ArithmeticsAdd) {
   EXPECT_EQ((2 + q1).to_string(), "6");
   EXPECT_EQ((q1 + 3).to_string(), "7");
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  q1 = puq::Quantity(4); // adding arrays
-  puq::Array a({2, 3, 4});
-  EXPECT_EQ((a + q1).to_string(), "[6, 7, ...]");
-  EXPECT_EQ((q1 + a).to_string(), "[6, 7, ...]");
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   q1 = puq::Quantity(4); // adding arrays
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
@@ -242,14 +183,7 @@ TEST(Quantity, ArithmeticsSubtract) {
   EXPECT_EQ((2 - q1).to_string(), "-2");
   EXPECT_EQ((q1 - 3).to_string(), "1");
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  q1 = puq::Quantity(4); // subtracting arrays
-  puq::Array a({2, 3, 4});
-  EXPECT_EQ((a - q1).to_string(), "[-2, -1, ...]");
-  EXPECT_EQ((q1 - a).to_string(), "[2, 1, ...]");
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   q1 = puq::Quantity(4); // subtracting arrays
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
@@ -274,14 +208,7 @@ TEST(Quantity, ArithmeticsMultiply) {
   EXPECT_EQ((2 * q1).to_string(), "8*cm");
   EXPECT_EQ((q1 * 3).to_string(), "12*cm");
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  q1 = puq::Quantity(4); // multiplying arrays
-  puq::Array a({2, 3, 4});
-  EXPECT_EQ((a * q1).to_string(), "[8, 12, ...]");
-  EXPECT_EQ((q1 * a).to_string(), "[8, 12, ...]");
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   q1 = puq::Quantity(4); // multiplying arrays
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
@@ -306,14 +233,7 @@ TEST(Quantity, ArithmeticsDivide) {
   EXPECT_EQ((4 / q1).to_string(), "2*cm-1");
   EXPECT_EQ((q1 / 0.5).to_string(), "4*cm");
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  q1 = puq::Quantity(4); // dividing arrays
-  puq::Array a({2, 3, 4});
-  EXPECT_EQ((a / q1).to_string(), "[0.5, 0.75, ...]");
-  EXPECT_EQ((q1 / a).to_string(), "[2, 1.33333, ...]");
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   q1 = puq::Quantity(4); // dividing arrays
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});

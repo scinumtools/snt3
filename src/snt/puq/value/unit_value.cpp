@@ -47,20 +47,7 @@ namespace snt::puq {
     magnitude = Magnitude(m, e) * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
-#if defined(MAGNITUDE_ARRAYS)
-  UnitValue::UnitValue(const Array& m, const std::string& s) {
-    UnitSolver solver;
-    UnitAtom atom = solver.solve(s);
-    magnitude = Magnitude(m) * atom.value.magnitude;
-    baseunits = atom.value.baseunits;
-  }
-  UnitValue::UnitValue(const Array& m, const Array& e, const std::string& s) {
-    UnitSolver solver;
-    UnitAtom atom = solver.solve(s);
-    magnitude = Magnitude(m, e) * atom.value.magnitude;
-    baseunits = atom.value.baseunits;
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   UnitValue::UnitValue(val::BaseValue::PointerType m, const std::string& s) {
     UnitSolver solver;
     UnitAtom atom = solver.solve(s);
@@ -80,11 +67,7 @@ namespace snt::puq {
     return magnitude.size();
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-  ArrayShape UnitValue::shape() const {
-    return magnitude.shape();
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   val::Array::ShapeType UnitValue::shape() const {
     return magnitude.shape();
   }
@@ -102,9 +85,6 @@ namespace snt::puq {
       if (magnitude.value != 1 || baseunits.size() == 0)
         ss << magnitude.to_string(format) << multiply;
 #endif
-#elif defined(MAGNITUDE_ARRAYS)
-      if (magnitude != 1 || baseunits.size() == 0)
-        ss << magnitude.to_string(format) << multiply;
 #elif defined(MAGNITUDE_VALUES)
       if (!magnitude->is_unity() || baseunits.size() == 0)
         ss << magnitude->to_string(format) << multiply;
@@ -221,7 +201,7 @@ namespace snt::puq {
   }
 
   void UnitValue::pow(const EXPONENT_TYPE& e) {
-#if defined(MAGNITUDE_ERRORS) || defined(MAGNITUDE_ARRAYS) || defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_ERRORS) || defined(MAGNITUDE_VALUES)
     magnitude.pow(e);
 #else
     magnitude = std::pow(magnitude, (EXPONENT_FLOAT_PRECISION)e);

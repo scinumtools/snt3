@@ -6,9 +6,7 @@
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION floor(const MAGNITUDE_PRECISION& m);
-#if defined(MAGNITUDE_ARRAYS)
-  extern Array floor(const Array& a);
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType floor(val::BaseValue::PointerType a);
 #endif
 #ifdef MAGNITUDE_ERRORS

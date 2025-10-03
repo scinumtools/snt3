@@ -6,9 +6,7 @@
 namespace snt::nostd {
 
   extern MAGNITUDE_PRECISION max(const MAGNITUDE_PRECISION& m1, const MAGNITUDE_PRECISION& m2);
-#if defined(MAGNITUDE_ARRAYS)
-  extern Array max(const Array& a1, const Array& a2);
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType max(val::BaseValue::PointerType a1, val::BaseValue::PointerType a2);
 #endif
 #ifdef MAGNITUDE_ERRORS

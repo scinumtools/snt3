@@ -2,18 +2,16 @@
 #define PUQ_MAGNITUDE_H
 
 #include "../val.h"
-#include "array.h"
+#include "exponent.h"
 #include "settings.h"
+#include "unit_format.h"
 
 namespace snt::puq {
 
 #ifdef MAGNITUDE_ERRORS
   class Magnitude {
   public:
-#if defined(MAGNITUDE_ARRAYS)
-    Array value;
-    Array error;
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
     val::BaseValue::PointerType value;
     val::BaseValue::PointerType error;
 #else
@@ -49,12 +47,7 @@ namespace snt::puq {
     static MAGNITUDE_PRECISION abs_to_rel(const MAGNITUDE_PRECISION& v, const MAGNITUDE_PRECISION& a);
     static MAGNITUDE_PRECISION rel_to_abs(const MAGNITUDE_PRECISION& v, const MAGNITUDE_PRECISION& r);
 #endif
-#if defined(MAGNITUDE_ARRAYS)
-    Magnitude(const Array& m);
-    Magnitude(const Array& m, const Array& e);
-    static Array abs_to_rel(const Array& v, const Array& a);
-    static Array rel_to_abs(const Array& v, const Array& r);
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
     Magnitude(val::BaseValue::PointerType m);
     Magnitude(val::BaseValue::PointerType m, val::BaseValue::PointerType e);
     static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);
@@ -63,9 +56,7 @@ namespace snt::puq {
 
 #endif
     std::size_t size() const;
-#if defined(MAGNITUDE_ARRAYS)
-    ArrayShape shape() const;
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
     val::Array::ShapeType shape() const;
 #endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;

@@ -6,14 +6,7 @@ namespace snt::nostd {
     return std::cbrt(m);
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-  Array cbrt(const Array& a) {
-    ArrayValue av(a.size());
-    for (int i = 0; i < a.size(); i++)
-      av[i] = std::cbrt(a[i]);
-    return Array(av, a.shape());
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   val::BaseValue::PointerType cbrt(val::BaseValue::PointerType a) {
     return a->math_cbrt();
   }

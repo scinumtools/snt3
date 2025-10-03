@@ -23,21 +23,7 @@ TEST(UnitValue, Initialization) {
   value = puq::UnitValue(2, dim);
   EXPECT_EQ(value.to_string(), "46*m*g2*s3*K4");
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  puq::ArrayValue a({2, 3, 4, 5}); // from Array
-  value = puq::UnitValue(a, "km");
-  EXPECT_EQ(value.to_string(), "[2, 3, ...]*km");
-
-  puq::ArrayValue av = {2, 3, 4, 5}; // from ArrayValue
-  value = puq::UnitValue(av, "km");
-  EXPECT_EQ(value.to_string(), "[2, 3, ...]*km");
-
-  std::vector<double> v = {2, 3, 4, 5}; // from a vector
-  value = puq::UnitValue(v, "km");
-  EXPECT_EQ(value.to_string(), "[2, 3, ...]*km");
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5}); // from Array
   value = puq::UnitValue(std::move(val), "km");
@@ -51,15 +37,7 @@ TEST(UnitValue, Initialization) {
   EXPECT_EQ(ss.str(), "3*km*s-1");
 }
 
-#if defined(MAGNITUDE_ARRAYS)
-
-TEST(UnitValue, Size) {
-
-  puq::UnitValue uv(puq::Array({2, 3, 4, 5}));
-  EXPECT_EQ(uv.size(), 4);
-}
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
 TEST(UnitValue, Size) {
 
@@ -164,24 +142,7 @@ TEST(UnitValue, InitializationErrors) {
   v = puq::UnitValue("3.40(10)*km3"); // unit expression
   EXPECT_EQ(v.to_string(), "3.40(10)*km3");
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  puq::Array am({2, 3, 4, 5}); // from Array
-  puq::Array ae({0.2, 0.3, 0.4, 0.5});
-  v = puq::UnitValue(am, ae, "km");
-  EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), ...]*km");
-
-  puq::ArrayValue avm = {2, 3, 4, 5}; // from ArrayValue
-  puq::ArrayValue ave = {0.2, 0.3, 0.4, 0.5};
-  v = puq::UnitValue(avm, ave, "km");
-  EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), ...]*km");
-
-  std::vector<double> vm = {2, 3, 4, 5}; // from a vector
-  std::vector<double> ve = {0.2, 0.3, 0.4, 0.5};
-  v = puq::UnitValue(vm, ve, "km");
-  EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), ...]*km");
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   val::BaseValue::PointerType am = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
   val::BaseValue::PointerType ae = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});

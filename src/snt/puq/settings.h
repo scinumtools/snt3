@@ -35,9 +35,6 @@
 /*
  *  Module specific settings
  */
-#if defined(MAGNITUDE_ARRAYS) || defined(MAGNITUDE_VALUES)
-#define SYMBOL_ARRAY_MORE "..."
-#endif
 #ifdef EXPONENT_FRACTIONS
 #define SYMBOL_FRACTION ":"
 #define SYMBOL_FRACTION2 "\u141F"
@@ -51,15 +48,11 @@
  */
 #if defined(MAGNITUDE_ERRORS)
 #define MAGNITUDE_TYPE Magnitude
-#if defined(MAGNITUDE_ARRAYS)
-#define MAGNITUDE_VALUE Array
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 #define MAGNITUDE_VALUE val::BaseValue::PointerType
 #else
 #define MAGNITUDE_VALUE MAGNITUDE_PRECISION
 #endif
-#elif defined(MAGNITUDE_ARRAYS)
-#define MAGNITUDE_TYPE Array
 #elif defined(MAGNITUDE_VALUES)
 #define MAGNITUDE_TYPE val::BaseValue::PointerType
 #else

@@ -6,15 +6,7 @@ namespace snt::nostd {
     return std::sqrt(m);
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-  Array sqrt(const Array& a) {
-    ArrayValue av;
-    av.resize(a.size());
-    for (int i = 0; i < a.size(); i++)
-      av[i] = std::sqrt(a[i]);
-    return Array(av, a.shape());
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   val::BaseValue::PointerType sqrt(val::BaseValue::PointerType a) {
     return a->math_sqrt();
   }

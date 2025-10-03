@@ -10,21 +10,7 @@
 
 namespace snt::puq {
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  Magnitude::Magnitude(const Array& m) : value(m), error(0) {
-    ArrayValue av;
-    for (int i = 0; i < m.size(); i++)
-      av.push_back(0);
-    error = Array(av, m.shape());
-  }
-
-  Magnitude::Magnitude(const Array& m, const Array& e) : value(m), error(e) {
-    if (m.size() != e.size())
-      throw std::invalid_argument("Value and error arrays have different size: " + std::to_string(m.size()) + " != " + std::to_string(e.size()));
-  }
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   Magnitude::Magnitude(val::BaseValue::PointerType m) : value(std::move(m)), error(nullptr) {
     if (!value)
@@ -51,17 +37,7 @@ namespace snt::puq {
     return v * e / 100;
   };
 
-#if defined(MAGNITUDE_ARRAYS)
-
-  Array Magnitude::abs_to_rel(const Array& v, const Array& e) {
-    return Array::filled(100, v.size()) * e / v;
-  };
-
-  Array Magnitude::rel_to_abs(const Array& v, const Array& e) {
-    return v * e / Array::filled(100, v.size());
-  };
-
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
 
   // DEBUG: need to implement properly
   val::BaseValue::PointerType Magnitude::abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType e) {
@@ -99,11 +75,7 @@ namespace snt::puq {
 #endif
   }
 
-#if defined(MAGNITUDE_ARRAYS)
-  ArrayShape Magnitude::shape() const {
-    return value.shape();
-  }
-#elif defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
   val::Array::ShapeType Magnitude::shape() const {
     return value->get_shape();
   }
