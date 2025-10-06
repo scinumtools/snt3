@@ -24,13 +24,13 @@ namespace snt::puq {
     std::string to_string(const UnitFormat& format = UnitFormat());
   };
 
-  typedef std::vector<BaseUnit> BaseUnitsList;
   class BaseUnits {
   public:
-    BaseUnitsList baseunits;
+    typedef std::vector<BaseUnit> ListType;
+    BaseUnits::ListType baseunits;
     BaseUnits() {}
     BaseUnits(const std::string& s);
-    BaseUnits(const BaseUnitsList& bu) : baseunits(bu) {}
+    BaseUnits(const BaseUnits::ListType& bu) : baseunits(bu) {}
     void append(const BaseUnit& bu);
     void append(const std::string& p, const std::string& u, EXPONENT_TYPE e);
 #ifdef EXPONENT_FRACTIONS
@@ -44,8 +44,8 @@ namespace snt::puq {
     void operator+=(const BaseUnits& bu);
     void operator-=(const BaseUnits& bu);
     void operator*=(const EXPONENT_TYPE& e);
-    BaseUnitsList::const_iterator begin() const;
-    BaseUnitsList::const_iterator end() const;
+    BaseUnits::ListType::const_iterator begin() const;
+    BaseUnits::ListType::const_iterator end() const;
     std::size_t size() const;
     Dimensions dimensions() const;
   };

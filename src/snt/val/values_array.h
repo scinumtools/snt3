@@ -231,6 +231,7 @@ namespace snt::val {
         throw std::runtime_error("Array slice size does not correspond with array shape: " + std::to_string(slice.size()) + "!=" + std::to_string(this->shape.size()));
       // calculate new shape and size
       Array::ShapeType new_shape;
+      new_shape.reserve(this->shape.size());
       size_t new_size = 0;
       for (size_t i = 0; i < this->shape.size(); i++) {
         int dmin = slice[i].dmin;

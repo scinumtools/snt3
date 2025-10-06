@@ -12,12 +12,12 @@ namespace snt::dip {
                                                  const val::Array::ShapeType& shape) const override;
 
   public:
-    static BaseNode::PointerType is_node(Parser& parser);
+    static ValueNode::PointerType is_node(Parser& parser);
     BooleanNode(const std::string& nm, val::BaseValue::PointerType val)
         : BaseNode(NodeDtype::Boolean), ValueNode(nm, std::move(val)) {};
     BooleanNode(Parser& parser)
         : BaseNode(parser, NodeDtype::Boolean), ValueNode(val::DataType::Boolean) {};
-    BaseNode::NodeListType parse(Environment& env) override;
+    BaseNode::ListType parse(Environment& env) override;
     ValueNode::PointerType clone(const std::string& nm) const override;
     void validate_options() const override;
     std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override;

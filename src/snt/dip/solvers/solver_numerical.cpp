@@ -22,18 +22,17 @@ namespace snt::dip {
           settings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
       return std::move(value);
     } else if (parser.part_literal()) {
-      BaseNode::PointerType node = nullptr;
-      if (node == nullptr)
-        node = BooleanNode::is_node(parser);
-      if (node == nullptr)
-        node = IntegerNode::is_node(parser);
-      if (node == nullptr)
-        node = FloatNode::is_node(parser);
-      if (node == nullptr)
-        node = StringNode::is_node(parser);
-      if (node == nullptr)
+      ValueNode::PointerType vnode = nullptr;
+      if (vnode == nullptr)
+        vnode = BooleanNode::is_node(parser);
+      if (vnode == nullptr)
+        vnode = IntegerNode::is_node(parser);
+      if (vnode == nullptr)
+        vnode = FloatNode::is_node(parser);
+      if (vnode == nullptr)
+        vnode = StringNode::is_node(parser);
+      if (vnode == nullptr)
         throw std::runtime_error("Value could not be determined from : " + s);
-      ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node);
       vnode->set_value();
       return std::move(vnode->value);
     } else {

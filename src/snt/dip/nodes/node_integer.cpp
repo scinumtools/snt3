@@ -6,7 +6,7 @@
 
 namespace snt::dip {
 
-  BaseNode::PointerType IntegerNode::is_node(Parser& parser) {
+  ValueNode::PointerType IntegerNode::is_node(Parser& parser) {
     if (parser.dtype_raw[1] == "int") {
       parser.part_dimension();
       if (parser.part_equal(false))
@@ -30,7 +30,7 @@ namespace snt::dip {
     }
   };
 
-  BaseNode::NodeListType IntegerNode::parse(Environment& env) {
+  BaseNode::ListType IntegerNode::parse(Environment& env) {
     switch (value_origin) {
     case ValueOrigin::Function:
       set_value(env.request_value(value_raw.at(0), RequestType::Function, units_raw));

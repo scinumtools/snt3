@@ -56,8 +56,8 @@ namespace snt::dip {
     return lines;
   }
 
-  BaseNode::NodeListType parse_code_nodes(std::queue<Line>& lines) {
-    BaseNode::NodeListType nodes;
+  BaseNode::ListType parse_code_nodes(std::queue<Line>& lines) {
+    BaseNode::ListType nodes;
     while (!lines.empty()) {
       Line line = lines.front();
       lines.pop();
@@ -140,9 +140,9 @@ namespace snt::dip {
     return nodes;
   }
 
-  BaseNode::NodeListType parse_table_nodes(std::queue<Line>& lines, const char delimiter) {
+  BaseNode::ListType parse_table_nodes(std::queue<Line>& lines, const char delimiter) {
     // parse nodes from a table header
-    BaseNode::NodeListType nodes;
+    BaseNode::ListType nodes;
     while (!lines.empty()) {
       Line line = lines.front();
       lines.pop();
@@ -303,7 +303,7 @@ namespace snt::dip {
       value_raw.push_back(value_string);
   }
 
-  void parse_slices(std::string& value_string, val::Array::RangeType& dimension) {
+  void parse_slices(const std::string& value_string, val::Array::RangeType& dimension) {
     std::istringstream ss_dims(value_string);
     std::string dim;
     while (getline(ss_dims, dim, SEPARATOR_DIMENSION)) {

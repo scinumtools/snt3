@@ -17,12 +17,12 @@ namespace snt::dip {
     size_t branch_id;
     size_t case_id;
     typedef std::shared_ptr<BaseNode> PointerType;
-    typedef std::deque<BaseNode::PointerType> NodeListType;
+    typedef std::deque<BaseNode::PointerType> ListType;
     BaseNode() : dtype(NodeDtype::None) {};
     BaseNode(const NodeDtype dt) : dtype(dt) {};
     BaseNode(Parser& parser, const NodeDtype dt);
     virtual ~BaseNode() = default;
-    virtual NodeListType parse(Environment& env);
+    virtual ListType parse(Environment& env);
     virtual bool set_property(PropertyType property, val::Array::StringType& values, std::string& units);
   };
 

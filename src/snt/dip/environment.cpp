@@ -67,9 +67,9 @@ namespace snt::dip {
     return std::move(new_value);
   }
 
-  ValueNode::NodeListType Environment::request_nodes(const std::string& request,
-                                                     const RequestType rtype) const {
-    ValueNode::NodeListType new_nodes;
+  ValueNode::ListType Environment::request_nodes(const std::string& request,
+                                                 const RequestType rtype) const {
+    ValueNode::ListType new_nodes;
     switch (rtype) {
     case RequestType::Function: {
       FunctionList::TableFunctionType func = functions.get_table(request);
@@ -110,6 +110,10 @@ namespace snt::dip {
     if (new_nodes.empty())
       throw std::runtime_error("Node environment request returns an empty node list: " + request);
     return new_nodes;
+  }
+
+  val::BaseValue::PointerType Environment::get_value(size_t index) const {
+    return nodes.at(index)->value->clone();
   }
 
 } // namespace snt::dip

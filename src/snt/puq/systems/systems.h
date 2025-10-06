@@ -92,7 +92,7 @@ namespace snt::puq {
     std::string message;
 
   public:
-    DimensionMapExcept(std::string m) : message(m) {}
+    DimensionMapExcept(const std::string& m) : message(m) {}
     const char* what() const noexcept override {
       return message.c_str();
     }

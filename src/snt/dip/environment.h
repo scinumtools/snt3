@@ -27,7 +27,8 @@ namespace snt::dip {
     std::string request_code(const std::string& source_name) const;
     val::BaseValue::PointerType request_value(const std::string& request, const RequestType rtype,
                                               const std::string& to_unit = "") const;
-    ValueNode::NodeListType request_nodes(const std::string& request, const RequestType rtype) const;
+    ValueNode::ListType request_nodes(const std::string& request, const RequestType rtype) const;
+    val::BaseValue::PointerType get_value(size_t index) const;
   };
 
 } // namespace snt::dip

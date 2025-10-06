@@ -20,7 +20,7 @@ namespace snt::dip {
     return nullptr;
   }
 
-  BaseNode::NodeListType SourceNode::parse(Environment& env) {
+  BaseNode::ListType SourceNode::parse(Environment& env) {
     // TODO: implement import of a source
     // TODO: implement injection of a source file
     // TODO: implement injection a text file

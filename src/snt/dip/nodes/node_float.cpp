@@ -6,7 +6,7 @@
 
 namespace snt::dip {
 
-  BaseNode::PointerType FloatNode::is_node(Parser& parser) {
+  ValueNode::PointerType FloatNode::is_node(Parser& parser) {
     if (parser.dtype_raw[1] == "float") {
       parser.part_dimension();
       if (parser.part_equal(false))
@@ -30,7 +30,7 @@ namespace snt::dip {
     }
   };
 
-  BaseNode::NodeListType FloatNode::parse(Environment& env) {
+  BaseNode::ListType FloatNode::parse(Environment& env) {
     switch (value_origin) {
     case ValueOrigin::Function:
       set_value(env.request_value(value_raw.at(0), RequestType::Function, units_raw));

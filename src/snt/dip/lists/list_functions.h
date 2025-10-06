@@ -13,7 +13,7 @@ namespace snt::dip {
   class FunctionList {
   public:
     typedef val::BaseValue::PointerType (*ValueFunctionType)(const Environment& env);
-    typedef ValueNode::NodeListType (*TableFunctionType)(const Environment& env);
+    typedef ValueNode::ListType (*TableFunctionType)(const Environment& env);
 
   private:
     std::map<std::string, ValueFunctionType> value_functions;

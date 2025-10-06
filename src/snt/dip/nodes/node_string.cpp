@@ -7,7 +7,7 @@
 
 namespace snt::dip {
 
-  BaseNode::PointerType StringNode::is_node(Parser& parser) {
+  ValueNode::PointerType StringNode::is_node(Parser& parser) {
     if (parser.dtype_raw[1] == "str") {
       parser.part_dimension();
       if (parser.part_equal(false))
@@ -19,7 +19,7 @@ namespace snt::dip {
     return nullptr;
   }
 
-  BaseNode::NodeListType StringNode::parse(Environment& env) {
+  BaseNode::ListType StringNode::parse(Environment& env) {
     if (!units_raw.empty())
       throw std::runtime_error("String data type does not support units: " + line.code);
     switch (value_origin) {

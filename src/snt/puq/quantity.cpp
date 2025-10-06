@@ -45,7 +45,7 @@ namespace snt::puq {
     value = UnitValue(m);
   }
 
-  Quantity::Quantity(const MAGNITUDE_TYPE& m, const BaseUnitsList& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = UnitValue(m, bu);
   }
@@ -63,7 +63,7 @@ namespace snt::puq {
     value = UnitValue(m);
   }
 
-  Quantity::Quantity(const MAGNITUDE_PRECISION& m, const BaseUnitsList& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(const MAGNITUDE_PRECISION& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = UnitValue(m, bu);
   }
@@ -80,7 +80,7 @@ namespace snt::puq {
     value = UnitValue(m, e);
   }
 
-  Quantity::Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnitsList& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = UnitValue(m, e, bu);
   }
@@ -99,7 +99,7 @@ namespace snt::puq {
     value = UnitValue(std::move(m));
   }
 
-  Quantity::Quantity(val::BaseValue::PointerType m, const BaseUnitsList& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = UnitValue(std::move(m), bu);
   }
@@ -116,7 +116,7 @@ namespace snt::puq {
     value = UnitValue(std::move(m), std::move(e));
   }
 
-  Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnitsList& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = UnitValue(std::move(m), std::move(e), bu);
   }

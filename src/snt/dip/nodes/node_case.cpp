@@ -16,7 +16,7 @@ namespace snt::dip {
     return nullptr;
   }
 
-  BaseNode::NodeListType CaseNode::parse(Environment& env) {
+  BaseNode::ListType CaseNode::parse(Environment& env) {
     std::ostringstream oss;
     oss << "^(" << PATTERN_PATH << "*[" << SIGN_CONDITION << "])";
     oss << "(" << KEYWORD_CASE << "|" << KEYWORD_ELSE << "|" << KEYWORD_END << ")";

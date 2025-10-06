@@ -18,6 +18,7 @@ namespace snt::exs {
         int t) : OperatorBase<A, S>(n, s, t), symbol_other(so) {}
     virtual void parse(Expression& expr) override {
       this->groups.clear();
+      this->groups.reserve(expr.right.size());
       expr.remove(this->symbol);
       bool closed = false;
       while (expr.right.length() > 0) {

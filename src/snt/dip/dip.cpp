@@ -145,7 +145,7 @@ namespace snt::dip {
         continue;
       if (!target.branching.false_case() or node->dtype == NodeDtype::Case) {
         // Perform specific node parsing only outside of case or inside of valid case
-        BaseNode::NodeListType parsed = node->parse(target);
+        BaseNode::ListType parsed = node->parse(target);
         if (parsed.size() > 0) {
           while (parsed.size() > 0) {
             queue.push_front(parsed.back());

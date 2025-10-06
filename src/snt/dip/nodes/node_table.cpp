@@ -19,25 +19,25 @@ namespace snt::dip {
     return nullptr;
   }
 
-  inline BaseNode::NodeListType parse_nodes(const std::string& value_raw,
-                                            const std::string& source_name, const char delimiter) {
+  inline BaseNode::ListType parse_nodes(const std::string& value_raw,
+                                        const std::string& source_name, const char delimiter) {
     std::queue<Line> lines;
     parse_lines(lines, value_raw, source_name);
     return parse_table_nodes(lines, delimiter);
   }
 
-  BaseNode::NodeListType TableNode::parse(Environment& env) {
+  BaseNode::ListType TableNode::parse(Environment& env) {
     std::string source_name = line.source.name + "_" + std::string(TABLE_SOURCE);
-    NodeListType nodes;
+    BaseNode::ListType nodes;
     switch (value_origin) {
     case ValueOrigin::Function: {
-      ValueNode::NodeListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Function);
+      ValueNode::ListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Function);
       for (const auto& node : vnodes)
         nodes.push_back(node);
       break;
     }
     case ValueOrigin::Reference: {
-      ValueNode::NodeListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Reference);
+      ValueNode::ListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Reference);
       for (const auto& node : vnodes)
         nodes.push_back(node);
       break;

@@ -16,8 +16,12 @@
 - substitute includes in header by forward declarations
 - implement variable precision in int/float
 - consolide string format and add gtests
-  
-* Task DONE
+
+* v0.3a
+- removed PUQ array and MAGNITUDE_ARRAYS
+- transformed DIP Environment BaseNode list into a ValueNode list
+
+* v0.2a
 - add template solver to dip
 - rename "float" to "real"
 - change puq magnitude array format to the snt::array_to_string
@@ -27,3 +31,4 @@
 - remove array completely from puq
 - split .h files with multiple classes
 - move array namespace to snt
+

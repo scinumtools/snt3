@@ -18,17 +18,17 @@ namespace snt::dip {
     return nullptr;
   }
 
-  BaseNode::NodeListType ImportNode::parse(Environment& env) {
-    NodeListType nodes;
+  BaseNode::ListType ImportNode::parse(Environment& env) {
+    BaseNode::ListType nodes;
     switch (value_origin) {
     case ValueOrigin::Function: {
-      ValueNode::NodeListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Function);
+      ValueNode::ListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Function);
       for (const auto& node : vnodes)
         nodes.push_back(node);
       break;
     }
     case ValueOrigin::Reference: {
-      ValueNode::NodeListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Reference);
+      ValueNode::ListType vnodes = env.request_nodes(value_raw.at(0), RequestType::Reference);
       for (const auto& node : vnodes)
         nodes.push_back(node);
       break;

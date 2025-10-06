@@ -9,7 +9,7 @@
 
 namespace snt::dip {
 
-  BaseNode::PointerType BooleanNode::is_node(Parser& parser) {
+  ValueNode::PointerType BooleanNode::is_node(Parser& parser) {
     if (parser.dtype_raw[1] == "bool") {
       parser.part_dimension();
       if (parser.part_equal(false))
@@ -21,7 +21,7 @@ namespace snt::dip {
     return nullptr;
   }
 
-  BaseNode::NodeListType BooleanNode::parse(Environment& env) {
+  BaseNode::ListType BooleanNode::parse(Environment& env) {
     if (!units_raw.empty())
       throw std::runtime_error("Boolean data type does not support units: " + line.code);
     switch (value_origin) {
@@ -65,6 +65,7 @@ namespace snt::dip {
   val::BaseValue::PointerType BooleanNode::cast_array_value(const val::Array::StringType& value_inputs,
                                                             const val::Array::ShapeType& shape) const {
     std::vector<bool> bool_values;
+    bool_values.reserve(value_inputs.size());
     for (const auto& value : value_inputs) {
       if (value == snt::KEYWORD_TRUE)
         bool_values.push_back(true);

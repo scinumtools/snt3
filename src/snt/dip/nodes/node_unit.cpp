@@ -22,7 +22,7 @@ namespace snt::dip {
     return nullptr;
   }
 
-  BaseNode::NodeListType UnitNode::parse(Environment& env) {
+  BaseNode::ListType UnitNode::parse(Environment& env) {
     EnvUnit senv = {value_raw.at(0), value_raw.at(1)};
     env.units.append(value_raw.at(0), senv);
     return {};

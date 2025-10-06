@@ -17,6 +17,7 @@ namespace snt::dip {
     val::Array::ShapeType dims = val->get_shape();
     if (val->get_size() > 1) {
       dimension.clear();
+      dimension.reserve(dims.size());
       for (size_t dim : dims)
         dimension.push_back({dim, dim});
     }

@@ -17,7 +17,7 @@ namespace snt::dip {
     units_raw = parser.units_raw;
   }
 
-  BaseNode::NodeListType BaseNode::parse(Environment& env) {
+  BaseNode::ListType BaseNode::parse(Environment& env) {
     return {};
   }
 

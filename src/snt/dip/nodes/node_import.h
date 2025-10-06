@@ -9,7 +9,7 @@ namespace snt::dip {
   public:
     static BaseNode::PointerType is_node(Parser& parser);
     ImportNode(Parser& parser) : BaseNode(parser, NodeDtype::Import) {};
-    BaseNode::NodeListType parse(Environment& env) override;
+    BaseNode::ListType parse(Environment& env) override;
   };
 
 } // namespace snt::dip

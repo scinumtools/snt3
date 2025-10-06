@@ -11,11 +11,11 @@ namespace snt::dip {
   template <typename T>
   class NodeList {
   private:
-    T::NodeListType nodes;
+    T::ListType nodes;
 
   public:
     NodeList() {};
-    NodeList(const T::NodeListType& nl) : nodes(nl) {};
+    NodeList(const T::ListType& nl) : nodes(nl) {};
     size_t size() const {
       return nodes.size();
     };

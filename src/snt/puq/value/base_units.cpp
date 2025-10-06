@@ -108,11 +108,11 @@ namespace snt::puq {
     return os;
   }
 
-  BaseUnitsList::const_iterator BaseUnits::begin() const {
+  BaseUnits::ListType::const_iterator BaseUnits::begin() const {
     return baseunits.begin();
   }
 
-  BaseUnitsList::const_iterator BaseUnits::end() const {
+  BaseUnits::ListType::const_iterator BaseUnits::end() const {
     return baseunits.end();
   }
 
@@ -122,6 +122,7 @@ namespace snt::puq {
 
   Dimensions BaseUnits::dimensions() const {
     Dimensions dim;
+    dim.symbols.reserve(baseunits.size());
     for (auto& bu : baseunits) {
       // find prefix
       auto prefix = UnitPrefixList.find(bu.prefix);

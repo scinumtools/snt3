@@ -27,21 +27,21 @@ namespace snt::puq {
     Quantity(const UnitValue& v, const SystemType system = UnitSystem::System);
     Quantity(const MAGNITUDE_TYPE& m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const MAGNITUDE_TYPE& m, const SystemType system = UnitSystem::System);
-    Quantity(const MAGNITUDE_TYPE& m, const BaseUnitsList& bu, const SystemType system = UnitSystem::System);
+    Quantity(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
 #ifdef MAGNITUDE_ERRORS
     Quantity(const MAGNITUDE_PRECISION& m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const MAGNITUDE_PRECISION& m, const SystemType system = UnitSystem::System);
-    Quantity(const MAGNITUDE_PRECISION& m, const BaseUnitsList& bu, const SystemType system = UnitSystem::System);
+    Quantity(const MAGNITUDE_PRECISION& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
     Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const SystemType system = UnitSystem::System);
-    Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnitsList& bu, const SystemType system = UnitSystem::System);
+    Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
 #if defined(MAGNITUDE_VALUES)
     Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(val::BaseValue::PointerType m, const SystemType system = UnitSystem::System);
-    Quantity(val::BaseValue::PointerType m, const BaseUnitsList& bu, const SystemType system = UnitSystem::System);
+    Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
     Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system = SystemType::NONE);
     Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system = UnitSystem::System);
-    Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnitsList& bu, const SystemType system = UnitSystem::System);
+    Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
 #endif
 #endif
     std::string unit_system() const;

@@ -14,7 +14,7 @@ namespace snt::dip {
     CaseType case_type; // type of a case
     static BaseNode::PointerType is_node(Parser& parser);
     CaseNode(Parser& parser) : BaseNode(parser, NodeDtype::Case), case_id(0), value(false) {};
-    BaseNode::NodeListType parse(Environment& env) override;
+    BaseNode::ListType parse(Environment& env) override;
   };
 
 } // namespace snt::dip
