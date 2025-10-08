@@ -68,18 +68,21 @@ void init_dip(py::module_& m) {
       //py::object* data = static_cast<py::object*>(arr.mutable_data());
       //for (size_t i = 0; i < val->get_size(); ++i)
       //  data[i] = py::str((*val).get_value(i));
-       // Find the longest string length to define fixed-width dtype
+      // Find the longest string length to define fixed-width dtype
       size_t max_len = 1;
       for (size_t i = 0; i < val->get_size(); ++i)
-        max_len = std::max(max_len, (*val).get_value(i).size());
+	max_len = std::max(max_len, (*val).get_value(i).size());
       std::string dtype_str = "U" + std::to_string(max_len);
       py::array arr(py::dtype(dtype_str), shape);
-      auto* data = static_cast<wchar_t*>(arr.mutable_data());
+      auto* data = static_cast<char32_t*>(arr.mutable_data());
       for (size_t i = 0; i < val->get_size(); ++i) {
-        std::wstring wstr = py::str((*val).get_value(i)).cast<std::wstring>();
-        std::wcsncpy(data + i * max_len, wstr.c_str(), max_len);
-        if (wstr.size() < max_len)
-	  std::wmemset(data + i * max_len + wstr.size(), 0, max_len - wstr.size());
+	const std::string& s = (*val).get_value(i);
+	for (size_t j = 0; j < max_len; ++j) {
+	  if (j < s.size())
+	    data[i * max_len + j] = static_cast<char32_t>(s[j]);
+	  else
+	    data[i * max_len + j] = U'\0';
+	}
       }
       return arr;
     }
