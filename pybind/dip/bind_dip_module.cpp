@@ -2,9 +2,17 @@
 #include <pybind11/pybind11.h>
 #include <snt/val.h>
 #include <snt/dip.h>
+#include <codecvt>
+#include <locale>
 
 namespace py = pybind11;
 using namespace snt;
+
+// helper: convert UTF-8 string to UTF-32 (UCS4)
+static std::u32string utf8_to_utf32(const std::string& input) {
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+    return conv.from_bytes(input);
+}
 
 void init_dip(py::module_& m) {
 
@@ -62,29 +70,32 @@ void init_dip(py::module_& m) {
     }
     case dip::NodeDtype::String: {
       val::ArrayValue<std::string>* val =
-        dynamic_cast<val::ArrayValue<std::string>*>(vnode.value.get());
-      if (!val) throw std::runtime_error("Type mismatch");      
-      //py::array arr(py::dtype("O"), shape);
-      //py::object* data = static_cast<py::object*>(arr.mutable_data());
-      //for (size_t i = 0; i < val->get_size(); ++i)
-      //  data[i] = py::str((*val).get_value(i));
-      // Find the longest string length to define fixed-width dtype
+	dynamic_cast<val::ArrayValue<std::string>*>(vnode.value.get());
+      if (!val) throw std::runtime_error("Type mismatch");
+      
       size_t max_len = 1;
-      for (size_t i = 0; i < val->get_size(); ++i)
-        max_len = std::max(max_len, (*val).get_value(i).size());
-      std::string dtype_str = "U" + std::to_string(max_len);
-      py::array arr(py::dtype(dtype_str), shape);
-      auto* data = static_cast<char32_t*>(arr.mutable_data());
+      std::vector<std::u32string> utf32_strings;
+      utf32_strings.reserve(val->get_size());
+      
       for (size_t i = 0; i < val->get_size(); ++i) {
-        const std::string& s = (*val).get_value(i);
-        for (size_t j = 0; j < max_len; ++j) {
-	  if (j < s.size())
-	    data[i * max_len + j] =
-	      static_cast<char32_t>(static_cast<unsigned char>(s[j]));
-	  else
-	    data[i * max_len + j] = U'\0';
-        }
+	std::u32string u32 = utf8_to_utf32((*val).get_value(i));
+	max_len = std::max(max_len, u32.size());
+	utf32_strings.push_back(std::move(u32));
       }
+
+      auto dtype = py::dtype("U" + std::to_string(max_len));
+      std::vector<size_t> shape = val->get_shape();
+      py::array arr(dtype, shape);
+      
+      auto* data = static_cast<char32_t*>(arr.mutable_data());
+      
+      for (size_t i = 0; i < val->get_size(); ++i) {
+	const auto& u32 = utf32_strings[i];
+	for (size_t j = 0; j < max_len; ++j) {
+	  data[i * max_len + j] = (j < u32.size()) ? u32[j] : U'\0';
+	}
+      }
+      
       return arr;
     }
     default:

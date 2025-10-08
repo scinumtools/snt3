@@ -39,10 +39,10 @@ def test_init():
     # initialize string nodes
     dip = DIP()
     dip.add_string("foo str = 'a'");
-    dip.add_string("bar str[2,3] = [['a','b','c'],['a','b','c']]");
+    dip.add_string("bar str[2,3] = [['a','b','c'],['d','e','f']]");
     env = dip.parse();
 
     assert env.size == 2
     assert env[0].value == 'a'
-    np.testing.assert_array_equal(env[1].value, np.array([['a','b','c'],['a','b','c']]))
+    np.testing.assert_array_equal(env[1].value, np.array([['a','b','c'],['d','e','f']]))
     
