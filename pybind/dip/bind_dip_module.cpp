@@ -71,18 +71,19 @@ void init_dip(py::module_& m) {
       // Find the longest string length to define fixed-width dtype
       size_t max_len = 1;
       for (size_t i = 0; i < val->get_size(); ++i)
-	max_len = std::max(max_len, (*val).get_value(i).size());
+        max_len = std::max(max_len, (*val).get_value(i).size());
       std::string dtype_str = "U" + std::to_string(max_len);
       py::array arr(py::dtype(dtype_str), shape);
       auto* data = static_cast<char32_t*>(arr.mutable_data());
       for (size_t i = 0; i < val->get_size(); ++i) {
-	const std::string& s = (*val).get_value(i);
-	for (size_t j = 0; j < max_len; ++j) {
+        const std::string& s = (*val).get_value(i);
+        for (size_t j = 0; j < max_len; ++j) {
 	  if (j < s.size())
-	    data[i * max_len + j] = static_cast<char32_t>(s[j]);
+	    data[i * max_len + j] =
+	      static_cast<char32_t>(static_cast<unsigned char>(s[j]));
 	  else
 	    data[i * max_len + j] = U'\0';
-	}
+        }
       }
       return arr;
     }
