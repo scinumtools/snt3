@@ -4,7 +4,7 @@ find_package(pybind11 CONFIG)
 
 set(MODULE_NAME scinumtools3)
 
-if (COMPILE_PUQ AND COMPILE_DIP)
+if (COMPILE_PUQ OR COMPILE_DIP)
 file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
 pybind11_add_module(${MODULE_NAME} ${SOURCE_FILES})
 target_include_directories(${MODULE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -14,8 +14,11 @@ set_target_properties(${MODULE_NAME} PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python
 )
 
+# install python module
+install(TARGETS ${MODULE_NAME}
+        LIBRARY DESTINATION ${Python3_SITEARCH})  # or ${Python3_SITELIB}
 
-if (COMPILE_TESTS_PUQ)
+if (COMPILE_TESTS_PUQ OR COMPILE_TESTS_DIP)
 # register pytest into ctest
 find_package(Pytest 8.2.1 REQUIRED)
 pytest_discover_tests(
