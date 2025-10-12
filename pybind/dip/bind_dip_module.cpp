@@ -8,12 +8,6 @@
 namespace py = pybind11;
 using namespace snt;
 
-// helper: convert UTF-8 string to UTF-32 (UCS4)
-static std::u32string utf8_to_utf32(const std::string& input) {
-    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
-    return conv.from_bytes(input);
-}
-
 void init_dip(py::module_& m) {
 
   auto rt = py::enum_<dip::RequestType>(m, "RequestType");
@@ -23,6 +17,8 @@ void init_dip(py::module_& m) {
 
   auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(m, "ValueNode");
   val.def_property_readonly("value", [](const dip::ValueNode &vnode) -> py::object {
+
+    std::cout << vnode.name << " " << vnode.to_string() << std::endl;
     
     std::vector<size_t> shape = vnode.value->get_shape();
     std::vector<ssize_t> strides(shape.size());
@@ -69,34 +65,20 @@ void init_dip(py::module_& m) {
       return py::array_t<double>(shape, strides, val->get_data(), capsule);
     }
     case dip::NodeDtype::String: {
-      val::ArrayValue<std::string>* val =
-	dynamic_cast<val::ArrayValue<std::string>*>(vnode.value.get());
-      if (!val) throw std::runtime_error("Type mismatch");
-      
-      size_t max_len = 1;
-      std::vector<std::u32string> utf32_strings;
-      utf32_strings.reserve(val->get_size());
-      
-      for (size_t i = 0; i < val->get_size(); ++i) {
-	std::u32string u32 = utf8_to_utf32((*val).get_value(i));
-	max_len = std::max(max_len, u32.size());
-	utf32_strings.push_back(std::move(u32));
-      }
-
-      auto dtype = py::dtype("U" + std::to_string(max_len));
-      std::vector<size_t> shape = val->get_shape();
-      py::array arr(dtype, shape);
-      
-      auto* data = static_cast<char32_t*>(arr.mutable_data());
-      
-      for (size_t i = 0; i < val->get_size(); ++i) {
-	const auto& u32 = utf32_strings[i];
-	for (size_t j = 0; j < max_len; ++j) {
-	  data[i * max_len + j] = (j < u32.size()) ? u32[j] : U'\0';
-	}
-      }
-      
-      return arr;
+      val::ArrayValue<std::string>* val = dynamic_cast<val::ArrayValue<std::string>*>(vnode.value.get());
+      py::list list;
+      // NOTE: For string-array conversion I could not find an alternative
+      //       implementation that would work both on clang/macos and gcc/linux
+      //       so for now we stick with this one.
+      for (size_t i=0; i<val->get_size(); i++)
+	list.append(py::str(val->get_value(i)));
+      py::tuple t(shape.size());
+      for (size_t i = 0; i < shape.size(); ++i)
+        t[i] = py::cast(shape[i]);
+      py::module np = py::module::import("numpy");
+      py::object arr = np.attr("array")(list);
+      py::object reshaped = arr.attr("reshape")(t);
+      return reshaped.cast<py::array>();
     }
     default:
       throw py::type_error("Unknown dtype in Environment");

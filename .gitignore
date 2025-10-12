@@ -6,6 +6,7 @@ helpers/*
 docs/build/*
 docs/doxy/*
 **/__pycache__/*
+.venv
 
 # Prerequisites
 *.d
