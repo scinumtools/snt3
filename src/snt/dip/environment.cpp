@@ -5,6 +5,12 @@
 
 namespace snt::dip {
 
+  /**
+   * @brief Split request expression into a name and node path
+   *
+   * @param request Request expression
+   * @return Tuple with the request name and node path
+   */
   inline std::tuple<std::string, std::string> parse_request(const std::string& request) {
     size_t pos = request.find(SIGN_QUERY);
     if (pos == std::string::npos)

@@ -3,7 +3,7 @@ import numpy as np
 
 from scinumtools3.dip import DIP, Environment, ValueNode
 
-def test_init():
+def test_parsing_value():
 
     # initialize boolean nodes
     dip = DIP()
