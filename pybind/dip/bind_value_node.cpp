@@ -1,6 +1,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <snt/val.h>
+#include <snt/puq.h>
 #include <snt/dip.h>
 #include <codecvt>
 #include <locale>
@@ -11,10 +12,13 @@ using namespace snt;
 void init_value_node(py::module_& m) {
   
   auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(m, "ValueNode");
+  val.def_readonly("name", &dip::ValueNode::name);
+  val.def_property_readonly("units", [](const dip::ValueNode &node) -> puq::Quantity {
+    const dip::QuantityNode& qnode = dynamic_cast<const dip::QuantityNode&>(node);
+    return *qnode.units;
+  });
   val.def_property_readonly("value", [](const dip::ValueNode &vnode) -> py::object {
 
-    std::cout << vnode.name << " " << vnode.to_string() << std::endl;
-    
     std::vector<size_t> shape = vnode.value->get_shape();
     std::vector<ssize_t> strides(shape.size());
     

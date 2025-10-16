@@ -1,5 +1,6 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <snt/val.h>
 #include <snt/dip.h>
 #include <codecvt>
@@ -10,16 +11,22 @@ using namespace snt;
 
 void init_environment(py::module_& m) {
 
+  auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList");
+  nl.def(py::init<>());
+  nl.def("__getitem__", [](const dip::NodeList<dip::ValueNode> &self, size_t i) {
+    return self.at(i);
+  }, py::arg("node"));
+  
   auto env = py::class_<dip::Environment>(m, "Environment");
   env.def(py::init<>());
-  env.def("__getitem__", [](const dip::Environment &e, size_t i) {
-    return e.nodes.at(i);
-  }, py::arg("node"));
+  env.def_property_readonly("nodes", [](const dip::Environment &e) {
+    return &e.nodes;
+  });
   env.def_property_readonly("size", [](const dip::Environment &e) {
     return e.nodes.size();
   });
   env.def("request", [](const dip::Environment &e, const std::string& path) {
-    return e.request_value(path);
+    return e.request_nodes("?"+path);
   });
   //env.def("request_code", &dip::Environment::request_code, py::arg("source_name"));
   //env.def("request_value", &dip::Environment::request_value, py::arg("request"), py::arg("rtype"), py::arg("to_units") = "");

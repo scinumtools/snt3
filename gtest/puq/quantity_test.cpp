@@ -243,6 +243,24 @@ TEST(Quantity, ArithmeticsDivide) {
 #endif
 }
 
+TEST(Quantity, CompareEqual) {
+
+  puq::Quantity q1, q2;
+
+  q1 = puq::Quantity(6, "cm");  // same units 
+  q2 = puq::Quantity(3, "cm");
+  EXPECT_EQ(q1 == q2, false);
+  EXPECT_EQ(q1 == q1, true);  
+  EXPECT_EQ(q1 != q2, true);
+  EXPECT_EQ(q1 != q1, false);  
+  
+  q1 = puq::Quantity(6, "g");  // different units
+  q2 = puq::Quantity(6, "cm");
+  EXPECT_EQ(q1 == q2, false);
+  EXPECT_EQ(q1 != q2, true);
+  
+}
+
 TEST(Quantity, RebaseUnits) {
 
   puq::Quantity q("23*cm*m2*kg*mg");

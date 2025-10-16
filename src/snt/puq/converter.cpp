@@ -161,7 +161,7 @@ namespace snt::puq {
     dimensions1 = bu1.dimensions();
     dimensions2 = bu2.dimensions();
     if (dimensions1 != dimensions2)
-      throw ConvDimExcept(bu1, bu2);
+      throw snt::puq::ConvDimExcept(bu1, bu2);
 
     // determine conversion type
     // std::cout << baseunits1.to_string() << " " << baseunits2.to_string() << std::endl;

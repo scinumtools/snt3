@@ -44,6 +44,8 @@ namespace snt::puq {
     val::Array::ShapeType shape() const;
 #endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
+    friend bool operator==(const UnitValue& v1, const UnitValue& v2);
+    friend bool operator!=(const UnitValue& v1, const UnitValue& v2);
     friend UnitValue operator+(const UnitValue& v1, const UnitValue& v2);
     friend UnitValue operator-(const UnitValue& v1, const UnitValue& v2);
     friend UnitValue operator*(const UnitValue& v1, const UnitValue& v2);

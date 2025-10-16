@@ -41,6 +41,9 @@ namespace snt::dip {
     T::PointerType at(const size_t index) const {
       return nodes.at(index);
     };
+    const T::ListType& get_nodes() const {
+      return nodes;
+    }
   };
 
 } // namespace snt::dip

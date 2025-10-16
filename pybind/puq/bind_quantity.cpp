@@ -196,12 +196,14 @@ void init_puq_quantity(py::module_& m) {
        val::BaseValue::PointerType varray = parseBaseValue(other);
        if (varray==nullptr)
 	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
-       return py::cast(quant + std::move(varray)); }, py::is_operator());
+       return py::cast(quant + std::move(varray));
+  }, py::is_operator());
   q.def("__radd__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
      val::BaseValue::PointerType varray = parseBaseValue(other);
      if (varray==nullptr)
        py::reinterpret_borrow<py::object>(Py_NotImplemented);
-     return py::cast(std::move(varray) + quant); }, py::is_operator());
+     return py::cast(std::move(varray) + quant);
+  }, py::is_operator());
 
   /**
    * Subtraction of quantities
@@ -210,12 +212,14 @@ void init_puq_quantity(py::module_& m) {
        val::BaseValue::PointerType varray = parseBaseValue(other);
        if (varray==nullptr)
 	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
-       return py::cast(quant - std::move(varray)); }, py::is_operator());
+       return py::cast(quant - std::move(varray));
+  }, py::is_operator());
   q.def("__rsub__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
      val::BaseValue::PointerType varray = parseBaseValue(other);
      if (varray==nullptr)
        py::reinterpret_borrow<py::object>(Py_NotImplemented);
-     return py::cast(std::move(varray) - quant); }, py::is_operator());
+     return py::cast(std::move(varray) - quant);
+  }, py::is_operator());
 
   /**
    * Multiplication of quantities
@@ -224,12 +228,14 @@ void init_puq_quantity(py::module_& m) {
        val::BaseValue::PointerType varray = parseBaseValue(other);
        if (varray==nullptr)
 	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
-       return py::cast(quant * std::move(varray)); }, py::is_operator());
+       return py::cast(quant * std::move(varray));
+  }, py::is_operator());
   q.def("__rmul__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
      val::BaseValue::PointerType varray = parseBaseValue(other);
      if (varray==nullptr)
        py::reinterpret_borrow<py::object>(Py_NotImplemented);
-     return py::cast(std::move(varray) * quant); }, py::is_operator());
+     return py::cast(std::move(varray) * quant);
+  }, py::is_operator());
 
   /**
    * Division of quantities
@@ -238,12 +244,14 @@ void init_puq_quantity(py::module_& m) {
        val::BaseValue::PointerType varray = parseBaseValue(other);
        if (varray==nullptr)
 	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
-       return py::cast(quant / std::move(varray)); }, py::is_operator());
+       return py::cast(quant / std::move(varray));
+  }, py::is_operator());
   q.def("__rtruediv__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
      val::BaseValue::PointerType varray = parseBaseValue(other);
      if (varray==nullptr)
        py::reinterpret_borrow<py::object>(Py_NotImplemented);
-     return py::cast(std::move(varray) / quant); }, py::is_operator());
+     return py::cast(std::move(varray) / quant);
+  }, py::is_operator());
 
   // q.def(std::vector<double>() + py::self)
   //.def(std::vector<double>() - py::self)
@@ -254,6 +262,14 @@ void init_puq_quantity(py::module_& m) {
   //.def(py::self * std::vector<double>())
   //.def(py::self / std::vector<double>())
 
+  q.def("__eq__", [](const snt::puq::Quantity& self, const snt::puq::Quantity& other) -> py::object {
+    return py::bool_(self==other);
+  }, py::is_operator());
+  
+  q.def("__neq__", [](const snt::puq::Quantity& self, const snt::puq::Quantity& other) -> py::object {
+    return py::bool_(self!=other);
+  }, py::is_operator());
+  
   q.def("__array__", [](const snt::puq::Quantity& q, const py::object& dtype) {
     throw std::runtime_error("Convert explicitly: use .to_numpy() or .magnitude");
   });

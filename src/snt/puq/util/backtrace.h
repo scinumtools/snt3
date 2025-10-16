@@ -6,7 +6,7 @@
 #include <execinfo.h> // For backtrace and backtrace_symbols
 #include <iostream>
 
-void print_backtrace() {
+inline void print_backtrace() {
   /*
     const int max_frames = 128;
     void* buffer[max_frames];  // Buffer to store backtrace pointers

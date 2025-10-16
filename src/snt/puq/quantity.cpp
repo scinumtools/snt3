@@ -200,6 +200,18 @@ namespace snt::puq {
     UnitSystem us(q1.stype);
     return Quantity(q1.value / q2.value);
   }
+  bool operator==(const Quantity& q1, const Quantity& q2) {
+    if (q1.stype != q2.stype)
+      throw UnitSystemExcept(q1.stype, q2.stype);
+    UnitSystem us(q1.stype);
+    return q1.value==q2.value;
+  }
+  bool operator!=(const Quantity& q1, const Quantity& q2) {
+    if (q1.stype != q2.stype)
+      throw UnitSystemExcept(q1.stype, q2.stype);
+    UnitSystem us(q1.stype);
+    return q1.value!=q2.value;
+  }
 
   // overloading scalar/quantity
   Quantity operator+(const MAGNITUDE_PRECISION& m, const Quantity& q) {
@@ -369,8 +381,8 @@ namespace snt::puq {
       UnitValue uv2 = _convert_without_context(us, system);
       try {
         return Quantity(uv2.convert(uv1), system);
-      } catch (const ConvDimExcept& e) {
-        throw ConvDimExcept(value.baseunits, stype, uv1.baseunits, system);
+      } catch (const snt::puq::ConvDimExcept& e) {
+        throw snt::puq::ConvDimExcept(value.baseunits, stype, uv1.baseunits, system);
       }
     } else {
       QuantityListType::iterator qs1 = puq::UnitSystem::Data->QuantityList.find(q);
@@ -406,8 +418,8 @@ namespace snt::puq {
       UnitValue uv = _convert_without_context(us, system);
       try {
         return Quantity(uv.convert(bu), system);
-      } catch (const ConvDimExcept& e) {
-        throw ConvDimExcept(value.baseunits, stype, UnitValue(1, bu).baseunits, system);
+      } catch (const snt::puq::ConvDimExcept& e) {
+        throw snt::puq::ConvDimExcept(value.baseunits, stype, UnitValue(1, bu).baseunits, system);
       }
     } else {
       QuantityListType::iterator qs1 = puq::UnitSystem::Data->QuantityList.find(q);
@@ -439,8 +451,8 @@ namespace snt::puq {
       UnitValue uv = _convert_without_context(us, system);
       try {
         return Quantity(uv.convert(s), system);
-      } catch (const ConvDimExcept& e) {
-        throw ConvDimExcept(value.baseunits, stype, UnitValue(s).baseunits, system);
+      } catch (const snt::puq::ConvDimExcept& e) {
+        throw snt::puq::ConvDimExcept(value.baseunits, stype, UnitValue(s).baseunits, system);
       }
     } else {
       QuantityListType::iterator qs1 = puq::UnitSystem::Data->QuantityList.find(q);

@@ -103,6 +103,46 @@ namespace snt::puq {
     return s.substr(0, s.size() - multiply.size());
   }
 
+  bool operator==(const UnitValue& v1, const UnitValue& v2) {
+    try {
+      Converter conv(v2.baseunits, v1.baseunits);
+#ifdef UNITS_LOGARITHMIC
+      if (conv.utype == Utype::LOG) {
+	MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
+	MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
+	  m1 = nostd::pow(10, m1);
+	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
+	  m2 = nostd::pow(10, m2);
+	return m1 == m2;
+      }
+#endif
+      return v1.magnitude == conv.convert(v2.magnitude);
+    } catch (const snt::puq::ConvDimExcept& e) {
+      return false;
+    }
+  }
+  
+  bool operator!=(const UnitValue& v1, const UnitValue& v2) {
+    try {
+      Converter conv(v2.baseunits, v1.baseunits);
+#ifdef UNITS_LOGARITHMIC
+      if (conv.utype == Utype::LOG) {
+	MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
+	MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
+	  m1 = nostd::pow(10, m1);
+	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
+	  m2 = nostd::pow(10, m2);
+	return m1 != m2;
+      }
+#endif
+      return v1.magnitude != conv.convert(v2.magnitude);
+    } catch (const snt::puq::ConvDimExcept& e) {
+      return true;
+    }
+  }
+  
   UnitValue operator+(const UnitValue& v1, const UnitValue& v2) {
     Converter conv(v2.baseunits, v1.baseunits);
 #ifdef UNITS_LOGARITHMIC

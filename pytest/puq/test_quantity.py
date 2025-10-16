@@ -171,6 +171,15 @@ def test_arithmetics():
 
     assert (Quantity('4*dm') * Quantity('3*m') / Quantity('6*s')).to_string() == "2*dm*m*s-1"
 
+def test_comparison():
+
+    n = Quantity(12)
+    q = Quantity(3, 'km')    
+    r = Quantity(3000, 'm')
+
+    assert q==q
+    assert n!=q
+    
 def test_rebase_units():
 
     q = Quantity("23*cm*m2*kg*mg")

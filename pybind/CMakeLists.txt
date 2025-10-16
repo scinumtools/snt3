@@ -8,7 +8,11 @@ if (COMPILE_PUQ OR COMPILE_DIP)
 file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
 pybind11_add_module(${MODULE_NAME} ${SOURCE_FILES})
 target_include_directories(${MODULE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_link_libraries(${MODULE_NAME} PRIVATE snt-dip)
+if (COMPILE_TESTS_DIP)
+   target_link_libraries(${MODULE_NAME} PRIVATE snt-dip)
+elseif (COMPILE_TESTS_PUQ)
+   target_link_libraries(${MODULE_NAME} PRIVATE snt-puq)
+endif()
 set_target_properties(${MODULE_NAME} PROPERTIES
     OUTPUT_NAME ${MODULE_NAME}
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python

@@ -56,25 +56,31 @@ namespace snt::puq {
     friend Quantity operator-(const Quantity& q1, const Quantity& q2);
     friend Quantity operator*(const Quantity& q1, const Quantity& q2);
     friend Quantity operator/(const Quantity& q1, const Quantity& q2);
+    friend bool operator==(const Quantity& q1, const Quantity& q2);
+    friend bool operator!=(const Quantity& q1, const Quantity& q2);
     // scalar operations
     friend Quantity operator+(const MAGNITUDE_PRECISION& m, const Quantity& q);
     friend Quantity operator-(const MAGNITUDE_PRECISION& m, const Quantity& q);
     friend Quantity operator*(const MAGNITUDE_PRECISION& m, const Quantity& q);
     friend Quantity operator/(const MAGNITUDE_PRECISION& m, const Quantity& q);
+    //friend bool operator==(const MAGNITUDE_PRECISION& m, const Quantity& q);
     friend Quantity operator+(const Quantity& q, const MAGNITUDE_PRECISION& m);
     friend Quantity operator-(const Quantity& q, const MAGNITUDE_PRECISION& m);
     friend Quantity operator*(const Quantity& q, const MAGNITUDE_PRECISION& m);
     friend Quantity operator/(const Quantity& q, const MAGNITUDE_PRECISION& m);
+    //friend bool operator==(const Quantity& q, const MAGNITUDE_PRECISION& m);
 #if defined(MAGNITUDE_VALUES)
     // array operations
     friend Quantity operator+(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator-(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator*(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator/(val::BaseValue::PointerType a, const Quantity& q);
+    //friend bool operator==(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator+(const Quantity& q, val::BaseValue::PointerType a);
     friend Quantity operator-(const Quantity& q, val::BaseValue::PointerType a);
     friend Quantity operator*(const Quantity& q, val::BaseValue::PointerType a);
     friend Quantity operator/(const Quantity& q, val::BaseValue::PointerType a);
+    //friend bool operator==(const Quantity& q, val::BaseValue::PointerType a);
 #endif
     friend Quantity operator+(const Quantity& q);
     friend Quantity operator-(const Quantity& q);
