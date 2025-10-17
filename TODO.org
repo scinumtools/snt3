@@ -1,16 +1,13 @@
-
 * SCINUMTOOLS TODO
 
 ** High priority
 - create std::variant for the unit exponents
-- include pybind11 to dip and puq
 - create sphix documentation
-- change node list in puq environment to NodeValue instead of NodeBase, so that value can be printed out using to_string()
+- start writing doxygen documentation comments and docstring
   
 ** Low priority
 - currently there are no uncertaintes in dip values, only in units/Quantities. In the future this should also be possible for values in general.
 - improve error handling strategy in whole snt
-- start writing doxygen documentation comments
 - installation using homebrew
 - implement dip linter
 - installation as a debian package
@@ -20,6 +17,8 @@
 - consolide string format and add gtests
 
 * v0.3a
+- change node list in puq environment to NodeValue instead of NodeBase, so that value can be printed out using to_string()
+- include pybind11 to dip and puq
 - remove QuantityNode and move its functionality to the ValueNode
 - removed PUQ array and MAGNITUDE_ARRAYS
 - transformed DIP Environment BaseNode list into a ValueNode list

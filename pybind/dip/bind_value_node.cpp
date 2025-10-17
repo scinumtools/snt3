@@ -40,7 +40,8 @@ void init_value_node(py::module_& m) {
     };
     
     switch (vnode.dtype) {
-    case dip::NodeDtype::Boolean: {  // TODO: in the future bool should be stored as uint8_t
+    case dip::NodeDtype::Boolean: {
+      // TODO: in the future bool should be stored as uint8_t because bool is not 8 bit, but 1 bit
       val::ArrayValue<bool>* val =
         dynamic_cast<val::ArrayValue<bool>*>(vnode.value.get());
       if (!val) throw std::runtime_error("Type mismatch");    
@@ -84,4 +85,3 @@ void init_value_node(py::module_& m) {
       throw py::type_error("Unknown dtype in Environment");
     }
   });
-}
