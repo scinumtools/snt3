@@ -180,10 +180,9 @@ namespace snt::dip {
         bool new_node = true;
         for (size_t i = 0; i < target.nodes.size(); i++) {
           if (target.nodes.at(i)->name == node->name) {
-            ValueNode::PointerType pnode =
-                std::dynamic_pointer_cast<ValueNode>(target.nodes.at(i));
-            pnode->validate_constant();
-            pnode->modify_value(node, target);
+            ValueNode::PointerType mnode = target.nodes.at(i);
+            mnode->validate_constant();
+            mnode->modify_value(node, target);
             new_node = false;
           }
         }
