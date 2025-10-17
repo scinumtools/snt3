@@ -97,10 +97,11 @@ def test_init_errors_numpy():
     assert q.to_string() == "[[2.0(10), 3.0(20), 4.0(30)], [5.0(40), 6.0(50), 7.0(60)]]*km"
     assert q.size() == 6
     
-def test_string():
+def test_class_special_methods():
 
     q = Quantity("23*cm")
     assert str(q) == "23*cm"
+    assert q.__repr__() == "23*cm"
 
 def test_conversion():
 

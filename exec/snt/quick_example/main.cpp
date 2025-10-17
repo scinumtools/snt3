@@ -24,5 +24,8 @@ int main() {
   d.add_string("foo = 3 km");
   dip::Environment env = d.parse();
   dip::ValueNode::PointerType vnode = env.nodes.at(0);
+  std::cout << vnode->to_string() << '\n';
   std::cout << vnode->value->to_string() << '\n';
+  dip::QuantityNode::PointerType qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
+  std::cout << qnode->units->to_string() << '\n';
 }
