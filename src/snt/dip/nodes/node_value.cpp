@@ -1,7 +1,5 @@
 #include "node_value.h"
 
-#include "node_quantity.h"
-
 #include <sstream>
 
 namespace snt::dip {
@@ -11,8 +9,8 @@ namespace snt::dip {
     name = nm;
   };
 
-  ValueNode::ValueNode(const std::string& nm, val::BaseValue::PointerType val)
-      : constant(false), value_dtype(val->get_dtype()) {
+  ValueNode::ValueNode(const std::string& nm, val::BaseValue::PointerType val, puq::Quantity::PointerType unt)
+    : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)) {
     name = nm;
     val::Array::ShapeType dims = val->get_shape();
     if (val->get_size() > 1) {
@@ -63,20 +61,43 @@ namespace snt::dip {
     }
   }
 
+  void ValueNode::set_units(puq::Quantity::PointerType units_input) {
+    // setting node units
+    units = nullptr;
+    if (units_input == nullptr and !units_raw.empty()) {
+      units = std::make_unique<puq::Quantity>(units_raw);
+    } else if (units_input != nullptr) {
+      units = std::move(units_input);
+    }
+    // converting option units if necessary
+    for (auto& option : options) {
+      std::string option_units = option.units_raw;
+      if (!option_units.empty()) {
+        if (units == nullptr)
+          throw std::runtime_error("Trying to convert '" + option_units +
+                                   "' into a nondimensional quantity: " + line.code);
+        else {
+          puq::Quantity quantity(std::move(option.value), option_units);
+          quantity = quantity.convert(*units);
+          option.value = std::move(quantity.value.magnitude.value);
+        }
+      }
+    }
+  }
+  
   void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
     if (node->dtype != NodeDtype::Modification and node->dtype != dtype)
       throw std::runtime_error("Node '" + name + "' with type '" + dtype_raw.at(1) +
                                "' cannot modify node '" + node->name + "' with type '" +
                                node->dtype_raw.at(1) + "'");
     val::BaseValue::PointerType value = cast_value(node->value_raw, node->value_shape);
-    QuantityNode* qnode = dynamic_cast<QuantityNode*>(this);
-    if (qnode and !node->units_raw.empty()) {
-      if (qnode->units == nullptr)
+    if (!node->units_raw.empty()) {
+      if (this->units == nullptr)
         throw std::runtime_error("Trying to convert '" + node->units_raw +
                                  "' into a nondimensional quantity: " + line.code);
       else {
         puq::Quantity quantity(std::move(value), node->units_raw);
-        quantity = quantity.convert(*qnode->units);
+        quantity = quantity.convert(*this->units);
         value = std::move(quantity.value.magnitude.value);
       }
     }

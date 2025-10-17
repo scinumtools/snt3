@@ -117,4 +117,12 @@ namespace snt::dip {
       return std::make_shared<FloatNode>(nm, std::move(value->clone()), std::move(units->clone()));
   }
 
+  std::string FloatNode::to_string(const snt::StringFormatType& format) const {
+    std::stringstream ss;
+    ss << value->to_string(format);
+    if (units)
+      ss << " " << units->to_string();
+    return ss.str();
+  }
+  
 } // namespace snt::dip

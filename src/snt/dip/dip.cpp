@@ -1,7 +1,6 @@
 #include "dip.h"
 
 #include "nodes/node_property.h"
-#include "nodes/node_quantity.h"
 #include "nodes/node_value.h"
 #include "parsers.h"
 #include "settings.h"
@@ -171,12 +170,11 @@ namespace snt::dip {
         // Set the node value an unit
         // TODO: maybe this can be done after modifications?!
         ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node);
-        if (vnode and vnode->value == nullptr) {
-          vnode->set_value();
-        }
-        QuantityNode::PointerType qnode = std::dynamic_pointer_cast<QuantityNode>(node);
-        if (qnode and qnode->units == nullptr) {
-          qnode->set_units();
+        if (vnode) {
+	  if (vnode->value == nullptr)
+	    vnode->set_value();
+	  if (vnode->units == nullptr)
+	    vnode->set_units();
         }
         // If node was previously defined, modify its value
         bool new_node = true;

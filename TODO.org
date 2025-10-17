@@ -3,7 +3,6 @@
 
 ** High priority
 - create std::variant for the unit exponents
-- remove QuantityNode and move its functionality to the ValueNode
 - include pybind11 to dip and puq
 - create sphix documentation
 - change node list in puq environment to NodeValue instead of NodeBase, so that value can be printed out using to_string()
@@ -21,6 +20,7 @@
 - consolide string format and add gtests
 
 * v0.3a
+- remove QuantityNode and move its functionality to the ValueNode
 - removed PUQ array and MAGNITUDE_ARRAYS
 - transformed DIP Environment BaseNode list into a ValueNode list
 

@@ -1,6 +1,5 @@
 #include "environment.h"
 
-#include "nodes/node_quantity.h"
 #include "nodes/node_value.h"
 
 namespace snt::dip {
@@ -43,20 +42,19 @@ namespace snt::dip {
         ValueNode::PointerType vnode = node_pool.at(i);
         if (vnode and vnode->name == node_path) {
           new_value = vnode->value->clone();
-          QuantityNode::PointerType qnode = std::dynamic_pointer_cast<QuantityNode>(vnode);
-          if (qnode && to_unit != KEYWORD_NONE) {
+          if (to_unit != KEYWORD_NONE) {
             // NOTE: If unit conversion is not required, the to_unit should be set to "none".
             //       This is usefull if we want to simply get a reference node as it is.
-            if (qnode->units == nullptr and !to_unit.empty())
+            if (vnode->units == nullptr and !to_unit.empty())
               throw std::runtime_error(
-                  "Trying to convert nondimensional quantity into '" + qnode->units_raw +
-                  "': " + qnode->line.code);
-            else if (qnode->units != nullptr and to_unit.empty())
+                  "Trying to convert nondimensional quantity into '" + vnode->units_raw +
+                  "': " + vnode->line.code);
+            else if (vnode->units != nullptr and to_unit.empty())
               throw std::runtime_error(
-                  "Trying to convert '" + qnode->units_raw +
-                  "' into a nondimensional quantity: " + qnode->line.code);
-            else if (qnode->units != nullptr) {
-              puq::Quantity quantity = std::move(new_value) * (*qnode->units);
+                  "Trying to convert '" + vnode->units_raw +
+                  "' into a nondimensional quantity: " + vnode->line.code);
+            else if (vnode->units != nullptr) {
+              puq::Quantity quantity = std::move(new_value) * (*vnode->units);
               quantity = quantity.convert(to_unit);
               new_value = std::move(quantity.value.magnitude.value);
             }

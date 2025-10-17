@@ -15,9 +15,8 @@ TEST(Units, Definition) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "23");
-  dip::QuantityNode::PointerType qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "km");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "km");
 
   d = dip::DIP();
   d.add_string("foo float = 2.34e5 km");
@@ -27,9 +26,8 @@ TEST(Units, Definition) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "2.34e5");
-  qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "km");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "km");
 }
 
 TEST(Units, ScalarModification) {
@@ -43,9 +41,8 @@ TEST(Units, ScalarModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "m");
   EXPECT_EQ(vnode->value->to_string(), "23000");
-  dip::QuantityNode::PointerType qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "m");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "m");
 
   d = dip::DIP();
   d.add_string("foo float = 23 km");
@@ -56,9 +53,8 @@ TEST(Units, ScalarModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "0.023");
-  qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "km");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "km");
 }
 
 TEST(Units, ArrayModification) {
@@ -72,9 +68,8 @@ TEST(Units, ArrayModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "m");
   EXPECT_EQ(vnode->value->to_string(), "[12000, 23000]");
-  dip::QuantityNode::PointerType qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "m");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "m");
 
   d = dip::DIP();
   d.add_string("foo float[2] = [23, 45] m");
@@ -85,9 +80,8 @@ TEST(Units, ArrayModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "m");
   EXPECT_EQ(vnode->value->to_string(), "[1.2e4, 2.3e4]");
-  qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "m");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "m");
 }
 
 TEST(Units, DimlessModification) {
@@ -101,9 +95,8 @@ TEST(Units, DimlessModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "45");
-  dip::QuantityNode::PointerType qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "km");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "km");
 
   d = dip::DIP();
   d.add_string("foo float = 23 km");
@@ -114,9 +107,8 @@ TEST(Units, DimlessModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "45");
-  qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "km");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "km");
 }
 
 TEST(Units, OptionSetting) {
@@ -130,9 +122,8 @@ TEST(Units, OptionSetting) {
   EXPECT_EQ(vnode->value->to_string(), "2000");
   EXPECT_EQ(vnode->options[0].value->to_string(), "2e3");
   EXPECT_EQ(vnode->options[1].value->to_string(), "3e3");
-  dip::QuantityNode::PointerType qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "m");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "m");
 
   d = dip::DIP();
   d.add_string("foo float = 2000 m");
@@ -143,9 +134,8 @@ TEST(Units, OptionSetting) {
   EXPECT_EQ(vnode->value->to_string(), "2e3");
   EXPECT_EQ(vnode->options[0].value->to_string(), "2e3");
   EXPECT_EQ(vnode->options[1].value->to_string(), "3e3");
-  qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "m");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "m");
 }
 
 TEST(Units, ScalarInjection) {
@@ -157,9 +147,8 @@ TEST(Units, ScalarInjection) {
 
   dip::ValueNode::PointerType vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->value->to_string(), "2");
-  dip::QuantityNode::PointerType qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "km");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "km");
 
   d = dip::DIP();
   d.add_string("foo float = 2000 m");
@@ -168,9 +157,8 @@ TEST(Units, ScalarInjection) {
 
   vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->value->to_string(), "2");
-  qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "km");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "km");
 }
 
 TEST(Units, ArrayInjection) {
@@ -182,9 +170,8 @@ TEST(Units, ArrayInjection) {
 
   dip::ValueNode::PointerType vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->value->to_string(), "[2, 3]");
-  dip::QuantityNode::PointerType qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "km");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "km");
 
   d = dip::DIP();
   d.add_string("foo float[2] = [2.23e4, 3.45e6] m");
@@ -193,9 +180,8 @@ TEST(Units, ArrayInjection) {
 
   vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->value->to_string(), "[22.3, 3.45e3]");
-  qnode = std::dynamic_pointer_cast<dip::QuantityNode>(vnode);
-  EXPECT_TRUE(qnode);
-  EXPECT_EQ(qnode->units->to_string(), "km");
+  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_EQ(vnode->units->to_string(), "km");
 }
 
 TEST(Units, DimlessModificationError) {
