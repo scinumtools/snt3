@@ -13,14 +13,38 @@ namespace snt::val {
   template <typename T>
   class ArrayValue;
 
+  /**
+   * @class BaseArrayValue
+   * @brief Base class for all array values
+   *
+   * @tparam T Data type of a values
+   */
   template <typename T>
   class BaseArrayValue : public BaseValue {
   protected:
-    std::vector<T> value;
+    std::vector<T> value;   ///< Internal data container that holds flattend array values
 
   public:
+    /**
+     * @brief Base array value constructor from a scalar value
+     *
+     * @param val Scalar value
+     */
     BaseArrayValue(const T& val) : value({val}), BaseValue(this->deduce_dtype(), {1}) {};
+
+    /**
+     * @brief Base array value constructor from a flattened vector of values and a shape
+     *
+     * @param arr Vector of values
+     * @param sh Array shape
+     */
     BaseArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh) : value(arr), BaseValue(this->deduce_dtype(), sh) {};
+
+    /**
+     * @brief Base array value constructor from a BaseValue pointer
+     *
+     * @param other Pointer to a BaseValue object
+     */
     BaseArrayValue(const BaseValue* other) : BaseValue(this->deduce_dtype(), other->get_shape()) {
       const BaseArrayValue<T>* otherT;
       BaseValue::PointerType casted_other;
@@ -35,6 +59,13 @@ namespace snt::val {
       } else
         throw std::runtime_error("ArrayValue could not be initialized from the given BaseValue.");
     };
+
+    /**
+     * @brief Create unique pointer from a vector of values
+     *
+     * @param val Reference to a vector of values
+     * @return Unique pointer of a vector of values
+     */
     static BaseValue::PointerType pointer_from_vector(const std::vector<T>& val) {
       return std::make_unique<val::ArrayValue<T>>(std::vector<T>(val));
     };
@@ -46,22 +77,30 @@ namespace snt::val {
 
     /**
      * @brief Get copy of the array values
+     *
+     * @return Flattened array of values
      */
     std::vector<T> get_values() const { return value; };
 
     /**
      * @brief Get copy of a particular value
+     *
      * @param index Index of a value
+     * @return Single value 
      */
     T get_value(const size_t index) const { return value.at(index); };
 
     /**
-     * @brief Get pointer to array values
+     * @brief Get pointer to the internal data container
+     *
+     * @return Pointer to the value data
      */
     T* get_data() { return value.data(); };
 
     /**
      * @brief Get size of an array
+     *
+     * @return Size of the flattened array value
      */
     size_t get_size() const override { return value.size(); };
 
@@ -100,13 +139,22 @@ namespace snt::val {
     friend std::ostream& operator<<(std::ostream& os, const ArrayValue<T>& val) {
       return os << val.to_string();
     };
+
+    /**
+     * @brief Return string representation of this array object
+     *
+     * @param format Object with an output string format
+     * @return String representation
+     */
     std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override {
       return snt::array_to_string(value, shape, format);
     };
+    
     /*
      * Operations
      */
   protected:
+    
     template <typename R, typename Func>
     std::unique_ptr<ArrayValue<R>> operate_unary(Func f) const {
       // apply operation
@@ -115,12 +163,14 @@ namespace snt::val {
         arr[i] = f(value[i]);
       return std::make_unique<ArrayValue<R>>(arr, this->shape);
     };
+    
     template <typename R, typename Func>
     void operate_unary_equal(Func f) {
       // apply operation
       for (int i = 0; i < value.size(); i++)
         value[i] = f(value[i]);
     };
+    
     template <typename R, typename Func>
     std::unique_ptr<ArrayValue<R>> operate_binary(const BaseValue* other, Func f) const {
       std::vector<R> arr;
@@ -154,6 +204,7 @@ namespace snt::val {
         return std::make_unique<ArrayValue<R>>(arr, this->get_shape());
       }
     };
+    
     template <typename R, typename Func>
     void operate_binary_equal(const BaseValue* other, Func f) {
       if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
@@ -184,6 +235,7 @@ namespace snt::val {
           value[i] = f(this->get_value(i), otherT.get_value(i));
       }
     };
+    
     template <typename U, typename R, typename Func>
     std::unique_ptr<ArrayValue<R>> operate_ternary(const BaseValue* other1, const BaseValue* other2, Func f) const {
       // test if shape match
@@ -205,6 +257,7 @@ namespace snt::val {
     };
 
   public:
+    
     BaseValue::PointerType compare_equal(const BaseValue* other) const override {
       return operate_binary<bool>(other, [](T a, T b) { return a == b; });
     };
