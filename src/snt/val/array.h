@@ -13,11 +13,6 @@ namespace snt::val {
    * @brief Define common array types
    */
   namespace Array {
-    typedef std::vector<std::string> StringType;                     ///< Holds raw string values
-    typedef std::vector<RangeStruct> RangeType;                      ///< Array dimension ranges
-    typedef std::vector<size_t> ShapeType;                           ///< Array shape
-    constexpr size_t max_range = std::numeric_limits<size_t>::max(); ///< Maximum size value indicates open range
-
     /**
      * @struct RangeStruct
      * @brief Array dimension range
@@ -35,6 +30,11 @@ namespace snt::val {
         return (dmin == other.dmin) && (dmax == other.dmax);
       };
     };
+    
+    typedef std::vector<std::string> StringType;                     ///< Holds raw string values
+    typedef std::vector<RangeStruct> RangeType;                      ///< Array dimension ranges
+    typedef std::vector<size_t> ShapeType;                           ///< Array shape
+    constexpr size_t max_range = std::numeric_limits<size_t>::max(); ///< Maximum size value indicates open range
   } // namespace Array
 
 } // namespace snt::val
