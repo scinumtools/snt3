@@ -2,13 +2,20 @@
 #ifndef MAT_PERIODIC_TABLE_H
 #define MAT_PERIODIC_TABLE_H
 
+#include <string_view>
+        
 namespace mat {
 
-  class PeriodicTable {
-  };
-  // https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl #
+  /**
+   * @file build_periodic_table.py
+   *
+   * This file was generated using the following Python script
+   * ```tools/uild_periodic_table.py```
+   * from data provided at the website of NIST
+   * [Atomic Weights and Isotopic Compositions for All Elements](https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl)
+   */
 
-  static constexpr std::array<std::string_stream, 2> PT_HEADER = {"Z", "A"}; 
+  static constexpr std::array<std::string_view, 2> PT_HEADER = {"Z", "A"}; 
 
   struct Isotope {
     std::string_view symbol;
