@@ -1,5 +1,5 @@
-#ifndef EXS_PCH_TESTS_H
-#define EXS_PCH_TESTS_H
+#ifndef DIP_PCH_TESTS_H
+#define DIP_PCH_TESTS_H
 
 #include "snt/dip/dip.h"
 #include "snt/dip/environment.h"
@@ -15,4 +15,4 @@
 
 #include <gtest/gtest.h>
 
-#endif // EXS_PCH_TESTS_H
+#endif // DIP_PCH_TESTS_H

@@ -20,4 +20,29 @@ Checks: >
   misc-unused-include
   llvm-include-order
   clang-analyzer-optin.cplusplus.IncludeWhatYouUse
+  readability-*
+  readability-identifier-naming
+   
+CheckOptions:
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack         # e.g., `computeResult`
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case        # e.g., `time_step`
+  - key: readability-identifier-naming.ParameterCase
+    value: lower_case
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: m_lower_case      # if members are prefixed by `m_`
+  - key: readability-identifier-naming.ConstantCase
+    value: UPPER_CASE        # e.g., `MAX_ITER`
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: k                 # if global constants are like `kMaxValue`
+  - key: readability-identifier-naming.EnumCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumConstantCase
+    value: UPPER_CASE
+
 WarningsAsErrors: '*'

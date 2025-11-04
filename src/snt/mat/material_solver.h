@@ -1,11 +1,12 @@
 #ifndef MAT_MATERIAL_SOLVER_H
 #define MAT_MATERIAL_SOLVER_H
 
-namespace mat {
+namespace snt::mat {
 
   class MaterialSolver {
+  public:
   };
 
-} // namespace mat
+} // namespace snt::mat
 
 #endif // MAT_MATERIAL_SOLVER_H

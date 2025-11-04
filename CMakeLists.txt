@@ -84,9 +84,8 @@ if(ENABLE_CLANG_TIDY)
     endif()
 
     # This makes all targets run clang-tidy automatically during compilation
-    set(CMAKE_CXX_CLANG_TIDY	
-        ${CLANG_TIDY_COMMAND}
-        -p=${CMAKE_BINARY_DIR})
+    set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY_COMMAND}
+    			     -p=${CMAKE_BINARY_DIR})
 endif()
 
 # compile libraries and executables

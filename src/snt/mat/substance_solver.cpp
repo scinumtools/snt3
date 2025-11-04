@@ -1,5 +1,5 @@
 #include "substance_solver.h"
 
-namespace mat {
+namespace snt::mat {
 
 }

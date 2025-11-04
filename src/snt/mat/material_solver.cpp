@@ -1,5 +1,5 @@
 #include "material_solver.h"
 
-namespace mat {
+namespace snt::mat {
 
 }

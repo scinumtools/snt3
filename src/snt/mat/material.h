@@ -1,11 +1,19 @@
 #ifndef MAT_MATERIAL_H
 #define MAT_MATERIAL_H
 
-namespace mat {
+#include "composite.h"
+#include "matter.h"
 
-  class Material {
+namespace snt::mat {
+
+  /**
+   * @class Material
+   * @brief Any substance or mixture of substances that can be used to make objects or structures
+   */
+  class Material: public Composite, public Matter {
+  public:
   };
 
-} // namespace mat
+} // namespace snt::mat
 
 #endif // MAT_MATERIAL_H

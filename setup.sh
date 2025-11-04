@@ -64,12 +64,19 @@ function test_code {
 	fi
 	EXEC_FLAGS="${EXEC_FLAGS} --gtest_break_on_failure --gtest_catch_exceptions=0"
     fi
-    if [[ -n "${1}" ]]; then
-	if [[ "${2}" != "" ]]; then
-	    EXEC_FLAGS="--gtest_filter="${2}" ${EXEC_FLAGS}"
-	fi
+
+    IFS='.' read -ra parts <<< "$1"
+    if [[ "${parts[0]}" == "gtest" ]]; then     
 	cd $DIR_BUILD
-	$EXEC_PROGRAM ./bin/gtest-$1 $EXEC_FLAGS
+    	if [[ "${parts[2]}" != "" && "${parts[3]}" != "" ]]; then       # eg. gtest.exs.Expression.Initialization
+	    $EXEC_PROGRAM ./bin/gtest-${parts[1]} $EXEC_FLAGS --gtest_filter="${parts[2]}.${parts[3]}"
+    	elif [[ "${parts[2]}" != "" ]]; then                            # eg. gtest.exs.Expression
+	    $EXEC_PROGRAM ./bin/gtest-${parts[1]} $EXEC_FLAGS --gtest_filter="${parts[2]}.*"
+	else                                 # eg. gtest.exs
+	    $EXEC_PROGRAM ./bin/gtest-${parts[1]} $EXEC_FLAGS
+    	fi
+    elif [[ "${parts[0]}" == "pytest" ]]; then
+	pytest pytest/${parts[1]}/${parts[2]}.py::test_${parts[3]}
     else
 	cd $DIR_BUILD
 	ctest --output-on-failure

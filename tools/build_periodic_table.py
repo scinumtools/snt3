@@ -27,13 +27,43 @@ def build_periodic_table():
     html_data = load_elements("https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl")
     if html_data:
         
-        text = ["""
+        
+        soup = BeautifulSoup(html_data, "html.parser")
+        table = soup.find("table")
+        rows = table.find_all("tr")
+        Z, A, M, NA, symbol = 0, 0, 0, 0, None
+        numRows = 0
+        lines = []
+        for row in rows:
+            dts = row.find_all('td',{'align':'right'})
+            if len(dts)==1:
+                A = int(dts[0].get_text().strip())
+            elif len(dts)==2:
+                Z = int(dts[0].get_text().strip())
+                A = int(dts[1].get_text().strip())
+                symbol = row.find('td',{'align':'center'}).get_text().strip()
+            else:
+                continue
+            dts = row.find_all('td',{'align':None})
+            # relative atomic masses
+            M = float(re.sub(r"(\s+|\([0-9#]+\))", '', dts[0].get_text()))
+            # isotopic composition
+            if ic := dts[1].get_text().strip():
+                NA = float(re.sub(r"(\s+|\([0-9#]+\))", '', ic))
+            else:
+                NA = 0
+            symbols, Zs, As, Ms, NAs = f"\"{symbol}\",", f"{Z},", f"{A},", f"{M},", f"{NA}"
+            lines.append(f"     {{{symbols:7s}{Zs:6s}{As:6s}{Ms:16s}{NAs:13s}}},")
+            numRows += 1;
+            
+        text = """
 #ifndef MAT_PERIODIC_TABLE_H
 #define MAT_PERIODIC_TABLE_H
 
+#include <array>
 #include <string_view>
         
-namespace mat {
+namespace snt::mat {
 
   /**
    * @file build_periodic_table.py
@@ -54,42 +84,12 @@ namespace mat {
     double natural_abundance;
   };
 
-  static constexpr std::array<Isotope, 360> PT_DATA = {{
-        """]
-        
-        soup = BeautifulSoup(html_data, "html.parser")
-        table = soup.find("table")
-        rows = table.find_all("tr")
-        Z, A, M, NA, symbol = 0, 0, 0, 0, None
-        numRows = 0
-        for row in rows:
-            dts = row.find_all('td',{'align':'right'})
-            if len(dts)==1:
-                A = int(dts[0].get_text().strip())
-            elif len(dts)==2:
-                Z = int(dts[0].get_text().strip())
-                A = int(dts[1].get_text().strip())
-                symbol = row.find('td',{'align':'center'}).get_text().strip()
-            else:
-                continue
-            dts = row.find_all('td',{'align':None})
-            # relative atomic masses
-            M = float(re.sub(r"(\s+|\([0-9#]+\))", '', dts[0].get_text()))
-            # isotopic composition
-            if ic := dts[1].get_text().strip():
-                NA = float(re.sub(r"(\s+|\([0-9#]+\))", '', ic))
-            else:
-                NA = 0
-            symbols, Zs, As, Ms, NAs = f"\"{symbol}\",", f"{Z},", f"{A},", f"{M},", f"{NA}"
-            text.append(f"     {{{symbols:7s}{Zs:6s}{As:6s}{Ms:16s}{NAs:13s}}},")
-            numRows += 1;
-        text = "\n".join(text)
-
-        text += """
+  static constexpr std::array<Isotope, """+str(numRows)+"""> PT_DATA = {{
+""" + "\n".join(lines) + """
   }};
   static constexpr size_t PT_NUM_DATA = """+str(numRows)+""";
   
-} // namespace mat
+} // namespace snt::mat
 
 #endif // MAT_PERIODIC_TABLE_H        
         """

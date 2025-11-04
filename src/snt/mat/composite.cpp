@@ -1,5 +1,6 @@
 #include "composite.h"
 
-namespace mat {
+namespace snt::mat {
+
 
 }

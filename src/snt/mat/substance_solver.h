@@ -1,11 +1,11 @@
 #ifndef MAT_SUBSTANCE_SOLVER_H
 #define MAT_SUBSTANCE_SOLVER_H
 
-namespace mat {
+namespace snt::mat {
 
   class SubstanceSolver {
   };
 
-} // namespace mat
+} // namespace snt::mat
 
 #endif // MAT_SUBSTANCE_SOLVER_H

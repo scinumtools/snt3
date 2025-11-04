@@ -1,5 +1,5 @@
 #include "material.h"
 
-namespace mat {
+namespace snt::mat {
 
 }

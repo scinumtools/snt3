@@ -1,11 +1,20 @@
 #ifndef MAT_SUBSTANCE_H
 #define MAT_SUBSTANCE_H
 
-namespace mat {
+#include "component.h"
+#include "composite.h"
+#include "matter.h"
 
-  class Substance {
+namespace snt::mat {
+
+  /**
+   * @class Substance
+   * @brief A form of matter with uniform and definite composition and distinct physical and chemical properties.
+   */
+  class Substance: public Composite, public Component<double>, public Matter {
+  public:
   };
 
-} // namespace mat
+} // namespace snt::mat
 
 #endif // MAT_SUBSTANCE_H

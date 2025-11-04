@@ -2,9 +2,10 @@
 #ifndef MAT_PERIODIC_TABLE_H
 #define MAT_PERIODIC_TABLE_H
 
+#include <array>
 #include <string_view>
         
-namespace mat {
+namespace snt::mat {
 
   /**
    * @file build_periodic_table.py
@@ -20,13 +21,12 @@ namespace mat {
   struct Isotope {
     std::string_view symbol;
     unsigned int protons;
-    unsigned int neutrons;
+    unsigned int isotope_number;
     double atomic_number;
     double natural_abundance;
   };
 
-  static constexpr std::array<Isotope, 360> PT_DATA = {{
-        
+  static constexpr std::array<Isotope, 354> PT_DATA = {{
      {"H",   1,    1,    1.00782503223,  0.999885     },
      {"H",   1,    2,    2.01410177812,  0.000115     },
      {"H",   1,    3,    3.0160492779,   0            },
@@ -384,7 +384,7 @@ namespace mat {
   }};
   static constexpr size_t PT_NUM_DATA = 354;
   
-} // namespace mat
+} // namespace snt::mat
 
 #endif // MAT_PERIODIC_TABLE_H        
         
