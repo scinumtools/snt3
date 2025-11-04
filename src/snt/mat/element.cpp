@@ -111,14 +111,14 @@ namespace snt::mat {
       ss << element;
     } else {
       ss << element;
-      if (isotope!=0 && ionisation!=0)
+      if (isotope!=0 || ionisation!=0) {
 	ss << "{";
-      if (isotope!=0)
-	ss << isotope;
-      if (ionisation!=0)
-	ss << ionisation;
-      if (isotope!=0 && ionisation!=0)
+	if (isotope!=0)
+	  ss << isotope;
+	if (ionisation!=0)
+	  ss << ionisation;
 	ss << "}";
+      }
     }
     return ss.str();
   }
