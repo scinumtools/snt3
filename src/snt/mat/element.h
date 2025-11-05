@@ -13,13 +13,13 @@ namespace snt::mat {
    */
   class Element: public Component<int>, public Matter {
   public:
-    bool natural;                  ///< true if element is a natural isotope
+    bool natural;                  ///< true if element is naturally abundant
     std::string element;           ///< element symbol
     unsigned int isotope;          ///< isotope type
     unsigned int ionisation;       ///< ionisation state
-    double protons;                ///< proton number Z
-    double neutrons;               ///< neutron number N
-    double electrons;              ///< electron number e
+    unsigned int protons;          ///< proton number Z
+    double neutrons;               ///< average number of neutrons in naturally abundant element N
+    unsigned int electrons;        ///< electron number e
 
     /**
      * @brief Element class constructor

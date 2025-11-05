@@ -52,10 +52,10 @@ namespace snt::mat {
     element = isodata->symbol;
     isotope = isodata->isotope_number;
     ionisation = ion;
-    mass = puq::Quantity(isodata->atomic_number, "Da") + puq::Quantity(ion, "{m_e}");
+    mass = puq::Quantity(isodata->atomic_number, "u") + puq::Quantity(ion, "{m_e}");
     protons = isodata->protons;
     neutrons = static_cast<double>(isodata->isotope_number) - static_cast<double>(isodata->protons);
-    electrons = static_cast<double>(isodata->protons) + static_cast<double>(ion);
+    electrons = isodata->protons + ion;
     if (electrons<0)
       throw std::runtime_error("Number of electrons cannot be negative.");
   }
@@ -96,13 +96,15 @@ namespace snt::mat {
     neutrons = 0;
     for (const auto& isodata: PT_DATA) {
       if (isodata.symbol==elem && isodata.natural_abundance>0) {
-	dmass += isodata.atomic_number*isodata.natural_abundance;
+	dmass += isodata.atomic_number * isodata.natural_abundance;
 	protons = isodata.protons;
 	neutrons += (static_cast<double>(isodata.isotope_number) - static_cast<double>(isodata.protons))*isodata.natural_abundance;
-	electrons = static_cast<double>(isodata.protons) + static_cast<double>(ion);
+	electrons = isodata.protons + ion;
       }
     }
-    mass = puq::Quantity(dmass, "Da") + puq::Quantity(ion, "{m_e}");
+    if (dmass==0)
+	throw std::runtime_error("Element has no natural abundance: "+elem);      
+    mass = puq::Quantity(dmass, "u") + puq::Quantity(ion, "{m_e}");
   }
 
   std::string Element::to_string() {
