@@ -24,7 +24,7 @@ namespace snt::mat {
     /**
      * @brief Element class constructor
      *
-     * @param expr Component string representation
+     * @param expr Element string representation
      * @param prop Component proportion in a Composite
      * @param nat Indicate if element is a natural isotope
      */
@@ -49,7 +49,7 @@ namespace snt::mat {
     void set_isotope(const std::string& elem, const int iso, const int ion);
 
     /**
-     * @brief set parameters of an element with natural isotopic average
+     * @brief Set parameters of an element with natural isotopic average
      *
      * @param elem Symbol of an element
      * @param iso Isotope number
@@ -58,7 +58,7 @@ namespace snt::mat {
     void set_natural(const std::string& elem, const int iso, const int ion);
 
     /**
-     * @brief set parameters of the most abundant element
+     * @brief Set parameters of the most abundant element
      *
      * @param elem Symbol of an element
      * @param iso Isotope number
@@ -73,6 +73,20 @@ namespace snt::mat {
      * @return String representation
      */
     std::string to_string();
+
+    /**
+     * @brief Addition of two elements
+     *
+     * @param other Pointer of another element
+     */
+    void math_add(Element* other);
+    
+    /**
+     * @brief Multiplication of two elements
+     *
+     * @param other Pointer of another element
+     */
+    void math_multiply(Element* other);
   };
 
 } // namespace snt::mat

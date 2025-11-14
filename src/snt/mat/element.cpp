@@ -8,7 +8,7 @@
 namespace snt::mat {
 
   Element::Element(const std::string& expr, int prop, bool nat):
-    Component<int>(expr, prop), natural(nat) {
+    Component<int>(prop, expr), natural(nat) {
     if (expr=="[p]") {
       element=expr, mass = puq::Quantity("{m_p}"), protons=1, neutrons=0, electrons=0, isotope=0, ionisation=0;
     } else if (expr=="[n]") {
@@ -125,4 +125,10 @@ namespace snt::mat {
     return ss.str();
   }
   
+  void Element::math_add(Element* other) {
+  }
+
+  void Element::math_multiply(Element* other) {
+  }
+
 }
