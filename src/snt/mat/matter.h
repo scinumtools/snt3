@@ -11,10 +11,17 @@ namespace snt::mat {
    */
   class Matter {
   public:
+    /**
+     * @struct MatterProperties
+     * @brief Set of matter defining properties
+     */
+    struct MatterProperties {
+      puq::Quantity volume;         ///< Volume
+      puq::Quantity mass;           ///< Mass
+    } matterProps;                  ///< set of basic matter properties
+    
     puq::Quantity mass_density;     ///< Mass density
     puq::Quantity number_density;   ///< Number density
-    puq::Quantity volume;           ///< Volume
-    puq::Quantity mass;             ///< Mass
     
   };
 

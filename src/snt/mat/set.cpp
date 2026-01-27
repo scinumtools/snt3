@@ -1,4 +1,4 @@
-#include "composite.h"
+#include "set.h"
 
 namespace snt::mat {
 

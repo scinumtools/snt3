@@ -8,13 +8,24 @@
 namespace snt::mat {
 
   Element::Element(const std::string& expr, int prop, bool nat):
-    Component<int>(prop, expr), natural(nat) {
-    if (expr=="[p]") {
-      element=expr, mass = puq::Quantity("{m_p}"), protons=1, neutrons=0, electrons=0, isotope=0, ionisation=0;
-    } else if (expr=="[n]") {
-      element=expr, mass = puq::Quantity("{m_n}"), protons=0, neutrons=1, electrons=0, isotope=0, ionisation=0; 
-    } else if (expr=="[e]") {
-      element=expr, mass = puq::Quantity("{m_e}"), protons=0, neutrons=0, electrons=1, isotope=0, ionisation=0;
+    elementProps({0, 0, 0}), Part<int>(prop, expr), natural(nat) {
+    if (expr.size()==3 && expr[0]=='[' && expr[2]==']') {
+      element=expr;
+      isotope=0;
+      ionisation=0;
+      matterProps.volume = 1;
+      if (expr[1]=='p') {
+	matterProps.mass = puq::Quantity("{m_p}");
+	elementProps = {1, 0, 0};
+      } else if (expr[1]=='n') {
+	matterProps.mass = puq::Quantity("{m_n}");
+	elementProps = {0, 1, 0};			   
+      } else if (expr[1]=='e') {
+	matterProps.mass = puq::Quantity("{m_e}");
+	elementProps = {0, 0, 1};
+      } else {
+	throw std::runtime_error("Element could not be determined from the expression: "+expr);
+      }
     } else {
       std::smatch m;
       std::regex pattern("^([a-zA-Z]{1,2})(?:\\{([0-9]+|)([-+][0-9]*|)\\}|)?$");
@@ -52,11 +63,11 @@ namespace snt::mat {
     element = isodata->symbol;
     isotope = isodata->isotope_number;
     ionisation = ion;
-    mass = puq::Quantity(isodata->atomic_number, "u") + puq::Quantity(ion, "{m_e}");
-    protons = isodata->protons;
-    neutrons = static_cast<double>(isodata->isotope_number) - static_cast<double>(isodata->protons);
-    electrons = isodata->protons + ion;
-    if (electrons<0)
+    matterProps.mass = puq::Quantity(isodata->atomic_number, "u") + puq::Quantity(ion, "{m_e}");
+    elementProps.protons = isodata->protons;
+    elementProps.neutrons = static_cast<double>(isodata->isotope_number) - static_cast<double>(isodata->protons);
+    elementProps.electrons = isodata->protons + ion;
+    if (elementProps.electrons<0)
       throw std::runtime_error("Number of electrons cannot be negative.");
   }
   
@@ -93,18 +104,22 @@ namespace snt::mat {
     isotope = 0;
     ionisation = ion;
     double dmass = 0;
-    neutrons = 0;
+    elementProps.neutrons = 0;
     for (const auto& isodata: PT_DATA) {
       if (isodata.symbol==elem && isodata.natural_abundance>0) {
 	dmass += isodata.atomic_number * isodata.natural_abundance;
-	protons = isodata.protons;
-	neutrons += (static_cast<double>(isodata.isotope_number) - static_cast<double>(isodata.protons))*isodata.natural_abundance;
-	electrons = isodata.protons + ion;
+	elementProps.protons = isodata.protons;
+	elementProps.neutrons += (static_cast<double>(isodata.isotope_number) - static_cast<double>(isodata.protons))*isodata.natural_abundance;
+	elementProps.electrons = isodata.protons + ion;
       }
     }
     if (dmass==0)
 	throw std::runtime_error("Element has no natural abundance: "+elem);      
-    mass = puq::Quantity(dmass, "u") + puq::Quantity(ion, "{m_e}");
+    matterProps.mass = puq::Quantity(dmass, "u") + puq::Quantity(ion, "{m_e}");
+  }
+
+  Element Element::from_string(const std::string& expr) {
+    return Element(expr);
   }
 
   std::string Element::to_string() {

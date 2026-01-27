@@ -2,7 +2,7 @@
 #define MAT_ELEMENT_H
 
 #include "periodic_table.h"
-#include "component.h"
+#include "part.h"
 #include "matter.h"
 
 namespace snt::mat {
@@ -11,15 +11,22 @@ namespace snt::mat {
    * @class Element
    * @brief An element is a pure substance that consists entirely of one type of atom
    */
-  class Element: public Component<int>, public Matter {
+  class Element: public Part<int>, public Matter {
   public:
+    /**
+     * @struct ElementProperties
+     * @brief Set of element defining properties
+     */
+    struct ElementProperties {
+      unsigned int protons;          ///< proton number Z
+      double neutrons;               ///< average number of neutrons in naturally abundant element N
+      unsigned int electrons;        ///< electron number e
+    } elementProps;                  ///< set of basic element properties
+    
     bool natural;                  ///< true if element is naturally abundant
     std::string element;           ///< element symbol
     unsigned int isotope;          ///< isotope type
     unsigned int ionisation;       ///< ionisation state
-    unsigned int protons;          ///< proton number Z
-    double neutrons;               ///< average number of neutrons in naturally abundant element N
-    unsigned int electrons;        ///< electron number e
 
     /**
      * @brief Element class constructor
@@ -67,6 +74,14 @@ namespace snt::mat {
     void set_abundant(const std::string& elem, const int iso, const int ion);
 
   public:
+    /**
+     * @brief Get an instance of an Element from an expression
+     *
+     * @param expr String expression
+     * @return An instance of the Element class
+     */
+    static Element from_string(const std::string& expr);
+    
     /**
      * @brief String representation of an element instance
      *

@@ -2,8 +2,8 @@
 #define MAT_SUBSTANCE_H
 
 #include "element.h"
-#include "component.h"
-#include "composite.h"
+#include "part.h"
+#include "set.h"
 #include "matter.h"
 #include "solvers/substance_solver.h"
 
@@ -13,11 +13,35 @@ namespace snt::mat {
    * @class Substance
    * @brief A form of matter with uniform and definite composition and distinct physical and chemical properties.
    */
-  class Substance: public Composite<SubstanceSolver, Element>, public Component<double>, public Matter {
+  class Substance: public Set<SubstanceSolver, Element, int>, public Part<double>, public Matter {
   public:
 
     /**
-     * @brief Substance class constructor
+     * @brief Initialise Substance from a string expression
+     *
+     * @param expr String expression
+     * @return Instance of a substance
+     */
+    static Substance from_string(const std::string& expr);
+
+    /**
+     * @brief Substance class constructor from a scalar number
+     *
+     * @param num Number
+     */
+    Substance(double num);
+
+    /**
+     * @brief Substance class constructor from a map of components and their proportions
+     *
+     * @param comp Map of components and their proportions
+     * @param prop Component proportion in a Composite
+     * @param nat Indicate if substance atoms should use natural abundance
+     */
+    Substance(const PartMap& comp, double prop = 1, bool nat = true);
+    
+    /**
+     * @brief Substance class constructor from an expression
      *
      * @param expr Element string representation
      * @param prop Component proportion in a Composite
@@ -38,6 +62,13 @@ namespace snt::mat {
      * @param other Pointer of another substance
      */
     void math_multiply(Substance* other);
+
+    /**
+     * @brief Convert element to a string
+     *
+     * @return String representation of a substance
+     */
+    std::string to_string() const;
   };
 
 } // namespace snt::mat
