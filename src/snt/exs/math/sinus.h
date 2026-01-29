@@ -3,12 +3,12 @@
 
 namespace snt::exs {
 
-  template <class A, typename S = EmptySettings>
-  class OperatorSinus : public OperatorGroup<A, 1, S> {
+  template <typename S = EmptySettings>
+  class OperatorSinus : public OperatorGroup<1, S> {
   public:
-    OperatorSinus(const OperatorGroupSybols& s = {"sin", "(", ")", ","}) : OperatorGroup<A, 1, S>("sin", s, SINUS_OPERATOR) {}
-    void operate_group(TokenListBase<A>* tokens) override {
-      Token<A> group1 = tokens->get_left();
+    OperatorSinus(const OperatorGroupSybols& s = {"sin", "(", ")", ","}) : OperatorGroup<1, S>("sin", s, SINUS_OPERATOR) {}
+    void operate_group(TokenListBase* tokens) override {
+      Token group1 = tokens->get_left();
       group1.atom->math_sinus();
       tokens->put_left(group1);
     };

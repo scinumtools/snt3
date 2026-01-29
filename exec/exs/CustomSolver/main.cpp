@@ -9,12 +9,12 @@
 int main() {
 
   // modifying default operator symbols
-  exs::OperatorList<CustomAtom> operators;
-  operators.append(exs::LESS_OPERATOR, std::make_shared<exs::OperatorLess<CustomAtom>>());
+  exs::OperatorList operators;
+  operators.append(exs::LESS_OPERATOR, std::make_shared<exs::OperatorLess<>>());
   operators.append(LENGTH_OPERATOR, std::make_shared<OperatorLength>());
 
   // changing default operation steps
-  exs::StepList steps;
+  exs::StepList steps {};
   steps.append(exs::GROUP_OPERATION, {LENGTH_OPERATOR});
   steps.append(exs::BINARY_OPERATION, {exs::LESS_OPERATOR});
 

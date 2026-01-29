@@ -8,16 +8,16 @@
 
 namespace snt::exs {
 
-  template <class A>
   class Token {
   public:
     TokenType type;
     int optype;
-    A* atom;
+    AtomGrand* atom;
     Token() : type(EMPTY_TOKEN), optype(NONE_OPERATOR), atom(nullptr) {}
     Token(TokenType t) : type(t), optype(NONE_OPERATOR), atom(nullptr) {}
     Token(TokenType t, int o) : type(t), optype(o), atom(nullptr) {};
-    Token(TokenType t, A* a) : type(t), optype(NONE_OPERATOR), atom(a) {};
+    Token(TokenType t, AtomGrand* a) :
+      type(t), optype(NONE_OPERATOR), atom(a) {};
     std::string to_string() {
       if (type == EMPTY_TOKEN) {
         return "Token(EMPTY)";

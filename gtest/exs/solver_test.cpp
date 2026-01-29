@@ -166,10 +166,10 @@ TEST(Solver, CustomStepList) {
 TEST(Solver, CustomOperatorList) {
 
   // create custom operator list
-  exs::OperatorList<exs::Atom> operators;
-  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<exs::Atom>>());
-  operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply<exs::Atom>>());
-  operators.append(exs::POWER_OPERATOR, std::make_shared<exs::OperatorPower<exs::Atom>>("^")); // changin the symbol
+  exs::OperatorList<> operators;
+  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<>>());
+  operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply<>>());
+  operators.append(exs::POWER_OPERATOR, std::make_shared<exs::OperatorPower<>>("^")); // changin the symbol
 
   // test the solver
   exs::Solver<exs::Atom> solver(operators);
@@ -177,17 +177,17 @@ TEST(Solver, CustomOperatorList) {
   EXPECT_EQ(atom.to_string(), "21.2");
 }
 
-class OperatorParentheses : public exs::OperatorGroup<exs::Atom, 1> {
+class OperatorParentheses : public exs::OperatorGroup<1> {
 public:
-  OperatorParentheses() : OperatorGroup<exs::Atom, 1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
+  OperatorParentheses() : OperatorGroup<1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
 };
 
 TEST(Operators, CustomParenthesesOperator) {
 
-  exs::OperatorList<exs::Atom> operators;
+  exs::OperatorList<> operators;
   operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses>());
-  operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply<exs::Atom>>());
-  operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide<exs::Atom>>());
+  operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply<>>());
+  operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide<>>());
 
   // create custom step list
   exs::StepList steps;

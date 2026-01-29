@@ -3,12 +3,12 @@
 
 namespace snt::exs {
 
-  template <class A, typename S = EmptySettings>
-  class OperatorSquareRoot : public OperatorGroup<A, 1, S> {
+  template <typename S = EmptySettings>
+  class OperatorSquareRoot : public OperatorGroup<1, S> {
   public:
-    OperatorSquareRoot(const OperatorGroupSybols& s = {"sqrt", "(", ")", ","}) : OperatorGroup<A, 1, S>("sqrt", s, SQUARE_ROOT_OPERATOR) {}
-    void operate_group(TokenListBase<A>* tokens) override {
-      Token<A> group1 = tokens->get_left();
+    OperatorSquareRoot(const OperatorGroupSybols& s = {"sqrt", "(", ")", ","}) : OperatorGroup<1, S>("sqrt", s, SQUARE_ROOT_OPERATOR) {}
+    void operate_group(TokenListBase* tokens) override {
+      Token group1 = tokens->get_left();
       group1.atom->math_square_root();
       tokens->put_left(group1);
     };

@@ -7,13 +7,13 @@ using namespace snt::exs;
 int main() {
 
   // modifying default operator symbols
-  OperatorList<Atom> operators;
-  operators.append(NOT_OPERATOR, std::make_shared<OperatorNot<Atom>>("N"));
-  operators.append(AND_OPERATOR, std::make_shared<OperatorAnd<Atom>>("A"));
-  operators.append(OR_OPERATOR, std::make_shared<OperatorOr<Atom>>("O"));
+  OperatorList operators;
+  operators.append(NOT_OPERATOR, std::make_shared<OperatorNot<>>("N"));
+  operators.append(AND_OPERATOR, std::make_shared<OperatorAnd<>>("A"));
+  operators.append(OR_OPERATOR, std::make_shared<OperatorOr<>>("O"));
 
   // changing default operation steps
-  StepList steps;
+  StepList steps {};
   steps.append(BINARY_OPERATION, {OR_OPERATOR});
   steps.append(BINARY_OPERATION, {AND_OPERATOR});
   steps.append(UNARY_OPERATION, {NOT_OPERATOR});

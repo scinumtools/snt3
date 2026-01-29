@@ -10,7 +10,7 @@
 
 namespace snt::exs {
 
-  template <class A, typename S = EmptySettings>
+  template <typename S = EmptySettings>
   class OperatorBase {
   public:
     std::string name;
@@ -27,14 +27,14 @@ namespace snt::exs {
         expr.remove(symbol);
       }
     };
-    virtual void operate_unary(TokenListBase<A>* tokens) { throw std::logic_error("Unary operation is not implemented"); };
-    virtual void operate_binary(TokenListBase<A>* tokens) { throw std::logic_error("Binary operation is not implemented"); };
-    virtual void operate_ternary(TokenListBase<A>* tokens) { throw std::logic_error("Ternary operation is not implemented"); };
-    virtual void operate_group(TokenListBase<A>* tokens) { throw std::logic_error("Group operation is not implemented"); };
-    virtual void operate_unary(TokenListBase<A>* tokens, S* settings) { operate_unary(tokens); };
-    virtual void operate_binary(TokenListBase<A>* tokens, S* settings) { operate_binary(tokens); };
-    virtual void operate_ternary(TokenListBase<A>* tokens, S* settings) { operate_ternary(tokens); };
-    virtual void operate_group(TokenListBase<A>* tokens, S* settings) { operate_group(tokens); };
+    virtual void operate_unary(TokenListBase* tokens) { throw std::logic_error("Unary operation is not implemented"); };
+    virtual void operate_binary(TokenListBase* tokens) { throw std::logic_error("Binary operation is not implemented"); };
+    virtual void operate_ternary(TokenListBase* tokens) { throw std::logic_error("Ternary operation is not implemented"); };
+    virtual void operate_group(TokenListBase* tokens) { throw std::logic_error("Group operation is not implemented"); };
+    virtual void operate_unary(TokenListBase* tokens, S* settings) { operate_unary(tokens); };
+    virtual void operate_binary(TokenListBase* tokens, S* settings) { operate_binary(tokens); };
+    virtual void operate_ternary(TokenListBase* tokens, S* settings) { operate_ternary(tokens); };
+    virtual void operate_group(TokenListBase* tokens, S* settings) { operate_group(tokens); };
     virtual void print() {};
   };
 

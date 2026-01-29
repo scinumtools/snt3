@@ -15,53 +15,53 @@
 
 namespace snt::exs {
 
-  template <class A, typename S = EmptySettings>
-  class TokenList : public TokenListBase<A> {
+  template <typename S = EmptySettings>
+  class TokenList : public TokenListBase {
   public:
-    std::deque<Token<A>> left;
-    std::deque<Token<A>> right;
-    OperatorList<A, S>* operators;
+    std::deque<Token> left;
+    std::deque<Token> right;
+    OperatorList<S>* operators;
     S* settings;
-    AtomList<A, S> atoms;
-    TokenList(OperatorList<A, S>* o, S* set = nullptr) : operators(o), settings(set) {};
+    AtomList<S> atoms;
+    TokenList(OperatorList<S>* o, S* set = nullptr) : operators(o), settings(set) {};
     void append(TokenType t) {
-      right.push_back(Token<A>(t));
+      right.push_back(Token(t));
     };
     void append(TokenType t, int o) {
-      right.push_back(Token<A>(t, o));
+      right.push_back(Token(t, o));
     };
-    void append(TokenType t, std::string s) {
-      A* a = atoms.append(s, settings);
-      right.push_back(Token<A>(t, a));
+    //void append(TokenType t, std::string s) {
+    //  AtomGrand* a = atoms.append(s, settings);
+    //  right.push_back(Token(t, a));
+    //};
+    void append(TokenType t, std::unique_ptr<AtomGrand> at) {
+      AtomGrand* a = atoms.append(std::move(at));
+      right.push_back(Token(t, a));
     };
-    void append(TokenType t, A at) {
-      A* a = atoms.append(at);
-      right.push_back(Token<A>(t, a));
-    };
-    Token<A> get_left() {
+    Token get_left() {
       if (left.empty()) {
-        return Token<A>(EMPTY_TOKEN);
+        return Token(EMPTY_TOKEN);
       } else {
-        Token<A> t = left.back();
+        Token t = left.back();
         left.pop_back();
         return t;
       }
     };
-    Token<A> get_right() {
+    Token get_right() {
       if (right.empty()) {
-        return Token<A>(EMPTY_TOKEN);
+        return Token(EMPTY_TOKEN);
       } else {
-        Token<A> t = right.front();
+        Token t = right.front();
         right.pop_front();
         return t;
       }
     };
-    void put_left(Token<A> t) {
+    void put_left(Token t) {
       if (t.type != EMPTY_TOKEN) {
         left.push_back(t);
       }
     };
-    void put_right(Token<A> t) {
+    void put_right(Token t) {
       if (t.type != EMPTY_TOKEN) {
         right.push_front(t);
       }
@@ -75,10 +75,10 @@ namespace snt::exs {
       */
       // perform operations on the individual tokens
       while (!right.empty()) {
-        Token<A> token = get_right();
+        Token token = get_right();
         // token.print();
         if (std::find(ops.begin(), ops.end(), token.optype) != ops.end()) {
-          OperatorBase<A, S>* op = operators->select(token.optype);
+          OperatorBase<S>* op = operators->select(token.optype);
           // token is an operator
           if (oitype == UNARY_OPERATION) {
             op->operate_unary(this, settings);
@@ -125,7 +125,7 @@ namespace snt::exs {
     }
 
   private:
-    std::string print_details(TokenType type, int optype, A* atom) {
+    std::string print_details(TokenType type, int optype, AtomGrand* atom) {
       std::stringstream str;
       switch (type) {
       case EMPTY_TOKEN:
@@ -135,7 +135,7 @@ namespace snt::exs {
         str << "A{" << atom->to_string() << "} ";
         break;
       case OPERATOR_TOKEN:
-        OperatorBase<A, S>* op = operators->select(optype);
+        OperatorBase<S>* op = operators->select(optype);
         str << op->name << " ";
         break;
       }

@@ -1,8 +1,7 @@
 #import "main.h"
 #import "snt/settings.h"
 
-LogicalAtom::LogicalAtom(const LogicalAtom& a) : AtomBase(std::make_unique<bool>(*a.value)) {
-                                                 };
+LogicalAtom::LogicalAtom(const LogicalAtom& a) : AtomBase(std::make_unique<bool>(*a.value)) {};
 
 LogicalAtom& LogicalAtom::operator=(const LogicalAtom& a) {
   if (this != &a) {
@@ -11,7 +10,7 @@ LogicalAtom& LogicalAtom::operator=(const LogicalAtom& a) {
   return *this;
 }
 
-UniquePtrType LogicalAtom::from_string(std::string& s) {
+UniquePtrType LogicalAtom::from_string(std::string& s, exs::EmptySettings* set) {
   if (s == snt::KEYWORD_TRUE)
     return std::make_unique<bool>(true);
   else if (s == snt::KEYWORD_FALSE)

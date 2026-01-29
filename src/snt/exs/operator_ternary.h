@@ -7,15 +7,15 @@
 
 namespace snt::exs {
 
-  template <class A, typename S = EmptySettings>
-  class OperatorTernary : public OperatorBase<A, S> {
+  template <typename S = EmptySettings>
+  class OperatorTernary : public OperatorBase<S> {
   public:
     std::string symbol_other;
     OperatorTernary(
         std::string n,
         std::string s,
         std::string so,
-        int t) : OperatorBase<A, S>(n, s, t), symbol_other(so) {}
+        int t) : OperatorBase<S>(n, s, t), symbol_other(so) {}
     virtual void parse(Expression& expr) override {
       this->groups.clear();
       this->groups.reserve(expr.right.size());

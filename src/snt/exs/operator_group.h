@@ -15,12 +15,12 @@ namespace snt::exs {
     std::string separator = ",";
   };
 
-  template <class A, int N = 0, typename S = EmptySettings>
-  class OperatorGroup : public OperatorBase<A, S> {
+  template <int N = 0, typename S = EmptySettings>
+  class OperatorGroup : public OperatorBase<S> {
   public:
     size_t num_groups = N;
     OperatorGroupSybols symbols;
-    OperatorGroup(const std::string& n, const OperatorGroupSybols& s, const int t) : OperatorBase<A, S>(n, s.prefix + s.open, t), symbols(s) {}
+    OperatorGroup(const std::string& n, const OperatorGroupSybols& s, const int t) : OperatorBase<S>(n, s.prefix + s.open, t), symbols(s) {}
     virtual void parse(Expression& expr) override {
       this->groups.clear();
       expr.remove(this->symbol);
@@ -48,8 +48,8 @@ namespace snt::exs {
         throw std::logic_error("Wrong number of group members: " + std::to_string(this->groups.size()) + ", " + std::to_string(N));
       }
     };
-    virtual void operate_group(TokenListBase<A>* tokens) override {}; // this should stay empty
-    virtual void operate_group(TokenListBase<A>* tokens, S* settings) override { operate_group(tokens); };
+    virtual void operate_group(TokenListBase* tokens) override {}; // this should stay empty
+    virtual void operate_group(TokenListBase* tokens, S* settings) override { operate_group(tokens); };
   };
 
 } // namespace snt::exs

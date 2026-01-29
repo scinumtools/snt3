@@ -11,13 +11,13 @@
 int main() {
 
   // modifying default operator symbols
-  exs::OperatorList<CustomAtom> operators;
-  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<CustomAtom>>());
-  operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract<CustomAtom>>());
+  exs::OperatorList operators;
+  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<>>());
+  operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract<>>());
   operators.append(ARRAY_OPERATOR, std::make_shared<OperatorArray>());
 
   // changing default operation steps
-  exs::StepList steps;
+  exs::StepList steps {};
   steps.append(exs::GROUP_OPERATION, {ARRAY_OPERATOR});
   steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 

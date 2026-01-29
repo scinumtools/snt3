@@ -3,13 +3,13 @@
 
 namespace snt::exs {
 
-  template <class A, typename S = EmptySettings>
-  class OperatorPowerBase : public OperatorGroup<A, 2, S> {
+  template <typename S = EmptySettings>
+  class OperatorPowerBase : public OperatorGroup<2, S> {
   public:
-    OperatorPowerBase(const OperatorGroupSybols& s = {"powb", "(", ")", ","}) : OperatorGroup<A, 2, S>("powb", s, POWER_BASE_OPERATOR) {}
-    void operate_group(TokenListBase<A>* tokens) override {
-      Token<A> group2 = tokens->get_left();
-      Token<A> group1 = tokens->get_left();
+    OperatorPowerBase(const OperatorGroupSybols& s = {"powb", "(", ")", ","}) : OperatorGroup<2, S>("powb", s, POWER_BASE_OPERATOR) {}
+    void operate_group(TokenListBase* tokens) override {
+      Token group2 = tokens->get_left();
+      Token group1 = tokens->get_left();
       group1.atom->math_power_base(group2.atom);
       tokens->put_left(group1);
     };

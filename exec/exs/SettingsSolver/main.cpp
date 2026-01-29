@@ -7,17 +7,17 @@ int main() {
   Settings settings({"?", 5, {1, 2, 3, 4, 5}});
 
   // modifying default operator symbols
-  exs::OperatorList<CustomAtom, Settings> operators;
+  exs::OperatorList<Settings> operators;
   operators.append(SELECT_OPERATOR, std::make_shared<OperatorSelect>());
-  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<CustomAtom, Settings>>());
-  operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract<CustomAtom, Settings>>());
+  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<Settings>>());
+  operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract<Settings>>());
 
   // changing default operation steps
-  exs::StepList steps;
+  exs::StepList steps {};
   steps.append(exs::GROUP_OPERATION, {SELECT_OPERATOR});
   steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 
-  exs::Solver<CustomAtom, Settings> solver(operators, steps, settings);
+  exs::Solver<CustomAtom, Settings> solver(operators, steps, &settings);
   CustomAtom atom = solver.solve("2 + ? - {3}");
   atom.print();
 

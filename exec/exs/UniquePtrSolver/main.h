@@ -4,7 +4,7 @@ using namespace snt;
 
 typedef std::unique_ptr<bool> UniquePtrType;
 
-class LogicalAtom : public exs::AtomBase<UniquePtrType> {
+class LogicalAtom final : public exs::AtomBase<LogicalAtom,UniquePtrType> {
 public:
   // Constructor from unique_ptr
   LogicalAtom(UniquePtrType b) : AtomBase(std::move(b)) {};
@@ -15,7 +15,7 @@ public:
   LogicalAtom(LogicalAtom&& a) noexcept = default;
   LogicalAtom& operator=(LogicalAtom&& a) noexcept = default;
 
-  static UniquePtrType from_string(std::string& s);
-  std::string to_string();
-  void logical_and(LogicalAtom* other);
+  static UniquePtrType from_string(std::string& s, exs::EmptySettings* set = nullptr);
+  std::string to_string() override;
+  void logical_and(LogicalAtom* other) override;
 };

@@ -1,8 +1,9 @@
 #import "main.h"
 
-int CustomAtom::from_string(std::string& s, Settings* set) {
-  if (s == set->symbol)
-    return set->value;
+int CustomAtom::from_string(std::string& s, exs::EmptySettings* set) {
+  Settings* cset = static_cast<Settings*>(set);
+  if (s == cset->symbol)
+    return cset->value;
   else
     return std::stoi(s);
 }

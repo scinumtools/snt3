@@ -3,12 +3,12 @@
 
 namespace snt::exs {
 
-  template <class A, typename S = EmptySettings>
-  class OperatorCubicRoot : public OperatorGroup<A, 1, S> {
+  template <typename S = EmptySettings>
+  class OperatorCubicRoot : public OperatorGroup<1, S> {
   public:
-    OperatorCubicRoot(const OperatorGroupSybols& s = {"cbrt", "(", ")", ","}) : OperatorGroup<A, 1, S>("cbrt", s, CUBIC_ROOT_OPERATOR) {}
-    void operate_group(TokenListBase<A>* tokens) override {
-      Token<A> group1 = tokens->get_left();
+    OperatorCubicRoot(const OperatorGroupSybols& s = {"cbrt", "(", ")", ","}) : OperatorGroup<1, S>("cbrt", s, CUBIC_ROOT_OPERATOR) {}
+    void operate_group(TokenListBase* tokens) override {
+      Token group1 = tokens->get_left();
       group1.atom->math_cubic_root();
       tokens->put_left(group1);
     };

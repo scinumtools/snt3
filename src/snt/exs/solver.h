@@ -31,6 +31,7 @@
 #include "settings.h"
 #include "step_list.h"
 #include "token_list.h"
+#include "../settings.h"
 
 #include <memory>
 #include <stdexcept>
@@ -40,75 +41,78 @@ namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class Solver {
-    S settings;
+    S* settings;
 
   public:
-    OperatorList<A, S> operators;
+    OperatorList<S> operators;
     StepList steps;
 
     // constructors without settings
-    Solver(S set = {}) : settings(set) {
+    Solver(S* set = {}) : settings(set) {
       init_steps();
       init_operators();
     };
-    Solver(OperatorList<A, S>& o, S set = {}) : operators(o), settings(set) {
+    Solver(OperatorList<S>& o, S* set = {}) : operators(o), settings(set) {
       init_steps();
     };
-    Solver(StepList& s, S set = {}) : steps(s), settings(set) {
+    Solver(StepList& s, S* set = {}) : steps(s), settings(set) {
       init_operators();
     };
-    Solver(OperatorList<A, S>& o, StepList& s, S set = {}) : operators(o), steps(s), settings(set) {};
+    Solver(OperatorList<S>& o, StepList& s, S* set = {}) : operators(o), steps(s), settings(set) {};
 
     // solve expressions
     A solve(std::string expression) {
       Expression expr(expression);
-      // expr.print();
-      TokenList<A, S> tokens(&operators, &settings);
+      //CHECKPOINT( expr.to_string() );
+      TokenList<S> tokens(&operators, settings);
 
       // Tokenize expression
       while (expr.right.length() > 0) {
         bool is_operator = false;
         for (auto o : operators.order) {
-          OperatorBase<A, S>* op = operators.select(o);
-          // std::cout << op->symbol << std::endl;
+          OperatorBase<S>* op = operators.select(o);
+          //CHECKPOINT( op->symbol );
           if (op->check(expr)) {
             is_operator = true;
             std::string left = expr.pop_left();
             if (left.length() > 0) {
-              tokens.append(ATOM_TOKEN, left);
+	      A atom = A::from_string(left, settings);
+              tokens.append(ATOM_TOKEN, std::make_unique<A>(std::move(atom.value)));
             }
             op->parse(expr);
             if (op->groups.size() > 0) {
               std::vector<std::string> groups = op->groups;
-              // std::cout <<  groups.size() << std::endl;
+              // CHECKPOINT( groups.size() )
               for (auto e : groups) {
-                tokens.append(ATOM_TOKEN, solve(e));
+		A atom = solve(e);
+                tokens.append(ATOM_TOKEN, std::make_unique<A>(std::move(atom.value)));
               }
             }
             tokens.append(OPERATOR_TOKEN, op->type);
-            // expr.print();
+            //CHECKPOINT( expr.to_string() );
           }
         }
         if (is_operator == false) {
           expr.shift();
-          // expr.print();
+          //CHECKPOINT( expr.to_string() );
         }
-        // tokens.print(true);
+        //CHECKPOINT( tokens.to_string(true) );
       }
       std::string left = expr.pop_left();
       if (left.length() > 0) {
-        tokens.append(ATOM_TOKEN, left);
+	A atom = A::from_string(left, settings);
+	tokens.append(ATOM_TOKEN, std::make_unique<A>(std::move(atom.value)));
       }
-      // expr.print();
+      //CHECKPOINT( expr.to_string() );
 
       for (auto s : steps.steps) {
-        // tokens.print(true);
+        //CHECKPOINT( tokens.to_string(true) );
         tokens.operate(s.second, s.first);
       }
-      // tokens.print(true);
+      //CHECKPOINT( tokens.to_string(true) );
 
       if (tokens.left.size() > 0 or tokens.right.size() > 1) {
-        // tokens.print(true);
+        //CHECKPOINT( tokens.to_string(true) );
         throw std::logic_error("Cannot solve expression due to unprocessed tokens: " + tokens.to_string(true));
       }
 
@@ -116,7 +120,8 @@ namespace snt::exs {
       // std::cout << &token << " " << token.atom << " " << token.atom->value << std::endl;
       if (!token.atom)
         throw std::runtime_error("Cannot dereference a null atom pointer");
-      return *token.atom;
+      A* catom = static_cast<A*>(token.atom);
+      return A(std::move(catom->value));
     };
 
   private:
@@ -139,40 +144,40 @@ namespace snt::exs {
       steps.append(BINARY_OPERATION, {OR_OPERATOR});
     }
     void init_operators() {
-      operators.append(TANGENS_OPERATOR, std::make_shared<OperatorTangens<A, S>>());
-      operators.append(COSINUS_OPERATOR, std::make_shared<OperatorCosinus<A, S>>());
-      operators.append(SINUS_OPERATOR, std::make_shared<OperatorSinus<A, S>>());
-      operators.append(CUBIC_ROOT_OPERATOR, std::make_shared<OperatorCubicRoot<A, S>>());
-      operators.append(SQUARE_ROOT_OPERATOR, std::make_shared<OperatorSquareRoot<A, S>>());
-      operators.append(POWER_BASE_OPERATOR, std::make_shared<OperatorPowerBase<A, S>>());
-      operators.append(LOGARITHM_BASE_OPERATOR, std::make_shared<OperatorLogarithmBase<A, S>>());
-      operators.append(LOGARITHM_10_OPERATOR, std::make_shared<OperatorLogarithm10<A, S>>());
-      operators.append(LOGARITHM_OPERATOR, std::make_shared<OperatorLogarithm<A, S>>());
-      operators.append(EXPONENT_OPERATOR, std::make_shared<OperatorExponent<A, S>>());
-      operators.append(PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses<A, S>>()); // should be last of group operators
+      operators.append(TANGENS_OPERATOR, std::make_shared<OperatorTangens<S>>());
+      operators.append(COSINUS_OPERATOR, std::make_shared<OperatorCosinus<S>>());
+      operators.append(SINUS_OPERATOR, std::make_shared<OperatorSinus<S>>());
+      operators.append(CUBIC_ROOT_OPERATOR, std::make_shared<OperatorCubicRoot<S>>());
+      operators.append(SQUARE_ROOT_OPERATOR, std::make_shared<OperatorSquareRoot<S>>());
+      operators.append(POWER_BASE_OPERATOR, std::make_shared<OperatorPowerBase<S>>());
+      operators.append(LOGARITHM_BASE_OPERATOR, std::make_shared<OperatorLogarithmBase<S>>());
+      operators.append(LOGARITHM_10_OPERATOR, std::make_shared<OperatorLogarithm10<S>>());
+      operators.append(LOGARITHM_OPERATOR, std::make_shared<OperatorLogarithm<S>>());
+      operators.append(EXPONENT_OPERATOR, std::make_shared<OperatorExponent<S>>());
+      operators.append(PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses<S>>()); // should be last of group operators
 
-      operators.append(CONDITION_OPERATOR, std::make_shared<OperatorCondition<A, S>>());
+      operators.append(CONDITION_OPERATOR, std::make_shared<OperatorCondition<S>>());
 
-      operators.append(POWER_OPERATOR, std::make_shared<OperatorPower<A, S>>());
+      operators.append(POWER_OPERATOR, std::make_shared<OperatorPower<S>>());
 
-      operators.append(MODULO_OPERATOR, std::make_shared<OperatorModulo<A, S>>());
-      operators.append(MULTIPLY_OPERATOR, std::make_shared<OperatorMultiply<A, S>>());
-      operators.append(DIVIDE_OPERATOR, std::make_shared<OperatorDivide<A, S>>());
-      operators.append(ADD_OPERATOR, std::make_shared<OperatorAdd<A, S>>());
-      operators.append(SUBTRACT_OPERATOR, std::make_shared<OperatorSubtract<A, S>>());
+      operators.append(MODULO_OPERATOR, std::make_shared<OperatorModulo<S>>());
+      operators.append(MULTIPLY_OPERATOR, std::make_shared<OperatorMultiply<S>>());
+      operators.append(DIVIDE_OPERATOR, std::make_shared<OperatorDivide<S>>());
+      operators.append(ADD_OPERATOR, std::make_shared<OperatorAdd<S>>());
+      operators.append(SUBTRACT_OPERATOR, std::make_shared<OperatorSubtract<S>>());
 
-      operators.append(EQUAL_OPERATOR, std::make_shared<OperatorEqual<A, S>>());
-      operators.append(NOT_EQUAL_OPERATOR, std::make_shared<OperatorNotEqual<A, S>>());
+      operators.append(EQUAL_OPERATOR, std::make_shared<OperatorEqual<S>>());
+      operators.append(NOT_EQUAL_OPERATOR, std::make_shared<OperatorNotEqual<S>>());
 
-      operators.append(NOT_OPERATOR, std::make_shared<OperatorNot<A, S>>()); // needs to be after NOT_EQUAL
+      operators.append(NOT_OPERATOR, std::make_shared<OperatorNot<S>>()); // needs to be after NOT_EQUAL
 
-      operators.append(LESS_EQUAL_OPERATOR, std::make_shared<OperatorLessEqual<A, S>>());
-      operators.append(GREATER_EQUAL_OPERATOR, std::make_shared<OperatorGreaterEqual<A, S>>());
-      operators.append(LESS_OPERATOR, std::make_shared<OperatorLess<A, S>>());
-      operators.append(GREATER_OPERATOR, std::make_shared<OperatorGreater<A, S>>());
+      operators.append(LESS_EQUAL_OPERATOR, std::make_shared<OperatorLessEqual<S>>());
+      operators.append(GREATER_EQUAL_OPERATOR, std::make_shared<OperatorGreaterEqual<S>>());
+      operators.append(LESS_OPERATOR, std::make_shared<OperatorLess<S>>());
+      operators.append(GREATER_OPERATOR, std::make_shared<OperatorGreater<S>>());
 
-      operators.append(AND_OPERATOR, std::make_shared<OperatorAnd<A, S>>());
-      operators.append(OR_OPERATOR, std::make_shared<OperatorOr<A, S>>());
+      operators.append(AND_OPERATOR, std::make_shared<OperatorAnd<S>>());
+      operators.append(OR_OPERATOR, std::make_shared<OperatorOr<S>>());
     }
   };
 

@@ -9,10 +9,10 @@
 
 int main() {
 
-  exs::OperatorList<LogicalAtom> operators;
-  operators.append(exs::AND_OPERATOR, std::make_shared<exs::OperatorAnd<LogicalAtom>>());
+  exs::OperatorList operators;
+  operators.append(exs::AND_OPERATOR, std::make_shared<exs::OperatorAnd<>>());
 
-  exs::StepList steps;
+  exs::StepList steps {};
   steps.append(exs::BINARY_OPERATION, {exs::AND_OPERATOR});
 
   exs::Solver<LogicalAtom> solver(operators, steps);

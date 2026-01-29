@@ -7,15 +7,15 @@
 
 namespace snt::exs {
 
-  template <class A, typename S = EmptySettings>
-  class OperatorAdd : public OperatorBase<A, S> {
+  template <typename S = EmptySettings>
+  class OperatorAdd : public OperatorBase<S> {
   public:
-    OperatorAdd(std::string s = "+") : OperatorBase<A, S>("add", s, ADD_OPERATOR) {}
-    void operate_unary(TokenListBase<A>* tokens) override {
+    OperatorAdd(std::string s = "+") : OperatorBase<S>("add", s, ADD_OPERATOR) {}
+    void operate_unary(TokenListBase* tokens) override {
       // std::cout << "operate_unary" << std::endl;
       // tokens->print(true);
-      Token<A> left = tokens->get_left();
-      Token<A> right = tokens->get_right();
+      Token left = tokens->get_left();
+      Token right = tokens->get_right();
       if (left.type == EMPTY_TOKEN && right.type == ATOM_TOKEN) {
         // std::cout << "a " << left.to_string() << " " << right.to_string() << std::endl;
         tokens->put_left(right);
@@ -34,13 +34,13 @@ namespace snt::exs {
       } else {
         // std::cout << "e" << std::endl;
         tokens->put_left(left);
-        tokens->put_left(Token<A>(OPERATOR_TOKEN, ADD_OPERATOR));
+        tokens->put_left(Token(OPERATOR_TOKEN, ADD_OPERATOR));
         tokens->put_right(right);
       }
     };
-    void operate_binary(TokenListBase<A>* tokens) override {
-      Token<A> left = tokens->get_left();
-      Token<A> right = tokens->get_right();
+    void operate_binary(TokenListBase* tokens) override {
+      Token left = tokens->get_left();
+      Token right = tokens->get_right();
       left.atom->math_add(right.atom);
       tokens->put_left(left);
     };
