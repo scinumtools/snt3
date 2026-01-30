@@ -31,5 +31,5 @@ public:
 class OperatorSelect : public exs::OperatorGroup<1, Settings> {
 public:
   OperatorSelect();
-  void operate_group(exs::TokenListBase* tokens, Settings* settings);
+  void operate_group(exs::TokenListBase* tokens, exs::EmptySettings* set) override;
 };

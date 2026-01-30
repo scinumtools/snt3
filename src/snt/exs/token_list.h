@@ -21,9 +21,10 @@ namespace snt::exs {
     std::deque<Token> left;
     std::deque<Token> right;
     OperatorList<S>* operators;
-    S* settings;
+    EmptySettings* settings;
     AtomList<S> atoms;
-    TokenList(OperatorList<S>* o, S* set = nullptr) : operators(o), settings(set) {};
+    TokenList(OperatorList<S>* o, EmptySettings* set = nullptr) :
+      operators(o), settings(set) {};
     void append(TokenType t) {
       right.push_back(Token(t));
     };

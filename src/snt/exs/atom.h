@@ -202,8 +202,11 @@ namespace snt::exs {
 
   class Atom final: public AtomBase<Atom,AtomValueType> {
   public:
+    
     Atom(Atom& a) : AtomBase(a) {};
+    
     Atom(AtomValueType v) : AtomBase(v) {};
+    
     static AtomValueType from_string(std::string s, EmptySettings* set = nullptr) {
       AtomValueType v;
       if (s == "true") {
@@ -220,6 +223,7 @@ namespace snt::exs {
       }
       return v;
     }
+    
     std::string to_string() override {
       if (std::holds_alternative<double>(value)) {
         std::stringstream str;

@@ -41,24 +41,24 @@ namespace snt::exs {
 
   template <class A, typename S = EmptySettings>
   class Solver {
-    S* settings;
+    EmptySettings* settings;
 
   public:
     OperatorList<S> operators;
     StepList steps;
 
     // constructors without settings
-    Solver(S* set = {}) : settings(set) {
+    Solver(EmptySettings* set = {}) : settings(set) {
       init_steps();
       init_operators();
     };
-    Solver(OperatorList<S>& o, S* set = {}) : operators(o), settings(set) {
+    Solver(OperatorList<S>& o, EmptySettings* set = {}) : operators(o), settings(set) {
       init_steps();
     };
-    Solver(StepList& s, S* set = {}) : steps(s), settings(set) {
+    Solver(StepList& s, EmptySettings* set = {}) : steps(s), settings(set) {
       init_operators();
     };
-    Solver(OperatorList<S>& o, StepList& s, S* set = {}) : operators(o), steps(s), settings(set) {};
+    Solver(OperatorList<S>& o, StepList& s, EmptySettings* set = {}) : operators(o), steps(s), settings(set) {};
 
     // solve expressions
     A solve(std::string expression) {

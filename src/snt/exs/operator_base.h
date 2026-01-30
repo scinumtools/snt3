@@ -31,10 +31,10 @@ namespace snt::exs {
     virtual void operate_binary(TokenListBase* tokens) { throw std::logic_error("Binary operation is not implemented"); };
     virtual void operate_ternary(TokenListBase* tokens) { throw std::logic_error("Ternary operation is not implemented"); };
     virtual void operate_group(TokenListBase* tokens) { throw std::logic_error("Group operation is not implemented"); };
-    virtual void operate_unary(TokenListBase* tokens, S* settings) { operate_unary(tokens); };
-    virtual void operate_binary(TokenListBase* tokens, S* settings) { operate_binary(tokens); };
-    virtual void operate_ternary(TokenListBase* tokens, S* settings) { operate_ternary(tokens); };
-    virtual void operate_group(TokenListBase* tokens, S* settings) { operate_group(tokens); };
+    virtual void operate_unary(TokenListBase* tokens, EmptySettings* settings) { operate_unary(tokens); };
+    virtual void operate_binary(TokenListBase* tokens, EmptySettings* settings) { operate_binary(tokens); };
+    virtual void operate_ternary(TokenListBase* tokens, EmptySettings* settings) { operate_ternary(tokens); };
+    virtual void operate_group(TokenListBase* tokens, EmptySettings* settings) { operate_group(tokens); };
     virtual void print() {};
   };
 
