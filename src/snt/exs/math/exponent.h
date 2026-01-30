@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorExponent : public OperatorGroup<1, S> {
+  class OperatorExponent : public OperatorGroup<1> {
   public:
-    OperatorExponent(const OperatorGroupSybols& s = {"exp", "(", ")", ","}) : OperatorGroup<1, S>("exp", s, EXPONENT_OPERATOR) {}
+    OperatorExponent(const OperatorGroupSybols& s = {"exp", "(", ")", ","}) : OperatorGroup<1>("exp", s, EXPONENT_OPERATOR) {}
     void operate_group(TokenListBase* tokens) override {
       Token group1 = tokens->get_left();
       group1.atom->math_exponent();

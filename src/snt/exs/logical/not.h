@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorNot : public OperatorBase<S> {
+  class OperatorNot : public OperatorBase {
   public:
-    OperatorNot(std::string s = "!") : OperatorBase<S>("not", s, NOT_OPERATOR) {}
+    OperatorNot(std::string s = "!") : OperatorBase("not", s, NOT_OPERATOR) {}
     void operate_unary(TokenListBase* tokens) override {
       Token right = tokens->get_right();
       right.atom->logical_not();

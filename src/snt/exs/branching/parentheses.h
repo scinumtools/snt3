@@ -5,10 +5,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorParentheses : public OperatorGroup<1, S> {
+  class OperatorParentheses : public OperatorGroup<1> {
   public:
-    OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","}) : OperatorGroup<1, S>("par", s, PARENTHESES_OPERATOR) {}
+    OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","}) : OperatorGroup<1>("par", s, PARENTHESES_OPERATOR) {}
   };
 
 } // namespace snt::exs

@@ -1,6 +1,6 @@
 #import "main.h"
 
-int CustomAtom::from_string(std::string& s, exs::EmptySettings* set) {
+int CustomAtom::from_string(std::string& s, exs::BaseSettings* set) {
   Settings* cset = static_cast<Settings*>(set);
   if (s == cset->symbol)
     return cset->value;

@@ -4,7 +4,7 @@
 
 using namespace snt;
 
-struct Settings: exs::EmptySettings {
+struct Settings: exs::BaseSettings {
   std::string symbol;
   int value;
   std::array<int, 5> options;
@@ -21,15 +21,15 @@ class CustomAtom final : public exs::AtomBase<CustomAtom,int> {
 public:
   CustomAtom(CustomAtom& a) : AtomBase(a) {};
   CustomAtom(int v) : AtomBase(v) {};
-  static int from_string(std::string& s, exs::EmptySettings* set = nullptr);
+  static int from_string(std::string& s, exs::BaseSettings* set = nullptr);
   std::string to_string() override;
   void math_add(CustomAtom* other) override;
   void math_subtract(CustomAtom* other) override;
   void math_negate() override;
 };
 
-class OperatorSelect : public exs::OperatorGroup<1, Settings> {
+class OperatorSelect : public exs::OperatorGroup<1> {
 public:
   OperatorSelect();
-  void operate_group(exs::TokenListBase* tokens, exs::EmptySettings* set) override;
+  void operate_group(exs::TokenListBase* tokens, exs::BaseSettings* set) override;
 };

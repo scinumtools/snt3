@@ -7,10 +7,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorAdd : public OperatorBase<S> {
+  class OperatorAdd : public OperatorBase {
   public:
-    OperatorAdd(std::string s = "+") : OperatorBase<S>("add", s, ADD_OPERATOR) {}
+    OperatorAdd(std::string s = "+") : OperatorBase("add", s, ADD_OPERATOR) {}
     void operate_unary(TokenListBase* tokens) override {
       // std::cout << "operate_unary" << std::endl;
       // tokens->print(true);

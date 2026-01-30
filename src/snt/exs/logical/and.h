@@ -5,10 +5,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorAnd : public OperatorBase<S> {
+  class OperatorAnd : public OperatorBase {
   public:
-    OperatorAnd(std::string s = "&&") : OperatorBase<S>("and", s, AND_OPERATOR) {}
+    OperatorAnd(std::string s = "&&") : OperatorBase("and", s, AND_OPERATOR) {}
     void operate_binary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();

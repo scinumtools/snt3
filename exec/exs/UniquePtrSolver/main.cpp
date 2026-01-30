@@ -10,7 +10,7 @@
 int main() {
 
   exs::OperatorList operators;
-  operators.append(exs::AND_OPERATOR, std::make_shared<exs::OperatorAnd<>>());
+  operators.append(exs::AND_OPERATOR, std::make_shared<exs::OperatorAnd>());
 
   exs::StepList steps {};
   steps.append(exs::BINARY_OPERATION, {exs::AND_OPERATOR});

@@ -5,10 +5,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorTangens : public OperatorGroup<1, S> {
+  class OperatorTangens : public OperatorGroup<1> {
   public:
-    OperatorTangens(const OperatorGroupSybols& s = {"tan", "(", ")", ","}) : OperatorGroup<1, S>("tan", s, TANGENS_OPERATOR) {}
+    OperatorTangens(const OperatorGroupSybols& s = {"tan", "(", ")", ","}) : OperatorGroup<1>("tan", s, TANGENS_OPERATOR) {}
     void operate_group(TokenListBase* tokens) override {
       Token group1 = tokens->get_left();
       group1.atom->math_tangens();

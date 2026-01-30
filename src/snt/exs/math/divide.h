@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorDivide : public OperatorBase<S> {
+  class OperatorDivide : public OperatorBase {
   public:
-    OperatorDivide(std::string s = "/") : OperatorBase<S>("div", s, DIVIDE_OPERATOR) {}
+    OperatorDivide(std::string s = "/") : OperatorBase("div", s, DIVIDE_OPERATOR) {}
     void operate_binary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();

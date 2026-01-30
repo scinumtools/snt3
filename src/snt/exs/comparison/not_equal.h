@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorNotEqual : public OperatorBase<S> {
+  class OperatorNotEqual : public OperatorBase {
   public:
-    OperatorNotEqual(std::string s = "!=") : OperatorBase<S>("ne", s, NOT_EQUAL_OPERATOR) {}
+    OperatorNotEqual(std::string s = "!=") : OperatorBase("ne", s, NOT_EQUAL_OPERATOR) {}
     void operate_binary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();

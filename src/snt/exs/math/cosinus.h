@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorCosinus : public OperatorGroup<1, S> {
+  class OperatorCosinus : public OperatorGroup<1> {
   public:
-    OperatorCosinus(const OperatorGroupSybols& s = {"cos", "(", ")", ","}) : OperatorGroup<1, S>("cos", s, COSINUS_OPERATOR) {}
+    OperatorCosinus(const OperatorGroupSybols& s = {"cos", "(", ")", ","}) : OperatorGroup<1>("cos", s, COSINUS_OPERATOR) {}
     void operate_group(TokenListBase* tokens) override {
       Token group1 = tokens->get_left();
       group1.atom->math_cosinus();

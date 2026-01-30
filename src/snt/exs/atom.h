@@ -207,7 +207,7 @@ namespace snt::exs {
     
     Atom(AtomValueType v) : AtomBase(v) {};
     
-    static AtomValueType from_string(std::string s, EmptySettings* set = nullptr) {
+    static AtomValueType from_string(std::string s, BaseSettings* set = nullptr) {
       AtomValueType v;
       if (s == "true") {
         v = true;

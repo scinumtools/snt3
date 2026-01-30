@@ -15,15 +15,14 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
   class TokenList : public TokenListBase {
   public:
     std::deque<Token> left;
     std::deque<Token> right;
-    OperatorList<S>* operators;
-    EmptySettings* settings;
-    AtomList<S> atoms;
-    TokenList(OperatorList<S>* o, EmptySettings* set = nullptr) :
+    OperatorList* operators;
+    BaseSettings* settings;
+    AtomList atoms;
+    TokenList(OperatorList* o, BaseSettings* set = nullptr) :
       operators(o), settings(set) {};
     void append(TokenType t) {
       right.push_back(Token(t));
@@ -79,7 +78,7 @@ namespace snt::exs {
         Token token = get_right();
         // token.print();
         if (std::find(ops.begin(), ops.end(), token.optype) != ops.end()) {
-          OperatorBase<S>* op = operators->select(token.optype);
+          OperatorBase* op = operators->select(token.optype);
           // token is an operator
           if (oitype == UNARY_OPERATION) {
             op->operate_unary(this, settings);
@@ -136,7 +135,7 @@ namespace snt::exs {
         str << "A{" << atom->to_string() << "} ";
         break;
       case OPERATOR_TOKEN:
-        OperatorBase<S>* op = operators->select(optype);
+        OperatorBase* op = operators->select(optype);
         str << op->name << " ";
         break;
       }

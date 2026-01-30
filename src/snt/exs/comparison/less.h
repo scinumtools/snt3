@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorLess : public OperatorBase<S> {
+  class OperatorLess : public OperatorBase {
   public:
-    OperatorLess(std::string s = "<") : OperatorBase<S>("lt", s, LESS_OPERATOR) {}
+    OperatorLess(std::string s = "<") : OperatorBase("lt", s, LESS_OPERATOR) {}
     void operate_binary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();

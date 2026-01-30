@@ -166,10 +166,10 @@ TEST(Solver, CustomStepList) {
 TEST(Solver, CustomOperatorList) {
 
   // create custom operator list
-  exs::OperatorList<> operators;
-  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<>>());
-  operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply<>>());
-  operators.append(exs::POWER_OPERATOR, std::make_shared<exs::OperatorPower<>>("^")); // changin the symbol
+  exs::OperatorList operators;
+  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd>());
+  operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>());
+  operators.append(exs::POWER_OPERATOR, std::make_shared<exs::OperatorPower>("^")); // changin the symbol
 
   // test the solver
   exs::Solver<exs::Atom> solver(operators);
@@ -184,10 +184,10 @@ public:
 
 TEST(Operators, CustomParenthesesOperator) {
 
-  exs::OperatorList<> operators;
+  exs::OperatorList operators;
   operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses>());
-  operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply<>>());
-  operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide<>>());
+  operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>());
+  operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide>());
 
   // create custom step list
   exs::StepList steps;

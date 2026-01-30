@@ -67,7 +67,7 @@ namespace snt::exs {
     return str.substr(strBegin, strRange);
   }
 
-  struct EmptySettings {};
+  struct BaseSettings {};
 
 } // namespace snt::exs
 

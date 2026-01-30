@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorGreater : public OperatorBase<S> {
+  class OperatorGreater : public OperatorBase {
   public:
-    OperatorGreater(std::string s = ">") : OperatorBase<S>("gt", s, GREATER_OPERATOR) {}
+    OperatorGreater(std::string s = ">") : OperatorBase("gt", s, GREATER_OPERATOR) {}
     void operate_binary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();

@@ -14,7 +14,7 @@ class CustomAtom final: public exs::AtomBase<CustomAtom,AtomValueType> {
 public:
   CustomAtom(CustomAtom& a) : AtomBase(a) {};
   CustomAtom(AtomValueType v) : AtomBase(v) {};
-  static AtomValueType from_string(std::string s, exs::EmptySettings* set = nullptr) {
+  static AtomValueType from_string(std::string s, exs::BaseSettings* set = nullptr) {
     return {std::stod(s)};
   }
   std::string to_string() override;

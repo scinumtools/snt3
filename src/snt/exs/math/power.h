@@ -5,10 +5,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorPower : public OperatorBase<S> {
+  class OperatorPower : public OperatorBase {
   public:
-    OperatorPower(std::string s = "**") : OperatorBase<S>("pow", s, POWER_OPERATOR) {}
+    OperatorPower(std::string s = "**") : OperatorBase("pow", s, POWER_OPERATOR) {}
     void operate_binary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();

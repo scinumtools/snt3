@@ -39,38 +39,38 @@
 
 namespace snt::exs {
 
-  template <class A, typename S = EmptySettings>
+  template <class A>
   class Solver {
-    EmptySettings* settings;
+    BaseSettings* settings;
 
   public:
-    OperatorList<S> operators;
+    OperatorList operators;
     StepList steps;
 
     // constructors without settings
-    Solver(EmptySettings* set = {}) : settings(set) {
+    Solver(BaseSettings* set = {}) : settings(set) {
       init_steps();
       init_operators();
     };
-    Solver(OperatorList<S>& o, EmptySettings* set = {}) : operators(o), settings(set) {
+    Solver(OperatorList& o, BaseSettings* set = {}) : operators(o), settings(set) {
       init_steps();
     };
-    Solver(StepList& s, EmptySettings* set = {}) : steps(s), settings(set) {
+    Solver(StepList& s, BaseSettings* set = {}) : steps(s), settings(set) {
       init_operators();
     };
-    Solver(OperatorList<S>& o, StepList& s, EmptySettings* set = {}) : operators(o), steps(s), settings(set) {};
+    Solver(OperatorList& o, StepList& s, BaseSettings* set = {}) : operators(o), steps(s), settings(set) {};
 
     // solve expressions
     A solve(std::string expression) {
       Expression expr(expression);
       //CHECKPOINT( expr.to_string() );
-      TokenList<S> tokens(&operators, settings);
+      TokenList tokens(&operators, settings);
 
       // Tokenize expression
       while (expr.right.length() > 0) {
         bool is_operator = false;
         for (auto o : operators.order) {
-          OperatorBase<S>* op = operators.select(o);
+          OperatorBase* op = operators.select(o);
           //CHECKPOINT( op->symbol );
           if (op->check(expr)) {
             is_operator = true;
@@ -144,40 +144,40 @@ namespace snt::exs {
       steps.append(BINARY_OPERATION, {OR_OPERATOR});
     }
     void init_operators() {
-      operators.append(TANGENS_OPERATOR, std::make_shared<OperatorTangens<S>>());
-      operators.append(COSINUS_OPERATOR, std::make_shared<OperatorCosinus<S>>());
-      operators.append(SINUS_OPERATOR, std::make_shared<OperatorSinus<S>>());
-      operators.append(CUBIC_ROOT_OPERATOR, std::make_shared<OperatorCubicRoot<S>>());
-      operators.append(SQUARE_ROOT_OPERATOR, std::make_shared<OperatorSquareRoot<S>>());
-      operators.append(POWER_BASE_OPERATOR, std::make_shared<OperatorPowerBase<S>>());
-      operators.append(LOGARITHM_BASE_OPERATOR, std::make_shared<OperatorLogarithmBase<S>>());
-      operators.append(LOGARITHM_10_OPERATOR, std::make_shared<OperatorLogarithm10<S>>());
-      operators.append(LOGARITHM_OPERATOR, std::make_shared<OperatorLogarithm<S>>());
-      operators.append(EXPONENT_OPERATOR, std::make_shared<OperatorExponent<S>>());
-      operators.append(PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses<S>>()); // should be last of group operators
+      operators.append(TANGENS_OPERATOR, std::make_shared<OperatorTangens>());
+      operators.append(COSINUS_OPERATOR, std::make_shared<OperatorCosinus>());
+      operators.append(SINUS_OPERATOR, std::make_shared<OperatorSinus>());
+      operators.append(CUBIC_ROOT_OPERATOR, std::make_shared<OperatorCubicRoot>());
+      operators.append(SQUARE_ROOT_OPERATOR, std::make_shared<OperatorSquareRoot>());
+      operators.append(POWER_BASE_OPERATOR, std::make_shared<OperatorPowerBase>());
+      operators.append(LOGARITHM_BASE_OPERATOR, std::make_shared<OperatorLogarithmBase>());
+      operators.append(LOGARITHM_10_OPERATOR, std::make_shared<OperatorLogarithm10>());
+      operators.append(LOGARITHM_OPERATOR, std::make_shared<OperatorLogarithm>());
+      operators.append(EXPONENT_OPERATOR, std::make_shared<OperatorExponent>());
+      operators.append(PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses>()); // should be last of group operators
 
-      operators.append(CONDITION_OPERATOR, std::make_shared<OperatorCondition<S>>());
+      operators.append(CONDITION_OPERATOR, std::make_shared<OperatorCondition>());
 
-      operators.append(POWER_OPERATOR, std::make_shared<OperatorPower<S>>());
+      operators.append(POWER_OPERATOR, std::make_shared<OperatorPower>());
 
-      operators.append(MODULO_OPERATOR, std::make_shared<OperatorModulo<S>>());
-      operators.append(MULTIPLY_OPERATOR, std::make_shared<OperatorMultiply<S>>());
-      operators.append(DIVIDE_OPERATOR, std::make_shared<OperatorDivide<S>>());
-      operators.append(ADD_OPERATOR, std::make_shared<OperatorAdd<S>>());
-      operators.append(SUBTRACT_OPERATOR, std::make_shared<OperatorSubtract<S>>());
+      operators.append(MODULO_OPERATOR, std::make_shared<OperatorModulo>());
+      operators.append(MULTIPLY_OPERATOR, std::make_shared<OperatorMultiply>());
+      operators.append(DIVIDE_OPERATOR, std::make_shared<OperatorDivide>());
+      operators.append(ADD_OPERATOR, std::make_shared<OperatorAdd>());
+      operators.append(SUBTRACT_OPERATOR, std::make_shared<OperatorSubtract>());
 
-      operators.append(EQUAL_OPERATOR, std::make_shared<OperatorEqual<S>>());
-      operators.append(NOT_EQUAL_OPERATOR, std::make_shared<OperatorNotEqual<S>>());
+      operators.append(EQUAL_OPERATOR, std::make_shared<OperatorEqual>());
+      operators.append(NOT_EQUAL_OPERATOR, std::make_shared<OperatorNotEqual>());
 
-      operators.append(NOT_OPERATOR, std::make_shared<OperatorNot<S>>()); // needs to be after NOT_EQUAL
+      operators.append(NOT_OPERATOR, std::make_shared<OperatorNot>()); // needs to be after NOT_EQUAL
 
-      operators.append(LESS_EQUAL_OPERATOR, std::make_shared<OperatorLessEqual<S>>());
-      operators.append(GREATER_EQUAL_OPERATOR, std::make_shared<OperatorGreaterEqual<S>>());
-      operators.append(LESS_OPERATOR, std::make_shared<OperatorLess<S>>());
-      operators.append(GREATER_OPERATOR, std::make_shared<OperatorGreater<S>>());
+      operators.append(LESS_EQUAL_OPERATOR, std::make_shared<OperatorLessEqual>());
+      operators.append(GREATER_EQUAL_OPERATOR, std::make_shared<OperatorGreaterEqual>());
+      operators.append(LESS_OPERATOR, std::make_shared<OperatorLess>());
+      operators.append(GREATER_OPERATOR, std::make_shared<OperatorGreater>());
 
-      operators.append(AND_OPERATOR, std::make_shared<OperatorAnd<S>>());
-      operators.append(OR_OPERATOR, std::make_shared<OperatorOr<S>>());
+      operators.append(AND_OPERATOR, std::make_shared<OperatorAnd>());
+      operators.append(OR_OPERATOR, std::make_shared<OperatorOr>());
     }
   };
 

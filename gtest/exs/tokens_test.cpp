@@ -7,9 +7,9 @@ TEST(Tokens, Initialization) {
 
   exs::Token t;
 
-  exs::OperatorList<> operators;
+  exs::OperatorList operators;
 
-  exs::TokenList<> tokens(&operators);
+  exs::TokenList tokens(&operators);
   EXPECT_EQ(tokens.left.size(), 0);
   EXPECT_EQ(tokens.right.size(), 0);
 
@@ -22,17 +22,17 @@ TEST(Tokens, Initialization) {
 // Test get and put tokenss
 TEST(Tokens, GetAndPut) {
 
-  exs::OperatorList<> operators;
+  exs::OperatorList operators;
 
   // prepare tokens
-  exs::TokenList<> tokens(&operators);
+  exs::TokenList tokens(&operators);
 
   // test empty arrays
   EXPECT_EQ(tokens.get_left().type, exs::EMPTY_TOKEN);
   EXPECT_EQ(tokens.get_right().type, exs::EMPTY_TOKEN);
 
   // fill with some dummy values
-  exs::AtomList<exs::Atom> atoms;
+  exs::AtomList atoms;
   int nitems = 4;
   for (int i = 0; i < nitems; i++) {
     exs::Atom atom = exs::Atom::from_string(std::to_string(i));

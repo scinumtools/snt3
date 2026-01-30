@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorOr : public OperatorBase<S> {
+  class OperatorOr : public OperatorBase {
   public:
-    OperatorOr(std::string s = "||") : OperatorBase<S>("or", s, OR_OPERATOR) {}
+    OperatorOr(std::string s = "||") : OperatorBase("or", s, OR_OPERATOR) {}
     void operate_binary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();

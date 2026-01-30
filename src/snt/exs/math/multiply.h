@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorMultiply : public OperatorBase<S> {
+  class OperatorMultiply : public OperatorBase {
   public:
-    OperatorMultiply(std::string s = "*") : OperatorBase<S>("mul", s, MULTIPLY_OPERATOR) {}
+    OperatorMultiply(std::string s = "*") : OperatorBase("mul", s, MULTIPLY_OPERATOR) {}
     void operate_binary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();

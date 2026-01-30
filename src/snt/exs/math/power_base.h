@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorPowerBase : public OperatorGroup<2, S> {
+  class OperatorPowerBase : public OperatorGroup<2> {
   public:
-    OperatorPowerBase(const OperatorGroupSybols& s = {"powb", "(", ")", ","}) : OperatorGroup<2, S>("powb", s, POWER_BASE_OPERATOR) {}
+    OperatorPowerBase(const OperatorGroupSybols& s = {"powb", "(", ")", ","}) : OperatorGroup<2>("powb", s, POWER_BASE_OPERATOR) {}
     void operate_group(TokenListBase* tokens) override {
       Token group2 = tokens->get_left();
       Token group1 = tokens->get_left();

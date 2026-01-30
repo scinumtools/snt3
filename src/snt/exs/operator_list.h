@@ -9,14 +9,13 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
   class OperatorList {
-    typedef std::unordered_map<int, std::shared_ptr<OperatorBase<S>>> OperatorListType;
+    typedef std::unordered_map<int, std::shared_ptr<OperatorBase>> OperatorListType;
 
   public:
     OperatorListType operators;
     std::vector<int> order;
-    OperatorBase<S>* select(int otype) {
+    OperatorBase* select(int otype) {
       auto it = operators.find(otype);
       if (it != operators.end()) {
         return &(*(it->second));
@@ -24,7 +23,7 @@ namespace snt::exs {
         throw std::logic_error("Selecting non existing operator");
       }
     };
-    void append(int t, std::shared_ptr<OperatorBase<S>> o) {
+    void append(int t, std::shared_ptr<OperatorBase> o) {
       operators[t] = o;
       order.push_back(t);
     };

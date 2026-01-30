@@ -7,10 +7,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorSubtract : public OperatorBase<S> {
+  class OperatorSubtract : public OperatorBase {
   public:
-    OperatorSubtract(std::string s = "-") : OperatorBase<S>("sub", s, SUBTRACT_OPERATOR) {}
+    OperatorSubtract(std::string s = "-") : OperatorBase("sub", s, SUBTRACT_OPERATOR) {}
     void operate_unary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();

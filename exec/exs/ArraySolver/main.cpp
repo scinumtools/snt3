@@ -12,8 +12,8 @@ int main() {
 
   // modifying default operator symbols
   exs::OperatorList operators;
-  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<>>());
-  operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract<>>());
+  operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd>());
+  operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract>());
   operators.append(ARRAY_OPERATOR, std::make_shared<OperatorArray>());
 
   // changing default operation steps

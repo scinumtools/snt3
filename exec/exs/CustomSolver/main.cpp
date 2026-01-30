@@ -10,7 +10,7 @@ int main() {
 
   // modifying default operator symbols
   exs::OperatorList operators;
-  operators.append(exs::LESS_OPERATOR, std::make_shared<exs::OperatorLess<>>());
+  operators.append(exs::LESS_OPERATOR, std::make_shared<exs::OperatorLess>());
   operators.append(LENGTH_OPERATOR, std::make_shared<OperatorLength>());
 
   // changing default operation steps

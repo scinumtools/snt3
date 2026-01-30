@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorLogarithm10 : public OperatorGroup<1, S> {
+  class OperatorLogarithm10 : public OperatorGroup<1> {
   public:
-    OperatorLogarithm10(const OperatorGroupSybols& s = {"log10", "(", ")", ","}) : OperatorGroup<1, S>("log10", s, LOGARITHM_10_OPERATOR) {}
+    OperatorLogarithm10(const OperatorGroupSybols& s = {"log10", "(", ")", ","}) : OperatorGroup<1>("log10", s, LOGARITHM_10_OPERATOR) {}
     void operate_group(TokenListBase* tokens) override {
       Token group1 = tokens->get_left();
       group1.atom->math_logarithm_10();

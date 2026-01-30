@@ -1,8 +1,8 @@
 #import "main.h"
 
-OperatorSelect::OperatorSelect() : OperatorGroup<1, Settings>("sel", {"", "{", "}", ","}, SELECT_OPERATOR) {}
+OperatorSelect::OperatorSelect() : OperatorGroup<1>("sel", {"", "{", "}", ","}, SELECT_OPERATOR) {}
 
-void OperatorSelect::operate_group(exs::TokenListBase* tokens, exs::EmptySettings* set) {
+void OperatorSelect::operate_group(exs::TokenListBase* tokens, exs::BaseSettings* set) {
   Settings* cset = static_cast<Settings*>(set);
   exs::Token group1 = tokens->get_left();
   // substitude value from an option list

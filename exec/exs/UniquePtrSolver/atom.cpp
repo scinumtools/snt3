@@ -10,7 +10,7 @@ LogicalAtom& LogicalAtom::operator=(const LogicalAtom& a) {
   return *this;
 }
 
-UniquePtrType LogicalAtom::from_string(std::string& s, exs::EmptySettings* set) {
+UniquePtrType LogicalAtom::from_string(std::string& s, exs::BaseSettings* set) {
   if (s == snt::KEYWORD_TRUE)
     return std::make_unique<bool>(true);
   else if (s == snt::KEYWORD_FALSE)

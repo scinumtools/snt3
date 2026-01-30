@@ -5,10 +5,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorCondition : public OperatorTernary<S> {
+  class OperatorCondition : public OperatorTernary {
   public:
-    OperatorCondition() : OperatorTernary<S>("cond", "?", ":", CONDITION_OPERATOR) {}
+    OperatorCondition() : OperatorTernary("cond", "?", ":", CONDITION_OPERATOR) {}
     void operate_ternary(TokenListBase* tokens) override {
       Token group2 = tokens->get_left();
       Token group1 = tokens->get_left();

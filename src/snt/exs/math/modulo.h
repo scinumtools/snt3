@@ -3,10 +3,9 @@
 
 namespace snt::exs {
 
-  template <typename S = EmptySettings>
-  class OperatorModulo : public OperatorBase<S> {
+  class OperatorModulo : public OperatorBase {
   public:
-    OperatorModulo(std::string s = "%") : OperatorBase<S>("mod", s, MODULO_OPERATOR) {}
+    OperatorModulo(std::string s = "%") : OperatorBase("mod", s, MODULO_OPERATOR) {}
     void operate_binary(TokenListBase* tokens) override {
       Token left = tokens->get_left();
       Token right = tokens->get_right();
