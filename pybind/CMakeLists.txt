@@ -9,10 +9,10 @@
 #enable_testing()
 #
 #add_subdirectory(snt)
-##if (COMPILE_GTESTS_PUQ)	
+##if (COMPILE_GTEST_PUQ)	
 ##add_subdirectory(puq)
 ##endif()
-##if (COMPILE_GTESTS_DIP)
+##if (COMPILE_GTEST_DIP)
 ##add_subdirectory(dip)
 ##endif()
 #
