@@ -1,16 +1,16 @@
 #ifndef EXS_OPERATOR_EXPONENT_H
 #define EXS_OPERATOR_EXPONENT_H
 
+#include "../operator_group.h"
+
 namespace snt::exs {
 
   class OperatorExponent : public OperatorGroup<1> {
   public:
-    OperatorExponent(const OperatorGroupSybols& s = {"exp", "(", ")", ","}) : OperatorGroup<1>("exp", s, EXPONENT_OPERATOR) {}
-    void operate_group(TokenListBase* tokens) override {
-      Token group1 = tokens->get_left();
-      group1.atom->math_exponent();
-      tokens->put_left(group1);
-    };
+    
+    OperatorExponent(const OperatorGroupSybols& s = {"exp", "(", ")", ","});
+    
+    void operate_group(TokenListBase* tokens) override;
   };
 
 } // namespace snt::exs

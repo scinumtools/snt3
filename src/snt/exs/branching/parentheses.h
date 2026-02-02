@@ -7,7 +7,7 @@ namespace snt::exs {
 
   class OperatorParentheses : public OperatorGroup<1> {
   public:
-    OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","}) : OperatorGroup<1>("par", s, PARENTHESES_OPERATOR) {}
+    OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","});
   };
 
 } // namespace snt::exs

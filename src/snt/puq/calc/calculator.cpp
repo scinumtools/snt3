@@ -7,12 +7,12 @@ namespace snt::puq {
 
   Calculator::Calculator() {
 
-    exs::OperatorList<CalculatorAtom> operators;
-    operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<exs::OperatorGroup<CalculatorAtom, 1>>("par", exs::OperatorGroupSybols("", "( ", " )", " , "), exs::PARENTHESES_OPERATOR));
-    operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd<CalculatorAtom>>(" + "));
-    operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract<CalculatorAtom>>(" - "));
-    operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply<CalculatorAtom>>(" * "));
-    operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide<CalculatorAtom>>(" / "));
+    exs::OperatorList operators;
+    operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<exs::OperatorGroup<1>>("par", exs::OperatorGroupSybols("", "( ", " )", " , "), exs::PARENTHESES_OPERATOR));
+    operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd>(" + "));
+    operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract>(" - "));
+    operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(" * "));
+    operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide>(" / "));
 
     exs::StepList steps;
     steps.append(exs::GROUP_OPERATION, {exs::PARENTHESES_OPERATOR});

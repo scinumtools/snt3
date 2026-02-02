@@ -8,7 +8,7 @@
 
 namespace snt::puq {
 
-  Quantity CalculatorAtom::from_string(std::string& expr_orig) {
+  Quantity CalculatorAtom::from_string(std::string& expr_orig, exs::BaseSettings* set) {
     std::string& expr = expr_orig;
     std::smatch m;
     std::regex rx_number("^([^\\s]+)$");

@@ -1,6 +1,8 @@
 #ifndef EXS_STEP_LIST_H
 #define EXS_STEP_LIST_H
 
+#include "settings.h"
+
 #include <memory>
 #include <vector>
 
@@ -11,9 +13,7 @@ namespace snt::exs {
   class StepList {
   public:
     StepListType steps;
-    void append(OperationType t, std::vector<int> s) {
-      steps.push_back({t, s});
-    };
+    void append(OperationType t, std::vector<int> s);
   };
 
 } // namespace snt::exs

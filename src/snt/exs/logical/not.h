@@ -1,16 +1,14 @@
 #ifndef EXS_OPERATOR_NOT_H
 #define EXS_OPERATOR_NOT_H
 
+#include "../operator_base.h"
+
 namespace snt::exs {
 
   class OperatorNot : public OperatorBase {
   public:
-    OperatorNot(std::string s = "!") : OperatorBase("not", s, NOT_OPERATOR) {}
-    void operate_unary(TokenListBase* tokens) override {
-      Token right = tokens->get_right();
-      right.atom->logical_not();
-      tokens->put_right(right);
-    };
+    OperatorNot(std::string s = "!");
+    void operate_unary(TokenListBase* tokens) override;
   };
 
 } // namespace snt::exs

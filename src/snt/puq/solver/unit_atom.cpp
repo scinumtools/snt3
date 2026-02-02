@@ -98,7 +98,7 @@ namespace snt::puq {
     uv.baseunits.append(bu);
   }
 
-  UnitValue UnitAtom::from_string(const std::string& expr_orig) {
+  UnitValue UnitAtom::from_string(const std::string& expr_orig, exs::BaseSettings* set) {
     std::string expr = expr_orig;
     struct UnitValue uv;
     std::smatch m;
@@ -130,6 +130,10 @@ namespace snt::puq {
     return value.to_string();
   }
 
+  void UnitAtom::math_power(UnitAtom* other) {
+    static_assert(true, "Math power is used only with the exponent type");
+  }
+  
   void UnitAtom::math_power(EXPONENT_TYPE& e) {
 #ifdef DEBUG_UNIT_SOLVER
     std::clog << "UNIT:    pow(" << value.to_string() << "," << e.to_string() << ") = ";

@@ -15,6 +15,12 @@ namespace snt::exs {
     std::string separator = ",";
   };
 
+  /**
+   * @class OperatorGroup
+   * @brief Group operator class
+   *
+   * @tparam N Number of group members. Zero means unlimited number
+   */
   template <int N = 0>
   class OperatorGroup : public OperatorBase {
   public:

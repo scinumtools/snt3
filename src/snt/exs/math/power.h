@@ -1,19 +1,18 @@
 #ifndef EXS_OPERATOR_POWER_H
 #define EXS_OPERATOR_POWER_H
 
+#include "../operator_base.h"
+
 #include <math.h>
 
 namespace snt::exs {
 
   class OperatorPower : public OperatorBase {
   public:
-    OperatorPower(std::string s = "**") : OperatorBase("pow", s, POWER_OPERATOR) {}
-    void operate_binary(TokenListBase* tokens) override {
-      Token left = tokens->get_left();
-      Token right = tokens->get_right();
-      left.atom->math_power(right.atom);
-      tokens->put_left(left);
-    };
+    
+    OperatorPower(std::string s = "**");
+    
+    void operate_binary(TokenListBase* tokens) override;
   };
 
 } // namespace snt::exs

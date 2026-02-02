@@ -2,6 +2,7 @@
 #define EXS_TOKEN_H
 
 #include "settings.h"
+#include "atom.h"
 
 #include <iostream>
 #include <string>
@@ -18,18 +19,8 @@ namespace snt::exs {
     Token(TokenType t, int o) : type(t), optype(o), atom(nullptr) {};
     Token(TokenType t, AtomGrand* a) :
       type(t), optype(NONE_OPERATOR), atom(a) {};
-    std::string to_string() {
-      if (type == EMPTY_TOKEN) {
-        return "Token(EMPTY)";
-      } else if (type == OPERATOR_TOKEN) {
-        return "Token(OPERATOR " + std::to_string(optype) + ")";
-      } else {
-        return "Token(ATOM " + atom->to_string() + ")";
-      }
-    }
-    void print() {
-      std::cout << to_string() << "\n";
-    };
+    std::string to_string();
+    void print();
   };
 
 } // namespace snt::exs

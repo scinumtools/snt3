@@ -13,10 +13,10 @@ namespace snt::puq {
     ARRAY_OPERATOR = exs::NUM_OPERATOR_TYPES
   };
 
-  class OperatorArray : public exs::OperatorGroup<UnitAtom> {
+  class OperatorArray : public exs::OperatorGroup<> {
   public:
-    OperatorArray() : exs::OperatorGroup<UnitAtom>("arr", {"", std::string(SYMBOL_ARRAY_START), std::string(SYMBOL_ARRAY_END), ","}, ARRAY_OPERATOR) {};
-    void operate_group(exs::TokenListBase<UnitAtom>* tokens);
+    OperatorArray() : exs::OperatorGroup<>("arr", {"", std::string(SYMBOL_ARRAY_START), std::string(SYMBOL_ARRAY_END), ","}, ARRAY_OPERATOR) {};
+    void operate_group(exs::TokenListBase* tokens);
   };
 
 #endif

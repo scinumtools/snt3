@@ -6,13 +6,13 @@
 
 namespace snt::puq {
 
-  class OperatorParentheses : public exs::OperatorGroup<UnitAtom, 1> {
+  class OperatorParentheses : public exs::OperatorGroup<1> {
   public:
     std::vector<EXPONENT_TYPE> exponent;
-    OperatorParentheses() : OperatorGroup<UnitAtom, 1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
+    OperatorParentheses() : OperatorGroup<1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
     virtual bool check(exs::Expression& expr);
     virtual void parse(exs::Expression& expr);
-    void operate_group(exs::TokenListBase<UnitAtom>* tokens);
+    void operate_group(exs::TokenListBase* tokens);
   };
 
 } // namespace snt::puq

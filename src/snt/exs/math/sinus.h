@@ -1,16 +1,16 @@
 #ifndef EXS_OPERATOR_SINUS_H
 #define EXS_OPERATOR_SINUS_H
 
+#include "../operator_group.h"
+
 namespace snt::exs {
 
   class OperatorSinus : public OperatorGroup<1> {
   public:
-    OperatorSinus(const OperatorGroupSybols& s = {"sin", "(", ")", ","}) : OperatorGroup<1>("sin", s, SINUS_OPERATOR) {}
-    void operate_group(TokenListBase* tokens) override {
-      Token group1 = tokens->get_left();
-      group1.atom->math_sinus();
-      tokens->put_left(group1);
-    };
+    
+    OperatorSinus(const OperatorGroupSybols& s = {"sin", "(", ")", ","});
+    
+    void operate_group(TokenListBase* tokens) override;
   };
 
 } // namespace snt::exs

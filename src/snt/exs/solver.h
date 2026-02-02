@@ -39,29 +39,66 @@
 
 namespace snt::exs {
 
-  template <class A>
+  /**
+   * @class Solver
+   * @brief Main expression solver class
+   *
+   * @tparam ATOM Atom type
+   */
+  template <class ATOM>
   class Solver {
-    BaseSettings* settings;
+    BaseSettings* settings;  ///< Pointer to a setting structure
 
   public:
-    OperatorList operators;
-    StepList steps;
+    OperatorList operators;  ///< List of used operators
+    StepList steps;          ///< List of operator steps
 
-    // constructors without settings
+    /**
+     * @brief Default solver constructor
+     *
+     * @param set Pointer to solver settings
+     */
     Solver(BaseSettings* set = {}) : settings(set) {
       init_steps();
       init_operators();
     };
+    
+    /**
+     * @brief Solver constructor with modified operators
+     *
+     * @param o List of operators
+     * @param set Pointer to solver settings
+     */
     Solver(OperatorList& o, BaseSettings* set = {}) : operators(o), settings(set) {
       init_steps();
     };
+    
+    /**
+     * @brief Solver constructor with modified operator steps
+     *
+     * @param s List of operator steps
+     * @param set Pointer to solver settings
+     */
     Solver(StepList& s, BaseSettings* set = {}) : steps(s), settings(set) {
       init_operators();
     };
+    
+    /**
+     * @brief Custom solver constructor
+     *
+     * @param o List of operators
+     * @param s List of operator steps
+     * @param set Pointer to solver settings
+     */
     Solver(OperatorList& o, StepList& s, BaseSettings* set = {}) : operators(o), steps(s), settings(set) {};
 
-    // solve expressions
-    A solve(std::string expression) {
+    /**
+     * @brief Main solver routine
+     *
+     * @param expression Expression that should be solved
+     * @return Final atom object with a solution
+     */
+    ATOM solve(std::string expression) {
       Expression expr(expression);
       //CHECKPOINT( expr.to_string() );
       TokenList tokens(&operators, settings);
@@ -76,16 +113,16 @@ namespace snt::exs {
             is_operator = true;
             std::string left = expr.pop_left();
             if (left.length() > 0) {
-	      A atom = A::from_string(left, settings);
-              tokens.append(ATOM_TOKEN, std::make_unique<A>(std::move(atom.value)));
+	      ATOM atom = ATOM::from_string(left, settings);
+              tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(std::move(atom.value)));
             }
             op->parse(expr);
             if (op->groups.size() > 0) {
               std::vector<std::string> groups = op->groups;
               // CHECKPOINT( groups.size() )
               for (auto e : groups) {
-		A atom = solve(e);
-                tokens.append(ATOM_TOKEN, std::make_unique<A>(std::move(atom.value)));
+		ATOM atom = solve(e);
+                tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(std::move(atom.value)));
               }
             }
             tokens.append(OPERATOR_TOKEN, op->type);
@@ -100,8 +137,8 @@ namespace snt::exs {
       }
       std::string left = expr.pop_left();
       if (left.length() > 0) {
-	A atom = A::from_string(left, settings);
-	tokens.append(ATOM_TOKEN, std::make_unique<A>(std::move(atom.value)));
+	ATOM atom = ATOM::from_string(left, settings);
+	tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(std::move(atom.value)));
       }
       //CHECKPOINT( expr.to_string() );
 
@@ -120,11 +157,15 @@ namespace snt::exs {
       // std::cout << &token << " " << token.atom << " " << token.atom->value << std::endl;
       if (!token.atom)
         throw std::runtime_error("Cannot dereference a null atom pointer");
-      A* catom = static_cast<A*>(token.atom);
-      return A(std::move(catom->value));
+      ATOM* catom = static_cast<ATOM*>(token.atom);
+      return ATOM(std::move(catom->value));
     };
 
   private:
+
+    /**
+     * @brief Initialisation of a default list of operator steps
+     */
     void init_steps() {
       steps.append(GROUP_OPERATION, {EXPONENT_OPERATOR, LOGARITHM_OPERATOR, LOGARITHM_10_OPERATOR,
                                      LOGARITHM_BASE_OPERATOR, POWER_BASE_OPERATOR,
@@ -143,6 +184,10 @@ namespace snt::exs {
       steps.append(BINARY_OPERATION, {AND_OPERATOR});
       steps.append(BINARY_OPERATION, {OR_OPERATOR});
     }
+
+    /**
+     * @brief Initialisation of default operators
+     */
     void init_operators() {
       operators.append(TANGENS_OPERATOR, std::make_shared<OperatorTangens>());
       operators.append(COSINUS_OPERATOR, std::make_shared<OperatorCosinus>());

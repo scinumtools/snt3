@@ -15,7 +15,7 @@ namespace snt::puq {
   }
 
   void OperatorParentheses::parse(exs::Expression& expr) {
-    OperatorGroup<UnitAtom, 1>::parse(expr); // perform ordinary parsing
+    OperatorGroup<1>::parse(expr); // perform ordinary parsing
     if (expr.right.length() > 0) {           // check if there is an exponent after closing parentheses
       std::smatch m;
 #ifdef EXPONENT_FRACTIONS
@@ -42,14 +42,15 @@ namespace snt::puq {
     }
   };
 
-  void OperatorParentheses::operate_group(exs::TokenListBase<UnitAtom>* tokens) {
+  void OperatorParentheses::operate_group(exs::TokenListBase* tokens) {
     if (exponent.size() == 0)
       throw AtomParsingExcept("Number of exponents does not match number of opened parentheses!");
     EXPONENT_TYPE exp = exponent.back();
     exponent.pop_back();
     if (exp != 1) {
-      exs::Token<UnitAtom> group1 = tokens->get_left();
-      group1.atom->math_power(exp);
+      exs::Token group1 = tokens->get_left();
+      UnitAtom* atom = static_cast<UnitAtom*>(group1.atom);
+      atom->math_power(exp);
       tokens->put_left(group1);
     }
   };

@@ -2,6 +2,7 @@
 #define EXS_OPERATOR_TERNARY_H
 
 #include "settings.h"
+#include "operator_base.h"
 
 #include <stdexcept>
 
@@ -15,24 +16,7 @@ namespace snt::exs {
         std::string s,
         std::string so,
         int t) : OperatorBase(n, s, t), symbol_other(so) {}
-    virtual void parse(Expression& expr) override {
-      this->groups.clear();
-      this->groups.reserve(expr.right.size());
-      expr.remove(this->symbol);
-      bool closed = false;
-      while (expr.right.length() > 0) {
-        if (expr.right.rfind(symbol_other, 0) == 0) {
-          expr.remove(symbol_other);
-          this->groups.push_back(expr.pop_left());
-          closed = true;
-          break;
-        }
-        expr.shift();
-      }
-      if (!closed) {
-        throw std::logic_error("Incomplete ternary operator: " + expr.expr);
-      }
-    };
+    virtual void parse(Expression& expr) override;
   };
 
 } // namespace snt::exs

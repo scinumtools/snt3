@@ -10,13 +10,13 @@ namespace snt::puq {
 
   UnitSolver::UnitSolver() {
 
-    exs::OperatorList<UnitAtom> operators;
+    exs::OperatorList operators;
     operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses>());
 #if defined(MAGNITUDE_VALUES)
     operators.append(ARRAY_OPERATOR, std::make_shared<OperatorArray>());
 #endif
-    operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply<UnitAtom>>(SYMBOL_MULTIPLY));
-    operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide<UnitAtom>>(SYMBOL_DIVIDE));
+    operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(SYMBOL_MULTIPLY));
+    operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide>(SYMBOL_DIVIDE));
 
     exs::StepList steps;
 #if defined(MAGNITUDE_VALUES)

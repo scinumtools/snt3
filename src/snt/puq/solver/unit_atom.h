@@ -17,13 +17,14 @@ namespace snt::puq {
     }
   };
 
-  class UnitAtom : public exs::AtomBase<UnitValue> {
+  class UnitAtom : public exs::AtomBase<UnitAtom, UnitValue> {
   public:
     UnitAtom(UnitAtom& a) : AtomBase(a) {};
     UnitAtom(UnitValue v) : AtomBase(v) {};
-    static UnitValue from_string(const std::string& s);
+    static UnitValue from_string(const std::string& s, exs::BaseSettings* set = nullptr);
     std::string to_string();
     void math_power(EXPONENT_TYPE& e);
+    void math_power(UnitAtom* other);
     void math_multiply(UnitAtom* other);
     void math_divide(UnitAtom* other);
   };
