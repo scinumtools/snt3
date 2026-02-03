@@ -19,7 +19,6 @@ namespace snt::dip {
     Parser parser({s, {"LOGICAL_ATOM", 0}});
     if (parser.part_reference()) {
       LogicalSettings* csettings = static_cast<LogicalSettings*>(settings);
-      std::cout << csettings->env << '\n';
       val::BaseValue::PointerType value =
           csettings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
       return std::move(value);
@@ -79,9 +78,7 @@ namespace snt::dip {
 
   LogicalSolver::LogicalSolver(Environment& env) {
 
-    std::cout << &env << '\n';
     LogicalSettings settings = {{},&env};
-    std::cout << settings.env << '\n';
 
     exs::OperatorList operators;
     operators.append(
