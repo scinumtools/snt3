@@ -15,11 +15,12 @@ namespace snt::dip {
     return *this;
   }
 
-  val::BaseValue::PointerType NumericalAtom::from_string(const std::string& s, NumericalSettings* settings) {
+  val::BaseValue::PointerType NumericalAtom::from_string(const std::string& s, exs::BaseSettings* settings) {
     Parser parser({s, {"NUMERICAL_ATOM", 0}});
     if (parser.part_reference()) {
+      NumericalSettings* csettings = static_cast<NumericalSettings*>(settings);
       val::BaseValue::PointerType value =
-          settings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
+	csettings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
       return std::move(value);
     } else if (parser.part_literal()) {
       ValueNode::PointerType vnode = nullptr;
@@ -96,52 +97,52 @@ namespace snt::dip {
 
   NumericalSolver::NumericalSolver(Environment& env) {
 
-    NumericalSettings settings = {&env};
+    NumericalSettings settings = {{},&env};
 
-    exs::OperatorList<NumericalAtom, NumericalSettings> operators;
+    exs::OperatorList operators;
     operators.append(
         exs::SINUS_OPERATOR,
-        std::make_shared<exs::OperatorSinus<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("sin", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorSinus>(exs::OperatorGroupSybols("sin", "( ", " )", ", ")));
     operators.append(
         exs::COSINUS_OPERATOR,
-        std::make_shared<exs::OperatorCosinus<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("cos", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorCosinus>(exs::OperatorGroupSybols("cos", "( ", " )", ", ")));
     operators.append(
         exs::TANGENS_OPERATOR,
-        std::make_shared<exs::OperatorTangens<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("tan", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorTangens>(exs::OperatorGroupSybols("tan", "( ", " )", ", ")));
     operators.append(
         exs::CUBIC_ROOT_OPERATOR,
-        std::make_shared<exs::OperatorCubicRoot<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("cbrt", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorCubicRoot>(exs::OperatorGroupSybols("cbrt", "( ", " )", ", ")));
     operators.append(
         exs::SQUARE_ROOT_OPERATOR,
-        std::make_shared<exs::OperatorSquareRoot<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("sqrt", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorSquareRoot>(exs::OperatorGroupSybols("sqrt", "( ", " )", ", ")));
     // operators.append(
     //     exs::POWER_BASE_OPERATOR,
-    //     std::make_shared<exs::OperatorPowerBase<NumericalAtom, NumericalSettings>>("powb( ", " )"));
+    //     std::make_shared<exs::OperatorPowerBase>("powb( ", " )"));
     // operators.append(
     //     exs::LOGARITHM_BASE_OPERATOR,
-    //     std::make_shared<exs::OperatorLogarithmBase<NumericalAtom, NumericalSettings>>("logb( ", " )"));
+    //     std::make_shared<exs::OperatorLogarithmBase>("logb( ", " )"));
     operators.append(
         exs::LOGARITHM_10_OPERATOR,
-        std::make_shared<exs::OperatorLogarithm10<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("log10", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorLogarithm10>(exs::OperatorGroupSybols("log10", "( ", " )", ", ")));
     operators.append(
         exs::LOGARITHM_OPERATOR,
-        std::make_shared<exs::OperatorLogarithm<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("log", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorLogarithm>(exs::OperatorGroupSybols("log", "( ", " )", ", ")));
     operators.append(
         exs::EXPONENT_OPERATOR,
-        std::make_shared<exs::OperatorExponent<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("exp", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorExponent>(exs::OperatorGroupSybols("exp", "( ", " )", ", ")));
     operators.append(
         exs::PARENTHESES_OPERATOR,
-        std::make_shared<exs::OperatorParentheses<NumericalAtom, NumericalSettings>>(exs::OperatorGroupSybols("", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorParentheses>(exs::OperatorGroupSybols("", "( ", " )", ", ")));
     operators.append(exs::POWER_OPERATOR,
-                     std::make_shared<exs::OperatorPower<NumericalAtom, NumericalSettings>>(" ** "));
+                     std::make_shared<exs::OperatorPower>(" ** "));
     operators.append(exs::MULTIPLY_OPERATOR,
-                     std::make_shared<exs::OperatorMultiply<NumericalAtom, NumericalSettings>>(" * "));
+                     std::make_shared<exs::OperatorMultiply>(" * "));
     operators.append(exs::DIVIDE_OPERATOR,
-                     std::make_shared<exs::OperatorDivide<NumericalAtom, NumericalSettings>>(" / "));
+                     std::make_shared<exs::OperatorDivide>(" / "));
     operators.append(exs::ADD_OPERATOR,
-                     std::make_shared<exs::OperatorAdd<NumericalAtom, NumericalSettings>>(" +"));
+                     std::make_shared<exs::OperatorAdd>(" +"));
     operators.append(exs::SUBTRACT_OPERATOR,
-                     std::make_shared<exs::OperatorSubtract<NumericalAtom, NumericalSettings>>(" -"));
+                     std::make_shared<exs::OperatorSubtract>(" -"));
 
     exs::StepList steps;
     steps.append(exs::GROUP_OPERATION, {exs::EXPONENT_OPERATOR, exs::LOGARITHM_OPERATOR,
@@ -156,8 +157,7 @@ namespace snt::dip {
     steps.append(exs::BINARY_OPERATION, {exs::MULTIPLY_OPERATOR, exs::DIVIDE_OPERATOR});
     steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 
-    solver =
-        std::make_unique<exs::Solver<NumericalAtom, NumericalSettings>>(operators, steps, settings);
+    solver = std::make_unique<exs::Solver<NumericalAtom,NumericalSettings>>(operators, steps, settings);
   }
 
   NumericalAtom NumericalSolver::eval(const std::string& expression) {

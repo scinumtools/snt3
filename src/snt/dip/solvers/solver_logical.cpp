@@ -15,11 +15,13 @@ namespace snt::dip {
     return *this;
   }
 
-  val::BaseValue::PointerType LogicalAtom::from_string(const std::string& s, LogicalSettings* settings) {
+  val::BaseValue::PointerType LogicalAtom::from_string(const std::string& s, exs::BaseSettings* settings) {
     Parser parser({s, {"LOGICAL_ATOM", 0}});
     if (parser.part_reference()) {
+      LogicalSettings* csettings = static_cast<LogicalSettings*>(settings);
+      std::cout << csettings->env << '\n';
       val::BaseValue::PointerType value =
-          settings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
+          csettings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
       return std::move(value);
     } else if (parser.part_literal()) {
       ValueNode::PointerType vnode = nullptr;
@@ -77,34 +79,36 @@ namespace snt::dip {
 
   LogicalSolver::LogicalSolver(Environment& env) {
 
-    LogicalSettings settings = {&env};
+    std::cout << &env << '\n';
+    LogicalSettings settings = {{},&env};
+    std::cout << settings.env << '\n';
 
-    exs::OperatorList<LogicalAtom, LogicalSettings> operators;
+    exs::OperatorList operators;
     operators.append(
         exs::PARENTHESES_OPERATOR,
-        std::make_shared<exs::OperatorParentheses<LogicalAtom, LogicalSettings>>(exs::OperatorGroupSybols("", "( ", " )", ", ")));
+        std::make_shared<exs::OperatorParentheses>(exs::OperatorGroupSybols("", "( ", " )", ", ")));
     operators.append(exs::EQUAL_OPERATOR,
-                     std::make_shared<exs::OperatorEqual<LogicalAtom, LogicalSettings>>(" == "));
+                     std::make_shared<exs::OperatorEqual>(" == "));
     operators.append(exs::NOT_EQUAL_OPERATOR,
-                     std::make_shared<exs::OperatorNotEqual<LogicalAtom, LogicalSettings>>(" != "));
+                     std::make_shared<exs::OperatorNotEqual>(" != "));
     operators.append(
         exs::NOT_OPERATOR,
-        std::make_shared<exs::OperatorNot<LogicalAtom, LogicalSettings>>()); // needs to be after
+        std::make_shared<exs::OperatorNot>()); // needs to be after
                                                                              // NOT_EQUAL
     operators.append(
         exs::LESS_EQUAL_OPERATOR,
-        std::make_shared<exs::OperatorLessEqual<LogicalAtom, LogicalSettings>>(" <= "));
+        std::make_shared<exs::OperatorLessEqual>(" <= "));
     operators.append(
         exs::GREATER_EQUAL_OPERATOR,
-        std::make_shared<exs::OperatorGreaterEqual<LogicalAtom, LogicalSettings>>(" >= "));
+        std::make_shared<exs::OperatorGreaterEqual>(" >= "));
     operators.append(exs::LESS_OPERATOR,
-                     std::make_shared<exs::OperatorLess<LogicalAtom, LogicalSettings>>(" < "));
+                     std::make_shared<exs::OperatorLess>(" < "));
     operators.append(exs::GREATER_OPERATOR,
-                     std::make_shared<exs::OperatorGreater<LogicalAtom, LogicalSettings>>(" > "));
+                     std::make_shared<exs::OperatorGreater>(" > "));
     operators.append(exs::AND_OPERATOR,
-                     std::make_shared<exs::OperatorAnd<LogicalAtom, LogicalSettings>>(" && "));
+                     std::make_shared<exs::OperatorAnd>(" && "));
     operators.append(exs::OR_OPERATOR,
-                     std::make_shared<exs::OperatorOr<LogicalAtom, LogicalSettings>>(" || "));
+                     std::make_shared<exs::OperatorOr>(" || "));
 
     exs::StepList steps;
     steps.append(exs::GROUP_OPERATION, {exs::PARENTHESES_OPERATOR});
@@ -115,8 +119,7 @@ namespace snt::dip {
     steps.append(exs::BINARY_OPERATION, {exs::AND_OPERATOR});
     steps.append(exs::BINARY_OPERATION, {exs::OR_OPERATOR});
 
-    solver =
-        std::make_unique<exs::Solver<LogicalAtom, LogicalSettings>>(operators, steps, settings);
+    solver = std::make_unique<exs::Solver<LogicalAtom,LogicalSettings>>(operators, steps, settings);
   }
 
   LogicalAtom LogicalSolver::eval(const std::string& expression) {

@@ -3,21 +3,21 @@
 namespace snt::exs {
 
   AtomValueType Atom::from_string(std::string s, BaseSettings* set) {
-     AtomValueType v;
-     if (s == "true") {
-       v = true;
-     } else if (s == "false") {
-       v = false;
-     } else {
-       std::regex rx("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?((e|E)((\\+|-)?)[[:digit:]]+)?");
-       if (std::regex_match(s, rx)) {
-         v = std::stof(s);
-       } else {
-         throw std::logic_error("Atom string could not be parsed, probably due to unknown symbol or operator: " + s);
-       }
-     }
-     return v;
-   }
+    AtomValueType v;
+    if (s == "true") {
+      v = true;
+    } else if (s == "false") {
+      v = false;
+    } else {
+      std::regex rx("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?((e|E)((\\+|-)?)[[:digit:]]+)?");
+      if (std::regex_match(s, rx)) {
+	v = std::stof(s);
+      } else {
+	throw std::logic_error("Atom string could not be parsed, probably due to unknown symbol or operator: " + s);
+      }
+    }
+    return v;
+  }
   
   std::string Atom::to_string() {
     if (std::holds_alternative<double>(value)) {

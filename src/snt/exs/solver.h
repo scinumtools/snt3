@@ -44,21 +44,22 @@ namespace snt::exs {
    * @brief Main expression solver class
    *
    * @tparam ATOM Atom type
+   * @tparam SETTINGS Atom settings
    */
-  template <class ATOM>
+  template <class ATOM, class SETTINGS = BaseSettings>
   class Solver {
-    BaseSettings* settings;  ///< Pointer to a setting structure
 
   public:
+    SETTINGS settings;       ///< Setting structure
     OperatorList operators;  ///< List of used operators
     StepList steps;          ///< List of operator steps
 
     /**
      * @brief Default solver constructor
      *
-     * @param set Pointer to solver settings
+     * @param set Solver settings
      */
-    Solver(BaseSettings* set = {}) : settings(set) {
+    Solver(const SETTINGS& set = {}) : settings(set) {
       init_steps();
       init_operators();
     };
@@ -67,9 +68,9 @@ namespace snt::exs {
      * @brief Solver constructor with modified operators
      *
      * @param o List of operators
-     * @param set Pointer to solver settings
+     * @param set Solver settings
      */
-    Solver(OperatorList& o, BaseSettings* set = {}) : operators(o), settings(set) {
+    Solver(const OperatorList& o, const SETTINGS& set = {}) : operators(o), settings(set) {
       init_steps();
     };
     
@@ -77,9 +78,9 @@ namespace snt::exs {
      * @brief Solver constructor with modified operator steps
      *
      * @param s List of operator steps
-     * @param set Pointer to solver settings
+     * @param set Solver settings
      */
-    Solver(StepList& s, BaseSettings* set = {}) : steps(s), settings(set) {
+    Solver(const StepList& s, const SETTINGS& set = {}) : steps(s), settings(set) {
       init_operators();
     };
     
@@ -88,9 +89,10 @@ namespace snt::exs {
      *
      * @param o List of operators
      * @param s List of operator steps
-     * @param set Pointer to solver settings
+     * @param set Solver settings
      */
-    Solver(OperatorList& o, StepList& s, BaseSettings* set = {}) : operators(o), steps(s), settings(set) {};
+    Solver(const OperatorList& o, const StepList& s, const SETTINGS& set = {}) : operators(o), steps(s), settings(set) {
+    };
 
     /**
      * @brief Main solver routine
@@ -99,10 +101,11 @@ namespace snt::exs {
      * @return Final atom object with a solution
      */
     ATOM solve(std::string expression) {
+      
       Expression expr(expression);
       //CHECKPOINT( expr.to_string() );
-      TokenList tokens(&operators, settings);
-
+      TokenList tokens(&operators, &settings);
+      
       // Tokenize expression
       while (expr.right.length() > 0) {
         bool is_operator = false;
@@ -113,7 +116,7 @@ namespace snt::exs {
             is_operator = true;
             std::string left = expr.pop_left();
             if (left.length() > 0) {
-	      ATOM atom = ATOM::from_string(left, settings);
+	      ATOM atom = ATOM::from_string(left, &settings);
               tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(std::move(atom.value)));
             }
             op->parse(expr);
@@ -137,7 +140,7 @@ namespace snt::exs {
       }
       std::string left = expr.pop_left();
       if (left.length() > 0) {
-	ATOM atom = ATOM::from_string(left, settings);
+	ATOM atom = ATOM::from_string(left, &settings);
 	tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(std::move(atom.value)));
       }
       //CHECKPOINT( expr.to_string() );

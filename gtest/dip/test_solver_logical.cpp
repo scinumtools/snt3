@@ -95,7 +95,7 @@ TEST(SolverLogical, Injections) {
   d.add_string("foo bool = false");
   d.add_string("bar int = 3");
   dip::Environment env = d.parse();
-
+  
   dip::LogicalSolver solver(env);
   dip::LogicalAtom atom = solver.eval("2 == {?bar} && {?foo}");
   EXPECT_EQ(atom.value->to_string(), "false");
