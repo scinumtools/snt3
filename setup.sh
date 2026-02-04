@@ -165,7 +165,7 @@ function show_help {
     echo "./setup.sh -g class            find 'class' in the code or test"
 }
 
-if [[ "${2}" == "" ]]; then
+if [[ "${1}" == "" ]]; then
     show_help
 fi
 while [[ $# -gt 0 ]]; do

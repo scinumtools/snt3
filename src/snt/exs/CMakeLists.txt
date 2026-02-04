@@ -3,8 +3,10 @@ file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
 set(EXEC_NAME snt-exs)
 
 add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
-target_compile_definitions(${EXEC_NAME} PRIVATE)
-target_link_libraries(${EXEC_NAME} PRIVATE)
+
+set_target_properties(${EXEC_NAME} PROPERTIES
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
 
 if(NOT ENABLE_CLANG_TIDY)
 target_precompile_headers(${EXEC_NAME} INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/../exs.h")

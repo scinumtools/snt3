@@ -7,6 +7,10 @@ set(MODULE_NAME scinumtools3)
 file(GLOB SOURCE_FILES "./*.cpp")
 pybind11_add_module(${MODULE_NAME} ${SOURCE_FILES})
 target_include_directories(${MODULE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
+set_target_properties(${MODULE_NAME} PROPERTIES
+    OUTPUT_NAME ${MODULE_NAME}
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/pytest
+)
 
 if (ENABLE_SNT_PYBIND)
    add_subdirectory(snt)
@@ -22,29 +26,17 @@ endif()
 
 enable_testing()
 
+# install python module
+install(TARGETS ${MODULE_NAME}
+        LIBRARY DESTINATION ${Python3_SITEARCH})  # or ${Python3_SITELIB}
 
-#add_subdirectory(snt)
-##if (ENABLE_PUQ_GTEST)	
-##add_subdirectory(puq)
-##endif()
-##if (ENABLE_DIP_GTEST)
-##add_subdirectory(dip)
-##endif()
-#
-#set_target_properties(${MODULE_NAME} PROPERTIES
-#    OUTPUT_NAME ${MODULE_NAME}
-#    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python
-#)
-#
-## install python module
-#install(TARGETS ${MODULE_NAME}
-#        LIBRARY DESTINATION ${Python3_SITEARCH})  # or ${Python3_SITELIB}
-#
 ### register pytest into ctest
-#list(APPEND CMAKE_MODULE_PATH
-#     ${CMAKE_CURRENT_LIST_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+find_package(Pytest 8.2.1 REQUIRED)
+
+
+
 #include(Pytest)
-#find_package(Pytest 8.2.1 REQUIRED)
 #
 #pytest_discover_tests(
 #    ${MODULE_NAME}
