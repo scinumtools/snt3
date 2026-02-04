@@ -9,8 +9,24 @@ pybind11_add_module(${MODULE_NAME} ${SOURCE_FILES})
 target_include_directories(${MODULE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
 set_target_properties(${MODULE_NAME} PROPERTIES
     OUTPUT_NAME ${MODULE_NAME}
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/pytest
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
 )
+
+# register pytests
+function(register_pytests MODULE_DIR)
+file(GLOB_RECURSE PYTEST_FILES "${CMAKE_SOURCE_DIR}/pytest/${MODULE_DIR}/test_*.py")
+foreach(TEST_FILE ${PYTEST_FILES})
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
+    string(REGEX REPLACE "^test_" "" TEST_NAME ${TEST_NAME})
+    set(TEST_FULL_NAME pytest.${MODULE_DIR}.${TEST_NAME})
+    add_test(
+        NAME ${TEST_FULL_NAME}
+        COMMAND ${Python3_EXECUTABLE} -m pytest -v ${TEST_FILE}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/pytest
+    )
+    set_tests_properties(${TEST_FULL_NAME} PROPERTIES DEPENDS ${MODULE_NAME})
+endforeach()
+endfunction()
 
 if (ENABLE_SNT_PYBIND)
    add_subdirectory(snt)
@@ -34,18 +50,3 @@ install(TARGETS ${MODULE_NAME}
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 find_package(Pytest 8.2.1 REQUIRED)
 
-
-
-#include(Pytest)
-#
-#pytest_discover_tests(
-#    ${MODULE_NAME}
-#    TEST_PATHS ${CMAKE_SOURCE_DIR}/pytest
-#    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/pytest
-#    LIBRARY_PATH_PREPEND
-#        $<TARGET_FILE_DIR:${MODULE_NAME}>
-#    PYTHON_PATH_PREPEND
-#        $<TARGET_FILE_DIR:${MODULE_NAME}>
-#    TRIM_FROM_NAME "^test_"
-#)
-#

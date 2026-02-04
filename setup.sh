@@ -21,11 +21,11 @@ CMAKE_FLAGS=(
 
   -DENABLE_EXS=ON
   -DENABLE_EXS_GTEST=ON
-  -DENABLE_EXS_PYTEST=OFF
+  -DENABLE_EXS_PYTEST=ON
 
   -DENABLE_VAL=ON
   -DENABLE_VAL_GTEST=ON
-  -DENABLE_VAL_PYTEST=OFF
+  -DENABLE_VAL_PYTEST=ON
 
   -DENABLE_PUQ=ON
   -DENABLE_PUQ_GTEST=ON
@@ -38,7 +38,7 @@ CMAKE_FLAGS=(
 
   -DENABLE_MAT=OFF
   -DENABLE_MAT_GTEST=ON
-  -DENABLE_MAT_PYTEST=OFF
+  -DENABLE_MAT_PYTEST=ON
 )
 
 OS="$(uname -s)"
@@ -106,7 +106,8 @@ function test_code {
 	    $EXEC_PROGRAM ./bin/gtest-${parts[1]} $EXEC_FLAGS
     	fi
     elif [[ "${parts[0]}" == "pytest" ]]; then
-	pytest pytest/${parts[1]}/${parts[2]}.py::test_${parts[3]}
+	export PYTHONPATH=$PWD/build/lib:$PYTHONPATH
+	pytest pytest/${parts[1]}/test_${parts[2]}.py #::test_${parts[3]}
     else
 	cd $DIR_BUILD
 	ctest --output-on-failure
