@@ -43,6 +43,10 @@ namespace snt::exs {
    * @class Solver
    * @brief Main expression solver class
    *
+   * Note that internal solver and operator routines use static_cast to convert between
+   * AtomGrand and actual ATOM type. Although it may seem dangerous, within a particular 
+   * solver we need to guarantee that AtomGrand will have only one derived type. 
+   *
    * @tparam ATOM Atom type
    * @tparam SETTINGS Atom settings
    */

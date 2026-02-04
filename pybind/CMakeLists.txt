@@ -1,18 +1,33 @@
-#find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-#include_directories(${Python3_INCLUDE_DIRS})
-#find_package(pybind11 CONFIG)
-#
-#set(MODULE_NAME scinumtools3)
-#
-#pybind11_add_module(${MODULE_NAME})
-#target_include_directories(${MODULE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
-#enable_testing()
-#
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+include_directories(${Python3_INCLUDE_DIRS})
+find_package(pybind11 CONFIG)
+
+set(MODULE_NAME scinumtools3)
+
+file(GLOB SOURCE_FILES "./*.cpp")
+pybind11_add_module(${MODULE_NAME} ${SOURCE_FILES})
+target_include_directories(${MODULE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+if (ENABLE_SNT_PYBIND)
+   add_subdirectory(snt)
+endif()
+
+if (ENABLE_PUQ_PYBIND)
+   add_subdirectory(puq)
+endif()
+
+if (ENABLE_DIP_PYBIND)
+   add_subdirectory(dip)
+endif()
+
+enable_testing()
+
+
 #add_subdirectory(snt)
-##if (COMPILE_GTEST_PUQ)	
+##if (ENABLE_PUQ_GTEST)	
 ##add_subdirectory(puq)
 ##endif()
-##if (COMPILE_GTEST_DIP)
+##if (ENABLE_DIP_GTEST)
 ##add_subdirectory(dip)
 ##endif()
 #

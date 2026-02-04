@@ -13,11 +13,34 @@ NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
 NUM_MAKE_CORES=$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release
 ENABLE_CLANG_TIDY=OFF
-CMAKE_FLAGS="-DCOMPILE_EXS=ON -DCOMPILE_GTEST_EXS=ON -DCOMPILE_PYTEST_EXS=OFF "
-CMAKE_FLAGS+="-DCOMPILE_VAL=ON -DCOMPILE_GTEST_VAL=ON -DCOMPILE_PYTEST_EXS=OFF "
-CMAKE_FLAGS+="-DCOMPILE_PUQ=ON -DCOMPILE_GTEST_PUQ=ON -DCOMPILE_PYTEST_EXS=OFF -DCOMPILE_PUQ_MAGNITUDE=value "
-CMAKE_FLAGS+="-DCOMPILE_DIP=ON -DCOMPILE_GTEST_DIP=ON -DCOMPILE_PYTEST_EXS=OFF "
-CMAKE_FLAGS+="-DCOMPILE_MAT=OFF -DCOMPILE_GTEST_MAT=OFF -DCOMPILE_PYTEST_EXS=OFF "
+
+CMAKE_FLAGS=(
+  -DENABLE_SNT=ON
+  -DENABLE_SNT_GTEST=ON
+  -DENABLE_SNT_PYTEST=ON
+
+  -DENABLE_EXS=ON
+  -DENABLE_EXS_GTEST=ON
+  -DENABLE_EXS_PYTEST=OFF
+
+  -DENABLE_VAL=ON
+  -DENABLE_VAL_GTEST=ON
+  -DENABLE_VAL_PYTEST=OFF
+
+  -DENABLE_PUQ=ON
+  -DENABLE_PUQ_GTEST=ON
+  -DENABLE_PUQ_PYTEST=ON
+  -DENABLE_PUQ_MAGNITUDE=value
+
+  -DENABLE_DIP=ON
+  -DENABLE_DIP_GTEST=ON
+  -DENABLE_DIP_PYTEST=ON
+
+  -DENABLE_MAT=OFF
+  -DENABLE_MAT_GTEST=ON
+  -DENABLE_MAT_PYTEST=OFF
+)
+
 OS="$(uname -s)"
 
 function clean_code {
@@ -32,12 +55,18 @@ function build_code {
     fi
     if [[ $ENABLE_CLANG_TIDY == "ON" ]]; then
 	clang_tidy_flag="clang-tidy;-warnings-as-errors=*"
-	CMAKE_FLAGS+=" -DENABLE_CLANG_TIDY=${ENABLE_CLANG_TIDY} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_CLANG_TIDY=${clang_tidy_flag}"
+	CMAKE_FLAGS+=(
+	    -DENABLE_CLANG_TIDY="${ENABLE_CLANG_TIDY}"
+	    -DCMAKE_EXPORT_ENABLE_COMMANDS=ON
+	    -DCMAKE_CXX_CLANG_TIDY="${clang_tidy_flag}"
+	)
     fi
     if [[ $CMAKE_BUILD_TYPE == Debug ]]; then
-	CMAKE_FLAGS+=" -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+	CMAKE_FLAGS+=(
+	    -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+	)
     fi
-    cmake -B $DIR_BUILD $CMAKE_FLAGS
+    cmake -B $DIR_BUILD "${CMAKE_FLAGS[@]}"
     cd $DIR_BUILD
     make -j $NUM_MAKE_CORES
     cd $DIR_ROOT
@@ -95,8 +124,8 @@ function compile_docs {
 }
 
 function grep_code {
-    if [[ "${1}" != "" ]]; then
-	grep -Inr --color "${1}" ./src ./gtest ./exec
+    if [[ "${2}" != "" ]]; then
+	grep -Inr --color "${2}" ./src ./gtest ./exec
     fi
 }
 
@@ -107,23 +136,28 @@ function setup_clang_format {
     find pybind -name '*.cpp' -o -name '*.h' | xargs clang-format -i
 }
 
+function refactor_code {
+    grep -rl "${1}" ./ --exclude-dir=build --exclude-dir=.venv | xargs sed -i '' "s/${1}/${2}/g"
+}
+
 function show_help {
     echo "Scientific Numerical Tools (SNT, scinumtools)"
     echo ""
     echo "Options:"
-    echo " -c|--clean          clean the build directory"
-    echo " -b|--build          build code"
-    echo " -i|--install        install dip"
-    echo " -u|--uninstall      uninstall dip"
-    echo " -r|--run <example>  run an example code"
-    echo " -t|--test [<test>]  run all/specific tests"
-    echo " -d|--docs           compile documentation"
-    echo " -g|--grep <expr>    find expression in a code"
-    echo " -h|--help           show this help"
-    echo " --debug             run in a debug mode"
-    echo " --clang-tidy        run clang-tidy during compilation"
-    echo " --clang-format      run clang-format"
-    echo " --num-cores N       number of compiliation cores"
+    echo " -c|--clean              clean the build directory"
+    echo " -b|--build              build code"
+    echo " -i|--install            install dip"
+    echo " -u|--uninstall          uninstall dip"
+    echo " -r|--run <example>      run an example code"
+    echo " -t|--test [<test>]      run all/specific tests"
+    echo " -d|--docs               compile documentation"
+    echo " -g|--grep <expr>        find expression in a code"
+    echo " -h|--help               show this help"
+    echo " --debug                 run in a debug mode"
+    echo " --clang-tidy            run clang-tidy during compilation"
+    echo " --clang-format          run clang-format"
+    echo " --num-cores N           number of compiliation cores"
+    echo " --refactor <from> <to>  replace <from> a string <to> another string"
     echo ""
     echo "Examples:"
     echo "./setup.sh -c -b               clean and build the code"
@@ -131,7 +165,7 @@ function show_help {
     echo "./setup.sh -g class            find 'class' in the code or test"
 }
 
-if [[ "${1}" == "" ]]; then
+if [[ "${2}" == "" ]]; then
     show_help
 fi
 while [[ $# -gt 0 ]]; do
@@ -163,6 +197,8 @@ while [[ $# -gt 0 ]]; do
 	    setup_clang_format; shift;;
 	--num-cores)
 	    NUM_SYSTEM_CORES=$2; shift; shift;;
+	--refactor)
+	    refactor_code $2 $3; shift; shift; shift;;
 	-*|--*)
 	    show_help; exit 1;;
 	*)
