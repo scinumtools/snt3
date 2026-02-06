@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  MAGNITUDE_PRECISION floor(const MAGNITUDE_PRECISION& m) {
+  MagnitudeFloat floor(const MagnitudeFloat& m) {
     return std::floor(m);
   }
 

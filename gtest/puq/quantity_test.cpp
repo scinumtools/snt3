@@ -57,13 +57,13 @@ TEST(Quantity, InitializationErrors) {
   q = puq::Quantity("3.40(10)*km3"); // unit expression
   EXPECT_EQ(q.to_string(), "3.40(10)*km3");
 
-#ifdef PREPROCESS_SYMBOLS
-  q = puq::Quantity("6.23537(39)×10−12*C4⋅m4⋅J−3");
-  EXPECT_EQ(q.to_string(), "6.23537(39)e-12*C4*m4*J-3");
-
-  q = puq::Quantity("8.8541878188(14)×10−12*F⋅m−1");
-  EXPECT_EQ(q.to_string(), "8.8541878188(14)e-12*F*m-1");
-#endif
+  if constexpr (puq::Config::preprocess_symbols) {
+    q = puq::Quantity("6.23537(39)×10−12*C4⋅m4⋅J−3");
+    EXPECT_EQ(q.to_string(), "6.23537(39)e-12*C4*m4*J-3");
+    
+    q = puq::Quantity("8.8541878188(14)×10−12*F⋅m−1");
+    EXPECT_EQ(q.to_string(), "8.8541878188(14)e-12*F*m-1");
+  }
 
 #if defined(MAGNITUDE_VALUES)
 
@@ -93,10 +93,10 @@ TEST(Quantity, InitializationArrays) {
 
 #endif
 
-#ifdef PREPROCESS_SYMBOLS
-  q = puq::Quantity("[2,3.4,5×106]*C4⋅m4⋅J−3");
-  EXPECT_EQ(q.to_string(), "[2, 3.4, 5e6]*C4*m4*J-3");
-#endif
+  if constexpr (puq::Config::preprocess_symbols) {
+    q = puq::Quantity("[2,3.4,5×106]*C4⋅m4⋅J−3");
+    EXPECT_EQ(q.to_string(), "[2, 3.4, 5e6]*C4*m4*J-3");
+  }
 }
 #endif
 

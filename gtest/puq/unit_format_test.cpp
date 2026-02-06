@@ -127,9 +127,12 @@ TEST(UnitFormat, SystemFormat) {
   EXPECT_EQ(q.to_string(format), "US 23⋅ft²");
 }
 
-#ifdef PREPROCESS_SYSTEM
 TEST(UnitFormat, PreprocessSystem) {
-
+  if constexpr (!puq::Config::preprocess_system) {
+    GTEST_SKIP() << "PreprocessSystem is disabled";
+    return;
+  }
+  
   puq::Quantity q1, q2;
 
   q1 = puq::Quantity(34, "ESU_statA"); // state the unit system in the unit expression
@@ -140,10 +143,12 @@ TEST(UnitFormat, PreprocessSystem) {
   EXPECT_EQ(q1.to_string(), "34*ft");
   EXPECT_EQ(q1.unit_system(), "US");
 }
-#endif
 
-#ifdef PREPROCESS_SYMBOLS
 TEST(UnitFormat, PreprocessSymbols) {
+  if constexpr (!puq::Config::preprocess_symbols) {
+    GTEST_SKIP() << "PreprocessSymbols is disabled";
+    return;
+  }
 
   puq::Quantity q;
 
@@ -156,4 +161,3 @@ TEST(UnitFormat, PreprocessSymbols) {
   q = puq::Quantity("6.23537×10⁻²⋅C³"); // exponents
   EXPECT_EQ(q.to_string(), "0.0623537*C3");
 }
-#endif

@@ -70,8 +70,8 @@ namespace snt::puq {
       struct pair {
         std::string first;
         std::string second;
-        MAGNITUDE_PRECISION exp;
-        MAGNITUDE_PRECISION conv;
+        MagnitudeFloat exp;
+        MagnitudeFloat conv;
       };
       const std::vector<pair> pairs_B_B = {
           {"BW", "Bm", 3},

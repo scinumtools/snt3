@@ -2,7 +2,7 @@
 #define NOSTD_H
 
 #include "../../val.h"
-#include "../config.h"
+#include "../settings.h"
 #include "../magnitude.h"
 #include "../value/unit_value.h"
 

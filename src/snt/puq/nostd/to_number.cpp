@@ -2,12 +2,12 @@
 
 namespace snt::nostd {
 
-  MAGNITUDE_PRECISION to_number(const std::string& value) {
-    if (typeid(MAGNITUDE_PRECISION) == typeid(float))
+  MagnitudeFloat to_number(const std::string& value) {
+    if (typeid(MagnitudeFloat) == typeid(float))
       return std::stof(value);
-    else if (typeid(MAGNITUDE_PRECISION) == typeid(double))
+    else if (typeid(MagnitudeFloat) == typeid(double))
       return std::stod(value);
-    else if (typeid(MAGNITUDE_PRECISION) == typeid(long double))
+    else if (typeid(MagnitudeFloat) == typeid(long double))
       return std::stold(value);
     else
       throw std::range_error("Unsupported magnitude precision.");

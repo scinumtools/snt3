@@ -66,7 +66,7 @@ namespace snt::puq {
   extern const std::unordered_map<std::string, UnitPrefixStruct> UnitPrefixList;
   extern const std::vector<std::string> UnitPrefixOrder;
 
-  typedef std::array<EXPONENT_TYPE, NUM_BASEDIM> BaseDimensions;
+  typedef std::array<EXPONENT_TYPE, Config::num_basedim> BaseDimensions;
   typedef std::set<std::string> AllowedPrefixes;
   struct UnitStruct {
     Utype utype;
@@ -99,8 +99,8 @@ namespace snt::puq {
   };
 
   struct DimensionStruct {
-    MAGNITUDE_PRECISION magnitude;
-    MAGNITUDE_PRECISION error;
+    MagnitudeFloat magnitude;
+    MagnitudeFloat error;
     BaseDimensions dimensions;
   };
   typedef std::unordered_map<std::string, DimensionStruct> DimensionMapType;
@@ -110,7 +110,7 @@ namespace snt::puq {
    */
 
 #ifdef EXPONENT_FRACTIONS
-  typedef EXPONENT_INT_PRECISION FRC[2];
+  typedef ExponentInt FRC[2];
 #endif
 
   struct SystemDataType {

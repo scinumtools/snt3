@@ -13,13 +13,13 @@ namespace snt::puq {
     std::string unit;
     EXPONENT_TYPE exponent;
     BaseUnit() {};
-    BaseUnit(const EXPONENT_INT_PRECISION& n) : exponent(n) {};
+    BaseUnit(const ExponentInt& n) : exponent(n) {};
 #ifdef EXPONENT_FRACTIONS
-    BaseUnit(const EXPONENT_INT_PRECISION& n, const EXPONENT_INT_PRECISION& d) : exponent(n, d) {};
+    BaseUnit(const ExponentInt& n, const ExponentInt& d) : exponent(n, d) {};
 #endif
     BaseUnit(const std::string& p, const std::string& u, const EXPONENT_TYPE& e) : prefix(p), unit(u), exponent(e) {};
 #ifdef EXPONENT_FRACTIONS
-    BaseUnit(const std::string& p, const std::string& u, const EXPONENT_INT_PRECISION& n, const EXPONENT_INT_PRECISION& d) : prefix(p), unit(u), exponent(n, d) {};
+    BaseUnit(const std::string& p, const std::string& u, const ExponentInt& n, const ExponentInt& d) : prefix(p), unit(u), exponent(n, d) {};
 #endif
     std::string to_string(const UnitFormat& format = UnitFormat());
   };
@@ -34,7 +34,7 @@ namespace snt::puq {
     void append(const BaseUnit& bu);
     void append(const std::string& p, const std::string& u, EXPONENT_TYPE e);
 #ifdef EXPONENT_FRACTIONS
-    void append(const std::string& p, const std::string& u, EXPONENT_INT_PRECISION n, EXPONENT_INT_PRECISION d);
+    void append(const std::string& p, const std::string& u, ExponentInt n, ExponentInt d);
 #endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     const BaseUnit& operator[](int index) const;

@@ -15,7 +15,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   ss << std::setfill(' ') << std::setw(15) << std::left;
   ss << "\"" + symbol + "\",";
   ss << "{";
-  int precision = std::numeric_limits<MAGNITUDE_PRECISION>::digits10;
+  int precision = std::numeric_limits<MagnitudeFloat>::digits10;
 #if defined(MAGNITUDE_VALUES)
   ss << std::setfill(' ') << std::setw(25) << std::left;
   val::ArrayValue<double> value(dim.numerical.value.get());
@@ -34,7 +34,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   ss << nostd::to_string(dim.numerical.error[0], precision) + ",";
 #endif
   ss << "{";
-  for (int i = 0; i < NUM_BASEDIM; i++) {
+  for (int i = 0; i < puq::Config::num_basedim; i++) {
     if (i > 0)
       ss << ",";
     ss << std::setfill(' ') << std::setw(2) << std::right;
@@ -64,7 +64,7 @@ bool solve_bu_unit(puq::DimensionMapType& dmap, puq::Dimensions& dim, puq::BaseU
     puq::MAGNITUDE_TYPE m(it->second.magnitude);
 #endif
     dim.numerical *= nostd::pow(m, (puq::EXPONENT_TYPE)bu.exponent);
-    for (int i = 0; i < NUM_BASEDIM; i++) {
+    for (int i = 0; i < puq::Config::num_basedim; i++) {
       dim.physical[i] += it->second.dimensions[i] * bu.exponent;
     }
     return true;

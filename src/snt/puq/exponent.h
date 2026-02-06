@@ -10,12 +10,12 @@ namespace snt::puq {
 
   class Exponent {
   public:
-    EXPONENT_INT_PRECISION numerator;
-    EXPONENT_INT_PRECISION denominator;
+    ExponentInt numerator;
+    ExponentInt denominator;
     Exponent() : numerator(1), denominator(1) {}
-    Exponent(const EXPONENT_INT_PRECISION n[2]) : numerator(n[0]), denominator(n[1]) {};
-    Exponent(const EXPONENT_INT_PRECISION& n) : numerator(n), denominator(1) {};
-    Exponent(const EXPONENT_INT_PRECISION& n, const EXPONENT_INT_PRECISION& d) : numerator(n), denominator(d) {};
+    Exponent(const ExponentInt n[2]) : numerator(n[0]), denominator(n[1]) {};
+    Exponent(const ExponentInt& n) : numerator(n), denominator(1) {};
+    Exponent(const ExponentInt& n, const ExponentInt& d) : numerator(n), denominator(d) {};
     friend Exponent operator*(const Exponent& e1, const Exponent& e2);
     friend std::ostream& operator<<(std::ostream& os, const Exponent& e);
     Exponent operator-() const;
@@ -24,12 +24,12 @@ namespace snt::puq {
     void operator*=(const Exponent& e);
     bool operator==(const Exponent& e) const;
     bool operator!=(const Exponent& e) const;
-    bool operator==(const EXPONENT_INT_PRECISION& e) const;
-    bool operator!=(const EXPONENT_INT_PRECISION& e) const;
-    bool operator==(const EXPONENT_FLOAT_PRECISION& e) const;
-    bool operator!=(const EXPONENT_FLOAT_PRECISION& e) const;
-    EXPONENT_FLOAT_PRECISION to_float() const;
-    operator EXPONENT_FLOAT_PRECISION() const;
+    bool operator==(const ExponentInt& e) const;
+    bool operator!=(const ExponentInt& e) const;
+    bool operator==(const ExponentFloat& e) const;
+    bool operator!=(const ExponentFloat& e) const;
+    ExponentFloat to_float() const;
+    operator ExponentFloat() const;
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     void reduce();
   };

@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  MAGNITUDE_PRECISION pow(const MAGNITUDE_PRECISION& m, const EXPONENT_FLOAT_PRECISION& e) {
+  MagnitudeFloat pow(const MagnitudeFloat& m, const ExponentFloat& e) {
     return std::pow(m, e);
   }
 
@@ -13,7 +13,7 @@ namespace snt::nostd {
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-  puq::Magnitude pow(const puq::Magnitude& m, const EXPONENT_FLOAT_PRECISION& e) {
+  puq::Magnitude pow(const puq::Magnitude& m, const ExponentFloat& e) {
 #ifdef MAGNITUDE_VALUES
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
     if (m.error) {

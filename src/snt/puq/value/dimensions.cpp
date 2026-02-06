@@ -11,21 +11,21 @@
 namespace snt::puq {
 
   Dimensions::Dimensions() : utype(Utype::NUL), numerical(1) {
-    for (int i = 0; i < NUM_BASEDIM; i++) {
+    for (int i = 0; i < Config::num_basedim; i++) {
       physical[i] = 0;
     }
   }
 
   Dimensions::Dimensions(const MAGNITUDE_TYPE& n) : utype(Utype::NUL), numerical(n) {
-    for (int i = 0; i < NUM_BASEDIM; i++) {
+    for (int i = 0; i < Config::num_basedim; i++) {
       physical[i] = 0;
     }
   }
 
 #ifdef MAGNITUDE_ERRORS
 
-  Dimensions::Dimensions(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e) : utype(Utype::NUL), numerical(m, e) {
-    for (int i = 0; i < NUM_BASEDIM; i++) {
+  Dimensions::Dimensions(const MagnitudeFloat& m, const MagnitudeFloat& e) : utype(Utype::NUL), numerical(m, e) {
+    for (int i = 0; i < Config::num_basedim; i++) {
       physical[i] = 0;
     }
   }
@@ -37,9 +37,9 @@ namespace snt::puq {
     std::string multiply = format.multiply_symbol();
     std::stringstream ss;
     if (format.base == Format::Base::MKS) {
-      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e-3, (EXPONENT_FLOAT_PRECISION)physical[1]));
+      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e-3, (ExponentFloat)physical[1]));
     } else if (format.base == Format::Base::CGS) {
-      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e2, (EXPONENT_FLOAT_PRECISION)physical[0]));
+      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e2, (ExponentFloat)physical[0]));
     }
 #if defined(MAGNITUDE_ERRORS)
 #if defined(MAGNITUDE_VALUES)
@@ -67,7 +67,7 @@ namespace snt::puq {
   inline std::string _physical_to_string(const BaseDimensions& physical, const UnitFormat& format) {
     std::string multiply = format.multiply_symbol();
     std::stringstream ss;
-    for (int i = 0; i < NUM_BASEDIM; i++) {
+    for (int i = 0; i < Config::num_basedim; i++) {
       std::string symbol = SystemData::BaseUnitOrder[i];
       if (i == 1 && format.base == Format::Base::MKS) {
         symbol = "kg";
@@ -102,7 +102,7 @@ namespace snt::puq {
   }
 
   bool Dimensions::operator==(const Dimensions& d) const {
-    for (int i = 0; i < NUM_BASEDIM; i++) {
+    for (int i = 0; i < Config::num_basedim; i++) {
       if (physical[i] != d.physical[i])
         return false;
     }
@@ -111,7 +111,7 @@ namespace snt::puq {
 
   bool Dimensions::operator!=(const Dimensions& d) const {
     bool equal = false;
-    for (int i = 0; i < NUM_BASEDIM; i++) {
+    for (int i = 0; i < Config::num_basedim; i++) {
       if (physical[i] != d.physical[i])
         return true;
     }

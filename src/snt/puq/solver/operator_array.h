@@ -2,7 +2,7 @@
 #define PUQ_OPERATOR_ARRAY_H
 
 #include "../../exs.h"
-#include "../config.h"
+#include "../settings.h"
 #include "unit_atom.h"
 
 namespace snt::puq {

@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern MAGNITUDE_PRECISION log10(const MAGNITUDE_PRECISION& m);
+  extern MagnitudeFloat log10(const MagnitudeFloat& m);
 #if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType log10(val::BaseValue::PointerType a);
 #endif

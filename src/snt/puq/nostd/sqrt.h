@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern MAGNITUDE_PRECISION sqrt(const MAGNITUDE_PRECISION& m);
+  extern MagnitudeFloat sqrt(const MagnitudeFloat& m);
 #if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType sqrt(val::BaseValue::PointerType a);
 #endif

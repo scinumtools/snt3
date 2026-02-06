@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  MAGNITUDE_PRECISION cbrt(const MAGNITUDE_PRECISION& m) {
+  MagnitudeFloat cbrt(const MagnitudeFloat& m) {
     return std::cbrt(m);
   }
 
@@ -20,7 +20,7 @@ namespace snt::nostd {
     std::unique_ptr<val::ArrayValue<double>> third2 = std::make_unique<val::ArrayValue<double>>(-2 * 1. / 3.);
     return puq::Magnitude(m.value->math_cbrt(), m.value->math_pow(third2.get())->math_mul(third1.get())->math_mul(m.error.get()));
 #else
-    constexpr MAGNITUDE_PRECISION third = 1. / 3.;
+    constexpr MagnitudeFloat third = 1. / 3.;
     return puq::Magnitude(cbrt(m.value), third * pow(m.value, -2 * third) * m.error);
 #endif
   }

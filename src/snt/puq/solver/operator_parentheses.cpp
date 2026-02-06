@@ -19,7 +19,7 @@ namespace snt::puq {
     if (expr.right.length() > 0) {           // check if there is an exponent after closing parentheses
       std::smatch m;
 #ifdef EXPONENT_FRACTIONS
-      std::regex rx_exponent("^([+-]?[0-9]*)(" + std::string(SYMBOL_FRACTION) + "([0-9]+)|)");
+      std::regex rx_exponent("^([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)");
       if (std::regex_search(expr.right, m, rx_exponent)) { // store exponent
         exponent.push_back(Exponent((m[1] == "" ? 1 : std::stoi(m[1])), (m[3] == "" ? 1 : std::stoi(m[3]))));
         expr.remove(m[0]);

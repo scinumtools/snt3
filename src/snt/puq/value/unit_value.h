@@ -20,14 +20,14 @@ namespace snt::puq {
     UnitValue(const MAGNITUDE_TYPE& m, const BaseUnits& bu) : magnitude(m), baseunits(bu) {};
     UnitValue(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bul) : magnitude(m), baseunits(bul) {};
 #ifdef MAGNITUDE_ERRORS
-    UnitValue(const MAGNITUDE_PRECISION& m, const std::string& s);
-    UnitValue(const MAGNITUDE_PRECISION& m) : magnitude(m) {};
-    UnitValue(const MAGNITUDE_PRECISION& m, const BaseUnits& bu) : magnitude(m), baseunits(bu) {};
-    UnitValue(const MAGNITUDE_PRECISION& m, const BaseUnits::ListType& bul) : magnitude(m), baseunits(bul) {};
-    UnitValue(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const std::string& s);
-    UnitValue(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e) : magnitude(m, e) {};
-    UnitValue(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnits& bu) : magnitude(m, e), baseunits(bu) {};
-    UnitValue(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnits::ListType& bul) : magnitude(m, e), baseunits(bul) {};
+    UnitValue(const MagnitudeFloat& m, const std::string& s);
+    UnitValue(const MagnitudeFloat& m) : magnitude(m) {};
+    UnitValue(const MagnitudeFloat& m, const BaseUnits& bu) : magnitude(m), baseunits(bu) {};
+    UnitValue(const MagnitudeFloat& m, const BaseUnits::ListType& bul) : magnitude(m), baseunits(bul) {};
+    UnitValue(const MagnitudeFloat& m, const MagnitudeFloat& e, const std::string& s);
+    UnitValue(const MagnitudeFloat& m, const MagnitudeFloat& e) : magnitude(m, e) {};
+    UnitValue(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseUnits& bu) : magnitude(m, e), baseunits(bu) {};
+    UnitValue(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseUnits::ListType& bul) : magnitude(m, e), baseunits(bul) {};
 #if defined(MAGNITUDE_VALUES)
     UnitValue(val::BaseValue::PointerType m, const std::string& s);
     UnitValue(val::BaseValue::PointerType m) : magnitude(std::move(m)) {};

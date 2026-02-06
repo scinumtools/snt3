@@ -15,15 +15,15 @@ namespace snt::puq {
     val::BaseValue::PointerType value;
     val::BaseValue::PointerType error;
 #else
-    MAGNITUDE_PRECISION value;
-    MAGNITUDE_PRECISION error;
+    MagnitudeFloat value;
+    MagnitudeFloat error;
 #endif
 #ifndef MAGNITUDE_VALUES
     Magnitude() : value(1), error(0) {}
-    Magnitude(const MAGNITUDE_PRECISION& m) : value(m), error(0) {}
-    Magnitude(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e) : value(m), error(e) {}
-    static MAGNITUDE_PRECISION abs_to_rel(const MAGNITUDE_PRECISION& v, const MAGNITUDE_PRECISION& a);
-    static MAGNITUDE_PRECISION rel_to_abs(const MAGNITUDE_PRECISION& v, const MAGNITUDE_PRECISION& r);
+    Magnitude(const MagnitudeFloat& m) : value(m), error(0) {}
+    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : value(m), error(e) {}
+    static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
+    static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
 #else
     Magnitude(const Magnitude& other) {
       value = other.value ? other.value->clone() : nullptr;
@@ -40,12 +40,12 @@ namespace snt::puq {
     Magnitude& operator=(Magnitude&&) noexcept = default;
     Magnitude() : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({1}))),
                   error(nullptr) {}
-    Magnitude(const MAGNITUDE_PRECISION& m) : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
+    Magnitude(const MagnitudeFloat& m) : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
                                               error(nullptr) {}
-    Magnitude(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e) : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
+    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
                                                                             error(std::make_unique<val::ArrayValue<double>>(std::vector<double>({e}))) {}
-    static MAGNITUDE_PRECISION abs_to_rel(const MAGNITUDE_PRECISION& v, const MAGNITUDE_PRECISION& a);
-    static MAGNITUDE_PRECISION rel_to_abs(const MAGNITUDE_PRECISION& v, const MAGNITUDE_PRECISION& r);
+    static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
+    static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
 #endif
 #if defined(MAGNITUDE_VALUES)
     Magnitude(val::BaseValue::PointerType m);

@@ -29,11 +29,11 @@ namespace snt::puq {
   /*
    * Convert absolute and relative (in %) errors
    */
-  MAGNITUDE_PRECISION Magnitude::abs_to_rel(const MAGNITUDE_PRECISION& v, const MAGNITUDE_PRECISION& e) {
+  MagnitudeFloat Magnitude::abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& e) {
     return 100 * e / v;
   };
 
-  MAGNITUDE_PRECISION Magnitude::rel_to_abs(const MAGNITUDE_PRECISION& v, const MAGNITUDE_PRECISION& e) {
+  MagnitudeFloat Magnitude::rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& e) {
     return v * e / 100;
   };
 
@@ -263,9 +263,9 @@ namespace snt::puq {
 
   void Magnitude::pow(const EXPONENT_TYPE& e) {
 #ifdef MAGNITUDE_VALUES
-    value = value->math_pow((EXPONENT_FLOAT_PRECISION)e);
+    value = value->math_pow((ExponentFloat)e);
 #else
-    value = nostd::pow(value, (EXPONENT_FLOAT_PRECISION)e);
+    value = nostd::pow(value, (ExponentFloat)e);
 #endif
   }
 

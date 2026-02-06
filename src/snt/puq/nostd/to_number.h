@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  MAGNITUDE_PRECISION to_number(const std::string& value);
+  MagnitudeFloat to_number(const std::string& value);
 
 } // namespace snt::nostd
 

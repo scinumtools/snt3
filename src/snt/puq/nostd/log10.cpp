@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  MAGNITUDE_PRECISION log10(const MAGNITUDE_PRECISION& m) {
+  MagnitudeFloat log10(const MagnitudeFloat& m) {
     return std::log10(m);
   }
 

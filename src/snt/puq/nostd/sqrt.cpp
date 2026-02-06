@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  MAGNITUDE_PRECISION sqrt(const MAGNITUDE_PRECISION& m) {
+  MagnitudeFloat sqrt(const MagnitudeFloat& m) {
     return std::sqrt(m);
   }
 

@@ -28,20 +28,20 @@ namespace snt::puq {
 
   UnitValue::UnitValue(const MAGNITUDE_TYPE& m, const Dimensions& dim) {
     magnitude = m * dim.numerical;
-    for (int i = 0; i < NUM_BASEDIM; i++) {
+    for (int i = 0; i < Config::num_basedim; i++) {
       const std::string& symbol = SystemData::BaseUnitOrder[i];
       baseunits.append("", symbol, dim.physical[i]);
     }
   }
 
 #ifdef MAGNITUDE_ERRORS
-  UnitValue::UnitValue(const MAGNITUDE_PRECISION& m, const std::string& s) {
+  UnitValue::UnitValue(const MagnitudeFloat& m, const std::string& s) {
     UnitSolver solver;
     UnitAtom atom = solver.solve(s);
     magnitude = Magnitude(m) * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
-  UnitValue::UnitValue(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const std::string& s) {
+  UnitValue::UnitValue(const MagnitudeFloat& m, const MagnitudeFloat& e, const std::string& s) {
     UnitSolver solver;
     UnitAtom atom = solver.solve(s);
     magnitude = Magnitude(m, e) * atom.value.magnitude;
@@ -244,7 +244,7 @@ namespace snt::puq {
 #if defined(MAGNITUDE_ERRORS) || defined(MAGNITUDE_VALUES)
     magnitude.pow(e);
 #else
-    magnitude = std::pow(magnitude, (EXPONENT_FLOAT_PRECISION)e);
+    magnitude = std::pow(magnitude, (ExponentFloat)e);
 #endif
     baseunits *= e;
   }
@@ -268,7 +268,7 @@ namespace snt::puq {
   UnitValue UnitValue::convert(const Format::Base& format) const {
     BaseUnits bu;
     Dimensions dim = baseunits.dimensions();
-    for (int i = 0; i < NUM_BASEDIM; i++) {
+    for (int i = 0; i < Config::num_basedim; i++) {
       if (dim.physical[i] == 0)
         continue;
       if (i == 1 && format == Format::Base::MKS) {

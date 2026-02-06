@@ -13,19 +13,19 @@ namespace snt::puq {
       {'7', "\u2077"}, // 4 5 6 7 -> ⁴ ⁵ ⁶ ⁷
       {'8', "\u2078"},
       {'9', "\u2079"},                        // 8 9 -> ⁸ ⁹
-      {SYMBOL_MINUS[0], "\u207B"},            // - -> ⁻
-      {SYMBOL_PLUS[0], ""},                   // + ->
-      {SYMBOL_FRACTION[0], SYMBOL_FRACTION2}, // : -> ᐟ
+      {Symbols::minus[0], "\u207B"},            // - -> ⁻
+      {Symbols::plus[0], ""},                   // + ->
+      {Symbols::fraction_separator[0], std::string(Symbols::fraction_separator2)}, // : -> ᐟ
   };
 
   const std::unordered_map<std::string, std::string> UnitFormat::symbol_map = {
-      {SYMBOL_EXPONENT2, std::string(1, SYMBOL_EXPONENT)}, // ×10 -> e
-      {SYMBOL_MINUS2, SYMBOL_MINUS},                       // −   -> -
-      {SYMBOL_MULTIPLY2, SYMBOL_MULTIPLY},                 // ⋅   -> *
+      {SYMBOL_EXPONENT2, std::string(1, SYMBOL_EXPONENT)},         // ×10 -> e
+      {std::string(Symbols::minus2), std::string(Symbols::minus)}, // −   -> -
+      {SYMBOL_MULTIPLY2, SYMBOL_MULTIPLY},                         // ⋅   -> *
   };
 
   bool UnitFormat::preprocess_system(std::string& expression, const std::string& abbrev) {
-    std::string prefix = abbrev + SYMBOL_SYSTEM;
+    std::string prefix = abbrev + std::string(Symbols::system_separator);
     size_t pos = expression.find(prefix);
     if (pos != std::string::npos && pos == 0) {
       expression = expression.substr(prefix.size(), expression.size());
@@ -74,7 +74,7 @@ namespace snt::puq {
       // removing leading zeros
       if (expression[0] == '0') {
         expression.erase(0, 0);
-      } else if (expression[0] == SYMBOL_PLUS[0] || expression[0] == SYMBOL_MINUS[0]) {
+      } else if (expression[0] == Symbols::plus[0] || expression[0] == Symbols::minus[0]) {
         if (expression[1] == '0')
           expression.erase(1, 1);
       }
@@ -108,7 +108,7 @@ namespace snt::puq {
       if (math == Format::Math::UNICODE || math == Format::Math::HTML)
         return abbrev + " " + expression;
       else
-        return abbrev + SYMBOL_SYSTEM + expression;
+        return abbrev + std::string(Symbols::system_separator) + expression;
     }
     return expression;
   };

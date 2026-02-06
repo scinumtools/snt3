@@ -87,11 +87,11 @@ TEST(UnitSystem, DirectConversionESU) {
   q3 = q1.convert(q2);
   EXPECT_EQ(q3.to_string(), "3.4e8*erg");
 
-#ifdef PREPROCESS_SYSTEM
-  q1 = puq::Quantity(34, "J");
-  q2 = q1.convert("ESU_erg");
-  EXPECT_EQ(q2.to_string(), "3.4e8*erg");
-#endif
+  if constexpr (puq::Config::preprocess_system) {
+    q1 = puq::Quantity(34, "J");
+    q2 = q1.convert("ESU_erg");
+    EXPECT_EQ(q2.to_string(), "3.4e8*erg");
+  }
 }
 
 TEST(UnitSystem, ContextConversionESU) {
@@ -119,11 +119,11 @@ TEST(UnitSystem, ContextConversionESU) {
   q2 = q1.convert("J", puq::SystemType::SI); // without a context
   EXPECT_EQ(q2.to_string(), "1e-7*J");
 
-#ifdef PREPROCESS_SYSTEM
-  // throw an error if preprocessor system does not match selected system
-  q1 = puq::Quantity("6.671282e-10*A");
-  EXPECT_THROW(q1.convert("ESU_statA", puq::SystemType::SI, "I"), puq::UnitSystemExcept);
-#endif
+  if constexpr (puq::Config::preprocess_system) {
+    // throw an error if preprocessor system does not match selected system
+    q1 = puq::Quantity("6.671282e-10*A");
+    EXPECT_THROW(q1.convert("ESU_statA", puq::SystemType::SI, "I"), puq::UnitSystemExcept);
+  }
 }
 
 #endif

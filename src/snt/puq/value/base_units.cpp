@@ -50,7 +50,7 @@ namespace snt::puq {
   }
 
 #ifdef EXPONENT_FRACTIONS
-  void BaseUnits::append(const std::string& p, const std::string& u, EXPONENT_INT_PRECISION n, EXPONENT_INT_PRECISION d) {
+  void BaseUnits::append(const std::string& p, const std::string& u, ExponentInt n, ExponentInt d) {
     append(BaseUnit(p, u, n, d));
   }
 #endif
@@ -141,7 +141,7 @@ namespace snt::puq {
           MAGNITUDE_TYPE magnitude(dmap->second.magnitude);
 #endif
           dim.numerical *= nostd::pow(magnitude, (EXPONENT_TYPE)bu.exponent);
-          for (int i = 0; i < NUM_BASEDIM; i++) {
+          for (int i = 0; i < Config::num_basedim; i++) {
             dim.physical[i] += dmap->second.dimensions[i] * bu.exponent;
           }
           continue;
@@ -168,7 +168,7 @@ namespace snt::puq {
             MAGNITUDE_TYPE magnitude(dmap->second.magnitude);
 #endif
             dim.numerical *= nostd::pow(magnitude, (EXPONENT_TYPE)bu.exponent);
-            for (int i = 0; i < NUM_BASEDIM; i++) {
+            for (int i = 0; i < Config::num_basedim; i++) {
               dim.physical[i] += dmap->second.dimensions[i] * bu.exponent;
             }
           } else {

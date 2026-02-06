@@ -17,8 +17,8 @@ namespace snt::puq {
     Dimensions(const MAGNITUDE_TYPE& n);
     Dimensions(const MAGNITUDE_TYPE& n, const BaseDimensions& p) : utype(Utype::NUL), numerical(n), physical(p) {};
 #ifdef MAGNITUDE_ERRORS
-    Dimensions(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e);
-    Dimensions(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseDimensions& p) : utype(Utype::NUL), numerical(m, e), physical(p) {};
+    Dimensions(const MagnitudeFloat& m, const MagnitudeFloat& e);
+    Dimensions(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseDimensions& p) : utype(Utype::NUL), numerical(m, e), physical(p) {};
 #endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     friend std::ostream& operator<<(std::ostream& os, const Dimensions& d);

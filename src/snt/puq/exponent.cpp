@@ -52,19 +52,19 @@ namespace snt::puq {
     return to_float() != e.to_float();
   }
 
-  bool Exponent::operator==(const EXPONENT_INT_PRECISION& e) const {
+  bool Exponent::operator==(const ExponentInt& e) const {
     return to_float() == e;
   }
 
-  bool Exponent::operator!=(const EXPONENT_INT_PRECISION& e) const {
+  bool Exponent::operator!=(const ExponentInt& e) const {
     return to_float() != e;
   }
 
-  bool Exponent::operator==(const EXPONENT_FLOAT_PRECISION& e) const {
+  bool Exponent::operator==(const ExponentFloat& e) const {
     return to_float() == e;
   }
 
-  bool Exponent::operator!=(const EXPONENT_FLOAT_PRECISION& e) const {
+  bool Exponent::operator!=(const ExponentFloat& e) const {
     return to_float() != e;
   }
 
@@ -76,14 +76,14 @@ namespace snt::puq {
   /*
    *  Convert rational exponents to float numbers
    */
-  EXPONENT_FLOAT_PRECISION Exponent::to_float() const {
-    return (EXPONENT_FLOAT_PRECISION)numerator / (EXPONENT_FLOAT_PRECISION)denominator;
+  ExponentFloat Exponent::to_float() const {
+    return (ExponentFloat)numerator / (ExponentFloat)denominator;
   }
 
   /*
    *  Cast as a float number
    */
-  Exponent::operator EXPONENT_FLOAT_PRECISION() const {
+  Exponent::operator ExponentFloat() const {
     return to_float();
   }
 
@@ -95,7 +95,7 @@ namespace snt::puq {
     e.reduce();
     std::stringstream ss;
     if (e.denominator != 1)
-      ss << std::to_string(e.numerator) << SYMBOL_FRACTION << std::to_string(e.denominator);
+      ss << std::to_string(e.numerator) << Symbols::fraction_separator << std::to_string(e.denominator);
     else
       ss << std::to_string(e.numerator);
     return format.format_exponents(ss.str());

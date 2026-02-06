@@ -9,24 +9,24 @@
 namespace snt::puq {
 
   void Quantity::preprocess(std::string& expression, SystemType& system) const {
-#ifdef PREPROCESS_SYSTEM
-    for (auto sys : SystemMap) {
-      if (UnitFormat::preprocess_system(expression, sys.second->SystemAbbrev)) {
-        if (system == SystemType::NONE)
-          system = sys.first;
-        else if (system != sys.first) {
-          auto it = SystemMap.find(system);
-          throw UnitSystemExcept("Selected unit systems are ambiguous: " + it->second->SystemAbbrev + " " + sys.second->SystemAbbrev);
-        }
-        break;
+    if constexpr (Config::preprocess_system) {
+      for (auto sys : SystemMap) {
+	if (UnitFormat::preprocess_system(expression, sys.second->SystemAbbrev)) {
+	  if (system == SystemType::NONE)
+	    system = sys.first;
+	  else if (system != sys.first) {
+	    auto it = SystemMap.find(system);
+	    throw UnitSystemExcept("Selected unit systems are ambiguous: " + it->second->SystemAbbrev + " " + sys.second->SystemAbbrev);
+	  }
+	  break;
+	}
       }
+      if (system == SystemType::NONE)
+	system = UnitSystem::System;
     }
-    if (system == SystemType::NONE)
-      system = UnitSystem::System;
-#endif
-#ifdef PREPROCESS_SYMBOLS
-    UnitFormat::preprocess_symbols(expression);
-#endif
+    if constexpr (Config::preprocess_symbols) {
+      UnitFormat::preprocess_symbols(expression);
+    }
   }
 
   Quantity::Quantity(std::string s, const SystemType system) : stype(system) {
@@ -58,34 +58,34 @@ namespace snt::puq {
 
 #ifdef MAGNITUDE_ERRORS
 
-  Quantity::Quantity(const MAGNITUDE_PRECISION& m, const SystemType system) : stype(system) {
+  Quantity::Quantity(const MagnitudeFloat& m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = UnitValue(m);
   }
 
-  Quantity::Quantity(const MAGNITUDE_PRECISION& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(const MagnitudeFloat& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = UnitValue(m, bu);
   }
 
-  Quantity::Quantity(const MAGNITUDE_PRECISION& m, std::string s, const SystemType system) : stype(system) {
+  Quantity::Quantity(const MagnitudeFloat& m, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     Magnitude mag(m);
     value = UnitValue(mag, s);
   }
 
-  Quantity::Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const SystemType system) : stype(system) {
+  Quantity::Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = UnitValue(m, e);
   }
 
-  Quantity::Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = UnitValue(m, e, bu);
   }
 
-  Quantity::Quantity(const MAGNITUDE_PRECISION& m, const MAGNITUDE_PRECISION& e, std::string s, const SystemType system) : stype(system) {
+  Quantity::Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     Magnitude mag(m, e);
@@ -214,37 +214,37 @@ namespace snt::puq {
   }
 
   // overloading scalar/quantity
-  Quantity operator+(const MAGNITUDE_PRECISION& m, const Quantity& q) {
+  Quantity operator+(const MagnitudeFloat& m, const Quantity& q) {
     UnitSystem us(q.stype);
     return Quantity(UnitValue(m) + q.value);
   }
-  Quantity operator-(const MAGNITUDE_PRECISION& m, const Quantity& q) {
+  Quantity operator-(const MagnitudeFloat& m, const Quantity& q) {
     UnitSystem us(q.stype);
     return Quantity(UnitValue(m) - q.value);
   }
-  Quantity operator*(const MAGNITUDE_PRECISION& m, const Quantity& q) {
+  Quantity operator*(const MagnitudeFloat& m, const Quantity& q) {
     UnitSystem us(q.stype);
     return Quantity(UnitValue(m) * q.value);
   }
-  Quantity operator/(const MAGNITUDE_PRECISION& m, const Quantity& q) {
+  Quantity operator/(const MagnitudeFloat& m, const Quantity& q) {
     UnitSystem us(q.stype);
     return Quantity(UnitValue(m) / q.value);
   }
 
   // overloading quantity/scalar
-  Quantity operator+(const Quantity& q, const MAGNITUDE_PRECISION& m) {
+  Quantity operator+(const Quantity& q, const MagnitudeFloat& m) {
     UnitSystem us(q.stype);
     return Quantity(q.value + UnitValue(m));
   }
-  Quantity operator-(const Quantity& q, const MAGNITUDE_PRECISION& m) {
+  Quantity operator-(const Quantity& q, const MagnitudeFloat& m) {
     UnitSystem us(q.stype);
     return Quantity(q.value - UnitValue(m));
   }
-  Quantity operator*(const Quantity& q, const MAGNITUDE_PRECISION& m) {
+  Quantity operator*(const Quantity& q, const MagnitudeFloat& m) {
     UnitSystem us(q.stype);
     return Quantity(q.value * UnitValue(m));
   }
-  Quantity operator/(const Quantity& q, const MAGNITUDE_PRECISION& m) {
+  Quantity operator/(const Quantity& q, const MagnitudeFloat& m) {
     UnitSystem us(q.stype);
     return Quantity(q.value / UnitValue(m));
   }

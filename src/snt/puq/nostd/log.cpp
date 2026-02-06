@@ -4,7 +4,7 @@
 
 namespace snt::nostd {
 
-  MAGNITUDE_PRECISION log(const MAGNITUDE_PRECISION& m) {
+  MagnitudeFloat log(const MagnitudeFloat& m) {
     return std::log(m);
   }
 
