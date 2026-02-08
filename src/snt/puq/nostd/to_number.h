@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  MagnitudeFloat to_number(const std::string& value);
+  puq::MagnitudeFloat to_number(const std::string& value);
 
 } // namespace snt::nostd
 

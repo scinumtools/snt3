@@ -148,20 +148,24 @@ int main(int argc, char* argv[]) {
     convert = input.getCmdOption("-l", 2);
     if (!convert.empty()) {
       change_system(us, convert);
+      if constexpr (!puq::Config::use_units_logarithmic) {
+	if (convert[0] == "log") {
+	  std::cout << puq::lists::logarithmic_units();
+	  goto found_output;
+	}
+      }
+      if constexpr (!puq::Config::use_units_temperature) {
+	if (convert[0] == "temp") {
+	  std::cout << puq::lists::temperature_units();
+	  goto found_output;
+	}
+      }
       if (convert[0] == "prefix")
         std::cout << puq::lists::prefixes();
       else if (convert[0] == "base")
         std::cout << puq::lists::base_units();
       else if (convert[0] == "deriv")
         std::cout << puq::lists::derived_units();
-#ifdef UNITS_LOGARITHMIC
-      else if (convert[0] == "log")
-        std::cout << puq::lists::logarithmic_units();
-#endif
-#ifdef UNITS_TEMPERATURES
-      else if (convert[0] == "temp")
-        std::cout << puq::lists::temperature_units();
-#endif
       else if (convert[0] == "const")
         std::cout << puq::lists::constants();
       else if (convert[0] == "quant")
@@ -171,6 +175,8 @@ int main(int argc, char* argv[]) {
       else {
         display_lists(convert);
       }
+    found_output:
+      ;
     } else if (input.cmdOptionExists("-l")) {
       std::deque<std::string> convert;
       display_lists(convert);

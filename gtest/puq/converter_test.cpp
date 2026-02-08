@@ -25,9 +25,11 @@ TEST(Converter, LinearConv) {
   EXPECT_EQ(nostd::to_string(puq::Converter("J/erg", "1").convert(2)), "2e7"); // converting to number
 }
 
-#ifdef UNITS_LOGARITHMIC
-
 TEST(Converter, LogarithmicConv) {
+  if constexpr (!puq::Config::use_units_logarithmic) {
+    GTEST_SKIP() << "Logarithmic units are disabled";
+    return;
+  }
 
   // Nepers and Bels
   EXPECT_EQ(nostd::to_string(puq::Converter("B", "dB").convert(1)), "10");
@@ -121,11 +123,11 @@ TEST(Converter, LogarithmicConv) {
   EXPECT_EQ(nostd::to_string(puq::Converter("dyn*cm", "Mw").convert(1.12202e+19)), "2");
 }
 
-#endif // UNITS_LOGARITHMIC
-
-#ifdef UNITS_TEMPERATURES
-
 TEST(Converter, TemperatureConv) {
+  if constexpr (!puq::Config::use_units_temperature) {
+    GTEST_SKIP() << "Temperature units are disabled";
+    return;
+  }
 
   // Kelvin conversions
   EXPECT_EQ(nostd::to_string(puq::Converter("K", "Cel").convert(23)), "-250.15");
@@ -153,5 +155,3 @@ TEST(Converter, TemperatureConv) {
   // Conversion of a form: T1/x = T2/y
   EXPECT_EQ(nostd::to_string(puq::Converter("Cel/m", "K/mm").convert(300)), "0.57315");
 }
-
-#endif // UNITS_TEMPERATURES

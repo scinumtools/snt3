@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern MagnitudeFloat log(const MagnitudeFloat& m);
+  extern puq::MagnitudeFloat log(const puq::MagnitudeFloat& m);
 #if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType log(val::BaseValue::PointerType a);
 #endif

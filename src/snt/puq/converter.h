@@ -61,7 +61,7 @@ namespace snt::puq {
           continue;
         if (unit.first == mgs || unit.first == mks || unit.first == cgs)
           continue;
-        if (unit.first[0] == SYMBOL_QUANTITY_START)
+        if (unit.first[0] == Symbols::quantity_start[0])
           continue;
         tab.append({SystemMap[s1]->SystemAbbrev, unit.first,
                     UnitSystem::Data->UnitList.find(unit.first)->second.name});
@@ -72,7 +72,7 @@ namespace snt::puq {
           continue;
         if (unit.first == mgs || unit.first == mks || unit.first == cgs)
           continue;
-        if (unit.first[0] == SYMBOL_QUANTITY_START)
+        if (unit.first[0] == Symbols::quantity_start[0])
           continue;
         tab.append({SystemMap[s2]->SystemAbbrev, unit.first,
                     UnitSystem::Data->UnitList.find(unit.first)->second.name});
@@ -80,18 +80,18 @@ namespace snt::puq {
       if (s1 != s2) {
         us.change(s1);
         for (auto quant : UnitSystem::Data->QuantityList) {
-          UnitValue uv(SYMBOL_QUANTITY_START + quant.first + SYMBOL_QUANTITY_END);
+          UnitValue uv(std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end));
           Dimensions dim_q = uv.baseunits.dimensions();
           if (dim_q == dim1) {
             us.change(s2);
-            uv = UnitValue(SYMBOL_QUANTITY_START + quant.first + SYMBOL_QUANTITY_END);
+            uv = UnitValue(std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end));
             dim_q = uv.baseunits.dimensions();
             for (auto unit : UnitSystem::Data->DimensionMap) {
               if (Dimensions(1, unit.second.dimensions) != dim_q)
                 continue;
               if (unit.first == mgs || unit.first == mks || unit.first == cgs)
                 continue;
-              if (unit.first[0] == SYMBOL_QUANTITY_START)
+              if (unit.first[0] == Symbols::quantity_start[0])
                 continue;
               UnitStruct uinfo = UnitSystem::Data->UnitList[unit.first];
               if ((uinfo.utype & Utype::LOG) == Utype::LOG)
@@ -130,12 +130,8 @@ namespace snt::puq {
     BaseUnits baseunits1;
     BaseUnits baseunits2;
     MAGNITUDE_TYPE _convert_linear(const MAGNITUDE_TYPE& m1, const MAGNITUDE_TYPE& m2);
-#ifdef UNITS_LOGARITHMIC
     MAGNITUDE_TYPE _convert_logarithmic(const MAGNITUDE_TYPE& m);
-#endif
-#ifdef UNITS_TEMPERATURES
     MAGNITUDE_TYPE _convert_temperature(MAGNITUDE_TYPE m);
-#endif
   public:
     Utype utype;
     Dimensions dimensions1;

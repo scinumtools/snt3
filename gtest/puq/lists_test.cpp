@@ -63,13 +63,13 @@ void test_unit_definitions() {
     dim2 = puq::Dimensions(uv2.magnitude * dim2.numerical, dim2.physical);
     std::string m2 = dim2.to_string();
 
-#ifdef UNITS_LOGARITHMIC
-    if (unit.second.utype == puq::Utype::LOG) {
-      // For logarithmic units compare only the physical dimensionality
-      m1 = dim1.to_string({puq::Format::Display::UNITS});
-      m2 = dim2.to_string({puq::Format::Display::UNITS});
+    if constexpr (puq::Config::use_units_logarithmic) {
+      if (unit.second.utype == puq::Utype::LOG) {
+	// For logarithmic units compare only the physical dimensionality
+	m1 = dim1.to_string({puq::Format::Display::UNITS});
+	m2 = dim2.to_string({puq::Format::Display::UNITS});
+      }
     }
-#endif
 
     /*
     EXPECT_DOUBLE_EQ(unit.magnitude, dim2.numerical.value[0])
@@ -123,9 +123,11 @@ TEST(Dmaps, UnitDefinitionsSI) {
   test_quantities();
 }
 
-#ifdef UNIT_SYSTEM_CGS
-
 TEST(Dmaps, UnitDefinitionsESU) {
+  if constexpr (!puq::Config::use_system_cgs) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::UnitSystem us(puq::SystemType::ESU);
   test_unit_symbols();
@@ -133,6 +135,10 @@ TEST(Dmaps, UnitDefinitionsESU) {
 }
 
 TEST(Dmaps, UnitDefinitionsGauss) {
+  if constexpr (!puq::Config::use_system_cgs) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::UnitSystem us(puq::SystemType::GU);
   test_unit_symbols();
@@ -140,17 +146,21 @@ TEST(Dmaps, UnitDefinitionsGauss) {
 }
 
 TEST(Dmaps, UnitDefinitionsEMU) {
+  if constexpr (!puq::Config::use_system_cgs) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::UnitSystem us(puq::SystemType::EMU);
   test_unit_symbols();
   // test_unit_definitions();
 }
 
-#endif
-
-#ifdef UNIT_SYSTEM_NUS
-
 TEST(Dmaps, UnitDefinitionsAU) {
+  if constexpr (!puq::Config::use_system_nus) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::UnitSystem us(puq::SystemType::AU);
   test_unit_symbols();
@@ -158,11 +168,11 @@ TEST(Dmaps, UnitDefinitionsAU) {
   test_quantities();
 }
 
-#endif
-
-#ifdef UNIT_SYSTEM_EUS
-
 TEST(Dmaps, UnitDefinitionsIU) {
+  if constexpr (!puq::Config::use_system_eus) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::UnitSystem us(puq::SystemType::IU);
   test_unit_symbols();
@@ -170,13 +180,15 @@ TEST(Dmaps, UnitDefinitionsIU) {
 }
 
 TEST(Dmaps, UnitDefinitionsUS) {
+  if constexpr (!puq::Config::use_system_eus) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::UnitSystem us(puq::SystemType::US);
   test_unit_symbols();
   // test_unit_definitions();
 }
-
-#endif
 
 TEST(Dmaps, DimensionMap) {
 

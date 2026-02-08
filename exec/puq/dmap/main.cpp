@@ -15,7 +15,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   ss << std::setfill(' ') << std::setw(15) << std::left;
   ss << "\"" + symbol + "\",";
   ss << "{";
-  int precision = std::numeric_limits<MagnitudeFloat>::digits10;
+  int precision = std::numeric_limits<puq::MagnitudeFloat>::digits10;
 #if defined(MAGNITUDE_VALUES)
   ss << std::setfill(' ') << std::setw(25) << std::left;
   val::ArrayValue<double> value(dim.numerical.value.get());
@@ -121,7 +121,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
                                       quant.second.definition + "'. Missing unit: " + bu.unit);
       }
     }
-    std::string symbol = SYMBOL_QUANTITY_START + quant.first + SYMBOL_QUANTITY_END;
+    std::string symbol = std::string(puq::Symbols::quantity_start) + quant.first + std::string(puq::Symbols::quantity_end);
     add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first));
 #if defined(MAGNITUDE_VALUES)
     val::ArrayValue<double> value(dim.numerical.value.get());
@@ -153,7 +153,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
       // clear physical dimensions to make conversion factors dimensionless
       std::fill(std::begin(dim.physical), std::end(dim.physical), 0);
       // register the conversion factor
-      symbol = SYMBOL_SIFACTOR_START + quant.first + SYMBOL_SIFACTOR_END;
+      symbol = std::string(puq::Symbols::si_factor_start) + quant.first + std::string(puq::Symbols::si_factor_end);
       add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first) + " SI factor");
 #if defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> value(dim.numerical.value.get());

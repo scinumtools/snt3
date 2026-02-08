@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  MagnitudeFloat pow(const MagnitudeFloat& m, const ExponentFloat& e) {
+  puq::MagnitudeFloat pow(const puq::MagnitudeFloat& m, const puq::ExponentFloat& e) {
     return std::pow(m, e);
   }
 
@@ -13,7 +13,7 @@ namespace snt::nostd {
 #endif
 
 #ifdef MAGNITUDE_ERRORS
-  puq::Magnitude pow(const puq::Magnitude& m, const ExponentFloat& e) {
+  puq::Magnitude pow(const puq::Magnitude& m, const puq::ExponentFloat& e) {
 #ifdef MAGNITUDE_VALUES
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
     if (m.error) {

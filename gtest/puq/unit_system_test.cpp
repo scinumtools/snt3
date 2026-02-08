@@ -2,9 +2,11 @@
 
 using namespace snt;
 
-#ifdef UNIT_SYSTEM_CGS
-
 TEST(UnitSystem, PrintUnitSystem) {
+  if constexpr (!puq::Config::use_system_cgs) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::Quantity q("23*cm");
   EXPECT_EQ(q.unit_system(), "SI");
@@ -18,6 +20,10 @@ TEST(UnitSystem, PrintUnitSystem) {
 }
 
 TEST(UnitSystem, DirectSetting) {
+  if constexpr (!puq::Config::use_system_cgs) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::Quantity q1, q2;
 
@@ -30,6 +36,10 @@ TEST(UnitSystem, DirectSetting) {
 }
 
 TEST(UnitSystem, EnvironmentSetting) {
+  if constexpr (!puq::Config::use_system_cgs) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::Quantity q1, q2;
 
@@ -49,6 +59,10 @@ TEST(UnitSystem, EnvironmentSetting) {
 }
 
 TEST(UnitSystem, FormatConversion) {
+  if constexpr (!puq::Config::use_system_cgs) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::Quantity q("J"), r;
 
@@ -61,20 +75,24 @@ TEST(UnitSystem, FormatConversion) {
   r = q.convert(puq::Format::Base::CGS);
   EXPECT_EQ(r.to_string(), "1e7*cm2*g*s-2");
 
-#ifdef UNIT_SYSTEM_EUS
-  // q is implicitely converted into MGS format,
-  // because unit J does not exist in US unit system
-  r = q.convert(puq::Format::Base::FPS, puq::SystemType::US);
-  EXPECT_EQ(r.to_string(), "23.7304*ft2*lb*s-2");
-
-  // explicitely what happens above
-  r = q.convert(puq::Format::Base::MGS);
-  r = r.convert(puq::Format::Base::FPS, puq::SystemType::US);
-  EXPECT_EQ(r.to_string(), "23.7304*ft2*lb*s-2");
-#endif
+  if constexpr (puq::Config::use_system_eus) {
+    // q is implicitely converted into MGS format,
+    // because unit J does not exist in US unit system
+    r = q.convert(puq::Format::Base::FPS, puq::SystemType::US);
+    EXPECT_EQ(r.to_string(), "23.7304*ft2*lb*s-2");
+    
+    // explicitely what happens above
+    r = q.convert(puq::Format::Base::MGS);
+    r = r.convert(puq::Format::Base::FPS, puq::SystemType::US);
+    EXPECT_EQ(r.to_string(), "23.7304*ft2*lb*s-2");
+  }
 }
 
 TEST(UnitSystem, DirectConversionESU) {
+  if constexpr (!puq::Config::use_system_cgs) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::Quantity q1, q2, q3;
 
@@ -95,6 +113,10 @@ TEST(UnitSystem, DirectConversionESU) {
 }
 
 TEST(UnitSystem, ContextConversionESU) {
+  if constexpr (!puq::Config::use_system_cgs) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::Quantity q1, q2, q3;
 
@@ -126,11 +148,11 @@ TEST(UnitSystem, ContextConversionESU) {
   }
 }
 
-#endif
-
-#ifdef UNIT_SYSTEM_NUS
-
 TEST(UnitSystem, ContextConversionSRU) {
+  if constexpr (!puq::Config::use_system_nus) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::Quantity q1, q2, q3;
 
@@ -144,6 +166,10 @@ TEST(UnitSystem, ContextConversionSRU) {
 }
 
 TEST(UnitSystem, ContextConversionGRU) {
+  if constexpr (!puq::Config::use_system_nus) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::Quantity q1, q2, q3;
 
@@ -157,6 +183,10 @@ TEST(UnitSystem, ContextConversionGRU) {
 }
 
 TEST(UnitSystem, ContextConversionGEO) {
+  if constexpr (!puq::Config::use_system_nus) {
+    GTEST_SKIP() << "CGS unit system is disabled";
+    return;
+  }
 
   puq::Quantity q1, q2, q3;
 
@@ -172,5 +202,3 @@ TEST(UnitSystem, ContextConversionGEO) {
   q2 = q1.convert("<L_ome>", puq::SystemType::SI, "L_ome");
   EXPECT_EQ(q2.to_string(), "4.036978(91)e35*<L_ome>");
 }
-
-#endif

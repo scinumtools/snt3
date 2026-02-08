@@ -34,7 +34,6 @@ namespace snt::puq {
     }
   }
 
-#ifdef MAGNITUDE_ERRORS
   UnitValue::UnitValue(const MagnitudeFloat& m, const std::string& s) {
     UnitSolver solver;
     UnitAtom atom = solver.solve(s);
@@ -47,7 +46,7 @@ namespace snt::puq {
     magnitude = Magnitude(m, e) * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
-#if defined(MAGNITUDE_VALUES)
+  
   UnitValue::UnitValue(val::BaseValue::PointerType m, const std::string& s) {
     UnitSolver solver;
     UnitAtom atom = solver.solve(s);
@@ -60,18 +59,14 @@ namespace snt::puq {
     magnitude = Magnitude(std::move(m), std::move(e)) * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
-#endif
-#endif
 
   std::size_t UnitValue::size() const {
     return magnitude.size();
   }
 
-#if defined(MAGNITUDE_VALUES)
   val::Array::ShapeType UnitValue::shape() const {
     return magnitude.shape();
   }
-#endif
 
   std::string UnitValue::to_string(const UnitFormat& format) const {
     std::string multiply = format.multiply_symbol();
@@ -106,17 +101,17 @@ namespace snt::puq {
   bool operator==(const UnitValue& v1, const UnitValue& v2) {
     try {
       Converter conv(v2.baseunits, v1.baseunits);
-#ifdef UNITS_LOGARITHMIC
-      if (conv.utype == Utype::LOG) {
-	MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
-	MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
-	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-	  m1 = nostd::pow(10, m1);
-	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-	  m2 = nostd::pow(10, m2);
-	return m1 == m2;
+      if constexpr (puq::Config::use_units_logarithmic) {
+	if (conv.utype == Utype::LOG) {
+	  MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
+	  MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	  if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
+	    m1 = nostd::pow(10, m1);
+	  if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
+	    m2 = nostd::pow(10, m2);
+	  return m1 == m2;
+	}
       }
-#endif
       return v1.magnitude == conv.convert(v2.magnitude);
     } catch (const snt::puq::ConvDimExcept& e) {
       return false;
@@ -126,17 +121,17 @@ namespace snt::puq {
   bool operator!=(const UnitValue& v1, const UnitValue& v2) {
     try {
       Converter conv(v2.baseunits, v1.baseunits);
-#ifdef UNITS_LOGARITHMIC
-      if (conv.utype == Utype::LOG) {
-	MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
-	MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
-	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-	  m1 = nostd::pow(10, m1);
-	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-	  m2 = nostd::pow(10, m2);
-	return m1 != m2;
+      if constexpr (puq::Config::use_units_logarithmic) {
+	if (conv.utype == Utype::LOG) {
+	  MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
+	  MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	  if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
+	    m1 = nostd::pow(10, m1);
+	  if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
+	    m2 = nostd::pow(10, m2);
+	  return m1 != m2;
+	}
       }
-#endif
       return v1.magnitude != conv.convert(v2.magnitude);
     } catch (const snt::puq::ConvDimExcept& e) {
       return true;
@@ -145,17 +140,17 @@ namespace snt::puq {
   
   UnitValue operator+(const UnitValue& v1, const UnitValue& v2) {
     Converter conv(v2.baseunits, v1.baseunits);
-#ifdef UNITS_LOGARITHMIC
-    if (conv.utype == Utype::LOG) {
-      MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
-      MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
-      if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-        m1 = nostd::pow(10, m1);
-      if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-        m2 = nostd::pow(10, m2);
-      return UnitValue(nostd::log10(m1 + m2) / conv.dimensions1.numerical, v1.baseunits);
+    if constexpr (puq::Config::use_units_logarithmic) {
+      if (conv.utype == Utype::LOG) {
+	MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
+	MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
+	  m1 = nostd::pow(10, m1);
+	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
+	  m2 = nostd::pow(10, m2);
+	return UnitValue(nostd::log10(m1 + m2) / conv.dimensions1.numerical, v1.baseunits);
+      }
     }
-#endif
     return UnitValue(v1.magnitude + conv.convert(v2.magnitude), v1.baseunits);
   }
 
@@ -165,34 +160,34 @@ namespace snt::puq {
 
   void UnitValue::operator+=(const UnitValue& v) {
     Converter conv(v.baseunits, baseunits);
-#ifdef UNITS_LOGARITHMIC
-    if (conv.utype == Utype::LOG) {
-      MAGNITUDE_TYPE m1 = magnitude * conv.dimensions1.numerical;
-      MAGNITUDE_TYPE m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
-      if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-        m1 = nostd::pow(10, m1);
-      if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-        m2 = nostd::pow(10, m2);
-      magnitude = nostd::log10(m1 + m2) / conv.dimensions1.numerical;
-      return;
+    if constexpr (puq::Config::use_units_logarithmic) {
+      if (conv.utype == Utype::LOG) {
+	MAGNITUDE_TYPE m1 = magnitude * conv.dimensions1.numerical;
+	MAGNITUDE_TYPE m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
+	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
+	  m1 = nostd::pow(10, m1);
+	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
+	  m2 = nostd::pow(10, m2);
+	magnitude = nostd::log10(m1 + m2) / conv.dimensions1.numerical;
+	return;
+      }
     }
-#endif
     magnitude += conv.convert(v.magnitude);
   }
 
   UnitValue operator-(const UnitValue& v1, const UnitValue& v2) {
     Converter conv(v2.baseunits, v1.baseunits);
-#ifdef UNITS_LOGARITHMIC
-    if (conv.utype == Utype::LOG) {
-      MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
-      MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
-      if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-        m1 = nostd::pow(10, m1);
-      if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-        m2 = nostd::pow(10, m2);
-      return UnitValue(nostd::log10(m1 - m2) / conv.dimensions1.numerical, v1.baseunits);
+    if constexpr (puq::Config::use_units_logarithmic) {
+      if (conv.utype == Utype::LOG) {
+	MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
+	MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
+	  m1 = nostd::pow(10, m1);
+	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
+	  m2 = nostd::pow(10, m2);
+	return UnitValue(nostd::log10(m1 - m2) / conv.dimensions1.numerical, v1.baseunits);
+      }
     }
-#endif
     return UnitValue(v1.magnitude - conv.convert(v2.magnitude), v1.baseunits);
   }
 
@@ -202,18 +197,18 @@ namespace snt::puq {
 
   void UnitValue::operator-=(const UnitValue& v) {
     Converter conv(v.baseunits, baseunits);
-#ifdef UNITS_LOGARITHMIC
-    if (conv.utype == Utype::LOG) {
-      MAGNITUDE_TYPE m1 = magnitude * conv.dimensions1.numerical;
-      MAGNITUDE_TYPE m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
-      if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-        m1 = nostd::pow(10, m1);
-      if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-        m2 = nostd::pow(10, m2);
-      magnitude = nostd::log10(m1 - m2) / conv.dimensions1.numerical;
-      return;
+    if constexpr (puq::Config::use_units_logarithmic) {
+      if (conv.utype == Utype::LOG) {
+	MAGNITUDE_TYPE m1 = magnitude * conv.dimensions1.numerical;
+	MAGNITUDE_TYPE m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
+	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
+	  m1 = nostd::pow(10, m1);
+	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
+	  m2 = nostd::pow(10, m2);
+	magnitude = nostd::log10(m1 - m2) / conv.dimensions1.numerical;
+	return;
+      }
     }
-#endif
     magnitude -= conv.convert(v.magnitude);
   }
 
@@ -271,19 +266,20 @@ namespace snt::puq {
     for (int i = 0; i < Config::num_basedim; i++) {
       if (dim.physical[i] == 0)
         continue;
+      if constexpr (Config::use_system_eus) {
+	if (i == 0 && format == Format::Base::FPS) {
+	  bu.append({"", "ft", dim.physical[i]});
+	  continue;
+	} else if (i == 1 && format == Format::Base::FPS) {
+	  bu.append({"", "lb", dim.physical[i]});
+	  continue;
+	}
+      }
       if (i == 1 && format == Format::Base::MKS) {
         bu.append({"k", "g", dim.physical[i]});
       } else if (i == 0 && format == Format::Base::CGS) {
         bu.append({"c", "m", dim.physical[i]});
-      }
-#ifdef UNIT_SYSTEM_EUS
-      else if (i == 0 && format == Format::Base::FPS) {
-        bu.append({"", "ft", dim.physical[i]});
-      } else if (i == 1 && format == Format::Base::FPS) {
-        bu.append({"", "lb", dim.physical[i]});
-      }
-#endif
-      else {
+      } else {
         bu.append({"", SystemData::BaseUnitOrder[i], dim.physical[i]});
       }
     }

@@ -17,12 +17,8 @@ namespace snt::puq {
     std::string derived_units(const bool json = false, const UnitFormat& format = UnitFormat());
     std::string constants(const bool json = false, const UnitFormat& format = UnitFormat());
     std::string quantities(const bool json = false, const UnitFormat& format = UnitFormat());
-#ifdef UNITS_TEMPERATURES
     std::string temperature_units(const bool json = false);
-#endif
-#ifdef UNITS_LOGARITHMIC
     std::string logarithmic_units(const bool json = false);
-#endif
   } // namespace lists
 
 } // namespace snt::puq

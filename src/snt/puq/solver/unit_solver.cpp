@@ -15,8 +15,8 @@ namespace snt::puq {
 #if defined(MAGNITUDE_VALUES)
     operators.append(ARRAY_OPERATOR, std::make_shared<OperatorArray>());
 #endif
-    operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(SYMBOL_MULTIPLY));
-    operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide>(SYMBOL_DIVIDE));
+    operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(std::string(Symbols::multiply)));
+    operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide>(std::string(Symbols::divide)));
 
     exs::StepList steps;
 #if defined(MAGNITUDE_VALUES)
@@ -30,13 +30,13 @@ namespace snt::puq {
   }
 
   UnitAtom UnitSolver::solve(const std::string& expression) {
-#ifdef DEBUG_UNIT_SOLVER
-    std::clog << "UNIT:  Solving: " << expression << std::endl;
-#endif
+    if constexpr (Config::debug_unit_solver) {
+      std::clog << "UNIT:  Solving: " << expression << std::endl;
+    }
     UnitAtom ua = solver->solve((expression == "") ? "1" : expression);
-#ifdef DEBUG_UNIT_SOLVER
-    std::clog << "UNIT:  Result:  " << ua.value.to_string() << std::endl;
-#endif
+    if constexpr (Config::debug_unit_solver) {
+      std::clog << "UNIT:  Result:  " << ua.value.to_string() << std::endl;
+    }
     return ua;
   }
 

@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  extern MagnitudeFloat max(const MagnitudeFloat& m1, const MagnitudeFloat& m2) {
+  extern puq::MagnitudeFloat max(const puq::MagnitudeFloat& m1, const puq::MagnitudeFloat& m2) {
     return std::max(m1, m2);
   }
 

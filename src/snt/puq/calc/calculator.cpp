@@ -24,13 +24,13 @@ namespace snt::puq {
   }
 
   CalculatorAtom Calculator::solve(const std::string& expression) {
-#ifdef DEBUG_CALCULATOR
-    std::clog << "CALC:  Solving: " << expression << std::endl;
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << "CALC:  Solving: " << expression << std::endl;
+    }
     CalculatorAtom ca = solver->solve((expression == "") ? "1" : expression);
-#ifdef DEBUG_CALCULATOR
-    std::clog << "CALC:  Result:  " << ca.value.to_string() << std::endl;
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << "CALC:  Result:  " << ca.value.to_string() << std::endl;
+    }
     return ca;
   }
 

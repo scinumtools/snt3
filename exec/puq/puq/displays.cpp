@@ -72,7 +72,7 @@ void display_info(const std::string& expr) {
     }
     for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
       for (const auto& bu : bus) {
-        if (bu.unit != SYMBOL_QUANTITY_START + quant.first + SYMBOL_QUANTITY_END)
+        if (bu.unit != std::string(puq::Symbols::quantity_start) + quant.first + std::string(puq::Symbols::quantity_end))
           continue;
         puq::BaseUnits bu_unit({bu});
         tab.append({bu.prefix,

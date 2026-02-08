@@ -130,7 +130,7 @@ namespace snt::puq {
         dim.numerical *= nostd::pow(prefix->second.magnitude, (EXPONENT_TYPE)bu.exponent);
       }
       // quantity
-      if (bu.unit.rfind(SYMBOL_QUANTITY_START, 0) == 0 || bu.unit.rfind(SYMBOL_SIFACTOR_START, 0) == 0) {
+      if (bu.unit.rfind(Symbols::quantity_start, 0) == 0 || bu.unit.rfind(Symbols::si_factor_start, 0) == 0) {
         auto dmap = UnitSystem::Data->DimensionMap.find(bu.unit);
         if (dmap != UnitSystem::Data->DimensionMap.end()) {
           dim.utype = dim.utype | Utype::LIN;

@@ -1,11 +1,10 @@
 #import "systems.h"
 
-#ifdef UNIT_SYSTEM_EUS
-
 namespace snt::puq {
   namespace SystemData {
 
-    const UnitListType _EUS_UNITS = {
+    inline UnitListType GetEUSUnits() {
+      UnitListType units = {
         // units of length
         {"twip", {Utype::LIN, "17.6388888e-6*m", "twip", false, {}}},
         {"th", {Utype::LIN, "25.4e-6*m", "thou", false, {}}},
@@ -52,15 +51,23 @@ namespace snt::puq {
 
         // units of temperature
         {"degR", {UT_LIN_TMP, "5/9*K", "degree Rankine", false, {}}},
-#ifdef UNITS_TEMPERATURES
-        {"Cel", {Utype::TMP, "K", "degree Celsius", false, {}}},
-        {"degF", {Utype::TMP, "K", "degree Fahrenheit", false, {}}},
-#endif
 
         // units of velocity
-        {"mph", {Utype::LIN, "mi/h", "miles per hour", false, {}}},
+        {"mph", {Utype::LIN, "mi/h", "miles per hour", false, {}}}
+      };
+      
+      if constexpr (Config::use_units_temperature) {
+	units.insert({
+	  {"Cel", {Utype::TMP, "K", "degree Celsius", false, {}}},
+	  {"degF", {Utype::TMP, "K", "degree Fahrenheit", false, {}}},
+        });
+      }
+      
+      return units;
     };
 
+    UnitListType _EUS_UNITS = GetEUSUnits();
+    
     const QuantityListType _EUS_QUANTITIES = {
         {"l", {"ft"}},
         {"m", {"lb"}},
@@ -165,5 +172,3 @@ namespace snt::puq {
 
   } // namespace SystemData
 } // namespace snt::puq
-
-#endif // UNIT_SYSTEM_EUS

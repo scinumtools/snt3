@@ -1,7 +1,5 @@
 #import "systems.h"
 
-#ifdef UNIT_SYSTEM_NUS
-
 namespace snt::puq {
   namespace SystemData {
 
@@ -161,4 +159,3 @@ namespace snt::puq {
   } // namespace SystemData
 } // namespace snt::puq
 
-#endif // UNIT_SYSTEM_NUS

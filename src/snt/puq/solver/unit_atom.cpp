@@ -135,33 +135,33 @@ namespace snt::puq {
   }
   
   void UnitAtom::math_power(EXPONENT_TYPE& e) {
-#ifdef DEBUG_UNIT_SOLVER
-    std::clog << "UNIT:    pow(" << value.to_string() << "," << e.to_string() << ") = ";
-#endif
+    if constexpr (Config::debug_unit_solver) {
+      std::clog << "UNIT:    pow(" << value.to_string() << "," << e.to_string() << ") = ";
+    }
     value.pow(e);
-#ifdef DEBUG_UNIT_SOLVER
-    std::clog << value.to_string() << std::endl;
-#endif
+    if constexpr (Config::debug_unit_solver) {
+      std::clog << value.to_string() << std::endl;
+    }
   }
 
   void UnitAtom::math_multiply(UnitAtom* other) {
-#ifdef DEBUG_UNIT_SOLVER
-    std::clog << "UNIT:    " << value.to_string() << " * " << other->value.to_string() << " = ";
-#endif
+    if constexpr (Config::debug_unit_solver) {
+      std::clog << "UNIT:    " << value.to_string() << " * " << other->value.to_string() << " = ";
+    }
     value *= other->value;
-#ifdef DEBUG_UNIT_SOLVER
-    std::clog << value.to_string() << std::endl;
-#endif
+    if constexpr (Config::debug_unit_solver) {
+      std::clog << value.to_string() << std::endl;
+    }
   }
 
   void UnitAtom::math_divide(UnitAtom* other) {
-#ifdef DEBUG_UNIT_SOLVER
-    std::clog << "UNIT:    " << value.to_string() << " / " << other->value.to_string() << " = ";
-#endif
+    if constexpr (Config::debug_unit_solver) {
+      std::clog << "UNIT:    " << value.to_string() << " / " << other->value.to_string() << " = ";
+    }
     value /= other->value;
-#ifdef DEBUG_UNIT_SOLVER
-    std::clog << value.to_string() << std::endl;
-#endif
+    if constexpr (Config::debug_unit_solver) {
+      std::clog << value.to_string() << std::endl;
+    }
   }
 
 } // namespace snt::puq

@@ -339,13 +339,13 @@ namespace snt::puq {
                                             const std::string& q) const {
     UnitValue uv = value;
     if (qs1->second.sifactor != "") {
-      uv *= UnitValue(SYMBOL_SIFACTOR_START + q + SYMBOL_SIFACTOR_END);
+      uv *= UnitValue(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
     }
-    uv = uv.convert(SYMBOL_QUANTITY_START + q + SYMBOL_QUANTITY_END);
+    uv = uv.convert(std::string(Symbols::quantity_start) + q + std::string(Symbols::quantity_end));
     us.change(stt);
-    uv = UnitValue(uv.magnitude, SYMBOL_QUANTITY_START + q + SYMBOL_QUANTITY_END);
+    uv = UnitValue(uv.magnitude, std::string(Symbols::quantity_start) + q + std::string(Symbols::quantity_end));
     if (qs2->second.sifactor != "") {
-      uv /= UnitValue(SYMBOL_SIFACTOR_START + q + SYMBOL_SIFACTOR_END);
+      uv /= UnitValue(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
     }
     return uv;
   }

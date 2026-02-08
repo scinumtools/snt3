@@ -8,25 +8,36 @@
 
 namespace snt::puq {
 
-  std::unordered_map<puq::SystemType, SystemDataType*> SystemMap = {
-      {puq::SystemType::SI, &puq::SystemData::SI},
-#ifdef UNIT_SYSTEM_CGS
-      {puq::SystemType::ESU, &puq::SystemData::ESU},
-      {puq::SystemType::GU, &puq::SystemData::GU},
-      {puq::SystemType::EMU, &puq::SystemData::EMU},
-#endif
-#ifdef UNIT_SYSTEM_EUS
-      {puq::SystemType::IU, &puq::SystemData::IU},
-      {puq::SystemType::US, &puq::SystemData::US},
-#endif
-#ifdef UNIT_SYSTEM_NUS
-      {puq::SystemType::AU, &puq::SystemData::AU},
-      {puq::SystemType::PU, &puq::SystemData::PU},
-      {puq::SystemType::SRU, &puq::SystemData::SRU},
-      {puq::SystemType::GRU, &puq::SystemData::GRU},
-      {puq::SystemType::GEO, &puq::SystemData::GEO},
-#endif
-  };
+  inline std::unordered_map<puq::SystemType, SystemDataType*> GetSystemMap() {
+      std::unordered_map<puq::SystemType, SystemDataType*> map = {
+	{puq::SystemType::SI, &puq::SystemData::SI},
+      };
+      if constexpr (Config::use_system_cgs) {
+	map.insert({
+          {puq::SystemType::ESU, &puq::SystemData::ESU},
+          {puq::SystemType::GU, &puq::SystemData::GU},
+          {puq::SystemType::EMU, &puq::SystemData::EMU},
+	});
+      }
+      if constexpr (Config::use_system_eus) {
+	map.insert({
+          {puq::SystemType::IU, &puq::SystemData::IU},
+          {puq::SystemType::US, &puq::SystemData::US},
+ 	});
+      }
+      if constexpr (Config::use_system_nus) {
+	map.insert({
+          {puq::SystemType::AU, &puq::SystemData::AU},
+          {puq::SystemType::PU, &puq::SystemData::PU},
+          {puq::SystemType::SRU, &puq::SystemData::SRU},
+          {puq::SystemType::GRU, &puq::SystemData::GRU},
+          {puq::SystemType::GEO, &puq::SystemData::GEO},
+	});
+      }
+      return map;
+  }
+  
+  std::unordered_map<puq::SystemType, SystemDataType*> SystemMap = GetSystemMap();
 
   SystemDataType* UnitSystem::Data = &SystemData::SI;
   SystemType UnitSystem::System = SystemType::SI;

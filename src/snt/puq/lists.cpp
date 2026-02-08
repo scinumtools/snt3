@@ -86,7 +86,7 @@ namespace snt::puq {
       DataTable tab({{"Symbol", 10}, {"Name", 30}, {"Magnitude", 30}, {"Dimension", 22}, {"Definition", 25}, {"SI factor", 11}});
       std::map<std::string, QuantityStruct> ordered(UnitSystem::Data->QuantityList.begin(), UnitSystem::Data->QuantityList.end());
       for (auto& quantity : ordered) {
-        std::string symbol = SYMBOL_QUANTITY_START + quantity.first + SYMBOL_QUANTITY_END;
+        std::string symbol = std::string(Symbols::quantity_start) + quantity.first + std::string(Symbols::quantity_end);
         UnitValue uv(symbol);
         Dimensions dim = uv.baseunits.dimensions();
         tab.append({symbol,
@@ -99,7 +99,6 @@ namespace snt::puq {
       return (json) ? tab.to_json() : tab.to_string();
     }
 
-#ifdef UNITS_TEMPERATURES
     std::string temperature_units(const bool json) {
       DataTable tab({{"Symbol", 9}, {"Name", 19}, {"Allowed prefixes", 22}});
       std::map<std::string, UnitStruct> ordered(UnitSystem::Data->UnitList.begin(), UnitSystem::Data->UnitList.end());
@@ -110,9 +109,7 @@ namespace snt::puq {
       }
       return (json) ? tab.to_json() : tab.to_string();
     }
-#endif
 
-#ifdef UNITS_LOGARITHMIC
     std::string logarithmic_units(const bool json) {
       DataTable tab({{"Symbol", 9}, {"Name", 19}, {"Allowed prefixes", 22}});
       std::map<std::string, UnitStruct> ordered(UnitSystem::Data->UnitList.begin(), UnitSystem::Data->UnitList.end());
@@ -123,7 +120,6 @@ namespace snt::puq {
       }
       return (json) ? tab.to_json() : tab.to_string();
     }
-#endif
 
   } // namespace lists
 

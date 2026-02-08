@@ -4,7 +4,7 @@
 
 namespace snt::nostd {
 
-  MagnitudeFloat log(const MagnitudeFloat& m) {
+  puq::MagnitudeFloat log(const puq::MagnitudeFloat& m) {
     return std::log(m);
   }
 

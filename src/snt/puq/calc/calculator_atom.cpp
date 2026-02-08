@@ -24,57 +24,55 @@ namespace snt::puq {
   }
 
   void CalculatorAtom::math_add(CalculatorAtom* other) {
-#ifdef DEBUG_CALCULATOR
     std::stringstream ss;
-    ss << "CALC:    " << value.to_string() << " + " << other->value.to_string() << " = ";
-#endif
+    if constexpr (Config::debug_calculator) {
+      ss << "CALC:    " << value.to_string() << " + " << other->value.to_string() << " = ";
+    }
     value += other->value;
-#ifdef DEBUG_CALCULATOR
-    std::clog << ss.str() << value.to_string() << std::endl;
-    ;
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << ss.str() << value.to_string() << std::endl;
+    }
   }
 
   void CalculatorAtom::math_subtract(CalculatorAtom* other) {
-#ifdef DEBUG_CALCULATOR
     std::stringstream ss;
-    ss << "CALC:    " << value.to_string() << " - " << other->value.to_string() << " = ";
-#endif
+    if constexpr (Config::debug_calculator) {
+      ss << "CALC:    " << value.to_string() << " - " << other->value.to_string() << " = ";
+    }
     value -= other->value;
-#ifdef DEBUG_CALCULATOR
-    std::clog << ss.str() << value.to_string() << std::endl;
-    ;
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << ss.str() << value.to_string() << std::endl;
+    }
   }
 
   void CalculatorAtom::math_negate() {
-#ifdef DEBUG_CALCULATOR
-    std::clog << "CALC:    - " << value.to_string() << " = ";
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << "CALC:    - " << value.to_string() << " = ";
+    }
     value = -value;
-#ifdef DEBUG_CALCULATOR
-    std::clog << value.to_string() << std::endl;
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << value.to_string() << std::endl;
+    }
   }
 
   void CalculatorAtom::math_multiply(CalculatorAtom* other) {
-#ifdef DEBUG_CALCULATOR
-    std::clog << "CALC:    " << value.to_string() << " * " << other->value.to_string() << " = ";
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << "CALC:    " << value.to_string() << " * " << other->value.to_string() << " = ";
+    }
     value *= other->value;
-#ifdef DEBUG_CALCULATOR
-    std::clog << value.to_string() << std::endl;
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << value.to_string() << std::endl;
+    }
   }
 
   void CalculatorAtom::math_divide(CalculatorAtom* other) {
-#ifdef DEBUG_CALCULATOR
-    std::clog << "CALC:    " << value.to_string() << " / " << other->value.to_string() << " = ";
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << "CALC:    " << value.to_string() << " / " << other->value.to_string() << " = ";
+    }
     value /= other->value;
-#ifdef DEBUG_CALCULATOR
-    std::clog << value.to_string() << std::endl;
-#endif
+    if constexpr (Config::debug_calculator) {
+      std::clog << value.to_string() << std::endl;
+    }
   }
 
 } // namespace snt::puq

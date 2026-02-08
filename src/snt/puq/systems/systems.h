@@ -123,42 +123,30 @@ namespace snt::puq {
   namespace SystemData {
 #include "system_base.h"
     extern SystemDataType SI;
-#ifdef UNIT_SYSTEM_CGS
     extern SystemDataType ESU;
     extern SystemDataType EMU;
     extern SystemDataType GU;
-#endif
-#ifdef UNIT_SYSTEM_EUS
     extern SystemDataType IU;
     extern SystemDataType US;
-#endif
-#ifdef UNIT_SYSTEM_NUS
     extern SystemDataType AU;
     extern SystemDataType PU;
     extern SystemDataType SRU;
     extern SystemDataType GRU;
     extern SystemDataType GEO;
-#endif
   } // namespace SystemData
   enum class SystemType {
     NONE,
     SI,
-#ifdef UNIT_SYSTEM_CGS
     ESU,
     GU,
     EMU,
-#endif
-#ifdef UNIT_SYSTEM_EUS
     IU,
     US,
-#endif
-#ifdef UNIT_SYSTEM_NUS
     AU,
     PU,
     SRU,
     GRU,
     GEO,
-#endif
   };
 
 } // namespace snt::puq

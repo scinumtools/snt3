@@ -180,13 +180,14 @@ TEST(UnitValue, UnitConversion) {
   v2 = v1.convert(puq::Format::Base::CGS);
   EXPECT_EQ(v2.to_string(), "2e7*cm2*g*s-2"); // CGS
 
-#ifdef UNIT_SYSTEM_EUS // conversion to foot/pound/second
-  puq::UnitSystem us(puq::SystemType::US);
-  v1 = puq::UnitValue("yd2*s/oz");
-  v2 = v1.convert(puq::Format::Base::FPS);
-  EXPECT_EQ(v2.to_string(), "144*ft2*lb-1*s");
-  us.close();
-#endif
+  if constexpr (puq::Config::use_system_eus) {
+    // conversion to foot/pound/second
+    puq::UnitSystem us(puq::SystemType::US);
+    v1 = puq::UnitValue("yd2*s/oz");
+    v2 = v1.convert(puq::Format::Base::FPS);
+    EXPECT_EQ(v2.to_string(), "144*ft2*lb-1*s");
+    us.close();
+  }
 }
 
 TEST(UnitValue, ArithmeticsAdd) {
@@ -263,9 +264,11 @@ TEST(UnitValue, ArithmeticsDivide) {
   EXPECT_EQ(q1.to_string(), "2*cm3*g-2");
 }
 
-#ifdef UNITS_LOGARITHMIC
-
 TEST(UnitValue, ArithmeticsLog) {
+  if constexpr (!puq::Config::use_units_logarithmic) {
+    GTEST_SKIP() << "Logarithmic units are disabled";
+    return;
+  }
 
   puq::UnitValue q1, q2, q3;
 
@@ -298,5 +301,3 @@ TEST(UnitValue, ArithmeticsLog) {
   q1 -= q2;
   EXPECT_EQ(q1.to_string(), "84.7952*dBA");
 }
-
-#endif

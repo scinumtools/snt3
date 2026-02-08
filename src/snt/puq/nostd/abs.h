@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern MagnitudeFloat abs(const MagnitudeFloat& m);
+  extern puq::MagnitudeFloat abs(const puq::MagnitudeFloat& m);
 #if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType abs(val::BaseValue::PointerType a);
 #endif

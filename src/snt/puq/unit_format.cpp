@@ -12,16 +12,16 @@ namespace snt::puq {
       {'6', "\u2076"},
       {'7', "\u2077"}, // 4 5 6 7 -> ⁴ ⁵ ⁶ ⁷
       {'8', "\u2078"},
-      {'9', "\u2079"},                        // 8 9 -> ⁸ ⁹
-      {Symbols::minus[0], "\u207B"},            // - -> ⁻
-      {Symbols::plus[0], ""},                   // + ->
-      {Symbols::fraction_separator[0], std::string(Symbols::fraction_separator2)}, // : -> ᐟ
+      {'9', "\u2079"}, // 8 9 -> ⁸ ⁹
+      {Symbols::minus[0], "\u207B"},              // - -> ⁻
+      {Symbols::plus[0], ""},                     // + ->
+      {Symbols::fraction_separator[0], "\u141F"}, // : -> ᐟ
   };
 
   const std::unordered_map<std::string, std::string> UnitFormat::symbol_map = {
-      {SYMBOL_EXPONENT2, std::string(1, SYMBOL_EXPONENT)},         // ×10 -> e
-      {std::string(Symbols::minus2), std::string(Symbols::minus)}, // −   -> -
-      {SYMBOL_MULTIPLY2, SYMBOL_MULTIPLY},                         // ⋅   -> *
+    {std::string(Symbols::exponent2), std::string(Symbols::exponent)},   // ×10 -> e
+    {std::string(Symbols::minus2),    std::string(Symbols::minus)},      // −   -> -
+    {std::string(Symbols::multiply2), std::string(Symbols::multiply)},   // ⋅   -> *
   };
 
   bool UnitFormat::preprocess_system(std::string& expression, const std::string& abbrev) {
@@ -64,9 +64,9 @@ namespace snt::puq {
 
   std::string UnitFormat::multiply_symbol() const {
     if (math == Format::Math::UNICODE || math == Format::Math::HTML) {
-      return SYMBOL_MULTIPLY2;
+      return std::string(Symbols::multiply2);
     }
-    return SYMBOL_MULTIPLY;
+    return std::string(Symbols::multiply);
   }
 
   std::string UnitFormat::format_exponents(std::string expression) const {
@@ -94,10 +94,10 @@ namespace snt::puq {
 
   std::string UnitFormat::format_order(std::string expression) const {
     if (math == Format::Math::UNICODE || math == Format::Math::HTML) {
-      size_t pos = expression.find(SYMBOL_EXPONENT);
+      size_t pos = expression.find(Symbols::exponent);
       if (pos != std::string::npos) {
-        std::string exponent_str = expression.substr(pos + std::string(1, SYMBOL_EXPONENT).size(), expression.size());
-        expression = expression.substr(0, pos) + std::string(SYMBOL_EXPONENT2) + format_exponents(exponent_str);
+        std::string exponent_str = expression.substr(pos + std::string(Symbols::exponent).size(), expression.size());
+        expression = expression.substr(0, pos) + std::string(Symbols::exponent2) + format_exponents(exponent_str);
       }
     }
     return expression;

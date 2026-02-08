@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  MagnitudeFloat exp(const MagnitudeFloat& e) {
+  puq::MagnitudeFloat exp(const puq::MagnitudeFloat& e) {
     return std::exp(e);
   }
 
