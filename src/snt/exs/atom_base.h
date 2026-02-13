@@ -62,95 +62,129 @@ namespace snt::exs {
     }
     
     // Math operations
-    virtual void math_add(ATOM* other) {};
+    virtual void math_add(ATOM* other) {
+      throw std::runtime_error("Atom method 'math_add' is not implemented");
+    };
     void math_add(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->math_add(casted);
     };
-    virtual void math_subtract(ATOM* other) {};
+    virtual void math_subtract(ATOM* other) {
+      throw std::runtime_error("Atom method 'math_subtract' is not implemented");
+    };
     void math_subtract(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->math_subtract(casted);
     };
-    virtual void math_multiply(ATOM* other) {};
+    virtual void math_multiply(ATOM* other) {
+      throw std::runtime_error("Atom method 'math_multiply' is not implemented");
+    };
     void math_multiply(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->math_multiply(casted);
     };
-    virtual void math_divide(ATOM* other) {};
+    virtual void math_divide(ATOM* other) {
+      throw std::runtime_error("Atom method 'math_divide' is not implemented");
+    };
     void math_divide(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->math_divide(casted);
     };
-    virtual void math_power(ATOM* other) {};
+    virtual void math_power(ATOM* other) {
+      throw std::runtime_error("Atom method 'math_power' is not implemented");
+    };
     void math_power(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->math_power(casted);
     };
-    virtual void math_modulo(ATOM* other) {};
+    virtual void math_modulo(ATOM* other) {
+      throw std::runtime_error("Atom method 'math_modulo' is not implemented");
+    };
     void math_modulo(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->math_modulo(casted);
     };
 
     // Argument math operators
-    virtual void math_logarithm_base(ATOM* other) {};
+    virtual void math_logarithm_base(ATOM* other) {
+      throw std::runtime_error("Atom method 'math_logarithm_base' is not implemented");
+    };
     void math_logarithm_base(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->math_logarithm_base(casted);
     };
-    virtual void math_power_base(ATOM* other) {};
+    virtual void math_power_base(ATOM* other) {
+      throw std::runtime_error("Atom method 'math_power_base' is not implemented");
+    };
     void math_power_base(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->math_power_base(casted);
     };
 
     // Comparison operations
-    virtual void comparison_equal(ATOM* other) {};
+    virtual void comparison_equal(ATOM* other) {
+      throw std::runtime_error("Atom method 'comparison_equal' is not implemented");
+    };
     void comparison_equal(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->comparison_equal(casted);
     };
-    virtual void comparison_not_equal(ATOM* other) {};
+    virtual void comparison_not_equal(ATOM* other) {
+      throw std::runtime_error("Atom method 'comparison_not_equal' is not implemented");
+    };
     void comparison_not_equal(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->comparison_not_equal(casted);
     };
-    virtual void comparison_less_equal(ATOM* other) {};
+    virtual void comparison_less_equal(ATOM* other) {
+      throw std::runtime_error("Atom method 'comparison_less_equal' is not implemented");
+    };
     void comparison_less_equal(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->comparison_less_equal(casted);
     };
-    virtual void comparison_greater_equal(ATOM* other) {};
+    virtual void comparison_greater_equal(ATOM* other) {
+      throw std::runtime_error("Atom method 'comparison_greater_equal' is not implemented");
+    };
     void comparison_greater_equal(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->comparison_greater_equal(casted);
     };
-    virtual void comparison_less(ATOM* other) {};
+    virtual void comparison_less(ATOM* other) {
+      throw std::runtime_error("Atom method 'comparison_less' is not implemented");
+    };
     void comparison_less(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->comparison_less(casted);
     };
-    virtual void comparison_greater(ATOM* other) {};
+    virtual void comparison_greater(ATOM* other) {
+      throw std::runtime_error("Atom method 'comparison_greater' is not implemented");
+    };
     void comparison_greater(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->comparison_greater(casted);
     };
 
     // Logical operations
-    virtual void logical_and(ATOM* other) {};
+    virtual void logical_and(ATOM* other) {
+      throw std::runtime_error("Atom method 'logical_and' is not implemented");
+    };
     void logical_and(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->logical_and(casted);
     };
-    virtual void logical_or(ATOM* other) {};
+    virtual void logical_or(ATOM* other) {
+      throw std::runtime_error("Atom method 'logical_or' is not implemented");
+    };
     void logical_or(AtomGrand* other) override {
       auto* casted = static_cast<ATOM*>(other);
       static_cast<ATOM*>(this)->logical_or(casted);
     };
 
     // Conditional operator
-    virtual void condition(ATOM* option1, ATOM* option2) {};
+    virtual void condition(ATOM* option1, ATOM* option2) {
+      throw std::runtime_error("Atom method 'condition' is not implemented");
+    };
     void condition(AtomGrand* option1, AtomGrand* option2) override {
       auto* casted1 = static_cast<ATOM*>(option1);
       auto* casted2 = static_cast<ATOM*>(option2);

@@ -1,6 +1,10 @@
 * SCINUMTOOLS TODO
 
 ** High priority
+- convert all solver initialisations to static variables as in the substance solver in mat
+- unify all module settings
+- create special directory for examples and move exs examples there
+- create special directory for bindings and put pybind there and put python pytests there as well
 - create std::variant for the unit exponents
 - create sphix documentation
 - start writing doxygen documentation comments and docstring

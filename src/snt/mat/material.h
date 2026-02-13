@@ -12,7 +12,8 @@ namespace snt::mat {
    * @class Material
    * @brief Any substance or mixture of substances that can be used to make objects or structures
    */
-  class Material: public Set<MaterialSolver,Substance,double>, public Matter {
+  class Material: public Set<Substance,double>,
+		  public Matter {
   public:
   };
 

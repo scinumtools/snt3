@@ -13,17 +13,11 @@ namespace snt::mat {
    * @class Substance
    * @brief A form of matter with uniform and definite composition and distinct physical and chemical properties.
    */
-  class Substance: public Set<SubstanceSolver, Element, int>, public Part<double>, public Matter {
+  class Substance: public Set<Element, int>,
+		   public Part<double>,
+		   public Matter {
   public:
-
-    /**
-     * @brief Initialise Substance from a string expression
-     *
-     * @param expr String expression
-     * @return Instance of a substance
-     */
-    static Substance from_string(const std::string& expr);
-
+    
     /**
      * @brief Substance class constructor from a scalar number
      *
@@ -38,7 +32,7 @@ namespace snt::mat {
      * @param prop Component proportion in a Composite
      * @param nat Indicate if substance atoms should use natural abundance
      */
-    Substance(const PartMap& comp, double prop = 1, bool nat = true);
+    Substance(const ElementMap& comp, double prop = 1, bool nat = true);
     
     /**
      * @brief Substance class constructor from an expression
@@ -49,20 +43,6 @@ namespace snt::mat {
      */
     Substance(const std::string& expr, double prop = 1, bool nat = true);
     
-    /**
-     * @brief Addition of two substances
-     *
-     * @param other Pointer of another substance
-     */
-    void math_add(Substance* other);
-    
-    /**
-     * @brief Multiplication of two substances
-     *
-     * @param other Pointer of another substance
-     */
-    void math_multiply(Substance* other);
-
     /**
      * @brief Convert element to a string
      *

@@ -121,7 +121,7 @@ namespace snt::exs {
             std::string left = expr.pop_left();
             if (left.length() > 0) {
 	      ATOM atom = ATOM::from_string(left, &settings);
-              tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(std::move(atom.value)));
+              tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
             }
             op->parse(expr);
             if (op->groups.size() > 0) {
@@ -129,7 +129,7 @@ namespace snt::exs {
               // CHECKPOINT( groups.size() )
               for (auto e : groups) {
 		ATOM atom = solve(e);
-                tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(std::move(atom.value)));
+                tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
               }
             }
             tokens.append(OPERATOR_TOKEN, op->type);
@@ -145,7 +145,7 @@ namespace snt::exs {
       std::string left = expr.pop_left();
       if (left.length() > 0) {
 	ATOM atom = ATOM::from_string(left, &settings);
-	tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(std::move(atom.value)));
+	tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
       }
       //CHECKPOINT( expr.to_string() );
 
@@ -165,7 +165,7 @@ namespace snt::exs {
       if (!token.atom)
         throw std::runtime_error("Cannot dereference a null atom pointer");
       ATOM* catom = static_cast<ATOM*>(token.atom);
-      return ATOM(std::move(catom->value));
+      return ATOM(*catom);
     };
 
   private:

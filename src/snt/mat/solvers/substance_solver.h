@@ -1,6 +1,7 @@
 #ifndef MAT_SUBSTANCE_SOLVER_H
 #define MAT_SUBSTANCE_SOLVER_H
 
+#include "substance_atom.h"
 #include "../../exs.h"
 #include "../element.h"
 
@@ -28,12 +29,12 @@ namespace snt::mat {
     
   public:
     
-    std::unique_ptr<exs::Solver<Substance>> solver;  ///< Pointer to the EXS solver object
+    static std::unique_ptr<exs::Solver<SubstanceAtom>> solver;  ///< Pointer to the EXS solver object
 
     /**
      * @brief Constructor of this class
      */
-    SubstanceSolver();
+    SubstanceSolver() {};
 
     /**
      * @brief Preprocess expression for the solver
@@ -46,9 +47,9 @@ namespace snt::mat {
      * @brief Solve expression using expression solver
      *
      * @param expr Substance expression
-     * @return Substance object
+     * @return Map of elements and their proportions
      */
-    Substance solve(const std::string& expr);
+    ElementMap solve(const std::string& expr);
   };
 
 } // namespace snt::mat

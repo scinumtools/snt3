@@ -12,11 +12,10 @@ namespace snt::mat {
    * @class Set
    * @brief A set is a material or object made up of two or more distinct members that remain physically separate and identifiable within the final structure
    *
-   * @tparam SOLVER Type of an expression solver used by a set
    * @tparam MEMBER Type of set members
    * @tparam PROPORTION Proportion data type
    */
-  template <typename SOLVER, typename MEMBER, typename PROPORTION>
+  template <typename MEMBER, typename PROPORTION>
   class Set {
   public:
 
@@ -26,18 +25,6 @@ namespace snt::mat {
     std::string expression;                          ///< String representation of a set
     bool natural;                                    ///< true if set is using natural abundances
     
-    /**
-     * @brief Set class constructor
-     *
-     * @param expr Set string representation
-     * @param nat Indicate if substance atoms should use natural abundance
-     */
-    Set(const std::string& expr, bool nat = true):
-      expression(expr), natural(nat) {
-
-      SOLVER solver;      
-    };
-
     /**
      * @brief Set class constructor
      *
