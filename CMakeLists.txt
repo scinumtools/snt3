@@ -102,10 +102,11 @@ endif()
 # compile libraries and executables
 ###################################
 
-add_subdirectory(src)        # build dip-cpp library
-add_subdirectory(exec)       # build executables
-add_subdirectory(gtest)      # build gtest executable
-add_subdirectory(pybind)     # build Python bindings
+add_subdirectory(src)                  # build dip-cpp library
+add_subdirectory(apps)                 # build executable applications
+add_subdirectory(examples)             # build example applications
+add_subdirectory(tests)                # build gtest executable
+add_subdirectory(bindings/python/cpp)  # build Python bindings
 
 # create include directory
 ##########################

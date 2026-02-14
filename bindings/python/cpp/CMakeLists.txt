@@ -14,7 +14,7 @@ set_target_properties(${MODULE_NAME} PROPERTIES
 
 # register pytests
 function(register_pytests MODULE_DIR)
-file(GLOB_RECURSE PYTEST_FILES "${CMAKE_SOURCE_DIR}/pytest/${MODULE_DIR}/test_*.py")
+file(GLOB_RECURSE PYTEST_FILES "${CMAKE_SOURCE_DIR}/bindings/python/tests/${MODULE_DIR}/test_*.py")
 foreach(TEST_FILE ${PYTEST_FILES})
     get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
     string(REGEX REPLACE "^test_" "" TEST_NAME ${TEST_NAME})
@@ -22,7 +22,7 @@ foreach(TEST_FILE ${PYTEST_FILES})
     add_test(
         NAME ${TEST_FULL_NAME}
         COMMAND ${Python3_EXECUTABLE} -m pytest -v ${TEST_FILE}
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/pytest
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bindings/python/tests
     )
     set_tests_properties(${TEST_FULL_NAME} PROPERTIES DEPENDS ${MODULE_NAME})
 endforeach()
