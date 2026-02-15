@@ -1,4 +1,4 @@
-#include "equal.h"
+#include <snt/exs/comparison/equal.h>
 
 namespace snt::exs {
 

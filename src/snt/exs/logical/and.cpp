@@ -1,4 +1,4 @@
-#include "and.h"
+#include <snt/exs/logical/and.h>
 
 namespace snt::exs {
 

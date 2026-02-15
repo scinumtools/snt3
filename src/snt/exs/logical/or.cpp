@@ -1,4 +1,4 @@
-#include "or.h"
+#include <snt/exs/logical/or.h>
 
 namespace snt::exs {
 

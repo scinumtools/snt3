@@ -1,4 +1,4 @@
-#include "subtract.h"
+#include <snt/exs/math/subtract.h>
 
 namespace snt::exs {
   

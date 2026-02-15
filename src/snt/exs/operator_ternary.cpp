@@ -1,4 +1,4 @@
-#include "operator_ternary.h"
+#include <snt/exs/operator_ternary.h>
 
 namespace snt::exs {
 

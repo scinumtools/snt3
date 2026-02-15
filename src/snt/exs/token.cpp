@@ -1,4 +1,4 @@
-#include "token.h"
+#include <snt/exs/token.h>
 
 namespace snt::exs {
 

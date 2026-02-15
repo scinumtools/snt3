@@ -1,4 +1,4 @@
-#include "power_base.h"
+#include <snt/exs/math/power_base.h>
 
 namespace snt::exs {
 

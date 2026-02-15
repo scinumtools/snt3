@@ -1,4 +1,4 @@
-#include "greater_equal.h"
+#include <snt/exs/comparison/greater_equal.h>
 
 namespace snt::exs {
 

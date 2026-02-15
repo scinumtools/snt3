@@ -1,4 +1,4 @@
-#include "not.h"
+#include <snt/exs/logical/not.h>
 
 namespace snt::exs {
 

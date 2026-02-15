@@ -1,4 +1,4 @@
-#include "atom_grand.h"
+#include <snt/exs/atom_grand.h>
 
 #include <iostream>
 

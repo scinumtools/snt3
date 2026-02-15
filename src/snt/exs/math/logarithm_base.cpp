@@ -1,4 +1,4 @@
-#include "logarithm_base.h"
+#include <snt/exs/math/logarithm_base.h>
 
 namespace snt::exs {
 

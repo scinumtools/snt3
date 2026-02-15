@@ -1,4 +1,4 @@
-#include "logarithm.h"
+#include <snt/exs/math/logarithm.h>
 
 namespace snt::exs {
 

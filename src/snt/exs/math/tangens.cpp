@@ -1,4 +1,4 @@
-#include "tangens.h"
+#include <snt/exs/math/tangens.h>
 
 namespace snt::exs {
 

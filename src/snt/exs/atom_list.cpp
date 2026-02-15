@@ -1,4 +1,4 @@
-#include "atom_list.h"
+#include <snt/exs/atom_list.h>
 
 namespace snt::exs {
 

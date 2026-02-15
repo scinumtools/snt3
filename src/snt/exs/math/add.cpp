@@ -1,4 +1,4 @@
-#include "add.h"
+#include <snt/exs/math/add.h>
 
 namespace snt::exs {
 

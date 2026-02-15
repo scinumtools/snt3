@@ -1,4 +1,4 @@
-#include "cosinus.h"
+#include <snt/exs/math/cosinus.h>
 
 namespace snt::exs {
 

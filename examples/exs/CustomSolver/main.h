@@ -1,4 +1,4 @@
-#include "snt/exs.h"
+#include <snt/exs/solver.h>
 
 #include <variant>
 

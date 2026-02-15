@@ -1,4 +1,4 @@
-#include "condition.h"
+#include <snt/exs/branching/condition.h>
 
 namespace snt::exs {
 

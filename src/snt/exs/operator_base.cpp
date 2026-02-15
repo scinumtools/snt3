@@ -1,4 +1,4 @@
-#include "operator_base.h"
+#include <snt/exs/operator_base.h>
 
 namespace snt::exs {
 

@@ -1,4 +1,4 @@
-#include "multiply.h"
+#include <snt/exs/math/multiply.h>
 
 namespace snt::exs {
 

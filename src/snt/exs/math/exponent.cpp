@@ -1,4 +1,4 @@
-#include "exponent.h"
+#include <snt/exs/math/exponent.h>
 
 namespace snt::exs {
 

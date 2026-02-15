@@ -108,31 +108,6 @@ add_subdirectory(examples)             # build example applications
 add_subdirectory(tests)                # build gtest executable
 add_subdirectory(bindings/python/cpp)  # build Python bindings
 
-# create include directory
-##########################
-
-file(GLOB_RECURSE PROJECT_HEADERS "${CMAKE_SOURCE_DIR}/src/*.h")
-
-set(HEADER_OUTPUT_DIR "${CMAKE_BINARY_DIR}/include")
-
-foreach(header ${PROJECT_HEADERS})
-    # Strip "src/" prefix from path
-    file(RELATIVE_PATH rel_path "${CMAKE_SOURCE_DIR}/src" "${header}")
-    set(dest "${HEADER_OUTPUT_DIR}/${rel_path}")
-    get_filename_component(dest_dir "${dest}" DIRECTORY)
-
-    add_custom_command(
-        OUTPUT "${dest}"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${dest_dir}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${header}" "${dest}"
-        DEPENDS "${header}"
-        COMMENT "Copying ${header} -> ${dest}"
-    )
-    list(APPEND COPIED_HEADERS "${dest}")
-endforeach()
-
-add_custom_target(copy_headers ALL DEPENDS ${COPIED_HEADERS})
-
 # create cmake export files
 ###########################
 

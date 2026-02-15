@@ -1,4 +1,4 @@
-#include "sinus.h"
+#include <snt/exs/math/sinus.h>
 
 namespace snt::exs {
 

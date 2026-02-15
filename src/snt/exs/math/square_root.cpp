@@ -1,4 +1,4 @@
-#include "square_root.h"
+#include <snt/exs/math/square_root.h>
 
 namespace snt::exs {
 

@@ -1,4 +1,4 @@
-#include "divide.h"
+#include <snt/exs/math/divide.h>
 
 namespace snt::exs {
 

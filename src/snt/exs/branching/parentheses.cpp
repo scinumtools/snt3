@@ -1,4 +1,4 @@
-#include "parentheses.h"
+#include <snt/exs/branching/parentheses.h>
 
 namespace snt::exs {
 

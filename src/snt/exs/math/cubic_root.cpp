@@ -1,4 +1,4 @@
-#include "cubic_root.h"
+#include <snt/exs/math/cubic_root.h>
 
 namespace snt::exs {
 

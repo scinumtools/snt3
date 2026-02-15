@@ -1,4 +1,4 @@
-#include "modulo.h"
+#include <snt/exs/math/modulo.h>
 
 namespace snt::exs {
 
