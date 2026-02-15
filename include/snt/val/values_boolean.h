@@ -1,7 +1,7 @@
 #ifndef VAL_VALUES_BOOLEAN_H
 #define VAL_VALUES_BOOLEAN_H
 
-#include "values_array.h"
+#include <snt/val/values_array.h>
 
 #include <typeinfo>
 

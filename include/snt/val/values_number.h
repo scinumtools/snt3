@@ -1,7 +1,7 @@
 #ifndef VAL_VALUES_NUMBER_H
 #define VAL_VALUES_NUMBER_H
 
-#include "values_array.h"
+#include <snt/val/values_array.h>
 
 #include <typeinfo>
 

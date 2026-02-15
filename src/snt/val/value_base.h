@@ -1,9 +1,9 @@
 #ifndef VAL_BASE_VALUE_H
 #define VAL_BASE_VALUE_H
 
-#include "../settings.h"
-#include "../string_format.h"
-#include "array.h"
+#include <snt/settings.h>
+#include <snt/string_format.h>
+#include <snt/val/array.h>
 #include "datatypes.h"
 
 #include <algorithm>
