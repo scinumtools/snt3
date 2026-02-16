@@ -10,7 +10,7 @@ set +a
 DIR_ROOT=$(pwd)
 
 NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
-NUM_MAKE_CORES=$NUM_SYSTEM_CORES
+NUM_MAKE_CORES=1 #$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release
 ENABLE_CLANG_TIDY=OFF
 
@@ -27,12 +27,12 @@ CMAKE_FLAGS=(
   -DENABLE_VAL_GTEST=ON
   -DENABLE_VAL_PYTEST=ON
 
-  -DENABLE_PUQ=OFF
+  -DENABLE_PUQ=ON
   -DENABLE_PUQ_GTEST=ON
   -DENABLE_PUQ_PYTEST=ON
   -DENABLE_PUQ_MAGNITUDE=value
 
-  -DENABLE_DIP=OFF
+  -DENABLE_DIP=ON
   -DENABLE_DIP_GTEST=ON
   -DENABLE_DIP_PYTEST=ON
 
@@ -132,9 +132,11 @@ function grep_code {
 
 function setup_clang_format {
     find src -name '*.cpp' -o -name '*.h' | xargs clang-format -i
-    find exec -name '*.cpp' -o -name '*.h' | xargs clang-format -i
-    find gtest -name '*.cpp' -o -name '*.h' | xargs clang-format -i
-    find pybind -name '*.cpp' -o -name '*.h' | xargs clang-format -i
+    find apps -name '*.cpp' -o -name '*.h' | xargs clang-format -i
+    find tests -name '*.cpp' -o -name '*.h' | xargs clang-format -i
+    find include -name '*.cpp' -o -name '*.h' | xargs clang-format -i
+    find examples -name '*.cpp' -o -name '*.h' | xargs clang-format -i
+    find bindings/python/cpp -name '*.cpp' -o -name '*.h' | xargs clang-format -i
 }
 
 function refactor_code {

@@ -1,9 +1,9 @@
-#include "converter.h"
+#include <snt/puq/converter.h>
 
-#include "nostd/exp.h"
-#include "nostd/log.h"
-#include "nostd/log10.h"
-#include "nostd/pow.h"
+#include <snt/puq/nostd/exp.h>
+#include <snt/puq/nostd/log.h>
+#include <snt/puq/nostd/log10.h>
+#include <snt/puq/nostd/pow.h>
 
 #include <iostream>
 #include <set>

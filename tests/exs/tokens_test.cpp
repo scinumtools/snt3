@@ -1,4 +1,7 @@
 #include "pch_tests.h"
+#include <snt/exs/token.h>
+#include <snt/exs/operator_list.h>
+#include <snt/exs/token_list.h>
 
 using namespace snt;
 

@@ -1,4 +1,6 @@
 #include "pch_tests.h"
+#include <snt/puq/solver/unit_solver.h>
+#include <snt/puq/solver/unit_atom.h>
 
 using namespace snt;
 

@@ -1,4 +1,6 @@
 #include "pch_tests.h"
+#include <snt/exs/atom.h>
+#include <snt/exs/solver.h>
 
 #include <memory>
 

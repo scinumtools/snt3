@@ -3,7 +3,12 @@ file(GLOB EXEC_FILES "./*.cpp" "./**/*.cpp")
 set(EXEC_NAME dmap)
 
 add_executable(${EXEC_NAME} ${EXEC_FILES} )
-target_include_directories(${EXEC_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_include_directories(${EXEC_NAME}
+  PRIVATE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+)
+
 target_link_libraries(${EXEC_NAME} PRIVATE snt-puq)
 
 set_target_properties(${EXEC_NAME} PROPERTIES

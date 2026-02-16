@@ -1,8 +1,8 @@
-#include "quantity.h"
+#include <snt/puq/quantity.h>
 
-#include "converter.h"
-#include "exceptions.h"
-#include "unit_format.h"
+#include <snt/puq/converter.h>
+#include <snt/puq/exceptions.h>
+#include <snt/puq/unit_format.h>
 
 #include <iostream>
 

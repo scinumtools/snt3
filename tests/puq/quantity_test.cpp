@@ -1,4 +1,6 @@
 #include "pch_tests.h"
+#include <snt/puq/quantity.h>
+#include <snt/puq/converter.h>
 
 #include <sstream>
 

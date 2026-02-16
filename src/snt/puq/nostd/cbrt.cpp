@@ -1,4 +1,4 @@
-#include "cbrt.h"
+#include <snt/puq/nostd/cbrt.h>
 
 namespace snt::nostd {
 

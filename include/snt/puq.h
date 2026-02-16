@@ -1,12 +1,8 @@
 #ifndef PCH_PUQ_H
 #define PCH_PUQ_H
 
-#include "puq/calc/calculator.h"
-#include "puq/lists.h"
-#include "puq/nostd/pow.h"
-#include "puq/nostd/to_string.h"
-#include "puq/quantity.h"
-#include "puq/systems/systems.h"
-#include "puq/util/data_table.h"
+#include <vector>
+#include <map>
+#include <string>
 
 #endif // PCH_PUQ_H

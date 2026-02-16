@@ -1,10 +1,10 @@
-#include "unit_value.h"
+#include <snt/puq/value/unit_value.h>
 
-#include "../converter.h"
-#include "../exceptions.h"
-#include "../nostd/log10.h"
-#include "../nostd/pow.h"
-#include "../solver/unit_solver.h"
+#include <snt/puq/converter.h>
+#include <snt/puq/exceptions.h>
+#include <snt/puq/nostd/log10.h>
+#include <snt/puq/nostd/pow.h>
+#include <snt/puq/solver/unit_solver.h>
 
 #include <iostream>
 #include <memory>

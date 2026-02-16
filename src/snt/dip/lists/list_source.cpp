@@ -1,4 +1,4 @@
-#include "list_source.h"
+#include <snt/dip/lists/list_source.h>
 
 #include <stdexcept>
 

@@ -1,4 +1,4 @@
-#include "magnitude.h"
+#include <snt/puq/magnitude.h>
 
 #include <algorithm>
 #include <cmath>

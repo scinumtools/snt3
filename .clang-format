@@ -11,15 +11,9 @@ PointerAlignment: Left
 SortIncludes: true
 IncludeBlocks: Regroup  
 IncludeCategories:
-  - Regex: '^"exs/.*"$'   # project headers
+  - Regex: '^<(exs|val|puq|dip|mat)/.*>$'   # project headers
     Priority: 1
-  - Regex: '^"val/.*"$'
-    Priority: 1
-  - Regex: '^"puq/.*"$'
-    Priority: 1
-  - Regex: '^"dip/.*"$'
-    Priority: 1
-  - Regex: '^"mat/.*"$'
+  - Regex: '^"(exs|val|puq|dip|mat)/.*"$'   # project headers
     Priority: 1
   - Regex: '^".*"$'       # local headers
     Priority: 2

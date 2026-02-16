@@ -1,6 +1,5 @@
-#include "calculator_atom.h"
-
-#include "../exceptions.h"
+#include <snt/puq/calc/calculator_atom.h>
+#include <snt/puq/exceptions.h>
 
 #include <algorithm>
 #include <regex>

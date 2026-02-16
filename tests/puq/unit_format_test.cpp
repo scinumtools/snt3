@@ -1,4 +1,10 @@
 #include "pch_tests.h"
+#include <snt/puq/unit_format.h>
+#include <snt/puq/exponent.h>
+#include <snt/puq/value/dimensions.h>
+#include <snt/puq/value/base_units.h>
+#include <snt/puq/value/unit_value.h>
+#include <snt/puq/quantity.h>
 
 using namespace snt;
 

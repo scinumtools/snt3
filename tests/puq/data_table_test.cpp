@@ -1,4 +1,5 @@
 #include "pch_tests.h"
+#include <snt/puq/util/data_table.h>
 
 #include <sstream>
 

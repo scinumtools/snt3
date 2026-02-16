@@ -1,4 +1,4 @@
-#include "exp.h"
+#include <snt/puq/nostd/exp.h>
 
 namespace snt::nostd {
 

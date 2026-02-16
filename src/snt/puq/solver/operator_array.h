@@ -1,9 +1,9 @@
 #ifndef PUQ_OPERATOR_ARRAY_H
 #define PUQ_OPERATOR_ARRAY_H
 
-#include "../../exs.h"
-#include "../settings.h"
-#include "unit_atom.h"
+#include <snt/exs/operator_group.h>
+#include <snt/puq/settings.h>
+#include <snt/puq/solver/unit_atom.h>
 
 namespace snt::puq {
 

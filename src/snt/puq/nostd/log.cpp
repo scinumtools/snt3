@@ -1,6 +1,6 @@
-#include "log.h"
+#include <snt/puq/nostd/log.h>
 
-#include "../exponent.h"
+#include <snt/puq/exponent.h>
 
 namespace snt::nostd {
 

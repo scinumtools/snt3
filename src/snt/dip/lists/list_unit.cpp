@@ -1,6 +1,6 @@
-#include "list_unit.h"
+#include <snt/dip/lists/list_unit.h>
 
-#include "../environment.h"
+#include <snt/dip/environment.h>
 
 #include <stdexcept>
 

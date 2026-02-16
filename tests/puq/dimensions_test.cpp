@@ -1,4 +1,5 @@
 #include "pch_tests.h"
+#include <snt/puq/value/dimensions.h>
 
 using namespace snt;
 

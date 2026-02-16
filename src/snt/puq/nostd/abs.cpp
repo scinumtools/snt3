@@ -1,4 +1,4 @@
-#include "abs.h"
+#include <snt/puq/nostd/abs.h>
 
 namespace snt::nostd {
 

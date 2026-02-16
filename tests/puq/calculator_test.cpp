@@ -1,4 +1,6 @@
 #include "pch_tests.h"
+#include <snt/puq/calc/calculator.h>
+#include <snt/puq/exceptions.h>
 
 using namespace snt;
 

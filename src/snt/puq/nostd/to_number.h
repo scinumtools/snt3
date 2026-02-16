@@ -1,7 +1,7 @@
 #ifndef NOSTD_TO_NUMBER_H
 #define NOSTD_TO_NUMBER_H
 
-#include "nostd.h"
+#include <snt/puq/nostd/nostd.h>
 
 namespace snt::nostd {
 

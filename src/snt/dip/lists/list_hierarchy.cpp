@@ -1,4 +1,4 @@
-#include "list_hierarchy.h"
+#include <snt/dip/lists/list_hierarchy.h>
 
 #include <iostream>
 #include <sstream>

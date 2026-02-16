@@ -1,9 +1,9 @@
-#include "dip.h"
+#include <snt/dip/dip.h>
 
-#include "nodes/node_property.h"
-#include "nodes/node_value.h"
+#include <snt/dip/nodes/node_property.h>
+#include <snt/dip/nodes/node_value.h>
 #include "parsers.h"
-#include "settings.h"
+#include <snt/dip/settings.h>
 
 #include <fstream>
 #include <iostream>

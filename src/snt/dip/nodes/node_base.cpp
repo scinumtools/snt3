@@ -1,4 +1,4 @@
-#include "node_base.h"
+#include <snt/dip/nodes/node_base.h>
 
 #include <sstream>
 

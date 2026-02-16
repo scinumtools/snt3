@@ -1,4 +1,4 @@
-#include "node.h"
+#include <snt/dip/nodes/node.h>
 
 #include <sstream>
 #include <tuple>

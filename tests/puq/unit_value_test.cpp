@@ -1,4 +1,9 @@
 #include "pch_tests.h"
+#include <snt/puq/value/unit_value.h>
+#include <snt/puq/value/base_units.h>
+#include <snt/puq/value/dimensions.h>
+#include <snt/puq/converter.h>
+#include <snt/puq/exceptions.h>
 
 using namespace snt;
 

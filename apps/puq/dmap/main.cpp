@@ -1,4 +1,8 @@
-#include "snt/puq.h"
+#include <snt/puq/value/dimensions.h>
+#include <snt/puq/nostd/to_string.h>
+#include <snt/puq/nostd/pow.h>
+#include <snt/puq/solver/unit_solver.h>
+#include <snt/puq/systems/unit_system.h>
 
 #include <chrono>
 #include <ctime>

@@ -1,4 +1,4 @@
-#include "max.h"
+#include <snt/puq/nostd/max.h>
 
 namespace snt::nostd {
 

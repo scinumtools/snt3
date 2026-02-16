@@ -1,4 +1,5 @@
 #include "pch_tests.h"
+#include <snt/exs/expression.h>
 
 using namespace snt;
 

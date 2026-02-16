@@ -5,8 +5,16 @@ set(EXEC_NAME snt-puq)
 add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
 target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-val)
 
+target_include_directories(${EXEC_NAME}
+  PUBLIC	
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+  PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+)
+
 if(NOT ENABLE_CLANG_TIDY)
-target_precompile_headers(${EXEC_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/nostd/nostd.h" "${CMAKE_CURRENT_SOURCE_DIR}/../puq.h" INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/../puq.h")
+target_precompile_headers(${EXEC_NAME} PRIVATE <snt/puq/nostd/nostd.h> INTERFACE <snt/puq.h>)
 endif()
 
 set_target_properties(${EXEC_NAME} PROPERTIES

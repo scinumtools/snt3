@@ -1,7 +1,7 @@
 #ifndef DIP_PARSERS_H
 #define DIP_PARSERS_H
 
-#include "lists/list_source.h"
+#include <snt/dip/lists/list_source.h>
 
 #include <queue>
 

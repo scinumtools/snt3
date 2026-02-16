@@ -1,7 +1,7 @@
-#include "dimensions.h"
+#include <snt/puq/value/dimensions.h>
 
-#include "../nostd/to_string.h"
-#include "../settings.h"
+#include <snt/puq/nostd/to_string.h>
+#include <snt/puq/settings.h>
 
 #include <algorithm>
 #include <iomanip>

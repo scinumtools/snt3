@@ -1,4 +1,4 @@
-#include "datatypes.h"
+#include <snt/val/datatypes.h>
 
 namespace snt::val {
 

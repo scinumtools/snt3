@@ -1,4 +1,4 @@
-#include "log10.h"
+#include <snt/puq/nostd/log10.h>
 
 namespace snt::nostd {
 

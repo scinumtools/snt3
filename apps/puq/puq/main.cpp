@@ -1,4 +1,6 @@
 #include "main.h"
+#include <snt/puq/calc/calculator.h>
+#include <snt/puq/lists.h>
 
 #include <deque>
 #include <iostream>

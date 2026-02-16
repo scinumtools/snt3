@@ -1,10 +1,10 @@
-#include "base_units.h"
+#include <snt/puq/value/base_units.h>
 
-#include "../exceptions.h"
-#include "../nostd/pow.h"
-#include "../nostd/to_string.h"
-#include "../settings.h"
-#include "../solver/unit_solver.h"
+#include <snt/puq/exceptions.h>
+#include <snt/puq/nostd/pow.h>
+#include <snt/puq/nostd/to_string.h>
+#include <snt/puq/settings.h>
+#include <snt/puq/solver/unit_solver.h>
 
 #include <fstream>
 #include <iostream>

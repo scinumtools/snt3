@@ -1,6 +1,6 @@
-#include "list_branching.h"
+#include <snt/dip/lists/list_branching.h>
 
-#include "../nodes/node_case.h"
+#include <snt/dip/nodes/node_case.h>
 
 #include <regex>
 

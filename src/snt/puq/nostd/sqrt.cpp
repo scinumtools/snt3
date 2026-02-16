@@ -1,4 +1,4 @@
-#include "sqrt.h"
+#include <snt/puq/nostd/sqrt.h>
 
 namespace snt::nostd {
 

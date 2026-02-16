@@ -1,4 +1,8 @@
 #include "pch_tests.h"
+#include <snt/puq/quantity.h>
+#include <snt/puq/systems/unit_system.h>
+#include <snt/puq/exceptions.h>
+#include <snt/puq/converter.h>
 
 using namespace snt;
 

@@ -1,9 +1,9 @@
-#include "nostd/to_string.h"
-#include "systems/systems.h"
-#include "systems/unit_system.h"
-#include "util/data_table.h"
-#include "value/dimensions.h"
-#include "value/unit_value.h"
+#include <snt/puq/nostd/to_string.h>
+#include <snt/puq/systems/systems.h>
+#include <snt/puq/systems/unit_system.h>
+#include <snt/puq/util/data_table.h>
+#include <snt/puq/value/dimensions.h>
+#include <snt/puq/value/unit_value.h>
 
 #include <iomanip>
 #include <iostream>

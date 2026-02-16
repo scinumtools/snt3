@@ -1,4 +1,4 @@
-#include "exponent.h"
+#include <snt/puq/exponent.h>
 
 #include <numeric>
 #include <sstream>

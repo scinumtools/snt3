@@ -3,7 +3,12 @@ file(GLOB TEST_FILES "*.cpp")
 set(EXEC_NAME gtest-val)
 
 add_executable(${EXEC_NAME} ${TEST_FILES})
-target_include_directories(${EXEC_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_include_directories(${EXEC_NAME}
+  PRIVATE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+)
+
 target_link_libraries(${EXEC_NAME} PRIVATE GTest::gtest_main snt-val)
 
 if(NOT ENABLE_CLANG_TIDY)
@@ -14,7 +19,6 @@ set_target_properties(${EXEC_NAME} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
-gtest_discover_tests(${EXEC_NAME} TEST_PREFIX gtest.val.)
 gtest_discover_tests(${EXEC_NAME}
   TEST_PREFIX gtest.val.
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

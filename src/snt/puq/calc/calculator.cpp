@@ -1,4 +1,4 @@
-#include "calculator.h"
+#include <snt/puq/calc/calculator.h>
 
 #include <memory>
 #include <regex>

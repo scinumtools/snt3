@@ -59,7 +59,7 @@ namespace snt::val {
       } else
         throw std::runtime_error("ArrayValue could not be initialized from the given BaseValue.");
     };
-
+    
     /**
      * @brief Create unique pointer from a vector of values
      *

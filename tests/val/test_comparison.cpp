@@ -1,4 +1,6 @@
 #include "pch_tests.h"
+#include <snt/val/value_base.h>
+#include <snt/val/values_boolean.h>
 
 using namespace snt;
 

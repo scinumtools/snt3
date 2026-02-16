@@ -1,4 +1,7 @@
 #include "pch_tests.h"
+#include <snt/puq/systems/unit_system.h>
+#include <snt/puq/value/dimensions.h>
+#include <snt/puq/value/unit_value.h>
 
 #include <set>
 
