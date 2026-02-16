@@ -1,7 +1,7 @@
 #ifndef DIP_NODE_FLOAT_H
 #define DIP_NODE_FLOAT_H
 
-#include "node_value.h"
+#include <snt/dip/nodes/node_value.h>
 
 namespace snt::dip {
 

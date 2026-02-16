@@ -42,16 +42,12 @@ TEST(UnitValue, Initialization) {
   EXPECT_EQ(ss.str(), "3*km*s-1");
 }
 
-#if defined(MAGNITUDE_VALUES)
-
 TEST(UnitValue, Size) {
 
   val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5});
   puq::UnitValue uv(std::move(val));
   EXPECT_EQ(uv.size(), 4);
 }
-
-#endif
 
 TEST(UnitValue, RebasePrefixes) {
 
@@ -117,8 +113,6 @@ TEST(UnitValue, RebaseDimensions) {
   EXPECT_THROW(value.rebase_dimensions(), puq::UnitValueExcept);
 }
 
-#ifdef EXPONENT_FRACTIONS
-
 TEST(UnitValue, InitializationFractions) {
 
   puq::UnitValue value1 = {3.34e3, {{"k", "m", -1, 2}}};
@@ -131,10 +125,6 @@ TEST(UnitValue, InitializationFractions) {
   puq::UnitValue value3(3, bu);
   EXPECT_EQ(value3.to_string(), "3*km-1:2*s-2");
 }
-
-#endif
-
-#ifdef MAGNITUDE_ERRORS
 
 TEST(UnitValue, InitializationErrors) {
 
@@ -156,8 +146,6 @@ TEST(UnitValue, InitializationErrors) {
 
 #endif
 }
-
-#endif
 
 TEST(UnitValue, UnitConversion) {
 

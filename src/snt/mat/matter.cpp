@@ -1,4 +1,4 @@
-#include "matter.h"
+#include <snt/mat/matter.h>
 
 namespace snt::mat {
   

@@ -1,5 +1,6 @@
 #include "fixtures.h"
 #include "pch_tests.h"
+#include <snt/dip/dip.h>
 
 using namespace snt;
 

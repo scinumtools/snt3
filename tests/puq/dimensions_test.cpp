@@ -20,8 +20,6 @@ TEST(Dimensions, Initialization) {
   EXPECT_EQ(ss.str(), "2*g*s2");
 }
 
-#ifdef MAGNITUDE_ERRORS
-
 TEST(Dimensions, InitializationErrors) {
 
   puq::Dimensions d(2.34, 0.23);
@@ -31,10 +29,6 @@ TEST(Dimensions, InitializationErrors) {
   EXPECT_EQ(d.to_string(), "2.34(23)*g*s2*K3*A4*cd5*mol6*rad7");
 }
 
-#endif
-
-#ifdef EXPONENT_FRACTIONS
-
 TEST(Dimensions, InitializationFractions) {
 
   puq::Dimensions d(2.34, {1, {1, -2}, 0, 0, 0, 0, 0, 0});
@@ -43,8 +37,6 @@ TEST(Dimensions, InitializationFractions) {
   d = puq::Dimensions(2.34, puq::BaseDimensions({puq::Exponent(3, 2), {1, -2}, 0, 0, 0, 0, 0, 0}));
   EXPECT_EQ(d.to_string(), "2.34*m3:2*g-1:2");
 }
-
-#endif
 
 TEST(Dimensions, Comparison) {
 

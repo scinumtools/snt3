@@ -1,9 +1,9 @@
 #ifndef MAT_ELEMENT_H
 #define MAT_ELEMENT_H
 
-#include "periodic_table.h"
-#include "part.h"
-#include "matter.h"
+#include <snt/mat/periodic_table.h>
+#include <snt/mat/part.h>
+#include <snt/mat/matter.h>
 
 namespace snt::mat {
 

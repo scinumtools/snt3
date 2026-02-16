@@ -1,9 +1,9 @@
-#include "node_boolean.h"
+#include <snt/dip/nodes/node_boolean.h>
 
-#include "../environment.h"
+#include <snt/dip/environment.h>
 #include "../parsers.h"
-#include "../solvers/solver_logical.h"
-#include "node_value.h"
+#include <snt/dip/solvers/solver_logical.h>
+#include <snt/dip/nodes/node_value.h>
 
 #include <stdexcept>
 

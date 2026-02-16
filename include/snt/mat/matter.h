@@ -1,7 +1,7 @@
 #ifndef MAT_MATTER_H
 #define MAT_MATTER_H
 
-#include "../puq.h"
+#include <snt/puq/quantity.h>
 
 namespace snt::mat {
 

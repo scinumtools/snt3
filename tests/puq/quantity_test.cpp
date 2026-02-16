@@ -44,7 +44,6 @@ TEST(Quantity, Initialization) {
   EXPECT_EQ(ss.str(), "34*J");
 }
 
-#ifdef MAGNITUDE_ERRORS
 TEST(Quantity, InitializationErrors) {
 
   puq::Quantity q(1.23, 0.01); // magnitudes with errors
@@ -76,9 +75,7 @@ TEST(Quantity, InitializationErrors) {
 
 #endif
 }
-#endif
 
-#if defined(MAGNITUDE_VALUES)
 TEST(Quantity, InitializationArrays) {
 
   puq::Quantity q("[2,3.4,5e6]*km/s"); // unit expression
@@ -100,9 +97,6 @@ TEST(Quantity, InitializationArrays) {
     EXPECT_EQ(q.to_string(), "[2, 3.4, 5e6]*C4*m4*J-3");
   }
 }
-#endif
-
-#if defined(MAGNITUDE_VALUES)
 
 TEST(Quantity, Size) {
 
@@ -119,8 +113,6 @@ TEST(Quantity, Shape) {
   puq::Quantity q(std::move(val));
   EXPECT_EQ(q.shape(), shape);
 }
-
-#endif
 
 TEST(Quantity, UnitConversion) {
 
@@ -274,12 +266,9 @@ TEST(Quantity, RebaseUnits) {
   EXPECT_EQ(q.to_string(), "2.20967e-31*kph-1*s2");
 }
 
-#if defined(MAGNITUDE_VALUES)
-
 TEST(Quantity, Cloning) {
 
   puq::Quantity q("23*cm*m2*kg*mg");
   puq::Quantity::PointerType r = q.clone();
   EXPECT_EQ(q.to_string(), "23*cm*m2*kg*mg");
 }
-#endif

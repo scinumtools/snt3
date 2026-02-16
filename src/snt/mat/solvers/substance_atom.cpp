@@ -1,4 +1,4 @@
-#include "substance_atom.h"
+#include <snt/mat/solvers/substance_atom.h>
 
 #include <sstream>
 

@@ -39,8 +39,6 @@ TEST(UnitAtom, FromString) {
   EXPECT_EQ(value.to_string(), "cm-2"); // negative exponents
 }
 
-#ifdef MAGNITUDE_ERRORS
-
 TEST(UnitAtom, FromStringErrors) {
 
   puq::UnitValue value = puq::UnitAtom::from_string("1.2345(67)"); // without exponent
@@ -62,10 +60,6 @@ TEST(UnitAtom, FromStringErrors) {
   EXPECT_EQ(value.to_string(), "1.22(23)e5");
 }
 
-#endif
-
-#ifdef EXPONENT_FRACTIONS
-
 TEST(UnitAtom, FromStringFractions) {
 
   puq::UnitValue value = puq::UnitAtom::from_string("kg4:2");
@@ -74,8 +68,6 @@ TEST(UnitAtom, FromStringFractions) {
   value = puq::UnitAtom::from_string("kg-2:3");
   EXPECT_EQ(value.to_string(), "kg-2:3"); // full fractions
 }
-
-#endif
 
 TEST(UnitAtom, Arithmetics) {
 
@@ -89,8 +81,6 @@ TEST(UnitAtom, Arithmetics) {
   EXPECT_EQ(a1.value.to_string(), "6*ab");
 }
 
-#ifdef EXPONENT_FRACTIONS
-
 TEST(UnitAtom, ArithmeticsFractions) {
 
   puq::UnitAtom a1({6.0, {{"c", "m", 1, 2}}});
@@ -102,5 +92,3 @@ TEST(UnitAtom, ArithmeticsFractions) {
   a1.math_divide(&a2); // Atom division: 18 / 3 = 6
   EXPECT_EQ(a1.value.to_string(), "6*cm1:2");
 }
-
-#endif

@@ -1,6 +1,5 @@
 #include "pch_tests.h"
-
-#ifdef MAGNITUDE_ERRORS
+#include <snt/puq/magnitude.h>
 
 using namespace snt;
 
@@ -46,8 +45,6 @@ TEST(Magnitude, ErrorConversion) {
   EXPECT_EQ(puq::Magnitude::rel_to_abs(30, 20), 6); // 30*20% = 30/5 = 6
 }
 
-#if defined(MAGNITUDE_VALUES)
-
 TEST(Magnitude, Size) {
 
   puq::Magnitude m(val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5}));
@@ -66,8 +63,6 @@ TEST(Magnitude, ErrorConversionArrays) {
                                  val::ArrayValue<double>::pointer_from_vector({20, 10}));
   EXPECT_EQ(a->to_string(), "[6, 2]");
 }
-
-#endif
 
 TEST(Magnitude, ArithmeticsAdd) {
 
@@ -175,8 +170,6 @@ TEST(Magnitude, Comparison) {
   EXPECT_EQ(a != b, true);
 }
 
-#if defined(MAGNITUDE_VALUES)
-
 TEST(Magnitude, Arrays) {
 
   puq::Magnitude m1, m2, m3;
@@ -189,7 +182,3 @@ TEST(Magnitude, Arrays) {
                       val::ArrayValue<double>::pointer_from_vector({0.1, 0.2, 0.3}));
   EXPECT_EQ(m1.to_string(), "[1.210(10)e1, 2.220(20)e1, 3.230(30)e1]");
 }
-
-#endif
-
-#endif // MAGNITUDE_ERRORS

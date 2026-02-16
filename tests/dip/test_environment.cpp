@@ -1,4 +1,6 @@
 #include "pch_tests.h"
+#include <snt/dip/dip.h>
+#include <snt/dip/environment.h>
 
 using namespace snt;
 

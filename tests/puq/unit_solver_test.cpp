@@ -38,8 +38,6 @@ TEST(UnitSolver, Solve) {
   EXPECT_EQ(atom.value.to_string(), "kg*<v>2");
 }
 
-#ifdef EXPONENT_FRACTIONS
-
 TEST(UnitSolver, SolveFractions) {
 
   puq::UnitSolver solver;
@@ -55,10 +53,6 @@ TEST(UnitSolver, SolveFractions) {
   atom = solver.solve("(kg3*s4/(m2*K))1:2"); // nested parentheses with an exponent
   EXPECT_EQ(atom.value.to_string(), "kg3:2*s2*m-1*K-1:2");
 }
-
-#endif
-
-#if defined(MAGNITUDE_VALUES)
 
 TEST(UnitSolver, SolveArrays) {
 
@@ -76,10 +70,6 @@ TEST(UnitSolver, SolveArrays) {
   EXPECT_EQ(atom.value.to_string(), "[40, 121.5]");
 }
 
-#endif
-
-#ifdef MAGNITUDE_ERRORS
-
 TEST(UnitSolver, SolveErrors) {
 
   puq::UnitSolver solver;
@@ -91,5 +81,3 @@ TEST(UnitSolver, SolveErrors) {
   puq::Dimensions dim = atom.value.baseunits.dimensions();
   EXPECT_EQ(dim.to_string(), "1.67262192595(52)e-24*g");
 }
-
-#endif

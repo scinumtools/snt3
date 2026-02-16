@@ -1,4 +1,5 @@
 #include "pch_tests.h"
+#include <snt/dip/dip.h>
 
 #include <iostream>
 #include <limits>

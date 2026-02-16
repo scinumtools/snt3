@@ -1,4 +1,5 @@
 #include "pch_tests.h"
+#include <snt/mat/substance.h>
 
 using namespace snt;
 

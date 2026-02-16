@@ -1,11 +1,11 @@
 #ifndef MAT_SUBSTANCE_H
 #define MAT_SUBSTANCE_H
 
-#include "element.h"
-#include "part.h"
-#include "set.h"
-#include "matter.h"
-#include "solvers/substance_solver.h"
+#include <snt/mat/element.h>
+#include <snt/mat/part.h>
+#include <snt/mat/set.h>
+#include <snt/mat/matter.h>
+#include <snt/mat/solvers/substance_solver.h>
 
 namespace snt::mat {
 

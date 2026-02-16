@@ -14,8 +14,6 @@ using namespace snt;
 // test from https://www.quora.com/How-does-one-calculate-uncertainty-in-an-exponent
 // and checked using http://www.julianibus.de/ online calculator
 
-#ifdef MAGNITUDE_ERRORS
-
 TEST(NoSTD, UnitValueMath) {
 
   puq::UnitValue uv1, uv2, uv3;
@@ -73,5 +71,3 @@ TEST(NoSTD, MagnitudeMath) {
   m3 = nostd::max(m1, m2);
   EXPECT_EQ(m3.to_string(), "4.36(16)");
 }
-
-#endif

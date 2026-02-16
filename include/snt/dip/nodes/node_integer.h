@@ -1,7 +1,7 @@
 #ifndef DIP_NODE_INTEGER_H
 #define DIP_NODE_INTEGER_H
 
-#include "node_value.h"
+#include <snt/dip/nodes/node_value.h>
 
 namespace snt::dip {
 

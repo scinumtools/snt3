@@ -1,6 +1,5 @@
 #include "pch_tests.h"
-
-#ifdef EXPONENT_FRACTIONS
+#include <snt/puq/exponent.h>
 
 using namespace snt;
 
@@ -86,5 +85,3 @@ TEST(Exponent, ArithmeticsFractions) {
   a -= b;
   EXPECT_EQ(a.to_string(), "2:3");
 }
-
-#endif // EXPONENT_FRACTIONS

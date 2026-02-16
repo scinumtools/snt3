@@ -1,6 +1,6 @@
-#include "substance_solver.h"
-#include "../substance.h"
-#include "../settings.h"
+#include <snt/mat/solvers/substance_solver.h>
+#include <snt/mat/substance.h>
+#include <snt/mat/settings.h>
 
 namespace snt::mat {
 

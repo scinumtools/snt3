@@ -1,7 +1,7 @@
 #ifndef DIP_NODE_EMPTY_H
 #define DIP_NODE_EMPTY_H
 
-#include "node_base.h"
+#include <snt/dip/nodes/node_base.h>
 
 namespace snt::dip {
 

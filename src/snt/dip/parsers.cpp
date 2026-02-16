@@ -1,18 +1,18 @@
 #include "parsers.h"
 
-#include "dip.h"
+#include <snt/dip/dip.h>
 #include "helpers.h"
-#include "nodes/node_boolean.h"
-#include "nodes/node_case.h"
+#include <snt/dip/nodes/node_boolean.h>
+#include <snt/dip/nodes/node_case.h>
 #include "nodes/node_empty.h"
-#include "nodes/node_float.h"
+#include <snt/dip/nodes/node_float.h>
 #include "nodes/node_group.h"
 #include "nodes/node_import.h"
-#include "nodes/node_integer.h"
+#include <snt/dip/nodes/node_integer.h>
 #include "nodes/node_modification.h"
 #include "nodes/node_property.h"
 #include "nodes/node_source.h"
-#include "nodes/node_string.h"
+#include <snt/dip/nodes/node_string.h>
 #include "nodes/node_table.h"
 #include "nodes/node_unit.h"
 

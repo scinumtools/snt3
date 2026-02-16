@@ -31,8 +31,6 @@ TEST(BaseUnits, Initialization) {
   EXPECT_EQ(ss.str(), "km*s-1");
 }
 
-#ifdef EXPONENT_FRACTIONS
-
 TEST(BaseUnits, InitializationFractions) {
 
   puq::BaseUnits bus;
@@ -44,8 +42,6 @@ TEST(BaseUnits, InitializationFractions) {
   EXPECT_EQ(bus.size(), 3);
   EXPECT_EQ(bus.to_string(), "kg2*ms3:2*cm");
 }
-
-#endif
 
 TEST(BaseUnits, RemoveZeroExponents) {
 
@@ -64,8 +60,6 @@ TEST(BaseUnits, RemoveZeroExponents) {
   EXPECT_EQ(bus.to_string(), "ms2");
 }
 
-#ifdef EXPONENT_FRACTIONS
-
 TEST(BaseUnits, RemoveZeroExponentsFractions) {
 
   puq::BaseUnits bus;
@@ -82,8 +76,6 @@ TEST(BaseUnits, RemoveZeroExponentsFractions) {
   EXPECT_EQ(bus.size(), 1); // adding unit with a zero exponent
   EXPECT_EQ(bus.to_string(), "ms2");
 }
-
-#endif
 
 TEST(BaseUnits, Dimensions) {
 

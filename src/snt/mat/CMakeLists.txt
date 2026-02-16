@@ -11,7 +11,7 @@ set_target_properties(${EXEC_NAME} PROPERTIES
 )
 
 if(NOT ENABLE_CLANG_TIDY)
-target_precompile_headers(${EXEC_NAME} INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/../mat.h")
+target_precompile_headers(${EXEC_NAME} INTERFACE <snt/mat.h>)
 endif()
 
 # install libraries and executables

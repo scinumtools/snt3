@@ -199,7 +199,6 @@ TEST(Dmaps, DimensionMap) {
   EXPECT_TRUE(it != puq::UnitSystem::Data->DimensionMap.end());
 }
 
-#ifdef MAGNITUDE_ERRORS
 TEST(Dmaps, DimensionMapErrors) {
 
   auto it = puq::UnitSystem::Data->DimensionMap.find("{a_0}");
@@ -207,4 +206,3 @@ TEST(Dmaps, DimensionMapErrors) {
   EXPECT_FLOAT_EQ(it->second.magnitude, 5.2917721e-11);
   EXPECT_FLOAT_EQ(it->second.error, 8.2e-21);
 }
-#endif

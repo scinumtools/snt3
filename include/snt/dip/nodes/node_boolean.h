@@ -1,29 +1,28 @@
-#ifndef DIP_NODE_STRING_H
-#define DIP_NODE_STRING_H
+#ifndef DIP_NODE_BOOLEAN_H
+#define DIP_NODE_BOOLEAN_H
 
-#include "node_value.h"
+#include <snt/dip/nodes/node_base.h>
+#include <snt/dip/nodes/node_value.h>
 
 namespace snt::dip {
 
-  class StringNode : public ValueNode {
+  class BooleanNode : public ValueNode {
     val::BaseValue::PointerType cast_scalar_value(const std::string& value_input) const override;
     val::BaseValue::PointerType cast_array_value(const val::Array::StringType& value_inputs,
                                                  const val::Array::ShapeType& shape) const override;
 
   public:
     static ValueNode::PointerType is_node(Parser& parser);
-    StringNode(const std::string& nm, val::BaseValue::PointerType val)
-        : BaseNode(NodeDtype::String), ValueNode(nm, std::move(val)) {};
-    StringNode(Parser& parser)
-        : BaseNode(parser, NodeDtype::String), ValueNode(val::DataType::String) {};
+    BooleanNode(const std::string& nm, val::BaseValue::PointerType val)
+        : BaseNode(NodeDtype::Boolean), ValueNode(nm, std::move(val)) {};
+    BooleanNode(Parser& parser)
+        : BaseNode(parser, NodeDtype::Boolean), ValueNode(val::DataType::Boolean) {};
     BaseNode::ListType parse(Environment& env) override;
     ValueNode::PointerType clone(const std::string& nm) const override;
-    bool set_property(PropertyType property, val::Array::StringType& values,
-                      std::string& units) override;
-    void validate_format() const override;
+    void validate_options() const override;
     std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override;
   };
 
 } // namespace snt::dip
 
-#endif // DIP_NODE_STRING_H
+#endif // DIP_NODE_BOOLEAN_H

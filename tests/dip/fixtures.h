@@ -2,6 +2,12 @@
 #define GTEST_FIXTURES_H
 
 #include "pch_tests.h"
+#include <snt/val/value_base.h>
+#include <snt/dip/environment.h>
+#include <snt/dip/nodes/node_boolean.h>
+#include <snt/dip/nodes/node_integer.h>
+#include <snt/dip/nodes/node_float.h>
+#include <snt/dip/nodes/node_string.h>
 
 using namespace snt;
 

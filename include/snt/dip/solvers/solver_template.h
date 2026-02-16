@@ -1,9 +1,7 @@
 #ifndef DIP_SOLVER_TEMPLATE_H
 #define DIP_SOLVER_TEMPLATE_H
 
-#include "../../exs.h"
-#include "../../val.h"
-#include "../environment.h"
+#include <snt/dip/environment.h>
 
 #include <string>
 

@@ -1,4 +1,4 @@
-#include "substance.h"
+#include <snt/mat/substance.h>
 
 namespace snt::mat {
 

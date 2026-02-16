@@ -1,6 +1,6 @@
-#include "element.h"
-#include "periodic_table.h"
-#include "../puq.h"
+#include <snt/mat/element.h>
+#include <snt/mat/periodic_table.h>
+#include <snt/puq/quantity.h>
 
 #include <sstream>
 #include <regex>

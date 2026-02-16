@@ -2,7 +2,7 @@
 #define MAT_SUBSTANCE_SOLVER_H
 
 #include "substance_atom.h"
-#include "../../exs.h"
+#include <snt/exs/solver.h>
 #include "../element.h"
 
 namespace snt::mat {

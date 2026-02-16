@@ -1,7 +1,7 @@
 #include "node_unit.h"
 
-#include "../dip.h"
-#include "../environment.h"
+#include <snt/dip/dip.h>
+#include <snt/dip/environment.h>
 #include "../parsers.h"
 
 #include <array>

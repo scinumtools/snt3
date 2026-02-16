@@ -1,9 +1,9 @@
-#include "solver_logical.h"
+#include <snt/dip/solvers/solver_logical.h>
 
-#include "../nodes/node_boolean.h"
-#include "../nodes/node_float.h"
-#include "../nodes/node_integer.h"
-#include "../nodes/node_string.h"
+#include <snt/dip/nodes/node_boolean.h>
+#include <snt/dip/nodes/node_float.h>
+#include <snt/dip/nodes/node_integer.h>
+#include <snt/dip/nodes/node_string.h>
 
 namespace snt::dip {
 

@@ -1,7 +1,7 @@
 #ifndef MAT_MATERIAL_SOLVER_H
 #define MAT_MATERIAL_SOLVER_H
 
-#include "../../exs.h"
+#include <snt/exs/solver.h>
 #include "../substance.h"
 
 namespace snt::mat {

@@ -1,4 +1,4 @@
-#include "parser.h"
+#include <snt/dip/nodes/parser.h>
 
 #include "../helpers.h"
 #include "../parsers.h"

@@ -1,8 +1,8 @@
-#include "node_integer.h"
+#include <snt/dip/nodes/node_integer.h>
 
-#include "../environment.h"
+#include <snt/dip/environment.h>
 #include "../parsers.h"
-#include "../solvers/solver_numerical.h"
+#include <snt/dip/solvers/solver_numerical.h>
 
 namespace snt::dip {
 

@@ -1,4 +1,4 @@
-#include "material_solver.h"
+#include <snt/mat/solvers/material_solver.h>
 
 namespace snt::mat {
 

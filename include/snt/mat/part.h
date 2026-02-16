@@ -1,7 +1,7 @@
 #ifndef MAT_PART_H
 #define MAT_PART_H
 
-#include "../puq.h"
+#include <snt/puq/quantity.h>
 
 #include <string>
 

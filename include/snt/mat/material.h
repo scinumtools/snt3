@@ -1,10 +1,10 @@
 #ifndef MAT_MATERIAL_H
 #define MAT_MATERIAL_H
 
-#include "substance.h"
-#include "set.h"
-#include "matter.h"
-#include "solvers/material_solver.h"
+#include <snt/mat/substance.h>
+#include <snt/mat/set.h>
+#include <snt/mat/matter.h>
+#include <snt/mat/solvers/material_solver.h>
 
 namespace snt::mat {
 

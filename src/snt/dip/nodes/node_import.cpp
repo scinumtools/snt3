@@ -1,6 +1,6 @@
 #include "node_import.h"
 
-#include "../environment.h"
+#include <snt/dip/environment.h>
 
 #include <array>
 #include <fstream>

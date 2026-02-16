@@ -1,4 +1,4 @@
-#include "node_value.h"
+#include <snt/dip/nodes/node_value.h>
 
 #include <sstream>
 
