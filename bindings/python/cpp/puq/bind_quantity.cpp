@@ -2,7 +2,7 @@
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <snt/puq.h>
+#include <snt/puq/quantity.h>
 #include <variant>
 
 namespace py = pybind11;

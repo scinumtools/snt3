@@ -1,7 +1,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
-#include <snt/val.h>
-#include <snt/dip.h>
+#include <snt/dip/environment.h>
+#include <snt/dip/dip.h>
 #include <codecvt>
 #include <locale>
 

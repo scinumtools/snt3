@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include <snt/puq.h>
+#include <snt/puq/systems/unit_system.h>
 
 namespace py = pybind11;
 using namespace snt;

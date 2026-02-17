@@ -10,7 +10,6 @@ pybind11_add_module(${MODULE_NAME} ${SOURCE_FILES})
 target_include_directories(${MODULE_NAME}
   PRIVATE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    ${PROJECT_SOURCE_DIR}/src
 )
 
 set_target_properties(${MODULE_NAME} PROPERTIES

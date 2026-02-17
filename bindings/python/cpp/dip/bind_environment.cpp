@@ -1,8 +1,9 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <snt/val.h>
-#include <snt/dip.h>
+#include <snt/dip/nodes/node_value.h>
+#include <snt/dip/lists/list_node.h>
+#include <snt/dip/environment.h>
 #include <codecvt>
 #include <locale>
 

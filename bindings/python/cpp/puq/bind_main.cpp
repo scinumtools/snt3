@@ -1,5 +1,7 @@
 #include <pybind11/pybind11.h>
-#include <snt/puq.h>
+#include <snt/puq/unit_format.h>
+#include <snt/puq/quantity.h>
+#include <snt/puq/calc/calculator.h>
 
 namespace py = pybind11;
 using namespace snt;
