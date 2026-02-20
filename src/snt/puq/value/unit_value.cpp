@@ -235,7 +235,7 @@ namespace snt::puq {
     return os;
   }
 
-  void UnitValue::pow(const EXPONENT_TYPE& e) {
+  void UnitValue::pow(const ExponentVariant& e) {
 #if defined(MAGNITUDE_ERRORS) || defined(MAGNITUDE_VALUES)
     magnitude.pow(e);
 #else
@@ -264,7 +264,7 @@ namespace snt::puq {
     BaseUnits bu;
     Dimensions dim = baseunits.dimensions();
     for (int i = 0; i < Config::num_basedim; i++) {
-      if (dim.physical[i] == 0)
+      if (exponent_to_float(dim.physical[i]) == 0)
         continue;
       if constexpr (Config::use_system_eus) {
 	if (i == 0 && format == Format::Base::FPS) {
@@ -295,11 +295,14 @@ namespace snt::puq {
       } else {
         auto prefix1 = UnitPrefixList.find(bu.prefix);
         auto prefix2 = UnitPrefixList.find(bumap[bu.unit].prefix);
+	ExponentFloat fexp = exponent_to_float(bu.exponent);
         if (prefix1 != UnitPrefixList.end())
-          mag *= nostd::pow(prefix1->second.magnitude, bu.exponent);
+          mag *= nostd::pow(prefix1->second.magnitude, fexp);
         if (prefix2 != UnitPrefixList.end())
-          mag /= nostd::pow(prefix2->second.magnitude, bu.exponent);
-        bumap[bu.unit].exponent += bu.exponent;
+          mag /= nostd::pow(prefix2->second.magnitude, fexp);
+	bumap[bu.unit].exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+	  return a + b;
+	}, bumap[bu.unit].exponent, bu.exponent);
       }
     }
     BaseUnits bus;
@@ -323,8 +326,10 @@ namespace snt::puq {
         bumap.insert({key, {bu.prefix, bu.unit, bu.exponent}});
       } else {
         Dimensions dim0 = BaseUnits(bumap[key].prefix + bumap[key].unit).dimensions();
-        mag *= nostd::pow(dim.numerical / dim0.numerical, bu.exponent);
-        bumap[key].exponent += bu.exponent;
+        mag *= nostd::pow(dim.numerical / dim0.numerical, exponent_to_float(bu.exponent));
+	bumap[key].exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+	  return a + b;
+	}, bumap[key].exponent, bu.exponent);
       }
     }
     BaseUnits bus;

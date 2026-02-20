@@ -37,9 +37,9 @@ namespace snt::puq {
     std::string multiply = format.multiply_symbol();
     std::stringstream ss;
     if (format.base == Format::Base::MKS) {
-      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e-3, (ExponentFloat)physical[1]));
+      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e-3, exponent_to_float(physical[1])));
     } else if (format.base == Format::Base::CGS) {
-      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e2, (ExponentFloat)physical[0]));
+      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e2, exponent_to_float(physical[0])));
     }
 #if defined(MAGNITUDE_ERRORS)
 #if defined(MAGNITUDE_VALUES)
@@ -74,9 +74,10 @@ namespace snt::puq {
       } else if (i == 0 && format.base == Format::Base::CGS) {
         symbol = "cm";
       }
-      if (physical[i] == 1)
+      ExponentFloat fexp = exponent_to_float(physical[i]);
+      if (fexp == 1)
         ss << symbol << multiply;
-      else if (physical[i] != 0)
+      else if (fexp != 0)
         ss << symbol << nostd::to_string(physical[i], format) << multiply;
     }
     return ss.str();

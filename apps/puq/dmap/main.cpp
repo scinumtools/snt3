@@ -42,10 +42,15 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
     if (i > 0)
       ss << ",";
     ss << std::setfill(' ') << std::setw(2) << std::right;
-    if (dim.physical[i].denominator == 1) {
-      ss << dim.physical[i];
+    if (std::holds_alternative<int>(dim.physical[i])) {
+      ss << std::get<int>(dim.physical[i]);
     } else {
-      ss << "(FRC){" + std::to_string(dim.physical[i].numerator) + "," + std::to_string(dim.physical[i].denominator) + "}";
+      puq::Exponent& exp = std::get<puq::Exponent>(dim.physical[i]);
+      if (exp.denominator == 1) {
+	ss << exp.numerator;
+      } else {
+	ss << "(FRC){" + std::to_string(exp.numerator) + "," + std::to_string(exp.denominator) + "}";
+      }
     }
   }
   ss << "} } },     // " + name + "\n";
@@ -55,7 +60,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
 void solve_bu_prefix(puq::Dimensions& dim, puq::BaseUnit& bu) {
   auto prefix = puq::UnitPrefixList.find(bu.prefix);
   if (prefix != puq::UnitPrefixList.end()) {
-    dim.numerical *= nostd::pow(prefix->second.magnitude, (puq::EXPONENT_TYPE)bu.exponent);
+    dim.numerical *= nostd::pow(prefix->second.magnitude, exponent_to_float(bu.exponent));
   }
 }
 
@@ -67,9 +72,9 @@ bool solve_bu_unit(puq::DimensionMapType& dmap, puq::Dimensions& dim, puq::BaseU
 #else
     puq::MAGNITUDE_TYPE m(it->second.magnitude);
 #endif
-    dim.numerical *= nostd::pow(m, (puq::EXPONENT_TYPE)bu.exponent);
+    dim.numerical *= nostd::pow(m, exponent_to_float(bu.exponent));
     for (int i = 0; i < puq::Config::num_basedim; i++) {
-      dim.physical[i] += it->second.dimensions[i] * bu.exponent;
+      dim.physical[i] = add_exp(dim.physical[i], mul_exp(it->second.dimensions[i], bu.exponent));
     }
     return true;
   }
@@ -152,8 +157,8 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
         }
       }
       // account for the conversion from MGS to MKS dimensions
-      if (dim.physical[1] != 0)
-        dim.numerical *= nostd::pow(1e-3, dim.physical[1]);
+      if (exponent_to_float(dim.physical[1]) != 0)
+        dim.numerical *= nostd::pow(1e-3, exponent_to_float(dim.physical[1]));
       // clear physical dimensions to make conversion factors dimensionless
       std::fill(std::begin(dim.physical), std::end(dim.physical), 0);
       // register the conversion factor

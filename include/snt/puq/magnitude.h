@@ -73,7 +73,7 @@ namespace snt::puq {
     void operator/=(const Magnitude& m);
     bool operator==(const Magnitude& a) const;
     bool operator!=(const Magnitude& a) const;
-    void pow(const EXPONENT_TYPE& e);
+    void pow(const ExponentVariant& e);
   };
 #endif
 

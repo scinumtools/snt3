@@ -15,13 +15,11 @@ TEST(UnitFormat, ExponentFormat) {
   puq::Exponent e = puq::Exponent(-2);
   EXPECT_EQ(e.to_string(format), "⁻²"); // integer exponents
 
-#ifdef EXPONENT_FRACTIONS
   e = puq::Exponent(3, 2);
   EXPECT_EQ(e.to_string(format), "³ᐟ²"); // positive fractional exponents
 
   e = puq::Exponent(-3, 2);
   EXPECT_EQ(e.to_string(format), "⁻³ᐟ²"); // negative fractional exponents
-#endif
 }
 
 TEST(UnitFormat, DimensionsFormat) {
@@ -63,10 +61,8 @@ TEST(UnitFormat, BaseUnitsFormat) {
   bus = puq::BaseUnits("kg*m2/s2"); // integer exponents
   EXPECT_EQ(bus.to_string(format), "kg⋅m²⋅s⁻²");
 
-#ifdef EXPONENT_FRACTIONS
   bus = puq::BaseUnits("m*kg-2:3"); // fractional exponents
   EXPECT_EQ(bus.to_string(format), "m⋅kg⁻²ᐟ³");
-#endif
 }
 
 TEST(UnitFormat, MagnitudeFormat) {

@@ -31,10 +31,10 @@ TEST(Dimensions, InitializationErrors) {
 
 TEST(Dimensions, InitializationFractions) {
 
-  puq::Dimensions d(2.34, {1, {1, -2}, 0, 0, 0, 0, 0, 0});
+  puq::Dimensions d(2.34, {1, puq::Exponent(1, -2), 0, 0, 0, 0, 0, 0});
   EXPECT_EQ(d.to_string(), "2.34*m*g-1:2");
 
-  d = puq::Dimensions(2.34, puq::BaseDimensions({puq::Exponent(3, 2), {1, -2}, 0, 0, 0, 0, 0, 0}));
+  d = puq::Dimensions(2.34, puq::BaseDimensions({puq::Exponent(3, 2), puq::Exponent(1, -2), 0, 0, 0, 0, 0, 0}));
   EXPECT_EQ(d.to_string(), "2.34*m3:2*g-1:2");
 }
 

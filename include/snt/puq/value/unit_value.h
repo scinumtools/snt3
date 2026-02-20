@@ -57,7 +57,7 @@ namespace snt::puq {
     void operator-=(const UnitValue& v);
     void operator*=(const UnitValue& v);
     void operator/=(const UnitValue& v);
-    void pow(const EXPONENT_TYPE& e);
+    void pow(const ExponentVariant& e);
     UnitValue convert(const Format::Base& format) const;
     UnitValue convert(const std::string& s) const;
     UnitValue convert(const BaseUnits& bu) const;

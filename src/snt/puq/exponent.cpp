@@ -3,8 +3,6 @@
 #include <numeric>
 #include <sstream>
 
-#ifdef EXPONENT_FRACTIONS
-
 namespace snt::puq {
 
   void Exponent::operator+=(const Exponent& e) {
@@ -122,5 +120,3 @@ namespace snt::puq {
   }
 
 } // namespace snt::puq
-
-#endif // EXPONENT_FRACTIONS

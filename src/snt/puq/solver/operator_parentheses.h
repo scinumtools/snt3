@@ -7,7 +7,7 @@ namespace snt::puq {
 
   class OperatorParentheses : public exs::OperatorGroup<1> {
   public:
-    std::vector<EXPONENT_TYPE> exponent;
+    std::vector<ExponentVariant> exponent;
     OperatorParentheses() : OperatorGroup<1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
     virtual bool check(exs::Expression& expr);
     virtual void parse(exs::Expression& expr);

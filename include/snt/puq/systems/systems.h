@@ -66,7 +66,7 @@ namespace snt::puq {
   extern const std::unordered_map<std::string, UnitPrefixStruct> UnitPrefixList;
   extern const std::vector<std::string> UnitPrefixOrder;
 
-  typedef std::array<EXPONENT_TYPE, Config::num_basedim> BaseDimensions;
+  typedef std::array<ExponentVariant, Config::num_basedim> BaseDimensions;
   typedef std::set<std::string> AllowedPrefixes;
   struct UnitStruct {
     Utype utype;
@@ -109,9 +109,7 @@ namespace snt::puq {
    *  System of units
    */
 
-#ifdef EXPONENT_FRACTIONS
   typedef ExponentInt FRC[2];
-#endif
 
   struct SystemDataType {
     std::string SystemAbbrev;

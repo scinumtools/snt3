@@ -22,7 +22,7 @@ namespace snt::puq {
   std::string BaseUnit::to_string(const UnitFormat& format) {
     std::stringstream ss;
     ss << prefix << unit;
-    if (exponent != 1)
+    if (exponent_to_float(exponent) != 1)
       ss << nostd::to_string(exponent, format);
     return ss.str();
   }
@@ -32,28 +32,28 @@ namespace snt::puq {
     for (auto it = baseunits.begin(); it != baseunits.end(); ++it) {
       if (it->prefix == bu.prefix && it->unit == bu.unit) {
         exists = true;
-        it->exponent += bu.exponent;
+	it->exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+	  return a + b;
+	}, it->exponent, bu.exponent);
         // removing zero exponents
-        if (it->exponent == 0) {
+        if (exponent_to_float(it->exponent) == 0) {
           baseunits.erase(it);
         }
         break;
       }
     }
-    if (!exists && bu.exponent != 0) {
+    if (!exists && exponent_to_float(bu.exponent) != 0) {
       baseunits.push_back(bu);
     }
   }
 
-  void BaseUnits::append(const std::string& p, const std::string& u, EXPONENT_TYPE e) {
+  void BaseUnits::append(const std::string& p, const std::string& u, ExponentVariant e) {
     append(BaseUnit(p, u, e));
   }
 
-#ifdef EXPONENT_FRACTIONS
   void BaseUnits::append(const std::string& p, const std::string& u, ExponentInt n, ExponentInt d) {
     append(BaseUnit(p, u, n, d));
   }
-#endif
 
   std::string BaseUnits::to_string(const UnitFormat& format) const {
     std::stringstream ss;
@@ -85,21 +85,27 @@ namespace snt::puq {
   BaseUnits operator-(const BaseUnits& bu1, const BaseUnits& bu2) {
     BaseUnits nbu(bu1.baseunits);
     for (auto unit : bu2) {
-      unit.exponent = -unit.exponent;
+      unit.exponent = std::visit([](auto const& v) -> ExponentVariant {
+	return -v;
+      }, unit.exponent);
       nbu.append(unit);
     }
     return nbu;
   }
   void BaseUnits::operator-=(const BaseUnits& bu) {
     for (auto unit : bu) {
-      unit.exponent = -unit.exponent;
+      unit.exponent = std::visit([](auto const& v) -> ExponentVariant {
+	return -v;
+      }, unit.exponent);
       append(unit);
     }
   }
 
-  void BaseUnits::operator*=(const EXPONENT_TYPE& e) {
+  void BaseUnits::operator*=(const ExponentVariant& e) {
     for (auto& unit : baseunits) {
-      unit.exponent *= e;
+      unit.exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+	return a * b;
+      }, unit.exponent, e);
     }
   }
 
@@ -127,7 +133,7 @@ namespace snt::puq {
       // find prefix
       auto prefix = UnitPrefixList.find(bu.prefix);
       if (prefix != UnitPrefixList.end()) {
-        dim.numerical *= nostd::pow(prefix->second.magnitude, (EXPONENT_TYPE)bu.exponent);
+        dim.numerical *= nostd::pow(prefix->second.magnitude, exponent_to_float(bu.exponent));
       }
       // quantity
       if (bu.unit.rfind(Symbols::quantity_start, 0) == 0 || bu.unit.rfind(Symbols::si_factor_start, 0) == 0) {
@@ -140,9 +146,10 @@ namespace snt::puq {
 #else
           MAGNITUDE_TYPE magnitude(dmap->second.magnitude);
 #endif
-          dim.numerical *= nostd::pow(magnitude, (EXPONENT_TYPE)bu.exponent);
+          dim.numerical *= nostd::pow(magnitude, exponent_to_float(bu.exponent));
           for (int i = 0; i < Config::num_basedim; i++) {
-            dim.physical[i] += dmap->second.dimensions[i] * bu.exponent;
+	    dim.physical[i] = add_exp(dim.physical[i],
+                         mul_exp(dmap->second.dimensions[i], bu.exponent));
           }
           continue;
         } else {
@@ -167,9 +174,10 @@ namespace snt::puq {
 #else
             MAGNITUDE_TYPE magnitude(dmap->second.magnitude);
 #endif
-            dim.numerical *= nostd::pow(magnitude, (EXPONENT_TYPE)bu.exponent);
+            dim.numerical *= nostd::pow(magnitude, exponent_to_float(bu.exponent));
             for (int i = 0; i < Config::num_basedim; i++) {
-              dim.physical[i] += dmap->second.dimensions[i] * bu.exponent;
+	      dim.physical[i] = add_exp(dim.physical[i],
+					mul_exp(dmap->second.dimensions[i], bu.exponent));
             }
           } else {
             throw UnitValueExcept("Undefined unit symbol: " + bu.unit);

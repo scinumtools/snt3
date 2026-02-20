@@ -261,11 +261,12 @@ namespace snt::puq {
 #endif
   }
 
-  void Magnitude::pow(const EXPONENT_TYPE& e) {
+  void Magnitude::pow(const ExponentVariant& e) {
+    ExponentFloat fexp = exponent_to_float(e);
 #ifdef MAGNITUDE_VALUES
-    value = value->math_pow((ExponentFloat)e);
+    value = value->math_pow(fexp);
 #else
-    value = nostd::pow(value, (ExponentFloat)e);
+    value = nostd::pow(value, fexp);
 #endif
   }
 

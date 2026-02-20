@@ -33,8 +33,12 @@ namespace snt::nostd {
     return value.to_string(format);
   }
 
-  std::string to_string(const puq::Exponent& value, const puq::UnitFormat& format) {
-    return value.to_string(format);
+  std::string to_string(const puq::ExponentVariant& value, const puq::UnitFormat& format) {
+    if (std::holds_alternative<int>(value)) {
+      return format.format_exponents(std::to_string(std::get<int>(value)));
+    } else {
+      return std::get<puq::Exponent>(value).to_string(format);
+    }
   }
 
   std::string to_string(const bool& use_prefixes, const puq::AllowedPrefixes& value) {

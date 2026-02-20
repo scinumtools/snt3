@@ -80,7 +80,7 @@ namespace snt::puq {
       }
     }
     if (math == Format::Math::UNICODE) {
-      // translating speccial characters
+      // translating special characters
       std::string superscript_str;
       for (char c : expression) {
         superscript_str += UnitFormat::superscript_map.at(c);

@@ -3,6 +3,7 @@
 #include "../nostd/to_number.h"
 #include <snt/puq/systems/unit_system.h>
 
+#include <sstream>
 #include <algorithm>
 #include <regex>
 
@@ -34,11 +35,11 @@ namespace snt::puq {
   }
 
   inline void _parse_exponent(BaseUnit& bu, std::string& expr, const std::smatch& m) {
-#ifdef EXPONENT_FRACTIONS
-    bu.exponent = Exponent((m[2] == "" ? 1 : std::stoi(m[2])), (m[4] == "" ? 1 : std::stoi(m[4])));
-#else
-    bu.exponent = m[2] == "" ? 1 : std::stoi(m[2]);
-#endif
+    if (m[4] == "") {
+      bu.exponent = (m[2] == "" ? 1 : std::stoi(m[2]));
+    } else {
+      bu.exponent = Exponent((m[2] == "" ? 1 : std::stoi(m[2])), std::stoi(m[4]));
+    }
     expr = std::string(m[1]);
   }
 
@@ -102,15 +103,9 @@ namespace snt::puq {
     std::string expr = expr_orig;
     struct UnitValue uv;
     std::smatch m;
-#ifdef EXPONENT_FRACTIONS
     std::regex rx_unit("^(\\{?[a-zA-Z0_%#']+\\}?)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
     std::regex rx_quantity("^(\\<[a-zA-Z_]+\\>)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
     std::regex rx_sifactor("^(\\|[a-zA-Z_]+\\|)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
-#else
-    std::regex rx_unit("^(\\{?[a-zA-Z0_%#']+\\}?)([+-]?[0-9]*)$");
-    std::regex rx_quantity("^(\\<[a-zA-Z_]+\\>)([+-]?[0-9]*)$");
-    std::regex rx_sifactor("^(\\|[a-zA-Z_]+\\|)([+-]?[0-9]*)$");
-#endif
     std::regex rx_number("^((\\+|-)?[0-9]+)(\\.(([0-9]+)?))?(\\(([0-9]+)\\))?((e|E)((\\+|-)?[0-9]+))?$");
     if (std::regex_match(expr, m, rx_number)) {
       _parse_number(expr, uv, m);
@@ -134,9 +129,15 @@ namespace snt::puq {
     static_assert(true, "Math power is used only with the exponent type");
   }
   
-  void UnitAtom::math_power(EXPONENT_TYPE& e) {
+  void UnitAtom::math_power(ExponentVariant& e) {
     if constexpr (Config::debug_unit_solver) {
-      std::clog << "UNIT:    pow(" << value.to_string() << "," << e.to_string() << ") = ";
+      std::stringstream ss;
+      ss << "UNIT:    pow(" << value.to_string() << ",";
+      if (std::holds_alternative<int>(e))
+	ss << std::get<int>(e);
+      if (std::holds_alternative<Exponent>(e))
+	ss << std::get<Exponent>(e).to_string();
+      std::clog << ss.str() << ") = ";
     }
     value.pow(e);
     if constexpr (Config::debug_unit_solver) {

@@ -18,25 +18,17 @@ namespace snt::puq {
     OperatorGroup<1>::parse(expr); // perform ordinary parsing
     if (expr.right.length() > 0) {           // check if there is an exponent after closing parentheses
       std::smatch m;
-#ifdef EXPONENT_FRACTIONS
       std::regex rx_exponent("^([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)");
       if (std::regex_search(expr.right, m, rx_exponent)) { // store exponent
-        exponent.push_back(Exponent((m[1] == "" ? 1 : std::stoi(m[1])), (m[3] == "" ? 1 : std::stoi(m[3]))));
+	if (m[3] == "") {
+          exponent.push_back((m[1] == "" ? 1 : std::stoi(m[1])));
+	} else {
+	  exponent.push_back(Exponent((m[1] == "" ? 1 : std::stoi(m[1])), std::stoi(m[3])));
+	}
         expr.remove(m[0]);
       } else {
         exponent.push_back(1);
       }
-#else
-      std::regex rx_exponent("^([+-]?[0-9]*)");
-      if (std::regex_search(expr.right, m, rx_exponent)) { // store exponent
-        if (m[1] != "") {
-          exponent.push_back(std::stoi(m[1]));
-        } else {
-          exponent.push_back(1);
-        }
-        expr.remove(m[0]);
-      }
-#endif
     } else {
       exponent.push_back(1);
     }
@@ -45,9 +37,9 @@ namespace snt::puq {
   void OperatorParentheses::operate_group(exs::TokenListBase* tokens) {
     if (exponent.size() == 0)
       throw AtomParsingExcept("Number of exponents does not match number of opened parentheses!");
-    EXPONENT_TYPE exp = exponent.back();
+    ExponentVariant exp = exponent.back();
     exponent.pop_back();
-    if (exp != 1) {
+    if (exponent_to_float(exp) != 1) {
       exs::Token group1 = tokens->get_left();
       UnitAtom* atom = static_cast<UnitAtom*>(group1.atom);
       atom->math_power(exp);

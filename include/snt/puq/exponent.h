@@ -6,8 +6,6 @@
 
 namespace snt::puq {
 
-#ifdef EXPONENT_FRACTIONS
-
   class Exponent {
   public:
     ExponentInt numerator;
@@ -34,8 +32,84 @@ namespace snt::puq {
     void reduce();
   };
 
-#endif
+  inline Exponent operator+(Exponent a, const ExponentInt& i) {
+    a += Exponent{i};
+    return a;
+  }
+  
+  inline Exponent operator+(const ExponentInt& i, Exponent a) {
+    a += Exponent{i};
+    return a;
+  }
+  
+  inline Exponent operator+(Exponent a, const Exponent& b) {
+    a += b;
+    return a;
+  }
+  
+  inline Exponent operator-(Exponent a, const ExponentInt& i) {
+    a -= Exponent{i};
+    return a;
+  }
 
+  inline Exponent operator-(ExponentInt i, const Exponent& a) {
+    Exponent lhs{i};
+    lhs -= a;
+    return lhs;
+  }
+
+  inline Exponent operator-(Exponent a, const Exponent& b) {
+    a -= b;
+    return a;
+  }
+  
+  inline Exponent operator*(const Exponent& e, const ExponentInt& i) {
+    return e * Exponent{i};
+  }
+  
+  inline Exponent operator*(const ExponentInt& i, const Exponent& e) {
+    return Exponent{i} * e;
+  }
+  
+  inline void operator*=(Exponent& e, const ExponentInt& i) {
+    e *= Exponent{i};
+  }
+  
+  using ExponentVariant = std::variant<int, Exponent>;
+  
+  inline ExponentVariant add_exp(const ExponentVariant& x, const ExponentVariant& y)
+  {
+    return std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+      using A = std::decay_t<decltype(a)>;
+      using B = std::decay_t<decltype(b)>;
+      
+      if constexpr (std::is_same_v<A,int> && std::is_same_v<B,int>)
+	return a + b;
+      else
+	return Exponent(a) + Exponent(b);
+    }, x, y);
+  }
+  
+  inline ExponentVariant mul_exp(const ExponentVariant& x, const ExponentVariant& y)
+  {
+    return std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+      using A = std::decay_t<decltype(a)>;
+      using B = std::decay_t<decltype(b)>;
+      
+      if constexpr (std::is_same_v<A,int> && std::is_same_v<B,int>)
+	return a * b;
+      else
+	return Exponent(a) * Exponent(b);
+    }, x, y);
+  }
+  
+  inline ExponentFloat exponent_to_float(const ExponentVariant& exp) {
+    if (std::holds_alternative<int>(exp))
+      return (ExponentFloat)std::get<int>(exp);
+    else
+      return (ExponentFloat)std::get<Exponent>(exp);
+  };
+  
 } // namespace snt::puq
 
 #endif // PUQ_EXPONENT_H

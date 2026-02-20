@@ -8,7 +8,7 @@ namespace snt::puq {
   using MagnitudeFloat = double;  ///< Numerical precision of a magnitude
   using ExponentInt = int;        ///< Numerical precision of an integer exponent
   using ExponentFloat = double;   ///< Numerical precision of a floating-point exponent
-
+    
   /*
    *  Modules
    */
@@ -17,7 +17,6 @@ namespace snt::puq {
 #if (ENABLE_PUQ_MAGNITUDE_VALUE)
 #define MAGNITUDE_VALUES
 #endif
-#define EXPONENT_FRACTIONS
 
   /**
    * @namespace Config
@@ -28,7 +27,7 @@ namespace snt::puq {
     inline constexpr int num_basedim = 8;                    ///< Number of base dimensions
     // various implementations				     
     inline constexpr bool use_magnitude_errors = true;	     ///< Use errors in magnitudes
-    inline constexpr bool use_magnitude_values = true;	     ///< Use snt::val array values instead of doubles
+    inline constexpr bool use_magnitude_arrays = true;	     ///< Use snt::val array values instead of doubles
     inline constexpr bool use_fractional_exponents = true;   ///< Use fractional exponents
     // special units					     
     inline constexpr bool use_units_temperature = true;      ///< Use temperature units
@@ -45,6 +44,11 @@ namespace snt::puq {
     inline constexpr bool debug_calculator = false;          ///< Switch on debugging diagnostics for Calculator
     inline constexpr bool debug_converter = false;           ///< Switch on debugging diagnostics for Converter
   }
+  
+  static_assert(!(Config::use_system_cgs&&!Config::use_fractional_exponents),
+		"Unit system CGS cannot be used without fractional exponents! Please use Config::use_system_cgs setting.");
+  static_assert(!(Config::use_system_nus&&!Config::use_fractional_exponents),
+		"Natural units cannot be used without fractional exponents! Please use Config::use_system_nus setting.");
 
   /**
    * @namespace Symbols
@@ -85,15 +89,7 @@ namespace snt::puq {
 #else
 #define MAGNITUDE_TYPE MagnitudeFloat
 #endif
-
-#ifdef EXPONENT_FRACTIONS
-#define EXPONENT_TYPE Exponent
-#else
-  static_assert(Config::use_system_cgs, "Unit system CGS cannot be used without fractional exponents! Please use EXPONENT_FRACTIONS flag.");
-  static_assert(Config::use_system_nus, "Natural units cannot be used without fractional exponents! Please use EXPONENT_FRACTIONS flag.");
-#define EXPONENT_TYPE ExponentInt
-#endif
-
+  
 }
   
 #endif // PUQ_SETTINGS_H
