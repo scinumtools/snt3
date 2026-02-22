@@ -25,17 +25,17 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   val::ArrayValue<double> value(dim.numerical.value.get());
   ss << nostd::to_string(value.get_value(0), precision) + ",";
   ss << std::setfill(' ') << std::setw(25) << std::left;
-  if (dim.numerical.error == nullptr) {
+  if (dim.numerical.uncertainty == nullptr) {
     ss << nostd::to_string(0, precision) + ",";
   } else {
-    val::ArrayValue<double> error(dim.numerical.error.get());
-    ss << nostd::to_string(error.get_value(0), precision) + ",";
+    val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
+    ss << nostd::to_string(uncertainty.get_value(0), precision) + ",";
   }
 #else
   ss << std::setfill(' ') << std::setw(25) << std::left;
   ss << nostd::to_string(dim.numerical.value[0], precision) + ",";
   ss << std::setfill(' ') << std::setw(25) << std::left;
-  ss << nostd::to_string(dim.numerical.error[0], precision) + ",";
+  ss << nostd::to_string(dim.numerical.uncertainty[0], precision) + ",";
 #endif
   ss << "{";
   for (int i = 0; i < puq::Config::num_basedim; i++) {
@@ -67,8 +67,8 @@ void solve_bu_prefix(puq::Dimensions& dim, puq::BaseUnit& bu) {
 bool solve_bu_unit(puq::DimensionMapType& dmap, puq::Dimensions& dim, puq::BaseUnit& bu) {
   auto it = dmap.find(bu.unit);
   if (it != dmap.end()) {
-#ifdef MAGNITUDE_ERRORS
-    puq::MAGNITUDE_TYPE m(it->second.magnitude, it->second.error);
+#ifdef MAGNITUDE_UNCERTAINTIES
+    puq::MAGNITUDE_TYPE m(it->second.magnitude, it->second.uncertainty);
 #else
     puq::MAGNITUDE_TYPE m(it->second.magnitude);
 #endif
@@ -103,14 +103,14 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
       add_line(ss, unit.first, dim, unit.second.name);
 #if defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> value(dim.numerical.value.get());
-      if (dim.numerical.error == nullptr) {
+      if (dim.numerical.uncertainty == nullptr) {
         dmap.insert({unit.first, {value.get_value(0), 0., dim.physical}});
       } else {
-        val::ArrayValue<double> error(dim.numerical.error.get());
-        dmap.insert({unit.first, {value.get_value(0), error.get_value(0), dim.physical}});
+        val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
+        dmap.insert({unit.first, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
       }
 #else
-      dmap.insert({unit.first, {dim.numerical.value[0], dim.numerical.error[0], dim.physical}});
+      dmap.insert({unit.first, {dim.numerical.value[0], dim.numerical.uncertainty[0], dim.physical}});
 #endif
     }
   }
@@ -134,14 +134,14 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
     add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first));
 #if defined(MAGNITUDE_VALUES)
     val::ArrayValue<double> value(dim.numerical.value.get());
-    if (dim.numerical.error == nullptr) {
+    if (dim.numerical.uncertainty == nullptr) {
       dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
     } else {
-      val::ArrayValue<double> error(dim.numerical.error.get());
-      dmap.insert({symbol, {value.get_value(0), error.get_value(0), dim.physical}});
+      val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
+      dmap.insert({symbol, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
     }
 #else
-    dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.error[0], dim.physical}});
+    dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.uncertainty[0], dim.physical}});
 #endif
 
     // solve a quantity IS conversion factor, if exists
@@ -166,14 +166,14 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
       add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first) + " SI factor");
 #if defined(MAGNITUDE_VALUES)
       val::ArrayValue<double> value(dim.numerical.value.get());
-      if (dim.numerical.error == nullptr) {
+      if (dim.numerical.uncertainty == nullptr) {
         dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
       } else {
-        val::ArrayValue<double> error(dim.numerical.error.get());
-        dmap.insert({symbol, {value.get_value(0), error.get_value(0), dim.physical}});
+        val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
+        dmap.insert({symbol, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
       }
 #else
-      dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.error[0], dim.physical}});
+      dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.uncertainty[0], dim.physical}});
 #endif
     }
   }

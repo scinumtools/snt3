@@ -19,7 +19,7 @@ namespace snt::puq {
     UnitValue(const MAGNITUDE_TYPE& m, const Dimensions& dim);
     UnitValue(const MAGNITUDE_TYPE& m, const BaseUnits& bu) : magnitude(m), baseunits(bu) {};
     UnitValue(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bul) : magnitude(m), baseunits(bul) {};
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
     UnitValue(const MagnitudeFloat& m, const std::string& s);
     UnitValue(const MagnitudeFloat& m) : magnitude(m) {};
     UnitValue(const MagnitudeFloat& m, const BaseUnits& bu) : magnitude(m), baseunits(bu) {};

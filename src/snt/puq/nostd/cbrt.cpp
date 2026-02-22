@@ -12,16 +12,16 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude cbrt(const puq::Magnitude& m) {
     // y ± Dz = pow(x ± Dx, 1/3) -> Dy = 1/3 * pow(x, -2/3) * Dx
 #ifdef MAGNITUDE_VALUES
     std::unique_ptr<val::ArrayValue<double>> third1 = std::make_unique<val::ArrayValue<double>>(1. / 3.);
     std::unique_ptr<val::ArrayValue<double>> third2 = std::make_unique<val::ArrayValue<double>>(-2 * 1. / 3.);
-    return puq::Magnitude(m.value->math_cbrt(), m.value->math_pow(third2.get())->math_mul(third1.get())->math_mul(m.error.get()));
+    return puq::Magnitude(m.value->math_cbrt(), m.value->math_pow(third2.get())->math_mul(third1.get())->math_mul(m.uncertainty.get()));
 #else
     constexpr puq::MagnitudeFloat third = 1. / 3.;
-    return puq::Magnitude(cbrt(m.value), third * pow(m.value, -2 * third) * m.error);
+    return puq::Magnitude(cbrt(m.value), third * pow(m.value, -2 * third) * m.uncertainty);
 #endif
   }
 #endif

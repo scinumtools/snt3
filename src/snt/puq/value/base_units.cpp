@@ -141,8 +141,8 @@ namespace snt::puq {
         if (dmap != UnitSystem::Data->DimensionMap.end()) {
           dim.utype = dim.utype | Utype::LIN;
           dim.symbols.push_back(dmap->first);
-#ifdef MAGNITUDE_ERRORS
-          MAGNITUDE_TYPE magnitude(dmap->second.magnitude, dmap->second.error);
+#ifdef MAGNITUDE_UNCERTAINTIES
+          MAGNITUDE_TYPE magnitude(dmap->second.magnitude, dmap->second.uncertainty);
 #else
           MAGNITUDE_TYPE magnitude(dmap->second.magnitude);
 #endif
@@ -169,8 +169,8 @@ namespace snt::puq {
           dim.symbols.push_back(unit->first);
           auto dmap = UnitSystem::Data->DimensionMap.find(unit->first);
           if (dmap != UnitSystem::Data->DimensionMap.end()) {
-#ifdef MAGNITUDE_ERRORS
-            MAGNITUDE_TYPE magnitude(dmap->second.magnitude, dmap->second.error);
+#ifdef MAGNITUDE_UNCERTAINTIES
+            MAGNITUDE_TYPE magnitude(dmap->second.magnitude, dmap->second.uncertainty);
 #else
             MAGNITUDE_TYPE magnitude(dmap->second.magnitude);
 #endif

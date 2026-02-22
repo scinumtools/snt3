@@ -56,7 +56,7 @@ namespace snt::puq {
     value = UnitValue(m, s);
   }
 
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
 
   Quantity::Quantity(const MagnitudeFloat& m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
@@ -150,8 +150,8 @@ namespace snt::puq {
   }
 
   Quantity::PointerType Quantity::clone() const {
-    if (value.magnitude.error)
-      return std::make_unique<Quantity>(value.magnitude.value->clone(), value.magnitude.error->clone(), value.baseunits.baseunits, stype);
+    if (value.magnitude.uncertainty)
+      return std::make_unique<Quantity>(value.magnitude.value->clone(), value.magnitude.uncertainty->clone(), value.baseunits.baseunits, stype);
     else
       return std::make_unique<Quantity>(value.magnitude.value->clone(), value.baseunits.baseunits, stype);
   }

@@ -8,7 +8,7 @@ namespace snt {
   struct StringFormatType {
     char specifier = 'g';        // format data type specifier
     int valuePrecision = 4;      // number of significant digits of value
-    int errorPrecision = 2;      // number of significant digits of an error
+    int uncertaintyPrecision = 2;      // number of significant digits of an uncertainty
     int thresholdScientific = 3; // exponent from which fixed notation switch to scientific
     bool paddingZeros = false;   // use zeros for string padding
     int paddingSize = 0;         // string padding
@@ -97,35 +97,35 @@ namespace snt {
     return _array_to_string(value, shape, format, offset, 0);
   }
 
-  // Implementation for value/error
+  // Implementation for value/uncertainty
 
   template <typename T>
-  std::string number_to_string(const T& value, const T& error, const StringFormatType& format = StringFormatType()) {
+  std::string number_to_string(const T& value, const T& uncertainty, const StringFormatType& format = StringFormatType()) {
     std::stringstream ss;
-    if (value == 0 && error == 0) {
+    if (value == 0 && uncertainty == 0) {
       return "0";
-    } else if (error == 0) {
+    } else if (uncertainty == 0) {
       return number_to_string(value, format);
     } else {
       int exp_val = std::floor(std::log10(std::fabs(value))); // rounded exponent
-      int exp_err = std::floor(std::log10(std::fabs(error)));
+      int exp_err = std::floor(std::log10(std::fabs(uncertainty)));
       int exp_diff = std::abs(exp_val - exp_err) - 1;
       ss << std::fixed;
       if (std::is_integral_v<T>) {
-        int prec = (exp_err) ? format.errorPrecision - 1 : 0;
-        int val_err = static_cast<int>(error * std::pow(10, -exp_err + prec));
+        int prec = (exp_err) ? format.uncertaintyPrecision - 1 : 0;
+        int val_err = static_cast<int>(uncertainty * std::pow(10, -exp_err + prec));
         T val_mag = value * std::pow(10, -exp_err + prec); // magnitude without x10^ part
         ss << std::setprecision(exp_diff);
         ss << val_mag;
-        ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";
+        ss << "(" << std::setprecision(format.uncertaintyPrecision) << val_err << ")";
         if (exp_err - prec)
           ss << 'e' << exp_err - prec;
       } else if (std::is_floating_point_v<T>) {
-        int val_err = static_cast<int>(std::round(error * std::pow(10, -exp_err - 1 + format.errorPrecision)));
+        int val_err = static_cast<int>(std::round(uncertainty * std::pow(10, -exp_err - 1 + format.uncertaintyPrecision)));
         T val_mag = value * std::pow(10, -exp_val); // magnitude without x10^ part
-        ss << std::setprecision(exp_diff + format.errorPrecision);
+        ss << std::setprecision(exp_diff + format.uncertaintyPrecision);
         ss << val_mag;
-        ss << "(" << std::setprecision(format.errorPrecision) << val_err << ")";
+        ss << "(" << std::setprecision(format.uncertaintyPrecision) << val_err << ")";
         if (exp_val)
           ss << 'e' << exp_val;
       }
@@ -142,7 +142,7 @@ namespace snt {
   }
 
   template <typename T>
-  std::string _array_to_string(const std::vector<T>& value, const std::vector<T>& error, const std::vector<size_t>& shape, const StringFormatType& format, size_t& offset, size_t dim) {
+  std::string _array_to_string(const std::vector<T>& value, const std::vector<T>& uncertainty, const std::vector<size_t>& shape, const StringFormatType& format, size_t& offset, size_t dim) {
     std::ostringstream oss;
     if (value.size() > 1)
       oss << SYMBOL_ARRAY_START;
@@ -150,10 +150,10 @@ namespace snt {
       if (i > 0)
         oss << SYMBOL_ARRAY_DELIMITER;
       if (dim + 1 < shape.size()) {
-        oss << _array_to_string(value, error, shape, format, offset, dim + 1);
+        oss << _array_to_string(value, uncertainty, shape, format, offset, dim + 1);
       } else {
         if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) {
-          oss << number_to_string(value[offset], error[offset], format);
+          oss << number_to_string(value[offset], uncertainty[offset], format);
         } else {
           return "<unsupported_type>";
         }
@@ -166,9 +166,9 @@ namespace snt {
   }
 
   template <typename T>
-  std::string array_to_string(const std::vector<T>& value, const std::vector<T>& error, const std::vector<size_t>& shape, const StringFormatType& format = StringFormatType()) {
+  std::string array_to_string(const std::vector<T>& value, const std::vector<T>& uncertainty, const std::vector<size_t>& shape, const StringFormatType& format = StringFormatType()) {
     size_t offset = 0;
-    return _array_to_string(value, error, shape, format, offset, 0);
+    return _array_to_string(value, uncertainty, shape, format, offset, 0);
   }
 
 } // namespace snt

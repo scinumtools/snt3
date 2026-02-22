@@ -37,7 +37,7 @@ namespace snt::puq {
                       MKS,
                       CGS,
                       FPS };
-    enum class Error { SHOW,
+    enum class Uncertainty { SHOW,
                        HIDE };
     typedef int Precision;
   } // namespace Format
@@ -52,7 +52,7 @@ namespace snt::puq {
     Format::Math math;
     Format::Display part;
     Format::Base base;
-    Format::Error error;
+    Format::Uncertainty uncertainty;
 
     UnitFormat(const auto&... args) {
       math = get_option<Format::Math>(args...).value_or(Format::Math::ASCII);
@@ -60,7 +60,7 @@ namespace snt::puq {
       system = get_option<Format::System>(args...).value_or(Format::System::HIDE);
       part = get_option<Format::Display>(args...).value_or(Format::Display::BOTH);
       base = get_option<Format::Base>(args...).value_or(Format::Base::UNITS);
-      error = get_option<Format::Error>(args...).value_or(Format::Error::SHOW);
+      uncertainty = get_option<Format::Uncertainty>(args...).value_or(Format::Uncertainty::SHOW);
     };
 
     UnitFormat merge(const auto&... args) const {
@@ -69,7 +69,7 @@ namespace snt::puq {
                     get_option<Format::System>(args...).value_or(system),
                     get_option<Format::Display>(args...).value_or(part),
                     get_option<Format::Base>(args...).value_or(base),
-                    get_option<Format::Error>(args...).value_or(error));
+                    get_option<Format::Uncertainty>(args...).value_or(uncertainty));
       return uf;
     }
 
@@ -81,7 +81,7 @@ namespace snt::puq {
     std::string format_system(std::string expression, const std::string& abbrev) const;
     bool display_magnitude() const;
     bool display_units() const;
-    bool display_error() const;
+    bool display_uncertainty() const;
   };
 
 } // namespace snt::puq

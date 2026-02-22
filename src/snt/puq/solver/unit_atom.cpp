@@ -11,7 +11,7 @@ namespace snt::puq {
 
   inline void _parse_number(std::string& expr, UnitValue& uv, const std::smatch& m) {
     if (m[6] == "") {
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
 #if defined(MAGNITUDE_VALUES)
       uv.magnitude.value = std::make_unique<val::ArrayValue<double>>(nostd::to_number(expr));
 #endif
@@ -20,13 +20,13 @@ namespace snt::puq {
 #endif
     } else {
       std::string decimals = m[3].str() == "" ? "." : m[3].str();
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
 #if defined(MAGNITUDE_VALUES)
       uv.magnitude.value = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[1].str() + decimals + m[8].str()));
       if (m[10] == "")
-        uv.magnitude.error = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
+        uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
       else
-        uv.magnitude.error = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
+        uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
 #endif
 #else
       uv.magnitude = nostd::to_number(m[1].str() + decimals + m[8].str());

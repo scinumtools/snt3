@@ -14,16 +14,16 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude log(const puq::Magnitude& m) {
     // y ± Dy = log10(x ± Dx) -> Dy = Dx / x
 #ifdef MAGNITUDE_VALUES
-    if (m.error)
-      return puq::Magnitude(m.value->math_log(), m.error->math_div(m.value.get()));
+    if (m.uncertainty)
+      return puq::Magnitude(m.value->math_log(), m.uncertainty->math_div(m.value.get()));
     else
       return puq::Magnitude(m.value->math_log());
 #else
-    return puq::Magnitude(log(m.value), m.error / m.value);
+    return puq::Magnitude(log(m.value), m.uncertainty / m.value);
 #endif
   }
 #endif

@@ -121,8 +121,8 @@ namespace snt::puq {
     return (part == Format::Display::BOTH) || (part == Format::Display::UNITS);
   }
 
-  bool UnitFormat::display_error() const {
-    return (error == Format::Error::SHOW);
+  bool UnitFormat::display_uncertainty() const {
+    return (uncertainty == Format::Uncertainty::SHOW);
   }
 
 } // namespace snt::puq

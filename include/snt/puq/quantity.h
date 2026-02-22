@@ -28,7 +28,7 @@ namespace snt::puq {
     Quantity(const MAGNITUDE_TYPE& m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const MAGNITUDE_TYPE& m, const SystemType system = UnitSystem::System);
     Quantity(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
     Quantity(const MagnitudeFloat& m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const MagnitudeFloat& m, const SystemType system = UnitSystem::System);
     Quantity(const MagnitudeFloat& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);

@@ -7,30 +7,30 @@ namespace snt::puq {
   // TODO: this needs probably templates because of the ArrayValue
   void OperatorArray::operate_group(exs::TokenListBase* tokens) {
     exs::Token group;
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
     std::vector<double> nv(num_groups);
     std::vector<double> ne(num_groups);
-    bool hasErrors = false;
+    bool hasUncertainties = false;
     for (size_t i = 0; i < num_groups; i++) {
       group = tokens->get_left();
       UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
       val::ArrayValue<double> value(atom->value.magnitude.value.get());
       nv[i] = value.get_value(0);
-      if (atom->value.magnitude.error) {
-        hasErrors = true;
-        val::ArrayValue<double> error(atom->value.magnitude.error.get());
-        ne[i] = error.get_value(0);
+      if (atom->value.magnitude.uncertainty) {
+        hasUncertainties = true;
+        val::ArrayValue<double> uncertainty(atom->value.magnitude.uncertainty.get());
+        ne[i] = uncertainty.get_value(0);
       }
     }
     std::reverse(nv.begin(), nv.end());
     if (group.atom) {
       UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
       atom->value.magnitude.value = std::make_unique<val::ArrayValue<double>>(nv);
-      if (hasErrors) {
+      if (hasUncertainties) {
         std::reverse(ne.begin(), ne.end());
-        atom->value.magnitude.error = std::make_unique<val::ArrayValue<double>>(ne);
+        atom->value.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(ne);
       } else {
-        atom->value.magnitude.error = nullptr;
+        atom->value.magnitude.uncertainty = nullptr;
       }
     } else {
       throw std::runtime_error("Detected empty atom in a group");

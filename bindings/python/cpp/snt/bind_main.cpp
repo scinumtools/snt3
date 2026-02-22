@@ -11,7 +11,7 @@ void init_snt(py::module_& m) {
     .def(py::init<>())  // default constructor
     .def_readwrite("specifier", &snt::StringFormatType::specifier)
     .def_readwrite("valuePrecision", &snt::StringFormatType::valuePrecision)
-    .def_readwrite("errorPrecision", &snt::StringFormatType::errorPrecision)
+    .def_readwrite("uncertaintyPrecision", &snt::StringFormatType::uncertaintyPrecision)
     .def_readwrite("thresholdScientific", &snt::StringFormatType::thresholdScientific)
     .def_readwrite("paddingZeros", &snt::StringFormatType::paddingZeros)
     .def_readwrite("paddingSize", &snt::StringFormatType::paddingSize)
@@ -20,7 +20,7 @@ void init_snt(py::module_& m) {
     .def("__repr__", [](const snt::StringFormatType &s) {
       return "<StringFormatType specifier='" + std::string(1, s.specifier) +
 	"', valuePrecision=" + std::to_string(s.valuePrecision) +
-	", errorPrecision=" + std::to_string(s.errorPrecision) +
+	", uncertaintyPrecision=" + std::to_string(s.uncertaintyPrecision) +
 	", thresholdScientific=" + std::to_string(s.thresholdScientific) +
 	", paddingZeros=" + std::string(s.paddingZeros ? "True" : "False") +
 	", paddingSize=" + std::to_string(s.paddingSize) +

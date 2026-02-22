@@ -22,7 +22,7 @@ namespace snt::puq {
     }
   }
 
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
 
   Dimensions::Dimensions(const MagnitudeFloat& m, const MagnitudeFloat& e) : utype(Utype::NUL), numerical(m, e) {
     for (int i = 0; i < Config::num_basedim; i++) {
@@ -41,7 +41,7 @@ namespace snt::puq {
     } else if (format.base == Format::Base::CGS) {
       numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e2, exponent_to_float(physical[0])));
     }
-#if defined(MAGNITUDE_ERRORS)
+#if defined(MAGNITUDE_UNCERTAINTIES)
 #if defined(MAGNITUDE_VALUES)
     if (!numerical.value->is_unity() && format.display_magnitude()) {
       ss << numerical.to_string(format) << multiply;

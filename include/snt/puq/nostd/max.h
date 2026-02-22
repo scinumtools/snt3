@@ -9,7 +9,7 @@ namespace snt::nostd {
 #if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType max(val::BaseValue::PointerType a1, val::BaseValue::PointerType a2);
 #endif
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
   extern puq::Magnitude max(const puq::Magnitude& m1, const puq::Magnitude& m2);
 #endif
 

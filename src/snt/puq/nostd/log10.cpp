@@ -12,19 +12,19 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude log10(const puq::Magnitude& m) {
     // y ± Dy = log(x ± Dx) -> Dy = 1 / ln(10) * Dx / x
 #ifdef MAGNITUDE_VALUES
-    if (m.error) {
+    if (m.uncertainty) {
       std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(std::log(10));
       return puq::Magnitude(m.value->math_log10(),
-                            m.error->math_div(m.value->math_mul(cst.get()).get()));
+                            m.uncertainty->math_div(m.value->math_mul(cst.get()).get()));
     } else {
       return puq::Magnitude(m.value->math_log10());
     }
 #else
-    return puq::Magnitude(log10(m.value), m.error / (m.value * std::log(10)));
+    return puq::Magnitude(log10(m.value), m.uncertainty / (m.value * std::log(10)));
 #endif
   }
 #endif

@@ -12,13 +12,13 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude abs(const puq::Magnitude& m) {
     // abs(y ± Dy) = abs(y) ± Dy
 #ifdef MAGNITUDE_VALUES
-    return puq::Magnitude(m.value->math_abs(), m.error->clone());
+    return puq::Magnitude(m.value->math_abs(), m.uncertainty->clone());
 #else
-    return puq::Magnitude(abs(m.value), m.error);
+    return puq::Magnitude(abs(m.value), m.uncertainty);
 #endif
   }
 #endif

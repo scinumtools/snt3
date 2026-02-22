@@ -9,7 +9,7 @@ namespace snt::nostd {
 #if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType floor(val::BaseValue::PointerType a);
 #endif
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
   extern puq::Magnitude floor(const puq::Magnitude& m);
 #endif
 

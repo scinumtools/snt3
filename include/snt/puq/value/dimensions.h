@@ -16,7 +16,7 @@ namespace snt::puq {
     Dimensions();
     Dimensions(const MAGNITUDE_TYPE& n);
     Dimensions(const MAGNITUDE_TYPE& n, const BaseDimensions& p) : utype(Utype::NUL), numerical(n), physical(p) {};
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
     Dimensions(const MagnitudeFloat& m, const MagnitudeFloat& e);
     Dimensions(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseDimensions& p) : utype(Utype::NUL), numerical(m, e), physical(p) {};
 #endif

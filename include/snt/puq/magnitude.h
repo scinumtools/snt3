@@ -9,42 +9,42 @@
 
 namespace snt::puq {
 
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
   class Magnitude {
   public:
 #if defined(MAGNITUDE_VALUES)
     val::BaseValue::PointerType value;
-    val::BaseValue::PointerType error;
+    val::BaseValue::PointerType uncertainty;
 #else
     MagnitudeFloat value;
-    MagnitudeFloat error;
+    MagnitudeFloat uncertainty;
 #endif
 #ifndef MAGNITUDE_VALUES
-    Magnitude() : value(1), error(0) {}
-    Magnitude(const MagnitudeFloat& m) : value(m), error(0) {}
-    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : value(m), error(e) {}
+    Magnitude() : value(1), uncertainty(0) {}
+    Magnitude(const MagnitudeFloat& m) : value(m), uncertainty(0) {}
+    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : value(m), uncertainty(e) {}
     static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
     static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
 #else
     Magnitude(const Magnitude& other) {
       value = other.value ? other.value->clone() : nullptr;
-      error = other.error ? other.error->clone() : nullptr;
+      uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
     }
     Magnitude& operator=(const Magnitude& other) {
       if (this != &other) {
         value = other.value ? other.value->clone() : nullptr;
-        error = other.error ? other.error->clone() : nullptr;
+        uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
       }
       return *this;
     }
     Magnitude(Magnitude&&) noexcept = default;
     Magnitude& operator=(Magnitude&&) noexcept = default;
     Magnitude() : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({1}))),
-                  error(nullptr) {}
+                  uncertainty(nullptr) {}
     Magnitude(const MagnitudeFloat& m) : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
-                                              error(nullptr) {}
+                                              uncertainty(nullptr) {}
     Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
-                                                                            error(std::make_unique<val::ArrayValue<double>>(std::vector<double>({e}))) {}
+                                                                            uncertainty(std::make_unique<val::ArrayValue<double>>(std::vector<double>({e}))) {}
     static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
     static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
 #endif

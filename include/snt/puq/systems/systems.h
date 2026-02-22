@@ -100,7 +100,7 @@ namespace snt::puq {
 
   struct DimensionStruct {
     MagnitudeFloat magnitude;
-    MagnitudeFloat error;
+    MagnitudeFloat uncertainty;
     BaseDimensions dimensions;
   };
   typedef std::unordered_map<std::string, DimensionStruct> DimensionMapType;

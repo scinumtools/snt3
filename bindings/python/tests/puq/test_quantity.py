@@ -62,7 +62,7 @@ def test_init_numpy():
     #print(a.shape)
     #assert a == 1
 
-def test_init_errors():
+def test_init_uncertainties():
 
     q = Quantity(23.34, 0.2)
     assert q.to_string() == "2.334(20)e1"
@@ -71,7 +71,7 @@ def test_init_errors():
     q = Quantity(23.34, 0.2, 'ft', US)
     assert q.to_string() == "2.334(20)e1*ft"
     
-def test_init_errors_list():
+def test_init_uncertainties_list():
     
     # initialize with an list/string pair
     q = Quantity([2,3,4],[1,2,3], 'km')                  # integers
@@ -81,7 +81,7 @@ def test_init_errors_list():
     q = Quantity([2.34,3.45,4.56],[0.1,0.2,0.3], 'km')   # doubles
     assert q.to_string() == "[2.34(10), 3.45(20), 4.56(30)]*km"
 
-def test_init_errors_numpy():
+def test_init_uncertainties_numpy():
     
     # initialize with a numpy array
     q = Quantity(np.array([2,3,4]),
@@ -196,17 +196,17 @@ def test_magnitude():
     # return scalar value
     q = Quantity("23.45(12)*km")
     assert q.value() == 23.45
-    assert q.error() == 0.12
+    assert q.uncertainty() == 0.12
 
     # return list of values
     q = Quantity("[2.23(12),3.5,4.48(94),5.293]*km")
     np.testing.assert_almost_equal(q.value(), [2.23, 3.5, 4.48, 5.293])
-    np.testing.assert_almost_equal(q.error(), [0.12, 0, 0.94, 0])
+    np.testing.assert_almost_equal(q.uncertainty(), [0.12, 0, 0.94, 0])
 
     # return numpy arrays
     q = Quantity("[2.23(12),3.5,4.48(94),5.293]*km")
     np.testing.assert_almost_equal(q.value(numpy=True), [2.23, 3.5, 4.48, 5.293])
-    np.testing.assert_almost_equal(q.error(numpy=True), [0.12, 0, 0.94, 0])
+    np.testing.assert_almost_equal(q.uncertainty(numpy=True), [0.12, 0, 0.94, 0])
 
     # return correct shape of a multi-dimensionall array
     q = Quantity(np.array([[1,2,3],[4,5,6]]),'km')

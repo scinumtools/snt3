@@ -19,7 +19,7 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_ERRORS
+#ifdef MAGNITUDE_UNCERTAINTIES
   std::string to_string(const puq::Magnitude& value, int precision) {
     return value.to_string(precision);
   }

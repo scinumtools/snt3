@@ -13,7 +13,7 @@ namespace snt::puq {
    *  Modules
    */
 
-#define MAGNITUDE_ERRORS
+#define MAGNITUDE_UNCERTAINTIES
 #if (ENABLE_PUQ_MAGNITUDE_VALUE)
 #define MAGNITUDE_VALUES
 #endif
@@ -26,7 +26,7 @@ namespace snt::puq {
     // default settings
     inline constexpr int num_basedim = 8;                    ///< Number of base dimensions
     // various implementations				     
-    inline constexpr bool use_magnitude_errors = true;	     ///< Use errors in magnitudes
+    inline constexpr bool use_magnitude_uncertainties = true; ///< Use uncertainties in magnitudes
     inline constexpr bool use_magnitude_arrays = true;	     ///< Use snt::val array values instead of doubles
     inline constexpr bool use_fractional_exponents = true;   ///< Use fractional exponents
     // special units					     
@@ -77,17 +77,17 @@ namespace snt::puq {
   /*
    *  Type settings
    */
-#if defined(MAGNITUDE_ERRORS)
-#define MAGNITUDE_TYPE Magnitude
-#if defined(MAGNITUDE_VALUES)
-#define MAGNITUDE_VALUE val::BaseValue::PointerType
-#else
-#define MAGNITUDE_VALUE MagnitudeFloat
-#endif
+#if defined(MAGNITUDE_UNCERTAINTIES)
+  #define MAGNITUDE_TYPE Magnitude
+  #if defined(MAGNITUDE_VALUES)
+    #define MAGNITUDE_VALUE val::BaseValue::PointerType
+  #else
+    #define MAGNITUDE_VALUE MagnitudeFloat
+  #endif
 #elif defined(MAGNITUDE_VALUES)
-#define MAGNITUDE_TYPE val::BaseValue::PointerType
+  #define MAGNITUDE_TYPE val::BaseValue::PointerType
 #else
-#define MAGNITUDE_TYPE MagnitudeFloat
+  #define MAGNITUDE_TYPE MagnitudeFloat
 #endif
   
 }

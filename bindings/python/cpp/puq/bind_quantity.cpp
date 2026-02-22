@@ -32,8 +32,8 @@ std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<
   return otherT->get_value(index);
 }
 
-std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<puq::MagnitudeFloat>> quantity_error(const puq::Quantity& q, bool numpy) {
-  val::ArrayValue<puq::MagnitudeFloat> varray(q.value.magnitude.error.get());
+std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<puq::MagnitudeFloat>> quantity_uncertainty(const puq::Quantity& q, bool numpy) {
+  val::ArrayValue<puq::MagnitudeFloat> varray(q.value.magnitude.uncertainty.get());
   if (numpy) {
     return array_to_numpy(varray);
   } else if (varray.get_size() == 1) {
@@ -113,7 +113,7 @@ void init_puq_quantity(py::module_& m) {
         py::arg("value"), py::arg("unit") = "", py::arg("system") = puq::SystemType::NONE);
 
   /**
-   * @brief Initialise Quantity with a value/error from numpy arrays
+   * @brief Initialise Quantity with a value/uncertainty from numpy arrays
    */
   q.def(py::init([](const py::array_t<puq::MagnitudeFloat, py::array::c_style | py::array::forcecast>& v,
                     const py::array_t<puq::MagnitudeFloat, py::array::c_style | py::array::forcecast>& e,
@@ -121,12 +121,12 @@ void init_puq_quantity(py::module_& m) {
           py::buffer_info v_info = v.request();
           val::BaseValue::PointerType value = buffer_to_array(v_info);
           py::buffer_info e_info = e.request();
-          val::BaseValue::PointerType error = buffer_to_array(e_info);
+          val::BaseValue::PointerType uncertainty = buffer_to_array(e_info);
 #if defined(MAGNITUDE_VALUE)
-          return puq::Quantity(std::move(value), std::move(error), s, sys);
+          return puq::Quantity(std::move(value), std::move(uncertainty), s, sys);
 #endif
         }),
-        py::arg("value"), py::arg("error"), py::arg("unit") = "", py::arg("system") = puq::SystemType::NONE);
+        py::arg("value"), py::arg("uncertainty"), py::arg("unit") = "", py::arg("system") = puq::SystemType::NONE);
 
   /**
    * @brief Convert Quantity into a numpy array
@@ -169,7 +169,7 @@ void init_puq_quantity(py::module_& m) {
       .def("shape", &puq::Quantity::shape);
 
   q.def("value", &quantity_value, py::arg("numpy") = false);
-  q.def("error", &quantity_error, py::arg("numpy") = false);
+  q.def("uncertainty", &quantity_uncertainty, py::arg("numpy") = false);
 
   q.def("__repr__", &puq::Quantity::to_string, py::arg("format") = snt::puq::UnitFormat())
       .def("__str__", &puq::Quantity::to_string, py::arg("format") = snt::puq::UnitFormat())
