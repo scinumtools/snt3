@@ -21,7 +21,7 @@ namespace snt::puq {
 
   public:
     SystemType stype;
-    Measurement value;
+    Measurement measurement;
     Quantity() : stype(UnitSystem::System) {};
     Quantity(std::string s, const SystemType system = SystemType::NONE);
     Quantity(const Measurement& v, const SystemType system = UnitSystem::System);

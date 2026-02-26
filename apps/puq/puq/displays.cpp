@@ -2,7 +2,7 @@
 #include "snt/puq/nostd/to_string.h"
 
 void display_info(const std::string& expr) {
-  puq::Measurement uv = puq::Quantity(expr).value;
+  puq::Measurement uv = puq::Quantity(expr).measurement;
   puq::BaseUnits bus = uv.baseunits;
   puq::Dimensions dim = bus.dimensions();
   puq::Dimensions dim_m = bus.dimensions();

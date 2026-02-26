@@ -24,7 +24,7 @@ TEST(Calculator, Arithmetics) {
 
   atom = calc.solve("2*cm * 3*m"); // multiplication
   EXPECT_EQ(atom.value.to_string(), "6*cm*m");
-  atom.value.value = atom.value.value.rebase_prefixes();
+  atom.value.measurement = atom.value.measurement.rebase_prefixes();
   EXPECT_EQ(atom.value.to_string(), "600*cm2");
 
   atom = calc.solve("6*cm / 2*g"); // division
