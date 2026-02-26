@@ -5,7 +5,7 @@ using namespace snt;
 
 TEST(UnitAtom, FromString) {
 
-  puq::UnitValue value = puq::UnitAtom::from_string("1");
+  puq::Measurement value = puq::UnitAtom::from_string("1");
   EXPECT_EQ(value.to_string(), "1"); // unit
 
   value = puq::UnitAtom::from_string("2");
@@ -41,7 +41,7 @@ TEST(UnitAtom, FromString) {
 
 TEST(UnitAtom, FromStringErrors) {
 
-  puq::UnitValue value = puq::UnitAtom::from_string("1.2345(67)"); // without exponent
+  puq::Measurement value = puq::UnitAtom::from_string("1.2345(67)"); // without exponent
   EXPECT_EQ(value.to_string(), "1.2345(67)");
 
   value = puq::UnitAtom::from_string("1.223(23)e+02"); // with an exponent
@@ -62,7 +62,7 @@ TEST(UnitAtom, FromStringErrors) {
 
 TEST(UnitAtom, FromStringFractions) {
 
-  puq::UnitValue value = puq::UnitAtom::from_string("kg4:2");
+  puq::Measurement value = puq::UnitAtom::from_string("kg4:2");
   EXPECT_EQ(value.to_string(), "kg2"); // reduced fractions
 
   value = puq::UnitAtom::from_string("kg-2:3");

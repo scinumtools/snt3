@@ -12,7 +12,7 @@ namespace snt::nostd {
 #ifdef MAGNITUDE_UNCERTAINTIES
   extern puq::Magnitude exp(const puq::Magnitude& e);
 #endif
-  extern puq::UnitValue exp(const puq::UnitValue& uv);
+  extern puq::Measurement exp(const puq::Measurement& uv);
 
 } // namespace snt::nostd
 

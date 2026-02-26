@@ -1,7 +1,7 @@
 #include "pch_tests.h"
 #include <snt/puq/systems/unit_system.h>
 #include <snt/puq/value/dimensions.h>
-#include <snt/puq/value/unit_value.h>
+#include <snt/puq/value/measurement.h>
 
 #include <set>
 
@@ -61,7 +61,7 @@ void test_unit_definitions() {
     puq::Dimensions dim1(magnitude, dmap.dimensions);
     std::string m1 = dim1.to_string();
 
-    puq::UnitValue uv2(unit.second.definition);
+    puq::Measurement uv2(unit.second.definition);
     puq::Dimensions dim2 = uv2.baseunits.dimensions();
     dim2 = puq::Dimensions(uv2.magnitude * dim2.numerical, dim2.physical);
     std::string m2 = dim2.to_string();
@@ -99,7 +99,7 @@ void test_quantities() {
     puq::Dimensions dim1(quantity.second.magnitude, quantity.second.dimensions);
     std::string m1 = dim1.to_string();
 
-    puq::UnitValue uv2(quantity.second.definition);
+    puq::Measurement uv2(quantity.second.definition);
     puq::Dimensions dim2 = uv2.baseunits.dimensions();
     dim2 = puq::Dimensions(uv2.magnitude*dim2.numerical, dim2.physical);
     std::string m2 = dim2.to_string();

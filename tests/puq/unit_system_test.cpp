@@ -104,7 +104,7 @@ TEST(UnitSystem, DirectConversionESU) {
   q2 = q1.convert("erg", puq::SystemType::ESU);
   EXPECT_EQ(q2.to_string(), "3.4e8*erg");
 
-  q1 = puq::Quantity(34, "J", puq::SystemType::SI); // convert using Quantity/UnitValue
+  q1 = puq::Quantity(34, "J", puq::SystemType::SI); // convert using Quantity/Measurement
   q2 = puq::Quantity("erg", puq::SystemType::ESU);
   q3 = q1.convert(q2);
   EXPECT_EQ(q3.to_string(), "3.4e8*erg");

@@ -14,14 +14,14 @@ using namespace snt;
 // test from https://www.quora.com/How-does-one-calculate-uncertainty-in-an-exponent
 // and checked using http://www.julianibus.de/ online calculator
 
-TEST(NoSTD, UnitValueMath) {
+TEST(NoSTD, MeasurementMath) {
 
-  puq::UnitValue uv1, uv2, uv3;
+  puq::Measurement uv1, uv2, uv3;
 
   puq::Magnitude m1(4.36, 0.16);
   puq::Magnitude m2(2.35, 0.04);
-  uv1 = puq::UnitValue(m1, "m");
-  uv2 = puq::UnitValue(m2, "m");
+  uv1 = puq::Measurement(m1, "m");
+  uv2 = puq::Measurement(m2, "m");
 
   // exponential function
   uv3 = nostd::exp(uv2);

@@ -9,7 +9,7 @@
 
 namespace snt::puq {
 
-  inline void _parse_number(std::string& expr, UnitValue& uv, const std::smatch& m) {
+  inline void _parse_number(std::string& expr, Measurement& uv, const std::smatch& m) {
     if (m[6] == "") {
 #ifdef MAGNITUDE_UNCERTAINTIES
 #if defined(MAGNITUDE_VALUES)
@@ -43,7 +43,7 @@ namespace snt::puq {
     expr = std::string(m[1]);
   }
 
-  inline void _parse_quantity(std::string& expr, UnitValue& uv, const std::smatch& m) {
+  inline void _parse_quantity(std::string& expr, Measurement& uv, const std::smatch& m) {
     BaseUnit bu;
     _parse_exponent(bu, expr, m);
     bu.unit = expr;
@@ -51,7 +51,7 @@ namespace snt::puq {
     uv.baseunits.append(bu);
   }
 
-  inline void _parse_unit(std::string& expr, UnitValue& uv, const std::smatch& m, const std::string& expr_orig) {
+  inline void _parse_unit(std::string& expr, Measurement& uv, const std::smatch& m, const std::string& expr_orig) {
     BaseUnit bu;
     _parse_exponent(bu, expr, m);
     // determine unit
@@ -94,14 +94,14 @@ namespace snt::puq {
         }
       }
     }
-    // fill UnitValue properties
+    // fill Measurement properties
     uv.magnitude = 1;
     uv.baseunits.append(bu);
   }
 
-  UnitValue UnitAtom::from_string(const std::string& expr_orig, exs::BaseSettings* set) {
+  Measurement UnitAtom::from_string(const std::string& expr_orig, exs::BaseSettings* set) {
     std::string expr = expr_orig;
-    struct UnitValue uv;
+    struct Measurement uv;
     std::smatch m;
     std::regex rx_unit("^(\\{?[a-zA-Z0_%#']+\\}?)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
     std::regex rx_quantity("^(\\<[a-zA-Z_]+\\>)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");

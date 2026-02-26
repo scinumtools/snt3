@@ -32,100 +32,100 @@ namespace snt::puq {
   Quantity::Quantity(std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
-    value = UnitValue(s);
+    value = Measurement(s);
   }
 
-  Quantity::Quantity(const UnitValue& v, const SystemType system) : stype(system) {
+  Quantity::Quantity(const Measurement& v, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     value = v;
   }
 
   Quantity::Quantity(const MAGNITUDE_TYPE& m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(m);
+    value = Measurement(m);
   }
 
   Quantity::Quantity(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(m, bu);
+    value = Measurement(m, bu);
   }
 
   Quantity::Quantity(const MAGNITUDE_TYPE& m, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
-    value = UnitValue(m, s);
+    value = Measurement(m, s);
   }
 
 #ifdef MAGNITUDE_UNCERTAINTIES
 
   Quantity::Quantity(const MagnitudeFloat& m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(m);
+    value = Measurement(m);
   }
 
   Quantity::Quantity(const MagnitudeFloat& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(m, bu);
+    value = Measurement(m, bu);
   }
 
   Quantity::Quantity(const MagnitudeFloat& m, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     Magnitude mag(m);
-    value = UnitValue(mag, s);
+    value = Measurement(mag, s);
   }
 
   Quantity::Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(m, e);
+    value = Measurement(m, e);
   }
 
   Quantity::Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(m, e, bu);
+    value = Measurement(m, e, bu);
   }
 
   Quantity::Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     Magnitude mag(m, e);
-    value = UnitValue(mag, s);
+    value = Measurement(mag, s);
   }
 
 #if defined(MAGNITUDE_VALUES)
 
   Quantity::Quantity(val::BaseValue::PointerType m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(std::move(m));
+    value = Measurement(std::move(m));
   }
 
   Quantity::Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(std::move(m), bu);
+    value = Measurement(std::move(m), bu);
   }
 
   Quantity::Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     Magnitude mag(std::move(m));
-    value = UnitValue(mag, s);
+    value = Measurement(mag, s);
   }
 
   Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(std::move(m), std::move(e));
+    value = Measurement(std::move(m), std::move(e));
   }
 
   Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
-    value = UnitValue(std::move(m), std::move(e), bu);
+    value = Measurement(std::move(m), std::move(e), bu);
   }
 
   Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     Magnitude mag(std::move(m), std::move(e));
-    value = UnitValue(mag, s);
+    value = Measurement(mag, s);
   }
 
 #endif
@@ -216,74 +216,74 @@ namespace snt::puq {
   // overloading scalar/quantity
   Quantity operator+(const MagnitudeFloat& m, const Quantity& q) {
     UnitSystem us(q.stype);
-    return Quantity(UnitValue(m) + q.value);
+    return Quantity(Measurement(m) + q.value);
   }
   Quantity operator-(const MagnitudeFloat& m, const Quantity& q) {
     UnitSystem us(q.stype);
-    return Quantity(UnitValue(m) - q.value);
+    return Quantity(Measurement(m) - q.value);
   }
   Quantity operator*(const MagnitudeFloat& m, const Quantity& q) {
     UnitSystem us(q.stype);
-    return Quantity(UnitValue(m) * q.value);
+    return Quantity(Measurement(m) * q.value);
   }
   Quantity operator/(const MagnitudeFloat& m, const Quantity& q) {
     UnitSystem us(q.stype);
-    return Quantity(UnitValue(m) / q.value);
+    return Quantity(Measurement(m) / q.value);
   }
 
   // overloading quantity/scalar
   Quantity operator+(const Quantity& q, const MagnitudeFloat& m) {
     UnitSystem us(q.stype);
-    return Quantity(q.value + UnitValue(m));
+    return Quantity(q.value + Measurement(m));
   }
   Quantity operator-(const Quantity& q, const MagnitudeFloat& m) {
     UnitSystem us(q.stype);
-    return Quantity(q.value - UnitValue(m));
+    return Quantity(q.value - Measurement(m));
   }
   Quantity operator*(const Quantity& q, const MagnitudeFloat& m) {
     UnitSystem us(q.stype);
-    return Quantity(q.value * UnitValue(m));
+    return Quantity(q.value * Measurement(m));
   }
   Quantity operator/(const Quantity& q, const MagnitudeFloat& m) {
     UnitSystem us(q.stype);
-    return Quantity(q.value / UnitValue(m));
+    return Quantity(q.value / Measurement(m));
   }
 
 #if defined(MAGNITUDE_VALUES)
   // overloading array/quantity
   Quantity operator+(val::BaseValue::PointerType a, const Quantity& q) {
     UnitSystem us(q.stype);
-    return Quantity(UnitValue(std::move(a)) + q.value);
+    return Quantity(Measurement(std::move(a)) + q.value);
   }
   Quantity operator-(val::BaseValue::PointerType a, const Quantity& q) {
     UnitSystem us(q.stype);
-    return Quantity(UnitValue(std::move(a)) - q.value);
+    return Quantity(Measurement(std::move(a)) - q.value);
   }
   Quantity operator*(val::BaseValue::PointerType a, const Quantity& q) {
     UnitSystem us(q.stype);
-    return Quantity(UnitValue(std::move(a)) * q.value);
+    return Quantity(Measurement(std::move(a)) * q.value);
   }
   Quantity operator/(val::BaseValue::PointerType a, const Quantity& q) {
     UnitSystem us(q.stype);
-    return Quantity(UnitValue(std::move(a)) / q.value);
+    return Quantity(Measurement(std::move(a)) / q.value);
   }
 
   // overloading quantity/array
   Quantity operator+(const Quantity& q, val::BaseValue::PointerType a) {
     UnitSystem us(q.stype);
-    return Quantity(q.value + UnitValue(std::move(a)));
+    return Quantity(q.value + Measurement(std::move(a)));
   }
   Quantity operator-(const Quantity& q, val::BaseValue::PointerType a) {
     UnitSystem us(q.stype);
-    return Quantity(q.value - UnitValue(std::move(a)));
+    return Quantity(q.value - Measurement(std::move(a)));
   }
   Quantity operator*(const Quantity& q, val::BaseValue::PointerType a) {
     UnitSystem us(q.stype);
-    return Quantity(q.value * UnitValue(std::move(a)));
+    return Quantity(q.value * Measurement(std::move(a)));
   }
   Quantity operator/(const Quantity& q, val::BaseValue::PointerType a) {
     UnitSystem us(q.stype);
-    return Quantity(q.value / UnitValue(std::move(a)));
+    return Quantity(q.value / Measurement(std::move(a)));
   }
 #endif
 
@@ -328,31 +328,31 @@ namespace snt::puq {
   }
 
   // conversion of units
-  UnitValue Quantity::_convert_without_context(UnitSystem& us, const SystemType stt) const {
+  Measurement Quantity::_convert_without_context(UnitSystem& us, const SystemType stt) const {
     Dimensions dim = value.baseunits.dimensions();
     us.change(stt); // change the unit system
-    return UnitValue(value.magnitude, dim);
+    return Measurement(value.magnitude, dim);
   }
 
-  UnitValue Quantity::_convert_with_context(UnitSystem& us, const SystemType stt,
+  Measurement Quantity::_convert_with_context(UnitSystem& us, const SystemType stt,
                                             QuantityListType::iterator& qs1, QuantityListType::iterator& qs2,
                                             const std::string& q) const {
-    UnitValue uv = value;
+    Measurement uv = value;
     if (qs1->second.sifactor != "") {
-      uv *= UnitValue(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
+      uv *= Measurement(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
     }
     uv = uv.convert(std::string(Symbols::quantity_start) + q + std::string(Symbols::quantity_end));
     us.change(stt);
-    uv = UnitValue(uv.magnitude, std::string(Symbols::quantity_start) + q + std::string(Symbols::quantity_end));
+    uv = Measurement(uv.magnitude, std::string(Symbols::quantity_start) + q + std::string(Symbols::quantity_end));
     if (qs2->second.sifactor != "") {
-      uv /= UnitValue(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
+      uv /= Measurement(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
     }
     return uv;
   }
 
   // convert using Format::Base
   Quantity Quantity::convert(const Format::Base& format, SystemType system) const {
-    UnitValue uv = value;
+    Measurement uv = value;
     if (system == SystemType::NONE)
       system = stype;
     else if (system != stype)
@@ -367,18 +367,18 @@ namespace snt::puq {
   }
 
   // convert using unit value
-  Quantity Quantity::convert(const UnitValue& uv1) const {
+  Quantity Quantity::convert(const Measurement& uv1) const {
     UnitSystem us(stype);
-    UnitValue uv2 = value.convert(uv1);
+    Measurement uv2 = value.convert(uv1);
     return Quantity(uv2);
   }
 
-  Quantity Quantity::convert(const UnitValue& uv1, const SystemType system, const std::string& q) const {
+  Quantity Quantity::convert(const Measurement& uv1, const SystemType system, const std::string& q) const {
     UnitSystem us(stype);
     if (stype == system) {
       return convert(uv1);
     } else if (q == "") {
-      UnitValue uv2 = _convert_without_context(us, system);
+      Measurement uv2 = _convert_without_context(us, system);
       try {
         return Quantity(uv2.convert(uv1), system);
       } catch (const snt::puq::ConvDimExcept& e) {
@@ -394,10 +394,10 @@ namespace snt::puq {
         throw UnitSystemExcept("Quantity symbol not found: " + q);
       us.change(stype);
       if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
-        UnitValue uv2 = _convert_without_context(us, system);
+        Measurement uv2 = _convert_without_context(us, system);
         return Quantity(uv2.convert(uv1), system);
       } else {
-        UnitValue uv2 = _convert_with_context(us, system, qs1, qs2, q);
+        Measurement uv2 = _convert_with_context(us, system, qs1, qs2, q);
         return Quantity(uv2.convert(uv1), system);
       }
     }
@@ -406,7 +406,7 @@ namespace snt::puq {
   // convert using base units
   Quantity Quantity::convert(const BaseUnits& bu) const {
     UnitSystem us(stype);
-    UnitValue uv = value.convert(bu);
+    Measurement uv = value.convert(bu);
     return Quantity(uv);
   }
 
@@ -415,11 +415,11 @@ namespace snt::puq {
     if (stype == system) {
       return convert(bu);
     } else if (q == "") {
-      UnitValue uv = _convert_without_context(us, system);
+      Measurement uv = _convert_without_context(us, system);
       try {
         return Quantity(uv.convert(bu), system);
       } catch (const snt::puq::ConvDimExcept& e) {
-        throw snt::puq::ConvDimExcept(value.baseunits, stype, UnitValue(1, bu).baseunits, system);
+        throw snt::puq::ConvDimExcept(value.baseunits, stype, Measurement(1, bu).baseunits, system);
       }
     } else {
       QuantityListType::iterator qs1 = puq::UnitSystem::Data->QuantityList.find(q);
@@ -431,10 +431,10 @@ namespace snt::puq {
         throw UnitSystemExcept("Quantity symbol not found: " + q);
       us.change(stype);
       if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
-        UnitValue uv = _convert_without_context(us, system);
+        Measurement uv = _convert_without_context(us, system);
         return Quantity(uv.convert(bu), system);
       } else {
-        UnitValue uv = _convert_with_context(us, system, qs1, qs2, q);
+        Measurement uv = _convert_with_context(us, system, qs1, qs2, q);
         return Quantity(uv.convert(bu), system);
       }
     }
@@ -445,14 +445,14 @@ namespace snt::puq {
     preprocess(s, system);
     UnitSystem us(stype);
     if (stype == system) {
-      UnitValue uv = value.convert(s);
+      Measurement uv = value.convert(s);
       return Quantity(uv);
     } else if (q == "") {
-      UnitValue uv = _convert_without_context(us, system);
+      Measurement uv = _convert_without_context(us, system);
       try {
         return Quantity(uv.convert(s), system);
       } catch (const snt::puq::ConvDimExcept& e) {
-        throw snt::puq::ConvDimExcept(value.baseunits, stype, UnitValue(s).baseunits, system);
+        throw snt::puq::ConvDimExcept(value.baseunits, stype, Measurement(s).baseunits, system);
       }
     } else {
       QuantityListType::iterator qs1 = puq::UnitSystem::Data->QuantityList.find(q);
@@ -464,10 +464,10 @@ namespace snt::puq {
         throw UnitSystemExcept("Quantity symbol not found: " + q);
       us.change(stype);
       if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
-        UnitValue uv = _convert_without_context(us, system);
+        Measurement uv = _convert_without_context(us, system);
         return Quantity(uv.convert(s), system);
       } else {
-        UnitValue uv = _convert_with_context(us, system, qs1, qs2, q);
+        Measurement uv = _convert_with_context(us, system, qs1, qs2, q);
         return Quantity(uv.convert(s), system);
       }
     }
@@ -475,13 +475,13 @@ namespace snt::puq {
 
   Quantity Quantity::rebase_prefixes() {
     UnitSystem us(stype);
-    UnitValue uv = value.rebase_prefixes();
+    Measurement uv = value.rebase_prefixes();
     return Quantity(uv);
   }
 
   Quantity Quantity::rebase_dimensions() {
     UnitSystem us(stype);
-    UnitValue uv = value.rebase_dimensions();
+    Measurement uv = value.rebase_dimensions();
     return Quantity(uv);
   }
 

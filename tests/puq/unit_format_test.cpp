@@ -3,7 +3,7 @@
 #include <snt/puq/exponent.h>
 #include <snt/puq/value/dimensions.h>
 #include <snt/puq/value/base_units.h>
-#include <snt/puq/value/unit_value.h>
+#include <snt/puq/value/measurement.h>
 #include <snt/puq/quantity.h>
 
 using namespace snt;
@@ -89,32 +89,32 @@ TEST(UnitFormat, MagnitudeFormat) {
 #endif
 }
 
-TEST(UnitFormat, UnitValueFormat) {
+TEST(UnitFormat, MeasurementFormat) {
 
-  puq::UnitValue value;
+  puq::Measurement value;
   puq::UnitFormat format;
 
   format = puq::UnitFormat(puq::Format::Math::UNICODE);
-  value = puq::UnitValue("3*km-2*m/s2"); // normal units
+  value = puq::Measurement("3*km-2*m/s2"); // normal units
   EXPECT_EQ(value.to_string(format), "3⋅km⁻²⋅m⋅s⁻²");
 
-  value = puq::UnitValue("3.234019394939e12*km-2"); // decimal orders
+  value = puq::Measurement("3.234019394939e12*km-2"); // decimal orders
   EXPECT_EQ(value.to_string(format), "3.23402×10¹²⋅km⁻²");
 
   format = puq::UnitFormat(puq::Format::Precision(10));
-  value = puq::UnitValue("3.2340342349349823e3*m/s2"); // higher precision
+  value = puq::Measurement("3.2340342349349823e3*m/s2"); // higher precision
   EXPECT_EQ(value.to_string(format), "3.234034235e3*m*s-2");
 
   format = puq::UnitFormat(puq::Format::Math::UNICODE, 10); // precision and UNICODE format
-  value = puq::UnitValue("3.2340342349349823e3*km-2");
+  value = puq::Measurement("3.2340342349349823e3*km-2");
   EXPECT_EQ(value.to_string(format), "3.234034235×10³⋅km⁻²");
 
   format = puq::UnitFormat(puq::Format::Display::MAGNITUDE); // display only magnitude
-  value = puq::UnitValue("3*km/s");
+  value = puq::Measurement("3*km/s");
   EXPECT_EQ(value.to_string(format), "3");
 
   format = puq::UnitFormat(puq::Format::Display::UNITS); // display only magnitude
-  value = puq::UnitValue("3*km/s");
+  value = puq::Measurement("3*km/s");
   EXPECT_EQ(value.to_string(format), "km*s-1");
 }
 

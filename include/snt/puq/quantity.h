@@ -16,15 +16,15 @@ namespace snt::puq {
 
   private:
     void preprocess(std::string& expression, SystemType& system) const;
-    UnitValue _convert_without_context(UnitSystem& us, const SystemType stt) const;
-    UnitValue _convert_with_context(UnitSystem& us, const SystemType stt, QuantityListType::iterator& qs1, QuantityListType::iterator& qs2, const std::string& q) const;
+    Measurement _convert_without_context(UnitSystem& us, const SystemType stt) const;
+    Measurement _convert_with_context(UnitSystem& us, const SystemType stt, QuantityListType::iterator& qs1, QuantityListType::iterator& qs2, const std::string& q) const;
 
   public:
     SystemType stype;
-    UnitValue value;
+    Measurement value;
     Quantity() : stype(UnitSystem::System) {};
     Quantity(std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const UnitValue& v, const SystemType system = UnitSystem::System);
+    Quantity(const Measurement& v, const SystemType system = UnitSystem::System);
     Quantity(const MAGNITUDE_TYPE& m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const MAGNITUDE_TYPE& m, const SystemType system = UnitSystem::System);
     Quantity(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
@@ -91,8 +91,8 @@ namespace snt::puq {
     void operator/=(Quantity& q);
     Quantity convert(const Format::Base& format, SystemType system = SystemType::NONE) const;
     Quantity convert(const Quantity& q) const;
-    Quantity convert(const UnitValue& uv) const;
-    Quantity convert(const UnitValue& uv, const SystemType system, const std::string& q = "") const;
+    Quantity convert(const Measurement& uv) const;
+    Quantity convert(const Measurement& uv, const SystemType system, const std::string& q = "") const;
     Quantity convert(const BaseUnits& bu) const;
     Quantity convert(const BaseUnits& bu, const SystemType system, const std::string& q = "") const;
     Quantity convert(std::string s, SystemType system = SystemType::NONE, const std::string& q = "") const;

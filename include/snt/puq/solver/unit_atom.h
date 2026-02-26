@@ -3,7 +3,7 @@
 
 #include <snt/exs/settings.h>
 #include <snt/exs/atom_base.h>
-#include <snt/puq/value/unit_value.h>
+#include <snt/puq/value/measurement.h>
 
 namespace snt::puq {
 
@@ -18,11 +18,11 @@ namespace snt::puq {
     }
   };
 
-  class UnitAtom : public exs::AtomBase<UnitAtom, UnitValue> {
+  class UnitAtom : public exs::AtomBase<UnitAtom, Measurement> {
   public:
     UnitAtom(UnitAtom& a) : AtomBase(a) {};
-    UnitAtom(UnitValue v) : AtomBase(v) {};
-    static UnitValue from_string(const std::string& s, exs::BaseSettings* set = nullptr);
+    UnitAtom(Measurement v) : AtomBase(v) {};
+    static Measurement from_string(const std::string& s, exs::BaseSettings* set = nullptr);
     std::string to_string();
     void math_power(ExponentVariant& e);
     void math_power(UnitAtom* other);

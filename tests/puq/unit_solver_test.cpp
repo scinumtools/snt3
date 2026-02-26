@@ -75,7 +75,7 @@ TEST(UnitSolver, SolveErrors) {
   puq::UnitSolver solver;
   puq::UnitAtom atom = solver.solve("{#m_p}");
 
-  puq::UnitValue uv = atom.value.convert(puq::Format::Base::MKS);
+  puq::Measurement uv = atom.value.convert(puq::Format::Base::MKS);
   EXPECT_EQ(uv.to_string(), "1.67262192595(52)e-27*kg");
 
   puq::Dimensions dim = atom.value.baseunits.dimensions();

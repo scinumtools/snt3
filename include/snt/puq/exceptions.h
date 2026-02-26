@@ -18,12 +18,12 @@ namespace snt::puq {
     }
   };
 
-  class UnitValueExcept : public std::exception {
+  class MeasurementExcept : public std::exception {
   private:
     std::string message;
 
   public:
-    UnitValueExcept(std::string m) : message(m) {}
+    MeasurementExcept(std::string m) : message(m) {}
     const char* what() const noexcept override {
       return message.c_str();
     }

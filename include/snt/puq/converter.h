@@ -5,7 +5,7 @@
 #include <snt/puq/util/data_table.h>
 #include <snt/puq/value/base_units.h>
 #include <snt/puq/value/dimensions.h>
-#include <snt/puq/value/unit_value.h>
+#include <snt/puq/value/measurement.h>
 
 #include <bitset>
 #include <memory>
@@ -80,11 +80,11 @@ namespace snt::puq {
       if (s1 != s2) {
         us.change(s1);
         for (auto quant : UnitSystem::Data->QuantityList) {
-          UnitValue uv(std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end));
+          Measurement uv(std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end));
           Dimensions dim_q = uv.baseunits.dimensions();
           if (dim_q == dim1) {
             us.change(s2);
-            uv = UnitValue(std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end));
+            uv = Measurement(std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end));
             dim_q = uv.baseunits.dimensions();
             for (auto unit : UnitSystem::Data->DimensionMap) {
               if (Dimensions(1, unit.second.dimensions) != dim_q)

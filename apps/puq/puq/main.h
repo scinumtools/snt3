@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <snt/puq/value/unit_value.h>
+#include <snt/puq/value/measurement.h>
 #include <snt/puq/quantity.h>
 #include <snt/puq/value/base_units.h>
 #include <snt/puq/value/dimensions.h>

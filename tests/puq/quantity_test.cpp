@@ -17,8 +17,8 @@ TEST(Quantity, Initialization) {
   q = puq::Quantity(1.2, {{"k", "m", 3}}); // magnitude and dimensions
   EXPECT_EQ(q.to_string(), "1.2*km3");
 
-  puq::UnitValue uv(1.2, {{"k", "m", 3}});
-  q = puq::Quantity(uv); // UnitValue
+  puq::Measurement uv(1.2, {{"k", "m", 3}});
+  q = puq::Quantity(uv); // Measurement
   EXPECT_EQ(q.to_string(), "1.2*km3");
 
   q = puq::Quantity("23.34*g/cm3"); // from a unit expression

@@ -26,8 +26,8 @@ namespace snt::nostd {
   }
 #endif
 
-  puq::UnitValue exp(const puq::UnitValue& uv) {
-    return puq::UnitValue(exp(uv.magnitude), uv.baseunits);
+  puq::Measurement exp(const puq::Measurement& uv) {
+    return puq::Measurement(exp(uv.magnitude), uv.baseunits);
   }
 
 } // namespace snt::nostd

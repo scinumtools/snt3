@@ -3,7 +3,7 @@
 #include <snt/puq/systems/unit_system.h>
 #include <snt/puq/util/data_table.h>
 #include <snt/puq/value/dimensions.h>
-#include <snt/puq/value/unit_value.h>
+#include <snt/puq/value/measurement.h>
 
 #include <iomanip>
 #include <iostream>
@@ -53,7 +53,7 @@ namespace snt::puq {
           continue;
         if ((unit.second.utype & Utype::CSB) == Utype::CSB)
           continue;
-        UnitValue uv(unit.first);
+        Measurement uv(unit.first);
         Dimensions dim = uv.baseunits.dimensions();
         tab.append({unit.first,
                     unit.second.name,
@@ -71,7 +71,7 @@ namespace snt::puq {
       for (auto& unit : ordered) {
         if ((unit.second.utype & Utype::CST) != Utype::CST)
           continue;
-        UnitValue uv(unit.first);
+        Measurement uv(unit.first);
         Dimensions dim = uv.baseunits.dimensions();
         tab.append({unit.first,
                     unit.second.name,
@@ -87,7 +87,7 @@ namespace snt::puq {
       std::map<std::string, QuantityStruct> ordered(UnitSystem::Data->QuantityList.begin(), UnitSystem::Data->QuantityList.end());
       for (auto& quantity : ordered) {
         std::string symbol = std::string(Symbols::quantity_start) + quantity.first + std::string(Symbols::quantity_end);
-        UnitValue uv(symbol);
+        Measurement uv(symbol);
         Dimensions dim = uv.baseunits.dimensions();
         tab.append({symbol,
                     QuantityNames.at(quantity.first),

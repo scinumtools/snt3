@@ -153,7 +153,7 @@ namespace snt::puq {
           }
           continue;
         } else {
-          throw UnitValueExcept("Undefined quantity symbol: " + bu.unit);
+          throw MeasurementExcept("Undefined quantity symbol: " + bu.unit);
         }
       }
       // dimensions
@@ -180,11 +180,11 @@ namespace snt::puq {
 					mul_exp(dmap->second.dimensions[i], bu.exponent));
             }
           } else {
-            throw UnitValueExcept("Undefined unit symbol: " + bu.unit);
+            throw MeasurementExcept("Undefined unit symbol: " + bu.unit);
           }
         }
       } else {
-        throw UnitValueExcept("Undefined unit symbol: " + bu.unit);
+        throw MeasurementExcept("Undefined unit symbol: " + bu.unit);
       }
     }
     if ((dim.utype & Utype::NUL) == Utype::NUL) // add liear utype for dimensionless values
