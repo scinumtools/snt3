@@ -9,7 +9,6 @@
 
 namespace snt::puq {
 
-#ifdef MAGNITUDE_UNCERTAINTIES
   class Magnitude {
   public:
 #if defined(MAGNITUDE_VALUES)
@@ -75,7 +74,6 @@ namespace snt::puq {
     bool operator!=(const Magnitude& a) const;
     void pow(const ExponentVariant& e);
   };
-#endif
 
 } // namespace snt::puq
 

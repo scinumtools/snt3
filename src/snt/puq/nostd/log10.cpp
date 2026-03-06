@@ -12,7 +12,6 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude log10(const puq::Magnitude& m) {
     // y ± Dy = log(x ± Dx) -> Dy = 1 / ln(10) * Dx / x
 #ifdef MAGNITUDE_VALUES
@@ -27,6 +26,5 @@ namespace snt::nostd {
     return puq::Magnitude(log10(m.value), m.uncertainty / (m.value * std::log(10)));
 #endif
   }
-#endif
 
 } // namespace snt::nostd

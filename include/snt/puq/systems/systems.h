@@ -59,7 +59,7 @@ namespace snt::puq {
    */
 
   struct UnitPrefixStruct {
-    MAGNITUDE_TYPE magnitude;
+    Magnitude magnitude;
     std::string definition;
     std::string name;
   };

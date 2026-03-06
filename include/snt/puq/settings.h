@@ -13,7 +13,6 @@ namespace snt::puq {
    *  Modules
    */
 
-#define MAGNITUDE_UNCERTAINTIES
 #if (ENABLE_PUQ_MAGNITUDE_VALUE)
 #define MAGNITUDE_VALUES
 #endif
@@ -77,17 +76,10 @@ namespace snt::puq {
   /*
    *  Type settings
    */
-#if defined(MAGNITUDE_UNCERTAINTIES)
-  #define MAGNITUDE_TYPE Magnitude
-  #if defined(MAGNITUDE_VALUES)
-    #define MAGNITUDE_VALUE val::BaseValue::PointerType
-  #else
-    #define MAGNITUDE_VALUE MagnitudeFloat
-  #endif
-#elif defined(MAGNITUDE_VALUES)
-  #define MAGNITUDE_TYPE val::BaseValue::PointerType
+#if defined(MAGNITUDE_VALUES)
+  #define MAGNITUDE_VALUE val::BaseValue::PointerType
 #else
-  #define MAGNITUDE_TYPE MagnitudeFloat
+  #define MAGNITUDE_VALUE MagnitudeFloat
 #endif
   
 }

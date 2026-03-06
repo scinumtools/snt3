@@ -9,9 +9,7 @@ namespace snt::nostd {
 #if defined(MAGNITUDE_VALUES)
   extern std::string to_string(val::BaseValue::PointerType value, int precision = std::cout.precision());
 #endif
-#ifdef MAGNITUDE_UNCERTAINTIES
   extern std::string to_string(const puq::Magnitude& value, int precision = std::cout.precision());
-#endif
   extern std::string to_string(const puq::BaseUnits& value, int precision = std::cout.precision());
   extern std::string to_string(const puq::Dimensions& value, const puq::UnitFormat& format = puq::UnitFormat());
   extern std::string to_string(const puq::ExponentVariant& value, const puq::UnitFormat& format = puq::UnitFormat());

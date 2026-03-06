@@ -10,16 +10,15 @@ namespace snt::puq {
 
   class Measurement {
   public:
-    MAGNITUDE_TYPE magnitude;
+    Magnitude magnitude;
     BaseUnits baseunits;
     Measurement() : magnitude(1) {}
     Measurement(const std::string& s);
-    Measurement(const MAGNITUDE_TYPE& m) : magnitude(m) {}
-    Measurement(const MAGNITUDE_TYPE& m, const std::string& s);
-    Measurement(const MAGNITUDE_TYPE& m, const Dimensions& dim);
-    Measurement(const MAGNITUDE_TYPE& m, const BaseUnits& bu) : magnitude(m), baseunits(bu) {};
-    Measurement(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bul) : magnitude(m), baseunits(bul) {};
-#ifdef MAGNITUDE_UNCERTAINTIES
+    Measurement(const Magnitude& m) : magnitude(m) {}
+    Measurement(const Magnitude& m, const std::string& s);
+    Measurement(const Magnitude& m, const Dimensions& dim);
+    Measurement(const Magnitude& m, const BaseUnits& bu) : magnitude(m), baseunits(bu) {};
+    Measurement(const Magnitude& m, const BaseUnits::ListType& bul) : magnitude(m), baseunits(bul) {};
     Measurement(const MagnitudeFloat& m, const std::string& s);
     Measurement(const MagnitudeFloat& m) : magnitude(m) {};
     Measurement(const MagnitudeFloat& m, const BaseUnits& bu) : magnitude(m), baseunits(bu) {};
@@ -37,7 +36,6 @@ namespace snt::puq {
     Measurement(val::BaseValue::PointerType m, val::BaseValue::PointerType e) : magnitude(std::move(m), std::move(e)) {};
     Measurement(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits& bu) : magnitude(std::move(m), std::move(e)), baseunits(bu) {};
     Measurement(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bul) : magnitude(std::move(m), std::move(e)), baseunits(bul) {};
-#endif
 #endif
     std::size_t size() const;
 #if defined(MAGNITUDE_VALUES)

@@ -9,9 +9,7 @@ namespace snt::nostd {
 #if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType log(val::BaseValue::PointerType a);
 #endif
-#ifdef MAGNITUDE_UNCERTAINTIES
   extern puq::Magnitude log(const puq::Magnitude& m);
-#endif
 
 } // namespace snt::nostd
 

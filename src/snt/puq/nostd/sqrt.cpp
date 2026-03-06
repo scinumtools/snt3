@@ -12,7 +12,6 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude sqrt(const puq::Magnitude& m) {
     // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
 #ifdef MAGNITUDE_VALUES
@@ -22,6 +21,5 @@ namespace snt::nostd {
     return puq::Magnitude(sqrt(m.value), 0.5 * pow(m.value, -0.5) * m.uncertainty);
 #endif
   }
-#endif
 
 } // namespace snt::nostd

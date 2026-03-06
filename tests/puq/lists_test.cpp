@@ -53,11 +53,7 @@ void test_unit_definitions() {
       continue;
 
     puq::DimensionStruct dmap = puq::UnitSystem::Data->DimensionMap.at(unit.first);
-#ifdef MAGNITUDE_UNCERTAINTIES
-    puq::MAGNITUDE_TYPE magnitude(dmap.magnitude, dmap.uncertainty);
-#else
-    puq::MAGNITUDE_TYPE magnitude(dmap.magnitude);
-#endif
+    puq::Magnitude magnitude(dmap.magnitude, dmap.uncertainty);
     puq::Dimensions dim1(magnitude, dmap.dimensions);
     std::string m1 = dim1.to_string();
 

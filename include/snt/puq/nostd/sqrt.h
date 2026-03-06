@@ -9,9 +9,7 @@ namespace snt::nostd {
 #if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType sqrt(val::BaseValue::PointerType a);
 #endif
-#ifdef MAGNITUDE_UNCERTAINTIES
   extern puq::Magnitude sqrt(const puq::Magnitude& m);
-#endif
 
 } // namespace snt::nostd
 

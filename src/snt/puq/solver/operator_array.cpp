@@ -7,7 +7,6 @@ namespace snt::puq {
   // TODO: this needs probably templates because of the ArrayValue
   void OperatorArray::operate_group(exs::TokenListBase* tokens) {
     exs::Token group;
-#ifdef MAGNITUDE_UNCERTAINTIES
     std::vector<double> nv(num_groups);
     std::vector<double> ne(num_groups);
     bool hasUncertainties = false;
@@ -35,18 +34,6 @@ namespace snt::puq {
     } else {
       throw std::runtime_error("Detected empty atom in a group");
     }
-#else
-    std::vector<double> nv(num_groups);
-    for (size_t i = 0; i < num_groups; i++) {
-      group = tokens->get_left();
-      UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
-      val::ArrayValue<double> value(atom->value.magnitude.get());
-      nv[i] = value.get_value(0);
-    }
-    std::reverse(nv.begin(), nv.end());
-    UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
-    atom->value.magnitude = std::make_unique<val::ArrayValue<double>>(nv);
-#endif
     tokens->put_left(group);
   };
 

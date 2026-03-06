@@ -40,23 +40,21 @@ namespace snt::puq {
     measurement = v;
   }
 
-  Quantity::Quantity(const MAGNITUDE_TYPE& m, const SystemType system) : stype(system) {
+  Quantity::Quantity(const Magnitude& m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     measurement = Measurement(m);
   }
 
-  Quantity::Quantity(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(const Magnitude& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     measurement = Measurement(m, bu);
   }
 
-  Quantity::Quantity(const MAGNITUDE_TYPE& m, std::string s, const SystemType system) : stype(system) {
+  Quantity::Quantity(const Magnitude& m, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     measurement = Measurement(m, s);
   }
-
-#ifdef MAGNITUDE_UNCERTAINTIES
 
   Quantity::Quantity(const MagnitudeFloat& m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
@@ -127,8 +125,6 @@ namespace snt::puq {
     Magnitude mag(std::move(m), std::move(e));
     measurement = Measurement(mag, s);
   }
-
-#endif
 
 #endif
 

@@ -12,7 +12,6 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude floor(const puq::Magnitude& m) {
 #ifdef MAGNITUDE_VALUES
     return puq::Magnitude(m.value->math_floor());
@@ -20,6 +19,5 @@ namespace snt::nostd {
     return puq::Magnitude(floor(m.value));
 #endif
   }
-#endif
 
 } // namespace snt::nostd

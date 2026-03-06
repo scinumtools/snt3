@@ -78,7 +78,6 @@ TEST(UnitFormat, MagnitudeFormat) {
   m = puq::Magnitude(3.2340342349349823e3); // increased precision
   EXPECT_EQ(m.to_string(format), "3.234034235e3");
 
-#ifdef MAGNITUDE_UNCERTAINTIES
   format = puq::UnitFormat(puq::Format::Math::UNICODE);
   m = puq::Magnitude(3.234019394939e12, 2.34e8); // with uncertainties
   EXPECT_EQ(m.to_string(format), "3.23402(23)×10¹²");
@@ -86,7 +85,6 @@ TEST(UnitFormat, MagnitudeFormat) {
   format = puq::UnitFormat(puq::Format::Math::UNICODE, puq::Format::Uncertainty::HIDE);
   m = puq::Magnitude(3.234019394939e12, 2.34e8); // without uncertainties
   EXPECT_EQ(m.to_string(format), "3.23402×10¹²");
-#endif
 }
 
 TEST(UnitFormat, MeasurementFormat) {

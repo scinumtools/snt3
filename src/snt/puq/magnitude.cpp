@@ -6,8 +6,6 @@
 #include <iostream>
 #include <sstream>
 
-#ifdef MAGNITUDE_UNCERTAINTIES
-
 namespace snt::puq {
 
 #if defined(MAGNITUDE_VALUES)
@@ -302,5 +300,3 @@ namespace snt::puq {
   }
 
 } // namespace snt::puq
-
-#endif

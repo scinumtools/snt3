@@ -19,14 +19,14 @@ namespace snt::puq {
     baseunits = atom.value.baseunits;
   }
 
-  Measurement::Measurement(const MAGNITUDE_TYPE& m, const std::string& s) {
+  Measurement::Measurement(const Magnitude& m, const std::string& s) {
     UnitSolver solver;
     UnitAtom atom = solver.solve(s);
     magnitude = m * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
 
-  Measurement::Measurement(const MAGNITUDE_TYPE& m, const Dimensions& dim) {
+  Measurement::Measurement(const Magnitude& m, const Dimensions& dim) {
     magnitude = m * dim.numerical;
     for (int i = 0; i < Config::num_basedim; i++) {
       const std::string& symbol = SystemData::BaseUnitOrder[i];
@@ -72,22 +72,12 @@ namespace snt::puq {
     std::string multiply = format.multiply_symbol();
     std::stringstream ss;
     if (format.display_magnitude()) {
-#if defined(MAGNITUDE_UNCERTAINTIES)
 #if defined(MAGNITUDE_VALUES)
       if (!magnitude.value->is_unity() || baseunits.size() == 0)
         ss << magnitude.to_string(format) << multiply;
 #else
       if (magnitude.value != 1 || baseunits.size() == 0)
         ss << magnitude.to_string(format) << multiply;
-#endif
-#elif defined(MAGNITUDE_VALUES)
-      if (!magnitude->is_unity() || baseunits.size() == 0)
-        ss << magnitude->to_string(format) << multiply;
-#else
-      if (magnitude != 1 || baseunits.size() == 0) {
-        ss << std::setprecision(format.precision);
-        ss << magnitude << std::scientific << multiply;
-      }
 #endif
     }
     if (format.display_units()) {
@@ -103,8 +93,8 @@ namespace snt::puq {
       Converter conv(v2.baseunits, v1.baseunits);
       if constexpr (puq::Config::use_units_logarithmic) {
 	if (conv.utype == Utype::LOG) {
-	  MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
-	  MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	  Magnitude m1 = v1.magnitude * conv.dimensions1.numerical;
+	  Magnitude m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
 	  if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
 	    m1 = nostd::pow(10, m1);
 	  if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
@@ -123,8 +113,8 @@ namespace snt::puq {
       Converter conv(v2.baseunits, v1.baseunits);
       if constexpr (puq::Config::use_units_logarithmic) {
 	if (conv.utype == Utype::LOG) {
-	  MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
-	  MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	  Magnitude m1 = v1.magnitude * conv.dimensions1.numerical;
+	  Magnitude m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
 	  if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
 	    m1 = nostd::pow(10, m1);
 	  if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
@@ -142,8 +132,8 @@ namespace snt::puq {
     Converter conv(v2.baseunits, v1.baseunits);
     if constexpr (puq::Config::use_units_logarithmic) {
       if (conv.utype == Utype::LOG) {
-	MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
-	MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	Magnitude m1 = v1.magnitude * conv.dimensions1.numerical;
+	Magnitude m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
 	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
 	  m1 = nostd::pow(10, m1);
 	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
@@ -162,8 +152,8 @@ namespace snt::puq {
     Converter conv(v.baseunits, baseunits);
     if constexpr (puq::Config::use_units_logarithmic) {
       if (conv.utype == Utype::LOG) {
-	MAGNITUDE_TYPE m1 = magnitude * conv.dimensions1.numerical;
-	MAGNITUDE_TYPE m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
+	Magnitude m1 = magnitude * conv.dimensions1.numerical;
+	Magnitude m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
 	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
 	  m1 = nostd::pow(10, m1);
 	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
@@ -179,8 +169,8 @@ namespace snt::puq {
     Converter conv(v2.baseunits, v1.baseunits);
     if constexpr (puq::Config::use_units_logarithmic) {
       if (conv.utype == Utype::LOG) {
-	MAGNITUDE_TYPE m1 = v1.magnitude * conv.dimensions1.numerical;
-	MAGNITUDE_TYPE m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	Magnitude m1 = v1.magnitude * conv.dimensions1.numerical;
+	Magnitude m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
 	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
 	  m1 = nostd::pow(10, m1);
 	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
@@ -199,8 +189,8 @@ namespace snt::puq {
     Converter conv(v.baseunits, baseunits);
     if constexpr (puq::Config::use_units_logarithmic) {
       if (conv.utype == Utype::LOG) {
-	MAGNITUDE_TYPE m1 = magnitude * conv.dimensions1.numerical;
-	MAGNITUDE_TYPE m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
+	Magnitude m1 = magnitude * conv.dimensions1.numerical;
+	Magnitude m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
 	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
 	  m1 = nostd::pow(10, m1);
 	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
@@ -236,7 +226,7 @@ namespace snt::puq {
   }
 
   void Measurement::pow(const ExponentVariant& e) {
-#if defined(MAGNITUDE_UNCERTAINTIES) || defined(MAGNITUDE_VALUES)
+#if defined(MAGNITUDE_VALUES)
     magnitude.pow(e);
 #else
     magnitude = std::pow(magnitude, (ExponentFloat)e);
@@ -251,7 +241,7 @@ namespace snt::puq {
 
   Measurement Measurement::convert(const Measurement& v) const {
     Converter conv(baseunits, v.baseunits);
-    MAGNITUDE_TYPE m = conv.convert(magnitude, v.magnitude);
+    Magnitude m = conv.convert(magnitude, v.magnitude);
     return Measurement(m, v.baseunits);
   }
 
@@ -287,7 +277,7 @@ namespace snt::puq {
   }
 
   Measurement Measurement::rebase_prefixes() {
-    MAGNITUDE_TYPE mag = magnitude;
+    Magnitude mag = magnitude;
     std::map<std::string, BaseUnit> bumap;
     for (const auto& bu : baseunits) {
       if (bumap.find(bu.unit) == bumap.end()) {
@@ -313,7 +303,7 @@ namespace snt::puq {
   }
 
   Measurement Measurement::rebase_dimensions() {
-    MAGNITUDE_TYPE mag = magnitude;
+    Magnitude mag = magnitude;
     std::map<std::string, BaseUnit> bumap;
     for (const auto& bu : baseunits) {
       Dimensions dim = BaseUnits(bu.prefix + bu.unit).dimensions();

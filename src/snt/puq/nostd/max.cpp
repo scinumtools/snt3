@@ -12,7 +12,6 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_UNCERTAINTIES
   extern puq::Magnitude max(const puq::Magnitude& m1, const puq::Magnitude& m2) {
     // x ± Dx = max(x ± Dx, y ± Dy)  <- if x > y
     // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
@@ -33,6 +32,5 @@ namespace snt::nostd {
     return puq::Magnitude(value, (value == m1.value) ? m1.uncertainty : m2.uncertainty);
 #endif
   }
-#endif
 
 } // namespace snt::nostd

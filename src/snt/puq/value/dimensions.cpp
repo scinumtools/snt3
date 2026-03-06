@@ -16,13 +16,11 @@ namespace snt::puq {
     }
   }
 
-  Dimensions::Dimensions(const MAGNITUDE_TYPE& n) : utype(Utype::NUL), numerical(n) {
+  Dimensions::Dimensions(const Magnitude& n) : utype(Utype::NUL), numerical(n) {
     for (int i = 0; i < Config::num_basedim; i++) {
       physical[i] = 0;
     }
   }
-
-#ifdef MAGNITUDE_UNCERTAINTIES
 
   Dimensions::Dimensions(const MagnitudeFloat& m, const MagnitudeFloat& e) : utype(Utype::NUL), numerical(m, e) {
     for (int i = 0; i < Config::num_basedim; i++) {
@@ -30,18 +28,15 @@ namespace snt::puq {
     }
   }
 
-#endif
-
-  inline std::string _numerical_to_string(MAGNITUDE_TYPE numerical, const BaseDimensions& physical,
+  inline std::string _numerical_to_string(Magnitude numerical, const BaseDimensions& physical,
                                           const UnitFormat& format) {
     std::string multiply = format.multiply_symbol();
     std::stringstream ss;
     if (format.base == Format::Base::MKS) {
-      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e-3, exponent_to_float(physical[1])));
+      numerical = numerical * (Magnitude)(std::pow(1e-3, exponent_to_float(physical[1])));
     } else if (format.base == Format::Base::CGS) {
-      numerical = numerical * (MAGNITUDE_TYPE)(std::pow(1e2, exponent_to_float(physical[0])));
+      numerical = numerical * (Magnitude)(std::pow(1e2, exponent_to_float(physical[0])));
     }
-#if defined(MAGNITUDE_UNCERTAINTIES)
 #if defined(MAGNITUDE_VALUES)
     if (!numerical.value->is_unity() && format.display_magnitude()) {
       ss << numerical.to_string(format) << multiply;
@@ -49,16 +44,6 @@ namespace snt::puq {
 #else
     if (numerical.value != 1 && format.display_magnitude()) {
       ss << numerical.to_string(format) << multiply;
-    }
-#endif
-#elif defined(MAGNITUDE_VALUES)
-    if (!numerical->is_unity() && format.display_magnitude()) {
-      ss << numerical->to_string(format) << multiply;
-    }
-#else
-    if (numerical != 1 && format.display_magnitude()) {
-      ss << std::setprecision(format.precision);
-      ss << numerical << std::scientific << multiply;
     }
 #endif
     return ss.str();

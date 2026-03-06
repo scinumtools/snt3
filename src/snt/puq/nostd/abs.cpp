@@ -12,7 +12,6 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude abs(const puq::Magnitude& m) {
     // abs(y ± Dy) = abs(y) ± Dy
 #ifdef MAGNITUDE_VALUES
@@ -21,6 +20,5 @@ namespace snt::nostd {
     return puq::Magnitude(abs(m.value), m.uncertainty);
 #endif
   }
-#endif
 
 } // namespace snt::nostd

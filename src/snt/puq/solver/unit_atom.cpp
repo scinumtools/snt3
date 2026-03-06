@@ -11,16 +11,12 @@ namespace snt::puq {
 
   inline void _parse_number(std::string& expr, Measurement& uv, const std::smatch& m) {
     if (m[6] == "") {
-#ifdef MAGNITUDE_UNCERTAINTIES
 #if defined(MAGNITUDE_VALUES)
       uv.magnitude.value = std::make_unique<val::ArrayValue<double>>(nostd::to_number(expr));
 #endif
-#else
-      uv.magnitude = nostd::to_number(expr);
-#endif
+      //uv.magnitude = nostd::to_number(expr);
     } else {
       std::string decimals = m[3].str() == "" ? "." : m[3].str();
-#ifdef MAGNITUDE_UNCERTAINTIES
 #if defined(MAGNITUDE_VALUES)
       uv.magnitude.value = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[1].str() + decimals + m[8].str()));
       if (m[10] == "")
@@ -28,9 +24,7 @@ namespace snt::puq {
       else
         uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
 #endif
-#else
-      uv.magnitude = nostd::to_number(m[1].str() + decimals + m[8].str());
-#endif
+      //uv.magnitude = nostd::to_number(m[1].str() + decimals + m[8].str());
     }
   }
 

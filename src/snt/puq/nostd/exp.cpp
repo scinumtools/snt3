@@ -12,7 +12,6 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude exp(const puq::Magnitude& e) {
     // z ± Dz = pow(e, y ± Dy) -> Dz = pow(e, y) * log(e) * Dy
 #ifdef MAGNITUDE_VALUES
@@ -24,7 +23,6 @@ namespace snt::nostd {
     return puq::Magnitude(exp(e.value), exp(e.value) * e.uncertainty);
 #endif
   }
-#endif
 
   puq::Measurement exp(const puq::Measurement& uv) {
     return puq::Measurement(exp(uv.magnitude), uv.baseunits);

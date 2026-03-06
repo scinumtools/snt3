@@ -12,7 +12,6 @@ namespace snt::nostd {
   }
 #endif
 
-#ifdef MAGNITUDE_UNCERTAINTIES
   puq::Magnitude pow(const puq::Magnitude& m, const puq::ExponentFloat& e) {
 #ifdef MAGNITUDE_VALUES
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
@@ -27,6 +26,7 @@ namespace snt::nostd {
     return puq::Magnitude(pow(m.value, e), abs(e * pow(m.value, e - 1)) * m.uncertainty);
 #endif
   }
+  
   puq::Magnitude pow(const puq::Magnitude& m, const puq::Magnitude& e) {
     // Dz = sqrt(pow(Dzx,2)+pow(Dzy,2))
     // z ± Dz = pow(x ± Dx, y ± Dy)
@@ -51,6 +51,5 @@ namespace snt::nostd {
     return puq::Magnitude(pow(m.value, e.value), sqrt(Dzx * Dzx + Dzy * Dzy));
 #endif
   }
-#endif
 
 } // namespace snt::nostd

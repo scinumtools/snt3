@@ -25,10 +25,9 @@ namespace snt::puq {
     Quantity() : stype(UnitSystem::System) {};
     Quantity(std::string s, const SystemType system = SystemType::NONE);
     Quantity(const Measurement& v, const SystemType system = UnitSystem::System);
-    Quantity(const MAGNITUDE_TYPE& m, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const MAGNITUDE_TYPE& m, const SystemType system = UnitSystem::System);
-    Quantity(const MAGNITUDE_TYPE& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-#ifdef MAGNITUDE_UNCERTAINTIES
+    Quantity(const Magnitude& m, std::string s, const SystemType system = SystemType::NONE);
+    Quantity(const Magnitude& m, const SystemType system = UnitSystem::System);
+    Quantity(const Magnitude& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
     Quantity(const MagnitudeFloat& m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const MagnitudeFloat& m, const SystemType system = UnitSystem::System);
     Quantity(const MagnitudeFloat& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
@@ -42,7 +41,6 @@ namespace snt::puq {
     Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system = SystemType::NONE);
     Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system = UnitSystem::System);
     Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-#endif
 #endif
     std::string unit_system() const;
     std::size_t size() const;
