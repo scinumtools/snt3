@@ -22,7 +22,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   int precision = std::numeric_limits<puq::MagnitudeFloat>::digits10;
 #if defined(MAGNITUDE_VALUES)
   ss << std::setfill(' ') << std::setw(25) << std::left;
-  val::ArrayValue<double> value(dim.numerical.value.get());
+  val::ArrayValue<double> value(dim.numerical.estimate.get());
   ss << nostd::to_string(value.get_value(0), precision) + ",";
   ss << std::setfill(' ') << std::setw(25) << std::left;
   if (dim.numerical.uncertainty == nullptr) {
@@ -33,7 +33,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   }
 #else
   ss << std::setfill(' ') << std::setw(25) << std::left;
-  ss << nostd::to_string(dim.numerical.value[0], precision) + ",";
+  ss << nostd::to_string(dim.numerical.estimate[0], precision) + ",";
   ss << std::setfill(' ') << std::setw(25) << std::left;
   ss << nostd::to_string(dim.numerical.uncertainty[0], precision) + ",";
 #endif
@@ -98,7 +98,7 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
     if (missing == "") {
       add_line(ss, unit.first, dim, unit.second.name);
 #if defined(MAGNITUDE_VALUES)
-      val::ArrayValue<double> value(dim.numerical.value.get());
+      val::ArrayValue<double> value(dim.numerical.estimate.get());
       if (dim.numerical.uncertainty == nullptr) {
         dmap.insert({unit.first, {value.get_value(0), 0., dim.physical}});
       } else {
@@ -106,7 +106,7 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
         dmap.insert({unit.first, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
       }
 #else
-      dmap.insert({unit.first, {dim.numerical.value[0], dim.numerical.uncertainty[0], dim.physical}});
+      dmap.insert({unit.first, {dim.numerical.estimate[0], dim.numerical.uncertainty[0], dim.physical}});
 #endif
     }
   }
@@ -129,7 +129,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
     std::string symbol = std::string(puq::Symbols::quantity_start) + quant.first + std::string(puq::Symbols::quantity_end);
     add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first));
 #if defined(MAGNITUDE_VALUES)
-    val::ArrayValue<double> value(dim.numerical.value.get());
+    val::ArrayValue<double> value(dim.numerical.estimate.get());
     if (dim.numerical.uncertainty == nullptr) {
       dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
     } else {
@@ -137,7 +137,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
       dmap.insert({symbol, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
     }
 #else
-    dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.uncertainty[0], dim.physical}});
+    dmap.insert({symbol, {dim.numerical.estimate[0], dim.numerical.uncertainty[0], dim.physical}});
 #endif
 
     // solve a quantity IS conversion factor, if exists
@@ -161,7 +161,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
       symbol = std::string(puq::Symbols::si_factor_start) + quant.first + std::string(puq::Symbols::si_factor_end);
       add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first) + " SI factor");
 #if defined(MAGNITUDE_VALUES)
-      val::ArrayValue<double> value(dim.numerical.value.get());
+      val::ArrayValue<double> value(dim.numerical.estimate.get());
       if (dim.numerical.uncertainty == nullptr) {
         dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
       } else {

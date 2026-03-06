@@ -147,9 +147,9 @@ namespace snt::puq {
 
   Quantity::PointerType Quantity::clone() const {
     if (measurement.magnitude.uncertainty)
-      return std::make_unique<Quantity>(measurement.magnitude.value->clone(), measurement.magnitude.uncertainty->clone(), measurement.baseunits.baseunits, stype);
+      return std::make_unique<Quantity>(measurement.magnitude.estimate->clone(), measurement.magnitude.uncertainty->clone(), measurement.baseunits.baseunits, stype);
     else
-      return std::make_unique<Quantity>(measurement.magnitude.value->clone(), measurement.baseunits.baseunits, stype);
+      return std::make_unique<Quantity>(measurement.magnitude.estimate->clone(), measurement.baseunits.baseunits, stype);
   }
 #endif
 

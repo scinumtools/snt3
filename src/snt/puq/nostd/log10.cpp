@@ -17,13 +17,13 @@ namespace snt::nostd {
 #ifdef MAGNITUDE_VALUES
     if (m.uncertainty) {
       std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(std::log(10));
-      return puq::Magnitude(m.value->math_log10(),
-                            m.uncertainty->math_div(m.value->math_mul(cst.get()).get()));
+      return puq::Magnitude(m.estimate->math_log10(),
+                            m.uncertainty->math_div(m.estimate->math_mul(cst.get()).get()));
     } else {
-      return puq::Magnitude(m.value->math_log10());
+      return puq::Magnitude(m.estimate->math_log10());
     }
 #else
-    return puq::Magnitude(log10(m.value), m.uncertainty / (m.value * std::log(10)));
+    return puq::Magnitude(log10(m.estimate), m.uncertainty / (m.estimate * std::log(10)));
 #endif
   }
 

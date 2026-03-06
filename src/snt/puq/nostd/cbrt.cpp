@@ -17,10 +17,10 @@ namespace snt::nostd {
 #ifdef MAGNITUDE_VALUES
     std::unique_ptr<val::ArrayValue<double>> third1 = std::make_unique<val::ArrayValue<double>>(1. / 3.);
     std::unique_ptr<val::ArrayValue<double>> third2 = std::make_unique<val::ArrayValue<double>>(-2 * 1. / 3.);
-    return puq::Magnitude(m.value->math_cbrt(), m.value->math_pow(third2.get())->math_mul(third1.get())->math_mul(m.uncertainty.get()));
+    return puq::Magnitude(m.estimate->math_cbrt(), m.estimate->math_pow(third2.get())->math_mul(third1.get())->math_mul(m.uncertainty.get()));
 #else
     constexpr puq::MagnitudeFloat third = 1. / 3.;
-    return puq::Magnitude(cbrt(m.value), third * pow(m.value, -2 * third) * m.uncertainty);
+    return puq::Magnitude(cbrt(m.estimate), third * pow(m.estimate, -2 * third) * m.uncertainty);
 #endif
   }
 

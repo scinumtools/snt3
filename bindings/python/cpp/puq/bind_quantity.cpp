@@ -17,10 +17,10 @@ py::array_t<puq::MagnitudeFloat> array_to_numpy(const val::ArrayValue<puq::Magni
 }
 
 std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<puq::MagnitudeFloat>> quantity_value(puq::Quantity q, bool numpy) {
-  val::ArrayValue<puq::MagnitudeFloat> varray(q.measurement.magnitude.value.get());
+  val::ArrayValue<puq::MagnitudeFloat> varray(q.measurement.magnitude.estimate.get());
   if (numpy) {
     return array_to_numpy(varray);
-  } else if (q.measurement.magnitude.value->get_size() == 1) {
+  } else if (q.measurement.magnitude.estimate->get_size() == 1) {
     return varray.get_value(0);
   } else {
     return varray.get_values();
@@ -28,7 +28,7 @@ std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<
 }
 
 std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<puq::MagnitudeFloat>> quantity_get_value(const puq::Quantity& q, size_t index) {
-  val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.value.get());
+  val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.estimate.get());
   return otherT->get_value(index);
 }
 
@@ -132,7 +132,7 @@ void init_puq_quantity(py::module_& m) {
    * @brief Convert Quantity into a numpy array
    */
   q.def("to_numpy", [](const puq::Quantity& q) {
-    val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.value.get());
+    val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.estimate.get());
     std::vector<size_t> shape = otherT->get_shape();
     std::vector<ssize_t> strides(shape.size());
     ssize_t stride = sizeof(otherT);
@@ -144,7 +144,7 @@ void init_puq_quantity(py::module_& m) {
   });
   //  q.def("to_numpy", [](const puq::Quantity &q) -> py::buffer_info {
   // #if defined(MAGNITUDE_VALUE)
-  //      val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.value.get());
+  //      val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.estimate.get());
   //      return py::buffer_info(
   //			     otherT->get_data(),
   //			     sizeof(puq::MagnitudeFloat),

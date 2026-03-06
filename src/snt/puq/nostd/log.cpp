@@ -18,11 +18,11 @@ namespace snt::nostd {
     // y ± Dy = log10(x ± Dx) -> Dy = Dx / x
 #ifdef MAGNITUDE_VALUES
     if (m.uncertainty)
-      return puq::Magnitude(m.value->math_log(), m.uncertainty->math_div(m.value.get()));
+      return puq::Magnitude(m.estimate->math_log(), m.uncertainty->math_div(m.estimate.get()));
     else
-      return puq::Magnitude(m.value->math_log());
+      return puq::Magnitude(m.estimate->math_log());
 #else
-    return puq::Magnitude(log(m.value), m.uncertainty / m.value);
+    return puq::Magnitude(log(m.estimate), m.uncertainty / m.estimate);
 #endif
   }
 

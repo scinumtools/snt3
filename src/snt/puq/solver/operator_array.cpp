@@ -13,7 +13,7 @@ namespace snt::puq {
     for (size_t i = 0; i < num_groups; i++) {
       group = tokens->get_left();
       UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
-      val::ArrayValue<double> value(atom->value.magnitude.value.get());
+      val::ArrayValue<double> value(atom->value.magnitude.estimate.get());
       nv[i] = value.get_value(0);
       if (atom->value.magnitude.uncertainty) {
         hasUncertainties = true;
@@ -24,7 +24,7 @@ namespace snt::puq {
     std::reverse(nv.begin(), nv.end());
     if (group.atom) {
       UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
-      atom->value.magnitude.value = std::make_unique<val::ArrayValue<double>>(nv);
+      atom->value.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(nv);
       if (hasUncertainties) {
         std::reverse(ne.begin(), ne.end());
         atom->value.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(ne);

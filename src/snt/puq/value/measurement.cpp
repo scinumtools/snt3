@@ -73,10 +73,10 @@ namespace snt::puq {
     std::stringstream ss;
     if (format.display_magnitude()) {
 #if defined(MAGNITUDE_VALUES)
-      if (!magnitude.value->is_unity() || baseunits.size() == 0)
+      if (!magnitude.estimate->is_unity() || baseunits.size() == 0)
         ss << magnitude.to_string(format) << multiply;
 #else
-      if (magnitude.value != 1 || baseunits.size() == 0)
+      if (magnitude.estimate != 1 || baseunits.size() == 0)
         ss << magnitude.to_string(format) << multiply;
 #endif
     }

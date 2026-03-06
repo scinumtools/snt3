@@ -10,16 +10,16 @@ namespace snt::puq {
 
 #if defined(MAGNITUDE_VALUES)
 
-  Magnitude::Magnitude(val::BaseValue::PointerType m) : value(std::move(m)), uncertainty(nullptr) {
-    if (!value)
+  Magnitude::Magnitude(val::BaseValue::PointerType m) : estimate(std::move(m)), uncertainty(nullptr) {
+    if (!estimate)
       throw std::invalid_argument("Magnitude value cannot be a null pointer.");
   }
 
-  Magnitude::Magnitude(val::BaseValue::PointerType m, val::BaseValue::PointerType e) : value(std::move(m)), uncertainty(std::move(e)) {
-    if (!value)
+  Magnitude::Magnitude(val::BaseValue::PointerType m, val::BaseValue::PointerType e) : estimate(std::move(m)), uncertainty(std::move(e)) {
+    if (!estimate)
       throw std::invalid_argument("Magnitude value cannot be a null pointer.");
-    if (uncertainty && value->get_size() != uncertainty->get_size())
-      throw std::invalid_argument("Value and uncertainty arrays have different size: " + std::to_string(value->get_size()) + " != " + std::to_string(uncertainty->get_size()));
+    if (uncertainty && estimate->get_size() != uncertainty->get_size())
+      throw std::invalid_argument("Value and uncertainty arrays have different size: " + std::to_string(estimate->get_size()) + " != " + std::to_string(uncertainty->get_size()));
   }
 
 #endif
@@ -56,9 +56,9 @@ namespace snt::puq {
     snt::StringFormatType fmt;
     fmt.valuePrecision = format.precision;
     if (uncertainty == nullptr || !format.display_uncertainty()) {
-      ss << value->to_string(fmt);
+      ss << estimate->to_string(fmt);
     } else {
-      val::ArrayValue<double> dvalue(value.get());
+      val::ArrayValue<double> dvalue(estimate.get());
       val::ArrayValue<double> duncertainty(uncertainty.get());
       ss << snt::array_to_string(dvalue.get_values(), duncertainty.get_values(), dvalue.get_shape(), fmt);
     }
@@ -67,15 +67,15 @@ namespace snt::puq {
 
   std::size_t Magnitude::size() const {
 #if defined(MAGNITUDE_VALUES)
-    return value->get_size();
+    return estimate->get_size();
 #else
-    return value.size();
+    return estimate.size();
 #endif
   }
 
 #if defined(MAGNITUDE_VALUES)
   val::Array::ShapeType Magnitude::shape() const {
-    return value->get_shape();
+    return estimate->get_shape();
   }
 #endif
 
@@ -93,24 +93,24 @@ namespace snt::puq {
     else if (m2.uncertainty)
       Dz = m2.uncertainty->clone();
     // Array Dz = nostd::sqrt(nostd::pow(m1.uncertainty,2)+nostd::pow(m2.uncertainty,2)); // Gaussian uncertainty propagation
-    return Magnitude(m1.value->math_add(m2.value.get()), std::move(Dz));
+    return Magnitude(m1.estimate->math_add(m2.estimate.get()), std::move(Dz));
 #else
     // z ± Dz = (x ± Dx) + (y ± Dy) -> Dz = Dx + Dy     (average uncertainties)
     Array Dz = m1.uncertainty + m2.uncertainty;
     // Array Dz = nostd::sqrt(nostd::pow(m1.uncertainty,2)+nostd::pow(m2.uncertainty,2)); // Gaussian uncertainty propagation
-    return Magnitude(m1.value + m2.value, Dz);
+    return Magnitude(m1.estimate + m2.estimate, Dz);
 #endif
   }
 
   void Magnitude::operator+=(const Magnitude& m) {
 #ifdef MAGNITUDE_VALUES
-    value->math_add_equal(m.value.get());
+    estimate->math_add_equal(m.estimate.get());
     if (uncertainty && m.uncertainty)
       uncertainty->math_add_equal(m.uncertainty.get());
     else if (m.uncertainty)
       uncertainty = m.uncertainty->clone();
 #else
-    value += m.value;
+    estimate += m.estimate;
     uncertainty += m.uncertainty;
     // uncertainty = nostd::sqrt(nostd::pow(uncertainty,2)+nostd::pow(m.uncertainty,2));
 #endif
@@ -122,11 +122,11 @@ namespace snt::puq {
   Magnitude operator-(const Magnitude& m1) {
 #ifdef MAGNITUDE_VALUES
     if (m1.uncertainty)
-      return Magnitude(m1.value->math_neg(), m1.uncertainty->clone());
+      return Magnitude(m1.estimate->math_neg(), m1.uncertainty->clone());
     else
-      return Magnitude(m1.value->math_neg());
+      return Magnitude(m1.estimate->math_neg());
 #else
-    return Magnitude(-m1.value, m1.uncertainty);
+    return Magnitude(-m1.estimate, m1.uncertainty);
 #endif
   }
   Magnitude operator-(const Magnitude& m1, const Magnitude& m2) {
@@ -139,21 +139,21 @@ namespace snt::puq {
       Dz = m1.uncertainty->clone();
     else if (m2.uncertainty)
       Dz = m2.uncertainty->clone();
-    return Magnitude(m1.value->math_sub(m2.value.get()), std::move(Dz));
+    return Magnitude(m1.estimate->math_sub(m2.estimate.get()), std::move(Dz));
 #else
-    return Magnitude(m1.value - m2.value, m1.uncertainty + m2.uncertainty);
+    return Magnitude(m1.estimate - m2.estimate, m1.uncertainty + m2.uncertainty);
 #endif
   }
 
   void Magnitude::operator-=(const Magnitude& m) {
 #ifdef MAGNITUDE_VALUES
-    value->math_sub_equal(m.value.get());
+    estimate->math_sub_equal(m.estimate.get());
     if (uncertainty && m.uncertainty)
       uncertainty->math_add_equal(m.uncertainty.get());
     else if (m.uncertainty)
       uncertainty = m.uncertainty->clone();
 #else
-    value -= m.value;
+    estimate -= m.estimate;
     uncertainty += m.uncertainty;
 #endif
   }
@@ -163,28 +163,28 @@ namespace snt::puq {
    */
   const Magnitude multiply(const Magnitude* m, const Magnitude* n) {
 #ifdef MAGNITUDE_VALUES
-    const val::ArrayValue<double> otherT(n->value.get());
-    Magnitude nm(m->value->math_mul(n->value.get()));
+    const val::ArrayValue<double> otherT(n->estimate.get());
+    Magnitude nm(m->estimate->math_mul(n->estimate.get()));
     if ((m->uncertainty && n->uncertainty) && (m->uncertainty->any_of() && n->uncertainty->any_of())) {
-      MAGNITUDE_VALUE maxuncertainty = ((m->value->math_add(m->uncertainty.get()))->math_mul((n->value->math_add(n->uncertainty.get())).get())->math_sub(nm.value.get()))->math_abs();
-      MAGNITUDE_VALUE minuncertainty = ((m->value->math_sub(m->uncertainty.get()))->math_mul((n->value->math_sub(n->uncertainty.get())).get())->math_sub(nm.value.get()))->math_abs();
+      MAGNITUDE_VALUE maxuncertainty = ((m->estimate->math_add(m->uncertainty.get()))->math_mul((n->estimate->math_add(n->uncertainty.get())).get())->math_sub(nm.estimate.get()))->math_abs();
+      MAGNITUDE_VALUE minuncertainty = ((m->estimate->math_sub(m->uncertainty.get()))->math_mul((n->estimate->math_sub(n->uncertainty.get())).get())->math_sub(nm.estimate.get()))->math_abs();
       nm.uncertainty = maxuncertainty->math_max(minuncertainty.get());
     } else if ((!m->uncertainty || m->uncertainty->none_of()) && (n->uncertainty && n->uncertainty->any_of())) {
-      nm.uncertainty = n->uncertainty->math_mul(m->value.get());
+      nm.uncertainty = n->uncertainty->math_mul(m->estimate.get());
     } else if ((m->uncertainty && m->uncertainty->any_of()) && (!n->uncertainty || n->uncertainty->none_of())) {
-      nm.uncertainty = m->uncertainty->math_mul(n->value.get());
+      nm.uncertainty = m->uncertainty->math_mul(n->estimate.get());
     }
 #else
-    Magnitude nm(m->value * n->value);
+    Magnitude nm(m->estimate * n->estimate);
     if (m->uncertainty == 0 && n->uncertainty == 0) {
       nm.uncertainty = (m->uncertainty.size() > n->uncertainty.size()) ? m->uncertainty : n->uncertainty;
     } else if (m->uncertainty == 0 && n->uncertainty != 0) {
-      nm.uncertainty = n->uncertainty * m->value;
+      nm.uncertainty = n->uncertainty * m->estimate;
     } else if (m->uncertainty != 0 && n->uncertainty == 0) {
-      nm.uncertainty = m->uncertainty * n->value;
+      nm.uncertainty = m->uncertainty * n->estimate;
     } else {
-      MAGNITUDE_VALUE maxuncertainty = nostd::abs((m->value + m->uncertainty) * (n->value + n->uncertainty) - nm.value);
-      MAGNITUDE_VALUE minuncertainty = nostd::abs((m->value - m->uncertainty) * (n->value - n->uncertainty) - nm.value);
+      MAGNITUDE_VALUE maxuncertainty = nostd::abs((m->estimate + m->uncertainty) * (n->estimate + n->uncertainty) - nm.estimate);
+      MAGNITUDE_VALUE minuncertainty = nostd::abs((m->estimate - m->uncertainty) * (n->estimate - n->uncertainty) - nm.estimate);
       nm.uncertainty = nostd::max(maxuncertainty, minuncertainty);
     }
 #endif
@@ -198,11 +198,11 @@ namespace snt::puq {
   void Magnitude::operator*=(const Magnitude& m) {
     Magnitude nm = multiply(this, &m);
 #ifdef MAGNITUDE_VALUES
-    value = nm.value->clone();
+    estimate = nm.estimate->clone();
     if (nm.uncertainty)
       uncertainty = nm.uncertainty->clone();
 #else
-    value = nm.value;
+    estimate = nm.estimate;
     uncertainty = nm.uncertainty;
 #endif
   }
@@ -212,31 +212,31 @@ namespace snt::puq {
    */
   const Magnitude divide(const Magnitude* m, const Magnitude* n) {
 #ifdef MAGNITUDE_VALUES
-    Magnitude nm(m->value->math_div(n->value.get()));
+    Magnitude nm(m->estimate->math_div(n->estimate.get()));
     if ((m->uncertainty && n->uncertainty) && (m->uncertainty->any_of() && n->uncertainty->any_of())) {
-      MAGNITUDE_VALUE maxuncertainty = (((m->value->math_add(m->uncertainty.get()))->math_div((n->value->math_sub(n->uncertainty.get())).get()))->math_sub(nm.value.get()))->math_abs();
-      MAGNITUDE_VALUE minuncertainty = (((m->value->math_sub(m->uncertainty.get()))->math_div((n->value->math_add(n->uncertainty.get())).get()))->math_sub(nm.value.get()))->math_abs();
+      MAGNITUDE_VALUE maxuncertainty = (((m->estimate->math_add(m->uncertainty.get()))->math_div((n->estimate->math_sub(n->uncertainty.get())).get()))->math_sub(nm.estimate.get()))->math_abs();
+      MAGNITUDE_VALUE minuncertainty = (((m->estimate->math_sub(m->uncertainty.get()))->math_div((n->estimate->math_add(n->uncertainty.get())).get()))->math_sub(nm.estimate.get()))->math_abs();
       nm.uncertainty = maxuncertainty->math_max(minuncertainty.get());
     } else if ((!m->uncertainty || m->uncertainty->none_of()) && (n->uncertainty && n->uncertainty->any_of())) {
-      MAGNITUDE_VALUE maxuncertainty = (m->value->math_div((n->value->math_add(n->uncertainty.get())).get())->math_sub(nm.value.get()))->math_abs();
-      MAGNITUDE_VALUE minuncertainty = (m->value->math_div((n->value->math_sub(n->uncertainty.get())).get())->math_sub(nm.value.get()))->math_abs();
+      MAGNITUDE_VALUE maxuncertainty = (m->estimate->math_div((n->estimate->math_add(n->uncertainty.get())).get())->math_sub(nm.estimate.get()))->math_abs();
+      MAGNITUDE_VALUE minuncertainty = (m->estimate->math_div((n->estimate->math_sub(n->uncertainty.get())).get())->math_sub(nm.estimate.get()))->math_abs();
       nm.uncertainty = maxuncertainty->math_max(minuncertainty.get());
     } else if ((m->uncertainty && m->uncertainty->any_of()) && (!n->uncertainty || n->uncertainty->none_of())) {
-      nm.uncertainty = m->uncertainty->math_div(n->value.get());
+      nm.uncertainty = m->uncertainty->math_div(n->estimate.get());
     }
 #else
-    Magnitude nm(m->value / n->value);
+    Magnitude nm(m->estimate / n->estimate);
     if (m->uncertainty == 0 && n->uncertainty == 0) {
       nm.uncertainty = (m->uncertainty.size() > n->uncertainty.size()) ? m->uncertainty : n->uncertainty;
     } else if (m->uncertainty == 0 && n->uncertainty != 0) {
-      MAGNITUDE_VALUE maxuncertainty = nostd::abs(m->value / (n->value + n->uncertainty) - nm.value);
-      MAGNITUDE_VALUE minuncertainty = nostd::abs(m->value / (n->value - n->uncertainty) - nm.value);
+      MAGNITUDE_VALUE maxuncertainty = nostd::abs(m->estimate / (n->estimate + n->uncertainty) - nm.estimate);
+      MAGNITUDE_VALUE minuncertainty = nostd::abs(m->estimate / (n->estimate - n->uncertainty) - nm.estimate);
       nm.uncertainty = nostd::max(maxuncertainty, minuncertainty);
     } else if (m->uncertainty != 0 && n->uncertainty == 0) {
-      nm.uncertainty = m->uncertainty / n->value;
+      nm.uncertainty = m->uncertainty / n->estimate;
     } else {
-      MAGNITUDE_VALUE maxuncertainty = nostd::abs((m->value + m->uncertainty) / (n->value - n->uncertainty) - nm.value);
-      MAGNITUDE_VALUE minuncertainty = nostd::abs((m->value - m->uncertainty) / (n->value + n->uncertainty) - nm.value);
+      MAGNITUDE_VALUE maxuncertainty = nostd::abs((m->estimate + m->uncertainty) / (n->estimate - n->uncertainty) - nm.estimate);
+      MAGNITUDE_VALUE minuncertainty = nostd::abs((m->estimate - m->uncertainty) / (n->estimate + n->uncertainty) - nm.estimate);
       nm.uncertainty = nostd::max(maxuncertainty, minuncertainty);
     }
 #endif
@@ -250,11 +250,11 @@ namespace snt::puq {
   void Magnitude::operator/=(const Magnitude& m) {
     Magnitude nm = divide(this, &m);
 #ifdef MAGNITUDE_VALUES
-    value = nm.value->clone();
+    estimate = nm.estimate->clone();
     if (nm.uncertainty)
       uncertainty = nm.uncertainty->clone();
 #else
-    value = nm.value;
+    estimate = nm.estimate;
     uncertainty = nm.uncertainty;
 #endif
   }
@@ -262,35 +262,35 @@ namespace snt::puq {
   void Magnitude::pow(const ExponentVariant& e) {
     ExponentFloat fexp = exponent_to_float(e);
 #ifdef MAGNITUDE_VALUES
-    value = value->math_pow(fexp);
+    estimate = estimate->math_pow(fexp);
 #else
-    value = nostd::pow(value, fexp);
+    estimate = nostd::pow(estimate, fexp);
 #endif
   }
 
   bool Magnitude::operator==(const Magnitude& a) const {
 #ifdef MAGNITUDE_VALUES
     if (uncertainty && a.uncertainty)
-      return (value->compare_equal(a.value.get())->all_of()) && (uncertainty->compare_equal(a.uncertainty.get())->all_of());
+      return (estimate->compare_equal(a.estimate.get())->all_of()) && (uncertainty->compare_equal(a.uncertainty.get())->all_of());
     else if (!uncertainty && !a.uncertainty)
-      return (value->compare_equal(a.value.get())->all_of());
+      return (estimate->compare_equal(a.estimate.get())->all_of());
     else
       return false;
 #else
-    return (value == a.value) && (uncertainty == a.uncertainty);
+    return (estimate == a.estimate) && (uncertainty == a.uncertainty);
 #endif
   };
 
   bool Magnitude::operator!=(const Magnitude& a) const {
 #ifdef MAGNITUDE_VALUES
     if (uncertainty && a.uncertainty)
-      return (value->compare_not_equal(a.value.get())->any_of()) || (uncertainty->compare_not_equal(a.uncertainty.get())->any_of());
+      return (estimate->compare_not_equal(a.estimate.get())->any_of()) || (uncertainty->compare_not_equal(a.uncertainty.get())->any_of());
     else if (!uncertainty && !a.uncertainty)
-      return (value->compare_not_equal(a.value.get())->any_of());
+      return (estimate->compare_not_equal(a.estimate.get())->any_of());
     else
       return false;
 #else
-    return (value != a.value) || (uncertainty != a.uncertainty);
+    return (estimate != a.estimate) || (uncertainty != a.uncertainty);
 #endif
   };
 

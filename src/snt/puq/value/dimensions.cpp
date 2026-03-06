@@ -38,11 +38,11 @@ namespace snt::puq {
       numerical = numerical * (Magnitude)(std::pow(1e2, exponent_to_float(physical[0])));
     }
 #if defined(MAGNITUDE_VALUES)
-    if (!numerical.value->is_unity() && format.display_magnitude()) {
+    if (!numerical.estimate->is_unity() && format.display_magnitude()) {
       ss << numerical.to_string(format) << multiply;
     }
 #else
-    if (numerical.value != 1 && format.display_magnitude()) {
+    if (numerical.estimate != 1 && format.display_magnitude()) {
       ss << numerical.to_string(format) << multiply;
     }
 #endif

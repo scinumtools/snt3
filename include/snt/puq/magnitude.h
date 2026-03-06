@@ -7,42 +7,46 @@
 #include <snt/puq/settings.h>
 #include <snt/puq/unit_format.h>
 
+#include <variant>
+
 namespace snt::puq {
 
+  using ValueVariant = std::variant<MagnitudeFloat, val::BaseValue::PointerType>;
+  
   class Magnitude {
   public:
 #if defined(MAGNITUDE_VALUES)
-    val::BaseValue::PointerType value;
+    val::BaseValue::PointerType estimate;
     val::BaseValue::PointerType uncertainty;
 #else
-    MagnitudeFloat value;
+    MagnitudeFloat estimate;
     MagnitudeFloat uncertainty;
 #endif
 #ifndef MAGNITUDE_VALUES
-    Magnitude() : value(1), uncertainty(0) {}
-    Magnitude(const MagnitudeFloat& m) : value(m), uncertainty(0) {}
-    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : value(m), uncertainty(e) {}
+    Magnitude() : estimate(1), uncertainty(0) {}
+    Magnitude(const MagnitudeFloat& m) : estimate(m), uncertainty(0) {}
+    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : estimate(m), uncertainty(e) {}
     static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
     static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
 #else
     Magnitude(const Magnitude& other) {
-      value = other.value ? other.value->clone() : nullptr;
+      estimate = other.estimate ? other.estimate->clone() : nullptr;
       uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
     }
     Magnitude& operator=(const Magnitude& other) {
       if (this != &other) {
-        value = other.value ? other.value->clone() : nullptr;
+        estimate = other.estimate ? other.estimate->clone() : nullptr;
         uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
       }
       return *this;
     }
     Magnitude(Magnitude&&) noexcept = default;
     Magnitude& operator=(Magnitude&&) noexcept = default;
-    Magnitude() : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({1}))),
+    Magnitude() : estimate(std::make_unique<val::ArrayValue<double>>(std::vector<double>({1}))),
                   uncertainty(nullptr) {}
-    Magnitude(const MagnitudeFloat& m) : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
+    Magnitude(const MagnitudeFloat& m) : estimate(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
                                               uncertainty(nullptr) {}
-    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : value(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
+    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : estimate(std::make_unique<val::ArrayValue<double>>(std::vector<double>({m}))),
                                                                             uncertainty(std::make_unique<val::ArrayValue<double>>(std::vector<double>({e}))) {}
     static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
     static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);

@@ -14,9 +14,9 @@ namespace snt::nostd {
 
   puq::Magnitude floor(const puq::Magnitude& m) {
 #ifdef MAGNITUDE_VALUES
-    return puq::Magnitude(m.value->math_floor());
+    return puq::Magnitude(m.estimate->math_floor());
 #else
-    return puq::Magnitude(floor(m.value));
+    return puq::Magnitude(floor(m.estimate));
 #endif
   }
 

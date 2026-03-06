@@ -16,20 +16,20 @@ namespace snt::nostd {
     // x ± Dx = max(x ± Dx, y ± Dy)  <- if x > y
     // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
 #ifdef MAGNITUDE_VALUES
-    MAGNITUDE_VALUE value = m1.value->math_max(m2.value.get());
+    MAGNITUDE_VALUE estimate = m1.estimate->math_max(m2.estimate.get());
     if (m1.uncertainty && m2.uncertainty) {
-      val::BaseValue::PointerType new_uncertainty = m1.uncertainty->where(value->compare_equal(m1.value.get()).get(), m2.uncertainty.get());
-      return puq::Magnitude(std::move(value), std::move(new_uncertainty));
+      val::BaseValue::PointerType new_uncertainty = m1.uncertainty->where(estimate->compare_equal(m1.estimate.get()).get(), m2.uncertainty.get());
+      return puq::Magnitude(std::move(estimate), std::move(new_uncertainty));
     } else if (m1.uncertainty) {
-      return puq::Magnitude(std::move(value), m1.uncertainty->clone());
+      return puq::Magnitude(std::move(estimate), m1.uncertainty->clone());
     } else if (m2.uncertainty) {
-      return puq::Magnitude(std::move(value), m2.uncertainty->clone());
+      return puq::Magnitude(std::move(estimate), m2.uncertainty->clone());
     } else {
-      return puq::Magnitude(std::move(value));
+      return puq::Magnitude(std::move(estimate));
     }
 #else
-    MAGNITUDE_VALUE value = max(m1.value, m2.value);
-    return puq::Magnitude(value, (value == m1.value) ? m1.uncertainty : m2.uncertainty);
+    MAGNITUDE_VALUE estimate = max(m1.estimate, m2.estimate);
+    return puq::Magnitude(estimate, (estimate == m1.estimate) ? m1.uncertainty : m2.uncertainty);
 #endif
   }
 

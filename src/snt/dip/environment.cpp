@@ -56,7 +56,7 @@ namespace snt::dip {
             else if (vnode->units != nullptr) {
               puq::Quantity quantity = std::move(new_value) * (*vnode->units);
               quantity = quantity.convert(to_unit);
-              new_value = std::move(quantity.measurement.magnitude.value);
+              new_value = std::move(quantity.measurement.magnitude.estimate);
             }
           }
         }
