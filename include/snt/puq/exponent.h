@@ -4,6 +4,8 @@
 #import <snt/puq/settings.h>
 #include <snt/puq/unit_format.h>
 
+#include <variant>
+
 namespace snt::puq {
 
   class Exponent {
