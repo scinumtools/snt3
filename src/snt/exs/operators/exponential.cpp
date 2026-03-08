@@ -1,4 +1,4 @@
-#include <snt/exs/math/exponential.h>
+#include <snt/exs/operators/exponential.h>
 
 namespace snt::exs {
 

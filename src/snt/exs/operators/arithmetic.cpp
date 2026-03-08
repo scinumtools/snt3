@@ -1,4 +1,4 @@
-#include <snt/exs/math/arithmetic.h>
+#include <snt/exs/operators/arithmetic.h>
 
 namespace snt::exs {
 

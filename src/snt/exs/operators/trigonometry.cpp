@@ -1,4 +1,4 @@
-#include <snt/exs/math/trigonometry.h>
+#include <snt/exs/operators/trigonometry.h>
 
 namespace snt::exs {
 

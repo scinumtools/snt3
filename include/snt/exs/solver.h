@@ -9,9 +9,7 @@
 #include <snt/exs/comparison/less.h>
 #include <snt/exs/comparison/less_equal.h>
 #include <snt/exs/comparison/not_equal.h>
-#include <snt/exs/logical/and.h>
-#include <snt/exs/logical/not.h>
-#include <snt/exs/logical/or.h>
+#include <snt/exs/operators/logical.h>
 #include <snt/exs/operators/arithmetic.h>
 #include <snt/exs/operators/trigonometry.h>
 #include <snt/exs/operators/exponential.h>

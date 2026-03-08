@@ -5,11 +5,6 @@
 
 namespace snt::exs {
 
-  class OperatorNot : public OperatorBase {
-  public:
-    OperatorNot(std::string s = "!");
-    void operate_unary(TokenListBase* tokens) override;
-  };
 
 } // namespace snt::exs
 
