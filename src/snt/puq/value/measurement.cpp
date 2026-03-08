@@ -72,13 +72,10 @@ namespace snt::puq {
     std::string multiply = format.multiply_symbol();
     std::stringstream ss;
     if (format.display_magnitude()) {
-#if defined(MAGNITUDE_VALUES)
       if (!magnitude.estimate->is_unity() || baseunits.size() == 0)
         ss << magnitude.to_string(format) << multiply;
-#else
-      if (magnitude.estimate != 1 || baseunits.size() == 0)
-        ss << magnitude.to_string(format) << multiply;
-#endif
+      //if (magnitude.estimate != 1 || baseunits.size() == 0)
+      //  ss << magnitude.to_string(format) << multiply;
     }
     if (format.display_units()) {
       if (baseunits.size() > 0)
@@ -226,11 +223,8 @@ namespace snt::puq {
   }
 
   void Measurement::pow(const ExponentVariant& e) {
-#if defined(MAGNITUDE_VALUES)
     magnitude.pow(e);
-#else
-    magnitude = std::pow(magnitude, (ExponentFloat)e);
-#endif
+    //magnitude = std::pow(magnitude, (ExponentFloat)e);
     baseunits *= e;
   }
 

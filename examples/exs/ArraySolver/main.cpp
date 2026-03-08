@@ -1,7 +1,6 @@
 #import "main.h"
 
-#import "snt/exs/math/add.h"
-#import "snt/exs/math/subtract.h"
+#import "snt/exs/operators/arithmetic.h"
 #import "snt/exs/operator_list.h"
 #import "snt/exs/solver.h"
 #import "snt/exs/step_list.h"

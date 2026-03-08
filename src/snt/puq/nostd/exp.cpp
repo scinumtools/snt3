@@ -6,22 +6,17 @@ namespace snt::nostd {
     return std::exp(e);
   }
 
-#if defined(MAGNITUDE_VALUES)
   val::BaseValue::PointerType exp(val::BaseValue::PointerType a) {
     return a->math_exp();
   }
-#endif
 
   puq::Magnitude exp(const puq::Magnitude& e) {
     // z ± Dz = pow(e, y ± Dy) -> Dz = pow(e, y) * log(e) * Dy
-#ifdef MAGNITUDE_VALUES
     if (e.uncertainty)
       return puq::Magnitude(e.estimate->math_exp(), e.estimate->math_exp()->math_mul(e.uncertainty.get()));
     else
       return puq::Magnitude(e.estimate->math_exp());
-#else
-    return puq::Magnitude(exp(e.estimate), exp(e.estimate) * e.uncertainty);
-#endif
+    //return puq::Magnitude(exp(e.estimate), exp(e.estimate) * e.uncertainty);
   }
 
   puq::Measurement exp(const puq::Measurement& uv) {

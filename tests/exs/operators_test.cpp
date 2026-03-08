@@ -1,8 +1,6 @@
 #include "pch_tests.h"
 #include <snt/exs/operator_list.h>
-#include <snt/exs/math/add.h>
-#include <snt/exs/math/subtract.h>
-#include <snt/exs/math/multiply.h>
+#include <snt/exs/operators/arithmetic.h>
 
 #include <memory>
 

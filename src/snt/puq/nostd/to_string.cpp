@@ -11,13 +11,11 @@ namespace snt::nostd {
     return ss.str();
   }
 
-#if defined(MAGNITUDE_VALUES)
   std::string to_string(val::BaseValue::PointerType value, int precision) {
     snt::StringFormatType fmt;
     fmt.valuePrecision = precision;
     return value->to_string(fmt);
   }
-#endif
 
   std::string to_string(const puq::Magnitude& value, int precision) {
     return value.to_string(precision);
@@ -56,7 +54,6 @@ namespace snt::nostd {
     return ss.str();
   }
 
-#if defined(MAGNITUDE_VALUES)
   std::string to_string(const val::Array::ShapeType& shape) {
     std::stringstream ss;
     ss << "[";
@@ -68,6 +65,5 @@ namespace snt::nostd {
     ss << "]";
     return ss.str();
   }
-#endif
 
 } // namespace snt::nostd

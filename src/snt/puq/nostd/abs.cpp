@@ -6,19 +6,14 @@ namespace snt::nostd {
     return std::abs(m);
   }
 
-#if defined(MAGNITUDE_VALUES)
   val::BaseValue::PointerType abs(val::BaseValue::PointerType a) {
     return a->math_abs();
   }
-#endif
 
   puq::Magnitude abs(const puq::Magnitude& m) {
     // abs(y ± Dy) = abs(y) ± Dy
-#ifdef MAGNITUDE_VALUES
     return puq::Magnitude(m.estimate->math_abs(), m.uncertainty->clone());
-#else
-    return puq::Magnitude(abs(m.estimate), m.uncertainty);
-#endif
+    //return puq::Magnitude(abs(m.estimate), m.uncertainty);
   }
 
 } // namespace snt::nostd

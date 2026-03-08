@@ -27,7 +27,6 @@ namespace snt::puq {
     Measurement(const MagnitudeFloat& m, const MagnitudeFloat& e) : magnitude(m, e) {};
     Measurement(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseUnits& bu) : magnitude(m, e), baseunits(bu) {};
     Measurement(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseUnits::ListType& bul) : magnitude(m, e), baseunits(bul) {};
-#if defined(MAGNITUDE_VALUES)
     Measurement(val::BaseValue::PointerType m, const std::string& s);
     Measurement(val::BaseValue::PointerType m) : magnitude(std::move(m)) {};
     Measurement(val::BaseValue::PointerType m, const BaseUnits& bu) : magnitude(std::move(m)), baseunits(bu) {};
@@ -36,11 +35,8 @@ namespace snt::puq {
     Measurement(val::BaseValue::PointerType m, val::BaseValue::PointerType e) : magnitude(std::move(m), std::move(e)) {};
     Measurement(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits& bu) : magnitude(std::move(m), std::move(e)), baseunits(bu) {};
     Measurement(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bul) : magnitude(std::move(m), std::move(e)), baseunits(bul) {};
-#endif
     std::size_t size() const;
-#if defined(MAGNITUDE_VALUES)
     val::Array::ShapeType shape() const;
-#endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     friend bool operator==(const Measurement& v1, const Measurement& v2);
     friend bool operator!=(const Measurement& v1, const Measurement& v2);

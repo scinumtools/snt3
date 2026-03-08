@@ -37,15 +37,12 @@ namespace snt::puq {
     } else if (format.base == Format::Base::CGS) {
       numerical = numerical * (Magnitude)(std::pow(1e2, exponent_to_float(physical[0])));
     }
-#if defined(MAGNITUDE_VALUES)
     if (!numerical.estimate->is_unity() && format.display_magnitude()) {
       ss << numerical.to_string(format) << multiply;
     }
-#else
-    if (numerical.estimate != 1 && format.display_magnitude()) {
-      ss << numerical.to_string(format) << multiply;
-    }
-#endif
+    //if (numerical.estimate != 1 && format.display_magnitude()) {
+    //  ss << numerical.to_string(format) << multiply;
+    //}
     return ss.str();
   }
 

@@ -106,9 +106,7 @@ void init_puq_quantity(py::module_& m) {
                     const std::string& s, puq::SystemType sys) {
           py::buffer_info info = v.request();
           val::BaseValue::PointerType value = buffer_to_array(info);
-#if defined(MAGNITUDE_VALUE)
           return puq::Quantity(std::move(value), s, sys);
-#endif
         }),
         py::arg("value"), py::arg("unit") = "", py::arg("system") = puq::SystemType::NONE);
 
@@ -122,9 +120,7 @@ void init_puq_quantity(py::module_& m) {
           val::BaseValue::PointerType value = buffer_to_array(v_info);
           py::buffer_info e_info = e.request();
           val::BaseValue::PointerType uncertainty = buffer_to_array(e_info);
-#if defined(MAGNITUDE_VALUE)
           return puq::Quantity(std::move(value), std::move(uncertainty), s, sys);
-#endif
         }),
         py::arg("value"), py::arg("uncertainty"), py::arg("unit") = "", py::arg("system") = puq::SystemType::NONE);
 
@@ -143,7 +139,6 @@ void init_puq_quantity(py::module_& m) {
     return py::array_t<puq::MagnitudeFloat>(shape, strides, otherT->get_data());
   });
   //  q.def("to_numpy", [](const puq::Quantity &q) -> py::buffer_info {
-  // #if defined(MAGNITUDE_VALUE)
   //      val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.estimate.get());
   //      return py::buffer_info(
   //			     otherT->get_data(),
@@ -154,7 +149,6 @@ void init_puq_quantity(py::module_& m) {
   //			     {sizeof(puq::MagnitudeFloat)},
   //			     false
   //			     );
-  // #endif
   //   });
 
   q.def("convert", py::overload_cast<std::string, puq::SystemType, const std::string&>(&puq::Quantity::convert, py::const_),

@@ -6,10 +6,8 @@
 namespace snt::nostd {
 
   extern puq::MagnitudeFloat pow(const puq::MagnitudeFloat& m, const puq::ExponentFloat& e);
-#if defined(MAGNITUDE_VALUES)
   extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, const puq::ExponentFloat& e);
   extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, val::BaseValue::PointerType e);
-#endif
   extern puq::Magnitude pow(const puq::Magnitude& m, const puq::ExponentFloat& e);
   extern puq::Magnitude pow(const puq::Magnitude& m, const puq::Magnitude& e);
 

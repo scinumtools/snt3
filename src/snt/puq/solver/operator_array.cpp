@@ -2,8 +2,6 @@
 
 namespace snt::puq {
 
-#if defined(MAGNITUDE_VALUES)
-
   // TODO: this needs probably templates because of the ArrayValue
   void OperatorArray::operate_group(exs::TokenListBase* tokens) {
     exs::Token group;
@@ -36,7 +34,5 @@ namespace snt::puq {
     }
     tokens->put_left(group);
   };
-
-#endif
 
 } // namespace snt::puq

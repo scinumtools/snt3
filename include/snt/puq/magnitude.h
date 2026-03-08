@@ -15,20 +15,8 @@ namespace snt::puq {
   
   class Magnitude {
   public:
-#if defined(MAGNITUDE_VALUES)
     val::BaseValue::PointerType estimate;
     val::BaseValue::PointerType uncertainty;
-#else
-    MagnitudeFloat estimate;
-    MagnitudeFloat uncertainty;
-#endif
-    static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
-    static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
-#ifndef MAGNITUDE_VALUES
-    Magnitude() : estimate(1), uncertainty(0) {}
-    Magnitude(const MagnitudeFloat& m) : estimate(m), uncertainty(0) {}
-    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : estimate(m), uncertainty(e) {}
-#else
     Magnitude(const Magnitude& other) {
       estimate = other.estimate ? other.estimate->clone() : nullptr;
       uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
@@ -50,14 +38,13 @@ namespace snt::puq {
                                                                             uncertainty(std::make_unique<val::ArrayValue<double>>(e)) {}
     Magnitude(val::BaseValue::PointerType m);
     Magnitude(val::BaseValue::PointerType m, val::BaseValue::PointerType e);
+    static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
+    static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
     static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);
     static val::BaseValue::PointerType rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType r);
-#endif
     
     std::size_t size() const;
-#if defined(MAGNITUDE_VALUES)
     val::Array::ShapeType shape() const;
-#endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     friend Magnitude operator-(const Magnitude& m1);
     friend Magnitude operator+(const Magnitude& m1, const Magnitude& m2);

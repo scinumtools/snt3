@@ -6,17 +6,14 @@ namespace snt::nostd {
     return std::max(m1, m2);
   }
 
-#if defined(MAGNITUDE_VALUES)
   val::BaseValue::PointerType max(val::BaseValue::PointerType a1, val::BaseValue::PointerType a2) {
     return a1->math_max(a2.get());
   }
-#endif
 
   extern puq::Magnitude max(const puq::Magnitude& m1, const puq::Magnitude& m2) {
     // x ± Dx = max(x ± Dx, y ± Dy)  <- if x > y
     // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
-#ifdef MAGNITUDE_VALUES
-    MAGNITUDE_VALUE estimate = m1.estimate->math_max(m2.estimate.get());
+    val::BaseValue::PointerType estimate = m1.estimate->math_max(m2.estimate.get());
     if (m1.uncertainty && m2.uncertainty) {
       val::BaseValue::PointerType new_uncertainty = m1.uncertainty->where(estimate->compare_equal(m1.estimate.get()).get(), m2.uncertainty.get());
       return puq::Magnitude(std::move(estimate), std::move(new_uncertainty));
@@ -27,10 +24,8 @@ namespace snt::nostd {
     } else {
       return puq::Magnitude(std::move(estimate));
     }
-#else
-    MAGNITUDE_VALUE estimate = max(m1.estimate, m2.estimate);
-    return puq::Magnitude(estimate, (estimate == m1.estimate) ? m1.uncertainty : m2.uncertainty);
-#endif
+    //val::BaseValue::PointerType estimate = max(m1.estimate, m2.estimate);
+    //return puq::Magnitude(estimate, (estimate == m1.estimate) ? m1.uncertainty : m2.uncertainty);
   }
 
 } // namespace snt::nostd

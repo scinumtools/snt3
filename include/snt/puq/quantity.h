@@ -34,20 +34,16 @@ namespace snt::puq {
     Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const SystemType system = UnitSystem::System);
     Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-#if defined(MAGNITUDE_VALUES)
     Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(val::BaseValue::PointerType m, const SystemType system = UnitSystem::System);
     Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
     Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system = SystemType::NONE);
     Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system = UnitSystem::System);
     Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-#endif
     std::string unit_system() const;
     std::size_t size() const;
-#if defined(MAGNITUDE_VALUES)
     val::Array::ShapeType shape() const;
     PointerType clone() const;
-#endif
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     // quantity operations
     friend Quantity operator+(const Quantity& q1, const Quantity& q2);
@@ -67,7 +63,6 @@ namespace snt::puq {
     friend Quantity operator*(const Quantity& q, const MagnitudeFloat& m);
     friend Quantity operator/(const Quantity& q, const MagnitudeFloat& m);
     //friend bool operator==(const Quantity& q, const MagnitudeFloat& m);
-#if defined(MAGNITUDE_VALUES)
     // array operations
     friend Quantity operator+(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator-(val::BaseValue::PointerType a, const Quantity& q);
@@ -79,7 +74,6 @@ namespace snt::puq {
     friend Quantity operator*(const Quantity& q, val::BaseValue::PointerType a);
     friend Quantity operator/(const Quantity& q, val::BaseValue::PointerType a);
     //friend bool operator==(const Quantity& q, val::BaseValue::PointerType a);
-#endif
     friend Quantity operator+(const Quantity& q);
     friend Quantity operator-(const Quantity& q);
     friend std::ostream& operator<<(std::ostream& os, const Quantity& q);

@@ -9,39 +9,31 @@ namespace snt::puq {
   using ExponentInt = int;        ///< Numerical precision of an integer exponent
   using ExponentFloat = double;   ///< Numerical precision of a floating-point exponent
     
-  /*
-   *  Modules
-   */
-
-#if (ENABLE_PUQ_MAGNITUDE_VALUE)
-#define MAGNITUDE_VALUES
-#endif
-
   /**
    * @namespace Config
    * @brief Configuration constants
    */
   namespace Config {
     // default settings
-    inline constexpr int num_basedim = 8;                    ///< Number of base dimensions
+    inline constexpr int num_basedim = 8;                     ///< Number of base dimensions
     // various implementations				     
     inline constexpr bool use_magnitude_uncertainties = true; ///< Use uncertainties in magnitudes
-    inline constexpr bool use_magnitude_arrays = true;	     ///< Use snt::val array values instead of doubles
-    inline constexpr bool use_fractional_exponents = true;   ///< Use fractional exponents
-    // special units					     
-    inline constexpr bool use_units_temperature = true;      ///< Use temperature units
-    inline constexpr bool use_units_logarithmic = true;      ///< Use logarithmic units
-    // system of units					     
-    inline constexpr bool use_system_cgs = true;             ///< Use CGS systems of units
-    inline constexpr bool use_system_nus = true;             ///< Use natural systems of units
-    inline constexpr bool use_system_eus = true;             ///< Use english system of units
-    // preprocessing					     
-    inline constexpr bool preprocess_system = true;          ///< Preprocess system prefix in quantity expressions 
-    inline constexpr bool preprocess_symbols = true;         ///< Preprocess special symbols in quantity expressions
-    // debugging					     
-    inline constexpr bool debug_unit_solver = false;         ///< Switch on debugging diagnostics for UnitSolver
-    inline constexpr bool debug_calculator = false;          ///< Switch on debugging diagnostics for Calculator
-    inline constexpr bool debug_converter = false;           ///< Switch on debugging diagnostics for Converter
+    inline constexpr bool use_magnitude_arrays = true;	      ///< Use snt::val array values instead of doubles
+    inline constexpr bool use_fractional_exponents = true;    ///< Use fractional exponents
+    // special units					      
+    inline constexpr bool use_units_temperature = true;       ///< Use temperature units
+    inline constexpr bool use_units_logarithmic = true;       ///< Use logarithmic units
+    // system of units					      
+    inline constexpr bool use_system_cgs = true;              ///< Use CGS systems of units
+    inline constexpr bool use_system_nus = true;              ///< Use natural systems of units
+    inline constexpr bool use_system_eus = true;              ///< Use english system of units
+    // preprocessing					      
+    inline constexpr bool preprocess_system = true;           ///< Preprocess system prefix in quantity expressions 
+    inline constexpr bool preprocess_symbols = true;          ///< Preprocess special symbols in quantity expressions
+    // debugging					      
+    inline constexpr bool debug_unit_solver = false;          ///< Switch on debugging diagnostics for UnitSolver
+    inline constexpr bool debug_calculator = false;           ///< Switch on debugging diagnostics for Calculator
+    inline constexpr bool debug_converter = false;            ///< Switch on debugging diagnostics for Converter
   }
   
   static_assert(!(Config::use_system_cgs&&!Config::use_fractional_exponents),
@@ -72,15 +64,6 @@ namespace snt::puq {
     inline constexpr std::string_view si_factor_start = "|";          ///< Starting symbol of an SI conversion factor (e.g. |A|)
     inline constexpr std::string_view si_factor_end = "|";            ///< Ending symbol of an SI conversion factor
   }
-
-  /*
-   *  Type settings
-   */
-#if defined(MAGNITUDE_VALUES)
-  #define MAGNITUDE_VALUE val::BaseValue::PointerType
-#else
-  #define MAGNITUDE_VALUE MagnitudeFloat
-#endif
   
 }
   

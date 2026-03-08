@@ -28,13 +28,9 @@ TEST(Measurement, Initialization) {
   value = puq::Measurement(2, dim);
   EXPECT_EQ(value.to_string(), "46*m*g2*s3*K4");
 
-#if defined(MAGNITUDE_VALUES)
-
   val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5}); // from Array
   value = puq::Measurement(std::move(val), "km");
   EXPECT_EQ(value.to_string(), "[2, 3, 4, 5]*km");
-
-#endif
 
   value = puq::Measurement("3*km/s");
   std::stringstream ss;
@@ -137,14 +133,11 @@ TEST(Measurement, InitializationErrors) {
   v = puq::Measurement("3.40(10)*km3"); // unit expression
   EXPECT_EQ(v.to_string(), "3.40(10)*km3");
 
-#if defined(MAGNITUDE_VALUES)
-
   val::BaseValue::PointerType am = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
   val::BaseValue::PointerType ae = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});
   v = puq::Measurement(std::move(am), std::move(ae), "km");
   EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), 4.00(40), 5.00(50)]*km");
 
-#endif
 }
 
 TEST(Measurement, UnitConversion) {

@@ -90,8 +90,6 @@ namespace snt::puq {
     measurement = Measurement(mag, s);
   }
 
-#if defined(MAGNITUDE_VALUES)
-
   Quantity::Quantity(val::BaseValue::PointerType m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     measurement = Measurement(std::move(m));
@@ -126,8 +124,6 @@ namespace snt::puq {
     measurement = Measurement(mag, s);
   }
 
-#endif
-
   std::string Quantity::unit_system() const {
     auto it = SystemMap.find(stype);
     if (it == SystemMap.end()) {
@@ -140,7 +136,6 @@ namespace snt::puq {
     return measurement.size();
   }
 
-#if defined(MAGNITUDE_VALUES)
   val::Array::ShapeType Quantity::shape() const {
     return measurement.shape();
   }
@@ -151,7 +146,6 @@ namespace snt::puq {
     else
       return std::make_unique<Quantity>(measurement.magnitude.estimate->clone(), measurement.baseunits.baseunits, stype);
   }
-#endif
 
   // strings and streams
   std::string Quantity::to_string(const UnitFormat& format) const {
@@ -245,7 +239,6 @@ namespace snt::puq {
     return Quantity(q.measurement / Measurement(m));
   }
 
-#if defined(MAGNITUDE_VALUES)
   // overloading array/quantity
   Quantity operator+(val::BaseValue::PointerType a, const Quantity& q) {
     UnitSystem us(q.stype);
@@ -281,7 +274,6 @@ namespace snt::puq {
     UnitSystem us(q.stype);
     return Quantity(q.measurement / Measurement(std::move(a)));
   }
-#endif
 
   // overloading unary operations
   Quantity operator+(const Quantity& q) {

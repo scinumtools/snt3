@@ -59,16 +59,6 @@ set_module_options(PUQ ON)
 set_module_options(DIP ON)
 set_module_options(MAT ON)
 
-# set specialised options
-set(ENABLE_PUQ_MAGNITUDE "value" CACHE STRING "Set the type of magnitude in PUQ module (array, value)")
-if(ENABLE_PUQ_MAGNITUDE STREQUAL "array")
-    add_compile_definitions(ENABLE_PUQ_MAGNITUDE_ARRAY)
-elseif(ENABLE_PUQ_MAGNITUDE STREQUAL "value")
-    add_compile_definitions(ENABLE_PUQ_MAGNITUDE_VALUE)
-else()
-    message(FATAL_ERROR "Invalid ENABLE_PUQ_MAGNITUDE: ${ENABLE_PUQ_MAGNITUDE}. Must be 'array' or 'value'.")
-endif()
-
 # import GTest
 ###############
 
