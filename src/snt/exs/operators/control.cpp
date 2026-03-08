@@ -1,6 +1,14 @@
-#include <snt/exs/branching/condition.h>
+#include <snt/exs/operators/control.h>
 
 namespace snt::exs {
+
+  // parentheses
+  
+  OperatorParentheses::OperatorParentheses(const OperatorGroupSybols& s) :
+      OperatorGroup<1>("par", s, PARENTHESES_OPERATOR) {
+  }
+  
+  // conditional operator
 
   OperatorCondition::OperatorCondition() :
     OperatorTernary("cond", "?", ":", CONDITION_OPERATOR) {
@@ -12,7 +20,6 @@ namespace snt::exs {
     Token group3 = tokens->get_right();
     group1.atom->condition(group2.atom, group3.atom);
     tokens->put_left(group1);
-  };
-
+  };  
+  
 }
-

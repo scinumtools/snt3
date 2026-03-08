@@ -1,8 +1,7 @@
 #ifndef EXS_SOLVER_H
 #define EXS_SOLVER_H
 
-#include <snt/exs/branching/condition.h>
-#include <snt/exs/branching/parentheses.h>
+#include <snt/exs/operators/control.h>
 #include <snt/exs/operators/comparison.h>
 #include <snt/exs/operators/logical.h>
 #include <snt/exs/operators/arithmetic.h>
