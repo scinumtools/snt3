@@ -3,12 +3,7 @@
 
 #include <snt/exs/branching/condition.h>
 #include <snt/exs/branching/parentheses.h>
-#include <snt/exs/comparison/equal.h>
-#include <snt/exs/comparison/greater.h>
-#include <snt/exs/comparison/greater_equal.h>
-#include <snt/exs/comparison/less.h>
-#include <snt/exs/comparison/less_equal.h>
-#include <snt/exs/comparison/not_equal.h>
+#include <snt/exs/operators/comparison.h>
 #include <snt/exs/operators/logical.h>
 #include <snt/exs/operators/arithmetic.h>
 #include <snt/exs/operators/trigonometry.h>

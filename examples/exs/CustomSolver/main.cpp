@@ -1,6 +1,6 @@
 #import "main.h"
 
-#import "snt/exs/comparison/less.h"
+#import "snt/exs/operators/comparison.h"
 #import "snt/exs/solver.h"
 #import "snt/exs/step_list.h"
 
