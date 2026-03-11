@@ -12,51 +12,74 @@
 
 namespace snt::puq {
 
-  Measurement::Measurement(const std::string& s) {
+  Measurement::Measurement(const std::string& str) {
     UnitSolver solver;
-    UnitAtom atom = solver.solve(s);
+    UnitAtom atom = solver.solve(str);
     magnitude = atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
 
-  Measurement::Measurement(const Magnitude& m, const std::string& s) {
+  Measurement::Measurement(const Magnitude& est, const std::string& str) {
     UnitSolver solver;
-    UnitAtom atom = solver.solve(s);
-    magnitude = m * atom.value.magnitude;
+    UnitAtom atom = solver.solve(str);
+    magnitude = est * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
-
-  Measurement::Measurement(const Magnitude& m, const Dimensions& dim) {
-    magnitude = m * dim.numerical;
+  
+  Measurement::Measurement(const Magnitude& est, const Dimensions& dim) {
+    magnitude = est * dim.numerical;
     for (int i = 0; i < Config::num_basedim; i++) {
       const std::string& symbol = SystemData::BaseUnitOrder[i];
       baseunits.append("", symbol, dim.physical[i]);
     }
   }
 
-  Measurement::Measurement(const MagnitudeFloat& m, const std::string& s) {
+  Measurement::Measurement(const Measurement& msr, const std::string& str) {
     UnitSolver solver;
-    UnitAtom atom = solver.solve(s);
-    magnitude = Magnitude(m) * atom.value.magnitude;
+    UnitAtom atom = solver.solve(str);
+    magnitude = msr.magnitude * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
-  Measurement::Measurement(const MagnitudeFloat& m, const MagnitudeFloat& e, const std::string& s) {
+
+  Measurement::Measurement(const Measurement& msr, const Dimensions& dim) {
+    magnitude = msr.magnitude * dim.numerical;
+    for (int i = 0; i < Config::num_basedim; i++) {
+      const std::string& symbol = SystemData::BaseUnitOrder[i];
+      baseunits.append("", symbol, dim.physical[i]);
+    }
+  }
+
+  Measurement::Measurement(const MagnitudeFloat& est, const Dimensions& dim) {
+    magnitude = Magnitude(est) * dim.numerical;
+    for (int i = 0; i < Config::num_basedim; i++) {
+      const std::string& symbol = SystemData::BaseUnitOrder[i];
+      baseunits.append("", symbol, dim.physical[i]);
+    }
+  }
+  
+  Measurement::Measurement(const MagnitudeFloat& est, const std::string& str) {
     UnitSolver solver;
-    UnitAtom atom = solver.solve(s);
-    magnitude = Magnitude(m, e) * atom.value.magnitude;
+    UnitAtom atom = solver.solve(str);
+    magnitude = Magnitude(est) * atom.value.magnitude;
+    baseunits = atom.value.baseunits;
+  }
+  Measurement::Measurement(const MagnitudeFloat& est, const MagnitudeFloat& unc, const std::string& str) {
+    UnitSolver solver;
+    UnitAtom atom = solver.solve(str);
+    magnitude = Magnitude(est, unc) * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
   
-  Measurement::Measurement(val::BaseValue::PointerType m, const std::string& s) {
+  Measurement::Measurement(val::BaseValue::PointerType est, const std::string& str) {
     UnitSolver solver;
-    UnitAtom atom = solver.solve(s);
-    magnitude = Magnitude(std::move(m)) * atom.value.magnitude;
+    UnitAtom atom = solver.solve(str);
+    magnitude = Magnitude(std::move(est)) * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
-  Measurement::Measurement(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const std::string& s) {
+  Measurement::Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const std::string& str) {
     UnitSolver solver;
-    UnitAtom atom = solver.solve(s);
-    magnitude = Magnitude(std::move(m), std::move(e)) * atom.value.magnitude;
+    UnitAtom atom = solver.solve(str);
+    magnitude = Magnitude(std::move(est), std::move(unc)) * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
 
@@ -85,208 +108,208 @@ namespace snt::puq {
     return s.substr(0, s.size() - multiply.size());
   }
 
-  bool operator==(const Measurement& v1, const Measurement& v2) {
+  bool operator==(const Measurement& msr1, const Measurement& msr2) {
     try {
-      Converter conv(v2.baseunits, v1.baseunits);
+      Converter conv(msr2.baseunits, msr1.baseunits);
       if constexpr (puq::Config::use_units_logarithmic) {
 	if (conv.utype == Utype::LOG) {
-	  Magnitude m1 = v1.magnitude * conv.dimensions1.numerical;
-	  Magnitude m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	  Magnitude mag1 = msr1.magnitude * conv.dimensions1.numerical;
+	  Magnitude mag2 = conv.convert(msr2.magnitude) * conv.dimensions2.numerical;
 	  if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-	    m1 = nostd::pow(10, m1);
+	    mag1 = nostd::pow(10, mag1);
 	  if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-	    m2 = nostd::pow(10, m2);
-	  return m1 == m2;
+	    mag2 = nostd::pow(10, mag2);
+	  return mag1 == mag2;
 	}
       }
-      return v1.magnitude == conv.convert(v2.magnitude);
+      return msr1.magnitude == conv.convert(msr2.magnitude);
     } catch (const snt::puq::ConvDimExcept& e) {
       return false;
     }
   }
   
-  bool operator!=(const Measurement& v1, const Measurement& v2) {
+  bool operator!=(const Measurement& msr1, const Measurement& msr2) {
     try {
-      Converter conv(v2.baseunits, v1.baseunits);
+      Converter conv(msr2.baseunits, msr1.baseunits);
       if constexpr (puq::Config::use_units_logarithmic) {
 	if (conv.utype == Utype::LOG) {
-	  Magnitude m1 = v1.magnitude * conv.dimensions1.numerical;
-	  Magnitude m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	  Magnitude mag1 = msr1.magnitude * conv.dimensions1.numerical;
+	  Magnitude mag2 = conv.convert(msr2.magnitude) * conv.dimensions2.numerical;
 	  if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-	    m1 = nostd::pow(10, m1);
+	    mag1 = nostd::pow(10, mag1);
 	  if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-	    m2 = nostd::pow(10, m2);
-	  return m1 != m2;
+	    mag2 = nostd::pow(10, mag2);
+	  return mag1 != mag2;
 	}
       }
-      return v1.magnitude != conv.convert(v2.magnitude);
+      return msr1.magnitude != conv.convert(msr2.magnitude);
     } catch (const snt::puq::ConvDimExcept& e) {
       return true;
     }
   }
   
-  Measurement operator+(const Measurement& v1, const Measurement& v2) {
-    Converter conv(v2.baseunits, v1.baseunits);
+  Measurement operator+(const Measurement& msr1, const Measurement& msr2) {
+    Converter conv(msr2.baseunits, msr1.baseunits);
     if constexpr (puq::Config::use_units_logarithmic) {
       if (conv.utype == Utype::LOG) {
-	Magnitude m1 = v1.magnitude * conv.dimensions1.numerical;
-	Magnitude m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	Magnitude mag1 = msr1.magnitude * conv.dimensions1.numerical;
+	Magnitude mag2 = conv.convert(msr2.magnitude) * conv.dimensions2.numerical;
 	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-	  m1 = nostd::pow(10, m1);
+	  mag1 = nostd::pow(10, mag1);
 	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-	  m2 = nostd::pow(10, m2);
-	return Measurement(nostd::log10(m1 + m2) / conv.dimensions1.numerical, v1.baseunits);
+	  mag2 = nostd::pow(10, mag2);
+	return Measurement(nostd::log10(mag1 + mag2) / conv.dimensions1.numerical, msr1.baseunits);
       }
     }
-    return Measurement(v1.magnitude + conv.convert(v2.magnitude), v1.baseunits);
+    return Measurement(msr1.magnitude + conv.convert(msr2.magnitude), msr1.baseunits);
   }
 
-  Measurement operator+(const Measurement& v) {
-    return v;
+  Measurement operator+(const Measurement& msr) {
+    return msr;
   }
 
-  void Measurement::operator+=(const Measurement& v) {
-    Converter conv(v.baseunits, baseunits);
+  void Measurement::operator+=(const Measurement& msr) {
+    Converter conv(msr.baseunits, baseunits);
     if constexpr (puq::Config::use_units_logarithmic) {
       if (conv.utype == Utype::LOG) {
-	Magnitude m1 = magnitude * conv.dimensions1.numerical;
-	Magnitude m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
+	Magnitude mag1 = magnitude * conv.dimensions1.numerical;
+	Magnitude mag2 = conv.convert(msr.magnitude) * conv.dimensions2.numerical;
 	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-	  m1 = nostd::pow(10, m1);
+	  mag1 = nostd::pow(10, mag1);
 	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-	  m2 = nostd::pow(10, m2);
-	magnitude = nostd::log10(m1 + m2) / conv.dimensions1.numerical;
+	  mag2 = nostd::pow(10, mag2);
+	magnitude = nostd::log10(mag1 + mag2) / conv.dimensions1.numerical;
 	return;
       }
     }
-    magnitude += conv.convert(v.magnitude);
+    magnitude += conv.convert(msr.magnitude);
   }
 
-  Measurement operator-(const Measurement& v1, const Measurement& v2) {
-    Converter conv(v2.baseunits, v1.baseunits);
+  Measurement operator-(const Measurement& msr1, const Measurement& msr2) {
+    Converter conv(msr2.baseunits, msr1.baseunits);
     if constexpr (puq::Config::use_units_logarithmic) {
       if (conv.utype == Utype::LOG) {
-	Magnitude m1 = v1.magnitude * conv.dimensions1.numerical;
-	Magnitude m2 = conv.convert(v2.magnitude) * conv.dimensions2.numerical;
+	Magnitude mag1 = msr1.magnitude * conv.dimensions1.numerical;
+	Magnitude mag2 = conv.convert(msr2.magnitude) * conv.dimensions2.numerical;
 	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-	  m1 = nostd::pow(10, m1);
+	  mag1 = nostd::pow(10, mag1);
 	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-	  m2 = nostd::pow(10, m2);
-	return Measurement(nostd::log10(m1 - m2) / conv.dimensions1.numerical, v1.baseunits);
+	  mag2 = nostd::pow(10, mag2);
+	return Measurement(nostd::log10(mag1 - mag2) / conv.dimensions1.numerical, msr1.baseunits);
       }
     }
-    return Measurement(v1.magnitude - conv.convert(v2.magnitude), v1.baseunits);
+    return Measurement(msr1.magnitude - conv.convert(msr2.magnitude), msr1.baseunits);
   }
 
-  Measurement operator-(const Measurement& v) {
-    return Measurement(-v.magnitude, v.baseunits);
+  Measurement operator-(const Measurement& msr) {
+    return Measurement(-msr.magnitude, msr.baseunits);
   }
 
-  void Measurement::operator-=(const Measurement& v) {
-    Converter conv(v.baseunits, baseunits);
+  void Measurement::operator-=(const Measurement& msr) {
+    Converter conv(msr.baseunits, baseunits);
     if constexpr (puq::Config::use_units_logarithmic) {
       if (conv.utype == Utype::LOG) {
-	Magnitude m1 = magnitude * conv.dimensions1.numerical;
-	Magnitude m2 = conv.convert(v.magnitude) * conv.dimensions2.numerical;
+	Magnitude mag1 = magnitude * conv.dimensions1.numerical;
+	Magnitude mag2 = conv.convert(msr.magnitude) * conv.dimensions2.numerical;
 	if ((conv.dimensions1.utype & Utype::LOG) == Utype::LOG)
-	  m1 = nostd::pow(10, m1);
+	  mag1 = nostd::pow(10, mag1);
 	if ((conv.dimensions2.utype & Utype::LOG) == Utype::LOG)
-	  m2 = nostd::pow(10, m2);
-	magnitude = nostd::log10(m1 - m2) / conv.dimensions1.numerical;
+	  mag2 = nostd::pow(10, mag2);
+	magnitude = nostd::log10(mag1 - mag2) / conv.dimensions1.numerical;
 	return;
       }
     }
-    magnitude -= conv.convert(v.magnitude);
+    magnitude -= conv.convert(msr.magnitude);
   }
 
-  Measurement operator*(const Measurement& v1, const Measurement& v2) {
-    return Measurement(v1.magnitude * v2.magnitude, v1.baseunits + v2.baseunits);
+  Measurement operator*(const Measurement& msr1, const Measurement& msr2) {
+    return Measurement(msr1.magnitude * msr2.magnitude, msr1.baseunits + msr2.baseunits);
   }
 
-  void Measurement::operator*=(const Measurement& v) {
-    magnitude *= v.magnitude;
-    baseunits += v.baseunits;
+  void Measurement::operator*=(const Measurement& msr) {
+    magnitude *= msr.magnitude;
+    baseunits += msr.baseunits;
   }
 
-  Measurement operator/(const Measurement& v1, const Measurement& v2) {
-    return Measurement(v1.magnitude / v2.magnitude, v1.baseunits - v2.baseunits);
+  Measurement operator/(const Measurement& msr1, const Measurement& msr2) {
+    return Measurement(msr1.magnitude / msr2.magnitude, msr1.baseunits - msr2.baseunits);
   }
 
-  void Measurement::operator/=(const Measurement& v) {
-    magnitude /= v.magnitude;
-    baseunits -= v.baseunits;
+  void Measurement::operator/=(const Measurement& msr) {
+    magnitude /= msr.magnitude;
+    baseunits -= msr.baseunits;
   }
 
-  std::ostream& operator<<(std::ostream& os, const Measurement& v) {
-    os << v.to_string();
+  std::ostream& operator<<(std::ostream& os, const Measurement& msr) {
+    os << msr.to_string();
     return os;
   }
 
-  void Measurement::pow(const ExponentVariant& e) {
-    magnitude.pow(e);
+  void Measurement::pow(const ExponentVariant& exp) {
+    magnitude.pow(exp);
     //magnitude = std::pow(magnitude, (ExponentFloat)e);
-    baseunits *= e;
+    baseunits *= exp;
   }
 
-  Measurement Measurement::convert(const std::string& s) const {
-    Measurement uv = Measurement(s);
-    return convert(uv);
+  Measurement Measurement::convert(const std::string& str) const {
+    Measurement msr = Measurement(str);
+    return convert(msr);
   }
 
-  Measurement Measurement::convert(const Measurement& v) const {
-    Converter conv(baseunits, v.baseunits);
-    Magnitude m = conv.convert(magnitude, v.magnitude);
-    return Measurement(m, v.baseunits);
+  Measurement Measurement::convert(const Measurement& msr) const {
+    Converter conv(baseunits, msr.baseunits);
+    Magnitude mag = conv.convert(magnitude, msr.magnitude);
+    return Measurement(mag, msr.baseunits);
   }
 
-  Measurement Measurement::convert(const BaseUnits& bu) const {
-    Converter conv(baseunits, bu);
-    return Measurement(conv.convert(magnitude, 1), bu);
+  Measurement Measurement::convert(const BaseUnits& bun) const {
+    Converter conv(baseunits, bun);
+    return Measurement(conv.convert(magnitude, 1), bun);
   }
 
   Measurement Measurement::convert(const Format::Base& format) const {
-    BaseUnits bu;
+    BaseUnits bun;
     Dimensions dim = baseunits.dimensions();
     for (int i = 0; i < Config::num_basedim; i++) {
       if (exponent_to_float(dim.physical[i]) == 0)
         continue;
       if constexpr (Config::use_system_eus) {
 	if (i == 0 && format == Format::Base::FPS) {
-	  bu.append({"", "ft", dim.physical[i]});
+	  bun.append({"", "ft", dim.physical[i]});
 	  continue;
 	} else if (i == 1 && format == Format::Base::FPS) {
-	  bu.append({"", "lb", dim.physical[i]});
+	  bun.append({"", "lb", dim.physical[i]});
 	  continue;
 	}
       }
       if (i == 1 && format == Format::Base::MKS) {
-        bu.append({"k", "g", dim.physical[i]});
+        bun.append({"k", "g", dim.physical[i]});
       } else if (i == 0 && format == Format::Base::CGS) {
-        bu.append({"c", "m", dim.physical[i]});
+        bun.append({"c", "m", dim.physical[i]});
       } else {
-        bu.append({"", SystemData::BaseUnitOrder[i], dim.physical[i]});
+        bun.append({"", SystemData::BaseUnitOrder[i], dim.physical[i]});
       }
     }
-    return convert(bu);
+    return convert(bun);
   }
 
   Measurement Measurement::rebase_prefixes() {
     Magnitude mag = magnitude;
     std::map<std::string, BaseUnit> bumap;
-    for (const auto& bu : baseunits) {
-      if (bumap.find(bu.unit) == bumap.end()) {
-        bumap.insert({bu.unit, {bu.prefix, bu.unit, bu.exponent}});
+    for (const auto& bun : baseunits) {
+      if (bumap.find(bun.unit) == bumap.end()) {
+        bumap.insert({bun.unit, {bun.prefix, bun.unit, bun.exponent}});
       } else {
-        auto prefix1 = UnitPrefixList.find(bu.prefix);
-        auto prefix2 = UnitPrefixList.find(bumap[bu.unit].prefix);
-	ExponentFloat fexp = exponent_to_float(bu.exponent);
+        auto prefix1 = UnitPrefixList.find(bun.prefix);
+        auto prefix2 = UnitPrefixList.find(bumap[bun.unit].prefix);
+	ExponentFloat fexp = exponent_to_float(bun.exponent);
         if (prefix1 != UnitPrefixList.end())
           mag *= nostd::pow(prefix1->second.magnitude, fexp);
         if (prefix2 != UnitPrefixList.end())
           mag /= nostd::pow(prefix2->second.magnitude, fexp);
-	bumap[bu.unit].exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+	bumap[bun.unit].exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
 	  return a + b;
-	}, bumap[bu.unit].exponent, bu.exponent);
+	}, bumap[bun.unit].exponent, bun.exponent);
       }
     }
     BaseUnits bus;
@@ -299,21 +322,21 @@ namespace snt::puq {
   Measurement Measurement::rebase_dimensions() {
     Magnitude mag = magnitude;
     std::map<std::string, BaseUnit> bumap;
-    for (const auto& bu : baseunits) {
-      Dimensions dim = BaseUnits(bu.prefix + bu.unit).dimensions();
+    for (const auto& bun : baseunits) {
+      Dimensions dim = BaseUnits(bun.prefix + bun.unit).dimensions();
       if ((dim.utype & Utype::LOG) == Utype::LOG)
         throw MeasurementExcept("Dimensions of logarithmic units cannot be rebased: " + baseunits.to_string());
       if ((dim.utype & Utype::TMP) == Utype::TMP)
         throw MeasurementExcept("Dimensions of temperature units cannot be rebased: " + baseunits.to_string());
       std::string key = dim.to_string({Format::Display::UNITS});
       if (bumap.find(key) == bumap.end()) {
-        bumap.insert({key, {bu.prefix, bu.unit, bu.exponent}});
+        bumap.insert({key, {bun.prefix, bun.unit, bun.exponent}});
       } else {
         Dimensions dim0 = BaseUnits(bumap[key].prefix + bumap[key].unit).dimensions();
-        mag *= nostd::pow(dim.numerical / dim0.numerical, exponent_to_float(bu.exponent));
+        mag *= nostd::pow(dim.numerical / dim0.numerical, exponent_to_float(bun.exponent));
 	bumap[key].exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
 	  return a + b;
-	}, bumap[key].exponent, bu.exponent);
+	}, bumap[key].exponent, bun.exponent);
       }
     }
     BaseUnits bus;
