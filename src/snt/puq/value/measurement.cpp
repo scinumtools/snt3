@@ -12,6 +12,30 @@
 
 namespace snt::puq {
 
+  /*
+   * Convert absolute and relative (in %) uncertainties
+   */
+  MagnitudeFloat Measurement::abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& e) {
+    return 100 * e / v;
+  };
+
+  MagnitudeFloat Measurement::rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& e) {
+    return v * e / 100;
+  };
+
+  // DEBUG: need to implement properly
+  val::BaseValue::PointerType Measurement::abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType e) {
+    return e->math_div(v.get())->math_mul(std::make_unique<val::ArrayValue<double>>(100).get());
+  };
+
+  val::BaseValue::PointerType Measurement::rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType e) {
+    return v->math_mul(e.get())->math_div(std::make_unique<val::ArrayValue<double>>(100).get());
+  };
+
+  /*
+   * Constructors
+   */
+  
   Measurement::Measurement(const std::string& str) {
     UnitSolver solver;
     UnitAtom atom = solver.solve(str);

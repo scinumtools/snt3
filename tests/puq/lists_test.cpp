@@ -53,8 +53,7 @@ void test_unit_definitions() {
       continue;
 
     puq::DimensionStruct dmap = puq::UnitSystem::Data->DimensionMap.at(unit.first);
-    puq::Magnitude magnitude(dmap.magnitude, dmap.uncertainty);
-    puq::Dimensions dim1(magnitude, dmap.dimensions);
+    puq::Dimensions dim1(dmap.magnitude, dmap.uncertainty, dmap.dimensions);
     std::string m1 = dim1.to_string();
 
     puq::Measurement uv2(unit.second.definition);
@@ -72,7 +71,7 @@ void test_unit_definitions() {
 
     /*
     EXPECT_DOUBLE_EQ(unit.magnitude, dim2.numerical.value[0])
-      << "Magnitude of unit '" << unit.first
+      << "Numerical value of unit '" << unit.first
       << "' does not match with its definition: "
       << puq::nostd::to_string(unit.magnitude) << " != "
       << puq::nostd::to_string(dim2.numerical);

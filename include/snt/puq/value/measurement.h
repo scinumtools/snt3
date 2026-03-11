@@ -12,6 +12,12 @@ namespace snt::puq {
   public:
     Magnitude magnitude;
     BaseUnits baseunits;
+    
+    static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
+    static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
+    static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);
+    static val::BaseValue::PointerType rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType r);
+    
     Measurement() : magnitude(1) {}
     Measurement(const std::string& str);
     Measurement(const MagnitudeFloat& est, const std::string& str);

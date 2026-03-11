@@ -38,6 +38,7 @@ namespace snt::puq {
                                                                             uncertainty(std::make_unique<val::ArrayValue<double>>(e)) {}
     Magnitude(val::BaseValue::PointerType m);
     Magnitude(val::BaseValue::PointerType m, val::BaseValue::PointerType e);
+    
     static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
     static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
     static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);

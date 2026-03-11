@@ -10,6 +10,8 @@ namespace snt::nostd {
   extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, val::BaseValue::PointerType e);
   extern puq::Magnitude pow(const puq::Magnitude& m, const puq::ExponentFloat& e);
   extern puq::Magnitude pow(const puq::Magnitude& m, const puq::Magnitude& e);
+  extern puq::Measurement pow(const puq::Measurement& msr, const puq::ExponentFloat& e);
+  extern puq::Measurement pow(const puq::Measurement& msr1, const puq::Measurement& msr2);
 
 } // namespace snt::nostd
 

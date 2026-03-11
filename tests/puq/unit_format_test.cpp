@@ -65,55 +65,55 @@ TEST(UnitFormat, BaseUnitsFormat) {
   EXPECT_EQ(bus.to_string(format), "m⋅kg⁻²ᐟ³");
 }
 
-TEST(UnitFormat, MagnitudeFormat) {
+TEST(UnitFormat, MeasurementFormatFloat) {
 
-  puq::Magnitude m;
+  puq::Measurement msr;
   puq::UnitFormat format;
 
   format = puq::UnitFormat(puq::Format::Math::UNICODE);
-  m = puq::Magnitude(3.234019394939e12); // without uncertainties
-  EXPECT_EQ(m.to_string(format), "3.23402×10¹²");
+  msr = puq::Measurement(3.234019394939e12); // without uncertainties
+  EXPECT_EQ(msr.to_string(format), "3.23402×10¹²");
 
   format = puq::UnitFormat(puq::Format::Precision(10));
-  m = puq::Magnitude(3.2340342349349823e3); // increased precision
-  EXPECT_EQ(m.to_string(format), "3.234034235e3");
+  msr = puq::Measurement(3.2340342349349823e3); // increased precision
+  EXPECT_EQ(msr.to_string(format), "3.234034235e3");
 
   format = puq::UnitFormat(puq::Format::Math::UNICODE);
-  m = puq::Magnitude(3.234019394939e12, 2.34e8); // with uncertainties
-  EXPECT_EQ(m.to_string(format), "3.23402(23)×10¹²");
+  msr = puq::Measurement(3.234019394939e12, 2.34e8); // with uncertainties
+  EXPECT_EQ(msr.to_string(format), "3.23402(23)×10¹²");
 
   format = puq::UnitFormat(puq::Format::Math::UNICODE, puq::Format::Uncertainty::HIDE);
-  m = puq::Magnitude(3.234019394939e12, 2.34e8); // without uncertainties
-  EXPECT_EQ(m.to_string(format), "3.23402×10¹²");
+  msr = puq::Measurement(3.234019394939e12, 2.34e8); // without uncertainties
+  EXPECT_EQ(msr.to_string(format), "3.23402×10¹²");
 }
 
-TEST(UnitFormat, MeasurementFormat) {
+TEST(UnitFormat, MeasurementFormatString) {
 
-  puq::Measurement value;
+  puq::Measurement msr;
   puq::UnitFormat format;
 
   format = puq::UnitFormat(puq::Format::Math::UNICODE);
-  value = puq::Measurement("3*km-2*m/s2"); // normal units
-  EXPECT_EQ(value.to_string(format), "3⋅km⁻²⋅m⋅s⁻²");
+  msr = puq::Measurement("3*km-2*m/s2"); // normal units
+  EXPECT_EQ(msr.to_string(format), "3⋅km⁻²⋅m⋅s⁻²");
 
-  value = puq::Measurement("3.234019394939e12*km-2"); // decimal orders
-  EXPECT_EQ(value.to_string(format), "3.23402×10¹²⋅km⁻²");
+  msr = puq::Measurement("3.234019394939e12*km-2"); // decimal orders
+  EXPECT_EQ(msr.to_string(format), "3.23402×10¹²⋅km⁻²");
 
   format = puq::UnitFormat(puq::Format::Precision(10));
-  value = puq::Measurement("3.2340342349349823e3*m/s2"); // higher precision
-  EXPECT_EQ(value.to_string(format), "3.234034235e3*m*s-2");
+  msr = puq::Measurement("3.2340342349349823e3*m/s2"); // higher precision
+  EXPECT_EQ(msr.to_string(format), "3.234034235e3*m*s-2");
 
   format = puq::UnitFormat(puq::Format::Math::UNICODE, 10); // precision and UNICODE format
-  value = puq::Measurement("3.2340342349349823e3*km-2");
-  EXPECT_EQ(value.to_string(format), "3.234034235×10³⋅km⁻²");
+  msr = puq::Measurement("3.2340342349349823e3*km-2");
+  EXPECT_EQ(msr.to_string(format), "3.234034235×10³⋅km⁻²");
 
   format = puq::UnitFormat(puq::Format::Display::MAGNITUDE); // display only magnitude
-  value = puq::Measurement("3*km/s");
-  EXPECT_EQ(value.to_string(format), "3");
+  msr = puq::Measurement("3*km/s");
+  EXPECT_EQ(msr.to_string(format), "3");
 
   format = puq::UnitFormat(puq::Format::Display::UNITS); // display only magnitude
-  value = puq::Measurement("3*km/s");
-  EXPECT_EQ(value.to_string(format), "km*s-1");
+  msr = puq::Measurement("3*km/s");
+  EXPECT_EQ(msr.to_string(format), "km*s-1");
 }
 
 TEST(UnitFormat, SystemFormat) {

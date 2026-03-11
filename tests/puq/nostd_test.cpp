@@ -14,60 +14,58 @@ using namespace snt;
 // test from https://www.quora.com/How-does-one-calculate-uncertainty-in-an-exponent
 // and checked using http://www.julianibus.de/ online calculator
 
-TEST(NoSTD, MeasurementMath) {
+TEST(NoSTD, MeasurementMathUnits) {
 
-  puq::Measurement uv1, uv2, uv3;
+  puq::Measurement msr1, msr2, msr3;
 
-  puq::Magnitude m1(4.36, 0.16);
-  puq::Magnitude m2(2.35, 0.04);
-  uv1 = puq::Measurement(m1, "m");
-  uv2 = puq::Measurement(m2, "m");
+  msr1 = puq::Measurement(4.36, 0.16, "m");
+  msr2 = puq::Measurement(2.35, 0.04, "m");
 
   // exponential function
-  uv3 = nostd::exp(uv2);
-  EXPECT_EQ(uv3.to_string(), "1.049(42)e1*m"); // mag 10.485569724727576 err 0.41942280901707824
+  msr3 = nostd::exp(msr2);
+  EXPECT_EQ(msr3.to_string(), "1.049(42)e1*m"); // mag 10.485569724727576 err 0.41942280901707824
 }
 
-TEST(NoSTD, MagnitudeMath) {
+TEST(NoSTD, MeasurementMath) {
 
-  puq::Magnitude m1, m2, m3;
+  puq::Measurement msr1, msr2, msr3;
 
-  m1 = puq::Magnitude(4.36, 0.16);
-  m2 = puq::Magnitude(2.35, 0.04);
+  msr1 = puq::Measurement(4.36, 0.16);
+  msr2 = puq::Measurement(2.35, 0.04);
 
   // exponential function
-  m3 = nostd::exp(m2);
-  EXPECT_EQ(m3.to_string(), "1.049(42)e1"); // mag 10.485569724727576 err 0.41942280901707824
+  msr3 = nostd::exp(msr2);
+  EXPECT_EQ(msr3.to_string(), "1.049(42)e1"); // est 10.485569724727576 unc 0.41942280901707824
 
   // power function with an exact exponent
-  m3 = nostd::pow(m1, 2.35);
-  EXPECT_EQ(m3.to_string(), "3.18(27)e1"); // mag 31.826820135086383 err 2.74469829832924
+  msr3 = nostd::pow(msr1, 2.35);
+  EXPECT_EQ(msr3.to_string(), "3.18(27)e1"); // est 31.826820135086383 unc 2.74469829832924
 
   // power function
-  m3 = nostd::pow(m1, m2);
-  EXPECT_EQ(m3.to_string(), "3.18(33)e1"); // mag 31.826820135086383 err 3.323756901862083
+  msr3 = nostd::pow(msr1, msr2);
+  EXPECT_EQ(msr3.to_string(), "3.18(33)e1"); // est 31.826820135086383 unc 3.323756901862083
 
   // natural logarithm
-  m3 = nostd::log(m1);
-  EXPECT_EQ(m3.to_string(), "1.472(37)"); // mag 1.472472057360943 err 0.03669724719657097
+  msr3 = nostd::log(msr1);
+  EXPECT_EQ(msr3.to_string(), "1.472(37)"); // est 1.472472057360943 unc 0.03669724719657097
 
   // decadic logarithm
-  m3 = nostd::log10(m1);
-  EXPECT_EQ(m3.to_string(), "6.39(16)e-1"); // mag 0.6394864892685861 err 0.01593741192351672
+  msr3 = nostd::log10(msr1);
+  EXPECT_EQ(msr3.to_string(), "6.39(16)e-1"); // est 0.6394864892685861 unc 0.01593741192351672
 
   // square root
-  m3 = nostd::sqrt(m1);
-  EXPECT_EQ(m3.to_string(), "2.088(38)"); // mag 2.08806130178211 err 0.03831305122048434
+  msr3 = nostd::sqrt(msr1);
+  EXPECT_EQ(msr3.to_string(), "2.088(38)"); // est 2.08806130178211 unc 0.03831305122048434
 
   // cubic root
-  m3 = nostd::cbrt(m1);
-  EXPECT_EQ(m3.to_string(), "1.634(20)"); // mag 1.633661834060757 err 0.019983631105446875
+  msr3 = nostd::cbrt(msr1);
+  EXPECT_EQ(msr3.to_string(), "1.634(20)"); // est 1.633661834060757 unc 0.019983631105446875
 
   // absolute value
-  m3 = nostd::abs(-m1);
-  EXPECT_EQ(m3.to_string(), "4.36(16)");
+  msr3 = nostd::abs(-msr1);
+  EXPECT_EQ(msr3.to_string(), "4.36(16)");
 
   // maximum value
-  m3 = nostd::max(m1, m2);
-  EXPECT_EQ(m3.to_string(), "4.36(16)");
+  msr3 = nostd::max(msr1, msr2);
+  EXPECT_EQ(msr3.to_string(), "4.36(16)");
 }
