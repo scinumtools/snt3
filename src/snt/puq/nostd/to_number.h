@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  puq::double to_number(const std::string& value);
+  double to_number(const std::string& value);
 
 } // namespace snt::nostd
 

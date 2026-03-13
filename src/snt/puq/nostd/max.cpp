@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  extern puq::double max(const puq::double& m1, const puq::double& m2) {
+  extern double max(const double& m1, const double& m2) {
     return std::max(m1, m2);
   }
 

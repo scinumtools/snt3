@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern std::string to_string(const puq::double& value, int precision = std::cout.precision());
+  extern std::string to_string(const double& value, int precision = std::cout.precision());
   extern std::string to_string(val::BaseValue::PointerType value, int precision = std::cout.precision());
   extern std::string to_string(const puq::Magnitude& value, int precision = std::cout.precision());
   extern std::string to_string(const puq::BaseUnits& value, int precision = std::cout.precision());

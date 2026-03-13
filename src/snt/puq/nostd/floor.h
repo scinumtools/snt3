@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern puq::double floor(const puq::double& m);
+  extern double floor(const double& m);
   extern val::BaseValue::PointerType floor(val::BaseValue::PointerType a);
   extern puq::Magnitude floor(const puq::Magnitude& m);
 

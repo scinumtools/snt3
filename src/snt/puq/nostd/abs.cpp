@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  puq::double abs(const puq::double& m) {
+  double abs(const double& m) {
     return std::abs(m);
   }
 

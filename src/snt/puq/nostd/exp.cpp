@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  puq::double exp(const puq::double& e) {
+  double exp(const double& e) {
     return std::exp(e);
   }
 

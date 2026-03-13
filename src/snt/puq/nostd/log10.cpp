@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  puq::double log10(const puq::double& m) {
+  double log10(const double& m) {
     return std::log10(m);
   }
 

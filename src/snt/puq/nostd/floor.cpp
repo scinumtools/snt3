@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  puq::double floor(const puq::double& m) {
+  double floor(const double& m) {
     return std::floor(m);
   }
 
