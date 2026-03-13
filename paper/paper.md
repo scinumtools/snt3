@@ -1,5 +1,5 @@
 ---
-title: "DIPL: A Dimensional Parameter Language for Scientific Simulation Configuration"
+title: "DIPL: A Dimensional Input Parameter Language for Scientific Simulation Configuration"
 tags:
   - C++
   - Python
@@ -7,10 +7,10 @@ tags:
   - configuration
   - units
 authors:
-  - name: Your Name
+  - name: Ondrej Pego Jaura
     affiliation: 1
 affiliations:
-  - name: Your Institution
+  - name: Unaffiliated
     index: 1
 date: 2026
 bibliography: paper.bib
