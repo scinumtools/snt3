@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  double cbrt(const double& m) {
+  double cbrt(const double m) {
     return std::cbrt(m);
   }
 

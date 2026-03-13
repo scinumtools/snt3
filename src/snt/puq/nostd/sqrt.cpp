@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  double sqrt(const double& m) {
+  double sqrt(const double m) {
     return std::sqrt(m);
   }
 

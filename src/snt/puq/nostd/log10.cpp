@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  double log10(const double& m) {
+  double log10(const double m) {
     return std::log10(m);
   }
 

@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern double max(const double& m1, const double& m2);
+  extern double max(const double m1, const double m2);
   extern val::BaseValue::PointerType max(val::BaseValue::PointerType a1, val::BaseValue::PointerType a2);
   extern puq::Magnitude max(const puq::Magnitude& m1, const puq::Magnitude& m2);
   extern puq::Measurement max(const puq::Measurement& msr1, const puq::Measurement& msr2);

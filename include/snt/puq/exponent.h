@@ -26,8 +26,8 @@ namespace snt::puq {
     bool operator!=(const Exponent& e) const;
     bool operator==(const int& e) const;
     bool operator!=(const int& e) const;
-    bool operator==(const double& e) const;
-    bool operator!=(const double& e) const;
+    bool operator==(const double e) const;
+    bool operator!=(const double e) const;
     double to_float() const;
     operator double() const;
     std::string to_string(const UnitFormat& format = UnitFormat()) const;

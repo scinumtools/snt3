@@ -4,7 +4,7 @@
 
 namespace snt::nostd {
 
-  std::string to_string(const double& value, int precision) {
+  std::string to_string(const double value, int precision) {
     std::stringstream ss;
     ss << std::setprecision(precision);
     ss << value << std::scientific;

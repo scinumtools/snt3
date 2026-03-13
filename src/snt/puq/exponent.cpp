@@ -58,11 +58,11 @@ namespace snt::puq {
     return to_float() != e;
   }
 
-  bool Exponent::operator==(const double& e) const {
+  bool Exponent::operator==(const double e) const {
     return to_float() == e;
   }
 
-  bool Exponent::operator!=(const double& e) const {
+  bool Exponent::operator!=(const double e) const {
     return to_float() != e;
   }
 

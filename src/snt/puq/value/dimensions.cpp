@@ -22,7 +22,7 @@ namespace snt::puq {
     }
   }
 
-  Dimensions::Dimensions(const double& m, const double& e) : utype(Utype::NUL), numerical(m, e) {
+  Dimensions::Dimensions(const double m, const double e) : utype(Utype::NUL), numerical(m, e) {
     for (int i = 0; i < Config::num_basedim; i++) {
       physical[i] = 0;
     }

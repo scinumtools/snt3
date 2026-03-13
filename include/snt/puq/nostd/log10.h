@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern double log10(const double& m);
+  extern double log10(const double m);
   extern val::BaseValue::PointerType log10(val::BaseValue::PointerType a);
   extern puq::Magnitude log10(const puq::Magnitude& m);
   extern puq::Measurement log10(const puq::Measurement& msr);

@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern double abs(const double& m);
+  extern double abs(const double m);
   extern val::BaseValue::PointerType abs(val::BaseValue::PointerType a);
   extern puq::Magnitude abs(const puq::Magnitude& m);
   extern puq::Measurement abs(const puq::Measurement& msr);

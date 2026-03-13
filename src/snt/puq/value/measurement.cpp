@@ -15,11 +15,11 @@ namespace snt::puq {
   /*
    * Convert absolute and relative (in %) uncertainties
    */
-  double Measurement::abs_to_rel(const double& v, const double& e) {
+  double Measurement::abs_to_rel(const double v, const double e) {
     return 100 * e / v;
   };
 
-  double Measurement::rel_to_abs(const double& v, const double& e) {
+  double Measurement::rel_to_abs(const double v, const double e) {
     return v * e / 100;
   };
 
@@ -73,7 +73,7 @@ namespace snt::puq {
     }
   }
 
-  Measurement::Measurement(const double& est, const Dimensions& dim) {
+  Measurement::Measurement(const double est, const Dimensions& dim) {
     magnitude = Magnitude(est) * dim.numerical;
     for (int i = 0; i < Config::num_basedim; i++) {
       const std::string& symbol = SystemData::BaseUnitOrder[i];
@@ -81,13 +81,13 @@ namespace snt::puq {
     }
   }
   
-  Measurement::Measurement(const double& est, const std::string& str) {
+  Measurement::Measurement(const double est, const std::string& str) {
     UnitSolver solver;
     UnitAtom atom = solver.solve(str);
     magnitude = Magnitude(est) * atom.value.magnitude;
     baseunits = atom.value.baseunits;
   }
-  Measurement::Measurement(const double& est, const double& unc, const std::string& str) {
+  Measurement::Measurement(const double est, const double unc, const std::string& str) {
     UnitSolver solver;
     UnitAtom atom = solver.solve(str);
     magnitude = Magnitude(est, unc) * atom.value.magnitude;

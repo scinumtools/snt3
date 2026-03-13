@@ -23,11 +23,11 @@ namespace snt::puq {
   /*
    * Convert absolute and relative (in %) uncertainties
    */
-  double Magnitude::abs_to_rel(const double& v, const double& e) {
+  double Magnitude::abs_to_rel(const double v, const double e) {
     return 100 * e / v;
   };
 
-  double Magnitude::rel_to_abs(const double& v, const double& e) {
+  double Magnitude::rel_to_abs(const double v, const double e) {
     return v * e / 100;
   };
 

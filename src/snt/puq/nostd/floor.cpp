@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  double floor(const double& m) {
+  double floor(const double m) {
     return std::floor(m);
   }
 

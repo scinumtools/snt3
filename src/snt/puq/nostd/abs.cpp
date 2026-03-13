@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  double abs(const double& m) {
+  double abs(const double m) {
     return std::abs(m);
   }
 

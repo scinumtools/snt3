@@ -32,15 +32,15 @@ namespace snt::puq {
     Magnitude& operator=(Magnitude&&) noexcept = default;
     Magnitude() : estimate(std::make_unique<val::ArrayValue<double>>(1)),
                   uncertainty(nullptr) {}
-    Magnitude(const double& m) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
+    Magnitude(const double m) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
                                               uncertainty(nullptr) {}
-    Magnitude(const double& m, const double& e) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
+    Magnitude(const double m, const double e) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
                                                                             uncertainty(std::make_unique<val::ArrayValue<double>>(e)) {}
     Magnitude(val::BaseValue::PointerType m);
     Magnitude(val::BaseValue::PointerType m, val::BaseValue::PointerType e);
     
-    static double abs_to_rel(const double& v, const double& a);
-    static double rel_to_abs(const double& v, const double& r);
+    static double abs_to_rel(const double v, const double a);
+    static double rel_to_abs(const double v, const double r);
     static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);
     static val::BaseValue::PointerType rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType r);
     
