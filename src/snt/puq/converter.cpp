@@ -77,8 +77,8 @@ namespace snt::puq {
 	struct pair {
 	  std::string first;
 	  std::string second;
-	  MagnitudeFloat exp;
-	  MagnitudeFloat conv;
+	  double exp;
+	  double conv;
 	};
 	const std::vector<pair> pairs_B_B = {
           {"BW", "Bm", 3},

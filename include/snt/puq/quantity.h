@@ -28,12 +28,12 @@ namespace snt::puq {
     Quantity(const Magnitude& m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const Magnitude& m, const SystemType system = UnitSystem::System);
     Quantity(const Magnitude& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-    Quantity(const MagnitudeFloat& m, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const MagnitudeFloat& m, const SystemType system = UnitSystem::System);
-    Quantity(const MagnitudeFloat& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-    Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const SystemType system = UnitSystem::System);
-    Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+    Quantity(const double& m, std::string s, const SystemType system = SystemType::NONE);
+    Quantity(const double& m, const SystemType system = UnitSystem::System);
+    Quantity(const double& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+    Quantity(const double& m, const double& e, std::string s, const SystemType system = SystemType::NONE);
+    Quantity(const double& m, const double& e, const SystemType system = UnitSystem::System);
+    Quantity(const double& m, const double& e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
     Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(val::BaseValue::PointerType m, const SystemType system = UnitSystem::System);
     Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
@@ -53,16 +53,16 @@ namespace snt::puq {
     friend bool operator==(const Quantity& q1, const Quantity& q2);
     friend bool operator!=(const Quantity& q1, const Quantity& q2);
     // scalar operations
-    friend Quantity operator+(const MagnitudeFloat& m, const Quantity& q);
-    friend Quantity operator-(const MagnitudeFloat& m, const Quantity& q);
-    friend Quantity operator*(const MagnitudeFloat& m, const Quantity& q);
-    friend Quantity operator/(const MagnitudeFloat& m, const Quantity& q);
-    //friend bool operator==(const MagnitudeFloat& m, const Quantity& q);
-    friend Quantity operator+(const Quantity& q, const MagnitudeFloat& m);
-    friend Quantity operator-(const Quantity& q, const MagnitudeFloat& m);
-    friend Quantity operator*(const Quantity& q, const MagnitudeFloat& m);
-    friend Quantity operator/(const Quantity& q, const MagnitudeFloat& m);
-    //friend bool operator==(const Quantity& q, const MagnitudeFloat& m);
+    friend Quantity operator+(const double& m, const Quantity& q);
+    friend Quantity operator-(const double& m, const Quantity& q);
+    friend Quantity operator*(const double& m, const Quantity& q);
+    friend Quantity operator/(const double& m, const Quantity& q);
+    //friend bool operator==(const double& m, const Quantity& q);
+    friend Quantity operator+(const Quantity& q, const double& m);
+    friend Quantity operator-(const Quantity& q, const double& m);
+    friend Quantity operator*(const Quantity& q, const double& m);
+    friend Quantity operator/(const Quantity& q, const double& m);
+    //friend bool operator==(const Quantity& q, const double& m);
     // array operations
     friend Quantity operator+(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator-(val::BaseValue::PointerType a, const Quantity& q);

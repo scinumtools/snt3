@@ -19,7 +19,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   ss << std::setfill(' ') << std::setw(15) << std::left;
   ss << "\"" + symbol + "\",";
   ss << "{";
-  int precision = std::numeric_limits<puq::MagnitudeFloat>::digits10;
+  int precision = std::numeric_limits<puq::double>::digits10;
   ss << std::setfill(' ') << std::setw(25) << std::left;
   val::ArrayValue<double> value(dim.numerical.estimate.get());
   ss << nostd::to_string(value.get_value(0), precision) + ",";

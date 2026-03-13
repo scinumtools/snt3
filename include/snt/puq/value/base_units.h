@@ -13,13 +13,13 @@ namespace snt::puq {
     std::string unit;
     ExponentVariant exponent;
     BaseUnit() {};
-    BaseUnit(const ExponentInt& n) :
+    BaseUnit(const int& n) :
       exponent(n) {};
-    BaseUnit(const ExponentInt& n, const ExponentInt& d) :
+    BaseUnit(const int& n, const int& d) :
       exponent(Exponent(n, d)) {};
     BaseUnit(const std::string& p, const std::string& u, const ExponentVariant& e) :
       prefix(p), unit(u), exponent(e) {};
-    BaseUnit(const std::string& p, const std::string& u, const ExponentInt& n, const ExponentInt& d) :
+    BaseUnit(const std::string& p, const std::string& u, const int& n, const int& d) :
       prefix(p), unit(u), exponent(Exponent(n, d)) {};
     std::string to_string(const UnitFormat& format = UnitFormat());
   };
@@ -33,7 +33,7 @@ namespace snt::puq {
     BaseUnits(const BaseUnits::ListType& bu) : baseunits(bu) {}
     void append(const BaseUnit& bu);
     void append(const std::string& p, const std::string& u, ExponentVariant e);
-    void append(const std::string& p, const std::string& u, ExponentInt n, ExponentInt d);
+    void append(const std::string& p, const std::string& u, int n, int d);
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     const BaseUnit& operator[](int index) const;
     friend BaseUnits operator+(const BaseUnits& bu1, const BaseUnits& bu2);

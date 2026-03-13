@@ -99,8 +99,8 @@ namespace snt::puq {
   };
 
   struct DimensionStruct {
-    MagnitudeFloat magnitude;
-    MagnitudeFloat uncertainty;
+    double magnitude;
+    double uncertainty;
     BaseDimensions dimensions;
   };
   typedef std::unordered_map<std::string, DimensionStruct> DimensionMapType;
@@ -109,7 +109,7 @@ namespace snt::puq {
    *  System of units
    */
 
-  typedef ExponentInt FRC[2];
+  typedef int FRC[2];
 
   struct SystemDataType {
     std::string SystemAbbrev;

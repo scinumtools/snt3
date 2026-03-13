@@ -5,10 +5,6 @@
 
 namespace snt::puq {
 
-  using MagnitudeFloat = double;  ///< Numerical precision of a magnitude
-  using ExponentInt = int;        ///< Numerical precision of an integer exponent
-  using ExponentFloat = double;   ///< Numerical precision of a floating-point exponent
-    
   /**
    * @namespace Config
    * @brief Configuration constants

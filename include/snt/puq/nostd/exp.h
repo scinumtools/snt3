@@ -5,7 +5,7 @@
 
 namespace snt::nostd {
 
-  extern puq::MagnitudeFloat exp(const puq::MagnitudeFloat& e);
+  extern puq::double exp(const puq::double& e);
   extern val::BaseValue::PointerType exp(val::BaseValue::PointerType e);
   extern puq::Magnitude exp(const puq::Magnitude& e);
   extern puq::Measurement exp(const puq::Measurement& uv);

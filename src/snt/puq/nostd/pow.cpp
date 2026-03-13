@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  puq::MagnitudeFloat pow(const puq::MagnitudeFloat& m, const puq::ExponentFloat& e) {
+  puq::double pow(const puq::double& m, const puq::double& e) {
     return std::pow(m, e);
   }
 
@@ -10,7 +10,7 @@ namespace snt::nostd {
     return a->math_pow(e.get());
   }
 
-  puq::Magnitude pow(const puq::Magnitude& m, const puq::ExponentFloat& e) {
+  puq::Magnitude pow(const puq::Magnitude& m, const puq::double& e) {
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
     if (m.uncertainty) {
       std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(e);
@@ -43,7 +43,7 @@ namespace snt::nostd {
     //return puq::Magnitude(pow(m.estimate, e.estimate), sqrt(Dzx * Dzx + Dzy * Dzy));
   }
 
-  puq::Measurement pow(const puq::Measurement& msr, const puq::ExponentFloat& e) {
+  puq::Measurement pow(const puq::Measurement& msr, const puq::double& e) {
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
     if (msr.magnitude.uncertainty) {
       std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(e);

@@ -51,7 +51,7 @@ namespace snt::puq {
     append(BaseUnit(p, u, e));
   }
 
-  void BaseUnits::append(const std::string& p, const std::string& u, ExponentInt n, ExponentInt d) {
+  void BaseUnits::append(const std::string& p, const std::string& u, int n, int d) {
     append(BaseUnit(p, u, n, d));
   }
 

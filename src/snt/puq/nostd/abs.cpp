@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  puq::MagnitudeFloat abs(const puq::MagnitudeFloat& m) {
+  puq::double abs(const puq::double& m) {
     return std::abs(m);
   }
 

@@ -22,7 +22,7 @@ namespace snt::puq {
     }
   }
 
-  Dimensions::Dimensions(const MagnitudeFloat& m, const MagnitudeFloat& e) : utype(Utype::NUL), numerical(m, e) {
+  Dimensions::Dimensions(const double& m, const double& e) : utype(Utype::NUL), numerical(m, e) {
     for (int i = 0; i < Config::num_basedim; i++) {
       physical[i] = 0;
     }
@@ -56,7 +56,7 @@ namespace snt::puq {
       } else if (i == 0 && format.base == Format::Base::CGS) {
         symbol = "cm";
       }
-      ExponentFloat fexp = exponent_to_float(physical[i]);
+      double fexp = exponent_to_float(physical[i]);
       if (fexp == 1)
         ss << symbol << multiply;
       else if (fexp != 0)

@@ -56,34 +56,34 @@ namespace snt::puq {
     measurement = Measurement(m, s);
   }
 
-  Quantity::Quantity(const MagnitudeFloat& m, const SystemType system) : stype(system) {
+  Quantity::Quantity(const double& m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     measurement = Measurement(m);
   }
 
-  Quantity::Quantity(const MagnitudeFloat& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(const double& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     measurement = Measurement(m, bu);
   }
 
-  Quantity::Quantity(const MagnitudeFloat& m, std::string s, const SystemType system) : stype(system) {
+  Quantity::Quantity(const double& m, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     Magnitude mag(m);
     measurement = Measurement(mag, s);
   }
 
-  Quantity::Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const SystemType system) : stype(system) {
+  Quantity::Quantity(const double& m, const double& e, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     measurement = Measurement(m, e);
   }
 
-  Quantity::Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(const double& m, const double& e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     measurement = Measurement(m, e, bu);
   }
 
-  Quantity::Quantity(const MagnitudeFloat& m, const MagnitudeFloat& e, std::string s, const SystemType system) : stype(system) {
+  Quantity::Quantity(const double& m, const double& e, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     Magnitude mag(m, e);
@@ -204,37 +204,37 @@ namespace snt::puq {
   }
 
   // overloading scalar/quantity
-  Quantity operator+(const MagnitudeFloat& m, const Quantity& q) {
+  Quantity operator+(const double& m, const Quantity& q) {
     UnitSystem us(q.stype);
     return Quantity(Measurement(m) + q.measurement);
   }
-  Quantity operator-(const MagnitudeFloat& m, const Quantity& q) {
+  Quantity operator-(const double& m, const Quantity& q) {
     UnitSystem us(q.stype);
     return Quantity(Measurement(m) - q.measurement);
   }
-  Quantity operator*(const MagnitudeFloat& m, const Quantity& q) {
+  Quantity operator*(const double& m, const Quantity& q) {
     UnitSystem us(q.stype);
     return Quantity(Measurement(m) * q.measurement);
   }
-  Quantity operator/(const MagnitudeFloat& m, const Quantity& q) {
+  Quantity operator/(const double& m, const Quantity& q) {
     UnitSystem us(q.stype);
     return Quantity(Measurement(m) / q.measurement);
   }
 
   // overloading quantity/scalar
-  Quantity operator+(const Quantity& q, const MagnitudeFloat& m) {
+  Quantity operator+(const Quantity& q, const double& m) {
     UnitSystem us(q.stype);
     return Quantity(q.measurement + Measurement(m));
   }
-  Quantity operator-(const Quantity& q, const MagnitudeFloat& m) {
+  Quantity operator-(const Quantity& q, const double& m) {
     UnitSystem us(q.stype);
     return Quantity(q.measurement - Measurement(m));
   }
-  Quantity operator*(const Quantity& q, const MagnitudeFloat& m) {
+  Quantity operator*(const Quantity& q, const double& m) {
     UnitSystem us(q.stype);
     return Quantity(q.measurement * Measurement(m));
   }
-  Quantity operator/(const Quantity& q, const MagnitudeFloat& m) {
+  Quantity operator/(const Quantity& q, const double& m) {
     UnitSystem us(q.stype);
     return Quantity(q.measurement / Measurement(m));
   }

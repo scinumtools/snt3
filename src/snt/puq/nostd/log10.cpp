@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  puq::MagnitudeFloat log10(const puq::MagnitudeFloat& m) {
+  puq::double log10(const puq::double& m) {
     return std::log10(m);
   }
 

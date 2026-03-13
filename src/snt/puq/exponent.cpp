@@ -50,19 +50,19 @@ namespace snt::puq {
     return to_float() != e.to_float();
   }
 
-  bool Exponent::operator==(const ExponentInt& e) const {
+  bool Exponent::operator==(const int& e) const {
     return to_float() == e;
   }
 
-  bool Exponent::operator!=(const ExponentInt& e) const {
+  bool Exponent::operator!=(const int& e) const {
     return to_float() != e;
   }
 
-  bool Exponent::operator==(const ExponentFloat& e) const {
+  bool Exponent::operator==(const double& e) const {
     return to_float() == e;
   }
 
-  bool Exponent::operator!=(const ExponentFloat& e) const {
+  bool Exponent::operator!=(const double& e) const {
     return to_float() != e;
   }
 
@@ -74,14 +74,14 @@ namespace snt::puq {
   /*
    *  Convert rational exponents to float numbers
    */
-  ExponentFloat Exponent::to_float() const {
-    return (ExponentFloat)numerator / (ExponentFloat)denominator;
+  double Exponent::to_float() const {
+    return (double)numerator / (double)denominator;
   }
 
   /*
    *  Cast as a float number
    */
-  Exponent::operator ExponentFloat() const {
+  Exponent::operator double() const {
     return to_float();
   }
 

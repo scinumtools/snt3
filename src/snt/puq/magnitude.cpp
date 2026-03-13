@@ -23,11 +23,11 @@ namespace snt::puq {
   /*
    * Convert absolute and relative (in %) uncertainties
    */
-  MagnitudeFloat Magnitude::abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& e) {
+  double Magnitude::abs_to_rel(const double& v, const double& e) {
     return 100 * e / v;
   };
 
-  MagnitudeFloat Magnitude::rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& e) {
+  double Magnitude::rel_to_abs(const double& v, const double& e) {
     return v * e / 100;
   };
 
@@ -219,7 +219,7 @@ namespace snt::puq {
   }
 
   void Magnitude::pow(const ExponentVariant& e) {
-    ExponentFloat fexp = exponent_to_float(e);
+    double fexp = exponent_to_float(e);
     estimate = estimate->math_pow(fexp);
     //estimate = nostd::pow(estimate, fexp);
   }

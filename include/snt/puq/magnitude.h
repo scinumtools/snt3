@@ -11,7 +11,7 @@
 
 namespace snt::puq {
 
-  using ValueVariant = std::variant<MagnitudeFloat, val::BaseValue::PointerType>;
+  using ValueVariant = std::variant<double, val::BaseValue::PointerType>;
   
   class Magnitude {
   public:
@@ -32,15 +32,15 @@ namespace snt::puq {
     Magnitude& operator=(Magnitude&&) noexcept = default;
     Magnitude() : estimate(std::make_unique<val::ArrayValue<double>>(1)),
                   uncertainty(nullptr) {}
-    Magnitude(const MagnitudeFloat& m) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
+    Magnitude(const double& m) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
                                               uncertainty(nullptr) {}
-    Magnitude(const MagnitudeFloat& m, const MagnitudeFloat& e) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
+    Magnitude(const double& m, const double& e) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
                                                                             uncertainty(std::make_unique<val::ArrayValue<double>>(e)) {}
     Magnitude(val::BaseValue::PointerType m);
     Magnitude(val::BaseValue::PointerType m, val::BaseValue::PointerType e);
     
-    static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
-    static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
+    static double abs_to_rel(const double& v, const double& a);
+    static double rel_to_abs(const double& v, const double& r);
     static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);
     static val::BaseValue::PointerType rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType r);
     

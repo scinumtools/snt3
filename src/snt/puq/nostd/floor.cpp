@@ -2,7 +2,7 @@
 
 namespace snt::nostd {
 
-  puq::MagnitudeFloat floor(const puq::MagnitudeFloat& m) {
+  puq::double floor(const puq::double& m) {
     return std::floor(m);
   }
 

@@ -10,12 +10,12 @@ namespace snt::puq {
 
   class Exponent {
   public:
-    ExponentInt numerator;
-    ExponentInt denominator;
+    int numerator;
+    int denominator;
     Exponent() : numerator(1), denominator(1) {}
-    Exponent(const ExponentInt n[2]) : numerator(n[0]), denominator(n[1]) {};
-    Exponent(const ExponentInt& n) : numerator(n), denominator(1) {};
-    Exponent(const ExponentInt& n, const ExponentInt& d) : numerator(n), denominator(d) {};
+    Exponent(const int n[2]) : numerator(n[0]), denominator(n[1]) {};
+    Exponent(const int& n) : numerator(n), denominator(1) {};
+    Exponent(const int& n, const int& d) : numerator(n), denominator(d) {};
     friend Exponent operator*(const Exponent& e1, const Exponent& e2);
     friend std::ostream& operator<<(std::ostream& os, const Exponent& e);
     Exponent operator-() const;
@@ -24,22 +24,22 @@ namespace snt::puq {
     void operator*=(const Exponent& e);
     bool operator==(const Exponent& e) const;
     bool operator!=(const Exponent& e) const;
-    bool operator==(const ExponentInt& e) const;
-    bool operator!=(const ExponentInt& e) const;
-    bool operator==(const ExponentFloat& e) const;
-    bool operator!=(const ExponentFloat& e) const;
-    ExponentFloat to_float() const;
-    operator ExponentFloat() const;
+    bool operator==(const int& e) const;
+    bool operator!=(const int& e) const;
+    bool operator==(const double& e) const;
+    bool operator!=(const double& e) const;
+    double to_float() const;
+    operator double() const;
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     void reduce();
   };
 
-  inline Exponent operator+(Exponent a, const ExponentInt& i) {
+  inline Exponent operator+(Exponent a, const int& i) {
     a += Exponent{i};
     return a;
   }
   
-  inline Exponent operator+(const ExponentInt& i, Exponent a) {
+  inline Exponent operator+(const int& i, Exponent a) {
     a += Exponent{i};
     return a;
   }
@@ -49,12 +49,12 @@ namespace snt::puq {
     return a;
   }
   
-  inline Exponent operator-(Exponent a, const ExponentInt& i) {
+  inline Exponent operator-(Exponent a, const int& i) {
     a -= Exponent{i};
     return a;
   }
 
-  inline Exponent operator-(ExponentInt i, const Exponent& a) {
+  inline Exponent operator-(int i, const Exponent& a) {
     Exponent lhs{i};
     lhs -= a;
     return lhs;
@@ -65,15 +65,15 @@ namespace snt::puq {
     return a;
   }
   
-  inline Exponent operator*(const Exponent& e, const ExponentInt& i) {
+  inline Exponent operator*(const Exponent& e, const int& i) {
     return e * Exponent{i};
   }
   
-  inline Exponent operator*(const ExponentInt& i, const Exponent& e) {
+  inline Exponent operator*(const int& i, const Exponent& e) {
     return Exponent{i} * e;
   }
   
-  inline void operator*=(Exponent& e, const ExponentInt& i) {
+  inline void operator*=(Exponent& e, const int& i) {
     e *= Exponent{i};
   }
   
@@ -105,11 +105,11 @@ namespace snt::puq {
     }, x, y);
   }
   
-  inline ExponentFloat exponent_to_float(const ExponentVariant& exp) {
+  inline double exponent_to_float(const ExponentVariant& exp) {
     if (std::holds_alternative<int>(exp))
-      return (ExponentFloat)std::get<int>(exp);
+      return (double)std::get<int>(exp);
     else
-      return (ExponentFloat)std::get<Exponent>(exp);
+      return (double)std::get<Exponent>(exp);
   };
   
 } // namespace snt::puq

@@ -8,16 +8,16 @@
 namespace py = pybind11;
 using namespace snt;
 
-py::array_t<puq::MagnitudeFloat> array_to_numpy(const val::ArrayValue<puq::MagnitudeFloat>& varray) {
-  py::array_t<puq::MagnitudeFloat> numpy(varray.get_shape());
+py::array_t<puq::double> array_to_numpy(const val::ArrayValue<puq::double>& varray) {
+  py::array_t<puq::double> numpy(varray.get_shape());
   py::buffer_info buf_info = numpy.request();
-  puq::MagnitudeFloat* ptr = static_cast<puq::MagnitudeFloat*>(buf_info.ptr);
-  std::memcpy(ptr, varray.get_values().data(), varray.get_size() * sizeof(puq::MagnitudeFloat));
+  puq::double* ptr = static_cast<puq::double*>(buf_info.ptr);
+  std::memcpy(ptr, varray.get_values().data(), varray.get_size() * sizeof(puq::double));
   return numpy;
 }
 
-std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<puq::MagnitudeFloat>> quantity_value(puq::Quantity q, bool numpy) {
-  val::ArrayValue<puq::MagnitudeFloat> varray(q.measurement.magnitude.estimate.get());
+std::variant<puq::double, std::vector<puq::double>, py::array_t<puq::double>> quantity_value(puq::Quantity q, bool numpy) {
+  val::ArrayValue<puq::double> varray(q.measurement.magnitude.estimate.get());
   if (numpy) {
     return array_to_numpy(varray);
   } else if (q.measurement.magnitude.estimate->get_size() == 1) {
@@ -27,13 +27,13 @@ std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<
   }
 }
 
-std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<puq::MagnitudeFloat>> quantity_get_value(const puq::Quantity& q, size_t index) {
-  val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.estimate.get());
+std::variant<puq::double, std::vector<puq::double>, py::array_t<puq::double>> quantity_get_value(const puq::Quantity& q, size_t index) {
+  val::ArrayValue<puq::double>* otherT = dynamic_cast<val::ArrayValue<puq::double>*>(q.measurement.magnitude.estimate.get());
   return otherT->get_value(index);
 }
 
-std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<puq::MagnitudeFloat>> quantity_uncertainty(const puq::Quantity& q, bool numpy) {
-  val::ArrayValue<puq::MagnitudeFloat> varray(q.measurement.magnitude.uncertainty.get());
+std::variant<puq::double, std::vector<puq::double>, py::array_t<puq::double>> quantity_uncertainty(const puq::Quantity& q, bool numpy) {
+  val::ArrayValue<puq::double> varray(q.measurement.magnitude.uncertainty.get());
   if (numpy) {
     return array_to_numpy(varray);
   } else if (varray.get_size() == 1) {
@@ -44,13 +44,13 @@ std::variant<puq::MagnitudeFloat, std::vector<puq::MagnitudeFloat>, py::array_t<
 }
 
 val::BaseValue::PointerType parseBaseValue(const py::object& other) {
-  std::vector<puq::MagnitudeFloat> vec;
+  std::vector<puq::double> vec;
   if (py::isinstance<py::int_>(other)) {
-    vec = {static_cast<puq::MagnitudeFloat>(other.cast<int>())};
+    vec = {static_cast<puq::double>(other.cast<int>())};
   } else if (py::isinstance<py::list>(other)) {
-    vec = other.cast<std::vector<puq::MagnitudeFloat>>();
+    vec = other.cast<std::vector<puq::double>>();
   } else if (py::isinstance<py::array>(other)) {
-    py::array_t<puq::MagnitudeFloat, py::array::c_style | py::array::forcecast> arr(other);
+    py::array_t<puq::double, py::array::c_style | py::array::forcecast> arr(other);
     auto buf = arr.unchecked<1>();
     vec.resize(buf.shape(0));
     for (ssize_t i = 0; i < buf.shape(0); ++i)
@@ -58,22 +58,22 @@ val::BaseValue::PointerType parseBaseValue(const py::object& other) {
   } else {
     return nullptr;
   }
-  return std::make_unique<val::ArrayValue<puq::MagnitudeFloat>>(vec);
+  return std::make_unique<val::ArrayValue<puq::double>>(vec);
 }
 
 val::BaseValue::PointerType buffer_to_array(py::buffer_info& info) {
-  std::vector<puq::MagnitudeFloat> a(info.size);
+  std::vector<puq::double> a(info.size);
 
-  if (info.format != py::format_descriptor<puq::MagnitudeFloat>::format())
+  if (info.format != py::format_descriptor<puq::double>::format())
     throw std::runtime_error("Incompatible format: expected a double array!");
 
-  std::copy(static_cast<puq::MagnitudeFloat*>(info.ptr),
-            static_cast<puq::MagnitudeFloat*>(info.ptr) + info.size,
+  std::copy(static_cast<puq::double*>(info.ptr),
+            static_cast<puq::double*>(info.ptr) + info.size,
             a.begin());
 
   val::Array::ShapeType s(info.shape.size());
   std::copy(info.shape.begin(), info.shape.end(), s.begin());
-  return std::make_unique<val::ArrayValue<puq::MagnitudeFloat>>(a, s);
+  return std::make_unique<val::ArrayValue<puq::double>>(a, s);
 }
 
 void init_puq_quantity(py::module_& m) {
@@ -82,12 +82,12 @@ void init_puq_quantity(py::module_& m) {
 
   q.def(py::init<std::string>())
       .def(py::init<std::string, puq::SystemType>())
-      .def(py::init<puq::MagnitudeFloat>())
-      .def(py::init<puq::MagnitudeFloat, std::string>())
-      .def(py::init<puq::MagnitudeFloat, std::string, puq::SystemType>())
-      .def(py::init<puq::MagnitudeFloat, puq::MagnitudeFloat>())
-      .def(py::init<puq::MagnitudeFloat, puq::MagnitudeFloat, std::string>())
-      .def(py::init<puq::MagnitudeFloat, puq::MagnitudeFloat, std::string, puq::SystemType>())
+      .def(py::init<puq::double>())
+      .def(py::init<puq::double, std::string>())
+      .def(py::init<puq::double, std::string, puq::SystemType>())
+      .def(py::init<puq::double, puq::double>())
+      .def(py::init<puq::double, puq::double, std::string>())
+      .def(py::init<puq::double, puq::double, std::string, puq::SystemType>())
       //.def(py::init<std::vector<double>>())
       //.def(py::init<std::vector<double>, std::string>())
       //.def(py::init<std::vector<double>, std::string, puq::SystemType>())
@@ -102,7 +102,7 @@ void init_puq_quantity(py::module_& m) {
   /**
    * @brief Initialise Quantity with a value from numpy arrays
    */
-  q.def(py::init([](const py::array_t<puq::MagnitudeFloat, py::array::c_style | py::array::forcecast>& v,
+  q.def(py::init([](const py::array_t<puq::double, py::array::c_style | py::array::forcecast>& v,
                     const std::string& s, puq::SystemType sys) {
           py::buffer_info info = v.request();
           val::BaseValue::PointerType value = buffer_to_array(info);
@@ -113,8 +113,8 @@ void init_puq_quantity(py::module_& m) {
   /**
    * @brief Initialise Quantity with a value/uncertainty from numpy arrays
    */
-  q.def(py::init([](const py::array_t<puq::MagnitudeFloat, py::array::c_style | py::array::forcecast>& v,
-                    const py::array_t<puq::MagnitudeFloat, py::array::c_style | py::array::forcecast>& e,
+  q.def(py::init([](const py::array_t<puq::double, py::array::c_style | py::array::forcecast>& v,
+                    const py::array_t<puq::double, py::array::c_style | py::array::forcecast>& e,
                     const std::string& s, puq::SystemType sys) {
           py::buffer_info v_info = v.request();
           val::BaseValue::PointerType value = buffer_to_array(v_info);
@@ -128,7 +128,7 @@ void init_puq_quantity(py::module_& m) {
    * @brief Convert Quantity into a numpy array
    */
   q.def("to_numpy", [](const puq::Quantity& q) {
-    val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.estimate.get());
+    val::ArrayValue<puq::double>* otherT = dynamic_cast<val::ArrayValue<puq::double>*>(q.measurement.magnitude.estimate.get());
     std::vector<size_t> shape = otherT->get_shape();
     std::vector<ssize_t> strides(shape.size());
     ssize_t stride = sizeof(otherT);
@@ -136,17 +136,17 @@ void init_puq_quantity(py::module_& m) {
       strides[i] = stride;
       stride *= static_cast<ssize_t>(shape[i]);
     }
-    return py::array_t<puq::MagnitudeFloat>(shape, strides, otherT->get_data());
+    return py::array_t<puq::double>(shape, strides, otherT->get_data());
   });
   //  q.def("to_numpy", [](const puq::Quantity &q) -> py::buffer_info {
-  //      val::ArrayValue<puq::MagnitudeFloat>* otherT = dynamic_cast<val::ArrayValue<puq::MagnitudeFloat>*>(q.measurement.magnitude.estimate.get());
+  //      val::ArrayValue<puq::double>* otherT = dynamic_cast<val::ArrayValue<puq::double>*>(q.measurement.magnitude.estimate.get());
   //      return py::buffer_info(
   //			     otherT->get_data(),
-  //			     sizeof(puq::MagnitudeFloat),
-  //			     py::format_descriptor<puq::MagnitudeFloat>::format(),
+  //			     sizeof(puq::double),
+  //			     py::format_descriptor<puq::double>::format(),
   //			     1,
   //			     otherT->get_shape(),
-  //			     {sizeof(puq::MagnitudeFloat)},
+  //			     {sizeof(puq::double)},
   //			     false
   //			     );
   //   });
@@ -173,14 +173,14 @@ void init_puq_quantity(py::module_& m) {
       .def(py::self - py::self)
       .def(py::self * py::self)
       .def(py::self / py::self)
-      //.def(puq::MagnitudeFloat() + py::self)
-      //.def(puq::MagnitudeFloat() - py::self)
-      //.def(puq::MagnitudeFloat() * py::self)
-      //.def(puq::MagnitudeFloat() / py::self)
-      //.def(py::self + puq::MagnitudeFloat())
-      //.def(py::self - puq::MagnitudeFloat())
-      //.def(py::self * puq::MagnitudeFloat())
-      //.def(py::self / puq::MagnitudeFloat())
+      //.def(puq::double() + py::self)
+      //.def(puq::double() - py::self)
+      //.def(puq::double() * py::self)
+      //.def(puq::double() / py::self)
+      //.def(py::self + puq::double())
+      //.def(py::self - puq::double())
+      //.def(py::self * puq::double())
+      //.def(py::self / puq::double())
       ;
 
   /**

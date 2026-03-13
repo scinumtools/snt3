@@ -13,22 +13,22 @@ namespace snt::puq {
     Magnitude magnitude;
     BaseUnits baseunits;
     
-    static MagnitudeFloat abs_to_rel(const MagnitudeFloat& v, const MagnitudeFloat& a);
-    static MagnitudeFloat rel_to_abs(const MagnitudeFloat& v, const MagnitudeFloat& r);
+    static double abs_to_rel(const double& v, const double& a);
+    static double rel_to_abs(const double& v, const double& r);
     static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);
     static val::BaseValue::PointerType rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType r);
     
     Measurement() : magnitude(1) {}
     Measurement(const std::string& str);
-    Measurement(const MagnitudeFloat& est, const std::string& str);
-    Measurement(const MagnitudeFloat& est) : magnitude(est) {};
-    Measurement(const MagnitudeFloat& est, const Dimensions& dim);
-    Measurement(const MagnitudeFloat& est, const BaseUnits& bun) : magnitude(est), baseunits(bun) {};
-    Measurement(const MagnitudeFloat& est, const BaseUnits::ListType& bun) : magnitude(est), baseunits(bun) {};
-    Measurement(const MagnitudeFloat& est, const MagnitudeFloat& unc, const std::string& str);
-    Measurement(const MagnitudeFloat& est, const MagnitudeFloat& unc) : magnitude(est, unc) {};
-    Measurement(const MagnitudeFloat& est, const MagnitudeFloat& unc, const BaseUnits& bun) : magnitude(est, unc), baseunits(bun) {};
-    Measurement(const MagnitudeFloat& est, const MagnitudeFloat& unc, const BaseUnits::ListType& bun) : magnitude(est, unc), baseunits(bun) {};
+    Measurement(const double& est, const std::string& str);
+    Measurement(const double& est) : magnitude(est) {};
+    Measurement(const double& est, const Dimensions& dim);
+    Measurement(const double& est, const BaseUnits& bun) : magnitude(est), baseunits(bun) {};
+    Measurement(const double& est, const BaseUnits::ListType& bun) : magnitude(est), baseunits(bun) {};
+    Measurement(const double& est, const double& unc, const std::string& str);
+    Measurement(const double& est, const double& unc) : magnitude(est, unc) {};
+    Measurement(const double& est, const double& unc, const BaseUnits& bun) : magnitude(est, unc), baseunits(bun) {};
+    Measurement(const double& est, const double& unc, const BaseUnits::ListType& bun) : magnitude(est, unc), baseunits(bun) {};
     Measurement(val::BaseValue::PointerType est, const std::string& str);
     Measurement(val::BaseValue::PointerType est) : magnitude(std::move(est)) {};
     Measurement(val::BaseValue::PointerType est, const BaseUnits& bun) : magnitude(std::move(est)), baseunits(bun) {};
