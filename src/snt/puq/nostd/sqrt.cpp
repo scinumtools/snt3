@@ -10,11 +10,11 @@ namespace snt::nostd {
     return a->math_sqrt();
   }
 
-  puq::Magnitude sqrt(const puq::Magnitude& m) {
+  puq::Result sqrt(const puq::Result& m) {
     // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
     std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(0.5);
-    return puq::Magnitude(m.estimate->math_sqrt(), m.estimate->math_pow(-0.5)->math_mul(cst.get())->math_mul(m.uncertainty.get()));
-    //return puq::Magnitude(sqrt(m.estimate), 0.5 * pow(m.estimate, -0.5) * m.uncertainty);
+    return puq::Result(m.estimate->math_sqrt(), m.estimate->math_pow(-0.5)->math_mul(cst.get())->math_mul(m.uncertainty.get()));
+    //return puq::Result(sqrt(m.estimate), 0.5 * pow(m.estimate, -0.5) * m.uncertainty);
   }
 
   puq::Measurement sqrt(const puq::Measurement& msr) {

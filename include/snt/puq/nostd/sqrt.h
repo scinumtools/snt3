@@ -7,7 +7,7 @@ namespace snt::nostd {
 
   extern double sqrt(const double m);
   extern val::BaseValue::PointerType sqrt(val::BaseValue::PointerType a);
-  extern puq::Magnitude sqrt(const puq::Magnitude& m);
+  extern puq::Result sqrt(const puq::Result& m);
   extern puq::Measurement sqrt(const puq::Measurement& msr);
 
 } // namespace snt::nostd

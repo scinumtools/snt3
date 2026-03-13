@@ -17,7 +17,7 @@ namespace snt::nostd {
     return value->to_string(fmt);
   }
 
-  std::string to_string(const puq::Magnitude& value, int precision) {
+  std::string to_string(const puq::Result& value, int precision) {
     return value.to_string(precision);
   }
 

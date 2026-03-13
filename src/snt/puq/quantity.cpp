@@ -40,17 +40,17 @@ namespace snt::puq {
     measurement = v;
   }
 
-  Quantity::Quantity(const Magnitude& m, const SystemType system) : stype(system) {
+  Quantity::Quantity(const Result& m, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     measurement = Measurement(m);
   }
 
-  Quantity::Quantity(const Magnitude& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
+  Quantity::Quantity(const Result& m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
     UnitSystem us(stype);
     measurement = Measurement(m, bu);
   }
 
-  Quantity::Quantity(const Magnitude& m, std::string s, const SystemType system) : stype(system) {
+  Quantity::Quantity(const Result& m, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
     measurement = Measurement(m, s);
@@ -69,7 +69,7 @@ namespace snt::puq {
   Quantity::Quantity(const double m, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
-    Magnitude mag(m);
+    Result mag(m);
     measurement = Measurement(mag, s);
   }
 
@@ -86,7 +86,7 @@ namespace snt::puq {
   Quantity::Quantity(const double m, const double e, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
-    Magnitude mag(m, e);
+    Result mag(m, e);
     measurement = Measurement(mag, s);
   }
 
@@ -103,7 +103,7 @@ namespace snt::puq {
   Quantity::Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
-    Magnitude mag(std::move(m));
+    Result mag(std::move(m));
     measurement = Measurement(mag, s);
   }
 
@@ -120,7 +120,7 @@ namespace snt::puq {
   Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system) : stype(system) {
     preprocess(s, stype);
     UnitSystem us(stype);
-    Magnitude mag(std::move(m), std::move(e));
+    Result mag(std::move(m), std::move(e));
     measurement = Measurement(mag, s);
   }
 

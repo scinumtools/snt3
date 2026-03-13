@@ -10,9 +10,9 @@ namespace snt::nostd {
     return a->math_floor();
   }
 
-  puq::Magnitude floor(const puq::Magnitude& m) {
-    return puq::Magnitude(m.estimate->math_floor());
-    //return puq::Magnitude(floor(m.estimate));
+  puq::Result floor(const puq::Result& m) {
+    return puq::Result(m.estimate->math_floor());
+    //return puq::Result(floor(m.estimate));
   }
 
 } // namespace snt::nostd

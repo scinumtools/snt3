@@ -1,7 +1,7 @@
 #ifndef PUQ_SYSTEMS_H
 #define PUQ_SYSTEMS_H
 
-#include <snt/puq/magnitude.h>
+#include <snt/puq/result.h>
 #include <snt/puq/settings.h>
 
 #include <map>
@@ -59,7 +59,7 @@ namespace snt::puq {
    */
 
   struct UnitPrefixStruct {
-    Magnitude magnitude;
+    Result magnitude;
     std::string definition;
     std::string name;
   };

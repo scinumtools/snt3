@@ -10,51 +10,51 @@
 
 namespace snt::puq {
 
-  Magnitude Converter::_convert_linear(const Magnitude& m1, const Magnitude& m2) {
+  Result Converter::_convert_linear(const Result& m1, const Result& m2) {
     return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
   }
 
-  inline Magnitude _convert_B_B(const Magnitude& value, const Magnitude& exp = 0) {
+  inline Result _convert_B_B(const Result& value, const Result& exp = 0) {
       return value + exp;
   }
   
-  inline Magnitude _convert_B_Np(const Magnitude& value) {
-      return (Magnitude)1.151277918 * value;
+  inline Result _convert_B_Np(const Result& value) {
+      return (Result)1.151277918 * value;
   }
   
-  inline Magnitude _convert_Np_B(const Magnitude& value) {
-      return value / (Magnitude)1.151277918;
+  inline Result _convert_Np_B(const Result& value) {
+      return value / (Result)1.151277918;
   }
   
-  inline Magnitude _convert_Ratio_B(const Magnitude& value, const Magnitude& exp) {
+  inline Result _convert_Ratio_B(const Result& value, const Result& exp) {
       return exp * nostd::log10(value);
   }
   
-  inline Magnitude _convert_B_Ratio(const Magnitude& value, const Magnitude& exp) {
-      return nostd::pow((Magnitude)10, value / exp);
+  inline Result _convert_B_Ratio(const Result& value, const Result& exp) {
+      return nostd::pow((Result)10, value / exp);
   }
   
-  inline Magnitude _convert_Ratio_Np(const Magnitude& value, const Magnitude& exp) {
+  inline Result _convert_Ratio_Np(const Result& value, const Result& exp) {
       return exp * nostd::log(value);
   }
   
-  inline Magnitude _convert_Np_Ratio(const Magnitude& value, const Magnitude& exp) {
+  inline Result _convert_Np_Ratio(const Result& value, const Result& exp) {
       return nostd::exp(value / exp);
   }
   
-  inline Magnitude _convert_Mw_Mo(const Magnitude& value) {
-      return nostd::pow((Magnitude)10, 1.5 * (value + (Magnitude)10.7));
+  inline Result _convert_Mw_Mo(const Result& value) {
+      return nostd::pow((Result)10, 1.5 * (value + (Result)10.7));
   }
   
-  inline Magnitude _convert_Mo_Mw(const Magnitude& value) {
-      return 2. / 3. * nostd::log10(value) - (Magnitude)10.7;
+  inline Result _convert_Mo_Mw(const Result& value) {
+      return 2. / 3. * nostd::log10(value) - (Result)10.7;
   }
   
-  Magnitude Converter::_convert_logarithmic(const Magnitude& m) {
+  Result Converter::_convert_logarithmic(const Result& m) {
       const std::string s1 = baseunits1[0].unit;
       const std::string s2 = baseunits2[0].unit;
-      const Magnitude n1 = dimensions1.numerical;
-      const Magnitude n2 = dimensions2.numerical;
+      const Result n1 = dimensions1.numerical;
+      const Result n2 = dimensions2.numerical;
       if (s1 == "Np") { // Nepers -> Bel or Ratio
 	if (s2 == "B")
 	  return _convert_Np_B(m * n1) / n2;
@@ -121,36 +121,36 @@ namespace snt::puq {
       throw NoConvExcept(s1, s2);
   }
 
-  Magnitude Converter::_convert_temperature(Magnitude m) {
+  Result Converter::_convert_temperature(Result m) {
     std::string s1 = baseunits1[0].unit;
     std::string s2 = baseunits2[0].unit;
-    Magnitude const9div5 = 9. / 5.;
-    Magnitude const5div9 = 5. / 9.;
+    Result const9div5 = 9. / 5.;
+    Result const5div9 = 5. / 9.;
     if (s1 == s2) {
       return m;
     } else {
       m = m * dimensions1.numerical;
     }
     if (s1 == "K" && s2 == "Cel") {
-      m = m - (Magnitude)273.15;
+      m = m - (Result)273.15;
     } else if (s1 == "K" && s2 == "degF") {
-      m = (m - (Magnitude)273.15) * const9div5 + (Magnitude)32;
+      m = (m - (Result)273.15) * const9div5 + (Result)32;
     } else if (s1 == "degR" && s2 == "degF") {
-      m = m * const9div5 - (Magnitude)459.67;
+      m = m * const9div5 - (Result)459.67;
     } else if (s1 == "degR" && s2 == "Cel") {
-      m = (m * const9div5 - (Magnitude)491.67) * const5div9;
+      m = (m * const9div5 - (Result)491.67) * const5div9;
     } else if (s1 == "Cel" && s2 == "K") {
-      m = m + (Magnitude)273.15;
+      m = m + (Result)273.15;
     } else if (s1 == "Cel" && s2 == "degF") {
-      m = (m * const9div5) + (Magnitude)32;
+      m = (m * const9div5) + (Result)32;
     } else if (s1 == "Cel" && s2 == "degR") {
-      m = ((m * const9div5) + (Magnitude)491.67) * const5div9;
+      m = ((m * const9div5) + (Result)491.67) * const5div9;
     } else if (s1 == "degF" && s2 == "K") {
-      m = ((m - (Magnitude)32) * const5div9) + (Magnitude)273.15;
+      m = ((m - (Result)32) * const5div9) + (Result)273.15;
     } else if (s1 == "degF" && s2 == "Cel") {
-      m = (m - (Magnitude)32) * const5div9;
+      m = (m - (Result)32) * const5div9;
     } else if (s1 == "degF" && s2 == "degR") {
-      m = (m + (Magnitude)459.67) * const5div9;
+      m = (m + (Result)459.67) * const5div9;
     } else {
       throw NoConvExcept(s1, s2);
     }
@@ -193,7 +193,7 @@ namespace snt::puq {
     ;
   };
 
-  Magnitude Converter::convert(const Magnitude& m1, const Magnitude& m2) {
+  Result Converter::convert(const Result& m1, const Result& m2) {
     if constexpr (Config::debug_converter) {
       std::clog << "CONV:  Solving: ";
       std::clog << m1.to_string() << Symbols::multiply << baseunits1.to_string();
@@ -201,15 +201,15 @@ namespace snt::puq {
       std::clog << m2.to_string() << Symbols::multiply << baseunits2.to_string();
       std::clog << std::endl;
     }
-    Magnitude mag;
+    Result mag;
     if constexpr (Config::use_units_logarithmic) {
-      if (utype == Utype::LOG && m2 == (Magnitude)1) {
+      if (utype == Utype::LOG && m2 == (Result)1) {
 	mag = _convert_logarithmic(m1);
 	goto converted;
       }
     }
     if constexpr (Config::use_units_temperature) {
-      if (utype == Utype::TMP && m2 == (Magnitude)1) {
+      if (utype == Utype::TMP && m2 == (Result)1) {
 	mag = _convert_temperature(m1);
 	goto converted;
       }

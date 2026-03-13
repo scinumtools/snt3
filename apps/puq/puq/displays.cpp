@@ -11,7 +11,7 @@ void display_info(const std::string& expr) {
             << "Expression:  " << expr << '\n'
             << '\n';
   std::cout << "Unit system: " << puq::UnitSystem::Data->SystemAbbrev << " (" << puq::UnitSystem::Data->SystemName << ")" << '\n';
-  std::cout << "Magnitude:   " << nostd::to_string(uv.magnitude) << '\n';
+  std::cout << "Result:   " << nostd::to_string(uv.magnitude) << '\n';
   std::cout << "Base units:  " << nostd::to_string(uv.baseunits) << '\n';
   std::stringstream ss;
   bool display = false;

@@ -129,9 +129,9 @@ namespace snt::puq {
   private:
     BaseUnits baseunits1;
     BaseUnits baseunits2;
-    Magnitude _convert_linear(const Magnitude& m1, const Magnitude& m2);
-    Magnitude _convert_logarithmic(const Magnitude& m);
-    Magnitude _convert_temperature(Magnitude m);
+    Result _convert_linear(const Result& m1, const Result& m2);
+    Result _convert_logarithmic(const Result& m);
+    Result _convert_temperature(Result m);
   public:
     Utype utype;
     Dimensions dimensions1;
@@ -139,7 +139,7 @@ namespace snt::puq {
     Converter() : utype(Utype::NUL) {};
     Converter(const BaseUnits& bu1, const BaseUnits& bu2);
     Converter(const std::string& s1, const std::string& s2) : Converter(BaseUnits(s1), BaseUnits(s2)) {};
-    Magnitude convert(const Magnitude& m1, const Magnitude& m2 = 1);
+    Result convert(const Result& m1, const Result& m2 = 1);
   };
 
 } // namespace snt::puq

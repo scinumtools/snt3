@@ -64,7 +64,7 @@ void solve_bu_prefix(puq::Dimensions& dim, puq::BaseUnit& bu) {
 bool solve_bu_unit(puq::DimensionMapType& dmap, puq::Dimensions& dim, puq::BaseUnit& bu) {
   auto it = dmap.find(bu.unit);
   if (it != dmap.end()) {
-    puq::Magnitude m(it->second.magnitude, it->second.uncertainty);
+    puq::Result m(it->second.magnitude, it->second.uncertainty);
     dim.numerical *= nostd::pow(m, exponent_to_float(bu.exponent));
     for (int i = 0; i < puq::Config::num_basedim; i++) {
       dim.physical[i] = add_exp(dim.physical[i], mul_exp(it->second.dimensions[i], bu.exponent));

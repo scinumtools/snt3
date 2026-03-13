@@ -2,7 +2,7 @@
 #define PUQ_UNIT_VALUE_H
 
 #include <snt/puq/exponent.h>
-#include <snt/puq/magnitude.h>
+#include <snt/puq/result.h>
 #include <snt/puq/settings.h>
 #include <snt/puq/value/base_units.h>
 
@@ -10,7 +10,7 @@ namespace snt::puq {
 
   class Measurement {
   public:
-    Magnitude magnitude;
+    Result magnitude;
     BaseUnits baseunits;
     
     static double abs_to_rel(const double v, const double a);
@@ -37,11 +37,11 @@ namespace snt::puq {
     Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc) : magnitude(std::move(est), std::move(unc)) {};
     Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const BaseUnits& bun) : magnitude(std::move(est), std::move(unc)), baseunits(bun) {};
     Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const BaseUnits::ListType& bun) : magnitude(std::move(est), std::move(unc)), baseunits(bun) {};
-    Measurement(const Magnitude& est) : magnitude(est) {}
-    Measurement(const Magnitude& est, const std::string& str);
-    Measurement(const Magnitude& est, const Dimensions& dim);
-    Measurement(const Magnitude& est, const BaseUnits& bun) : magnitude(est), baseunits(bun) {};
-    Measurement(const Magnitude& est, const BaseUnits::ListType& bun) : magnitude(est), baseunits(bun) {};
+    Measurement(const Result& est) : magnitude(est) {}
+    Measurement(const Result& est, const std::string& str);
+    Measurement(const Result& est, const Dimensions& dim);
+    Measurement(const Result& est, const BaseUnits& bun) : magnitude(est), baseunits(bun) {};
+    Measurement(const Result& est, const BaseUnits::ListType& bun) : magnitude(est), baseunits(bun) {};
     Measurement(const Measurement& msr) : magnitude(msr.magnitude), baseunits(msr.baseunits) {}
     Measurement(const Measurement& msr, const std::string& str);
     Measurement(const Measurement& msr, const Dimensions& dim);

@@ -141,7 +141,7 @@ namespace snt::puq {
         if (dmap != UnitSystem::Data->DimensionMap.end()) {
           dim.utype = dim.utype | Utype::LIN;
           dim.symbols.push_back(dmap->first);
-          Magnitude magnitude(dmap->second.magnitude, dmap->second.uncertainty);
+          Result magnitude(dmap->second.magnitude, dmap->second.uncertainty);
           dim.numerical *= nostd::pow(magnitude, exponent_to_float(bu.exponent));
           for (int i = 0; i < Config::num_basedim; i++) {
 	    dim.physical[i] = add_exp(dim.physical[i],
@@ -165,7 +165,7 @@ namespace snt::puq {
           dim.symbols.push_back(unit->first);
           auto dmap = UnitSystem::Data->DimensionMap.find(unit->first);
           if (dmap != UnitSystem::Data->DimensionMap.end()) {
-            Magnitude magnitude(dmap->second.magnitude, dmap->second.uncertainty);
+            Result magnitude(dmap->second.magnitude, dmap->second.uncertainty);
             dim.numerical *= nostd::pow(magnitude, exponent_to_float(bu.exponent));
             for (int i = 0; i < Config::num_basedim; i++) {
 	      dim.physical[i] = add_exp(dim.physical[i],

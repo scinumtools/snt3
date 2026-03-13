@@ -12,13 +12,13 @@ namespace snt::nostd {
     return a->math_log();
   }
 
-  puq::Magnitude log(const puq::Magnitude& m) {
+  puq::Result log(const puq::Result& m) {
     // y ± Dy = log10(x ± Dx) -> Dy = Dx / x
     if (m.uncertainty)
-      return puq::Magnitude(m.estimate->math_log(), m.uncertainty->math_div(m.estimate.get()));
+      return puq::Result(m.estimate->math_log(), m.uncertainty->math_div(m.estimate.get()));
     else
-      return puq::Magnitude(m.estimate->math_log());
-    //return puq::Magnitude(log(m.estimate), m.uncertainty / m.estimate);
+      return puq::Result(m.estimate->math_log());
+    //return puq::Result(log(m.estimate), m.uncertainty / m.estimate);
   }
 
   puq::Measurement log(const puq::Measurement& msr) {

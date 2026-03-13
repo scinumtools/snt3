@@ -25,9 +25,9 @@ namespace snt::puq {
     Quantity() : stype(UnitSystem::System) {};
     Quantity(std::string s, const SystemType system = SystemType::NONE);
     Quantity(const Measurement& v, const SystemType system = UnitSystem::System);
-    Quantity(const Magnitude& m, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const Magnitude& m, const SystemType system = UnitSystem::System);
-    Quantity(const Magnitude& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+    Quantity(const Result& m, std::string s, const SystemType system = SystemType::NONE);
+    Quantity(const Result& m, const SystemType system = UnitSystem::System);
+    Quantity(const Result& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
     Quantity(const double m, std::string s, const SystemType system = SystemType::NONE);
     Quantity(const double m, const SystemType system = UnitSystem::System);
     Quantity(const double m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);

@@ -16,7 +16,7 @@ namespace snt::puq {
     }
   }
 
-  Dimensions::Dimensions(const Magnitude& n) : utype(Utype::NUL), numerical(n) {
+  Dimensions::Dimensions(const Result& n) : utype(Utype::NUL), numerical(n) {
     for (int i = 0; i < Config::num_basedim; i++) {
       physical[i] = 0;
     }
@@ -28,14 +28,14 @@ namespace snt::puq {
     }
   }
 
-  inline std::string _numerical_to_string(Magnitude numerical, const BaseDimensions& physical,
+  inline std::string _numerical_to_string(Result numerical, const BaseDimensions& physical,
                                           const UnitFormat& format) {
     std::string multiply = format.multiply_symbol();
     std::stringstream ss;
     if (format.base == Format::Base::MKS) {
-      numerical = numerical * (Magnitude)(std::pow(1e-3, exponent_to_float(physical[1])));
+      numerical = numerical * (Result)(std::pow(1e-3, exponent_to_float(physical[1])));
     } else if (format.base == Format::Base::CGS) {
-      numerical = numerical * (Magnitude)(std::pow(1e2, exponent_to_float(physical[0])));
+      numerical = numerical * (Result)(std::pow(1e2, exponent_to_float(physical[0])));
     }
     if (!numerical.estimate->is_unity() && format.display_magnitude()) {
       ss << numerical.to_string(format) << multiply;
