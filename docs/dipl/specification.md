@@ -1,10 +1,8 @@
-# DIPL Language Specification
+# DIPL - Language Specification
 
 Version: 0.1  
 Status: Draft  
 Project: SciNumTools
-
----
 
 ## Introduction
 
@@ -39,28 +37,50 @@ velocity float32[1,2:] = [[23.45, 23e-34, 45.1]] SI_km/s
 burst_energy float64 = 2.34e5 US_btu
 ```
 
-## Parameter Declaration
+## Language Syntax
 
-## Types
-
-## Shape Specification
-
-## Values
-
-## Units and Dimensions
-
-## Expressions
-
-## References
-
-## Metadata Tags
+- [Nodes](syntax/nodes.md)
+- [Data Types](syntax/datatypes.md)
+- [Values](syntax/values.md)
+- [References](syntax/references.md)
+- [Expressions](syntax/expressions.md)
+- [Units](syntax/units.md)
+- [Functions](syntax/functions.md)
+- [Properties](syntax/properties.md)
+- [Conditions](syntax/conditions.md)
  
 ## Execution Model
- 
+
+A DIPL processor evaluates files using the following steps:
+
+1. parse file
+2. build parameter tree
+3. resolve references
+4. evaluate expressions
+5. apply unit conversions
+6. validate shapes
+7. evaluate conditions
+
+Errors are reported if any step fails.
+
 ## Error Handling
+
+Possible error types include:
+
+- runtime error
 
 ## Examples
 
 ## Versioning
 
+This document describes DIPL version 0.1.
+
+Future versions may extend the language while maintaining backward
+compatibility where possible.
+
 ## Reference Implementation
+
+The reference implementation of DIPL is provided in the SciNumTools v3 project.
+
+[scinumtools3](https://github.com/vrtulka23/scinumtools3)
+[documentation](https://vrtulka23.github.io/scinumtools3/)
