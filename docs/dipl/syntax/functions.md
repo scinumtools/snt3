@@ -2,22 +2,22 @@
 
 « Back to [specification](../specification.md#language-syntax)
 
-## Functions
+## 3.7. Functions
 
-In addition to expressions described in previous sections, DIP code can access functions of its interpreter language and use them to fill parameter values.
+In addition to expressions described in previous sections, DIPL code can access functions of its interpreter language and use them to fill parameter values.
 This is especially useful when syntax of expressions is not enough to solve some complicated problem.
 
 Function calls are, similarly as expressions, wrapped in parentheses.
 Instead of an expression string, the inner argument is simply a function name.
 
-``` DIPSchema
+``` DIPL-Schema
 # Function schema
 (<function>)
 ```
 
-An example of functions used in DIP code is below.
+An example of functions used in DIPL code is below.
 
-``` DIP
+``` DIPL
 # function_calls.dip
 side float = 5 cm
 volume float = (fn_volume) cm3
@@ -26,7 +26,7 @@ prime bool = (is_prime)
 value str = (print_value)
 ```
 
-Function names in parentheses correspond to function defined by the interpreter language (e.g. Python) and receive an argument ``data`` that holds a copy of current node values. Each function must return a value that correspond to the node type defined in DIP. This can be either a native data type or DIP data type.
+Function names in parentheses correspond to function defined by the interpreter language (e.g. Python) and receive an argument ``data`` that holds a copy of current node values. Each function must return a value that correspond to the node type defined in DIPL. This can be either a native data type or DIPL data type.
 	     
 ``` python
 >>> def fn_volume(data):
@@ -45,7 +45,7 @@ Function names in parentheses correspond to function defined by the interpreter 
 >>>     return str(data['side'])
 ```
 
-Functions are registered to DIP before parsing using method ``DIP::.add_function()``.
+Functions are registered to DIPL before parsing using method ``DIP::.add_function()``.
 
 ``` python
 >>> with DIP() as dip:

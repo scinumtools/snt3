@@ -56,7 +56,7 @@ namespace snt::dip {
 
   bool Parser::kwd_case() {
     constexpr auto pstr =
-        ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_CONDITION, "]", KEYWORD_CASE, ")[ ]*");
+      ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_CONDITION, "](", KEYWORD_IF, "|", KEYWORD_ELIF, "))[ ]*");
     std::regex pattern(pstr.data());
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {

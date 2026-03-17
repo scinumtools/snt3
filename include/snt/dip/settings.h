@@ -52,7 +52,8 @@ namespace snt::dip {
   constexpr std::string_view KEYWORD_OPTIONS = "options";
   constexpr std::string_view KEYWORD_DELIMITER = "delimiter";
 
-  constexpr std::string_view KEYWORD_CASE = "case";
+  constexpr std::string_view KEYWORD_IF = "if";
+  constexpr std::string_view KEYWORD_ELIF = "elif";
   constexpr std::string_view KEYWORD_ELSE = "else";
   constexpr std::string_view KEYWORD_END = "end";
 
@@ -64,7 +65,9 @@ namespace snt::dip {
   constexpr std::string_view PATTERN_PATH = "[a-zA-Z0-9._-]";
 
   // Various settings
-  constexpr std::string_view FILE_SUFFIX_DIP = ".dip";
+  constexpr std::string_view FILE_SUFFIX_DIP1 = ".dip";         ///< Suffix name of a DIPL file
+  constexpr std::string_view FILE_SUFFIX_DIP2 = ".dipl";        ///< Suffix name of a DIPL file
+  constexpr int INDENT_STEP = 2;                                ///< Number of white spaces in an indent step
 
   struct Source {
     std::string name;
@@ -82,9 +85,10 @@ namespace snt::dip {
   };
 
   enum class CaseType {
-    Case,
-    Else,
-    End
+    IF,
+    ELIF,
+    ELSE,
+    END
   };
 
   enum class ValueOrigin {

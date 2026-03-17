@@ -10,7 +10,7 @@ TEST(Properties, Constant) {
 
   dip::DIP d;
   d.add_string("foo bool = true");
-  d.add_string(" !constant");
+  d.add_string("  !constant");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // constant declaration is not returned as a separate node
 
@@ -40,7 +40,7 @@ TEST(Properties, Constant) {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "The indent '0' of a property is not higher than the indent '2' of a preceding node: !constant");
+    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !constant");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -85,7 +85,7 @@ TEST(Properties, Description) {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "The indent '0' of a property is not higher than the indent '2' of a preceding node: !descr 'If foo is true, bar is false'");
+    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !descr 'If foo is true, bar is false'");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -124,7 +124,7 @@ TEST(Properties, Format) {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "The indent '0' of a property is not higher than the indent '2' of a preceding node: !format '[a-z]+'");
+    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !format '[a-z]+'");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -151,7 +151,7 @@ TEST(Properties, Tags) {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "The indent '0' of a property is not higher than the indent '2' of a preceding node: !tags '[a-z]+'");
+    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !tags '[a-z]+'");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }

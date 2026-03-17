@@ -19,22 +19,22 @@ namespace snt::dip {
   BaseNode::ListType CaseNode::parse(Environment& env) {
     std::ostringstream oss;
     oss << "^(" << PATTERN_PATH << "*[" << SIGN_CONDITION << "])";
-    oss << "(" << KEYWORD_CASE << "|" << KEYWORD_ELSE << "|" << KEYWORD_END << ")";
+    oss << "(" << KEYWORD_IF << "|" << KEYWORD_ELIF << "|" << KEYWORD_ELSE << "|" << KEYWORD_END << ")";
     std::regex pattern(oss.str());
     std::smatch matchResult;
     if (std::regex_search(name, matchResult, pattern)) {
       case_id = env.branching.register_case();
-      if (matchResult[2].str() == KEYWORD_CASE) {
-        case_type = CaseType::Case;
+      if (matchResult[2].str() == KEYWORD_ELIF) {
+        case_type = CaseType::ELIF;
       } else if (matchResult[2].str() == KEYWORD_ELSE) {
-        case_type = CaseType::Else;
+        case_type = CaseType::ELSE;
       } else if (matchResult[2].str() == KEYWORD_END) {
-        case_type = CaseType::End;
+        case_type = CaseType::END;
       } else {
         throw std::runtime_error("Unsupported case type: " + line.code);
       }
       name = matchResult[1].str() + "C" + std::to_string(case_id);
-      if (case_type == CaseType::Case) {
+      if (case_type == CaseType::ELIF) {
         if (value_raw.empty())
           throw std::runtime_error("Case node requires an input value: " + line.code);
         switch (value_origin) {
@@ -64,7 +64,7 @@ namespace snt::dip {
             throw std::runtime_error("Invalid value: " + line.code);
           break;
         }
-      } else if (case_type == CaseType::Else) {
+      } else if (case_type == CaseType::ELSE) {
         value = true;
       }
     }

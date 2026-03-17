@@ -21,16 +21,22 @@
 
 namespace snt::dip {
 
+  inline EnvSource parse_file_source(const std::string& source_name, const std::string& source_file,
+				     const Source& parent) {
+    DIP d(parent);
+    d.add_file(source_file, source_name);
+    Environment senv = d.parse();
+    return EnvSource({source_name, source_file, senv.sources.at(source_name).code, parent, senv.nodes});
+  }
+  
   EnvSource parse_source(const std::string& source_name, const std::string& source_file,
                          const Source& parent) {
-    if (source_file.size() >= FILE_SUFFIX_DIP.size() &&
-        source_file.compare(source_file.size() - FILE_SUFFIX_DIP.size(), FILE_SUFFIX_DIP.size(),
-                            FILE_SUFFIX_DIP) == 0) {
-      DIP d(parent);
-      d.add_file(source_file, source_name);
-      Environment senv = d.parse();
-      return EnvSource(
-          {source_name, source_file, senv.sources.at(source_name).code, parent, senv.nodes});
+    if (source_file.size() >= FILE_SUFFIX_DIP1.size() &&
+        source_file.compare(source_file.size() - FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1) == 0) {
+      return parse_file_source(source_name, source_file, parent);
+    } else if (source_file.size() >= FILE_SUFFIX_DIP2.size() &&
+        source_file.compare(source_file.size() - FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2) == 0) {
+      return parse_file_source(source_name, source_file, parent);
     } else {
       std::ifstream file(source_file);
       if (!file)

@@ -32,7 +32,7 @@ namespace snt::dip {
   int BranchingList::open_branch(const size_t case_id) {
     size_t branch_id = ++num_branches;
     state.push_back(branch_id);
-    branches[branch_id] = Branch({case_id}, {CaseType::Case});
+    branches[branch_id] = Branch({case_id}, {CaseType::ELIF});
     return 0;
   }
 
@@ -96,11 +96,11 @@ namespace snt::dip {
         path_old = cs.path;
       }
       // validate correct condition type and process end of the case
-      if (cnode->case_type == CaseType::Case) {
+      if (cnode->case_type == CaseType::ELIF) {
         // continue
-      } else if (cnode->case_type == CaseType::Else and !cases.empty()) {
+      } else if (cnode->case_type == CaseType::ELSE and !cases.empty()) {
         // continue
-      } else if (cnode->case_type == CaseType::End and !cases.empty() and
+      } else if (cnode->case_type == CaseType::END and !cases.empty() and
                  path_old.size() >= path_new.size()) {
         close_branch();
         return;

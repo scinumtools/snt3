@@ -2,21 +2,21 @@
 
 « Back to [specification](../specification.md#language-syntax)
 
-## Properties
+## 3.8. Properties
 
 Numerical codes usually require initial parameter values with a specific format.
-In this section, we summarize properties that can be used in DIP to restrict node values and describe their format.
+In this section, we summarize properties that can be used in DIPL to restrict node values and describe their format.
 Each node property directive is given on a new line immediately after node definitions, declarations or modification.
 All properties must have consistent indent, higher than their parent node.
 
-### Options
+### 3.8.1. Options
 
 **Used by:** ``int``, ``float``, ``str``
 
 Initial code parameters often accept only a few discrete input values, also called options.
 These can be explicitly described during node definition or declaration.
 
-``` DIPSchema
+``` DIPL-Schema
 # Schema of a node option
 <indent>= <value> <unit>
 <indent>= <value>
@@ -28,18 +28,18 @@ Individual options are specified directly under particular nodes starting with e
 Options cannot be separated from nodes by an empty line.
 All options corresponding to the same node must have the same indent, higher than the node.
 
-``` DIP
+``` DIPL
 coordinates int = 1
   = 1  # carthesian
   = 2  # polar
   = 3  # spherical
 ```
 
-If the node has an other value than one of the options, DIP will throw an error message.
+If the node has an other value than one of the options, DIPL will throw an error message.
 
 Node definition and individual options can have different units, but they must have the same dimensionality. The final value of such modified node will be, however, converted into units specified in the definition.
 
-``` DIP
+``` DIPL
 animal str = 'dog'
   = cat
   = dog
@@ -56,7 +56,7 @@ energy = 3e-7 J         # modification
 
 If the number of options is too large, and it is not practical to write each option on a new line, it is also possible to use a shorthand ``!options`` option notation.
 
-``` DIPSchema
+``` DIPL-Schema
 # Schema of an option array
 <indent>!options <value> <unit>
 <indent>!options <value>
@@ -69,7 +69,7 @@ Similiarly as in the cases above, units are optional and must be of the same dim
 Several ``!options`` clauses are allowed for the same node (e.g. each with different units).
 They combine into a single array of options against which the node value is evaluated.
      
-``` DIP
+``` DIPL
 animal str = 'dog'
   !options ['cat','dog','horse']
 
@@ -79,7 +79,7 @@ energy float = 23 J
 # all options: [23, 45, 10, 234, 490, 1939, 3.4e-6, 2.34e-7] J
 ```
 
-### Condition
+### 3.8.2. Condition
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
@@ -87,7 +87,7 @@ Numerical values can usually have values ranging in some intervals.
 In order to restrict node values to some particular interval, it is possible to set logical using ``!condition`` directive and logical expression.
 A given expression has to be evaluated as ``true`` after each definition or modification of a node.
 
-``` DIPSchema
+``` DIPL-Schema
 # Schema of a node condition requirement
 <indent>!condition ('<expression>')    
 <indent>!condition ("<expression>")    
@@ -99,51 +99,51 @@ A given expression has to be evaluated as ``true`` after each definition or modi
 In the example below, node ``energy`` can have values in a range of 23 and 26 erg.
 The actual value of node ``energy`` is matched using a special self-reference sign ``{?}``.
 
-``` DIP
+``` DIPL
 energy float = 25 erg
   !condition ("23 < {?} && {?} < 26")
 ```
 
-### Format
+### 3.8.3. Format
 
 **Used by:** ``str``
 
 In general, string values wrapped into quote marks can contain all characters and can be arbitrary long.
 This can be restricted by defining their ``!format`` using standard (Python based) regular expressions.
 
-``` DIPSchema
+``` DIPL-Schema
 # Schema of a node format requirement
 <indent>!format <value>
 ```
 
 In the following example, node 'name' can contain only small and capital letters:
    
-``` DIP
+``` DIPL
 name str = 'Ferdinant'
   !format '[a-zA-Z]+'
 ```
 
-### Constants
+### 3.8.4. Constants
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
 Sometimes nodes have to stay constant and exclude all possible modifications.
 This can be achieved by a directive ``!constant``.
 
-``` DIPSchema
+``` DIPL-Schema
 # Schema of a constant node requirement
 <indent>!constant
 ```
 
 Node ``name`` in the following example cannot be further modified.
      
-``` DIP
+``` DIPL
 name str = 'John'
   !constant
 name = 'Mary'   # this modification will raise an error exception
 ```
 
-### Tags
+### 3.8.5. Tags
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
@@ -151,7 +151,7 @@ Tags have proven to be a good way how to sort and categorize large number of inf
 Data types supporting tagging can use dedicated property ``!tags`` that accept a list of tags.
 It is advised to use only string tags.
 
-``` DIPSchema
+``` DIPL-Schema
 # Schema for node tags property
 <indent>!tags <value>
 ```
@@ -159,7 +159,7 @@ It is advised to use only string tags.
 Tagged nodes can be later on selected from environment using a tag selector.
 
 ``` 
->>> with DIP() as p:
+>>> with DIPL() as p:
 >>>     p.add_string('''
 >>>     name str = John
 >>>         !tags ["name","male"]
@@ -172,14 +172,14 @@ Tagged nodes can be later on selected from environment using a tag selector.
 {'name': StringType('John')}
 ```
 
-### Description
+### 3.8.6. Description
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
-Notes about parameters in ``.dip`` file can be written as comments, however, comments as such are not visible in automatically generated DIP documentation.
+Notes about parameters in ``.dip`` file can be written as comments, however, comments as such are not visible in automatically generated DIPL documentation.
 For this purpouse, there is a dedicated node property ``!description``. Abbreviation ``!desc`` can be also used. 
 
-``` DIPSchema
+``` DIPL-Schema
 # Schema for node description   
 <indent>!description <value>
 <indent>!desc <value>

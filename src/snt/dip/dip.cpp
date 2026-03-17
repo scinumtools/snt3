@@ -2,8 +2,8 @@
 
 #include <snt/dip/nodes/node_property.h>
 #include <snt/dip/nodes/node_value.h>
-#include "parsers.h"
 #include <snt/dip/settings.h>
+#include "parsers.h"
 
 #include <fstream>
 #include <iostream>
@@ -125,14 +125,25 @@ namespace snt::dip {
           throw std::runtime_error(
               "Only value nodes (bool, int, float and str) can have properties: " +
               pnode->line.code);
-        if (previous_node->indent >= pnode->indent)
-          throw std::runtime_error("The indent '" + std::to_string(pnode->indent) +
-                                   "' of a property is not higher than the indent '" +
+        if (previous_node->indent >= pnode->indent or (pnode->indent-previous_node->indent)!=INDENT_STEP)
+          throw std::runtime_error("The indent of a property '" + std::to_string(pnode->indent) +
+                                   "' is not " + std::to_string(INDENT_STEP) +
+                                   " white spaces higher than the indent of a preceding node '" +
                                    std::to_string(previous_node->indent) +
-                                   "' of a preceding node: " + pnode->line.code);
+                                   "': " + pnode->line.code);
         if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
           throw std::runtime_error("Property could not be set: " + pnode->line.code);
       } else {
+	// We make sure that the indent spacing is always set by INDENT_STEP
+	if ((current_node->indent%INDENT_STEP) != 0)
+	  throw std::runtime_error("Indent of the current node is not a multiple of " + std::to_string(INDENT_STEP) + " '" +
+				   std::to_string(current_node->indent) + "': " + current_node->line.code);
+	if (previous_node != nullptr) {
+	  if ((current_node->indent > previous_node->indent) && (current_node->indent - previous_node->indent) != INDENT_STEP) {
+	      throw std::runtime_error("Indent of the child node '" + std::to_string(current_node->indent) + "' is not exactly " + std::to_string(INDENT_STEP) +
+		                       " white spaces higher than its parent nodes '" + std::to_string(current_node->indent) + "': " + current_node->line.code);
+	  }
+	}
         previous_node = current_node;
       }
     }
@@ -143,7 +154,7 @@ namespace snt::dip {
       if (node->dtype == NodeDtype::Property)
         continue;
       if (!target.branching.false_case() or node->dtype == NodeDtype::Case) {
-        // Perform specific node parsing only outside of case or inside of valid case
+        // Perform specific node parsing outside of a condition block or inside of a valid condition block
         BaseNode::ListType parsed = node->parse(target);
         if (parsed.size() > 0) {
           while (parsed.size() > 0) {

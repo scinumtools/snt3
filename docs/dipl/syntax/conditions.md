@@ -2,66 +2,66 @@
 
 « Back to [specification](../specification.md#language-syntax)
 
-## Conditions
+## 3.9. Conditions
 
-``` DIPSchema
+``` DIPL-Schema
 # Schemas of condition directives
 
 # condition with only one case
-@case ("<expression>")
+@elif ("<expression>")
   ...
 @end                 # end is optional
 
 # condition with multiple cases
-@case ("<expression>")
+@elif ("<expression>")
   ...
-@case ("<expression>")
+@elif ("<expression>")
   ...
 @else                # else is optional
   ...
 @end                 # end is optional
 
 # consecutive conditions
-@case ("<expression>")   # first condition
+@elif ("<expression>")   # first condition
   ...
 @else
   ...
 @end                 # end is necessary
-@case ("<expression>")   # second condition
+@elif ("<expression>")   # second condition
   ...
 ```
 
-Parameters in DIP can also be branched using conditions.
+Parameters in DIPL can also be branched using conditions.
 There are 3 clauses used in conditions.
 Child nodes must have higher indent than the parent clause.
 
-``@case ("<expression>")``
+``@elif ("<expression>")``
   is a starting clause of each condition and requires as an argument result of a logical expression.
-  If the expression is evaluated as true, child nodes of the corresponding ``@case`` will be taken and the condition is terminated.
+  If the expression is evaluated as true, child nodes of the corresponding ``@elif`` will be taken and the condition is terminated.
   If the expression is false, its child nodes are skipped and subsequent clauses are evaluated.
   For testing purposes, one can also use direct ``true`` or ``false`` keywords instead of expressions.
 
 ``@else``
   is a special, optional, clause that is at the very end of conditions and does not require any expression.
   Each condition can have only one ``@else`` clause.
-  If all previous ``@case``-s are evaluated as false, child nodes of ``@else`` are taken.
+  If all previous ``@elif``-s are evaluated as false, child nodes of ``@else`` are taken.
 
 ``@end``
   is a terminating clause whose main purpose is to separate two consecutive conditions.
-  If omitted, a single condition terminates after last ``@case`` or ``@else``.
+  If omitted, a single condition terminates after last ``@elif`` or ``@else``.
       
-``` DIP
+``` DIPL
 winner int = 1
 
-@case ("{?winner} == 1")     # first case
+@elif ("{?winner} == 1")     # first case
   name str = "John"
-@case ("{?winner} == 2")     # second case
+@elif ("{?winner} == 2")     # second case
   name str = "Jenny"
 @else                        # default case
   name str = "Jonas"
 @end                         # end of first condition
 
-@case ("{?name} == 'Jenny'")
+@elif ("{?name} == 'Jenny'")
   toy str = "doll"
 @else
   toy str = "robot"
@@ -69,17 +69,17 @@ winner int = 1
 
 Nested conditions are also possible, provided that each child condition has indent higher than the parent condition.
 
-``` DIP
-@case false
+``` DIPL
+@elif false
   flower str = 'rose'
 @else
   flower str = 'dandelion'
-  @case false
+  @elif false
     color str = 'red'
-  @case false
+  @elif false
     color str = 'blue'
   @else
-    @case true
+    @elif true
       leaves int = 234
     color str = 'yellow'
   tree str = 'maple'

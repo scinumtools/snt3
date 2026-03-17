@@ -1,10 +1,12 @@
 # DIPL - Language Specification
 
-Version: 0.1  
-Status: Draft  
-Project: SciNumTools
+**Version:** 0.1
 
-## Introduction
+**Status:** Draft (17.03.2026)
+
+**Project:** SciNumTools v3
+
+## 1. Introduction
 
 DIPL (Dimensional Input Parameter Language) is a domain-specific language for
 defining typed, unit-aware parameters for scientific simulations and numerical
@@ -14,16 +16,18 @@ The language provides:
 
 - dimensional units
 - typed parameters
-- array shape constraints
-- parameter references
-- expressions
-- validation rules
+- arrays with shape constraints
+- hierarchical parameter structure
+- parameter references (node imports and value injections)
+- numerical and logical expression solvers
+- text template solver
+- parameter properties and validation rules
 - conditional operators
 
 DIPL is intended to replace fragile configuration formats such as JSON, YAML,
-or INI files when physical units and validation are required.
+or INI files when physical units, precision and validation are required.
 
-## Language Overview
+## 2. Language Overview
 
 A DIPL file consists of parameter declarations organized in hierarchical
 blocks using indentation.
@@ -37,50 +41,88 @@ velocity float32[1,2:] = [[23.45, 23e-34, 45.1]] SI_km/s
 burst_energy float64 = 2.34e5 US_btu
 ```
 
-## Language Syntax
+## 3. Language Syntax
 
-- [Nodes](syntax/nodes.md)
-- [Data Types](syntax/datatypes.md)
-- [Values](syntax/values.md)
-- [References](syntax/references.md)
-- [Expressions](syntax/expressions.md)
-- [Units](syntax/units.md)
-- [Functions](syntax/functions.md)
-- [Properties](syntax/properties.md)
-- [Conditions](syntax/conditions.md)
+- [3.1. Nodes](syntax/nodes.md)
+- [3.2. Data Types](syntax/datatypes.md)
+- [3.3. Values](syntax/values.md)
+- [3.4. References](syntax/references.md)
+- [3.5. Expressions](syntax/expressions.md)
+- [3.6. Units](syntax/units.md)
+- [3.7. Functions](syntax/functions.md)
+- [3.8. Properties](syntax/properties.md)
+- [3.9. Conditions](syntax/conditions.md)
  
-## Execution Model
+## 4. File Format
+
+The source file MUST have an extension of either `.dip` or `.dipl`.
+Nodes with the smallest [indentations](syntax/nodes.md#definition) in the file should be considered as the root nodes with an indentation level of 0.
+
+## 5. Execution Model
 
 A DIPL processor evaluates files using the following steps:
 
-1. parse file
-2. build parameter tree
-3. resolve references
-4. evaluate expressions
-5. apply unit conversions
-6. validate shapes
-7. evaluate conditions
+1) parse code lines into nodes
+   1. combine multiline string [blocks](syntax/values.md#blocks) into single strings (e.g. text wrapped in ``"""``)
+   2. replace special symbols with replacing marks (e.g. ``\n``, ``\'``, ``\"``)
+   3. determine a node type for each line (e.g. [group](syntax/nodes.md#hierarchy), [value](syntax/values.md#values), [case](syntax/conditions.md#conditions), ...)
+   4. convert replacing marks back to corresponding special symbols
+   5. populate node list from processed lines
+2) prepare node for processing
+   1. assign [property](syntax/properties.md#properties) nodes to preceding value nodes (e.g. ``!options [2, 3] erg``)
+   2. check node [indentation](syntax/nodes.md#definition) (e.g. number of whitespace characters)
+3) parse nodes one by one
+   1. perform specific node parsing outside or inside a valid condition block (e.g. expand [table](syntax/values.md#tables) nodes and solve [references](syntax/references.md#references))
+   2. solve the node [hierarchy](syntax/nodes.md#hierarchy) and construct node full names (e.g. ``foo.bar.baz``)
+   3. solve current [branching](syntax/conditions.md#conditions) and parse case expression
+   4. clean value node names from ``@if`` nodes
+   5. parse node [value](syntax/values.md#values) (e.g. parse scalars ``34e+3`` and arrays ``[[1,3],[4,5]]``)
+   6. parse node [units](syntax/units.md#units) (e.g. solve unit expressions ``kg/s``)
+   7. apply [modifications](syntax/nodes.md#modification) to already existing nodes
+4) validate nodes
+   1. check if all nodes are [defined](syntax/nodes.md#declaration)
+   2. check if nodes value is in available [options](syntax/properties.md#options)
+   3. check if nodes fulfill specific [conditions](syntax/properties.md#condition)
+   4. check value [formats](syntax/properties.md#format) of string nodes
+5) return final list of value nodes
+
+## 6. Error Handling
 
 Errors are reported if any step fails.
-
-## Error Handling
-
 Possible error types include:
 
 - runtime error
+- calculator exception
+- measurement exception
+- unit system exception
+- conversion exception
+- atom parsing exception
+- dimension map exception
 
-## Examples
+## 7. Versioning
 
-## Versioning
+This document specifies version 0.1 of the DIPL language.
 
-This document describes DIPL version 0.1.
+Language versioning is independent of any particular implementation. Each implementation MUST explicitly declare the version of the DIPL language it supports.
 
-Future versions may extend the language while maintaining backward
-compatibility where possible.
+Future versions of the language MAY introduce extensions or modifications. Backward compatibility SHOULD be preserved where feasible.
 
-## Reference Implementation
+## 8. Reference Implementation
 
-The reference implementation of DIPL is provided in the SciNumTools v3 project.
+A reference implementation of the DIPL language is provided as part of the SciNumTools v3 project.
 
-[scinumtools3](https://github.com/vrtulka23/scinumtools3)
-[documentation](https://vrtulka23.github.io/scinumtools3/)
+The reference implementation includes:
+- A C++ implementation
+- Python bindings for integration and scripting use cases
+
+**Project:**        SciNumTools v3
+
+**Repository:**     [scinumtools3](https://github.com/vrtulka23/scinumtools3)
+
+**Documentation:**  See project [documentation](https://vrtulka23.github.io/scinumtools3/) for usage and details
+
+Independent implementations of the DIPL language (e.g., in Rust or Julia) are encouraged and welcome, and can be added to this list on request.
+
+## 9. Authors and Contributors
+
+- Ondrej Pego Jaura — Original author

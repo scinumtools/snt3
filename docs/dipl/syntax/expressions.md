@@ -2,12 +2,12 @@
 
 « Back to [specification](../specification.md#language-syntax)
 
-## Expressions
+## 3.5. Expressions
 
 Node values can also be defined indirectly using expressions.
 Notation of expression values is similar to the string notation wrapped in additional parentheses:
 
-``` DIPSchema
+``` DIPL-Schema
 # Expression schema
    
 # using double quotes
@@ -22,7 +22,7 @@ Notation of expression values is similar to the string notation wrapped in addit
 """)
 ```
 
-There are 4 different types of expressions in DIP.
+There are 4 different types of expressions in DIPL.
 Three of them (logical, numerical and textual, i.e. templates) are described below.
 Dimensional expressions, i.e. :doc:`units <units>`, are described in a separate chapter.
 
@@ -53,14 +53,14 @@ Possible input values used by expressions are summarized in the following table:
 
 Operators summarized below are evaluated according to their priority from 1 to 4 and can be nested accordingly.       
 
-### Logical
+### 3.5.1. Logical
 
 Logical expressions are used to generate values for boolean nodes.
 The expressions can be composed of multiple nested logical operators that always return a true or false value.
 
 An example of a logical expression is given below.
        
-``` DIP
+``` DIPL
 a bool = true
 b float = 23.43 cm
 c bool = ("""
@@ -99,7 +99,7 @@ Expression operators evaluate only boolean values, either given directly or as a
 Numerical values with dimensions compared using comparison operations are automatically converted into same units. The result of such comparison is always a boolean value.
 
 > [!NOTE]
-> At the moment, it is possible to compare only scalar numerical values. Support for array comparison is planned to be provided in next versions of DIP.
+> At the moment, it is possible to compare only scalar numerical values. Support for array comparison is planned to be provided in next versions of DIPL.
 
 .. list-table:: Comparison operators
    :widths: 35 20 100
@@ -144,12 +144,12 @@ Numerical values with dimensions compared using comparison operations are automa
      - 1
      - Non-definition operator returns true if <reference> node does not exist
 
-### Numerical
+### 3.5.2. Numerical
 
 Numerical expressions are used to generate values for numerical node types.
 If given, the expression result is automatically converted into node units.
 
-``` DIP
+``` DIPL
 const
    c float = 299792458 m/s
 energy float = ("""
@@ -160,10 +160,10 @@ energy float = ("""
 ```
 
 > [!NOTE]
-> DIP does not aim to substitute advanced numerical programming languages.
-> Numerical expressions in DIP are supposed to give a quick tool for generation of input values that can be easily derived from other parameters.
+> DIPL does not aim to substitute advanced numerical programming languages.
+> Numerical expressions in DIPL are supposed to give a quick tool for generation of input values that can be easily derived from other parameters.
 > Therefore, it implements only the most basic mathematical operations on scalar values.
-> More advanced operations can be added in the future versions of DIP.
+> More advanced operations can be added in the future versions of DIPL.
 
 Operators used in numerical expressions are summarized below:
   
@@ -219,12 +219,12 @@ Most of the following operators require, that the final value has no dimensions.
      - 1
      - Returns cosine value of a dimensionless expression.
        
-### Templates
+### 3.5.3. Templates
 
 Templates are used to parse node values into a text form.
 All value types can be parsed into text using standard python formatting notation.
 
-``` DIP
+``` DIPL
 id int = 345
 name str = 'Tina'
 body
@@ -269,7 +269,7 @@ Basic syntax of parsing operators is described below:
 Arrays can also be parsed using templates, however, without specifying a format.
 The format depends on the default Python string casting functions:
 
-``` DIP
+``` DIPL
 name str = "Will Smith"
 widths float[2,3] = [[23.4,235.4,34],[1e10,2e23,5e20]]
 
