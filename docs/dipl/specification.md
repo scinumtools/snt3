@@ -56,34 +56,34 @@ burst_energy float64 = 2.34e5 US_btu
 ## 4. File Format
 
 The source file MUST have an extension of either `.dip` or `.dipl`.
-Nodes with the smallest [indentations](syntax/nodes.md#definition) in the file should be considered as the root nodes with an indentation level of 0.
+Nodes with the smallest [indentations](syntax/nodes.md#3.1.1.-definition) in the file should be considered as the root nodes with an indentation level of 0.
 
 ## 5. Execution Model
 
 A DIPL processor evaluates files using the following steps:
 
 1) parse code lines into nodes
-   1. combine multiline string [blocks](syntax/values.md#blocks) into single strings (e.g. text wrapped in ``"""``)
+   1. combine multiline string [blocks](syntax/values.md#3.3.4.-blocks) into single strings (e.g. text wrapped in ``"""``)
    2. replace special symbols with replacing marks (e.g. ``\n``, ``\'``, ``\"``)
-   3. determine a node type for each line (e.g. [group](syntax/nodes.md#hierarchy), [value](syntax/values.md#values), [case](syntax/conditions.md#conditions), ...)
+   3. determine a node type for each line (e.g. [group](syntax/nodes.md#3.1.4.-hierarchy), [value](syntax/values.md#3.3.-values), [case](syntax/conditions.md#3.9.-conditions), ...)
    4. convert replacing marks back to corresponding special symbols
    5. populate node list from processed lines
 2) prepare node for processing
-   1. assign [property](syntax/properties.md#properties) nodes to preceding value nodes (e.g. ``!options [2, 3] erg``)
-   2. check node [indentation](syntax/nodes.md#definition) (e.g. number of whitespace characters)
-3) parse nodes one by one
-   1. perform specific node parsing outside or inside a valid condition block (e.g. expand [table](syntax/values.md#tables) nodes and solve [references](syntax/references.md#references))
-   2. solve the node [hierarchy](syntax/nodes.md#hierarchy) and construct node full names (e.g. ``foo.bar.baz``)
-   3. solve current [branching](syntax/conditions.md#conditions) and parse case expression
+   1. assign [property](syntax/properties.md#3.8.-properties) nodes to preceding value nodes (e.g. ``!options [2, 3] erg``)
+   2. check node [indentation](syntax/nodes.md#3.1.1.-definition) (e.g. number of whitespace characters)
+3) parse nodes
+   1. perform specific node parsing outside or inside a valid condition block (e.g. expand [table](syntax/values.md#3.3.5.-tables) nodes and solve [references](syntax/references.md#3.4.-references))
+   2. solve the node [hierarchy](syntax/nodes.md#3.1.4.-hierarchy) and construct node full names (e.g. ``foo.bar.baz``)
+   3. solve current [branching](syntax/conditions.md#3.9.-conditions) and parse case expression
    4. clean value node names from ``@if`` nodes
-   5. parse node [value](syntax/values.md#values) (e.g. parse scalars ``34e+3`` and arrays ``[[1,3],[4,5]]``)
-   6. parse node [units](syntax/units.md#units) (e.g. solve unit expressions ``kg/s``)
-   7. apply [modifications](syntax/nodes.md#modification) to already existing nodes
+   5. parse node [value](syntax/values.md#3.3.-values) (e.g. parse scalars ``34e+3`` and arrays ``[[1,3],[4,5]]``)
+   6. parse node [units](syntax/units.md#3.6.-units) (e.g. solve unit expressions ``kg/s``)
+   7. apply [modifications](syntax/nodes.md#3.1.2.-modification) to already existing nodes
 4) validate nodes
-   1. check if all nodes are [defined](syntax/nodes.md#declaration)
-   2. check if nodes value is in available [options](syntax/properties.md#options)
-   3. check if nodes fulfill specific [conditions](syntax/properties.md#condition)
-   4. check value [formats](syntax/properties.md#format) of string nodes
+   1. check if all nodes are [defined](syntax/nodes.md#3.1.3.-declaration)
+   2. check if nodes value is in available [options](syntax/properties.md#3.8.1.-options)
+   3. check if nodes fulfill specific [conditions](syntax/properties.md#3.8.2.-condition)
+   4. check value [formats](syntax/properties.md#3.8.3.-format) of string nodes
 5) return final list of value nodes
 
 ## 6. Error Handling
@@ -127,7 +127,7 @@ Independent implementations of the DIPL language (e.g., in Rust or Julia) are en
 
 In the next versions of DIPL we plan to introduce the following new concepts:
 
-- improved expression parsing
+- improve expressions
 - node containers, such as lists of nodes and associative node dictionaries
 - container item schemas
 - node templating
