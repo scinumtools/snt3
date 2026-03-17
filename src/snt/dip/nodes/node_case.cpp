@@ -24,7 +24,9 @@ namespace snt::dip {
     std::smatch matchResult;
     if (std::regex_search(name, matchResult, pattern)) {
       case_id = env.branching.register_case();
-      if (matchResult[2].str() == KEYWORD_ELIF) {
+      if (matchResult[2].str() == KEYWORD_IF) {
+        case_type = CaseType::IF;
+      } else if (matchResult[2].str() == KEYWORD_ELIF) {
         case_type = CaseType::ELIF;
       } else if (matchResult[2].str() == KEYWORD_ELSE) {
         case_type = CaseType::ELSE;
@@ -34,7 +36,7 @@ namespace snt::dip {
         throw std::runtime_error("Unsupported case type: " + line.code);
       }
       name = matchResult[1].str() + "C" + std::to_string(case_id);
-      if (case_type == CaseType::ELIF) {
+      if (case_type == CaseType::IF || case_type == CaseType::ELIF) {
         if (value_raw.empty())
           throw std::runtime_error("Case node requires an input value: " + line.code);
         switch (value_origin) {

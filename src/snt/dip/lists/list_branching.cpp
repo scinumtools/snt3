@@ -32,7 +32,7 @@ namespace snt::dip {
   int BranchingList::open_branch(const size_t case_id) {
     size_t branch_id = ++num_branches;
     state.push_back(branch_id);
-    branches[branch_id] = Branch({case_id}, {CaseType::ELIF});
+    branches[branch_id] = Branch({case_id}, {CaseType::IF});
     return 0;
   }
 
@@ -96,7 +96,9 @@ namespace snt::dip {
         path_old = cs.path;
       }
       // validate correct condition type and process end of the case
-      if (cnode->case_type == CaseType::ELIF) {
+      if (cnode->case_type == CaseType::IF) {
+        // continue
+      } else if (cnode->case_type == CaseType::ELIF and !cases.empty()) {
         // continue
       } else if (cnode->case_type == CaseType::ELSE and !cases.empty()) {
         // continue
@@ -125,12 +127,16 @@ namespace snt::dip {
             path_old = "";
           }
         }
-        if (state.empty())
+        if (state.empty() && cnode->case_type == CaseType::IF)
           branch_part = open_branch(case_id);
-        else
+        else if (cnode->case_type == CaseType::ELIF or cnode->case_type == CaseType::ELSE) 
           branch_part = switch_case(case_id, cnode->case_type);
-      } else {
+	else
+	  throw std::runtime_error("Only @if can open a new case:  " + node->line.code);
+      } else if (cnode->case_type == CaseType::IF) {
         branch_part = open_branch(case_id);
+      } else {
+	throw std::runtime_error("Only @if can open a new case:  " + node->line.code);
       }
       // get current branch id
       size_t branch_id = get_branch_id();

@@ -4,8 +4,8 @@
 
 ## 3.6. Units
 
-Parsing of units in DIPL and their conversion is done using the `Physical Quantities <https://vrtulka23.github.io/scinumtools/units/index.html>`_ module of this package.
-For more information about unit expressions consult the corresponding documentation.
+Units in DIPL follow a dedicated domain specific language designed for this purpose and defined in a separate [specification](docs/puql/specification.md).
+Consequently, every DIPL implementation MUST either provide a fully compliant units parser or utilize the reference units parser available in the [SciNumTools v3](https://github.com/vrtulka23/scinumtools3) repository.
 
 ### 3.6.1 Standard Units
 
@@ -37,7 +37,8 @@ weight = 90000 g
 Similarly as in case of references, it is also possible to define new units directly in the DIPL code. This can be achieved by a special node directive ``$unit``.
 
 ``` DIPL-Schema
-# Schema of a custom unit definition          
+# Schema of a custom unit definition
+
 <indent>$unit <name> = <value> <unit>  # if value is a number
 <indent>$unit <name> = <value>         # if value is reference, or expression
 ```
@@ -54,13 +55,4 @@ velocity float = 2 [length]/[time]
 density float = 34 [mass]/[lenght]3
 ```
 
-Units can also be defined outside the code using ``DIPL::add_unit()`` method before code is parsed:
-
-``` python
->>> with DIPL() as dip:
->>>     dip.add_unit("length", 1, "m")
->>>     dip.add_string("""
->>>     width float = 23 [length]
->>>     """)
->>>     env = dip.parse()
-```
+Each DIPL implementation MUST support the definition and integration of custom units directly through the code interface.

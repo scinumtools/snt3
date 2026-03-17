@@ -24,34 +24,23 @@ Notation of expression values is similar to the string notation wrapped in addit
 
 There are 4 different types of expressions in DIPL.
 Three of them (logical, numerical and textual, i.e. templates) are described below.
-Dimensional expressions, i.e. :doc:`units <units>`, are described in a separate chapter.
+Dimensional expressions, i.e. [units](units.md#3.6.-units), are described in a separate chapter.
 
 > [!NOTE]
 > All operators used in expressions must be separated from values with at least one empty space.
 
 Possible input values used by expressions are summarized in the following table:
 
-.. list-table:: Input values
-   :widths: 30 30 70
-   :header-rows: 1
-		 
-   * - Syntax
-     - Name
-     - Example
-   * - <bool>
-     - boolean
-     - true/false
-   * - <num>
-     - numerical
-     - 24 cm
-   * - <ref>
-     - reference
-     - {?energy}
-   * - <expr>
-     - expression
-     - 12 cm == {?width} && true
+**Input values**
 
-Operators summarized below are evaluated according to their priority from 1 to 4 and can be nested accordingly.       
+| Schema     | Name       | Example                       |
+|------------|------------|-------------------------------|
+| ``<bool>`` | boolean    | ``true``/``false``            |
+| ``<num>``  | numerical  | ``24 cm``                     |
+| ``<ref>``  | reference  | ``{?energy}``                 |
+| ``<expr>`` | expression | ``12 cm == {?width} && true`` |
+
+Operators summarized below are evaluated according to their priority from 1 to 4 and can be nested accordingly.
 
 ### 3.5.1. Logical
 

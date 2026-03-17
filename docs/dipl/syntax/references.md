@@ -169,6 +169,7 @@ Arrays can be imported either directly or can be sliced to match dimensions of a
 
 ``` DIPL-Schema
 # Schema of an array slice reference
+
 {?<query>}[<slice>]            # node query from a local domain
 {<source>?<query>}[<slice>]    # node query from a remote domain
 ```
@@ -216,6 +217,7 @@ Values of source and unit definitions can also be injected from other nodes.
 
 ``` DIPL-Schema
 # Schema of node value injections
+
 <indent>$unit <name> = {<request>}
 <indent>$source <name> = {<request>}
 ```

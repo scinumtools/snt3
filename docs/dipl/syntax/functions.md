@@ -12,13 +12,13 @@ Instead of an expression string, the inner argument is simply a function name.
 
 ``` DIPL-Schema
 # Function schema
+
 (<function>)
 ```
 
 An example of functions used in DIPL code is below.
 
 ``` DIPL
-# function_calls.dip
 side float = 5 cm
 volume float = (fn_volume) cm3
 surface int = (fn_surface) mm2
@@ -26,41 +26,7 @@ prime bool = (is_prime)
 value str = (print_value)
 ```
 
-Function names in parentheses correspond to function defined by the interpreter language (e.g. Python) and receive an argument ``data`` that holds a copy of current node values. Each function must return a value that correspond to the node type defined in DIPL. This can be either a native data type or DIPL data type.
+Function names in parentheses correspond to function defined by the interpreter language (e.g. C++, Python, ...) and receive an argument ``data`` that holds a copy of already parsed value nodes.
+Each function must return a value that correspond to the node type defined in DIPL.
+This can be either a native data type or DIPL data type.
 	     
-``` python
->>> def fn_volume(data):
->>>     side = data['side'].convert('cm').value
->>>     return side**3
->>> 
->>> def fn_surface(data):
->>>     side = data['side'].convert('cm').value
->>>     return IntegerType(6*side**2, 'cm2')
->>> 
->>> def is_prime(data):
->>>     side = data['side'].convert('cm').value
->>>     return side in [1,2,3,5,7,11]
->>> 
->>> def print_value(data):
->>>     return str(data['side'])
-```
-
-Functions are registered to DIPL before parsing using method ``DIP::.add_function()``.
-
-``` python
->>> with DIP() as dip:
->>>     dip.add_function("fn_volume", fn_volume)
->>>     dip.add_function("fn_surface", fn_surface)
->>>     dip.add_function("is_prime", is_prime)
->>>     dip.add_function("print_value", print_value)
->>>     dip.add_file("function_calls.dip")
->>>     env = dip.parse()
->>>     data = env.data()
-{
-   'side':    FloatType(5, 'cm'),
-   'volume':  FloatType(125, 'cm3'),
-   'surface': IntegerType(15000, 'mm2'),
-   'prime':   BooleanType(True),
-   'value':   StringType("FloatType(5.0 cm)")
-}
-```

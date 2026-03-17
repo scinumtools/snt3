@@ -10,10 +10,13 @@ Numerical types can have additionally derived types that specify their **signedn
 
 ### 3.2.1. Standard data types
 
-DIPL uses defaultly a set of 4 basic data types.
-Below is an overview of possible scalar values for each of them:
+DIPL provides a minimal set of four built-in scalar data types. These types are designed to cover the most common use cases while keeping the language simple and predictable. Each type represents a distinct category of values and enforces basic constraints on how data is stored and interpreted.
+
+Below is an overview of the supported scalar types and their typical usage.
 
 **Boolean** (``bool``)
+
+The Boolean type represents logical truth values. It is primarily used for control flow, conditional evaluation, and state representation.
 
 ``` DIPL 
 day bool = true
@@ -22,11 +25,17 @@ night bool = false
 
 **Integer** (``int``, signed 32-bit)
 
+The Integer type represents whole numbers without fractional components.
+It uses a signed 32-bit representation, allowing both positive and negative values within a fixed range.
+
 ``` DIPL
 year int = 2023
 ```
 
 **Float** (``float``, 64-bit)
+
+The Float type represents real numbers with fractional components.
+It uses a 64-bit floating-point representation, allowing for a wide range of values, including very large and very small numbers.
 
 ``` DIPL
 duration float = 10            # integer form
@@ -35,6 +44,9 @@ distance float = 2.3e20        # scientific form
 ```
 
 **String** (``str``)
+
+The String type represents sequences of characters.
+It is used for textual data, labels, and any form of human-readable content.
 
 ``` DIPL
 name str = John                # single word

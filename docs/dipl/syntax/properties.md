@@ -7,7 +7,7 @@
 Numerical codes usually require initial parameter values with a specific format.
 In this section, we summarize properties that can be used in DIPL to restrict node values and describe their format.
 Each node property directive is given on a new line immediately after node definitions, declarations or modification.
-All properties must have consistent indent, higher than their parent node.
+All properties must have consistent indent, two whitespaces higher than their parent node.
 
 ### 3.8.1. Options
 
@@ -58,13 +58,14 @@ If the number of options is too large, and it is not practical to write each opt
 
 ``` DIPL-Schema
 # Schema of an option array
+
 <indent>!options <value> <unit>
 <indent>!options <value>
 ```
 
 The expected value of this clause is a list of values.
-It can be given explicitly or as a :doc:`reference <references>`.
-Similiarly as in the cases above, units are optional and must be of the same dimension as those given in a corresponding definition.
+It can be given explicitly or as a [reference](references.md#3.4.-references).
+Similiarly as in the cases above, units are optional and must be of the same dimension as those given in the corresponding definition.
    
 Several ``!options`` clauses are allowed for the same node (e.g. each with different units).
 They combine into a single array of options against which the node value is evaluated.
@@ -84,11 +85,12 @@ energy float = 23 J
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
 Numerical values can usually have values ranging in some intervals.
-In order to restrict node values to some particular interval, it is possible to set logical using ``!condition`` directive and logical expression.
+To restrict node values to some particular interval, it is possible to set a logical condition using ``!condition`` directive and a logical expression.
 A given expression has to be evaluated as ``true`` after each definition or modification of a node.
 
 ``` DIPL-Schema
 # Schema of a node condition requirement
+
 <indent>!condition ('<expression>')    
 <indent>!condition ("<expression>")    
 <indent>!condition ("""
@@ -109,10 +111,11 @@ energy float = 25 erg
 **Used by:** ``str``
 
 In general, string values wrapped into quote marks can contain all characters and can be arbitrary long.
-This can be restricted by defining their ``!format`` using standard (Python based) regular expressions.
+This can be restricted by defining their ``!format`` using standard regular expressions.
 
 ``` DIPL-Schema
 # Schema of a node format requirement
+
 <indent>!format <value>
 ```
 
@@ -147,54 +150,30 @@ name = 'Mary'   # this modification will raise an error exception
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
-Tags have proven to be a good way how to sort and categorize large number of information.
-Data types supporting tagging can use dedicated property ``!tags`` that accept a list of tags.
-It is advised to use only string tags.
+Tags provide a simple and effective mechanism for organizing and categorizing large sets of parameters.
+Any data type that supports tagging may define the dedicated ``!tags`` property, which accepts a list of tag values.
+In practice, it is recommended to use string values for tags to ensure consistency and interoperability.
 
 ``` DIPL-Schema
 # Schema for node tags property
+
 <indent>!tags <value>
 ```
 
-Tagged nodes can be later on selected from environment using a tag selector.
-
-``` 
->>> with DIPL() as p:
->>>     p.add_string('''
->>>     name str = John
->>>         !tags ["name","male"]
->>>     age int = 34
->>>     ''')
->>>     env = p.parse()
->>> env.nodes.query("*", tags=['male'])
-[StringNode(John)]
->>> env.data(tags=['male'])
-{'name': StringType('John')}
-```
+Once assigned, tags enable nodes to be queried and filtered after parsing through the use of tag selectors.
+Every DIPL implementation SHOULD provide support for selecting parsed nodes based on their associated tags.
 
 ### 3.8.6. Description
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
-Notes about parameters in ``.dip`` file can be written as comments, however, comments as such are not visible in automatically generated DIPL documentation.
-For this purpouse, there is a dedicated node property ``!description``. Abbreviation ``!desc`` can be also used. 
+Notes about parameters in DIPL may be written as comments; however, such comments are not included in automatically generated documentation.
+For this purpose, a dedicated node property ``!description`` is provided.
+The abbreviated form ``!desc`` may be used as an alternative.
 
 ``` DIPL-Schema
-# Schema for node description   
+# Schema for node description
+
 <indent>!description <value>
 <indent>!desc <value>
-```
-
-Descriptions are stored in nodes and are used mostly in documentation.
-
-``` 
->>> with DIP() as p:
->>>     p.add_string('''
->>>     name str = "John Smith"
->>>         !description "Name of a person"
->>>     ''')
->>>     env = p.parse()
->>> nodes = env.nodes.query("*")
->>> nodes[0].description
-Name of a person
 ```

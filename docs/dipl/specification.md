@@ -123,6 +123,15 @@ The reference implementation includes:
 
 Independent implementations of the DIPL language (e.g., in Rust or Julia) are encouraged and welcome, and can be added to this list on request.
 
-## 9. Authors and Contributors
+## 9. Future Development
+
+In the next versions of DIPL we plan to introduce the following new concepts:
+
+- improved expression parsing
+- node containers, such as lists of nodes and associative node dictionaries
+- container item schemas
+- node templating
+
+## 10. Authors and Contributors
 
 - Ondrej Pego Jaura — Original author
