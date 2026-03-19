@@ -49,10 +49,8 @@ The String type represents sequences of characters.
 It is used for textual data, labels, and any form of human-readable content.
 
 ``` DIPL
-name str = John                # single word
-city str = 'New York'          # multiple words
-country str = "United States"  # multiple words
-address str = """              # multiple lines
+country str = "United States"  # single line text
+address str = """              # text on multiple lines
 350 Fifth Avenue
 NY 10118
 """
