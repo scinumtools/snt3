@@ -13,9 +13,6 @@ Notation of expression values is similar to the string notation wrapped in addit
 # using double quotes
 ("<expression>")
 
-# using single quotes
-('<expression>')  
-
 # using block notation
 ("""
 <expression>
