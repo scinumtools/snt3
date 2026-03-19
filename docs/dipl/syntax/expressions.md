@@ -64,7 +64,7 @@ Expression operators evaluate only boolean values, either given directly or as a
 
 | Syntax            | Priority | Description                                                                              |
 |-------------------|----------|------------------------------------------------------------------------------------------|
-| `A || B || C ...` | 4        | Logical OR operator returns true if at least one expression (`A`, `B`, `C`, ...) is true |
+| `A \|\| B \|\| C ...` | 4        | Logical OR operator returns true if at least one expression (`A`, `B`, `C`, ...) is true |
 | `A && B && C ...` | 3        | Logical AND operator returns true if all expressions (`A`, `B`, `C`, ...) are true       |
 
 **Parentheses**
@@ -89,7 +89,7 @@ Numerical values with dimensions compared using comparison operations are automa
 | `A > B`  | 1        | Greather than operator returns true if `A` is greater than `B`                                                       |
 | `A < B`  | 1        | Smaller than operator returns true if `A` is smaller than `B`                                                        |
   
-**Unary operators**
+**Single value operators**
 
 | Syntax    | Priority | Description                                                             |
 |-----------|----------|-------------------------------------------------------------------------|
