@@ -309,7 +309,7 @@ TEST(Properties, TableDelimiter) {
   d.add_string("1, true");
   d.add_string("2, false");
   d.add_string("\"\"\"");
-  d.add_string("  !delimiter ,");
+  d.add_string("  !delimiter \",\"");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);
 

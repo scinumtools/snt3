@@ -15,7 +15,7 @@ namespace snt::dip {
       // TODO: implement injection of a unit
       parser.part_keyword();
       parser.part_equal();
-      parser.part_string();
+      parser.part_units('\0');  // an empty space before the units is already taken by ' = ' sign, so we don't enforce it here
       parser.part_comment();
       return std::make_shared<UnitNode>(parser);
     }
@@ -23,7 +23,7 @@ namespace snt::dip {
   }
 
   BaseNode::ListType UnitNode::parse(Environment& env) {
-    EnvUnit senv = {value_raw.at(0), value_raw.at(1)};
+    EnvUnit senv = {value_raw.at(0), units_raw};
     env.units.append(value_raw.at(0), senv);
     return {};
   }

@@ -61,7 +61,8 @@ namespace snt::dip {
   constexpr std::string_view KEYWORD_UNIT = "unit";
 
   // Regex Patterns
-  constexpr std::string_view PATTERN_KEY = "[a-zA-Z0-9_-]";
+  constexpr std::string_view PATTERN_KEYWORD = "[a-zA-Z0-9_-]";
+  constexpr std::string_view PATTERN_NUMBER = "[+-]?[0-9]+([.][0-9]+)?([eE][+-]?[0-9]+)?";
   constexpr std::string_view PATTERN_PATH = "[a-zA-Z0-9._-]";
 
   // Various settings
@@ -93,6 +94,7 @@ namespace snt::dip {
 
   enum class ValueOrigin {
     Keyword,
+    Number,
     String,
     Reference,
     ReferenceRaw,

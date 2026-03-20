@@ -48,19 +48,15 @@ TEST(ParseStrings, EscapeSymbols) {
 TEST(ParseStrings, CommentSymbol) {
 
   dip::DIP d;
-  d.add_string("foo str = bar#baz # comment");
-  d.add_string("bar str = \"baz#foo\" # comment");
+  d.add_string("foo str = \"bar#baz\" # comment");
   d.add_string("baz str[:] = [\"foo#\",\"bar\"] # comment");
   dip::Environment env = d.parse();
-  EXPECT_EQ(env.nodes.size(), 3);
+  EXPECT_EQ(env.nodes.size(), 2);
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "foo");
   EXPECT_EQ(node->value_raw.at(0), "bar#baz");
   node = env.nodes.at(1);
-  EXPECT_EQ(node->name, "bar");
-  EXPECT_EQ(node->value_raw.at(0), "baz#foo");
-  node = env.nodes.at(2);
   EXPECT_EQ(node->name, "baz");
   EXPECT_EQ(node->value_raw, val::Array::StringType({"foo#", "bar"}));
 }

@@ -21,7 +21,7 @@ TEST(ReferencesRaw, BooleanValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("$source " + source_name + " = \"" + source_filename.string() + "\"");
   d.add_string("snap bool[2,2] = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
@@ -50,7 +50,7 @@ TEST(ReferencesRaw, IntegerValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("$source " + source_name + " = \"" + source_filename.string() + "\"");
   d.add_string("snap int[2,2] = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
@@ -79,7 +79,7 @@ TEST(ReferencesRaw, FloatValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("$source " + source_name + " = \"" + source_filename.string() + "\"");
   d.add_string("snap float[2,2] = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
@@ -108,7 +108,7 @@ TEST(ReferencesRaw, StringValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("$source " + source_name + " = \"" + source_filename.string() + "\"");
   d.add_string("snap str[2,2] = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1);
@@ -142,7 +142,7 @@ TEST(ReferencesRaw, TableNodes) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("$source " + source_name + " = \"" + source_filename.string() + "\"");
   d.add_string("snap table = {" + source_name + "}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 2);

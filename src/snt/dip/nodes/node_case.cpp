@@ -9,7 +9,8 @@ namespace snt::dip {
 
   BaseNode::PointerType CaseNode::is_node(Parser& parser) {
     if (parser.kwd_case()) {
-      parser.part_value();
+      if (parser.name.substr(1) != KEYWORD_ELSE and parser.name.substr(1) != KEYWORD_END)
+	parser.part_value();
       parser.part_comment();
       return std::make_shared<CaseNode>(parser);
     }
@@ -57,7 +58,8 @@ namespace snt::dip {
           value = std::move(result.value)->all_of();
           break;
         }
-        default:
+	case ValueOrigin::Keyword:
+	case ValueOrigin::String:
           if (value_raw.at(0) == snt::KEYWORD_TRUE)
             value = true;
           else if (value_raw.at(0) == snt::KEYWORD_FALSE)
@@ -65,6 +67,9 @@ namespace snt::dip {
           else
             throw std::runtime_error("Invalid value: " + line.code);
           break;
+        default:
+	  throw std::runtime_error("Invalid value: " + line.code);
+	  break;
         }
       } else if (case_type == CaseType::ELSE) {
         value = true;

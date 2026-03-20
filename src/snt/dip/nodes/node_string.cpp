@@ -37,8 +37,11 @@ namespace snt::dip {
       set_value(cast_value(source_value_raw, source_value_shape));
       break;
     }
+    case ValueOrigin::Keyword:
+    case ValueOrigin::Number:
     case ValueOrigin::Expression: {
-      // TODO: implement template expression
+      // TODO: not implementation yet
+      throw std::runtime_error("Keyword, number and expression values are not implemented: " + line.code);
       break;
     }
     default:

@@ -209,6 +209,10 @@ namespace snt::dip {
         parser.value_raw.clear();
         if (parser.part_string()) {
           node->value_raw.push_back(parser.value_raw.at(0));
+	} else if (parser.part_number(false, delimiter)) {
+          node->value_raw.push_back(parser.value_raw.at(0));
+	} else if (parser.part_keyword(false, delimiter)) {
+          node->value_raw.push_back(parser.value_raw.at(0));
         } else {
           throw std::runtime_error("Could not parse column '" + node->name +
                                    "' from the table row: " + line.code);

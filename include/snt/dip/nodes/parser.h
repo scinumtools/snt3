@@ -36,11 +36,34 @@ namespace snt::dip {
     bool part_function();
     bool part_array();
     bool part_string();
-    bool part_keyword(const bool required = true);
+    
+    /**
+     * @brief Parse a keyword from a code
+     *
+     * @param required Specifies if keyword is required or not
+     * @param delimiter Trailing character after a keyword
+     */
+    bool part_keyword(const bool required = true, const char delimiter = ' ');
+    
+    /**
+     * @brief Parse a number from a code
+     *
+     * @param required Specifies if number is required or not
+     * @param delimiter Trailing character after a number
+     */
+    bool part_number(const bool required = true, const char delimiter = ' ');
+    
     bool part_value();
     bool part_slice();
     bool part_format();
-    bool part_units();
+    
+    /**
+     * @brief Parse units from a code
+     *
+     * @param delimiter Leading character before an unit expression
+     */
+    bool part_units(const char delimiter = ' ');
+    
     bool part_comment();
     bool part_delimiter(const char symbol, const bool required = true);
   };

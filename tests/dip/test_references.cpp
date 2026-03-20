@@ -208,7 +208,7 @@ TEST(References, RemoteSource) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("$source " + source_name + " = " + source_filename.string());
+  d.add_string("$source " + source_name + " = \"" + source_filename.string() + "\"");
   d.add_string("snap int = {" + source_name + "?foo.bar}");
   d.add_string("crackle bool[2] = {" + source_name + "?foo.baz}");
   d.add_string("pop {" + source_name + "?foo}");

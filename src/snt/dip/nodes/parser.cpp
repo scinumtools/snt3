@@ -106,7 +106,7 @@ namespace snt::dip {
   }
 
   bool Parser::kwd_property(PropertyType& ptype) {
-    constexpr auto pstr = ce_concat<50>("^[", SIGN_VALIDATION, "](", PATTERN_KEY, "+)[ ]*");
+    constexpr auto pstr = ce_concat<50>("^[", SIGN_VALIDATION, "](", PATTERN_KEYWORD, "+)[ ]*");
     std::regex pattern(pstr.data());
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
@@ -281,7 +281,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_reference() {
-    constexpr auto pstr = ce_concat<50>("^[ ]*[{](", PATTERN_KEY, "*([?]", PATTERN_PATH, "*|))[}]");
+    constexpr auto pstr = ce_concat<50>("^[ ]*[{](", PATTERN_KEYWORD, "*([?]", PATTERN_PATH, "*|))[}]");
     std::regex pattern(pstr.data());
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
@@ -300,7 +300,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_function() {
-    constexpr auto pstr = ce_concat<50>("^[ ]*[(](", PATTERN_KEY, "+)[)]");
+    constexpr auto pstr = ce_concat<50>("^[ ]*[(](", PATTERN_KEYWORD, "+)[)]");
     std::regex pattern(pstr.data());
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
@@ -340,7 +340,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_string() {
-    std::regex pattern("^(\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\"|\'([^\']*)\'|((?!#)[^ ]+))");
+    std::regex pattern("^(\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\"|\'([^\']*)\')");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       for (int i = 2; i < 6; i++) {
@@ -357,19 +357,36 @@ namespace snt::dip {
     return false;
   }
 
-  bool Parser::part_keyword(const bool required) {
-    constexpr auto pstr = ce_concat<50>("^", PATTERN_KEY, "+");
+  bool Parser::part_number(const bool required, const char delimiter) {
+    constexpr auto pstr = ce_concat<50>("^", PATTERN_NUMBER);
+    std::regex pattern(pstr.data());
+    std::smatch matchResult;
+    if (std::regex_search(code, matchResult, pattern)) {
+      value_raw.push_back(matchResult[0].str());
+      value_origin = ValueOrigin::Number;
+      strip(matchResult[0].str());
+      if (do_continue() and code[0] != delimiter)
+        throw std::runtime_error("Number was not fully parsed: " + line.code);
+      return true;
+    } else if (required) {
+      throw std::runtime_error("Number has an invalid format: " + line.code);
+    }
+    return false;
+  }  
+  
+  bool Parser::part_keyword(const bool required, const char delimiter) {
+    constexpr auto pstr = ce_concat<50>("^", PATTERN_KEYWORD, "+");
     std::regex pattern(pstr.data());
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       value_raw.push_back(matchResult[0].str());
       value_origin = ValueOrigin::Keyword;
       strip(matchResult[0].str());
-      if (do_continue() and code[0] != ' ')
-        throw std::runtime_error("Key has an invalid format: " + line.code);
+      if (do_continue() and code[0] != delimiter)
+        throw std::runtime_error("Keyword was not fully parsed: " + line.code);
       return true;
     } else if (required) {
-      throw std::runtime_error("Key has an invalid format: " + line.code);
+      throw std::runtime_error("Keyword has an invalid format: " + line.code);
     }
     return false;
   }
@@ -384,6 +401,10 @@ namespace snt::dip {
     if (part_array())
       return true;
     if (part_string())
+      return true;
+    if (part_number(false))
+      return true;
+    if (part_keyword(false))
       return true;
     return false;
   }
@@ -413,10 +434,17 @@ namespace snt::dip {
     return false;
   }
 
-  bool Parser::part_units() {
+  bool Parser::part_units(const char delimiter) {
+    // Enforce the leading delimiter
+    if (delimiter!='\0') {
+      if (code[0]==delimiter)
+	strip(std::string(1,delimiter));
+      else
+	return false;
+    }
     // In numerical expressions starting signs +-*/ have to be explicitely excluded
-    std::regex pattern1("^[ ]+([^#= ]+)");
-    std::regex pattern2("^[ ]+[/*+-]+");
+    std::regex pattern1("^([^#= ]+)");
+    std::regex pattern2("^[/*+-]+");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern1) and !std::regex_match(code, pattern2)) {
       units_raw = matchResult[1].str();
