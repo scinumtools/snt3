@@ -97,12 +97,12 @@ Multiple levels of hierarchy are also allowed, and there can be empty lines betw
 The number of empty spaces for each indentation level can vary, as long as indentation of all children nodes is consistent.
 
 ``` DIPL
-grandfather str = 'John'   # parent of Peter and Cintia
-  father str = 'Peter'     # John's child, Cintia's sibling
+grandfather str = "John"   # parent of Peter and Cintia
+  father str = "Peter"     # John's child, Cintia's sibling
                            # Ben's and Lucia's parent
-    son str = 'Benjamin'   # Peter's child
-    daughter str = 'Lucia' # Peter's child
-  aunt str = 'Cintia'      # John's child, Peter's sibling
+    son str = "Benjamin"   # Peter's child
+    daughter str = "Lucia" # Peter's child
+  aunt str = "Cintia"      # John's child, Peter's sibling
 ```
 
 Both parent and children nodes can be either definitions, modifications or declarations.
@@ -122,17 +122,17 @@ The original node name can already be a path and will be parsed accordingly.
 
 ``` DIPL
 family                          # group is not parsed
-  father str = 'Peter'          
-    son str = 'Benjamin'        # normal notation
-  father.daughter str = 'Lucia' # using both normal and path notation
-family.aunt.dog str = 'Lassie'  # using only path notation
+  father str = "Peter"          
+    son str = "Benjamin"        # normal notation
+  father.daughter str = "Lucia" # using both normal and path notation
+family.aunt.dog str = "Lassie"  # using only path notation
 ```
 
 The example above will result in the following flattened set of parameters:
 
 ``` DIPL
-family.father = 'Peter'
-family.father.son = 'Benjamin'
-family.father.daughter = 'Lucia'
-family.aunt.dog = 'Lassie'
+family.father = "Peter"
+family.father.son = "Benjamin"
+family.father.daughter = "Lucia"
+family.aunt.dog = "Lassie"
 ```

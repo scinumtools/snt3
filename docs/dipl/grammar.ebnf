@@ -1,58 +1,143 @@
-file        = { statement } ;
+(* ========================= *)
+(*        LEXICAL RULES      *)
+(* ========================= *)
 
-statement   = parameter | block ;
+letter        = "A"…"Z" | "a"…"z" | "_" ;
+digit         = "0"…"9" ;
+identifier    = letter , { letter | digit } ;
 
-block       = identifier newline indent { parameter } dedent ;
+path_char     = ? any character except whitespace and '=' ? ;
+path          = path_char , { path_char } ;
 
-parameter   = identifier type shape_opt "=" value unit_opt newline { tag } ;
+whitespace    = " " | "\t" ;
+newline       = "\n" | "\r\n" ;
 
-type        = identifier ;
+(* ========================= *)
+(*        DOCUMENT           *)
+(* ========================= *)
 
-shape_opt   = "[" dimension { "," dimension } "]" | ε ;
+document      = { statement } ;
 
-dimension   = integer | integer ":" | ":" ;
+statement     = source_definition
+              | node_definition
+              | newline ;
 
-value       = scalar
-            | array
-            | expression
-            | reference ;
+(* ========================= *)
+(*     SOURCE DEFINITION     *)
+(* ========================= *)
 
-scalar      = number ;
+source_definition =
+    "$source" , whitespace , identifier , whitespace , "=" , whitespace , path ;
 
-array       = "[" value { "," value } "]" ;
+(* ========================= *)
+(*      NODE DEFINITION      *)
+(* ========================= *)
 
-expression  = "(" expression_body ")" ;
+node_definition =
+    identifier , ":" , { node_property } ;
 
-expression_body
-            = { expression_token } ;
+node_property =
+    whitespace , property ;
 
-reference   = "{" source_opt "?" path "}" ;
+property      =
+    value_property
+  | condition_property
+  | reference_property ;
 
-source_opt  = identifier | ε ;
+(* ========================= *)
+(*        PROPERTIES         *)
+(* ========================= *)
 
-path        = identifier { "." identifier } ;
+value_property =
+    "value" , ":" , whitespace , expression ;
 
-unit_opt    = unit | ε ;
+condition_property =
+    "!condition" , whitespace , "(" , expression , ")" ;
 
-unit        = identifier { "/" identifier | "*" identifier | "^" integer } ;
+reference_property =
+    "ref" , ":" , whitespace , reference ;
 
-tag         = "!" identifier "(" expression_body ")" newline ;
+(* ========================= *)
+(*        REFERENCES         *)
+(* ========================= *)
 
-identifier  = letter { letter | digit | "_" } ;
+reference =
+    "{" , reference_body , "}" ;
 
-number      = integer | float | scientific ;
+reference_body =
+      self_reference
+    | local_reference
+    | remote_reference
+    | source_only ;
 
-integer     = digit { digit } ;
+(* --- self reference --- *)
+self_reference =
+    "?" ;
 
-float       = digit { digit } "." digit { digit } ;
+(* --- local reference --- *)
+local_reference =
+    "?" , query ;
 
-scientific  = (float | integer) exponent ;
+(* --- remote reference --- *)
+remote_reference =
+    identifier , "?" , [ query ] ;
 
-exponent    = ("e" | "E") ["+" | "-"] integer ;
+(* --- full source content --- *)
+source_only =
+    identifier ;
 
-letter      = "A"…"Z" | "a"…"z" ;
-digit       = "0"…"9" ;
+(* ========================= *)
+(*           QUERY           *)
+(* ========================= *)
 
-newline     = "\n" ;
-indent      = indentation increase ;
-dedent      = indentation decrease ;
+query =
+    path_segment , { "." , path_segment } , [ wildcard ] ;
+
+path_segment =
+    identifier ;
+
+wildcard =
+    "." , "*" ;
+
+(* ========================= *)
+(*        EXPRESSIONS        *)
+(* ========================= *)
+
+expression =
+    term , { operator , term } ;
+
+term =
+      number
+    | reference
+    | identifier
+    | "(" , expression , ")" ;
+
+operator =
+      "+"
+    | "-"
+    | "*"
+    | "/"
+    | "<"
+    | ">"
+    | "<="
+    | ">="
+    | "=="
+    | "!=" ;
+
+number =
+    digit , { digit } , [ "." , digit , { digit } ] ;
+
+(* ========================= *)
+(*        SEMANTICS NOTES    *)
+(* ========================= *)
+
+(*
+
+1. { ? } is only valid inside condition_property.
+2. { ? query } refers to local domain.
+3. { source ? query } refers to remote domain.
+4. { source } returns full source content.
+5. Missing source implies local domain.
+6. Query wildcard ".*" selects child nodes (semantics defined elsewhere).
+
+*)

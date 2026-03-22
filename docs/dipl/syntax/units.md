@@ -7,6 +7,8 @@
 Units in DIPL follow a dedicated domain specific language designed for this purpose and defined in a separate [specification](docs/puql/specification.md).
 Consequently, every DIPL implementation MUST either provide a fully compliant units parser or utilize the reference units parser available in the [SciNumTools v3](https://github.com/vrtulka23/scinumtools3) repository.
 
+All values MUST be converted to a canonical unit representation before comparison or condition evaluation.
+
 ### 3.6.1 Standard Units
 
 Each node has default units assigned at definition, or declaration.

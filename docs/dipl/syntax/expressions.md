@@ -148,7 +148,7 @@ All value types can be parsed into text using standard python formatting notatio
 
 ``` DIPL
 id int = 345
-name str = 'Tina'
+name str = "Tina"
 body
   weight float = 62.3 kg
   height float = 177 cm

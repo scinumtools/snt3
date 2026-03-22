@@ -1,10 +1,9 @@
 # DIPL - Language Specification
 
-**Version:** 0.1
-
-**Status:** Draft (17.03.2026)
-
-**Project:** SciNumTools v3
+**Version:** v1.0  
+**Status:** Stable (Implementation-defined semantics)  
+**Date:** 2026-03-17  
+**Reference Implementation:** SciNumTools v3
 
 ## 1. Introduction
 
@@ -29,17 +28,68 @@ or INI files when physical units, precision and validation are required.
 
 ## 2. Language Overview
 
-A DIPL file consists of parameter declarations organized in hierarchical
-blocks using indentation.
+DIPL is a declarative, strongly-typed domain-specific language for defining structured scientific parameters, constraints, and relationships in a human-readable format.
 
-Example:
+A DIPL document consists of parameter declarations organized into hierarchical blocks via indentation. Each parameter combines:
 
-```dipl
+- a name
+- an explicit type
+- an optional shape or structure
+- a value expression
+- an optional unit annotation
+- optional properties for validation and constraints
+
+This design allows DIPL to represent not only data, but also semantic rules and domain-specific logic in a single, unified format.
+
+### 2.1. Structure
+
+Parameters are defined line-by-line. Indentation introduces hierarchical grouping, enabling nested structures without additional syntax.
+
+```DIPL
+parameter_name type = value [unit]
+    !property (expression)
+```
+
+- Indentation defines scope and hierarchy
+- Properties (prefixed with ``!``) attach constraints or metadata to the preceding parameter
+- Expressions may reference other parameters and include numerical or logical operations
+
+### 2.2. Example
+
+```DIPL
 velocity float32[1,2:] = [[23.45, 23e-34, 45.1]] SI_km/s
-    !condition (" {?} < {?cfl_limit} ")
+    !condition ("{?} < {?cfl_limit}")
 
 burst_energy float64 = 2.34e5 US_btu
 ```
+
+### 2.3. Key Characteristics
+
+**Strong typing**  
+All parameters declare explicit types (e.g., float32, int, arrays, tables), enabling predictable behavior and validation.
+
+**Units-aware computation**  
+Values may include physical units, which are automatically normalized and validated during evaluation.
+
+**Declarative constraints**  
+Properties such as ``!condition`` define validation rules that must hold for a valid document.
+
+**Hierarchical organization**  
+Indentation-based structure allows grouping of related parameters without additional syntactic overhead.
+
+**Referential expressions**  
+Parameters can reference other values within the document, enabling dependency-aware configurations.
+
+### 2.4. Conceptual Model
+
+A DIPL file is not just static data; it represents a validated configuration graph:
+
+- Parameters define values and structure
+- Expressions establish dependencies between parameters
+- Units ensure physical consistency
+- Properties enforce constraints
+
+The result is a configuration that is both machine-evaluable and semantically validated.
 
 ## 3. Language Syntax
 
@@ -60,44 +110,77 @@ Nodes with the smallest [indentations](syntax/nodes.md#3.1.1.-definition) in the
 
 ## 5. Execution Model
 
-A DIPL processor evaluates files using the following steps:
+### 5.1 Normative Execution Model
 
-1) parse code lines into nodes
-   1. combine multiline string [blocks](syntax/values.md#3.3.4.-blocks) into single strings (e.g. text wrapped in ``"""``)
-   2. replace special symbols with replacing marks (e.g. ``\n``, ``\'``, ``\"``)
-   3. determine a node type for each line (e.g. [group](syntax/nodes.md#3.1.4.-hierarchy), [value](syntax/values.md#3.3.-values), [case](syntax/conditions.md#3.9.-conditions), ...)
-   4. convert replacing marks back to corresponding special symbols
-   5. populate node list from processed lines
-2) prepare node for processing
-   1. assign [property](syntax/properties.md#3.8.-properties) nodes to preceding value nodes (e.g. ``!options [2, 3] erg``)
-   2. check node [indentation](syntax/nodes.md#3.1.1.-definition) (e.g. number of whitespace characters)
-3) parse nodes
-   1. perform specific node parsing outside or inside a valid condition block (e.g. expand [table](syntax/values.md#3.3.5.-tables) nodes and solve [references](syntax/references.md#3.4.-references))
-   2. solve the node [hierarchy](syntax/nodes.md#3.1.4.-hierarchy) and construct node full names (e.g. ``foo.bar.baz``)
-   3. solve current [branching](syntax/conditions.md#3.9.-conditions) and parse case expression
-   4. clean value node names from ``@if`` nodes
-   5. parse node [value](syntax/values.md#3.3.-values) (e.g. parse scalars ``34e+3`` and arrays ``[[1,3],[4,5]]``)
-   6. parse node [units](syntax/units.md#3.6.-units) (e.g. solve unit expressions ``kg/s``)
-   7. apply [modifications](syntax/nodes.md#3.1.2.-modification) to already existing nodes
-4) validate nodes
-   1. check if all nodes are [defined](syntax/nodes.md#3.1.3.-declaration)
-   2. check if nodes value is in available [options](syntax/properties.md#3.8.1.-options)
-   3. check if nodes fulfill specific [conditions](syntax/properties.md#3.8.2.-condition)
-   4. check value [formats](syntax/properties.md#3.8.3.-format) of string nodes
-5) return final list of value nodes
+Evaluation of a DIPL document MUST proceed in the following stages, in order:
+
+1. **Parsing**  
+   The input MUST be parsed into a structured representation of nodes.
+   This includes processing indentation, node types, and structural relationships.
+2. **Dependency Resolution**  
+   All references MUST be resolved into a directed acyclic graph (DAG) of node dependencies.
+   - Unresolved sources or node references MUST result in an error.
+   - Cyclic dependencies MUST result in an error.
+3. **Reference Evaluation**  
+   All reference expressions (e.g. ``{<source>?<query>}``, ``{?<query>}``) MUST be resolved to their corresponding values or node sets.
+   Remote sources MUST be processed independently before their results are used.
+4. **Expression and Value Evaluation**  
+   All node values MUST be evaluated, including:
+   - scalar values
+   - arrays and structured values
+   - expressions involving references
+   If evaluation fails (e.g. invalid operations or unresolved values), evaluation MUST fail.
+5. **Unit Normalization**  
+   All evaluated values MUST be converted to the canonical unit representation defined in the Units specification.
+   Unit incompatibility MUST result in an error.
+6. **Condition Evaluation**  
+   All conditions MUST be evaluated using the normalized value of the node.
+   The ``{?}`` self-reference refers to this value.
+   - If a condition evaluates to false, the node MUST be considered invalid.
+   - If condition evaluation fails, evaluation MUST fail.
+7. **Validation**  
+   All validation rules MUST be applied, including:
+   - option constraints
+   - value format checks
+   - structural constraints  
+   
+   Any violation MUST result in an error.
+
+All conforming implementations MUST produce identical results for identical inputs and sources.
+If any stage fails, evaluation MUST terminate with an error.
+
+### 5.2 Implementation Notes (Non-Normative)
+
+A DIPL processor may implement the above stages using steps such as:
+
+- parsing code lines into nodes
+- combining multiline string blocks into single strings (e.g. text wrapped in ``"""``)
+- replacing special symbols with temporary markers (e.g. ``\n``, ``\'``, ``\"``) and restoring them later
+- determining node types (e.g. group, value, case)
+- constructing node hierarchy and full names (e.g. ``foo.bar.baz``)
+- assigning property nodes to preceding value nodes
+- validating indentation and structural consistency
+- resolving references and expanding nodes
+- evaluating expressions and parsing values (e.g. scalars like ``34e+3``, arrays like ``[[1,3],[4,5]]``)
+- parsing and applying unit expressions (e.g. ``kg/s``)
+- applying modifications to existing nodes
+- evaluating conditional branches and case expressions
+- validating nodes against constraints (options, conditions, formats)
+
+These steps are provided for guidance only. Implementations MAY use different internal strategies, provided the observable behavior conforms to the normative execution model defined above.
 
 ## 6. Error Handling
 
-Errors are reported if any step fails.
-Possible error types include:
+The following conditions MUST result in evaluation failure:
 
-- runtime error
-- calculator exception
-- measurement exception
-- unit system exception
-- conversion exception
-- atom parsing exception
-- dimension map exception
+- unresolved source or node reference
+- cyclic dependencies
+- invalid query path
+- type mismatch
+- unit incompatibility
+- expression evaluation failure
+
+Errors MUST be deterministic and MUST NOT be ignored.
 
 ## 7. Versioning
 
@@ -115,11 +198,9 @@ The reference implementation includes:
 - A C++ implementation
 - Python bindings for integration and scripting use cases
 
-**Project:**        SciNumTools v3
-
-**Repository:**     [scinumtools3](https://github.com/vrtulka23/scinumtools3)
-
-**Documentation:**  See project [documentation](https://vrtulka23.github.io/scinumtools3/) for usage and details
+**Project:**        SciNumTools v3  
+**Repository:**     [scinumtools3](https://github.com/vrtulka23/scinumtools3)  
+**Documentation:**  See project [documentation](https://vrtulka23.github.io/scinumtools3/) for usage and details  
 
 Independent implementations of the DIPL language (e.g., in Rust or Julia) are encouraged and welcome, and can be added to this list on request.
 

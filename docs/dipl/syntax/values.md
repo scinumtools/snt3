@@ -38,17 +38,17 @@ data1 bool[4]   = [true,false,false,true]  # exactly four values
 data2 int[:]    = [0,1,2,3,4,5,6]          # any number of values
 data3 float[3:] = [0,1.34,1.34e4]          # at least 3 values
 data4 float[:4] = [0,1.34,1.34e4]          # maximum of 4 values
-data4 str[3:4]  = ['John','Peter','Simon'] # between 3 and 4 values
+data4 str[3:4]  = ["John","Peter","Simon"] # between 3 and 4 values
 ```
 
 Multiple values above are written in a tight notation without empty spaces in between the values.
 Loose notation, with empty spaces, is also permitted.
-Additionally, arrays can be parsed from string values, wrapped into single/double quotes.
+Additionally, arrays can be parsed from string values, wrapped into double quotes.
 
 ``` DIPL
 data1 bool[4]   = [true, false, false, true]
-data2 int[4]    = '[1, 2, 3, 4]'
-data3 str[3:4]  = "['John', 'Peter', 'Simon']"
+data2 int[4]    = "[1, 2, 3, 4]"
+data3 str[3:4]  = "[\"John\", \"Peter\", \"Simon\"]"
 ```
 
 Multidimensional arrays are defined similarly using nested bracket notation.

@@ -40,7 +40,7 @@ If the node has an other value than one of the options, DIPL will throw an error
 Node definition and individual options can have different units, but they must have the same dimensionality. The final value of such modified node will be, however, converted into units specified in the definition.
 
 ``` DIPL
-animal str = 'dog'
+animal str = "dog"
   = cat
   = dog
   = horse
@@ -71,8 +71,8 @@ Several ``!options`` clauses are allowed for the same node (e.g. each with diffe
 They combine into a single array of options against which the node value is evaluated.
      
 ``` DIPL
-animal str = 'dog'
-  !options ['cat','dog','horse']
+animal str = "dog"
+  !options ["cat","dog","horse"]
 
 energy float = 23 J
   !options [23, 45, 10, 234, 490, 1939] J
@@ -91,7 +91,6 @@ A given expression has to be evaluated as ``true`` after each definition or modi
 ``` DIPL-Schema
 # Schema of a node condition requirement
 
-<indent>!condition ('<expression>')    
 <indent>!condition ("<expression>")    
 <indent>!condition ("""
 <expression>
@@ -99,7 +98,7 @@ A given expression has to be evaluated as ``true`` after each definition or modi
 ```
 
 In the example below, node ``energy`` can have values in a range of 23 and 26 erg.
-The actual value of node ``energy`` is matched using a special self-reference sign ``{?}``.
+The actual value of node ``energy`` is matched using a special [self-reference sign](references.md#3.4.-references) ``{?}``.
 
 ``` DIPL
 energy float = 25 erg
@@ -122,8 +121,8 @@ This can be restricted by defining their ``!format`` using standard regular expr
 In the following example, node 'name' can contain only small and capital letters:
    
 ``` DIPL
-name str = 'Ferdinant'
-  !format '[a-zA-Z]+'
+name str = "Ferdinant"
+  !format "[a-zA-Z]+"
 ```
 
 ### 3.8.4. Constants
@@ -141,9 +140,9 @@ This can be achieved by a directive ``!constant``.
 Node ``name`` in the following example cannot be further modified.
      
 ``` DIPL
-name str = 'John'
+name str = "John"
   !constant
-name = 'Mary'   # this modification will raise an error exception
+name = "Mary"   # this modification will raise an error exception
 ```
 
 ### 3.8.5. Tags

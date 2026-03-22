@@ -79,25 +79,25 @@ Nested conditions are also possible, provided that each child condition has inde
 
 ``` DIPL
 @if false
-  flower str = 'rose'
+  flower str = "rose"
 @else
-  flower str = 'dandelion'
+  flower str = "dandelion"
   @if false
-    color str = 'red'
+    color str = "red"
   @elif false
-    color str = 'blue'
+    color str = "blue"
   @else
     @elif true
       leaves int = 234
-    color str = 'yellow'
-  tree str = 'maple'
+    color str = "yellow"
+  tree str = "maple"
 
 # The nodes above will be parsed as:
 #
-# flower = 'dandelion'
+# flower = "dandelion"
 # leaves = 234
-# color  = 'yellow'
-# tree   = 'maple'
+# color  = "yellow"
+# tree   = "maple"
 ```
 
 > [!NOTE]

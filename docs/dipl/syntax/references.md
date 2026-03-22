@@ -4,28 +4,94 @@
 
 ## 3.4. References
 
-Node referencing is an important feature of DIPL, because it enables to create reusable parts of a code.
-Reference is similar to a standard URL **requests**.
-It consist of a source name (path to a file) and a query (node path) part, separated by a question mark.
-Sources are defined once using ``$source`` definition and can be referenced multiple times.
+References have two main applications.
+One can either [import](references.md#3.4.2-imports) some already parsed DIPL nodes into a new location, or [inject](references.md#3.4.3.-injections) other node values or contents of text files into a new node.
+Besides the two cases, references are also used in [conditions](conditions.md#3.9.-conditions) and [condition properties](properties.md#3.8.2.-condition) that are explained in a separate chapter.
+		      
+### 3.4.1. Node Referencing
+
+Node referencing is a core feature of DIPL that enables the creation of reusable code structures. 
+A reference consists of a source identifier and an optional query component separated by ``?`` (i.e., ``{<source>?<query>}``).
+
+The ``source`` identifier refers to a named source, which maps to a file path. 
+The ``query`` component specifies a node path within the referenced domain.
+
+Sources are defined once using the ``$source`` declaration and may be referenced multiple times throughout the DIPL document.
 
 ``` DIPL-Schema
-# Schema of a source definition
+# Source Definition Schema
 
 <indent>$source <name> = <path>
 ```
 
-All implementations of the DIPL language SHOULD support defining sources directly through the code interface.
-Source paths defined via the code interface MUST be interpreted as relative to the calling context.
-Source paths defined within DIPL files MUST be interpreted as relative to the location of the respective DIPL file.
-   
-Depending on a context, **sources** can be either simple text files (references without query) or DIPL files (references with, or without query).
-A local domain contains all nodes that were already parsed in the current DIPL file.
-Remote domain is a completely separate DIPL file that is processed independently.
-   
-**Query** part specifies which nodes from local or remote DIPL files will be selected.
-A single node is queried by its full hierarchy path.
-An asterix at the end of the query selects children nodes:
+``<name>`` is the source identifier.  
+``<path>`` specifies the location of the referenced file.
+
+All implementations of the DIPL language SHOULD support defining sources through the host environment (code interface).
+- Source paths defined via the code interface MUST be interpreted relative to the calling context.
+- Source paths defined within DIPL files MUST be interpreted relative to the location of the respective DIPL file.
+
+#### 3.4.1.1. Domains
+
+Depending on the context, sources may refer to:
+- Text files, when no query is provided (raw content access), or
+- DIPL files, when a query is provided (node-based access), or when the entire file is referenced.
+
+The **local domain** consists of all nodes parsed within the current DIPL file.
+A **remote domain** refers to a separate DIPL file, which is processed independently.
+
+#### 3.4.1.2. Local References
+
+If the source component is omitted, the reference implicitly targets the local domain.
+
+```DIPL-Schema
+{?<query>}
+```
+
+is equivalent to:
+
+```DIPL-Schema
+{<local>?<query>}
+```
+
+where ```<local>``` denotes the current document.
+
+#### 3.4.1.3. Query Semantics
+
+The query component specifies which nodes are selected from a domain.
+
+A query path MUST resolve to either:
+- a single node, or
+- a set of nodes (when using ``*``)
+
+The ``.*`` suffix selects all descendant nodes of the target node recursively, including the entire subtree rooted at that node.
+
+If a query path does not exist, evaluation MUST fail.
+If a reference returns multiple nodes in a context that requires a single value, evaluation MUST fail.
+
+#### 3.4.1.4. Self-Reference (``{?}``)
+
+The ``{?}`` reference is only valid within [condition properties](properties.md#3.8.2.-condition) and MUST NOT appear in any other context.
+It refers to the fully evaluated value of the current node after:
+- resolution of all references,
+- evaluation of all expressions, and
+- normalization to the canonical unit representation defined in the Units specification.
+
+The resulting value retains its full type, including dimensionality and unit.
+
+If evaluation of the node’s value fails for any reason (e.g., unresolved references, type errors, or unit incompatibility), the ``{?}`` reference is undefined and condition evaluation MUST result in an error.
+
+#### 3.4.1.5. Reference Result Types
+
+``{<source>}`` returns:
+- raw content for text sources
+- root node set for DIPL sources
+
+``{?<query>}`` and ``{<source>?<query>}`` return:
+- a single node, or
+- a node set (when using *)
+
+The expected type MUST match the usage context. Otherwise, evaluation MUST fail.
 
 ``` DIPL-Schema
 # Schema of reference requests
@@ -49,14 +115,7 @@ An asterix at the end of the query selects children nodes:
 {?}                            # local
 ```
 
-> [!NOTE]  
-> The last reference type ``{?}`` is used only in [condition properties](properties.md#3.8.2.-condition) to reference the node's own value.  
-   
-References have two main applications.
-One can either import some already parsed DIPL nodes into a new location, or inject other node values or contents of text files into a new node.
-Besides the two cases, references are also used in [conditions](conditions.md#3.9.-conditions) that are explained in a separate chapter.
-		      
-### 3.4.1 Imports
+### 3.4.2 Imports
 
 Imports can be used to insert referenced nodes directly into the current DIPL hierarchy.
 
@@ -72,7 +131,7 @@ Name paths of imported nodes are embedded into the current node hierarchy as sho
 
 ``` DIPL
 icecream 
-  waffle str = 'standard'
+  waffle str = "standard"
   scoops
     strawberry int = 1
     chocolate int = 2
@@ -85,19 +144,19 @@ plate {?icecream.waffle}    # select a specific node
 The node hierarchy above is equivalent to the one given below.
 
 ``` DIPL
-icecream.waffle = 'standard'
+icecream.waffle = "standard"
 icecream.scoops.strawberry = 1
 icecream.scoops.chocolate = 2
 bowl.strawberry = 1
 bowl.chocolate = 2
-plate.waffle = 'standard'
+plate.waffle = "standard"
 ```
 
 The example above demonstrates importing local nodes; the same mechanism applies to external DIPL files.
 In this case, a source name must be specified before the question mark.
 
 ``` DIPL
-$source pantry = pantry.dip
+$source pantry = "pantry.dip"
 
 bag {pantry?*}                 # import all nodes
 bowl 
@@ -123,13 +182,13 @@ The request can select either one ``{<source>?<query>}`` or all ``{<source>?*}``
 Importing sources/units enables users to dynamically modify numerical code units and setting scripts via their DIPL.
 
 ``` DIPL
-$source init = initial/settings.dip
+$source init = "initial/settings.dip"
 $source {init?*}           # all sources of 'init' are imported
 $unit {units?*}            # all units are imported from an imported source 'units'
 weight float = 23 [mass]   # using imported unit
 ```
 
-### 3.4.2. Injections
+### 3.4.3. Injections
 
 Injections do not insert whole nodes.
 They are used in node definitions and modifications instead of values.
@@ -161,7 +220,7 @@ size1 = {?size2}          # modifying by import
 It is also possible to inject values from remote DIPL files:
 
 ``` DIPL
-$source pressure = pressures.dip
+$source pressure = "pressures.dip"
 pressure float = {pressure?magnetic}
 ```
    
@@ -204,9 +263,9 @@ This makes both the code and text data more readable and easily editable.
 Note that when requests do not include a question mark with a query, DIPL imports files as a text and not as a node list.
 
 ``` DIPL   
-$source velocity = velocity.txt
-$source outputs = outputs.txt
-$source message = message.txt
+$source velocity = "velocity.txt"
+$source outputs = "outputs.txt"
+$source message = "message.txt"
 
 velocity int[3,4] = {velocity} km/s   # import an array
 outputs table = {outputs}             # import a table
