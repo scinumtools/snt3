@@ -12,17 +12,40 @@
 ---
 
 ## Overview
-`scinumtools3`, or simply `snt`, is a C++ library that helps scientists and engineers write safer, clearer numerical code by providing:
 
-- **Expression Solver (EXS)** — parse and evaluate mathematical, logical, or custom expressions at runtime.  
-- **Physical Units & Quantities (PUQ)** — represent values with units and perform unit-aware arithmetic.  
-- **Dimensional Input Parameters (DIP)** — declare and validate parameter inputs with type & unit checks.
+Scientific software often suffers from inconsistent parameter definitions, ad hoc unit handling, and missing validation. These issues become particularly problematic in workflows that span multiple components or languages.
 
-This project is the C++ counterpart to the original Python [scinumtools](https://github.com/vrtulka23/scinumtools/tree/main), focused on performance and strong typing.
+``scinumtools3`` (or ``snt``) addresses this by providing a unified system that combines:
+
+- unit-aware quantities
+- runtime expression evaluation
+- validated parameter definitions
+
+into a single configuration layer that can be used consistently across workflows.
+
+``snt`` is a C++ library, with optional Python bindings, designed for safer and more transparent numerical computation. 
+It is built around three core components:
+
+**Expression Solver** (EXS) — parses and evaluates mathematical, logical, and custom expressions at runtime  
+**Physical Units & Quantities** (PUQ) — represents values with physical units and supports unit-aware arithmetic and conversions  
+**Dimensional Input Parameters** (DIP) — defines and validates input parameters with explicit types and unit constraints  
+
+Together, these components form a validated, unit-aware configuration system that can be shared across heterogeneous environments (e.g. C++ simulation code and Python analysis workflows).
+
+This design enables:
+
+- a single source of truth for parameters
+- consistent interpretation of units and values across codebases
+- early detection of invalid or inconsistent inputs
+
+As a result, discrepancies between simulation and analysis pipelines are significantly reduced.
+
+This project is the C++ counterpart to the original Python [scinumtools](https://github.com/vrtulka23/scinumtools/tree/main), with a focus on performance, static typing, and integration into high-performance computing workflows.
 
 ---
 
-## Features
+## Core Capabilities
+
 - Expression parsing & evaluation  
 - Strong SI unit support (units, prefixes, conversions, other unit systems e.g. CGS, AU)  
 - Compile-time / runtime dimensional checks for parameters  
@@ -123,7 +146,7 @@ int main() {
 
 API reference and guides are available in the `docs/` directory.
 
-To generate Doxigen + breathe + Sphinx documentation:
+To generate Doxygen + breathe + Sphinx documentation:
 
 * Using the setup script
 

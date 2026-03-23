@@ -1,0 +1,16 @@
+unit_expr   ::= term ( ("*" | "/") term )*
+
+term        ::= factor [ exponent ]
+
+factor      ::= NUMBER "*" factor
+              | IDENTIFIER
+              | "(" unit_expr ")"
+              | CONSTANT
+
+exponent    ::= INTEGER
+              | INTEGER ":" INTEGER
+              | "-" exponent
+
+IDENTIFIER  ::= letter ( letter | digit )*
+CONSTANT    ::= "[" IDENTIFIER "]"
+NUMBER      ::= digit+ ( "." digit+ )? ( "e" ("+"|"-") digit+ )?
