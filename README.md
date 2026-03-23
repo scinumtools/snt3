@@ -53,11 +53,18 @@ Compared to alternatives:
 - ad hoc configs → no validation, no unit safety
 
 ``snt`` combines:
-- runtime expressions
-- unit safety
-- validated parameters
+- runtime expressions → dynamic configs without recompilation
+- unit safety → prevents silent scaling errors
+- validated parameters → fail fast instead of corrupting simulations
 
 in a single system.
+
+## Target Use Cases
+
+- scientific simulations (C++, HPC)
+- physics / engineering pipelines
+- parameter-heavy workflows with unit safety requirements
+- hybrid C++ / Python environments
 
 ---
 
