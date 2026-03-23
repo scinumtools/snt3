@@ -47,7 +47,7 @@ All unit expressions are based on a fixed set of base dimensions:
 - Amount of substance (`mol`)
 - Angle (`rad`)
 
-Derived units are represented as combinations of these base dimensions with an associated magnitude. :contentReference[oaicite:0]{index=0}
+Derived units are represented as combinations of these base dimensions with an associated magnitude.
 
 ---
 
