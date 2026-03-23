@@ -166,7 +166,7 @@ plate {pantry?veggies.*}       # selecting all subnodes
 ```
 
 So far, we have shown how to import regular nodes from a local or remote source.
-It is, however, also possible to import sources and custom :doc:`units` in the similar way.
+It is, however, also possible to import sources and custom [units](units.md#36-units) in the similar way.
 The request can select either one ``{<source>?<query>}`` or all ``{<source>?*}`` sources/units.
 
 ``` DIPL-Schema
