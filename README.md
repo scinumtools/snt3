@@ -12,13 +12,23 @@
 ---
 
 ## Overview
-`scinumtools3`, or simply `snt`, is a C++ library that helps scientists and engineers write safer, clearer numerical code by providing:
 
-- **Expression Solver (EXS)** — parse and evaluate mathematical, logical, or custom expressions at runtime.  
-- **Physical Units & Quantities (PUQ)** — represent values with units and perform unit-aware arithmetic.  
-- **Dimensional Input Parameters (DIP)** — declare and validate parameter inputs with type & unit checks.
+`scinumtools3` (or `snt`) is a C++ library designed to help scientists and engineers write safer, clearer numerical code by providing:
 
-This project is the C++ counterpart to the original Python [scinumtools](https://github.com/vrtulka23/scinumtools/tree/main), focused on performance and strong typing.
+- **Expression Solver (EXS)** — parsing and evaluation of mathematical, logical, and custom expressions at runtime  
+- **Physical Units & Quantities (PUQ)** — representation of values with physical units and unit-aware arithmetic  
+- **Dimensional Input Parameters (DIP)** — declaration and validation of input parameters with type and unit constraints  
+
+`snt` introduces a **single, validated, unit-aware configuration layer** that can be shared across heterogeneous environments (e.g., C++ simulation code and Python analysis workflows).
+
+This enables:
+- a single source of truth for all parameters  
+- elimination of duplicated configuration  
+- consistent interpretation of units and values across languages  
+
+As a result, inconsistencies between simulation and analysis pipelines are avoided.
+
+This project is the C++ counterpart to the original Python [scinumtools](https://github.com/vrtulka23/scinumtools/tree/main), with a focus on performance, static typing, and integration into high-performance computing workflows.
 
 ---
 
