@@ -1,4 +1,5 @@
 #include "pch_tests.h"
+
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
 
@@ -12,7 +13,6 @@ TEST(Environment, RequestValue) {
   dip::Environment env = d.parse();
   val::BaseValue::PointerType node = env.request_value("?bar");
   EXPECT_EQ(node->to_string(), "3");
-
 }
 
 TEST(Environment, RequestNodes) {
@@ -24,8 +24,6 @@ TEST(Environment, RequestNodes) {
   dip::ValueNode::ListType nodes = env.request_nodes("?foo");
   EXPECT_EQ(nodes.at(0)->to_string(), "true");
   EXPECT_EQ(nodes.at(1)->to_string(), "3");
-
 }
 
-//TODO: tests more requests
-
+// TODO: tests more requests

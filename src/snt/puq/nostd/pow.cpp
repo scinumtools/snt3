@@ -18,9 +18,9 @@ namespace snt::nostd {
     } else {
       return puq::Result(m.estimate->math_pow(e));
     }
-    //return puq::Result(pow(m.estimate, e), abs(e * pow(m.estimate, e - 1)) * m.uncertainty);
+    // return puq::Result(pow(m.estimate, e), abs(e * pow(m.estimate, e - 1)) * m.uncertainty);
   }
-  
+
   puq::Result pow(const puq::Result& m, const puq::Result& e) {
     // Dz = sqrt(pow(Dzx,2)+pow(Dzy,2))
     // z ± Dz = pow(x ± Dx, y ± Dy)
@@ -38,9 +38,9 @@ namespace snt::nostd {
     } else {
       return puq::Result(m.estimate->math_pow(e.estimate.get()));
     }
-    //val::BaseValue::PointerType Dzx = e.estimate * pow(m.estimate, e.estimate - 1) * m.uncertainty;  // Dzx = y * pow(x, y-1) * Dx
-    //val::BaseValue::PointerType Dzy = pow(m.estimate, e.estimate) * log(m.estimate) * e.uncertainty; // Dzy = pow(x, y) * log(x) * Dy
-    //return puq::Result(pow(m.estimate, e.estimate), sqrt(Dzx * Dzx + Dzy * Dzy));
+    // val::BaseValue::PointerType Dzx = e.estimate * pow(m.estimate, e.estimate - 1) * m.uncertainty;  // Dzx = y * pow(x, y-1) * Dx
+    // val::BaseValue::PointerType Dzy = pow(m.estimate, e.estimate) * log(m.estimate) * e.uncertainty; // Dzy = pow(x, y) * log(x) * Dy
+    // return puq::Result(pow(m.estimate, e.estimate), sqrt(Dzx * Dzx + Dzy * Dzy));
   }
 
   puq::Measurement pow(const puq::Measurement& msr, const double e) {
@@ -51,9 +51,9 @@ namespace snt::nostd {
     } else {
       return puq::Measurement(msr.magnitude.estimate->math_pow(e));
     }
-    //return puq::Measurement(pow(msr.magnitude.estimate, e), abs(e * pow(msr.magnitude.estimate, e - 1)) * msr.magnitude.uncertainty);
+    // return puq::Measurement(pow(msr.magnitude.estimate, e), abs(e * pow(msr.magnitude.estimate, e - 1)) * msr.magnitude.uncertainty);
   }
-  
+
   puq::Measurement pow(const puq::Measurement& msr1, const puq::Measurement& msr2) {
     // Dz = sqrt(pow(Dzx,2)+pow(Dzy,2))
     // z ± Dz = pow(x ± Dx, y ± Dy)
@@ -71,9 +71,9 @@ namespace snt::nostd {
     } else {
       return puq::Measurement(msr1.magnitude.estimate->math_pow(msr2.magnitude.estimate.get()));
     }
-    //val::BaseValue::PointerType Dzx = msr2.magnitude.estimate * pow(msr1.magnitude.estimate, msr2.magnitude.estimate - 1) * msr1.magnitude.uncertainty;  // Dzx = y * pow(x, y-1) * Dx
-    //val::BaseValue::PointerType Dzy = pow(msr1.magnitude.estimate, msr2.magnitude.estimate) * log(msr1.magnitude.estimate) * msr2.magnitude.uncertainty; // Dzy = pow(x, y) * log(x) * Dy
-    //return puq::Measurement(pow(msr1.magnitude.estimate, msr2.magnitude.estimate), sqrt(Dzx * Dzx + Dzy * Dzy));
+    // val::BaseValue::PointerType Dzx = msr2.magnitude.estimate * pow(msr1.magnitude.estimate, msr2.magnitude.estimate - 1) * msr1.magnitude.uncertainty;  // Dzx = y * pow(x, y-1) * Dx
+    // val::BaseValue::PointerType Dzy = pow(msr1.magnitude.estimate, msr2.magnitude.estimate) * log(msr1.magnitude.estimate) * msr2.magnitude.uncertainty; // Dzy = pow(x, y) * log(x) * Dy
+    // return puq::Measurement(pow(msr1.magnitude.estimate, msr2.magnitude.estimate), sqrt(Dzx * Dzx + Dzy * Dzy));
   }
-  
+
 } // namespace snt::nostd

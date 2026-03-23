@@ -1,12 +1,11 @@
 #ifndef EXS_ATOM_BASE_H
 #define EXS_ATOM_BASE_H
 
-#include <snt/exs/atom_grand.h>
-
 #include <cmath>
 #include <iostream>
 #include <math.h>
 #include <regex>
+#include <snt/exs/atom_grand.h>
 #include <sstream>
 #include <stdexcept>
 #include <variant>
@@ -21,7 +20,7 @@ namespace snt::exs {
    * @tparam VALUE Atom value type
    */
   template <typename ATOM, typename VALUE>
-  class AtomBase: public AtomGrand {
+  class AtomBase : public AtomGrand {
   public:
     VALUE value;
     // Copy constructor
@@ -60,7 +59,7 @@ namespace snt::exs {
       }
       return *this;
     }
-    
+
     // Math operations
     virtual void math_add(ATOM* other) {
       throw std::runtime_error("Atom method 'math_add' is not implemented");
@@ -192,6 +191,6 @@ namespace snt::exs {
     };
   };
 
-}
-  
+} // namespace snt::exs
+
 #endif // EXS_ATOM_BASE_H

@@ -1,14 +1,13 @@
-#include <snt/puq/value/dimensions.h>
-#include <snt/puq/nostd/to_string.h>
-#include <snt/puq/nostd/pow.h>
-#include <snt/puq/solver/unit_solver.h>
-#include <snt/puq/systems/unit_system.h>
-
 #include <chrono>
 #include <ctime>
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <snt/puq/nostd/pow.h>
+#include <snt/puq/nostd/to_string.h>
+#include <snt/puq/solver/unit_solver.h>
+#include <snt/puq/systems/unit_system.h>
+#include <snt/puq/value/dimensions.h>
 #include <sstream>
 #include <sys/stat.h>
 
@@ -30,10 +29,10 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
     val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
     ss << nostd::to_string(uncertainty.get_value(0), precision) + ",";
   }
-  //ss << std::setfill(' ') << std::setw(25) << std::left;
-  //ss << nostd::to_string(dim.numerical.estimate[0], precision) + ",";
-  //ss << std::setfill(' ') << std::setw(25) << std::left;
-  //ss << nostd::to_string(dim.numerical.uncertainty[0], precision) + ",";
+  // ss << std::setfill(' ') << std::setw(25) << std::left;
+  // ss << nostd::to_string(dim.numerical.estimate[0], precision) + ",";
+  // ss << std::setfill(' ') << std::setw(25) << std::left;
+  // ss << nostd::to_string(dim.numerical.uncertainty[0], precision) + ",";
   ss << "{";
   for (int i = 0; i < puq::Config::num_basedim; i++) {
     if (i > 0)
@@ -44,9 +43,9 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
     } else {
       puq::Exponent& exp = std::get<puq::Exponent>(dim.physical[i]);
       if (exp.denominator == 1) {
-	ss << exp.numerator;
+        ss << exp.numerator;
       } else {
-	ss << "(FRC){" + std::to_string(exp.numerator) + "," + std::to_string(exp.denominator) + "}";
+        ss << "(FRC){" + std::to_string(exp.numerator) + "," + std::to_string(exp.denominator) + "}";
       }
     }
   }
@@ -101,7 +100,7 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
         val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
         dmap.insert({unit.first, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
       }
-      //dmap.insert({unit.first, {dim.numerical.estimate[0], dim.numerical.uncertainty[0], dim.physical}});
+      // dmap.insert({unit.first, {dim.numerical.estimate[0], dim.numerical.uncertainty[0], dim.physical}});
     }
   }
 }
@@ -129,7 +128,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
       val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
       dmap.insert({symbol, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
     }
-    //dmap.insert({symbol, {dim.numerical.estimate[0], dim.numerical.uncertainty[0], dim.physical}});
+    // dmap.insert({symbol, {dim.numerical.estimate[0], dim.numerical.uncertainty[0], dim.physical}});
 
     // solve a quantity IS conversion factor, if exists
     if (quant.second.sifactor != "") {
@@ -158,7 +157,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
         val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
         dmap.insert({symbol, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
       }
-      //dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.uncertainty[0], dim.physical}});
+      // dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.uncertainty[0], dim.physical}});
     }
   }
 }

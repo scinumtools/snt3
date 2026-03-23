@@ -16,7 +16,7 @@ namespace snt::nostd {
       return puq::Result(e.estimate->math_exp(), e.estimate->math_exp()->math_mul(e.uncertainty.get()));
     else
       return puq::Result(e.estimate->math_exp());
-    //return puq::Result(exp(e.estimate), exp(e.estimate) * e.uncertainty);
+    // return puq::Result(exp(e.estimate), exp(e.estimate) * e.uncertainty);
   }
 
   puq::Measurement exp(const puq::Measurement& uv) {

@@ -158,4 +158,3 @@ namespace snt::puq {
 
   } // namespace SystemData
 } // namespace snt::puq
-

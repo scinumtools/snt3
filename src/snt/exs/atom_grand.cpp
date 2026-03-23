@@ -1,6 +1,5 @@
-#include <snt/exs/atom_grand.h>
-
 #include <iostream>
+#include <snt/exs/atom_grand.h>
 
 namespace snt::exs {
 
@@ -8,4 +7,4 @@ namespace snt::exs {
     std::cout << to_string() << "\n";
   }
 
-}
+} // namespace snt::exs

@@ -1,9 +1,8 @@
 #ifndef DIP_LIST_NODE_H
 #define DIP_LIST_NODE_H
 
-#include "../../val.h"
-#include "../nodes/node_base.h"
-#include "../nodes/parser.h"
+#include <snt/dip/nodes/node_base.h>
+#include <snt/dip/nodes/parser.h>
 
 namespace snt::dip {
 

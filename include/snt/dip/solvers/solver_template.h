@@ -2,7 +2,6 @@
 #define DIP_SOLVER_TEMPLATE_H
 
 #include <snt/dip/environment.h>
-
 #include <string>
 
 namespace snt::dip {

@@ -1,9 +1,10 @@
 #include "pch_tests.h"
-#include <snt/puq/value/measurement.h>
-#include <snt/puq/value/base_units.h>
-#include <snt/puq/value/dimensions.h>
+
 #include <snt/puq/converter.h>
 #include <snt/puq/exceptions.h>
+#include <snt/puq/value/base_units.h>
+#include <snt/puq/value/dimensions.h>
+#include <snt/puq/value/measurement.h>
 
 using namespace snt;
 
@@ -137,7 +138,6 @@ TEST(Measurement, InitializationErrors) {
   val::BaseValue::PointerType ae = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});
   v = puq::Measurement(std::move(am), std::move(ae), "km");
   EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), 4.00(40), 5.00(50)]*km");
-
 }
 
 TEST(Measurement, UnitConversion) {

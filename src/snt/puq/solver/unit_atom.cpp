@@ -1,18 +1,17 @@
-#include <snt/puq/solver/unit_atom.h>
-
 #include "../nostd/to_number.h"
-#include <snt/puq/systems/unit_system.h>
 
-#include <sstream>
 #include <algorithm>
 #include <regex>
+#include <snt/puq/solver/unit_atom.h>
+#include <snt/puq/systems/unit_system.h>
+#include <sstream>
 
 namespace snt::puq {
 
   inline void _parse_number(std::string& expr, Measurement& uv, const std::smatch& m) {
     if (m[6] == "") {
       uv.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(nostd::to_number(expr));
-      //uv.magnitude = nostd::to_number(expr);
+      // uv.magnitude = nostd::to_number(expr);
     } else {
       std::string decimals = m[3].str() == "" ? "." : m[3].str();
       uv.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[1].str() + decimals + m[8].str()));
@@ -20,7 +19,7 @@ namespace snt::puq {
         uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
       else
         uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(nostd::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
-      //uv.magnitude = nostd::to_number(m[1].str() + decimals + m[8].str());
+      // uv.magnitude = nostd::to_number(m[1].str() + decimals + m[8].str());
     }
   }
 
@@ -118,15 +117,15 @@ namespace snt::puq {
   void UnitAtom::math_power(UnitAtom* other) {
     static_assert(true, "Math power is used only with the exponent type");
   }
-  
+
   void UnitAtom::math_power(ExponentVariant& e) {
     if constexpr (Config::debug_unit_solver) {
       std::stringstream ss;
       ss << "UNIT:    pow(" << value.to_string() << ",";
       if (std::holds_alternative<int>(e))
-	ss << std::get<int>(e);
+        ss << std::get<int>(e);
       if (std::holds_alternative<Exponent>(e))
-	ss << std::get<Exponent>(e).to_string();
+        ss << std::get<Exponent>(e).to_string();
       std::clog << ss.str() << ") = ";
     }
     value.pow(e);

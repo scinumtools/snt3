@@ -1,14 +1,14 @@
 #ifndef MAT_SUBSTANCE_SOLVER_H
 #define MAT_SUBSTANCE_SOLVER_H
 
-#include "substance_atom.h"
 #include <snt/exs/solver.h>
-#include "../element.h"
+#include <snt/mat/element.h>
+#include <snt/mat/solvers/substance_atom.h>
 
 namespace snt::mat {
 
   class Substance;
-  
+
   /**
    * @class SubstanceSolver
    * @brief This class solves substance expressions
@@ -26,10 +26,9 @@ namespace snt::mat {
       OPERATION,
       ERROR
     };
-    
+
   public:
-    
-    static std::unique_ptr<exs::Solver<SubstanceAtom>> solver;  ///< Pointer to the EXS solver object
+    static std::unique_ptr<exs::Solver<SubstanceAtom>> solver; ///< Pointer to the EXS solver object
 
     /**
      * @brief Constructor of this class

@@ -2,7 +2,6 @@
 #define PUQ_LISTS_H
 
 #include <snt/puq/systems/systems.h>
-
 #include <string>
 #include <vector>
 

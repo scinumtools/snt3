@@ -1,14 +1,13 @@
 #ifndef PUQ_CONVERTER_H
 #define PUQ_CONVERTER_H
 
+#include <bitset>
+#include <memory>
 #include <snt/puq/systems/unit_system.h>
 #include <snt/puq/util/data_table.h>
 #include <snt/puq/value/base_units.h>
 #include <snt/puq/value/dimensions.h>
 #include <snt/puq/value/measurement.h>
-
-#include <bitset>
-#include <memory>
 #include <sstream>
 
 namespace snt::puq {
@@ -132,6 +131,7 @@ namespace snt::puq {
     Result _convert_linear(const Result& m1, const Result& m2);
     Result _convert_logarithmic(const Result& m);
     Result _convert_temperature(Result m);
+
   public:
     Utype utype;
     Dimensions dimensions1;

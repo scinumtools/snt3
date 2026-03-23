@@ -1,9 +1,8 @@
 #ifndef DIP_PARSERS_H
 #define DIP_PARSERS_H
 
-#include <snt/dip/lists/list_source.h>
-
 #include <queue>
+#include <snt/dip/lists/list_source.h>
 
 namespace snt::dip {
 

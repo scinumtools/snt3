@@ -16,15 +16,15 @@ namespace snt::puq {
 
   void OperatorParentheses::parse(exs::Expression& expr) {
     OperatorGroup<1>::parse(expr); // perform ordinary parsing
-    if (expr.right.length() > 0) {           // check if there is an exponent after closing parentheses
+    if (expr.right.length() > 0) { // check if there is an exponent after closing parentheses
       std::smatch m;
       std::regex rx_exponent("^([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)");
       if (std::regex_search(expr.right, m, rx_exponent)) { // store exponent
-	if (m[3] == "") {
+        if (m[3] == "") {
           exponent.push_back((m[1] == "" ? 1 : std::stoi(m[1])));
-	} else {
-	  exponent.push_back(Exponent((m[1] == "" ? 1 : std::stoi(m[1])), std::stoi(m[3])));
-	}
+        } else {
+          exponent.push_back(Exponent((m[1] == "" ? 1 : std::stoi(m[1])), std::stoi(m[3])));
+        }
         expr.remove(m[0]);
       } else {
         exponent.push_back(1);

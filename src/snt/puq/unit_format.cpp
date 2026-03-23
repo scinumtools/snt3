@@ -12,16 +12,16 @@ namespace snt::puq {
       {'6', "\u2076"},
       {'7', "\u2077"}, // 4 5 6 7 -> ⁴ ⁵ ⁶ ⁷
       {'8', "\u2078"},
-      {'9', "\u2079"}, // 8 9 -> ⁸ ⁹
+      {'9', "\u2079"},                            // 8 9 -> ⁸ ⁹
       {Symbols::minus[0], "\u207B"},              // - -> ⁻
       {Symbols::plus[0], ""},                     // + ->
       {Symbols::fraction_separator[0], "\u141F"}, // : -> ᐟ
   };
 
   const std::unordered_map<std::string, std::string> UnitFormat::symbol_map = {
-    {std::string(Symbols::exponent2), std::string(Symbols::exponent)},   // ×10 -> e
-    {std::string(Symbols::minus2),    std::string(Symbols::minus)},      // −   -> -
-    {std::string(Symbols::multiply2), std::string(Symbols::multiply)},   // ⋅   -> *
+      {std::string(Symbols::exponent2), std::string(Symbols::exponent)}, // ×10 -> e
+      {std::string(Symbols::minus2), std::string(Symbols::minus)},       // −   -> -
+      {std::string(Symbols::multiply2), std::string(Symbols::multiply)}, // ⋅   -> *
   };
 
   bool UnitFormat::preprocess_system(std::string& expression, const std::string& abbrev) {

@@ -1,9 +1,9 @@
 #ifndef MAT_ELEMENT_H
 #define MAT_ELEMENT_H
 
-#include <snt/mat/periodic_table.h>
-#include <snt/mat/part.h>
 #include <snt/mat/matter.h>
+#include <snt/mat/part.h>
+#include <snt/mat/periodic_table.h>
 
 namespace snt::mat {
 
@@ -11,22 +11,22 @@ namespace snt::mat {
    * @class Element
    * @brief An element is a pure substance that consists entirely of one type of atom
    */
-  class Element: public Part<int>, public Matter {
+  class Element : public Part<int>, public Matter {
   public:
     /**
      * @struct ElementProperties
      * @brief Set of element defining properties
      */
     struct ElementProperties {
-      unsigned int protons;          ///< proton number Z
-      double neutrons;               ///< average number of neutrons in naturally abundant element N
-      unsigned int electrons;        ///< electron number e
-    } elementProps;                  ///< set of basic element properties
-    
-    bool natural;                  ///< true if element is naturally abundant
-    std::string element;           ///< element symbol
-    unsigned int isotope;          ///< isotope type
-    unsigned int ionisation;       ///< ionisation state
+      unsigned int protons;   ///< proton number Z
+      double neutrons;        ///< average number of neutrons in naturally abundant element N
+      unsigned int electrons; ///< electron number e
+    } elementProps;           ///< set of basic element properties
+
+    bool natural;            ///< true if element is naturally abundant
+    std::string element;     ///< element symbol
+    unsigned int isotope;    ///< isotope type
+    unsigned int ionisation; ///< ionisation state
 
     /**
      * @brief Element class constructor
@@ -45,7 +45,7 @@ namespace snt::mat {
      * @param ion Ionisation state
      */
     void set_element(const Isotope* isodata, const int ion);
-   
+
     /**
      * @brief Set parameters of an isotope element
      *
@@ -81,7 +81,7 @@ namespace snt::mat {
      * @return An instance of the Element class
      */
     static Element from_string(const std::string& expr);
-    
+
     /**
      * @brief String representation of an element instance
      *
@@ -95,7 +95,7 @@ namespace snt::mat {
      * @param other Pointer of another element
      */
     void math_add(Element* other);
-    
+
     /**
      * @brief Multiplication of two elements
      *

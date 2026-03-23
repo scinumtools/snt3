@@ -1,8 +1,7 @@
 #ifndef DIP_SETTINGS_H
 #define DIP_SETTINGS_H
 
-#include "../settings.h"
-
+#include <snt/settings.h>
 #include <sstream>
 #include <string>
 
@@ -66,9 +65,9 @@ namespace snt::dip {
   constexpr std::string_view PATTERN_PATH = "[a-zA-Z0-9._-]";
 
   // Various settings
-  constexpr std::string_view FILE_SUFFIX_DIP1 = ".dip";         ///< Suffix name of a DIPL file
-  constexpr std::string_view FILE_SUFFIX_DIP2 = ".dipl";        ///< Suffix name of a DIPL file
-  constexpr int INDENT_STEP = 2;                                ///< Number of white spaces in an indent step
+  constexpr std::string_view FILE_SUFFIX_DIP1 = ".dip";  ///< Suffix name of a DIPL file
+  constexpr std::string_view FILE_SUFFIX_DIP2 = ".dipl"; ///< Suffix name of a DIPL file
+  constexpr int INDENT_STEP = 2;                         ///< Number of white spaces in an indent step
 
   struct Source {
     std::string name;

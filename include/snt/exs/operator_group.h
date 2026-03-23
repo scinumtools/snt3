@@ -3,7 +3,6 @@
 
 #include <snt/exs/operator_base.h>
 #include <snt/exs/settings.h>
-
 #include <stdexcept>
 
 namespace snt::exs {

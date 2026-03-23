@@ -1,11 +1,11 @@
 #include "main.h"
-#include <snt/puq/calc/calculator.h>
-#include <snt/puq/lists.h>
 
 #include <deque>
 #include <iostream>
 #include <limits>
 #include <map>
+#include <snt/puq/calc/calculator.h>
+#include <snt/puq/lists.h>
 #include <sstream>
 #include <stdexcept>
 
@@ -151,16 +151,16 @@ int main(int argc, char* argv[]) {
     if (!convert.empty()) {
       change_system(us, convert);
       if constexpr (!puq::Config::use_units_logarithmic) {
-	if (convert[0] == "log") {
-	  std::cout << puq::lists::logarithmic_units();
-	  goto found_output;
-	}
+        if (convert[0] == "log") {
+          std::cout << puq::lists::logarithmic_units();
+          goto found_output;
+        }
       }
       if constexpr (!puq::Config::use_units_temperature) {
-	if (convert[0] == "temp") {
-	  std::cout << puq::lists::temperature_units();
-	  goto found_output;
-	}
+        if (convert[0] == "temp") {
+          std::cout << puq::lists::temperature_units();
+          goto found_output;
+        }
       }
       if (convert[0] == "prefix")
         std::cout << puq::lists::prefixes();
@@ -177,8 +177,7 @@ int main(int argc, char* argv[]) {
       else {
         display_lists(convert);
       }
-    found_output:
-      ;
+    found_output:;
     } else if (input.cmdOptionExists("-l")) {
       std::deque<std::string> convert;
       display_lists(convert);

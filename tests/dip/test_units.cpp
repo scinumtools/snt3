@@ -1,9 +1,9 @@
 #include "pch_tests.h"
-#include <snt/dip/dip.h>
-#include <snt/puq/converter.h>
 
 #include <iostream>
 #include <limits>
+#include <snt/dip/dip.h>
+#include <snt/puq/converter.h>
 
 using namespace snt;
 
@@ -17,7 +17,7 @@ TEST(Units, Definition) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "23");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "km");
 
   d = dip::DIP();
@@ -28,7 +28,7 @@ TEST(Units, Definition) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "2.34e5");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "km");
 }
 
@@ -43,7 +43,7 @@ TEST(Units, ScalarModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "m");
   EXPECT_EQ(vnode->value->to_string(), "23000");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "m");
 
   d = dip::DIP();
@@ -55,7 +55,7 @@ TEST(Units, ScalarModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "0.023");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "km");
 }
 
@@ -70,7 +70,7 @@ TEST(Units, ArrayModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "m");
   EXPECT_EQ(vnode->value->to_string(), "[12000, 23000]");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "m");
 
   d = dip::DIP();
@@ -82,7 +82,7 @@ TEST(Units, ArrayModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "m");
   EXPECT_EQ(vnode->value->to_string(), "[1.2e4, 2.3e4]");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "m");
 }
 
@@ -97,7 +97,7 @@ TEST(Units, DimlessModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "45");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "km");
 
   d = dip::DIP();
@@ -109,7 +109,7 @@ TEST(Units, DimlessModification) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->units_raw, "km");
   EXPECT_EQ(vnode->value->to_string(), "45");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "km");
 }
 
@@ -124,7 +124,7 @@ TEST(Units, OptionSetting) {
   EXPECT_EQ(vnode->value->to_string(), "2000");
   EXPECT_EQ(vnode->options[0].value->to_string(), "2e3");
   EXPECT_EQ(vnode->options[1].value->to_string(), "3e3");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "m");
 
   d = dip::DIP();
@@ -136,7 +136,7 @@ TEST(Units, OptionSetting) {
   EXPECT_EQ(vnode->value->to_string(), "2e3");
   EXPECT_EQ(vnode->options[0].value->to_string(), "2e3");
   EXPECT_EQ(vnode->options[1].value->to_string(), "3e3");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "m");
 }
 
@@ -149,7 +149,7 @@ TEST(Units, ScalarInjection) {
 
   dip::ValueNode::PointerType vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->value->to_string(), "2");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "km");
 
   d = dip::DIP();
@@ -159,7 +159,7 @@ TEST(Units, ScalarInjection) {
 
   vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->value->to_string(), "2");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "km");
 }
 
@@ -172,7 +172,7 @@ TEST(Units, ArrayInjection) {
 
   dip::ValueNode::PointerType vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->value->to_string(), "[2, 3]");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "km");
 
   d = dip::DIP();
@@ -182,7 +182,7 @@ TEST(Units, ArrayInjection) {
 
   vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->value->to_string(), "[22.3, 3.45e3]");
-  EXPECT_TRUE(vnode->units!=nullptr);
+  EXPECT_TRUE(vnode->units != nullptr);
   EXPECT_EQ(vnode->units->to_string(), "km");
 }
 

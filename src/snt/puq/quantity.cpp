@@ -1,28 +1,26 @@
-#include <snt/puq/quantity.h>
-
+#include <iostream>
 #include <snt/puq/converter.h>
 #include <snt/puq/exceptions.h>
+#include <snt/puq/quantity.h>
 #include <snt/puq/unit_format.h>
-
-#include <iostream>
 
 namespace snt::puq {
 
   void Quantity::preprocess(std::string& expression, SystemType& system) const {
     if constexpr (Config::preprocess_system) {
       for (auto sys : SystemMap) {
-	if (UnitFormat::preprocess_system(expression, sys.second->SystemAbbrev)) {
-	  if (system == SystemType::NONE)
-	    system = sys.first;
-	  else if (system != sys.first) {
-	    auto it = SystemMap.find(system);
-	    throw UnitSystemExcept("Selected unit systems are ambiguous: " + it->second->SystemAbbrev + " " + sys.second->SystemAbbrev);
-	  }
-	  break;
-	}
+        if (UnitFormat::preprocess_system(expression, sys.second->SystemAbbrev)) {
+          if (system == SystemType::NONE)
+            system = sys.first;
+          else if (system != sys.first) {
+            auto it = SystemMap.find(system);
+            throw UnitSystemExcept("Selected unit systems are ambiguous: " + it->second->SystemAbbrev + " " + sys.second->SystemAbbrev);
+          }
+          break;
+        }
       }
       if (system == SystemType::NONE)
-	system = UnitSystem::System;
+        system = UnitSystem::System;
     }
     if constexpr (Config::preprocess_symbols) {
       UnitFormat::preprocess_symbols(expression);
@@ -194,13 +192,13 @@ namespace snt::puq {
     if (q1.stype != q2.stype)
       throw UnitSystemExcept(q1.stype, q2.stype);
     UnitSystem us(q1.stype);
-    return q1.measurement==q2.measurement;
+    return q1.measurement == q2.measurement;
   }
   bool operator!=(const Quantity& q1, const Quantity& q2) {
     if (q1.stype != q2.stype)
       throw UnitSystemExcept(q1.stype, q2.stype);
     UnitSystem us(q1.stype);
-    return q1.measurement!=q2.measurement;
+    return q1.measurement != q2.measurement;
   }
 
   // overloading scalar/quantity
@@ -323,8 +321,8 @@ namespace snt::puq {
   }
 
   Measurement Quantity::_convert_with_context(UnitSystem& us, const SystemType stt,
-                                            QuantityListType::iterator& qs1, QuantityListType::iterator& qs2,
-                                            const std::string& q) const {
+                                              QuantityListType::iterator& qs1, QuantityListType::iterator& qs2,
+                                              const std::string& q) const {
     Measurement uv = measurement;
     if (qs1->second.sifactor != "") {
       uv *= Measurement(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));

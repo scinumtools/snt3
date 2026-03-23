@@ -1,10 +1,9 @@
 #ifndef EXS_TOKEN_H
 #define EXS_TOKEN_H
 
-#include <snt/exs/settings.h>
-#include <snt/exs/atom.h>
-
 #include <iostream>
+#include <snt/exs/atom.h>
+#include <snt/exs/settings.h>
 #include <string>
 
 namespace snt::exs {
@@ -17,8 +16,7 @@ namespace snt::exs {
     Token() : type(EMPTY_TOKEN), optype(NONE_OPERATOR), atom(nullptr) {}
     Token(TokenType t) : type(t), optype(NONE_OPERATOR), atom(nullptr) {}
     Token(TokenType t, int o) : type(t), optype(o), atom(nullptr) {};
-    Token(TokenType t, AtomGrand* a) :
-      type(t), optype(NONE_OPERATOR), atom(a) {};
+    Token(TokenType t, AtomGrand* a) : type(t), optype(NONE_OPERATOR), atom(a) {};
     std::string to_string();
     void print();
   };

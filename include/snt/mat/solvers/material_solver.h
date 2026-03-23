@@ -2,7 +2,7 @@
 #define MAT_MATERIAL_SOLVER_H
 
 #include <snt/exs/solver.h>
-#include "../substance.h"
+#include <snt/mat/substance.h>
 
 namespace snt::mat {
 
@@ -12,13 +12,12 @@ namespace snt::mat {
    */
   class MaterialSolver {
   public:
-    
-    //std::unique_ptr<exs::Solver<Substance>> solver;  ///< Pointer to the EXS solver object
+    // std::unique_ptr<exs::Solver<Substance>> solver;  ///< Pointer to the EXS solver object
 
     /**
      * @brief Constructor of this class
      */
-    MaterialSolver();    
+    MaterialSolver();
   };
 
 } // namespace snt::mat

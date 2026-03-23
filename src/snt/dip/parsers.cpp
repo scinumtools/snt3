@@ -1,41 +1,41 @@
 #include "parsers.h"
 
-#include <snt/dip/dip.h>
 #include "helpers.h"
-#include <snt/dip/nodes/node_boolean.h>
-#include <snt/dip/nodes/node_case.h>
 #include "nodes/node_empty.h"
-#include <snt/dip/nodes/node_float.h>
 #include "nodes/node_group.h"
 #include "nodes/node_import.h"
-#include <snt/dip/nodes/node_integer.h>
 #include "nodes/node_modification.h"
 #include "nodes/node_property.h"
 #include "nodes/node_source.h"
-#include <snt/dip/nodes/node_string.h>
 #include "nodes/node_table.h"
 #include "nodes/node_unit.h"
 
 #include <fstream>
 #include <iostream>
+#include <snt/dip/dip.h>
+#include <snt/dip/nodes/node_boolean.h>
+#include <snt/dip/nodes/node_case.h>
+#include <snt/dip/nodes/node_float.h>
+#include <snt/dip/nodes/node_integer.h>
+#include <snt/dip/nodes/node_string.h>
 
 namespace snt::dip {
 
   inline EnvSource parse_file_source(const std::string& source_name, const std::string& source_file,
-				     const Source& parent) {
+                                     const Source& parent) {
     DIP d(parent);
     d.add_file(source_file, source_name);
     Environment senv = d.parse();
     return EnvSource({source_name, source_file, senv.sources.at(source_name).code, parent, senv.nodes});
   }
-  
+
   EnvSource parse_source(const std::string& source_name, const std::string& source_file,
                          const Source& parent) {
     if (source_file.size() >= FILE_SUFFIX_DIP1.size() &&
         source_file.compare(source_file.size() - FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1) == 0) {
       return parse_file_source(source_name, source_file, parent);
     } else if (source_file.size() >= FILE_SUFFIX_DIP2.size() &&
-        source_file.compare(source_file.size() - FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2) == 0) {
+               source_file.compare(source_file.size() - FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2) == 0) {
       return parse_file_source(source_name, source_file, parent);
     } else {
       std::ifstream file(source_file);
@@ -209,9 +209,9 @@ namespace snt::dip {
         parser.value_raw.clear();
         if (parser.part_string()) {
           node->value_raw.push_back(parser.value_raw.at(0));
-	} else if (parser.part_number(false, delimiter)) {
+        } else if (parser.part_number(false, delimiter)) {
           node->value_raw.push_back(parser.value_raw.at(0));
-	} else if (parser.part_keyword(false, delimiter)) {
+        } else if (parser.part_keyword(false, delimiter)) {
           node->value_raw.push_back(parser.value_raw.at(0));
         } else {
           throw std::runtime_error("Could not parse column '" + node->name +

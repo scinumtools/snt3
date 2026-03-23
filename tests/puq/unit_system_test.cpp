@@ -1,8 +1,9 @@
 #include "pch_tests.h"
+
+#include <snt/puq/converter.h>
+#include <snt/puq/exceptions.h>
 #include <snt/puq/quantity.h>
 #include <snt/puq/systems/unit_system.h>
-#include <snt/puq/exceptions.h>
-#include <snt/puq/converter.h>
 
 using namespace snt;
 
@@ -84,7 +85,7 @@ TEST(UnitSystem, FormatConversion) {
     // because unit J does not exist in US unit system
     r = q.convert(puq::Format::Base::FPS, puq::SystemType::US);
     EXPECT_EQ(r.to_string(), "23.7304*ft2*lb*s-2");
-    
+
     // explicitely what happens above
     r = q.convert(puq::Format::Base::MGS);
     r = r.convert(puq::Format::Base::FPS, puq::SystemType::US);

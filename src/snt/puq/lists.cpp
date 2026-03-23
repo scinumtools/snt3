@@ -1,12 +1,11 @@
+#include <iomanip>
+#include <iostream>
 #include <snt/puq/nostd/to_string.h>
 #include <snt/puq/systems/systems.h>
 #include <snt/puq/systems/unit_system.h>
 #include <snt/puq/util/data_table.h>
 #include <snt/puq/value/dimensions.h>
 #include <snt/puq/value/measurement.h>
-
-#include <iomanip>
-#include <iostream>
 #include <sstream>
 
 namespace snt::puq {

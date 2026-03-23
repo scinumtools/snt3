@@ -1,10 +1,9 @@
-#include <snt/dip/nodes/node_boolean.h>
+#include "../parsers.h"
 
 #include <snt/dip/environment.h>
-#include "../parsers.h"
-#include <snt/dip/solvers/solver_logical.h>
+#include <snt/dip/nodes/node_boolean.h>
 #include <snt/dip/nodes/node_value.h>
-
+#include <snt/dip/solvers/solver_logical.h>
 #include <stdexcept>
 
 namespace snt::dip {

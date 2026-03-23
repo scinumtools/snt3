@@ -1,5 +1,6 @@
-#include <snt/val/values_array.h>
 #include "pch_tests.h"
+
+#include <snt/val/values_array.h>
 
 using namespace snt;
 

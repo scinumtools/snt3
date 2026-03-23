@@ -1,9 +1,8 @@
 #ifndef PUQ_CALCULATOR_H
 #define PUQ_CALCULATOR_H
 
-#include <snt/puq/calc/calculator_atom.h>
-
 #include <memory>
+#include <snt/puq/calc/calculator_atom.h>
 
 namespace snt::puq {
 

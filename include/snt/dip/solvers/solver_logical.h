@@ -1,17 +1,15 @@
 #ifndef DIP_SOLVER_LOGICAL_H
 #define DIP_SOLVER_LOGICAL_H
 
-#include "../../exs.h"
-#include "../../val.h"
-#include "../environment.h"
+#include <snt/dip/environment.h>
 
 namespace snt::dip {
 
-  struct LogicalSettings: exs::BaseSettings {
+  struct LogicalSettings : exs::BaseSettings {
     Environment* env;
   };
 
-  class LogicalAtom : public exs::AtomBase<LogicalAtom,val::BaseValue::PointerType> {
+  class LogicalAtom : public exs::AtomBase<LogicalAtom, val::BaseValue::PointerType> {
   public:
     // Constructor from unique_ptr
     LogicalAtom(val::BaseValue::PointerType b) : AtomBase(std::move(b)) {};
@@ -37,7 +35,7 @@ namespace snt::dip {
 
   class LogicalSolver {
   public:
-    std::unique_ptr<exs::Solver<LogicalAtom,LogicalSettings>> solver;
+    std::unique_ptr<exs::Solver<LogicalAtom, LogicalSettings>> solver;
     LogicalSolver(Environment& env);
     LogicalAtom eval(const std::string& expression);
   };

@@ -1,11 +1,10 @@
 #ifndef PUQ_SYSTEMS_H
 #define PUQ_SYSTEMS_H
 
-#include <snt/puq/result.h>
-#include <snt/puq/settings.h>
-
 #include <map>
 #include <set>
+#include <snt/puq/result.h>
+#include <snt/puq/settings.h>
 #include <sstream>
 #include <stack>
 #include <string>

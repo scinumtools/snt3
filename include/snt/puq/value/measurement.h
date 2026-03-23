@@ -12,12 +12,12 @@ namespace snt::puq {
   public:
     Result magnitude;
     BaseUnits baseunits;
-    
+
     static double abs_to_rel(const double v, const double a);
     static double rel_to_abs(const double v, const double r);
     static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);
     static val::BaseValue::PointerType rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType r);
-    
+
     Measurement() : magnitude(1) {}
     Measurement(const std::string& str);
     Measurement(const double est, const std::string& str);

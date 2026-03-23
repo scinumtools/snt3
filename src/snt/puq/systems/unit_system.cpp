@@ -1,42 +1,40 @@
-#include <snt/puq/systems/unit_system.h>
-
-#include <snt/puq/exceptions.h>
-
 #include <fstream>
+#include <snt/puq/exceptions.h>
+#include <snt/puq/systems/unit_system.h>
 #include <sstream>
 #include <sys/stat.h>
 
 namespace snt::puq {
 
   inline std::unordered_map<puq::SystemType, SystemDataType*> GetSystemMap() {
-      std::unordered_map<puq::SystemType, SystemDataType*> map = {
-	{puq::SystemType::SI, &puq::SystemData::SI},
-      };
-      if constexpr (Config::use_system_cgs) {
-	map.insert({
+    std::unordered_map<puq::SystemType, SystemDataType*> map = {
+        {puq::SystemType::SI, &puq::SystemData::SI},
+    };
+    if constexpr (Config::use_system_cgs) {
+      map.insert({
           {puq::SystemType::ESU, &puq::SystemData::ESU},
           {puq::SystemType::GU, &puq::SystemData::GU},
           {puq::SystemType::EMU, &puq::SystemData::EMU},
-	});
-      }
-      if constexpr (Config::use_system_eus) {
-	map.insert({
+      });
+    }
+    if constexpr (Config::use_system_eus) {
+      map.insert({
           {puq::SystemType::IU, &puq::SystemData::IU},
           {puq::SystemType::US, &puq::SystemData::US},
- 	});
-      }
-      if constexpr (Config::use_system_nus) {
-	map.insert({
+      });
+    }
+    if constexpr (Config::use_system_nus) {
+      map.insert({
           {puq::SystemType::AU, &puq::SystemData::AU},
           {puq::SystemType::PU, &puq::SystemData::PU},
           {puq::SystemType::SRU, &puq::SystemData::SRU},
           {puq::SystemType::GRU, &puq::SystemData::GRU},
           {puq::SystemType::GEO, &puq::SystemData::GEO},
-	});
-      }
-      return map;
+      });
+    }
+    return map;
   }
-  
+
   std::unordered_map<puq::SystemType, SystemDataType*> SystemMap = GetSystemMap();
 
   SystemDataType* UnitSystem::Data = &SystemData::SI;

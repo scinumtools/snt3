@@ -1,9 +1,8 @@
 #include <snt/mat/solvers/substance_atom.h>
-
 #include <sstream>
 
 namespace snt::mat {
-  
+
   /**
    * @brief Test if a string is an integer
    *
@@ -13,7 +12,7 @@ namespace snt::mat {
   inline bool is_integer(const std::string& str) {
     try {
       size_t pos;
-      std::stoi(str, &pos); // Convert string to int
+      std::stoi(str, &pos);     // Convert string to int
       return pos == str.size(); // Ensure entire string was used
     } catch (std::invalid_argument&) {
       return false; // Not a number
@@ -21,7 +20,7 @@ namespace snt::mat {
       return false; // Number too big for int
     }
   }
-  
+
   ElementMap SubstanceAtom::from_string(std::string s, exs::BaseSettings* set) {
     if (is_integer(s)) {
       return {{"", std::stoi(s)}};
@@ -32,14 +31,14 @@ namespace snt::mat {
 
   std::string SubstanceAtom::to_string() {
     std::stringstream ss;
-    for (const auto& [name, prop]: value) {
+    for (const auto& [name, prop] : value) {
       ss << name << prop;
     }
     return ss.str();
   }
 
   void SubstanceAtom::math_add(SubstanceAtom* other) {
-    for (auto& [key,val]: other->value) {
+    for (auto& [key, val] : other->value) {
       value[key] += val;
     }
   }
@@ -47,12 +46,12 @@ namespace snt::mat {
   void SubstanceAtom::math_multiply(SubstanceAtom* other) {
     if (other->value.size() == 1 && other->value.begin()->first.empty()) {
       const auto& exponent = other->value.begin()->second;
-      for (auto& [key,val]: value) {
-	val *= exponent;
+      for (auto& [key, val] : value) {
+        val *= exponent;
       }
     } else {
       throw std::runtime_error("Multiplication exponent is not a scalar value");
     }
   }
 
-}
+} // namespace snt::mat

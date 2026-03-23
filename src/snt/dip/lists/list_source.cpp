@@ -1,5 +1,4 @@
 #include <snt/dip/lists/list_source.h>
-
 #include <stdexcept>
 
 namespace snt::dip {

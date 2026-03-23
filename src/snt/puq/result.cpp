@@ -1,9 +1,8 @@
-#include <snt/puq/result.h>
-
 #include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <snt/puq/result.h>
 #include <sstream>
 
 namespace snt::puq {
@@ -59,7 +58,7 @@ namespace snt::puq {
 
   std::size_t Result::size() const {
     return estimate->get_size();
-    //return estimate.size();
+    // return estimate.size();
   }
 
   val::Array::ShapeType Result::shape() const {
@@ -80,9 +79,9 @@ namespace snt::puq {
       Dz = m2.uncertainty->clone();
     // Array Dz = nostd::sqrt(nostd::pow(m1.uncertainty,2)+nostd::pow(m2.uncertainty,2)); // Gaussian uncertainty propagation
     return Result(m1.estimate->math_add(m2.estimate.get()), std::move(Dz));
-    //Array Dz = m1.uncertainty + m2.uncertainty;
+    // Array Dz = m1.uncertainty + m2.uncertainty;
     //// Array Dz = nostd::sqrt(nostd::pow(m1.uncertainty,2)+nostd::pow(m2.uncertainty,2)); // Gaussian uncertainty propagation
-    //return Result(m1.estimate + m2.estimate, Dz);
+    // return Result(m1.estimate + m2.estimate, Dz);
   }
 
   void Result::operator+=(const Result& m) {
@@ -91,8 +90,8 @@ namespace snt::puq {
       uncertainty->math_add_equal(m.uncertainty.get());
     else if (m.uncertainty)
       uncertainty = m.uncertainty->clone();
-    //estimate += m.estimate;
-    //uncertainty += m.uncertainty;
+    // estimate += m.estimate;
+    // uncertainty += m.uncertainty;
     //// uncertainty = nostd::sqrt(nostd::pow(uncertainty,2)+nostd::pow(m.uncertainty,2));
   }
 
@@ -104,7 +103,7 @@ namespace snt::puq {
       return Result(m1.estimate->math_neg(), m1.uncertainty->clone());
     else
       return Result(m1.estimate->math_neg());
-    //return Result(-m1.estimate, m1.uncertainty);
+    // return Result(-m1.estimate, m1.uncertainty);
   }
   Result operator-(const Result& m1, const Result& m2) {
     // z ± Dz = (x ± Dx) - (y ± Dy) -> Dz = Dx + Dy     (average uncertainties)
@@ -116,7 +115,7 @@ namespace snt::puq {
     else if (m2.uncertainty)
       Dz = m2.uncertainty->clone();
     return Result(m1.estimate->math_sub(m2.estimate.get()), std::move(Dz));
-    //return Result(m1.estimate - m2.estimate, m1.uncertainty + m2.uncertainty);
+    // return Result(m1.estimate - m2.estimate, m1.uncertainty + m2.uncertainty);
   }
 
   void Result::operator-=(const Result& m) {
@@ -125,8 +124,8 @@ namespace snt::puq {
       uncertainty->math_add_equal(m.uncertainty.get());
     else if (m.uncertainty)
       uncertainty = m.uncertainty->clone();
-    //estimate -= m.estimate;
-    //uncertainty += m.uncertainty;
+    // estimate -= m.estimate;
+    // uncertainty += m.uncertainty;
   }
 
   /*
@@ -144,18 +143,18 @@ namespace snt::puq {
     } else if ((m->uncertainty && m->uncertainty->any_of()) && (!n->uncertainty || n->uncertainty->none_of())) {
       nm.uncertainty = m->uncertainty->math_mul(n->estimate.get());
     }
-    //Result nm(m->estimate * n->estimate);
-    //if (m->uncertainty == 0 && n->uncertainty == 0) {
-    //  nm.uncertainty = (m->uncertainty.size() > n->uncertainty.size()) ? m->uncertainty : n->uncertainty;
-    //} else if (m->uncertainty == 0 && n->uncertainty != 0) {
-    //  nm.uncertainty = n->uncertainty * m->estimate;
-    //} else if (m->uncertainty != 0 && n->uncertainty == 0) {
-    //  nm.uncertainty = m->uncertainty * n->estimate;
-    //} else {
-    //  val::BaseValue::PointerType maxuncertainty = nostd::abs((m->estimate + m->uncertainty) * (n->estimate + n->uncertainty) - nm.estimate);
-    //  val::BaseValue::PointerType minuncertainty = nostd::abs((m->estimate - m->uncertainty) * (n->estimate - n->uncertainty) - nm.estimate);
-    //  nm.uncertainty = nostd::max(maxuncertainty, minuncertainty);
-    //}
+    // Result nm(m->estimate * n->estimate);
+    // if (m->uncertainty == 0 && n->uncertainty == 0) {
+    //   nm.uncertainty = (m->uncertainty.size() > n->uncertainty.size()) ? m->uncertainty : n->uncertainty;
+    // } else if (m->uncertainty == 0 && n->uncertainty != 0) {
+    //   nm.uncertainty = n->uncertainty * m->estimate;
+    // } else if (m->uncertainty != 0 && n->uncertainty == 0) {
+    //   nm.uncertainty = m->uncertainty * n->estimate;
+    // } else {
+    //   val::BaseValue::PointerType maxuncertainty = nostd::abs((m->estimate + m->uncertainty) * (n->estimate + n->uncertainty) - nm.estimate);
+    //   val::BaseValue::PointerType minuncertainty = nostd::abs((m->estimate - m->uncertainty) * (n->estimate - n->uncertainty) - nm.estimate);
+    //   nm.uncertainty = nostd::max(maxuncertainty, minuncertainty);
+    // }
     return nm;
   }
 
@@ -168,8 +167,8 @@ namespace snt::puq {
     estimate = nm.estimate->clone();
     if (nm.uncertainty)
       uncertainty = nm.uncertainty->clone();
-    //estimate = nm.estimate;
-    //uncertainty = nm.uncertainty;
+    // estimate = nm.estimate;
+    // uncertainty = nm.uncertainty;
   }
 
   /*
@@ -188,20 +187,20 @@ namespace snt::puq {
     } else if ((m->uncertainty && m->uncertainty->any_of()) && (!n->uncertainty || n->uncertainty->none_of())) {
       nm.uncertainty = m->uncertainty->math_div(n->estimate.get());
     }
-    //Result nm(m->estimate / n->estimate);
-    //if (m->uncertainty == 0 && n->uncertainty == 0) {
-    //  nm.uncertainty = (m->uncertainty.size() > n->uncertainty.size()) ? m->uncertainty : n->uncertainty;
-    //} else if (m->uncertainty == 0 && n->uncertainty != 0) {
-    //  val::BaseValue::PointerType maxuncertainty = nostd::abs(m->estimate / (n->estimate + n->uncertainty) - nm.estimate);
-    //  val::BaseValue::PointerType minuncertainty = nostd::abs(m->estimate / (n->estimate - n->uncertainty) - nm.estimate);
-    //  nm.uncertainty = nostd::max(maxuncertainty, minuncertainty);
-    //} else if (m->uncertainty != 0 && n->uncertainty == 0) {
-    //  nm.uncertainty = m->uncertainty / n->estimate;
-    //} else {
-    //  val::BaseValue::PointerType maxuncertainty = nostd::abs((m->estimate + m->uncertainty) / (n->estimate - n->uncertainty) - nm.estimate);
-    //  val::BaseValue::PointerType minuncertainty = nostd::abs((m->estimate - m->uncertainty) / (n->estimate + n->uncertainty) - nm.estimate);
-    //  nm.uncertainty = nostd::max(maxuncertainty, minuncertainty);
-    //}
+    // Result nm(m->estimate / n->estimate);
+    // if (m->uncertainty == 0 && n->uncertainty == 0) {
+    //   nm.uncertainty = (m->uncertainty.size() > n->uncertainty.size()) ? m->uncertainty : n->uncertainty;
+    // } else if (m->uncertainty == 0 && n->uncertainty != 0) {
+    //   val::BaseValue::PointerType maxuncertainty = nostd::abs(m->estimate / (n->estimate + n->uncertainty) - nm.estimate);
+    //   val::BaseValue::PointerType minuncertainty = nostd::abs(m->estimate / (n->estimate - n->uncertainty) - nm.estimate);
+    //   nm.uncertainty = nostd::max(maxuncertainty, minuncertainty);
+    // } else if (m->uncertainty != 0 && n->uncertainty == 0) {
+    //   nm.uncertainty = m->uncertainty / n->estimate;
+    // } else {
+    //   val::BaseValue::PointerType maxuncertainty = nostd::abs((m->estimate + m->uncertainty) / (n->estimate - n->uncertainty) - nm.estimate);
+    //   val::BaseValue::PointerType minuncertainty = nostd::abs((m->estimate - m->uncertainty) / (n->estimate + n->uncertainty) - nm.estimate);
+    //   nm.uncertainty = nostd::max(maxuncertainty, minuncertainty);
+    // }
     return nm;
   }
 
@@ -214,14 +213,14 @@ namespace snt::puq {
     estimate = nm.estimate->clone();
     if (nm.uncertainty)
       uncertainty = nm.uncertainty->clone();
-    //estimate = nm.estimate;
-    //uncertainty = nm.uncertainty;
+    // estimate = nm.estimate;
+    // uncertainty = nm.uncertainty;
   }
 
   void Result::pow(const ExponentVariant& e) {
     double fexp = exponent_to_float(e);
     estimate = estimate->math_pow(fexp);
-    //estimate = nostd::pow(estimate, fexp);
+    // estimate = nostd::pow(estimate, fexp);
   }
 
   bool Result::operator==(const Result& a) const {
@@ -231,7 +230,7 @@ namespace snt::puq {
       return (estimate->compare_equal(a.estimate.get())->all_of());
     else
       return false;
-    //return (estimate == a.estimate) && (uncertainty == a.uncertainty);
+    // return (estimate == a.estimate) && (uncertainty == a.uncertainty);
   };
 
   bool Result::operator!=(const Result& a) const {
@@ -241,7 +240,7 @@ namespace snt::puq {
       return (estimate->compare_not_equal(a.estimate.get())->any_of());
     else
       return false;
-    //return (estimate != a.estimate) || (uncertainty != a.uncertainty);
+    // return (estimate != a.estimate) || (uncertainty != a.uncertainty);
   };
 
   std::ostream& operator<<(std::ostream& os, const Result& m) {

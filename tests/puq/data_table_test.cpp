@@ -1,6 +1,6 @@
 #include "pch_tests.h"
-#include <snt/puq/util/data_table.h>
 
+#include <snt/puq/util/data_table.h>
 #include <sstream>
 
 using namespace snt;

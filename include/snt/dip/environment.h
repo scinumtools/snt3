@@ -1,13 +1,14 @@
 #ifndef DIP_ENVIRONMENT_H
 #define DIP_ENVIRONMENT_H
 
+#include "nodes/node_value.h"
+
 #include <snt/dip/lists/list_branching.h>
 #include <snt/dip/lists/list_functions.h>
 #include <snt/dip/lists/list_hierarchy.h>
 #include <snt/dip/lists/list_node.h>
 #include <snt/dip/lists/list_source.h>
 #include <snt/dip/lists/list_unit.h>
-#include "nodes/node_value.h"
 
 namespace snt::dip {
 
@@ -16,13 +17,13 @@ namespace snt::dip {
    * @brief Type of an environment request
    */
   enum class RequestType {
-    Reference,   ///< Search in the node list
-    Function     ///< Search in the function list
+    Reference, ///< Search in the node list
+    Function   ///< Search in the function list
   };
 
   /**
    * @class Environment
-   * @brief Object of this class holds the whole DIP parsing environment 
+   * @brief Object of this class holds the whole DIP parsing environment
    */
   class Environment {
   private:
@@ -56,7 +57,7 @@ namespace snt::dip {
      * @return Selected ArrayValue object (in specified units)
      */
     val::BaseValue::PointerType request_value(const std::string& request,
-					      const RequestType rtype = RequestType::Reference,
+                                              const RequestType rtype = RequestType::Reference,
                                               const std::string& to_unit = "") const;
 
     /**
@@ -67,7 +68,7 @@ namespace snt::dip {
      * @return List of selected nodes
      */
     ValueNode::ListType request_nodes(const std::string& request,
-				      const RequestType rtype = RequestType::Reference) const;
+                                      const RequestType rtype = RequestType::Reference) const;
 
     /**
      * @brief Get parsed node value at the specific index

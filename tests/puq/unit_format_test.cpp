@@ -1,10 +1,11 @@
 #include "pch_tests.h"
-#include <snt/puq/unit_format.h>
+
 #include <snt/puq/exponent.h>
-#include <snt/puq/value/dimensions.h>
-#include <snt/puq/value/base_units.h>
-#include <snt/puq/value/measurement.h>
 #include <snt/puq/quantity.h>
+#include <snt/puq/unit_format.h>
+#include <snt/puq/value/base_units.h>
+#include <snt/puq/value/dimensions.h>
+#include <snt/puq/value/measurement.h>
 
 using namespace snt;
 
@@ -132,7 +133,7 @@ TEST(UnitFormat, PreprocessSystem) {
     GTEST_SKIP() << "PreprocessSystem is disabled";
     return;
   }
-  
+
   puq::Quantity q1, q2;
 
   q1 = puq::Quantity(34, "ESU_statA"); // state the unit system in the unit expression

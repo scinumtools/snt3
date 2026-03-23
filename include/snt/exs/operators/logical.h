@@ -6,7 +6,7 @@
 namespace snt::exs {
 
   // and
-  
+
   class OperatorAnd : public OperatorBase {
   public:
     OperatorAnd(std::string s = "&&");
@@ -14,7 +14,7 @@ namespace snt::exs {
   };
 
   // or
-  
+
   class OperatorOr : public OperatorBase {
   public:
     OperatorOr(std::string s = "||");
@@ -28,7 +28,7 @@ namespace snt::exs {
     OperatorNot(std::string s = "!");
     void operate_unary(TokenListBase* tokens) override;
   };
-  
+
 } // namespace snt::exs
 
 #endif // EXS_OPERATOR_LOGICAL_H

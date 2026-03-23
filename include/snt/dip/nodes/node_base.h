@@ -1,7 +1,6 @@
 #ifndef DIP_NODE_BASE_H
 #define DIP_NODE_BASE_H
 
-#include "../../val.h"
 #include "node.h"
 #include "parser.h"
 

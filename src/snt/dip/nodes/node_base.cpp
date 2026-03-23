@@ -1,5 +1,4 @@
 #include <snt/dip/nodes/node_base.h>
-
 #include <sstream>
 
 namespace snt::dip {

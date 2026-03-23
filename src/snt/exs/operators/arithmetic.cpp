@@ -3,11 +3,10 @@
 namespace snt::exs {
 
   // add
-  
-  OperatorAdd::OperatorAdd(std::string s) :
-    OperatorBase("add", s, ADD_OPERATOR) {
+
+  OperatorAdd::OperatorAdd(std::string s) : OperatorBase("add", s, ADD_OPERATOR) {
   }
-  
+
   void OperatorAdd::operate_unary(TokenListBase* tokens) {
     // std::cout << "operate_unary" << std::endl;
     // tokens->print(true);
@@ -35,7 +34,7 @@ namespace snt::exs {
       tokens->put_right(right);
     }
   };
-  
+
   void OperatorAdd::operate_binary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();
@@ -44,11 +43,10 @@ namespace snt::exs {
   };
 
   // subtract
-  
-  OperatorSubtract::OperatorSubtract(std::string s) :
-    OperatorBase("sub", s, SUBTRACT_OPERATOR) {
+
+  OperatorSubtract::OperatorSubtract(std::string s) : OperatorBase("sub", s, SUBTRACT_OPERATOR) {
   }
-  
+
   void OperatorSubtract::operate_unary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();
@@ -71,7 +69,7 @@ namespace snt::exs {
       tokens->put_right(right);
     }
   };
-  
+
   void OperatorSubtract::operate_binary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();
@@ -81,23 +79,21 @@ namespace snt::exs {
 
   // multiply
 
-  OperatorMultiply::OperatorMultiply(std::string s) :
-    OperatorBase("mul", s, MULTIPLY_OPERATOR) {
+  OperatorMultiply::OperatorMultiply(std::string s) : OperatorBase("mul", s, MULTIPLY_OPERATOR) {
   }
-  
+
   void OperatorMultiply::operate_binary(TokenListBase* tokens) {
-      Token left = tokens->get_left();
-      Token right = tokens->get_right();
-      left.atom->math_multiply(right.atom);
-      tokens->put_left(left);
+    Token left = tokens->get_left();
+    Token right = tokens->get_right();
+    left.atom->math_multiply(right.atom);
+    tokens->put_left(left);
   };
 
   // divide
 
-  OperatorDivide::OperatorDivide(std::string s):
-    OperatorBase("div", s, DIVIDE_OPERATOR) {
+  OperatorDivide::OperatorDivide(std::string s) : OperatorBase("div", s, DIVIDE_OPERATOR) {
   }
-  
+
   void OperatorDivide::operate_binary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();
@@ -107,10 +103,9 @@ namespace snt::exs {
 
   // modulo
 
-  OperatorModulo::OperatorModulo(std::string s) :
-    OperatorBase("mod", s, MODULO_OPERATOR) {
+  OperatorModulo::OperatorModulo(std::string s) : OperatorBase("mod", s, MODULO_OPERATOR) {
   }
-  
+
   void OperatorModulo::operate_binary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();
@@ -118,4 +113,4 @@ namespace snt::exs {
     tokens->put_left(left);
   };
 
-}
+} // namespace snt::exs

@@ -11,14 +11,14 @@ namespace snt::exs {
     } else {
       std::regex rx("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?((e|E)((\\+|-)?)[[:digit:]]+)?");
       if (std::regex_match(s, rx)) {
-	v = std::stof(s);
+        v = std::stof(s);
       } else {
-	throw std::logic_error("Atom string could not be parsed, probably due to unknown symbol or operator: " + s);
+        throw std::logic_error("Atom string could not be parsed, probably due to unknown symbol or operator: " + s);
       }
     }
     return v;
   }
-  
+
   std::string Atom::to_string() {
     if (std::holds_alternative<double>(value)) {
       std::stringstream str;
@@ -26,9 +26,9 @@ namespace snt::exs {
       return str.str();
     } else {
       if (std::get<bool>(value) == 0)
-	return "false";
+        return "false";
       else
-	return "true";
+        return "true";
     }
   }
 
@@ -122,5 +122,5 @@ namespace snt::exs {
   void Atom::condition(Atom* option1, Atom* option2) {
     value = std::get<bool>(value) ? std::get<double>(option1->value) : std::get<double>(option2->value);
   }
-  
-}
+
+} // namespace snt::exs

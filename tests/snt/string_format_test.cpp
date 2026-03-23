@@ -1,7 +1,6 @@
+#include <gtest/gtest.h>
 #include <snt/settings.h>
 #include <snt/string_format.h>
-
-#include <gtest/gtest.h>
 #include <string>
 
 TEST(StringFormat, Integers) {

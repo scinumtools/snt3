@@ -10,9 +10,9 @@ namespace snt::exs {
    * @brief List of operator types
    */
   enum TokenType {
-    EMPTY_TOKEN,       ///< Token is empty
-    OPERATOR_TOKEN,    ///< Token is an operator
-    ATOM_TOKEN,        ///< Token is an atom
+    EMPTY_TOKEN,    ///< Token is empty
+    OPERATOR_TOKEN, ///< Token is an operator
+    ATOM_TOKEN,     ///< Token is an atom
   };
 
   /**
@@ -20,10 +20,10 @@ namespace snt::exs {
    * @brief Type of an operation
    */
   enum OperationType {
-    UNARY_OPERATION,    ///< Unary operation operates on the atom value
-    BINARY_OPERATION,   ///< Binary operation operates between two atoms
-    TERNARY_OPERATION,  ///< Ternary operation operates with three atoms
-    GROUP_OPERATION,    ///< Group operation operates on various number of atoms
+    UNARY_OPERATION,   ///< Unary operation operates on the atom value
+    BINARY_OPERATION,  ///< Binary operation operates between two atoms
+    TERNARY_OPERATION, ///< Ternary operation operates with three atoms
+    GROUP_OPERATION,   ///< Group operation operates on various number of atoms
   };
 
   /**
@@ -31,30 +31,30 @@ namespace snt::exs {
    * @brief List of all operators
    */
   enum OperatorType {
-    NONE_OPERATOR,           ///< Item is not an operator
-			     
-    ADD_OPERATOR,            ///< Addition of values
-    SUBTRACT_OPERATOR,       ///< Subtraction of values
-    MULTIPLY_OPERATOR,       ///< Multiplication of values
-    DIVIDE_OPERATOR,         ///< Division of values
-    POWER_OPERATOR,          ///< Power of a value
-    MODULO_OPERATOR,         ///< Modulo of values
+    NONE_OPERATOR, ///< Item is not an operator
 
-    NOT_OPERATOR,            ///< Logical negation
-    AND_OPERATOR,            ///< Logical and
-    OR_OPERATOR,             ///< Logical or
+    ADD_OPERATOR,      ///< Addition of values
+    SUBTRACT_OPERATOR, ///< Subtraction of values
+    MULTIPLY_OPERATOR, ///< Multiplication of values
+    DIVIDE_OPERATOR,   ///< Division of values
+    POWER_OPERATOR,    ///< Power of a value
+    MODULO_OPERATOR,   ///< Modulo of values
 
-    EQUAL_OPERATOR,          ///< Logical equality
-    NOT_EQUAL_OPERATOR,      ///< Logical difference
-    LESS_EQUAL_OPERATOR,     ///< Logical less or equal
-    GREATER_EQUAL_OPERATOR,  ///< Logical greater or equal
-    LESS_OPERATOR,           ///< Logical less
-    GREATER_OPERATOR,        ///< Logical greater
+    NOT_OPERATOR, ///< Logical negation
+    AND_OPERATOR, ///< Logical and
+    OR_OPERATOR,  ///< Logical or
 
-    CONDITION_OPERATOR,      ///< Conditional operator
+    EQUAL_OPERATOR,         ///< Logical equality
+    NOT_EQUAL_OPERATOR,     ///< Logical difference
+    LESS_EQUAL_OPERATOR,    ///< Logical less or equal
+    GREATER_EQUAL_OPERATOR, ///< Logical greater or equal
+    LESS_OPERATOR,          ///< Logical less
+    GREATER_OPERATOR,       ///< Logical greater
+
+    CONDITION_OPERATOR, ///< Conditional operator
 
     PARENTHESES_OPERATOR,    ///< Parentheses
-    EXPONENT_OPERATOR,       ///< Exponents 
+    EXPONENT_OPERATOR,       ///< Exponents
     LOGARITHM_OPERATOR,      ///< Logarithm
     LOGARITHM_10_OPERATOR,   ///< Logarithm with a base 10
     LOGARITHM_BASE_OPERATOR, ///< Logarithm with an arbitrary base
@@ -65,7 +65,7 @@ namespace snt::exs {
     COSINUS_OPERATOR,        ///< Cosinus
     TANGENS_OPERATOR,        ///< Tangens
 
-    NUM_OPERATOR_TYPES       ///< Total number of operators
+    NUM_OPERATOR_TYPES ///< Total number of operators
   };
 
   /**

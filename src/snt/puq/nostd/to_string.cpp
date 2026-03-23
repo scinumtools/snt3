@@ -1,5 +1,4 @@
 #include <snt/puq/nostd/to_string.h>
-
 #include <string>
 
 namespace snt::nostd {

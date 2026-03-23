@@ -7,4 +7,4 @@ namespace snt::exs {
     return atoms.back().get();
   };
 
-}
+} // namespace snt::exs

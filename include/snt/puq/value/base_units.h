@@ -6,21 +6,17 @@
 #include <snt/puq/value/dimensions.h>
 
 namespace snt::puq {
-  
+
   class BaseUnit {
   public:
     std::string prefix;
     std::string unit;
     ExponentVariant exponent;
     BaseUnit() {};
-    BaseUnit(const int& n) :
-      exponent(n) {};
-    BaseUnit(const int& n, const int& d) :
-      exponent(Exponent(n, d)) {};
-    BaseUnit(const std::string& p, const std::string& u, const ExponentVariant& e) :
-      prefix(p), unit(u), exponent(e) {};
-    BaseUnit(const std::string& p, const std::string& u, const int& n, const int& d) :
-      prefix(p), unit(u), exponent(Exponent(n, d)) {};
+    BaseUnit(const int& n) : exponent(n) {};
+    BaseUnit(const int& n, const int& d) : exponent(Exponent(n, d)) {};
+    BaseUnit(const std::string& p, const std::string& u, const ExponentVariant& e) : prefix(p), unit(u), exponent(e) {};
+    BaseUnit(const std::string& p, const std::string& u, const int& n, const int& d) : prefix(p), unit(u), exponent(Exponent(n, d)) {};
     std::string to_string(const UnitFormat& format = UnitFormat());
   };
 

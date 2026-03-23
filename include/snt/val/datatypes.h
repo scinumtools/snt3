@@ -54,9 +54,9 @@ namespace snt::val {
    */
   enum class DataType : uint16_t {
     // Define individual data types
-    None = 0,               
-    Boolean = 1 << 0,       
-    String = 1 << 1,        
+    None = 0,
+    Boolean = 1 << 0,
+    String = 1 << 1,
     Character = 1 << 2,
     Integer16 = 1 << 3,
     Integer32 = 1 << 4,
@@ -106,12 +106,12 @@ namespace snt::val {
    * @param lhs Left-hand side flag.
    * @param rhs Right-hand side flag.
    * @return A new DataType value representing the intersected flags.
-   */   
+   */
   inline DataType operator&(DataType lhs, DataType rhs) {
     return static_cast<DataType>(static_cast<std::underlying_type_t<DataType>>(lhs) &
                                  static_cast<std::underlying_type_t<DataType>>(rhs));
   }
-  
+
   /**
    * @brief Performs an in-place bitwise OR assignment on DataType flags.
    *

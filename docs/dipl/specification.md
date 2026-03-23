@@ -184,11 +184,11 @@ Errors MUST be deterministic and MUST NOT be ignored.
 
 ## 7. Versioning
 
-This document specifies version 0.1 of the DIPL language.
+Language versioning is independent of any particular implementation. 
+Each implementation MUST explicitly declare the version of the DIPL language it supports.
 
-Language versioning is independent of any particular implementation. Each implementation MUST explicitly declare the version of the DIPL language it supports.
-
-Future versions of the language MAY introduce extensions or modifications. Backward compatibility SHOULD be preserved where feasible.
+Future versions of the language MAY introduce extensions or modifications. 
+Backward compatibility SHOULD be preserved where feasible.
 
 ## 8. Reference Implementation
 

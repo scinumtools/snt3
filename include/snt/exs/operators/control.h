@@ -12,9 +12,9 @@ namespace snt::exs {
   public:
     OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","});
   };
-    
+
   // conditional operator
-  
+
   class OperatorCondition : public OperatorTernary {
   public:
     OperatorCondition();

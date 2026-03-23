@@ -1,6 +1,5 @@
-#include <snt/puq/nostd/log.h>
-
 #include <snt/puq/exponent.h>
+#include <snt/puq/nostd/log.h>
 
 namespace snt::nostd {
 
@@ -18,7 +17,7 @@ namespace snt::nostd {
       return puq::Result(m.estimate->math_log(), m.uncertainty->math_div(m.estimate.get()));
     else
       return puq::Result(m.estimate->math_log());
-    //return puq::Result(log(m.estimate), m.uncertainty / m.estimate);
+    // return puq::Result(log(m.estimate), m.uncertainty / m.estimate);
   }
 
   puq::Measurement log(const puq::Measurement& msr) {
@@ -27,7 +26,7 @@ namespace snt::nostd {
       return puq::Measurement(msr.magnitude.estimate->math_log(), msr.magnitude.uncertainty->math_div(msr.magnitude.estimate.get()));
     else
       return puq::Measurement(msr.magnitude.estimate->math_log());
-    //return puq::Measurement(log(msr.magnitude.estimate), msr.magnitude.uncertainty / msr.magnitude.estimate);
+    // return puq::Measurement(log(msr.magnitude.estimate), msr.magnitude.uncertainty / msr.magnitude.estimate);
   }
 
 } // namespace snt::nostd

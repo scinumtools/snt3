@@ -1,10 +1,9 @@
-#include <snt/puq/solver/unit_solver.h>
-
 #include "operator_array.h"
 #include "operator_parentheses.h"
 
 #include <memory>
 #include <regex>
+#include <snt/puq/solver/unit_solver.h>
 
 namespace snt::puq {
 

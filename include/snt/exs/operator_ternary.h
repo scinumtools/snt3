@@ -1,9 +1,8 @@
 #ifndef EXS_OPERATOR_TERNARY_H
 #define EXS_OPERATOR_TERNARY_H
 
-#include <snt/exs/settings.h>
 #include <snt/exs/operator_base.h>
-
+#include <snt/exs/settings.h>
 #include <stdexcept>
 
 namespace snt::exs {

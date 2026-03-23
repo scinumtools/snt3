@@ -1,9 +1,9 @@
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-#include <snt/dip/environment.h>
-#include <snt/dip/dip.h>
 #include <codecvt>
 #include <locale>
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+#include <snt/dip/dip.h>
+#include <snt/dip/environment.h>
 
 namespace py = pybind11;
 using namespace snt;
@@ -20,7 +20,7 @@ void init_dip(py::module_& m) {
 
   init_value_node(m);
   init_environment(m);
-  
+
   auto dip = py::class_<dip::DIP>(m, "DIP");
   dip.def(py::init<>());
   dip.def("add_string", &dip::DIP::add_string, py::arg("source_code"));
@@ -32,5 +32,4 @@ void init_dip(py::module_& m) {
   dip.def("parse", &dip::DIP::parse);
   // dip.def("parse_docs", &dip::DIP::parse_docs);
   dip.def("to_string", &dip::DIP::to_string);
-  
 }

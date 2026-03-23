@@ -1,12 +1,10 @@
+#include <iostream>
+#include <set>
 #include <snt/puq/converter.h>
-
 #include <snt/puq/nostd/exp.h>
 #include <snt/puq/nostd/log.h>
 #include <snt/puq/nostd/log10.h>
 #include <snt/puq/nostd/pow.h>
-
-#include <iostream>
-#include <set>
 
 namespace snt::puq {
 
@@ -15,85 +13,85 @@ namespace snt::puq {
   }
 
   inline Result _convert_B_B(const Result& value, const Result& exp = 0) {
-      return value + exp;
+    return value + exp;
   }
-  
+
   inline Result _convert_B_Np(const Result& value) {
-      return (Result)1.151277918 * value;
+    return (Result)1.151277918 * value;
   }
-  
+
   inline Result _convert_Np_B(const Result& value) {
-      return value / (Result)1.151277918;
+    return value / (Result)1.151277918;
   }
-  
+
   inline Result _convert_Ratio_B(const Result& value, const Result& exp) {
-      return exp * nostd::log10(value);
+    return exp * nostd::log10(value);
   }
-  
+
   inline Result _convert_B_Ratio(const Result& value, const Result& exp) {
-      return nostd::pow((Result)10, value / exp);
+    return nostd::pow((Result)10, value / exp);
   }
-  
+
   inline Result _convert_Ratio_Np(const Result& value, const Result& exp) {
-      return exp * nostd::log(value);
+    return exp * nostd::log(value);
   }
-  
+
   inline Result _convert_Np_Ratio(const Result& value, const Result& exp) {
-      return nostd::exp(value / exp);
+    return nostd::exp(value / exp);
   }
-  
+
   inline Result _convert_Mw_Mo(const Result& value) {
-      return nostd::pow((Result)10, 1.5 * (value + (Result)10.7));
+    return nostd::pow((Result)10, 1.5 * (value + (Result)10.7));
   }
-  
+
   inline Result _convert_Mo_Mw(const Result& value) {
-      return 2. / 3. * nostd::log10(value) - (Result)10.7;
+    return 2. / 3. * nostd::log10(value) - (Result)10.7;
   }
-  
+
   Result Converter::_convert_logarithmic(const Result& m) {
-      const std::string s1 = baseunits1[0].unit;
-      const std::string s2 = baseunits2[0].unit;
-      const Result n1 = dimensions1.numerical;
-      const Result n2 = dimensions2.numerical;
-      if (s1 == "Np") { // Nepers -> Bel or Ratio
-	if (s2 == "B")
-	  return _convert_Np_B(m * n1) / n2;
-	else if (s2 == "AR")
-	  return _convert_Np_Ratio(m * n1, 1) / n2;
-	else if (s2 == "PR")
-	  return _convert_Np_Ratio(m * n1, 0.5) / n2;
-      } else if (s2 == "Np") { // Bel or Ratio -> Nepers
-	if (s1 == "B")
-	  return _convert_B_Np(m * n1) / n2;
-	else if (s1 == "AR")
-	  return _convert_Ratio_Np(m * n1, 1) / n2;
-	else if (s1 == "PR")
-	  return _convert_Ratio_Np(m * n1, 0.5) / n2;
-      } else if (s1 == "Mw" && (s2 == "Mo" || s2 == "dyn")) { // moment magnitude -> seismic moment
-	return _convert_Mw_Mo(m * n1) / (n2 * 1e4);           // 1e4 to MGS
-      } else if ((s1 == "Mo" || s1 == "dyn") && s2 == "Mw") { // seismic moment -> moment magnitude
-	return _convert_Mo_Mw(m * n1 * 1e4) / n2;             // 1e4 to MGS
-      } else {
-	struct pair {
-	  std::string first;
-	  std::string second;
-	  double exp;
-	  double conv;
-	};
-	const std::vector<pair> pairs_B_B = {
+    const std::string s1 = baseunits1[0].unit;
+    const std::string s2 = baseunits2[0].unit;
+    const Result n1 = dimensions1.numerical;
+    const Result n2 = dimensions2.numerical;
+    if (s1 == "Np") { // Nepers -> Bel or Ratio
+      if (s2 == "B")
+        return _convert_Np_B(m * n1) / n2;
+      else if (s2 == "AR")
+        return _convert_Np_Ratio(m * n1, 1) / n2;
+      else if (s2 == "PR")
+        return _convert_Np_Ratio(m * n1, 0.5) / n2;
+    } else if (s2 == "Np") { // Bel or Ratio -> Nepers
+      if (s1 == "B")
+        return _convert_B_Np(m * n1) / n2;
+      else if (s1 == "AR")
+        return _convert_Ratio_Np(m * n1, 1) / n2;
+      else if (s1 == "PR")
+        return _convert_Ratio_Np(m * n1, 0.5) / n2;
+    } else if (s1 == "Mw" && (s2 == "Mo" || s2 == "dyn")) { // moment magnitude -> seismic moment
+      return _convert_Mw_Mo(m * n1) / (n2 * 1e4);           // 1e4 to MGS
+    } else if ((s1 == "Mo" || s1 == "dyn") && s2 == "Mw") { // seismic moment -> moment magnitude
+      return _convert_Mo_Mw(m * n1 * 1e4) / n2;             // 1e4 to MGS
+    } else {
+      struct pair {
+        std::string first;
+        std::string second;
+        double exp;
+        double conv;
+      };
+      const std::vector<pair> pairs_B_B = {
           {"BW", "Bm", 3},
           {"BW", "BmW", 3},
           {"Bm", "BmW", 0},
           {"BV", "BuV", 12},
-	};
-	for (auto& pair : pairs_B_B) {
-	  if (s1 == pair.first && s2 == pair.second) { // BelX -> BelY
-	    return _convert_B_B(m * n1, pair.exp) / n2;
-	  } else if (s1 == pair.second && s2 == pair.first) { // BelY -> BelX
-	    return _convert_B_B(m * n1, -pair.exp) / n2;
-	  }
-	}
-	const std::vector<pair> pairs_B_Ratio = {
+      };
+      for (auto& pair : pairs_B_B) {
+        if (s1 == pair.first && s2 == pair.second) { // BelX -> BelY
+          return _convert_B_B(m * n1, pair.exp) / n2;
+        } else if (s1 == pair.second && s2 == pair.first) { // BelY -> BelX
+          return _convert_B_B(m * n1, -pair.exp) / n2;
+        }
+      }
+      const std::vector<pair> pairs_B_Ratio = {
           {"B", "PR", 1, 1},
           {"Bm", "W", 1, 1},
           {"BmW", "W", 1, 1},
@@ -107,18 +105,18 @@ namespace snt::puq {
           {"BuA", "A", 2, 1e6},
           {"BOhm", "Ohm", 2, 1e-3},
           {"BSPL", "Pa", 2, 50},
-	};
-	for (auto& pair : pairs_B_Ratio) {
-	  if (s1 == pair.first && s1 == s2) { // Bel -> Bel
-	    return _convert_B_B(m * n1) / n2;
-	  } else if (s1 == pair.first && s2 == pair.second) { // Bel -> Ratio
-	    return _convert_B_Ratio(m * n1, pair.exp) / (n2 * pair.conv);
-	  } else if (s1 == pair.second && s2 == pair.first) { // Ratio -> Bel
-	    return _convert_Ratio_B(m * n1 * pair.conv, pair.exp) / n2;
-	  }
-	}
+      };
+      for (auto& pair : pairs_B_Ratio) {
+        if (s1 == pair.first && s1 == s2) { // Bel -> Bel
+          return _convert_B_B(m * n1) / n2;
+        } else if (s1 == pair.first && s2 == pair.second) { // Bel -> Ratio
+          return _convert_B_Ratio(m * n1, pair.exp) / (n2 * pair.conv);
+        } else if (s1 == pair.second && s2 == pair.first) { // Ratio -> Bel
+          return _convert_Ratio_B(m * n1 * pair.conv, pair.exp) / n2;
+        }
       }
-      throw NoConvExcept(s1, s2);
+    }
+    throw NoConvExcept(s1, s2);
   }
 
   Result Converter::_convert_temperature(Result m) {
@@ -170,27 +168,26 @@ namespace snt::puq {
     // std::cout << std::bitset<8>((int)dimensions2.utype) << std::endl;
     if constexpr (Config::use_units_logarithmic) {
       if (((dimensions1.utype | dimensions2.utype) & Utype::LOG) == Utype::LOG) {
-	if ((baseunits1.size() == 1 || baseunits1.size() == 2) &&
-	    (baseunits2.size() == 1 || baseunits2.size() == 2)) {
-	  utype = Utype::LOG;
-	  goto finalize_init;
-	}
+        if ((baseunits1.size() == 1 || baseunits1.size() == 2) &&
+            (baseunits2.size() == 1 || baseunits2.size() == 2)) {
+          utype = Utype::LOG;
+          goto finalize_init;
+        }
       }
     }
     if constexpr (Config::use_units_temperature) {
       if (((dimensions1.utype | dimensions2.utype) & Utype::TMP) == Utype::TMP) {
-	if ((baseunits1.size() == 1 || baseunits1.size() == 2) &&
-	    (baseunits2.size() == 1 || baseunits2.size() == 2)) {
-	  utype = Utype::TMP;
-	  goto finalize_init;
-	}
+        if ((baseunits1.size() == 1 || baseunits1.size() == 2) &&
+            (baseunits2.size() == 1 || baseunits2.size() == 2)) {
+          utype = Utype::TMP;
+          goto finalize_init;
+        }
       }
     }
     if (((dimensions1.utype & dimensions2.utype) & Utype::LIN) == Utype::LIN) {
       utype = Utype::LIN;
     }
-  finalize_init:
-    ;
+  finalize_init:;
   };
 
   Result Converter::convert(const Result& m1, const Result& m2) {
@@ -204,14 +201,14 @@ namespace snt::puq {
     Result mag;
     if constexpr (Config::use_units_logarithmic) {
       if (utype == Utype::LOG && m2 == (Result)1) {
-	mag = _convert_logarithmic(m1);
-	goto converted;
+        mag = _convert_logarithmic(m1);
+        goto converted;
       }
     }
     if constexpr (Config::use_units_temperature) {
       if (utype == Utype::TMP && m2 == (Result)1) {
-	mag = _convert_temperature(m1);
-	goto converted;
+        mag = _convert_temperature(m1);
+        goto converted;
       }
     }
     if (utype == Utype::LIN)

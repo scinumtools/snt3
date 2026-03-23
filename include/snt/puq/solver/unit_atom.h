@@ -1,8 +1,8 @@
 #ifndef PUQ_UNIT_ATOM_H
 #define PUQ_UNIT_ATOM_H
 
-#include <snt/exs/settings.h>
 #include <snt/exs/atom_base.h>
+#include <snt/exs/settings.h>
 #include <snt/puq/value/measurement.h>
 
 namespace snt::puq {

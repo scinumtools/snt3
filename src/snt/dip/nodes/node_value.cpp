@@ -1,5 +1,4 @@
 #include <snt/dip/nodes/node_value.h>
-
 #include <sstream>
 
 namespace snt::dip {
@@ -10,7 +9,7 @@ namespace snt::dip {
   };
 
   ValueNode::ValueNode(const std::string& nm, val::BaseValue::PointerType val, puq::Quantity::PointerType unt)
-    : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)) {
+      : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)) {
     name = nm;
     val::Array::ShapeType dims = val->get_shape();
     if (val->get_size() > 1) {
@@ -84,7 +83,7 @@ namespace snt::dip {
       }
     }
   }
-  
+
   void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
     if (node->dtype != NodeDtype::Modification and node->dtype != dtype)
       throw std::runtime_error("Node '" + name + "' with type '" + dtype_raw.at(1) +

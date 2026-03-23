@@ -1,10 +1,10 @@
 #ifndef MAT_MATERIAL_H
 #define MAT_MATERIAL_H
 
-#include <snt/mat/substance.h>
-#include <snt/mat/set.h>
 #include <snt/mat/matter.h>
+#include <snt/mat/set.h>
 #include <snt/mat/solvers/material_solver.h>
+#include <snt/mat/substance.h>
 
 namespace snt::mat {
 
@@ -12,8 +12,8 @@ namespace snt::mat {
    * @class Material
    * @brief Any substance or mixture of substances that can be used to make objects or structures
    */
-  class Material: public Set<Substance,double>,
-		  public Matter {
+  class Material : public Set<Substance, double>,
+                   public Matter {
   public:
   };
 

@@ -11,9 +11,9 @@ namespace snt::exs {
       return "Token(ATOM " + atom->to_string() + ")";
     }
   }
-  
+
   void Token::print() {
     std::cout << to_string() << "\n";
   };
 
-}
+} // namespace snt::exs

@@ -1,6 +1,5 @@
-#include <snt/exs/solver.h>
-
 #include <memory>
+#include <snt/exs/solver.h>
 
 using namespace snt::exs;
 
@@ -13,7 +12,7 @@ int main() {
   operators.append(OR_OPERATOR, std::make_shared<OperatorOr>("O"));
 
   // changing default operation steps
-  StepList steps {};
+  StepList steps{};
   steps.append(BINARY_OPERATION, {OR_OPERATOR});
   steps.append(BINARY_OPERATION, {AND_OPERATOR});
   steps.append(UNARY_OPERATION, {NOT_OPERATOR});

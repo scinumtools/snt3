@@ -1,15 +1,14 @@
 #ifndef EXS_TOKEN_LIST_H
 #define EXS_TOKEN_LIST_H
 
+#include <algorithm>
+#include <deque>
+#include <iostream>
 #include <snt/exs/atom_list.h>
 #include <snt/exs/operator_list.h>
 #include <snt/exs/settings.h>
 #include <snt/exs/token.h>
 #include <snt/exs/token_list.h>
-
-#include <algorithm>
-#include <deque>
-#include <iostream>
 #include <stdexcept>
 #include <vector>
 
@@ -22,19 +21,18 @@ namespace snt::exs {
     OperatorList* operators;
     BaseSettings* settings;
     AtomList atoms;
-    TokenList(OperatorList* o, BaseSettings* set = nullptr) :
-      operators(o), settings(set) {
-    };
+    TokenList(OperatorList* o, BaseSettings* set = nullptr) : operators(o), settings(set) {
+                                                              };
     void append(TokenType t) {
       right.push_back(Token(t));
     };
     void append(TokenType t, int o) {
       right.push_back(Token(t, o));
     };
-    //void append(TokenType t, std::string s) {
-    //  AtomGrand* a = atoms.append(s, settings);
-    //  right.push_back(Token(t, a));
-    //};
+    // void append(TokenType t, std::string s) {
+    //   AtomGrand* a = atoms.append(s, settings);
+    //   right.push_back(Token(t, a));
+    // };
     void append(TokenType t, std::unique_ptr<AtomGrand> at) {
       AtomGrand* a = atoms.append(std::move(at));
       right.push_back(Token(t, a));

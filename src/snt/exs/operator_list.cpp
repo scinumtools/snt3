@@ -10,10 +10,10 @@ namespace snt::exs {
       throw std::logic_error("Selecting non existing operator");
     }
   };
-  
+
   void OperatorList::append(int t, std::shared_ptr<OperatorBase> o) {
     operators[t] = o;
     order.push_back(t);
   };
 
-}
+} // namespace snt::exs

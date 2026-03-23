@@ -5,69 +5,68 @@ namespace snt::puq {
 
     inline UnitListType GetEUSUnits() {
       UnitListType units = {
-        // units of length
-        {"twip", {Utype::LIN, "17.6388888e-6*m", "twip", false, {}}},
-        {"th", {Utype::LIN, "25.4e-6*m", "thou", false, {}}},
-        {"mil", {Utype::LIN, "th", "mil", false, {}}},
-        {"in", {Utype::LIN, "0.0254*m", "inch", false, {}}},
-        {"''", {Utype::LIN, "in", "inch", false, {}}},
-        {"li", {Utype::LIN, "0.201168*m", "link", false, {}}},
-        {"ft", {Utype::LIN, "0.3048*m", "foot", false, {}}},
-        {"'", {Utype::LIN, "ft", "foot", false, {}}},
-        {"yd", {Utype::LIN, "0.9144*m", "yard", false, {}}},
-        {"rd", {Utype::LIN, "5.0292*m", "rod/pole/perch", false, {}}},
-        {"ch", {Utype::LIN, "20.1168*m", "chain", false, {}}},
-        {"fur", {Utype::LIN, "201.168*m", "furlong", false, {}}},
-        {"mi", {Utype::LIN, "1609.344*m", "mile", false, {}}},
-        {"lea", {Utype::LIN, "4828.032*m", "league", false, {}}},
-        {"le", {Utype::LIN, "lea", "league", false, {}}},
+          // units of length
+          {"twip", {Utype::LIN, "17.6388888e-6*m", "twip", false, {}}},
+          {"th", {Utype::LIN, "25.4e-6*m", "thou", false, {}}},
+          {"mil", {Utype::LIN, "th", "mil", false, {}}},
+          {"in", {Utype::LIN, "0.0254*m", "inch", false, {}}},
+          {"''", {Utype::LIN, "in", "inch", false, {}}},
+          {"li", {Utype::LIN, "0.201168*m", "link", false, {}}},
+          {"ft", {Utype::LIN, "0.3048*m", "foot", false, {}}},
+          {"'", {Utype::LIN, "ft", "foot", false, {}}},
+          {"yd", {Utype::LIN, "0.9144*m", "yard", false, {}}},
+          {"rd", {Utype::LIN, "5.0292*m", "rod/pole/perch", false, {}}},
+          {"ch", {Utype::LIN, "20.1168*m", "chain", false, {}}},
+          {"fur", {Utype::LIN, "201.168*m", "furlong", false, {}}},
+          {"mi", {Utype::LIN, "1609.344*m", "mile", false, {}}},
+          {"lea", {Utype::LIN, "4828.032*m", "league", false, {}}},
+          {"le", {Utype::LIN, "lea", "league", false, {}}},
 
-        // international nautical units
-        {"ftm", {Utype::LIN, "1.8288*m", "fathom", false, {}}},
-        {"cb", {Utype::LIN, "219.456*m", "cable", false, {}}},
-        {"nmi", {Utype::LIN, "1852*m", "nautical mile", false, {}}},
-        {"NM", {Utype::LIN, "nmi", "nautical mile", false, {}}},
+          // international nautical units
+          {"ftm", {Utype::LIN, "1.8288*m", "fathom", false, {}}},
+          {"cb", {Utype::LIN, "219.456*m", "cable", false, {}}},
+          {"nmi", {Utype::LIN, "1852*m", "nautical mile", false, {}}},
+          {"NM", {Utype::LIN, "nmi", "nautical mile", false, {}}},
 
-        // units of area
-        {"ac", {Utype::LIN, "4046.8564224*m2", "acre", false, {}}},
+          // units of area
+          {"ac", {Utype::LIN, "4046.8564224*m2", "acre", false, {}}},
 
-        // units of mass
-        {"gr", {Utype::LIN, "64.79891e-3*g", "grain", false, {}}},
-        {"dr", {Utype::LIN, "1.771845195*g", "drachm/dram", false, {}}},
-        {"oz", {Utype::LIN, "28.349523125*g", "ounce", false, {}}},
-        {"lb", {Utype::LIN, "453.59237*g", "pund", false, {}}},
-        {"cwt", {Utype::LIN, "50.80234544e3*g", "long hundredweight", false, {}}},
-        {"ton", {Utype::LIN, "1.0160469088e6*g", "long ton", false, {}}},
-        {"slug", {Utype::LIN, "14.59390294e3*g", "slug", false, {}}},
+          // units of mass
+          {"gr", {Utype::LIN, "64.79891e-3*g", "grain", false, {}}},
+          {"dr", {Utype::LIN, "1.771845195*g", "drachm/dram", false, {}}},
+          {"oz", {Utype::LIN, "28.349523125*g", "ounce", false, {}}},
+          {"lb", {Utype::LIN, "453.59237*g", "pund", false, {}}},
+          {"cwt", {Utype::LIN, "50.80234544e3*g", "long hundredweight", false, {}}},
+          {"ton", {Utype::LIN, "1.0160469088e6*g", "long ton", false, {}}},
+          {"slug", {Utype::LIN, "14.59390294e3*g", "slug", false, {}}},
 
-        // units of time
-        {"min", {Utype::LIN, "60*s", "minute", false, {}}},
-        {"h", {Utype::LIN, "60*min", "hour", false, {}}},
-        {"day", {Utype::LIN, "24*h", "day", false, {}}},
-        {"yr_t", {Utype::LIN, "365.24219*day", "tropical year", true, {"k", "m", "G"}}},
-        {"yr_j", {Utype::LIN, "365.25*day", "Julian year", true, {"k", "m", "G"}}},
-        {"yr_g", {Utype::LIN, "365.2425*day", "Gregorian year", true, {"k", "m", "G"}}},
-        {"yr", {Utype::LIN, "yr_j", "year", true, {"k", "m", "G"}}},
+          // units of time
+          {"min", {Utype::LIN, "60*s", "minute", false, {}}},
+          {"h", {Utype::LIN, "60*min", "hour", false, {}}},
+          {"day", {Utype::LIN, "24*h", "day", false, {}}},
+          {"yr_t", {Utype::LIN, "365.24219*day", "tropical year", true, {"k", "m", "G"}}},
+          {"yr_j", {Utype::LIN, "365.25*day", "Julian year", true, {"k", "m", "G"}}},
+          {"yr_g", {Utype::LIN, "365.2425*day", "Gregorian year", true, {"k", "m", "G"}}},
+          {"yr", {Utype::LIN, "yr_j", "year", true, {"k", "m", "G"}}},
 
-        // units of temperature
-        {"degR", {UT_LIN_TMP, "5/9*K", "degree Rankine", false, {}}},
+          // units of temperature
+          {"degR", {UT_LIN_TMP, "5/9*K", "degree Rankine", false, {}}},
 
-        // units of velocity
-        {"mph", {Utype::LIN, "mi/h", "miles per hour", false, {}}}
-      };
-      
+          // units of velocity
+          {"mph", {Utype::LIN, "mi/h", "miles per hour", false, {}}}};
+
       if constexpr (Config::use_units_temperature) {
-	units.insert({
-	  {"Cel", {Utype::TMP, "K", "degree Celsius", false, {}}},
-	  {"degF", {Utype::TMP, "K", "degree Fahrenheit", false, {}}},
+        units.insert({
+            {"Cel", {Utype::TMP, "K", "degree Celsius", false, {}}},
+            {"degF", {Utype::TMP, "K", "degree Fahrenheit", false, {}}},
         });
       }
-      
+
       return units;
     };
 
     UnitListType _EUS_UNITS = GetEUSUnits();
-    
+
     const QuantityListType _EUS_QUANTITIES = {
         {"l", {"ft"}},
         {"m", {"lb"}},

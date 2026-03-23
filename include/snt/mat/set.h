@@ -3,8 +3,8 @@
 
 #include "part.h"
 
-#include <string>
 #include <map>
+#include <string>
 
 namespace snt::mat {
 
@@ -18,27 +18,24 @@ namespace snt::mat {
   template <typename MEMBER, typename PROPORTION>
   class Set {
   public:
+    using PartMap = std::map<std::string, PROPORTION>; ///< Map of parts and their proportions
 
-    using PartMap = std::map<std::string, PROPORTION>;  ///< Map of parts and their proportions
+    std::map<std::string, Part<PROPORTION>> parts; ///< Map of parts
+    std::string expression;                        ///< String representation of a set
+    bool natural;                                  ///< true if set is using natural abundances
 
-    std::map<std::string, Part<PROPORTION>> parts;   ///< Map of parts
-    std::string expression;                          ///< String representation of a set
-    bool natural;                                    ///< true if set is using natural abundances
-    
     /**
      * @brief Set class constructor
      *
      * @param comp A map of parts with their proportions
      * @param nat Indicate if substance atoms should use natural abundance
-     * @param expr Set string representation     
+     * @param expr Set string representation
      */
-    Set(const PartMap& comp, bool nat = true, const std::string& expr = ""):
-      expression(expr), natural(nat) {
+    Set(const PartMap& comp, bool nat = true, const std::string& expr = "") : expression(expr), natural(nat) {
 
-      for (const auto& [pexpr, pprop]: comp) {
+      for (const auto& [pexpr, pprop] : comp) {
       }
     };
-    
   };
 
 } // namespace snt::mat

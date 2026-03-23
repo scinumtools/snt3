@@ -3,7 +3,6 @@
 
 #include <snt/val/array.h>
 #include <snt/val/values_array.h>
-
 #include <typeinfo>
 
 namespace snt::val {

@@ -1,28 +1,26 @@
 #ifndef EXS_ATOM_H
 #define EXS_ATOM_H
 
-#include <snt/exs/settings.h>
-#include <snt/exs/atom_base.h>
-
 #include <cmath>
 #include <iostream>
 #include <math.h>
 #include <regex>
+#include <snt/exs/atom_base.h>
+#include <snt/exs/settings.h>
 #include <sstream>
 #include <stdexcept>
 #include <variant>
 
-namespace snt::exs {  
+namespace snt::exs {
 
-  typedef std::variant<double, bool> AtomValueType;  ///< Type of default atom value
+  typedef std::variant<double, bool> AtomValueType; ///< Type of default atom value
 
   /**
    * @class Atom
    * @brief Default atom class
    */
-  class Atom final: public AtomBase<Atom,AtomValueType> {
+  class Atom final : public AtomBase<Atom, AtomValueType> {
   public:
-
     /**
      * @brief Copy constructor of an atom
      *
@@ -44,12 +42,12 @@ namespace snt::exs {
      * @param set Pointer to solver settings
      */
     static AtomValueType from_string(std::string s, BaseSettings* set = nullptr);
-     
+
     /**
      * @copydoc AtomGrand::to_string
      */
     std::string to_string() override;
-    
+
     // Math operations
 
     /**
@@ -140,39 +138,39 @@ namespace snt::exs {
     void math_tangens() override;
 
     // Comparison operations
-    
+
     /**
      * @copydoc AtomGrand::comparison_equal
      */
     void comparison_equal(Atom* other) override;
-    
+
     /**
      * @copydoc AtomGrand::comparison_not_equal
      */
     void comparison_not_equal(Atom* other) override;
-    
+
     /**
      * @copydoc AtomGrand::comparison_less_equal
      */
     void comparison_less_equal(Atom* other) override;
-    
+
     /**
      * @copydoc AtomGrand::comparison_greater_equal
      */
     void comparison_greater_equal(Atom* other) override;
-    
+
     /**
      * @copydoc AtomGrand::comparison_less
      */
     void comparison_less(Atom* other) override;
-    
+
     /**
      * @copydoc AtomGrand::comparison_greater
      */
     void comparison_greater(Atom* other) override;
 
     // Logical operations
-    
+
     /**
      * @copydoc AtomGrand::logical_not
      */
@@ -189,7 +187,7 @@ namespace snt::exs {
     void logical_or(Atom* other) override;
 
     // Conditional operator
-    
+
     /**
      * @copydoc AtomGrand::condition
      */

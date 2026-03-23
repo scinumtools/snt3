@@ -1,11 +1,9 @@
-#include <snt/puq/value/dimensions.h>
-
-#include <snt/puq/nostd/to_string.h>
-#include <snt/puq/settings.h>
-
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
+#include <snt/puq/nostd/to_string.h>
+#include <snt/puq/settings.h>
+#include <snt/puq/value/dimensions.h>
 #include <sstream>
 
 namespace snt::puq {
@@ -40,9 +38,9 @@ namespace snt::puq {
     if (!numerical.estimate->is_unity() && format.display_magnitude()) {
       ss << numerical.to_string(format) << multiply;
     }
-    //if (numerical.estimate != 1 && format.display_magnitude()) {
-    //  ss << numerical.to_string(format) << multiply;
-    //}
+    // if (numerical.estimate != 1 && format.display_magnitude()) {
+    //   ss << numerical.to_string(format) << multiply;
+    // }
     return ss.str();
   }
 

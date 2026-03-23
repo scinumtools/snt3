@@ -1,8 +1,7 @@
-#include <snt/puq/calc/calculator_atom.h>
-#include <snt/puq/exceptions.h>
-
 #include <algorithm>
 #include <regex>
+#include <snt/puq/calc/calculator_atom.h>
+#include <snt/puq/exceptions.h>
 #include <sstream>
 
 namespace snt::puq {

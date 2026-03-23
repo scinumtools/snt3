@@ -1,16 +1,14 @@
-#include <snt/dip/nodes/node_case.h>
-
-#include <snt/dip/environment.h>
-#include <snt/dip/solvers/solver_logical.h>
-
 #include <regex>
+#include <snt/dip/environment.h>
+#include <snt/dip/nodes/node_case.h>
+#include <snt/dip/solvers/solver_logical.h>
 
 namespace snt::dip {
 
   BaseNode::PointerType CaseNode::is_node(Parser& parser) {
     if (parser.kwd_case()) {
       if (parser.name.substr(1) != KEYWORD_ELSE and parser.name.substr(1) != KEYWORD_END)
-	parser.part_value();
+        parser.part_value();
       parser.part_comment();
       return std::make_shared<CaseNode>(parser);
     }
@@ -58,8 +56,8 @@ namespace snt::dip {
           value = std::move(result.value)->all_of();
           break;
         }
-	case ValueOrigin::Keyword:
-	case ValueOrigin::String:
+        case ValueOrigin::Keyword:
+        case ValueOrigin::String:
           if (value_raw.at(0) == snt::KEYWORD_TRUE)
             value = true;
           else if (value_raw.at(0) == snt::KEYWORD_FALSE)
@@ -68,8 +66,8 @@ namespace snt::dip {
             throw std::runtime_error("Invalid value: " + line.code);
           break;
         default:
-	  throw std::runtime_error("Invalid value: " + line.code);
-	  break;
+          throw std::runtime_error("Invalid value: " + line.code);
+          break;
         }
       } else if (case_type == CaseType::ELSE) {
         value = true;

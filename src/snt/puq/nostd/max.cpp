@@ -24,8 +24,8 @@ namespace snt::nostd {
     } else {
       return puq::Result(std::move(estimate));
     }
-    //val::BaseValue::PointerType estimate = max(m1.estimate, m2.estimate);
-    //return puq::Result(estimate, (estimate == m1.estimate) ? m1.uncertainty : m2.uncertainty);
+    // val::BaseValue::PointerType estimate = max(m1.estimate, m2.estimate);
+    // return puq::Result(estimate, (estimate == m1.estimate) ? m1.uncertainty : m2.uncertainty);
   }
 
   extern puq::Measurement max(const puq::Measurement& msr1, const puq::Measurement& msr2) {
@@ -42,8 +42,8 @@ namespace snt::nostd {
     } else {
       return puq::Measurement(std::move(estimate));
     }
-    //val::BaseValue::PointerType estimate = max(msr1.magnitude.estimate, msr2.magnitude.estimate);
-    //return puq::Measurement(estimate, (estimate == msr1.magnitude.estimate) ? msr1.magnitude.uncertainty : msr2.magnitude.uncertainty);
+    // val::BaseValue::PointerType estimate = max(msr1.magnitude.estimate, msr2.magnitude.estimate);
+    // return puq::Measurement(estimate, (estimate == msr1.magnitude.estimate) ? msr1.magnitude.uncertainty : msr2.magnitude.uncertainty);
   }
 
 } // namespace snt::nostd

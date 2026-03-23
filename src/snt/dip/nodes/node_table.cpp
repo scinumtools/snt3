@@ -1,8 +1,8 @@
 #include "node_table.h"
 
-#include <snt/dip/environment.h>
 #include "../parsers.h"
 
+#include <snt/dip/environment.h>
 #include <stdexcept>
 
 namespace snt::dip {

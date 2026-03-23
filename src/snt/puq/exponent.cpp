@@ -1,6 +1,5 @@
-#include <snt/puq/exponent.h>
-
 #include <numeric>
+#include <snt/puq/exponent.h>
 #include <sstream>
 
 namespace snt::puq {

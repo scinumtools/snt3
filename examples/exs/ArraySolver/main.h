@@ -1,5 +1,4 @@
 #include <snt/exs/solver.h>
-
 #include <vector>
 
 using namespace snt;
@@ -10,7 +9,7 @@ enum CustomOperatorType {
 
 typedef std::vector<double> AtomValueType;
 
-class CustomAtom final: public exs::AtomBase<CustomAtom,AtomValueType> {
+class CustomAtom final : public exs::AtomBase<CustomAtom, AtomValueType> {
 public:
   CustomAtom(CustomAtom& a) : AtomBase(a) {};
   CustomAtom(AtomValueType v) : AtomBase(v) {};

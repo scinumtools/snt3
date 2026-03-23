@@ -3,9 +3,8 @@
 namespace snt::exs {
 
   // equal
-  
-  OperatorEqual::OperatorEqual(std::string s) :
-    OperatorBase("eq", s, EQUAL_OPERATOR) {
+
+  OperatorEqual::OperatorEqual(std::string s) : OperatorBase("eq", s, EQUAL_OPERATOR) {
   }
 
   void OperatorEqual::operate_binary(TokenListBase* tokens) {
@@ -16,11 +15,10 @@ namespace snt::exs {
   };
 
   // not equal
-  
-  OperatorNotEqual::OperatorNotEqual(std::string s) :
-    OperatorBase("ne", s, NOT_EQUAL_OPERATOR) {
+
+  OperatorNotEqual::OperatorNotEqual(std::string s) : OperatorBase("ne", s, NOT_EQUAL_OPERATOR) {
   }
-  
+
   void OperatorNotEqual::operate_binary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();
@@ -30,10 +28,9 @@ namespace snt::exs {
 
   // greater
 
-  OperatorGreater::OperatorGreater(std::string s) :
-    OperatorBase("gt", s, GREATER_OPERATOR) {
+  OperatorGreater::OperatorGreater(std::string s) : OperatorBase("gt", s, GREATER_OPERATOR) {
   }
-  
+
   void OperatorGreater::operate_binary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();
@@ -43,10 +40,9 @@ namespace snt::exs {
 
   // less
 
-  OperatorLess::OperatorLess(std::string s) :
-    OperatorBase("lt", s, LESS_OPERATOR) {
+  OperatorLess::OperatorLess(std::string s) : OperatorBase("lt", s, LESS_OPERATOR) {
   }
-  
+
   void OperatorLess::operate_binary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();
@@ -56,10 +52,9 @@ namespace snt::exs {
 
   // greater equal
 
-  OperatorGreaterEqual::OperatorGreaterEqual(std::string s) :
-    OperatorBase("ge", s, GREATER_EQUAL_OPERATOR) {
+  OperatorGreaterEqual::OperatorGreaterEqual(std::string s) : OperatorBase("ge", s, GREATER_EQUAL_OPERATOR) {
   }
-  
+
   void OperatorGreaterEqual::operate_binary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();
@@ -69,10 +64,9 @@ namespace snt::exs {
 
   // less equal
 
-  OperatorLessEqual::OperatorLessEqual(std::string s) :
-    OperatorBase("le", s, LESS_EQUAL_OPERATOR) {
+  OperatorLessEqual::OperatorLessEqual(std::string s) : OperatorBase("le", s, LESS_EQUAL_OPERATOR) {
   }
-  
+
   void OperatorLessEqual::operate_binary(TokenListBase* tokens) {
     Token left = tokens->get_left();
     Token right = tokens->get_right();

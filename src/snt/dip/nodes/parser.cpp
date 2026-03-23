@@ -1,10 +1,9 @@
-#include <snt/dip/nodes/parser.h>
-
 #include "../helpers.h"
 #include "../parsers.h"
 
 #include <iostream>
 #include <regex>
+#include <snt/dip/nodes/parser.h>
 #include <sstream>
 #include <stdexcept>
 
@@ -56,7 +55,7 @@ namespace snt::dip {
 
   bool Parser::kwd_case() {
     constexpr auto pstr =
-      ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_CONDITION, "](", KEYWORD_IF, "|", KEYWORD_ELIF, "))[ ]*");
+        ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_CONDITION, "](", KEYWORD_IF, "|", KEYWORD_ELIF, "))[ ]*");
     std::regex pattern(pstr.data());
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
@@ -372,8 +371,8 @@ namespace snt::dip {
       throw std::runtime_error("Number has an invalid format: " + line.code);
     }
     return false;
-  }  
-  
+  }
+
   bool Parser::part_keyword(const bool required, const char delimiter) {
     constexpr auto pstr = ce_concat<50>("^", PATTERN_KEYWORD, "+");
     std::regex pattern(pstr.data());
@@ -436,11 +435,11 @@ namespace snt::dip {
 
   bool Parser::part_units(const char delimiter) {
     // Enforce the leading delimiter
-    if (delimiter!='\0') {
-      if (code[0]==delimiter)
-	strip(std::string(1,delimiter));
+    if (delimiter != '\0') {
+      if (code[0] == delimiter)
+        strip(std::string(1, delimiter));
       else
-	return false;
+        return false;
     }
     // In numerical expressions starting signs +-*/ have to be explicitely excluded
     std::regex pattern1("^([^#= ]+)");

@@ -6,13 +6,13 @@
 namespace snt {
 
   struct StringFormatType {
-    char specifier = 'g';        // format data type specifier
-    int valuePrecision = 4;      // number of significant digits of value
-    int uncertaintyPrecision = 2;      // number of significant digits of an uncertainty
-    int thresholdScientific = 3; // exponent from which fixed notation switch to scientific
-    bool paddingZeros = false;   // use zeros for string padding
-    int paddingSize = 0;         // string padding
-    bool stringQuotes = true;    // add quotes to string values
+    char specifier = 'g';         // format data type specifier
+    int valuePrecision = 4;       // number of significant digits of value
+    int uncertaintyPrecision = 2; // number of significant digits of an uncertainty
+    int thresholdScientific = 3;  // exponent from which fixed notation switch to scientific
+    bool paddingZeros = false;    // use zeros for string padding
+    int paddingSize = 0;          // string padding
+    bool stringQuotes = true;     // add quotes to string values
   };
 
   // Implementation for value only

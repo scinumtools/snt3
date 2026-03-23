@@ -2,9 +2,9 @@
 #define MAT_SUBSTANCE_H
 
 #include <snt/mat/element.h>
+#include <snt/mat/matter.h>
 #include <snt/mat/part.h>
 #include <snt/mat/set.h>
-#include <snt/mat/matter.h>
 #include <snt/mat/solvers/substance_solver.h>
 
 namespace snt::mat {
@@ -13,11 +13,10 @@ namespace snt::mat {
    * @class Substance
    * @brief A form of matter with uniform and definite composition and distinct physical and chemical properties.
    */
-  class Substance: public Set<Element, int>,
-		   public Part<double>,
-		   public Matter {
+  class Substance : public Set<Element, int>,
+                    public Part<double>,
+                    public Matter {
   public:
-    
     /**
      * @brief Substance class constructor from a scalar number
      *
@@ -33,7 +32,7 @@ namespace snt::mat {
      * @param nat Indicate if substance atoms should use natural abundance
      */
     Substance(const ElementMap& comp, double prop = 1, bool nat = true);
-    
+
     /**
      * @brief Substance class constructor from an expression
      *
@@ -42,7 +41,7 @@ namespace snt::mat {
      * @param nat Indicate if substance atoms should use natural abundance
      */
     Substance(const std::string& expr, double prop = 1, bool nat = true);
-    
+
     /**
      * @brief Convert element to a string
      *

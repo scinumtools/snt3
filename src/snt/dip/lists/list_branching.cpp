@@ -1,8 +1,6 @@
-#include <snt/dip/lists/list_branching.h>
-
-#include <snt/dip/nodes/node_case.h>
-
 #include <regex>
+#include <snt/dip/lists/list_branching.h>
+#include <snt/dip/nodes/node_case.h>
 
 namespace snt::dip {
 
@@ -129,14 +127,14 @@ namespace snt::dip {
         }
         if (state.empty() && cnode->case_type == CaseType::IF)
           branch_part = open_branch(case_id);
-        else if (cnode->case_type == CaseType::ELIF or cnode->case_type == CaseType::ELSE) 
+        else if (cnode->case_type == CaseType::ELIF or cnode->case_type == CaseType::ELSE)
           branch_part = switch_case(case_id, cnode->case_type);
-	else
-	  throw std::runtime_error("Only @if can open a new case:  " + node->line.code);
+        else
+          throw std::runtime_error("Only @if can open a new case:  " + node->line.code);
       } else if (cnode->case_type == CaseType::IF) {
         branch_part = open_branch(case_id);
       } else {
-	throw std::runtime_error("Only @if can open a new case:  " + node->line.code);
+        throw std::runtime_error("Only @if can open a new case:  " + node->line.code);
       }
       // get current branch id
       size_t branch_id = get_branch_id();

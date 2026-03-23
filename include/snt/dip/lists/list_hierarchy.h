@@ -1,7 +1,7 @@
 #ifndef DIP_HIERARCHY_LIST_H
 #define DIP_HIERARCHY_LIST_H
 
-#include "../nodes/node_base.h"
+#include <snt/dip/nodes/node_base.h>
 
 namespace snt::dip {
 

@@ -1,9 +1,8 @@
 #ifndef EXS_STEP_LIST_H
 #define EXS_STEP_LIST_H
 
-#include <snt/exs/settings.h>
-
 #include <memory>
+#include <snt/exs/settings.h>
 #include <vector>
 
 namespace snt::exs {

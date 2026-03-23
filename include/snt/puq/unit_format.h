@@ -1,10 +1,9 @@
 #ifndef PUQ_UNIT_FORMAT_H
 #define PUQ_UNIT_FORMAT_H
 
-#include <snt/puq/settings.h>
-
 #include <iostream>
 #include <optional>
+#include <snt/puq/settings.h>
 #include <string>
 #include <unordered_map>
 
@@ -38,7 +37,7 @@ namespace snt::puq {
                       CGS,
                       FPS };
     enum class Uncertainty { SHOW,
-                       HIDE };
+                             HIDE };
     typedef int Precision;
   } // namespace Format
 

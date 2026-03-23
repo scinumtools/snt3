@@ -1,9 +1,9 @@
 #include "pch_tests.h"
+
+#include <set>
 #include <snt/puq/systems/unit_system.h>
 #include <snt/puq/value/dimensions.h>
 #include <snt/puq/value/measurement.h>
-
-#include <set>
 
 using namespace snt;
 
@@ -63,9 +63,9 @@ void test_unit_definitions() {
 
     if constexpr (puq::Config::use_units_logarithmic) {
       if (unit.second.utype == puq::Utype::LOG) {
-	// For logarithmic units compare only the physical dimensionality
-	m1 = dim1.to_string({puq::Format::Display::UNITS});
-	m2 = dim2.to_string({puq::Format::Display::UNITS});
+        // For logarithmic units compare only the physical dimensionality
+        m1 = dim1.to_string({puq::Format::Display::UNITS});
+        m2 = dim2.to_string({puq::Format::Display::UNITS});
       }
     }
 

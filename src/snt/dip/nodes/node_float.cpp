@@ -1,7 +1,7 @@
-#include <snt/dip/nodes/node_float.h>
+#include "../parsers.h"
 
 #include <snt/dip/environment.h>
-#include "../parsers.h"
+#include <snt/dip/nodes/node_float.h>
 #include <snt/dip/solvers/solver_numerical.h>
 
 namespace snt::dip {
@@ -124,5 +124,5 @@ namespace snt::dip {
       ss << " " << units->to_string();
     return ss.str();
   }
-  
+
 } // namespace snt::dip

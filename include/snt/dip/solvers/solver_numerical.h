@@ -1,17 +1,15 @@
 #ifndef DIP_SOLVER_NUMERICAL_H
 #define DIP_SOLVER_NUMERICAL_H
 
-#include "../../exs.h"
-#include "../../val.h"
-#include "../environment.h"
+#include <snt/dip/environment.h>
 
 namespace snt::dip {
 
-  struct NumericalSettings: exs::BaseSettings {
+  struct NumericalSettings : exs::BaseSettings {
     Environment* env;
   };
 
-  class NumericalAtom : public exs::AtomBase<NumericalAtom,val::BaseValue::PointerType> {
+  class NumericalAtom : public exs::AtomBase<NumericalAtom, val::BaseValue::PointerType> {
   public:
     // Constructor from unique_ptr
     NumericalAtom(val::BaseValue::PointerType b) : AtomBase(std::move(b)) {};
@@ -44,7 +42,7 @@ namespace snt::dip {
 
   class NumericalSolver {
   public:
-    std::unique_ptr<exs::Solver<NumericalAtom,NumericalSettings>> solver;
+    std::unique_ptr<exs::Solver<NumericalAtom, NumericalSettings>> solver;
     NumericalSolver(Environment& env);
     NumericalAtom eval(const std::string& expression);
   };

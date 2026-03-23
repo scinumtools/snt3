@@ -1,11 +1,11 @@
 #include "node_unit.h"
 
-#include <snt/dip/dip.h>
-#include <snt/dip/environment.h>
 #include "../parsers.h"
 
 #include <array>
 #include <fstream>
+#include <snt/dip/dip.h>
+#include <snt/dip/environment.h>
 
 namespace snt::dip {
 
@@ -15,7 +15,7 @@ namespace snt::dip {
       // TODO: implement injection of a unit
       parser.part_keyword();
       parser.part_equal();
-      parser.part_units('\0');  // an empty space before the units is already taken by ' = ' sign, so we don't enforce it here
+      parser.part_units('\0'); // an empty space before the units is already taken by ' = ' sign, so we don't enforce it here
       parser.part_comment();
       return std::make_shared<UnitNode>(parser);
     }

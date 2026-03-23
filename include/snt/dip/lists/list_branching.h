@@ -1,9 +1,8 @@
 #ifndef DIP_BRANCHING_LIST_H
 #define DIP_BRANCHING_LIST_H
 
-#include "../nodes/node_case.h"
-
 #include <map>
+#include <snt/dip/nodes/node_case.h>
 #include <string>
 
 namespace snt::dip {

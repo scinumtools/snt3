@@ -9,10 +9,10 @@ namespace snt::exs {
     bool closed = false;
     while (expr.right.length() > 0) {
       if (expr.right.rfind(symbol_other, 0) == 0) {
-	expr.remove(symbol_other);
-	this->groups.push_back(expr.pop_left());
-	closed = true;
-	break;
+        expr.remove(symbol_other);
+        this->groups.push_back(expr.pop_left());
+        closed = true;
+        break;
       }
       expr.shift();
     }
@@ -21,4 +21,4 @@ namespace snt::exs {
     }
   };
 
-}
+} // namespace snt::exs

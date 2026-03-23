@@ -1,8 +1,8 @@
 #include "pch_tests.h"
-#include <snt/dip/dip.h>
 
 #include <filesystem>
 #include <fstream>
+#include <snt/dip/dip.h>
 
 using namespace snt;
 

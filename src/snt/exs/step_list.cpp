@@ -6,4 +6,4 @@ namespace snt::exs {
     steps.push_back({t, s});
   };
 
-}
+} // namespace snt::exs

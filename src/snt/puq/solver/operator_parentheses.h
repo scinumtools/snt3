@@ -2,6 +2,7 @@
 #define PUQ_OPERATOR_PARENTHESES_H
 
 #include <snt/exs/operator_group.h>
+#include <snt/puq/exponent.h>
 
 namespace snt::puq {
 

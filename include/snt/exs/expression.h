@@ -1,9 +1,8 @@
 #ifndef EXS_EXPRESSION_H
 #define EXS_EXPRESSION_H
 
-#include <snt/exs/settings.h>
-
 #include <iostream>
+#include <snt/exs/settings.h>
 #include <sstream>
 
 namespace snt::exs {

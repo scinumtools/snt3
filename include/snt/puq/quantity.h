@@ -1,11 +1,10 @@
 #ifndef PUQ_QUANTITY_H
 #define PUQ_QUANTITY_H
 
+#include <iomanip>
 #include <snt/puq/settings.h>
 #include <snt/puq/solver/unit_solver.h>
 #include <snt/puq/systems/unit_system.h>
-
-#include <iomanip>
 #include <sstream>
 
 namespace snt::puq {
@@ -57,23 +56,23 @@ namespace snt::puq {
     friend Quantity operator-(const double m, const Quantity& q);
     friend Quantity operator*(const double m, const Quantity& q);
     friend Quantity operator/(const double m, const Quantity& q);
-    //friend bool operator==(const double m, const Quantity& q);
+    // friend bool operator==(const double m, const Quantity& q);
     friend Quantity operator+(const Quantity& q, const double m);
     friend Quantity operator-(const Quantity& q, const double m);
     friend Quantity operator*(const Quantity& q, const double m);
     friend Quantity operator/(const Quantity& q, const double m);
-    //friend bool operator==(const Quantity& q, const double m);
-    // array operations
+    // friend bool operator==(const Quantity& q, const double m);
+    //  array operations
     friend Quantity operator+(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator-(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator*(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator/(val::BaseValue::PointerType a, const Quantity& q);
-    //friend bool operator==(val::BaseValue::PointerType a, const Quantity& q);
+    // friend bool operator==(val::BaseValue::PointerType a, const Quantity& q);
     friend Quantity operator+(const Quantity& q, val::BaseValue::PointerType a);
     friend Quantity operator-(const Quantity& q, val::BaseValue::PointerType a);
     friend Quantity operator*(const Quantity& q, val::BaseValue::PointerType a);
     friend Quantity operator/(const Quantity& q, val::BaseValue::PointerType a);
-    //friend bool operator==(const Quantity& q, val::BaseValue::PointerType a);
+    // friend bool operator==(const Quantity& q, val::BaseValue::PointerType a);
     friend Quantity operator+(const Quantity& q);
     friend Quantity operator-(const Quantity& q);
     friend std::ostream& operator<<(std::ostream& os, const Quantity& q);

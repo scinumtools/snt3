@@ -1,18 +1,17 @@
 #ifndef EXS_SOLVER_H
 #define EXS_SOLVER_H
 
-#include <snt/exs/operators/control.h>
-#include <snt/exs/operators/comparison.h>
-#include <snt/exs/operators/logical.h>
+#include <memory>
 #include <snt/exs/operators/arithmetic.h>
-#include <snt/exs/operators/trigonometry.h>
+#include <snt/exs/operators/comparison.h>
+#include <snt/exs/operators/control.h>
 #include <snt/exs/operators/exponential.h>
+#include <snt/exs/operators/logical.h>
+#include <snt/exs/operators/trigonometry.h>
 #include <snt/exs/settings.h>
 #include <snt/exs/step_list.h>
 #include <snt/exs/token_list.h>
 #include <snt/settings.h>
-
-#include <memory>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -23,8 +22,8 @@ namespace snt::exs {
    * @brief Main expression solver class
    *
    * Note that internal solver and operator routines use static_cast to convert between
-   * AtomGrand and actual ATOM type. Although it may seem dangerous, within a particular 
-   * solver we need to guarantee that AtomGrand will have only one derived type. 
+   * AtomGrand and actual ATOM type. Although it may seem dangerous, within a particular
+   * solver we need to guarantee that AtomGrand will have only one derived type.
    *
    * @tparam ATOM Atom type
    * @tparam SETTINGS Atom settings
@@ -33,9 +32,9 @@ namespace snt::exs {
   class Solver {
 
   public:
-    SETTINGS settings;       ///< Setting structure
-    OperatorList operators;  ///< List of used operators
-    StepList steps;          ///< List of operator steps
+    SETTINGS settings;      ///< Setting structure
+    OperatorList operators; ///< List of used operators
+    StepList steps;         ///< List of operator steps
 
     /**
      * @brief Default solver constructor
@@ -46,7 +45,7 @@ namespace snt::exs {
       init_steps();
       init_operators();
     };
-    
+
     /**
      * @brief Solver constructor with modified operators
      *
@@ -56,7 +55,7 @@ namespace snt::exs {
     Solver(const OperatorList& o, const SETTINGS& set = {}) : operators(o), settings(set) {
       init_steps();
     };
-    
+
     /**
      * @brief Solver constructor with modified operator steps
      *
@@ -66,7 +65,7 @@ namespace snt::exs {
     Solver(const StepList& s, const SETTINGS& set = {}) : steps(s), settings(set) {
       init_operators();
     };
-    
+
     /**
      * @brief Custom solver constructor
      *
@@ -75,7 +74,7 @@ namespace snt::exs {
      * @param set Solver settings
      */
     Solver(const OperatorList& o, const StepList& s, const SETTINGS& set = {}) : operators(o), steps(s), settings(set) {
-    };
+                                                                                 };
 
     /**
      * @brief Main solver routine
@@ -84,22 +83,22 @@ namespace snt::exs {
      * @return Final atom object with a solution
      */
     ATOM solve(std::string expression) {
-      
+
       Expression expr(expression);
-      //CHECKPOINT( expr.to_string() );
+      // CHECKPOINT( expr.to_string() );
       TokenList tokens(&operators, &settings);
-      
+
       // Tokenize expression
       while (expr.right.length() > 0) {
         bool is_operator = false;
         for (auto o : operators.order) {
           OperatorBase* op = operators.select(o);
-          //CHECKPOINT( op->symbol );
+          // CHECKPOINT( op->symbol );
           if (op->check(expr)) {
             is_operator = true;
             std::string left = expr.pop_left();
             if (left.length() > 0) {
-	      ATOM atom = ATOM::from_string(left, &settings);
+              ATOM atom = ATOM::from_string(left, &settings);
               tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
             }
             op->parse(expr);
@@ -107,35 +106,35 @@ namespace snt::exs {
               std::vector<std::string> groups = op->groups;
               // CHECKPOINT( groups.size() )
               for (auto e : groups) {
-		ATOM atom = solve(e);
+                ATOM atom = solve(e);
                 tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
               }
             }
             tokens.append(OPERATOR_TOKEN, op->type);
-            //CHECKPOINT( expr.to_string() );
+            // CHECKPOINT( expr.to_string() );
           }
         }
         if (is_operator == false) {
           expr.shift();
-          //CHECKPOINT( expr.to_string() );
+          // CHECKPOINT( expr.to_string() );
         }
-        //CHECKPOINT( tokens.to_string(true) );
+        // CHECKPOINT( tokens.to_string(true) );
       }
       std::string left = expr.pop_left();
       if (left.length() > 0) {
-	ATOM atom = ATOM::from_string(left, &settings);
-	tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
+        ATOM atom = ATOM::from_string(left, &settings);
+        tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
       }
-      //CHECKPOINT( expr.to_string() );
+      // CHECKPOINT( expr.to_string() );
 
       for (auto s : steps.steps) {
-        //CHECKPOINT( tokens.to_string(true) );
+        // CHECKPOINT( tokens.to_string(true) );
         tokens.operate(s.second, s.first);
       }
-      //CHECKPOINT( tokens.to_string(true) );
+      // CHECKPOINT( tokens.to_string(true) );
 
       if (tokens.left.size() > 0 or tokens.right.size() > 1) {
-        //CHECKPOINT( tokens.to_string(true) );
+        // CHECKPOINT( tokens.to_string(true) );
         throw std::logic_error("Cannot solve expression due to unprocessed tokens: " + tokens.to_string(true));
       }
 
@@ -148,7 +147,6 @@ namespace snt::exs {
     };
 
   private:
-
     /**
      * @brief Initialisation of a default list of operator steps
      */

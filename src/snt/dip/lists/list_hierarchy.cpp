@@ -1,6 +1,5 @@
-#include <snt/dip/lists/list_hierarchy.h>
-
 #include <iostream>
+#include <snt/dip/lists/list_hierarchy.h>
 #include <sstream>
 
 namespace snt::dip {

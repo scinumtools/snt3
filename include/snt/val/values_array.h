@@ -2,7 +2,6 @@
 #define VAL_VALUES_ARRAY_H
 
 #include <snt/val/value_base.h>
-
 #include <typeinfo>
 
 namespace snt::val {
@@ -22,7 +21,7 @@ namespace snt::val {
   template <typename T>
   class BaseArrayValue : public BaseValue {
   protected:
-    std::vector<T> value;   ///< Internal data container that holds flattend array values
+    std::vector<T> value; ///< Internal data container that holds flattend array values
 
   public:
     /**
@@ -59,7 +58,7 @@ namespace snt::val {
       } else
         throw std::runtime_error("ArrayValue could not be initialized from the given BaseValue.");
     };
-    
+
     /**
      * @brief Create unique pointer from a vector of values
      *
@@ -86,7 +85,7 @@ namespace snt::val {
      * @brief Get copy of a particular value
      *
      * @param index Index of a value
-     * @return Single value 
+     * @return Single value
      */
     T get_value(const size_t index) const { return value.at(index); };
 
@@ -149,12 +148,11 @@ namespace snt::val {
     std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override {
       return snt::array_to_string(value, shape, format);
     };
-    
+
     /*
      * Operations
      */
   protected:
-    
     template <typename R, typename Func>
     std::unique_ptr<ArrayValue<R>> operate_unary(Func f) const {
       // apply operation
@@ -163,14 +161,14 @@ namespace snt::val {
         arr[i] = f(value[i]);
       return std::make_unique<ArrayValue<R>>(arr, this->shape);
     };
-    
+
     template <typename R, typename Func>
     void operate_unary_equal(Func f) {
       // apply operation
       for (int i = 0; i < value.size(); i++)
         value[i] = f(value[i]);
     };
-    
+
     template <typename R, typename Func>
     std::unique_ptr<ArrayValue<R>> operate_binary(const BaseValue* other, Func f) const {
       std::vector<R> arr;
@@ -204,7 +202,7 @@ namespace snt::val {
         return std::make_unique<ArrayValue<R>>(arr, this->get_shape());
       }
     };
-    
+
     template <typename R, typename Func>
     void operate_binary_equal(const BaseValue* other, Func f) {
       if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
@@ -235,7 +233,7 @@ namespace snt::val {
           value[i] = f(this->get_value(i), otherT.get_value(i));
       }
     };
-    
+
     template <typename U, typename R, typename Func>
     std::unique_ptr<ArrayValue<R>> operate_ternary(const BaseValue* other1, const BaseValue* other2, Func f) const {
       // test if shape match
@@ -257,7 +255,6 @@ namespace snt::val {
     };
 
   public:
-    
     BaseValue::PointerType compare_equal(const BaseValue* other) const override {
       return operate_binary<bool>(other, [](T a, T b) { return a == b; });
     };

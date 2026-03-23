@@ -1,11 +1,6 @@
 #ifndef VAL_BASE_VALUE_H
 #define VAL_BASE_VALUE_H
 
-#include <snt/settings.h>
-#include <snt/string_format.h>
-#include <snt/val/array.h>
-#include <snt/val/datatypes.h>
-
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -15,6 +10,10 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <snt/settings.h>
+#include <snt/string_format.h>
+#include <snt/val/array.h>
+#include <snt/val/datatypes.h>
 #include <sstream>
 #include <typeinfo>
 #include <unordered_map>

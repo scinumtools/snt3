@@ -1,23 +1,22 @@
-#include <snt/exs/solver.h>
-
 #include <array>
+#include <snt/exs/solver.h>
 
 using namespace snt;
 
-struct Settings: exs::BaseSettings {
+struct Settings : exs::BaseSettings {
   std::string symbol;
   int value;
   std::array<int, 5> options;
 
-  Settings(std::string s, int v, std::array<int, 5> o) 
-    : symbol(s), value(v), options(o) {}
+  Settings(std::string s, int v, std::array<int, 5> o)
+      : symbol(s), value(v), options(o) {}
 };
 
 enum CustomOperatorType {
   SELECT_OPERATOR = exs::NUM_OPERATOR_TYPES
 };
 
-class CustomAtom final : public exs::AtomBase<CustomAtom,int> {
+class CustomAtom final : public exs::AtomBase<CustomAtom, int> {
 public:
   CustomAtom(CustomAtom& a) : AtomBase(a) {};
   CustomAtom(int v) : AtomBase(v) {};

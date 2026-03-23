@@ -1,7 +1,8 @@
 #include "pch_tests.h"
+
+#include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/solvers/solver_logical.h>
-#include <snt/dip/dip.h>
 
 using namespace snt;
 
@@ -98,7 +99,7 @@ TEST(SolverLogical, Injections) {
   d.add_string("foo bool = false");
   d.add_string("bar int = 3");
   dip::Environment env = d.parse();
-  
+
   dip::LogicalSolver solver(env);
   dip::LogicalAtom atom = solver.eval("2 == {?bar} && {?foo}");
   EXPECT_EQ(atom.value->to_string(), "false");

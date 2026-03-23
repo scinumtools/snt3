@@ -1,11 +1,11 @@
 #include "node_source.h"
 
-#include <snt/dip/dip.h>
-#include <snt/dip/environment.h>
 #include "../parsers.h"
 
 #include <array>
 #include <fstream>
+#include <snt/dip/dip.h>
+#include <snt/dip/environment.h>
 
 namespace snt::dip {
 

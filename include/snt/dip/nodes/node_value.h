@@ -2,9 +2,9 @@
 #define DIP_NODE_VALUE_H
 
 #include "node_base.h"
-#include <snt/puq/quantity.h>
 
 #include <deque>
+#include <snt/puq/quantity.h>
 
 namespace snt::dip {
 

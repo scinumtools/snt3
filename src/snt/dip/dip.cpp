@@ -1,12 +1,11 @@
-#include <snt/dip/dip.h>
-
-#include <snt/dip/nodes/node_property.h>
-#include <snt/dip/nodes/node_value.h>
-#include <snt/dip/settings.h>
 #include "parsers.h"
 
 #include <fstream>
 #include <iostream>
+#include <snt/dip/dip.h>
+#include <snt/dip/nodes/node_property.h>
+#include <snt/dip/nodes/node_value.h>
+#include <snt/dip/settings.h>
 #include <sstream>
 #include <string>
 
@@ -125,7 +124,7 @@ namespace snt::dip {
           throw std::runtime_error(
               "Only value nodes (bool, int, float and str) can have properties: " +
               pnode->line.code);
-        if (previous_node->indent >= pnode->indent or (pnode->indent-previous_node->indent)!=INDENT_STEP)
+        if (previous_node->indent >= pnode->indent or (pnode->indent - previous_node->indent) != INDENT_STEP)
           throw std::runtime_error("The indent of a property '" + std::to_string(pnode->indent) +
                                    "' is not " + std::to_string(INDENT_STEP) +
                                    " white spaces higher than the indent of a preceding node '" +
@@ -134,16 +133,16 @@ namespace snt::dip {
         if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
           throw std::runtime_error("Property could not be set: " + pnode->line.code);
       } else {
-	// We make sure that the indent spacing is always set by INDENT_STEP
-	if ((current_node->indent%INDENT_STEP) != 0)
-	  throw std::runtime_error("Indent of the current node is not a multiple of " + std::to_string(INDENT_STEP) + " '" +
-				   std::to_string(current_node->indent) + "': " + current_node->line.code);
-	if (previous_node != nullptr) {
-	  if ((current_node->indent > previous_node->indent) && (current_node->indent - previous_node->indent) != INDENT_STEP) {
-	      throw std::runtime_error("Indent of the child node '" + std::to_string(current_node->indent) + "' is not exactly " + std::to_string(INDENT_STEP) +
-		                       " white spaces higher than its parent nodes '" + std::to_string(current_node->indent) + "': " + current_node->line.code);
-	  }
-	}
+        // We make sure that the indent spacing is always set by INDENT_STEP
+        if ((current_node->indent % INDENT_STEP) != 0)
+          throw std::runtime_error("Indent of the current node is not a multiple of " + std::to_string(INDENT_STEP) + " '" +
+                                   std::to_string(current_node->indent) + "': " + current_node->line.code);
+        if (previous_node != nullptr) {
+          if ((current_node->indent > previous_node->indent) && (current_node->indent - previous_node->indent) != INDENT_STEP) {
+            throw std::runtime_error("Indent of the child node '" + std::to_string(current_node->indent) + "' is not exactly " + std::to_string(INDENT_STEP) +
+                                     " white spaces higher than its parent nodes '" + std::to_string(current_node->indent) + "': " + current_node->line.code);
+          }
+        }
         previous_node = current_node;
       }
     }
@@ -182,10 +181,10 @@ namespace snt::dip {
         // TODO: maybe this can be done after modifications?!
         ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node);
         if (vnode) {
-	  if (vnode->value == nullptr)
-	    vnode->set_value();
-	  if (vnode->units == nullptr)
-	    vnode->set_units();
+          if (vnode->value == nullptr)
+            vnode->set_value();
+          if (vnode->units == nullptr)
+            vnode->set_units();
         }
         // If node was previously defined, modify its value
         bool new_node = true;

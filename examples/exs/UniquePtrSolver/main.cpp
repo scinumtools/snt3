@@ -1,7 +1,7 @@
 #import "main.h"
 
-#import "snt/exs/operators/logical.h"
 #import "snt/exs/operator_list.h"
+#import "snt/exs/operators/logical.h"
 #import "snt/exs/solver.h"
 #import "snt/exs/step_list.h"
 
@@ -12,7 +12,7 @@ int main() {
   exs::OperatorList operators;
   operators.append(exs::AND_OPERATOR, std::make_shared<exs::OperatorAnd>());
 
-  exs::StepList steps {};
+  exs::StepList steps{};
   steps.append(exs::BINARY_OPERATION, {exs::AND_OPERATOR});
 
   exs::Solver<LogicalAtom> solver(operators, steps);

@@ -1,10 +1,10 @@
 #include <iostream>
-#include <snt/exs/atom.h>
-#include <snt/exs/solver.h>
-#include <snt/val/values_array.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/nodes/node_value.h>
+#include <snt/exs/atom.h>
+#include <snt/exs/solver.h>
+#include <snt/val/values_array.h>
 
 using namespace snt;
 

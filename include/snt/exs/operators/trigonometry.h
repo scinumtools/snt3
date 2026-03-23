@@ -6,12 +6,11 @@
 namespace snt::exs {
 
   // sinus
-  
+
   class OperatorSinus : public OperatorGroup<1> {
   public:
-    
     OperatorSinus(const OperatorGroupSybols& s = {"sin", "(", ")", ","});
-    
+
     void operate_group(TokenListBase* tokens) override;
   };
 
@@ -27,12 +26,11 @@ namespace snt::exs {
 
   class OperatorTangens : public OperatorGroup<1> {
   public:
-    
     OperatorTangens(const OperatorGroupSybols& s = {"tan", "(", ")", ","});
-    
+
     void operate_group(TokenListBase* tokens) override;
   };
-  
+
 } // namespace snt::exs
 
 #endif // EXS_OPERATOR_TRIGONOMETRY_H

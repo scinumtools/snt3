@@ -1,9 +1,8 @@
 #ifndef EXS_OPERATOR_LIST_H
 #define EXS_OPERATOR_LIST_H
 
-#include <snt/exs/operator_base.h>
-
 #include <memory>
+#include <snt/exs/operator_base.h>
 #include <unordered_map>
 #include <vector>
 

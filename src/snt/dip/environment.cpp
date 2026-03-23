@@ -1,5 +1,4 @@
 #include <snt/dip/environment.h>
-
 #include <snt/dip/nodes/node_value.h>
 
 namespace snt::dip {

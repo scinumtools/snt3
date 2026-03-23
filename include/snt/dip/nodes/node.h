@@ -1,9 +1,9 @@
 #ifndef DIP_NODE_H
 #define DIP_NODE_H
 
+#include <snt/dip/settings.h>
 #include <snt/val/array.h>
 #include <snt/val/value_base.h>
-#include "../settings.h"
 
 namespace snt::dip {
 

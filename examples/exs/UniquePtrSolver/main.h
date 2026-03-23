@@ -4,7 +4,7 @@ using namespace snt;
 
 typedef std::unique_ptr<bool> UniquePtrType;
 
-class LogicalAtom final : public exs::AtomBase<LogicalAtom,UniquePtrType> {
+class LogicalAtom final : public exs::AtomBase<LogicalAtom, UniquePtrType> {
 public:
   // Constructor from unique_ptr
   LogicalAtom(UniquePtrType b) : AtomBase(std::move(b)) {};

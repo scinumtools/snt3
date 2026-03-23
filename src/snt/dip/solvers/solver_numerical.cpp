@@ -1,9 +1,8 @@
-#include <snt/dip/solvers/solver_numerical.h>
-
 #include <snt/dip/nodes/node_boolean.h>
 #include <snt/dip/nodes/node_float.h>
 #include <snt/dip/nodes/node_integer.h>
 #include <snt/dip/nodes/node_string.h>
+#include <snt/dip/solvers/solver_numerical.h>
 
 namespace snt::dip {
 
@@ -20,7 +19,7 @@ namespace snt::dip {
     if (parser.part_reference()) {
       NumericalSettings* csettings = static_cast<NumericalSettings*>(settings);
       val::BaseValue::PointerType value =
-	csettings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
+          csettings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
       return std::move(value);
     } else if (parser.part_literal()) {
       ValueNode::PointerType vnode = nullptr;
@@ -97,7 +96,7 @@ namespace snt::dip {
 
   NumericalSolver::NumericalSolver(Environment& env) {
 
-    NumericalSettings settings = {{},&env};
+    NumericalSettings settings = {{}, &env};
 
     exs::OperatorList operators;
     operators.append(
@@ -157,7 +156,7 @@ namespace snt::dip {
     steps.append(exs::BINARY_OPERATION, {exs::MULTIPLY_OPERATOR, exs::DIVIDE_OPERATOR});
     steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 
-    solver = std::make_unique<exs::Solver<NumericalAtom,NumericalSettings>>(operators, steps, settings);
+    solver = std::make_unique<exs::Solver<NumericalAtom, NumericalSettings>>(operators, steps, settings);
   }
 
   NumericalAtom NumericalSolver::eval(const std::string& expression) {

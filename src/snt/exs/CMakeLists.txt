@@ -16,10 +16,6 @@ target_include_directories(${EXEC_NAME}
     ${PROJECT_SOURCE_DIR}/src
 )
 
-if(NOT ENABLE_CLANG_TIDY)
-target_precompile_headers(${EXEC_NAME} PRIVATE <snt/exs.h>)
-endif()
-
 # install libraries and executables
 install(TARGETS ${EXEC_NAME} EXPORT TargetsSNT
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/${MODULE_NAME})

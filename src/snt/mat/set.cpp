@@ -2,5 +2,4 @@
 
 namespace snt::mat {
 
-
 }

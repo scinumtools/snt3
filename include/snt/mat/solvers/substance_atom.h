@@ -1,18 +1,17 @@
 #ifndef MAT_SUBSTANCE_ATOM_H
 #define MAT_SUBSTANCE_ATOM_H
 
-#include "../settings.h"
-#include "../set.h"
+#include <snt/mat/set.h>
+#include <snt/mat/settings.h>
 
 namespace snt::mat {
- 
+
   /**
    * @class SubstanceAtom
    * @brief Substance expression solver
    */
-  class SubstanceAtom final: public exs::AtomBase<SubstanceAtom,ElementMap> {
+  class SubstanceAtom final : public exs::AtomBase<SubstanceAtom, ElementMap> {
   public:
-
     /**
      * @brief Copy constructor
      *
@@ -47,14 +46,13 @@ namespace snt::mat {
      * @copydoc exs::AtomBase::math_add
      */
     void math_add(SubstanceAtom* other) override;
-    
+
     /**
      * @copydoc exs::AtomBase::math_multiply
      */
     void math_multiply(SubstanceAtom* other) override;
-    
   };
-  
-}
+
+} // namespace snt::mat
 
 #endif // MAT_SUBSTANCE_ATOM_H

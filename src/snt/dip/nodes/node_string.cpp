@@ -1,9 +1,8 @@
-#include <snt/dip/nodes/node_string.h>
-
-#include <snt/dip/environment.h>
 #include "../parsers.h"
 
 #include <regex>
+#include <snt/dip/environment.h>
+#include <snt/dip/nodes/node_string.h>
 
 namespace snt::dip {
 

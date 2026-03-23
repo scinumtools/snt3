@@ -1,7 +1,6 @@
-#include <snt/puq/calc/calculator.h>
-
 #include <memory>
 #include <regex>
+#include <snt/puq/calc/calculator.h>
 
 namespace snt::puq {
 

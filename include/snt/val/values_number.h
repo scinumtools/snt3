@@ -2,7 +2,6 @@
 #define VAL_VALUES_NUMBER_H
 
 #include <snt/val/values_array.h>
-
 #include <typeinfo>
 
 namespace snt::val {

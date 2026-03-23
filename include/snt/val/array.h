@@ -18,8 +18,8 @@ namespace snt::val {
      * @brief Array dimension range
      */
     struct RangeStruct {
-      size_t dmin;    ///<  Dimension range minimum
-      size_t dmax;    ///<  Dimension range maximum
+      size_t dmin; ///<  Dimension range minimum
+      size_t dmax; ///<  Dimension range maximum
 
       /**
        * @brief Compare equalit of two ranges
@@ -30,7 +30,7 @@ namespace snt::val {
         return (dmin == other.dmin) && (dmax == other.dmax);
       };
     };
-    
+
     typedef std::vector<std::string> StringType;                     ///< Holds raw string values
     typedef std::vector<RangeStruct> RangeType;                      ///< Array dimension ranges
     typedef std::vector<size_t> ShapeType;                           ///< Array shape

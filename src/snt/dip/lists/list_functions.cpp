@@ -1,5 +1,4 @@
 #include <snt/dip/lists/list_functions.h>
-
 #include <stdexcept>
 #include <string>
 

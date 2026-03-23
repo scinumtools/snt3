@@ -1,10 +1,8 @@
 #ifndef DIP_FUNCTION_LIST_H
 #define DIP_FUNCTION_LIST_H
 
-#include "../../val.h"
-#include "../nodes/node_value.h"
-
 #import <map>
+#include <snt/dip/nodes/node_value.h>
 
 namespace snt::dip {
 

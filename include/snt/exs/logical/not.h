@@ -5,7 +5,6 @@
 
 namespace snt::exs {
 
-
 } // namespace snt::exs
 
 #endif // EXS_OPERATOR_NOT_H

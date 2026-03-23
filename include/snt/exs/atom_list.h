@@ -1,10 +1,9 @@
 #ifndef EXS_ATOM_LIST_H
 #define EXS_ATOM_LIST_H
 
-#include <snt/exs/settings.h>
-#include <snt/exs/atom.h>
-
 #include <memory>
+#include <snt/exs/atom.h>
+#include <snt/exs/settings.h>
 #include <vector>
 
 namespace snt::exs {

@@ -1,7 +1,7 @@
 #include "pch_tests.h"
-#include <snt/puq/quantity.h>
-#include <snt/puq/converter.h>
 
+#include <snt/puq/converter.h>
+#include <snt/puq/quantity.h>
 #include <sstream>
 
 using namespace snt;
@@ -57,7 +57,7 @@ TEST(Quantity, InitializationErrors) {
   if constexpr (puq::Config::preprocess_symbols) {
     q = puq::Quantity("6.23537(39)×10−12*C4⋅m4⋅J−3");
     EXPECT_EQ(q.to_string(), "6.23537(39)e-12*C4*m4*J-3");
-    
+
     q = puq::Quantity("8.8541878188(14)×10−12*F⋅m−1");
     EXPECT_EQ(q.to_string(), "8.8541878188(14)e-12*F*m-1");
   }
@@ -66,7 +66,6 @@ TEST(Quantity, InitializationErrors) {
   val::BaseValue::PointerType ve = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});
   q = puq::Quantity(std::move(vm), std::move(ve), "km");
   EXPECT_EQ(q.to_string(), "[2.00(20), 3.00(30), 4.00(40), 5.00(50)]*km");
-  
 }
 
 TEST(Quantity, InitializationArrays) {
@@ -139,7 +138,6 @@ TEST(Quantity, ArithmeticsAdd) {
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
   EXPECT_EQ((val->clone() + q1).to_string(), "[6, 7, 8]");
   EXPECT_EQ((q1 + val->clone()).to_string(), "[6, 7, 8]");
-
 }
 
 TEST(Quantity, ArithmeticsSubtract) {
@@ -167,7 +165,6 @@ TEST(Quantity, ArithmeticsSubtract) {
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
   EXPECT_EQ((val->clone() - q1).to_string(), "[-2, -1, 0]");
   EXPECT_EQ((q1 - val->clone()).to_string(), "[2, 1, 0]");
-
 }
 
 TEST(Quantity, ArithmeticsMultiply) {
@@ -189,7 +186,6 @@ TEST(Quantity, ArithmeticsMultiply) {
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
   EXPECT_EQ((val->clone() * q1).to_string(), "[8, 12, 16]");
   EXPECT_EQ((q1 * val->clone()).to_string(), "[8, 12, 16]");
-
 }
 
 TEST(Quantity, ArithmeticsDivide) {
@@ -211,25 +207,23 @@ TEST(Quantity, ArithmeticsDivide) {
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
   EXPECT_EQ((val->clone() / q1).to_string(), "[0.5, 0.75, 1]");
   EXPECT_EQ((q1 / val->clone()).to_string(), "[2, 1.33333, 1]");
-
 }
 
 TEST(Quantity, CompareEqual) {
 
   puq::Quantity q1, q2;
 
-  q1 = puq::Quantity(6, "cm");  // same units 
+  q1 = puq::Quantity(6, "cm"); // same units
   q2 = puq::Quantity(3, "cm");
   EXPECT_EQ(q1 == q2, false);
-  EXPECT_EQ(q1 == q1, true);  
+  EXPECT_EQ(q1 == q1, true);
   EXPECT_EQ(q1 != q2, true);
-  EXPECT_EQ(q1 != q1, false);  
-  
-  q1 = puq::Quantity(6, "g");  // different units
+  EXPECT_EQ(q1 != q1, false);
+
+  q1 = puq::Quantity(6, "g"); // different units
   q2 = puq::Quantity(6, "cm");
   EXPECT_EQ(q1 == q2, false);
   EXPECT_EQ(q1 != q2, true);
-  
 }
 
 TEST(Quantity, RebaseUnits) {

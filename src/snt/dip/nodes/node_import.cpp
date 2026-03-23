@@ -1,9 +1,8 @@
 #include "node_import.h"
 
-#include <snt/dip/environment.h>
-
 #include <array>
 #include <fstream>
+#include <snt/dip/environment.h>
 
 namespace snt::dip {
 

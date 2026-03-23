@@ -1,11 +1,10 @@
 #ifndef DIP_LIST_SOURCE_H
 #define DIP_LIST_SOURCE_H
 
-#include "../nodes/node_value.h"
-#include "../settings.h"
-#include "list_node.h"
-
 #include <map>
+#include <snt/dip/lists/list_node.h>
+#include <snt/dip/nodes/node_value.h>
+#include <snt/dip/settings.h>
 #include <string>
 
 namespace snt::dip {

@@ -1,5 +1,5 @@
-#include <pybind11/pybind11.h>
 #include <iostream>
+#include <pybind11/pybind11.h>
 namespace py = pybind11;
 
 #ifdef ENABLE_SNT_PYBIND
@@ -32,5 +32,4 @@ PYBIND11_MODULE(scinumtools3, m) {
   auto dip = m.def_submodule("dip", "Dimensional Input Parameters");
   init_dip(dip);
 #endif
-
 }

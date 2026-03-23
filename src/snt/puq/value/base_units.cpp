@@ -1,13 +1,11 @@
-#include <snt/puq/value/base_units.h>
-
+#include <fstream>
+#include <iostream>
 #include <snt/puq/exceptions.h>
 #include <snt/puq/nostd/pow.h>
 #include <snt/puq/nostd/to_string.h>
 #include <snt/puq/settings.h>
 #include <snt/puq/solver/unit_solver.h>
-
-#include <fstream>
-#include <iostream>
+#include <snt/puq/value/base_units.h>
 #include <sstream>
 #include <string>
 
@@ -32,9 +30,10 @@ namespace snt::puq {
     for (auto it = baseunits.begin(); it != baseunits.end(); ++it) {
       if (it->prefix == bu.prefix && it->unit == bu.unit) {
         exists = true;
-	it->exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
-	  return a + b;
-	}, it->exponent, bu.exponent);
+        it->exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+          return a + b;
+        },
+                                  it->exponent, bu.exponent);
         // removing zero exponents
         if (exponent_to_float(it->exponent) == 0) {
           baseunits.erase(it);
@@ -86,8 +85,9 @@ namespace snt::puq {
     BaseUnits nbu(bu1.baseunits);
     for (auto unit : bu2) {
       unit.exponent = std::visit([](auto const& v) -> ExponentVariant {
-	return -v;
-      }, unit.exponent);
+        return -v;
+      },
+                                 unit.exponent);
       nbu.append(unit);
     }
     return nbu;
@@ -95,8 +95,9 @@ namespace snt::puq {
   void BaseUnits::operator-=(const BaseUnits& bu) {
     for (auto unit : bu) {
       unit.exponent = std::visit([](auto const& v) -> ExponentVariant {
-	return -v;
-      }, unit.exponent);
+        return -v;
+      },
+                                 unit.exponent);
       append(unit);
     }
   }
@@ -104,8 +105,9 @@ namespace snt::puq {
   void BaseUnits::operator*=(const ExponentVariant& e) {
     for (auto& unit : baseunits) {
       unit.exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
-	return a * b;
-      }, unit.exponent, e);
+        return a * b;
+      },
+                                 unit.exponent, e);
     }
   }
 
@@ -144,8 +146,8 @@ namespace snt::puq {
           Result magnitude(dmap->second.magnitude, dmap->second.uncertainty);
           dim.numerical *= nostd::pow(magnitude, exponent_to_float(bu.exponent));
           for (int i = 0; i < Config::num_basedim; i++) {
-	    dim.physical[i] = add_exp(dim.physical[i],
-                         mul_exp(dmap->second.dimensions[i], bu.exponent));
+            dim.physical[i] = add_exp(dim.physical[i],
+                                      mul_exp(dmap->second.dimensions[i], bu.exponent));
           }
           continue;
         } else {
@@ -168,8 +170,8 @@ namespace snt::puq {
             Result magnitude(dmap->second.magnitude, dmap->second.uncertainty);
             dim.numerical *= nostd::pow(magnitude, exponent_to_float(bu.exponent));
             for (int i = 0; i < Config::num_basedim; i++) {
-	      dim.physical[i] = add_exp(dim.physical[i],
-					mul_exp(dmap->second.dimensions[i], bu.exponent));
+              dim.physical[i] = add_exp(dim.physical[i],
+                                        mul_exp(dmap->second.dimensions[i], bu.exponent));
             }
           } else {
             throw MeasurementExcept("Undefined unit symbol: " + bu.unit);

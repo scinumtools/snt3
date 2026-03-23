@@ -4,7 +4,6 @@
 #include <snt/exs/expression.h>
 #include <snt/exs/settings.h>
 #include <snt/exs/token_list_base.h>
-
 #include <stdexcept>
 #include <vector>
 

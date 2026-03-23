@@ -1,9 +1,8 @@
 #ifndef PUQ_DATA_TABLE_H
 #define PUQ_DATA_TABLE_H
 
-#include <snt/puq/util/display_length.h>
-
 #include <iomanip>
+#include <snt/puq/util/display_length.h>
 #include <sstream>
 #include <vector>
 

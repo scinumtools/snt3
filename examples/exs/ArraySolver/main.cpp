@@ -1,7 +1,7 @@
 #import "main.h"
 
-#import "snt/exs/operators/arithmetic.h"
 #import "snt/exs/operator_list.h"
+#import "snt/exs/operators/arithmetic.h"
 #import "snt/exs/solver.h"
 #import "snt/exs/step_list.h"
 
@@ -16,7 +16,7 @@ int main() {
   operators.append(ARRAY_OPERATOR, std::make_shared<OperatorArray>());
 
   // changing default operation steps
-  exs::StepList steps {};
+  exs::StepList steps{};
   steps.append(exs::GROUP_OPERATION, {ARRAY_OPERATOR});
   steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 
