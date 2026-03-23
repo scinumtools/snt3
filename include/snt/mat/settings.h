@@ -1,6 +1,7 @@
 #ifndef MAT_SETTINGS_H
 #define MAT_SETTINGS_H
 
+#include <string>
 #include <map>
 
 namespace snt::mat {
