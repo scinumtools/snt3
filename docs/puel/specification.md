@@ -72,9 +72,10 @@ m3/(kg*s2)
 PUEL supports the following operators:
 
 Operator	Meaning
-*	Multiplication
-/	Division
-exponent	Power (integer or fractional)
+
+``*``	Multiplication  
+``/``	Division  
+exponent	Power (integer or fractional)  
 
 ### 4.3 Exponents
 Integer exponents
@@ -147,38 +148,39 @@ kg * m / s2
 ## 5. Semantics
 
 ### 5.1 Dimensional Composition
-Multiplication → adds dimension exponents
-Division → subtracts dimension exponents
-Power → multiplies exponents
+
+**Multiplication** → adds dimension exponents  
+**Division** → subtracts dimension exponents  
+**Power** → multiplies exponents  
 
 ### 5.2 Canonical Form
 
 Each unit expression resolves to:
 
-a dimension vector
-a magnitude scaling factor
+a dimension vector  
+a magnitude scaling factor  
 
 Example:
 
-km → m with factor 1000
+``km`` → ``m`` with factor 1000
 
 ### 6.3 Compatibility Rules
 
-Addition/subtraction require identical dimensions
-Multiplication/division always valid
-Exponent must be dimensionless
+**Addition/subtraction** require identical dimensions  
+**Multiplication/division** always valid  
+**Exponent** must be dimensionless  
 
 ## 7. Conversions
 
 PUEL supports conversion between units of identical dimensions:
 
-km → m
-eV → J
-dB → W
+``km`` → ``m``  
+``eV`` → ``J``  
+``dB`` → ``W``  
 
 Special handling exists for:
 
-logarithmic units
-temperature units
+- logarithmic units
+- temperature units
 
 These require custom conversion rules.
