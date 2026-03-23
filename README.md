@@ -44,6 +44,23 @@ This project is the C++ counterpart to the original Python [scinumtools](https:/
 
 ---
 
+## Why use SNT?
+
+Compared to alternatives:
+
+- Boost.Units → compile-time only, no runtime expressions
+- pint → Python-only, no C++ integration
+- ad hoc configs → no validation, no unit safety
+
+``snt`` combines:
+- runtime expressions
+- unit safety
+- validated parameters
+
+in a single system.
+
+---
+
 ## Core Capabilities
 
 - Expression parsing & evaluation  
