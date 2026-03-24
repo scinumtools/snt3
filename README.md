@@ -26,11 +26,12 @@ Scientific software often suffers from inconsistent parameter definitions, ad ho
 into a single configuration layer that can be used consistently across workflows.
 
 ``SNT`` is a C++ library, with optional Python bindings, designed for safer and more transparent numerical computation. 
-It is built around three core components:
+It is built around four core components:
 
-**Expression Solver** (EXS) — parses and evaluates mathematical, logical, and custom expressions at runtime  
-**Physical Units & Quantities** (PUQ) — represents values with physical units and supports unit-aware arithmetic and conversions  
-**Dimensional Input Parameters** (DIP) — defines and validates input parameters with explicit types and unit constraints  
+**Value Layer** (VAL) — a unified, typed multidimensional data model for booleans, numeric values, and strings, forming the core runtime representation shared across all components  
+**Expression Solver** (EXS) — a generic, extensible evaluation framework capable of operating on arbitrary data types defined as atoms; its behavior is fully determined by the set of atom types, operators/functions, and evaluation rules (precedence and semantics), making it adaptable to domain-specific evaluation systems  
+**Physical Units & Quantities** (PUQ) (built on VAL + EXS) — extends the value system with physical units, enabling unit-aware arithmetic, dimensional consistency, and automatic conversions through EXS-based evaluation  
+**Dimensional Input Parameters** (DIP) (built on VAL + EXS + PUQ) — a declarative parameter definition layer that enforces types, units, constraints, and structure, while delegating all numerical, logical, and unit-aware expression evaluation to EXS via PUQ  
 
 Together, these components establish a validated, unit-aware configuration framework that can be consistently shared across heterogeneous environments, including C++ simulations, Python-based analysis workflows, and Bash-driven processing pipelines.
 
