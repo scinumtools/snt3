@@ -110,8 +110,6 @@ in a single system.
    target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
    ```
 
----
-
 ## Quick Example
 
 Below is a quick example how to use the core functionality of `SciNumTools3`.
@@ -153,8 +151,6 @@ int main() {
   // 3000
 }
 ```
-
----
 
 ## Documentation
 
@@ -200,13 +196,9 @@ Contributions are welcome — please follow these guidelines:
 
 See [CONTRIBUTING.md](https://github.com/vrtulka23/scinumtools3/blob/main/CONTRIBUTING.md) for full instructions.
 
----
-
 ## License
 
 This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/vrtulka23/scinumtools3/blob/main/LICENSE) file for full text.
-
----
 
 ## Contact / Issues
 
