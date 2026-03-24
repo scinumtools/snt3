@@ -20,7 +20,7 @@ Scientific software often suffers from inconsistent parameter definitions, ad ho
 - Runtime expression evaluation → define relationships without recompilation  
 - Unit-aware quantities → prevent scaling and conversion errors  
 - Validated input parameters → detect invalid configurations early  
-- Cross-language consistency → shared parameter logic between C++ and Python  
+- Cross-language consistency → shared parameter logic between C++, Python and CLI  
 - Lightweight integration → header-based design with CMake support 
 
 into a single configuration layer that can be used consistently across workflows.
