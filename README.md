@@ -1,5 +1,5 @@
 # **Scientific Numerical Tools v3 (SciNumTools3, SNT)**  
-*A modern C++ toolkit for scientific computations with units, expressions, and dimensional parameters.*
+*``SciNumTools3`` is a C++ library for unit-safe, validated parameters—eliminating hidden assumptions in scientific code.*
 
 [![C/C++ CI](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml)
 [![Linux Build](https://img.shields.io/github/actions/workflow/status/vrtulka23/scinumtools3/c-cpp.yml?label=Linux%20build)](https://github.com/vrtulka23/scinumtools3/actions/workflows/build-linux.yml)
