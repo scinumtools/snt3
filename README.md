@@ -115,7 +115,7 @@ in a single system.
 ## Quick Example
 
 Below is a quick example how to use the core functionality of `SciNumTools3`.
-For more examples and patterns please look into the ``gtest`` and ``exec`` folders.
+For more examples and patterns please look into the ``tests`` and ``examples`` folders.
 
 ```cpp
 #include <snt/exs/atom.h>
@@ -158,7 +158,7 @@ int main() {
 
 ## Documentation
 
-API reference and guides are available in the `docs/` directory.
+The `docs/` directory contains the full API reference and user guides for the project. It also includes detailed specifications for the DIPL and PUEL domain-specific languages. [DIPL](docs/dipl/specification.md) is used for defining validated, structured input parameters, while [PUEL](docs/puel/specification.md) provides a syntax for unit-aware expressions and calculations.
 
 To generate Doxygen + breathe + Sphinx documentation:
 
