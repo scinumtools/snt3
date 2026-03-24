@@ -185,24 +185,13 @@ puq -c "1*m" "km"
 
 ## Documentation
 
-The `docs/` directory contains the full API reference and user guides for the project. It also includes detailed specifications for the DIPL and PUEL domain-specific languages. [DIPL](docs/dipl/specification.md) is used for defining validated, structured input parameters, while [PUEL](docs/puel/specification.md) provides a syntax for unit-aware expressions and calculations.
+The ``docs/`` directory contains the complete API reference and user guides for the project.
+The online documentation for the C++ reference implementation, including Python bindings and the CLI, is available [here](https://vrtulka23.github.io/scinumtools3/).
 
-To generate Doxygen + breathe + Sphinx documentation:
+It also provides detailed specifications for the DIPL and PUEL domain-specific languages:
 
-* Using the setup script
-
-  ```bash
-  ./setup.sh -d   # build documentation
-  ```
-  
-* Manually
-
-  ```bash
-  cd docs
-  make html
-  ```
-
-See `docs/README.md` for more information.
+[DIPL](docs/dipl/specification.md) is used to define validated, structured input parameters.  
+[PUEL](docs/puel/specification.md) defines a syntax for unit-aware expressions and calculations.  
 
 ---
 
