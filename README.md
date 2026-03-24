@@ -32,7 +32,7 @@ It is built around three core components:
 **Physical Units & Quantities** (PUQ) — represents values with physical units and supports unit-aware arithmetic and conversions  
 **Dimensional Input Parameters** (DIP) — defines and validates input parameters with explicit types and unit constraints  
 
-Together, these components form a validated, unit-aware configuration system that can be shared across heterogeneous environments (e.g. C++ simulation code and Python analysis workflows).
+Together, these components establish a validated, unit-aware configuration framework that can be consistently shared across heterogeneous environments, including C++ simulations, Python-based analysis workflows, and Bash-driven processing pipelines.
 
 This design enables:
 
