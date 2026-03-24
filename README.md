@@ -101,7 +101,9 @@ This project is the C++ counterpart to the original Python [scinumtools](https:/
 ## Quick Example
 
 Below is a quick example how to use the core functionality of `scinumtools3`.
-For more examples and patterns please look into the ``gtest`` and ``exec`` folders.
+For more examples and patterns please look into the ``gtest``, ``exec``, ``apps`` and ``bindings`` folders.
+
+### C++
 
 ```cpp
 #include <snt/exs/atom.h>
@@ -138,6 +140,32 @@ int main() {
   std::cout << vnode->value->to_string() << std::endl;
   // 3000
 }
+```
+
+### Python 
+
+``` python
+from scinumtools3.puq import Quantity
+from scinumtools3.dip import DIP, Environment
+
+length = Quantity("1*m")
+length = length.convert("km");
+print(length) 
+# 1e-3*km
+
+dip = DIP()
+dip.add_string("foo int m");
+dip.add_string("foo = 3 km");
+env = dip.parse();
+print(env.nodes[0])
+# 3000 m
+```
+
+### CLI
+
+``` bash
+puq -c "1*m" "km"
+# 1e-3*km
 ```
 
 ---

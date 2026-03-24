@@ -45,6 +45,8 @@ if (ENABLE_DIP_PYBIND)
    add_subdirectory(dip)
 endif()
 
+register_pytests(misc)
+
 enable_testing()
 
 # install python module
