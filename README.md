@@ -1,4 +1,4 @@
-# **Scientific Numerical Tools v3 (SNT)**  
+# **Scientific Numerical Tools v3 (SciNumTools3, SNT)**  
 *A modern C++ toolkit for scientific computations with units, expressions, and dimensional parameters.*
 
 [![C/C++ CI](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml)
@@ -15,15 +15,17 @@
 
 Scientific software often suffers from inconsistent parameter definitions, ad hoc unit handling, and missing validation. These issues become particularly problematic in workflows that span multiple components or languages.
 
-``scinumtools3`` (or ``snt``) addresses this by providing a unified system that combines:
+``SciNumTools3`` (or ``SNT``) addresses this by providing a unified system that combines:
 
-- unit-aware quantities
-- runtime expression evaluation
-- validated parameter definitions
+- Runtime expression evaluation → define relationships without recompilation  
+- Unit-aware quantities → prevent scaling and conversion errors  
+- Validated input parameters → detect invalid configurations early  
+- Cross-language consistency → shared parameter logic between C++ and Python  
+- Lightweight integration → header-based design with CMake support 
 
 into a single configuration layer that can be used consistently across workflows.
 
-``snt`` is a C++ library, with optional Python bindings, designed for safer and more transparent numerical computation. 
+``SNT`` is a C++ library, with optional Python bindings, designed for safer and more transparent numerical computation. 
 It is built around three core components:
 
 **Expression Solver** (EXS) — parses and evaluates mathematical, logical, and custom expressions at runtime  
@@ -42,8 +44,6 @@ As a result, discrepancies between simulation and analysis pipelines are signifi
 
 This project is the C++ counterpart to the original Python [scinumtools](https://github.com/vrtulka23/scinumtools/tree/main), with a focus on performance, static typing, and integration into high-performance computing workflows.
 
----
-
 ## Why use SNT?
 
 Compared to alternatives:
@@ -52,7 +52,7 @@ Compared to alternatives:
 - pint → Python-only, no C++ integration
 - ad hoc configs → no validation, no unit safety
 
-``snt`` combines:
+``SNT`` combines:
 - runtime expressions → dynamic configs without recompilation
 - unit safety → prevents silent scaling errors
 - validated parameters → fail fast instead of corrupting simulations
@@ -61,20 +61,10 @@ in a single system.
 
 ## Target Use Cases
 
-- scientific simulations (C++, HPC)
+- scientific simulations (C/C++, HPC)
 - physics / engineering pipelines
 - parameter-heavy workflows with unit safety requirements
 - hybrid C++ / Python environments
-
----
-
-## Core Capabilities
-
-- Expression parsing & evaluation  
-- Strong SI unit support (units, prefixes, conversions, other unit systems e.g. CGS, AU)  
-- Compile-time / runtime dimensional checks for parameters  
-- Small, easy-to-integrate headers and CMake-friendly build  
-- Unit tests included (GoogleTest)
 
 ---
 
@@ -107,7 +97,7 @@ in a single system.
    sudo ./setup.sh -b -t -i  # build, run tests, install
    ```
 
-### Link `scinumtools3` in your `CMAKE` project
+### Link `SciNumTools3` in your `CMAKE` project
 
 1) Find the package
 
@@ -124,7 +114,7 @@ in a single system.
 
 ## Quick Example
 
-Below is a quick example how to use the core functionality of `scinumtools3`.
+Below is a quick example how to use the core functionality of `SciNumTools3`.
 For more examples and patterns please look into the ``gtest`` and ``exec`` folders.
 
 ```cpp
