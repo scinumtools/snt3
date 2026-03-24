@@ -1,5 +1,5 @@
-# **Scientific Numerical Tools v3 (SNT)**  
-*A modern C++ toolkit for scientific computations with units, expressions, and dimensional parameters.*
+# **Scientific Numerical Tools v3 (SciNumTools3, SNT)**  
+*``SciNumTools3`` is a C++ library for unit-safe, validated parameters—eliminating hidden assumptions in scientific code.*
 
 [![C/C++ CI](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml)
 [![Linux Build](https://img.shields.io/github/actions/workflow/status/vrtulka23/scinumtools3/c-cpp.yml?label=Linux%20build)](https://github.com/vrtulka23/scinumtools3/actions/workflows/build-linux.yml)
@@ -15,22 +15,25 @@
 
 Scientific software often suffers from inconsistent parameter definitions, ad hoc unit handling, and missing validation. These issues become particularly problematic in workflows that span multiple components or languages.
 
-``scinumtools3`` (or ``snt``) addresses this by providing a unified system that combines:
+``SciNumTools3`` (or ``SNT``) addresses this by providing a unified system that combines:
 
-- unit-aware quantities
-- runtime expression evaluation
-- validated parameter definitions
+- Runtime expression evaluation → define relationships without recompilation  
+- Unit-aware quantities → prevent scaling and conversion errors  
+- Validated input parameters → detect invalid configurations early  
+- Cross-language consistency → shared parameter logic between C++, Python and CLI  
+- Lightweight integration → header-based design with CMake support 
 
 into a single configuration layer that can be used consistently across workflows.
 
-``snt`` is a C++ library, with optional Python bindings, designed for safer and more transparent numerical computation. 
-It is built around three core components:
+``SNT`` is a C++ library, with optional Python bindings, designed for safer and more transparent numerical computation. 
+It is built around four core components:
 
-**Expression Solver** (EXS) — parses and evaluates mathematical, logical, and custom expressions at runtime  
-**Physical Units & Quantities** (PUQ) — represents values with physical units and supports unit-aware arithmetic and conversions  
-**Dimensional Input Parameters** (DIP) — defines and validates input parameters with explicit types and unit constraints  
+**Value Layer** (VAL) — a unified, typed multidimensional data model for booleans, numeric values, and strings, forming the core runtime representation shared across all components  
+**Expression Solver** (EXS) — a generic, extensible evaluation framework capable of operating on arbitrary data types defined as atoms; its behavior is fully determined by the set of atom types, operators/functions, and evaluation rules (precedence and semantics), making it adaptable to domain-specific evaluation systems  
+**Physical Units & Quantities** (PUQ) (built on VAL + EXS) — extends the value system with physical units, enabling unit-aware arithmetic, dimensional consistency, and automatic conversions through EXS-based evaluation  
+**Dimensional Input Parameters** (DIP) (built on VAL + EXS + PUQ) — a declarative parameter definition layer that enforces types, units, constraints, and structure, while delegating all numerical, logical, and unit-aware expression evaluation to EXS via PUQ  
 
-Together, these components form a validated, unit-aware configuration system that can be shared across heterogeneous environments (e.g. C++ simulation code and Python analysis workflows).
+Together, these components establish a validated, unit-aware configuration framework that can be consistently shared across heterogeneous environments, including C++ simulations, Python-based analysis workflows, and Bash-driven processing pipelines.
 
 This design enables:
 
@@ -42,15 +45,27 @@ As a result, discrepancies between simulation and analysis pipelines are signifi
 
 This project is the C++ counterpart to the original Python [scinumtools](https://github.com/vrtulka23/scinumtools/tree/main), with a focus on performance, static typing, and integration into high-performance computing workflows.
 
----
+## Why use SNT?
 
-## Core Capabilities
+Compared to alternatives:
 
-- Expression parsing & evaluation  
-- Strong SI unit support (units, prefixes, conversions, other unit systems e.g. CGS, AU)  
-- Compile-time / runtime dimensional checks for parameters  
-- Small, easy-to-integrate headers and CMake-friendly build  
-- Unit tests included (GoogleTest)
+- Boost.Units → compile-time only, no runtime expressions
+- pint → Python-only, no C++ integration
+- ad hoc configs → no validation, no unit safety
+
+``SNT`` combines:
+- runtime expressions → dynamic configs without recompilation
+- unit safety → prevents silent scaling errors
+- validated parameters → fail fast instead of corrupting simulations
+
+in a single system.
+
+## Target Use Cases
+
+- scientific simulations (C/C++, HPC)
+- physics / engineering pipelines
+- parameter-heavy workflows with unit safety requirements
+- hybrid C++ / Python environments
 
 ---
 
@@ -83,7 +98,7 @@ This project is the C++ counterpart to the original Python [scinumtools](https:/
    sudo ./setup.sh -b -t -i  # build, run tests, install
    ```
 
-### Link `scinumtools3` in your `CMAKE` project
+### Link `SciNumTools3` in your `CMAKE` project
 
 1) Find the package
 
@@ -95,8 +110,6 @@ This project is the C++ counterpart to the original Python [scinumtools](https:/
    add_executable(${EXEC_NAME} ${SOURCE_FILES})
    target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
    ```
-
----
 
 ## Quick Example
 
@@ -172,7 +185,7 @@ puq -c "1*m" "km"
 
 ## Documentation
 
-API reference and guides are available in the `docs/` directory.
+The `docs/` directory contains the full API reference and user guides for the project. It also includes detailed specifications for the DIPL and PUEL domain-specific languages. [DIPL](docs/dipl/specification.md) is used for defining validated, structured input parameters, while [PUEL](docs/puel/specification.md) provides a syntax for unit-aware expressions and calculations.
 
 To generate Doxygen + breathe + Sphinx documentation:
 
@@ -214,13 +227,9 @@ Contributions are welcome — please follow these guidelines:
 
 See [CONTRIBUTING.md](https://github.com/vrtulka23/scinumtools3/blob/main/CONTRIBUTING.md) for full instructions.
 
----
-
 ## License
 
 This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/vrtulka23/scinumtools3/blob/main/LICENSE) file for full text.
-
----
 
 ## Contact / Issues
 
