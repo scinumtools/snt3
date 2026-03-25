@@ -299,7 +299,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_function() {
-    constexpr auto pstr = ce_concat<50>("^[ ]*[(](", PATTERN_KEYWORD, "+)[)]");
+    constexpr auto pstr = ce_concat<50>("^[ ]*(", PATTERN_KEYWORD, "+)[(][)]");
     std::regex pattern(pstr.data());
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {

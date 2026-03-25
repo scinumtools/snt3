@@ -158,7 +158,7 @@ TEST_F(Branching, ValueFunction) {
 
   dip::DIP d;
   d.add_value_function("scalar_value", FixtureFunctions::get_scalar_boolean);
-  d.add_string("@if (scalar_value)");
+  d.add_string("@if scalar_value()");
   d.add_string("  age int = 30");
   d.add_string("@end");
   dip::Environment env = d.parse();
