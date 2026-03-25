@@ -312,7 +312,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_expression() {
-    std::regex pattern("^[(](\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\"|\'([^\']*)\')[)]");
+    std::regex pattern("^[(](\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\")[)]");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       if (matchResult[2].length())
@@ -339,7 +339,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_string() {
-    std::regex pattern("^(\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\"|\'([^\']*)\')");
+    std::regex pattern("^(\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\")");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       for (int i = 2; i < 6; i++) {

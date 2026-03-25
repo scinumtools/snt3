@@ -9,7 +9,7 @@ TEST(SolverTemplate, BasicParsing) {
 
   dip::DIP d;
   d.add_string("foo float = 23 cm");
-  d.add_string("bar str = 'baz'");
+  d.add_string("bar str = \"baz\"");
   dip::Environment env = d.parse();
 
   dip::TemplateSolver solver(env);
@@ -76,7 +76,7 @@ TEST(SolverTemplate, ArraySlicing) {
 TEST(SolverTemplate, StringFormatting) {
 
   dip::DIP d;
-  d.add_string("foo str = 'bar'");
+  d.add_string("foo str = \"bar\"");
   dip::Environment env = d.parse();
 
   dip::TemplateSolver solver(env);

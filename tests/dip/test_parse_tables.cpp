@@ -12,10 +12,10 @@ TEST(ParseTables, BasicTable) {
   d.add_string("baz bool");
   d.add_string("dig str");
   d.add_string("---");
-  d.add_string("1 true  'a'");
-  d.add_string("2 true  'b'");
-  d.add_string("3 false 'c'");
-  d.add_string("4 true  'd'");
+  d.add_string("1 true  \\\"a\\\"");
+  d.add_string("2 true  \\\"b\\\"");
+  d.add_string("3 false \\\"c\\\"");
+  d.add_string("4 true  \\\"d\\\"");
   d.add_string("\"\"\"");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 3);
@@ -38,7 +38,7 @@ TEST(ParseTables, BasicTable) {
   EXPECT_EQ(vnode->name, "foo.dig");
   EXPECT_EQ(vnode->value_raw, val::Array::StringType({"a", "b", "c", "d"}));
   EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({4}));
-  EXPECT_EQ(vnode->value->to_string(), "['a', 'b', 'c', 'd']");
+  EXPECT_EQ(vnode->value->to_string(), "[\"a\", \"b\", \"c\", \"d\"]");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
 }
 

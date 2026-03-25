@@ -61,7 +61,7 @@ TEST(ParseArrays, FloatValue) {
 TEST(ParseArrays, StringValue) {
 
   dip::DIP d;
-  d.add_string("foo str[2,3] = [[position,'velo,ci\"ty',\"acce]lera'tion\"],['jerk','snap','crackle']]");
+  d.add_string("foo str[2,3] = [[position,\"velo,ci\\\"ty\",\"acce]lera'tion\"],[\"jerk\",\"snap\",\"crackle\"]]");
   dip::Environment env = d.parse();
 
   dip::ValueNode::PointerType vnode = env.nodes.at(0);
@@ -72,7 +72,7 @@ TEST(ParseArrays, StringValue) {
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
-  EXPECT_EQ(vnode->value->to_string(), "[['position', 'velo,ci\"ty', 'acce]lera'tion'], ['jerk', 'snap', 'crackle']]");
+  EXPECT_EQ(vnode->value->to_string(), "[[\"position\", \"velo,ci\\\"ty\", \"acce]lera'tion\"], [\"jerk\", \"snap\", \"crackle\"]]");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
 }
 

@@ -79,7 +79,7 @@ TEST(ValueSlicing, OpenRangesString) {
   dip::ValueNode::PointerType vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->name, "crackle");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "['a', 'b', 'c']");
+  EXPECT_EQ(vnode->value->to_string(), "[\"a\", \"b\", \"c\"]");
 }
 
 TEST(ValueSlicing, ArrayToScalar) {

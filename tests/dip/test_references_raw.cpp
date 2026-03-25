@@ -98,7 +98,7 @@ TEST(ReferencesRaw, StringValues) {
   // create temporary file
   std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
   std::filesystem::path source_filename = temp_dir / "example_raw_file.txt";
-  std::string source_code = "  [[jerk,'snap'], \n[\"crackle\",'pop']]  ";
+  std::string source_code = "  [[jerk,\"snap\"], \n[\"crackle\",\"pop\"]]  ";
   std::string source_name = "foo_source";
   {
     std::ofstream source_file(source_filename);
@@ -119,7 +119,7 @@ TEST(ReferencesRaw, StringValues) {
   dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_EQ(vnode->name, "snap");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "[['jerk', 'snap'], ['crackle', 'pop']]");
+  EXPECT_EQ(vnode->value->to_string(), "[[\"jerk\", \"snap\"], [\"crackle\", \"pop\"]]");
 }
 
 TEST(ReferencesRaw, TableNodes) {

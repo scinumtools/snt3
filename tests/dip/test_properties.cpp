@@ -50,7 +50,7 @@ TEST(Properties, Description) {
 
   dip::DIP d;
   d.add_string("foo bool = true");
-  d.add_string("  !descr 'If foo is true, bar is false'");
+  d.add_string("  !descr \"If foo is true, bar is false\"");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // description is not returned as a separate node
 
@@ -66,13 +66,13 @@ TEST(Properties, Description) {
   //       This needs to be fixed!
   d = dip::DIP();
   d.add_string("foo");
-  d.add_string("  !descr 'This is a group node'");
+  d.add_string("  !descr \"This is a group node\"");
   d.add_string("bar int = 3");
   try {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Only value nodes (bool, int, float and str) can have properties:   !descr 'This is a group node'");
+    EXPECT_STREQ(e.what(), "Only value nodes (bool, int, float and str) can have properties:   !descr \"This is a group node\"");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -80,12 +80,12 @@ TEST(Properties, Description) {
   // Throw an error if indent is not higher
   d = dip::DIP();
   d.add_string("  foo bool = true");
-  d.add_string("!descr 'If foo is true, bar is false'");
+  d.add_string("!descr \"If foo is true, bar is false\"");
   try {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !descr 'If foo is true, bar is false'");
+    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !descr \"If foo is true, bar is false\"");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -94,8 +94,8 @@ TEST(Properties, Description) {
 TEST(Properties, Format) {
 
   dip::DIP d;
-  d.add_string("foo str = 'bar'");
-  d.add_string("  !format '[a-z]+'");
+  d.add_string("foo str = \"bar\"");
+  d.add_string("  !format \"[a-z]+\"");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // format is not returned as a separate node
 
@@ -105,26 +105,26 @@ TEST(Properties, Format) {
 
   // Throw an error if node value does not match expected format
   d = dip::DIP();
-  d.add_string("foo str = 'sdf34'");
-  d.add_string("  !format '[a-z]+'");
+  d.add_string("foo str = \"sdf34\"");
+  d.add_string("  !format \"[a-z]+\"");
   try {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Node value 'sdf34' does not match with expected format '[a-z]+'");
+    EXPECT_STREQ(e.what(), "Node value \"sdf34\" does not match with expected format '[a-z]+'");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
 
   // Throw an error if indent is not higher
   d = dip::DIP();
-  d.add_string("  foo str = 'bar'");
-  d.add_string("!format '[a-z]+'");
+  d.add_string("  foo str = \"bar\"");
+  d.add_string("!format \"[a-z]+\"");
   try {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !format '[a-z]+'");
+    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !format \"[a-z]+\"");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -133,8 +133,8 @@ TEST(Properties, Format) {
 TEST(Properties, Tags) {
 
   dip::DIP d;
-  d.add_string("foo str = 'bar'");
-  d.add_string("  !tags ['baz','word']");
+  d.add_string("foo str = \"bar\"");
+  d.add_string("  !tags [\"baz\",\"word\"]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
 
@@ -145,13 +145,13 @@ TEST(Properties, Tags) {
 
   // Throw an error if indent is not higher
   d = dip::DIP();
-  d.add_string("  foo str = 'bar'");
-  d.add_string("!tags '[a-z]+'");
+  d.add_string("  foo str = \"bar\"");
+  d.add_string("!tags \"[a-z]+\"");
   try {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !tags '[a-z]+'");
+    EXPECT_STREQ(e.what(), "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !tags \"[a-z]+\"");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -160,7 +160,7 @@ TEST(Properties, Tags) {
 TEST(Properties, Condition) {
 
   dip::DIP d;
-  d.add_string("foo str = 'bar'");
+  d.add_string("foo str = \"bar\"");
   d.add_string("  !condition true");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // condition is not returned as a separate node
@@ -171,7 +171,7 @@ TEST(Properties, Condition) {
 
   // Throw an error if indent is not higher
   d = dip::DIP();
-  d.add_string("foo str = 'bar'");
+  d.add_string("foo str = \"bar\"");
   d.add_string("  !condition false");
   try {
     d.parse();
@@ -264,26 +264,26 @@ TEST(Properties, OptionsFloat) {
 TEST(Properties, OptionsString) {
 
   dip::DIP d;
-  d.add_string("foo str = 'bar'");
-  d.add_string("  !options ['bar','snap','pow']");
+  d.add_string("foo str = \"bar\"");
+  d.add_string("  !options [\"bar\",\"snap\",\"pow\"]");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
   dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_TRUE(vnode);
   EXPECT_EQ(vnode->options.size(), 3);
-  EXPECT_EQ(vnode->options[0].value->to_string(), "'bar'");
-  EXPECT_EQ(vnode->options[1].value->to_string(), "'snap'");
-  EXPECT_EQ(vnode->options[2].value->to_string(), "'pow'");
+  EXPECT_EQ(vnode->options[0].value->to_string(), "\"bar\"");
+  EXPECT_EQ(vnode->options[1].value->to_string(), "\"snap\"");
+  EXPECT_EQ(vnode->options[2].value->to_string(), "\"pow\"");
 
   // validate if node value is in options
   d = dip::DIP();
-  d.add_string("foo str = 'baz'");
-  d.add_string("  !options ['bar','snap','pow']");
+  d.add_string("foo str = \"baz\"");
+  d.add_string("  !options [\"bar\",\"snap\",\"pow\"]");
   try {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Value 'baz' of node 'foo' doesn't match with any option: 'bar', 'snap', 'pow'");
+    EXPECT_STREQ(e.what(), "Value \"baz\" of node 'foo' doesn't match with any option: \"bar\", \"snap\", \"pow\"");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -292,7 +292,7 @@ TEST(Properties, OptionsString) {
 TEST(Properties, OptionsMultiline) {
 
   dip::DIP d;
-  d.add_string("jerk str = 'snap'");
+  d.add_string("jerk str = \"snap\"");
   d.add_string("  = snap");
   d.add_string("  = crackle");
   d.add_string("  = pop");

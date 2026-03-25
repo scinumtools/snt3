@@ -54,6 +54,21 @@ namespace snt {
     return ss.str();
   }
 
+  inline std::string escape_quotes(const std::string& value, bool escape) {
+    if (escape) {
+      std::string output;
+      for (char c : value) {
+        if (c == '"') {
+	  output += "\\\"";  // add \"
+        } else {
+	  output += c;
+        }
+      }
+      return output;
+    }
+    return value;
+  }
+  
   template <typename T>
   std::string _array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const StringFormatType& format, size_t& offset, size_t dim) {
     std::ostringstream oss;
@@ -73,13 +88,13 @@ namespace snt {
           oss << number_to_string(value[offset], format);
         } else if constexpr (std::is_same_v<T, std::string>) {
           if (format.stringQuotes)
-            oss << '\'';
+            oss << '"';
           if (format.paddingSize)
-            oss << std::setw(format.paddingSize) << value[offset];
+            oss << std::setw(format.paddingSize) << escape_quotes(value[offset], format.stringQuotes);
           else
-            oss << value[offset];
+            oss << escape_quotes(value[offset], format.stringQuotes);
           if (format.stringQuotes)
-            oss << '\'';
+            oss << '"';
         } else {
           return "<unsupported_type>";
         }

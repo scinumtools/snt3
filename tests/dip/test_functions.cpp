@@ -87,12 +87,12 @@ TEST_F(Functions, StringValues) {
   dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_EQ(vnode->name, "foo");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "'string'");
+  EXPECT_EQ(vnode->value->to_string(), "\"string\"");
 
   vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->name, "bar");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "['foo', 'bar', 'baz']");
+  EXPECT_EQ(vnode->value->to_string(), "[\"foo\", \"bar\", \"baz\"]");
 }
 
 TEST_F(Functions, DataTypeConversion) {
@@ -107,7 +107,7 @@ TEST_F(Functions, DataTypeConversion) {
   dip::ValueNode::PointerType vnode = env.nodes.at(0);
   EXPECT_EQ(vnode->name, "bar");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "'true'");
+  EXPECT_EQ(vnode->value->to_string(), "\"true\"");
 }
 
 TEST_F(Functions, ExceptionDimension) {
@@ -154,7 +154,7 @@ TEST_F(Functions, TableNodes) {
   vnode = env.nodes.at(3);
   EXPECT_EQ(vnode->name, "foo.scalar_str");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "'baz_value'");
+  EXPECT_EQ(vnode->value->to_string(), "\"baz_value\"");
 
   vnode = env.nodes.at(4);
   EXPECT_EQ(vnode->name, "bar.array_bool");
@@ -174,7 +174,7 @@ TEST_F(Functions, TableNodes) {
   vnode = env.nodes.at(7);
   EXPECT_EQ(vnode->name, "bar.array_str");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "['foo', 'bar', 'baz']");
+  EXPECT_EQ(vnode->value->to_string(), "[\"foo\", \"bar\", \"baz\"]");
 }
 
 TEST_F(Functions, ImportNodes) {
@@ -206,7 +206,7 @@ TEST_F(Functions, ImportNodes) {
   vnode = env.nodes.at(3);
   EXPECT_EQ(vnode->name, "foo.scalar_str");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "'baz_value'");
+  EXPECT_EQ(vnode->value->to_string(), "\"baz_value\"");
 
   vnode = env.nodes.at(4);
   EXPECT_EQ(vnode->name, "bar.array_bool");
@@ -226,5 +226,5 @@ TEST_F(Functions, ImportNodes) {
   vnode = env.nodes.at(7);
   EXPECT_EQ(vnode->name, "bar.array_str");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "['foo', 'bar', 'baz']");
+  EXPECT_EQ(vnode->value->to_string(), "[\"foo\", \"bar\", \"baz\"]");
 }

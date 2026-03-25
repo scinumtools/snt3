@@ -76,9 +76,9 @@ TEST(References, StringValues) {
 
   // referencing scalar and array values
   dip::DIP d;
-  d.add_string("foo str = 'baz'");
+  d.add_string("foo str = \"baz\"");
   d.add_string("bar str = {?foo}");
-  d.add_string("snap str[2] = ['pop','jerk']");
+  d.add_string("snap str[2] = [\"pop\",\"jerk\"]");
   d.add_string("crackle str[2] = {?snap}");
   dip::Environment env = d.parse();
   EXPECT_EQ(env.nodes.size(), 4);
@@ -86,12 +86,12 @@ TEST(References, StringValues) {
   dip::ValueNode::PointerType vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->name, "bar");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "'baz'");
+  EXPECT_EQ(vnode->value->to_string(), "\"baz\"");
 
   vnode = env.nodes.at(3);
   EXPECT_EQ(vnode->name, "crackle");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "['pop', 'jerk']");
+  EXPECT_EQ(vnode->value->to_string(), "[\"pop\", \"jerk\"]");
 }
 
 TEST(References, ExceptionMissingNode) {
@@ -119,7 +119,7 @@ TEST(References, DataTypeConversion) {
   dip::ValueNode::PointerType vnode = env.nodes.at(1);
   EXPECT_EQ(vnode->name, "bar");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "'true'");
+  EXPECT_EQ(vnode->value->to_string(), "\"true\"");
 }
 
 TEST(References, ExceptionDimension) {
@@ -142,7 +142,7 @@ TEST(References, TableNodes) {
   // referencing scalar and array values
   dip::DIP d;
   d.add_string("foo");
-  d.add_string("  snap str = 'snap'");
+  d.add_string("  snap str = \"snap\"");
   d.add_string("  crackle bool[2] = [true,false]");
   d.add_string("bar table = {?foo}");
   dip::Environment env = d.parse();
@@ -151,7 +151,7 @@ TEST(References, TableNodes) {
   dip::ValueNode::PointerType vnode = env.nodes.at(2);
   EXPECT_EQ(vnode->name, "bar.snap");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "'snap'");
+  EXPECT_EQ(vnode->value->to_string(), "\"snap\"");
 
   vnode = env.nodes.at(3);
   EXPECT_EQ(vnode->name, "bar.crackle");
@@ -164,7 +164,7 @@ TEST(References, ImportNodes) {
   // referencing scalar and array values
   dip::DIP d;
   d.add_string("foo");
-  d.add_string("  snap str = 'snap'");
+  d.add_string("  snap str = \"snap\"");
   d.add_string("  crackle bool[2] = [true,false]");
   d.add_string("bar {?}");
   d.add_string("baz");
@@ -175,7 +175,7 @@ TEST(References, ImportNodes) {
   dip::ValueNode::PointerType vnode = env.nodes.at(2);
   EXPECT_EQ(vnode->name, "bar.foo.snap");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "'snap'");
+  EXPECT_EQ(vnode->value->to_string(), "\"snap\"");
 
   vnode = env.nodes.at(3);
   EXPECT_EQ(vnode->name, "bar.foo.crackle");
@@ -185,7 +185,7 @@ TEST(References, ImportNodes) {
   vnode = env.nodes.at(4);
   EXPECT_EQ(vnode->name, "baz.snap");
   EXPECT_TRUE(vnode);
-  EXPECT_EQ(vnode->value->to_string(), "'snap'");
+  EXPECT_EQ(vnode->value->to_string(), "\"snap\"");
 
   vnode = env.nodes.at(5);
   EXPECT_EQ(vnode->name, "baz.crackle");

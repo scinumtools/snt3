@@ -108,7 +108,7 @@ TEST(ParseScalars, StringValue) {
   EXPECT_EQ(vnode->indent, 0);
   EXPECT_EQ(vnode->name, "foo");
 
-  EXPECT_EQ(vnode->value->to_string(), "'bar'");
+  EXPECT_EQ(vnode->value->to_string(), "\"bar\"");
   EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
 }
 
@@ -118,7 +118,7 @@ TEST(ParseScalars, Cloning) {
   d.add_string("jerk bool = true");
   d.add_string("snap int = 3 cm");
   d.add_string("crackle float = 1.23 J");
-  d.add_string("pop str = 'foo'");
+  d.add_string("pop str = \"foo\"");
   dip::Environment env = d.parse();
 
   dip::ValueNode::PointerType clone;
@@ -137,5 +137,5 @@ TEST(ParseScalars, Cloning) {
 
   dip::ValueNode::PointerType pop = env.nodes.at(3);
   clone = pop->clone("clone");
-  EXPECT_EQ(clone->to_string(), "'foo'");
+  EXPECT_EQ(clone->to_string(), "\"foo\"");
 }
