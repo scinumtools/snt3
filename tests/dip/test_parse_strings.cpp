@@ -28,21 +28,17 @@ TEST(ParseStrings, BlockQuotes) {
 TEST(ParseStrings, EscapeSymbols) {
 
   dip::DIP d;
-  d.add_string("foo str = \"\"\"foo \\\" foo \\\' foo \\n foo\"\"\"");
-  d.add_string("bar str = \"bar \\\" bar \\\' bar \\n bar\"");
-  d.add_string("baz str = 'baz \\\" baz \\\' baz \\n baz'");
+  d.add_string("foo str = \"\"\"foo \\\" foo ' foo \\n foo\"\"\"");
+  d.add_string("bar str = \"bar \\\" bar ' bar \\n bar\"");
   dip::Environment env = d.parse();
-  EXPECT_EQ(env.nodes.size(), 3);
+  EXPECT_EQ(env.nodes.size(), 2);
 
   dip::BaseNode::PointerType node = env.nodes.at(0);
   EXPECT_EQ(node->name, "foo");
-  EXPECT_EQ(node->value_raw.at(0), "foo \\\" foo \\' foo \\n foo");
+  EXPECT_EQ(node->value_raw.at(0), "foo \" foo ' foo \n foo");
   node = env.nodes.at(1);
   EXPECT_EQ(node->name, "bar");
-  EXPECT_EQ(node->value_raw.at(0), "bar \\\" bar \\' bar \\n bar");
-  node = env.nodes.at(2);
-  EXPECT_EQ(node->name, "baz");
-  EXPECT_EQ(node->value_raw.at(0), "baz \\\" baz \\' baz \\n baz");
+  EXPECT_EQ(node->value_raw.at(0), "bar \" bar ' bar \n bar");
 }
 
 TEST(ParseStrings, CommentSymbol) {

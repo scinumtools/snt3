@@ -9,7 +9,7 @@
 
 namespace snt::dip {
 
-  // constexpr std::array<std::string, 3> Parser::ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
+  // constexpr std::array<std::string, 2> Parser::ESCAPE_SYMBOLS = {"\\\"", "\\n"};
 
   void Parser::strip(const std::string& text) {
     code = code.substr(text.length(), code.length());
@@ -24,7 +24,7 @@ namespace snt::dip {
    */
 
   void Parser::encode_escape_symbols(std::string& str) {
-    std::array<std::string, 3> ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
+    std::array<std::string, 2> ESCAPE_SYMBOLS = {"\\\"", "\\n"};
     for (size_t i = 0; i < ESCAPE_SYMBOLS.size(); i++) {
       std::string replace_symbol = "Z@" + std::to_string(i) + ";";
       size_t pos = 0;
@@ -37,7 +37,7 @@ namespace snt::dip {
   }
 
   void Parser::decode_escape_symbols(std::string& str) {
-    std::array<std::string, 3> ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
+    std::array<std::string, 2> ESCAPE_SYMBOLS = {"\"", "\n"};
     for (size_t i = 0; i < ESCAPE_SYMBOLS.size(); i++) {
       std::string replace_symbol = "Z@" + std::to_string(i) + ";";
       size_t pos = 0;
