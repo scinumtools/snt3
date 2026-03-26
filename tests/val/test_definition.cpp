@@ -101,17 +101,17 @@ TEST(Definitions, String) {
   val::BaseValue::PointerType val;
 
   val = std::make_unique<val::ArrayValue<std::string>>("Hello World");
-  EXPECT_EQ(val->to_string(), "'Hello World'");
+  EXPECT_EQ(val->to_string(), "\"Hello World\"");
   EXPECT_EQ(val->get_dtype(), val::DataType::String);
   EXPECT_EQ(val->get_shape(), val::Array::ShapeType({1}));
 
   val = std::make_unique<val::ArrayValue<std::string>>(arr);
-  EXPECT_EQ(val->to_string(), "['a', 'b', 'c', 'd', 'e', 'f']");
+  EXPECT_EQ(val->to_string(), "[\"a\", \"b\", \"c\", \"d\", \"e\", \"f\"]");
   EXPECT_EQ(val->get_dtype(), val::DataType::String);
   EXPECT_EQ(val->get_shape(), val::Array::ShapeType({6}));
 
   val = std::make_unique<val::ArrayValue<std::string>>(arr, sh);
-  EXPECT_EQ(val->to_string(), "[['a', 'b', 'c'], ['d', 'e', 'f']]");
+  EXPECT_EQ(val->to_string(), "[[\"a\", \"b\", \"c\"], [\"d\", \"e\", \"f\"]]");
   EXPECT_EQ(val->get_dtype(), val::DataType::String);
   EXPECT_EQ(val->get_shape(), val::Array::ShapeType(sh));
 }

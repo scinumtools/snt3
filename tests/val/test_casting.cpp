@@ -21,7 +21,7 @@ TEST(Casting, Boolean) {
   EXPECT_EQ(bval->to_string(), "[1, 0, 0, 1, 1]");
 
   bval = val->cast_as(val::DataType::String);
-  EXPECT_EQ(bval->to_string(), "['true', 'false', 'false', 'true', 'true']");
+  EXPECT_EQ(bval->to_string(), "[\"true\", \"false\", \"false\", \"true\", \"true\"]");
 
   val = std::make_unique<val::ArrayValue<bool>>(1);
   bval = val->cast_as(val::DataType::Character);
@@ -44,7 +44,7 @@ TEST(Casting, Character) {
   EXPECT_EQ(bval->to_string(), "[65, 66, 67, 68, 69]");
 
   bval = val->cast_as(val::DataType::String);
-  EXPECT_EQ(bval->to_string(), "['65', '66', '67', '68', '69']");
+  EXPECT_EQ(bval->to_string(), "[\"65\", \"66\", \"67\", \"68\", \"69\"]");
 
   bval = val->cast_as(val::DataType::Character);
   EXPECT_EQ(bval->to_string(), "[A, B, C, D, E]");
@@ -66,7 +66,7 @@ TEST(Casting, Integer) {
   EXPECT_EQ(bval->to_string(), "[0, 2, 33, 45, 1e5]");
 
   bval = val->cast_as(val::DataType::String);
-  EXPECT_EQ(bval->to_string(), "['0', '2', '33', '45', '100023']");
+  EXPECT_EQ(bval->to_string(), "[\"0\", \"2\", \"33\", \"45\", \"100023\"]");
 
   val = std::make_unique<val::ArrayValue<int>>(66);
   bval = val->cast_as(val::DataType::Character);
@@ -89,7 +89,7 @@ TEST(Casting, Float) {
   EXPECT_EQ(bval->to_string(), "[0, 2, 33.3, 4.5e3, -1e8]");
 
   bval = val->cast_as(val::DataType::String);
-  EXPECT_EQ(bval->to_string(), "['0.000000', '2.000000', '33.300000', '4500.000000', '-100023000.000000']");
+  EXPECT_EQ(bval->to_string(), "[\"0.000000\", \"2.000000\", \"33.300000\", \"4500.000000\", \"-100023000.000000\"]");
 
   val = std::make_unique<val::ArrayValue<double>>(66.);
   bval = val->cast_as(val::DataType::Character);
@@ -120,7 +120,7 @@ TEST(Casting, String) {
   arr = {"a", "b", "c"};
   val = std::make_unique<val::ArrayValue<std::string>>(arr);
   bval = val->cast_as(val::DataType::String);
-  EXPECT_EQ(bval->to_string(), "['a', 'b', 'c']");
+  EXPECT_EQ(bval->to_string(), "[\"a\", \"b\", \"c\"]");
 
   val = std::make_unique<val::ArrayValue<std::string>>("B");
   bval = val->cast_as(val::DataType::Character);

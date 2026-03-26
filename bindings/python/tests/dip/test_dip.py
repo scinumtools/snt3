@@ -43,8 +43,8 @@ def test_select_node():
 
     # initialize string nodes
     dip = DIP()
-    dip.add_string("foo str = 'A'");
-    dip.add_string("bar str[2,3] = [['a','b','c'],['d','e','f']]");
+    dip.add_string("foo str = \"A\"");
+    dip.add_string("bar str[2,3] = [[\"a\",\"b\",\"c\"],[\"d\",\"e\",\"f\"]]");
     env = dip.parse();
 
     assert env.size == 2

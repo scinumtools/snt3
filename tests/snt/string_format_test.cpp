@@ -70,7 +70,7 @@ TEST(StringFormat, StringArrays) {
 
   std::vector<std::string> value = {"a", "b", "c", "d", "e", "f"};
   std::vector<size_t> shape = {2, 3};
-  EXPECT_EQ(snt::array_to_string(value, shape), "[['a', 'b', 'c'], ['d', 'e', 'f']]");
+  EXPECT_EQ(snt::array_to_string(value, shape), "[[\"a\", \"b\", \"c\"], [\"d\", \"e\", \"f\"]]");
 }
 
 TEST(StringFormat, ToString) {
@@ -80,7 +80,7 @@ TEST(StringFormat, ToString) {
   std::vector<size_t> shape = {1};
 
   // test string settings
-  EXPECT_EQ(snt::array_to_string(value, shape), "'foo'");
+  EXPECT_EQ(snt::array_to_string(value, shape), "\"foo\"");
   format.stringQuotes = false;
   EXPECT_EQ(snt::array_to_string(value, shape, format), "foo");
 
