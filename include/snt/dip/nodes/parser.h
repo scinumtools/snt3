@@ -42,6 +42,7 @@ namespace snt::dip {
      *
      * @param required Specifies if keyword is required or not
      * @param delimiter Trailing character after a keyword
+     * @return True if the keyword was successfully parsed; otherwise, false.
      */
     bool part_keyword(const bool required = true, const char delimiter = ' ');
 
@@ -50,10 +51,16 @@ namespace snt::dip {
      *
      * @param required Specifies if number is required or not
      * @param delimiter Trailing character after a number
+     * @return True if the number was successfully parsed; otherwise, false.
      */
     bool part_number(const bool required = true, const char delimiter = ' ');
 
+    /**
+     * @brief Parse node value
+     * @return True if the value was successfully parsed; otherwise, false.
+     */
     bool part_value();
+    
     bool part_slice();
     bool part_format();
 

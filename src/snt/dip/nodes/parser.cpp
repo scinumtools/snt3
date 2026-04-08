@@ -7,6 +7,9 @@
 #include <sstream>
 #include <stdexcept>
 
+// TODO: Using of regular expressions is not efficient, but fast to implement.
+//       In the future, this should be optimised!
+
 namespace snt::dip {
 
   // constexpr std::array<std::string, 2> Parser::ESCAPE_SYMBOLS = {"\\\"", "\\n"};
@@ -140,7 +143,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_indent() {
-    std::regex pattern("^[ ]+");
+    std::regex pattern(R"(^[ ]+)");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       indent = matchResult[0].str().length();
@@ -252,7 +255,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_dimension() {
-    std::regex pattern("^\\[([0-9:,]*)\\]");
+    std::regex pattern(R"(^\[([0-9:,]*)\])");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       std::string slices = matchResult[1].str();
@@ -312,7 +315,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_expression() {
-    std::regex pattern("^[(](\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\")[)]");
+    std::regex pattern(R"(^[(](\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\")[)])");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       if (matchResult[2].length())
@@ -339,7 +342,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_string() {
-    std::regex pattern("^(\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\")");
+    std::regex pattern(R"(^(\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\"))");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       for (int i = 2; i < 6; i++) {
@@ -409,7 +412,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_slice() {
-    std::regex pattern("^\\[([0-9:,]*)\\]");
+    std::regex pattern(R"(^\[([0-9:,]*)\])");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       std::string slices = matchResult[1].str();
@@ -423,7 +426,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_format() {
-    std::regex pattern("^:([0-9]*)(?:[.]([0-9]+))?([sfeg]+)"); //^\\[([0-9:,]*)\\]");
+    std::regex pattern(R"(^:([0-9]*)(?:[.]([0-9]+))?([sfeg]+))"); //^\\[([0-9:,]*)\\]");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       formatting = {matchResult[1].str(), matchResult[2].str(), matchResult[3].str()};
@@ -434,19 +437,21 @@ namespace snt::dip {
   }
 
   bool Parser::part_units(const char delimiter) {
-    // Enforce the leading delimiter
+    // Check delimiter, but don't strip yet
     if (delimiter != '\0') {
-      if (code[0] == delimiter)
-        strip(std::string(1, delimiter));
-      else
-        return false;
-    }
-    // In numerical expressions starting signs +-*/ have to be explicitely excluded
-    std::regex pattern1("^([^#= ]+)");
-    std::regex pattern2("^[/*+-]+");
+      if (code.empty() || code[0] != delimiter)
+	return false;
+    }    
+    // Run regex on the correct substring
+    std::string target = (delimiter != '\0') ? code.substr(1) : code;
+    std::regex pattern(R"(^(?![/*+\-]+)([^#= ]+))");
     std::smatch matchResult;
-    if (std::regex_search(code, matchResult, pattern1) and !std::regex_match(code, pattern2)) {
+    if (std::regex_search(target, matchResult, pattern)) {
       units_raw = matchResult[1].str();
+      // Now strip delimiter + match
+      if (delimiter != '\0') {
+	strip(std::string(1, delimiter));
+      }
       strip(matchResult[0].str());
       return true;
     }
@@ -454,7 +459,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_comment() {
-    std::regex pattern("^[ ]*#[ ]*(.*)$");
+    std::regex pattern(R"(^[ ]*#[ ]*(.*)$)");
     std::smatch matchResult;
     if (std::regex_search(code, matchResult, pattern)) {
       comment = matchResult[1].str();
