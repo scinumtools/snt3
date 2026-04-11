@@ -1,0 +1,15 @@
+#ifndef NOSTD_ABS_H
+#define NOSTD_ABS_H
+
+#include <snt/puq/math/math.h>
+
+namespace snt::math {
+
+  extern double abs(const double m);
+  extern val::BaseValue::PointerType abs(val::BaseValue::PointerType a);
+  extern puq::Result abs(const puq::Result& m);
+  extern puq::Measurement abs(const puq::Measurement& msr);
+
+} // namespace snt::math
+
+#endif // NOSTD_ABS_H
