@@ -73,7 +73,7 @@ namespace snt::dip {
       std::string option_units = option.units_raw;
       if (!option_units.empty()) {
         if (units == nullptr)
-          throw std::runtime_error("Trying to convert '" + option_units +
+          throw std::runtime_error("Options: Trying to convert '" + option_units +
                                    "' into a nondimensional quantity: " + line.code);
         else {
           puq::Quantity quantity(std::move(option.value), option_units);
@@ -92,7 +92,7 @@ namespace snt::dip {
     val::BaseValue::PointerType value = cast_value(node->value_raw, node->value_shape);
     if (!node->units_raw.empty()) {
       if (this->units == nullptr)
-        throw std::runtime_error("Trying to convert '" + node->units_raw +
+        throw std::runtime_error("Modifications: Trying to convert '" + node->units_raw +
                                  "' into a nondimensional quantity: " + line.code);
       else {
         puq::Quantity quantity(std::move(value), node->units_raw);

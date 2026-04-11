@@ -1,5 +1,5 @@
 #include "main.h"
-#include "snt/puq/nostd/to_string.h"
+#include "snt/puq/math/to_string.h"
 
 void display_info(const std::string& expr) {
   puq::Measurement uv = puq::Quantity(expr).measurement;
@@ -11,8 +11,8 @@ void display_info(const std::string& expr) {
             << "Expression:  " << expr << '\n'
             << '\n';
   std::cout << "Unit system: " << puq::UnitSystem::Data->SystemAbbrev << " (" << puq::UnitSystem::Data->SystemName << ")" << '\n';
-  std::cout << "Result:   " << nostd::to_string(uv.magnitude) << '\n';
-  std::cout << "Base units:  " << nostd::to_string(uv.baseunits) << '\n';
+  std::cout << "Result:   " << math::to_string(uv.magnitude) << '\n';
+  std::cout << "Base units:  " << math::to_string(uv.baseunits) << '\n';
   std::stringstream ss;
   bool display = false;
   for (const auto& unit : puq::UnitSystem::Data->DimensionMap) {
@@ -63,11 +63,11 @@ void display_info(const std::string& expr) {
         puq::BaseUnits bu_unit({bu});
         tab.append({bu.prefix,
                     bu.unit,
-                    ((nostd::to_string(bu.exponent) == "") ? "1" : nostd::to_string(bu.exponent)),
+                    ((math::to_string(bu.exponent) == "") ? "1" : math::to_string(bu.exponent)),
                     unit.second.name,
                     unit.second.definition,
                     bu_unit.dimensions().to_string(),
-                    nostd::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
+                    math::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
       }
     }
     for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
@@ -77,7 +77,7 @@ void display_info(const std::string& expr) {
         puq::BaseUnits bu_unit({bu});
         tab.append({bu.prefix,
                     bu.unit,
-                    ((nostd::to_string(bu.exponent) == "") ? "1" : nostd::to_string(bu.exponent)),
+                    ((math::to_string(bu.exponent) == "") ? "1" : math::to_string(bu.exponent)),
                     puq::QuantityNames.at(quant.first),
                     quant.second.definition,
                     bu_unit.dimensions().to_string(),

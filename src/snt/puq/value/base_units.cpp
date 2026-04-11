@@ -1,8 +1,8 @@
 #include <fstream>
 #include <iostream>
 #include <snt/puq/exceptions.h>
-#include <snt/puq/nostd/pow.h>
-#include <snt/puq/nostd/to_string.h>
+#include <snt/puq/math/pow.h>
+#include <snt/puq/math/to_string.h>
 #include <snt/puq/settings.h>
 #include <snt/puq/solver/unit_solver.h>
 #include <snt/puq/value/base_units.h>
@@ -21,7 +21,7 @@ namespace snt::puq {
     std::stringstream ss;
     ss << prefix << unit;
     if (exponent_to_float(exponent) != 1)
-      ss << nostd::to_string(exponent, format);
+      ss << math::to_string(exponent, format);
     return ss.str();
   }
 
@@ -135,7 +135,7 @@ namespace snt::puq {
       // find prefix
       auto prefix = UnitPrefixList.find(bu.prefix);
       if (prefix != UnitPrefixList.end()) {
-        dim.numerical *= nostd::pow(prefix->second.magnitude, exponent_to_float(bu.exponent));
+        dim.numerical *= math::pow(prefix->second.magnitude, exponent_to_float(bu.exponent));
       }
       // quantity
       if (bu.unit.rfind(Symbols::quantity_start, 0) == 0 || bu.unit.rfind(Symbols::si_factor_start, 0) == 0) {
@@ -144,7 +144,7 @@ namespace snt::puq {
           dim.utype = dim.utype | Utype::LIN;
           dim.symbols.push_back(dmap->first);
           Result magnitude(dmap->second.magnitude, dmap->second.uncertainty);
-          dim.numerical *= nostd::pow(magnitude, exponent_to_float(bu.exponent));
+          dim.numerical *= math::pow(magnitude, exponent_to_float(bu.exponent));
           for (int i = 0; i < Config::num_basedim; i++) {
             dim.physical[i] = add_exp(dim.physical[i],
                                       mul_exp(dmap->second.dimensions[i], bu.exponent));
@@ -168,7 +168,7 @@ namespace snt::puq {
           auto dmap = UnitSystem::Data->DimensionMap.find(unit->first);
           if (dmap != UnitSystem::Data->DimensionMap.end()) {
             Result magnitude(dmap->second.magnitude, dmap->second.uncertainty);
-            dim.numerical *= nostd::pow(magnitude, exponent_to_float(bu.exponent));
+            dim.numerical *= math::pow(magnitude, exponent_to_float(bu.exponent));
             for (int i = 0; i < Config::num_basedim; i++) {
               dim.physical[i] = add_exp(dim.physical[i],
                                         mul_exp(dmap->second.dimensions[i], bu.exponent));

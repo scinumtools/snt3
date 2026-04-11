@@ -73,8 +73,8 @@ void test_unit_definitions() {
     EXPECT_DOUBLE_EQ(unit.magnitude, dim2.numerical.value[0])
       << "Numerical value of unit '" << unit.first
       << "' does not match with its definition: "
-      << puq::nostd::to_string(unit.magnitude) << " != "
-      << puq::nostd::to_string(dim2.numerical);
+      << puq::math::to_string(unit.magnitude) << " != "
+      << puq::math::to_string(dim2.numerical);
     */
     EXPECT_EQ(m1, m2) << "Dimension of unit '" << unit.first
                       << "' do not match its definition: "

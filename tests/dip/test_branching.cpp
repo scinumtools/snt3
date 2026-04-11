@@ -184,7 +184,7 @@ TEST_F(Branching, ValueExpression) {
 
   dip::DIP d;
   d.add_string("foo int = 34");
-  d.add_string("@if (\"{?foo} <= 50\")");
+  d.add_string("@if ({?foo} <= 50)");
   d.add_string("  age int = 30");
   d.add_string("@end");
   dip::Environment env = d.parse();

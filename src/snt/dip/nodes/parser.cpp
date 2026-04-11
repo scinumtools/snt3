@@ -185,71 +185,124 @@ namespace snt::dip {
     return false;
   }
 
-  bool Parser::part_literal() {
-    std::string trimmed = code;
-    trimmed.erase(0, trimmed.find_first_not_of(" \t\n\r"));
-    trimmed.erase(trimmed.find_last_not_of(" \t\n\r") + 1);
-    // Check Boolean
-    if (trimmed == snt::KEYWORD_TRUE || trimmed == snt::KEYWORD_FALSE) {
+  bool Parser::part_literal_boolean(const std::string& str) {
+    if (str == snt::KEYWORD_TRUE || str == snt::KEYWORD_FALSE) {
       dtype_raw = {"", std::string(KEYWORD_BOOLEAN), ""};
-      value_raw.push_back(trimmed);
+      value_raw.push_back(str);
       value_origin = ValueOrigin::String;
       return true;
     }
-    // Check String (quoted with "" or '')
-    if ((trimmed.front() == '"' && trimmed.back() == '"') ||
-        (trimmed.front() == '\'' && trimmed.back() == '\'')) {
+    return false;
+  }
+
+  bool Parser::part_literal_string(const std::string& str) {
+    if ((str.front() == '"' && str.back() == '"')) {
       dtype_raw = {"", std::string(KEYWORD_STRING), ""};
-      value_raw.push_back(trimmed.substr(1, trimmed.length() - 2));
+      value_raw.push_back(str.substr(1, str.length() - 2));
       value_origin = ValueOrigin::String;
       return true;
     }
-    // Check Integer
+    return false;
+  }
+
+  bool Parser::part_literal_integer(const std::string& str) {
     size_t i = 0;
-    if (trimmed[i] == '+' || trimmed[i] == '-')
+    if (str[i] == '+' || str[i] == '-')
       ++i;
     std::string::difference_type i_signed = static_cast<std::string::difference_type>(i);
-    if (i < trimmed.size() && std::all_of(trimmed.begin() + i_signed, trimmed.end(), ::isdigit)) {
+    if (i < str.size() && std::all_of(str.begin() + i_signed, str.end(), ::isdigit)) {
       dtype_raw = {"", std::string(KEYWORD_INTEGER), ""};
-      value_raw.push_back(trimmed);
+      value_raw.push_back(str);
       value_origin = ValueOrigin::String;
       return true;
     }
-    // Check Float
+    return false;
+  }
+
+  bool Parser::part_literal_float(const std::string& str) {
+    size_t i = 0;
+    if (str[i] == '+' || str[i] == '-')
+      ++i;
     bool has_digits = false;
-    while (i < trimmed.size() && std::isdigit(trimmed[i])) {
+    while (i < str.size() && std::isdigit(str[i])) {
       ++i;
       has_digits = true;
     }
     bool is_float = false;
-    if (i < trimmed.size() && trimmed[i] == '.') {
+    if (i < str.size() && str[i] == '.') {
       ++i;
       is_float = true;
-      while (i < trimmed.size() && std::isdigit(trimmed[i])) {
+      while (i < str.size() && std::isdigit(str[i])) {
         ++i;
         has_digits = true;
       }
     }
-    if (has_digits && i < trimmed.size() && (trimmed[i] == 'e' || trimmed[i] == 'E')) {
+    if (has_digits && i < str.size() && (str[i] == 'e' || str[i] == 'E')) {
       ++i;
-      if (trimmed[i] == '+' || trimmed[i] == '-')
+      if (str[i] == '+' || str[i] == '-')
         ++i;
       bool exp_digits = false;
-      while (i < trimmed.size() && std::isdigit(trimmed[i])) {
+      while (i < str.size() && std::isdigit(str[i])) {
         ++i;
         exp_digits = true;
       }
-      if (exp_digits && i == trimmed.size()) {
+      if (exp_digits && i == str.size()) {
         dtype_raw = {"", std::string(KEYWORD_FLOAT), ""};
-        value_raw.push_back(trimmed);
+        value_raw.push_back(str);
         value_origin = ValueOrigin::String;
         return true;
       }
-    } else if (is_float && has_digits && i == trimmed.size()) {
+    } else if (is_float && has_digits && i == str.size()) {
       dtype_raw = {"", std::string(KEYWORD_FLOAT), ""};
-      value_raw.push_back(trimmed);
+      value_raw.push_back(str);
       value_origin = ValueOrigin::String;
       return true;
+    }
+    return false;
+  }
+
+  bool Parser::part_literal_units(const std::string& str) {
+    if (str.empty())
+      return false;
+    char c = str[0];
+    if (c == '/' || c == '*' || c == '+' || c == '-')
+      return false;
+    size_t i = 0;
+    while (i < str.size()) {
+      char ch = str[i];
+      if (ch == '#' || ch == '=' || ch == ' ')
+	break;
+      ++i;
+    }
+    if (i == 0)
+      return false;
+    units_raw = str.substr(0, i);
+    strip(units_raw);
+    return true;
+  }
+  
+  bool Parser::part_literal() {
+    std::string trimmed = code;
+    trimmed.erase(0, trimmed.find_first_not_of(" \t\n\r"));
+    trimmed.erase(trimmed.find_last_not_of(" \t\n\r") + 1);
+    if (part_literal_boolean(trimmed))
+      return true;
+    else if (part_literal_string(trimmed))
+      return true;
+    size_t pos = trimmed.find(' ');
+    if (pos != std::string::npos) {
+      std::string number = trimmed.substr(0, pos);
+      std::string units  = trimmed.substr(pos + 1);
+      units.erase(0, units.find_first_not_of(" \t\n\r"));
+      if (part_literal_integer(number) && part_literal_units(units))
+	return true;
+      else if (part_literal_float(number) && part_literal_units(units))
+	return true;
+    } else {
+      if (part_literal_integer(trimmed))
+	return true;
+      else if (part_literal_float(trimmed))
+	return true;
     }
     return false;
   }
@@ -315,22 +368,34 @@ namespace snt::dip {
   }
 
   bool Parser::part_expression() {
-    std::regex pattern(R"(^[(](\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\")[)])");
-    std::smatch matchResult;
-    if (std::regex_search(code, matchResult, pattern)) {
-      if (matchResult[2].length())
-        value_raw.push_back(matchResult[2].str());
-      else if (matchResult[3].length())
-        value_raw.push_back(matchResult[3].str());
-      else if (matchResult[4].length())
-        value_raw.push_back(matchResult[4].str());
-      else
-        throw std::runtime_error("Expression cannot be an empty string: " + line.code);
-      value_origin = ValueOrigin::Expression;
-      strip(matchResult[0].str());
-      return true;
+    if (code.empty())
+      return false;
+    // Skip leading whitespace
+    size_t start = code.find_first_not_of(" \t\n\r");
+    if (start == std::string::npos || code[start] != '(')
+      return false;
+    int depth = 0;
+    size_t i = start;
+    // Parse parentheses from first '('
+    for (; i < code.size(); ++i) {
+      if (code[i] == '(') depth++;
+      else if (code[i] == ')') {
+	depth--;
+	if (depth == 0) break;
+      }
     }
-    return false;
+    // No matching closing parenthesis
+    if (depth != 0)
+      throw std::runtime_error("Expression contains unclosed parentheses: " + line.code);    
+    // Extract inside content
+    std::string inside = code.substr(start + 1, i - start - 1);
+    if (inside.empty())
+      throw std::runtime_error("Expression cannot be empty: " + line.code);    
+    value_raw.push_back(inside);
+    value_origin = ValueOrigin::Expression;    
+    // Strip including leading whitespace + full "(...)"
+    strip(code.substr(0, i + 1));
+    return true;
   }
 
   bool Parser::part_array() {
@@ -444,6 +509,7 @@ namespace snt::dip {
     }    
     // Run regex on the correct substring
     std::string target = (delimiter != '\0') ? code.substr(1) : code;
+    // In numerical expressions starting signs +-*/ have to be explicitely excluded
     std::regex pattern(R"(^(?![/*+\-]+)([^#= ]+))");
     std::smatch matchResult;
     if (std::regex_search(target, matchResult, pattern)) {

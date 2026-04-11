@@ -1,10 +1,10 @@
 #include <iostream>
 #include <set>
 #include <snt/puq/converter.h>
-#include <snt/puq/nostd/exp.h>
-#include <snt/puq/nostd/log.h>
-#include <snt/puq/nostd/log10.h>
-#include <snt/puq/nostd/pow.h>
+#include <snt/puq/math/exp.h>
+#include <snt/puq/math/log.h>
+#include <snt/puq/math/log10.h>
+#include <snt/puq/math/pow.h>
 
 namespace snt::puq {
 
@@ -25,27 +25,27 @@ namespace snt::puq {
   }
 
   inline Result _convert_Ratio_B(const Result& value, const Result& exp) {
-    return exp * nostd::log10(value);
+    return exp * math::log10(value);
   }
 
   inline Result _convert_B_Ratio(const Result& value, const Result& exp) {
-    return nostd::pow((Result)10, value / exp);
+    return math::pow((Result)10, value / exp);
   }
 
   inline Result _convert_Ratio_Np(const Result& value, const Result& exp) {
-    return exp * nostd::log(value);
+    return exp * math::log(value);
   }
 
   inline Result _convert_Np_Ratio(const Result& value, const Result& exp) {
-    return nostd::exp(value / exp);
+    return math::exp(value / exp);
   }
 
   inline Result _convert_Mw_Mo(const Result& value) {
-    return nostd::pow((Result)10, 1.5 * (value + (Result)10.7));
+    return math::pow((Result)10, 1.5 * (value + (Result)10.7));
   }
 
   inline Result _convert_Mo_Mw(const Result& value) {
-    return 2. / 3. * nostd::log10(value) - (Result)10.7;
+    return 2. / 3. * math::log10(value) - (Result)10.7;
   }
 
   Result Converter::_convert_logarithmic(const Result& m) {

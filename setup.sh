@@ -139,7 +139,8 @@ function setup_clang_format {
 }
 
 function refactor_code {
-    grep -rl "${1}" ./ --exclude-dir=build --exclude-dir=.venv | xargs sed -i '' "s/${1}/${2}/g"
+    git grep -l -z "$1" | xargs -0 sed -i '' "s|$1|$2|g"
+    #grep -rl "${1}" ./ --exclude-dir=build --exclude-dir=.venv | xargs sed -i '' "s/${1}/${2}/g"
 }
 
 function show_help {

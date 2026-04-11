@@ -195,7 +195,7 @@ TEST(Units, DimlessModificationError) {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Trying to convert 'm' into a nondimensional quantity: foo float = 23");
+    EXPECT_STREQ(e.what(), "Modifications: Trying to convert 'm' into a nondimensional quantity: foo float = 23");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }
@@ -210,7 +210,7 @@ TEST(Units, DimlessInjectionError) {
     d.parse();
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Trying to convert 'm' into a nondimensional quantity: foo float = 23 m");
+    EXPECT_STREQ(e.what(), "Request: Trying to convert 'm' into a nondimensional quantity: foo float = 23 m");
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
   }

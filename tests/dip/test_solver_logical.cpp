@@ -75,10 +75,10 @@ TEST(SolverLogical, StringComparison) {
 
   dip::Environment env;
   dip::LogicalSolver solver(env);
-  dip::LogicalAtom atom = solver.eval("'foo' == 'bar'");
+  dip::LogicalAtom atom = solver.eval("\"foo\" == \"bar\"");
   EXPECT_EQ(atom.value->to_string(), "false");
 
-  atom = solver.eval("'foo' != 'foo'");
+  atom = solver.eval("\"foo\" != \"foo\"");
   EXPECT_EQ(atom.value->to_string(), "false");
 }
 

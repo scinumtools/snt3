@@ -7,6 +7,7 @@ namespace snt::dip {
 
   struct NumericalSettings : exs::BaseSettings {
     Environment* env;
+    std::string units;
   };
 
   class NumericalAtom : public exs::AtomBase<NumericalAtom, val::BaseValue::PointerType> {
@@ -43,7 +44,7 @@ namespace snt::dip {
   class NumericalSolver {
   public:
     std::unique_ptr<exs::Solver<NumericalAtom, NumericalSettings>> solver;
-    NumericalSolver(Environment& env);
+    NumericalSolver(Environment& env, const std::string& units = "");
     NumericalAtom eval(const std::string& expression);
   };
 

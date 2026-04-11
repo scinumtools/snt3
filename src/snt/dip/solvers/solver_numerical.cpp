@@ -16,10 +16,10 @@ namespace snt::dip {
 
   val::BaseValue::PointerType NumericalAtom::from_string(const std::string& s, exs::BaseSettings* settings) {
     Parser parser({s, {"NUMERICAL_ATOM", 0}});
+    NumericalSettings* csettings = static_cast<NumericalSettings*>(settings);
     if (parser.part_reference()) {
-      NumericalSettings* csettings = static_cast<NumericalSettings*>(settings);
       val::BaseValue::PointerType value =
-          csettings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
+	csettings->env->request_value(parser.value_raw.at(0), RequestType::Reference, csettings->units);
       return std::move(value);
     } else if (parser.part_literal()) {
       ValueNode::PointerType vnode = nullptr;
@@ -34,6 +34,19 @@ namespace snt::dip {
       if (vnode == nullptr)
         throw std::runtime_error("Value could not be determined from : " + s);
       vnode->set_value();
+      if (!vnode->units_raw.empty() && !csettings->units.empty()) {
+	puq::Quantity quantity(std::move(vnode->value), vnode->units_raw);
+        quantity = quantity.convert(csettings->units);
+        vnode->value = std::move(quantity.measurement.magnitude.estimate);
+      }
+      else if (vnode->units_raw.empty() && !csettings->units.empty())
+	throw std::runtime_error(
+                  "Numerical Solver: Trying to convert nondimensional quantity into '" + csettings->units +
+                  "': " + vnode->line.code);
+      else if (!vnode->units_raw.empty() && csettings->units.empty())
+	throw std::runtime_error(
+		  "Numerical Solver: Trying to convert '" + vnode->units_raw +
+                  "' into a nondimensional quantity: " + vnode->line.code);
       return std::move(vnode->value);
     } else {
       throw std::runtime_error("Invalid atom value: " + s);
@@ -94,9 +107,9 @@ namespace snt::dip {
     value = value->math_neg();
   }
 
-  NumericalSolver::NumericalSolver(Environment& env) {
+  NumericalSolver::NumericalSolver(Environment& env, const std::string& units) {
 
-    NumericalSettings settings = {{}, &env};
+    NumericalSettings settings = {{}, &env, units};
 
     exs::OperatorList operators;
     operators.append(

@@ -46,11 +46,11 @@ namespace snt::dip {
             //       This is usefull if we want to simply get a reference node as it is.
             if (vnode->units == nullptr and !to_unit.empty())
               throw std::runtime_error(
-                  "Trying to convert nondimensional quantity into '" + vnode->units_raw +
+                  "Request: Trying to convert nondimensional quantity into '" + to_unit +
                   "': " + vnode->line.code);
             else if (vnode->units != nullptr and to_unit.empty())
               throw std::runtime_error(
-                  "Trying to convert '" + vnode->units_raw +
+                  "Request: Trying to convert '" + vnode->units_raw +
                   "' into a nondimensional quantity: " + vnode->line.code);
             else if (vnode->units != nullptr) {
               puq::Quantity quantity = std::move(new_value) * (*vnode->units);
