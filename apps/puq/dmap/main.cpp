@@ -4,7 +4,9 @@
 #include <iostream>
 #include <limits>
 #include <snt/puq/math/pow.h>
-#include <snt/puq/math/to_string.h>
+#include <snt/core/to_string.h>
+#include <snt/core/math/pow.h>
+#include <snt/puq/to_string.h>
 #include <snt/puq/solver/unit_solver.h>
 #include <snt/puq/systems/unit_system.h>
 #include <snt/puq/value/dimensions.h>
@@ -21,18 +23,18 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
   int precision = std::numeric_limits<double>::digits10;
   ss << std::setfill(' ') << std::setw(25) << std::left;
   val::ArrayValue<double> value(dim.numerical.estimate.get());
-  ss << math::to_string(value.get_value(0), precision) + ",";
+  ss << core::to_string(value.get_value(0), precision) + ",";
   ss << std::setfill(' ') << std::setw(25) << std::left;
   if (dim.numerical.uncertainty == nullptr) {
-    ss << math::to_string(0, precision) + ",";
+    ss << core::to_string(0, precision) + ",";
   } else {
     val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
-    ss << math::to_string(uncertainty.get_value(0), precision) + ",";
+    ss << core::to_string(uncertainty.get_value(0), precision) + ",";
   }
   // ss << std::setfill(' ') << std::setw(25) << std::left;
-  // ss << math::to_string(dim.numerical.estimate[0], precision) + ",";
+  // ss << core::to_string(dim.numerical.estimate[0], precision) + ",";
   // ss << std::setfill(' ') << std::setw(25) << std::left;
-  // ss << math::to_string(dim.numerical.uncertainty[0], precision) + ",";
+  // ss << core::to_string(dim.numerical.uncertainty[0], precision) + ",";
   ss << "{";
   for (int i = 0; i < puq::Config::num_basedim; i++) {
     if (i > 0)
@@ -56,7 +58,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
 void solve_bu_prefix(puq::Dimensions& dim, puq::BaseUnit& bu) {
   auto prefix = puq::UnitPrefixList.find(bu.prefix);
   if (prefix != puq::UnitPrefixList.end()) {
-    dim.numerical *= math::pow(prefix->second.magnitude, exponent_to_float(bu.exponent));
+    dim.numerical *= puq::math::pow(prefix->second.magnitude, exponent_to_float(bu.exponent));
   }
 }
 
@@ -64,7 +66,7 @@ bool solve_bu_unit(puq::DimensionMapType& dmap, puq::Dimensions& dim, puq::BaseU
   auto it = dmap.find(bu.unit);
   if (it != dmap.end()) {
     puq::Result m(it->second.magnitude, it->second.uncertainty);
-    dim.numerical *= math::pow(m, exponent_to_float(bu.exponent));
+    dim.numerical *= puq::math::pow(m, exponent_to_float(bu.exponent));
     for (int i = 0; i < puq::Config::num_basedim; i++) {
       dim.physical[i] = add_exp(dim.physical[i], mul_exp(it->second.dimensions[i], bu.exponent));
     }
@@ -144,7 +146,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
       }
       // account for the conversion from MGS to MKS dimensions
       if (exponent_to_float(dim.physical[1]) != 0)
-        dim.numerical *= math::pow(1e-3, exponent_to_float(dim.physical[1]));
+        dim.numerical *= core::math::pow(1e-3, exponent_to_float(dim.physical[1]));
       // clear physical dimensions to make conversion factors dimensionless
       std::fill(std::begin(dim.physical), std::end(dim.physical), 0);
       // register the conversion factor

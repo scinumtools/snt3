@@ -1,6 +1,6 @@
 #include <iomanip>
 #include <iostream>
-#include <snt/puq/math/to_string.h>
+#include <snt/puq/to_string.h>
 #include <snt/puq/systems/systems.h>
 #include <snt/puq/systems/unit_system.h>
 #include <snt/puq/util/data_table.h>
@@ -24,7 +24,7 @@ namespace snt::puq {
       DataTable tab({{"Symbol", 8}, {"Name", 8}, {"Result", 11}});
       for (auto& symbol : UnitPrefixOrder) {
         auto prefix = UnitPrefixList.at(symbol);
-        tab.append({symbol, prefix.name, math::to_string(prefix.magnitude, format)});
+        tab.append({symbol, prefix.name, puq::to_string(prefix.magnitude, format)});
       }
       return (json) ? tab.to_json() : tab.to_string();
     }
@@ -35,7 +35,7 @@ namespace snt::puq {
         auto unit = UnitSystem::Data->UnitList.at(symbol);
         if ((unit.utype & Utype::BAS) != Utype::BAS)
           continue;
-        tab.append({symbol, unit.name, math::to_string(unit.use_prefixes, unit.allowed_prefixes)});
+        tab.append({symbol, unit.name, puq::to_string(unit.use_prefixes, unit.allowed_prefixes)});
       }
       return (json) ? tab.to_json() : tab.to_string();
     }
@@ -59,7 +59,7 @@ namespace snt::puq {
                     dim.to_string(format.merge(Format::Display::MAGNITUDE)),
                     dim.to_string(format.merge(Format::Display::UNITS)),
                     unit.second.definition,
-                    math::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
+                    puq::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
       }
       return (json) ? tab.to_json() : tab.to_string();
     }
@@ -104,7 +104,7 @@ namespace snt::puq {
       for (auto& unit : ordered) {
         if ((unit.second.utype & Utype::TMP) != Utype::TMP)
           continue;
-        tab.append({unit.first, unit.second.name, math::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
+        tab.append({unit.first, unit.second.name, puq::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
       }
       return (json) ? tab.to_json() : tab.to_string();
     }
@@ -115,7 +115,7 @@ namespace snt::puq {
       for (auto& unit : ordered) {
         if ((unit.second.utype & Utype::LOG) != Utype::LOG)
           continue;
-        tab.append({unit.first, unit.second.name, math::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
+        tab.append({unit.first, unit.second.name, puq::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
       }
       return (json) ? tab.to_json() : tab.to_string();
     }

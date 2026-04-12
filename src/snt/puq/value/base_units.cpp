@@ -2,7 +2,7 @@
 #include <iostream>
 #include <snt/puq/exceptions.h>
 #include <snt/puq/math/pow.h>
-#include <snt/puq/math/to_string.h>
+#include <snt/puq/to_string.h>
 #include <snt/puq/settings.h>
 #include <snt/puq/solver/unit_solver.h>
 #include <snt/puq/value/base_units.h>
@@ -21,7 +21,7 @@ namespace snt::puq {
     std::stringstream ss;
     ss << prefix << unit;
     if (exponent_to_float(exponent) != 1)
-      ss << math::to_string(exponent, format);
+      ss << puq::to_string(exponent, format);
     return ss.str();
   }
 

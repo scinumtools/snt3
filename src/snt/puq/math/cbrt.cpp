@@ -1,14 +1,6 @@
 #include <snt/puq/math/cbrt.h>
 
-namespace snt::math {
-
-  double cbrt(const double m) {
-    return std::cbrt(m);
-  }
-
-  val::BaseValue::PointerType cbrt(val::BaseValue::PointerType a) {
-    return a->math_cbrt();
-  }
+namespace snt::puq::math {
 
   puq::Result cbrt(const puq::Result& m) {
     // y ± Dz = pow(x ± Dx, 1/3) -> Dy = 1/3 * pow(x, -2/3) * Dx
@@ -28,4 +20,4 @@ namespace snt::math {
     // return puq::Measurement(cbrt(msr.magnitude.estimate), third * pow(msr.magnitude.estimate, -2 * third) * msr.magnitude.uncertainty);
   }
 
-} // namespace snt::math
+} // namespace snt::puq::math

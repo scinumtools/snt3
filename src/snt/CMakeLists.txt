@@ -1,4 +1,5 @@
 # add submodule libraries
+add_subdirectory(core)
 if (ENABLE_EXS)
    add_subdirectory(exs)
 endif()

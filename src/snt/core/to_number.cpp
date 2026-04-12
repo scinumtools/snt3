@@ -1,6 +1,6 @@
 #include "to_number.h"
 
-namespace snt::math {
+namespace snt::core {
 
   double to_number(const std::string& value) {
     if (typeid(double) == typeid(float))
@@ -13,4 +13,4 @@ namespace snt::math {
       throw std::range_error("Unsupported magnitude precision.");
   }
 
-} // namespace snt::math
+} // namespace snt::core

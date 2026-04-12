@@ -1,15 +1,14 @@
-#ifndef NOSTD_LOG_H
-#define NOSTD_LOG_H
+#ifndef PUQ_MATH_LOG_H
+#define PUQ_MATH_LOG_H
 
-#include <snt/puq/math/math.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
 
-namespace snt::math {
+namespace snt::puq::math {
 
-  extern double log(const double m);
-  extern val::BaseValue::PointerType log(val::BaseValue::PointerType a);
   extern puq::Result log(const puq::Result& m);
   extern puq::Measurement log(const puq::Measurement& msr);
 
-} // namespace snt::math
+} // namespace snt::puq::math
 
-#endif // NOSTD_LOG_H
+#endif // PUQ_MATH_LOG_H

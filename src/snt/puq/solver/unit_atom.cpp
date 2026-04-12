@@ -1,25 +1,24 @@
-#include "../math/to_number.h"
-
 #include <algorithm>
 #include <regex>
 #include <snt/puq/solver/unit_atom.h>
 #include <snt/puq/systems/unit_system.h>
+#include <snt/core/to_number.h>
 #include <sstream>
 
 namespace snt::puq {
 
   inline void _parse_number(std::string& expr, Measurement& uv, const std::smatch& m) {
     if (m[6] == "") {
-      uv.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(math::to_number(expr));
-      // uv.magnitude = math::to_number(expr);
+      uv.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(expr));
+      // uv.magnitude = core::to_number(expr);
     } else {
       std::string decimals = m[3].str() == "" ? "." : m[3].str();
-      uv.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(math::to_number(m[1].str() + decimals + m[8].str()));
+      uv.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(m[1].str() + decimals + m[8].str()));
       if (m[10] == "")
-        uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(math::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
+        uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
       else
-        uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(math::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
-      // uv.magnitude = math::to_number(m[1].str() + decimals + m[8].str());
+        uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
+      // uv.magnitude = core::to_number(m[1].str() + decimals + m[8].str());
     }
   }
 

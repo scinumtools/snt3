@@ -1,15 +1,14 @@
-#ifndef NOSTD_CBRT_H
-#define NOSTD_CBRT_H
+#ifndef PUQ_MATH_CBRT_H
+#define PUQ_MATH_CBRT_H
 
-#include <snt/puq/math/math.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
 
-namespace snt::math {
+namespace snt::puq::math {
 
-  extern double cbrt(const double m);
-  extern val::BaseValue::PointerType cbrt(val::BaseValue::PointerType a);
   extern puq::Result cbrt(const puq::Result& m);
   extern puq::Measurement cbrt(const puq::Measurement& msr);
 
-} // namespace snt::math
+} // namespace snt::puq::math
 
-#endif // NOSTD_CBRT_H
+#endif // PUQ_MATH_CBRT_H

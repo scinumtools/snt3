@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <snt/puq/math/to_string.h>
+#include <snt/puq/to_string.h>
 #include <snt/puq/settings.h>
 #include <snt/puq/value/dimensions.h>
 #include <sstream>
@@ -58,7 +58,7 @@ namespace snt::puq {
       if (fexp == 1)
         ss << symbol << multiply;
       else if (fexp != 0)
-        ss << symbol << math::to_string(physical[i], format) << multiply;
+        ss << symbol << puq::to_string(physical[i], format) << multiply;
     }
     return ss.str();
   }

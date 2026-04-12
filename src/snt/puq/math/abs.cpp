@@ -1,14 +1,6 @@
 #include <snt/puq/math/abs.h>
 
-namespace snt::math {
-
-  double abs(const double m) {
-    return std::abs(m);
-  }
-
-  val::BaseValue::PointerType abs(val::BaseValue::PointerType a) {
-    return a->math_abs();
-  }
+namespace snt::puq::math {
 
   puq::Result abs(const puq::Result& m) {
     // abs(y ± Dy) = abs(y) ± Dy
@@ -22,4 +14,4 @@ namespace snt::math {
     // return puq::Measurement(abs(msr.magnitude.estimate), msr.magnitude.uncertainty);
   }
 
-} // namespace snt::math
+} // namespace snt::puq::math

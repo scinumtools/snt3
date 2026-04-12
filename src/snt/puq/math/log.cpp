@@ -1,15 +1,7 @@
 #include <snt/puq/exponent.h>
 #include <snt/puq/math/log.h>
 
-namespace snt::math {
-
-  double log(const double m) {
-    return std::log(m);
-  }
-
-  val::BaseValue::PointerType log(val::BaseValue::PointerType a) {
-    return a->math_log();
-  }
+namespace snt::puq::math {
 
   puq::Result log(const puq::Result& m) {
     // y ± Dy = log10(x ± Dx) -> Dy = Dx / x
@@ -29,4 +21,4 @@ namespace snt::math {
     // return puq::Measurement(log(msr.magnitude.estimate), msr.magnitude.uncertainty / msr.magnitude.estimate);
   }
 
-} // namespace snt::math
+} // namespace snt::puq::math

@@ -1,18 +1,16 @@
-#ifndef NOSTD_POW_H
-#define NOSTD_POW_H
+#ifndef PUQ_MATH_POW_H
+#define PUQ_MATH_POW_H
 
-#include <snt/puq/math/math.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
 
-namespace snt::math {
+namespace snt::puq::math {
 
-  extern double pow(const double m, const double e);
-  extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, const double e);
-  extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, val::BaseValue::PointerType e);
   extern puq::Result pow(const puq::Result& m, const double e);
   extern puq::Result pow(const puq::Result& m, const puq::Result& e);
   extern puq::Measurement pow(const puq::Measurement& msr, const double e);
   extern puq::Measurement pow(const puq::Measurement& msr1, const puq::Measurement& msr2);
 
-} // namespace snt::math
+} // namespace snt::puq::math
 
-#endif // NOSTD_POW_H
+#endif // PUQ_MATH_POW_H

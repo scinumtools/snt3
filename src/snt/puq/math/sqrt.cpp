@@ -1,14 +1,6 @@
 #include <snt/puq/math/sqrt.h>
 
-namespace snt::math {
-
-  double sqrt(const double m) {
-    return std::sqrt(m);
-  }
-
-  val::BaseValue::PointerType sqrt(val::BaseValue::PointerType a) {
-    return a->math_sqrt();
-  }
+namespace snt::puq::math {
 
   puq::Result sqrt(const puq::Result& m) {
     // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
@@ -24,4 +16,4 @@ namespace snt::math {
     // return puq::Measurement(sqrt(msr.magnitude.estimate), 0.5 * pow(msr.magnitude.estimate, -0.5) * msr.magnitude.uncertainty);
   }
 
-} // namespace snt::math
+} // namespace snt::puq::math

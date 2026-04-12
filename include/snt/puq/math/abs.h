@@ -1,15 +1,14 @@
-#ifndef NOSTD_ABS_H
-#define NOSTD_ABS_H
+#ifndef PUQ_MATH_ABS_H
+#define PUQ_MATH_ABS_H
 
-#include <snt/puq/math/math.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
 
-namespace snt::math {
+namespace snt::puq::math {
 
-  extern double abs(const double m);
-  extern val::BaseValue::PointerType abs(val::BaseValue::PointerType a);
   extern puq::Result abs(const puq::Result& m);
   extern puq::Measurement abs(const puq::Measurement& msr);
 
-} // namespace snt::math
+} // namespace snt::puq::math
 
-#endif // NOSTD_ABS_H
+#endif // PUQ_MATH_ABS_H

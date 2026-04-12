@@ -1,15 +1,14 @@
-#ifndef NOSTD_EXP_H
-#define NOSTD_EXP_H
+#ifndef PUQ_MATH_EXP_H
+#define PUQ_MATH_EXP_H
 
-#include <snt/puq/math/math.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
 
-namespace snt::math {
+namespace snt::puq::math {
 
-  extern double exp(const double e);
-  extern val::BaseValue::PointerType exp(val::BaseValue::PointerType e);
   extern puq::Result exp(const puq::Result& e);
   extern puq::Measurement exp(const puq::Measurement& uv);
 
-} // namespace snt::math
+} // namespace snt::puq::math
 
-#endif // NOSTD_EXP_H
+#endif // PUQ_MATH_EXP_H

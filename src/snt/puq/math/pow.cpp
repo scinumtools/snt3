@@ -1,14 +1,6 @@
 #include <snt/puq/math/pow.h>
 
-namespace snt::math {
-
-  double pow(const double m, const double e) {
-    return std::pow(m, e);
-  }
-
-  val::BaseValue::PointerType pow(val::BaseValue::PointerType a, val::BaseValue::PointerType e) {
-    return a->math_pow(e.get());
-  }
+namespace snt::puq::math {
 
   puq::Result pow(const puq::Result& m, const double e) {
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
@@ -76,4 +68,4 @@ namespace snt::math {
     // return puq::Measurement(pow(msr1.magnitude.estimate, msr2.magnitude.estimate), sqrt(Dzx * Dzx + Dzy * Dzy));
   }
 
-} // namespace snt::math
+} // namespace snt::puq::math

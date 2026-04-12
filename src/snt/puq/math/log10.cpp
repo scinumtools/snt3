@@ -1,14 +1,6 @@
 #include <snt/puq/math/log10.h>
 
-namespace snt::math {
-
-  double log10(const double m) {
-    return std::log10(m);
-  }
-
-  val::BaseValue::PointerType log10(val::BaseValue::PointerType a) {
-    return a->math_log10();
-  }
+namespace snt::puq::math {
 
   puq::Result log10(const puq::Result& m) {
     // y ± Dy = log(x ± Dx) -> Dy = 1 / ln(10) * Dx / x
@@ -34,4 +26,4 @@ namespace snt::math {
     // return puq::Measurement(log10(msr.magnitude.estimate), msr.magnitude.uncertainty / (msr.magnitude.estimate * std::log(10)));
   }
 
-} // namespace snt::math
+} // namespace snt::puq::math

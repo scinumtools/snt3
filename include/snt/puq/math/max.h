@@ -1,15 +1,14 @@
-#ifndef NOSTD_MAX_H
-#define NOSTD_MAX_H
+#ifndef PUQ_MATH_MAX_H
+#define PUQ_MATH_MAX_H
 
-#include <snt/puq/math/math.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
 
-namespace snt::math {
+namespace snt::puq::math {
 
-  extern double max(const double m1, const double m2);
-  extern val::BaseValue::PointerType max(val::BaseValue::PointerType a1, val::BaseValue::PointerType a2);
   extern puq::Result max(const puq::Result& m1, const puq::Result& m2);
   extern puq::Measurement max(const puq::Measurement& msr1, const puq::Measurement& msr2);
 
-} // namespace snt::math
+} // namespace snt::puq::math
 
-#endif // NOSTD_MAX_H
+#endif // PUQ_MATH_MAX_H

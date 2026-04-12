@@ -1,14 +1,12 @@
-#ifndef NOSTD_FLOOR_H
-#define NOSTD_FLOOR_H
+#ifndef PUQ_MATH_FLOOR_H
+#define PUQ_MATH_FLOOR_H
 
-#include <snt/puq/math/math.h>
+#include <snt/puq/result.h>
 
-namespace snt::math {
+namespace snt::puq::math {
 
-  extern double floor(const double m);
-  extern val::BaseValue::PointerType floor(val::BaseValue::PointerType a);
   extern puq::Result floor(const puq::Result& m);
 
-} // namespace snt::math
+} // namespace snt::puq::math
 
-#endif // NOSTD_FLOOR_H
+#endif // PUQ_MATH_FLOOR_H

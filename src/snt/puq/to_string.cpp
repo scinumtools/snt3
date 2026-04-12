@@ -1,20 +1,7 @@
-#include <snt/puq/math/to_string.h>
+#include <snt/puq/to_string.h>
 #include <string>
 
-namespace snt::math {
-
-  std::string to_string(const double value, int precision) {
-    std::stringstream ss;
-    ss << std::setprecision(precision);
-    ss << value << std::scientific;
-    return ss.str();
-  }
-
-  std::string to_string(val::BaseValue::PointerType value, int precision) {
-    snt::StringFormatType fmt;
-    fmt.valuePrecision = precision;
-    return value->to_string(fmt);
-  }
+namespace snt::puq {
 
   std::string to_string(const puq::Result& value, int precision) {
     return value.to_string(precision);
@@ -53,16 +40,4 @@ namespace snt::math {
     return ss.str();
   }
 
-  std::string to_string(const val::Array::ShapeType& shape) {
-    std::stringstream ss;
-    ss << "[";
-    for (int i = 0; i < shape.size(); i++) {
-      if (i > 0)
-        ss << ",";
-      ss << std::to_string(shape[i]);
-    }
-    ss << "]";
-    return ss.str();
-  }
-
-} // namespace snt::math
+} // namespace snt::puq

@@ -3,7 +3,7 @@ file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
 set(EXEC_NAME snt-puq)
 
 add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-val)
+target_link_libraries(${EXEC_NAME} PRIVATE snt-core snt-exs snt-val)
 
 target_include_directories(${EXEC_NAME}
   PUBLIC	

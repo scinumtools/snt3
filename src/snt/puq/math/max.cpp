@@ -1,14 +1,6 @@
 #include <snt/puq/math/max.h>
 
-namespace snt::math {
-
-  extern double max(const double m1, const double m2) {
-    return std::max(m1, m2);
-  }
-
-  val::BaseValue::PointerType max(val::BaseValue::PointerType a1, val::BaseValue::PointerType a2) {
-    return a1->math_max(a2.get());
-  }
+namespace snt::puq::math {
 
   extern puq::Result max(const puq::Result& m1, const puq::Result& m2) {
     // x ± Dx = max(x ± Dx, y ± Dy)  <- if x > y
@@ -46,4 +38,4 @@ namespace snt::math {
     // return puq::Measurement(estimate, (estimate == msr1.magnitude.estimate) ? msr1.magnitude.uncertainty : msr2.magnitude.uncertainty);
   }
 
-} // namespace snt::math
+} // namespace snt::puq::math

@@ -1,14 +1,6 @@
 #include <snt/puq/math/exp.h>
 
-namespace snt::math {
-
-  double exp(const double e) {
-    return std::exp(e);
-  }
-
-  val::BaseValue::PointerType exp(val::BaseValue::PointerType a) {
-    return a->math_exp();
-  }
+namespace snt::puq::math {
 
   puq::Result exp(const puq::Result& e) {
     // z ± Dz = pow(e, y ± Dy) -> Dz = pow(e, y) * log(e) * Dy
@@ -23,4 +15,4 @@ namespace snt::math {
     return puq::Measurement(exp(uv.magnitude), uv.baseunits);
   }
 
-} // namespace snt::math
+} // namespace snt::puq::math
