@@ -1,5 +1,7 @@
 #include "to_number.h"
 
+#include <typeinfo>
+
 namespace snt::core {
 
   double to_number(const std::string& value) {
