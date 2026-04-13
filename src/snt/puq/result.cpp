@@ -44,14 +44,14 @@ namespace snt::puq {
    */
   std::string Result::to_string(const UnitFormat& format) const {
     std::stringstream ss;
-    snt::StringFormatType fmt;
+    core::StringFormatType fmt;
     fmt.valuePrecision = format.precision;
     if (uncertainty == nullptr || !format.display_uncertainty()) {
       ss << estimate->to_string(fmt);
     } else {
       val::ArrayValue<double> dvalue(estimate.get());
       val::ArrayValue<double> duncertainty(uncertainty.get());
-      ss << snt::array_to_string(dvalue.get_values(), duncertainty.get_values(), dvalue.get_shape(), fmt);
+      ss << core::array_to_string(dvalue.get_values(), duncertainty.get_values(), dvalue.get_shape(), fmt);
     }
     return format.format_order(ss.str());
   }

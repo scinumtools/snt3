@@ -77,7 +77,7 @@ TEST(ParseScalars, FloatValue) {
   EXPECT_EQ(vnode->value_raw.at(0), "23.456e7");
   EXPECT_EQ(vnode->value->to_string(), "2.346e8");
 
-  snt::StringFormatType fmt;
+  core::StringFormatType fmt;
 
   vnode = env.nodes.at(3);
   fmt.valuePrecision = 7;

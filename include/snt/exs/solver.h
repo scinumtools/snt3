@@ -11,7 +11,7 @@
 #include <snt/exs/settings.h>
 #include <snt/exs/step_list.h>
 #include <snt/exs/token_list.h>
-#include <snt/settings.h>
+#include <snt/core/settings.h>
 #include <stdexcept>
 #include <unordered_map>
 

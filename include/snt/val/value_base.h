@@ -10,8 +10,8 @@
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <snt/settings.h>
-#include <snt/string_format.h>
+#include <snt/core/settings.h>
+#include <snt/core/string_format.h>
 #include <snt/val/array.h>
 #include <snt/val/datatypes.h>
 #include <sstream>
@@ -36,7 +36,7 @@ namespace snt::val {
     BaseValue(DataType dt, Array::ShapeType sh) : dtype(dt), shape(sh) {};
     virtual ~BaseValue() = default;
     virtual void print() = 0;
-    virtual std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const = 0;
+    virtual std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const = 0;
     Array::ShapeType get_shape() const { return shape; };
     DataType get_dtype() const { return dtype; };
     virtual size_t get_size() const = 0;

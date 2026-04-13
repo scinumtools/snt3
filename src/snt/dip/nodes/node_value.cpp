@@ -150,9 +150,9 @@ namespace snt::dip {
 
   void ValueNode::validate_condition() const {
     if (!condition.empty()) {
-      if (condition == snt::KEYWORD_FALSE)
+      if (condition == core::KEYWORD_FALSE)
         throw std::runtime_error("Node does not satisfy the given condition: " + condition);
-      else if (condition == snt::KEYWORD_TRUE)
+      else if (condition == core::KEYWORD_TRUE)
         return;
       // TODO: implement expression solver
     }

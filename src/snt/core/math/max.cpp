@@ -1,6 +1,6 @@
 #include <snt/core/math/max.h>
 
-#include <cmath>
+#include <algorithm>
 
 namespace snt::core::math {
 

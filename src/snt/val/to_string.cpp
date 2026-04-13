@@ -4,7 +4,7 @@
 namespace snt::val {
 
   std::string to_string(val::BaseValue::PointerType value, int precision) {
-    snt::StringFormatType fmt;
+    core::StringFormatType fmt;
     fmt.valuePrecision = precision;
     return value->to_string(fmt);
   }

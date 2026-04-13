@@ -145,8 +145,8 @@ namespace snt::val {
      * @param format Object with an output string format
      * @return String representation
      */
-    std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override {
-      return snt::array_to_string(value, shape, format);
+    std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override {
+      return core::array_to_string(value, shape, format);
     };
 
     /*

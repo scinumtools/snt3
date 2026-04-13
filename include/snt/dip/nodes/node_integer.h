@@ -22,7 +22,7 @@ namespace snt::dip {
     IntegerNode(Parser& parser);
     BaseNode::ListType parse(Environment& env) override;
     ValueNode::PointerType clone(const std::string& nm) const override;
-    std::string to_string(const snt::StringFormatType& format = snt::StringFormatType()) const override;
+    std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override;
   };
 
 } // namespace snt::dip

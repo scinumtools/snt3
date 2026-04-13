@@ -41,7 +41,7 @@ namespace snt::dip {
         ValueNode::PointerType vnode = node_pool.at(i);
         if (vnode and vnode->name == node_path) {
           new_value = vnode->value->clone();
-          if (to_unit != KEYWORD_NONE) {
+          if (to_unit != core::KEYWORD_NONE) {
             // NOTE: If unit conversion is not required, the to_unit should be set to "none".
             //       This is usefull if we want to simply get a reference node as it is.
             if (vnode->units == nullptr and !to_unit.empty())

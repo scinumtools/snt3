@@ -160,7 +160,7 @@ namespace snt::dip {
       return std::make_shared<IntegerNode>(nm, std::move(value->clone()), std::move(units->clone()));
   }
 
-  std::string IntegerNode::to_string(const snt::StringFormatType& format) const {
+  std::string IntegerNode::to_string(const core::StringFormatType& format) const {
     std::stringstream ss;
     ss << value->to_string(format);
     if (units)

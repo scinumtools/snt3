@@ -13,7 +13,7 @@ namespace snt::puq {
 
   class OperatorArray : public exs::OperatorGroup<> {
   public:
-    OperatorArray() : exs::OperatorGroup<>("arr", {"", std::string(SYMBOL_ARRAY_START), std::string(SYMBOL_ARRAY_END), ","}, ARRAY_OPERATOR) {};
+    OperatorArray() : exs::OperatorGroup<>("arr", {"", std::string(core::SYMBOL_ARRAY_START), std::string(core::SYMBOL_ARRAY_END), ","}, ARRAY_OPERATOR) {};
     void operate_group(exs::TokenListBase* tokens);
   };
 

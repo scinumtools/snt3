@@ -58,9 +58,9 @@ namespace snt::dip {
         }
         case ValueOrigin::Keyword:
         case ValueOrigin::String:
-          if (value_raw.at(0) == snt::KEYWORD_TRUE)
+          if (value_raw.at(0) == core::KEYWORD_TRUE)
             value = true;
-          else if (value_raw.at(0) == snt::KEYWORD_FALSE)
+          else if (value_raw.at(0) == core::KEYWORD_FALSE)
             value = false;
           else
             throw std::runtime_error("Invalid value: " + line.code);

@@ -7,9 +7,9 @@ namespace snt::val {
     case DataType::Boolean: {
       std::vector<bool> arr(this->value.size());
       for (size_t i = 0; i < this->value.size(); i++) {
-        if (this->value[i] == snt::KEYWORD_TRUE)
+        if (this->value[i] == core::KEYWORD_TRUE)
           arr[i] = true;
-        else if (this->value[i] == snt::KEYWORD_FALSE)
+        else if (this->value[i] == core::KEYWORD_FALSE)
           arr[i] = false;
         else
           throw std::runtime_error("Could not cast value as boolean: " + this->value[i]);

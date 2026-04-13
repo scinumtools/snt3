@@ -32,7 +32,7 @@ namespace snt::dip {
             vnode->value = vnode->value->slice(parser.value_slice);
 
           // set value string format
-          snt::StringFormatType format;
+          core::StringFormatType format;
           format.stringQuotes = false;
           if (!parser.formatting[0].empty()) {
             if (parser.formatting[0][0] == '0')

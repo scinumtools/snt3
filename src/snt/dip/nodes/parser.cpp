@@ -186,7 +186,7 @@ namespace snt::dip {
   }
 
   bool Parser::part_literal_boolean(const std::string& str) {
-    if (str == snt::KEYWORD_TRUE || str == snt::KEYWORD_FALSE) {
+    if (str == core::KEYWORD_TRUE || str == core::KEYWORD_FALSE) {
       dtype_raw = {"", std::string(KEYWORD_BOOLEAN), ""};
       value_raw.push_back(str);
       value_origin = ValueOrigin::String;

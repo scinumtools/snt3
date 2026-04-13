@@ -1,9 +1,9 @@
 #ifndef SNT_STRING_FORMAT_H
 #define SNT_STRING_FORMAT_H
 
-#include <snt/settings.h>
+#include <snt/core/settings.h>
 
-namespace snt {
+namespace snt::core {
 
   struct StringFormatType {
     char specifier = 'g';         // format data type specifier

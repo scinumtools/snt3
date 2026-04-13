@@ -71,9 +71,9 @@ namespace snt::val {
       std::vector<std::string> arr(this->value.size());
       for (size_t i = 0; i < this->value.size(); i++) {
         if (this->value[i])
-          arr[i] = std::string(snt::KEYWORD_TRUE);
+          arr[i] = std::string(core::KEYWORD_TRUE);
         else
-          arr[i] = std::string(snt::KEYWORD_FALSE);
+          arr[i] = std::string(core::KEYWORD_FALSE);
       }
       return std::make_unique<ArrayValue<std::string>>(arr, this->shape);
     }

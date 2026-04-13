@@ -52,9 +52,9 @@ namespace snt::dip {
   }
 
   val::BaseValue::PointerType BooleanNode::cast_scalar_value(const std::string& value_input) const {
-    if (value_input == snt::KEYWORD_TRUE)
+    if (value_input == core::KEYWORD_TRUE)
       return std::make_unique<val::ArrayValue<bool>>(true);
-    else if (value_input == snt::KEYWORD_FALSE)
+    else if (value_input == core::KEYWORD_FALSE)
       return std::make_unique<val::ArrayValue<bool>>(false);
     else
       throw std::runtime_error("Value cannot be casted as boolean from the given string: " +
@@ -66,9 +66,9 @@ namespace snt::dip {
     std::vector<bool> bool_values;
     bool_values.reserve(value_inputs.size());
     for (const auto& value : value_inputs) {
-      if (value == snt::KEYWORD_TRUE)
+      if (value == core::KEYWORD_TRUE)
         bool_values.push_back(true);
-      else if (value == snt::KEYWORD_FALSE)
+      else if (value == core::KEYWORD_FALSE)
         bool_values.push_back(false);
       else
         throw std::runtime_error("Value cannot be casted as boolean from the given string: " +
@@ -90,7 +90,7 @@ namespace snt::dip {
                                line.code);
   }
 
-  std::string BooleanNode::to_string(const snt::StringFormatType& format) const {
+  std::string BooleanNode::to_string(const core::StringFormatType& format) const {
     return value->to_string();
   }
 

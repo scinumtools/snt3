@@ -24,7 +24,7 @@ constexpr const char* file_basename(const char* path) {
               << "] " << msg << '\n';            \
   } while (0)
 
-namespace snt {
+namespace snt::core {
 
   // Keywords
   constexpr std::string_view KEYWORD_NONE = "none";
