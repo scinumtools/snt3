@@ -34,6 +34,8 @@ namespace snt::dip {
   constexpr char SIGN_ARRAY_CLOSE = ']';
   constexpr char SIGN_REFERENCE_OPEN = '{';
   constexpr char SIGN_REFERENCE_CLOSE = '}';
+  constexpr char SIGN_EXPRESSION_OPEN = '(';
+  constexpr char SIGN_EXPRESSION_CLOSE = ')';
   constexpr char SIGN_EQUAL = '=';
   constexpr std::string_view SIGN_BLOCK = "\"\"\"";
 

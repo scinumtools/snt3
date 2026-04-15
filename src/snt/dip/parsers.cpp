@@ -62,33 +62,78 @@ namespace snt::dip {
     return lines;
   }
 
+  inline int count_group_balance(const std::string& str, char sign_open, char sign_close) {
+    int balance = 0;
+    bool in_string = false;    
+    for (size_t i = 0; i < str.size(); ++i) {
+      char c = str[i];
+      // Handle entering/exiting string
+      if (c == '"' && (i == 0 || str[i - 1] != '\\')) {
+	in_string = !in_string;
+	continue;
+      }
+      if (in_string) continue; 
+      if (c == sign_open) balance++;
+      else if (c == sign_close) balance--;
+    } 
+    return balance;
+  }
+  
   BaseNode::ListType parse_code_nodes(std::queue<Line>& lines) {
     BaseNode::ListType nodes;
     while (!lines.empty()) {
       Line line = lines.front();
       lines.pop();
 
-      // group block strings
-      size_t pos = 0;
-      if ((pos = line.code.find(SIGN_BLOCK)) != std::string::npos) { // opening block quotes
-        pos += SIGN_BLOCK.length();
-        std::ostringstream oss;
-        oss << line.code;
-        if (line.code.find(SIGN_BLOCK, pos) ==
-            std::string::npos) { // closing block quotes on the same line
-          while (lines.size() > 0) {
-            Line block_line = lines.front();
-            lines.pop();
-            oss << SEPARATOR_NEWLINE << block_line.code;
-            if (block_line.code.find(SIGN_BLOCK) !=
-                std::string::npos) { // closing block quotes on a subsequent line
-              break;
-            }
-          }
-        }
-        line.code = oss.str();
+      {
+	// group block strings
+	size_t pos = 0;
+	if ((pos = line.code.find(SIGN_BLOCK)) != std::string::npos) { // opening block quotes
+	  pos += SIGN_BLOCK.length();
+	  std::ostringstream oss;
+	  oss << line.code;
+	  if (line.code.find(SIGN_BLOCK, pos) ==
+	      std::string::npos) { // closing block quotes on the same line
+	    while (lines.size() > 0) {
+	      Line block_line = lines.front();
+	      lines.pop();
+	      oss << SEPARATOR_NEWLINE << block_line.code;
+	      if (block_line.code.find(SIGN_BLOCK) !=
+		  std::string::npos) { // closing block quotes on a subsequent line
+		break;
+	      }
+	    }
+	  }
+	  line.code = oss.str();
+	}
       }
-
+      {
+	// group expression parentheses group
+	int balance = count_group_balance(line.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
+	while (balance > 0 && !lines.empty()) {
+	  Line next = lines.front();
+	  lines.pop();
+	  line.code += next.code; 
+	  balance += count_group_balance(next.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
+	}
+	if (balance != 0) {
+	  throw std::runtime_error("Unbalanced parentheses");
+	}
+      }
+      {
+	// group array brackets group
+	int balance = count_group_balance(line.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
+	while (balance > 0 && !lines.empty()) {
+	  Line next = lines.front();
+	  lines.pop();
+	  line.code += next.code; 
+	  balance += count_group_balance(next.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
+	}
+	if (balance != 0) {
+	  throw std::runtime_error("Unbalanced parentheses");
+	}
+      }
+      
       // add replacement mark for escape symbols
       Parser::encode_escape_symbols(line.code);
 

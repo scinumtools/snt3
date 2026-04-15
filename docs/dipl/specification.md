@@ -58,7 +58,7 @@ parameter_name type = value [unit]
 
 ```DIPL
 velocity float32[1,2:] = [[23.45, 23e-34, 45.1]] SI_km/s
-    !condition ("{?} < {?cfl_limit}")
+    !condition ({?} < {?cfl_limit})
 
 burst_energy float64 = 2.34e5 US_btu
 ```

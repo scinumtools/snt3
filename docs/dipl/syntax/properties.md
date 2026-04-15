@@ -91,10 +91,9 @@ A given expression has to be evaluated as ``true`` after each definition or modi
 ``` DIPL-Schema
 # Schema of a node condition requirement
 
-<indent>!condition ("<expression>")    
-<indent>!condition ("""
-<expression>
-""")                                   
+<indent>!condition (<expression>)    
+<indent>!condition (<expression>
+                    <expression>)                                   
 ```
 
 In the example below, node ``energy`` can have values in a range of 23 and 26 erg.
@@ -102,7 +101,7 @@ The actual value of node ``energy`` is matched using a special [self-reference s
 
 ``` DIPL
 energy float = 25 erg
-  !condition ("23 < {?} && {?} < 26")
+  !condition (23 < {?} && {?} < 26)
 ```
 
 ### 3.8.3. Format

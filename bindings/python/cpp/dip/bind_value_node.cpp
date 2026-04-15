@@ -13,7 +13,9 @@ void init_value_node(py::module_& m) {
   auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(m, "ValueNode");
   val.def("__str__", &dip::ValueNode::to_string, py::arg("format") = core::StringFormatType());
   val.def_readonly("name", &dip::ValueNode::name);
-  val.def_property_readonly("units", [](const dip::ValueNode& vnode) -> puq::Quantity* { return vnode.units ? vnode.units.get() : nullptr; }, py::return_value_policy::reference_internal);
+  val.def_property_readonly("units", [](const dip::ValueNode& vnode) -> puq::Quantity* {
+    return vnode.units ? vnode.units.get() : nullptr;
+  }, py::return_value_policy::reference_internal);
   val.def_property_readonly("value", [](const dip::ValueNode& vnode) -> py::object {
     std::vector<size_t> shape = vnode.value->get_shape();
     std::vector<ssize_t> strides(shape.size());

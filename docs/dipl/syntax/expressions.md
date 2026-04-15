@@ -5,18 +5,17 @@
 ## 3.5. Expressions
 
 Node values can also be defined indirectly using expressions.
-Notation of expression values is similar to the string notation wrapped in additional parentheses:
+Expression values consist of multiple values combined with mathematical expressions wrapped in additional parentheses, while they can span on multiple lines. The code will be automatically wrapped into a single line based on the balance of the parentheses
 
 ``` DIPL-Schema
 # Expression schema
    
 # using double quotes
-("<expression>")
+(<expression>)
 
 # using block notation
-("""
-<expression>
-""")
+(<expression>       # first part
+ <expression>)      # second part
 ```
 
 There are 4 different types of expressions in DIPL.
@@ -49,9 +48,8 @@ An example of a logical expression is given below.
 ``` DIPL
 a bool = true
 b float = 23.43 cm
-c bool = ("""
-false || ({?b} == 23.43 cm || ~{?a}) && {?a} || ~!{?c}
-""")
+c bool = (false || ( {?b} == 23.43 cm || ~{?a} ) 
+          && {?a} || ~!{?c})
 # Node 'c' will be evaluated as 'true'
 ```
 
@@ -98,13 +96,12 @@ Numerical values with dimensions compared using comparison operations are automa
 
 Numerical expressions are used to generate values for numerical node types.
 If given, the expression result is automatically converted into node units.
+The target units should be placed after the expression parentheses end.
 
 ``` DIPL
 const
    c float = 299792458 m/s
-energy float = ("""
-2 kg * pow({?const.c},2)
-""") eV
+energy float = (2 kg * pow({?const.c},2)) eV
 
 # Node 'energy' will be parsed as 1.79751 eV
 ```
@@ -144,6 +141,7 @@ Most of the following operators require, that the final value has no dimensions.
 ### 3.5.3. Templates
 
 Templates are used to parse node values into a text form.
+They look as a normal string values, but with an `f` before the openning quotation symbol.
 All value types can be parsed into text using standard python formatting notation.
 
 ``` DIPL
@@ -154,14 +152,14 @@ body
   height float = 177 cm
 married bool = true
 
-person str = ("""
+person str = f"""
 ID:      {{?id}:05d}
 Name:    {{?name}}
 Weight:  {{?body.weight}:.3e}
 Height:  {{?body.height}:.2f}
 Married: {{?married}}
 \{not a  reference}
-""")
+"""
 
 # Node 'person' will be parsed as:
 #
@@ -189,12 +187,12 @@ The format depends on the default Python string casting functions:
 name str = "Will Smith"
 widths float[2,3] = [[23.4,235.4,34],[1e10,2e23,5e20]]
 
-preview str = ("""
+preview str = f"""
 Surname:  {{?name}[5:]}
 Scalar:   {{?widths}[1,1]:.2e}
 Array:
 {{?widths}[:,1:]}
-""")
+"""
 
 # Node 'preview' will be parsed as:
 #
