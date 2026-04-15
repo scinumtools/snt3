@@ -17,10 +17,10 @@ py::array_t<double> array_to_numpy(const val::ArrayValue<double>& varray) {
 }
 
 std::variant<double, std::vector<double>, py::array_t<double>> quantity_value(puq::Quantity q, bool numpy) {
-  val::ArrayValue<double> varray(q.measurement.magnitude.estimate.get());
+  val::ArrayValue<double> varray(q.measurement.result.estimate.get());
   if (numpy) {
     return array_to_numpy(varray);
-  } else if (q.measurement.magnitude.estimate->get_size() == 1) {
+  } else if (q.measurement.result.estimate->get_size() == 1) {
     return varray.get_value(0);
   } else {
     return varray.get_values();
@@ -28,12 +28,12 @@ std::variant<double, std::vector<double>, py::array_t<double>> quantity_value(pu
 }
 
 std::variant<double, std::vector<double>, py::array_t<double>> quantity_get_value(const puq::Quantity& q, size_t index) {
-  val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.magnitude.estimate.get());
+  val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
   return otherT->get_value(index);
 }
 
 std::variant<double, std::vector<double>, py::array_t<double>> quantity_uncertainty(const puq::Quantity& q, bool numpy) {
-  val::ArrayValue<double> varray(q.measurement.magnitude.uncertainty.get());
+  val::ArrayValue<double> varray(q.measurement.result.uncertainty.get());
   if (numpy) {
     return array_to_numpy(varray);
   } else if (varray.get_size() == 1) {
@@ -128,7 +128,7 @@ void init_puq_quantity(py::module_& m) {
    * @brief Convert Quantity into a numpy array
    */
   q.def("to_numpy", [](const puq::Quantity& q) {
-    val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.magnitude.estimate.get());
+    val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
     std::vector<size_t> shape = otherT->get_shape();
     std::vector<ssize_t> strides(shape.size());
     ssize_t stride = sizeof(otherT);
@@ -139,7 +139,7 @@ void init_puq_quantity(py::module_& m) {
     return py::array_t<double>(shape, strides, otherT->get_data());
   });
   //  q.def("to_numpy", [](const puq::Quantity &q) -> py::buffer_info {
-  //      val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.magnitude.estimate.get());
+  //      val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
   //      return py::buffer_info(
   //			     otherT->get_data(),
   //			     sizeof(double),
@@ -253,6 +253,6 @@ void init_puq_quantity(py::module_& m) {
   q.def("__neq__", [](const snt::puq::Quantity& self, const snt::puq::Quantity& other) -> py::object { return py::bool_(self != other); }, py::is_operator());
 
   q.def("__array__", [](const snt::puq::Quantity& q, const py::object& dtype) {
-    throw std::runtime_error("Convert explicitly: use .to_numpy() or .magnitude");
+    throw std::runtime_error("Convert explicitly: use .to_numpy() or .result");
   });
 }

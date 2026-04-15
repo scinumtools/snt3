@@ -10,8 +10,10 @@ namespace snt::puq::math {
 
   puq::Measurement abs(const puq::Measurement& msr) {
     // abs(y ± Dy) = abs(y) ± Dy
-    return puq::Measurement(msr.magnitude.estimate->math_abs(), msr.magnitude.uncertainty->clone());
-    // return puq::Measurement(abs(msr.magnitude.estimate), msr.magnitude.uncertainty);
+    return puq::Measurement(msr.result.estimate->math_abs(),
+			    msr.result.uncertainty->clone(),
+			    msr.baseunits);
+    // return puq::Measurement(abs(msr.result.estimate), msr.result.uncertainty);
   }
 
 } // namespace snt::puq::math

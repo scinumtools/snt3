@@ -53,12 +53,12 @@ void test_unit_definitions() {
       continue;
 
     puq::DimensionStruct dmap = puq::UnitSystem::Data->DimensionMap.at(unit.first);
-    puq::Dimensions dim1(dmap.magnitude, dmap.uncertainty, dmap.dimensions);
+    puq::Dimensions dim1(dmap.estimate, dmap.uncertainty, dmap.dimensions);
     std::string m1 = dim1.to_string();
 
     puq::Measurement uv2(unit.second.definition);
     puq::Dimensions dim2 = uv2.baseunits.dimensions();
-    dim2 = puq::Dimensions(uv2.magnitude * dim2.numerical, dim2.physical);
+    dim2 = puq::Dimensions(uv2.result * dim2.numerical, dim2.physical);
     std::string m2 = dim2.to_string();
 
     if constexpr (puq::Config::use_units_logarithmic) {
@@ -70,10 +70,10 @@ void test_unit_definitions() {
     }
 
     /*
-    EXPECT_DOUBLE_EQ(unit.magnitude, dim2.numerical.value[0])
+    EXPECT_DOUBLE_EQ(unit.result, dim2.numerical.value[0])
       << "Numerical value of unit '" << unit.first
       << "' does not match with its definition: "
-      << puq::math::to_string(unit.magnitude) << " != "
+      << puq::math::to_string(unit.result) << " != "
       << puq::math::to_string(dim2.numerical);
     */
     EXPECT_EQ(m1, m2) << "Dimension of unit '" << unit.first
@@ -90,13 +90,13 @@ void test_quantities() {
         << "Quantity symbol is not in a name list: " << quantity.first;
 
     /*
-    // check if quantity definition matches magnitude and dimensions
-    puq::Dimensions dim1(quantity.second.magnitude, quantity.second.dimensions);
+    // check if quantity definition matches result and dimensions
+    puq::Dimensions dim1(quantity.second.result, quantity.second.dimensions);
     std::string m1 = dim1.to_string();
 
     puq::Measurement uv2(quantity.second.definition);
     puq::Dimensions dim2 = uv2.baseunits.dimensions();
-    dim2 = puq::Dimensions(uv2.magnitude*dim2.numerical, dim2.physical);
+    dim2 = puq::Dimensions(uv2.result*dim2.numerical, dim2.physical);
     std::string m2 = dim2.to_string();
 
     EXPECT_EQ(m1, m2) << "Dimensions of quantity '" << quantity.first
@@ -198,6 +198,6 @@ TEST(Dmaps, DimensionMapUncertainties) {
 
   auto it = puq::UnitSystem::Data->DimensionMap.find("{a_0}");
   EXPECT_TRUE(it != puq::UnitSystem::Data->DimensionMap.end());
-  EXPECT_FLOAT_EQ(it->second.magnitude, 5.2917721e-11);
+  EXPECT_FLOAT_EQ(it->second.estimate, 5.2917721e-11);
   EXPECT_FLOAT_EQ(it->second.uncertainty, 8.2e-21);
 }

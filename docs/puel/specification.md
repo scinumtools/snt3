@@ -47,7 +47,7 @@ All unit expressions are based on a fixed set of base dimensions:
 - Amount of substance (`mol`)
 - Angle (`rad`)
 
-Derived units are represented as combinations of these base dimensions with an associated magnitude.
+Derived units are represented as combinations of these base dimensions with an associated result.
 
 ---
 
@@ -122,7 +122,7 @@ mm
 MJ
 ```
 
-Prefixes scale the magnitude of the unit.
+Prefixes scale the numerical value of the unit.
 
 ### 4.7 Constants
 

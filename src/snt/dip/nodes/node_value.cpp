@@ -78,7 +78,7 @@ namespace snt::dip {
         else {
           puq::Quantity quantity(std::move(option.value), option_units);
           quantity = quantity.convert(*units);
-          option.value = std::move(quantity.measurement.magnitude.estimate);
+          option.value = std::move(quantity.measurement.result.estimate);
         }
       }
     }
@@ -97,7 +97,7 @@ namespace snt::dip {
       else {
         puq::Quantity quantity(std::move(value), node->units_raw);
         quantity = quantity.convert(*this->units);
-        value = std::move(quantity.measurement.magnitude.estimate);
+        value = std::move(quantity.measurement.result.estimate);
       }
     }
     value_raw = node->value_raw;

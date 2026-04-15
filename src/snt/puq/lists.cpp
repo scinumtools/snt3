@@ -24,7 +24,7 @@ namespace snt::puq {
       DataTable tab({{"Symbol", 8}, {"Name", 8}, {"Result", 11}});
       for (auto& symbol : UnitPrefixOrder) {
         auto prefix = UnitPrefixList.at(symbol);
-        tab.append({symbol, prefix.name, puq::to_string(prefix.magnitude, format)});
+        tab.append({symbol, prefix.name, puq::to_string(prefix.result, format)});
       }
       return (json) ? tab.to_json() : tab.to_string();
     }
@@ -56,7 +56,7 @@ namespace snt::puq {
         Dimensions dim = uv.baseunits.dimensions();
         tab.append({unit.first,
                     unit.second.name,
-                    dim.to_string(format.merge(Format::Display::MAGNITUDE)),
+                    dim.to_string(format.merge(Format::Display::RESULT)),
                     dim.to_string(format.merge(Format::Display::UNITS)),
                     unit.second.definition,
                     puq::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
@@ -74,7 +74,7 @@ namespace snt::puq {
         Dimensions dim = uv.baseunits.dimensions();
         tab.append({unit.first,
                     unit.second.name,
-                    dim.to_string(format.merge(Format::Display::MAGNITUDE)),
+                    dim.to_string(format.merge(Format::Display::RESULT)),
                     dim.to_string(format.merge(Format::Display::UNITS)),
                     unit.second.definition});
       }
@@ -90,7 +90,7 @@ namespace snt::puq {
         Dimensions dim = uv.baseunits.dimensions();
         tab.append({symbol,
                     QuantityNames.at(quantity.first),
-                    dim.to_string(format.merge(Format::Display::MAGNITUDE)),
+                    dim.to_string(format.merge(Format::Display::RESULT)),
                     dim.to_string(format.merge(Format::Display::UNITS)),
                     quantity.second.definition,
                     ((quantity.second.sifactor == "") ? "no" : "yes")});

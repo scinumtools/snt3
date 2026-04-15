@@ -19,7 +19,7 @@ TEST(Converter, LinearConv) {
   puq::Converter con;
 
   EXPECT_EQ(puq::to_string(puq::Converter("erg", "J").convert(1)), "1e-7");      // different units
-  EXPECT_EQ(puq::to_string(puq::Converter("kg*m2/s2", "J").convert(6, 2)), "3"); // different units with magnitudes
+  EXPECT_EQ(puq::to_string(puq::Converter("kg*m2/s2", "J").convert(6, 2)), "3"); // different units with measurement results
   EXPECT_EQ(puq::to_string(puq::Converter("mg", "g").convert(1)), "1e-3");       // different prefixes
   EXPECT_EQ(puq::to_string(puq::Converter("1/s", "kHz").convert(6, 2)), "3e-3"); // different prefixes
 
@@ -116,7 +116,7 @@ TEST(Converter, LogarithmicConv) {
   // Conversions of a form: dBx/y -> x/y
   EXPECT_EQ(puq::to_string(puq::Converter("dBmW/Hz", "W/Hz").convert(10)), "0.01");
 
-  // Conversions of moment magnitude to seismic moment
+  // Conversions of moment measurement result to seismic moment
   EXPECT_EQ(puq::to_string(puq::Converter("Mw", "Mo").convert(0)), "1.12202e9");
   EXPECT_EQ(puq::to_string(puq::Converter("Mw", "Mo").convert(9)), "3.54813e22");
   EXPECT_EQ(puq::to_string(puq::Converter("Mo", "Mw").convert(1.12202e+12)), "2");

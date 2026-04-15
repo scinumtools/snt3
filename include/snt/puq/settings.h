@@ -12,10 +12,6 @@ namespace snt::puq {
   namespace Config {
     // default settings
     inline constexpr int num_basedim = 8; ///< Number of base dimensions
-    // various implementations
-    inline constexpr bool use_magnitude_uncertainties = true; ///< Use uncertainties in magnitudes
-    inline constexpr bool use_magnitude_arrays = true;        ///< Use snt::val array values instead of doubles
-    inline constexpr bool use_fractional_exponents = true;    ///< Use fractional exponents
     // special units
     inline constexpr bool use_units_temperature = true; ///< Use temperature units
     inline constexpr bool use_units_logarithmic = true; ///< Use logarithmic units
@@ -32,9 +28,9 @@ namespace snt::puq {
     inline constexpr bool debug_converter = false;   ///< Switch on debugging diagnostics for Converter
   } // namespace Config
 
-  static_assert(!(Config::use_system_cgs && !Config::use_fractional_exponents),
+  static_assert(Config::use_system_cgs,
                 "Unit system CGS cannot be used without fractional exponents! Please use Config::use_system_cgs setting.");
-  static_assert(!(Config::use_system_nus && !Config::use_fractional_exponents),
+  static_assert(Config::use_system_nus,
                 "Natural units cannot be used without fractional exponents! Please use Config::use_system_nus setting.");
 
   /**

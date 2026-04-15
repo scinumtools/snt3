@@ -191,7 +191,7 @@ def test_rebase_units():
     q = q.rebase_dimensions()
     assert q.to_string() == "1.4298e14*km3*s"
 
-def test_magnitude():
+def test_result():
 
     # return scalar value
     q = Quantity("23.45(12)*km")
@@ -214,7 +214,7 @@ def test_magnitude():
     np.testing.assert_almost_equal(q.value(numpy=True), [[1.1,2.1,3.1], [4.1,5.1,6.1]])
     assert q.value(numpy=True).shape == (2, 3)
 
-def test_magnitude_numpy():
+def test_result_numpy():
 
     # convert to scalar
     q = Quantity("23.45(12)*km")

@@ -139,10 +139,10 @@ namespace snt::puq {
   }
 
   Quantity::PointerType Quantity::clone() const {
-    if (measurement.magnitude.uncertainty)
-      return std::make_unique<Quantity>(measurement.magnitude.estimate->clone(), measurement.magnitude.uncertainty->clone(), measurement.baseunits.baseunits, stype);
+    if (measurement.result.uncertainty)
+      return std::make_unique<Quantity>(measurement.result.estimate->clone(), measurement.result.uncertainty->clone(), measurement.baseunits.baseunits, stype);
     else
-      return std::make_unique<Quantity>(measurement.magnitude.estimate->clone(), measurement.baseunits.baseunits, stype);
+      return std::make_unique<Quantity>(measurement.result.estimate->clone(), measurement.baseunits.baseunits, stype);
   }
 
   // strings and streams
@@ -317,34 +317,34 @@ namespace snt::puq {
   Measurement Quantity::_convert_without_context(UnitSystem& us, const SystemType stt) const {
     Dimensions dim = measurement.baseunits.dimensions();
     us.change(stt); // change the unit system
-    return Measurement(measurement.magnitude, dim);
+    return Measurement(measurement.result, dim);
   }
 
   Measurement Quantity::_convert_with_context(UnitSystem& us, const SystemType stt,
                                               QuantityListType::iterator& qs1, QuantityListType::iterator& qs2,
                                               const std::string& q) const {
-    Measurement uv = measurement;
+    Measurement msr = measurement;
     if (qs1->second.sifactor != "") {
-      uv *= Measurement(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
+      msr *= Measurement(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
     }
-    uv = uv.convert(std::string(Symbols::quantity_start) + q + std::string(Symbols::quantity_end));
+    msr = msr.convert(std::string(Symbols::quantity_start) + q + std::string(Symbols::quantity_end));
     us.change(stt);
-    uv = Measurement(uv.magnitude, std::string(Symbols::quantity_start) + q + std::string(Symbols::quantity_end));
+    msr = Measurement(msr.result, std::string(Symbols::quantity_start) + q + std::string(Symbols::quantity_end));
     if (qs2->second.sifactor != "") {
-      uv /= Measurement(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
+      msr /= Measurement(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));
     }
-    return uv;
+    return msr;
   }
 
   // convert using Format::Base
   Quantity Quantity::convert(const Format::Base& format, SystemType system) const {
-    Measurement uv = measurement;
+    Measurement msr = measurement;
     if (system == SystemType::NONE)
       system = stype;
     else if (system != stype)
-      uv = measurement.convert(Format::Base::MGS);
+      msr = measurement.convert(Format::Base::MGS);
     UnitSystem us(system);
-    return Quantity(uv.convert(format));
+    return Quantity(msr.convert(format));
   }
 
   // convert using quantity
@@ -353,22 +353,22 @@ namespace snt::puq {
   }
 
   // convert using unit measurement
-  Quantity Quantity::convert(const Measurement& uv1) const {
+  Quantity Quantity::convert(const Measurement& msr1) const {
     UnitSystem us(stype);
-    Measurement uv2 = measurement.convert(uv1);
-    return Quantity(uv2);
+    Measurement msr2 = measurement.convert(msr1);
+    return Quantity(msr2);
   }
 
-  Quantity Quantity::convert(const Measurement& uv1, const SystemType system, const std::string& q) const {
+  Quantity Quantity::convert(const Measurement& msr1, const SystemType system, const std::string& q) const {
     UnitSystem us(stype);
     if (stype == system) {
-      return convert(uv1);
+      return convert(msr1);
     } else if (q == "") {
-      Measurement uv2 = _convert_without_context(us, system);
+      Measurement msr2 = _convert_without_context(us, system);
       try {
-        return Quantity(uv2.convert(uv1), system);
+        return Quantity(msr2.convert(msr1), system);
       } catch (const snt::puq::ConvDimExcept& e) {
-        throw snt::puq::ConvDimExcept(measurement.baseunits, stype, uv1.baseunits, system);
+        throw snt::puq::ConvDimExcept(measurement.baseunits, stype, msr1.baseunits, system);
       }
     } else {
       QuantityListType::iterator qs1 = puq::UnitSystem::Data->QuantityList.find(q);
@@ -380,11 +380,11 @@ namespace snt::puq {
         throw UnitSystemExcept("Quantity symbol not found: " + q);
       us.change(stype);
       if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
-        Measurement uv2 = _convert_without_context(us, system);
-        return Quantity(uv2.convert(uv1), system);
+        Measurement msr2 = _convert_without_context(us, system);
+        return Quantity(msr2.convert(msr1), system);
       } else {
-        Measurement uv2 = _convert_with_context(us, system, qs1, qs2, q);
-        return Quantity(uv2.convert(uv1), system);
+        Measurement msr2 = _convert_with_context(us, system, qs1, qs2, q);
+        return Quantity(msr2.convert(msr1), system);
       }
     }
   }
@@ -392,8 +392,8 @@ namespace snt::puq {
   // convert using base units
   Quantity Quantity::convert(const BaseUnits& bu) const {
     UnitSystem us(stype);
-    Measurement uv = measurement.convert(bu);
-    return Quantity(uv);
+    Measurement msr = measurement.convert(bu);
+    return Quantity(msr);
   }
 
   Quantity Quantity::convert(const BaseUnits& bu, const SystemType system, const std::string& q) const {
@@ -401,9 +401,9 @@ namespace snt::puq {
     if (stype == system) {
       return convert(bu);
     } else if (q == "") {
-      Measurement uv = _convert_without_context(us, system);
+      Measurement msr = _convert_without_context(us, system);
       try {
-        return Quantity(uv.convert(bu), system);
+        return Quantity(msr.convert(bu), system);
       } catch (const snt::puq::ConvDimExcept& e) {
         throw snt::puq::ConvDimExcept(measurement.baseunits, stype, Measurement(1, bu).baseunits, system);
       }
@@ -417,11 +417,11 @@ namespace snt::puq {
         throw UnitSystemExcept("Quantity symbol not found: " + q);
       us.change(stype);
       if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
-        Measurement uv = _convert_without_context(us, system);
-        return Quantity(uv.convert(bu), system);
+        Measurement msr = _convert_without_context(us, system);
+        return Quantity(msr.convert(bu), system);
       } else {
-        Measurement uv = _convert_with_context(us, system, qs1, qs2, q);
-        return Quantity(uv.convert(bu), system);
+        Measurement msr = _convert_with_context(us, system, qs1, qs2, q);
+        return Quantity(msr.convert(bu), system);
       }
     }
   }
@@ -431,12 +431,12 @@ namespace snt::puq {
     preprocess(s, system);
     UnitSystem us(stype);
     if (stype == system) {
-      Measurement uv = measurement.convert(s);
-      return Quantity(uv);
+      Measurement msr = measurement.convert(s);
+      return Quantity(msr);
     } else if (q == "") {
-      Measurement uv = _convert_without_context(us, system);
+      Measurement msr = _convert_without_context(us, system);
       try {
-        return Quantity(uv.convert(s), system);
+        return Quantity(msr.convert(s), system);
       } catch (const snt::puq::ConvDimExcept& e) {
         throw snt::puq::ConvDimExcept(measurement.baseunits, stype, Measurement(s).baseunits, system);
       }
@@ -450,25 +450,25 @@ namespace snt::puq {
         throw UnitSystemExcept("Quantity symbol not found: " + q);
       us.change(stype);
       if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
-        Measurement uv = _convert_without_context(us, system);
-        return Quantity(uv.convert(s), system);
+        Measurement msr = _convert_without_context(us, system);
+        return Quantity(msr.convert(s), system);
       } else {
-        Measurement uv = _convert_with_context(us, system, qs1, qs2, q);
-        return Quantity(uv.convert(s), system);
+        Measurement msr = _convert_with_context(us, system, qs1, qs2, q);
+        return Quantity(msr.convert(s), system);
       }
     }
   }
 
   Quantity Quantity::rebase_prefixes() {
     UnitSystem us(stype);
-    Measurement uv = measurement.rebase_prefixes();
-    return Quantity(uv);
+    Measurement msr = measurement.rebase_prefixes();
+    return Quantity(msr);
   }
 
   Quantity Quantity::rebase_dimensions() {
     UnitSystem us(stype);
-    Measurement uv = measurement.rebase_dimensions();
-    return Quantity(uv);
+    Measurement msr = measurement.rebase_dimensions();
+    return Quantity(msr);
   }
 
 } // namespace snt::puq

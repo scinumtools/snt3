@@ -13,7 +13,7 @@ namespace snt::core {
     else if (typeid(double) == typeid(long double))
       return std::stold(value);
     else
-      throw std::range_error("Unsupported magnitude precision.");
+      throw std::range_error("Unsupported numerical precision.");
   }
 
 } // namespace snt::core

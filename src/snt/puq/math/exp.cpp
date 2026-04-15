@@ -11,8 +11,9 @@ namespace snt::puq::math {
     // return puq::Result(exp(e.estimate), exp(e.estimate) * e.uncertainty);
   }
 
-  puq::Measurement exp(const puq::Measurement& uv) {
-    return puq::Measurement(exp(uv.magnitude), uv.baseunits);
+  puq::Measurement exp(const puq::Measurement& msr) {
+    return puq::Measurement(exp(msr.result),
+			    msr.baseunits);
   }
 
 } // namespace snt::puq::math

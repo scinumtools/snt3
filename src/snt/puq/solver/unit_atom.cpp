@@ -7,18 +7,18 @@
 
 namespace snt::puq {
 
-  inline void _parse_number(std::string& expr, Measurement& uv, const std::smatch& m) {
+  inline void _parse_number(std::string& expr, Measurement& msr, const std::smatch& m) {
     if (m[6] == "") {
-      uv.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(expr));
-      // uv.magnitude = core::to_number(expr);
+      msr.result.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(expr));
+      // msr.result = core::to_number(expr);
     } else {
       std::string decimals = m[3].str() == "" ? "." : m[3].str();
-      uv.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(m[1].str() + decimals + m[8].str()));
+      msr.result.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(m[1].str() + decimals + m[8].str()));
       if (m[10] == "")
-        uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
+        msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
       else
-        uv.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
-      // uv.magnitude = core::to_number(m[1].str() + decimals + m[8].str());
+        msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
+      // msr.result = core::to_number(m[1].str() + decimals + m[8].str());
     }
   }
 
@@ -31,15 +31,15 @@ namespace snt::puq {
     expr = std::string(m[1]);
   }
 
-  inline void _parse_quantity(std::string& expr, Measurement& uv, const std::smatch& m) {
+  inline void _parse_quantity(std::string& expr, Measurement& msr, const std::smatch& m) {
     BaseUnit bu;
     _parse_exponent(bu, expr, m);
     bu.unit = expr;
-    uv.magnitude = 1;
-    uv.baseunits.append(bu);
+    msr.result = 1;
+    msr.baseunits.append(bu);
   }
 
-  inline void _parse_unit(std::string& expr, Measurement& uv, const std::smatch& m, const std::string& expr_orig) {
+  inline void _parse_unit(std::string& expr, Measurement& msr, const std::smatch& m, const std::string& expr_orig) {
     BaseUnit bu;
     _parse_exponent(bu, expr, m);
     // determine unit
@@ -83,30 +83,30 @@ namespace snt::puq {
       }
     }
     // fill Measurement properties
-    uv.magnitude = 1;
-    uv.baseunits.append(bu);
+    msr.result = 1;
+    msr.baseunits.append(bu);
   }
 
   Measurement UnitAtom::from_string(const std::string& expr_orig, exs::BaseSettings* set) {
     std::string expr = expr_orig;
-    struct Measurement uv;
+    struct Measurement msr;
     std::smatch m;
     std::regex rx_unit("^(\\{?[a-zA-Z0_%#']+\\}?)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
     std::regex rx_quantity("^(\\<[a-zA-Z_]+\\>)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
     std::regex rx_sifactor("^(\\|[a-zA-Z_]+\\|)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
     std::regex rx_number("^((\\+|-)?[0-9]+)(\\.(([0-9]+)?))?(\\(([0-9]+)\\))?((e|E)((\\+|-)?[0-9]+))?$");
     if (std::regex_match(expr, m, rx_number)) {
-      _parse_number(expr, uv, m);
+      _parse_number(expr, msr, m);
     } else if (std::regex_match(expr, m, rx_quantity)) {
-      _parse_quantity(expr, uv, m);
+      _parse_quantity(expr, msr, m);
     } else if (std::regex_match(expr, m, rx_sifactor)) {
-      _parse_quantity(expr, uv, m);
+      _parse_quantity(expr, msr, m);
     } else if (std::regex_match(expr, m, rx_unit)) {
-      _parse_unit(expr, uv, m, expr_orig);
+      _parse_unit(expr, msr, m, expr_orig);
     } else {
       throw AtomParsingExcept("Invalid unit expression: " + expr_orig);
     }
-    return uv;
+    return msr;
   }
 
   std::string UnitAtom::to_string() {

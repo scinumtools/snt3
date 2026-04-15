@@ -37,7 +37,7 @@ namespace snt::dip {
       if (!vnode->units_raw.empty() && !csettings->units.empty()) {
 	puq::Quantity quantity(std::move(vnode->value), vnode->units_raw);
         quantity = quantity.convert(csettings->units);
-        vnode->value = std::move(quantity.measurement.magnitude.estimate);
+        vnode->value = std::move(quantity.measurement.result.estimate);
       }
       else if (vnode->units_raw.empty() && !csettings->units.empty())
 	throw std::runtime_error(

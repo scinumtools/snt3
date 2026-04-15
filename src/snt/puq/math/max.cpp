@@ -23,19 +23,19 @@ namespace snt::puq::math {
   extern puq::Measurement max(const puq::Measurement& msr1, const puq::Measurement& msr2) {
     // x ± Dx = max(x ± Dx, y ± Dy)  <- if x > y
     // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
-    val::BaseValue::PointerType estimate = msr1.magnitude.estimate->math_max(msr2.magnitude.estimate.get());
-    if (msr1.magnitude.uncertainty && msr2.magnitude.uncertainty) {
-      val::BaseValue::PointerType new_uncertainty = msr1.magnitude.uncertainty->where(estimate->compare_equal(msr1.magnitude.estimate.get()).get(), msr2.magnitude.uncertainty.get());
+    val::BaseValue::PointerType estimate = msr1.result.estimate->math_max(msr2.result.estimate.get());
+    if (msr1.result.uncertainty && msr2.result.uncertainty) {
+      val::BaseValue::PointerType new_uncertainty = msr1.result.uncertainty->where(estimate->compare_equal(msr1.result.estimate.get()).get(), msr2.result.uncertainty.get());
       return puq::Measurement(std::move(estimate), std::move(new_uncertainty));
-    } else if (msr1.magnitude.uncertainty) {
-      return puq::Measurement(std::move(estimate), msr1.magnitude.uncertainty->clone());
-    } else if (msr2.magnitude.uncertainty) {
-      return puq::Measurement(std::move(estimate), msr2.magnitude.uncertainty->clone());
+    } else if (msr1.result.uncertainty) {
+      return puq::Measurement(std::move(estimate), msr1.result.uncertainty->clone());
+    } else if (msr2.result.uncertainty) {
+      return puq::Measurement(std::move(estimate), msr2.result.uncertainty->clone());
     } else {
       return puq::Measurement(std::move(estimate));
     }
-    // val::BaseValue::PointerType estimate = max(msr1.magnitude.estimate, msr2.magnitude.estimate);
-    // return puq::Measurement(estimate, (estimate == msr1.magnitude.estimate) ? msr1.magnitude.uncertainty : msr2.magnitude.uncertainty);
+    // val::BaseValue::PointerType estimate = max(msr1.result.estimate, msr2.result.estimate);
+    // return puq::Measurement(estimate, (estimate == msr1.result.estimate) ? msr1.result.uncertainty : msr2.result.uncertainty);
   }
 
 } // namespace snt::puq::math

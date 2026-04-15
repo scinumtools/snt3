@@ -6,12 +6,12 @@ void display_info(const std::string& expr) {
   puq::BaseUnits bus = uv.baseunits;
   puq::Dimensions dim = bus.dimensions();
   puq::Dimensions dim_m = bus.dimensions();
-  dim_m.numerical *= uv.magnitude;
+  dim_m.numerical *= uv.result;
   std::cout << '\n'
             << "Expression:  " << expr << '\n'
             << '\n';
   std::cout << "Unit system: " << puq::UnitSystem::Data->SystemAbbrev << " (" << puq::UnitSystem::Data->SystemName << ")" << '\n';
-  std::cout << "Result:   " << puq::to_string(uv.magnitude) << '\n';
+  std::cout << "Result:   " << puq::to_string(uv.result) << '\n';
   std::cout << "Base units:  " << puq::to_string(uv.baseunits) << '\n';
   std::stringstream ss;
   bool display = false;
@@ -41,14 +41,14 @@ void display_info(const std::string& expr) {
   std::cout << "Dimensions:" << '\n'
             << '\n';
   puq::DataTable tab({{"Base", 6}, {"Num*Mag", 25}, {"Numerical", 25}, {"Physical", 25}});
-  tab.append({"MGS", dim_m.to_string(puq::Format::Display::MAGNITUDE), dim.to_string(puq::Format::Display::MAGNITUDE), dim.to_string(puq::Format::Display::UNITS)});
+  tab.append({"MGS", dim_m.to_string(puq::Format::Display::RESULT), dim.to_string(puq::Format::Display::RESULT), dim.to_string(puq::Format::Display::UNITS)});
   tab.append({"MKS",
-              dim_m.to_string({puq::Format::Display::MAGNITUDE, puq::Format::Base::MKS}),
-              dim.to_string({puq::Format::Display::MAGNITUDE, puq::Format::Base::MKS}),
+              dim_m.to_string({puq::Format::Display::RESULT, puq::Format::Base::MKS}),
+              dim.to_string({puq::Format::Display::RESULT, puq::Format::Base::MKS}),
               dim.to_string({puq::Format::Display::UNITS, puq::Format::Base::MKS})});
   tab.append({"CGS",
-              dim_m.to_string({puq::Format::Display::MAGNITUDE, puq::Format::Base::CGS}),
-              dim.to_string({puq::Format::Display::MAGNITUDE, puq::Format::Base::CGS}),
+              dim_m.to_string({puq::Format::Display::RESULT, puq::Format::Base::CGS}),
+              dim.to_string({puq::Format::Display::RESULT, puq::Format::Base::CGS}),
               dim.to_string({puq::Format::Display::UNITS, puq::Format::Base::CGS})});
   std::cout << tab.to_string();
   std::cout << '\n';

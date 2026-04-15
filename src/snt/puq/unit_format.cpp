@@ -113,8 +113,8 @@ namespace snt::puq {
     return expression;
   };
 
-  bool UnitFormat::display_magnitude() const {
-    return (part == Format::Display::BOTH) || (part == Format::Display::MAGNITUDE);
+  bool UnitFormat::display_result() const {
+    return (part == Format::Display::BOTH) || (part == Format::Display::RESULT);
   }
 
   bool UnitFormat::display_units() const {

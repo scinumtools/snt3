@@ -135,7 +135,7 @@ namespace snt::puq {
       // find prefix
       auto prefix = UnitPrefixList.find(bu.prefix);
       if (prefix != UnitPrefixList.end()) {
-        dim.numerical *= math::pow(prefix->second.magnitude, exponent_to_float(bu.exponent));
+        dim.numerical *= math::pow(prefix->second.result, exponent_to_float(bu.exponent));
       }
       // quantity
       if (bu.unit.rfind(Symbols::quantity_start, 0) == 0 || bu.unit.rfind(Symbols::si_factor_start, 0) == 0) {
@@ -143,8 +143,8 @@ namespace snt::puq {
         if (dmap != UnitSystem::Data->DimensionMap.end()) {
           dim.utype = dim.utype | Utype::LIN;
           dim.symbols.push_back(dmap->first);
-          Result magnitude(dmap->second.magnitude, dmap->second.uncertainty);
-          dim.numerical *= math::pow(magnitude, exponent_to_float(bu.exponent));
+          Result result(dmap->second.estimate, dmap->second.uncertainty);
+          dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
           for (int i = 0; i < Config::num_basedim; i++) {
             dim.physical[i] = add_exp(dim.physical[i],
                                       mul_exp(dmap->second.dimensions[i], bu.exponent));
@@ -167,8 +167,8 @@ namespace snt::puq {
           dim.symbols.push_back(unit->first);
           auto dmap = UnitSystem::Data->DimensionMap.find(unit->first);
           if (dmap != UnitSystem::Data->DimensionMap.end()) {
-            Result magnitude(dmap->second.magnitude, dmap->second.uncertainty);
-            dim.numerical *= math::pow(magnitude, exponent_to_float(bu.exponent));
+            Result result(dmap->second.estimate, dmap->second.uncertainty);
+            dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
             for (int i = 0; i < Config::num_basedim; i++) {
               dim.physical[i] = add_exp(dim.physical[i],
                                         mul_exp(dmap->second.dimensions[i], bu.exponent));

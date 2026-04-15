@@ -11,23 +11,23 @@ namespace snt::puq {
     for (size_t i = 0; i < num_groups; i++) {
       group = tokens->get_left();
       UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
-      val::ArrayValue<double> value(atom->value.magnitude.estimate.get());
+      val::ArrayValue<double> value(atom->value.result.estimate.get());
       nv[i] = value.get_value(0);
-      if (atom->value.magnitude.uncertainty) {
+      if (atom->value.result.uncertainty) {
         hasUncertainties = true;
-        val::ArrayValue<double> uncertainty(atom->value.magnitude.uncertainty.get());
+        val::ArrayValue<double> uncertainty(atom->value.result.uncertainty.get());
         ne[i] = uncertainty.get_value(0);
       }
     }
     std::reverse(nv.begin(), nv.end());
     if (group.atom) {
       UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
-      atom->value.magnitude.estimate = std::make_unique<val::ArrayValue<double>>(nv);
+      atom->value.result.estimate = std::make_unique<val::ArrayValue<double>>(nv);
       if (hasUncertainties) {
         std::reverse(ne.begin(), ne.end());
-        atom->value.magnitude.uncertainty = std::make_unique<val::ArrayValue<double>>(ne);
+        atom->value.result.uncertainty = std::make_unique<val::ArrayValue<double>>(ne);
       } else {
-        atom->value.magnitude.uncertainty = nullptr;
+        atom->value.result.uncertainty = nullptr;
       }
     } else {
       throw std::runtime_error("Detected empty atom in a group");

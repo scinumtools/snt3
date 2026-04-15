@@ -11,10 +11,10 @@ TEST(Quantity, Initialization) {
   puq::Quantity q; // default initialization
   EXPECT_EQ(q.to_string(), "1");
 
-  q = puq::Quantity(1.23); // magnitude
+  q = puq::Quantity(1.23); // measurement result
   EXPECT_EQ(q.to_string(), "1.23");
 
-  q = puq::Quantity(1.2, {{"k", "m", 3}}); // magnitude and dimensions
+  q = puq::Quantity(1.2, {{"k", "m", 3}}); // measurement result and dimensions
   EXPECT_EQ(q.to_string(), "1.2*km3");
 
   puq::Measurement uv(1.2, {{"k", "m", 3}});
@@ -24,10 +24,10 @@ TEST(Quantity, Initialization) {
   q = puq::Quantity("23.34*g/cm3"); // from a unit expression
   EXPECT_EQ(q.to_string(), "23.34*g*cm-3");
 
-  q = puq::Quantity(1.23, "g/cm3"); // magnitude and a unit expression
+  q = puq::Quantity(1.23, "g/cm3"); // measurement result and a unit expression
   EXPECT_EQ(q.to_string(), "1.23*g*cm-3");
 
-  q = puq::Quantity(1.23, "2*km3"); // magnitude and a unit expression with a number
+  q = puq::Quantity(1.23, "2*km3"); // measurement result and a unit expression with a number
   EXPECT_EQ(q.to_string(), "2.46*km3");
 
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
@@ -42,13 +42,13 @@ TEST(Quantity, Initialization) {
 
 TEST(Quantity, InitializationErrors) {
 
-  puq::Quantity q(1.23, 0.01); // magnitudes with errors
+  puq::Quantity q(1.23, 0.01); // measurement results with errors
   EXPECT_EQ(q.to_string(), "1.230(10)");
 
-  q = puq::Quantity(1.23, 0.01, "km3"); // magnitude, errors and dimensions
+  q = puq::Quantity(1.23, 0.01, "km3"); // measurement result, errors and dimensions
   EXPECT_EQ(q.to_string(), "1.230(10)*km3");
 
-  q = puq::Quantity(1.23, 0.01, "2*km3"); // magnitude, errors and dimensions with a number
+  q = puq::Quantity(1.23, 0.01, "2*km3"); // measurement result, errors and dimensions with a number
   EXPECT_EQ(q.to_string(), "2.460(20)*km3");
 
   q = puq::Quantity("3.40(10)*km3"); // unit expression
@@ -77,7 +77,7 @@ TEST(Quantity, InitializationArrays) {
   EXPECT_EQ(q.to_string(), "[2, 3.4, 5e6]*km*s-1");
 
   val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3.4, 5e6});
-  q = puq::Quantity(std::move(val), "km2"); // magnitudes and units
+  q = puq::Quantity(std::move(val), "km2"); // measurement results and units
   EXPECT_EQ(q.to_string(), "[2, 3.4, 5e6]*km2");
 
   if constexpr (puq::Config::preprocess_symbols) {

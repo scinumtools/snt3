@@ -40,7 +40,7 @@ namespace snt::puq {
   };
 
   /*
-   * Return a string representation of a magnitude
+   * Return a string representation of a measurement result
    */
   std::string Result::to_string(const UnitFormat& format) const {
     std::stringstream ss;
@@ -66,7 +66,7 @@ namespace snt::puq {
   }
 
   /*
-   * Add two magnitudes
+   * Add two measurement results
    */
   Result operator+(const Result& m1, const Result& m2) {
     // z ± Dz = (x ± Dx) + (y ± Dy) -> Dz = Dx + Dy     (average uncertainties)
@@ -96,7 +96,7 @@ namespace snt::puq {
   }
 
   /*
-   * Subtract two magnitudes
+   * Subtract two measurement results
    */
   Result operator-(const Result& m1) {
     if (m1.uncertainty)
@@ -129,7 +129,7 @@ namespace snt::puq {
   }
 
   /*
-   * Multiply magnitude by another magnitude
+   * Multiply measurement result by another measurement result
    */
   const Result multiply(const Result* m, const Result* n) {
     const val::ArrayValue<double> otherT(n->estimate.get());
@@ -172,7 +172,7 @@ namespace snt::puq {
   }
 
   /*
-   * Divide magnitude by another magnitude
+   * Divide measurement result by another measurement result
    */
   const Result divide(const Result* m, const Result* n) {
     Result nm(m->estimate->math_div(n->estimate.get()));

@@ -35,10 +35,10 @@ namespace snt::puq {
     } else if (format.base == Format::Base::CGS) {
       numerical = numerical * (Result)(std::pow(1e2, exponent_to_float(physical[0])));
     }
-    if (!numerical.estimate->is_unity() && format.display_magnitude()) {
+    if (!numerical.estimate->is_unity() && format.display_result()) {
       ss << numerical.to_string(format) << multiply;
     }
-    // if (numerical.estimate != 1 && format.display_magnitude()) {
+    // if (numerical.estimate != 1 && format.display_result()) {
     //   ss << numerical.to_string(format) << multiply;
     // }
     return ss.str();
@@ -66,7 +66,7 @@ namespace snt::puq {
   std::string Dimensions::to_string(const UnitFormat& format) const {
     std::string multiply = format.multiply_symbol();
     std::stringstream ss;
-    if (format.display_magnitude()) {
+    if (format.display_result()) {
       ss << _numerical_to_string(numerical, physical, format);
     }
     if (format.display_units()) {

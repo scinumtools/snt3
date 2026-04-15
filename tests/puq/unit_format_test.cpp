@@ -34,7 +34,7 @@ TEST(UnitFormat, DimensionsFormat) {
   format = puq::UnitFormat(puq::Format::Math::UNICODE); // UNICODE math format
   EXPECT_EQ(d.to_string(format), "2.34034×10⁶⋅m⋅g²⋅s³");
 
-  format = puq::UnitFormat(puq::Format::Display::MAGNITUDE); // display only magnitudes
+  format = puq::UnitFormat(puq::Format::Display::RESULT); // display only numerical values
   EXPECT_EQ(d.to_string(format), "2.34034e6");
 
   format = puq::UnitFormat(puq::Format::Display::UNITS); // display only units
@@ -43,9 +43,9 @@ TEST(UnitFormat, DimensionsFormat) {
   format = puq::UnitFormat(puq::Format::Base::CGS); // change unit base
   EXPECT_EQ(d.to_string(format), "2.34034e8*cm*g2*s3");
 
-  format = puq::UnitFormat({// change unit base and show only magnitude
+  format = puq::UnitFormat({// change unit base and show only measurement result
                             puq::Format::Base::CGS,
-                            puq::Format::Display::MAGNITUDE});
+                            puq::Format::Display::RESULT});
   EXPECT_EQ(d.to_string(format), "2.34034e8");
 
   format = puq::UnitFormat({// change unit base and show only units
@@ -108,11 +108,11 @@ TEST(UnitFormat, MeasurementFormatString) {
   msr = puq::Measurement("3.2340342349349823e3*km-2");
   EXPECT_EQ(msr.to_string(format), "3.234034235×10³⋅km⁻²");
 
-  format = puq::UnitFormat(puq::Format::Display::MAGNITUDE); // display only magnitude
+  format = puq::UnitFormat(puq::Format::Display::RESULT); // display only measurement result
   msr = puq::Measurement("3*km/s");
   EXPECT_EQ(msr.to_string(format), "3");
 
-  format = puq::UnitFormat(puq::Format::Display::UNITS); // display only magnitude
+  format = puq::UnitFormat(puq::Format::Display::UNITS); // display only measurement result
   msr = puq::Measurement("3*km/s");
   EXPECT_EQ(msr.to_string(format), "km*s-1");
 }

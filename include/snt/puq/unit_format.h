@@ -29,7 +29,7 @@ namespace snt::puq {
                       HTML,
                       MATH };
     enum class Display { BOTH,
-                         MAGNITUDE,
+                         RESULT,
                          UNITS };
     enum class Base { UNITS,
                       MGS,
@@ -78,7 +78,7 @@ namespace snt::puq {
     std::string format_exponents(std::string expression) const;
     std::string format_order(std::string expression) const;
     std::string format_system(std::string expression, const std::string& abbrev) const;
-    bool display_magnitude() const;
+    bool display_result() const;
     bool display_units() const;
     bool display_uncertainty() const;
   };

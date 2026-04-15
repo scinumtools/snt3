@@ -1,5 +1,5 @@
-#ifndef PUQ_MAGNITUDE_H
-#define PUQ_MAGNITUDE_H
+#ifndef PUQ_RESULT_H
+#define PUQ_RESULT_H
 
 #include <snt/puq/exponent.h>
 #include <snt/puq/settings.h>
@@ -63,4 +63,4 @@ namespace snt::puq {
 
 } // namespace snt::puq
 
-#endif // PUQ_MAGNITUDE_H
+#endif // PUQ_RESULT_H

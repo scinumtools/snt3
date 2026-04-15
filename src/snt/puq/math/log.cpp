@@ -14,11 +14,11 @@ namespace snt::puq::math {
 
   puq::Measurement log(const puq::Measurement& msr) {
     // y ± Dy = log10(x ± Dx) -> Dy = Dx / x
-    if (msr.magnitude.uncertainty)
-      return puq::Measurement(msr.magnitude.estimate->math_log(), msr.magnitude.uncertainty->math_div(msr.magnitude.estimate.get()));
+    if (msr.result.uncertainty)
+      return puq::Measurement(msr.result.estimate->math_log(), msr.result.uncertainty->math_div(msr.result.estimate.get()));
     else
-      return puq::Measurement(msr.magnitude.estimate->math_log());
-    // return puq::Measurement(log(msr.magnitude.estimate), msr.magnitude.uncertainty / msr.magnitude.estimate);
+      return puq::Measurement(msr.result.estimate->math_log());
+    // return puq::Measurement(log(msr.result.estimate), msr.result.uncertainty / msr.result.estimate);
   }
 
 } // namespace snt::puq::math

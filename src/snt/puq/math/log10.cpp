@@ -16,14 +16,14 @@ namespace snt::puq::math {
 
   puq::Measurement log10(const puq::Measurement& msr) {
     // y ± Dy = log(x ± Dx) -> Dy = 1 / ln(10) * Dx / x
-    if (msr.magnitude.uncertainty) {
+    if (msr.result.uncertainty) {
       std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(std::log(10));
-      return puq::Measurement(msr.magnitude.estimate->math_log10(),
-                              msr.magnitude.uncertainty->math_div(msr.magnitude.estimate->math_mul(cst.get()).get()));
+      return puq::Measurement(msr.result.estimate->math_log10(),
+                              msr.result.uncertainty->math_div(msr.result.estimate->math_mul(cst.get()).get()));
     } else {
-      return puq::Measurement(msr.magnitude.estimate->math_log10());
+      return puq::Measurement(msr.result.estimate->math_log10());
     }
-    // return puq::Measurement(log10(msr.magnitude.estimate), msr.magnitude.uncertainty / (msr.magnitude.estimate * std::log(10)));
+    // return puq::Measurement(log10(msr.result.estimate), msr.result.uncertainty / (msr.result.estimate * std::log(10)));
   }
 
 } // namespace snt::puq::math

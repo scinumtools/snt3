@@ -58,14 +58,14 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
 void solve_bu_prefix(puq::Dimensions& dim, puq::BaseUnit& bu) {
   auto prefix = puq::UnitPrefixList.find(bu.prefix);
   if (prefix != puq::UnitPrefixList.end()) {
-    dim.numerical *= puq::math::pow(prefix->second.magnitude, exponent_to_float(bu.exponent));
+    dim.numerical *= puq::math::pow(prefix->second.result, exponent_to_float(bu.exponent));
   }
 }
 
 bool solve_bu_unit(puq::DimensionMapType& dmap, puq::Dimensions& dim, puq::BaseUnit& bu) {
   auto it = dmap.find(bu.unit);
   if (it != dmap.end()) {
-    puq::Result m(it->second.magnitude, it->second.uncertainty);
+    puq::Result m(it->second.estimate, it->second.uncertainty);
     dim.numerical *= puq::math::pow(m, exponent_to_float(bu.exponent));
     for (int i = 0; i < puq::Config::num_basedim; i++) {
       dim.physical[i] = add_exp(dim.physical[i], mul_exp(it->second.dimensions[i], bu.exponent));
@@ -82,7 +82,7 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
     if ((unit.second.utype & puq::Utype::BAS) == puq::Utype::BAS)
       continue;
     puq::UnitAtom atom = solver.solve(unit.second.definition);
-    puq::Dimensions dim(atom.value.magnitude);
+    puq::Dimensions dim(atom.value.result);
     std::string missing = "";
     for (auto bu : atom.value.baseunits) {
       solve_bu_prefix(dim, bu);
@@ -112,7 +112,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
   for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
     // solve a quantity definition
     puq::UnitAtom atom = solver.solve(quant.second.definition);
-    puq::Dimensions dim(atom.value.magnitude);
+    puq::Dimensions dim(atom.value.result);
     for (auto bu : atom.value.baseunits) {
       solve_bu_prefix(dim, bu);
       if (!solve_bu_unit(dmap, dim, bu)) {
@@ -135,7 +135,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
     // solve a quantity IS conversion factor, if exists
     if (quant.second.sifactor != "") {
       atom = solver.solve(quant.second.sifactor);
-      dim = puq::Dimensions(atom.value.magnitude);
+      dim = puq::Dimensions(atom.value.result);
       for (auto bu : atom.value.baseunits) {
         solve_bu_prefix(dim, bu);
         if (!solve_bu_unit(dmap, dim, bu)) {
@@ -171,7 +171,7 @@ void create_map(const std::string& file_header) {
   // add dimension of base units
   for (const auto& d : puq::SystemData::_BASE_MAP) {
     dmap.insert(d);
-    puq::Dimensions dim(d.second.magnitude, d.second.dimensions);
+    puq::Dimensions dim(d.second.estimate, d.second.dimensions);
     std::string name;
     auto bu = puq::UnitSystem::Data->UnitList.at(d.first);
     add_line(ss, d.first, dim, bu.name);

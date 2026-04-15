@@ -58,7 +58,7 @@ namespace snt::puq {
    */
 
   struct UnitPrefixStruct {
-    Result magnitude;
+    Result result;
     std::string definition;
     std::string name;
   };
@@ -98,7 +98,7 @@ namespace snt::puq {
   };
 
   struct DimensionStruct {
-    double magnitude;
+    double estimate;
     double uncertainty;
     BaseDimensions dimensions;
   };

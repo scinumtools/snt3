@@ -125,10 +125,10 @@ TEST(Measurement, InitializationFractions) {
 
 TEST(Measurement, InitializationErrors) {
 
-  puq::Measurement v = puq::Measurement(1.23, 0.01, "km3"); // magnitude, errors and dimensions
+  puq::Measurement v = puq::Measurement(1.23, 0.01, "km3"); // measurement result, errors and dimensions
   EXPECT_EQ(v.to_string(), "1.230(10)*km3");
 
-  v = puq::Measurement(1.23, 0.01, "2*km3"); // magnitude, errors and dimensions with a number
+  v = puq::Measurement(1.23, 0.01, "2*km3"); // measurement result, errors and dimensions with a number
   EXPECT_EQ(v.to_string(), "2.460(20)*km3");
 
   v = puq::Measurement("3.40(10)*km3"); // unit expression
