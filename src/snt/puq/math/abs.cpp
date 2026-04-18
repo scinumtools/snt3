@@ -1,19 +1,28 @@
 #include <snt/puq/math/abs.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
+#include <snt/puq/quantity.h>
 
 namespace snt::puq::math {
 
-  puq::Result abs(const puq::Result& m) {
+  puq::Result abs(const puq::Result& res) {
     // abs(y ± Dy) = abs(y) ± Dy
-    return puq::Result(m.estimate->math_abs(), m.uncertainty->clone());
+    if (res.uncertainty)
+      return puq::Result(res.estimate->math_abs(),
+			 res.uncertainty->clone());
+    else
+      return puq::Result(res.estimate->math_abs());
     // return puq::Result(abs(m.estimate), m.uncertainty);
   }
 
   puq::Measurement abs(const puq::Measurement& msr) {
-    // abs(y ± Dy) = abs(y) ± Dy
-    return puq::Measurement(msr.result.estimate->math_abs(),
-			    msr.result.uncertainty->clone(),
+    return puq::Measurement(abs(msr.result),
 			    msr.baseunits);
-    // return puq::Measurement(abs(msr.result.estimate), msr.result.uncertainty);
+  }
+
+  puq::Quantity abs(const puq::Quantity& quant) {
+    return puq::Quantity(abs(quant.measurement),
+			 quant.stype);
   }
 
 } // namespace snt::puq::math

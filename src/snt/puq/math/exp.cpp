@@ -1,14 +1,18 @@
 #include <snt/puq/math/exp.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
+#include <snt/puq/quantity.h>
 
 namespace snt::puq::math {
 
-  puq::Result exp(const puq::Result& e) {
+  puq::Result exp(const puq::Result& res) {
     // z ± Dz = pow(e, y ± Dy) -> Dz = pow(e, y) * log(e) * Dy
-    if (e.uncertainty)
-      return puq::Result(e.estimate->math_exp(), e.estimate->math_exp()->math_mul(e.uncertainty.get()));
+    if (res.uncertainty)
+      return puq::Result(res.estimate->math_exp(),
+			 res.estimate->math_exp()->math_mul(res.uncertainty.get()));
     else
-      return puq::Result(e.estimate->math_exp());
-    // return puq::Result(exp(e.estimate), exp(e.estimate) * e.uncertainty);
+      return puq::Result(res.estimate->math_exp());
+    // return puq::Result(exp(res.estimate), exp(res.estimate) * res.uncertainty);
   }
 
   puq::Measurement exp(const puq::Measurement& msr) {
@@ -16,4 +20,9 @@ namespace snt::puq::math {
 			    msr.baseunits);
   }
 
+  puq::Quantity exp(const puq::Quantity& quant) {
+    return puq::Quantity(exp(quant.measurement),
+			 quant.stype);
+  }
+  
 } // namespace snt::puq::math

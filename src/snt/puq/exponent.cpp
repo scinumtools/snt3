@@ -37,6 +37,19 @@ namespace snt::puq {
     reduce();
   }
 
+  Exponent operator/(const Exponent& e1, const Exponent& e2) {
+    Exponent ne;
+    ne.numerator = e1.numerator * e2.denominator;
+    ne.denominator = e1.denominator * e2.numerator;
+    ne.reduce();
+    return ne;
+  }
+  void Exponent::operator/=(const Exponent& e) {
+    numerator *= e.denominator;
+    denominator *= e.numerator;
+    reduce();
+  }
+  
   Exponent Exponent::operator-() const {
     return Exponent(-numerator, denominator);
   }

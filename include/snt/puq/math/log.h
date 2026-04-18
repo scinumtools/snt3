@@ -1,13 +1,17 @@
 #ifndef PUQ_MATH_LOG_H
 #define PUQ_MATH_LOG_H
 
-#include <snt/puq/result.h>
-#include <snt/puq/value/measurement.h>
+namespace snt::puq {
+  class Result;
+  class Measurement;
+  class Quantity;
+}
 
 namespace snt::puq::math {
 
-  extern puq::Result log(const puq::Result& m);
+  extern puq::Result log(const puq::Result& res);
   extern puq::Measurement log(const puq::Measurement& msr);
+  extern puq::Quantity quant(const puq::Quantity& quant);
 
 } // namespace snt::puq::math
 

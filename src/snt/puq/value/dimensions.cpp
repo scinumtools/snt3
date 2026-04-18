@@ -77,6 +77,15 @@ namespace snt::puq {
     return (s == "") ? "1" : s;
   }
 
+  bool Dimensions::is_numeric() const {
+    bool all_unity = true;
+    for (int i = 0; i < Config::num_basedim; i++) {
+      if (exponent_to_float(physical[i])!=0)
+        all_unity = false;
+    }
+    return all_unity;
+  }
+  
   std::ostream& operator<<(std::ostream& os, const Dimensions& d) {
     os << d.to_string();
     return os;

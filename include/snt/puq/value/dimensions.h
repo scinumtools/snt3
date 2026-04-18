@@ -19,6 +19,7 @@ namespace snt::puq {
     Dimensions(const double m, const double e);
     Dimensions(const double m, const double e, const BaseDimensions& p) : utype(Utype::NUL), numerical(m, e), physical(p) {};
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
+    bool is_numeric() const;
     friend std::ostream& operator<<(std::ostream& os, const Dimensions& d);
     bool operator==(const Dimensions& d) const;
     bool operator!=(const Dimensions& d) const;

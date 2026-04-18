@@ -1,71 +1,61 @@
 #include <snt/puq/math/pow.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
+#include <snt/puq/quantity.h>
 
 namespace snt::puq::math {
 
-  puq::Result pow(const puq::Result& m, const double e) {
+  puq::Result pow(const puq::Result& res, const double exp) {
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
-    if (m.uncertainty) {
-      std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(e);
-      return puq::Result(m.estimate->math_pow(e), m.estimate->math_pow(e - 1)->math_mul(cst.get())->math_abs()->math_mul(m.uncertainty.get()));
+    if (res.uncertainty) {
+      std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(exp);
+      return puq::Result(res.estimate->math_pow(exp), res.estimate->math_pow(exp - 1)->math_mul(cst.get())->math_abs()->math_mul(res.uncertainty.get()));
     } else {
-      return puq::Result(m.estimate->math_pow(e));
+      return puq::Result(res.estimate->math_pow(exp));
     }
-    // return puq::Result(pow(m.estimate, e), abs(e * pow(m.estimate, e - 1)) * m.uncertainty);
+    // return puq::Result(pow(res.estimate, exp), abs(exp * pow(res.estimate, exp - 1)) * res.uncertainty);
   }
 
-  puq::Result pow(const puq::Result& m, const puq::Result& e) {
+  puq::Result pow(const puq::Result& res1, const puq::Result& res2) {
     // Dz = sqrt(pow(Dzx,2)+pow(Dzy,2))
     // z ± Dz = pow(x ± Dx, y ± Dy)
     std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(-1);
-    if (m.uncertainty && e.uncertainty) {
-      val::BaseValue::PointerType Dzx = e.estimate->math_mul(m.estimate->math_pow(e.estimate->math_add(cst.get()).get()).get())->math_mul(m.uncertainty.get()); // Dzx = y * pow(x, y-1) * Dx
-      val::BaseValue::PointerType Dzy = m.estimate->math_pow(e.estimate.get())->math_mul(m.estimate->math_log().get())->math_mul(e.uncertainty.get());          // Dzy = pow(x, y) * log(x) * Dy
-      return puq::Result(m.estimate->math_pow(e.estimate.get()), Dzx->math_pow(2)->math_add(Dzy->math_pow(2).get())->math_sqrt());
-    } else if (m.uncertainty) {
-      val::BaseValue::PointerType Dzx = e.estimate->math_mul(m.estimate->math_pow(e.estimate->math_add(cst.get()).get()).get())->math_mul(m.uncertainty.get()); // Dzx = y * pow(x, y-1) * Dx
-      return puq::Result(m.estimate->math_pow(e.estimate.get()), Dzx->math_pow(2)->math_sqrt());
-    } else if (e.uncertainty) {
-      val::BaseValue::PointerType Dzy = m.estimate->math_pow(e.estimate.get())->math_mul(m.estimate->math_log().get())->math_mul(e.uncertainty.get()); // Dzy = pow(x, y) * log(x) * Dy
-      return puq::Result(m.estimate->math_pow(e.estimate.get()), Dzy->math_pow(2)->math_sqrt());
+    if (res1.uncertainty && res2.uncertainty) {
+      val::BaseValue::PointerType Dzx = res2.estimate->math_mul(res1.estimate->math_pow(res2.estimate->math_add(cst.get()).get()).get())->math_mul(res1.uncertainty.get()); // Dzx = y * pow(x, y-1) * Dx
+      val::BaseValue::PointerType Dzy = res1.estimate->math_pow(res2.estimate.get())->math_mul(res1.estimate->math_log().get())->math_mul(res2.uncertainty.get());          // Dzy = pow(x, y) * log(x) * Dy
+      return puq::Result(res1.estimate->math_pow(res2.estimate.get()), Dzx->math_pow(2)->math_add(Dzy->math_pow(2).get())->math_sqrt());
+    } else if (res1.uncertainty) {
+      val::BaseValue::PointerType Dzx = res2.estimate->math_mul(res1.estimate->math_pow(res2.estimate->math_add(cst.get()).get()).get())->math_mul(res1.uncertainty.get()); // Dzx = y * pow(x, y-1) * Dx
+      return puq::Result(res1.estimate->math_pow(res2.estimate.get()), Dzx->math_pow(2)->math_sqrt());
+    } else if (res2.uncertainty) {
+      val::BaseValue::PointerType Dzy = res1.estimate->math_pow(res2.estimate.get())->math_mul(res1.estimate->math_log().get())->math_mul(res2.uncertainty.get()); // Dzy = pow(x, y) * log(x) * Dy
+      return puq::Result(res1.estimate->math_pow(res2.estimate.get()), Dzy->math_pow(2)->math_sqrt());
     } else {
-      return puq::Result(m.estimate->math_pow(e.estimate.get()));
+      return puq::Result(res1.estimate->math_pow(res2.estimate.get()));
     }
-    // val::BaseValue::PointerType Dzx = e.estimate * pow(m.estimate, e.estimate - 1) * m.uncertainty;  // Dzx = y * pow(x, y-1) * Dx
-    // val::BaseValue::PointerType Dzy = pow(m.estimate, e.estimate) * log(m.estimate) * e.uncertainty; // Dzy = pow(x, y) * log(x) * Dy
-    // return puq::Result(pow(m.estimate, e.estimate), sqrt(Dzx * Dzx + Dzy * Dzy));
+    // val::BaseValue::PointerType Dzx = res2.estimate * pow(res1.estimate, res2.estimate - 1) * res1.uncertainty;  // Dzx = y * pow(x, y-1) * Dx
+    // val::BaseValue::PointerType Dzy = pow(res1.estimate, res2.estimate) * log(res1.estimate) * res2.uncertainty; // Dzy = pow(x, y) * log(x) * Dy
+    // return puq::Result(pow(res1.estimate, res2.estimate), sqrt(Dzx * Dzx + Dzy * Dzy));
   }
 
-  puq::Measurement pow(const puq::Measurement& msr, const double e) {
-    // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
-    if (msr.result.uncertainty) {
-      std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(e);
-      return puq::Measurement(msr.result.estimate->math_pow(e), msr.result.estimate->math_pow(e - 1)->math_mul(cst.get())->math_abs()->math_mul(msr.result.uncertainty.get()));
-    } else {
-      return puq::Measurement(msr.result.estimate->math_pow(e));
-    }
-    // return puq::Measurement(pow(msr.result.estimate, e), abs(e * pow(msr.result.estimate, e - 1)) * msr.result.uncertainty);
+  puq::Measurement pow(const puq::Measurement& msr, const double exp) {
+    return puq::Measurement(pow(msr.result, exp),
+			    msr.baseunits);
   }
 
   puq::Measurement pow(const puq::Measurement& msr1, const puq::Measurement& msr2) {
-    // Dz = sqrt(pow(Dzx,2)+pow(Dzy,2))
-    // z ± Dz = pow(x ± Dx, y ± Dy)
-    std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(-1);
-    if (msr1.result.uncertainty && msr2.result.uncertainty) {
-      val::BaseValue::PointerType Dzx = msr2.result.estimate->math_mul(msr1.result.estimate->math_pow(msr2.result.estimate->math_add(cst.get()).get()).get())->math_mul(msr1.result.uncertainty.get()); // Dzx = y * pow(x, y-1) * Dx
-      val::BaseValue::PointerType Dzy = msr1.result.estimate->math_pow(msr2.result.estimate.get())->math_mul(msr1.result.estimate->math_log().get())->math_mul(msr2.result.uncertainty.get());          // Dzy = pow(x, y) * log(x) * Dy
-      return puq::Measurement(msr1.result.estimate->math_pow(msr2.result.estimate.get()), Dzx->math_pow(2)->math_add(Dzy->math_pow(2).get())->math_sqrt());
-    } else if (msr1.result.uncertainty) {
-      val::BaseValue::PointerType Dzx = msr2.result.estimate->math_mul(msr1.result.estimate->math_pow(msr2.result.estimate->math_add(cst.get()).get()).get())->math_mul(msr1.result.uncertainty.get()); // Dzx = y * pow(x, y-1) * Dx
-      return puq::Measurement(msr1.result.estimate->math_pow(msr2.result.estimate.get()), Dzx->math_pow(2)->math_sqrt());
-    } else if (msr2.result.uncertainty) {
-      val::BaseValue::PointerType Dzy = msr1.result.estimate->math_pow(msr2.result.estimate.get())->math_mul(msr1.result.estimate->math_log().get())->math_mul(msr2.result.uncertainty.get()); // Dzy = pow(x, y) * log(x) * Dy
-      return puq::Measurement(msr1.result.estimate->math_pow(msr2.result.estimate.get()), Dzy->math_pow(2)->math_sqrt());
-    } else {
-      return puq::Measurement(msr1.result.estimate->math_pow(msr2.result.estimate.get()));
-    }
-    // val::BaseValue::PointerType Dzx = msr2.result.estimate * pow(msr1.result.estimate, msr2.result.estimate - 1) * msr1.result.uncertainty;  // Dzx = y * pow(x, y-1) * Dx
-    // val::BaseValue::PointerType Dzy = pow(msr1.result.estimate, msr2.result.estimate) * log(msr1.result.estimate) * msr2.result.uncertainty; // Dzy = pow(x, y) * log(x) * Dy
-    // return puq::Measurement(pow(msr1.result.estimate, msr2.result.estimate), sqrt(Dzx * Dzx + Dzy * Dzy));
+    return puq::Measurement(pow(msr1.result, msr2.result),
+			    msr1.baseunits);
   }
 
+  puq::Quantity pow(const puq::Quantity& quant, const double exp) {
+    return puq::Quantity(pow(quant.measurement, exp),
+			 quant.stype);
+  }
+  
+  puq::Quantity pow(const puq::Quantity& quant1, const puq::Quantity& quant2) {
+    return puq::Quantity(pow(quant1.measurement, quant2.measurement),
+			 quant1.stype);
+  }
+  
 } // namespace snt::puq::math

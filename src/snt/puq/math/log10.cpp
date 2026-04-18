@@ -1,4 +1,7 @@
 #include <snt/puq/math/log10.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
+#include <snt/puq/quantity.h>
 
 namespace snt::puq::math {
 
@@ -15,15 +18,13 @@ namespace snt::puq::math {
   }
 
   puq::Measurement log10(const puq::Measurement& msr) {
-    // y ± Dy = log(x ± Dx) -> Dy = 1 / ln(10) * Dx / x
-    if (msr.result.uncertainty) {
-      std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(std::log(10));
-      return puq::Measurement(msr.result.estimate->math_log10(),
-                              msr.result.uncertainty->math_div(msr.result.estimate->math_mul(cst.get()).get()));
-    } else {
-      return puq::Measurement(msr.result.estimate->math_log10());
-    }
-    // return puq::Measurement(log10(msr.result.estimate), msr.result.uncertainty / (msr.result.estimate * std::log(10)));
+    return puq::Measurement(log10(msr.result),
+			    msr.baseunits);
   }
 
+  puq::Quantity log10(const puq::Quantity& quant) {
+    return puq::Quantity(log10(quant.measurement),
+			 quant.stype);
+  }
+  
 } // namespace snt::puq::math

@@ -1,5 +1,8 @@
 #include <snt/puq/exponent.h>
 #include <snt/puq/math/log.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
+#include <snt/puq/quantity.h>
 
 namespace snt::puq::math {
 
@@ -13,12 +16,13 @@ namespace snt::puq::math {
   }
 
   puq::Measurement log(const puq::Measurement& msr) {
-    // y ± Dy = log10(x ± Dx) -> Dy = Dx / x
-    if (msr.result.uncertainty)
-      return puq::Measurement(msr.result.estimate->math_log(), msr.result.uncertainty->math_div(msr.result.estimate.get()));
-    else
-      return puq::Measurement(msr.result.estimate->math_log());
-    // return puq::Measurement(log(msr.result.estimate), msr.result.uncertainty / msr.result.estimate);
+    return puq::Measurement(log(msr.result),
+			    msr.baseunits);
   }
 
+  puq::Quantity log(const puq::Quantity& quant) {
+    return puq::Quantity(log(quant.measurement),
+			 quant.stype);
+  }
+  
 } // namespace snt::puq::math

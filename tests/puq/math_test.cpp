@@ -1,4 +1,7 @@
 #include "pch_tests.h"
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
+#include <snt/puq/quantity.h>
 #include <snt/puq/math/abs.h>
 #include <snt/puq/math/cbrt.h>
 #include <snt/puq/math/exp.h>
@@ -14,19 +17,7 @@ using namespace snt;
 // test from https://www.quora.com/How-does-one-calculate-uncertainty-in-an-exponent
 // and checked using http://www.julianibus.de/ online calculator
 
-TEST(NoSTD, MeasurementMathUnits) {
-
-  puq::Measurement msr1, msr2, msr3;
-
-  msr1 = puq::Measurement(4.36, 0.16, "m");
-  msr2 = puq::Measurement(2.35, 0.04, "m");
-
-  // exponential function
-  msr3 = puq::math::exp(msr2);
-  EXPECT_EQ(msr3.to_string(), "1.049(42)e1*m"); // mag 10.485569724727576 err 0.41942280901707824
-}
-
-TEST(NoSTD, MeasurementMath) {
+TEST(Math, Measurement) {
 
   puq::Measurement msr1, msr2, msr3;
 
@@ -68,4 +59,42 @@ TEST(NoSTD, MeasurementMath) {
   // maximum value
   msr3 = puq::math::max(msr1, msr2);
   EXPECT_EQ(msr3.to_string(), "4.36(16)");
+}
+
+TEST(Math, MeasurementUnits) {
+
+  puq::Measurement msr1, msr2, msr3;
+
+  msr1 = puq::Measurement(4.36, 0.16, "m");
+  msr2 = puq::Measurement(2.35, 0.04, "km");
+
+  // exponential function
+  msr3 = puq::math::exp(msr2);
+  EXPECT_EQ(msr3.to_string(), "1.049(42)e1*km"); // mag 10.485569724727576 err 0.41942280901707824
+
+  // absolute value
+  msr3 = puq::math::abs(-msr1);
+  EXPECT_EQ(msr3.to_string(), "4.36(16)*m");
+  
+  // maximum value
+  //msr3 = puq::math::max(msr1, msr2);
+  //EXPECT_EQ(msr3.to_string(), "2.35(4)*km");
+}
+
+TEST(Math, Quantity) {
+
+  puq::Quantity quant1, quant2, quant3;
+
+  quant1 = puq::Quantity(4.36, 0.16, "m");
+  quant2 = puq::Quantity(2.35, 0.04, "km");
+
+  // exponential function
+  quant3 = puq::math::exp(quant2);
+  EXPECT_EQ(quant3.to_string(), "1.049(42)e1*km");
+  
+  // absolute value
+  quant3 = puq::math::abs(-quant1);
+  EXPECT_EQ(quant3.to_string(), "4.36(16)*m");
+
+  // DEBUG: implement tests with different systems
 }

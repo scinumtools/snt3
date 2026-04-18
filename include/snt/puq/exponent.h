@@ -21,6 +21,7 @@ namespace snt::puq {
     void operator+=(const Exponent& e);
     void operator-=(const Exponent& e);
     void operator*=(const Exponent& e);
+    void operator/=(const Exponent& e);
     bool operator==(const Exponent& e) const;
     bool operator!=(const Exponent& e) const;
     bool operator==(const int& e) const;

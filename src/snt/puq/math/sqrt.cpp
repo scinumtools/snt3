@@ -1,19 +1,26 @@
 #include <snt/puq/math/sqrt.h>
+#include <snt/puq/result.h>
+#include <snt/puq/value/measurement.h>
+#include <snt/puq/quantity.h>
 
 namespace snt::puq::math {
 
-  puq::Result sqrt(const puq::Result& m) {
+  puq::Result sqrt(const puq::Result& res) {
     // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
     std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(0.5);
-    return puq::Result(m.estimate->math_sqrt(), m.estimate->math_pow(-0.5)->math_mul(cst.get())->math_mul(m.uncertainty.get()));
-    // return puq::Result(sqrt(m.estimate), 0.5 * pow(m.estimate, -0.5) * m.uncertainty);
+    return puq::Result(res.estimate->math_sqrt(),
+		       res.estimate->math_pow(-0.5)->math_mul(cst.get())->math_mul(res.uncertainty.get()));
+    // return puq::Result(sqrt(res.estimate), 0.5 * pow(res.estimate, -0.5) * res.uncertainty);
   }
 
   puq::Measurement sqrt(const puq::Measurement& msr) {
-    // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
-    std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(0.5);
-    return puq::Measurement(msr.result.estimate->math_sqrt(), msr.result.estimate->math_pow(-0.5)->math_mul(cst.get())->math_mul(msr.result.uncertainty.get()));
-    // return puq::Measurement(sqrt(msr.result.estimate), 0.5 * pow(msr.result.estimate, -0.5) * msr.result.uncertainty);
+    return puq::Measurement(sqrt(msr.result),
+			    msr.baseunits);
   }
 
+  puq::Quantity sqrt(const puq::Quantity& quant) {
+    return puq::Quantity(sqrt(quant.measurement),
+			 quant.stype);
+  }
+  
 } // namespace snt::puq::math
