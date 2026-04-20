@@ -43,12 +43,15 @@ TEST(Dimensions, Comparison) {
 
   puq::Dimensions d1(2.34, {0, 1, 2, 3, 4, 5, 6, 7});
   puq::Dimensions d2(2.34, {0, 0, 1, 2, 3, 4, 5, 6});
+  puq::Dimensions d3(3.34, {0, 0, 1, 2, 3, 4, 5, 6});
 
-  EXPECT_EQ(d1 == d2, false);
-  EXPECT_EQ(d1 == d1, true);
+  EXPECT_FALSE(d1 == d2);
+  EXPECT_TRUE(d1 == d1);
+  EXPECT_FALSE(d2 == d3);
 
-  EXPECT_EQ(d1 != d2, true);
-  EXPECT_EQ(d1 != d1, false);
+  EXPECT_TRUE(d1 != d2);
+  EXPECT_FALSE(d1 != d1);
+  EXPECT_TRUE(d2 != d3);
 }
 
 TEST(Dimensions, HasDimensions) {

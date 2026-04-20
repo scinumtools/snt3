@@ -25,8 +25,23 @@ namespace snt::puq::math {
   }
 
   extern puq::Measurement max(const puq::Measurement& msr1, const puq::Measurement& msr2) {
-    return puq::Measurement(max(msr1.result, msr2.result),
-			    msr1.baseunits);
+    puq::Dimensions dim1 = msr1.baseunits.dimensions();
+    puq::Dimensions dim2 = msr2.baseunits.dimensions();
+    if (dim1.has_dimensions() && dim2.has_dimensions()) {
+      if (dim1==dim2) {
+	return puq::Measurement(max(msr1.result, msr2.result),
+				msr1.baseunits);
+      } else {
+	puq::Measurement msr3 = msr2.convert(msr1.baseunits);
+	std::cout << msr3.to_string() << std::endl;
+	return puq::Measurement(max(msr1.result, msr3.result),
+				msr1.baseunits);
+      }
+    } else if (dim1.has_dimensions() || dim2.has_dimensions()) {
+      throw std::runtime_error("Cannot convert between dimensional and dimensionless quantities.");
+    } else {
+      return puq::Measurement(max(msr1.result, msr2.result));
+    }
   }
 
   puq::Quantity max(const puq::Quantity& quant1, const puq::Quantity& quant2) {

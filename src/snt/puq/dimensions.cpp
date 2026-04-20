@@ -94,6 +94,8 @@ namespace snt::puq {
   }
 
   bool Dimensions::operator==(const Dimensions& d) const {
+    if (numerical != d.numerical)
+      return false;
     for (int i = 0; i < Config::num_basedim; i++) {
       if (physical[i] != d.physical[i])
         return false;
@@ -102,7 +104,8 @@ namespace snt::puq {
   }
 
   bool Dimensions::operator!=(const Dimensions& d) const {
-    bool equal = false;
+    if (numerical != d.numerical)
+      return true;    
     for (int i = 0; i < Config::num_basedim; i++) {
       if (physical[i] != d.physical[i])
         return true;

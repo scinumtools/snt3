@@ -159,8 +159,12 @@ namespace snt::puq {
     // determine dimensions
     dimensions1 = bu1.dimensions();
     dimensions2 = bu2.dimensions();
-    if (dimensions1 != dimensions2)
-      throw snt::puq::ConvDimExcept(bu1, bu2);
+
+    // make sure that physical dimensions are matching
+    for (int i = 0; i < Config::num_basedim; i++) {
+      if (dimensions1.physical[i] != dimensions2.physical[i])
+        throw snt::puq::ConvDimExcept(bu1, bu2);
+    }
 
     // determine conversion type
     // std::cout << baseunits1.to_string() << " " << baseunits2.to_string() << std::endl;

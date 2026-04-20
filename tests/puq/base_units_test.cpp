@@ -1,7 +1,7 @@
 #include "pch_tests.h"
 
 #include <snt/puq/base_units.h>
-#include <snt/puq/math/pow.h>
+#include <snt/puq/math.h>
 
 using namespace snt;
 
