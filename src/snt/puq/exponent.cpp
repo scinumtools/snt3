@@ -24,30 +24,24 @@ namespace snt::puq {
     reduce();
   }
 
-  Exponent operator*(const Exponent& e1, const Exponent& e2) {
-    Exponent ne;
-    ne.numerator = e1.numerator * e2.numerator;
-    ne.denominator = e1.denominator * e2.denominator;
-    ne.reduce();
-    return ne;
-  }
   void Exponent::operator*=(const Exponent& e) {
     numerator *= e.numerator;
     denominator *= e.denominator;
     reduce();
   }
-
-  Exponent operator/(const Exponent& e1, const Exponent& e2) {
-    Exponent ne;
-    ne.numerator = e1.numerator * e2.denominator;
-    ne.denominator = e1.denominator * e2.numerator;
-    ne.reduce();
-    return ne;
+  Exponent operator*(Exponent e1, const Exponent& e2) {
+    e1 *= e2;
+    return e1;
   }
+
   void Exponent::operator/=(const Exponent& e) {
     numerator *= e.denominator;
     denominator *= e.numerator;
     reduce();
+  }
+  Exponent operator/(Exponent e1, const Exponent& e2) {
+    e1 /= e2;
+    return e1;
   }
   
   Exponent Exponent::operator-() const {

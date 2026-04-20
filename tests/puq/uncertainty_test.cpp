@@ -1,6 +1,6 @@
 #include "pch_tests.h"
 
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 
 using namespace snt;
 

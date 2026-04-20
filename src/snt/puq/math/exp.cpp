@@ -1,6 +1,6 @@
 #include <snt/puq/math/exp.h>
 #include <snt/puq/result.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
 
 namespace snt::puq::math {
@@ -16,6 +16,8 @@ namespace snt::puq::math {
   }
 
   puq::Measurement exp(const puq::Measurement& msr) {
+    if (msr.baseunits.has_dimensions())
+      throw std::runtime_error("Exponential function accepts only dimmensionless quatntities.");
     return puq::Measurement(exp(msr.result),
 			    msr.baseunits);
   }

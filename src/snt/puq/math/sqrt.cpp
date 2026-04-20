@@ -1,10 +1,17 @@
 #include <snt/puq/math/sqrt.h>
+#include <snt/puq/math/pow.h>
 #include <snt/puq/result.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
+#include <snt/puq/exponent.h>
+#include <snt/puq/base_units.h>
 
 namespace snt::puq::math {
 
+  puq::BaseUnits sqrt(const puq::BaseUnits& bu) {
+    return pow(bu, puq::Exponent(1,2));
+  }
+  
   puq::Result sqrt(const puq::Result& res) {
     // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
     std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(0.5);
@@ -15,7 +22,7 @@ namespace snt::puq::math {
 
   puq::Measurement sqrt(const puq::Measurement& msr) {
     return puq::Measurement(sqrt(msr.result),
-			    msr.baseunits);
+			    sqrt(msr.baseunits));
   }
 
   puq::Quantity sqrt(const puq::Quantity& quant) {

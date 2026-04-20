@@ -2,7 +2,7 @@
 #define PUQ_MATH_TO_STRING_H
 
 #include <string>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 
 namespace snt::puq {
 

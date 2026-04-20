@@ -5,7 +5,7 @@
 #include <snt/puq/math/log10.h>
 #include <snt/puq/math/pow.h>
 #include <snt/puq/solver/unit_solver.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 #include <sstream>
 
 namespace snt::puq {
@@ -245,21 +245,21 @@ namespace snt::puq {
   }
 
   Measurement operator*(const Measurement& msr1, const Measurement& msr2) {
-    return Measurement(msr1.result * msr2.result, msr1.baseunits + msr2.baseunits);
+    return Measurement(msr1.result * msr2.result, msr1.baseunits * msr2.baseunits);
   }
 
   void Measurement::operator*=(const Measurement& msr) {
     result *= msr.result;
-    baseunits += msr.baseunits;
+    baseunits *= msr.baseunits;
   }
 
   Measurement operator/(const Measurement& msr1, const Measurement& msr2) {
-    return Measurement(msr1.result / msr2.result, msr1.baseunits - msr2.baseunits);
+    return Measurement(msr1.result / msr2.result, msr1.baseunits / msr2.baseunits);
   }
 
   void Measurement::operator/=(const Measurement& msr) {
     result /= msr.result;
-    baseunits -= msr.baseunits;
+    baseunits /= msr.baseunits;
   }
 
   std::ostream& operator<<(std::ostream& os, const Measurement& msr) {
@@ -267,11 +267,12 @@ namespace snt::puq {
     return os;
   }
 
-  void Measurement::pow(const ExponentVariant& exp) {
-    result.pow(exp);
-    // result = std::pow(result, (double)e);
-    baseunits *= exp;
-  }
+  //void Measurement::pow(const ExponentVariant& exp) {
+  //  result.pow(exp);
+  //  // TODO: should be pow() instead of *=
+  //  // result = std::pow(result, (double)e);
+  //  baseunits *= exp;
+  //}
 
   Measurement Measurement::convert(const std::string& str) const {
     Measurement msr = Measurement(str);

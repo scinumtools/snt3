@@ -3,7 +3,7 @@
 #include <iostream>
 #include <snt/puq/to_string.h>
 #include <snt/puq/settings.h>
-#include <snt/puq/value/dimensions.h>
+#include <snt/puq/dimensions.h>
 #include <sstream>
 
 namespace snt::puq {
@@ -77,13 +77,15 @@ namespace snt::puq {
     return (s == "") ? "1" : s;
   }
 
-  bool Dimensions::is_numeric() const {
-    bool all_unity = true;
+  bool Dimensions::has_dimensions() const {
+    if (physical.empty())
+      return false;
+    bool has_dims = false;
     for (int i = 0; i < Config::num_basedim; i++) {
       if (exponent_to_float(physical[i])!=0)
-        all_unity = false;
+        has_dims = true;
     }
-    return all_unity;
+    return has_dims;
   }
   
   std::ostream& operator<<(std::ostream& os, const Dimensions& d) {

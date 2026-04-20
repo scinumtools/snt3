@@ -1,6 +1,6 @@
 #include "pch_tests.h"
 
-#include <snt/puq/value/dimensions.h>
+#include <snt/puq/dimensions.h>
 
 using namespace snt;
 
@@ -49,4 +49,13 @@ TEST(Dimensions, Comparison) {
 
   EXPECT_EQ(d1 != d2, true);
   EXPECT_EQ(d1 != d1, false);
+}
+
+TEST(Dimensions, HasDimensions) {
+
+  puq::Dimensions dim(2.34, {0, 1, 0, 3, 0, 0, 0, 0});
+  EXPECT_TRUE(dim.has_dimensions());
+
+  dim = puq::Dimensions(2.34, {0, 0, 0, 0, 0, 0, 0, 0});
+  EXPECT_FALSE(dim.has_dimensions());
 }

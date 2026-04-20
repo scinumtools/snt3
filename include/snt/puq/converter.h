@@ -5,9 +5,9 @@
 #include <memory>
 #include <snt/puq/systems/unit_system.h>
 #include <snt/puq/util/data_table.h>
-#include <snt/puq/value/base_units.h>
-#include <snt/puq/value/dimensions.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/base_units.h>
+#include <snt/puq/dimensions.h>
+#include <snt/puq/measurement.h>
 #include <sstream>
 
 namespace snt::puq {

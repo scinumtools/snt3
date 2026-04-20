@@ -3,7 +3,7 @@
 
 #include <snt/puq/exponent.h>
 #include <snt/puq/settings.h>
-#include <snt/puq/value/dimensions.h>
+#include <snt/puq/dimensions.h>
 
 namespace snt::puq {
 
@@ -32,15 +32,19 @@ namespace snt::puq {
     void append(const std::string& p, const std::string& u, int n, int d);
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     const BaseUnit& operator[](int index) const;
-    friend BaseUnits operator+(const BaseUnits& bu1, const BaseUnits& bu2);
-    friend BaseUnits operator-(const BaseUnits& bu1, const BaseUnits& bu2);
     friend std::ostream& operator<<(std::ostream& os, const BaseUnits& bu);
-    void operator+=(const BaseUnits& bu);
-    void operator-=(const BaseUnits& bu);
-    void operator*=(const ExponentVariant& e);
+    void operator*=(const BaseUnits& bu);
+    void operator/=(const BaseUnits& bu);
+    //void operator*=(const ExponentVariant& exp);
+    //void operator/=(const ExponentVariant& exp);
+    friend BaseUnits operator*(BaseUnits bu1, const BaseUnits& bu2);
+    friend BaseUnits operator/(BaseUnits bu1, const BaseUnits& bu2);
+    //friend BaseUnits operator*(BaseUnits bu, const ExponentVariant& exp);
+    //friend BaseUnits operator/(BaseUnits bu, const ExponentVariant& exp);
     BaseUnits::ListType::const_iterator begin() const;
     BaseUnits::ListType::const_iterator end() const;
     std::size_t size() const;
+    bool has_dimensions() const;
     Dimensions dimensions() const;
   };
 

@@ -1,10 +1,17 @@
 #include <snt/puq/math/cbrt.h>
+#include <snt/puq/math/pow.h>
 #include <snt/puq/result.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
+#include <snt/puq/exponent.h>
+#include <snt/puq/base_units.h>
 
 namespace snt::puq::math {
 
+  puq::BaseUnits cbrt(const puq::BaseUnits& bu) {
+    return pow(bu, puq::Exponent(1,3));
+  }
+  
   puq::Result cbrt(const puq::Result& res) {
     // y ± Dz = pow(x ± Dx, 1/3) -> Dy = 1/3 * pow(x, -2/3) * Dx
     std::unique_ptr<val::ArrayValue<double>> third1 = std::make_unique<val::ArrayValue<double>>(1. / 3.);
@@ -16,7 +23,7 @@ namespace snt::puq::math {
 
   puq::Measurement cbrt(const puq::Measurement& msr) {
     return puq::Measurement(cbrt(msr.result),
-			    msr.baseunits);
+			    cbrt(msr.baseunits));
   }
 
   puq::Quantity cbrt(const puq::Quantity& quant) {

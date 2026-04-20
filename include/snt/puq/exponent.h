@@ -15,7 +15,8 @@ namespace snt::puq {
     Exponent(const int n[2]) : numerator(n[0]), denominator(n[1]) {};
     Exponent(const int& n) : numerator(n), denominator(1) {};
     Exponent(const int& n, const int& d) : numerator(n), denominator(d) {};
-    friend Exponent operator*(const Exponent& e1, const Exponent& e2);
+    friend Exponent operator*(Exponent e1, const Exponent& e2);
+    friend Exponent operator/(Exponent e1, const Exponent& e2);
     friend std::ostream& operator<<(std::ostream& os, const Exponent& e);
     Exponent operator-() const;
     void operator+=(const Exponent& e);

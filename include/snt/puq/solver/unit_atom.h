@@ -3,7 +3,7 @@
 
 #include <snt/exs/atom_base.h>
 #include <snt/exs/settings.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 
 namespace snt::puq {
 

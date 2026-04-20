@@ -2,9 +2,9 @@
 
 #include <snt/puq/converter.h>
 #include <snt/puq/exceptions.h>
-#include <snt/puq/value/base_units.h>
-#include <snt/puq/value/dimensions.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/base_units.h>
+#include <snt/puq/dimensions.h>
+#include <snt/puq/measurement.h>
 
 using namespace snt;
 

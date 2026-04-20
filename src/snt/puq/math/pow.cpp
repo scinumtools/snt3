@@ -1,10 +1,21 @@
 #include <snt/puq/math/pow.h>
 #include <snt/puq/result.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
+#include <snt/puq/base_units.h>
+#include <snt/puq/exponent.h>
 
 namespace snt::puq::math {
 
+  puq::BaseUnits pow(puq::BaseUnits bu, const ExponentVariant& exp) {
+    for (auto& unit : bu.baseunits) {
+      unit.exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+        return a * b;
+      }, unit.exponent, exp);
+    }
+    return bu;
+  }
+    
   puq::Result pow(const puq::Result& res, const double exp) {
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
     if (res.uncertainty) {
@@ -43,6 +54,14 @@ namespace snt::puq::math {
 			    msr.baseunits);
   }
 
+  puq::Measurement pow(const puq::Measurement& msr, const ExponentVariant& exp) {
+    // WARNING: if exp is not converted in float in the pow(msr.result, ..)
+    //          the exponent will be casted as a Measurement and calculation
+    //          will loop infinitely
+    return puq::Measurement(pow(msr.result, exponent_to_float(exp)),
+			    pow(msr.baseunits, exp));
+  }
+  
   puq::Measurement pow(const puq::Measurement& msr1, const puq::Measurement& msr2) {
     return puq::Measurement(pow(msr1.result, msr2.result),
 			    msr1.baseunits);
@@ -57,5 +76,5 @@ namespace snt::puq::math {
     return puq::Quantity(pow(quant1.measurement, quant2.measurement),
 			 quant1.stype);
   }
-  
+
 } // namespace snt::puq::math

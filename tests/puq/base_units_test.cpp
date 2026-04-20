@@ -1,6 +1,7 @@
 #include "pch_tests.h"
 
-#include <snt/puq/value/base_units.h>
+#include <snt/puq/base_units.h>
+#include <snt/puq/math/pow.h>
 
 using namespace snt;
 
@@ -91,4 +92,36 @@ TEST(BaseUnits, Dimensions) {
   bus = puq::BaseUnits("<v>"); // quantities
   dim = bus.dimensions();
   EXPECT_EQ(dim.to_string(), "m*s-1");
+}
+
+TEST(BaseUnits, HasDimensions) {
+
+  puq::BaseUnits bus("kg*m2/s2");
+  EXPECT_TRUE(bus.has_dimensions());
+
+  bus = puq::BaseUnits("34*%");
+  EXPECT_FALSE(bus.has_dimensions());
+}
+
+
+TEST(BaseUnits, Arithmetics) {
+
+  puq::BaseUnits bus0;
+  puq::BaseUnits bus1("kg*m2/s2");
+  puq::BaseUnits bus2("kg");
+
+  // multiply by a base unit
+  bus0 = bus1 * bus2;
+  EXPECT_EQ(bus0.to_string(), "kg2*m2*s-2");
+
+  bus0 = bus1 / bus2;
+  EXPECT_EQ(bus0.to_string(), "m2*s-2");
+
+  // multiply by an exponent
+  bus0 = puq::math::pow(bus1, 2);
+  EXPECT_EQ(bus0.to_string(), "kg2*m4*s-4");
+
+  bus0 = puq::math::pow(bus1, puq::Exponent(1,2));
+  EXPECT_EQ(bus0.to_string(), "kg1:2*m*s-1");
+  
 }

@@ -1,7 +1,7 @@
 #include <snt/puq/exponent.h>
 #include <snt/puq/math/log.h>
 #include <snt/puq/result.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
 
 namespace snt::puq::math {
@@ -16,6 +16,8 @@ namespace snt::puq::math {
   }
 
   puq::Measurement log(const puq::Measurement& msr) {
+    if (msr.baseunits.has_dimensions())
+      throw std::runtime_error("Logarithmic function accepts only dimmensionless quatntities.");
     return puq::Measurement(log(msr.result),
 			    msr.baseunits);
   }

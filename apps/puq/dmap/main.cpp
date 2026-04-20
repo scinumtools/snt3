@@ -9,7 +9,7 @@
 #include <snt/puq/to_string.h>
 #include <snt/puq/solver/unit_solver.h>
 #include <snt/puq/systems/unit_system.h>
-#include <snt/puq/value/dimensions.h>
+#include <snt/puq/dimensions.h>
 #include <sstream>
 #include <sys/stat.h>
 

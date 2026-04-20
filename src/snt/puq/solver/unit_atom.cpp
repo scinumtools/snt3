@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <regex>
+#include <snt/puq/math/pow.h>
 #include <snt/puq/solver/unit_atom.h>
 #include <snt/puq/systems/unit_system.h>
 #include <snt/core/to_number.h>
@@ -127,7 +128,7 @@ namespace snt::puq {
         ss << std::get<Exponent>(e).to_string();
       std::clog << ss.str() << ") = ";
     }
-    value.pow(e);
+    value = math::pow(value, e);
     if constexpr (Config::debug_unit_solver) {
       std::clog << value.to_string() << std::endl;
     }

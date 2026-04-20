@@ -1,6 +1,6 @@
 #include <snt/puq/math/floor.h>
 #include <snt/puq/result.h>
-#include <snt/puq/value/measurement.h>
+#include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
 
 namespace snt::puq::math {
