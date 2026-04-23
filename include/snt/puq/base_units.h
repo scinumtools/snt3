@@ -1,9 +1,9 @@
 #ifndef PUQ_BASE_UNITS_H
 #define PUQ_BASE_UNITS_H
 
+#include <snt/puq/dimensions.h>
 #include <snt/puq/exponent.h>
 #include <snt/puq/settings.h>
-#include <snt/puq/dimensions.h>
 
 namespace snt::puq {
 
@@ -35,12 +35,12 @@ namespace snt::puq {
     friend std::ostream& operator<<(std::ostream& os, const BaseUnits& bu);
     void operator*=(const BaseUnits& bu);
     void operator/=(const BaseUnits& bu);
-    //void operator*=(const ExponentVariant& exp);
-    //void operator/=(const ExponentVariant& exp);
+    // void operator*=(const ExponentVariant& exp);
+    // void operator/=(const ExponentVariant& exp);
     friend BaseUnits operator*(BaseUnits bu1, const BaseUnits& bu2);
     friend BaseUnits operator/(BaseUnits bu1, const BaseUnits& bu2);
-    //friend BaseUnits operator*(BaseUnits bu, const ExponentVariant& exp);
-    //friend BaseUnits operator/(BaseUnits bu, const ExponentVariant& exp);
+    // friend BaseUnits operator*(BaseUnits bu, const ExponentVariant& exp);
+    // friend BaseUnits operator/(BaseUnits bu, const ExponentVariant& exp);
     BaseUnits::ListType::const_iterator begin() const;
     BaseUnits::ListType::const_iterator end() const;
     std::size_t size() const;

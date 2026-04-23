@@ -1,6 +1,5 @@
-#include <snt/core/math/floor.h>
-
 #include <cmath>
+#include <snt/core/math/floor.h>
 
 namespace snt::core::math {
 

@@ -26,7 +26,7 @@ namespace snt::puq {
      * @return Returns true if there are some physical dimensions; otherwise returns false
      */
     bool has_dimensions() const;
-    
+
     friend std::ostream& operator<<(std::ostream& os, const Dimensions& d);
     bool operator==(const Dimensions& d) const;
     bool operator!=(const Dimensions& d) const;

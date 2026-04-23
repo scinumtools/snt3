@@ -125,7 +125,6 @@ TEST(Expressions, NestedParentheses) {
   EXPECT_EQ(vnode->to_string(), "5.3 J");
 }
 
-
 TEST(Expressions, MultipleLines) {
 
   // define scalar

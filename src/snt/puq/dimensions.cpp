@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <snt/puq/to_string.h>
-#include <snt/puq/settings.h>
 #include <snt/puq/dimensions.h>
+#include <snt/puq/settings.h>
+#include <snt/puq/to_string.h>
 #include <sstream>
 
 namespace snt::puq {
@@ -82,12 +82,12 @@ namespace snt::puq {
       return false;
     bool has_dims = false;
     for (int i = 0; i < Config::num_basedim; i++) {
-      if (exponent_to_float(physical[i])!=0)
+      if (exponent_to_float(physical[i]) != 0)
         has_dims = true;
     }
     return has_dims;
   }
-  
+
   std::ostream& operator<<(std::ostream& os, const Dimensions& d) {
     os << d.to_string();
     return os;
@@ -105,7 +105,7 @@ namespace snt::puq {
 
   bool Dimensions::operator!=(const Dimensions& d) const {
     if (numerical != d.numerical)
-      return true;    
+      return true;
     for (int i = 0; i < Config::num_basedim; i++) {
       if (physical[i] != d.physical[i])
         return true;

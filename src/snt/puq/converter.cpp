@@ -167,9 +167,9 @@ namespace snt::puq {
     }
 
     // determine conversion type
-    // std::cout << baseunits1.to_string() << " " << baseunits2.to_string() << std::endl;
-    // std::cout << std::bitset<8>((int)dimensions1.utype) << std::endl;
-    // std::cout << std::bitset<8>((int)dimensions2.utype) << std::endl;
+    // std::cout << baseunits1.to_string() << " " << baseunits2.to_string() << '\n';
+    // std::cout << std::bitset<8>((int)dimensions1.utype) << '\n';
+    // std::cout << std::bitset<8>((int)dimensions2.utype) << '\n';
     if constexpr (Config::use_units_logarithmic) {
       if (((dimensions1.utype | dimensions2.utype) & Utype::LOG) == Utype::LOG) {
         if ((baseunits1.size() == 1 || baseunits1.size() == 2) &&
@@ -200,7 +200,7 @@ namespace snt::puq {
       std::clog << m1.to_string() << Symbols::multiply << baseunits1.to_string();
       std::clog << " -> ";
       std::clog << m2.to_string() << Symbols::multiply << baseunits2.to_string();
-      std::clog << std::endl;
+      std::clog << '\n';
     }
     Result mag;
     if constexpr (Config::use_units_logarithmic) {
@@ -223,7 +223,7 @@ namespace snt::puq {
     if constexpr (Config::debug_converter) {
       std::clog << "CONV:  Result: ";
       std::clog << mag.to_string() << Symbols::multiply << baseunits2.to_string();
-      std::clog << std::endl;
+      std::clog << '\n';
     }
     return mag;
   };

@@ -1,6 +1,5 @@
-#include <snt/core/math/sqrt.h>
-
 #include <cmath>
+#include <snt/core/math/sqrt.h>
 
 namespace snt::core::math {
 

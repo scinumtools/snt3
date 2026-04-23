@@ -59,16 +59,16 @@ namespace snt::core {
       std::string output;
       for (char c : value) {
         if (c == '"') {
-	  output += "\\\"";  // add \"
+          output += "\\\""; // add \"
         } else {
-	  output += c;
+          output += c;
         }
       }
       return output;
     }
     return value;
   }
-  
+
   template <typename T>
   std::string _array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const StringFormatType& format, size_t& offset, size_t dim) {
     std::ostringstream oss;
@@ -186,6 +186,6 @@ namespace snt::core {
     return _array_to_string(value, uncertainty, shape, format, offset, 0);
   }
 
-} // namespace snt
+} // namespace snt::core
 
 #endif // SNT_STRING_FORMAT_H

@@ -43,7 +43,7 @@ namespace snt::puq {
     e1 /= e2;
     return e1;
   }
-  
+
   Exponent Exponent::operator-() const {
     return Exponent(-numerator, denominator);
   }

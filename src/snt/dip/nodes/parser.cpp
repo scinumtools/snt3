@@ -271,7 +271,7 @@ namespace snt::dip {
     while (i < str.size()) {
       char ch = str[i];
       if (ch == '#' || ch == '=' || ch == ' ')
-	break;
+        break;
       ++i;
     }
     if (i == 0)
@@ -280,7 +280,7 @@ namespace snt::dip {
     strip(units_raw);
     return true;
   }
-  
+
   bool Parser::part_literal() {
     std::string trimmed = code;
     trimmed.erase(0, trimmed.find_first_not_of(" \t\n\r"));
@@ -292,17 +292,17 @@ namespace snt::dip {
     size_t pos = trimmed.find(' ');
     if (pos != std::string::npos) {
       std::string number = trimmed.substr(0, pos);
-      std::string units  = trimmed.substr(pos + 1);
+      std::string units = trimmed.substr(pos + 1);
       units.erase(0, units.find_first_not_of(" \t\n\r"));
       if (part_literal_integer(number) && part_literal_units(units))
-	return true;
+        return true;
       else if (part_literal_float(number) && part_literal_units(units))
-	return true;
+        return true;
     } else {
       if (part_literal_integer(trimmed))
-	return true;
+        return true;
       else if (part_literal_float(trimmed))
-	return true;
+        return true;
     }
     return false;
   }
@@ -378,21 +378,23 @@ namespace snt::dip {
     size_t i = start;
     // Parse parentheses from first '('
     for (; i < code.size(); ++i) {
-      if (code[i] == '(') depth++;
+      if (code[i] == '(')
+        depth++;
       else if (code[i] == ')') {
-	depth--;
-	if (depth == 0) break;
+        depth--;
+        if (depth == 0)
+          break;
       }
     }
     // No matching closing parenthesis
     if (depth != 0)
-      throw std::runtime_error("Expression contains unclosed parentheses: " + line.code);    
+      throw std::runtime_error("Expression contains unclosed parentheses: " + line.code);
     // Extract inside content
     std::string inside = code.substr(start + 1, i - start - 1);
     if (inside.empty())
-      throw std::runtime_error("Expression cannot be empty: " + line.code);    
+      throw std::runtime_error("Expression cannot be empty: " + line.code);
     value_raw.push_back(inside);
-    value_origin = ValueOrigin::Expression;    
+    value_origin = ValueOrigin::Expression;
     // Strip including leading whitespace + full "(...)"
     strip(code.substr(0, i + 1));
     return true;
@@ -505,8 +507,8 @@ namespace snt::dip {
     // Check delimiter, but don't strip yet
     if (delimiter != '\0') {
       if (code.empty() || code[0] != delimiter)
-	return false;
-    }    
+        return false;
+    }
     // Run regex on the correct substring
     std::string target = (delimiter != '\0') ? code.substr(1) : code;
     // In numerical expressions starting signs +-*/ have to be explicitely excluded
@@ -516,7 +518,7 @@ namespace snt::dip {
       units_raw = matchResult[1].str();
       // Now strip delimiter + match
       if (delimiter != '\0') {
-	strip(std::string(1, delimiter));
+        strip(std::string(1, delimiter));
       }
       strip(matchResult[0].str());
       return true;

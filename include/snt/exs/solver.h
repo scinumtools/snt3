@@ -2,6 +2,7 @@
 #define EXS_SOLVER_H
 
 #include <memory>
+#include <snt/core/settings.h>
 #include <snt/exs/operators/arithmetic.h>
 #include <snt/exs/operators/comparison.h>
 #include <snt/exs/operators/control.h>
@@ -11,7 +12,6 @@
 #include <snt/exs/settings.h>
 #include <snt/exs/step_list.h>
 #include <snt/exs/token_list.h>
-#include <snt/core/settings.h>
 #include <stdexcept>
 #include <unordered_map>
 

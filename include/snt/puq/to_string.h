@@ -1,8 +1,8 @@
 #ifndef PUQ_MATH_TO_STRING_H
 #define PUQ_MATH_TO_STRING_H
 
-#include <string>
 #include <snt/puq/measurement.h>
+#include <string>
 
 namespace snt::puq {
 

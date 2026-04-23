@@ -1,6 +1,5 @@
-#include <snt/core/math/exp.h>
-
 #include <cmath>
+#include <snt/core/math/exp.h>
 
 namespace snt::core::math {
 

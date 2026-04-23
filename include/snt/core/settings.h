@@ -34,6 +34,6 @@ namespace snt::core {
   constexpr std::string_view SYMBOL_ARRAY_END = "]";
   constexpr std::string_view SYMBOL_ARRAY_DELIMITER = ", ";
 
-} // namespace snt
+} // namespace snt::core
 
 #endif // SNT_SETTINGS_H

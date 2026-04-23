@@ -1,7 +1,7 @@
 #include <snt/puq/math/exp.h>
-#include <snt/puq/result.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
+#include <snt/puq/result.h>
 
 namespace snt::puq::math {
 
@@ -9,7 +9,7 @@ namespace snt::puq::math {
     // z ± Dz = pow(e, y ± Dy) -> Dz = pow(e, y) * log(e) * Dy
     if (res.uncertainty)
       return puq::Result(res.estimate->math_exp(),
-			 res.estimate->math_exp()->math_mul(res.uncertainty.get()));
+                         res.estimate->math_exp()->math_mul(res.uncertainty.get()));
     else
       return puq::Result(res.estimate->math_exp());
     // return puq::Result(exp(res.estimate), exp(res.estimate) * res.uncertainty);
@@ -19,12 +19,12 @@ namespace snt::puq::math {
     if (msr.baseunits.has_dimensions())
       throw std::runtime_error("Exponential function accepts only dimensionless quantities.");
     return puq::Measurement(exp(msr.result),
-			    msr.baseunits);
+                            msr.baseunits);
   }
 
   puq::Quantity exp(const puq::Quantity& quant) {
     return puq::Quantity(exp(quant.measurement),
-			 quant.stype);
+                         quant.stype);
   }
-  
+
 } // namespace snt::puq::math

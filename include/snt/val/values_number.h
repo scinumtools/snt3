@@ -1,9 +1,9 @@
 #ifndef VAL_VALUES_NUMBER_H
 #define VAL_VALUES_NUMBER_H
 
+#include <limits>
 #include <snt/val/values_array.h>
 #include <typeinfo>
-#include <limits>
 
 namespace snt::val {
 

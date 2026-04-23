@@ -1,8 +1,8 @@
 #ifndef VAL_MATH_TO_STRING_H
 #define VAL_MATH_TO_STRING_H
 
-#include <string>
 #include <snt/val/value_base.h>
+#include <string>
 
 namespace snt::val {
 

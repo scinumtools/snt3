@@ -1,10 +1,10 @@
 #ifndef PUQ_UNIT_VALUE_H
 #define PUQ_UNIT_VALUE_H
 
+#include <snt/puq/base_units.h>
 #include <snt/puq/exponent.h>
 #include <snt/puq/result.h>
 #include <snt/puq/settings.h>
-#include <snt/puq/base_units.h>
 
 namespace snt::puq {
 
@@ -63,7 +63,7 @@ namespace snt::puq {
     void operator-=(const Measurement& msr);
     void operator*=(const Measurement& msr);
     void operator/=(const Measurement& msr);
-    //void pow(const ExponentVariant& exp);
+    // void pow(const ExponentVariant& exp);
     Measurement convert(const Format::Base& format) const;
     Measurement convert(const std::string& str) const;
     Measurement convert(const BaseUnits& bun) const;

@@ -1,9 +1,9 @@
-#include <snt/puq/math/pow.h>
-#include <snt/puq/result.h>
-#include <snt/puq/measurement.h>
-#include <snt/puq/quantity.h>
 #include <snt/puq/base_units.h>
 #include <snt/puq/exponent.h>
+#include <snt/puq/math/pow.h>
+#include <snt/puq/measurement.h>
+#include <snt/puq/quantity.h>
+#include <snt/puq/result.h>
 
 namespace snt::puq::math {
 
@@ -11,11 +11,12 @@ namespace snt::puq::math {
     for (auto& unit : bu.baseunits) {
       unit.exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
         return a * b;
-      }, unit.exponent, exp);
+      },
+                                 unit.exponent, exp);
     }
     return bu;
   }
-    
+
   puq::Result pow(const puq::Result& res, const double exp) {
     // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
     if (res.uncertainty) {
@@ -51,7 +52,7 @@ namespace snt::puq::math {
 
   puq::Measurement pow(const puq::Measurement& msr, const double exp) {
     return puq::Measurement(pow(msr.result, exp),
-			    pow(msr.baseunits, exp));
+                            pow(msr.baseunits, exp));
   }
 
   puq::Measurement pow(const puq::Measurement& msr, const ExponentVariant& exp) {
@@ -59,24 +60,24 @@ namespace snt::puq::math {
     //          the exponent will be casted as a Measurement and calculation
     //          will loop infinitely
     return puq::Measurement(pow(msr.result, exponent_to_float(exp)),
-			    pow(msr.baseunits, exp));
+                            pow(msr.baseunits, exp));
   }
-  
+
   puq::Measurement pow(const puq::Measurement& msr1, const puq::Measurement& msr2) {
     if (msr2.baseunits.has_dimensions())
-      throw std::runtime_error("Exponent in the power function must be dimensionless quantity.");    
+      throw std::runtime_error("Exponent in the power function must be dimensionless quantity.");
     return puq::Measurement(pow(msr1.result, msr2.result),
-			    msr1.baseunits);
+                            msr1.baseunits);
   }
 
   puq::Quantity pow(const puq::Quantity& quant, const double exp) {
     return puq::Quantity(pow(quant.measurement, exp),
-			 quant.stype);
+                         quant.stype);
   }
-  
+
   puq::Quantity pow(const puq::Quantity& quant1, const puq::Quantity& quant2) {
     return puq::Quantity(pow(quant1.measurement, quant2.measurement),
-			 quant1.stype);
+                         quant1.stype);
   }
 
 } // namespace snt::puq::math

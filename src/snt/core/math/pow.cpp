@@ -1,6 +1,5 @@
-#include <snt/core/math/pow.h>
-
 #include <cmath>
+#include <snt/core/math/pow.h>
 
 namespace snt::core::math {
 

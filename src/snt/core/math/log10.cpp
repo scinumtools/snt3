@@ -1,6 +1,5 @@
-#include <snt/core/math/log10.h>
-
 #include <cmath>
+#include <snt/core/math/log10.h>
 
 namespace snt::core::math {
 

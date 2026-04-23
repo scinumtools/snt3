@@ -56,7 +56,7 @@ namespace snt::puq {
     inline constexpr std::string_view si_factor_start = "|"; ///< Starting symbol of an SI conversion factor (e.g. |A|)
     inline constexpr std::string_view si_factor_end = "|";   ///< Ending symbol of an SI conversion factor
   } // namespace Symbols
-  
+
 } // namespace snt::puq
 
 #endif // PUQ_SETTINGS_H

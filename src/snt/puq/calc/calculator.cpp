@@ -24,11 +24,11 @@ namespace snt::puq {
 
   CalculatorAtom Calculator::solve(const std::string& expression) {
     if constexpr (Config::debug_calculator) {
-      std::clog << "CALC:  Solving: " << expression << std::endl;
+      std::clog << "CALC:  Solving: " << expression << '\n';
     }
     CalculatorAtom ca = solver->solve((expression == "") ? "1" : expression);
     if constexpr (Config::debug_calculator) {
-      std::clog << "CALC:  Result:  " << ca.value.to_string() << std::endl;
+      std::clog << "CALC:  Result:  " << ca.value.to_string() << '\n';
     }
     return ca;
   }

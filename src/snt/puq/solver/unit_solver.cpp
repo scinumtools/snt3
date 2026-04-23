@@ -24,11 +24,11 @@ namespace snt::puq {
 
   UnitAtom UnitSolver::solve(const std::string& expression) {
     if constexpr (Config::debug_unit_solver) {
-      std::clog << "UNIT:  Solving: " << expression << std::endl;
+      std::clog << "UNIT:  Solving: " << expression << '\n';
     }
     UnitAtom ua = solver->solve((expression == "") ? "1" : expression);
     if constexpr (Config::debug_unit_solver) {
-      std::clog << "UNIT:  Result:  " << ua.value.to_string() << std::endl;
+      std::clog << "UNIT:  Result:  " << ua.value.to_string() << '\n';
     }
     return ua;
   }

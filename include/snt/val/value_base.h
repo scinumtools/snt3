@@ -71,7 +71,7 @@ namespace snt::val {
     virtual BaseValue::PointerType math_pow(const double exp) const { throw std::logic_error("method is not implemented for this type"); };
     virtual BaseValue::PointerType math_max(const BaseValue* other) const { throw std::logic_error("method is not implemented for this type"); };
     virtual BaseValue::PointerType math_min(const BaseValue* other) const { throw std::logic_error("method is not implemented for this type"); };
-    virtual BaseValue::PointerType math_inf() const {throw std::logic_error("method is not implemented for this type"); };
+    virtual BaseValue::PointerType math_inf() const { throw std::logic_error("method is not implemented for this type"); };
     // Comparison operators
     virtual BaseValue::PointerType compare_equal(const BaseValue* other) const { throw std::logic_error("method is not implemented for this type"); };
     virtual BaseValue::PointerType compare_not_equal(const BaseValue* other) const { throw std::logic_error("method is not implemented for this type"); };

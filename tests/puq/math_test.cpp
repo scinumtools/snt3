@@ -1,8 +1,9 @@
 #include "pch_tests.h"
-#include <snt/puq/result.h>
+
+#include <snt/puq/math.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
-#include <snt/puq/math.h>
+#include <snt/puq/result.h>
 #include <snt/puq/to_string.h>
 
 using namespace snt;
@@ -16,7 +17,7 @@ TEST(Math, Power) {
     // Base Units
     puq::BaseUnits bu0;
     puq::BaseUnits bu1("kg*m2/s2");
-    puq::Exponent exp(1,2);
+    puq::Exponent exp(1, 2);
     bu0 = puq::math::pow(bu1, exp);
     EXPECT_EQ(bu0.to_string(), "kg1:2*m*s-1");
   }
@@ -33,15 +34,15 @@ TEST(Math, Power) {
   {
     // Measurement
     puq::Measurement msr0;
-    puq::Measurement msr1(2.35, 0.04, "km2");  
+    puq::Measurement msr1(2.35, 0.04, "km2");
     puq::Measurement msr2(3.23, 0.07);
-    puq::ExponentVariant exp(puq::Exponent(1,2));
+    puq::ExponentVariant exp(puq::Exponent(1, 2));
     msr0 = puq::math::pow(msr1, 2);
-    EXPECT_EQ(msr0.to_string(), "5.52(19)*km4");    // est 5.522500000000001 unc 0.18800000347596324
-    msr0 = puq::math::pow(msr1, exp);		    
-    EXPECT_EQ(msr0.to_string(), "1.533(13)*km");    // est 1.5329709716755893 unc 0.013046561253560185
+    EXPECT_EQ(msr0.to_string(), "5.52(19)*km4"); // est 5.522500000000001 unc 0.18800000347596324
+    msr0 = puq::math::pow(msr1, exp);
+    EXPECT_EQ(msr0.to_string(), "1.533(13)*km"); // est 1.5329709716755893 unc 0.013046561253560185
     msr0 = puq::math::pow(msr1, msr2);
-    EXPECT_EQ(msr0.to_string(), "1.58(13)e1*km2");  // est 15.79607529212455 unc 1.2832583987008226
+    EXPECT_EQ(msr0.to_string(), "1.58(13)e1*km2"); // est 15.79607529212455 unc 1.2832583987008226
     try {
       puq::math::pow(msr1, msr1);
       FAIL() << "Expected std::runtime_error";
@@ -54,12 +55,12 @@ TEST(Math, Power) {
   {
     // Quantity   TODO: implement tests with different systems
     puq::Quantity quant0;
-    puq::Quantity quant1(2.34e4,56,"m2");
-    puq::Quantity quant2(2.1,0.1);
+    puq::Quantity quant1(2.34e4, 56, "m2");
+    puq::Quantity quant2(2.1, 0.1);
     quant0 = puq::math::pow(quant1, 2);
-    EXPECT_EQ(quant0.to_string(), "5.476(26)e8*m4");  // est 547560000 unc 2620820.999145508
+    EXPECT_EQ(quant0.to_string(), "5.476(26)e8*m4"); // est 547560000 unc 2620820.999145508
     quant0 = puq::math::pow(quant1, quant2);
-    EXPECT_EQ(quant0.to_string(), "1.5(15)e9*m2");    // est 1497453345.9230108 unc 1506531188.1869695
+    EXPECT_EQ(quant0.to_string(), "1.5(15)e9*m2"); // est 1497453345.9230108 unc 1506531188.1869695
   }
 }
 
@@ -104,7 +105,7 @@ TEST(Math, LogarithmNatural) {
     puq::Result res0;
     puq::Result res1(4.36, 0.16);
     res0 = puq::math::log(res1);
-    EXPECT_EQ(res0.to_string(), "1.472(37)");   // est 1.472472057360943 unc 0.03669724719657097
+    EXPECT_EQ(res0.to_string(), "1.472(37)"); // est 1.472472057360943 unc 0.03669724719657097
   }
   {
     // Measurement
@@ -112,7 +113,7 @@ TEST(Math, LogarithmNatural) {
     puq::Measurement msr1(7.23, 0.07);
     puq::Measurement msr2(2.35, 0.04, "km3");
     msr0 = puq::math::log(msr1);
-    EXPECT_EQ(msr0.to_string(), "1.9782(97)");  // est 1.9782390361706734 unc 0.009681881008027917
+    EXPECT_EQ(msr0.to_string(), "1.9782(97)"); // est 1.9782390361706734 unc 0.009681881008027917
     try {
       puq::math::log(msr2);
       FAIL() << "Expected std::runtime_error";
@@ -127,7 +128,7 @@ TEST(Math, LogarithmNatural) {
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::log(quant1);
-    EXPECT_EQ(quant0.to_string(), "8.54(17)e-1");  // est 0.8544153281560676 unc 0.01702127621072691
+    EXPECT_EQ(quant0.to_string(), "8.54(17)e-1"); // est 0.8544153281560676 unc 0.01702127621072691
   }
 }
 
@@ -146,7 +147,7 @@ TEST(Math, LogarithmDecadic) {
     puq::Measurement msr1(7.23, 0.07);
     puq::Measurement msr2(2.35, 0.04, "km3");
     msr0 = puq::math::log10(msr1);
-    EXPECT_EQ(msr0.to_string(), "8.591(42)e-1");  // est 0.8591382972945308 unc 0.00420478755147613
+    EXPECT_EQ(msr0.to_string(), "8.591(42)e-1"); // est 0.8591382972945308 unc 0.00420478755147613
     try {
       puq::math::log10(msr2);
       FAIL() << "Expected std::runtime_error";
@@ -161,10 +162,10 @@ TEST(Math, LogarithmDecadic) {
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::log10(quant1);
-    EXPECT_EQ(quant0.to_string(), "3.711(74)e-1");  // est 0.37106786227173627 unc 0.0073922463261766325
+    EXPECT_EQ(quant0.to_string(), "3.711(74)e-1"); // est 0.37106786227173627 unc 0.0073922463261766325
   }
 }
-  
+
 TEST(Math, CubicRoot) {
 
   {
@@ -172,21 +173,21 @@ TEST(Math, CubicRoot) {
     puq::Result res0;
     puq::Result res1(4.36, 0.16);
     res0 = puq::math::cbrt(res1);
-    EXPECT_EQ(res0.to_string(), "1.634(20)");       // est 1.633661834060757 unc 0.019983631105446875
+    EXPECT_EQ(res0.to_string(), "1.634(20)"); // est 1.633661834060757 unc 0.019983631105446875
   }
   {
     // Measurement
     puq::Measurement msr0;
     puq::Measurement msr1(2.35, 0.04, "km3");
     msr0 = puq::math::cbrt(msr1);
-    EXPECT_EQ(msr0.to_string(), "1.3295(75)*km");   // est 1.3295028952345866 unc 0.0075432788015916685
+    EXPECT_EQ(msr0.to_string(), "1.3295(75)*km"); // est 1.3295028952345866 unc 0.0075432788015916685
   }
   {
     // Quantity    TODO: implement tests with different systems
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::cbrt(quant1);
-    EXPECT_EQ(quant0.to_string(), "1.3295(75)");    // est 1.3295028952345866 unc 0.007543278712773827
+    EXPECT_EQ(quant0.to_string(), "1.3295(75)"); // est 1.3295028952345866 unc 0.007543278712773827
   }
 }
 
@@ -197,21 +198,21 @@ TEST(Math, SquareRoot) {
     puq::Result res0;
     puq::Result res1(4.36, 0.16);
     res0 = puq::math::sqrt(res1);
-    EXPECT_EQ(res0.to_string(), "2.088(38)");       // est 2.08806130178211 unc 0.03831305122048434
+    EXPECT_EQ(res0.to_string(), "2.088(38)"); // est 2.08806130178211 unc 0.03831305122048434
   }
   {
     // Measurement
     puq::Measurement msr0;
     puq::Measurement msr1(4.36, 0.16, "m2");
     msr0 = puq::math::sqrt(msr1);
-    EXPECT_EQ(msr0.to_string(), "2.088(38)*m");     // est 2.08806130178211 unc 0.03831305122048434
+    EXPECT_EQ(msr0.to_string(), "2.088(38)*m"); // est 2.08806130178211 unc 0.03831305122048434
   }
   {
     // Quantity    TODO: implement tests with different systems
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::sqrt(quant1);
-    EXPECT_EQ(quant0.to_string(), "1.533(13)");     // est 1.5329709716755893 unc 0.013046561253560185
+    EXPECT_EQ(quant0.to_string(), "1.533(13)"); // est 1.5329709716755893 unc 0.013046561253560185
   }
 }
 
@@ -222,7 +223,7 @@ TEST(Math, Sinus) {
     puq::Result res0;
     puq::Result res1(4.36, 0.16);
     res0 = puq::math::sin(res1);
-    EXPECT_EQ(res0.to_string(), "-9.39(55)e-1");   // est 0.9385508568851079 unc 0.055222547779010256
+    EXPECT_EQ(res0.to_string(), "-9.39(55)e-1"); // est 0.9385508568851079 unc 0.055222547779010256
   }
   {
     // Measurement
@@ -230,11 +231,11 @@ TEST(Math, Sinus) {
     puq::Measurement msr1(7.23, 0.07);
     puq::Measurement msr2(2.35, 0.04, "km3");
     msr0 = puq::math::sin(msr1);
-    EXPECT_EQ(msr0.to_string(), "8.12(41)e-1");  // est 0.8115585420741488 unc 0.040898975084413536
+    EXPECT_EQ(msr0.to_string(), "8.12(41)e-1"); // est 0.8115585420741488 unc 0.040898975084413536
     try {
       puq::math::sin(msr2);
       FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {  // TODO: should accept also radians
+    } catch (const std::runtime_error& e) { // TODO: should accept also radians
       EXPECT_STREQ(e.what(), "Sinus function accepts only dimensionless quantities.");
     } catch (...) {
       FAIL() << "Expected std::runtime_error";
@@ -245,7 +246,7 @@ TEST(Math, Sinus) {
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::sin(quant1);
-    EXPECT_EQ(quant0.to_string(), "7.11(28)e-1");  // est 0.7114733527908443 unc 0.02810852444135037
+    EXPECT_EQ(quant0.to_string(), "7.11(28)e-1"); // est 0.7114733527908443 unc 0.02810852444135037
   }
 }
 
@@ -256,7 +257,7 @@ TEST(Math, Cosinus) {
     puq::Result res0;
     puq::Result res1(4.36, 0.16);
     res0 = puq::math::cos(res1);
-    EXPECT_EQ(res0.to_string(), "-3.5(15)e-1");   // est -0.3451409698083231 unc 0.15016814032264847
+    EXPECT_EQ(res0.to_string(), "-3.5(15)e-1"); // est -0.3451409698083231 unc 0.15016814032264847
   }
   {
     // Measurement
@@ -264,11 +265,11 @@ TEST(Math, Cosinus) {
     puq::Measurement msr1(7.23, 0.07);
     puq::Measurement msr2(2.35, 0.04, "km3");
     msr0 = puq::math::cos(msr1);
-    EXPECT_EQ(msr0.to_string(), "5.84(57)e-1");  // est 0.5842711124011541 unc 0.0568091001573734
+    EXPECT_EQ(msr0.to_string(), "5.84(57)e-1"); // est 0.5842711124011541 unc 0.0568091001573734
     try {
       puq::math::cos(msr2);
       FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {  // TODO: should accept also radians
+    } catch (const std::runtime_error& e) { // TODO: should accept also radians
       EXPECT_STREQ(e.what(), "Cosinus function accepts only dimensionless quantities.");
     } catch (...) {
       FAIL() << "Expected std::runtime_error";
@@ -279,7 +280,7 @@ TEST(Math, Cosinus) {
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::cos(quant1);
-    EXPECT_EQ(quant0.to_string(), "-7.03(28)e-1");  // est -0.702713076773554 unc 0.028458932632702272
+    EXPECT_EQ(quant0.to_string(), "-7.03(28)e-1"); // est -0.702713076773554 unc 0.028458932632702272
   }
 }
 
@@ -290,7 +291,7 @@ TEST(Math, Tangens) {
     puq::Result res0;
     puq::Result res1(4.36, 0.16);
     res0 = puq::math::tan(res1);
-    EXPECT_EQ(res0.to_string(), "2.7(13)");   // est 2.7193261275424354 unc 1.3431579027667342
+    EXPECT_EQ(res0.to_string(), "2.7(13)"); // est 2.7193261275424354 unc 1.3431579027667342
   }
   {
     // Measurement
@@ -298,11 +299,11 @@ TEST(Math, Tangens) {
     puq::Measurement msr1(7.23, 0.07);
     puq::Measurement msr2(2.35, 0.04, "km3");
     msr0 = puq::math::tan(msr1);
-    EXPECT_EQ(msr0.to_string(), "1.39(21)");  // est 1.3890102126372825 unc 0.20505448494745337
+    EXPECT_EQ(msr0.to_string(), "1.39(21)"); // est 1.3890102126372825 unc 0.20505448494745337
     try {
       puq::math::tan(msr2);
       FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {  // TODO: should accept also radians
+    } catch (const std::runtime_error& e) { // TODO: should accept also radians
       EXPECT_STREQ(e.what(), "Tangens function accepts only dimensionless quantities.");
     } catch (...) {
       FAIL() << "Expected std::runtime_error";
@@ -314,7 +315,7 @@ TEST(Math, Tangens) {
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::tan(quant1);
-    EXPECT_EQ(quant0.to_string(), "-1.012(81)");  // est -1.0124663625978223 unc 0.08100351713835607
+    EXPECT_EQ(quant0.to_string(), "-1.012(81)"); // est -1.0124663625978223 unc 0.08100351713835607
   }
 }
 
@@ -420,7 +421,7 @@ TEST(Math, Floor) {
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::floor(quant1);
-    EXPECT_EQ(quant0.to_string(), "2"); 
+    EXPECT_EQ(quant0.to_string(), "2");
   }
 }
 
@@ -445,7 +446,7 @@ TEST(Math, Ceil) {
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::ceil(quant1);
-    EXPECT_EQ(quant0.to_string(), "3"); 
+    EXPECT_EQ(quant0.to_string(), "3");
   }
 }
 
@@ -476,6 +477,6 @@ TEST(Math, Round) {
     puq::Quantity quant0;
     puq::Quantity quant1(2.35, 0.04);
     quant0 = puq::math::round(quant1);
-    EXPECT_EQ(quant0.to_string(), "2"); 
+    EXPECT_EQ(quant0.to_string(), "2");
   }
 }

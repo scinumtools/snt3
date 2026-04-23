@@ -3,13 +3,13 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
-#include <snt/puq/math.h>
-#include <snt/core/to_string.h>
 #include <snt/core/math.h>
-#include <snt/puq/to_string.h>
+#include <snt/core/to_string.h>
+#include <snt/puq/dimensions.h>
+#include <snt/puq/math.h>
 #include <snt/puq/solver/unit_solver.h>
 #include <snt/puq/systems/unit_system.h>
-#include <snt/puq/dimensions.h>
+#include <snt/puq/to_string.h>
 #include <sstream>
 #include <sys/stat.h>
 

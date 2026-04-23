@@ -4,8 +4,8 @@
 #include <snt/puq/exceptions.h>
 #include <snt/puq/math/log10.h>
 #include <snt/puq/math/pow.h>
-#include <snt/puq/solver/unit_solver.h>
 #include <snt/puq/measurement.h>
+#include <snt/puq/solver/unit_solver.h>
 #include <sstream>
 
 namespace snt::puq {
@@ -267,12 +267,12 @@ namespace snt::puq {
     return os;
   }
 
-  //void Measurement::pow(const ExponentVariant& exp) {
-  //  result.pow(exp);
-  //  // TODO: should be pow() instead of *=
-  //  // result = std::pow(result, (double)e);
-  //  baseunits *= exp;
-  //}
+  // void Measurement::pow(const ExponentVariant& exp) {
+  //   result.pow(exp);
+  //   // TODO: should be pow() instead of *=
+  //   // result = std::pow(result, (double)e);
+  //   baseunits *= exp;
+  // }
 
   Measurement Measurement::convert(const std::string& str) const {
     Measurement msr = Measurement(str);

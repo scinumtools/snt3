@@ -37,7 +37,7 @@ namespace snt::dip {
      * @return True if literal was successfully parsed; otherwise, false.
      */
     bool part_literal_boolean(const std::string& str);
-    
+
     /**
      * @brief Parse literal string values from a string
      *
@@ -45,7 +45,7 @@ namespace snt::dip {
      * @return True if literal was successfully parsed; otherwise, false.
      */
     bool part_literal_string(const std::string& str);
-    
+
     /**
      * @brief Parse literal integer values from a string
      *
@@ -61,7 +61,7 @@ namespace snt::dip {
      * @return True if literal was successfully parsed; otherwise, false.
      */
     bool part_literal_float(const std::string& str);
-    
+
     /**
      * @brief Parse literal units values from a string
      *
@@ -69,7 +69,7 @@ namespace snt::dip {
      * @return True if literal was successfully parsed; otherwise, false.
      */
     bool part_literal_units(const std::string& str);
-    
+
   public:
     /**
      * @brief Parse literal node values from a string
@@ -77,7 +77,7 @@ namespace snt::dip {
      * @return True if literal was successfully parsed; otherwise, false.
      */
     bool part_literal();
-    
+
     bool part_dimension();
     bool part_equal(const bool required = true);
     bool part_reference();
@@ -109,7 +109,7 @@ namespace snt::dip {
      * @return True if the value was successfully parsed; otherwise, false.
      */
     bool part_value();
-    
+
     bool part_slice();
     bool part_format();
 

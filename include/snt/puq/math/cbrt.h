@@ -6,7 +6,7 @@ namespace snt::puq {
   class Result;
   class Measurement;
   class Quantity;
-}
+} // namespace snt::puq
 
 namespace snt::puq::math {
 

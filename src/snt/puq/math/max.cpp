@@ -1,7 +1,7 @@
 #include <snt/puq/math/max.h>
-#include <snt/puq/result.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
+#include <snt/puq/result.h>
 
 namespace snt::puq::math {
 
@@ -28,13 +28,13 @@ namespace snt::puq::math {
     puq::Dimensions dim1 = msr1.baseunits.dimensions();
     puq::Dimensions dim2 = msr2.baseunits.dimensions();
     if (dim1.has_dimensions() && dim2.has_dimensions()) {
-      if (dim1==dim2) {
-	return puq::Measurement(max(msr1.result, msr2.result),
-				msr1.baseunits);
+      if (dim1 == dim2) {
+        return puq::Measurement(max(msr1.result, msr2.result),
+                                msr1.baseunits);
       } else {
-	puq::Measurement msr3 = msr2.convert(msr1.baseunits);
-	return puq::Measurement(max(msr1.result, msr3.result),
-				msr1.baseunits);
+        puq::Measurement msr3 = msr2.convert(msr1.baseunits);
+        return puq::Measurement(max(msr1.result, msr3.result),
+                                msr1.baseunits);
       }
     } else if (dim1.has_dimensions() || dim2.has_dimensions()) {
       throw std::runtime_error("Cannot convert between dimensional and dimensionless quantities.");
@@ -45,7 +45,7 @@ namespace snt::puq::math {
 
   puq::Quantity max(const puq::Quantity& quant1, const puq::Quantity& quant2) {
     return puq::Quantity(max(quant1.measurement, quant2.measurement),
-			 quant1.stype);
+                         quant1.stype);
   }
 
 } // namespace snt::puq::math

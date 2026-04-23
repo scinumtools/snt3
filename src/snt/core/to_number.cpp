@@ -1,7 +1,7 @@
 #include "to_number.h"
 
-#include <typeinfo>
 #include <stdexcept>
+#include <typeinfo>
 
 namespace snt::core {
 

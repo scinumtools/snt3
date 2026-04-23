@@ -1,6 +1,5 @@
-#include <snt/core/math/cbrt.h>
-
 #include <cmath>
+#include <snt/core/math/cbrt.h>
 
 namespace snt::core::math {
 

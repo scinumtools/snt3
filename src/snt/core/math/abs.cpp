@@ -1,6 +1,5 @@
-#include <snt/core/math/abs.h>
-
 #include <cmath>
+#include <snt/core/math/abs.h>
 
 namespace snt::core::math {
 

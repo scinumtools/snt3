@@ -63,11 +63,12 @@ int main(int argc, char* argv[]) {
   } else if (input.cmdOptionExists("-v")) {
     std::cout << CODE_VERSION << '\n';
     exit(0);
-  }  
-  
+  }
+
   try {
     std::deque<std::string> convert;
     dip::DIP d;
+    // TODO: add multiple files, strings, sources and custom units
     convert = input.getCmdOption("--add-file", 2);
     if (!convert.empty()) {
       d.add_file(convert[0]);
@@ -76,6 +77,7 @@ int main(int argc, char* argv[]) {
     if (!convert.empty()) {
       d.add_string(convert[0]);
     }
+    // TODO: don't parse if no files, or strings added
     dip::Environment env = d.parse();
     dip::ValueNode::ListType vnodes;
     convert = input.getCmdOption("--request", 2);
@@ -84,22 +86,21 @@ int main(int argc, char* argv[]) {
     } else {
       vnodes = env.request_nodes("?");
     }
+    // TODO: implement tag selectors
+    // TODO: print can have an argument: format
     if (input.cmdOptionExists("--print")) {
-      for (size_t i=0; i<vnodes.size(); i++) {
-	dip::ValueNode::PointerType node = vnodes.at(i);
-	std::cout << node->name << " = " << node->to_string() << std::endl;
+      for (const auto& node : vnodes) {
+        std::cout << node->name << " = " << node->to_string() << '\n';
       }
     }
     if (input.cmdOptionExists("--print-values")) {
-      for (size_t i=0; i<vnodes.size(); i++) {
-	dip::ValueNode::PointerType node = vnodes.at(i);
-	std::cout << node->to_string() << std::endl;
+      for (const auto& node : vnodes) {
+        std::cout << node->to_string() << '\n';
       }
     }
+    // TODO: implement exports to other languages: yaml, toml, c/c++, fortran,...
+    // TODO: implement output into a file
   } catch (std::exception& e) {
     std::cout << e.what() << '\n';
   }
-
-
-  
 }

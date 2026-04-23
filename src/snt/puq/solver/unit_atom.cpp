@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <regex>
+#include <snt/core/to_number.h>
 #include <snt/puq/math/pow.h>
 #include <snt/puq/solver/unit_atom.h>
 #include <snt/puq/systems/unit_system.h>
-#include <snt/core/to_number.h>
 #include <sstream>
 
 namespace snt::puq {
@@ -130,7 +130,7 @@ namespace snt::puq {
     }
     value = math::pow(value, e);
     if constexpr (Config::debug_unit_solver) {
-      std::clog << value.to_string() << std::endl;
+      std::clog << value.to_string() << '\n';
     }
   }
 
@@ -140,7 +140,7 @@ namespace snt::puq {
     }
     value *= other->value;
     if constexpr (Config::debug_unit_solver) {
-      std::clog << value.to_string() << std::endl;
+      std::clog << value.to_string() << '\n';
     }
   }
 
@@ -150,7 +150,7 @@ namespace snt::puq {
     }
     value /= other->value;
     if constexpr (Config::debug_unit_solver) {
-      std::clog << value.to_string() << std::endl;
+      std::clog << value.to_string() << '\n';
     }
   }
 

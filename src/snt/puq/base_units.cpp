@@ -1,11 +1,11 @@
 #include <fstream>
 #include <iostream>
+#include <snt/puq/base_units.h>
 #include <snt/puq/exceptions.h>
 #include <snt/puq/math/pow.h>
-#include <snt/puq/to_string.h>
 #include <snt/puq/settings.h>
 #include <snt/puq/solver/unit_solver.h>
-#include <snt/puq/base_units.h>
+#include <snt/puq/to_string.h>
 #include <sstream>
 #include <string>
 
@@ -82,7 +82,8 @@ namespace snt::puq {
     for (auto unit : bu) {
       unit.exponent = std::visit([](auto const& v) -> ExponentVariant {
         return -v;
-      }, unit.exponent);
+      },
+                                 unit.exponent);
       append(unit);
     }
   }
@@ -91,29 +92,29 @@ namespace snt::puq {
     return bu1;
   }
 
-  //void BaseUnits::operator*=(const ExponentVariant& exp) {
-  //  for (auto& unit : baseunits) {
-  //    unit.exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
-  //      return a * b;
-  //    }, unit.exponent, exp);
-  //  }
-  //}
-  //BaseUnits operator*(BaseUnits bu, const ExponentVariant& exp) {
-  //  bu *= exp;
-  //  return bu;
-  //}
+  // void BaseUnits::operator*=(const ExponentVariant& exp) {
+  //   for (auto& unit : baseunits) {
+  //     unit.exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+  //       return a * b;
+  //     }, unit.exponent, exp);
+  //   }
+  // }
+  // BaseUnits operator*(BaseUnits bu, const ExponentVariant& exp) {
+  //   bu *= exp;
+  //   return bu;
+  // }
   //
-  //void BaseUnits::operator/=(const ExponentVariant& exp) {
-  //  for (auto& unit : baseunits) {
-  //    unit.exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
-  //      return a / b;
-  //    }, unit.exponent, exp);
-  //  }
-  //}
-  //BaseUnits operator/(BaseUnits bu, const ExponentVariant& exp) {
-  //  bu /= exp;
-  //  return bu;
-  //}
+  // void BaseUnits::operator/=(const ExponentVariant& exp) {
+  //   for (auto& unit : baseunits) {
+  //     unit.exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
+  //       return a / b;
+  //     }, unit.exponent, exp);
+  //   }
+  // }
+  // BaseUnits operator/(BaseUnits bu, const ExponentVariant& exp) {
+  //   bu /= exp;
+  //   return bu;
+  // }
 
   std::ostream& operator<<(std::ostream& os, const BaseUnits& bu) {
     os << bu.to_string();
@@ -138,7 +139,7 @@ namespace snt::puq {
     Dimensions dims = dimensions();
     return dims.has_dimensions();
   }
-  
+
   Dimensions BaseUnits::dimensions() const {
     Dimensions dim;
     dim.symbols.reserve(baseunits.size());

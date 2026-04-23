@@ -28,7 +28,7 @@ namespace snt::puq {
     }
     value += other->value;
     if constexpr (Config::debug_calculator) {
-      std::clog << ss.str() << value.to_string() << std::endl;
+      std::clog << ss.str() << value.to_string() << '\n';
     }
   }
 
@@ -39,7 +39,7 @@ namespace snt::puq {
     }
     value -= other->value;
     if constexpr (Config::debug_calculator) {
-      std::clog << ss.str() << value.to_string() << std::endl;
+      std::clog << ss.str() << value.to_string() << '\n';
     }
   }
 
@@ -49,7 +49,7 @@ namespace snt::puq {
     }
     value = -value;
     if constexpr (Config::debug_calculator) {
-      std::clog << value.to_string() << std::endl;
+      std::clog << value.to_string() << '\n';
     }
   }
 
@@ -59,7 +59,7 @@ namespace snt::puq {
     }
     value *= other->value;
     if constexpr (Config::debug_calculator) {
-      std::clog << value.to_string() << std::endl;
+      std::clog << value.to_string() << '\n';
     }
   }
 
@@ -69,7 +69,7 @@ namespace snt::puq {
     }
     value /= other->value;
     if constexpr (Config::debug_calculator) {
-      std::clog << value.to_string() << std::endl;
+      std::clog << value.to_string() << '\n';
     }
   }
 

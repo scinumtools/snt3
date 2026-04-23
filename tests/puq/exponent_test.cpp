@@ -71,13 +71,13 @@ TEST(Exponent, ArithmeticsIntegers) {
   a += b;
   EXPECT_EQ(a.to_string(), "3");
 
-  a -= b;   // 3 - 1 = 2
+  a -= b; // 3 - 1 = 2
   EXPECT_EQ(a.to_string(), "2");
 
-  a *= 2;   // 2 * 2 = 4
+  a *= 2; // 2 * 2 = 4
   EXPECT_EQ(a.to_string(), "4");
 
-  a /= 2;   // 4 / 2 = 2
+  a /= 2; // 4 / 2 = 2
   EXPECT_EQ(a.to_string(), "2");
 }
 
@@ -89,12 +89,12 @@ TEST(Exponent, ArithmeticsFractions) {
   a += b;
   EXPECT_EQ(a.to_string(), "5:6");
 
-  a -= b;   // 5:6 - 1:6 = 4:6 = 2:3
+  a -= b; // 5:6 - 1:6 = 4:6 = 2:3
   EXPECT_EQ(a.to_string(), "2:3");
 
-  a *= 2;   // 2:3 * 2  = 4:3
+  a *= 2; // 2:3 * 2  = 4:3
   EXPECT_EQ(a.to_string(), "4:3");
 
-  a *= b;   // 4:3 * 1:6  = 4:18 = 2:9
+  a *= b; // 4:3 * 1:6  = 4:18 = 2:9
   EXPECT_EQ(a.to_string(), "2:9");
 }

@@ -1,8 +1,8 @@
 #include <snt/puq/exponent.h>
 #include <snt/puq/math/log.h>
-#include <snt/puq/result.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
+#include <snt/puq/result.h>
 
 namespace snt::puq::math {
 
@@ -19,12 +19,12 @@ namespace snt::puq::math {
     if (msr.baseunits.has_dimensions())
       throw std::runtime_error("Natural logarithm accepts only dimensionless quantities.");
     return puq::Measurement(log(msr.result),
-			    msr.baseunits);
+                            msr.baseunits);
   }
 
   puq::Quantity log(const puq::Quantity& quant) {
     return puq::Quantity(log(quant.measurement),
-			 quant.stype);
+                         quant.stype);
   }
-  
+
 } // namespace snt::puq::math

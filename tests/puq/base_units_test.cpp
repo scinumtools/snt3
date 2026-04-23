@@ -103,7 +103,6 @@ TEST(BaseUnits, HasDimensions) {
   EXPECT_FALSE(bus.has_dimensions());
 }
 
-
 TEST(BaseUnits, Arithmetics) {
 
   puq::BaseUnits bus0;
@@ -121,7 +120,6 @@ TEST(BaseUnits, Arithmetics) {
   bus0 = puq::math::pow(bus1, 2);
   EXPECT_EQ(bus0.to_string(), "kg2*m4*s-4");
 
-  bus0 = puq::math::pow(bus1, puq::Exponent(1,2));
+  bus0 = puq::math::pow(bus1, puq::Exponent(1, 2));
   EXPECT_EQ(bus0.to_string(), "kg1:2*m*s-1");
-  
 }
