@@ -3,6 +3,7 @@
 
 #include <snt/val/values_array.h>
 #include <typeinfo>
+#include <limits>
 
 namespace snt::val {
 
@@ -133,6 +134,9 @@ namespace snt::val {
     BaseValue::PointerType math_ceil() const override {
       return this->template operate_unary<T>([](T a) { return std::ceil(a); });
     };
+    BaseValue::PointerType math_round() const override {
+      return this->template operate_unary<T>([](T a) { return std::round(a); });
+    };
     BaseValue::PointerType math_abs() const override {
       if constexpr (std::is_same_v<T, uint16_t> || std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>) {
         throw std::runtime_error("Absolute value is not implemented for unsigned integers");
@@ -195,13 +199,16 @@ namespace snt::val {
     BaseValue::PointerType math_pow(const double exp) const override {
       return this->template operate_unary<T>([&exp](T a) { return std::pow(a, exp); });
     };
-    // maximum
+    // maximum / minimum
     BaseValue::PointerType math_max(const BaseValue* other) const override {
       return this->template operate_binary<T>(other, [](T a, T b) { return std::max(a, b); });
     };
-    // minimum
     BaseValue::PointerType math_min(const BaseValue* other) const override {
       return this->template operate_binary<T>(other, [](T a, T b) { return std::min(a, b); });
+    };
+    // extremems
+    BaseValue::PointerType math_inf() const override {
+      return this->template operate_unary<T>([](T a) { return std::numeric_limits<T>::infinity(); });
     };
     // logical
     BaseValue::PointerType logical_and(const BaseValue* other) const override {

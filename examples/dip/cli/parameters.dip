@@ -1,0 +1,7 @@
+family
+  father float = 184 cm
+  mother float = 161 cm
+  children int = 2
+    son float = 112 cm
+    daughter float = 98 cm
+  members float = ({?family.children} + 2)

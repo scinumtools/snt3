@@ -19,7 +19,7 @@ namespace snt::puq::math {
 
   puq::Measurement log10(const puq::Measurement& msr) {
     if (msr.baseunits.has_dimensions())
-      throw std::runtime_error("Logarithmic function accepts only dimmensionless quatntities.");
+      throw std::runtime_error("Decadic logarithm accepts only dimensionless quantities.");
     return puq::Measurement(log10(msr.result),
 			    msr.baseunits);
   }

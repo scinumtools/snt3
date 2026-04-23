@@ -64,7 +64,7 @@ namespace snt::puq::math {
   
   puq::Measurement pow(const puq::Measurement& msr1, const puq::Measurement& msr2) {
     if (msr2.baseunits.has_dimensions())
-      throw std::runtime_error("Exponent in the power function must be dimmensionless.");    
+      throw std::runtime_error("Exponent in the power function must be dimensionless quantity.");    
     return puq::Measurement(pow(msr1.result, msr2.result),
 			    msr1.baseunits);
   }

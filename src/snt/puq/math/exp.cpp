@@ -17,7 +17,7 @@ namespace snt::puq::math {
 
   puq::Measurement exp(const puq::Measurement& msr) {
     if (msr.baseunits.has_dimensions())
-      throw std::runtime_error("Exponential function accepts only dimmensionless quatntities.");
+      throw std::runtime_error("Exponential function accepts only dimensionless quantities.");
     return puq::Measurement(exp(msr.result),
 			    msr.baseunits);
   }

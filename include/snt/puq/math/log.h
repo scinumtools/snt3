@@ -11,7 +11,7 @@ namespace snt::puq::math {
 
   extern puq::Result log(const puq::Result& res);
   extern puq::Measurement log(const puq::Measurement& msr);
-  extern puq::Quantity quant(const puq::Quantity& quant);
+  extern puq::Quantity log(const puq::Quantity& quant);
 
 } // namespace snt::puq::math
 

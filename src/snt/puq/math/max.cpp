@@ -8,7 +8,7 @@ namespace snt::puq::math {
   extern puq::Result max(const puq::Result& res1, const puq::Result& res2) {
     // x ± Dx = max(x ± Dx, y ± Dy)  <- if x > y
     // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
-    // TODO: this implementation is fishy, need a check
+    // TODO: this implementation is fishy, need a check, or a Monte Carlo propagation
     val::BaseValue::PointerType estimate = res1.estimate->math_max(res2.estimate.get());
     if (res1.uncertainty && res2.uncertainty) {
       val::BaseValue::PointerType new_uncertainty = res1.uncertainty->where(estimate->compare_equal(res1.estimate.get()).get(), res2.uncertainty.get());
@@ -33,7 +33,6 @@ namespace snt::puq::math {
 				msr1.baseunits);
       } else {
 	puq::Measurement msr3 = msr2.convert(msr1.baseunits);
-	std::cout << msr3.to_string() << std::endl;
 	return puq::Measurement(max(msr1.result, msr3.result),
 				msr1.baseunits);
       }
