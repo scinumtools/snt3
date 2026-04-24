@@ -101,7 +101,7 @@ The target units should be placed after the expression parentheses end.
 ``` DIPL
 const
    c float = 299792458 m/s
-energy float = (2 kg * pow({?const.c},2)) eV
+energy float = (2 kg * pow( {?const.c}, 2 )) eV
 
 # Node 'energy' will be parsed as 1.79751 eV
 ```
@@ -128,21 +128,31 @@ Most of the following operators require, that the final value has no dimensions.
 
 **Parentheses operators**
 
-| Syntax               | Priority | Description                                                                   |
-|----------------------|----------|-------------------------------------------------------------------------------|
-| `\(<expr>)`          | 1        | Standard parenthesis operator                                                 |
-| `exp(<expr>)`        | 1        | Returns exponential value of a dimensionless expression.                      |
-| `pow(<expr>,<expr>)` | 1        | Returns first expression risen on a power of second dimensionless expression. |
-| `ln(<expr>)`         | 1        | Returns natural logarithmic value of a dimensionless expression.              |
-| `log10(<expr>)`      | 1        | Returns common logarithmic value of a dimmensionless expression.              |
-| `sin(<expr>)`        | 1        | Returns sine value of a dimensionless expression.                             |
-| `cos(<expr>)`        | 1        | Returns cosine value of a dimensionless expression.                           |
-       
+| Syntax                  | Priority | Description                                                                   |
+|-------------------------|----------|-------------------------------------------------------------------------------|
+| `( <expr> )`            | 1        | Standard parenthesis operator                                                 |
+| `exp( <expr> )`         | 1        | Returns exponential value of a dimensionless expression.                      |
+| `pow( <expr>, <expr> )` | 1        | Returns first expression risen on a power of second dimensionless expression. |
+| `ln( <expr> )`          | 1        | Returns natural logarithmic value of a dimensionless expression.              |
+| `log10( <expr> )`       | 1        | Returns common logarithmic value of a dimmensionless expression.              |
+| `sin( <expr> )`         | 1        | Returns sine value of a dimensionless expression.                             |
+| `cos( <expr> )`         | 1        | Returns cosine value of a dimensionless expression.                           |
+| `tan( <expr> )`         | 1        | Returns tangens value of a dimensionless expression.                          |
+| `min( <expr>, <expr> )` | 1        | Returns minimum of the two expressions.                                       |
+| `max( <expr>, <expr> )` | 1        | Returns maximum of the two expressions.                                       |
+| `floor( <expr> )`       | 1        | Returns the greatest integer less than or equal to the expression             |
+| `ceil( <expr> )`        | 1        | Returns the smallest integer greater than or equal to the expression          |
+| `round( <expr> )`       | 1        | Returns the closest integer or equal to the expression                        |
+
+> [!NOTE]
+> Unlike the outer parentheses that define an expression, the inner parentheses must contain at least one whitespace separating the enclosed content. 
+> For example, `exp(2 cm)` is invalid, whereas `exp( 2 cm )` is valid.
+	   
 ### 3.5.3. Templates
 
-Templates are used to parse node values into a text form.
-They look as a normal string values, but with an `f` before the openning quotation symbol.
-All value types can be parsed into text using standard python formatting notation.
+Templates, or formatted text values, are used to convert node values into a textual representation.
+They follow the same syntax as standard string values, but are prefixed with an `f` before the opening quotation mark.
+All value types can be embedded into the text using standard Python-style formatting notation.
 
 ``` DIPL
 id int = 345
