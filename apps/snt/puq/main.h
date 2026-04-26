@@ -1,5 +1,7 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef APPS_SNT_PUQ_MAIN_H
+#define APPS_SNT_PUQ_MAIN_H
+
+#include "../argparser.h"
 
 #include <exception>
 #include <iomanip>
@@ -10,9 +12,10 @@
 #include <snt/puq/quantity.h>
 #include <snt/puq/util/data_table.h>
 
-using namespace snt;
+namespace snt::cli {
+  
+  void puq_main(ArgParser& argpar);
 
-void display_info(const std::string& expr);
-void display_lists(std::deque<std::string>& convert);
-
-#endif // MAIN_H
+}
+  
+#endif // APPS_SNT_PUQ_MAIN_H
