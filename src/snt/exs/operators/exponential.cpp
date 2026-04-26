@@ -71,7 +71,7 @@ namespace snt::exs {
 
   // power
 
-  OperatorPower::OperatorPower(std::string s) : OperatorBase("pow", s, POWER_OPERATOR) {
+  OperatorPower::OperatorPower(std::string s) : OperatorBase("pow", std::move(s), POWER_OPERATOR) {
   }
 
   void OperatorPower::operate_binary(TokenListBase* tokens) {

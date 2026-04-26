@@ -12,7 +12,7 @@ namespace snt::exs {
   };
 
   void OperatorList::append(int t, std::shared_ptr<OperatorBase> o) {
-    operators[t] = o;
+    operators[t] = std::move(o);
     order.push_back(t);
   };
 

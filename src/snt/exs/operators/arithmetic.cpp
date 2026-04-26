@@ -4,7 +4,7 @@ namespace snt::exs {
 
   // add
 
-  OperatorAdd::OperatorAdd(std::string s) : OperatorBase("add", s, ADD_OPERATOR) {
+  OperatorAdd::OperatorAdd(std::string s) : OperatorBase("add", std::move(s), ADD_OPERATOR) {
   }
 
   void OperatorAdd::operate_unary(TokenListBase* tokens) {
@@ -44,7 +44,7 @@ namespace snt::exs {
 
   // subtract
 
-  OperatorSubtract::OperatorSubtract(std::string s) : OperatorBase("sub", s, SUBTRACT_OPERATOR) {
+  OperatorSubtract::OperatorSubtract(std::string s) : OperatorBase("sub", std::move(s), SUBTRACT_OPERATOR) {
   }
 
   void OperatorSubtract::operate_unary(TokenListBase* tokens) {
@@ -79,7 +79,7 @@ namespace snt::exs {
 
   // multiply
 
-  OperatorMultiply::OperatorMultiply(std::string s) : OperatorBase("mul", s, MULTIPLY_OPERATOR) {
+  OperatorMultiply::OperatorMultiply(std::string s) : OperatorBase("mul", std::move(s), MULTIPLY_OPERATOR) {
   }
 
   void OperatorMultiply::operate_binary(TokenListBase* tokens) {
@@ -91,7 +91,7 @@ namespace snt::exs {
 
   // divide
 
-  OperatorDivide::OperatorDivide(std::string s) : OperatorBase("div", s, DIVIDE_OPERATOR) {
+  OperatorDivide::OperatorDivide(std::string s) : OperatorBase("div", std::move(s), DIVIDE_OPERATOR) {
   }
 
   void OperatorDivide::operate_binary(TokenListBase* tokens) {
@@ -103,7 +103,7 @@ namespace snt::exs {
 
   // modulo
 
-  OperatorModulo::OperatorModulo(std::string s) : OperatorBase("mod", s, MODULO_OPERATOR) {
+  OperatorModulo::OperatorModulo(std::string s) : OperatorBase("mod", std::move(s), MODULO_OPERATOR) {
   }
 
   void OperatorModulo::operate_binary(TokenListBase* tokens) {

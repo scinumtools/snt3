@@ -3,7 +3,7 @@
 
 namespace snt::exs {
 
-  Expression::Expression(std::string expression) {
+  Expression::Expression(const std::string& expression) {
     left = "";
     right = expression;
     expr = expression;
@@ -14,7 +14,7 @@ namespace snt::exs {
     right = right.substr(nchar, right.length());
   };
 
-  void Expression::remove(std::string string) {
+  void Expression::remove(const std::string& string) {
     right = right.substr(string.length(), right.length());
   };
 
@@ -31,7 +31,7 @@ namespace snt::exs {
   }
 
   void Expression::print() {
-    std::cout << to_string() << std::endl;
+    std::cout << to_string() << '\n';
   };
 
 } // namespace snt::exs

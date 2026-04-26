@@ -17,3 +17,8 @@ endif()
 if (ENABLE_MAT AND ENABLE_MAT_GTEST) 
    add_subdirectory(mat)  
 endif()
+
+if (ENABLE_DIP AND ENABLE_DIP_GTEST
+    AND ENABLE_PUQ AND ENABLE_PUQ_GTEST)
+   add_subdirectory(cli)
+endif()

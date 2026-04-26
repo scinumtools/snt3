@@ -65,33 +65,31 @@ Examples:
   
   void puq_main(ArgParser& argpar) {
   
-    if (argpar.has("-h") || !argpar.hasArguments()) {
+    std::vector<std::string> values = argpar.positionals();
+    std::deque<std::string> arguments;
+    std::string command;
+    
+    if (argpar.has("-h") || values.size()<=2) {
       std::cout << puq_help();
+      exit(0);
+    } else {
+      command = values[1];
+      arguments = std::deque(values.begin()+2, values.end());
     }
     try {
-      std::vector<std::string> values;
-      std::deque<std::string> arguments;
       puq::UnitSystem us(puq::SystemType::SI);
-      values = argpar.getAll("info");
-      if (!values.empty()) {
-	arguments = std::deque(values.begin(), values.end());
+      if (command=="info") {
 	change_system(us, arguments);
 	display_info(arguments[0]);
       }
-      values = argpar.getAll("solve");
-      if (!values.empty()) {
-	arguments = std::deque(values.begin(), values.end());
+      if (command=="solve") {
 	change_system(us, arguments);
 	command_solve(arguments);
       }
-      values = argpar.getAll("arguments");
-      if (!values.empty()) {
-	arguments = std::deque(values.begin(), values.end());
+      if (command=="convert") {
 	command_convert(arguments);
       }
-      values = argpar.getAll("list");
-      if (!values.empty()) {
-	arguments = std::deque(values.begin(), values.end());
+      if (command=="list") {
 	change_system(us, arguments);
 	if constexpr (!puq::Config::use_units_logarithmic) {
 	  if (arguments[0] == "log") {

@@ -12,9 +12,9 @@ namespace snt::exs {
     std::string left;  // left side
     std::string right; // right side
     std::string expr;  // original expression
-    Expression(std::string expression);
+    Expression(const std::string& expression);
     void shift(int nchar = 1);
-    void remove(std::string string);
+    void remove(const std::string& string);
     std::string pop_left();
     std::string to_string();
     void print();

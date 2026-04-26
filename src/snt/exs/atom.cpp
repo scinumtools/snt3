@@ -2,7 +2,7 @@
 
 namespace snt::exs {
 
-  AtomValueType Atom::from_string(std::string s, BaseSettings* set) {
+  AtomValueType Atom::from_string(const std::string& s, BaseSettings* set) {
     AtomValueType v;
     if (s == "true") {
       v = true;

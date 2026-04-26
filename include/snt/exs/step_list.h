@@ -12,7 +12,7 @@ namespace snt::exs {
   class StepList {
   public:
     StepListType steps;
-    void append(OperationType t, std::vector<int> s);
+    void append(OperationType t, const std::vector<int>& s);
   };
 
 } // namespace snt::exs

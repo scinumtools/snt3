@@ -41,7 +41,7 @@ namespace snt::exs {
      * @param s String corresponding to an atom
      * @param set Pointer to solver settings
      */
-    static AtomValueType from_string(std::string s, BaseSettings* set = nullptr);
+    static AtomValueType from_string(const std::string& s, BaseSettings* set = nullptr);
 
     /**
      * @copydoc AtomGrand::to_string
