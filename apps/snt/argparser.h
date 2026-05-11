@@ -4,29 +4,39 @@
 #include <vector>
 #include <string>
 
-namespace snt::cli {
+struct KeywordArgument {
+  std::string key;                   ///< Argument key
+  std::vector<std::string> values;   ///< Argument values
+};
 
-  struct Arg {
-    std::string key;
-    std::vector<std::string> values;
-  };
+class ArgParser {
+private:
+  std::vector<std::string> positional;      ///< Positional arguments
+  std::vector<KeywordArgument> keywords;    ///< Keyword arguments
+    
+  static bool isFlag(const std::string& s);
+public:
+    
+  ArgParser(int argc, char** argv);
+  
+  const std::vector<KeywordArgument>& getAllKeywords() const;
 
-  class ArgParser {
-  private:
-    std::vector<Arg> args;
-    std::vector<std::string> positional;
-    static bool isFlag(const std::string& s);
-  public:
-    ArgParser(int argc, char** argv);
-    const std::vector<Arg>& sequence() const;
-    std::vector<std::string> getAll(const std::string& key) const;
-    bool has(const std::string& key) const;
-    bool hasPositionals() const;
-    bool hasArguments() const;
-    bool isEmpty() const;
-    const std::vector<std::string>& positionals() const;
-  };
+  const std::vector<std::string>& getAllPositionals() const;
 
-}
+  std::string getPositionalValue(const size_t index) const;
+    
+  std::vector<std::string> getKeywordValues(const std::string& key1, const std::string& key2="") const;
+
+  size_t numPositional() const;
+    
+  bool hasKeyword(const std::string& key) const;
+
+  bool hasPositionals() const;
+    
+  bool hasKeywords() const;
+    
+  bool isEmpty() const;
+    
+};
 
 #endif // APPS_SNT_ARGPARSER_H

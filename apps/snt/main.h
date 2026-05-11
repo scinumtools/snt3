@@ -1,8 +1,9 @@
 #ifndef APPS_SNT_MAIN_H
 #define APPS_SNT_MAIN_H
 
-#include <exception>
-#include <iomanip>
-#include <iostream>
+class ArgParser;
+
+void main_dip(ArgParser& argpar);
+void main_puq(ArgParser& argpar);
 
 #endif // APPS_SNT_MAIN_H

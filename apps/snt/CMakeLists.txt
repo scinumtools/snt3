@@ -1,23 +1,13 @@
-# create library
-file(GLOB EXEC_FILES "./*.cpp" "./**/*.cpp")
-set(EXEC_NAME snt-cli)
-add_library(${EXEC_NAME} ${EXEC_FILES})
-
-target_include_directories(${EXEC_NAME}
-  PRIVATE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-)
-
-target_link_libraries(${EXEC_NAME} PRIVATE snt-puq snt-dip)
-
 # create executable
 set(EXEC_NAME snt)
 
-add_executable(${EXEC_NAME} main.cpp )
+file(GLOB EXEC_FILES "./*.cpp" "./**/*.cpp")
+add_executable(${EXEC_NAME} ${EXEC_FILES} )
 
 target_include_directories(${EXEC_NAME}
   PRIVATE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
 )
 
 target_link_libraries(${EXEC_NAME} PRIVATE snt-cli)

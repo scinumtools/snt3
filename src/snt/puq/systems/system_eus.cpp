@@ -35,7 +35,7 @@ namespace snt::puq {
           {"gr", {Utype::LIN, "64.79891e-3*g", "grain", false, {}}},
           {"dr", {Utype::LIN, "1.771845195*g", "drachm/dram", false, {}}},
           {"oz", {Utype::LIN, "28.349523125*g", "ounce", false, {}}},
-          {"lb", {Utype::LIN, "453.59237*g", "pund", false, {}}},
+          {"lb", {Utype::LIN, "453.59237*g", "pound", false, {}}},
           {"cwt", {Utype::LIN, "50.80234544e3*g", "long hundredweight", false, {}}},
           {"ton", {Utype::LIN, "1.0160469088e6*g", "long ton", false, {}}},
           {"slug", {Utype::LIN, "14.59390294e3*g", "slug", false, {}}},

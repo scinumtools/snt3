@@ -1,16 +1,42 @@
-#include "displays.h"
+#include "puq_info.h"
 #include "snt/puq/to_string.h"
+
+#include <exception>
+#include <iomanip>
+#include <iostream>
+#include <snt/puq/base_units.h>
+#include <snt/puq/dimensions.h>
+#include <snt/puq/measurement.h>
+#include <snt/puq/quantity.h>
+#include <snt/puq/util/data_table.h>
 
 namespace snt::cli {
 
-  void display_info(const std::string& expr) {
-    puq::Measurement uv = puq::Quantity(expr).measurement;
+  void PUQInfo::argument_input_system(const std::string& system) {
+    for (auto sys : puq::SystemMap) {
+      if (sys.second->SystemAbbrev == system) {
+	input_system = sys.first;
+	return;
+      }
+    }
+    throw std::runtime_error("Could not find unit system: "+system);
+  }
+  
+  void PUQInfo::execute() {
+    
+    puq::UnitSystem us(puq::SystemType::SI);
+
+    if (input_system != puq::SystemType::NONE) {
+      us.change(input_system);
+    }
+
+    puq::Measurement uv = puq::Quantity(expression).measurement;
     puq::BaseUnits bus = uv.baseunits;
     puq::Dimensions dim = bus.dimensions();
     puq::Dimensions dim_m = bus.dimensions();
     dim_m.numerical *= uv.result;
     std::cout << '\n'
-	      << "Expression:  " << expr << '\n'
+	      << "Expression:  " << expression << '\n'
 	      << '\n';
     std::cout << "Unit system: " << puq::UnitSystem::Data->SystemAbbrev << " (" << puq::UnitSystem::Data->SystemName << ")" << '\n';
     std::cout << "Result:   " << puq::to_string(uv.result) << '\n';
@@ -90,24 +116,5 @@ namespace snt::cli {
     }
     std::cout << '\n';
   }
-
-  void display_lists(std::deque<std::string>& convert) {
-    std::stringstream ss;
-    ss << '\n';
-    if (convert.size() > 0)
-      ss << "List '" << convert[0] << "' does not exist." << '\n'
-	 << '\n';
-    ss << "Available lists:" << '\n'
-       << '\n';
-    ss << "prefix  unit prefixes" << '\n';
-    ss << "base    base units" << '\n';
-    ss << "deriv   derived units" << '\n';
-    ss << "log     logarithmic units" << '\n';
-    ss << "temp    temperature units" << '\n';
-    ss << "const   constants" << '\n';
-    ss << "quant   quantities" << '\n';
-    ss << "sys     unit systems" << '\n';
-    throw std::runtime_error(ss.str());
-  }
-
+    
 }
