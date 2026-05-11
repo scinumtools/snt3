@@ -1,4 +1,5 @@
 #include "argparser.h"
+#include <stdexcept>
 
 bool ArgParser::isFlag(const std::string& s) {
   return s.size() > 1 && s[0] == '-';
