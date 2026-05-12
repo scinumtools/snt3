@@ -84,18 +84,29 @@ namespace snt::cli {
       std::cout << "Base units:" << '\n'
 		<< '\n';
       puq::DataTable tab({{"Prefix", 8}, {"Symbol", 8}, {"Exponent", 10}, {"Name", 30}, {"Definition", 30}, {"Dimensions MGS", 22}, {"Allowed prefixes", 22}});
+      // We have to sort the unit names first, because UnitList is an std::unordered_map
+      // and the listing of units can change the order
+      std::vector<std::string> unit_names;
+      unit_names.reserve(puq::UnitSystem::Data->UnitList.size());
       for (const auto& unit : puq::UnitSystem::Data->UnitList) {
+	unit_names.push_back(unit.first);
+      }
+      std::sort(unit_names.begin(), unit_names.end());
+      // and now we loop over sorted units
+      for (auto const& name : unit_names) {
+	  auto const& unit = puq::UnitSystem::Data->UnitList.at(name);
+	  //for (const auto& unit : puq::UnitSystem::Data->UnitList) {
 	for (const auto& bu : bus) {
-	  if (bu.unit != unit.first)
+	  if (bu.unit != name)
 	    continue;
 	  puq::BaseUnits bu_unit({bu});
 	  tab.append({bu.prefix,
 	      bu.unit,
 	      ((puq::to_string(bu.exponent) == "") ? "1" : puq::to_string(bu.exponent)),
-	      unit.second.name,
-	      unit.second.definition,
+	      unit.name,
+	      unit.definition,
 	      bu_unit.dimensions().to_string(),
-	      puq::to_string(unit.second.use_prefixes, unit.second.allowed_prefixes)});
+	      puq::to_string(unit.use_prefixes, unit.allowed_prefixes)});
 	}
       }
       for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
