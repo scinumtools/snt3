@@ -37,12 +37,12 @@ Options:
       Print nodes.
 
 Examples:
-  snt dip parse --file parameters.dip --print
+  snt dip parse -f parameters.dip --print
 
   snt dip parse \
-      --file parameters.dip \
-      --string "age int = 23 yr" \
-      --request "?family.father" \
+      -f parameters.dip \
+      -s "age int = 23 yr" \
+      -r "?family.father" \
       --print
 )";
 }

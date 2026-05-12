@@ -99,7 +99,7 @@ namespace snt::dip {
         ValueNode::PointerType vnode = node_pool.at(p);
         size_t pos = node_path.find_last_of('.');
         if (pos != std::string::npos) {
-          std::string new_name = vnode->name.substr(pos, node_path.size());
+          std::string new_name = vnode->name.substr(pos+1, node_path.size());
           new_nodes.push_back(vnode->clone(new_name));
         } else {
           new_nodes.push_back(vnode->clone(node_path));

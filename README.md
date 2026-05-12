@@ -177,8 +177,14 @@ print(env.nodes[0])
 ### CLI
 
 ``` bash
-puq -c "1*m" "km"
-# 1e-3*km
+snt puq convert "12*statA" "A" -s ESU -S SI -Q "I"
+# 4.00277e-9*A
+
+snt dip parse \
+    -f parameters.dip \
+    -r "?family.father" \
+    --print
+# father = 184 cm
 ```
 
 ---

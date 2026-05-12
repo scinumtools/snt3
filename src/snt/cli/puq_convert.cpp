@@ -24,8 +24,8 @@ namespace snt::cli {
     throw std::runtime_error("Could not find unit system: "+system);
   }
 
-  void PUQConvert::argument_output_quantity(const std::string& oquantity) {
-    output_quantity = oquantity;
+  void PUQConvert::argument_output_quantity(const std::string& quantity) {
+    output_quantity = quantity;
   }
   
   void PUQConvert::execute() {
@@ -37,20 +37,18 @@ namespace snt::cli {
     }
         
     puq::Quantity q(expression);
-    if (!output_quantity.empty()) {
-      if (output_quantity == "") {
-	if (output_system == puq::SystemType::NONE)
-	  q = q.convert(output_units);
-	else
-	  q = q.convert(output_units, output_system);
+    if (output_quantity.empty()) {
+      if (output_system == puq::SystemType::NONE) {
+	q = q.convert(output_units);
       } else {
-	if (output_system == puq::SystemType::NONE)
-	  q = q.convert(output_units, puq::UnitSystem::System, output_quantity);
-	else {
-	  q = q.convert(output_units, output_system, output_quantity);
-	}
+	q = q.convert(output_units, output_system);
       }
-      
+    } else {
+      if (output_system == puq::SystemType::NONE) {
+	q = q.convert(output_units, puq::UnitSystem::System, output_quantity);
+      } else {
+	q = q.convert(output_units, output_system, output_quantity);
+      }
     }
     
     std::cout << q.to_string() << '\n';

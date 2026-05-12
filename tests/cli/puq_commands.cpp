@@ -71,7 +71,7 @@ TEST(PUQCommands, Convert) {
   }
 }
 
-TEST(PUQList, SystemList) {
+TEST(PUQCommands, List) {
   {
     cli::PUQList cmd;
     
