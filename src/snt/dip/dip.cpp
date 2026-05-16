@@ -223,5 +223,5 @@ namespace snt::dip {
     }
     return target;
   }
-
+  
 } // namespace snt::dip

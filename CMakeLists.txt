@@ -98,6 +98,35 @@ add_subdirectory(examples)             # build example applications
 add_subdirectory(tests)                # build gtest executable
 add_subdirectory(bindings/python/cpp)  # build Python bindings
 
+# setup Google Benchmark
+########################
+
+option(ENABLE_BENCHMARKS "Build benchmarks" OFF)
+
+if(ENABLE_BENCHMARKS)
+
+  include(FetchContent)
+  
+  FetchContent_Declare(
+      benchmark
+      GIT_REPOSITORY https://github.com/google/benchmark.git
+      GIT_TAG v1.8.3
+  )
+  
+  set(BENCHMARK_ENABLE_TESTING OFF)
+
+  FetchContent_MakeAvailable(benchmark)
+
+  set_target_properties(
+      benchmark
+      benchmark_main
+      PROPERTIES
+      CXX_CLANG_TIDY ""
+  )
+
+  add_subdirectory(benchmarks)
+endif()
+
 # create cmake export files
 ###########################
 
