@@ -46,9 +46,9 @@ int main(int argc, char* argv[]) {
     if (argpar.hasPositionals()) {
       std::string mod = argpar.getPositionalValue(0);
       if (mod=="puq") {
-	main_puq(argpar);
+	module_puq(argpar);
       } else if (mod=="dip") {
-	main_dip(argpar);
+	module_dip(argpar);
       }
     }
   } catch (std::exception& e) {

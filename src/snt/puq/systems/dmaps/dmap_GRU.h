@@ -3,7 +3,7 @@
  * This file can be updated using 'dmap' executable.
  * 
  * Unit system:  Units for general relativity (GRU)
- * Last update:  Sat May 16 22:49:13 2026
+ * Last update:  Tue May 19 22:49:16 2026
  * Code version: v0.3.0
  * 
  * Symbol legend:

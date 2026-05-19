@@ -3,7 +3,7 @@
 
 class ArgParser;
 
-void main_dip(ArgParser& argpar);
-void main_puq(ArgParser& argpar);
+void module_dip(ArgParser& argpar);
+void module_puq(ArgParser& argpar);
 
 #endif // APPS_SNT_MAIN_H
