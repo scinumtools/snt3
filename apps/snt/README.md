@@ -4,9 +4,9 @@
 
 It provides interface to:
 
-PUQ — Physical Units & Quantities
-DIP — Dimensional Input Parameters
-MAT (planned) — Materials Properties
+PUQ — Physical Units & Quantities  
+DIP — Dimensional Input Parameters  
+MAT (planned) — Materials Properties  
 
 This executable is built together with the `SNT` library and provides the command-line interface implemented in the `src/snt/cli` and `include/snt/cli` directories.
 
