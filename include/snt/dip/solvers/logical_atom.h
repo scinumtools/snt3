@@ -1,5 +1,5 @@
-#ifndef DIP_SOLVER_LOGICAL_H
-#define DIP_SOLVER_LOGICAL_H
+#ifndef DIP_LOGICAL_ATOM_H
+#define DIP_LOGICAL_ATOM_H
 
 #include <snt/dip/environment.h>
 
@@ -8,7 +8,7 @@ namespace snt::dip {
   struct LogicalSettings : exs::BaseSettings {
     Environment* env;
   };
-
+  
   class LogicalAtom : public exs::AtomBase<LogicalAtom, val::BaseValue::PointerType> {
   public:
     // Constructor from unique_ptr
@@ -32,14 +32,7 @@ namespace snt::dip {
     void logical_and(LogicalAtom* other) override;
     void logical_or(LogicalAtom* other) override;
   };
-
-  class LogicalSolver {
-  public:
-    std::unique_ptr<exs::Solver<LogicalAtom, LogicalSettings>> solver;
-    LogicalSolver(Environment& env);
-    LogicalAtom eval(const std::string& expression);
-  };
-
+  
 } // namespace snt::dip
 
-#endif // DIP_SOLVER_LOGICAL_H
+#endif // DIP_LOGICAL_ATOM_H

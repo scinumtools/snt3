@@ -2,7 +2,7 @@
 
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
-#include <snt/dip/solvers/solver_logical.h>
+#include <snt/dip/solvers/logical_solver.h>
 
 using namespace snt;
 

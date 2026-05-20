@@ -3,7 +3,7 @@
 #include <snt/dip/environment.h>
 #include <snt/dip/nodes/node_boolean.h>
 #include <snt/dip/nodes/node_value.h>
-#include <snt/dip/solvers/solver_logical.h>
+#include <snt/dip/solvers/logical_solver.h>
 #include <stdexcept>
 
 namespace snt::dip {

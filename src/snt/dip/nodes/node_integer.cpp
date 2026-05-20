@@ -2,7 +2,7 @@
 
 #include <snt/dip/environment.h>
 #include <snt/dip/nodes/node_integer.h>
-#include <snt/dip/solvers/solver_numerical.h>
+#include <snt/dip/solvers/numerical_solver.h>
 
 namespace snt::dip {
 

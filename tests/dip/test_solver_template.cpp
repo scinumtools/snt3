@@ -1,7 +1,7 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
-#include <snt/dip/solvers/solver_template.h>
+#include <snt/dip/solvers/template_solver.h>
 
 using namespace snt;
 
