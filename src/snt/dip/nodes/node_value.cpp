@@ -1,5 +1,6 @@
 #include <snt/dip/nodes/node_value.h>
 #include <sstream>
+#include <optional>
 
 namespace snt::dip {
 
@@ -8,8 +9,8 @@ namespace snt::dip {
     name = nm;
   };
 
-  ValueNode::ValueNode(const std::string& nm, val::BaseValue::PointerType val, puq::Quantity::PointerType unt)
-      : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)) {
+  ValueNode::ValueNode(const std::string& nm, val::BaseValue::PointerType val, std::optional<puq::Quantity> unt)
+    : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)) {
     name = nm;
     val::Array::ShapeType dims = val->get_shape();
     if (val->get_size() > 1) {
@@ -60,19 +61,19 @@ namespace snt::dip {
     }
   }
 
-  void ValueNode::set_units(puq::Quantity::PointerType units_input) {
+  void ValueNode::set_units(const std::optional<puq::Quantity>& units_input) {
     // setting node units
-    units = nullptr;
-    if (units_input == nullptr and !units_raw.empty()) {
-      units = std::make_unique<puq::Quantity>(units_raw);
-    } else if (units_input != nullptr) {
-      units = std::move(units_input);
+    units = std::nullopt;
+    if (!units_input and !units_raw.empty()) {
+      units = puq::Quantity(units_raw);
+    } else if (units_input) {
+      units = units_input;
     }
     // converting option units if necessary
     for (auto& option : options) {
       std::string option_units = option.units_raw;
       if (!option_units.empty()) {
-        if (units == nullptr)
+        if (!units)
           throw std::runtime_error("Options: Trying to convert '" + option_units +
                                    "' into a nondimensional quantity: " + line.code);
         else {
@@ -91,7 +92,7 @@ namespace snt::dip {
                                node->dtype_raw.at(1) + "'");
     val::BaseValue::PointerType value = cast_value(node->value_raw, node->value_shape);
     if (!node->units_raw.empty()) {
-      if (this->units == nullptr)
+      if (!this->units)
         throw std::runtime_error("Modifications: Trying to convert '" + node->units_raw +
                                  "' into a nondimensional quantity: " + line.code);
       else {

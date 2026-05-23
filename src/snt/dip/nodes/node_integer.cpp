@@ -154,10 +154,10 @@ namespace snt::dip {
   ValueNode::PointerType IntegerNode::clone(const std::string& nm) const {
     if (value == nullptr)
       return std::make_shared<IntegerNode>(nm, value->get_dtype());
-    else if (units == nullptr)
+    else if (!units)
       return std::make_shared<IntegerNode>(nm, std::move(value->clone()));
     else
-      return std::make_shared<IntegerNode>(nm, std::move(value->clone()), std::move(units->clone()));
+      return std::make_shared<IntegerNode>(nm, std::move(value->clone()), units);
   }
 
   std::string IntegerNode::to_string(const core::StringFormatType& format) const {

@@ -31,7 +31,7 @@ namespace snt::dip {
     typedef std::shared_ptr<ValueNode> PointerType;
     typedef std::deque<ValueNode::PointerType> ListType;
     val::BaseValue::PointerType value;
-    puq::Quantity::PointerType units;
+    std::optional<puq::Quantity> units;
     val::Array::StringType tags;
     bool constant;
     std::string description;
@@ -41,13 +41,13 @@ namespace snt::dip {
     ValueNode() : constant(false) {};
     ValueNode(const val::DataType vdt) : constant(false), value_dtype(vdt) {};
     ValueNode(const std::string& nm, const val::DataType vdt);
-    ValueNode(const std::string& nm, val::BaseValue::PointerType val, puq::Quantity::PointerType unt = nullptr);
+    ValueNode(const std::string& nm, val::BaseValue::PointerType val, std::optional<puq::Quantity> unt = std::nullopt);
     virtual ~ValueNode() = default;
     val::BaseValue::PointerType cast_value();
     val::BaseValue::PointerType cast_value(val::Array::StringType& value_input,
                                            const val::Array::ShapeType& shape);
     void set_value(val::BaseValue::PointerType value_input = nullptr);
-    void set_units(puq::Quantity::PointerType units_input = nullptr);
+    void set_units(const std::optional<puq::Quantity>& units_input = std::nullopt);
     void modify_value(const BaseNode::PointerType& node, Environment& env);
     virtual ValueNode::PointerType clone(const std::string& nm) const = 0;
     virtual bool set_property(PropertyType property, val::Array::StringType& values,

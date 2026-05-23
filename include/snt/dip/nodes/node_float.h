@@ -1,6 +1,7 @@
 #ifndef DIP_NODE_FLOAT_H
 #define DIP_NODE_FLOAT_H
 
+#include <optional>
 #include <snt/dip/nodes/node_value.h>
 
 namespace snt::dip {
@@ -17,7 +18,7 @@ namespace snt::dip {
         : BaseNode(NodeDtype::Float), ValueNode(nm, vdt) {};
     FloatNode(const std::string& nm, val::BaseValue::PointerType val)
         : BaseNode(NodeDtype::Float), ValueNode(nm, std::move(val)) {};
-    FloatNode(const std::string& nm, val::BaseValue::PointerType val, puq::Quantity::PointerType quant)
+    FloatNode(const std::string& nm, val::BaseValue::PointerType val, std::optional<puq::Quantity> quant)
         : BaseNode(NodeDtype::Float), ValueNode(nm, std::move(val), std::move(quant)) {};
     FloatNode(Parser& parser);
     BaseNode::ListType parse(Environment& env) override;

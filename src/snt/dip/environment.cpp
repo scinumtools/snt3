@@ -40,8 +40,8 @@ namespace snt::dip {
         ValueNode::PointerType vnode = node_pool.at(i);
         if (vnode and vnode->name == node_path) {
           new_value.value = vnode->value->clone();
-	  if (vnode->units != nullptr) 
-	    new_value.units = *vnode->units;
+	  if (vnode->units) 
+	    new_value.units = vnode->units;
         }
       }
       break;
@@ -74,15 +74,15 @@ namespace snt::dip {
           if (to_unit != core::KEYWORD_NONE) {
             // NOTE: If unit conversion is not required, the to_unit should be set to "none".
             //       This is usefull if we want to simply get a reference node as it is.
-            if (vnode->units == nullptr and !to_unit.empty())
+            if (!vnode->units and !to_unit.empty())
               throw std::runtime_error(
                   "Request: Trying to convert nondimensional quantity into '" + to_unit +
                   "': " + vnode->line.code);
-            else if (vnode->units != nullptr and to_unit.empty())
+            else if (vnode->units and to_unit.empty())
               throw std::runtime_error(
                   "Request: Trying to convert '" + vnode->units_raw +
                   "' into a nondimensional quantity: " + vnode->line.code);
-            else if (vnode->units != nullptr) {
+            else if (vnode->units) {
               puq::Quantity quantity = std::move(new_value) * (*vnode->units);
               quantity = quantity.convert(to_unit);
               new_value = std::move(quantity.measurement.result.estimate);

@@ -183,7 +183,7 @@ namespace snt::dip {
         if (vnode) {
           if (vnode->value == nullptr)
             vnode->set_value();
-          if (vnode->units == nullptr)
+          if (!vnode->units)
             vnode->set_units();
         }
         // If node was previously defined, modify its value
