@@ -9,8 +9,8 @@ namespace snt::dip {
   NumericalAtom& NumericalAtom::operator=(const NumericalAtom& a) {
     if (this != &a) {
       value.value = a.value.value->clone();
-      if (value.units != nullptr) 
-	value.units = a.value.units->clone();
+      if (value.units) 
+	value.units = a.value.units;
     }
     return *this;
   }
@@ -36,7 +36,7 @@ namespace snt::dip {
       vnode->set_value();
       data.value = std::move(vnode->value);
       if (!vnode->units_raw.empty())
-	data.units = std::make_unique<puq::Quantity>(vnode->units_raw);
+	data.units = puq::Quantity(vnode->units_raw);
       return data;
     } else {
       throw std::runtime_error("Invalid atom value: " + s);
@@ -44,7 +44,7 @@ namespace snt::dip {
   }
 
   std::string NumericalAtom::to_string() {
-    if (value.units != nullptr)
+    if (value.units)
       return value.value->to_string() + " " + value.units->to_string();
     else
       return value.value->to_string();
@@ -91,15 +91,15 @@ namespace snt::dip {
     value.value = value.value->math_div(other->value.value.get());
   }
   void NumericalAtom::math_add(NumericalAtom* other) {
-    if (value.units != nullptr  && other->value.units != nullptr) {
+    if (value.units  && other->value.units) {
       puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
       quantity = quantity.convert(*value.units);
       val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
       value.value = value.value->math_add(new_value.get());
-    } else if (value.units != nullptr) {
+    } else if (value.units) {
       throw std::runtime_error("NumericalAtom: Trying add nondimensional quantity to '" +
 			       other->value.units->to_string() + "'");
-    } else if (other->value.units != nullptr) {
+    } else if (other->value.units) {
       throw std::runtime_error("NumericalAtom: Trying add '" + value.units->to_string() +
 			       "' to a nondimensional quantity");
     } else {
@@ -107,15 +107,15 @@ namespace snt::dip {
     }
   }
   void NumericalAtom::math_subtract(NumericalAtom* other) {
-    if (value.units != nullptr  && other->value.units != nullptr) {
+    if (value.units  && other->value.units) {
       puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
       quantity = quantity.convert(*value.units);
       val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
       value.value = value.value->math_sub(new_value.get());
-    } else if (value.units != nullptr) {
+    } else if (value.units) {
       throw std::runtime_error("NumericalAtom: Trying to subtract nondimensional quantity from '" +
 			       other->value.units->to_string() + "'");
-    } else if (other->value.units != nullptr) {
+    } else if (other->value.units) {
       throw std::runtime_error("NumericalAtom: Trying to subtract '" + value.units->to_string() +
 			       "' from a nondimensional quantity");
     } else {

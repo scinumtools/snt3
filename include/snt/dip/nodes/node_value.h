@@ -4,13 +4,14 @@
 #include "node_base.h"
 
 #include <deque>
+#include <optional>
 #include <snt/puq/quantity.h>
 
 namespace snt::dip {
 
   struct ValueNodeData {
     val::BaseValue::PointerType value;
-    puq::Quantity::PointerType units;
+    std::optional<puq::Quantity> units;
   };
     
   class ValueNode : virtual public BaseNode {

@@ -75,12 +75,12 @@ namespace snt::dip {
     NumericalAtom ua = solver->solve(expression);
 
     // convert units if necessary
-    if (ua.value.units != nullptr  && !units.empty()) {
+    if (ua.value.units  && !units.empty()) {
       puq::Quantity quantity = std::move(ua.value.value) * (*ua.value.units);
       quantity = quantity.convert(units);
       ua.value.value = std::move(quantity.measurement.result.estimate);
-      ua.value.units = std::make_unique<puq::Quantity>(units);
-    } else if (ua.value.units != nullptr) {
+      ua.value.units = puq::Quantity(units);
+    } else if (ua.value.units) {
       throw std::runtime_error("NumericalSolver: Trying to convert nondimensional quantity into '" +
 			       units + "'");
     } else if (!units.empty()) {

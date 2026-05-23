@@ -15,7 +15,7 @@ namespace snt::dip {
     // Constructor from unique_ptr
     NumericalAtom(ValueNodeData b) : AtomBase({std::move(b.value), std::move(b.units)}) {};
     // Deep copy constructor
-    NumericalAtom(const NumericalAtom& a) : AtomBase({a.value.value->clone(), a.value.units ? a.value.units->clone() : nullptr}) {};
+    NumericalAtom(const NumericalAtom& a) : AtomBase({a.value.value->clone(), a.value.units}) {};
     NumericalAtom& operator=(const NumericalAtom& a);
     // Move constructor
     NumericalAtom(NumericalAtom&& a) noexcept = default;

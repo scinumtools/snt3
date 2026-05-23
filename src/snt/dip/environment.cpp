@@ -41,7 +41,7 @@ namespace snt::dip {
         if (vnode and vnode->name == node_path) {
           new_value.value = vnode->value->clone();
 	  if (vnode->units != nullptr) 
-	    new_value.units = vnode->units->clone();
+	    new_value.units = *vnode->units;
         }
       }
       break;
