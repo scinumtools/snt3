@@ -1,6 +1,6 @@
 """
 Run as:
-python3 tools/build_materials.py
+python3 devtools/build_materials.py
 from the main directory
 """
 from dotenv import load_dotenv
