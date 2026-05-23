@@ -11,8 +11,8 @@ DIR_ROOT=$(pwd)
 
 NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
 NUM_MAKE_CORES=2 #$NUM_SYSTEM_CORES
-CMAKE_BUILD_TYPE=Release    # Release/Debug/Analyze
-ENABLE_CLANG_TIDY=OFF
+CMAKE_BUILD_TYPE=Release    # Release/Debug
+ENABLE_CLANG_TIDY=ON        # Switch Clang Tidy on 
 
 CMAKE_FLAGS=(
   -DENABLE_SNT=ON
@@ -39,8 +39,8 @@ CMAKE_FLAGS=(
   -DENABLE_MAT_GTEST=ON
   -DENABLE_MAT_PYTEST=ON
 
-  -DENABLE_BENCHMARKS=ON
-  -DENABLE_TIME_TRACE=ON
+  -DENABLE_BENCHMARKS=ON     # build Google Benchmark tests
+  -DENABLE_TIME_TRACE=OFF    # build compilation time tracing outputs
 )
 
 OS="$(uname -s)"
