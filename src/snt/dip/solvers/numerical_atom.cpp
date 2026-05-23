@@ -86,9 +86,19 @@ namespace snt::dip {
     }
     void NumericalAtom::math_multiply(NumericalAtom* other) {
         value.value = value.value->math_mul(other->value.value.get());
+        if (value.units && other->value.units) {
+	  value.units = (*value.units) * (*other->value.units);	  
+        } else if (other->value.units) {
+	  value.units = other->value.units;
+        }	
     }
     void NumericalAtom::math_divide(NumericalAtom* other) {
         value.value = value.value->math_div(other->value.value.get());
+        if (value.units && other->value.units) {
+	  value.units = (*value.units) / (*other->value.units);	  
+        } else if (other->value.units) {
+	  value.units = 1. / (*other->value.units);
+        }	
     }
     void NumericalAtom::math_add(NumericalAtom* other) {
         if (value.units && other->value.units) {

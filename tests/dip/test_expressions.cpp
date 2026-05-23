@@ -63,7 +63,7 @@ TEST(Expressions, Numerical) {
 
 TEST(Expressions, NumericalUnits) {
 
-    // define scalar
+    // integer
     dip::DIP d;
     d.add_string("foo int = 23 m");
     d.add_string("bar int = 445 cm");
@@ -76,10 +76,11 @@ TEST(Expressions, NumericalUnits) {
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "27450 mm");
 
+    // float: add + subtract
     d = dip::DIP();
     d.add_string("foo float = 23.3 cm");
     d.add_string("bar float = 425.6 mm");
-    d.add_string("baz float = ({?foo} + {?bar} + 0.1 m) dm");
+    d.add_string("baz float = ({?foo} + {?bar} - 0.1 m) dm");
 
     env = d.parse();
     EXPECT_EQ(env.nodes.size(), 3);
@@ -87,7 +88,22 @@ TEST(Expressions, NumericalUnits) {
     vnode = env.nodes.at(2);
     EXPECT_EQ(vnode->name, "baz");
     EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->to_string(), "7.586 dm");
+    EXPECT_EQ(vnode->to_string(), "5.586 dm");
+
+    // float: multiply + divide
+    d = dip::DIP();
+    d.add_string("foo float = 23.3 cm");
+    d.add_string("bar float = 425.6 mm");
+    d.add_string("baz float = ({?foo} / {?bar} * 2 dm) m");
+
+    env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 3);
+
+    vnode = env.nodes.at(2);
+    EXPECT_EQ(vnode->name, "baz");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->to_string(), "0.1095 m");   // 0.233*m / 0.4256*m * 0.2*m = 0.109492... m
+    
 }
 
 /* TODO: Implement expressions with Quantities/Measurements with units and not just values
