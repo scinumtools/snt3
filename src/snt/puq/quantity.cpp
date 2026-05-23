@@ -138,13 +138,6 @@ namespace snt::puq {
     return measurement.shape();
   }
 
-  Quantity::PointerType Quantity::clone() const {
-    if (measurement.result.uncertainty)
-      return std::make_unique<Quantity>(measurement.result.estimate->clone(), measurement.result.uncertainty->clone(), measurement.baseunits.baseunits, stype);
-    else
-      return std::make_unique<Quantity>(measurement.result.estimate->clone(), measurement.baseunits.baseunits, stype);
-  }
-
   // strings and streams
   std::string Quantity::to_string(const UnitFormat& format) const {
     UnitSystem us(stype);

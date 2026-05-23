@@ -10,9 +10,6 @@
 namespace snt::puq {
 
   class Quantity {
-  public:
-    typedef std::unique_ptr<Quantity> PointerType;
-
   private:
     void preprocess(std::string& expression, SystemType& system) const;
     Measurement _convert_without_context(UnitSystem& us, const SystemType stt) const;
@@ -42,7 +39,6 @@ namespace snt::puq {
     std::string unit_system() const;
     std::size_t size() const;
     val::Array::ShapeType shape() const;
-    PointerType clone() const;
     std::string to_string(const UnitFormat& format = UnitFormat()) const;
     // quantity operations
     friend Quantity operator+(const Quantity& q1, const Quantity& q2);
