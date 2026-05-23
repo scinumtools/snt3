@@ -11,6 +11,7 @@ namespace snt::dip {
   class FunctionList {
   public:
     typedef val::BaseValue::PointerType (*ValueFunctionType)(const Environment& env);
+    typedef ValueNodeData (*DataFunctionType)(const Environment& env);
     typedef ValueNode::ListType (*TableFunctionType)(const Environment& env);
 
   private:

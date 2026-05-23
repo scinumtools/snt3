@@ -49,6 +49,16 @@ namespace snt::dip {
     std::string request_code(const std::string& source_name) const;
 
     /**
+     * @brief Get node data (value + units) from a reference or a function based on a request expression
+     *
+     * @param request Request expression
+     * @param rtype Request type: reference, or function
+     * @return Selected value node data
+     */
+    ValueNodeData request_node_data(const std::string& request,
+				    const RequestType rtype = RequestType::Reference) const;
+    
+    /**
      * @brief Get value from a reference or a function based on a request expression
      *
      * @param request Request expression

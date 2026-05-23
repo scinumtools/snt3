@@ -6,21 +6,21 @@
 
 namespace snt::dip {
 
-  NumericalAtom::NumericalAtom(const NumericalAtom& a) : AtomBase(a.value->clone()) {}
-
   NumericalAtom& NumericalAtom::operator=(const NumericalAtom& a) {
-    if (this != &a)
-      value = a.value->clone();
+    if (this != &a) {
+      value.value = a.value.value->clone();
+      if (value.units != nullptr) 
+	value.units = a.value.units->clone();
+    }
     return *this;
   }
 
-  val::BaseValue::PointerType NumericalAtom::from_string(const std::string& s, exs::BaseSettings* settings) {
+  ValueNodeData NumericalAtom::from_string(const std::string& s, exs::BaseSettings* settings) {
     Parser parser({s, {"NUMERICAL_ATOM", 0}});
     NumericalSettings* csettings = static_cast<NumericalSettings*>(settings);
+    ValueNodeData data;
     if (parser.part_reference()) {
-      val::BaseValue::PointerType value =
-          csettings->env->request_value(parser.value_raw.at(0), RequestType::Reference, csettings->units);
-      return std::move(value);
+      return csettings->env->request_node_data(parser.value_raw.at(0), RequestType::Reference);
     } else if (parser.part_literal()) {
       ValueNode::PointerType vnode = nullptr;
       if (vnode == nullptr)
@@ -34,76 +34,96 @@ namespace snt::dip {
       if (vnode == nullptr)
         throw std::runtime_error("Value could not be determined from : " + s);
       vnode->set_value();
-      if (!vnode->units_raw.empty() && !csettings->units.empty()) {
-        puq::Quantity quantity(std::move(vnode->value), vnode->units_raw);
-        quantity = quantity.convert(csettings->units);
-        vnode->value = std::move(quantity.measurement.result.estimate);
-      } else if (vnode->units_raw.empty() && !csettings->units.empty())
-        throw std::runtime_error(
-            "Numerical Solver: Trying to convert nondimensional quantity into '" + csettings->units +
-            "': " + vnode->line.code);
-      else if (!vnode->units_raw.empty() && csettings->units.empty())
-        throw std::runtime_error(
-            "Numerical Solver: Trying to convert '" + vnode->units_raw +
-            "' into a nondimensional quantity: " + vnode->line.code);
-      return std::move(vnode->value);
+      data.value = std::move(vnode->value);
+      if (!vnode->units_raw.empty())
+	data.units = std::make_unique<puq::Quantity>(vnode->units_raw);
+      return data;
     } else {
       throw std::runtime_error("Invalid atom value: " + s);
     }
   }
 
   std::string NumericalAtom::to_string() {
-    return value->to_string();
+    if (value.units != nullptr)
+      return value.value->to_string() + " " + value.units->to_string();
+    else
+      return value.value->to_string();
   }
 
   // Mathematical operations
   void NumericalAtom::math_sinus() {
-    value = value->math_sin();
+    value.value = value.value->math_sin();
   }
   void NumericalAtom::math_cosinus() {
-    value = value->math_cos();
+    value.value = value.value->math_cos();
   }
   void NumericalAtom::math_tangens() {
-    value = value->math_tan();
+    value.value = value.value->math_tan();
   }
   void NumericalAtom::math_cubic_root() {
-    value = value->math_cbrt();
+    value.value = value.value->math_cbrt();
   }
   void NumericalAtom::math_square_root() {
-    value = value->math_sqrt();
+    value.value = value.value->math_sqrt();
   }
   // void NumericalAtom::math_power_base(NumericalAtom* other) {
-  //   value = value->math_powb(other->value.get());
+  //   value.value = value.value->math_powb(other->value.get());
   // }
   // void NumericalAtom::math_logarithm_base(NumericalAtom* other) {
-  //   value = value->math_logb(other->value.get());
+  //   value.value = value.value->math_logb(other->value.get());
   // }
   void NumericalAtom::math_logarithm_10() {
-    value = value->math_log10();
+    value.value = value.value->math_log10();
   }
   void NumericalAtom::math_logarithm() {
-    value = value->math_log();
+    value.value = value.value->math_log();
   }
   void NumericalAtom::math_exponent() {
-    value = value->math_exp();
+    value.value = value.value->math_exp();
   }
   void NumericalAtom::math_power(NumericalAtom* other) {
-    value = value->math_pow(other->value.get());
+    value.value = value.value->math_pow(other->value.value.get());
   }
   void NumericalAtom::math_multiply(NumericalAtom* other) {
-    value = value->math_mul(other->value.get());
+    value.value = value.value->math_mul(other->value.value.get());
   }
   void NumericalAtom::math_divide(NumericalAtom* other) {
-    value = value->math_div(other->value.get());
+    value.value = value.value->math_div(other->value.value.get());
   }
   void NumericalAtom::math_add(NumericalAtom* other) {
-    value = value->math_add(other->value.get());
+    if (value.units != nullptr  && other->value.units != nullptr) {
+      puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
+      quantity = quantity.convert(*value.units);
+      val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
+      value.value = value.value->math_add(new_value.get());
+    } else if (value.units != nullptr) {
+      throw std::runtime_error("NumericalAtom: Trying add nondimensional quantity to '" +
+			       other->value.units->to_string() + "'");
+    } else if (other->value.units != nullptr) {
+      throw std::runtime_error("NumericalAtom: Trying add '" + value.units->to_string() +
+			       "' to a nondimensional quantity");
+    } else {
+      value.value = value.value->math_add(other->value.value.get());
+    }
   }
   void NumericalAtom::math_subtract(NumericalAtom* other) {
-    value = value->math_sub(other->value.get());
+    if (value.units != nullptr  && other->value.units != nullptr) {
+      puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
+      quantity = quantity.convert(*value.units);
+      val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
+      value.value = value.value->math_sub(new_value.get());
+    } else if (value.units != nullptr) {
+      throw std::runtime_error("NumericalAtom: Trying to subtract nondimensional quantity from '" +
+			       other->value.units->to_string() + "'");
+    } else if (other->value.units != nullptr) {
+      throw std::runtime_error("NumericalAtom: Trying to subtract '" + value.units->to_string() +
+			       "' from a nondimensional quantity");
+    } else {
+      value.value = value.value->math_sub(other->value.value.get());
+    }
   }
   void NumericalAtom::math_negate() {
-    value = value->math_neg();
+    value.value = value.value->math_neg();
   }
 
 } // namespace snt::dip

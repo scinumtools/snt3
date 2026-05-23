@@ -2,26 +2,26 @@
 #define DIP_NUMERICAL_ATOM_H
 
 #include <snt/dip/environment.h>
+#include <snt/puq/quantity.h>
 
 namespace snt::dip {
 
   struct NumericalSettings : exs::BaseSettings {
     Environment* env;
-    std::string units;
   };
 
-  class NumericalAtom : public exs::AtomBase<NumericalAtom, val::BaseValue::PointerType> {
+  class NumericalAtom : public exs::AtomBase<NumericalAtom, ValueNodeData> {
   public:
     // Constructor from unique_ptr
-    NumericalAtom(val::BaseValue::PointerType b) : AtomBase(std::move(b)) {};
+    NumericalAtom(ValueNodeData b) : AtomBase({std::move(b.value), std::move(b.units)}) {};
     // Deep copy constructor
-    NumericalAtom(const NumericalAtom& a);
+    NumericalAtom(const NumericalAtom& a) : AtomBase({a.value.value->clone(), a.value.units ? a.value.units->clone() : nullptr}) {};
     NumericalAtom& operator=(const NumericalAtom& a);
     // Move constructor
     NumericalAtom(NumericalAtom&& a) noexcept = default;
     NumericalAtom& operator=(NumericalAtom&& a) noexcept = default;
 
-    static val::BaseValue::PointerType from_string(const std::string& s, exs::BaseSettings* settings);
+    static ValueNodeData from_string(const std::string& s, exs::BaseSettings* settings);
     std::string to_string() override;
     void math_sinus() override;
     void math_cosinus() override;

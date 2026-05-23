@@ -24,6 +24,36 @@ namespace snt::dip {
     return sources.at(source_name).code;
   }
 
+  ValueNodeData Environment::request_node_data(const std::string& request,
+					       const RequestType rtype) const {
+    ValueNodeData new_value;
+    switch (rtype) {
+    case RequestType::Function: {
+      // TODO: this needs to be implemented
+      std::runtime_error("Functions in the request_node_data are not implemented yet.");
+      break;
+    }
+    case RequestType::Reference: {
+      auto [source_name, node_path] = parse_request(request);
+      const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
+      for (size_t i = 0; i < node_pool.size(); i++) {
+        ValueNode::PointerType vnode = node_pool.at(i);
+        if (vnode and vnode->name == node_path) {
+          new_value.value = vnode->value->clone();
+	  if (vnode->units != nullptr) 
+	    new_value.units = vnode->units->clone();
+        }
+      }
+      break;
+    }
+    default:
+      throw std::runtime_error("Unrecognized environment request type");
+    }
+    if (new_value.value == nullptr)
+      throw std::runtime_error("Value node data environment request returns an empty pointer: " + request);
+    return new_value;
+  }
+  
   val::BaseValue::PointerType Environment::request_value(const std::string& request,
                                                          const RequestType rtype,
                                                          const std::string& to_unit) const {

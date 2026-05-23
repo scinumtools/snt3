@@ -11,22 +11,22 @@ TEST(SolverNumerical, AddSubtract) {
   dip::Environment env;
   dip::NumericalSolver solver(env);
   dip::NumericalAtom atom = solver.eval("1.23 + 4.56");
-  EXPECT_EQ(atom.value->to_string(), "5.79");
+  EXPECT_EQ(atom.value.value->to_string(), "5.79");
 
   atom = solver.eval("4.56 - 1.23");
-  EXPECT_EQ(atom.value->to_string(), "3.33");
+  EXPECT_EQ(atom.value.value->to_string(), "3.33");
 
   atom = solver.eval("1.23 + 4.56 - 7.89");
-  EXPECT_EQ(atom.value->to_string(), "-2.1");
+  EXPECT_EQ(atom.value.value->to_string(), "-2.1");
 
   atom = solver.eval("+1.23");
-  EXPECT_EQ(atom.value->to_string(), "1.23");
+  EXPECT_EQ(atom.value.value->to_string(), "1.23");
 
   atom = solver.eval("-1.23");
-  EXPECT_EQ(atom.value->to_string(), "-1.23");
+  EXPECT_EQ(atom.value.value->to_string(), "-1.23");
 
   atom = solver.eval("1.23 + -2.34");
-  EXPECT_EQ(atom.value->to_string(), "-1.11");
+  EXPECT_EQ(atom.value.value->to_string(), "-1.11");
 }
 
 TEST(SolverNumerical, MultiplyDivide) {
@@ -34,13 +34,13 @@ TEST(SolverNumerical, MultiplyDivide) {
   dip::Environment env;
   dip::NumericalSolver solver(env);
   dip::NumericalAtom atom = solver.eval("1.23 * 4.56");
-  EXPECT_EQ(atom.value->to_string(), "5.609");
+  EXPECT_EQ(atom.value.value->to_string(), "5.609");
 
   atom = solver.eval("4.56 / 1.23");
-  EXPECT_EQ(atom.value->to_string(), "3.707");
+  EXPECT_EQ(atom.value.value->to_string(), "3.707");
 
   atom = solver.eval("1.23 * 4.56 / 7.89");
-  EXPECT_EQ(atom.value->to_string(), "0.7109");
+  EXPECT_EQ(atom.value.value->to_string(), "0.7109");
 }
 
 TEST(SolverNumerical, GroupOperators) {
@@ -48,37 +48,37 @@ TEST(SolverNumerical, GroupOperators) {
   dip::Environment env;
   dip::NumericalSolver solver(env);
   dip::NumericalAtom atom = solver.eval("1.23 ** 4.56");
-  EXPECT_EQ(atom.value->to_string(), "2.57");
+  EXPECT_EQ(atom.value.value->to_string(), "2.57");
 
   atom = solver.eval("exp( 1.23 )");
-  EXPECT_EQ(atom.value->to_string(), "3.421");
+  EXPECT_EQ(atom.value.value->to_string(), "3.421");
 
   atom = solver.eval("log( 19.0 )");
-  EXPECT_EQ(atom.value->to_string(), "2.944");
+  EXPECT_EQ(atom.value.value->to_string(), "2.944");
 
   atom = solver.eval("log10( 19.0 )");
-  EXPECT_EQ(atom.value->to_string(), "1.279");
+  EXPECT_EQ(atom.value.value->to_string(), "1.279");
 
   atom = solver.eval("sqrt( 9.0 )");
-  EXPECT_EQ(atom.value->to_string(), "3");
+  EXPECT_EQ(atom.value.value->to_string(), "3");
 
   atom = solver.eval("cbrt( 8.0 )");
-  EXPECT_EQ(atom.value->to_string(), "2");
+  EXPECT_EQ(atom.value.value->to_string(), "2");
 
   atom = solver.eval("sin( 8.0 )");
-  EXPECT_EQ(atom.value->to_string(), "0.9894");
+  EXPECT_EQ(atom.value.value->to_string(), "0.9894");
 
   atom = solver.eval("cos( 8.0 )");
-  EXPECT_EQ(atom.value->to_string(), "-0.1455");
+  EXPECT_EQ(atom.value.value->to_string(), "-0.1455");
 
   atom = solver.eval("tan( 8.0 )");
-  EXPECT_EQ(atom.value->to_string(), "-6.8");
+  EXPECT_EQ(atom.value.value->to_string(), "-6.8");
 
   atom = solver.eval("2.0 * ( 8.0 - 4.0 )");
-  EXPECT_EQ(atom.value->to_string(), "8");
+  EXPECT_EQ(atom.value.value->to_string(), "8");
 
   atom = solver.eval("cos( 2.0 * ( sqrt( 16.0 ) - 2.0 ) )");
-  EXPECT_EQ(atom.value->to_string(), "-0.6536");
+  EXPECT_EQ(atom.value.value->to_string(), "-0.6536");
 }
 
 TEST(SolverNumerical, Injections) {
@@ -90,5 +90,5 @@ TEST(SolverNumerical, Injections) {
 
   dip::NumericalSolver solver(env);
   dip::NumericalAtom atom = solver.eval("sin( {?foo} ) - 2 * {?bar}");
-  EXPECT_EQ(atom.value->to_string(), "-6.982");
+  EXPECT_EQ(atom.value.value->to_string(), "-6.982");
 }

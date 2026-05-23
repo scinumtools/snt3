@@ -8,6 +8,11 @@
 
 namespace snt::dip {
 
+  struct ValueNodeData {
+    val::BaseValue::PointerType value;
+    puq::Quantity::PointerType units;
+  };
+    
   class ValueNode : virtual public BaseNode {
     virtual val::BaseValue::PointerType cast_scalar_value(const std::string& value_input) const = 0;
     virtual val::BaseValue::PointerType cast_array_value(const val::Array::StringType& value_inputs,

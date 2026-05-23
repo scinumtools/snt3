@@ -4,9 +4,9 @@
 namespace snt::dip {
 
 
-  NumericalSolver::NumericalSolver(Environment& env, const std::string& units) {
+  NumericalSolver::NumericalSolver(Environment& env) {
 
-    NumericalSettings settings = {{}, &env, units};
+    NumericalSettings settings = {{}, &env};
 
     exs::OperatorList operators;
     operators.append(
@@ -69,10 +69,25 @@ namespace snt::dip {
     solver = std::make_unique<exs::Solver<NumericalAtom, NumericalSettings>>(operators, steps, settings);
   }
 
-  NumericalAtom NumericalSolver::eval(const std::string& expression) {
+  NumericalAtom NumericalSolver::eval(const std::string& expression, const std::string& units) {
     if (expression.empty())
       throw std::runtime_error("Numerical expression cannot be empty");
     NumericalAtom ua = solver->solve(expression);
+
+    // convert units if necessary
+    if (ua.value.units != nullptr  && !units.empty()) {
+      puq::Quantity quantity = std::move(ua.value.value) * (*ua.value.units);
+      quantity = quantity.convert(units);
+      ua.value.value = std::move(quantity.measurement.result.estimate);
+      ua.value.units = std::make_unique<puq::Quantity>(units);
+    } else if (ua.value.units != nullptr) {
+      throw std::runtime_error("NumericalSolver: Trying to convert nondimensional quantity into '" +
+			       units + "'");
+    } else if (!units.empty()) {
+      throw std::runtime_error("NumericalSolver: Trying to convert '" + ua.value.units->to_string() +
+			       "' into a nondimensional quantity");
+    }
+    
     return ua;
   }
 
