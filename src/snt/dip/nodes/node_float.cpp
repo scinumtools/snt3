@@ -55,7 +55,6 @@ namespace snt::dip {
         default:
             break;
         }
-        // TODO: process expression
         return {};
     }
 
