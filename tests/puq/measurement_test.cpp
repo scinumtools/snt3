@@ -10,280 +10,280 @@ using namespace snt;
 
 TEST(Measurement, Initialization) {
 
-  puq::Measurement value;
+    puq::Measurement value;
 
-  value = {3.34e3, {{"k", "m", -1}}}; // list initialization
-  EXPECT_EQ(value.to_string(), "3.34e3*km-1");
+    value = {3.34e3, {{"k", "m", -1}}}; // list initialization
+    EXPECT_EQ(value.to_string(), "3.34e3*km-1");
 
-  value = puq::Measurement(3.34e3, "km-1"); // assigning Measurement
-  EXPECT_EQ(value.to_string(), "3.34e3*km-1");
+    value = puq::Measurement(3.34e3, "km-1"); // assigning Measurement
+    EXPECT_EQ(value.to_string(), "3.34e3*km-1");
 
-  puq::BaseUnits bu("km-1/s2");
-  value = puq::Measurement(3, bu); // from BaseUnits
-  EXPECT_EQ(value.to_string(), "3*km-1*s-2");
+    puq::BaseUnits bu("km-1/s2");
+    value = puq::Measurement(3, bu); // from BaseUnits
+    EXPECT_EQ(value.to_string(), "3*km-1*s-2");
 
-  value = puq::Measurement("3*km/s"); // from a string
-  EXPECT_EQ(value.to_string(), "3*km*s-1");
+    value = puq::Measurement("3*km/s"); // from a string
+    EXPECT_EQ(value.to_string(), "3*km*s-1");
 
-  puq::Dimensions dim(23, {1, 2, 3, 4, 0, 0, 0, 0}); // from Dimensions
-  value = puq::Measurement(2, dim);
-  EXPECT_EQ(value.to_string(), "46*m*g2*s3*K4");
+    puq::Dimensions dim(23, {1, 2, 3, 4, 0, 0, 0, 0}); // from Dimensions
+    value = puq::Measurement(2, dim);
+    EXPECT_EQ(value.to_string(), "46*m*g2*s3*K4");
 
-  val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5}); // from Array
-  value = puq::Measurement(std::move(val), "km");
-  EXPECT_EQ(value.to_string(), "[2, 3, 4, 5]*km");
+    val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5}); // from Array
+    value = puq::Measurement(std::move(val), "km");
+    EXPECT_EQ(value.to_string(), "[2, 3, 4, 5]*km");
 
-  value = puq::Measurement("3*km/s");
-  std::stringstream ss;
-  ss << value; // cast unit value as a string into a stream
-  EXPECT_EQ(ss.str(), "3*km*s-1");
+    value = puq::Measurement("3*km/s");
+    std::stringstream ss;
+    ss << value; // cast unit value as a string into a stream
+    EXPECT_EQ(ss.str(), "3*km*s-1");
 }
 
 TEST(Measurement, Size) {
 
-  val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5});
-  puq::Measurement uv(std::move(val));
-  EXPECT_EQ(uv.size(), 4);
+    val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5});
+    puq::Measurement uv(std::move(val));
+    EXPECT_EQ(uv.size(), 4);
 }
 
 TEST(Measurement, RebasePrefixes) {
 
-  puq::Measurement value;
+    puq::Measurement value;
 
-  value = puq::Measurement("m*m"); // no prefixes
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "m2");
+    value = puq::Measurement("m*m"); // no prefixes
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "m2");
 
-  value = puq::Measurement("cm*cm"); // same prefixes
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "cm2");
+    value = puq::Measurement("cm*cm"); // same prefixes
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "cm2");
 
-  value = puq::Measurement("cm*m"); // different prefixes
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "100*cm2");
+    value = puq::Measurement("cm*m"); // different prefixes
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "100*cm2");
 
-  value = puq::Measurement("m*cm");
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "0.01*m2");
+    value = puq::Measurement("m*cm");
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "0.01*m2");
 
-  value = puq::Measurement("mm*km");
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e6*mm2");
+    value = puq::Measurement("mm*km");
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "1e6*mm2");
 
-  value = puq::Measurement("km*mm");
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e-6*km2");
+    value = puq::Measurement("km*mm");
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "1e-6*km2");
 
-  value = puq::Measurement("cm2*m3"); // exponents
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e6*cm5");
+    value = puq::Measurement("cm2*m3"); // exponents
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "1e6*cm5");
 
-  value = puq::Measurement("mm2*km3");
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e18*mm5");
+    value = puq::Measurement("mm2*km3");
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "1e18*mm5");
 
-  value = puq::Measurement("km*mm2*cm3"); // multiple units
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e-27*km6");
+    value = puq::Measurement("km*mm2*cm3"); // multiple units
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "1e-27*km6");
 
-  value = puq::Measurement("km*mm2*mg/kg2"); // with other units
-  value = value.rebase_prefixes();
-  EXPECT_EQ(value.to_string(), "1e-24*mg-1*km3");
+    value = puq::Measurement("km*mm2*mg/kg2"); // with other units
+    value = value.rebase_prefixes();
+    EXPECT_EQ(value.to_string(), "1e-24*mg-1*km3");
 }
 
 TEST(Measurement, RebaseDimensions) {
 
-  puq::Measurement value;
+    puq::Measurement value;
 
-  value = puq::Measurement("km*au2*pc"); // two different units of length
-  value = value.rebase_dimensions();
-  EXPECT_EQ(value.to_string(), "6.90565e29*km4");
+    value = puq::Measurement("km*au2*pc"); // two different units of length
+    value = value.rebase_dimensions();
+    EXPECT_EQ(value.to_string(), "6.90565e29*km4");
 
-  value = puq::Measurement("kph2*s3/(h*{c}3)"); // multiple dimensions
-  value = value.rebase_dimensions();
-  EXPECT_EQ(value.to_string(), "2.20967e-31*kph-1*s2");
+    value = puq::Measurement("kph2*s3/(h*{c}3)"); // multiple dimensions
+    value = value.rebase_dimensions();
+    EXPECT_EQ(value.to_string(), "2.20967e-31*kph-1*s2");
 
-  value = puq::Measurement("km*au*K/Cel"); // rebasing temperature units
-  EXPECT_THROW(value.rebase_dimensions(), puq::MeasurementExcept);
+    value = puq::Measurement("km*au*K/Cel"); // rebasing temperature units
+    EXPECT_THROW(value.rebase_dimensions(), puq::MeasurementExcept);
 
-  value = puq::Measurement("km*au*dB/B"); // rebasing logarithmic units
-  EXPECT_THROW(value.rebase_dimensions(), puq::MeasurementExcept);
+    value = puq::Measurement("km*au*dB/B"); // rebasing logarithmic units
+    EXPECT_THROW(value.rebase_dimensions(), puq::MeasurementExcept);
 }
 
 TEST(Measurement, InitializationFractions) {
 
-  puq::Measurement value1 = {3.34e3, {{"k", "m", -1, 2}}};
-  EXPECT_EQ(value1.to_string(), "3.34e3*km-1:2");
+    puq::Measurement value1 = {3.34e3, {{"k", "m", -1, 2}}};
+    EXPECT_EQ(value1.to_string(), "3.34e3*km-1:2");
 
-  puq::Measurement value2(3.34e3, "km-1:2");
-  EXPECT_EQ(value2.to_string(), "3.34e3*km-1:2");
+    puq::Measurement value2(3.34e3, "km-1:2");
+    EXPECT_EQ(value2.to_string(), "3.34e3*km-1:2");
 
-  puq::BaseUnits bu("km-1:2/s2");
-  puq::Measurement value3(3, bu);
-  EXPECT_EQ(value3.to_string(), "3*km-1:2*s-2");
+    puq::BaseUnits bu("km-1:2/s2");
+    puq::Measurement value3(3, bu);
+    EXPECT_EQ(value3.to_string(), "3*km-1:2*s-2");
 }
 
 TEST(Measurement, InitializationErrors) {
 
-  puq::Measurement v = puq::Measurement(1.23, 0.01, "km3"); // measurement result, errors and dimensions
-  EXPECT_EQ(v.to_string(), "1.230(10)*km3");
+    puq::Measurement v = puq::Measurement(1.23, 0.01, "km3"); // measurement result, errors and dimensions
+    EXPECT_EQ(v.to_string(), "1.230(10)*km3");
 
-  v = puq::Measurement(1.23, 0.01, "2*km3"); // measurement result, errors and dimensions with a number
-  EXPECT_EQ(v.to_string(), "2.460(20)*km3");
+    v = puq::Measurement(1.23, 0.01, "2*km3"); // measurement result, errors and dimensions with a number
+    EXPECT_EQ(v.to_string(), "2.460(20)*km3");
 
-  v = puq::Measurement("3.40(10)*km3"); // unit expression
-  EXPECT_EQ(v.to_string(), "3.40(10)*km3");
+    v = puq::Measurement("3.40(10)*km3"); // unit expression
+    EXPECT_EQ(v.to_string(), "3.40(10)*km3");
 
-  val::BaseValue::PointerType am = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
-  val::BaseValue::PointerType ae = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});
-  v = puq::Measurement(std::move(am), std::move(ae), "km");
-  EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), 4.00(40), 5.00(50)]*km");
+    val::BaseValue::PointerType am = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
+    val::BaseValue::PointerType ae = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});
+    v = puq::Measurement(std::move(am), std::move(ae), "km");
+    EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), 4.00(40), 5.00(50)]*km");
 }
 
 TEST(Measurement, UnitConversion) {
 
-  puq::Measurement v1, v2, v3;
+    puq::Measurement v1, v2, v3;
 
-  v1 = puq::Measurement("9*cm2");
-  v2 = puq::Measurement("3*m2");
-  v3 = v1.convert(v2); // conversion using Measurement
-  EXPECT_EQ(v3.to_string(), "3e-4*m2");
+    v1 = puq::Measurement("9*cm2");
+    v2 = puq::Measurement("3*m2");
+    v3 = v1.convert(v2); // conversion using Measurement
+    EXPECT_EQ(v3.to_string(), "3e-4*m2");
 
-  puq::BaseUnits bu("m2");
-  v1 = puq::Measurement("4*cm2");
-  v2 = v1.convert(bu); // conversion using BaseUnits
-  EXPECT_EQ(v2.to_string(), "4e-4*m2");
+    puq::BaseUnits bu("m2");
+    v1 = puq::Measurement("4*cm2");
+    v2 = v1.convert(bu); // conversion using BaseUnits
+    EXPECT_EQ(v2.to_string(), "4e-4*m2");
 
-  v1 = puq::Measurement("4*cm2");
-  v2 = v1.convert("2*m2"); // conversion using an expression
-  EXPECT_EQ(v2.to_string(), "2e-4*m2");
+    v1 = puq::Measurement("4*cm2");
+    v2 = v1.convert("2*m2"); // conversion using an expression
+    EXPECT_EQ(v2.to_string(), "2e-4*m2");
 
-  v1 = puq::Measurement("2*J"); // conversion to system base units
-  v2 = v1.convert(puq::Format::Base::MGS);
-  EXPECT_EQ(v2.to_string(), "2e3*m2*g*s-2"); // code base units
-  v2 = v1.convert(puq::Format::Base::MKS);
-  EXPECT_EQ(v2.to_string(), "2*m2*kg*s-2"); // SI
-  v2 = v1.convert(puq::Format::Base::CGS);
-  EXPECT_EQ(v2.to_string(), "2e7*cm2*g*s-2"); // CGS
+    v1 = puq::Measurement("2*J"); // conversion to system base units
+    v2 = v1.convert(puq::Format::Base::MGS);
+    EXPECT_EQ(v2.to_string(), "2e3*m2*g*s-2"); // code base units
+    v2 = v1.convert(puq::Format::Base::MKS);
+    EXPECT_EQ(v2.to_string(), "2*m2*kg*s-2"); // SI
+    v2 = v1.convert(puq::Format::Base::CGS);
+    EXPECT_EQ(v2.to_string(), "2e7*cm2*g*s-2"); // CGS
 
-  if constexpr (puq::Config::use_system_eus) {
-    // conversion to foot/pound/second
-    puq::UnitSystem us(puq::SystemType::US);
-    v1 = puq::Measurement("yd2*s/oz");
-    v2 = v1.convert(puq::Format::Base::FPS);
-    EXPECT_EQ(v2.to_string(), "144*ft2*lb-1*s");
-    us.close();
-  }
+    if constexpr (puq::Config::use_system_eus) {
+        // conversion to foot/pound/second
+        puq::UnitSystem us(puq::SystemType::US);
+        v1 = puq::Measurement("yd2*s/oz");
+        v2 = v1.convert(puq::Format::Base::FPS);
+        EXPECT_EQ(v2.to_string(), "144*ft2*lb-1*s");
+        us.close();
+    }
 }
 
 TEST(Measurement, ArithmeticsAdd) {
 
-  puq::Measurement q1, q2, q3;
+    puq::Measurement q1, q2, q3;
 
-  q1 = puq::Measurement(6, "cm"); // same units
-  q2 = puq::Measurement(3, "cm");
-  q3 = q1 + q2;
-  EXPECT_EQ(q3.to_string(), "9*cm");
-  q1 += q2;
-  EXPECT_EQ(q1.to_string(), "9*cm");
+    q1 = puq::Measurement(6, "cm"); // same units
+    q2 = puq::Measurement(3, "cm");
+    q3 = q1 + q2;
+    EXPECT_EQ(q3.to_string(), "9*cm");
+    q1 += q2;
+    EXPECT_EQ(q1.to_string(), "9*cm");
 
-  q1 = puq::Measurement(6, "cm2/s2"); // same dimensions
-  q2 = puq::Measurement(3, "m2/s2");
-  q3 = q1 + q2;
-  EXPECT_EQ(q3.to_string(), "3.0006e4*cm2*s-2");
-  q1 += q2;
-  EXPECT_EQ(q1.to_string(), "3.0006e4*cm2*s-2");
+    q1 = puq::Measurement(6, "cm2/s2"); // same dimensions
+    q2 = puq::Measurement(3, "m2/s2");
+    q3 = q1 + q2;
+    EXPECT_EQ(q3.to_string(), "3.0006e4*cm2*s-2");
+    q1 += q2;
+    EXPECT_EQ(q1.to_string(), "3.0006e4*cm2*s-2");
 
-  q3 = puq::Measurement(3, "cm2"); // different units
-  EXPECT_THROW(q1 + q3, puq::ConvDimExcept);
+    q3 = puq::Measurement(3, "cm2"); // different units
+    EXPECT_THROW(q1 + q3, puq::ConvDimExcept);
 
-  q1 = +puq::Measurement(3, "cm2"); // uniary plus
-  EXPECT_EQ(q1.to_string(), "3*cm2");
+    q1 = +puq::Measurement(3, "cm2"); // uniary plus
+    EXPECT_EQ(q1.to_string(), "3*cm2");
 }
 
 TEST(Measurement, ArithmeticsSubtract) {
 
-  puq::Measurement q1, q2, q3;
+    puq::Measurement q1, q2, q3;
 
-  q1 = puq::Measurement(6, "cm"); // same units
-  q2 = puq::Measurement(3, "cm");
-  q3 = q1 - q2;
-  EXPECT_EQ(q3.to_string(), "3*cm");
-  q1 -= q2;
-  EXPECT_EQ(q1.to_string(), "3*cm");
+    q1 = puq::Measurement(6, "cm"); // same units
+    q2 = puq::Measurement(3, "cm");
+    q3 = q1 - q2;
+    EXPECT_EQ(q3.to_string(), "3*cm");
+    q1 -= q2;
+    EXPECT_EQ(q1.to_string(), "3*cm");
 
-  q1 = puq::Measurement(6, "m2/s2"); // same dimensions
-  q2 = puq::Measurement(3, "cm2/s2");
-  q3 = q1 - q2;
-  EXPECT_EQ(q3.to_string(), "5.9997*m2*s-2");
-  q1 -= q2;
-  EXPECT_EQ(q1.to_string(), "5.9997*m2*s-2");
+    q1 = puq::Measurement(6, "m2/s2"); // same dimensions
+    q2 = puq::Measurement(3, "cm2/s2");
+    q3 = q1 - q2;
+    EXPECT_EQ(q3.to_string(), "5.9997*m2*s-2");
+    q1 -= q2;
+    EXPECT_EQ(q1.to_string(), "5.9997*m2*s-2");
 
-  q3 = puq::Measurement(3, "cm2"); // different units
-  EXPECT_THROW(q1 - q3, puq::ConvDimExcept);
+    q3 = puq::Measurement(3, "cm2"); // different units
+    EXPECT_THROW(q1 - q3, puq::ConvDimExcept);
 
-  q1 = -puq::Measurement(3, "cm2"); // unary minus
-  EXPECT_EQ(q1.to_string(), "-3*cm2");
+    q1 = -puq::Measurement(3, "cm2"); // unary minus
+    EXPECT_EQ(q1.to_string(), "-3*cm2");
 }
 
 TEST(Measurement, ArithmeticsMultiply) {
 
-  puq::Measurement q1, q2, q3;
+    puq::Measurement q1, q2, q3;
 
-  q1 = puq::Measurement(6, "cm3");
-  q2 = puq::Measurement(3, "g2");
-  q3 = q1 * q2;
-  EXPECT_EQ(q3.to_string(), "18*cm3*g2");
-  q1 *= q2;
-  EXPECT_EQ(q1.to_string(), "18*cm3*g2");
+    q1 = puq::Measurement(6, "cm3");
+    q2 = puq::Measurement(3, "g2");
+    q3 = q1 * q2;
+    EXPECT_EQ(q3.to_string(), "18*cm3*g2");
+    q1 *= q2;
+    EXPECT_EQ(q1.to_string(), "18*cm3*g2");
 }
 
 TEST(Measurement, ArithmeticsDivide) {
 
-  puq::Measurement q1, q2, q3;
+    puq::Measurement q1, q2, q3;
 
-  q1 = puq::Measurement(6, "cm3");
-  q2 = puq::Measurement(3, "g2");
-  q3 = q1 / q2;
-  EXPECT_EQ(q3.to_string(), "2*cm3*g-2");
-  q1 /= q2;
-  EXPECT_EQ(q1.to_string(), "2*cm3*g-2");
+    q1 = puq::Measurement(6, "cm3");
+    q2 = puq::Measurement(3, "g2");
+    q3 = q1 / q2;
+    EXPECT_EQ(q3.to_string(), "2*cm3*g-2");
+    q1 /= q2;
+    EXPECT_EQ(q1.to_string(), "2*cm3*g-2");
 }
 
 TEST(Measurement, ArithmeticsLog) {
-  if constexpr (!puq::Config::use_units_logarithmic) {
-    GTEST_SKIP() << "Logarithmic units are disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_units_logarithmic) {
+        GTEST_SKIP() << "Logarithmic units are disabled";
+        return;
+    }
 
-  puq::Measurement q1, q2, q3;
+    puq::Measurement q1, q2, q3;
 
-  // addition of same units
-  q1 = puq::Measurement(1, "dB");
-  q2 = puq::Measurement(2, "dB");
-  q3 = q1 + q2;
-  EXPECT_EQ(q3.to_string(), "4.53902*dB");
-  q1 += q2;
-  EXPECT_EQ(q1.to_string(), "4.53902*dB");
+    // addition of same units
+    q1 = puq::Measurement(1, "dB");
+    q2 = puq::Measurement(2, "dB");
+    q3 = q1 + q2;
+    EXPECT_EQ(q3.to_string(), "4.53902*dB");
+    q1 += q2;
+    EXPECT_EQ(q1.to_string(), "4.53902*dB");
 
-  // addition with different symbols, conversion
-  q1 = puq::Measurement(20, "dBm");
-  q2 = puq::Measurement(23, "dBmW");
-  q3 = q1 + q2;
-  EXPECT_EQ(q3.to_string(), "24.7643*dBm");
-  q1 += q2;
-  EXPECT_EQ(q1.to_string(), "24.7643*dBm");
+    // addition with different symbols, conversion
+    q1 = puq::Measurement(20, "dBm");
+    q2 = puq::Measurement(23, "dBmW");
+    q3 = q1 + q2;
+    EXPECT_EQ(q3.to_string(), "24.7643*dBm");
+    q1 += q2;
+    EXPECT_EQ(q1.to_string(), "24.7643*dBm");
 
-  // addition of different units throws an error
-  q1 = puq::Measurement(20, "dBW");
-  q2 = puq::Measurement(23, "dBA");
-  EXPECT_THROW(q1 + q2, puq::ConvDimExcept);
+    // addition of different units throws an error
+    q1 = puq::Measurement(20, "dBW");
+    q2 = puq::Measurement(23, "dBA");
+    EXPECT_THROW(q1 + q2, puq::ConvDimExcept);
 
-  // subtraction
-  q1 = puq::Measurement(87, "dBA");
-  q2 = puq::Measurement(83, "dBA");
-  q3 = q1 - q2;
-  EXPECT_EQ(q3.to_string(), "84.7952*dBA");
-  q1 -= q2;
-  EXPECT_EQ(q1.to_string(), "84.7952*dBA");
+    // subtraction
+    q1 = puq::Measurement(87, "dBA");
+    q2 = puq::Measurement(83, "dBA");
+    q3 = q1 - q2;
+    EXPECT_EQ(q3.to_string(), "84.7952*dBA");
+    q1 -= q2;
+    EXPECT_EQ(q1.to_string(), "84.7952*dBA");
 }

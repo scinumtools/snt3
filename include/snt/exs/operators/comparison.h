@@ -5,59 +5,59 @@
 
 namespace snt::exs {
 
-  // equal
+    // equal
 
-  class OperatorEqual : public OperatorBase {
-  public:
-    OperatorEqual(std::string s = "==");
+    class OperatorEqual : public OperatorBase {
+      public:
+        OperatorEqual(std::string s = "==");
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // not equal
+    // not equal
 
-  class OperatorNotEqual : public OperatorBase {
-  public:
-    OperatorNotEqual(std::string s = "!=");
+    class OperatorNotEqual : public OperatorBase {
+      public:
+        OperatorNotEqual(std::string s = "!=");
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // greater
+    // greater
 
-  class OperatorGreater : public OperatorBase {
-  public:
-    OperatorGreater(std::string s = ">");
+    class OperatorGreater : public OperatorBase {
+      public:
+        OperatorGreater(std::string s = ">");
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // less
+    // less
 
-  class OperatorLess : public OperatorBase {
-  public:
-    OperatorLess(std::string s = "<");
+    class OperatorLess : public OperatorBase {
+      public:
+        OperatorLess(std::string s = "<");
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // greater equal
+    // greater equal
 
-  class OperatorGreaterEqual : public OperatorBase {
-  public:
-    OperatorGreaterEqual(std::string s = ">=");
+    class OperatorGreaterEqual : public OperatorBase {
+      public:
+        OperatorGreaterEqual(std::string s = ">=");
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // less equal
+    // less equal
 
-  class OperatorLessEqual : public OperatorBase {
-  public:
-    OperatorLessEqual(std::string s = "<=");
+    class OperatorLessEqual : public OperatorBase {
+      public:
+        OperatorLessEqual(std::string s = "<=");
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
 } // namespace snt::exs
 

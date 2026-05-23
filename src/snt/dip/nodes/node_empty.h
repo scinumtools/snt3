@@ -5,11 +5,11 @@
 
 namespace snt::dip {
 
-  class EmptyNode : public BaseNode {
-  public:
-    static BaseNode::PointerType is_node(Parser& parser);
-    EmptyNode(Parser& parser) : BaseNode(parser, NodeDtype::Empty) {};
-  };
+    class EmptyNode : public BaseNode {
+      public:
+        static BaseNode::PointerType is_node(Parser& parser);
+        EmptyNode(Parser& parser) : BaseNode(parser, NodeDtype::Empty) {};
+    };
 
 } // namespace snt::dip
 

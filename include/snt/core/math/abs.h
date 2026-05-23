@@ -3,7 +3,7 @@
 
 namespace snt::core::math {
 
-  extern double abs(const double m);
+    extern double abs(const double m);
 
 } // namespace snt::core::math
 

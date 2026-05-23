@@ -36,6 +36,12 @@ configure_file(
     ${CMAKE_BINARY_DIR}/settings.h
 )
 
+# analyze code compilation
+option(ENABLE_TIME_TRACE "Enable Clang time tracing" OFF)
+if(ENABLE_TIME_TRACE)
+    add_compile_options(-ftime-trace)
+endif()
+
 # set generic options
 function(set_module_options NAME DEFAULT)
     # set default values

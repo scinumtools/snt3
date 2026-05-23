@@ -8,51 +8,51 @@
 
 namespace snt::exs {
 
-  // add
+    // add
 
-  class OperatorAdd : public OperatorBase {
-  public:
-    OperatorAdd(std::string s = "+");
-    void operate_unary(TokenListBase* tokens) override;
-    void operate_binary(TokenListBase* tokens) override;
-  };
+    class OperatorAdd : public OperatorBase {
+      public:
+        OperatorAdd(std::string s = "+");
+        void operate_unary(TokenListBase* tokens) override;
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // subtract
+    // subtract
 
-  class OperatorSubtract : public OperatorBase {
-  public:
-    OperatorSubtract(std::string s = "-");
+    class OperatorSubtract : public OperatorBase {
+      public:
+        OperatorSubtract(std::string s = "-");
 
-    void operate_unary(TokenListBase* tokens) override;
+        void operate_unary(TokenListBase* tokens) override;
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // multiply
+    // multiply
 
-  class OperatorMultiply : public OperatorBase {
-  public:
-    OperatorMultiply(std::string s = "*");
+    class OperatorMultiply : public OperatorBase {
+      public:
+        OperatorMultiply(std::string s = "*");
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // divide
+    // divide
 
-  class OperatorDivide : public OperatorBase {
-  public:
-    OperatorDivide(std::string s = "/");
-    void operate_binary(TokenListBase* tokens) override;
-  };
+    class OperatorDivide : public OperatorBase {
+      public:
+        OperatorDivide(std::string s = "/");
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // modulo
+    // modulo
 
-  class OperatorModulo : public OperatorBase {
-  public:
-    OperatorModulo(std::string s = "%");
+    class OperatorModulo : public OperatorBase {
+      public:
+        OperatorModulo(std::string s = "%");
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
 } // namespace snt::exs
 

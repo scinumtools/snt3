@@ -5,26 +5,26 @@
 
 namespace snt::puq::math {
 
-  puq::Result exp(const puq::Result& res) {
-    // z ± Dz = pow(e, y ± Dy) -> Dz = pow(e, y) * log(e) * Dy
-    if (res.uncertainty)
-      return puq::Result(res.estimate->math_exp(),
-                         res.estimate->math_exp()->math_mul(res.uncertainty.get()));
-    else
-      return puq::Result(res.estimate->math_exp());
-    // return puq::Result(exp(res.estimate), exp(res.estimate) * res.uncertainty);
-  }
+    puq::Result exp(const puq::Result& res) {
+        // z ± Dz = pow(e, y ± Dy) -> Dz = pow(e, y) * log(e) * Dy
+        if (res.uncertainty)
+            return puq::Result(res.estimate->math_exp(),
+                               res.estimate->math_exp()->math_mul(res.uncertainty.get()));
+        else
+            return puq::Result(res.estimate->math_exp());
+        // return puq::Result(exp(res.estimate), exp(res.estimate) * res.uncertainty);
+    }
 
-  puq::Measurement exp(const puq::Measurement& msr) {
-    if (msr.baseunits.has_dimensions())
-      throw std::runtime_error("Exponential function accepts only dimensionless quantities.");
-    return puq::Measurement(exp(msr.result),
-                            msr.baseunits);
-  }
+    puq::Measurement exp(const puq::Measurement& msr) {
+        if (msr.baseunits.has_dimensions())
+            throw std::runtime_error("Exponential function accepts only dimensionless quantities.");
+        return puq::Measurement(exp(msr.result),
+                                msr.baseunits);
+    }
 
-  puq::Quantity exp(const puq::Quantity& quant) {
-    return puq::Quantity(exp(quant.measurement),
-                         quant.stype);
-  }
+    puq::Quantity exp(const puq::Quantity& quant) {
+        return puq::Quantity(exp(quant.measurement),
+                             quant.stype);
+    }
 
 } // namespace snt::puq::math

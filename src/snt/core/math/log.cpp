@@ -3,8 +3,8 @@
 
 namespace snt::core::math {
 
-  double log(const double m) {
-    return std::log(m);
-  }
+    double log(const double m) {
+        return std::log(m);
+    }
 
 } // namespace snt::core::math

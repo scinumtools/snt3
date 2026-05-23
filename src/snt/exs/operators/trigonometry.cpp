@@ -2,37 +2,37 @@
 
 namespace snt::exs {
 
-  // sinus
+    // sinus
 
-  OperatorSinus::OperatorSinus(const OperatorGroupSybols& s) : OperatorGroup<1>("sin", s, SINUS_OPERATOR) {
-  }
+    OperatorSinus::OperatorSinus(const OperatorGroupSybols& s) : OperatorGroup<1>("sin", s, SINUS_OPERATOR) {
+    }
 
-  void OperatorSinus::operate_group(TokenListBase* tokens) {
-    Token group1 = tokens->get_left();
-    group1.atom->math_sinus();
-    tokens->put_left(group1);
-  };
+    void OperatorSinus::operate_group(TokenListBase* tokens) {
+        Token group1 = tokens->get_left();
+        group1.atom->math_sinus();
+        tokens->put_left(group1);
+    };
 
-  // cosinus
+    // cosinus
 
-  OperatorCosinus::OperatorCosinus(const OperatorGroupSybols& s) : OperatorGroup<1>("cos", s, COSINUS_OPERATOR) {
-  }
+    OperatorCosinus::OperatorCosinus(const OperatorGroupSybols& s) : OperatorGroup<1>("cos", s, COSINUS_OPERATOR) {
+    }
 
-  void OperatorCosinus::operate_group(TokenListBase* tokens) {
-    Token group1 = tokens->get_left();
-    group1.atom->math_cosinus();
-    tokens->put_left(group1);
-  };
+    void OperatorCosinus::operate_group(TokenListBase* tokens) {
+        Token group1 = tokens->get_left();
+        group1.atom->math_cosinus();
+        tokens->put_left(group1);
+    };
 
-  // tangens
+    // tangens
 
-  OperatorTangens::OperatorTangens(const OperatorGroupSybols& s) : OperatorGroup<1>("tan", s, TANGENS_OPERATOR) {
-  }
+    OperatorTangens::OperatorTangens(const OperatorGroupSybols& s) : OperatorGroup<1>("tan", s, TANGENS_OPERATOR) {
+    }
 
-  void OperatorTangens::operate_group(TokenListBase* tokens) {
-    Token group1 = tokens->get_left();
-    group1.atom->math_tangens();
-    tokens->put_left(group1);
-  };
+    void OperatorTangens::operate_group(TokenListBase* tokens) {
+        Token group1 = tokens->get_left();
+        group1.atom->math_tangens();
+        tokens->put_left(group1);
+    };
 
 } // namespace snt::exs

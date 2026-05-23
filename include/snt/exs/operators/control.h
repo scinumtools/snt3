@@ -6,20 +6,20 @@
 
 namespace snt::exs {
 
-  // parentheses
+    // parentheses
 
-  class OperatorParentheses : public OperatorGroup<1> {
-  public:
-    OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","});
-  };
+    class OperatorParentheses : public OperatorGroup<1> {
+      public:
+        OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","});
+    };
 
-  // conditional operator
+    // conditional operator
 
-  class OperatorCondition : public OperatorTernary {
-  public:
-    OperatorCondition();
-    void operate_ternary(TokenListBase* tokens) override;
-  };
+    class OperatorCondition : public OperatorTernary {
+      public:
+        OperatorCondition();
+        void operate_ternary(TokenListBase* tokens) override;
+    };
 
 } // namespace snt::exs
 

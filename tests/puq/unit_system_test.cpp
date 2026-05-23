@@ -8,202 +8,202 @@
 using namespace snt;
 
 TEST(UnitSystem, PrintUnitSystem) {
-  if constexpr (!puq::Config::use_system_cgs) {
-    GTEST_SKIP() << "CGS unit system is disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
 
-  puq::Quantity q("23*cm");
-  EXPECT_EQ(q.unit_system(), "SI");
+    puq::Quantity q("23*cm");
+    EXPECT_EQ(q.unit_system(), "SI");
 
-  q = puq::Quantity("23*cm", puq::SystemType::ESU);
-  EXPECT_EQ(q.unit_system(), "ESU");
+    q = puq::Quantity("23*cm", puq::SystemType::ESU);
+    EXPECT_EQ(q.unit_system(), "ESU");
 
-  puq::UnitSystem us(puq::SystemType::AU);
-  q = puq::Quantity("3*E_h");
-  EXPECT_EQ(q.unit_system(), "AU");
+    puq::UnitSystem us(puq::SystemType::AU);
+    q = puq::Quantity("3*E_h");
+    EXPECT_EQ(q.unit_system(), "AU");
 }
 
 TEST(UnitSystem, DirectSetting) {
-  if constexpr (!puq::Config::use_system_cgs) {
-    GTEST_SKIP() << "CGS unit system is disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
 
-  puq::Quantity q1, q2;
+    puq::Quantity q1, q2;
 
-  q1 = puq::Quantity("34*statA", puq::SystemType::ESU); // set unit system using an abbreviation
-  EXPECT_EQ(q1.to_string(), "34*statA");
+    q1 = puq::Quantity("34*statA", puq::SystemType::ESU); // set unit system using an abbreviation
+    EXPECT_EQ(q1.to_string(), "34*statA");
 
-  q1 = puq::Quantity(34, "statA", puq::SystemType::ESU); // explicitely state the unit system
-  q2 = q1.convert("Fr/ms", puq::SystemType::ESU);
-  EXPECT_EQ(q2.to_string(), "0.034*Fr*ms-1");
+    q1 = puq::Quantity(34, "statA", puq::SystemType::ESU); // explicitely state the unit system
+    q2 = q1.convert("Fr/ms", puq::SystemType::ESU);
+    EXPECT_EQ(q2.to_string(), "0.034*Fr*ms-1");
 }
 
 TEST(UnitSystem, EnvironmentSetting) {
-  if constexpr (!puq::Config::use_system_cgs) {
-    GTEST_SKIP() << "CGS unit system is disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
 
-  puq::Quantity q1, q2;
+    puq::Quantity q1, q2;
 
-  puq::UnitSystem us(puq::SystemType::ESU); // set a default unit system environment
+    puq::UnitSystem us(puq::SystemType::ESU); // set a default unit system environment
 
-  q1 = puq::Quantity(34, "statA"); // ESU units are available by default
-  q2 = q1.convert("Fr/ms");
-  EXPECT_EQ(q2.to_string(), "0.034*Fr*ms-1");
+    q1 = puq::Quantity(34, "statA"); // ESU units are available by default
+    q2 = q1.convert("Fr/ms");
+    EXPECT_EQ(q2.to_string(), "0.034*Fr*ms-1");
 
-  us.close(); // switch to previous system
-  EXPECT_THROW(us.close(), puq::UnitSystemExcept);
+    us.close(); // switch to previous system
+    EXPECT_THROW(us.close(), puq::UnitSystemExcept);
 
-  EXPECT_THROW(puq::Quantity(2, "statA"), puq::AtomParsingExcept); // ESU is no more available
+    EXPECT_THROW(puq::Quantity(2, "statA"), puq::AtomParsingExcept); // ESU is no more available
 
-  q1 = puq::Quantity(2, "A");
-  EXPECT_EQ(q1.to_string(), "2*A"); // SI is available
+    q1 = puq::Quantity(2, "A");
+    EXPECT_EQ(q1.to_string(), "2*A"); // SI is available
 }
 
 TEST(UnitSystem, FormatConversion) {
-  if constexpr (!puq::Config::use_system_cgs) {
-    GTEST_SKIP() << "CGS unit system is disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
 
-  puq::Quantity q("J"), r;
+    puq::Quantity q("J"), r;
 
-  r = q.convert(puq::Format::Base::MKS);
-  EXPECT_EQ(r.to_string(), "m2*kg*s-2");
+    r = q.convert(puq::Format::Base::MKS);
+    EXPECT_EQ(r.to_string(), "m2*kg*s-2");
 
-  r = q.convert(puq::Format::Base::MGS);
-  EXPECT_EQ(r.to_string(), "1e3*m2*g*s-2");
-
-  r = q.convert(puq::Format::Base::CGS);
-  EXPECT_EQ(r.to_string(), "1e7*cm2*g*s-2");
-
-  if constexpr (puq::Config::use_system_eus) {
-    // q is implicitely converted into MGS format,
-    // because unit J does not exist in US unit system
-    r = q.convert(puq::Format::Base::FPS, puq::SystemType::US);
-    EXPECT_EQ(r.to_string(), "23.7304*ft2*lb*s-2");
-
-    // explicitely what happens above
     r = q.convert(puq::Format::Base::MGS);
-    r = r.convert(puq::Format::Base::FPS, puq::SystemType::US);
-    EXPECT_EQ(r.to_string(), "23.7304*ft2*lb*s-2");
-  }
+    EXPECT_EQ(r.to_string(), "1e3*m2*g*s-2");
+
+    r = q.convert(puq::Format::Base::CGS);
+    EXPECT_EQ(r.to_string(), "1e7*cm2*g*s-2");
+
+    if constexpr (puq::Config::use_system_eus) {
+        // q is implicitely converted into MGS format,
+        // because unit J does not exist in US unit system
+        r = q.convert(puq::Format::Base::FPS, puq::SystemType::US);
+        EXPECT_EQ(r.to_string(), "23.7304*ft2*lb*s-2");
+
+        // explicitely what happens above
+        r = q.convert(puq::Format::Base::MGS);
+        r = r.convert(puq::Format::Base::FPS, puq::SystemType::US);
+        EXPECT_EQ(r.to_string(), "23.7304*ft2*lb*s-2");
+    }
 }
 
 TEST(UnitSystem, DirectConversionESU) {
-  if constexpr (!puq::Config::use_system_cgs) {
-    GTEST_SKIP() << "CGS unit system is disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
 
-  puq::Quantity q1, q2, q3;
+    puq::Quantity q1, q2, q3;
 
-  q1 = puq::Quantity(34, "J", puq::SystemType::SI); // convert using expression
-  q2 = q1.convert("erg", puq::SystemType::ESU);
-  EXPECT_EQ(q2.to_string(), "3.4e8*erg");
-
-  q1 = puq::Quantity(34, "J", puq::SystemType::SI); // convert using Quantity/Measurement
-  q2 = puq::Quantity("erg", puq::SystemType::ESU);
-  q3 = q1.convert(q2);
-  EXPECT_EQ(q3.to_string(), "3.4e8*erg");
-
-  if constexpr (puq::Config::preprocess_system) {
-    q1 = puq::Quantity(34, "J");
-    q2 = q1.convert("ESU_erg");
+    q1 = puq::Quantity(34, "J", puq::SystemType::SI); // convert using expression
+    q2 = q1.convert("erg", puq::SystemType::ESU);
     EXPECT_EQ(q2.to_string(), "3.4e8*erg");
-  }
+
+    q1 = puq::Quantity(34, "J", puq::SystemType::SI); // convert using Quantity/Measurement
+    q2 = puq::Quantity("erg", puq::SystemType::ESU);
+    q3 = q1.convert(q2);
+    EXPECT_EQ(q3.to_string(), "3.4e8*erg");
+
+    if constexpr (puq::Config::preprocess_system) {
+        q1 = puq::Quantity(34, "J");
+        q2 = q1.convert("ESU_erg");
+        EXPECT_EQ(q2.to_string(), "3.4e8*erg");
+    }
 }
 
 TEST(UnitSystem, ContextConversionESU) {
-  if constexpr (!puq::Config::use_system_cgs) {
-    GTEST_SKIP() << "CGS unit system is disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
 
-  puq::Quantity q1, q2, q3;
+    puq::Quantity q1, q2, q3;
 
-  q1 = puq::Quantity(20, "statA", puq::SystemType::ESU);
-  q2 = q1.convert("A", puq::SystemType::SI, "I"); // specify conversion context
-  EXPECT_EQ(q2.to_string(), "6.67128e-9*A");
+    q1 = puq::Quantity(20, "statA", puq::SystemType::ESU);
+    q2 = q1.convert("A", puq::SystemType::SI, "I"); // specify conversion context
+    EXPECT_EQ(q2.to_string(), "6.67128e-9*A");
 
-  q1 = puq::Quantity("6.671282e-10*A", puq::SystemType::SI);
-  q2 = q1.convert("statA", puq::SystemType::ESU, "I"); // inverse conversion
-  EXPECT_EQ(q2.to_string(), "2*statA");
+    q1 = puq::Quantity("6.671282e-10*A", puq::SystemType::SI);
+    q2 = q1.convert("statA", puq::SystemType::ESU, "I"); // inverse conversion
+    EXPECT_EQ(q2.to_string(), "2*statA");
 
-  q1 = puq::Quantity("1.13412e-08*A", puq::SystemType::SI); // error without given context
-  EXPECT_THROW(q1.convert("statA", puq::SystemType::ESU), puq::ConvDimExcept);
+    q1 = puq::Quantity("1.13412e-08*A", puq::SystemType::SI); // error without given context
+    EXPECT_THROW(q1.convert("statA", puq::SystemType::ESU), puq::ConvDimExcept);
 
-  q1 = puq::Quantity(1, "statT", puq::SystemType::ESU);
-  q2 = q1.convert("T", puq::SystemType::SI, "B"); // specify conversion context
-  EXPECT_EQ(q2.to_string(), "2.99792e6*T");
+    q1 = puq::Quantity(1, "statT", puq::SystemType::ESU);
+    q2 = q1.convert("T", puq::SystemType::SI, "B"); // specify conversion context
+    EXPECT_EQ(q2.to_string(), "2.99792e6*T");
 
-  q1 = puq::Quantity(1, "erg", puq::SystemType::ESU); // quantities that do not need a conversion context
-  q2 = q1.convert("J", puq::SystemType::SI, "E");     // with a context
-  EXPECT_EQ(q2.to_string(), "1e-7*J");
-  q2 = q1.convert("J", puq::SystemType::SI); // without a context
-  EXPECT_EQ(q2.to_string(), "1e-7*J");
+    q1 = puq::Quantity(1, "erg", puq::SystemType::ESU); // quantities that do not need a conversion context
+    q2 = q1.convert("J", puq::SystemType::SI, "E");     // with a context
+    EXPECT_EQ(q2.to_string(), "1e-7*J");
+    q2 = q1.convert("J", puq::SystemType::SI); // without a context
+    EXPECT_EQ(q2.to_string(), "1e-7*J");
 
-  if constexpr (puq::Config::preprocess_system) {
-    // throw an error if preprocessor system does not match selected system
-    q1 = puq::Quantity("6.671282e-10*A");
-    EXPECT_THROW(q1.convert("ESU_statA", puq::SystemType::SI, "I"), puq::UnitSystemExcept);
-  }
+    if constexpr (puq::Config::preprocess_system) {
+        // throw an error if preprocessor system does not match selected system
+        q1 = puq::Quantity("6.671282e-10*A");
+        EXPECT_THROW(q1.convert("ESU_statA", puq::SystemType::SI, "I"), puq::UnitSystemExcept);
+    }
 }
 
 TEST(UnitSystem, ContextConversionSRU) {
-  if constexpr (!puq::Config::use_system_nus) {
-    GTEST_SKIP() << "CGS unit system is disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_system_nus) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
 
-  puq::Quantity q1, q2, q3;
+    puq::Quantity q1, q2, q3;
 
-  q1 = puq::Quantity(1, "<E>", puq::SystemType::SRU);
-  q2 = q1.convert("<E>", puq::SystemType::SI, "E");
-  EXPECT_EQ(q2.to_string(), "8.98755e16*<E>");
+    q1 = puq::Quantity(1, "<E>", puq::SystemType::SRU);
+    q2 = q1.convert("<E>", puq::SystemType::SI, "E");
+    EXPECT_EQ(q2.to_string(), "8.98755e16*<E>");
 
-  q1 = puq::Quantity(1, "<L_ome>", puq::SystemType::SRU);
-  q2 = q1.convert("<L_ome>", puq::SystemType::SI, "L_ome");
-  EXPECT_EQ(q2.to_string(), "2.99792e8*<L_ome>");
+    q1 = puq::Quantity(1, "<L_ome>", puq::SystemType::SRU);
+    q2 = q1.convert("<L_ome>", puq::SystemType::SI, "L_ome");
+    EXPECT_EQ(q2.to_string(), "2.99792e8*<L_ome>");
 }
 
 TEST(UnitSystem, ContextConversionGRU) {
-  if constexpr (!puq::Config::use_system_nus) {
-    GTEST_SKIP() << "CGS unit system is disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_system_nus) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
 
-  puq::Quantity q1, q2, q3;
+    puq::Quantity q1, q2, q3;
 
-  q1 = puq::Quantity(1, "<E>", puq::SystemType::GRU);
-  q2 = q1.convert("<E>", puq::SystemType::SI, "E");
-  EXPECT_EQ(q2.to_string(), "1.60218e-10*<E>");
+    q1 = puq::Quantity(1, "<E>", puq::SystemType::GRU);
+    q2 = q1.convert("<E>", puq::SystemType::SI, "E");
+    EXPECT_EQ(q2.to_string(), "1.60218e-10*<E>");
 
-  q1 = puq::Quantity(1, "<L_ome>", puq::SystemType::GRU);
-  q2 = q1.convert("<L_ome>", puq::SystemType::SI, "L_ome");
-  EXPECT_EQ(q2.to_string(), "1.05457e-34*<L_ome>");
+    q1 = puq::Quantity(1, "<L_ome>", puq::SystemType::GRU);
+    q2 = q1.convert("<L_ome>", puq::SystemType::SI, "L_ome");
+    EXPECT_EQ(q2.to_string(), "1.05457e-34*<L_ome>");
 }
 
 TEST(UnitSystem, ContextConversionGEO) {
-  if constexpr (!puq::Config::use_system_nus) {
-    GTEST_SKIP() << "CGS unit system is disabled";
-    return;
-  }
+    if constexpr (!puq::Config::use_system_nus) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
 
-  puq::Quantity q1, q2, q3;
+    puq::Quantity q1, q2, q3;
 
-  q1 = puq::Quantity(1, "m*{#c}2/{#G}", puq::SystemType::GEO);
-  q1 = q1.convert(puq::Format::Base::MKS);
-  EXPECT_EQ(q1.to_string(), "1.346591(30)e27*kg");
+    q1 = puq::Quantity(1, "m*{#c}2/{#G}", puq::SystemType::GEO);
+    q1 = q1.convert(puq::Format::Base::MKS);
+    EXPECT_EQ(q1.to_string(), "1.346591(30)e27*kg");
 
-  q1 = puq::Quantity(1, "<E>", puq::SystemType::GEO);
-  q2 = q1.convert("<E>", puq::SystemType::SI, "E");
-  EXPECT_EQ(q2.to_string(), "1.210256(27)e44*<E>");
+    q1 = puq::Quantity(1, "<E>", puq::SystemType::GEO);
+    q2 = q1.convert("<E>", puq::SystemType::SI, "E");
+    EXPECT_EQ(q2.to_string(), "1.210256(27)e44*<E>");
 
-  q1 = puq::Quantity(1, "<L_ome>", puq::SystemType::GEO);
-  q2 = q1.convert("<L_ome>", puq::SystemType::SI, "L_ome");
-  EXPECT_EQ(q2.to_string(), "4.036978(91)e35*<L_ome>");
+    q1 = puq::Quantity(1, "<L_ome>", puq::SystemType::GEO);
+    q2 = q1.convert("<L_ome>", puq::SystemType::SI, "L_ome");
+    EXPECT_EQ(q2.to_string(), "4.036978(91)e35*<L_ome>");
 }

@@ -6,114 +6,114 @@ using namespace snt;
 
 TEST(ParseArrays, BooleanValue) {
 
-  dip::DIP d;
-  d.add_string("foo bool[2,3] = [[true,false,true],[true,true,false]]");
-  dip::Environment env = d.parse();
+    dip::DIP d;
+    d.add_string("foo bool[2,3] = [[true,false,true],[true,true,false]]");
+    dip::Environment env = d.parse();
 
-  dip::ValueNode::PointerType vnode = env.nodes.at(0);
-  EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "false", "true", "true", "true", "false"}));
-  EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
-  EXPECT_EQ(vnode->dtype, dip::NodeDtype::Boolean);
-  EXPECT_EQ(vnode->indent, 0);
-  EXPECT_EQ(vnode->name, "foo");
-  EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "false", "true", "true", "true", "false"}));
+    EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
+    EXPECT_EQ(vnode->dtype, dip::NodeDtype::Boolean);
+    EXPECT_EQ(vnode->indent, 0);
+    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
-  EXPECT_EQ(vnode->value->to_string(), "[[true, false, true], [true, true, false]]");
-  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(vnode->value->to_string(), "[[true, false, true], [true, true, false]]");
+    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
 }
 
 TEST(ParseArrays, IntegerValue) {
 
-  dip::DIP d;
-  d.add_string("foo int[2,3] = [[1,2,3],[-4,-5,-678910111]]");
-  dip::Environment env = d.parse();
+    dip::DIP d;
+    d.add_string("foo int[2,3] = [[1,2,3],[-4,-5,-678910111]]");
+    dip::Environment env = d.parse();
 
-  dip::ValueNode::PointerType vnode = env.nodes.at(0);
-  EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2", "3", "-4", "-5", "-678910111"}));
-  EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
-  EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
-  EXPECT_EQ(vnode->indent, 0);
-  EXPECT_EQ(vnode->name, "foo");
-  EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2", "3", "-4", "-5", "-678910111"}));
+    EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
+    EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
+    EXPECT_EQ(vnode->indent, 0);
+    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
-  EXPECT_EQ(vnode->value->to_string(), "[[1, 2, 3], [-4, -5, -678910111]]");
-  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(vnode->value->to_string(), "[[1, 2, 3], [-4, -5, -678910111]]");
+    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
 }
 
 TEST(ParseArrays, FloatValue) {
 
-  dip::DIP d;
-  d.add_string("foo float[2,3] = [[1,2.2,3.3e3],[-4,-5.5,-6.6e6]]");
-  dip::Environment env = d.parse();
+    dip::DIP d;
+    d.add_string("foo float[2,3] = [[1,2.2,3.3e3],[-4,-5.5,-6.6e6]]");
+    dip::Environment env = d.parse();
 
-  dip::ValueNode::PointerType vnode = env.nodes.at(0);
-  EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2.2", "3.3e3", "-4", "-5.5", "-6.6e6"}));
-  EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
-  EXPECT_EQ(vnode->dtype, dip::NodeDtype::Float);
-  EXPECT_EQ(vnode->indent, 0);
-  EXPECT_EQ(vnode->name, "foo");
-  EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2.2", "3.3e3", "-4", "-5.5", "-6.6e6"}));
+    EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
+    EXPECT_EQ(vnode->dtype, dip::NodeDtype::Float);
+    EXPECT_EQ(vnode->indent, 0);
+    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
-  EXPECT_EQ(vnode->value->to_string(), "[[1, 2.2, 3.3e3], [-4, -5.5, -6.6e6]]");
-  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Float64);
+    EXPECT_EQ(vnode->value->to_string(), "[[1, 2.2, 3.3e3], [-4, -5.5, -6.6e6]]");
+    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Float64);
 }
 
 TEST(ParseArrays, StringValue) {
 
-  dip::DIP d;
-  d.add_string("foo str[2,3] = [[position,\"velo,ci\\\"ty\",\"acce]lera'tion\"],[\"jerk\",\"snap\",\"crackle\"]]");
-  dip::Environment env = d.parse();
+    dip::DIP d;
+    d.add_string("foo str[2,3] = [[position,\"velo,ci\\\"ty\",\"acce]lera'tion\"],[\"jerk\",\"snap\",\"crackle\"]]");
+    dip::Environment env = d.parse();
 
-  dip::ValueNode::PointerType vnode = env.nodes.at(0);
-  EXPECT_EQ(vnode->value_raw, val::Array::StringType({"position", "velo,ci\"ty", "acce]lera'tion", "jerk", "snap", "crackle"}));
-  EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
-  EXPECT_EQ(vnode->dtype, dip::NodeDtype::String);
-  EXPECT_EQ(vnode->indent, 0);
-  EXPECT_EQ(vnode->name, "foo");
-  EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->value_raw, val::Array::StringType({"position", "velo,ci\"ty", "acce]lera'tion", "jerk", "snap", "crackle"}));
+    EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
+    EXPECT_EQ(vnode->dtype, dip::NodeDtype::String);
+    EXPECT_EQ(vnode->indent, 0);
+    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
-  EXPECT_EQ(vnode->value->to_string(), "[[\"position\", \"velo,ci\\\"ty\", \"acce]lera'tion\"], [\"jerk\", \"snap\", \"crackle\"]]");
-  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
+    EXPECT_EQ(vnode->value->to_string(), "[[\"position\", \"velo,ci\\\"ty\", \"acce]lera'tion\"], [\"jerk\", \"snap\", \"crackle\"]]");
+    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
 }
 
 TEST(ParseArrays, ArrayToScalarsError) {
 
-  dip::DIP d;
-  d.add_string("foo int = [1,2,3]");
-  try {
-    d.parse();
-    FAIL() << "Expected std::runtime_error";
-  } catch (const std::runtime_error& e) {
-    EXPECT_STREQ(e.what(), "Value size is an array but node is defined as scalar: foo int = [1,2,3]");
-  } catch (...) {
-    FAIL() << "Expected std::runtime_error";
-  }
+    dip::DIP d;
+    d.add_string("foo int = [1,2,3]");
+    try {
+        d.parse();
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(e.what(), "Value size is an array but node is defined as scalar: foo int = [1,2,3]");
+    } catch (...) {
+        FAIL() << "Expected std::runtime_error";
+    }
 }
 
 TEST(ParseArrays, WhiteSpace) {
 
-  dip::DIP d;
-  d.add_string("foo bool[2,2] = [[true,  true], [true, false]]");
-  // d.add_string("bar int[2,2] = \"[[1, 2], [3, 4]]\"");   // TODO implement parsing from a text block
-  dip::Environment env = d.parse();
+    dip::DIP d;
+    d.add_string("foo bool[2,2] = [[true,  true], [true, false]]");
+    // d.add_string("bar int[2,2] = \"[[1, 2], [3, 4]]\"");   // TODO implement parsing from a text block
+    dip::Environment env = d.parse();
 
-  dip::ValueNode::PointerType vnode = env.nodes.at(0);
-  EXPECT_EQ(vnode->value->to_string(), "[[true, true], [true, false]]");
-  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->value->to_string(), "[[true, true], [true, false]]");
+    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
 
-  // vnode = env.nodes.at(1);  // TODO
-  // EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3, 4]]");
-  // EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer);
+    // vnode = env.nodes.at(1);  // TODO
+    // EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3, 4]]");
+    // EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer);
 }
 
 TEST(ParseArrays, MultiLine) {
 
-  dip::DIP d;
-  d.add_string("foo bool[2,2] = [[true,  true],");
-  d.add_string("                 [true, false]]");
-  dip::Environment env = d.parse();
+    dip::DIP d;
+    d.add_string("foo bool[2,2] = [[true,  true],");
+    d.add_string("                 [true, false]]");
+    dip::Environment env = d.parse();
 
-  dip::ValueNode::PointerType vnode = env.nodes.at(0);
-  EXPECT_EQ(vnode->value->to_string(), "[[true, true], [true, false]]");
-  EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->value->to_string(), "[[true, true], [true, false]]");
+    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
 }

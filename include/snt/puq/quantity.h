@@ -9,83 +9,83 @@
 
 namespace snt::puq {
 
-  class Quantity {
-  private:
-    void preprocess(std::string& expression, SystemType& system) const;
-    Measurement _convert_without_context(UnitSystem& us, const SystemType stt) const;
-    Measurement _convert_with_context(UnitSystem& us, const SystemType stt, QuantityListType::iterator& qs1, QuantityListType::iterator& qs2, const std::string& q) const;
+    class Quantity {
+      private:
+        void preprocess(std::string& expression, SystemType& system) const;
+        Measurement _convert_without_context(UnitSystem& us, const SystemType stt) const;
+        Measurement _convert_with_context(UnitSystem& us, const SystemType stt, QuantityListType::iterator& qs1, QuantityListType::iterator& qs2, const std::string& q) const;
 
-  public:
-    SystemType stype;
-    Measurement measurement;
-    Quantity() : stype(UnitSystem::System) {};
-    Quantity(std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const Measurement& v, const SystemType system = UnitSystem::System);
-    Quantity(const Result& m, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const Result& m, const SystemType system = UnitSystem::System);
-    Quantity(const Result& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-    Quantity(const double m, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const double m, const SystemType system = UnitSystem::System);
-    Quantity(const double m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-    Quantity(const double m, const double e, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(const double m, const double e, const SystemType system = UnitSystem::System);
-    Quantity(const double m, const double e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-    Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(val::BaseValue::PointerType m, const SystemType system = UnitSystem::System);
-    Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-    Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system = SystemType::NONE);
-    Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system = UnitSystem::System);
-    Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-    std::string unit_system() const;
-    std::size_t size() const;
-    val::Array::ShapeType shape() const;
-    std::string to_string(const UnitFormat& format = UnitFormat()) const;
-    // quantity operations
-    friend Quantity operator+(const Quantity& q1, const Quantity& q2);
-    friend Quantity operator-(const Quantity& q1, const Quantity& q2);
-    friend Quantity operator*(const Quantity& q1, const Quantity& q2);
-    friend Quantity operator/(const Quantity& q1, const Quantity& q2);
-    friend bool operator==(const Quantity& q1, const Quantity& q2);
-    friend bool operator!=(const Quantity& q1, const Quantity& q2);
-    // scalar operations
-    friend Quantity operator+(const double m, const Quantity& q);
-    friend Quantity operator-(const double m, const Quantity& q);
-    friend Quantity operator*(const double m, const Quantity& q);
-    friend Quantity operator/(const double m, const Quantity& q);
-    // friend bool operator==(const double m, const Quantity& q);
-    friend Quantity operator+(const Quantity& q, const double m);
-    friend Quantity operator-(const Quantity& q, const double m);
-    friend Quantity operator*(const Quantity& q, const double m);
-    friend Quantity operator/(const Quantity& q, const double m);
-    // friend bool operator==(const Quantity& q, const double m);
-    //  array operations
-    friend Quantity operator+(val::BaseValue::PointerType a, const Quantity& q);
-    friend Quantity operator-(val::BaseValue::PointerType a, const Quantity& q);
-    friend Quantity operator*(val::BaseValue::PointerType a, const Quantity& q);
-    friend Quantity operator/(val::BaseValue::PointerType a, const Quantity& q);
-    // friend bool operator==(val::BaseValue::PointerType a, const Quantity& q);
-    friend Quantity operator+(const Quantity& q, val::BaseValue::PointerType a);
-    friend Quantity operator-(const Quantity& q, val::BaseValue::PointerType a);
-    friend Quantity operator*(const Quantity& q, val::BaseValue::PointerType a);
-    friend Quantity operator/(const Quantity& q, val::BaseValue::PointerType a);
-    // friend bool operator==(const Quantity& q, val::BaseValue::PointerType a);
-    friend Quantity operator+(const Quantity& q);
-    friend Quantity operator-(const Quantity& q);
-    friend std::ostream& operator<<(std::ostream& os, const Quantity& q);
-    void operator+=(Quantity& q);
-    void operator-=(Quantity& q);
-    void operator*=(Quantity& q);
-    void operator/=(Quantity& q);
-    Quantity convert(const Format::Base& format, SystemType system = SystemType::NONE) const;
-    Quantity convert(const Quantity& q) const;
-    Quantity convert(const Measurement& uv) const;
-    Quantity convert(const Measurement& uv, const SystemType system, const std::string& q = "") const;
-    Quantity convert(const BaseUnits& bu) const;
-    Quantity convert(const BaseUnits& bu, const SystemType system, const std::string& q = "") const;
-    Quantity convert(std::string s, SystemType system = SystemType::NONE, const std::string& q = "") const;
-    Quantity rebase_prefixes();
-    Quantity rebase_dimensions();
-  };
+      public:
+        SystemType stype;
+        Measurement measurement;
+        Quantity() : stype(UnitSystem::System) {};
+        Quantity(std::string s, const SystemType system = SystemType::NONE);
+        Quantity(const Measurement& v, const SystemType system = UnitSystem::System);
+        Quantity(const Result& m, std::string s, const SystemType system = SystemType::NONE);
+        Quantity(const Result& m, const SystemType system = UnitSystem::System);
+        Quantity(const Result& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+        Quantity(const double m, std::string s, const SystemType system = SystemType::NONE);
+        Quantity(const double m, const SystemType system = UnitSystem::System);
+        Quantity(const double m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+        Quantity(const double m, const double e, std::string s, const SystemType system = SystemType::NONE);
+        Quantity(const double m, const double e, const SystemType system = UnitSystem::System);
+        Quantity(const double m, const double e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+        Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system = SystemType::NONE);
+        Quantity(val::BaseValue::PointerType m, const SystemType system = UnitSystem::System);
+        Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+        Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system = SystemType::NONE);
+        Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system = UnitSystem::System);
+        Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+        std::string unit_system() const;
+        std::size_t size() const;
+        val::Array::ShapeType shape() const;
+        std::string to_string(const UnitFormat& format = UnitFormat()) const;
+        // quantity operations
+        friend Quantity operator+(const Quantity& q1, const Quantity& q2);
+        friend Quantity operator-(const Quantity& q1, const Quantity& q2);
+        friend Quantity operator*(const Quantity& q1, const Quantity& q2);
+        friend Quantity operator/(const Quantity& q1, const Quantity& q2);
+        friend bool operator==(const Quantity& q1, const Quantity& q2);
+        friend bool operator!=(const Quantity& q1, const Quantity& q2);
+        // scalar operations
+        friend Quantity operator+(const double m, const Quantity& q);
+        friend Quantity operator-(const double m, const Quantity& q);
+        friend Quantity operator*(const double m, const Quantity& q);
+        friend Quantity operator/(const double m, const Quantity& q);
+        // friend bool operator==(const double m, const Quantity& q);
+        friend Quantity operator+(const Quantity& q, const double m);
+        friend Quantity operator-(const Quantity& q, const double m);
+        friend Quantity operator*(const Quantity& q, const double m);
+        friend Quantity operator/(const Quantity& q, const double m);
+        // friend bool operator==(const Quantity& q, const double m);
+        //  array operations
+        friend Quantity operator+(val::BaseValue::PointerType a, const Quantity& q);
+        friend Quantity operator-(val::BaseValue::PointerType a, const Quantity& q);
+        friend Quantity operator*(val::BaseValue::PointerType a, const Quantity& q);
+        friend Quantity operator/(val::BaseValue::PointerType a, const Quantity& q);
+        // friend bool operator==(val::BaseValue::PointerType a, const Quantity& q);
+        friend Quantity operator+(const Quantity& q, val::BaseValue::PointerType a);
+        friend Quantity operator-(const Quantity& q, val::BaseValue::PointerType a);
+        friend Quantity operator*(const Quantity& q, val::BaseValue::PointerType a);
+        friend Quantity operator/(const Quantity& q, val::BaseValue::PointerType a);
+        // friend bool operator==(const Quantity& q, val::BaseValue::PointerType a);
+        friend Quantity operator+(const Quantity& q);
+        friend Quantity operator-(const Quantity& q);
+        friend std::ostream& operator<<(std::ostream& os, const Quantity& q);
+        void operator+=(Quantity& q);
+        void operator-=(Quantity& q);
+        void operator*=(Quantity& q);
+        void operator/=(Quantity& q);
+        Quantity convert(const Format::Base& format, SystemType system = SystemType::NONE) const;
+        Quantity convert(const Quantity& q) const;
+        Quantity convert(const Measurement& uv) const;
+        Quantity convert(const Measurement& uv, const SystemType system, const std::string& q = "") const;
+        Quantity convert(const BaseUnits& bu) const;
+        Quantity convert(const BaseUnits& bu, const SystemType system, const std::string& q = "") const;
+        Quantity convert(std::string s, SystemType system = SystemType::NONE, const std::string& q = "") const;
+        Quantity rebase_prefixes();
+        Quantity rebase_dimensions();
+    };
 
 } // namespace snt::puq
 

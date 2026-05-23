@@ -2,8 +2,8 @@
 
 namespace snt::exs {
 
-  void StepList::append(OperationType t, const std::vector<int>& s) {
-    steps.push_back({t, s});
-  };
+    void StepList::append(OperationType t, const std::vector<int>& s) {
+        steps.push_back({t, s});
+    };
 
 } // namespace snt::exs

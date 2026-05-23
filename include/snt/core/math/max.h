@@ -3,7 +3,7 @@
 
 namespace snt::core::math {
 
-  extern double max(const double m1, const double m2);
+    extern double max(const double m1, const double m2);
 
 } // namespace snt::core::math
 

@@ -6,12 +6,12 @@
 
 namespace snt::puq {
 
-  class UnitSolver {
-  public:
-    std::unique_ptr<exs::Solver<UnitAtom>> solver;
-    UnitSolver();
-    UnitAtom solve(const std::string& expression);
-  };
+    class UnitSolver {
+      public:
+        std::unique_ptr<exs::Solver<UnitAtom>> solver;
+        UnitSolver();
+        UnitAtom solve(const std::string& expression);
+    };
 
 } // namespace snt::puq
 

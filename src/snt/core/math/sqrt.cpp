@@ -3,8 +3,8 @@
 
 namespace snt::core::math {
 
-  double sqrt(const double m) {
-    return std::sqrt(m);
-  }
+    double sqrt(const double m) {
+        return std::sqrt(m);
+    }
 
 } // namespace snt::core::math

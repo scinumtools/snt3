@@ -7,30 +7,30 @@
 
 namespace snt::puq {
 
-  class Dimensions {
-  public:
-    Result numerical;
-    BaseDimensions physical;
-    std::vector<std::string> symbols;
-    Utype utype;
-    Dimensions();
-    Dimensions(const Result& n);
-    Dimensions(const Result& n, const BaseDimensions& p) : utype(Utype::NUL), numerical(n), physical(p) {};
-    Dimensions(const double m, const double e);
-    Dimensions(const double m, const double e, const BaseDimensions& p) : utype(Utype::NUL), numerical(m, e), physical(p) {};
-    std::string to_string(const UnitFormat& format = UnitFormat()) const;
+    class Dimensions {
+      public:
+        Result numerical;
+        BaseDimensions physical;
+        std::vector<std::string> symbols;
+        Utype utype;
+        Dimensions();
+        Dimensions(const Result& n);
+        Dimensions(const Result& n, const BaseDimensions& p) : utype(Utype::NUL), numerical(n), physical(p) {};
+        Dimensions(const double m, const double e);
+        Dimensions(const double m, const double e, const BaseDimensions& p) : utype(Utype::NUL), numerical(m, e), physical(p) {};
+        std::string to_string(const UnitFormat& format = UnitFormat()) const;
 
-    /**
-     * @brief Test if there are physical dimensions
-     *
-     * @return Returns true if there are some physical dimensions; otherwise returns false
-     */
-    bool has_dimensions() const;
+        /**
+         * @brief Test if there are physical dimensions
+         *
+         * @return Returns true if there are some physical dimensions; otherwise returns false
+         */
+        bool has_dimensions() const;
 
-    friend std::ostream& operator<<(std::ostream& os, const Dimensions& d);
-    bool operator==(const Dimensions& d) const;
-    bool operator!=(const Dimensions& d) const;
-  };
+        friend std::ostream& operator<<(std::ostream& os, const Dimensions& d);
+        bool operator==(const Dimensions& d) const;
+        bool operator!=(const Dimensions& d) const;
+    };
 
 } // namespace snt::puq
 

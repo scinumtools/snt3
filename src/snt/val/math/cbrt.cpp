@@ -2,8 +2,8 @@
 
 namespace snt::val::math {
 
-  val::BaseValue::PointerType cbrt(val::BaseValue::PointerType a) {
-    return a->math_cbrt();
-  }
+    val::BaseValue::PointerType cbrt(val::BaseValue::PointerType a) {
+        return a->math_cbrt();
+    }
 
 } // namespace snt::val::math

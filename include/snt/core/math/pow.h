@@ -3,7 +3,7 @@
 
 namespace snt::core::math {
 
-  extern double pow(const double m, const double e);
+    extern double pow(const double m, const double e);
 
 } // namespace snt::core::math
 

@@ -3,8 +3,8 @@
 
 namespace snt::core::math {
 
-  double abs(const double m) {
-    return std::abs(m);
-  }
+    double abs(const double m) {
+        return std::abs(m);
+    }
 
 } // namespace snt::core::math

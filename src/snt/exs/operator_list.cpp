@@ -2,18 +2,18 @@
 
 namespace snt::exs {
 
-  OperatorBase* OperatorList::select(int otype) {
-    auto it = operators.find(otype);
-    if (it != operators.end()) {
-      return &(*(it->second));
-    } else {
-      throw std::logic_error("Selecting non existing operator");
-    }
-  };
+    OperatorBase* OperatorList::select(int otype) {
+        auto it = operators.find(otype);
+        if (it != operators.end()) {
+            return &(*(it->second));
+        } else {
+            throw std::logic_error("Selecting non existing operator");
+        }
+    };
 
-  void OperatorList::append(int t, std::shared_ptr<OperatorBase> o) {
-    operators[t] = std::move(o);
-    order.push_back(t);
-  };
+    void OperatorList::append(int t, std::shared_ptr<OperatorBase> o) {
+        operators[t] = std::move(o);
+        order.push_back(t);
+    };
 
 } // namespace snt::exs

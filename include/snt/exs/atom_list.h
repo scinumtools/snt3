@@ -8,11 +8,11 @@
 
 namespace snt::exs {
 
-  class AtomList {
-  public:
-    std::vector<std::unique_ptr<AtomGrand>> atoms;
-    AtomGrand* append(std::unique_ptr<AtomGrand> a);
-  };
+    class AtomList {
+      public:
+        std::vector<std::unique_ptr<AtomGrand>> atoms;
+        AtomGrand* append(std::unique_ptr<AtomGrand> a);
+    };
 
 } // namespace snt::exs
 

@@ -1,16 +1,17 @@
 #include "main.h"
+
 #include "argparser.h"
 
 #include <deque>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
 #include <stdexcept>
-#include <iomanip>
 
 std::string help() {
-  return R"(
+    return R"(
 Scientific Numerical Tools v3 (SNT)
 
 Usage:
@@ -32,27 +33,26 @@ Run 'snt <module> --help' for module-specific commands.
 
 int main(int argc, char* argv[]) {
 
-  ArgParser argpar(argc, argv);
+    ArgParser argpar(argc, argv);
 
-  if (!argpar.hasPositionals() && (argpar.hasKeyword("-h") || !argpar.hasKeywords())) {
-    std::cout << help();
-    exit(0);
-  } else if (argpar.hasKeyword("-v")) {
-    std::cout << CODE_VERSION << '\n';
-    exit(0);
-  }
-
-  try {
-    if (argpar.hasPositionals()) {
-      std::string mod = argpar.getPositionalValue(0);
-      if (mod=="puq") {
-	module_puq(argpar);
-      } else if (mod=="dip") {
-	module_dip(argpar);
-      }
+    if (!argpar.hasPositionals() && (argpar.hasKeyword("-h") || !argpar.hasKeywords())) {
+        std::cout << help();
+        exit(0);
+    } else if (argpar.hasKeyword("-v")) {
+        std::cout << CODE_VERSION << '\n';
+        exit(0);
     }
-  } catch (std::exception& e) {
-    std::cout << e.what() << '\n';
-  }
 
+    try {
+        if (argpar.hasPositionals()) {
+            std::string mod = argpar.getPositionalValue(0);
+            if (mod == "puq") {
+                module_puq(argpar);
+            } else if (mod == "dip") {
+                module_dip(argpar);
+            }
+        }
+    } catch (std::exception& e) {
+        std::cout << e.what() << '\n';
+    }
 }

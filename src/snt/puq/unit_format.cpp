@@ -2,127 +2,127 @@
 
 namespace snt::puq {
 
-  const std::unordered_map<char, std::string> UnitFormat::superscript_map = {
-      {'0', "\u2070"},
-      {'1', "\u00B9"},
-      {'2', "\u00B2"},
-      {'3', "\u00B3"}, // 0 1 2 3 -> ⁰ ¹ ² ³
-      {'4', "\u2074"},
-      {'5', "\u2075"},
-      {'6', "\u2076"},
-      {'7', "\u2077"}, // 4 5 6 7 -> ⁴ ⁵ ⁶ ⁷
-      {'8', "\u2078"},
-      {'9', "\u2079"},                            // 8 9 -> ⁸ ⁹
-      {Symbols::minus[0], "\u207B"},              // - -> ⁻
-      {Symbols::plus[0], ""},                     // + ->
-      {Symbols::fraction_separator[0], "\u141F"}, // : -> ᐟ
-  };
+    const std::unordered_map<char, std::string> UnitFormat::superscript_map = {
+        {'0', "\u2070"},
+        {'1', "\u00B9"},
+        {'2', "\u00B2"},
+        {'3', "\u00B3"}, // 0 1 2 3 -> ⁰ ¹ ² ³
+        {'4', "\u2074"},
+        {'5', "\u2075"},
+        {'6', "\u2076"},
+        {'7', "\u2077"}, // 4 5 6 7 -> ⁴ ⁵ ⁶ ⁷
+        {'8', "\u2078"},
+        {'9', "\u2079"},                            // 8 9 -> ⁸ ⁹
+        {Symbols::minus[0], "\u207B"},              // - -> ⁻
+        {Symbols::plus[0], ""},                     // + ->
+        {Symbols::fraction_separator[0], "\u141F"}, // : -> ᐟ
+    };
 
-  const std::unordered_map<std::string, std::string> UnitFormat::symbol_map = {
-      {std::string(Symbols::exponent2), std::string(Symbols::exponent)}, // ×10 -> e
-      {std::string(Symbols::minus2), std::string(Symbols::minus)},       // −   -> -
-      {std::string(Symbols::multiply2), std::string(Symbols::multiply)}, // ⋅   -> *
-  };
+    const std::unordered_map<std::string, std::string> UnitFormat::symbol_map = {
+        {std::string(Symbols::exponent2), std::string(Symbols::exponent)}, // ×10 -> e
+        {std::string(Symbols::minus2), std::string(Symbols::minus)},       // −   -> -
+        {std::string(Symbols::multiply2), std::string(Symbols::multiply)}, // ⋅   -> *
+    };
 
-  bool UnitFormat::preprocess_system(std::string& expression, const std::string& abbrev) {
-    std::string prefix = abbrev + std::string(Symbols::system_separator);
-    size_t pos = expression.find(prefix);
-    if (pos != std::string::npos && pos == 0) {
-      expression = expression.substr(prefix.size(), expression.size());
-      return true;
+    bool UnitFormat::preprocess_system(std::string& expression, const std::string& abbrev) {
+        std::string prefix = abbrev + std::string(Symbols::system_separator);
+        size_t pos = expression.find(prefix);
+        if (pos != std::string::npos && pos == 0) {
+            expression = expression.substr(prefix.size(), expression.size());
+            return true;
+        }
+        prefix = abbrev + " ";
+        pos = expression.find(prefix);
+        if (pos != std::string::npos && pos == 0) {
+            expression = expression.substr(prefix.size(), expression.size());
+            return true;
+        }
+        return false;
     }
-    prefix = abbrev + " ";
-    pos = expression.find(prefix);
-    if (pos != std::string::npos && pos == 0) {
-      expression = expression.substr(prefix.size(), expression.size());
-      return true;
-    }
-    return false;
-  }
 
-  void UnitFormat::preprocess_symbols(std::string& expression) {
-    // convert superscripts
-    for (const auto& item : UnitFormat::superscript_map) {
-      if (item.second == "")
-        continue;
-      size_t pos = expression.find(item.second);
-      while (pos != std::string::npos) {
-        std::string first(1, item.first);
-        expression.replace(pos, item.second.size(), first);
-        pos = expression.find(item.second, pos + item.second.size());
-      }
+    void UnitFormat::preprocess_symbols(std::string& expression) {
+        // convert superscripts
+        for (const auto& item : UnitFormat::superscript_map) {
+            if (item.second == "")
+                continue;
+            size_t pos = expression.find(item.second);
+            while (pos != std::string::npos) {
+                std::string first(1, item.first);
+                expression.replace(pos, item.second.size(), first);
+                pos = expression.find(item.second, pos + item.second.size());
+            }
+        }
+        // convert mathematical symbols
+        for (const auto& item : UnitFormat::symbol_map) {
+            size_t pos = expression.find(item.first);
+            while (pos != std::string::npos) {
+                expression.replace(pos, item.first.size(), item.second);
+                pos = expression.find(item.first, pos + item.first.size());
+            }
+        }
     }
-    // convert mathematical symbols
-    for (const auto& item : UnitFormat::symbol_map) {
-      size_t pos = expression.find(item.first);
-      while (pos != std::string::npos) {
-        expression.replace(pos, item.first.size(), item.second);
-        pos = expression.find(item.first, pos + item.first.size());
-      }
+
+    std::string UnitFormat::multiply_symbol() const {
+        if (math == Format::Math::UNICODE || math == Format::Math::HTML) {
+            return std::string(Symbols::multiply2);
+        }
+        return std::string(Symbols::multiply);
     }
-  }
 
-  std::string UnitFormat::multiply_symbol() const {
-    if (math == Format::Math::UNICODE || math == Format::Math::HTML) {
-      return std::string(Symbols::multiply2);
+    std::string UnitFormat::format_exponents(std::string expression) const {
+        if (math != Format::Math::ASCII) {
+            // removing leading zeros
+            if (expression[0] == '0') {
+                expression.erase(0, 0);
+            } else if (expression[0] == Symbols::plus[0] || expression[0] == Symbols::minus[0]) {
+                if (expression[1] == '0')
+                    expression.erase(1, 1);
+            }
+        }
+        if (math == Format::Math::UNICODE) {
+            // translating special characters
+            std::string superscript_str;
+            for (char c : expression) {
+                superscript_str += UnitFormat::superscript_map.at(c);
+            }
+            return superscript_str;
+        } else if (math == Format::Math::HTML) {
+            return "<sup>" + expression + "</sup>";
+        }
+        return expression;
     }
-    return std::string(Symbols::multiply);
-  }
 
-  std::string UnitFormat::format_exponents(std::string expression) const {
-    if (math != Format::Math::ASCII) {
-      // removing leading zeros
-      if (expression[0] == '0') {
-        expression.erase(0, 0);
-      } else if (expression[0] == Symbols::plus[0] || expression[0] == Symbols::minus[0]) {
-        if (expression[1] == '0')
-          expression.erase(1, 1);
-      }
+    std::string UnitFormat::format_order(std::string expression) const {
+        if (math == Format::Math::UNICODE || math == Format::Math::HTML) {
+            size_t pos = expression.find(Symbols::exponent);
+            if (pos != std::string::npos) {
+                std::string exponent_str = expression.substr(pos + std::string(Symbols::exponent).size(), expression.size());
+                expression = expression.substr(0, pos) + std::string(Symbols::exponent2) + format_exponents(exponent_str);
+            }
+        }
+        return expression;
     }
-    if (math == Format::Math::UNICODE) {
-      // translating special characters
-      std::string superscript_str;
-      for (char c : expression) {
-        superscript_str += UnitFormat::superscript_map.at(c);
-      }
-      return superscript_str;
-    } else if (math == Format::Math::HTML) {
-      return "<sup>" + expression + "</sup>";
+
+    std::string UnitFormat::format_system(std::string expression, const std::string& abbrev) const {
+        if (system == Format::System::SHOW) {
+            if (math == Format::Math::UNICODE || math == Format::Math::HTML)
+                return abbrev + " " + expression;
+            else
+                return abbrev + std::string(Symbols::system_separator) + expression;
+        }
+        return expression;
+    };
+
+    bool UnitFormat::display_result() const {
+        return (part == Format::Display::BOTH) || (part == Format::Display::RESULT);
     }
-    return expression;
-  }
 
-  std::string UnitFormat::format_order(std::string expression) const {
-    if (math == Format::Math::UNICODE || math == Format::Math::HTML) {
-      size_t pos = expression.find(Symbols::exponent);
-      if (pos != std::string::npos) {
-        std::string exponent_str = expression.substr(pos + std::string(Symbols::exponent).size(), expression.size());
-        expression = expression.substr(0, pos) + std::string(Symbols::exponent2) + format_exponents(exponent_str);
-      }
+    bool UnitFormat::display_units() const {
+        return (part == Format::Display::BOTH) || (part == Format::Display::UNITS);
     }
-    return expression;
-  }
 
-  std::string UnitFormat::format_system(std::string expression, const std::string& abbrev) const {
-    if (system == Format::System::SHOW) {
-      if (math == Format::Math::UNICODE || math == Format::Math::HTML)
-        return abbrev + " " + expression;
-      else
-        return abbrev + std::string(Symbols::system_separator) + expression;
+    bool UnitFormat::display_uncertainty() const {
+        return (uncertainty == Format::Uncertainty::SHOW);
     }
-    return expression;
-  };
-
-  bool UnitFormat::display_result() const {
-    return (part == Format::Display::BOTH) || (part == Format::Display::RESULT);
-  }
-
-  bool UnitFormat::display_units() const {
-    return (part == Format::Display::BOTH) || (part == Format::Display::UNITS);
-  }
-
-  bool UnitFormat::display_uncertainty() const {
-    return (uncertainty == Format::Uncertainty::SHOW);
-  }
 
 } // namespace snt::puq

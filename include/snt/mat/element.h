@@ -7,102 +7,102 @@
 
 namespace snt::mat {
 
-  /**
-   * @class Element
-   * @brief An element is a pure substance that consists entirely of one type of atom
-   */
-  class Element : public Part<int>, public Matter {
-  public:
     /**
-     * @struct ElementProperties
-     * @brief Set of element defining properties
+     * @class Element
+     * @brief An element is a pure substance that consists entirely of one type of atom
      */
-    struct ElementProperties {
-      unsigned int protons;   ///< proton number Z
-      double neutrons;        ///< average number of neutrons in naturally abundant element N
-      unsigned int electrons; ///< electron number e
-    } elementProps;           ///< set of basic element properties
+    class Element : public Part<int>, public Matter {
+      public:
+        /**
+         * @struct ElementProperties
+         * @brief Set of element defining properties
+         */
+        struct ElementProperties {
+            unsigned int protons;   ///< proton number Z
+            double neutrons;        ///< average number of neutrons in naturally abundant element N
+            unsigned int electrons; ///< electron number e
+        } elementProps;             ///< set of basic element properties
 
-    bool natural;            ///< true if element is naturally abundant
-    std::string element;     ///< element symbol
-    unsigned int isotope;    ///< isotope type
-    unsigned int ionisation; ///< ionisation state
+        bool natural;            ///< true if element is naturally abundant
+        std::string element;     ///< element symbol
+        unsigned int isotope;    ///< isotope type
+        unsigned int ionisation; ///< ionisation state
 
-    /**
-     * @brief Element class constructor
-     *
-     * @param expr Element string representation
-     * @param prop Component proportion in a Composite
-     * @param nat Indicate if element is a natural isotope
-     */
-    Element(const std::string& expr, int prop = 1, bool nat = true);
+        /**
+         * @brief Element class constructor
+         *
+         * @param expr Element string representation
+         * @param prop Component proportion in a Composite
+         * @param nat Indicate if element is a natural isotope
+         */
+        Element(const std::string& expr, int prop = 1, bool nat = true);
 
-  private:
-    /**
-     * @brief Set parameters of an isotope element
-     *
-     * @param isodata Isotope data from the periodic table
-     * @param ion Ionisation state
-     */
-    void set_element(const Isotope* isodata, const int ion);
+      private:
+        /**
+         * @brief Set parameters of an isotope element
+         *
+         * @param isodata Isotope data from the periodic table
+         * @param ion Ionisation state
+         */
+        void set_element(const Isotope* isodata, const int ion);
 
-    /**
-     * @brief Set parameters of an isotope element
-     *
-     * @param elem Symbol of an element
-     * @param iso Isotope number
-     * @param ion Ionisation state
-     */
-    void set_isotope(const std::string& elem, const int iso, const int ion);
+        /**
+         * @brief Set parameters of an isotope element
+         *
+         * @param elem Symbol of an element
+         * @param iso Isotope number
+         * @param ion Ionisation state
+         */
+        void set_isotope(const std::string& elem, const int iso, const int ion);
 
-    /**
-     * @brief Set parameters of an element with natural isotopic average
-     *
-     * @param elem Symbol of an element
-     * @param iso Isotope number
-     * @param ion Ionisation state
-     */
-    void set_natural(const std::string& elem, const int iso, const int ion);
+        /**
+         * @brief Set parameters of an element with natural isotopic average
+         *
+         * @param elem Symbol of an element
+         * @param iso Isotope number
+         * @param ion Ionisation state
+         */
+        void set_natural(const std::string& elem, const int iso, const int ion);
 
-    /**
-     * @brief Set parameters of the most abundant element
-     *
-     * @param elem Symbol of an element
-     * @param iso Isotope number
-     * @param ion Ionisation state
-     */
-    void set_abundant(const std::string& elem, const int iso, const int ion);
+        /**
+         * @brief Set parameters of the most abundant element
+         *
+         * @param elem Symbol of an element
+         * @param iso Isotope number
+         * @param ion Ionisation state
+         */
+        void set_abundant(const std::string& elem, const int iso, const int ion);
 
-  public:
-    /**
-     * @brief Get an instance of an Element from an expression
-     *
-     * @param expr String expression
-     * @return An instance of the Element class
-     */
-    static Element from_string(const std::string& expr);
+      public:
+        /**
+         * @brief Get an instance of an Element from an expression
+         *
+         * @param expr String expression
+         * @return An instance of the Element class
+         */
+        static Element from_string(const std::string& expr);
 
-    /**
-     * @brief String representation of an element instance
-     *
-     * @return String representation
-     */
-    std::string to_string();
+        /**
+         * @brief String representation of an element instance
+         *
+         * @return String representation
+         */
+        std::string to_string();
 
-    /**
-     * @brief Addition of two elements
-     *
-     * @param other Pointer of another element
-     */
-    void math_add(Element* other);
+        /**
+         * @brief Addition of two elements
+         *
+         * @param other Pointer of another element
+         */
+        void math_add(Element* other);
 
-    /**
-     * @brief Multiplication of two elements
-     *
-     * @param other Pointer of another element
-     */
-    void math_multiply(Element* other);
-  };
+        /**
+         * @brief Multiplication of two elements
+         *
+         * @param other Pointer of another element
+         */
+        void math_multiply(Element* other);
+    };
 
 } // namespace snt::mat
 

@@ -7,49 +7,49 @@
 
 namespace snt::mat {
 
-  class Substance;
-
-  /**
-   * @class SubstanceSolver
-   * @brief This class solves substance expressions
-   */
-  class SubstanceSolver {
+    class Substance;
 
     /**
-     * @enum Parser state flags
+     * @class SubstanceSolver
+     * @brief This class solves substance expressions
      */
-    enum class ParserState {
-      START,
-      ELEMENT,
-      STATE,
-      END,
-      OPERATION,
-      ERROR
+    class SubstanceSolver {
+
+        /**
+         * @enum Parser state flags
+         */
+        enum class ParserState {
+            START,
+            ELEMENT,
+            STATE,
+            END,
+            OPERATION,
+            ERROR
+        };
+
+      public:
+        static std::unique_ptr<exs::Solver<SubstanceAtom>> solver; ///< Pointer to the EXS solver object
+
+        /**
+         * @brief Constructor of this class
+         */
+        SubstanceSolver() {};
+
+        /**
+         * @brief Preprocess expression for the solver
+         *
+         * @param expr Substance expression
+         */
+        std::string preprocess(const std::string& expr);
+
+        /**
+         * @brief Solve expression using expression solver
+         *
+         * @param expr Substance expression
+         * @return Map of elements and their proportions
+         */
+        ElementMap solve(const std::string& expr);
     };
-
-  public:
-    static std::unique_ptr<exs::Solver<SubstanceAtom>> solver; ///< Pointer to the EXS solver object
-
-    /**
-     * @brief Constructor of this class
-     */
-    SubstanceSolver() {};
-
-    /**
-     * @brief Preprocess expression for the solver
-     *
-     * @param expr Substance expression
-     */
-    std::string preprocess(const std::string& expr);
-
-    /**
-     * @brief Solve expression using expression solver
-     *
-     * @param expr Substance expression
-     * @return Map of elements and their proportions
-     */
-    ElementMap solve(const std::string& expr);
-  };
 
 } // namespace snt::mat
 

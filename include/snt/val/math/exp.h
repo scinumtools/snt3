@@ -5,7 +5,7 @@
 
 namespace snt::val::math {
 
-  extern val::BaseValue::PointerType exp(val::BaseValue::PointerType e);
+    extern val::BaseValue::PointerType exp(val::BaseValue::PointerType e);
 
 } // namespace snt::val::math
 

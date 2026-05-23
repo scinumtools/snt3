@@ -2,39 +2,39 @@
 
 namespace snt::exs {
 
-  // and
+    // and
 
-  OperatorAnd::OperatorAnd(std::string s) : OperatorBase("and", std::move(s), AND_OPERATOR) {
-  }
+    OperatorAnd::OperatorAnd(std::string s) : OperatorBase("and", std::move(s), AND_OPERATOR) {
+    }
 
-  void OperatorAnd::operate_binary(TokenListBase* tokens) {
-    Token left = tokens->get_left();
-    Token right = tokens->get_right();
-    left.atom->logical_and(right.atom);
-    tokens->put_left(left);
-  };
+    void OperatorAnd::operate_binary(TokenListBase* tokens) {
+        Token left = tokens->get_left();
+        Token right = tokens->get_right();
+        left.atom->logical_and(right.atom);
+        tokens->put_left(left);
+    };
 
-  // or
+    // or
 
-  OperatorOr::OperatorOr(std::string s) : OperatorBase("or", std::move(s), OR_OPERATOR) {
-  }
+    OperatorOr::OperatorOr(std::string s) : OperatorBase("or", std::move(s), OR_OPERATOR) {
+    }
 
-  void OperatorOr::operate_binary(TokenListBase* tokens) {
-    Token left = tokens->get_left();
-    Token right = tokens->get_right();
-    left.atom->logical_or(right.atom);
-    tokens->put_left(left);
-  };
+    void OperatorOr::operate_binary(TokenListBase* tokens) {
+        Token left = tokens->get_left();
+        Token right = tokens->get_right();
+        left.atom->logical_or(right.atom);
+        tokens->put_left(left);
+    };
 
-  // not
+    // not
 
-  OperatorNot::OperatorNot(std::string s) : OperatorBase("not", std::move(s), NOT_OPERATOR) {
-  }
+    OperatorNot::OperatorNot(std::string s) : OperatorBase("not", std::move(s), NOT_OPERATOR) {
+    }
 
-  void OperatorNot::operate_unary(TokenListBase* tokens) {
-    Token right = tokens->get_right();
-    right.atom->logical_not();
-    tokens->put_right(right);
-  };
+    void OperatorNot::operate_unary(TokenListBase* tokens) {
+        Token right = tokens->get_right();
+        right.atom->logical_not();
+        tokens->put_right(right);
+    };
 
 } // namespace snt::exs

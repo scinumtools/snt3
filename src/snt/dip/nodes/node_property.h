@@ -5,14 +5,14 @@
 
 namespace snt::dip {
 
-  class PropertyNode : public virtual BaseNode {
-  public:
-    typedef std::shared_ptr<PropertyNode> PointerType;
-    PropertyType ptype;
-    static BaseNode::PointerType is_node(Parser& parser);
-    PropertyNode(Parser& parser, PropertyType pt)
-        : BaseNode(parser, NodeDtype::Property), ptype(pt) {};
-  };
+    class PropertyNode : public virtual BaseNode {
+      public:
+        typedef std::shared_ptr<PropertyNode> PointerType;
+        PropertyType ptype;
+        static BaseNode::PointerType is_node(Parser& parser);
+        PropertyNode(Parser& parser, PropertyType pt)
+            : BaseNode(parser, NodeDtype::Property), ptype(pt) {};
+    };
 
 } // namespace snt::dip
 

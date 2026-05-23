@@ -5,7 +5,7 @@
 
 namespace snt::val::math {
 
-  extern val::BaseValue::PointerType max(val::BaseValue::PointerType a1, val::BaseValue::PointerType a2);
+    extern val::BaseValue::PointerType max(val::BaseValue::PointerType a1, val::BaseValue::PointerType a2);
 
 } // namespace snt::val::math
 

@@ -3,150 +3,150 @@
 
 namespace snt::dip {
 
-  /**
-   * @brief Split request expression into a name and node path
-   *
-   * @param request Request expression
-   * @return Tuple with the request name and node path
-   */
-  inline std::tuple<std::string, std::string> parse_request(const std::string& request) {
-    size_t pos = request.find(SIGN_QUERY);
-    if (pos == std::string::npos)
-      throw std::runtime_error("Environment request must contain a question mark symbol: " +
-                               request);
-    else
-      return {request.substr(0, pos), request.substr(pos + 1)};
-  }
+    /**
+     * @brief Split request expression into a name and node path
+     *
+     * @param request Request expression
+     * @return Tuple with the request name and node path
+     */
+    inline std::tuple<std::string, std::string> parse_request(const std::string& request) {
+        size_t pos = request.find(SIGN_QUERY);
+        if (pos == std::string::npos)
+            throw std::runtime_error("Environment request must contain a question mark symbol: " +
+                                     request);
+        else
+            return {request.substr(0, pos), request.substr(pos + 1)};
+    }
 
-  Environment::Environment() = default;
+    Environment::Environment() = default;
 
-  std::string Environment::request_code(const std::string& source_name) const {
-    return sources.at(source_name).code;
-  }
+    std::string Environment::request_code(const std::string& source_name) const {
+        return sources.at(source_name).code;
+    }
 
-  ValueNodeData Environment::request_node_data(const std::string& request,
-					       const RequestType rtype) const {
-    ValueNodeData new_value;
-    switch (rtype) {
-    case RequestType::Function: {
-      // TODO: this needs to be implemented
-      std::runtime_error("Functions in the request_node_data are not implemented yet.");
-      break;
-    }
-    case RequestType::Reference: {
-      auto [source_name, node_path] = parse_request(request);
-      const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
-      for (size_t i = 0; i < node_pool.size(); i++) {
-        ValueNode::PointerType vnode = node_pool.at(i);
-        if (vnode and vnode->name == node_path) {
-          new_value.value = vnode->value->clone();
-	  if (vnode->units) 
-	    new_value.units = vnode->units;
-        }
-      }
-      break;
-    }
-    default:
-      throw std::runtime_error("Unrecognized environment request type");
-    }
-    if (new_value.value == nullptr)
-      throw std::runtime_error("Value node data environment request returns an empty pointer: " + request);
-    return new_value;
-  }
-  
-  val::BaseValue::PointerType Environment::request_value(const std::string& request,
-                                                         const RequestType rtype,
-                                                         const std::string& to_unit) const {
-    val::BaseValue::PointerType new_value = nullptr;
-    switch (rtype) {
-    case RequestType::Function: {
-      FunctionList::ValueFunctionType func = functions.get_value(request);
-      new_value = func(*this);
-      break;
-    }
-    case RequestType::Reference: {
-      auto [source_name, node_path] = parse_request(request);
-      const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
-      for (size_t i = 0; i < node_pool.size(); i++) {
-        ValueNode::PointerType vnode = node_pool.at(i);
-        if (vnode and vnode->name == node_path) {
-          new_value = vnode->value->clone();
-          if (to_unit != core::KEYWORD_NONE) {
-            // NOTE: If unit conversion is not required, the to_unit should be set to "none".
-            //       This is usefull if we want to simply get a reference node as it is.
-            if (!vnode->units and !to_unit.empty())
-              throw std::runtime_error(
-                  "Request: Trying to convert nondimensional quantity into '" + to_unit +
-                  "': " + vnode->line.code);
-            else if (vnode->units and to_unit.empty())
-              throw std::runtime_error(
-                  "Request: Trying to convert '" + vnode->units_raw +
-                  "' into a nondimensional quantity: " + vnode->line.code);
-            else if (vnode->units) {
-              puq::Quantity quantity = std::move(new_value) * (*vnode->units);
-              quantity = quantity.convert(to_unit);
-              new_value = std::move(quantity.measurement.result.estimate);
-            }
-          }
-        }
-      }
-      break;
-    }
-    default:
-      throw std::runtime_error("Unrecognized environment request type");
-    }
-    if (new_value == nullptr)
-      throw std::runtime_error("Value environment request returns an empty pointer: " + request);
-    return std::move(new_value);
-  }
-
-  ValueNode::ListType Environment::request_nodes(const std::string& request,
+    ValueNodeData Environment::request_node_data(const std::string& request,
                                                  const RequestType rtype) const {
-    ValueNode::ListType new_nodes;
-    switch (rtype) {
-    case RequestType::Function: {
-      FunctionList::TableFunctionType func = functions.get_table(request);
-      new_nodes = func(*this);
-      break;
-    }
-    case RequestType::Reference: {
-      auto [source_name, node_path] = parse_request(request);
-      std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
-      const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
-      size_t p = node_pool.size(); // parent node index
-      for (size_t i = 0; i < node_pool.size(); i++) {
-        ValueNode::PointerType vnode = node_pool.at(i);
-        if (vnode and vnode->name.rfind(node_path_child, 0) == 0 and
-            vnode->name.size() > node_path_child.size()) {
-          std::string new_name = vnode->name.substr(node_path_child.size(), vnode->name.size());
-          new_nodes.push_back(vnode->clone(new_name));
-        } else if (vnode and vnode->name == node_path) {
-          p = i;
+        ValueNodeData new_value;
+        switch (rtype) {
+        case RequestType::Function: {
+            // TODO: this needs to be implemented
+            std::runtime_error("Functions in the request_node_data are not implemented yet.");
+            break;
         }
-      }
-      // if node does not have childs, but exists, return it
-      if (new_nodes.empty() && p < node_pool.size()) {
-        ValueNode::PointerType vnode = node_pool.at(p);
-        size_t pos = node_path.find_last_of('.');
-        if (pos != std::string::npos) {
-          std::string new_name = vnode->name.substr(pos+1, node_path.size());
-          new_nodes.push_back(vnode->clone(new_name));
-        } else {
-          new_nodes.push_back(vnode->clone(node_path));
+        case RequestType::Reference: {
+            auto [source_name, node_path] = parse_request(request);
+            const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
+            for (size_t i = 0; i < node_pool.size(); i++) {
+                ValueNode::PointerType vnode = node_pool.at(i);
+                if (vnode and vnode->name == node_path) {
+                    new_value.value = vnode->value->clone();
+                    if (vnode->units)
+                        new_value.units = vnode->units;
+                }
+            }
+            break;
         }
-      }
-      break;
+        default:
+            throw std::runtime_error("Unrecognized environment request type");
+        }
+        if (new_value.value == nullptr)
+            throw std::runtime_error("Value node data environment request returns an empty pointer: " + request);
+        return new_value;
     }
-    default:
-      throw std::runtime_error("Unrecognized environment request type");
-    }
-    if (new_nodes.empty())
-      throw std::runtime_error("Node environment request returns an empty node list: " + request);
-    return new_nodes;
-  }
 
-  val::BaseValue::PointerType Environment::get_value(size_t index) const {
-    return nodes.at(index)->value->clone();
-  }
+    val::BaseValue::PointerType Environment::request_value(const std::string& request,
+                                                           const RequestType rtype,
+                                                           const std::string& to_unit) const {
+        val::BaseValue::PointerType new_value = nullptr;
+        switch (rtype) {
+        case RequestType::Function: {
+            FunctionList::ValueFunctionType func = functions.get_value(request);
+            new_value = func(*this);
+            break;
+        }
+        case RequestType::Reference: {
+            auto [source_name, node_path] = parse_request(request);
+            const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
+            for (size_t i = 0; i < node_pool.size(); i++) {
+                ValueNode::PointerType vnode = node_pool.at(i);
+                if (vnode and vnode->name == node_path) {
+                    new_value = vnode->value->clone();
+                    if (to_unit != core::KEYWORD_NONE) {
+                        // NOTE: If unit conversion is not required, the to_unit should be set to "none".
+                        //       This is usefull if we want to simply get a reference node as it is.
+                        if (!vnode->units and !to_unit.empty())
+                            throw std::runtime_error(
+                                "Request: Trying to convert nondimensional quantity into '" + to_unit +
+                                "': " + vnode->line.code);
+                        else if (vnode->units and to_unit.empty())
+                            throw std::runtime_error(
+                                "Request: Trying to convert '" + vnode->units_raw +
+                                "' into a nondimensional quantity: " + vnode->line.code);
+                        else if (vnode->units) {
+                            puq::Quantity quantity = std::move(new_value) * (*vnode->units);
+                            quantity = quantity.convert(to_unit);
+                            new_value = std::move(quantity.measurement.result.estimate);
+                        }
+                    }
+                }
+            }
+            break;
+        }
+        default:
+            throw std::runtime_error("Unrecognized environment request type");
+        }
+        if (new_value == nullptr)
+            throw std::runtime_error("Value environment request returns an empty pointer: " + request);
+        return std::move(new_value);
+    }
+
+    ValueNode::ListType Environment::request_nodes(const std::string& request,
+                                                   const RequestType rtype) const {
+        ValueNode::ListType new_nodes;
+        switch (rtype) {
+        case RequestType::Function: {
+            FunctionList::TableFunctionType func = functions.get_table(request);
+            new_nodes = func(*this);
+            break;
+        }
+        case RequestType::Reference: {
+            auto [source_name, node_path] = parse_request(request);
+            std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
+            const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
+            size_t p = node_pool.size(); // parent node index
+            for (size_t i = 0; i < node_pool.size(); i++) {
+                ValueNode::PointerType vnode = node_pool.at(i);
+                if (vnode and vnode->name.rfind(node_path_child, 0) == 0 and
+                    vnode->name.size() > node_path_child.size()) {
+                    std::string new_name = vnode->name.substr(node_path_child.size(), vnode->name.size());
+                    new_nodes.push_back(vnode->clone(new_name));
+                } else if (vnode and vnode->name == node_path) {
+                    p = i;
+                }
+            }
+            // if node does not have childs, but exists, return it
+            if (new_nodes.empty() && p < node_pool.size()) {
+                ValueNode::PointerType vnode = node_pool.at(p);
+                size_t pos = node_path.find_last_of('.');
+                if (pos != std::string::npos) {
+                    std::string new_name = vnode->name.substr(pos + 1, node_path.size());
+                    new_nodes.push_back(vnode->clone(new_name));
+                } else {
+                    new_nodes.push_back(vnode->clone(node_path));
+                }
+            }
+            break;
+        }
+        default:
+            throw std::runtime_error("Unrecognized environment request type");
+        }
+        if (new_nodes.empty())
+            throw std::runtime_error("Node environment request returns an empty node list: " + request);
+        return new_nodes;
+    }
+
+    val::BaseValue::PointerType Environment::get_value(size_t index) const {
+        return nodes.at(index)->value->clone();
+    }
 
 } // namespace snt::dip

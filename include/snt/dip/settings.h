@@ -7,129 +7,129 @@
 
 namespace snt::dip {
 
-  // Source labels
-  constexpr std::string_view ROOT_SOURCE = "ROOT";
-  constexpr std::string_view FILE_SOURCE = "FILE";
-  constexpr std::string_view STRING_SOURCE = "STRING";
-  constexpr std::string_view DIRECT_SOURCE = "SOURCE";
-  constexpr std::string_view TABLE_SOURCE = "TABLE";
+    // Source labels
+    constexpr std::string_view ROOT_SOURCE = "ROOT";
+    constexpr std::string_view FILE_SOURCE = "FILE";
+    constexpr std::string_view STRING_SOURCE = "STRING";
+    constexpr std::string_view DIRECT_SOURCE = "SOURCE";
+    constexpr std::string_view TABLE_SOURCE = "TABLE";
 
-  // Parsing separators
-  constexpr char SEPARATOR_NEWLINE = '\n';
-  constexpr char SEPARATOR_DIMENSION = ',';
-  constexpr char SEPARATOR_ARRAY = ',';
-  constexpr char SEPARATOR_SLICE = ':';
-  constexpr char SEPARATOR_TABLE_COLUMNS = ' ';
-  constexpr std::string_view SEPARATOR_TABLE_HEADER = "---";
+    // Parsing separators
+    constexpr char SEPARATOR_NEWLINE = '\n';
+    constexpr char SEPARATOR_DIMENSION = ',';
+    constexpr char SEPARATOR_ARRAY = ',';
+    constexpr char SEPARATOR_SLICE = ':';
+    constexpr char SEPARATOR_TABLE_COLUMNS = ' ';
+    constexpr std::string_view SEPARATOR_TABLE_HEADER = "---";
 
-  constexpr char SIGN_QUERY = '?';
-  constexpr char SIGN_WILDCARD = '*';
-  constexpr char SIGN_NEGATE = '~';
-  constexpr char SIGN_DEFINED = '!';
-  constexpr char SIGN_SEPARATOR = '.';
-  constexpr char SIGN_CONDITION = '@';
-  constexpr char SIGN_VARIABLE = '$';
-  constexpr char SIGN_VALIDATION = '!';
-  constexpr char SIGN_ARRAY_OPEN = '[';
-  constexpr char SIGN_ARRAY_CLOSE = ']';
-  constexpr char SIGN_REFERENCE_OPEN = '{';
-  constexpr char SIGN_REFERENCE_CLOSE = '}';
-  constexpr char SIGN_EXPRESSION_OPEN = '(';
-  constexpr char SIGN_EXPRESSION_CLOSE = ')';
-  constexpr char SIGN_EQUAL = '=';
-  constexpr std::string_view SIGN_BLOCK = "\"\"\"";
+    constexpr char SIGN_QUERY = '?';
+    constexpr char SIGN_WILDCARD = '*';
+    constexpr char SIGN_NEGATE = '~';
+    constexpr char SIGN_DEFINED = '!';
+    constexpr char SIGN_SEPARATOR = '.';
+    constexpr char SIGN_CONDITION = '@';
+    constexpr char SIGN_VARIABLE = '$';
+    constexpr char SIGN_VALIDATION = '!';
+    constexpr char SIGN_ARRAY_OPEN = '[';
+    constexpr char SIGN_ARRAY_CLOSE = ']';
+    constexpr char SIGN_REFERENCE_OPEN = '{';
+    constexpr char SIGN_REFERENCE_CLOSE = '}';
+    constexpr char SIGN_EXPRESSION_OPEN = '(';
+    constexpr char SIGN_EXPRESSION_CLOSE = ')';
+    constexpr char SIGN_EQUAL = '=';
+    constexpr std::string_view SIGN_BLOCK = "\"\"\"";
 
-  // Keywords
-  constexpr std::string_view KEYWORD_BOOLEAN = "bool";
-  constexpr std::string_view KEYWORD_INTEGER = "int";
-  constexpr std::string_view KEYWORD_FLOAT = "float";
-  constexpr std::string_view KEYWORD_STRING = "str";
+    // Keywords
+    constexpr std::string_view KEYWORD_BOOLEAN = "bool";
+    constexpr std::string_view KEYWORD_INTEGER = "int";
+    constexpr std::string_view KEYWORD_FLOAT = "float";
+    constexpr std::string_view KEYWORD_STRING = "str";
 
-  constexpr std::string_view KEYWORD_CONSTANT = "constant";
-  constexpr std::string_view KEYWORD_CONDITION = "condition";
-  constexpr std::string_view KEYWORD_DESCRIPTION = "descr";
-  constexpr std::string_view KEYWORD_FORMAT = "format";
-  constexpr std::string_view KEYWORD_TAGS = "tags";
-  constexpr std::string_view KEYWORD_OPTIONS = "options";
-  constexpr std::string_view KEYWORD_DELIMITER = "delimiter";
+    constexpr std::string_view KEYWORD_CONSTANT = "constant";
+    constexpr std::string_view KEYWORD_CONDITION = "condition";
+    constexpr std::string_view KEYWORD_DESCRIPTION = "descr";
+    constexpr std::string_view KEYWORD_FORMAT = "format";
+    constexpr std::string_view KEYWORD_TAGS = "tags";
+    constexpr std::string_view KEYWORD_OPTIONS = "options";
+    constexpr std::string_view KEYWORD_DELIMITER = "delimiter";
 
-  constexpr std::string_view KEYWORD_IF = "if";
-  constexpr std::string_view KEYWORD_ELIF = "elif";
-  constexpr std::string_view KEYWORD_ELSE = "else";
-  constexpr std::string_view KEYWORD_END = "end";
+    constexpr std::string_view KEYWORD_IF = "if";
+    constexpr std::string_view KEYWORD_ELIF = "elif";
+    constexpr std::string_view KEYWORD_ELSE = "else";
+    constexpr std::string_view KEYWORD_END = "end";
 
-  constexpr std::string_view KEYWORD_SOURCE = "source";
-  constexpr std::string_view KEYWORD_UNIT = "unit";
+    constexpr std::string_view KEYWORD_SOURCE = "source";
+    constexpr std::string_view KEYWORD_UNIT = "unit";
 
-  // Regex Patterns
-  constexpr std::string_view PATTERN_KEYWORD = "[a-zA-Z0-9_-]";
-  constexpr std::string_view PATTERN_NUMBER = "[+-]?[0-9]+([.][0-9]+)?([eE][+-]?[0-9]+)?";
-  constexpr std::string_view PATTERN_PATH = "[a-zA-Z0-9._-]";
+    // Regex Patterns
+    constexpr std::string_view PATTERN_KEYWORD = "[a-zA-Z0-9_-]";
+    constexpr std::string_view PATTERN_NUMBER = "[+-]?[0-9]+([.][0-9]+)?([eE][+-]?[0-9]+)?";
+    constexpr std::string_view PATTERN_PATH = "[a-zA-Z0-9._-]";
 
-  // Various settings
-  constexpr std::string_view FILE_SUFFIX_DIP1 = ".dip";  ///< Suffix name of a DIPL file
-  constexpr std::string_view FILE_SUFFIX_DIP2 = ".dipl"; ///< Suffix name of a DIPL file
-  constexpr int INDENT_STEP = 2;                         ///< Number of white spaces in an indent step
+    // Various settings
+    constexpr std::string_view FILE_SUFFIX_DIP1 = ".dip";  ///< Suffix name of a DIPL file
+    constexpr std::string_view FILE_SUFFIX_DIP2 = ".dipl"; ///< Suffix name of a DIPL file
+    constexpr int INDENT_STEP = 2;                         ///< Number of white spaces in an indent step
 
-  struct Source {
-    std::string name;
-    int line_number;
-  };
-
-  struct Line {
-    std::string code;
-    Source source;
-    std::string to_string() {
-      std::ostringstream oss;
-      oss << "[" << source.name << ":" << source.line_number << "] " << code;
-      return oss.str();
+    struct Source {
+        std::string name;
+        int line_number;
     };
-  };
 
-  enum class CaseType {
-    IF,
-    ELIF,
-    ELSE,
-    END
-  };
+    struct Line {
+        std::string code;
+        Source source;
+        std::string to_string() {
+            std::ostringstream oss;
+            oss << "[" << source.name << ":" << source.line_number << "] " << code;
+            return oss.str();
+        };
+    };
 
-  enum class ValueOrigin {
-    Keyword,
-    Number,
-    String,
-    Reference,
-    ReferenceRaw,
-    Function,
-    Expression
-  };
+    enum class CaseType {
+        IF,
+        ELIF,
+        ELSE,
+        END
+    };
 
-  enum class NodeDtype {
-    None,
-    Empty, // empty
-    Unit,
-    Source, // environment
-    Group,
-    Case,
-    Import, // node structure
-    Boolean,
-    Integer,
-    Float,
-    String,
-    Table,
-    Modification, // data handling
-    Property,     // properties
-  };
+    enum class ValueOrigin {
+        Keyword,
+        Number,
+        String,
+        Reference,
+        ReferenceRaw,
+        Function,
+        Expression
+    };
 
-  enum class PropertyType {
-    None, // not a property
-    Constant,
-    Condition,
-    Tags,
-    Description, // global properties
-    Format,
-    Options,
-    Delimiter // specific properties
-  };
+    enum class NodeDtype {
+        None,
+        Empty, // empty
+        Unit,
+        Source, // environment
+        Group,
+        Case,
+        Import, // node structure
+        Boolean,
+        Integer,
+        Float,
+        String,
+        Table,
+        Modification, // data handling
+        Property,     // properties
+    };
+
+    enum class PropertyType {
+        None, // not a property
+        Constant,
+        Condition,
+        Tags,
+        Description, // global properties
+        Format,
+        Options,
+        Delimiter // specific properties
+    };
 
 } // namespace snt::dip
 

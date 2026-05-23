@@ -3,9 +3,9 @@
 
 template <typename T>
 std::vector<T> operator+(const std::vector<T>& v1, const std::vector<T>& v2) {
-  std::vector<T> vr(std::begin(v1), std::end(v1));
-  vr.insert(std::end(vr), std::begin(v2), std::end(v2));
-  return vr;
+    std::vector<T> vr(std::begin(v1), std::end(v1));
+    vr.insert(std::end(vr), std::begin(v2), std::end(v2));
+    return vr;
 }
 
 const std::vector<std::string> BaseUnitOrder = {"m", "g", "s", "K", "A", "cd", "mol", "rad"};

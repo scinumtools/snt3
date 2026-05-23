@@ -3,7 +3,7 @@
 
 namespace snt::core {
 
-  extern std::string to_string(const double value, int precision = std::cout.precision());
+    extern std::string to_string(const double value, int precision = std::cout.precision());
 
 } // namespace snt::core
 

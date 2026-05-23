@@ -5,8 +5,8 @@
 
 namespace snt::val::math {
 
-  extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, const double e);
-  extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, val::BaseValue::PointerType e);
+    extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, const double e);
+    extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, val::BaseValue::PointerType e);
 
 } // namespace snt::val::math
 

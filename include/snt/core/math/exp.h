@@ -3,7 +3,7 @@
 
 namespace snt::core::math {
 
-  extern double exp(const double e);
+    extern double exp(const double e);
 
 } // namespace snt::core::math
 

@@ -7,122 +7,122 @@
 
 namespace snt::dip {
 
-  class Parser : public Node {
-  private:
-    void strip(const std::string& text);
-    // static constexpr std::array<std::string, 3> ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
+    class Parser : public Node {
+      private:
+        void strip(const std::string& text);
+        // static constexpr std::array<std::string, 3> ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
 
-  public:
-    std::string code; // in Python this was 'ccode', the original 'code' is now in the 'line' struct
-    std::string comment;
-    std::array<std::string, 3> formatting;
-    Parser(const Line& l) : Node(l), code(l.code) {};
-    static void encode_escape_symbols(std::string& str);
-    static void decode_escape_symbols(std::string& str);
-    bool do_continue();
-    bool kwd_case();
-    bool kwd_unit();
-    bool kwd_source();
-    bool kwd_property(PropertyType& ptype);
-    bool part_space(const bool required = true);
-    bool part_indent();
-    bool part_name(const bool required = true);
-    bool part_type(const bool required = true);
+      public:
+        std::string code; // in Python this was 'ccode', the original 'code' is now in the 'line' struct
+        std::string comment;
+        std::array<std::string, 3> formatting;
+        Parser(const Line& l) : Node(l), code(l.code) {};
+        static void encode_escape_symbols(std::string& str);
+        static void decode_escape_symbols(std::string& str);
+        bool do_continue();
+        bool kwd_case();
+        bool kwd_unit();
+        bool kwd_source();
+        bool kwd_property(PropertyType& ptype);
+        bool part_space(const bool required = true);
+        bool part_indent();
+        bool part_name(const bool required = true);
+        bool part_type(const bool required = true);
 
-  private:
-    /**
-     * @brief Parse literal boolean values from a string
-     *
-     * @param str String that should be parsed
-     * @return True if literal was successfully parsed; otherwise, false.
-     */
-    bool part_literal_boolean(const std::string& str);
+      private:
+        /**
+         * @brief Parse literal boolean values from a string
+         *
+         * @param str String that should be parsed
+         * @return True if literal was successfully parsed; otherwise, false.
+         */
+        bool part_literal_boolean(const std::string& str);
 
-    /**
-     * @brief Parse literal string values from a string
-     *
-     * @param str String that should be parsed
-     * @return True if literal was successfully parsed; otherwise, false.
-     */
-    bool part_literal_string(const std::string& str);
+        /**
+         * @brief Parse literal string values from a string
+         *
+         * @param str String that should be parsed
+         * @return True if literal was successfully parsed; otherwise, false.
+         */
+        bool part_literal_string(const std::string& str);
 
-    /**
-     * @brief Parse literal integer values from a string
-     *
-     * @param str String that should be parsed
-     * @return True if literal was successfully parsed; otherwise, false.
-     */
-    bool part_literal_integer(const std::string& str);
+        /**
+         * @brief Parse literal integer values from a string
+         *
+         * @param str String that should be parsed
+         * @return True if literal was successfully parsed; otherwise, false.
+         */
+        bool part_literal_integer(const std::string& str);
 
-    /**
-     * @brief Parse literal float values from a string
-     *
-     * @param str String that should be parsed
-     * @return True if literal was successfully parsed; otherwise, false.
-     */
-    bool part_literal_float(const std::string& str);
+        /**
+         * @brief Parse literal float values from a string
+         *
+         * @param str String that should be parsed
+         * @return True if literal was successfully parsed; otherwise, false.
+         */
+        bool part_literal_float(const std::string& str);
 
-    /**
-     * @brief Parse literal units values from a string
-     *
-     * @param str String that should be parsed
-     * @return True if literal was successfully parsed; otherwise, false.
-     */
-    bool part_literal_units(const std::string& str);
+        /**
+         * @brief Parse literal units values from a string
+         *
+         * @param str String that should be parsed
+         * @return True if literal was successfully parsed; otherwise, false.
+         */
+        bool part_literal_units(const std::string& str);
 
-  public:
-    /**
-     * @brief Parse literal node values from a string
-     *
-     * @return True if literal was successfully parsed; otherwise, false.
-     */
-    bool part_literal();
+      public:
+        /**
+         * @brief Parse literal node values from a string
+         *
+         * @return True if literal was successfully parsed; otherwise, false.
+         */
+        bool part_literal();
 
-    bool part_dimension();
-    bool part_equal(const bool required = true);
-    bool part_reference();
-    bool part_expression();
-    bool part_function();
-    bool part_array();
-    bool part_string();
+        bool part_dimension();
+        bool part_equal(const bool required = true);
+        bool part_reference();
+        bool part_expression();
+        bool part_function();
+        bool part_array();
+        bool part_string();
 
-    /**
-     * @brief Parse a keyword from a code
-     *
-     * @param required Specifies if keyword is required or not
-     * @param delimiter Trailing character after a keyword
-     * @return True if the keyword was successfully parsed; otherwise, false.
-     */
-    bool part_keyword(const bool required = true, const char delimiter = ' ');
+        /**
+         * @brief Parse a keyword from a code
+         *
+         * @param required Specifies if keyword is required or not
+         * @param delimiter Trailing character after a keyword
+         * @return True if the keyword was successfully parsed; otherwise, false.
+         */
+        bool part_keyword(const bool required = true, const char delimiter = ' ');
 
-    /**
-     * @brief Parse a number from a code
-     *
-     * @param required Specifies if number is required or not
-     * @param delimiter Trailing character after a number
-     * @return True if the number was successfully parsed; otherwise, false.
-     */
-    bool part_number(const bool required = true, const char delimiter = ' ');
+        /**
+         * @brief Parse a number from a code
+         *
+         * @param required Specifies if number is required or not
+         * @param delimiter Trailing character after a number
+         * @return True if the number was successfully parsed; otherwise, false.
+         */
+        bool part_number(const bool required = true, const char delimiter = ' ');
 
-    /**
-     * @brief Parse node value
-     * @return True if the value was successfully parsed; otherwise, false.
-     */
-    bool part_value();
+        /**
+         * @brief Parse node value
+         * @return True if the value was successfully parsed; otherwise, false.
+         */
+        bool part_value();
 
-    bool part_slice();
-    bool part_format();
+        bool part_slice();
+        bool part_format();
 
-    /**
-     * @brief Parse units from a code
-     *
-     * @param delimiter Leading character before an unit expression
-     */
-    bool part_units(const char delimiter = ' ');
+        /**
+         * @brief Parse units from a code
+         *
+         * @param delimiter Leading character before an unit expression
+         */
+        bool part_units(const char delimiter = ' ');
 
-    bool part_comment();
-    bool part_delimiter(const char symbol, const bool required = true);
-  };
+        bool part_comment();
+        bool part_delimiter(const char symbol, const bool required = true);
+    };
 
 } // namespace snt::dip
 

@@ -1,17 +1,17 @@
-//#include <snt/puq/lists.h>
-#include "snt/cli/puq_eval.h"
-#include "snt/cli/puq_convert.h"
-#include "snt/cli/puq_info.h"
-#include "snt/cli/puq_list.h"
+// #include <snt/puq/lists.h>
 #include "argparser.h"
 #include "main.h"
-//#include "puq/commands.h"
-//#include "puq/displays.h"
+#include "snt/cli/puq_convert.h"
+#include "snt/cli/puq_eval.h"
+#include "snt/cli/puq_info.h"
+#include "snt/cli/puq_list.h"
+// #include "puq/commands.h"
+// #include "puq/displays.h"
 
 using namespace snt;
 
 std::string help_puq() {
-  return R"(
+    return R"(
 Scientific Numerical Tools v3 (SNT)
 Module: Physical Units & Quantities (PUQ)
 
@@ -72,73 +72,73 @@ Examples:
   snt puq convert "12*statA" "A" -s ESU -S SI -Q "I"
 )";
 }
-  
+
 void module_puq(ArgParser& argpar) {
-  
-  if (argpar.hasKeyword("-h") || argpar.numPositional()<=2) {
-    std::cout << help_puq();
-    exit(0);
-  }
-  
-  try {
-    std::string command = argpar.getPositionalValue(1);
-    std::string argument = argpar.getPositionalValue(2);
-    std::vector<std::string> arguments;
-    //puq::UnitSystem us(puq::SystemType::SI);
-    if (command=="info") {
-      cli::PUQInfo cmd(argument);
-      arguments = argpar.getKeywordValues("-s", "--system");
-      if (!arguments.empty()) {
-	cmd.argument_input_system(arguments[0]);
-      }      
-      cmd.execute();
+
+    if (argpar.hasKeyword("-h") || argpar.numPositional() <= 2) {
+        std::cout << help_puq();
+        exit(0);
     }
-    if (command=="eval") {
-      cli::PUQEval cmd(argument);
-      arguments = argpar.getKeywordValues("-s", "--input-system");
-      if (!arguments.empty()) {
-	cmd.argument_input_system(arguments[0]);
-      }
-      arguments = argpar.getKeywordValues("-S", "--output-system");
-      if (!arguments.empty()) {
-	cmd.argument_output_system(arguments[0]);
-      }
-      arguments = argpar.getKeywordValues("-U", "--output-units");
-      if (!arguments.empty()) {
-	cmd.argument_output_units(arguments[0]);
-      }
-      arguments = argpar.getKeywordValues("-Q", "--output-quantity");
-      if (!arguments.empty()) {
-	cmd.argument_output_quantity(arguments[0]);
-      }
-      cmd.execute();
+
+    try {
+        std::string command = argpar.getPositionalValue(1);
+        std::string argument = argpar.getPositionalValue(2);
+        std::vector<std::string> arguments;
+        // puq::UnitSystem us(puq::SystemType::SI);
+        if (command == "info") {
+            cli::PUQInfo cmd(argument);
+            arguments = argpar.getKeywordValues("-s", "--system");
+            if (!arguments.empty()) {
+                cmd.argument_input_system(arguments[0]);
+            }
+            cmd.execute();
+        }
+        if (command == "eval") {
+            cli::PUQEval cmd(argument);
+            arguments = argpar.getKeywordValues("-s", "--input-system");
+            if (!arguments.empty()) {
+                cmd.argument_input_system(arguments[0]);
+            }
+            arguments = argpar.getKeywordValues("-S", "--output-system");
+            if (!arguments.empty()) {
+                cmd.argument_output_system(arguments[0]);
+            }
+            arguments = argpar.getKeywordValues("-U", "--output-units");
+            if (!arguments.empty()) {
+                cmd.argument_output_units(arguments[0]);
+            }
+            arguments = argpar.getKeywordValues("-Q", "--output-quantity");
+            if (!arguments.empty()) {
+                cmd.argument_output_quantity(arguments[0]);
+            }
+            cmd.execute();
+        }
+        if (command == "convert") {
+            std::string argument2 = argpar.getPositionalValue(3);
+            cli::PUQConvert cmd(argument, argument2);
+            arguments = argpar.getKeywordValues("-s", "--input-system");
+            if (!arguments.empty()) {
+                cmd.argument_input_system(arguments[0]);
+            }
+            arguments = argpar.getKeywordValues("-S", "--output-system");
+            if (!arguments.empty()) {
+                cmd.argument_output_system(arguments[0]);
+            }
+            arguments = argpar.getKeywordValues("-Q", "--output-quantity");
+            if (!arguments.empty()) {
+                cmd.argument_output_quantity(arguments[0]);
+            }
+            cmd.execute();
+        }
+        if (command == "list") {
+            cli::PUQList cmd(argument);
+            arguments = argpar.getKeywordValues("-s", "--system");
+            if (!arguments.empty()) {
+                cmd.argument_system(arguments[0]);
+            }
+            cmd.execute();
+        }
+    } catch (std::exception& e) {
+        std::cout << e.what() << '\n';
     }
-    if (command=="convert") {
-      std::string argument2 = argpar.getPositionalValue(3);
-      cli::PUQConvert cmd(argument, argument2);
-      arguments = argpar.getKeywordValues("-s", "--input-system");
-      if (!arguments.empty()) {
-	cmd.argument_input_system(arguments[0]);
-      }
-      arguments = argpar.getKeywordValues("-S", "--output-system");
-      if (!arguments.empty()) {
-	cmd.argument_output_system(arguments[0]);
-      }
-      arguments = argpar.getKeywordValues("-Q", "--output-quantity");
-      if (!arguments.empty()) {
-	cmd.argument_output_quantity(arguments[0]);
-      }
-      cmd.execute();
-    }
-    if (command=="list") {
-      cli::PUQList cmd(argument);
-      arguments = argpar.getKeywordValues("-s", "--system");
-      if (!arguments.empty()) {
-	cmd.argument_system(arguments[0]);
-      }
-      cmd.execute();
-    }
-  } catch (std::exception& e) {
-    std::cout << e.what() << '\n';
-  }
 }

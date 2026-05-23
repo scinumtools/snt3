@@ -2,8 +2,8 @@
 
 namespace snt::val::math {
 
-  val::BaseValue::PointerType floor(val::BaseValue::PointerType a) {
-    return a->math_floor();
-  }
+    val::BaseValue::PointerType floor(val::BaseValue::PointerType a) {
+        return a->math_floor();
+    }
 
 } // namespace snt::val::math

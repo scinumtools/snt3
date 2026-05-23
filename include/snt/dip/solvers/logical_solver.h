@@ -5,13 +5,13 @@
 #include <snt/dip/solvers/logical_atom.h>
 
 namespace snt::dip {
-  
-  class LogicalSolver {
-  public:
-    std::unique_ptr<exs::Solver<LogicalAtom, LogicalSettings>> solver;
-    LogicalSolver(Environment& env);
-    LogicalAtom eval(const std::string& expression);
-  };
+
+    class LogicalSolver {
+      public:
+        std::unique_ptr<exs::Solver<LogicalAtom, LogicalSettings>> solver;
+        LogicalSolver(Environment& env);
+        LogicalAtom eval(const std::string& expression);
+    };
 
 } // namespace snt::dip
 

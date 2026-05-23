@@ -5,76 +5,76 @@
 
 namespace snt::exs {
 
-  // exponent
+    // exponent
 
-  class OperatorExponent : public OperatorGroup<1> {
-  public:
-    OperatorExponent(const OperatorGroupSybols& s = {"exp", "(", ")", ","});
+    class OperatorExponent : public OperatorGroup<1> {
+      public:
+        OperatorExponent(const OperatorGroupSybols& s = {"exp", "(", ")", ","});
 
-    void operate_group(TokenListBase* tokens) override;
-  };
+        void operate_group(TokenListBase* tokens) override;
+    };
 
-  // natural logarithm
+    // natural logarithm
 
-  class OperatorLogarithm : public OperatorGroup<1> {
-  public:
-    OperatorLogarithm(const OperatorGroupSybols& s = {"log", "(", ")", ","});
+    class OperatorLogarithm : public OperatorGroup<1> {
+      public:
+        OperatorLogarithm(const OperatorGroupSybols& s = {"log", "(", ")", ","});
 
-    void operate_group(TokenListBase* tokens) override;
-  };
+        void operate_group(TokenListBase* tokens) override;
+    };
 
-  // logarithm with base 10
+    // logarithm with base 10
 
-  class OperatorLogarithm10 : public OperatorGroup<1> {
-  public:
-    OperatorLogarithm10(const OperatorGroupSybols& s = {"log10", "(", ")", ","});
+    class OperatorLogarithm10 : public OperatorGroup<1> {
+      public:
+        OperatorLogarithm10(const OperatorGroupSybols& s = {"log10", "(", ")", ","});
 
-    void operate_group(TokenListBase* tokens) override;
-  };
+        void operate_group(TokenListBase* tokens) override;
+    };
 
-  // logarithm with an arbitrary base
+    // logarithm with an arbitrary base
 
-  class OperatorLogarithmBase : public OperatorGroup<2> {
-  public:
-    OperatorLogarithmBase(const OperatorGroupSybols& s = {"logb", "(", ")", ","});
+    class OperatorLogarithmBase : public OperatorGroup<2> {
+      public:
+        OperatorLogarithmBase(const OperatorGroupSybols& s = {"logb", "(", ")", ","});
 
-    void operate_group(TokenListBase* tokens) override;
-  };
+        void operate_group(TokenListBase* tokens) override;
+    };
 
-  // square root
+    // square root
 
-  class OperatorSquareRoot : public OperatorGroup<1> {
-  public:
-    OperatorSquareRoot(const OperatorGroupSybols& s = {"sqrt", "(", ")", ","});
+    class OperatorSquareRoot : public OperatorGroup<1> {
+      public:
+        OperatorSquareRoot(const OperatorGroupSybols& s = {"sqrt", "(", ")", ","});
 
-    void operate_group(TokenListBase* tokens) override;
-  };
+        void operate_group(TokenListBase* tokens) override;
+    };
 
-  // cubic root
+    // cubic root
 
-  class OperatorCubicRoot : public OperatorGroup<1> {
-  public:
-    OperatorCubicRoot(const OperatorGroupSybols& s = {"cbrt", "(", ")", ","});
-    void operate_group(TokenListBase* tokens) override;
-  };
+    class OperatorCubicRoot : public OperatorGroup<1> {
+      public:
+        OperatorCubicRoot(const OperatorGroupSybols& s = {"cbrt", "(", ")", ","});
+        void operate_group(TokenListBase* tokens) override;
+    };
 
-  // power function
+    // power function
 
-  class OperatorPower : public OperatorBase {
-  public:
-    OperatorPower(std::string s = "**");
+    class OperatorPower : public OperatorBase {
+      public:
+        OperatorPower(std::string s = "**");
 
-    void operate_binary(TokenListBase* tokens) override;
-  };
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // power function with an arbitrary base
+    // power function with an arbitrary base
 
-  class OperatorPowerBase : public OperatorGroup<2> {
-  public:
-    OperatorPowerBase(const OperatorGroupSybols& s = {"powb", "(", ")", ","});
+    class OperatorPowerBase : public OperatorGroup<2> {
+      public:
+        OperatorPowerBase(const OperatorGroupSybols& s = {"powb", "(", ")", ","});
 
-    void operate_group(TokenListBase* tokens) override;
-  };
+        void operate_group(TokenListBase* tokens) override;
+    };
 
 } // namespace snt::exs
 

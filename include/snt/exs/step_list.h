@@ -7,13 +7,13 @@
 
 namespace snt::exs {
 
-  typedef std::vector<std::pair<OperationType, std::vector<int>>> StepListType;
+    typedef std::vector<std::pair<OperationType, std::vector<int>>> StepListType;
 
-  class StepList {
-  public:
-    StepListType steps;
-    void append(OperationType t, const std::vector<int>& s);
-  };
+    class StepList {
+      public:
+        StepListType steps;
+        void append(OperationType t, const std::vector<int>& s);
+    };
 
 } // namespace snt::exs
 

@@ -5,11 +5,11 @@
 
 namespace snt::dip {
 
-  class GroupNode : public BaseNode {
-  public:
-    static BaseNode::PointerType is_node(Parser& parser);
-    GroupNode(Parser& parser) : BaseNode(parser, NodeDtype::Group) {};
-  };
+    class GroupNode : public BaseNode {
+      public:
+        static BaseNode::PointerType is_node(Parser& parser);
+        GroupNode(Parser& parser) : BaseNode(parser, NodeDtype::Group) {};
+    };
 
 } // namespace snt::dip
 

@@ -8,15 +8,15 @@
 
 namespace snt::exs {
 
-  class OperatorList {
-    typedef std::unordered_map<int, std::shared_ptr<OperatorBase>> OperatorListType;
+    class OperatorList {
+        typedef std::unordered_map<int, std::shared_ptr<OperatorBase>> OperatorListType;
 
-  public:
-    OperatorListType operators;
-    std::vector<int> order;
-    OperatorBase* select(int otype);
-    void append(int t, std::shared_ptr<OperatorBase> o);
-  };
+      public:
+        OperatorListType operators;
+        std::vector<int> order;
+        OperatorBase* select(int otype);
+        void append(int t, std::shared_ptr<OperatorBase> o);
+    };
 
 } // namespace snt::exs
 

@@ -3,7 +3,7 @@
 
 namespace snt::core::math {
 
-  extern double floor(const double m);
+    extern double floor(const double m);
 
 } // namespace snt::core::math
 

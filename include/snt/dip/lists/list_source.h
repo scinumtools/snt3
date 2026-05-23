@@ -9,29 +9,29 @@
 
 namespace snt::dip {
 
-  class SourceList; // EnvSource needs a forward declaration
+    class SourceList; // EnvSource needs a forward declaration
 
-  struct EnvSource {
-    std::string name;          // source key
-    std::string path;          // source path
-    std::string code;          // source code
-    Source parent;             // parent source
-    NodeList<ValueNode> nodes; // parsed nodes
-                               // std::shared_ptr<SourceList> sources;
-  };
+    struct EnvSource {
+        std::string name;          // source key
+        std::string path;          // source path
+        std::string code;          // source code
+        Source parent;             // parent source
+        NodeList<ValueNode> nodes; // parsed nodes
+                                   // std::shared_ptr<SourceList> sources;
+    };
 
-  class SourceList {
-  private:
-    std::map<std::string, EnvSource> sources;
+    class SourceList {
+      private:
+        std::map<std::string, EnvSource> sources;
 
-  public:
-    SourceList();
-    void append(const std::string& name, const std::string& path, const std::string& code,
-                const Source& parent);
-    void append(const std::string& name, const EnvSource& src);
-    EnvSource& at(const std::string& name);
-    const EnvSource& at(const std::string& name) const;
-  };
+      public:
+        SourceList();
+        void append(const std::string& name, const std::string& path, const std::string& code,
+                    const Source& parent);
+        void append(const std::string& name, const EnvSource& src);
+        EnvSource& at(const std::string& name);
+        const EnvSource& at(const std::string& name) const;
+    };
 
 } // namespace snt::dip
 

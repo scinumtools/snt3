@@ -6,7 +6,7 @@
 
 namespace snt::val {
 
-  extern std::string to_string(val::BaseValue::PointerType value, int precision = std::cout.precision());
+    extern std::string to_string(val::BaseValue::PointerType value, int precision = std::cout.precision());
 
 } // namespace snt::val
 

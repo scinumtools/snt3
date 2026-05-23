@@ -3,7 +3,7 @@
 
 namespace snt::core::math {
 
-  extern double sqrt(const double m);
+    extern double sqrt(const double m);
 
 } // namespace snt::core::math
 

@@ -6,14 +6,14 @@
 
 namespace snt::puq {
 
-  class OperatorParentheses : public exs::OperatorGroup<1> {
-  public:
-    std::vector<ExponentVariant> exponent;
-    OperatorParentheses() : OperatorGroup<1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
-    virtual bool check(exs::Expression& expr);
-    virtual void parse(exs::Expression& expr);
-    void operate_group(exs::TokenListBase* tokens);
-  };
+    class OperatorParentheses : public exs::OperatorGroup<1> {
+      public:
+        std::vector<ExponentVariant> exponent;
+        OperatorParentheses() : OperatorGroup<1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
+        virtual bool check(exs::Expression& expr);
+        virtual void parse(exs::Expression& expr);
+        void operate_group(exs::TokenListBase* tokens);
+    };
 
 } // namespace snt::puq
 

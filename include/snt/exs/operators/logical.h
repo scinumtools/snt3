@@ -5,29 +5,29 @@
 
 namespace snt::exs {
 
-  // and
+    // and
 
-  class OperatorAnd : public OperatorBase {
-  public:
-    OperatorAnd(std::string s = "&&");
-    void operate_binary(TokenListBase* tokens) override;
-  };
+    class OperatorAnd : public OperatorBase {
+      public:
+        OperatorAnd(std::string s = "&&");
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // or
+    // or
 
-  class OperatorOr : public OperatorBase {
-  public:
-    OperatorOr(std::string s = "||");
-    void operate_binary(TokenListBase* tokens) override;
-  };
+    class OperatorOr : public OperatorBase {
+      public:
+        OperatorOr(std::string s = "||");
+        void operate_binary(TokenListBase* tokens) override;
+    };
 
-  // not
+    // not
 
-  class OperatorNot : public OperatorBase {
-  public:
-    OperatorNot(std::string s = "!");
-    void operate_unary(TokenListBase* tokens) override;
-  };
+    class OperatorNot : public OperatorBase {
+      public:
+        OperatorNot(std::string s = "!");
+        void operate_unary(TokenListBase* tokens) override;
+    };
 
 } // namespace snt::exs
 

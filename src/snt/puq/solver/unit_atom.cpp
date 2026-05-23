@@ -8,150 +8,150 @@
 
 namespace snt::puq {
 
-  inline void _parse_number(std::string& expr, Measurement& msr, const std::smatch& m) {
-    if (m[6] == "") {
-      msr.result.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(expr));
-      // msr.result = core::to_number(expr);
-    } else {
-      std::string decimals = m[3].str() == "" ? "." : m[3].str();
-      msr.result.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(m[1].str() + decimals + m[8].str()));
-      if (m[10] == "")
-        msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
-      else
-        msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
-      // msr.result = core::to_number(m[1].str() + decimals + m[8].str());
-    }
-  }
-
-  inline void _parse_exponent(BaseUnit& bu, std::string& expr, const std::smatch& m) {
-    if (m[4] == "") {
-      bu.exponent = (m[2] == "" ? 1 : std::stoi(m[2]));
-    } else {
-      bu.exponent = Exponent((m[2] == "" ? 1 : std::stoi(m[2])), std::stoi(m[4]));
-    }
-    expr = std::string(m[1]);
-  }
-
-  inline void _parse_quantity(std::string& expr, Measurement& msr, const std::smatch& m) {
-    BaseUnit bu;
-    _parse_exponent(bu, expr, m);
-    bu.unit = expr;
-    msr.result = 1;
-    msr.baseunits.append(bu);
-  }
-
-  inline void _parse_unit(std::string& expr, Measurement& msr, const std::smatch& m, const std::string& expr_orig) {
-    BaseUnit bu;
-    _parse_exponent(bu, expr, m);
-    // determine unit
-    std::pair<std::string, UnitStruct> munit; // current candidate unit
-    for (auto& unit : UnitSystem::Data->UnitList) {
-      if (unit.first.size() > expr.size()) // symbol is longer than the expression
-        continue;
-      if (unit.first.size() <= munit.first.size()) // symbol is smaller or equal to the current candidate symbol
-        continue;
-      if (expr.compare(expr.size() - unit.first.size(), unit.first.size(), unit.first) == 0) {
-        munit = unit;
-      }
-    }
-    if (munit.first == "") {
-      throw AtomParsingExcept("Unknown unit base \"" + expr_orig + "\" in " + UnitSystem::Data->SystemAbbrev + " system!");
-    } else {
-      bu.unit = munit.first;
-    }
-    expr = expr.substr(0, expr.size() - bu.unit.size());
-    // determine prefix
-    if (expr.size() > 0) {
-      // no prefixes are allowed
-      if (!munit.second.use_prefixes)
-        throw AtomParsingExcept("Prefixes are not allowed for this unit: " + expr_orig);
-      // is symbol in the prefix list
-      if (UnitPrefixList.find(expr) == UnitPrefixList.end())
-        throw AtomParsingExcept("Unknown prefix '" + expr + "' detected in unit: " + expr_orig);
-      else
-        bu.prefix = expr;
-      // is prefix allowed
-      if (munit.second.allowed_prefixes.size() > 0) {
-        if (std::find(munit.second.allowed_prefixes.begin(), munit.second.allowed_prefixes.end(), bu.prefix) == munit.second.allowed_prefixes.end()) {
-          std::stringstream ss;
-          ss << "Given prefix is not allowed in unit system " + UnitSystem::Data->SystemAbbrev + ": " + expr_orig << '\n';
-          ss << "Allowed prefixes are:";
-          for (auto& prefix : munit.second.allowed_prefixes) {
-            ss << " " << prefix;
-          }
-          throw AtomParsingExcept(ss.str());
+    inline void _parse_number(std::string& expr, Measurement& msr, const std::smatch& m) {
+        if (m[6] == "") {
+            msr.result.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(expr));
+            // msr.result = core::to_number(expr);
+        } else {
+            std::string decimals = m[3].str() == "" ? "." : m[3].str();
+            msr.result.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(m[1].str() + decimals + m[8].str()));
+            if (m[10] == "")
+                msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
+            else
+                msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
+            // msr.result = core::to_number(m[1].str() + decimals + m[8].str());
         }
-      }
     }
-    // fill Measurement properties
-    msr.result = 1;
-    msr.baseunits.append(bu);
-  }
 
-  Measurement UnitAtom::from_string(const std::string& expr_orig, exs::BaseSettings* set) {
-    std::string expr = expr_orig;
-    struct Measurement msr;
-    std::smatch m;
-    std::regex rx_unit("^(\\{?[a-zA-Z0_%#']+\\}?)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
-    std::regex rx_quantity("^(\\<[a-zA-Z_]+\\>)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
-    std::regex rx_sifactor("^(\\|[a-zA-Z_]+\\|)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
-    std::regex rx_number("^((\\+|-)?[0-9]+)(\\.(([0-9]+)?))?(\\(([0-9]+)\\))?((e|E)((\\+|-)?[0-9]+))?$");
-    if (std::regex_match(expr, m, rx_number)) {
-      _parse_number(expr, msr, m);
-    } else if (std::regex_match(expr, m, rx_quantity)) {
-      _parse_quantity(expr, msr, m);
-    } else if (std::regex_match(expr, m, rx_sifactor)) {
-      _parse_quantity(expr, msr, m);
-    } else if (std::regex_match(expr, m, rx_unit)) {
-      _parse_unit(expr, msr, m, expr_orig);
-    } else {
-      throw AtomParsingExcept("Invalid unit expression: " + expr_orig);
+    inline void _parse_exponent(BaseUnit& bu, std::string& expr, const std::smatch& m) {
+        if (m[4] == "") {
+            bu.exponent = (m[2] == "" ? 1 : std::stoi(m[2]));
+        } else {
+            bu.exponent = Exponent((m[2] == "" ? 1 : std::stoi(m[2])), std::stoi(m[4]));
+        }
+        expr = std::string(m[1]);
     }
-    return msr;
-  }
 
-  std::string UnitAtom::to_string() {
-    return value.to_string();
-  }
+    inline void _parse_quantity(std::string& expr, Measurement& msr, const std::smatch& m) {
+        BaseUnit bu;
+        _parse_exponent(bu, expr, m);
+        bu.unit = expr;
+        msr.result = 1;
+        msr.baseunits.append(bu);
+    }
 
-  void UnitAtom::math_power(UnitAtom* other) {
-    static_assert(true, "Math power is used only with the exponent type");
-  }
+    inline void _parse_unit(std::string& expr, Measurement& msr, const std::smatch& m, const std::string& expr_orig) {
+        BaseUnit bu;
+        _parse_exponent(bu, expr, m);
+        // determine unit
+        std::pair<std::string, UnitStruct> munit; // current candidate unit
+        for (auto& unit : UnitSystem::Data->UnitList) {
+            if (unit.first.size() > expr.size()) // symbol is longer than the expression
+                continue;
+            if (unit.first.size() <= munit.first.size()) // symbol is smaller or equal to the current candidate symbol
+                continue;
+            if (expr.compare(expr.size() - unit.first.size(), unit.first.size(), unit.first) == 0) {
+                munit = unit;
+            }
+        }
+        if (munit.first == "") {
+            throw AtomParsingExcept("Unknown unit base \"" + expr_orig + "\" in " + UnitSystem::Data->SystemAbbrev + " system!");
+        } else {
+            bu.unit = munit.first;
+        }
+        expr = expr.substr(0, expr.size() - bu.unit.size());
+        // determine prefix
+        if (expr.size() > 0) {
+            // no prefixes are allowed
+            if (!munit.second.use_prefixes)
+                throw AtomParsingExcept("Prefixes are not allowed for this unit: " + expr_orig);
+            // is symbol in the prefix list
+            if (UnitPrefixList.find(expr) == UnitPrefixList.end())
+                throw AtomParsingExcept("Unknown prefix '" + expr + "' detected in unit: " + expr_orig);
+            else
+                bu.prefix = expr;
+            // is prefix allowed
+            if (munit.second.allowed_prefixes.size() > 0) {
+                if (std::find(munit.second.allowed_prefixes.begin(), munit.second.allowed_prefixes.end(), bu.prefix) == munit.second.allowed_prefixes.end()) {
+                    std::stringstream ss;
+                    ss << "Given prefix is not allowed in unit system " + UnitSystem::Data->SystemAbbrev + ": " + expr_orig << '\n';
+                    ss << "Allowed prefixes are:";
+                    for (auto& prefix : munit.second.allowed_prefixes) {
+                        ss << " " << prefix;
+                    }
+                    throw AtomParsingExcept(ss.str());
+                }
+            }
+        }
+        // fill Measurement properties
+        msr.result = 1;
+        msr.baseunits.append(bu);
+    }
 
-  void UnitAtom::math_power(ExponentVariant& e) {
-    if constexpr (Config::debug_unit_solver) {
-      std::stringstream ss;
-      ss << "UNIT:    pow(" << value.to_string() << ",";
-      if (std::holds_alternative<int>(e))
-        ss << std::get<int>(e);
-      if (std::holds_alternative<Exponent>(e))
-        ss << std::get<Exponent>(e).to_string();
-      std::clog << ss.str() << ") = ";
+    Measurement UnitAtom::from_string(const std::string& expr_orig, exs::BaseSettings* set) {
+        std::string expr = expr_orig;
+        struct Measurement msr;
+        std::smatch m;
+        std::regex rx_unit("^(\\{?[a-zA-Z0_%#']+\\}?)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
+        std::regex rx_quantity("^(\\<[a-zA-Z_]+\\>)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
+        std::regex rx_sifactor("^(\\|[a-zA-Z_]+\\|)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
+        std::regex rx_number("^((\\+|-)?[0-9]+)(\\.(([0-9]+)?))?(\\(([0-9]+)\\))?((e|E)((\\+|-)?[0-9]+))?$");
+        if (std::regex_match(expr, m, rx_number)) {
+            _parse_number(expr, msr, m);
+        } else if (std::regex_match(expr, m, rx_quantity)) {
+            _parse_quantity(expr, msr, m);
+        } else if (std::regex_match(expr, m, rx_sifactor)) {
+            _parse_quantity(expr, msr, m);
+        } else if (std::regex_match(expr, m, rx_unit)) {
+            _parse_unit(expr, msr, m, expr_orig);
+        } else {
+            throw AtomParsingExcept("Invalid unit expression: " + expr_orig);
+        }
+        return msr;
     }
-    value = math::pow(value, e);
-    if constexpr (Config::debug_unit_solver) {
-      std::clog << value.to_string() << '\n';
-    }
-  }
 
-  void UnitAtom::math_multiply(UnitAtom* other) {
-    if constexpr (Config::debug_unit_solver) {
-      std::clog << "UNIT:    " << value.to_string() << " * " << other->value.to_string() << " = ";
+    std::string UnitAtom::to_string() {
+        return value.to_string();
     }
-    value *= other->value;
-    if constexpr (Config::debug_unit_solver) {
-      std::clog << value.to_string() << '\n';
-    }
-  }
 
-  void UnitAtom::math_divide(UnitAtom* other) {
-    if constexpr (Config::debug_unit_solver) {
-      std::clog << "UNIT:    " << value.to_string() << " / " << other->value.to_string() << " = ";
+    void UnitAtom::math_power(UnitAtom* other) {
+        static_assert(true, "Math power is used only with the exponent type");
     }
-    value /= other->value;
-    if constexpr (Config::debug_unit_solver) {
-      std::clog << value.to_string() << '\n';
+
+    void UnitAtom::math_power(ExponentVariant& e) {
+        if constexpr (Config::debug_unit_solver) {
+            std::stringstream ss;
+            ss << "UNIT:    pow(" << value.to_string() << ",";
+            if (std::holds_alternative<int>(e))
+                ss << std::get<int>(e);
+            if (std::holds_alternative<Exponent>(e))
+                ss << std::get<Exponent>(e).to_string();
+            std::clog << ss.str() << ") = ";
+        }
+        value = math::pow(value, e);
+        if constexpr (Config::debug_unit_solver) {
+            std::clog << value.to_string() << '\n';
+        }
     }
-  }
+
+    void UnitAtom::math_multiply(UnitAtom* other) {
+        if constexpr (Config::debug_unit_solver) {
+            std::clog << "UNIT:    " << value.to_string() << " * " << other->value.to_string() << " = ";
+        }
+        value *= other->value;
+        if constexpr (Config::debug_unit_solver) {
+            std::clog << value.to_string() << '\n';
+        }
+    }
+
+    void UnitAtom::math_divide(UnitAtom* other) {
+        if constexpr (Config::debug_unit_solver) {
+            std::clog << "UNIT:    " << value.to_string() << " / " << other->value.to_string() << " = ";
+        }
+        value /= other->value;
+        if constexpr (Config::debug_unit_solver) {
+            std::clog << value.to_string() << '\n';
+        }
+    }
 
 } // namespace snt::puq

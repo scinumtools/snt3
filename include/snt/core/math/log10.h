@@ -3,7 +3,7 @@
 
 namespace snt::core::math {
 
-  extern double log10(const double m);
+    extern double log10(const double m);
 
 } // namespace snt::core::math
 

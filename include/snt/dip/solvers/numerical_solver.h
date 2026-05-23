@@ -6,12 +6,12 @@
 
 namespace snt::dip {
 
-  class NumericalSolver {
-  public:
-    std::unique_ptr<exs::Solver<NumericalAtom, NumericalSettings>> solver;
-    NumericalSolver(Environment& env);
-    NumericalAtom eval(const std::string& expression, const std::string& units = "");
-  };
+    class NumericalSolver {
+      public:
+        std::unique_ptr<exs::Solver<NumericalAtom, NumericalSettings>> solver;
+        NumericalSolver(Environment& env);
+        NumericalAtom eval(const std::string& expression, const std::string& units = "");
+    };
 
 } // namespace snt::dip
 

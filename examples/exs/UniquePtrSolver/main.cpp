@@ -9,18 +9,18 @@
 
 int main() {
 
-  exs::OperatorList operators;
-  operators.append(exs::AND_OPERATOR, std::make_shared<exs::OperatorAnd>());
+    exs::OperatorList operators;
+    operators.append(exs::AND_OPERATOR, std::make_shared<exs::OperatorAnd>());
 
-  exs::StepList steps{};
-  steps.append(exs::BINARY_OPERATION, {exs::AND_OPERATOR});
+    exs::StepList steps{};
+    steps.append(exs::BINARY_OPERATION, {exs::AND_OPERATOR});
 
-  exs::Solver<LogicalAtom> solver(operators, steps);
-  LogicalAtom atom = solver.solve("true && false");
-  atom.print();
+    exs::Solver<LogicalAtom> solver(operators, steps);
+    LogicalAtom atom = solver.solve("true && false");
+    atom.print();
 
-  /*
-   * Equivalent c++ notation:
-   * true && false = false
-   */
+    /*
+     * Equivalent c++ notation:
+     * true && false = false
+     */
 }

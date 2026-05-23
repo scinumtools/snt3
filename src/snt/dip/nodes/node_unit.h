@@ -5,12 +5,12 @@
 
 namespace snt::dip {
 
-  class UnitNode : public BaseNode {
-  public:
-    static BaseNode::PointerType is_node(Parser& parser);
-    UnitNode(Parser& parser) : BaseNode(parser, NodeDtype::Unit) {};
-    BaseNode::ListType parse(Environment& env) override;
-  };
+    class UnitNode : public BaseNode {
+      public:
+        static BaseNode::PointerType is_node(Parser& parser);
+        UnitNode(Parser& parser) : BaseNode(parser, NodeDtype::Unit) {};
+        BaseNode::ListType parse(Environment& env) override;
+    };
 
 } // namespace snt::dip
 

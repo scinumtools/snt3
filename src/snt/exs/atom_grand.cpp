@@ -3,8 +3,8 @@
 
 namespace snt::exs {
 
-  void AtomGrand::print() {
-    std::cout << to_string() << "\n";
-  }
+    void AtomGrand::print() {
+        std::cout << to_string() << "\n";
+    }
 
 } // namespace snt::exs

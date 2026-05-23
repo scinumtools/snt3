@@ -5,75 +5,75 @@
 
 namespace snt::dip {
 
-  BaseNode::PointerType CaseNode::is_node(Parser& parser) {
-    if (parser.kwd_case()) {
-      if (parser.name.substr(1) != KEYWORD_ELSE and parser.name.substr(1) != KEYWORD_END)
-        parser.part_value();
-      parser.part_comment();
-      return std::make_shared<CaseNode>(parser);
+    BaseNode::PointerType CaseNode::is_node(Parser& parser) {
+        if (parser.kwd_case()) {
+            if (parser.name.substr(1) != KEYWORD_ELSE and parser.name.substr(1) != KEYWORD_END)
+                parser.part_value();
+            parser.part_comment();
+            return std::make_shared<CaseNode>(parser);
+        }
+        return nullptr;
     }
-    return nullptr;
-  }
 
-  BaseNode::ListType CaseNode::parse(Environment& env) {
-    std::ostringstream oss;
-    oss << "^(" << PATTERN_PATH << "*[" << SIGN_CONDITION << "])";
-    oss << "(" << KEYWORD_IF << "|" << KEYWORD_ELIF << "|" << KEYWORD_ELSE << "|" << KEYWORD_END << ")";
-    std::regex pattern(oss.str());
-    std::smatch matchResult;
-    if (std::regex_search(name, matchResult, pattern)) {
-      case_id = env.branching.register_case();
-      if (matchResult[2].str() == KEYWORD_IF) {
-        case_type = CaseType::IF;
-      } else if (matchResult[2].str() == KEYWORD_ELIF) {
-        case_type = CaseType::ELIF;
-      } else if (matchResult[2].str() == KEYWORD_ELSE) {
-        case_type = CaseType::ELSE;
-      } else if (matchResult[2].str() == KEYWORD_END) {
-        case_type = CaseType::END;
-      } else {
-        throw std::runtime_error("Unsupported case type: " + line.code);
-      }
-      name = matchResult[1].str() + "C" + std::to_string(case_id);
-      if (case_type == CaseType::IF || case_type == CaseType::ELIF) {
-        if (value_raw.empty())
-          throw std::runtime_error("Case node requires an input value: " + line.code);
-        switch (value_origin) {
-        case ValueOrigin::Function:
-          value = env.request_value(value_raw.at(0), RequestType::Function)->all_of();
-          break;
-        case ValueOrigin::Reference: {
-          value = env.request_value(value_raw.at(0), RequestType::Reference, units_raw)->all_of();
-          break;
+    BaseNode::ListType CaseNode::parse(Environment& env) {
+        std::ostringstream oss;
+        oss << "^(" << PATTERN_PATH << "*[" << SIGN_CONDITION << "])";
+        oss << "(" << KEYWORD_IF << "|" << KEYWORD_ELIF << "|" << KEYWORD_ELSE << "|" << KEYWORD_END << ")";
+        std::regex pattern(oss.str());
+        std::smatch matchResult;
+        if (std::regex_search(name, matchResult, pattern)) {
+            case_id = env.branching.register_case();
+            if (matchResult[2].str() == KEYWORD_IF) {
+                case_type = CaseType::IF;
+            } else if (matchResult[2].str() == KEYWORD_ELIF) {
+                case_type = CaseType::ELIF;
+            } else if (matchResult[2].str() == KEYWORD_ELSE) {
+                case_type = CaseType::ELSE;
+            } else if (matchResult[2].str() == KEYWORD_END) {
+                case_type = CaseType::END;
+            } else {
+                throw std::runtime_error("Unsupported case type: " + line.code);
+            }
+            name = matchResult[1].str() + "C" + std::to_string(case_id);
+            if (case_type == CaseType::IF || case_type == CaseType::ELIF) {
+                if (value_raw.empty())
+                    throw std::runtime_error("Case node requires an input value: " + line.code);
+                switch (value_origin) {
+                case ValueOrigin::Function:
+                    value = env.request_value(value_raw.at(0), RequestType::Function)->all_of();
+                    break;
+                case ValueOrigin::Reference: {
+                    value = env.request_value(value_raw.at(0), RequestType::Reference, units_raw)->all_of();
+                    break;
+                }
+                case ValueOrigin::ReferenceRaw: {
+                    throw std::runtime_error("Raw reference value is not implemented: " + line.code);
+                    break;
+                }
+                case ValueOrigin::Expression: {
+                    LogicalSolver solver(env);
+                    LogicalAtom result = solver.eval(value_raw.at(0));
+                    value = std::move(result.value)->all_of();
+                    break;
+                }
+                case ValueOrigin::Keyword:
+                case ValueOrigin::String:
+                    if (value_raw.at(0) == core::KEYWORD_TRUE)
+                        value = true;
+                    else if (value_raw.at(0) == core::KEYWORD_FALSE)
+                        value = false;
+                    else
+                        throw std::runtime_error("Invalid value: " + line.code);
+                    break;
+                default:
+                    throw std::runtime_error("Invalid value: " + line.code);
+                    break;
+                }
+            } else if (case_type == CaseType::ELSE) {
+                value = true;
+            }
         }
-        case ValueOrigin::ReferenceRaw: {
-          throw std::runtime_error("Raw reference value is not implemented: " + line.code);
-          break;
-        }
-        case ValueOrigin::Expression: {
-          LogicalSolver solver(env);
-          LogicalAtom result = solver.eval(value_raw.at(0));
-          value = std::move(result.value)->all_of();
-          break;
-        }
-        case ValueOrigin::Keyword:
-        case ValueOrigin::String:
-          if (value_raw.at(0) == core::KEYWORD_TRUE)
-            value = true;
-          else if (value_raw.at(0) == core::KEYWORD_FALSE)
-            value = false;
-          else
-            throw std::runtime_error("Invalid value: " + line.code);
-          break;
-        default:
-          throw std::runtime_error("Invalid value: " + line.code);
-          break;
-        }
-      } else if (case_type == CaseType::ELSE) {
-        value = true;
-      }
+        return {};
     }
-    return {};
-  }
 
 } // namespace snt::dip
