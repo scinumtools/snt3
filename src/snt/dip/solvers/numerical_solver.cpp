@@ -68,7 +68,7 @@ namespace snt::dip {
         solver = std::make_unique<exs::Solver<NumericalAtom, NumericalSettings>>(operators, steps, settings);
     }
 
-    NumericalAtom NumericalSolver::eval(const std::string& expression, const std::string& units) {
+    ValueNodeData NumericalSolver::eval(const std::string& expression, const std::string& units) {
         if (expression.empty())
             throw std::runtime_error("Numerical expression cannot be empty");
         NumericalAtom ua = solver->solve(expression);
@@ -87,7 +87,7 @@ namespace snt::dip {
                                      "' into a nondimensional quantity");
         }
 
-        return ua;
+        return ValueNodeData({std::move(ua.value.value), std::move(ua.value.units)});;
     }
 
 } // namespace snt::dip

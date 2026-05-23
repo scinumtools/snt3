@@ -9,18 +9,18 @@ namespace snt::dip {
         Environment* env;
     };
 
-    class LogicalAtom : public exs::AtomBase<LogicalAtom, val::BaseValue::PointerType> {
+    class LogicalAtom : public exs::AtomBase<LogicalAtom, ValueNodeData> {
       public:
-        // Constructor from unique_ptr
-        LogicalAtom(val::BaseValue::PointerType b) : AtomBase(std::move(b)) {};
+      // Constructor from unique_ptr
+      LogicalAtom(ValueNodeData b) : AtomBase({std::move(b.value), std::move(b.units)}) {};
         // Deep copy constructor
-        LogicalAtom(const LogicalAtom& a);
+      LogicalAtom(const LogicalAtom& a) : AtomBase({a.value.value->clone(), a.value.units}) {};
         LogicalAtom& operator=(const LogicalAtom& a);
         // Move constructor
         LogicalAtom(LogicalAtom&& a) noexcept = default;
         LogicalAtom& operator=(LogicalAtom&& a) noexcept = default;
 
-        static val::BaseValue::PointerType from_string(const std::string& s, exs::BaseSettings* settings);
+        static ValueNodeData from_string(const std::string& s, exs::BaseSettings* settings);
         std::string to_string() override;
         void comparison_equal(LogicalAtom* other) override;
         void comparison_not_equal(LogicalAtom* other) override;

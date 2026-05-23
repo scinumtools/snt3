@@ -10,7 +10,7 @@ namespace snt::dip {
       public:
         std::unique_ptr<exs::Solver<NumericalAtom, NumericalSettings>> solver;
         NumericalSolver(Environment& env);
-        NumericalAtom eval(const std::string& expression, const std::string& units = "");
+        ValueNodeData eval(const std::string& expression, const std::string& units = "");
     };
 
 } // namespace snt::dip

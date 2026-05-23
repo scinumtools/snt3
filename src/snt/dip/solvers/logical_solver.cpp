@@ -46,11 +46,11 @@ namespace snt::dip {
         solver = std::make_unique<exs::Solver<LogicalAtom, LogicalSettings>>(operators, steps, settings);
     }
 
-    LogicalAtom LogicalSolver::eval(const std::string& expression) {
+    ValueNodeData LogicalSolver::eval(const std::string& expression) {
         if (expression.empty())
             throw std::runtime_error("Logical expression cannot be empty");
         LogicalAtom ua = solver->solve(expression);
-        return ua;
+        return ValueNodeData({std::move(ua.value.value), std::move(ua.value.units)});
     }
 
 } // namespace snt::dip

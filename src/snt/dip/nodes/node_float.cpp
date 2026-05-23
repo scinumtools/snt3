@@ -48,8 +48,8 @@ namespace snt::dip {
         }
         case ValueOrigin::Expression: {
             NumericalSolver solver(env);
-            NumericalAtom result = solver.eval(value_raw.at(0), units_raw);
-            set_value(std::move(result.value.value));
+            ValueNodeData data = solver.eval(value_raw.at(0), units_raw);
+            set_value(std::move(data.value));
             break;
         }
         default:

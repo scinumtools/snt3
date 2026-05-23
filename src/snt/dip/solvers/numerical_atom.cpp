@@ -18,7 +18,6 @@ namespace snt::dip {
     ValueNodeData NumericalAtom::from_string(const std::string& s, exs::BaseSettings* settings) {
         Parser parser({s, {"NUMERICAL_ATOM", 0}});
         NumericalSettings* csettings = static_cast<NumericalSettings*>(settings);
-        ValueNodeData data;
         if (parser.part_reference()) {
             return csettings->env->request_node_data(parser.value_raw.at(0), RequestType::Reference);
         } else if (parser.part_literal()) {
@@ -34,6 +33,7 @@ namespace snt::dip {
             if (vnode == nullptr)
                 throw std::runtime_error("Value could not be determined from : " + s);
             vnode->set_value();
+            ValueNodeData data;
             data.value = std::move(vnode->value);
             if (!vnode->units_raw.empty())
                 data.units = puq::Quantity(vnode->units_raw);
