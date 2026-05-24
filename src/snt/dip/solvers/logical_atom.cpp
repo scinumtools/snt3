@@ -53,22 +53,111 @@ namespace snt::dip {
 
     // Comparison operations
     void LogicalAtom::comparison_equal(LogicalAtom* other) {
-        value.value = value.value->compare_equal(other->value.value.get());
+        if (value.units && other->value.units) {
+            puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
+            quantity = quantity.convert(*value.units);
+            val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
+            value.value = value.value->compare_equal(new_value.get());
+        } else if (value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
+                                     other->value.units->to_string() + "'");
+        } else if (other->value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
+                                     "' and a nondimensional quantity");
+        } else {
+            value.value = value.value->compare_equal(other->value.value.get());
+        }
+        value.units = std::nullopt;
     }
+    
     void LogicalAtom::comparison_not_equal(LogicalAtom* other) {
-        value.value = value.value->compare_not_equal(other->value.value.get());
+        if (value.units && other->value.units) {
+            puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
+            quantity = quantity.convert(*value.units);
+            val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
+            value.value = value.value->compare_not_equal(new_value.get());
+        } else if (value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
+                                     other->value.units->to_string() + "'");
+        } else if (other->value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
+                                     "' and a nondimensional quantity");
+        } else {
+            value.value = value.value->compare_not_equal(other->value.value.get());
+        }
+        value.units = std::nullopt;
     }
+    
     void LogicalAtom::comparison_less_equal(LogicalAtom* other) {
-        value.value = value.value->compare_less_equal(other->value.value.get());
+        if (value.units && other->value.units) {
+            puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
+            quantity = quantity.convert(*value.units);
+            val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
+            value.value = value.value->compare_less_equal(new_value.get());
+        } else if (value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
+                                     other->value.units->to_string() + "'");
+        } else if (other->value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
+                                     "' and a nondimensional quantity");
+        } else {
+            value.value = value.value->compare_less_equal(other->value.value.get());
+        }
+        value.units = std::nullopt;
     }
+    
     void LogicalAtom::comparison_greater_equal(LogicalAtom* other) {
-        value.value = value.value->compare_greater_equal(other->value.value.get());
+        if (value.units && other->value.units) {
+            puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
+            quantity = quantity.convert(*value.units);
+            val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
+            value.value = value.value->compare_greater_equal(new_value.get());
+        } else if (value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
+                                     other->value.units->to_string() + "'");
+        } else if (other->value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
+                                     "' and a nondimensional quantity");
+        } else {
+            value.value = value.value->compare_greater_equal(other->value.value.get());
+        }
+        value.units = std::nullopt;
     }
+    
     void LogicalAtom::comparison_less(LogicalAtom* other) {
-        value.value = value.value->compare_less(other->value.value.get());
+        if (value.units && other->value.units) {
+            puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
+            quantity = quantity.convert(*value.units);
+            val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
+            value.value = value.value->compare_less(new_value.get());
+        } else if (value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
+                                     other->value.units->to_string() + "'");
+        } else if (other->value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
+                                     "' and a nondimensional quantity");
+        } else {
+            value.value = value.value->compare_less(other->value.value.get());
+        }
+        value.units = std::nullopt;
     }
+    
     void LogicalAtom::comparison_greater(LogicalAtom* other) {
-        value.value = value.value->compare_greater(other->value.value.get());
+        if (value.units && other->value.units) {
+            puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
+            quantity = quantity.convert(*value.units);
+            val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
+            value.value = value.value->compare_greater(new_value.get());
+        } else if (value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
+                                     other->value.units->to_string() + "'");
+        } else if (other->value.units) {
+            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
+                                     "' and a nondimensional quantity");
+        } else {
+            value.value = value.value->compare_greater(other->value.value.get());
+        }
+        value.units = std::nullopt;
     }
 
     // Logical operations
