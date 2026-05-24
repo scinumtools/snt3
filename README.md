@@ -29,8 +29,11 @@ into a single configuration layer that can be used consistently across workflows
 It is built around four core components:
 
 **Value Layer** (VAL) — a unified, typed multidimensional data model for booleans, numeric values, and strings, forming the core runtime representation shared across all components  
+
 **Expression Solver** (EXS) — a generic, extensible evaluation framework capable of operating on arbitrary data types defined as atoms; its behavior is fully determined by the set of atom types, operators/functions, and evaluation rules (precedence and semantics), making it adaptable to domain-specific evaluation systems  
+
 **Physical Units & Quantities** (PUQ) (built on VAL + EXS) — extends the value system with physical units, enabling unit-aware arithmetic, dimensional consistency, and automatic conversions through EXS-based evaluation  
+
 **Dimensional Input Parameters** (DIP) (built on VAL + EXS + PUQ) — a declarative parameter definition layer that enforces types, units, constraints, and structure, while delegating all numerical, logical, and unit-aware expression evaluation to EXS via PUQ  
 
 Together, these components establish a validated, unit-aware configuration framework that can be consistently shared across heterogeneous environments, including C++ simulations, Python-based analysis workflows, and Bash-driven processing pipelines.
@@ -43,7 +46,7 @@ This design enables:
 
 As a result, discrepancies between simulation and analysis pipelines are significantly reduced.
 
-This project is the C++ counterpart to the original Python [scinumtools](https://github.com/vrtulka23/scinumtools/tree/main), with a focus on performance, static typing, and integration into high-performance computing workflows.
+This project is the C++ counterpart to the original Python [SciNumTools v2](https://github.com/vrtulka23/scinumtools/tree/main), with a focus on performance, static typing, and integration into high-performance computing workflows.
 
 ## Why use SNT?
 
@@ -113,10 +116,42 @@ in a single system.
 
 ## Quick Example
 
+### Domain Specific Languages
+
+`SciNumTools` is built around two domain-specific languages that form the foundation of the framework and enable consistent handling of scientific notation and dimensional analysis. The first language, [PUEL](docs/puel/specification.md), defines a formal notation system for representing physical units and quantities in a precise and machine-readable way. The second language, [DIPL](docs/dipl/specification.md), provides a textual specification format for defining dimensional parameters and their relationships. Together, these languages establish the core abstraction layer of `SciNumTools`, allowing scientific data, units, and dimensional constraints to be expressed in a structured, interoperable, and extensible manner.
+
+#### Physical Units Expression Language - PUEL
+
+Expressions of physical units must account for several important aspects, including the underlying unit system (such as SI, CGS, Atomic Units, or US Customary Units), unit prefixes and scaling factors (such as `kg`, `mm`, or `MJ`), the associated numerical values (whether scalar values or arrays), uncertainties arising from measurements, the relationship between base units and physical dimensions, as well as support for integer and fractional exponents of units.
+
+`PUEL` provides a minimal, coherent and extensible notation that integrates all of these concerns into a unified representation. 
+
+``` puel
+# General form
+<SYSTEM>_[<VALUE>]*<UNIT><EXPONENT>
+
+# Examples
+ESU_erg              # sefining erg in ESU unit system
+m2*kg*s-2            # definition of complex units
+kg2*ms3:2*cm         # fractional exponents
+1.346591(30)e27*kg   # uncertainties in measurements
+[2, 3, 4, 5]*km      # arrays of values
+```
+
+Building upon this specification, the `PUQ` module of `SciNumTools` implements parsing, dimensional analysis, arithmetic operations, and unit conversion both within a single unit system and across different systems.
+
+#### Dimensional Input Parameter Language - DIPL
+
+The definition of input parameters for scientific and engineering software involves several recurring requirements that are common across many numerical codes. High-performance applications often require strongly typed parameters with explicitly defined numerical precision. Numerical values frequently carry associated physical units, and many parameters consist not only of scalar values, but also arrays, matrices, or tabulated datasets.
+
+In addition, parameters commonly require validation rules, numerical constraints, admissible ranges, or configurable options that govern their behavior and interpretation. Parameter definitions are often interdependent as well, where the validity, availability, or meaning of one setting depends on the values of others. `DIPL` provides a coherent and extensible framework for expressing these definitions, relationships, and constraints in a structured, machine-readable, and implementation-independent form.
+
+### Example of Use
+
 Below is a quick example how to use the core functionality of `scinumtools3`.
 For more examples and patterns please look into the ``tests``, ``exec``, ``apps`` and ``bindings`` folders.
 
-### C++
+#### with C++
 
 ```cpp
 #include <snt/exs/atom.h>
@@ -155,7 +190,7 @@ int main() {
 }
 ```
 
-### Python 
+#### with Python 
 
 ``` python
 from scinumtools3.puq import Quantity
@@ -174,7 +209,7 @@ print(env.nodes[0])
 # 3000 m
 ```
 
-### CLI
+#### with CLI (e.g. BASH)
 
 ``` bash
 snt puq convert "12*statA" "A" -s ESU -S SI -Q "I"
