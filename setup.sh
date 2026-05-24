@@ -12,7 +12,8 @@ DIR_ROOT=$(pwd)
 NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
 NUM_MAKE_CORES=2 #$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release    # Release/Debug
-ENABLE_CLANG_TIDY=ON        # Switch Clang Tidy on 
+ENABLE_CLANG_TIDY=OFF       # Switch Clang Tidy on 
+GITHUB_WORKFLOWS=OFF        # Set specific settings for GitHub workflows
 
 CMAKE_FLAGS=(
   -DENABLE_SNT=ON
@@ -55,7 +56,7 @@ function build_code {
     if [[ ! -d $DIR_BUILD ]]; then
 	    mkdir $DIR_BUILD
     fi
-    if [[ $ENABLE_CLANG_TIDY == "ON" ]]; then
+    if [[ $ENABLE_CLANG_TIDY == "ON" && $GITHUB_WORKFLOWS == "OFF" ]]; then
 	clang_tidy_flag="clang-tidy;-warnings-as-errors=*"
 	CMAKE_FLAGS+=(
 	    -DENABLE_CLANG_TIDY="${ENABLE_CLANG_TIDY}"
@@ -164,6 +165,7 @@ function show_help {
     echo " --clang-format          run clang-format"
     echo " --num-cores N           number of compiliation cores"
     echo " --refactor <from> <to>  replace <from> a string <to> another string"
+    echo " --github-workflows      set a specific configuration of settings for GitHub Workflows"
     echo ""
     echo "Examples:"
     echo "./setup.sh -c -b               clean and build the code"
@@ -205,6 +207,8 @@ while [[ $# -gt 0 ]]; do
 	    NUM_SYSTEM_CORES=$2; shift; shift;;
 	--refactor)
 	    refactor_code $2 $3; shift; shift; shift;;
+        --github-workflows)
+            GITHUB_WORKFLOWS=ON; shift;;
 	-*|--*)
 	    show_help; exit 1;;
 	*)
