@@ -114,7 +114,7 @@ in a single system.
 ## Quick Example
 
 Below is a quick example how to use the core functionality of `scinumtools3`.
-For more examples and patterns please look into the ``gtest``, ``exec``, ``apps`` and ``bindings`` folders.
+For more examples and patterns please look into the ``tests``, ``exec``, ``apps`` and ``bindings`` folders.
 
 ### C++
 
