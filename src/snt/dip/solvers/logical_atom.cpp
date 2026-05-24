@@ -20,9 +20,6 @@ namespace snt::dip {
         LogicalSettings* csettings = static_cast<LogicalSettings*>(settings);
         if (parser.part_reference()) {
             return csettings->env->request_node_data(parser.value_raw.at(0), RequestType::Reference);
-            //ValueNodeData value =
-            //    csettings->env->request_value(parser.value_raw.at(0), RequestType::Reference);
-            //return std::move(value);
         } else if (parser.part_literal()) {
             ValueNode::PointerType vnode = nullptr;
             if (vnode == nullptr)
@@ -41,7 +38,6 @@ namespace snt::dip {
             if (!vnode->units_raw.empty())
                 data.units = puq::Quantity(vnode->units_raw);
             return data;
-            //return std::move(vnode->value);
         } else {
             throw std::runtime_error("Invalid atom value: " + s);
         }
