@@ -42,6 +42,9 @@ CMAKE_FLAGS=(
 
   -DENABLE_BENCHMARKS=ON     # build Google Benchmark tests
   -DENABLE_TIME_TRACE=OFF    # build compilation time tracing outputs
+
+  -DENABLE_APP_SNT_SERVER=ON
+  -DENABLE_APP_SNT_GUI=ON
 )
 
 OS="$(uname -s)"

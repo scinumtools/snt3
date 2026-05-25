@@ -42,6 +42,10 @@ if(ENABLE_TIME_TRACE)
     add_compile_options(-ftime-trace)
 endif()
 
+# enable apps
+option(ENABLE_APP_SNT_SERVER "Enable SNT REST-API server app" OFF)
+option(ENABLE_APP_SNT_GUI "Enable SNT graphical user interface" OFF)
+
 # set generic options
 function(set_module_options NAME DEFAULT)
     # set default values
