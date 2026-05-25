@@ -24,7 +24,7 @@ src/snt/puq/systems/dmaps/dmap_*.h
 Build the main library and run the executable from the project root directory:
 
 ``` bash
-./build/bin/dmap
+./build/bin/snt-dmap
 ```
 
 This will regenerate and update the header files containing the precomputed dimensional representations of the newly added derived units defined in the supported unit systems.

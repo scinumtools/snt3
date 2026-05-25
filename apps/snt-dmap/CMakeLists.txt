@@ -1,6 +1,6 @@
 # create executable
 file(GLOB EXEC_FILES "./*.cpp" "./**/*.cpp")
-set(EXEC_NAME dmap)
+set(EXEC_NAME snt-dmap)
 
 add_executable(${EXEC_NAME} ${EXEC_FILES} )
 

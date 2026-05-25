@@ -1,8 +1,8 @@
 # add submodule directories
-if (ENABLE_PUQ)
-   add_subdirectory(dmap)
-endif()
 add_subdirectory(snt)
+if (ENABLE_PUQ)
+   add_subdirectory(snt-dmap)
+endif()
 if (ENABLE_APP_SNT_SERVER)
    add_subdirectory(snt-server)
 endif()
