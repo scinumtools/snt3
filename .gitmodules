@@ -1,3 +1,3 @@
 [submodule "apps/snt-server/external/cpp-httplib"]
 	path = apps/snt-server/external/cpp-httplib
-	url = https://github.com/yhirose/cpp-httplib.git
+	url = git@github.com:yhirose/cpp-httplib.git
