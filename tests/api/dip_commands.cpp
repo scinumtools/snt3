@@ -1,4 +1,4 @@
-#include "snt/cli/dip_parse.h"
+#include "snt/api/dip_parse.h"
 
 #include <gtest/gtest.h>
 #include <string>
@@ -8,7 +8,7 @@ using namespace snt;
 
 TEST(DIPCommands, Parse) {
 
-    cli::DIPParse cmd;
+    api::DIPParse cmd;
     cmd.argument_string("johan int = 32");
     cmd.argument_print();
 

@@ -114,7 +114,7 @@ in a single system.
 ## Quick Example
 
 Below is a quick example how to use the core functionality of `scinumtools3`.
-For more examples and patterns please look into the ``gtest``, ``exec``, ``apps`` and ``bindings`` folders.
+For more examples and patterns please look into the ``tests``, ``exec``, ``apps`` and ``bindings`` folders.
 
 ### C++
 
@@ -212,7 +212,7 @@ Contributions are welcome — please follow these guidelines:
    git checkout -b feature/my-feature
    ```
 2. Follow the coding style (`.clang-format`) and use modern C++ (C++17+).
-3. Add unit tests for new features or bug fixes (see `gtest/`).
+3. Add unit tests for new features or bug fixes (see `tests/`).
 4. Build and run tests locally:
 
    ```bash

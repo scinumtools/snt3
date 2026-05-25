@@ -1498,7 +1498,7 @@ HTML_CODE_FOLDING      = YES
 
 # If the HTML_COPY_CLIPBOARD tag is set to YES then Doxygen will show an icon in
 # the top right corner of code and text fragments that allows the user to copy
-# its content to the clipboard. Note this only works if supported by the browser
+# its content to the apipboard. Note this only works if supported by the browser
 # and the web page is served via a secure context (see:
 # https://www.w3.org/TR/secure-contexts/), i.e. using the https: or file:
 # protocol.
@@ -1721,18 +1721,18 @@ QHP_SECT_FILTER_ATTRS  =
 QHG_LOCATION           =
 
 # If the GENERATE_ECLIPSEHELP tag is set to YES, additional index files will be
-# generated, together with the HTML files, they form an Eclipse help plugin. To
+# generated, together with the HTML files, they form an Eapipse help plugin. To
 # install this plugin and make it available under the help contents menu in
-# Eclipse, the contents of the directory containing the HTML and XML files needs
-# to be copied into the plugins directory of eclipse. The name of the directory
+# Eapipse, the contents of the directory containing the HTML and XML files needs
+# to be copied into the plugins directory of eapipse. The name of the directory
 # within the plugins directory should be the same as the ECLIPSE_DOC_ID value.
-# After copying Eclipse needs to be restarted before the help appears.
+# After copying Eapipse needs to be restarted before the help appears.
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 GENERATE_ECLIPSEHELP   = NO
 
-# A unique identifier for the Eclipse help plugin. When installing the plugin
+# A unique identifier for the Eapipse help plugin. When installing the plugin
 # the directory name containing the HTML and XML files should also have this
 # name. Each documentation set should have its own identifier.
 # The default value is: org.doxygen.Project.
@@ -1853,7 +1853,7 @@ FORMULA_FONTSIZE       = 10
 FORMULA_MACROFILE      =
 
 # Enable the USE_MATHJAX option to render LaTeX formulas using MathJax (see
-# https://www.mathjax.org) which uses client side JavaScript for the rendering
+# https://www.mathjax.org) which uses apient side JavaScript for the rendering
 # instead of using pre-rendered bitmaps. Use this if you do not have LaTeX
 # installed or if you want to formulas look prettier in the HTML output. When
 # enabled you may also need to install MathJax separately and configure the path
@@ -1948,7 +1948,7 @@ MATHJAX_CODEFILE       =
 SEARCHENGINE           = YES
 
 # When the SERVER_BASED_SEARCH tag is enabled the search engine will be
-# implemented using a web server instead of a web client using JavaScript. There
+# implemented using a web server instead of a web apient using JavaScript. There
 # are two flavors of web server based searching depending on the EXTERNAL_SEARCH
 # setting. When disabled, Doxygen will generate a PHP script for searching and
 # an index file used by the script. When EXTERNAL_SEARCH is enabled the indexing

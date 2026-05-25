@@ -20,5 +20,5 @@ endif()
 
 if (ENABLE_DIP AND ENABLE_DIP_GTEST
     AND ENABLE_PUQ AND ENABLE_PUQ_GTEST)
-   add_subdirectory(cli)
+   add_subdirectory(api)
 endif()

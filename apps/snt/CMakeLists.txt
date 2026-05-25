@@ -10,7 +10,7 @@ target_include_directories(${EXEC_NAME}
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
 )
 
-target_link_libraries(${EXEC_NAME} PRIVATE snt-cli)
+target_link_libraries(${EXEC_NAME} PRIVATE snt-api)
 
 set_target_properties(${EXEC_NAME} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

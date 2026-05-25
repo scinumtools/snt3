@@ -1,6 +1,6 @@
 # build library
 file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
-set(EXEC_NAME snt-cli)
+set(EXEC_NAME snt-api)
 
 add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
 target_link_libraries(${EXEC_NAME} PRIVATE snt-puq snt-dip)

@@ -1,10 +1,10 @@
 // #include <snt/puq/lists.h>
 #include "argparser.h"
 #include "main.h"
-#include "snt/cli/puq_convert.h"
-#include "snt/cli/puq_eval.h"
-#include "snt/cli/puq_info.h"
-#include "snt/cli/puq_list.h"
+#include "snt/api/puq_convert.h"
+#include "snt/api/puq_eval.h"
+#include "snt/api/puq_info.h"
+#include "snt/api/puq_list.h"
 // #include "puq/commands.h"
 // #include "puq/displays.h"
 
@@ -86,7 +86,7 @@ void module_puq(ArgParser& argpar) {
         std::vector<std::string> arguments;
         // puq::UnitSystem us(puq::SystemType::SI);
         if (command == "info") {
-            cli::PUQInfo cmd(argument);
+            api::PUQInfo cmd(argument);
             arguments = argpar.getKeywordValues("-s", "--system");
             if (!arguments.empty()) {
                 cmd.argument_input_system(arguments[0]);
@@ -94,7 +94,7 @@ void module_puq(ArgParser& argpar) {
             cmd.execute();
         }
         if (command == "eval") {
-            cli::PUQEval cmd(argument);
+            api::PUQEval cmd(argument);
             arguments = argpar.getKeywordValues("-s", "--input-system");
             if (!arguments.empty()) {
                 cmd.argument_input_system(arguments[0]);
@@ -115,7 +115,7 @@ void module_puq(ArgParser& argpar) {
         }
         if (command == "convert") {
             std::string argument2 = argpar.getPositionalValue(3);
-            cli::PUQConvert cmd(argument, argument2);
+            api::PUQConvert cmd(argument, argument2);
             arguments = argpar.getKeywordValues("-s", "--input-system");
             if (!arguments.empty()) {
                 cmd.argument_input_system(arguments[0]);
@@ -131,7 +131,7 @@ void module_puq(ArgParser& argpar) {
             cmd.execute();
         }
         if (command == "list") {
-            cli::PUQList cmd(argument);
+            api::PUQList cmd(argument);
             arguments = argpar.getKeywordValues("-s", "--system");
             if (!arguments.empty()) {
                 cmd.argument_system(arguments[0]);

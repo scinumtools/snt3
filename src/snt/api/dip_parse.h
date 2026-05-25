@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace snt::cli {
+namespace snt::api {
 
     /**
      * @class DIPParse
@@ -77,6 +77,6 @@ namespace snt::cli {
         void execute();
     };
 
-} // namespace snt::cli
+} // namespace snt::api
 
 #endif // SNT_CLI_DIP_PARSE

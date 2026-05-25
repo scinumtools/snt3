@@ -8,7 +8,7 @@ PUQ — Physical Units & Quantities
 DIP — Dimensional Input Parameters  
 MAT (planned) — Materials Properties  
 
-This executable is built together with the `SNT` library and provides the command-line interface implemented in the `src/snt/cli` and `include/snt/cli` directories.
+This executable is built together with the `SNT` library and provides the command-line interface implemented in the `src/snt/api` and `include/snt/api` directories.
 
 ## Example of use
 

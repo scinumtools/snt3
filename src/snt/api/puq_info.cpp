@@ -11,7 +11,7 @@
 #include <snt/puq/quantity.h>
 #include <snt/puq/util/data_table.h>
 
-namespace snt::cli {
+namespace snt::api {
 
     void PUQInfo::argument_input_system(const std::string& system) {
         for (auto sys : puq::SystemMap) {
@@ -129,4 +129,4 @@ namespace snt::cli {
         std::cout << '\n';
     }
 
-} // namespace snt::cli
+} // namespace snt::api

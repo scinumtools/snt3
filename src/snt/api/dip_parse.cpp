@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace snt::cli {
+namespace snt::api {
 
     void DIPParse::argument_file(const std::string& file_name) {
         dip.add_file(file_name);
@@ -49,4 +49,4 @@ namespace snt::cli {
         }
     }
 
-} // namespace snt::cli
+} // namespace snt::api

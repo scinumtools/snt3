@@ -3,7 +3,7 @@
 #include <snt/puq/lists.h>
 #include <snt/puq/systems/unit_system.h>
 
-namespace snt::cli {
+namespace snt::api {
 
     void PUQList::argument_system(const std::string& system) {
         for (auto sys : puq::SystemMap) {
@@ -59,4 +59,4 @@ namespace snt::cli {
         }
     }
 
-} // namespace snt::cli
+} // namespace snt::api

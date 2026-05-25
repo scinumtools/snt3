@@ -2,7 +2,7 @@
 
 #include <snt/puq/quantity.h>
 
-namespace snt::cli {
+namespace snt::api {
 
     void PUQConvert::argument_input_system(const std::string& system) {
         for (auto sys : puq::SystemMap) {
@@ -54,4 +54,4 @@ namespace snt::cli {
         std::cout << q.to_string() << '\n';
     }
 
-} // namespace snt::cli
+} // namespace snt::api

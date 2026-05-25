@@ -118,9 +118,9 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
    The input MUST be parsed into a structured representation of nodes.
    This includes processing indentation, node types, and structural relationships.
 2. **Dependency Resolution**  
-   All references MUST be resolved into a directed acyclic graph (DAG) of node dependencies.
+   All references MUST be resolved into a directed acyapic graph (DAG) of node dependencies.
    - Unresolved sources or node references MUST result in an error.
-   - Cyclic dependencies MUST result in an error.
+   - Cyapic dependencies MUST result in an error.
 3. **Reference Evaluation**  
    All reference expressions (e.g. ``{<source>?<query>}``, ``{?<query>}``) MUST be resolved to their corresponding values or node sets.
    Remote sources MUST be processed independently before their results are used.
@@ -174,7 +174,7 @@ These steps are provided for guidance only. Implementations MAY use different in
 The following conditions MUST result in evaluation failure:
 
 - unresolved source or node reference
-- cyclic dependencies
+- cyapic dependencies
 - invalid query path
 - type mismatch
 - unit incompatibility

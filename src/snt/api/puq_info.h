@@ -4,7 +4,7 @@
 #include <snt/puq/lists.h>
 #include <string>
 
-namespace snt::cli {
+namespace snt::api {
 
     /**
      * @class PUQInfo
@@ -35,6 +35,6 @@ namespace snt::cli {
         void execute();
     };
 
-} // namespace snt::cli
+} // namespace snt::api
 
 #endif // SNT_CLI_PUQ_INFO

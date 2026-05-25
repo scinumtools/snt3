@@ -1,7 +1,7 @@
-#include "snt/cli/puq_convert.h"
-#include "snt/cli/puq_eval.h"
-#include "snt/cli/puq_info.h"
-#include "snt/cli/puq_list.h"
+#include "snt/api/puq_convert.h"
+#include "snt/api/puq_eval.h"
+#include "snt/api/puq_info.h"
+#include "snt/api/puq_list.h"
 
 #include <gtest/gtest.h>
 #include <string>
@@ -11,7 +11,7 @@ using namespace snt;
 
 TEST(PUQCommands, Info) {
     {
-        cli::PUQInfo cmd("23*cm");
+        api::PUQInfo cmd("23*cm");
 
         testing::internal::CaptureStdout();
         cmd.execute();
@@ -20,7 +20,7 @@ TEST(PUQCommands, Info) {
         EXPECT_EQ(output, "\nExpression:  23*cm\n\nUnit system: SI (International System of Units)\nResult:   23\nBase units:  cm\n\nDimensions:\n\nBase   Num*Mag                   Numerical                 Physical                  \n------ ------------------------- ------------------------- ------------------------- \nMGS    0.23                      0.01                      m                         \nMKS    0.23                      0.01                      m                         \nCGS    23                        1                         cm                        \n\nBase units:\n\nPrefix   Symbol   Exponent   Name                           Definition                     Dimensions MGS         Allowed prefixes       \n-------- -------- ---------- ------------------------------ ------------------------------ ---------------------- ---------------------- \nc        m        1          meter                          m                              0.01*m                 all                    \n\n");
     }
     {
-        cli::PUQInfo cmd("ft2*lb");
+        api::PUQInfo cmd("ft2*lb");
         cmd.argument_input_system("US");
 
         testing::internal::CaptureStdout();
@@ -33,7 +33,7 @@ TEST(PUQCommands, Info) {
 
 TEST(PUQCommands, Eval) {
     {
-        cli::PUQEval cmd("23*cm + 3*m");
+        api::PUQEval cmd("23*cm + 3*m");
 
         testing::internal::CaptureStdout();
         cmd.execute();
@@ -42,7 +42,7 @@ TEST(PUQCommands, Eval) {
         EXPECT_EQ(output, "323*cm\n");
     }
     {
-        cli::PUQEval cmd("23*cm + 3*m");
+        api::PUQEval cmd("23*cm + 3*m");
         cmd.argument_input_system("SI");
         cmd.argument_output_system("US");
         cmd.argument_output_units("ft");
@@ -58,7 +58,7 @@ TEST(PUQCommands, Eval) {
 
 TEST(PUQCommands, Convert) {
     {
-        cli::PUQConvert cmd("12*statA", "A");
+        api::PUQConvert cmd("12*statA", "A");
         cmd.argument_input_system("ESU");
         cmd.argument_output_system("SI");
         cmd.argument_output_quantity("I");
@@ -73,7 +73,7 @@ TEST(PUQCommands, Convert) {
 
 TEST(PUQCommands, List) {
     {
-        cli::PUQList cmd;
+        api::PUQList cmd;
 
         testing::internal::CaptureStdout();
         cmd.execute();
@@ -82,7 +82,7 @@ TEST(PUQCommands, List) {
         EXPECT_EQ(output, "\nAvailable lists:\n\nprefix  unit prefixes\nbase    base units\nderiv   derived units\nlog     logarithmic units\ntemp    temperature units\nconst   constants\nquant   quantities\nsys     unit systems\n\n");
     }
     {
-        cli::PUQList cmd("deriv");
+        api::PUQList cmd("deriv");
         cmd.argument_system("AU");
 
         testing::internal::CaptureStdout();

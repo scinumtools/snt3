@@ -1,16 +1,106 @@
-unit_expr   ::= term ( ("*" | "/") term )*
+(* ========================================================================= *)
+(* PUEL - Physical Unit Expression Language                                  *)
+(* ========================================================================= *)
 
-term        ::= factor [ exponent ]
+PUEL            = [ System "_" ] Expression ;
 
-factor      ::= NUMBER "*" factor
-              | IDENTIFIER
-              | "(" unit_expr ")"
-              | CONSTANT
+(* ========================================================================= *)
+(* Expressions                                                               *)
+(* ========================================================================= *)
 
-exponent    ::= INTEGER
-              | INTEGER ":" INTEGER
-              | "-" exponent
+Expression      = Term , { ( "*" | "/" ) , Term } ;
 
-IDENTIFIER  ::= letter ( letter | digit )*
-CONSTANT    ::= "[" IDENTIFIER "]"
-NUMBER      ::= digit+ ( "." digit+ )? ( "e" ("+"|"-") digit+ )?
+Term            = Value
+                | UnitTerm
+                | Value , "*" , UnitTerm
+                ;
+
+(* ========================================================================= *)
+(* Values                                                                    *)
+(* ========================================================================= *)
+
+Value           = Number
+                | Array
+                ;
+
+Array           = "[" , ValueElement , { "," , ValueElement } , "]" ;
+
+ValueElement    = Number ;
+
+(* ========================================================================= *)
+(* Numbers                                                                   *)
+(* ========================================================================= *)
+
+Number          = [ Sign ] ,
+                  Mantissa ,
+                  [ Uncertainty ] ,
+                  [ ExponentPart ] ;
+
+Mantissa        = Digits , [ "." , Digits ]
+                | "." , Digits
+                ;
+
+Uncertainty     = "(" , Digits , ")" ;
+
+ExponentPart    = ( "e" | "E" ) , [ Sign ] , Digits ;
+
+Sign            = "+" | "-" ;
+
+(* ========================================================================= *)
+(* Units                                                                     *)
+(* ========================================================================= *)
+
+UnitTerm        = UnitSymbol , [ UnitExponent ] ;
+
+UnitExponent    = IntegerExponent
+                | FractionalExponent
+                ;
+
+IntegerExponent = SignedInteger ;
+
+FractionalExponent
+                = SignedInteger , ":" , UnsignedInteger ;
+
+(* ========================================================================= *)
+(* Identifiers                                                               *)
+(* ========================================================================= *)
+
+System          = Identifier ;
+
+UnitSymbol      = Identifier ;
+
+Identifier      = Letter , { Letter | Digit } ;
+
+(* ========================================================================= *)
+(* Integers                                                                  *)
+(* ========================================================================= *)
+
+SignedInteger   = [ Sign ] , UnsignedInteger ;
+
+UnsignedInteger = Digits ;
+
+Digits          = Digit , { Digit } ;
+
+(* ========================================================================= *)
+(* Characters                                                                *)
+(* ========================================================================= *)
+
+Letter          = "A".."Z"
+                | "a".."z"
+                | "µ"
+                | "Ω"
+                ;
+
+Digit           = "0".."9" ;
+
+(* ========================================================================= *)
+(* Examples                                                                  *)
+(* ========================================================================= *)
+
+(*
+ESU_erg
+SI_kg*m2/s2
+SI_kg2*m3:2/cm
+SI_1.346591(30)e27*kg
+SI_[2,3,4,5]*km
+*)

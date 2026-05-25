@@ -1,6 +1,6 @@
 #include "argparser.h"
 #include "main.h"
-#include "snt/cli/dip_parse.h"
+#include "snt/api/dip_parse.h"
 
 #include <deque>
 #include <iostream>
@@ -56,7 +56,7 @@ void module_dip(ArgParser& argpar) {
 
         std::string command = argpar.getPositionalValue(1);
         if (command == "parse") {
-            cli::DIPParse cmd;
+            api::DIPParse cmd;
             std::vector<std::string> arguments;
             arguments = argpar.getKeywordValues("-f", "--file");
             if (!arguments.empty()) {
