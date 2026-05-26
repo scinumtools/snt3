@@ -55,18 +55,20 @@ c bool = (false || ( {?b} == 23.43 cm || ~{?a} )
 
 Expression operators evaluate only boolean values, either given directly or as a result of a nested expression.
 
-**Logical operators**
-
-| Syntax            | Priority | Description                                                                              |
-|-------------------|----------|------------------------------------------------------------------------------------------|
-| `A \|\| B \|\| C ...` | 4        | Logical OR operator returns true if at least one expression (`A`, `B`, `C`, ...) is true |
-| `A && B && C ...` | 3        | Logical AND operator returns true if all expressions (`A`, `B`, `C`, ...) are true       |
-
 **Parentheses**
 
-| Syntax              | Priority | Description                                                                              |
-|---------------------|----------|------------------------------------------------------------------------------------------|
-| `(<expr>)`        | 2        | Parentheses operator evaluates expression `A` in a separate thread and returns its value |
+| Syntax          | Priority | Description                                                                              |
+|-----------------|----------|------------------------------------------------------------------------------------------|
+| `(<expr>)`      | 2        | Parentheses operator evaluates expression `A` in a separate thread and returns its value |
+| `def( <ref> )`  | 1        | Definition operator returns true if <reference> node exists                              |
+| `ndef( <ref> )` | 1        | Non-definition operator returns true if <reference> node does not exist                  |
+
+**Logical operators**
+
+| Syntax                | Priority | Description                                                                              |
+|-----------------------|----------|------------------------------------------------------------------------------------------|
+| `A \|\| B \|\| C ...` | 6        | Logical OR operator returns true if at least one expression (`A`, `B`, `C`, ...) is true |
+| `A && B && C ...`     | 5        | Logical AND operator returns true if all expressions (`A`, `B`, `C`, ...) are true       |
 
 Numerical values with dimensions compared using comparison operations are automatically converted into same units. The result of such comparison is always a boolean value.
 
@@ -77,25 +79,18 @@ Numerical values with dimensions compared using comparison operations are automa
 
 | Syntax   | Priority | Description                                                                                                          |
 |----------|----------|----------------------------------------------------------------------------------------------------------------------|
-| `A == B` | 1        | Equality operator returns true if `A` and `B` have same dimensions and numeraical value up to EQUAL\_PRECISION       |
-| `A != B` | 1        | Inequality operator returns true if `A` and `B` do not have same dimension or numerical value up to EQUAL\_PRECISION |
-| `A >= B` | 1        | Greater or equal operator returns true if `A` is greater or equal (up to EQUAL\_PRECISION) than `B`                  |
-| `A <= B` | 1        | Smaller or equal operator returns true if `A` is smaller or equal (up to EQUAL\_PRECISION) than `B`                  |
-| `A > B`  | 1        | Greather than operator returns true if `A` is greater than `B`                                                       |
-| `A < B`  | 1        | Smaller than operator returns true if `A` is smaller than `B`                                                        |
+| `A == B` | 3        | Equality operator returns true if `A` and `B` have same dimensions and numeraical value up to EQUAL\_PRECISION       |
+| `A != B` | 3        | Inequality operator returns true if `A` and `B` do not have same dimension or numerical value up to EQUAL\_PRECISION |
+| `A >= B` | 3        | Greater or equal operator returns true if `A` is greater or equal (up to EQUAL\_PRECISION) than `B`                  |
+| `A <= B` | 3        | Smaller or equal operator returns true if `A` is smaller or equal (up to EQUAL\_PRECISION) than `B`                  |
+| `A > B`  | 3        | Greather than operator returns true if `A` is greater than `B`                                                       |
+| `A < B`  | 3        | Smaller than operator returns true if `A` is smaller than `B`                                                        |
   
 **Single value operators**
 
 | Syntax    | Priority | Description                                                             |
 |-----------|----------|-------------------------------------------------------------------------|
-| `~<bool>` | 1        | Negation operator returns true if value `A` is false                    |
-
-**Parentheses operators**
-
-| Syntax          | Priority | Description                                                             |
-|-----------------|----------|-------------------------------------------------------------------------|
-| `def( <ref> )`  | 1        | Definition operator returns true if <reference> node exists             |
-| `ndef( <ref> )` | 1        | Non-definition operator returns true if <reference> node does not exist |
+| `~<bool>` | 4        | Negation operator returns true if value `A` is false                    |
 
 ### 3.5.2. Numerical
 
@@ -121,12 +116,15 @@ Operators used in numerical expressions are summarized below:
 
 **Arithmetics**
 
-| Syntax  | Priority | Description                                    |
-|---------|----------|------------------------------------------------|
-| `A + B` | 3        | Addition of two values of a same dimension     |
-| `A - B` | 3        | Substraction of two values of a same dimension |
-| `A * B` | 2        | Multiplication of two values                   |
-| `A / B` | 2        | Division of two values                         |
+| Syntax   | Priority | Description                                    |
+|----------|----------|------------------------------------------------|
+| `A + B`  | 6        | Addition of two values of a same dimension     |
+| `A - B`  | 6        | Substraction of two values of a same dimension |
+| `A * B`  | 5        | Multiplication of two values                   |
+| `A / B`  | 5        | Division of two values                         |
+| `A ** B` | 4        | First value on the power of the second value   |
+| ` +B`    | 3        | Unary plus                                     |
+| ` -B`    | 3        | Unary minus                                    |
 
 Parentheses operators evaluate expressions in a separate thread and return its final value.
 Most of the following operators require, that the final value has no dimensions.
@@ -135,7 +133,7 @@ Most of the following operators require, that the final value has no dimensions.
 
 | Syntax                  | Priority | Description                                                                   |
 |-------------------------|----------|-------------------------------------------------------------------------------|
-| `( <expr> )`            | 1        | Standard parenthesis operator                                                 |
+| `( <expr> )`            | 2        | Standard parenthesis operator                                                 |
 | `exp( <expr> )`         | 1        | Returns exponential value of a dimensionless expression.                      |
 | `pow( <expr>, <expr> )` | 1        | Returns first expression risen on a power of second dimensionless expression. |
 | `ln( <expr> )`          | 1        | Returns natural logarithmic value of a dimensionless expression.              |

@@ -42,7 +42,8 @@ namespace snt::dip {
                          std::make_shared<exs::OperatorOr>(" || "));
 
         exs::StepList steps;
-        steps.append(exs::GROUP_OPERATION, {exs::PARENTHESES_OPERATOR, dip::DEFINED_OPERATOR, dip::NOT_DEFINED_OPERATOR});
+        steps.append(exs::GROUP_OPERATION, {dip::DEFINED_OPERATOR, dip::NOT_DEFINED_OPERATOR});
+        steps.append(exs::GROUP_OPERATION, {exs::PARENTHESES_OPERATOR});
         steps.append(exs::BINARY_OPERATION, {exs::LESS_EQUAL_OPERATOR, exs::GREATER_EQUAL_OPERATOR,
                                              exs::LESS_OPERATOR, exs::GREATER_OPERATOR});
         steps.append(exs::BINARY_OPERATION, {exs::EQUAL_OPERATOR, exs::NOT_EQUAL_OPERATOR});
