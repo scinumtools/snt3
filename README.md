@@ -144,6 +144,26 @@ Building upon this specification, the `PUQ` module of `SciNumTools` implements p
 
 The definition of input parameters for scientific and engineering software involves several recurring requirements that are common across many numerical codes. High-performance applications often require strongly typed parameters with explicitly defined numerical precision. Numerical values frequently carry associated physical units, and many parameters consist not only of scalar values, but also arrays, matrices, or tabulated datasets.
 
+```dipl
+simulation
+
+  timestep float = 0.5 fs
+    !condition ({?} > 0.0 fs)
+
+  temperature float = 300 K
+    !condition ({?} > 0 K)
+
+  pressure float = 1 atm
+
+  steps int = 1000000
+    !condition ({?} > 1)
+
+  duration float = {?simulation.timestep} * {?simulation.steps}
+
+  ensemble string = "NPT"
+    !options ["NVE", "NVT", "NPT"]
+```
+
 In addition, parameters commonly require validation rules, numerical constraints, admissible ranges, or configurable options that govern their behavior and interpretation. Parameter definitions are often interdependent as well, where the validity, availability, or meaning of one setting depends on the values of others. `DIPL` provides a coherent and extensible framework for expressing these definitions, relationships, and constraints in a structured, machine-readable, and implementation-independent form.
 
 ### Example of Use
