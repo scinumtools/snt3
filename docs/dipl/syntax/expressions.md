@@ -36,7 +36,7 @@ Possible input values used by expressions are summarized in the following table:
 | ``<ref>``  | reference  | ``{?energy}``                 |
 | ``<expr>`` | expression | ``12 cm == {?width} && true`` |
 
-Operators summarized below are evaluated according to their priority from 1 to 4 and can be nested accordingly.
+Operators summarized below are evaluated according to their priority from highest `1` to lowest `4`, and can be nested accordingly.
 
 ### 3.5.1. Logical
 
@@ -49,7 +49,7 @@ An example of a logical expression is given below.
 a bool = true
 b float = 23.43 cm
 c bool = (false || ( {?b} == 23.43 cm || ~{?a} ) 
-          && {?a} || ~!{?c})
+          && {?a} || ndef( {?c} ))
 # Node 'c' will be evaluated as 'true'
 ```
 
