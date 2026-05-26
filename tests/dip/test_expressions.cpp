@@ -36,12 +36,11 @@ TEST(Expressions, MultipleLines) {
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "2");
 
-    /* TODO: Implement expressions with Quantities/Measurements with units and not just values
     d = dip::DIP();
     d.add_string("a bool = true");
     d.add_string("b float = 23.43 cm");
-    d.add_string("c bool = (false || ( {?b} == 23.43 cm || ~{?a} )");
-    d.add_string("          && {?a} || ~!{?c})");
+    d.add_string("c bool = (false || ( {?b} == 23.43 cm || def( {?a} ) )");
+    d.add_string("          && {?a} || ndef( {?c} ))");
     env = d.parse();
     EXPECT_EQ(env.nodes.size(), 3);
 
@@ -49,5 +48,4 @@ TEST(Expressions, MultipleLines) {
     EXPECT_EQ(vnode->name, "c");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
-    */
 }

@@ -49,8 +49,9 @@ namespace snt::dip {
         default:
             throw std::runtime_error("Unrecognized environment request type");
         }
-        if (new_value.value == nullptr)
-            throw std::runtime_error("Value node data environment request returns an empty pointer: " + request);
+        // NOTE: We need to enable this in order to implemente the def/ndef logical operators
+        // if (new_value.value == nullptr)
+        //    throw std::runtime_error("Value node data environment request returns an empty pointer: " + request);
         return new_value;
     }
 

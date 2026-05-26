@@ -5,7 +5,7 @@
 #include <snt/dip/solvers/logical_atom.h>
 
 namespace snt::dip {
-  
+
     LogicalAtom& LogicalAtom::operator=(const LogicalAtom& a) {
         if (this != &a) {
             value.value = a.value.value->clone();
@@ -14,7 +14,7 @@ namespace snt::dip {
         }
         return *this;
     }
-    
+
     ValueNodeData LogicalAtom::from_string(const std::string& s, exs::BaseSettings* settings) {
         Parser parser({s, {"LOGICAL_ATOM", 0}});
         LogicalSettings* csettings = static_cast<LogicalSettings*>(settings);
@@ -49,7 +49,9 @@ namespace snt::dip {
 
     // Comparison operations
     void LogicalAtom::comparison_equal(LogicalAtom* other) {
-        if (value.units && other->value.units) {
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("LogicalAtom: Undefined value");
+        } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
@@ -65,9 +67,11 @@ namespace snt::dip {
         }
         value.units = std::nullopt;
     }
-    
+
     void LogicalAtom::comparison_not_equal(LogicalAtom* other) {
-        if (value.units && other->value.units) {
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("LogicalAtom: Undefined value");
+        } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
@@ -83,9 +87,11 @@ namespace snt::dip {
         }
         value.units = std::nullopt;
     }
-    
+
     void LogicalAtom::comparison_less_equal(LogicalAtom* other) {
-        if (value.units && other->value.units) {
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("LogicalAtom: Undefined value");
+        } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
@@ -101,9 +107,11 @@ namespace snt::dip {
         }
         value.units = std::nullopt;
     }
-    
+
     void LogicalAtom::comparison_greater_equal(LogicalAtom* other) {
-        if (value.units && other->value.units) {
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("LogicalAtom: Undefined value");
+        } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
@@ -119,9 +127,11 @@ namespace snt::dip {
         }
         value.units = std::nullopt;
     }
-    
+
     void LogicalAtom::comparison_less(LogicalAtom* other) {
-        if (value.units && other->value.units) {
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("LogicalAtom: Undefined value");
+        } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
@@ -137,9 +147,11 @@ namespace snt::dip {
         }
         value.units = std::nullopt;
     }
-    
+
     void LogicalAtom::comparison_greater(LogicalAtom* other) {
-        if (value.units && other->value.units) {
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("LogicalAtom: Undefined value");
+        } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
@@ -158,13 +170,33 @@ namespace snt::dip {
 
     // Logical operations
     void LogicalAtom::logical_not() {
-        value.value = value.value->logical_not();
+        if (!value.value) {
+            throw std::runtime_error("LogicalAtom: Undefined value");
+        } else {
+            value.value = value.value->logical_not();
+        }
     }
     void LogicalAtom::logical_and(LogicalAtom* other) {
-        value.value = value.value->logical_and(other->value.value.get());
+        if (!value.value) {
+            throw std::runtime_error("LogicalAtom: Undefined value");
+        } else {
+            value.value = value.value->logical_and(other->value.value.get());
+        }
     }
     void LogicalAtom::logical_or(LogicalAtom* other) {
-        value.value = value.value->logical_or(other->value.value.get());
+        if (!value.value) {
+            throw std::runtime_error("LogicalAtom: Undefined value");
+        } else {
+            value.value = value.value->logical_or(other->value.value.get());
+        }
+    }
+
+    // Definition operators
+    void LogicalAtom::custom_defined() {
+        value.value = std::make_unique<val::ArrayValue<bool>>(value.value != nullptr);
+    }
+    void LogicalAtom::custom_not_defined() {
+        value.value = std::make_unique<val::ArrayValue<bool>>(value.value == nullptr);
     }
 
 } // namespace snt::dip

@@ -22,7 +22,7 @@ TEST(SolverLogical, AndOrNot) {
     data = solver.eval("false || false || false");
     EXPECT_EQ(data.value->to_string(), "false");
 
-    data = solver.eval("!false");
+    data = solver.eval("~false");
     EXPECT_EQ(data.value->to_string(), "true");
 }
 
@@ -79,6 +79,17 @@ TEST(SolverLogical, StringComparison) {
     EXPECT_EQ(data.value->to_string(), "false");
 
     data = solver.eval("\"foo\" != \"foo\"");
+    EXPECT_EQ(data.value->to_string(), "false");
+}
+
+TEST(SolverLogical, Definition) {
+
+    dip::Environment env;
+    dip::LogicalSolver solver(env);
+    dip::ValueNodeData data = solver.eval("def( {?foo} )");
+    EXPECT_EQ(data.value->to_string(), "false");
+
+    data = solver.eval("ndef( true )");
     EXPECT_EQ(data.value->to_string(), "false");
 }
 

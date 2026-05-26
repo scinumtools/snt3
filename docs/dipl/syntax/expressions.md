@@ -89,8 +89,13 @@ Numerical values with dimensions compared using comparison operations are automa
 | Syntax    | Priority | Description                                                             |
 |-----------|----------|-------------------------------------------------------------------------|
 | `~<bool>` | 1        | Negation operator returns true if value `A` is false                    |
-| `!<ref>`  | 1        | Definition operator returns true if <reference> node exists             |
-| `~!<ref>` | 1        | Non-definition operator returns true if <reference> node does not exist |
+
+**Parentheses operators**
+
+| Syntax          | Priority | Description                                                             |
+|-----------------|----------|-------------------------------------------------------------------------|
+| `def( <ref> )`  | 1        | Definition operator returns true if <reference> node exists             |
+| `ndef( <ref> )` | 1        | Non-definition operator returns true if <reference> node does not exist |
 
 ### 3.5.2. Numerical
 

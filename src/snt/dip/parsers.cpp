@@ -120,7 +120,7 @@ namespace snt::dip {
                     balance += count_group_balance(next.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
                 }
                 if (balance != 0) {
-                    throw std::runtime_error("Unbalanced parentheses");
+                    throw std::runtime_error("Expression: Unbalanced parentheses");
                 }
             }
             {
@@ -133,7 +133,7 @@ namespace snt::dip {
                     balance += count_group_balance(next.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
                 }
                 if (balance != 0) {
-                    throw std::runtime_error("Unbalanced parentheses");
+                    throw std::runtime_error("Array: Unbalanced parentheses");
                 }
             }
 

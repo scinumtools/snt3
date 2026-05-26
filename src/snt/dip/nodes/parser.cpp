@@ -372,7 +372,26 @@ namespace snt::dip {
             return false;
         // Skip leading whitespace
         size_t start = code.find_first_not_of(" \t\n\r");
-        if (start == std::string::npos || code[start] != '(')
+        // Try to parse template expression
+        if (code.substr(start, 4) == R"(f""")") {
+            size_t end = start + 4;
+            for (; end < code.size(); ++end) {
+                // std::cout << "|" << code.substr(end, 3) << "|" << '\n';
+                if (code.substr(end, 3) == R"(""")") {
+                    std::string inside = code.substr(start + 4, end - (start + 4) - 1);
+                    if (inside.empty())
+                        throw std::runtime_error("Expression cannot be empty: " + line.code);
+                    value_raw.push_back(inside);
+                    value_origin = ValueOrigin::Expression;
+                    // Strip including leading whitespace + full f"""..."""
+                    strip(code.substr(0, end + 3));
+                    return true;
+                }
+            }
+            throw std::runtime_error("Invalid template expression: " + code);
+        }
+        // Try to parse numerical or logical expression
+        if (start == std::string::npos || (code[start] != '('))
             return false;
         int depth = 0;
         size_t i = start;

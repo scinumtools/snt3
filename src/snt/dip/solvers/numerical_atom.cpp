@@ -52,19 +52,39 @@ namespace snt::dip {
 
     // Mathematical operations
     void NumericalAtom::math_sinus() {
-        value.value = value.value->math_sin();
+        if (!value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_sin();
+        }
     }
     void NumericalAtom::math_cosinus() {
-        value.value = value.value->math_cos();
+        if (!value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_cos();
+        }
     }
     void NumericalAtom::math_tangens() {
-        value.value = value.value->math_tan();
+        if (!value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_tan();
+        }
     }
     void NumericalAtom::math_cubic_root() {
-        value.value = value.value->math_cbrt();
+        if (!value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_cbrt();
+        }
     }
     void NumericalAtom::math_square_root() {
-        value.value = value.value->math_sqrt();
+        if (!value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_sqrt();
+        }
     }
     // void NumericalAtom::math_power_base(NumericalAtom* other) {
     //   value.value = value.value->math_powb(other->value.get());
@@ -73,35 +93,61 @@ namespace snt::dip {
     //   value.value = value.value->math_logb(other->value.get());
     // }
     void NumericalAtom::math_logarithm_10() {
-        value.value = value.value->math_log10();
+        if (!value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_log10();
+        }
     }
     void NumericalAtom::math_logarithm() {
-        value.value = value.value->math_log();
+        if (!value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_log();
+        }
     }
     void NumericalAtom::math_exponent() {
-        value.value = value.value->math_exp();
+        if (!value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_exp();
+        }
     }
     void NumericalAtom::math_power(NumericalAtom* other) {
-        value.value = value.value->math_pow(other->value.value.get());
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_pow(other->value.value.get());
+        }
     }
     void NumericalAtom::math_multiply(NumericalAtom* other) {
-        value.value = value.value->math_mul(other->value.value.get());
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_mul(other->value.value.get());
+        }
         if (value.units && other->value.units) {
-	  value.units = (*value.units) * (*other->value.units);	  
+            value.units = (*value.units) * (*other->value.units);
         } else if (other->value.units) {
-	  value.units = other->value.units;
-        }	
+            value.units = other->value.units;
+        }
     }
     void NumericalAtom::math_divide(NumericalAtom* other) {
-        value.value = value.value->math_div(other->value.value.get());
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_div(other->value.value.get());
+        }
         if (value.units && other->value.units) {
-	  value.units = (*value.units) / (*other->value.units);	  
+            value.units = (*value.units) / (*other->value.units);
         } else if (other->value.units) {
-	  value.units = 1. / (*other->value.units);
-        }	
+            value.units = 1. / (*other->value.units);
+        }
     }
     void NumericalAtom::math_add(NumericalAtom* other) {
-        if (value.units && other->value.units) {
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
@@ -117,7 +163,9 @@ namespace snt::dip {
         }
     }
     void NumericalAtom::math_subtract(NumericalAtom* other) {
-        if (value.units && other->value.units) {
+        if (!value.value || !other->value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
@@ -133,7 +181,11 @@ namespace snt::dip {
         }
     }
     void NumericalAtom::math_negate() {
-        value.value = value.value->math_neg();
+        if (!value.value) {
+            throw std::runtime_error("NumericalAtom: Undefined value");
+        } else {
+            value.value = value.value->math_neg();
+        }
     }
 
 } // namespace snt::dip

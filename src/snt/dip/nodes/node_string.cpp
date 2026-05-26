@@ -3,6 +3,7 @@
 #include <regex>
 #include <snt/dip/environment.h>
 #include <snt/dip/nodes/node_string.h>
+#include <snt/dip/solvers/template_solver.h>
 
 namespace snt::dip {
 
@@ -39,8 +40,9 @@ namespace snt::dip {
         case ValueOrigin::Keyword:
         case ValueOrigin::Number:
         case ValueOrigin::Expression: {
-            // TODO: not implementation yet
-            throw std::runtime_error("Keyword, number and expression values are not implemented: " + line.code);
+            TemplateSolver solver(env);
+            ValueNodeData data = solver.eval(value_raw.at(0));
+            set_value(std::move(data.value));
             break;
         }
         default:

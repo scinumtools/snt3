@@ -11,10 +11,11 @@ namespace snt::dip {
 
     class LogicalAtom : public exs::AtomBase<LogicalAtom, ValueNodeData> {
       public:
-      // Constructor from unique_ptr
-      LogicalAtom(ValueNodeData b) : AtomBase({std::move(b.value), std::move(b.units)}) {};
+        // Constructor from unique_ptr
+        LogicalAtom(ValueNodeData b) : AtomBase({std::move(b.value), std::move(b.units)}) {};
         // Deep copy constructor
-      LogicalAtom(const LogicalAtom& a) : AtomBase({a.value.value->clone(), a.value.units}) {};
+        LogicalAtom(const LogicalAtom& a) : AtomBase({a.value.value ? a.value.value->clone() : nullptr,
+                                                      a.value.units}) {};
         LogicalAtom& operator=(const LogicalAtom& a);
         // Move constructor
         LogicalAtom(LogicalAtom&& a) noexcept = default;
@@ -31,6 +32,8 @@ namespace snt::dip {
         void logical_not() override;
         void logical_and(LogicalAtom* other) override;
         void logical_or(LogicalAtom* other) override;
+        void custom_defined();
+        void custom_not_defined();
     };
 
 } // namespace snt::dip

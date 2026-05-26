@@ -8,7 +8,7 @@ namespace snt::dip {
         environment = &env;
     }
 
-    std::string TemplateSolver::eval(std::string expression) {
+    ValueNodeData TemplateSolver::eval(std::string expression) {
         std::stringstream ss;
         bool openned = false;
         while (!expression.empty()) {
@@ -25,6 +25,11 @@ namespace snt::dip {
 
                     // request node from the environment and extract its value
                     ValueNode::ListType nodes = environment->request_nodes(parser.value_raw.at(0), RequestType::Reference);
+                    if (nodes.size() != 1) {
+                        throw std::runtime_error("Reference in a template should return only one node. "
+                                                 "Number of nodes returned: " +
+                                                 std::to_string(nodes.size()));
+                    }
                     const ValueNode::PointerType& vnode = nodes.front();
 
                     // apply slicing
@@ -61,7 +66,9 @@ namespace snt::dip {
                 ss << c;
             }
         }
-        return ss.str();
+        // return value node data
+        val::BaseValue::PointerType value = std::make_unique<val::ArrayValue<std::string>>(ss.str());
+        return ValueNodeData({std::move(value), std::nullopt});
     }
 
 } // namespace snt::dip

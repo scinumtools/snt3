@@ -11,7 +11,7 @@ namespace snt::dip {
 
       public:
         TemplateSolver(Environment& env);
-        std::string eval(std::string expression);
+        ValueNodeData eval(std::string expression);
     };
 
 } // namespace snt::dip
