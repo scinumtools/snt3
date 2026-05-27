@@ -308,16 +308,33 @@ namespace snt::dip {
     }
 
     bool Parser::part_dimension() {
-        std::regex pattern(R"(^\[([0-9:,]*)\])");
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            std::string slices = matchResult[1].str();
-            parse_slices(slices, dimension);
-            if (dimension.empty())
-                throw std::runtime_error("Dimension settings cannot be empty: " + line.code);
-            strip(matchResult[0].str());
-            return true;
+        if (code.empty() || code[0] != '[') {
+            return false;
         }
+
+        size_t pos = 1;
+        while (pos < code.size()) {
+            char c = code[pos];
+            // End of dimension block
+            if (c == ']') {
+                std::string slices = code.substr(1, pos - 1);
+                parse_slices(slices, dimension);
+                if (dimension.empty()) {
+                    throw std::runtime_error(
+                        "Dimension settings cannot be empty: " + line.code);
+                }
+                strip(code.substr(0, pos + 1));
+                return true;
+            }
+            // Allowed characters
+            if (!(std::isdigit(static_cast<unsigned char>(c)) ||
+                  c == ':' ||
+                  c == ',')) {
+                return false;
+            }
+            ++pos;
+        }
+
         return false;
     }
 
@@ -372,24 +389,7 @@ namespace snt::dip {
             return false;
         // Skip leading whitespace
         size_t start = code.find_first_not_of(" \t\n\r");
-        // Try to parse template expression
-        if (code.substr(start, 4) == R"(f""")") {
-            size_t end = start + 4;
-            for (; end < code.size(); ++end) {
-                // std::cout << "|" << code.substr(end, 3) << "|" << '\n';
-                if (code.substr(end, 3) == R"(""")") {
-                    std::string inside = code.substr(start + 4, end - (start + 4) - 1);
-                    if (inside.empty())
-                        throw std::runtime_error("Expression cannot be empty: " + line.code);
-                    value_raw.push_back(inside);
-                    value_origin = ValueOrigin::Expression;
-                    // Strip including leading whitespace + full f"""..."""
-                    strip(code.substr(0, end + 3));
-                    return true;
-                }
-            }
-            throw std::runtime_error("Invalid template expression: " + code);
-        }
+        // NOTE: Template expressions are catched in Parser::part_string()
         // Try to parse numerical or logical expression
         if (start == std::string::npos || (code[start] != '('))
             return false;
@@ -428,19 +428,67 @@ namespace snt::dip {
     }
 
     bool Parser::part_string() {
-        std::regex pattern(R"(^(\"\"\"([^\"]*)\"\"\"|\"([^\"]*)\"))");
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            for (int i = 2; i < 6; i++) {
-                std::string vraw = matchResult[i].str();
-                if (vraw != "") {
-                    value_raw.push_back(vraw);
-                    value_origin = ValueOrigin::String;
-                    break;
-                }
+        if (code.empty()) {
+            return false;
+        }
+        bool is_expression = false;
+        size_t start = 0;
+
+        // Detect f-prefixed strings
+        if (code[0] == 'f') {
+            is_expression = true;
+            start = 1;
+            if (start >= code.size() || code[start] != '"') {
+                return false;
             }
-            strip(matchResult[0].str());
-            return true;
+        }
+
+        // Triple-quoted string
+        if (code.substr(start).starts_with("\"\"\"")) {
+            size_t content_start = start + 3;
+            size_t pos = content_start;
+            while (pos + 2 < code.size()) {
+                if (code[pos] == '"' &&
+                    code[pos + 1] == '"' &&
+                    code[pos + 2] == '"') {
+                    std::string value =
+                        code.substr(content_start,
+                                    pos - content_start);
+                    value_raw.push_back(value);
+                    value_origin = is_expression
+                                       ? ValueOrigin::Expression
+                                       : ValueOrigin::String;
+                    strip(code.substr(0, pos + 3));
+                    return true;
+                }
+                ++pos;
+            }
+            return false;
+        }
+
+        // Normal quoted string
+        if (code[start] == '"') {
+            size_t pos = start + 1;
+            bool escaped = false;
+            while (pos < code.size()) {
+                char c = code[pos];
+                if (escaped) {
+                    escaped = false;
+                } else if (c == '\\') {
+                    escaped = true;
+                } else if (c == '"') {
+                    std::string value =
+                        code.substr(start + 1,
+                                    pos - start - 1);
+                    value_raw.push_back(value);
+                    value_origin = is_expression
+                                       ? ValueOrigin::Expression
+                                       : ValueOrigin::String;
+                    strip(code.substr(0, pos + 1));
+                    return true;
+                }
+                ++pos;
+            }
         }
         return false;
     }
