@@ -158,7 +158,7 @@ simulation
   steps int = 1000000
     !condition ({?} > 1)
 
-  duration float = {?simulation.timestep} * {?simulation.steps}
+  duration float = ( {?simulation.timestep} * {?simulation.steps} )
 
   ensemble string = "NPT"
     !options ["NVE", "NVT", "NPT"]
