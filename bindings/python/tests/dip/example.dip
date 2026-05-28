@@ -1,0 +1,3 @@
+# this is an example dip file for testing
+foo bool = false
+bar int = 2

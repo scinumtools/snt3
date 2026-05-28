@@ -13,7 +13,11 @@ void init_value_node(py::module_& m) {
     auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(m, "ValueNode");
     val.def("__str__", &dip::ValueNode::to_string, py::arg("format") = core::StringFormatType());
     val.def_readonly("name", &dip::ValueNode::name);
-    val.def_property_readonly("units", [](const dip::ValueNode& vnode) -> const puq::Quantity* { return vnode.units ? &(*vnode.units) : nullptr; }, py::return_value_policy::reference_internal);
+    val.def_property_readonly(
+        "units",
+        [](const dip::ValueNode& vnode) -> const puq::Quantity* { return vnode.units ? &(*vnode.units) : nullptr; },
+        py::return_value_policy::reference_internal
+    );
     val.def_property_readonly("value", [](const dip::ValueNode& vnode) -> py::object {
         std::vector<size_t> shape = vnode.value->get_shape();
         std::vector<ssize_t> strides(shape.size());
@@ -36,9 +40,9 @@ void init_value_node(py::module_& m) {
 
         switch (vnode.dtype) {
         case dip::NodeDtype::Boolean: {
-            // TODO: in the future bool should be stored as uint8_t because bool is not 8 bit, but 1 bit
-            val::ArrayValue<bool>* val =
-                dynamic_cast<val::ArrayValue<bool>*>(vnode.value.get());
+            // TODO: in the future bool should be stored as uint8_t because bool is not 8 bit,
+            // but 1 bit
+            val::ArrayValue<bool>* val = dynamic_cast<val::ArrayValue<bool>*>(vnode.value.get());
             if (!val)
                 throw std::runtime_error("Type mismatch");
             std::vector<uint8_t> tmp(val->get_size());

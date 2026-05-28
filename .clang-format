@@ -1,21 +1,44 @@
 BasedOnStyle: LLVM
-IndentWidth: 4   
+
+IndentWidth: 4
 TabWidth: 4
-UseTab: Never    
-NamespaceIndentation: All  
-BreakBeforeBraces: Attach  
-ColumnLimit: 0             
+UseTab: Never
+
+NamespaceIndentation: All
+
+BreakBeforeBraces: Attach
+
+# Important for preventing giant one-line pybind11 calls
+ColumnLimit: 120
+
 AllowShortFunctionsOnASingleLine: Inline
+AllowShortLambdasOnASingleLine: Inline
+
+# Better formatting for env.def(...) style calls
+BinPackArguments: false
+BinPackParameters: false
+AlignAfterOpenBracket: BlockIndent
+PenaltyBreakBeforeFirstCallParameter: 1
+
+# Prevent return type wrapping
+PenaltyReturnTypeOnItsOwnLine: 1000
+AlwaysBreakAfterReturnType: None
+
 DerivePointerAlignment: false
 PointerAlignment: Left
+
 SortIncludes: true
-IncludeBlocks: Regroup  
+IncludeBlocks: Regroup
+
 IncludeCategories:
-  - Regex: '^<(exs|val|puq|dip|mat)/.*>$'   # project headers
+  - Regex: '^<(exs|val|puq|dip|mat)/.*>$'
     Priority: 1
-  - Regex: '^"(exs|val|puq|dip|mat)/.*"$'   # project headers
+
+  - Regex: '^"(exs|val|puq|dip|mat)/.*"$'
     Priority: 1
-  - Regex: '^".*"$'       # local headers
+
+  - Regex: '^".*"$'
     Priority: 2
-  - Regex: '^<.*>$'       # system headers
+
+  - Regex: '^<.*>$'
     Priority: 3

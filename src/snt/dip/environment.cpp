@@ -13,8 +13,7 @@ namespace snt::dip {
     inline std::tuple<std::string, std::string> parse_request(const std::string& request) {
         size_t pos = request.find(SIGN_QUERY);
         if (pos == std::string::npos)
-            throw std::runtime_error("Environment request must contain a question mark symbol: " +
-                                     request);
+            throw std::runtime_error("Environment request must contain a question mark symbol: " + request);
         else
             return {request.substr(0, pos), request.substr(pos + 1)};
     }
@@ -25,9 +24,9 @@ namespace snt::dip {
         return sources.at(source_name).code;
     }
 
-    ValueNodeData Environment::request_node_data(const std::string& request,
-                                                 const RequestType rtype) const {
+    ValueNodeData Environment::request_node_data(const std::string& request, const RequestType rtype) const {
         ValueNodeData new_value;
+
         switch (rtype) {
         case RequestType::Function: {
             // TODO: this needs to be implemented
@@ -53,13 +52,14 @@ namespace snt::dip {
         }
         // NOTE: We need to enable this in order to implemente the def/ndef logical operators
         // if (new_value.value == nullptr)
-        //    throw std::runtime_error("Value node data environment request returns an empty pointer: " + request);
+        //    throw std::runtime_error("Value node data environment request returns an empty
+        //    pointer: " + request);
         return new_value;
     }
 
-    val::BaseValue::PointerType Environment::request_value(const std::string& request,
-                                                           const RequestType rtype,
-                                                           const std::string& to_unit) const {
+    val::BaseValue::PointerType Environment::request_value(
+        const std::string& request, const RequestType rtype, const std::string& to_unit
+    ) const {
         val::BaseValue::PointerType new_value = nullptr;
         switch (rtype) {
         case RequestType::Function: {
@@ -75,17 +75,20 @@ namespace snt::dip {
                 if (vnode and vnode->name == node_path) {
                     new_value = vnode->value->clone();
                     if (to_unit != core::KEYWORD_NONE) {
-                        // NOTE: If unit conversion is not required, the to_unit should be set to "none".
+                        // NOTE: If unit conversion is not required, the to_unit should be set to
+                        // "none".
                         //       This is usefull if we want to simply get a reference node as it is.
                         if (!vnode->units and !to_unit.empty()) {
                             throw std::runtime_error(
                                 "Request: Trying to convert nondimensional quantity into '" + to_unit +
-                                "': " + vnode->line.code);
+                                "': " + vnode->line.code
+                            );
                         } else if (vnode->units and to_unit.empty()) {
                             std::cout << vnode->units->to_string() << " " << to_unit << '\n';
                             throw std::runtime_error(
                                 "Request: Trying to convert '" + vnode->units_raw +
-                                "' into a nondimensional quantity: " + vnode->line.code);
+                                "' into a nondimensional quantity: " + vnode->line.code
+                            );
                         } else if (vnode->units) {
                             puq::Quantity quantity = std::move(new_value) * (*vnode->units);
                             quantity = quantity.convert(to_unit);
@@ -118,9 +121,9 @@ namespace snt::dip {
         return false; // No match found
     }
 
-    ValueNode::ListType Environment::request_nodes(const std::string& request,
-                                                   const RequestType rtype,
-                                                   const std::vector<std::string>& tags) const {
+    ValueNode::ListType Environment::request_nodes(
+        const std::string& request, const RequestType rtype, const std::vector<std::string>& tags
+    ) const {
         ValueNode::ListType new_nodes;
         switch (rtype) {
         case RequestType::Function: {

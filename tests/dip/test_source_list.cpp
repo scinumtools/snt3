@@ -76,7 +76,7 @@ TEST(SourceList, KeywordSourceText) {
     EXPECT_EQ(senv.nodes.size(), 0);
 }
 
-TEST(SourceList, AddSourceCode) {
+TEST(SourceList, AddSourceFromCode) {
 
     // create temporary file
     std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
