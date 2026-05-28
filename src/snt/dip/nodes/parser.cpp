@@ -389,10 +389,11 @@ namespace snt::dip {
             return false;
         // Skip leading whitespace
         size_t start = code.find_first_not_of(" \t\n\r");
-        // NOTE: Template expressions are catched in Parser::part_string()
         // Try to parse numerical or logical expression
         if (start == std::string::npos || (code[start] != '('))
             return false;
+        if (dtype_raw[1] == std::string(KEYWORD_STRING))
+            throw std::runtime_error("Template expressions use formatted string notation: f\"str\", or f\"\"\"str\"\"\"");
         int depth = 0;
         size_t i = start;
         // Parse parentheses from first '('
