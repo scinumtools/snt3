@@ -393,7 +393,7 @@ namespace snt::dip {
         if (start == std::string::npos || (code[start] != '('))
             return false;
         if (dtype_raw[1] == std::string(KEYWORD_STRING))
-            throw std::runtime_error("Template expressions use f-prefixed strings: f\"str\", or f\"\"\"str\"\"\"");
+            throw std::runtime_error("Template expressions should use f-prefixed strings notation: f\"str\", or f\"\"\"str\"\"\"");
         int depth = 0;
         size_t i = start;
         // Parse parentheses from first '('
