@@ -1,5 +1,6 @@
 #include <snt/dip/environment.h>
 #include <snt/dip/nodes/node_value.h>
+#include <unordered_set>
 
 namespace snt::dip {
 
@@ -42,6 +43,7 @@ namespace snt::dip {
                     new_value.value = vnode->value->clone();
                     if (vnode->units)
                         new_value.units = vnode->units;
+                    break;
                 }
             }
             break;
@@ -75,18 +77,20 @@ namespace snt::dip {
                     if (to_unit != core::KEYWORD_NONE) {
                         // NOTE: If unit conversion is not required, the to_unit should be set to "none".
                         //       This is usefull if we want to simply get a reference node as it is.
-                        if (!vnode->units and !to_unit.empty())
+                        if (!vnode->units and !to_unit.empty()) {
                             throw std::runtime_error(
                                 "Request: Trying to convert nondimensional quantity into '" + to_unit +
                                 "': " + vnode->line.code);
-                        else if (vnode->units and to_unit.empty())
+                        } else if (vnode->units and to_unit.empty()) {
+                            std::cout << vnode->units->to_string() << " " << to_unit << '\n';
                             throw std::runtime_error(
                                 "Request: Trying to convert '" + vnode->units_raw +
                                 "' into a nondimensional quantity: " + vnode->line.code);
-                        else if (vnode->units) {
+                        } else if (vnode->units) {
                             puq::Quantity quantity = std::move(new_value) * (*vnode->units);
                             quantity = quantity.convert(to_unit);
                             new_value = std::move(quantity.measurement.result.estimate);
+                            break;
                         }
                     }
                 }
@@ -101,8 +105,22 @@ namespace snt::dip {
         return std::move(new_value);
     }
 
+    inline bool hasIntersection(const std::vector<std::string>& vec1, const std::vector<std::string>& vec2) {
+        // Put elements of the first vector into a hash set
+        std::unordered_set<std::string> set1(vec1.begin(), vec1.end());
+
+        // Check if any element of the second vector exists in the set
+        for (const auto& item : vec2) {
+            if (set1.count(item)) {
+                return true; // Found a match, they intersect
+            }
+        }
+        return false; // No match found
+    }
+
     ValueNode::ListType Environment::request_nodes(const std::string& request,
-                                                   const RequestType rtype) const {
+                                                   const RequestType rtype,
+                                                   const std::vector<std::string>& tags) const {
         ValueNode::ListType new_nodes;
         switch (rtype) {
         case RequestType::Function: {
@@ -114,11 +132,16 @@ namespace snt::dip {
             auto [source_name, node_path] = parse_request(request);
             std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
+            // if node has children, select them all
             size_t p = node_pool.size(); // parent node index
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
                 if (vnode and vnode->name.rfind(node_path_child, 0) == 0 and
                     vnode->name.size() > node_path_child.size()) {
+                    // filter nodes based on tags
+                    if (!tags.empty() and !hasIntersection(vnode->tags, tags))
+                        continue;
+                    // select node
                     std::string new_name = vnode->name.substr(node_path_child.size(), vnode->name.size());
                     new_nodes.push_back(vnode->clone(new_name));
                 } else if (vnode and vnode->name == node_path) {

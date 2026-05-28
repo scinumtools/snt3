@@ -315,13 +315,6 @@ namespace snt::dip {
                     rm << ch;
                 }
                 rm << ch;
-            } else if (ch == '\'') {
-                value.clear();
-                while (ss.get(ch) && ch != '\'') {
-                    value += ch;
-                    rm << ch;
-                }
-                rm << ch;
             } else if (ch == ' ') {
                 continue;
             } else {

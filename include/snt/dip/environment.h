@@ -75,10 +75,12 @@ namespace snt::dip {
          *
          * @param request Request expression
          * @param rtype Request type: reference, or function
+         * @param tags List of node tags that filter selected set
          * @return List of selected nodes
          */
         ValueNode::ListType request_nodes(const std::string& request,
-                                          const RequestType rtype = RequestType::Reference) const;
+                                          const RequestType rtype = RequestType::Reference,
+                                          const std::vector<std::string>& tags = {}) const;
 
         /**
          * @brief Get parsed node value at the specific index
