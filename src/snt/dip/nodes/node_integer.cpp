@@ -82,16 +82,21 @@ namespace snt::dip {
             break;
         default:
             if (dtype_raw[0] == "u")
-                throw std::runtime_error("Value cannot be casted as unsigned " + dtype_raw[0] +
-                                         " bit integer type from the given string: " + value_input);
+                throw std::runtime_error(
+                    "Value cannot be casted as unsigned " + dtype_raw[0] +
+                    " bit integer type from the given string: " + value_input
+                );
             else
-                throw std::runtime_error("Value cannot be casted as " + dtype_raw[0] +
-                                         " bit integer type from the given string: " + value_input);
+                throw std::runtime_error(
+                    "Value cannot be casted as " + dtype_raw[0] +
+                    " bit integer type from the given string: " + value_input
+                );
         }
     }
 
-    val::BaseValue::PointerType IntegerNode::cast_array_value(const val::Array::StringType& value_inputs,
-                                                              const val::Array::ShapeType& shape) const {
+    val::BaseValue::PointerType IntegerNode::cast_array_value(
+        const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
+    ) const {
         // TODO: variable precision x should be implemented
         switch (value_dtype) {
         case val::DataType::Integer16_U: {
@@ -141,11 +146,15 @@ namespace snt::dip {
             for (const auto& s : value_inputs)
                 oss << s;
             if (dtype_raw[0] == "u") {
-                throw std::runtime_error("Value cannot be casted as unsigned " + dtype_raw[0] +
-                                         " bit integer type from the given string: " + oss.str());
+                throw std::runtime_error(
+                    "Value cannot be casted as unsigned " + dtype_raw[0] +
+                    " bit integer type from the given string: " + oss.str()
+                );
             } else {
-                throw std::runtime_error("Value cannot be casted as " + dtype_raw[0] +
-                                         " bit integer type from the given string: " + oss.str());
+                throw std::runtime_error(
+                    "Value cannot be casted as " + dtype_raw[0] +
+                    " bit integer type from the given string: " + oss.str()
+                );
             }
         }
     }

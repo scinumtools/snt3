@@ -5,10 +5,7 @@
 
 namespace snt::dip {
 
-    enum CustomOperatorType {
-        DEFINED_OPERATOR = exs::NUM_OPERATOR_TYPES,
-        NOT_DEFINED_OPERATOR
-    };
+    enum CustomOperatorType { DEFINED_OPERATOR = exs::NUM_OPERATOR_TYPES, NOT_DEFINED_OPERATOR };
 
     class OperatorDefined : public exs::OperatorGroup<1> {
       public:

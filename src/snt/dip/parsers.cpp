@@ -21,21 +21,25 @@
 
 namespace snt::dip {
 
-    inline EnvSource parse_file_source(const std::string& source_name, const std::string& source_file,
-                                       const Source& parent) {
+    inline EnvSource parse_file_source(
+        const std::string& source_name, const std::string& source_file, const Source& parent
+    ) {
         DIP d(parent);
         d.add_file(source_file, source_name);
         Environment senv = d.parse();
         return EnvSource({source_name, source_file, senv.sources.at(source_name).code, parent, senv.nodes});
     }
 
-    EnvSource parse_source(const std::string& source_name, const std::string& source_file,
-                           const Source& parent) {
+    EnvSource parse_source(const std::string& source_name, const std::string& source_file, const Source& parent) {
         if (source_file.size() >= FILE_SUFFIX_DIP1.size() &&
-            source_file.compare(source_file.size() - FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1) == 0) {
+            source_file.compare(
+                source_file.size() - FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1
+            ) == 0) {
             return parse_file_source(source_name, source_file, parent);
         } else if (source_file.size() >= FILE_SUFFIX_DIP2.size() &&
-                   source_file.compare(source_file.size() - FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2) == 0) {
+                   source_file.compare(
+                       source_file.size() - FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2
+                   ) == 0) {
             return parse_file_source(source_name, source_file, parent);
         } else {
             std::ifstream file(source_file);
@@ -47,8 +51,9 @@ namespace snt::dip {
         }
     }
 
-    std::queue<Line> parse_lines(std::queue<Line>& lines, const std::string& source_code,
-                                 const std::string& source_name) {
+    std::queue<Line> parse_lines(
+        std::queue<Line>& lines, const std::string& source_code, const std::string& source_name
+    ) {
         // parse nodes from a text
         std::string line;
         std::istringstream ss(source_code);
@@ -95,8 +100,7 @@ namespace snt::dip {
                     pos += SIGN_BLOCK.length();
                     std::ostringstream oss;
                     oss << line.code;
-                    if (line.code.find(SIGN_BLOCK, pos) ==
-                        std::string::npos) { // closing block quotes on the same line
+                    if (line.code.find(SIGN_BLOCK, pos) == std::string::npos) { // closing block quotes on the same line
                         while (lines.size() > 0) {
                             Line block_line = lines.front();
                             lines.pop();
@@ -262,8 +266,9 @@ namespace snt::dip {
                 } else if (parser.part_keyword(false, delimiter)) {
                     node->value_raw.push_back(parser.value_raw.at(0));
                 } else {
-                    throw std::runtime_error("Could not parse column '" + node->name +
-                                             "' from the table row: " + line.code);
+                    throw std::runtime_error(
+                        "Could not parse column '" + node->name + "' from the table row: " + line.code
+                    );
                 }
             }
             if (parser.do_continue())
@@ -272,8 +277,9 @@ namespace snt::dip {
         return nodes;
     }
 
-    std::string parse_array(const std::string& value_string, val::Array::StringType& value_raw,
-                            val::Array::ShapeType& value_shape) {
+    std::string parse_array(
+        const std::string& value_string, val::Array::StringType& value_raw, val::Array::ShapeType& value_shape
+    ) {
         std::stringstream ss(value_string), rm;
         char ch;
 
@@ -324,16 +330,16 @@ namespace snt::dip {
 
         // Check if all nested arrays are closed
         if (dim != 0)
-            throw std::runtime_error("Definition of an array has some unclosed brackets or quotes: " +
-                                     value_string);
+            throw std::runtime_error("Definition of an array has some unclosed brackets or quotes: " + value_string);
 
         // Normalize shape and check coherence of nested arrays
         size_t coef = 1;
         for (int d = 1; d < value_shape.size(); d++) {
             coef *= value_shape[d - 1];
             if (value_shape[d] % coef != 0)
-                throw std::runtime_error("Items in dimension " + std::to_string(d + 1) +
-                                         " do not have the same shape: " + value_string);
+                throw std::runtime_error(
+                    "Items in dimension " + std::to_string(d + 1) + " do not have the same shape: " + value_string
+                );
             value_shape[d] /= coef;
         }
         // std::cout << ss.str() << std::endl;
@@ -341,11 +347,9 @@ namespace snt::dip {
         return rm.str();
     }
 
-    void parse_value(std::string value_string, val::Array::StringType& value_raw,
-                     val::Array::ShapeType& value_shape) {
+    void parse_value(std::string value_string, val::Array::StringType& value_raw, val::Array::ShapeType& value_shape) {
         trim(value_string);
-        value_string.erase(std::remove(value_string.begin(), value_string.end(), '\n'),
-                           value_string.end());
+        value_string.erase(std::remove(value_string.begin(), value_string.end(), '\n'), value_string.end());
         if (value_string.empty())
             throw std::runtime_error("Source code of the value is empty");
         else if (value_string.at(0) == SIGN_ARRAY_OPEN)
@@ -361,8 +365,7 @@ namespace snt::dip {
             val::Array::RangeStruct range = {};
             std::size_t pos = dim.find_first_of(SEPARATOR_SLICE);
             if (pos == std::string::npos) {
-                range = {static_cast<size_t>(std::stoul(dim)),
-                         static_cast<size_t>(std::stoul(dim))};
+                range = {static_cast<size_t>(std::stoul(dim)), static_cast<size_t>(std::stoul(dim))};
             } else {
                 std::string dmin = dim.substr(0, pos), dmax = dim.substr(pos + 1);
                 if (dmin == "" and dmax == "")
@@ -372,12 +375,10 @@ namespace snt::dip {
                 else if (dmax == "")
                     range = {static_cast<size_t>(std::stoul(dmin)), val::Array::max_range};
                 else
-                    range = {static_cast<size_t>(std::stoul(dmin)),
-                             static_cast<size_t>(std::stoul(dmax))};
+                    range = {static_cast<size_t>(std::stoul(dmin)), static_cast<size_t>(std::stoul(dmax))};
             }
             if (range.dmax != val::Array::max_range and range.dmax < range.dmin)
-                throw std::runtime_error("Maximum range must be higher or equal than minimum range: " +
-                                         dim);
+                throw std::runtime_error("Maximum range must be higher or equal than minimum range: " + dim);
             dimension.push_back(range);
         }
     }

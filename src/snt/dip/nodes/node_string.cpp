@@ -56,8 +56,9 @@ namespace snt::dip {
         return std::make_unique<val::ArrayValue<std::string>>(value_input);
     }
 
-    val::BaseValue::PointerType StringNode::cast_array_value(const val::Array::StringType& value_inputs,
-                                                             const val::Array::ShapeType& shape) const {
+    val::BaseValue::PointerType StringNode::cast_array_value(
+        const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
+    ) const {
         return std::make_unique<val::ArrayValue<std::string>>(value_inputs, shape);
     }
 
@@ -68,8 +69,7 @@ namespace snt::dip {
             return std::make_shared<StringNode>(nm, std::move(value->clone()));
     }
 
-    bool StringNode::set_property(PropertyType property, val::Array::StringType& values,
-                                  std::string& units) {
+    bool StringNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
         if (ValueNode::set_property(property, values, units)) {
             return true;
         } else if (property == PropertyType::Format) {
@@ -86,8 +86,9 @@ namespace snt::dip {
             const val::ArrayValue<std::string> valueT(value.get());
             for (int i = 0; i < valueT.get_size(); i++) {
                 if (!std::regex_match(valueT.get_value(i), pattern)) {
-                    throw std::runtime_error("Node value " + value->to_string() +
-                                             " does not match with expected format '" + format + "'");
+                    throw std::runtime_error(
+                        "Node value " + value->to_string() + " does not match with expected format '" + format + "'"
+                    );
                 }
             }
         }

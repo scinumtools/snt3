@@ -18,8 +18,9 @@ namespace snt::dip {
 
         Source source;
 
-        static constexpr std::array<NodeDtype, 3> nodes_special = {NodeDtype::Empty, NodeDtype::Unit,
-                                                                   NodeDtype::Source};
+        static constexpr std::array<NodeDtype, 3> nodes_special = {
+            NodeDtype::Empty, NodeDtype::Unit, NodeDtype::Source
+        };
         static constexpr std::array<NodeDtype, 6> nodes_properties = {NodeDtype::Property};
         static constexpr std::array<NodeDtype, 1> nodes_hierarchy = {NodeDtype::Group};
         std::vector<NodeDtype> nodes_nohierarchy;
@@ -34,8 +35,7 @@ namespace snt::dip {
         DIP();
         DIP(const Source& src);
         void add_string(const std::string& source_code);
-        void add_file(const std::string& source_file, std::string source_name = "",
-                      const bool absolute = true);
+        void add_file(const std::string& source_file, std::string source_name = "", const bool absolute = true);
         void add_source(const std::string& source_name, const std::string& source_file);
         void add_unit(const std::string& name, const double value, const std::string& unit = "");
         void add_value_function(const std::string& name, FunctionList::ValueFunctionType func);

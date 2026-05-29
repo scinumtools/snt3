@@ -21,8 +21,7 @@ namespace snt::api {
          *
          * @param li Name of a list that should be displayed
          **/
-        PUQList(const std::string& li = "") : list(li),
-                                              input_system(puq::SystemType::NONE) {};
+        PUQList(const std::string& li = "") : list(li), input_system(puq::SystemType::NONE) {};
 
         /**
          * @brief Select unit system

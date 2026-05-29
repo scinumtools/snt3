@@ -13,7 +13,13 @@ namespace snt::puq {
       private:
         void preprocess(std::string& expression, SystemType& system) const;
         Measurement _convert_without_context(UnitSystem& us, const SystemType stt) const;
-        Measurement _convert_with_context(UnitSystem& us, const SystemType stt, QuantityListType::iterator& qs1, QuantityListType::iterator& qs2, const std::string& q) const;
+        Measurement _convert_with_context(
+            UnitSystem& us,
+            const SystemType stt,
+            QuantityListType::iterator& qs1,
+            QuantityListType::iterator& qs2,
+            const std::string& q
+        ) const;
 
       public:
         SystemType stype;
@@ -29,13 +35,29 @@ namespace snt::puq {
         Quantity(const double m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
         Quantity(const double m, const double e, std::string s, const SystemType system = SystemType::NONE);
         Quantity(const double m, const double e, const SystemType system = UnitSystem::System);
-        Quantity(const double m, const double e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+        Quantity(
+            const double m, const double e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System
+        );
         Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system = SystemType::NONE);
         Quantity(val::BaseValue::PointerType m, const SystemType system = UnitSystem::System);
-        Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
-        Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system = SystemType::NONE);
-        Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system = UnitSystem::System);
-        Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+        Quantity(
+            val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System
+        );
+        Quantity(
+            val::BaseValue::PointerType m,
+            val::BaseValue::PointerType e,
+            std::string s,
+            const SystemType system = SystemType::NONE
+        );
+        Quantity(
+            val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system = UnitSystem::System
+        );
+        Quantity(
+            val::BaseValue::PointerType m,
+            val::BaseValue::PointerType e,
+            const BaseUnits::ListType& bu,
+            const SystemType system = UnitSystem::System
+        );
         std::string unit_system() const;
         std::size_t size() const;
         val::Array::ShapeType shape() const;

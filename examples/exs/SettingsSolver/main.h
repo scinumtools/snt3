@@ -8,13 +8,10 @@ struct Settings : exs::BaseSettings {
     int value;
     std::array<int, 5> options;
 
-    Settings(std::string s, int v, std::array<int, 5> o)
-        : symbol(s), value(v), options(o) {}
+    Settings(std::string s, int v, std::array<int, 5> o) : symbol(s), value(v), options(o) {}
 };
 
-enum CustomOperatorType {
-    SELECT_OPERATOR = exs::NUM_OPERATOR_TYPES
-};
+enum CustomOperatorType { SELECT_OPERATOR = exs::NUM_OPERATOR_TYPES };
 
 class CustomAtom final : public exs::AtomBase<CustomAtom, int> {
   public:

@@ -1,8 +1,7 @@
 #ifndef PUQ_SYSTEM_BASE_H
 #define PUQ_SYSTEM_BASE_H
 
-template <typename T>
-std::vector<T> operator+(const std::vector<T>& v1, const std::vector<T>& v2) {
+template <typename T> std::vector<T> operator+(const std::vector<T>& v1, const std::vector<T>& v2) {
     std::vector<T> vr(std::begin(v1), std::end(v1));
     vr.insert(std::end(vr), std::begin(v2), std::end(v2));
     return vr;
@@ -63,7 +62,7 @@ const UnitListType _BASE_CONSTANTS = {
     {"{#H_0}", {UT_LIN_CSB, "67.36(54)*3.24076e-20*s-1", "Hubble const.", false, {}}},         // Planck 2018
     {"{#L_sol}", {UT_LIN_CSB, "3.828e26*m2*kg*s-3", "Solar luminosity", false, {}}},           // IAU definition
     {"{#M_sol}", {UT_LIN_CSB, "1.988475(92)e30*kg", "Solar mass", false, {}}},                 // Prsa, et al. 2016
-    {"{#R_sol}", {UT_LIN_CSB, "6.9566(14)e8*m", "Solar radius", false, {}}},                   // Schmutz&Kosovichev 2008
+    {"{#R_sol}", {UT_LIN_CSB, "6.9566(14)e8*m", "Solar radius", false, {}}}, // Schmutz&Kosovichev 2008
 };
 
 #endif // PUQ_SYSTEM_BASE_H

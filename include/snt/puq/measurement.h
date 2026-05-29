@@ -28,15 +28,20 @@ namespace snt::puq {
         Measurement(const double est, const double unc, const std::string& str);
         Measurement(const double est, const double unc) : result(est, unc) {};
         Measurement(const double est, const double unc, const BaseUnits& bun) : result(est, unc), baseunits(bun) {};
-        Measurement(const double est, const double unc, const BaseUnits::ListType& bun) : result(est, unc), baseunits(bun) {};
+        Measurement(const double est, const double unc, const BaseUnits::ListType& bun)
+            : result(est, unc), baseunits(bun) {};
         Measurement(val::BaseValue::PointerType est, const std::string& str);
         Measurement(val::BaseValue::PointerType est) : result(std::move(est)) {};
         Measurement(val::BaseValue::PointerType est, const BaseUnits& bun) : result(std::move(est)), baseunits(bun) {};
-        Measurement(val::BaseValue::PointerType est, const BaseUnits::ListType& bun) : result(std::move(est)), baseunits(bun) {};
+        Measurement(val::BaseValue::PointerType est, const BaseUnits::ListType& bun)
+            : result(std::move(est)), baseunits(bun) {};
         Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const std::string& str);
-        Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc) : result(std::move(est), std::move(unc)) {};
-        Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const BaseUnits& bun) : result(std::move(est), std::move(unc)), baseunits(bun) {};
-        Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const BaseUnits::ListType& bun) : result(std::move(est), std::move(unc)), baseunits(bun) {};
+        Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc)
+            : result(std::move(est), std::move(unc)) {};
+        Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const BaseUnits& bun)
+            : result(std::move(est), std::move(unc)), baseunits(bun) {};
+        Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const BaseUnits::ListType& bun)
+            : result(std::move(est), std::move(unc)), baseunits(bun) {};
         Measurement(const Result& est) : result(est) {}
         Measurement(const Result& est, const std::string& str);
         Measurement(const Result& est, const Dimensions& dim);

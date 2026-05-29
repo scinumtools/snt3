@@ -12,11 +12,15 @@ namespace snt::puq {
             throw std::invalid_argument("Result value cannot be a null pointer.");
     }
 
-    Result::Result(val::BaseValue::PointerType m, val::BaseValue::PointerType e) : estimate(std::move(m)), uncertainty(std::move(e)) {
+    Result::Result(val::BaseValue::PointerType m, val::BaseValue::PointerType e)
+        : estimate(std::move(m)), uncertainty(std::move(e)) {
         if (!estimate)
             throw std::invalid_argument("Result value cannot be a null pointer.");
         if (uncertainty && estimate->get_size() != uncertainty->get_size())
-            throw std::invalid_argument("Value and uncertainty arrays have different size: " + std::to_string(estimate->get_size()) + " != " + std::to_string(uncertainty->get_size()));
+            throw std::invalid_argument(
+                "Value and uncertainty arrays have different size: " + std::to_string(estimate->get_size()) +
+                " != " + std::to_string(uncertainty->get_size())
+            );
     }
 
     /*
@@ -77,10 +81,12 @@ namespace snt::puq {
             Dz = m1.uncertainty->clone();
         else if (m2.uncertainty)
             Dz = m2.uncertainty->clone();
-        // Array Dz = math::sqrt(math::pow(m1.uncertainty,2)+math::pow(m2.uncertainty,2)); // Gaussian uncertainty propagation
+        // Array Dz = math::sqrt(math::pow(m1.uncertainty,2)+math::pow(m2.uncertainty,2)); // Gaussian uncertainty
+        // propagation
         return Result(m1.estimate->math_add(m2.estimate.get()), std::move(Dz));
         // Array Dz = m1.uncertainty + m2.uncertainty;
-        //// Array Dz = math::sqrt(math::pow(m1.uncertainty,2)+math::pow(m2.uncertainty,2)); // Gaussian uncertainty propagation
+        //// Array Dz = math::sqrt(math::pow(m1.uncertainty,2)+math::pow(m2.uncertainty,2)); // Gaussian uncertainty
+        ///propagation
         // return Result(m1.estimate + m2.estimate, Dz);
     }
 
@@ -135,8 +141,16 @@ namespace snt::puq {
         const val::ArrayValue<double> otherT(n->estimate.get());
         Result nm(m->estimate->math_mul(n->estimate.get()));
         if ((m->uncertainty && n->uncertainty) && (m->uncertainty->any_of() && n->uncertainty->any_of())) {
-            val::BaseValue::PointerType maxuncertainty = ((m->estimate->math_add(m->uncertainty.get()))->math_mul((n->estimate->math_add(n->uncertainty.get())).get())->math_sub(nm.estimate.get()))->math_abs();
-            val::BaseValue::PointerType minuncertainty = ((m->estimate->math_sub(m->uncertainty.get()))->math_mul((n->estimate->math_sub(n->uncertainty.get())).get())->math_sub(nm.estimate.get()))->math_abs();
+            val::BaseValue::PointerType maxuncertainty =
+                ((m->estimate->math_add(m->uncertainty.get()))
+                     ->math_mul((n->estimate->math_add(n->uncertainty.get())).get())
+                     ->math_sub(nm.estimate.get()))
+                    ->math_abs();
+            val::BaseValue::PointerType minuncertainty =
+                ((m->estimate->math_sub(m->uncertainty.get()))
+                     ->math_mul((n->estimate->math_sub(n->uncertainty.get())).get())
+                     ->math_sub(nm.estimate.get()))
+                    ->math_abs();
             nm.uncertainty = maxuncertainty->math_max(minuncertainty.get());
         } else if ((!m->uncertainty || m->uncertainty->none_of()) && (n->uncertainty && n->uncertainty->any_of())) {
             nm.uncertainty = n->uncertainty->math_mul(m->estimate.get());
@@ -151,9 +165,10 @@ namespace snt::puq {
         // } else if (m->uncertainty != 0 && n->uncertainty == 0) {
         //   nm.uncertainty = m->uncertainty * n->estimate;
         // } else {
-        //   val::BaseValue::PointerType maxuncertainty = math::abs((m->estimate + m->uncertainty) * (n->estimate + n->uncertainty) - nm.estimate);
-        //   val::BaseValue::PointerType minuncertainty = math::abs((m->estimate - m->uncertainty) * (n->estimate - n->uncertainty) - nm.estimate);
-        //   nm.uncertainty = math::max(maxuncertainty, minuncertainty);
+        //   val::BaseValue::PointerType maxuncertainty = math::abs((m->estimate + m->uncertainty) * (n->estimate +
+        //   n->uncertainty) - nm.estimate); val::BaseValue::PointerType minuncertainty = math::abs((m->estimate -
+        //   m->uncertainty) * (n->estimate - n->uncertainty) - nm.estimate); nm.uncertainty = math::max(maxuncertainty,
+        //   minuncertainty);
         // }
         return nm;
     }
@@ -177,12 +192,26 @@ namespace snt::puq {
     const Result divide(const Result* m, const Result* n) {
         Result nm(m->estimate->math_div(n->estimate.get()));
         if ((m->uncertainty && n->uncertainty) && (m->uncertainty->any_of() && n->uncertainty->any_of())) {
-            val::BaseValue::PointerType maxuncertainty = (((m->estimate->math_add(m->uncertainty.get()))->math_div((n->estimate->math_sub(n->uncertainty.get())).get()))->math_sub(nm.estimate.get()))->math_abs();
-            val::BaseValue::PointerType minuncertainty = (((m->estimate->math_sub(m->uncertainty.get()))->math_div((n->estimate->math_add(n->uncertainty.get())).get()))->math_sub(nm.estimate.get()))->math_abs();
+            val::BaseValue::PointerType maxuncertainty =
+                (((m->estimate->math_add(m->uncertainty.get()))
+                      ->math_div((n->estimate->math_sub(n->uncertainty.get())).get()))
+                     ->math_sub(nm.estimate.get()))
+                    ->math_abs();
+            val::BaseValue::PointerType minuncertainty =
+                (((m->estimate->math_sub(m->uncertainty.get()))
+                      ->math_div((n->estimate->math_add(n->uncertainty.get())).get()))
+                     ->math_sub(nm.estimate.get()))
+                    ->math_abs();
             nm.uncertainty = maxuncertainty->math_max(minuncertainty.get());
         } else if ((!m->uncertainty || m->uncertainty->none_of()) && (n->uncertainty && n->uncertainty->any_of())) {
-            val::BaseValue::PointerType maxuncertainty = (m->estimate->math_div((n->estimate->math_add(n->uncertainty.get())).get())->math_sub(nm.estimate.get()))->math_abs();
-            val::BaseValue::PointerType minuncertainty = (m->estimate->math_div((n->estimate->math_sub(n->uncertainty.get())).get())->math_sub(nm.estimate.get()))->math_abs();
+            val::BaseValue::PointerType maxuncertainty =
+                (m->estimate->math_div((n->estimate->math_add(n->uncertainty.get())).get())
+                     ->math_sub(nm.estimate.get()))
+                    ->math_abs();
+            val::BaseValue::PointerType minuncertainty =
+                (m->estimate->math_div((n->estimate->math_sub(n->uncertainty.get())).get())
+                     ->math_sub(nm.estimate.get()))
+                    ->math_abs();
             nm.uncertainty = maxuncertainty->math_max(minuncertainty.get());
         } else if ((m->uncertainty && m->uncertainty->any_of()) && (!n->uncertainty || n->uncertainty->none_of())) {
             nm.uncertainty = m->uncertainty->math_div(n->estimate.get());
@@ -191,15 +220,16 @@ namespace snt::puq {
         // if (m->uncertainty == 0 && n->uncertainty == 0) {
         //   nm.uncertainty = (m->uncertainty.size() > n->uncertainty.size()) ? m->uncertainty : n->uncertainty;
         // } else if (m->uncertainty == 0 && n->uncertainty != 0) {
-        //   val::BaseValue::PointerType maxuncertainty = math::abs(m->estimate / (n->estimate + n->uncertainty) - nm.estimate);
-        //   val::BaseValue::PointerType minuncertainty = math::abs(m->estimate / (n->estimate - n->uncertainty) - nm.estimate);
-        //   nm.uncertainty = math::max(maxuncertainty, minuncertainty);
+        //   val::BaseValue::PointerType maxuncertainty = math::abs(m->estimate / (n->estimate + n->uncertainty) -
+        //   nm.estimate); val::BaseValue::PointerType minuncertainty = math::abs(m->estimate / (n->estimate -
+        //   n->uncertainty) - nm.estimate); nm.uncertainty = math::max(maxuncertainty, minuncertainty);
         // } else if (m->uncertainty != 0 && n->uncertainty == 0) {
         //   nm.uncertainty = m->uncertainty / n->estimate;
         // } else {
-        //   val::BaseValue::PointerType maxuncertainty = math::abs((m->estimate + m->uncertainty) / (n->estimate - n->uncertainty) - nm.estimate);
-        //   val::BaseValue::PointerType minuncertainty = math::abs((m->estimate - m->uncertainty) / (n->estimate + n->uncertainty) - nm.estimate);
-        //   nm.uncertainty = math::max(maxuncertainty, minuncertainty);
+        //   val::BaseValue::PointerType maxuncertainty = math::abs((m->estimate + m->uncertainty) / (n->estimate -
+        //   n->uncertainty) - nm.estimate); val::BaseValue::PointerType minuncertainty = math::abs((m->estimate -
+        //   m->uncertainty) / (n->estimate + n->uncertainty) - nm.estimate); nm.uncertainty = math::max(maxuncertainty,
+        //   minuncertainty);
         // }
         return nm;
     }
@@ -225,7 +255,8 @@ namespace snt::puq {
 
     bool Result::operator==(const Result& a) const {
         if (uncertainty && a.uncertainty)
-            return (estimate->compare_equal(a.estimate.get())->all_of()) && (uncertainty->compare_equal(a.uncertainty.get())->all_of());
+            return (estimate->compare_equal(a.estimate.get())->all_of()) &&
+                   (uncertainty->compare_equal(a.uncertainty.get())->all_of());
         else if (!uncertainty && !a.uncertainty)
             return (estimate->compare_equal(a.estimate.get())->all_of());
         else
@@ -235,7 +266,8 @@ namespace snt::puq {
 
     bool Result::operator!=(const Result& a) const {
         if (uncertainty && a.uncertainty)
-            return (estimate->compare_not_equal(a.estimate.get())->any_of()) || (uncertainty->compare_not_equal(a.uncertainty.get())->any_of());
+            return (estimate->compare_not_equal(a.estimate.get())->any_of()) ||
+                   (uncertainty->compare_not_equal(a.uncertainty.get())->any_of());
         else if (!uncertainty && !a.uncertainty)
             return (estimate->compare_not_equal(a.estimate.get())->any_of());
         else

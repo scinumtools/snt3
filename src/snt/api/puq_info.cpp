@@ -36,10 +36,9 @@ namespace snt::api {
         puq::Dimensions dim = bus.dimensions();
         puq::Dimensions dim_m = bus.dimensions();
         dim_m.numerical *= uv.result;
-        std::cout << '\n'
-                  << "Expression:  " << expression << '\n'
-                  << '\n';
-        std::cout << "Unit system: " << puq::UnitSystem::Data->SystemAbbrev << " (" << puq::UnitSystem::Data->SystemName << ")" << '\n';
+        std::cout << '\n' << "Expression:  " << expression << '\n' << '\n';
+        std::cout << "Unit system: " << puq::UnitSystem::Data->SystemAbbrev << " (" << puq::UnitSystem::Data->SystemName
+                  << ")" << '\n';
         std::cout << "Result:   " << puq::to_string(uv.result) << '\n';
         std::cout << "Base units:  " << puq::to_string(uv.baseunits) << '\n';
         std::stringstream ss;
@@ -67,24 +66,39 @@ namespace snt::api {
             std::cout << "Quantities:  " << ss.str() << '\n';
         }
         std::cout << '\n';
-        std::cout << "Dimensions:" << '\n'
-                  << '\n';
+        std::cout << "Dimensions:" << '\n' << '\n';
         puq::DataTable tab({{"Base", 6}, {"Num*Mag", 25}, {"Numerical", 25}, {"Physical", 25}});
-        tab.append({"MGS", dim_m.to_string(puq::Format::Display::RESULT), dim.to_string(puq::Format::Display::RESULT), dim.to_string(puq::Format::Display::UNITS)});
-        tab.append({"MKS",
-                    dim_m.to_string({puq::Format::Display::RESULT, puq::Format::Base::MKS}),
-                    dim.to_string({puq::Format::Display::RESULT, puq::Format::Base::MKS}),
-                    dim.to_string({puq::Format::Display::UNITS, puq::Format::Base::MKS})});
-        tab.append({"CGS",
-                    dim_m.to_string({puq::Format::Display::RESULT, puq::Format::Base::CGS}),
-                    dim.to_string({puq::Format::Display::RESULT, puq::Format::Base::CGS}),
-                    dim.to_string({puq::Format::Display::UNITS, puq::Format::Base::CGS})});
+        tab.append(
+            {"MGS",
+             dim_m.to_string(puq::Format::Display::RESULT),
+             dim.to_string(puq::Format::Display::RESULT),
+             dim.to_string(puq::Format::Display::UNITS)}
+        );
+        tab.append(
+            {"MKS",
+             dim_m.to_string({puq::Format::Display::RESULT, puq::Format::Base::MKS}),
+             dim.to_string({puq::Format::Display::RESULT, puq::Format::Base::MKS}),
+             dim.to_string({puq::Format::Display::UNITS, puq::Format::Base::MKS})}
+        );
+        tab.append(
+            {"CGS",
+             dim_m.to_string({puq::Format::Display::RESULT, puq::Format::Base::CGS}),
+             dim.to_string({puq::Format::Display::RESULT, puq::Format::Base::CGS}),
+             dim.to_string({puq::Format::Display::UNITS, puq::Format::Base::CGS})}
+        );
         std::cout << tab.to_string();
         std::cout << '\n';
         if (bus.size() > 0) {
-            std::cout << "Base units:" << '\n'
-                      << '\n';
-            puq::DataTable tab({{"Prefix", 8}, {"Symbol", 8}, {"Exponent", 10}, {"Name", 30}, {"Definition", 30}, {"Dimensions MGS", 22}, {"Allowed prefixes", 22}});
+            std::cout << "Base units:" << '\n' << '\n';
+            puq::DataTable tab(
+                {{"Prefix", 8},
+                 {"Symbol", 8},
+                 {"Exponent", 10},
+                 {"Name", 30},
+                 {"Definition", 30},
+                 {"Dimensions MGS", 22},
+                 {"Allowed prefixes", 22}}
+            );
             // We have to sort the unit names first, because UnitList is an std::unordered_map
             // and the listing of units can change the order
             std::vector<std::string> unit_names;
@@ -101,27 +115,32 @@ namespace snt::api {
                     if (bu.unit != name)
                         continue;
                     puq::BaseUnits bu_unit({bu});
-                    tab.append({bu.prefix,
-                                bu.unit,
-                                ((puq::to_string(bu.exponent) == "") ? "1" : puq::to_string(bu.exponent)),
-                                unit.name,
-                                unit.definition,
-                                bu_unit.dimensions().to_string(),
-                                puq::to_string(unit.use_prefixes, unit.allowed_prefixes)});
+                    tab.append(
+                        {bu.prefix,
+                         bu.unit,
+                         ((puq::to_string(bu.exponent) == "") ? "1" : puq::to_string(bu.exponent)),
+                         unit.name,
+                         unit.definition,
+                         bu_unit.dimensions().to_string(),
+                         puq::to_string(unit.use_prefixes, unit.allowed_prefixes)}
+                    );
                 }
             }
             for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
                 for (const auto& bu : bus) {
-                    if (bu.unit != std::string(puq::Symbols::quantity_start) + quant.first + std::string(puq::Symbols::quantity_end))
+                    if (bu.unit != std::string(puq::Symbols::quantity_start) + quant.first +
+                                       std::string(puq::Symbols::quantity_end))
                         continue;
                     puq::BaseUnits bu_unit({bu});
-                    tab.append({bu.prefix,
-                                bu.unit,
-                                ((puq::to_string(bu.exponent) == "") ? "1" : puq::to_string(bu.exponent)),
-                                puq::QuantityNames.at(quant.first),
-                                quant.second.definition,
-                                bu_unit.dimensions().to_string(),
-                                ""});
+                    tab.append(
+                        {bu.prefix,
+                         bu.unit,
+                         ((puq::to_string(bu.exponent) == "") ? "1" : puq::to_string(bu.exponent)),
+                         puq::QuantityNames.at(quant.first),
+                         quant.second.definition,
+                         bu_unit.dimensions().to_string(),
+                         ""}
+                    );
                 }
             }
             std::cout << tab.to_string();

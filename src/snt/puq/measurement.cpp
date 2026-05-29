@@ -330,10 +330,11 @@ namespace snt::puq {
                     res *= math::pow(prefix1->second.result, fexp);
                 if (prefix2 != UnitPrefixList.end())
                     res /= math::pow(prefix2->second.result, fexp);
-                bumap[bun.unit].exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
-                    return a + b;
-                },
-                                                      bumap[bun.unit].exponent, bun.exponent);
+                bumap[bun.unit].exponent = std::visit(
+                    [](auto const& a, auto const& b) -> ExponentVariant { return a + b; },
+                    bumap[bun.unit].exponent,
+                    bun.exponent
+                );
             }
         }
         BaseUnits bus;
@@ -358,10 +359,11 @@ namespace snt::puq {
             } else {
                 Dimensions dim0 = BaseUnits(bumap[key].prefix + bumap[key].unit).dimensions();
                 res *= math::pow(dim.numerical / dim0.numerical, exponent_to_float(bun.exponent));
-                bumap[key].exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
-                    return a + b;
-                },
-                                                 bumap[key].exponent, bun.exponent);
+                bumap[key].exponent = std::visit(
+                    [](auto const& a, auto const& b) -> ExponentVariant { return a + b; },
+                    bumap[key].exponent,
+                    bun.exponent
+                );
             }
         }
         BaseUnits bus;

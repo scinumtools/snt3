@@ -33,13 +33,11 @@ namespace snt::puq::math {
     }
 
     puq::Measurement round(const puq::Measurement& msr) {
-        return puq::Measurement(round(msr.result),
-                                msr.baseunits);
+        return puq::Measurement(round(msr.result), msr.baseunits);
     }
 
     puq::Quantity round(const puq::Quantity& quant) {
-        return puq::Quantity(round(quant.measurement),
-                             quant.stype);
+        return puq::Quantity(round(quant.measurement), quant.stype);
     }
 
 } // namespace snt::puq::math

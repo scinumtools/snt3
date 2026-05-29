@@ -68,13 +68,15 @@ namespace snt::dip {
         case val::DataType::Float128:
             return std::make_unique<val::ArrayValue<long double>>(std::stold(value_input));
         default:
-            throw std::runtime_error("Value cannot be casted as " + dtype_raw[2] +
-                                     " bit float type from the given string: " + value_input);
+            throw std::runtime_error(
+                "Value cannot be casted as " + dtype_raw[2] + " bit float type from the given string: " + value_input
+            );
         }
     }
 
-    val::BaseValue::PointerType FloatNode::cast_array_value(const val::Array::StringType& value_inputs,
-                                                            const val::Array::ShapeType& shape) const {
+    val::BaseValue::PointerType FloatNode::cast_array_value(
+        const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
+    ) const {
         // TODO: variable precision x should be implemented
         switch (value_dtype) {
         case val::DataType::Float32: {
@@ -102,8 +104,9 @@ namespace snt::dip {
             std::ostringstream oss;
             for (const auto& s : value_inputs)
                 oss << s;
-            throw std::runtime_error("Value cannot be casted as " + dtype_raw[2] +
-                                     " bit float type from the given string: " + oss.str());
+            throw std::runtime_error(
+                "Value cannot be casted as " + dtype_raw[2] + " bit float type from the given string: " + oss.str()
+            );
         }
     }
 

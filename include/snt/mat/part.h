@@ -12,8 +12,7 @@ namespace snt::mat {
      *
      * @tparam PROPORTION proportion coefficient type (double or integer)
      */
-    template <typename PROPORTION>
-    class Part {
+    template <typename PROPORTION> class Part {
       protected:
         PROPORTION proportion;   ///< Proportion of a componet in a composite (double or integer)
         std::string expression;  ///< String representation of a part

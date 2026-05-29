@@ -49,12 +49,9 @@ class FixtureFunctions : public ::testing::Test {
 
     // node lists
     static dip::ValueNode::ListType get_scalar_nodes(const dip::Environment& env) {
-        std::unique_ptr<val::ArrayValue<bool>> val_bool =
-            std::make_unique<val::ArrayValue<bool>>(false);
-        std::unique_ptr<val::ArrayValue<int>> val_int =
-            std::make_unique<val::ArrayValue<int>>(1);
-        std::unique_ptr<val::ArrayValue<double>> val_double =
-            std::make_unique<val::ArrayValue<double>>(2.34e5);
+        std::unique_ptr<val::ArrayValue<bool>> val_bool = std::make_unique<val::ArrayValue<bool>>(false);
+        std::unique_ptr<val::ArrayValue<int>> val_int = std::make_unique<val::ArrayValue<int>>(1);
+        std::unique_ptr<val::ArrayValue<double>> val_double = std::make_unique<val::ArrayValue<double>>(2.34e5);
         std::unique_ptr<val::ArrayValue<std::string>> val_string =
             std::make_unique<val::ArrayValue<std::string>>("baz_value");
         return {
@@ -71,12 +68,9 @@ class FixtureFunctions : public ::testing::Test {
         std::vector<double> vec_double = {2.34e5, 3.45e6, 4.56e7};
         std::vector<std::string> vec_string = {"foo", "bar", "baz"};
         val::Array::ShapeType sh = {2, 2};
-        std::unique_ptr<val::ArrayValue<bool>> val_bool =
-            std::make_unique<val::ArrayValue<bool>>(vec_bool);
-        std::unique_ptr<val::ArrayValue<int>> val_int =
-            std::make_unique<val::ArrayValue<int>>(vec_int, sh);
-        std::unique_ptr<val::ArrayValue<double>> val_double =
-            std::make_unique<val::ArrayValue<double>>(vec_double);
+        std::unique_ptr<val::ArrayValue<bool>> val_bool = std::make_unique<val::ArrayValue<bool>>(vec_bool);
+        std::unique_ptr<val::ArrayValue<int>> val_int = std::make_unique<val::ArrayValue<int>>(vec_int, sh);
+        std::unique_ptr<val::ArrayValue<double>> val_double = std::make_unique<val::ArrayValue<double>>(vec_double);
         std::unique_ptr<val::ArrayValue<std::string>> val_string =
             std::make_unique<val::ArrayValue<std::string>>(vec_string);
         return {

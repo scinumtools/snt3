@@ -18,9 +18,11 @@ TEST(Converter, LinearConv) {
 
     puq::Converter con;
 
-    EXPECT_EQ(puq::to_string(puq::Converter("erg", "J").convert(1)), "1e-7");      // different units
-    EXPECT_EQ(puq::to_string(puq::Converter("kg*m2/s2", "J").convert(6, 2)), "3"); // different units with measurement results
-    EXPECT_EQ(puq::to_string(puq::Converter("mg", "g").convert(1)), "1e-3");       // different prefixes
+    EXPECT_EQ(puq::to_string(puq::Converter("erg", "J").convert(1)), "1e-7"); // different units
+    EXPECT_EQ(
+        puq::to_string(puq::Converter("kg*m2/s2", "J").convert(6, 2)), "3"
+    );                                                                       // different units with measurement results
+    EXPECT_EQ(puq::to_string(puq::Converter("mg", "g").convert(1)), "1e-3"); // different prefixes
     EXPECT_EQ(puq::to_string(puq::Converter("1/s", "kHz").convert(6, 2)), "3e-3"); // different prefixes
 
     EXPECT_EQ(puq::to_string(puq::Converter("J/erg", "").convert(2)), "2e7");  // converting to no units

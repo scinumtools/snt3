@@ -4,8 +4,7 @@ namespace snt::exs {
 
     // and
 
-    OperatorAnd::OperatorAnd(std::string s) : OperatorBase("and", std::move(s), AND_OPERATOR) {
-    }
+    OperatorAnd::OperatorAnd(std::string s) : OperatorBase("and", std::move(s), AND_OPERATOR) {}
 
     void OperatorAnd::operate_binary(TokenListBase* tokens) {
         Token left = tokens->get_left();
@@ -16,8 +15,7 @@ namespace snt::exs {
 
     // or
 
-    OperatorOr::OperatorOr(std::string s) : OperatorBase("or", std::move(s), OR_OPERATOR) {
-    }
+    OperatorOr::OperatorOr(std::string s) : OperatorBase("or", std::move(s), OR_OPERATOR) {}
 
     void OperatorOr::operate_binary(TokenListBase* tokens) {
         Token left = tokens->get_left();
@@ -28,8 +26,7 @@ namespace snt::exs {
 
     // not
 
-    OperatorNot::OperatorNot(std::string s) : OperatorBase("not", std::move(s), NOT_OPERATOR) {
-    }
+    OperatorNot::OperatorNot(std::string s) : OperatorBase("not", std::move(s), NOT_OPERATOR) {}
 
     void OperatorNot::operate_unary(TokenListBase* tokens) {
         Token right = tokens->get_right();

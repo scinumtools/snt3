@@ -15,7 +15,10 @@ std::string CustomAtom::to_string() {
 
 void CustomAtom::math_add(CustomAtom* other) {
     if (value.size() != other->value.size()) {
-        throw std::logic_error("Arrays have different sizes: " + std::to_string(value.size()) + " != " + std::to_string(other->value.size()));
+        throw std::logic_error(
+            "Arrays have different sizes: " + std::to_string(value.size()) +
+            " != " + std::to_string(other->value.size())
+        );
     }
     AtomValueType nv;
     for (size_t i = 0; i < value.size(); i++) {
@@ -26,7 +29,10 @@ void CustomAtom::math_add(CustomAtom* other) {
 
 void CustomAtom::math_subtract(CustomAtom* other) {
     if (value.size() != other->value.size()) {
-        throw std::logic_error("Arrays have different sizes: " + std::to_string(value.size()) + " != " + std::to_string(other->value.size()));
+        throw std::logic_error(
+            "Arrays have different sizes: " + std::to_string(value.size()) +
+            " != " + std::to_string(other->value.size())
+        );
     }
     AtomValueType nv;
     for (size_t i = 0; i < value.size(); i++) {

@@ -22,8 +22,7 @@ namespace snt::dip {
 
         // populate node lists
         nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_special.begin(), nodes_special.end());
-        nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_properties.begin(),
-                                 nodes_properties.end());
+        nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_properties.begin(), nodes_properties.end());
         nodes_notypes.insert(nodes_notypes.end(), nodes_special.begin(), nodes_special.end());
         nodes_notypes.insert(nodes_notypes.end(), nodes_properties.begin(), nodes_properties.end());
         nodes_notypes.insert(nodes_notypes.end(), nodes_hierarchy.begin(), nodes_hierarchy.end());
@@ -37,8 +36,7 @@ namespace snt::dip {
 
         // populate node lists
         nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_special.begin(), nodes_special.end());
-        nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_properties.begin(),
-                                 nodes_properties.end());
+        nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_properties.begin(), nodes_properties.end());
         nodes_notypes.insert(nodes_notypes.end(), nodes_special.begin(), nodes_special.end());
         nodes_notypes.insert(nodes_notypes.end(), nodes_properties.begin(), nodes_properties.end());
         nodes_notypes.insert(nodes_notypes.end(), nodes_hierarchy.begin(), nodes_hierarchy.end());
@@ -48,8 +46,7 @@ namespace snt::dip {
 
         // prepare source data
         std::string source_file = env.sources.at(source.name).path;
-        std::string source_name =
-            source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings);
+        std::string source_name = source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings);
         num_strings++;
 
         // create a new source
@@ -75,16 +72,14 @@ namespace snt::dip {
 
         // create a new source
         // TODO: treat source lineno and source_file with respect to where this method is called
-        env.sources.append(source_name, source_file, source_code.str(),
-                           {source.name, source.line_number});
+        env.sources.append(source_name, source_file, source_code.str(), {source.name, source.line_number});
 
         // parse lines from the source code
         parse_lines(lines, source_code.str(), source_name);
     }
 
     void DIP::add_source(const std::string& sname, const std::string& spath) {
-        std::string source_name =
-            source.name + "_" + std::string(DIRECT_SOURCE) + std::to_string(num_sources);
+        std::string source_name = source.name + "_" + std::string(DIRECT_SOURCE) + std::to_string(num_sources);
         num_sources++;
         Source sparent = {source_name, 0};
         EnvSource senv = parse_source(sname, spath, sparent);
@@ -109,7 +104,8 @@ namespace snt::dip {
 
     // Set nodes that can preceeding an option
     static constexpr std::array<NodeDtype, 13> preceeding_nodes = {
-        NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table};
+        NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table
+    };
 
     Environment DIP::parse() {
         NodeList<BaseNode> queue = parse_code_nodes(lines);
@@ -122,25 +118,31 @@ namespace snt::dip {
                 if (std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
                     preceeding_nodes.end())
                     throw std::runtime_error(
-                        "Only value nodes (bool, int, float and str) can have properties: " +
-                        pnode->line.code);
+                        "Only value nodes (bool, int, float and str) can have properties: " + pnode->line.code
+                    );
                 if (previous_node->indent >= pnode->indent or (pnode->indent - previous_node->indent) != INDENT_STEP)
-                    throw std::runtime_error("The indent of a property '" + std::to_string(pnode->indent) +
-                                             "' is not " + std::to_string(INDENT_STEP) +
-                                             " white spaces higher than the indent of a preceding node '" +
-                                             std::to_string(previous_node->indent) +
-                                             "': " + pnode->line.code);
+                    throw std::runtime_error(
+                        "The indent of a property '" + std::to_string(pnode->indent) + "' is not " +
+                        std::to_string(INDENT_STEP) + " white spaces higher than the indent of a preceding node '" +
+                        std::to_string(previous_node->indent) + "': " + pnode->line.code
+                    );
                 if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
                     throw std::runtime_error("Property could not be set: " + pnode->line.code);
             } else {
                 // We make sure that the indent spacing is always set by INDENT_STEP
                 if ((current_node->indent % INDENT_STEP) != 0)
-                    throw std::runtime_error("Indent of the current node is not a multiple of " + std::to_string(INDENT_STEP) + " '" +
-                                             std::to_string(current_node->indent) + "': " + current_node->line.code);
+                    throw std::runtime_error(
+                        "Indent of the current node is not a multiple of " + std::to_string(INDENT_STEP) + " '" +
+                        std::to_string(current_node->indent) + "': " + current_node->line.code
+                    );
                 if (previous_node != nullptr) {
-                    if ((current_node->indent > previous_node->indent) && (current_node->indent - previous_node->indent) != INDENT_STEP) {
-                        throw std::runtime_error("Indent of the child node '" + std::to_string(current_node->indent) + "' is not exactly " + std::to_string(INDENT_STEP) +
-                                                 " white spaces higher than its parent nodes '" + std::to_string(current_node->indent) + "': " + current_node->line.code);
+                    if ((current_node->indent > previous_node->indent) &&
+                        (current_node->indent - previous_node->indent) != INDENT_STEP) {
+                        throw std::runtime_error(
+                            "Indent of the child node '" + std::to_string(current_node->indent) + "' is not exactly " +
+                            std::to_string(INDENT_STEP) + " white spaces higher than its parent nodes '" +
+                            std::to_string(current_node->indent) + "': " + current_node->line.code
+                        );
                     }
                 }
                 previous_node = current_node;
@@ -166,8 +168,7 @@ namespace snt::dip {
             // Create hierarchical names
             target.hierarchy.record(node, nodes_nohierarchy);
             // Add nodes to the node list
-            if (std::find(nodes_notypes.begin(), nodes_notypes.end(), node->dtype) !=
-                nodes_notypes.end()) {
+            if (std::find(nodes_notypes.begin(), nodes_notypes.end(), node->dtype) != nodes_notypes.end()) {
                 continue;
             } else if (node->dtype == NodeDtype::Case) {
                 target.branching.solve_case(node);
@@ -217,8 +218,7 @@ namespace snt::dip {
                 vnode->validate_condition();
                 vnode->validate_format();
             } else {
-                throw std::runtime_error("Detected non-value node in the node list: " +
-                                         target.nodes.at(i)->line.code);
+                throw std::runtime_error("Detected non-value node in the node list: " + target.nodes.at(i)->line.code);
             }
         }
         return target;

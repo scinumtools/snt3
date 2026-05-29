@@ -43,10 +43,8 @@ namespace snt::api {
             std::stringstream ss;
             ss << '\n';
             if (list.size() > 0)
-                ss << "List '" << list << "' does not exist." << '\n'
-                   << '\n';
-            ss << "Available lists:" << '\n'
-               << '\n';
+                ss << "List '" << list << "' does not exist." << '\n' << '\n';
+            ss << "Available lists:" << '\n' << '\n';
             ss << "prefix  unit prefixes" << '\n';
             ss << "base    base units" << '\n';
             ss << "deriv   derived units" << '\n';

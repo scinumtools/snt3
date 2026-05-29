@@ -28,10 +28,14 @@ namespace snt::puq {
         inline constexpr bool debug_converter = false;   ///< Switch on debugging diagnostics for Converter
     } // namespace Config
 
-    static_assert(Config::use_system_cgs,
-                  "Unit system CGS cannot be used without fractional exponents! Please use Config::use_system_cgs setting.");
-    static_assert(Config::use_system_nus,
-                  "Natural units cannot be used without fractional exponents! Please use Config::use_system_nus setting.");
+    static_assert(
+        Config::use_system_cgs,
+        "Unit system CGS cannot be used without fractional exponents! Please use Config::use_system_cgs setting."
+    );
+    static_assert(
+        Config::use_system_nus,
+        "Natural units cannot be used without fractional exponents! Please use Config::use_system_nus setting."
+    );
 
     /**
      * @namespace Symbols
@@ -49,12 +53,15 @@ namespace snt::puq {
         inline constexpr std::string_view exponent = "e";           ///< Symbol exponent e
         inline constexpr std::string_view exponent2 = "\u00D710";   ///< Symbol exponent ×10
         inline constexpr std::string_view fraction_separator = ":"; ///< Separator in an exponent fraction (e.g. m3:2)
-        inline constexpr std::string_view system_separator = "_";   ///< Separator of an unit system in expressions (e.g. SI_m)
+        inline constexpr std::string_view system_separator =
+            "_"; ///< Separator of an unit system in expressions (e.g. SI_m)
         // special unit symbols
-        inline constexpr std::string_view quantity_start = "<";  ///< Starting symbol of a physical quantity unit (e.g. <a>)
-        inline constexpr std::string_view quantity_end = ">";    ///< Ending symbol of a physical quantity unit
-        inline constexpr std::string_view si_factor_start = "|"; ///< Starting symbol of an SI conversion factor (e.g. |A|)
-        inline constexpr std::string_view si_factor_end = "|";   ///< Ending symbol of an SI conversion factor
+        inline constexpr std::string_view quantity_start =
+            "<"; ///< Starting symbol of a physical quantity unit (e.g. <a>)
+        inline constexpr std::string_view quantity_end = ">"; ///< Ending symbol of a physical quantity unit
+        inline constexpr std::string_view si_factor_start =
+            "|"; ///< Starting symbol of an SI conversion factor (e.g. |A|)
+        inline constexpr std::string_view si_factor_end = "|"; ///< Ending symbol of an SI conversion factor
     } // namespace Symbols
 
 } // namespace snt::puq

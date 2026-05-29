@@ -1,5 +1,3 @@
 #include <snt/mat/material.h>
 
-namespace snt::mat {
-
-}
+namespace snt::mat {}

@@ -5,16 +5,18 @@ struct QuantityStruct {
     std::string definition;
     std::string sifactor;
 };
-typedef std::unordered_map<std::string, QuantityStruct> QuantityListType;
+using QuantityListType = std::unordered_map<std::string, QuantityStruct>;
 
 template <typename T>
-std::unordered_map<std::string, T> operator+(const std::unordered_map<std::string, T>& map1, const std::unordered_map<std::string, T>& map2) {
+std::unordered_map<std::string, T> operator+(
+    const std::unordered_map<std::string, T>& map1, const std::unordered_map<std::string, T>& map2
+) {
     std::unordered_map<std::string, T> mapr(map1.begin(), map1.end());
     mapr.insert(map2.begin(), map2.end());
     return mapr;
 }
 
-typedef std::unordered_map<std::string, std::string> QuantityNamesType;
+using QuantityNamesType = std::unordered_map<std::string, std::string>;
 const QuantityNamesType QuantityNames = {
     // base quantities
     {"l", "length"},

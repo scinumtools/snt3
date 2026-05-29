@@ -155,7 +155,8 @@ namespace snt::puq {
         return m / dimensions2.numerical;
     }
 
-    Converter::Converter(const BaseUnits& bu1, const BaseUnits& bu2) : baseunits1(bu1), baseunits2(bu2), utype(Utype::NUL) {
+    Converter::Converter(const BaseUnits& bu1, const BaseUnits& bu2)
+        : baseunits1(bu1), baseunits2(bu2), utype(Utype::NUL) {
         // determine dimensions
         dimensions1 = bu1.dimensions();
         dimensions2 = bu2.dimensions();

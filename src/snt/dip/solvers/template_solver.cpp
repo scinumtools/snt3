@@ -24,11 +24,14 @@ namespace snt::dip {
                     parser.part_format();
 
                     // request node from the environment and extract its value
-                    ValueNode::ListType nodes = environment->request_nodes(parser.value_raw.at(0), RequestType::Reference);
+                    ValueNode::ListType nodes =
+                        environment->request_nodes(parser.value_raw.at(0), RequestType::Reference);
                     if (nodes.size() != 1) {
-                        throw std::runtime_error("Reference in a template should return only one node. "
-                                                 "Number of nodes returned: " +
-                                                 std::to_string(nodes.size()));
+                        throw std::runtime_error(
+                            "Reference in a template should return only one node. "
+                            "Number of nodes returned: " +
+                            std::to_string(nodes.size())
+                        );
                     }
                     const ValueNode::PointerType& vnode = nodes.front();
 

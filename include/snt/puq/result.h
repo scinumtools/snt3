@@ -29,12 +29,11 @@ namespace snt::puq {
         }
         Result(Result&&) noexcept = default;
         Result& operator=(Result&&) noexcept = default;
-        Result() : estimate(std::make_unique<val::ArrayValue<double>>(1)),
-                   uncertainty(nullptr) {}
-        Result(const double m) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
-                                 uncertainty(nullptr) {}
-        Result(const double m, const double e) : estimate(std::make_unique<val::ArrayValue<double>>(m)),
-                                                 uncertainty(std::make_unique<val::ArrayValue<double>>(e)) {}
+        Result() : estimate(std::make_unique<val::ArrayValue<double>>(1)), uncertainty(nullptr) {}
+        Result(const double m) : estimate(std::make_unique<val::ArrayValue<double>>(m)), uncertainty(nullptr) {}
+        Result(const double m, const double e)
+            : estimate(std::make_unique<val::ArrayValue<double>>(m)),
+              uncertainty(std::make_unique<val::ArrayValue<double>>(e)) {}
         Result(val::BaseValue::PointerType m);
         Result(val::BaseValue::PointerType m, val::BaseValue::PointerType e);
 

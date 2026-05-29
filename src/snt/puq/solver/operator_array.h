@@ -7,13 +7,16 @@
 
 namespace snt::puq {
 
-    enum CustomOperatorType {
-        ARRAY_OPERATOR = exs::NUM_OPERATOR_TYPES
-    };
+    enum CustomOperatorType { ARRAY_OPERATOR = exs::NUM_OPERATOR_TYPES };
 
     class OperatorArray : public exs::OperatorGroup<> {
       public:
-        OperatorArray() : exs::OperatorGroup<>("arr", {"", std::string(core::SYMBOL_ARRAY_START), std::string(core::SYMBOL_ARRAY_END), ","}, ARRAY_OPERATOR) {};
+        OperatorArray()
+            : exs::OperatorGroup<>(
+                  "arr",
+                  {"", std::string(core::SYMBOL_ARRAY_START), std::string(core::SYMBOL_ARRAY_END), ","},
+                  ARRAY_OPERATOR
+              ) {};
         void operate_group(exs::TokenListBase* tokens);
     };
 

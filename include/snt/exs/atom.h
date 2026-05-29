@@ -13,7 +13,7 @@
 
 namespace snt::exs {
 
-    typedef std::variant<double, bool> AtomValueType; ///< Type of default atom value
+    using AtomValueType = std::variant<double, bool>; ///< Type of default atom value
 
     /**
      * @class Atom

@@ -96,8 +96,10 @@ namespace snt::puq {
         if (math == Format::Math::UNICODE || math == Format::Math::HTML) {
             size_t pos = expression.find(Symbols::exponent);
             if (pos != std::string::npos) {
-                std::string exponent_str = expression.substr(pos + std::string(Symbols::exponent).size(), expression.size());
-                expression = expression.substr(0, pos) + std::string(Symbols::exponent2) + format_exponents(exponent_str);
+                std::string exponent_str =
+                    expression.substr(pos + std::string(Symbols::exponent).size(), expression.size());
+                expression =
+                    expression.substr(0, pos) + std::string(Symbols::exponent2) + format_exponents(exponent_str);
             }
         }
         return expression;

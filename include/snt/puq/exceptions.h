@@ -12,9 +12,7 @@ namespace snt::puq {
 
       public:
         CalculatorExcept(const std::string& m) : message(m) {}
-        const char* what() const noexcept override {
-            return message.c_str();
-        }
+        const char* what() const noexcept override { return message.c_str(); }
     };
 
     class MeasurementExcept : public std::exception {
@@ -23,9 +21,7 @@ namespace snt::puq {
 
       public:
         MeasurementExcept(std::string m) : message(m) {}
-        const char* what() const noexcept override {
-            return message.c_str();
-        }
+        const char* what() const noexcept override { return message.c_str(); }
     };
 
     class UnitSystemExcept : public std::exception {
@@ -49,9 +45,7 @@ namespace snt::puq {
                 message = ss.str();
             }
         }
-        const char* what() const noexcept override {
-            return message.c_str();
-        }
+        const char* what() const noexcept override { return message.c_str(); }
     };
 
 } // namespace snt::puq

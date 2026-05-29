@@ -21,8 +21,7 @@ namespace snt::dip {
     EnvUnit& UnitList::at(const std::string& name) {
         auto it = units.find(name);
         if (it == units.end())
-            throw std::runtime_error("Following unit was not found in the environment unit list: " +
-                                     name);
+            throw std::runtime_error("Following unit was not found in the environment unit list: " + name);
         else
             return it->second;
     }
@@ -30,8 +29,7 @@ namespace snt::dip {
     const EnvUnit& UnitList::at(const std::string& name) const {
         auto it = units.find(name);
         if (it == units.end())
-            throw std::runtime_error("Following unit was not found in the environment unit list: " +
-                                     name);
+            throw std::runtime_error("Following unit was not found in the environment unit list: " + name);
         else
             return it->second;
     }

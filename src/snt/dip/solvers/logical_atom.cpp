@@ -57,11 +57,13 @@ namespace snt::dip {
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_equal(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
-                                     other->value.units->to_string() + "'");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            );
         } else if (other->value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
-                                     "' and a nondimensional quantity");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            );
         } else {
             value.value = value.value->compare_equal(other->value.value.get());
         }
@@ -77,11 +79,13 @@ namespace snt::dip {
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_not_equal(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
-                                     other->value.units->to_string() + "'");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            );
         } else if (other->value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
-                                     "' and a nondimensional quantity");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            );
         } else {
             value.value = value.value->compare_not_equal(other->value.value.get());
         }
@@ -97,11 +101,13 @@ namespace snt::dip {
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_less_equal(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
-                                     other->value.units->to_string() + "'");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            );
         } else if (other->value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
-                                     "' and a nondimensional quantity");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            );
         } else {
             value.value = value.value->compare_less_equal(other->value.value.get());
         }
@@ -117,11 +123,13 @@ namespace snt::dip {
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_greater_equal(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
-                                     other->value.units->to_string() + "'");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            );
         } else if (other->value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
-                                     "' and a nondimensional quantity");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            );
         } else {
             value.value = value.value->compare_greater_equal(other->value.value.get());
         }
@@ -137,11 +145,13 @@ namespace snt::dip {
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_less(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
-                                     other->value.units->to_string() + "'");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            );
         } else if (other->value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
-                                     "' and a nondimensional quantity");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            );
         } else {
             value.value = value.value->compare_less(other->value.value.get());
         }
@@ -157,11 +167,13 @@ namespace snt::dip {
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_greater(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare nondimensional quantity and '" +
-                                     other->value.units->to_string() + "'");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            );
         } else if (other->value.units) {
-            throw std::runtime_error("LogicalAtom: Trying to compare '" + value.units->to_string() +
-                                     "' and a nondimensional quantity");
+            throw std::runtime_error(
+                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            );
         } else {
             value.value = value.value->compare_greater(other->value.value.get());
         }

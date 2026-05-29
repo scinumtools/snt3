@@ -81,29 +81,35 @@ namespace snt::puq {
     using ExponentVariant = std::variant<int, Exponent>;
 
     inline ExponentVariant add_exp(const ExponentVariant& x, const ExponentVariant& y) {
-        return std::visit([](auto const& a, auto const& b) -> ExponentVariant {
-            using A = std::decay_t<decltype(a)>;
-            using B = std::decay_t<decltype(b)>;
+        return std::visit(
+            [](auto const& a, auto const& b) -> ExponentVariant {
+                using A = std::decay_t<decltype(a)>;
+                using B = std::decay_t<decltype(b)>;
 
-            if constexpr (std::is_same_v<A, int> && std::is_same_v<B, int>)
-                return a + b;
-            else
-                return Exponent(a) + Exponent(b);
-        },
-                          x, y);
+                if constexpr (std::is_same_v<A, int> && std::is_same_v<B, int>)
+                    return a + b;
+                else
+                    return Exponent(a) + Exponent(b);
+            },
+            x,
+            y
+        );
     }
 
     inline ExponentVariant mul_exp(const ExponentVariant& x, const ExponentVariant& y) {
-        return std::visit([](auto const& a, auto const& b) -> ExponentVariant {
-            using A = std::decay_t<decltype(a)>;
-            using B = std::decay_t<decltype(b)>;
+        return std::visit(
+            [](auto const& a, auto const& b) -> ExponentVariant {
+                using A = std::decay_t<decltype(a)>;
+                using B = std::decay_t<decltype(b)>;
 
-            if constexpr (std::is_same_v<A, int> && std::is_same_v<B, int>)
-                return a * b;
-            else
-                return Exponent(a) * Exponent(b);
-        },
-                          x, y);
+                if constexpr (std::is_same_v<A, int> && std::is_same_v<B, int>)
+                    return a * b;
+                else
+                    return Exponent(a) * Exponent(b);
+            },
+            x,
+            y
+        );
     }
 
     inline double exponent_to_float(const ExponentVariant& exp) {

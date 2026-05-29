@@ -65,14 +65,20 @@ TEST(ParseArrays, StringValue) {
     dip::Environment env = d.parse();
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->value_raw, val::Array::StringType({"position", "velo,ci\"ty", "acce]lera'tion", "jerk", "snap", "crackle"}));
+    EXPECT_EQ(
+        vnode->value_raw,
+        val::Array::StringType({"position", "velo,ci\"ty", "acce]lera'tion", "jerk", "snap", "crackle"})
+    );
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::String);
     EXPECT_EQ(vnode->indent, 0);
     EXPECT_EQ(vnode->name, "foo");
     EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
-    EXPECT_EQ(vnode->value->to_string(), "[[\"position\", \"velo,ci\\\"ty\", \"acce]lera'tion\"], [\"jerk\", \"snap\", \"crackle\"]]");
+    EXPECT_EQ(
+        vnode->value->to_string(),
+        "[[\"position\", \"velo,ci\\\"ty\", \"acce]lera'tion\"], [\"jerk\", \"snap\", \"crackle\"]]"
+    );
     EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
 }
 

@@ -30,13 +30,11 @@ namespace snt::puq::math {
     }
 
     puq::Measurement floor(const puq::Measurement& msr) {
-        return puq::Measurement(floor(msr.result),
-                                msr.baseunits);
+        return puq::Measurement(floor(msr.result), msr.baseunits);
     }
 
     puq::Quantity floor(const puq::Quantity& quant) {
-        return puq::Quantity(floor(quant.measurement),
-                             quant.stype);
+        return puq::Quantity(floor(quant.measurement), quant.stype);
     }
 
 } // namespace snt::puq::math

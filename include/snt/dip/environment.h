@@ -55,8 +55,9 @@ namespace snt::dip {
          * @param rtype Request type: reference, or function
          * @return Selected value node data
          */
-        ValueNodeData request_node_data(const std::string& request,
-                                        const RequestType rtype = RequestType::Reference) const;
+        ValueNodeData request_node_data(
+            const std::string& request, const RequestType rtype = RequestType::Reference
+        ) const;
 
         /**
          * @brief Get value from a reference or a function based on a request expression
@@ -66,9 +67,11 @@ namespace snt::dip {
          * @param to_unit Request values with a specific unit
          * @return Selected ArrayValue object (in specified units)
          */
-        val::BaseValue::PointerType request_value(const std::string& request,
-                                                  const RequestType rtype = RequestType::Reference,
-                                                  const std::string& to_unit = "") const;
+        val::BaseValue::PointerType request_value(
+            const std::string& request,
+            const RequestType rtype = RequestType::Reference,
+            const std::string& to_unit = ""
+        ) const;
 
         /**
          * @brief Get list of nodes from a reference or a function based on a request expression
@@ -78,9 +81,11 @@ namespace snt::dip {
          * @param tags List of node tags that filter selected set
          * @return List of selected nodes
          */
-        ValueNode::ListType request_nodes(const std::string& request,
-                                          const RequestType rtype = RequestType::Reference,
-                                          const std::vector<std::string>& tags = {}) const;
+        ValueNode::ListType request_nodes(
+            const std::string& request,
+            const RequestType rtype = RequestType::Reference,
+            const std::vector<std::string>& tags = {}
+        ) const;
 
         /**
          * @brief Get parsed node value at the specific index

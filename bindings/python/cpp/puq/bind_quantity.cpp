@@ -27,12 +27,16 @@ std::variant<double, std::vector<double>, py::array_t<double>> quantity_value(pu
     }
 }
 
-std::variant<double, std::vector<double>, py::array_t<double>> quantity_get_value(const puq::Quantity& q, size_t index) {
+std::variant<double, std::vector<double>, py::array_t<double>> quantity_get_value(
+    const puq::Quantity& q, size_t index
+) {
     val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
     return otherT->get_value(index);
 }
 
-std::variant<double, std::vector<double>, py::array_t<double>> quantity_uncertainty(const puq::Quantity& q, bool numpy) {
+std::variant<double, std::vector<double>, py::array_t<double>> quantity_uncertainty(
+    const puq::Quantity& q, bool numpy
+) {
     val::ArrayValue<double> varray(q.measurement.result.uncertainty.get());
     if (numpy) {
         return array_to_numpy(varray);
@@ -67,9 +71,7 @@ val::BaseValue::PointerType buffer_to_array(py::buffer_info& info) {
     if (info.format != py::format_descriptor<double>::format())
         throw std::runtime_error("Incompatible format: expected a double array!");
 
-    std::copy(static_cast<double*>(info.ptr),
-              static_cast<double*>(info.ptr) + info.size,
-              a.begin());
+    std::copy(static_cast<double*>(info.ptr), static_cast<double*>(info.ptr) + info.size, a.begin());
 
     val::Array::ShapeType s(info.shape.size());
     std::copy(info.shape.begin(), info.shape.end(), s.begin());
@@ -102,27 +104,38 @@ void init_puq_quantity(py::module_& m) {
     /**
      * @brief Initialise Quantity with a value from numpy arrays
      */
-    q.def(py::init([](const py::array_t<double, py::array::c_style | py::array::forcecast>& v,
-                      const std::string& s, puq::SystemType sys) {
-              py::buffer_info info = v.request();
-              val::BaseValue::PointerType value = buffer_to_array(info);
-              return puq::Quantity(std::move(value), s, sys);
-          }),
-          py::arg("value"), py::arg("unit") = "", py::arg("system") = puq::SystemType::NONE);
+    q.def(
+        py::init([](const py::array_t<double, py::array::c_style | py::array::forcecast>& v,
+                    const std::string& s,
+                    puq::SystemType sys) {
+            py::buffer_info info = v.request();
+            val::BaseValue::PointerType value = buffer_to_array(info);
+            return puq::Quantity(std::move(value), s, sys);
+        }),
+        py::arg("value"),
+        py::arg("unit") = "",
+        py::arg("system") = puq::SystemType::NONE
+    );
 
     /**
      * @brief Initialise Quantity with a value/uncertainty from numpy arrays
      */
-    q.def(py::init([](const py::array_t<double, py::array::c_style | py::array::forcecast>& v,
-                      const py::array_t<double, py::array::c_style | py::array::forcecast>& e,
-                      const std::string& s, puq::SystemType sys) {
-              py::buffer_info v_info = v.request();
-              val::BaseValue::PointerType value = buffer_to_array(v_info);
-              py::buffer_info e_info = e.request();
-              val::BaseValue::PointerType uncertainty = buffer_to_array(e_info);
-              return puq::Quantity(std::move(value), std::move(uncertainty), s, sys);
-          }),
-          py::arg("value"), py::arg("uncertainty"), py::arg("unit") = "", py::arg("system") = puq::SystemType::NONE);
+    q.def(
+        py::init([](const py::array_t<double, py::array::c_style | py::array::forcecast>& v,
+                    const py::array_t<double, py::array::c_style | py::array::forcecast>& e,
+                    const std::string& s,
+                    puq::SystemType sys) {
+            py::buffer_info v_info = v.request();
+            val::BaseValue::PointerType value = buffer_to_array(v_info);
+            py::buffer_info e_info = e.request();
+            val::BaseValue::PointerType uncertainty = buffer_to_array(e_info);
+            return puq::Quantity(std::move(value), std::move(uncertainty), s, sys);
+        }),
+        py::arg("value"),
+        py::arg("uncertainty"),
+        py::arg("unit") = "",
+        py::arg("system") = puq::SystemType::NONE
+    );
 
     /**
      * @brief Convert Quantity into a numpy array
@@ -139,8 +152,8 @@ void init_puq_quantity(py::module_& m) {
         return py::array_t<double>(shape, strides, otherT->get_data());
     });
     //  q.def("to_numpy", [](const puq::Quantity &q) -> py::buffer_info {
-    //      val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
-    //      return py::buffer_info(
+    //      val::ArrayValue<double>* otherT =
+    //      dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get()); return py::buffer_info(
     //			     otherT->get_data(),
     //			     sizeof(double),
     //			     py::format_descriptor<double>::format(),
@@ -151,10 +164,19 @@ void init_puq_quantity(py::module_& m) {
     //			     );
     //   });
 
-    q.def("convert", py::overload_cast<std::string, puq::SystemType, const std::string&>(&puq::Quantity::convert, py::const_),
-          py::arg("expression"), py::arg("system") = puq::SystemType::NONE, py::arg("quantity") = "")
-        .def("convert", py::overload_cast<const puq::Format::Base&, puq::SystemType>(&puq::Quantity::convert, py::const_),
-             py::arg("dformat"), py::arg("system") = puq::SystemType::NONE)
+    q.def(
+         "convert",
+         py::overload_cast<std::string, puq::SystemType, const std::string&>(&puq::Quantity::convert, py::const_),
+         py::arg("expression"),
+         py::arg("system") = puq::SystemType::NONE,
+         py::arg("quantity") = ""
+    )
+        .def(
+            "convert",
+            py::overload_cast<const puq::Format::Base&, puq::SystemType>(&puq::Quantity::convert, py::const_),
+            py::arg("dformat"),
+            py::arg("system") = puq::SystemType::NONE
+        )
         .def("unit_system", &puq::Quantity::unit_system)
         .def("rebase_prefixes", &puq::Quantity::rebase_prefixes)
         .def("rebase_dimensions", &puq::Quantity::rebase_dimensions)
@@ -186,58 +208,98 @@ void init_puq_quantity(py::module_& m) {
     /**
      * Addition of quantities
      */
-    q.def("__add__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
-       val::BaseValue::PointerType varray = parseBaseValue(other);
-       if (varray==nullptr)
-	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
-       return py::cast(quant + std::move(varray)); }, py::is_operator());
-    q.def("__radd__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
-     val::BaseValue::PointerType varray = parseBaseValue(other);
-     if (varray==nullptr)
-       py::reinterpret_borrow<py::object>(Py_NotImplemented);
-     return py::cast(std::move(varray) + quant); }, py::is_operator());
+    q.def(
+        "__add__",
+        [](const puq::Quantity& quant, const py::object& other) -> py::object {
+            val::BaseValue::PointerType varray = parseBaseValue(other);
+            if (varray == nullptr)
+                py::reinterpret_borrow<py::object>(Py_NotImplemented);
+            return py::cast(quant + std::move(varray));
+        },
+        py::is_operator()
+    );
+    q.def(
+        "__radd__",
+        [](const puq::Quantity& quant, const py::object& other) -> py::object {
+            val::BaseValue::PointerType varray = parseBaseValue(other);
+            if (varray == nullptr)
+                py::reinterpret_borrow<py::object>(Py_NotImplemented);
+            return py::cast(std::move(varray) + quant);
+        },
+        py::is_operator()
+    );
 
     /**
      * Subtraction of quantities
      */
-    q.def("__sub__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
-       val::BaseValue::PointerType varray = parseBaseValue(other);
-       if (varray==nullptr)
-	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
-       return py::cast(quant - std::move(varray)); }, py::is_operator());
-    q.def("__rsub__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
-     val::BaseValue::PointerType varray = parseBaseValue(other);
-     if (varray==nullptr)
-       py::reinterpret_borrow<py::object>(Py_NotImplemented);
-     return py::cast(std::move(varray) - quant); }, py::is_operator());
+    q.def(
+        "__sub__",
+        [](const puq::Quantity& quant, const py::object& other) -> py::object {
+            val::BaseValue::PointerType varray = parseBaseValue(other);
+            if (varray == nullptr)
+                py::reinterpret_borrow<py::object>(Py_NotImplemented);
+            return py::cast(quant - std::move(varray));
+        },
+        py::is_operator()
+    );
+    q.def(
+        "__rsub__",
+        [](const puq::Quantity& quant, const py::object& other) -> py::object {
+            val::BaseValue::PointerType varray = parseBaseValue(other);
+            if (varray == nullptr)
+                py::reinterpret_borrow<py::object>(Py_NotImplemented);
+            return py::cast(std::move(varray) - quant);
+        },
+        py::is_operator()
+    );
 
     /**
      * Multiplication of quantities
      */
-    q.def("__mul__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
-       val::BaseValue::PointerType varray = parseBaseValue(other);
-       if (varray==nullptr)
-	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
-       return py::cast(quant * std::move(varray)); }, py::is_operator());
-    q.def("__rmul__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
-     val::BaseValue::PointerType varray = parseBaseValue(other);
-     if (varray==nullptr)
-       py::reinterpret_borrow<py::object>(Py_NotImplemented);
-     return py::cast(std::move(varray) * quant); }, py::is_operator());
+    q.def(
+        "__mul__",
+        [](const puq::Quantity& quant, const py::object& other) -> py::object {
+            val::BaseValue::PointerType varray = parseBaseValue(other);
+            if (varray == nullptr)
+                py::reinterpret_borrow<py::object>(Py_NotImplemented);
+            return py::cast(quant * std::move(varray));
+        },
+        py::is_operator()
+    );
+    q.def(
+        "__rmul__",
+        [](const puq::Quantity& quant, const py::object& other) -> py::object {
+            val::BaseValue::PointerType varray = parseBaseValue(other);
+            if (varray == nullptr)
+                py::reinterpret_borrow<py::object>(Py_NotImplemented);
+            return py::cast(std::move(varray) * quant);
+        },
+        py::is_operator()
+    );
 
     /**
      * Division of quantities
      */
-    q.def("__truediv__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
-       val::BaseValue::PointerType varray = parseBaseValue(other);
-       if (varray==nullptr)
-	 py::reinterpret_borrow<py::object>(Py_NotImplemented);
-       return py::cast(quant / std::move(varray)); }, py::is_operator());
-    q.def("__rtruediv__", [](const puq::Quantity& quant, const py::object& other) -> py::object {
-     val::BaseValue::PointerType varray = parseBaseValue(other);
-     if (varray==nullptr)
-       py::reinterpret_borrow<py::object>(Py_NotImplemented);
-     return py::cast(std::move(varray) / quant); }, py::is_operator());
+    q.def(
+        "__truediv__",
+        [](const puq::Quantity& quant, const py::object& other) -> py::object {
+            val::BaseValue::PointerType varray = parseBaseValue(other);
+            if (varray == nullptr)
+                py::reinterpret_borrow<py::object>(Py_NotImplemented);
+            return py::cast(quant / std::move(varray));
+        },
+        py::is_operator()
+    );
+    q.def(
+        "__rtruediv__",
+        [](const puq::Quantity& quant, const py::object& other) -> py::object {
+            val::BaseValue::PointerType varray = parseBaseValue(other);
+            if (varray == nullptr)
+                py::reinterpret_borrow<py::object>(Py_NotImplemented);
+            return py::cast(std::move(varray) / quant);
+        },
+        py::is_operator()
+    );
 
     // q.def(std::vector<double>() + py::self)
     //.def(std::vector<double>() - py::self)
@@ -248,9 +310,21 @@ void init_puq_quantity(py::module_& m) {
     //.def(py::self * std::vector<double>())
     //.def(py::self / std::vector<double>())
 
-    q.def("__eq__", [](const snt::puq::Quantity& self, const snt::puq::Quantity& other) -> py::object { return py::bool_(self == other); }, py::is_operator());
+    q.def(
+        "__eq__",
+        [](const snt::puq::Quantity& self, const snt::puq::Quantity& other) -> py::object {
+            return py::bool_(self == other);
+        },
+        py::is_operator()
+    );
 
-    q.def("__neq__", [](const snt::puq::Quantity& self, const snt::puq::Quantity& other) -> py::object { return py::bool_(self != other); }, py::is_operator());
+    q.def(
+        "__neq__",
+        [](const snt::puq::Quantity& self, const snt::puq::Quantity& other) -> py::object {
+            return py::bool_(self != other);
+        },
+        py::is_operator()
+    );
 
     q.def("__array__", [](const snt::puq::Quantity& q, const py::object& dtype) {
         throw std::runtime_error("Convert explicitly: use .to_numpy() or .result");

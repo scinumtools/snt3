@@ -70,7 +70,13 @@ namespace snt::core {
     }
 
     template <typename T>
-    std::string _array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const StringFormatType& format, size_t& offset, size_t dim) {
+    std::string _array_to_string(
+        const std::vector<T>& value,
+        const std::vector<size_t>& shape,
+        const StringFormatType& format,
+        size_t& offset,
+        size_t dim
+    ) {
         std::ostringstream oss;
         if (value.size() > 1)
             oss << SYMBOL_ARRAY_START;
@@ -107,7 +113,11 @@ namespace snt::core {
     }
 
     template <typename T>
-    std::string array_to_string(const std::vector<T>& value, const std::vector<size_t>& shape, const StringFormatType& format = StringFormatType()) {
+    std::string array_to_string(
+        const std::vector<T>& value,
+        const std::vector<size_t>& shape,
+        const StringFormatType& format = StringFormatType()
+    ) {
         size_t offset = 0;
         return _array_to_string(value, shape, format, offset, 0);
     }
@@ -115,7 +125,9 @@ namespace snt::core {
     // Implementation for value/uncertainty
 
     template <typename T>
-    std::string number_to_string(const T& value, const T& uncertainty, const StringFormatType& format = StringFormatType()) {
+    std::string number_to_string(
+        const T& value, const T& uncertainty, const StringFormatType& format = StringFormatType()
+    ) {
         std::stringstream ss;
         if (value == 0 && uncertainty == 0) {
             return "0";
@@ -136,7 +148,9 @@ namespace snt::core {
                 if (exp_err - prec)
                     ss << 'e' << exp_err - prec;
             } else if (std::is_floating_point_v<T>) {
-                int val_err = static_cast<int>(std::round(uncertainty * std::pow(10, -exp_err - 1 + format.uncertaintyPrecision)));
+                int val_err = static_cast<int>(
+                    std::round(uncertainty * std::pow(10, -exp_err - 1 + format.uncertaintyPrecision))
+                );
                 T val_mag = value * std::pow(10, -exp_val); // numerical value without x10^ part
                 ss << std::setprecision(exp_diff + format.uncertaintyPrecision);
                 ss << val_mag;
@@ -157,7 +171,14 @@ namespace snt::core {
     }
 
     template <typename T>
-    std::string _array_to_string(const std::vector<T>& value, const std::vector<T>& uncertainty, const std::vector<size_t>& shape, const StringFormatType& format, size_t& offset, size_t dim) {
+    std::string _array_to_string(
+        const std::vector<T>& value,
+        const std::vector<T>& uncertainty,
+        const std::vector<size_t>& shape,
+        const StringFormatType& format,
+        size_t& offset,
+        size_t dim
+    ) {
         std::ostringstream oss;
         if (value.size() > 1)
             oss << SYMBOL_ARRAY_START;
@@ -181,7 +202,12 @@ namespace snt::core {
     }
 
     template <typename T>
-    std::string array_to_string(const std::vector<T>& value, const std::vector<T>& uncertainty, const std::vector<size_t>& shape, const StringFormatType& format = StringFormatType()) {
+    std::string array_to_string(
+        const std::vector<T>& value,
+        const std::vector<T>& uncertainty,
+        const std::vector<size_t>& shape,
+        const StringFormatType& format = StringFormatType()
+    ) {
         size_t offset = 0;
         return _array_to_string(value, uncertainty, shape, format, offset, 0);
     }

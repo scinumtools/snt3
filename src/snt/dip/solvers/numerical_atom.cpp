@@ -153,11 +153,13 @@ namespace snt::dip {
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->math_add(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error("NumericalAtom: Trying to add nondimensional quantity to '" +
-                                     other->value.units->to_string() + "'");
+            throw std::runtime_error(
+                "NumericalAtom: Trying to add nondimensional quantity to '" + other->value.units->to_string() + "'"
+            );
         } else if (other->value.units) {
-            throw std::runtime_error("NumericalAtom: Trying to add '" + value.units->to_string() +
-                                     "' to a nondimensional quantity");
+            throw std::runtime_error(
+                "NumericalAtom: Trying to add '" + value.units->to_string() + "' to a nondimensional quantity"
+            );
         } else {
             value.value = value.value->math_add(other->value.value.get());
         }
@@ -171,11 +173,14 @@ namespace snt::dip {
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->math_sub(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error("NumericalAtom: Trying to subtract nondimensional quantity from '" +
-                                     other->value.units->to_string() + "'");
+            throw std::runtime_error(
+                "NumericalAtom: Trying to subtract nondimensional quantity from '" + other->value.units->to_string() +
+                "'"
+            );
         } else if (other->value.units) {
-            throw std::runtime_error("NumericalAtom: Trying to subtract '" + value.units->to_string() +
-                                     "' from a nondimensional quantity");
+            throw std::runtime_error(
+                "NumericalAtom: Trying to subtract '" + value.units->to_string() + "' from a nondimensional quantity"
+            );
         } else {
             value.value = value.value->math_sub(other->value.value.get());
         }

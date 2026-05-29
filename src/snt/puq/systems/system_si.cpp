@@ -143,31 +143,37 @@ namespace snt::puq {
                 {"{R_inf}", {UT_LIN_CST, "{#R_inf}", "Rydberg constant", false, {}}},
                 {"{R_sol}", {UT_LIN_CST, "{#R_sol}", "Solar radius", false, {}}},
                 {"{sigma}", {UT_LIN_CST, "{#sigma}", "Stef.Bolt. const.", false, {}}},
-                {"{N_A}", {UT_LIN_CST, "{#N_A}", "Avogadro's const.", false, {}}}};
+                {"{N_A}", {UT_LIN_CST, "{#N_A}", "Avogadro's const.", false, {}}}
+            };
 
             if constexpr (Config::use_units_temperature) {
-                units.insert({{"Cel", {Utype::TMP, "K", "degree Celsius", false, {}}},
-                              {"degF", {Utype::TMP, "K", "degree Fahrenheit", false, {}}}});
+                units.insert(
+                    {{"Cel", {Utype::TMP, "K", "degree Celsius", false, {}}},
+                     {"degF", {Utype::TMP, "K", "degree Fahrenheit", false, {}}}}
+                );
             }
 
             if constexpr (Config::use_units_logarithmic) {
-                units.insert({// logarithmic units and ratios
-                              {"PR", {UT_LIN_LOG, "1", "Power ratio", false, {}}},
-                              {"AR", {UT_LIN_LOG, "1", "Amplitude ratio", false, {}}},
-                              {"Np", {Utype::LOG, "1", "Nepers", true, {"c", "d"}}},
-                              {"B", {Utype::LOG, "1", "Bel", true, {"d"}}},
-                              {"Bm", {Utype::LOG, "mW", "bel-milliwatt", true, {"d"}}},
-                              {"BmW", {Utype::LOG, "mW", "bel-milliwatt", true, {"d"}}},
-                              {"BW", {Utype::LOG, "W", "bel-watt", true, {"d"}}},
-                              {"BV", {Utype::LOG, "V", "bel-volt", true, {"d"}}},
-                              {"BuV", {Utype::LOG, "uV", "bel-microvolt", true, {"d"}}},
-                              {"BA", {Utype::LOG, "A", "bel-amps", true, {"d"}}},
-                              {"BuA", {Utype::LOG, "uA", "bel-microamps", true, {"d"}}},
-                              {"BOhm", {Utype::LOG, "Ohm", "bel-ohms", true, {"d"}}},
-                              {"BSPL", {Utype::LOG, "Pa", "bel-SPL (Pa)", true, {"d"}}},
-                              {"BSIL", {Utype::LOG, "W/m2", "bel-SIL (W/m2)", true, {"d"}}},
-                              {"BSWL", {Utype::LOG, "W", "bel-SWL (W)", true, {"d"}}},
-                              {"Mw", {Utype::LOG, "Mo", "mom. magnitude", false, {}}}});
+                units.insert(
+                    {// logarithmic units and ratios
+                     {"PR", {UT_LIN_LOG, "1", "Power ratio", false, {}}},
+                     {"AR", {UT_LIN_LOG, "1", "Amplitude ratio", false, {}}},
+                     {"Np", {Utype::LOG, "1", "Nepers", true, {"c", "d"}}},
+                     {"B", {Utype::LOG, "1", "Bel", true, {"d"}}},
+                     {"Bm", {Utype::LOG, "mW", "bel-milliwatt", true, {"d"}}},
+                     {"BmW", {Utype::LOG, "mW", "bel-milliwatt", true, {"d"}}},
+                     {"BW", {Utype::LOG, "W", "bel-watt", true, {"d"}}},
+                     {"BV", {Utype::LOG, "V", "bel-volt", true, {"d"}}},
+                     {"BuV", {Utype::LOG, "uV", "bel-microvolt", true, {"d"}}},
+                     {"BA", {Utype::LOG, "A", "bel-amps", true, {"d"}}},
+                     {"BuA", {Utype::LOG, "uA", "bel-microamps", true, {"d"}}},
+                     {"BOhm", {Utype::LOG, "Ohm", "bel-ohms", true, {"d"}}},
+                     {"BSPL", {Utype::LOG, "Pa", "bel-SPL (Pa)", true, {"d"}}},
+                     {"BSIL", {Utype::LOG, "W/m2", "bel-SIL (W/m2)", true, {"d"}}},
+                     {"BSWL", {Utype::LOG, "W", "bel-SWL (W)", true, {"d"}}},
+                     {"Mw", {Utype::LOG, "Mo", "mom. magnitude", false, {}}}
+                    }
+                );
             }
 
             return units;

@@ -32,8 +32,9 @@ const std::vector<std::string>& ArgParser::getAllPositionals() const {
 
 std::string ArgParser::getPositionalValue(const size_t index) const {
     if (index >= positional.size())
-        throw std::runtime_error("Requesting positional argument " + std::to_string(index) +
-                                 " out of " + std::to_string(positional.size()));
+        throw std::runtime_error(
+            "Requesting positional argument " + std::to_string(index) + " out of " + std::to_string(positional.size())
+        );
     return positional[index];
 }
 

@@ -19,8 +19,7 @@ namespace snt::exs {
      * @tparam ATOM Atom type class
      * @tparam VALUE Atom value type
      */
-    template <typename ATOM, typename VALUE>
-    class AtomBase : public AtomGrand {
+    template <typename ATOM, typename VALUE> class AtomBase : public AtomGrand {
       public:
         VALUE value;
         // Copy constructor
@@ -61,9 +60,7 @@ namespace snt::exs {
         }
 
         // Math operations
-        virtual void math_add(ATOM* other) {
-            throw std::runtime_error("Atom method 'math_add' is not implemented");
-        };
+        virtual void math_add(ATOM* other) { throw std::runtime_error("Atom method 'math_add' is not implemented"); };
         void math_add(AtomGrand* other) override {
             auto* casted = static_cast<ATOM*>(other);
             static_cast<ATOM*>(this)->math_add(casted);

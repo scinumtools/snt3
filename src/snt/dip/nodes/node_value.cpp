@@ -4,8 +4,7 @@
 
 namespace snt::dip {
 
-    ValueNode::ValueNode(const std::string& nm, const val::DataType vdt)
-        : constant(false), value_dtype(vdt) {
+    ValueNode::ValueNode(const std::string& nm, const val::DataType vdt) : constant(false), value_dtype(vdt) {
         name = nm;
     };
 
@@ -26,13 +25,13 @@ namespace snt::dip {
         return cast_value(value_raw, value_shape);
     }
 
-    val::BaseValue::PointerType ValueNode::cast_value(val::Array::StringType& value_input,
-                                                      const val::Array::ShapeType& shape) {
+    val::BaseValue::PointerType ValueNode::cast_value(
+        val::Array::StringType& value_input, const val::Array::ShapeType& shape
+    ) {
         if (!dimension.empty()) {
             return cast_array_value(value_input, shape);
         } else if (value_input.size() > 1) {
-            throw std::runtime_error("Value size is an array but node is defined as scalar: " +
-                                     line.code);
+            throw std::runtime_error("Value size is an array but node is defined as scalar: " + line.code);
         } else {
             return cast_scalar_value(value_input.at(0));
         }
@@ -74,8 +73,9 @@ namespace snt::dip {
             std::string option_units = option.units_raw;
             if (!option_units.empty()) {
                 if (!units)
-                    throw std::runtime_error("Options: Trying to convert '" + option_units +
-                                             "' into a nondimensional quantity: " + line.code);
+                    throw std::runtime_error(
+                        "Options: Trying to convert '" + option_units + "' into a nondimensional quantity: " + line.code
+                    );
                 else {
                     puq::Quantity quantity(std::move(option.value), option_units);
                     quantity = quantity.convert(*units);
@@ -87,14 +87,17 @@ namespace snt::dip {
 
     void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
         if (node->dtype != NodeDtype::Modification and node->dtype != dtype)
-            throw std::runtime_error("Node '" + name + "' with type '" + dtype_raw.at(1) +
-                                     "' cannot modify node '" + node->name + "' with type '" +
-                                     node->dtype_raw.at(1) + "'");
+            throw std::runtime_error(
+                "Node '" + name + "' with type '" + dtype_raw.at(1) + "' cannot modify node '" + node->name +
+                "' with type '" + node->dtype_raw.at(1) + "'"
+            );
         val::BaseValue::PointerType value = cast_value(node->value_raw, node->value_shape);
         if (!node->units_raw.empty()) {
             if (!this->units)
-                throw std::runtime_error("Modifications: Trying to convert '" + node->units_raw +
-                                         "' into a nondimensional quantity: " + line.code);
+                throw std::runtime_error(
+                    "Modifications: Trying to convert '" + node->units_raw +
+                    "' into a nondimensional quantity: " + line.code
+                );
             else {
                 puq::Quantity quantity(std::move(value), node->units_raw);
                 quantity = quantity.convert(*this->units);
@@ -110,8 +113,7 @@ namespace snt::dip {
         case PropertyType::Options:
             for (const auto& value_option : values) {
                 if (dtype == NodeDtype::Boolean)
-                    throw std::runtime_error("Option property is not implemented for boolean nodes: " +
-                                             line.code);
+                    throw std::runtime_error("Option property is not implemented for boolean nodes: " + line.code);
                 // TODO: account for multidimensional arrays as individual options
                 val::BaseValue::PointerType ovalue = cast_scalar_value(value_option);
                 options.push_back({std::move(ovalue), value_option, units});
@@ -140,8 +142,7 @@ namespace snt::dip {
 
     void ValueNode::validate_constant() const {
         if (constant)
-            throw std::runtime_error("Node '" + name +
-                                     "' is constant and cannot be modified: " + line.code);
+            throw std::runtime_error("Node '" + name + "' is constant and cannot be modified: " + line.code);
     }
 
     void ValueNode::validate_definition() const {
@@ -173,24 +174,26 @@ namespace snt::dip {
                         oss << ", ";
                     oss << options[i].value->to_string();
                 }
-                throw std::runtime_error("Value " + value->to_string() + " of node '" + name +
-                                         "' doesn't match with any option: " + oss.str());
+                throw std::runtime_error(
+                    "Value " + value->to_string() + " of node '" + name +
+                    "' doesn't match with any option: " + oss.str()
+                );
             }
         }
     }
 
     void ValueNode::validate_format() const {
         if (format.size() > 0)
-            throw std::runtime_error("Format property can be used only with string nodes: " +
-                                     line.code);
+            throw std::runtime_error("Format property can be used only with string nodes: " + line.code);
     }
 
     void ValueNode::validate_dimensions() const {
         val::Array::ShapeType vdim = value->get_shape();
         if (dimension.size() != vdim.size())
-            throw std::runtime_error("Number of value dimensions does not match that of node: " +
-                                     std::to_string(vdim.size()) +
-                                     "!=" + std::to_string(dimension.size()));
+            throw std::runtime_error(
+                "Number of value dimensions does not match that of node: " + std::to_string(vdim.size()) +
+                "!=" + std::to_string(dimension.size())
+            );
         for (size_t i = 0; i < dimension.size(); i++) {
             size_t dmin = dimension[i].dmin;
             size_t dmax = dimension[i].dmax; // dimension ranges can be max(size_t)
@@ -218,8 +221,9 @@ namespace snt::dip {
                     vss << vdim[j];
                 }
                 throw std::runtime_error(
-                    "Value dimensions do not correspond to the node dimension ranges: [" + vss.str() +
-                    "] != [" + nss.str() + "]");
+                    "Value dimensions do not correspond to the node dimension ranges: [" + vss.str() + "] != [" +
+                    nss.str() + "]"
+                );
             }
         }
         // std::cout << "checking dimensions " << std::endl;

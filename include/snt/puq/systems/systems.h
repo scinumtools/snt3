@@ -28,20 +28,20 @@ namespace snt::puq {
 
     inline Utype operator|(Utype lhs, Utype rhs) {
         return static_cast<Utype>(
-            static_cast<std::underlying_type_t<Utype>>(lhs) |
-            static_cast<std::underlying_type_t<Utype>>(rhs));
+            static_cast<std::underlying_type_t<Utype>>(lhs) | static_cast<std::underlying_type_t<Utype>>(rhs)
+        );
     }
 
     inline Utype operator&(Utype lhs, Utype rhs) {
         return static_cast<Utype>(
-            static_cast<std::underlying_type_t<Utype>>(lhs) &
-            static_cast<std::underlying_type_t<Utype>>(rhs));
+            static_cast<std::underlying_type_t<Utype>>(lhs) & static_cast<std::underlying_type_t<Utype>>(rhs)
+        );
     }
 
     inline Utype operator^(Utype lhs, Utype rhs) {
         return static_cast<Utype>(
-            static_cast<std::underlying_type_t<Utype>>(lhs) ^
-            static_cast<std::underlying_type_t<Utype>>(rhs));
+            static_cast<std::underlying_type_t<Utype>>(lhs) ^ static_cast<std::underlying_type_t<Utype>>(rhs)
+        );
     }
 
     const Utype UT_LIN_BAS = Utype::LIN | Utype::BAS;
@@ -62,11 +62,13 @@ namespace snt::puq {
         std::string definition;
         std::string name;
     };
+
     extern const std::unordered_map<std::string, UnitPrefixStruct> UnitPrefixList;
     extern const std::vector<std::string> UnitPrefixOrder;
 
-    typedef std::array<ExponentVariant, Config::num_basedim> BaseDimensions;
-    typedef std::set<std::string> AllowedPrefixes;
+    using BaseDimensions = std::array<ExponentVariant, Config::num_basedim>;
+    using AllowedPrefixes = std::set<std::string>;
+
     struct UnitStruct {
         Utype utype;
         std::string definition;
@@ -74,7 +76,7 @@ namespace snt::puq {
         bool use_prefixes;
         AllowedPrefixes allowed_prefixes;
     };
-    typedef std::unordered_map<std::string, UnitStruct> UnitListType;
+    using UnitListType = std::unordered_map<std::string, UnitStruct>;
 
     /*
      *  Quantities
@@ -92,9 +94,7 @@ namespace snt::puq {
 
       public:
         DimensionMapExcept(const std::string& m) : message(m) {}
-        const char* what() const noexcept override {
-            return message.c_str();
-        }
+        const char* what() const noexcept override { return message.c_str(); }
     };
 
     struct DimensionStruct {
@@ -102,13 +102,13 @@ namespace snt::puq {
         double uncertainty;
         BaseDimensions dimensions;
     };
-    typedef std::unordered_map<std::string, DimensionStruct> DimensionMapType;
+    using DimensionMapType = std::unordered_map<std::string, DimensionStruct>;
 
     /*
      *  System of units
      */
 
-    typedef int FRC[2];
+    using FRC = int[2];
 
     struct SystemDataType {
         std::string SystemAbbrev;
@@ -117,6 +117,7 @@ namespace snt::puq {
         QuantityListType QuantityList;
         DimensionMapType DimensionMap;
     };
+
     namespace SystemData {
 #include <snt/puq/systems/system_base.h>
         extern SystemDataType SI;
@@ -131,6 +132,7 @@ namespace snt::puq {
         extern SystemDataType GRU;
         extern SystemDataType GEO;
     } // namespace SystemData
+
     enum class SystemType {
         NONE,
         SI,

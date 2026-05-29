@@ -13,9 +13,7 @@ namespace snt::mat {
      * @class Substance
      * @brief A form of matter with uniform and definite composition and distinct physical and chemical properties.
      */
-    class Substance : public Set<Element, int>,
-                      public Part<double>,
-                      public Matter {
+    class Substance : public Set<Element, int>, public Part<double>, public Matter {
       public:
         /**
          * @brief Substance class constructor from a scalar number

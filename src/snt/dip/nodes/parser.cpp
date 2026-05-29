@@ -66,11 +66,21 @@ namespace snt::dip {
             strip(matchResult[0].str());
             return true;
         } else {
-            constexpr auto pstr =
-                ce_concat<50>("^", PATTERN_PATH, "*(", "[", SIGN_CONDITION, "]", KEYWORD_ELSE,
-                              "|"
-                              "[",
-                              SIGN_CONDITION, "]", KEYWORD_END, ")");
+            constexpr auto pstr = ce_concat<50>(
+                "^",
+                PATTERN_PATH,
+                "*(",
+                "[",
+                SIGN_CONDITION,
+                "]",
+                KEYWORD_ELSE,
+                "|"
+                "[",
+                SIGN_CONDITION,
+                "]",
+                KEYWORD_END,
+                ")"
+            );
             pattern = pstr.data();
             if (std::regex_search(code, matchResult, pattern)) {
                 name = matchResult[0].str();
@@ -82,8 +92,7 @@ namespace snt::dip {
     }
 
     bool Parser::kwd_unit() {
-        constexpr auto pstr =
-            ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_VARIABLE, "]", KEYWORD_UNIT, ")[ ]*");
+        constexpr auto pstr = ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_VARIABLE, "]", KEYWORD_UNIT, ")[ ]*");
         std::regex pattern(pstr.data());
         std::smatch matchResult;
         if (std::regex_search(code, matchResult, pattern)) {
@@ -95,8 +104,7 @@ namespace snt::dip {
     }
 
     bool Parser::kwd_source() {
-        constexpr auto pstr =
-            ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_VARIABLE, "]", KEYWORD_SOURCE, ")[ ]*");
+        constexpr auto pstr = ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_VARIABLE, "]", KEYWORD_SOURCE, ")[ ]*");
         std::regex pattern(pstr.data());
         std::smatch matchResult;
         if (std::regex_search(code, matchResult, pattern)) {
@@ -170,9 +178,17 @@ namespace snt::dip {
     }
 
     bool Parser::part_type(const bool required) {
-        constexpr auto pstr =
-            ce_concat<70>("^[ ]+(u|)(", KEYWORD_BOOLEAN, "|", KEYWORD_INTEGER, "|", KEYWORD_FLOAT, "|",
-                          KEYWORD_STRING, "|table)(16|32|64|128|x|)");
+        constexpr auto pstr = ce_concat<70>(
+            "^[ ]+(u|)(",
+            KEYWORD_BOOLEAN,
+            "|",
+            KEYWORD_INTEGER,
+            "|",
+            KEYWORD_FLOAT,
+            "|",
+            KEYWORD_STRING,
+            "|table)(16|32|64|128|x|)"
+        );
         std::regex pattern(pstr.data());
         std::smatch matchResult;
         if (std::regex_search(code, matchResult, pattern)) {
@@ -320,16 +336,13 @@ namespace snt::dip {
                 std::string slices = code.substr(1, pos - 1);
                 parse_slices(slices, dimension);
                 if (dimension.empty()) {
-                    throw std::runtime_error(
-                        "Dimension settings cannot be empty: " + line.code);
+                    throw std::runtime_error("Dimension settings cannot be empty: " + line.code);
                 }
                 strip(code.substr(0, pos + 1));
                 return true;
             }
             // Allowed characters
-            if (!(std::isdigit(static_cast<unsigned char>(c)) ||
-                  c == ':' ||
-                  c == ',')) {
+            if (!(std::isdigit(static_cast<unsigned char>(c)) || c == ':' || c == ',')) {
                 return false;
             }
             ++pos;
@@ -346,8 +359,7 @@ namespace snt::dip {
             strip(matchResult[0].str());
             return true;
         } else if (required) {
-            throw std::runtime_error("Equal sign '" + std::string(1, SIGN_EQUAL) +
-                                     "' is required: " + line.code);
+            throw std::runtime_error("Equal sign '" + std::string(1, SIGN_EQUAL) + "' is required: " + line.code);
         }
         return false;
     }
@@ -393,7 +405,9 @@ namespace snt::dip {
         if (start == std::string::npos || (code[start] != '('))
             return false;
         if (dtype_raw[1] == std::string(KEYWORD_STRING))
-            throw std::runtime_error("Template expressions should use f-prefixed strings notation: f\"str\", or f\"\"\"str\"\"\"");
+            throw std::runtime_error(
+                "Template expressions should use f-prefixed strings notation: f\"str\", or f\"\"\"str\"\"\""
+            );
         int depth = 0;
         size_t i = start;
         // Parse parentheses from first '('
@@ -449,16 +463,10 @@ namespace snt::dip {
             size_t content_start = start + 3;
             size_t pos = content_start;
             while (pos + 2 < code.size()) {
-                if (code[pos] == '"' &&
-                    code[pos + 1] == '"' &&
-                    code[pos + 2] == '"') {
-                    std::string value =
-                        code.substr(content_start,
-                                    pos - content_start);
+                if (code[pos] == '"' && code[pos + 1] == '"' && code[pos + 2] == '"') {
+                    std::string value = code.substr(content_start, pos - content_start);
                     value_raw.push_back(value);
-                    value_origin = is_expression
-                                       ? ValueOrigin::Expression
-                                       : ValueOrigin::String;
+                    value_origin = is_expression ? ValueOrigin::Expression : ValueOrigin::String;
                     strip(code.substr(0, pos + 3));
                     return true;
                 }
@@ -478,13 +486,9 @@ namespace snt::dip {
                 } else if (c == '\\') {
                     escaped = true;
                 } else if (c == '"') {
-                    std::string value =
-                        code.substr(start + 1,
-                                    pos - start - 1);
+                    std::string value = code.substr(start + 1, pos - start - 1);
                     value_raw.push_back(value);
-                    value_origin = is_expression
-                                       ? ValueOrigin::Expression
-                                       : ValueOrigin::String;
+                    value_origin = is_expression ? ValueOrigin::Expression : ValueOrigin::String;
                     strip(code.substr(0, pos + 1));
                     return true;
                 }
@@ -614,8 +618,7 @@ namespace snt::dip {
             strip(matchResult[0].str());
             return true;
         } else if (required) {
-            throw std::runtime_error("Delimiter '" + std::string(1, symbol) +
-                                     "' is required: " + line.code);
+            throw std::runtime_error("Delimiter '" + std::string(1, symbol) + "' is required: " + line.code);
         }
         return false;
     }

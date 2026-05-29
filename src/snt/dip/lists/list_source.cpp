@@ -5,8 +5,9 @@ namespace snt::dip {
 
     SourceList::SourceList() = default;
 
-    void SourceList::append(const std::string& name, const std::string& path, const std::string& code,
-                            const Source& parent) {
+    void SourceList::append(
+        const std::string& name, const std::string& path, const std::string& code, const Source& parent
+    ) {
         if (sources.contains(name))
             throw std::invalid_argument("Source with the same name already exists: " + name);
         sources.insert({name, {name, path, code, parent}});
@@ -21,8 +22,7 @@ namespace snt::dip {
     EnvSource& SourceList::at(const std::string& name) {
         auto it = sources.find(name);
         if (it == sources.end())
-            throw std::runtime_error("Following source was not found in the environment source list: " +
-                                     name);
+            throw std::runtime_error("Following source was not found in the environment source list: " + name);
         else
             return it->second;
     }
@@ -30,8 +30,7 @@ namespace snt::dip {
     const EnvSource& SourceList::at(const std::string& name) const {
         auto it = sources.find(name);
         if (it == sources.end())
-            throw std::runtime_error("Following source was not found in the environment source list: " +
-                                     name);
+            throw std::runtime_error("Following source was not found in the environment source list: " + name);
         else
             return it->second;
     }

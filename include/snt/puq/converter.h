@@ -18,27 +18,34 @@ namespace snt::puq {
 
       public:
         ConvDimExcept(std::string m) : message(m) {}
-        ConvDimExcept(const BaseUnits& bu1, const BaseUnits& bu2) : ConvDimExcept(bu1, UnitSystem::System, bu2, UnitSystem::System) {}
+        ConvDimExcept(const BaseUnits& bu1, const BaseUnits& bu2)
+            : ConvDimExcept(bu1, UnitSystem::System, bu2, UnitSystem::System) {}
         ConvDimExcept(const BaseUnits& bu1, const SystemType& s1, const BaseUnits& bu2, const SystemType& s2) {
             UnitSystem us(s1);
             Dimensions dim1 = bu1.dimensions();
             us.change(s2);
             Dimensions dim2 = bu2.dimensions();
             std::stringstream ss;
-            ss << "Incompatible dimensions:" << std::endl
-               << std::endl;
+            ss << "Incompatible dimensions:" << std::endl << std::endl;
             DataTable tab({{"", 8}, {"System", 10}, {"Unit", 26}, {"Dimensions", 26}});
             us.change(s1);
-            tab.append({"From", SystemMap[s1]->SystemAbbrev, bu1.to_string(),
-                        ((dim1.to_string(Format::Display::UNITS) == "") ? "1" : dim1.to_string(Format::Display::UNITS))});
+            tab.append(
+                {"From",
+                 SystemMap[s1]->SystemAbbrev,
+                 bu1.to_string(),
+                 ((dim1.to_string(Format::Display::UNITS) == "") ? "1" : dim1.to_string(Format::Display::UNITS))}
+            );
             us.change(s2);
-            tab.append({"To", SystemMap[s2]->SystemAbbrev, bu2.to_string(),
-                        ((dim2.to_string(Format::Display::UNITS) == "") ? "1" : dim2.to_string(Format::Display::UNITS))});
+            tab.append(
+                {"To",
+                 SystemMap[s2]->SystemAbbrev,
+                 bu2.to_string(),
+                 ((dim2.to_string(Format::Display::UNITS) == "") ? "1" : dim2.to_string(Format::Display::UNITS))}
+            );
             ss << tab.to_string() << std::endl;
             ;
             us.change(s1);
-            ss << "Possible conversions:" << std::endl
-               << std::endl;
+            ss << "Possible conversions:" << std::endl << std::endl;
             tab = DataTable({{"System", 10}, {"Units", 26}, {"Name", 26}, {"Context", 10}});
             std::string mgs = dim1.to_string({Format::Display::UNITS});
             std::string mks = dim1.to_string({Format::Display::UNITS, Format::Base::MKS});
@@ -62,8 +69,9 @@ namespace snt::puq {
                     continue;
                 if (unit.first[0] == Symbols::quantity_start[0])
                     continue;
-                tab.append({SystemMap[s1]->SystemAbbrev, unit.first,
-                            UnitSystem::Data->UnitList.find(unit.first)->second.name});
+                tab.append(
+                    {SystemMap[s1]->SystemAbbrev, unit.first, UnitSystem::Data->UnitList.find(unit.first)->second.name}
+                );
             }
             us.change(s2);
             for (auto unit : UnitSystem::Data->DimensionMap) {
@@ -73,17 +81,22 @@ namespace snt::puq {
                     continue;
                 if (unit.first[0] == Symbols::quantity_start[0])
                     continue;
-                tab.append({SystemMap[s2]->SystemAbbrev, unit.first,
-                            UnitSystem::Data->UnitList.find(unit.first)->second.name});
+                tab.append(
+                    {SystemMap[s2]->SystemAbbrev, unit.first, UnitSystem::Data->UnitList.find(unit.first)->second.name}
+                );
             }
             if (s1 != s2) {
                 us.change(s1);
                 for (auto quant : UnitSystem::Data->QuantityList) {
-                    Measurement uv(std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end));
+                    Measurement uv(
+                        std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end)
+                    );
                     Dimensions dim_q = uv.baseunits.dimensions();
                     if (dim_q == dim1) {
                         us.change(s2);
-                        uv = Measurement(std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end));
+                        uv = Measurement(
+                            std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end)
+                        );
                         dim_q = uv.baseunits.dimensions();
                         for (auto unit : UnitSystem::Data->DimensionMap) {
                             if (Dimensions(1, unit.second.dimensions) != dim_q)
@@ -97,9 +110,12 @@ namespace snt::puq {
                                 continue;
                             if ((uinfo.utype & Utype::TMP) == Utype::TMP)
                                 continue;
-                            tab.append({SystemMap[s2]->SystemAbbrev, unit.first,
-                                        UnitSystem::Data->UnitList.find(unit.first)->second.name,
-                                        quant.first});
+                            tab.append(
+                                {SystemMap[s2]->SystemAbbrev,
+                                 unit.first,
+                                 UnitSystem::Data->UnitList.find(unit.first)->second.name,
+                                 quant.first}
+                            );
                         }
                         us.change(s1);
                     }
@@ -108,9 +124,7 @@ namespace snt::puq {
             ss << tab.to_string();
             message = ss.str();
         }
-        const char* what() const noexcept override {
-            return message.c_str();
-        }
+        const char* what() const noexcept override { return message.c_str(); }
     };
 
     class NoConvExcept : public std::exception {
@@ -118,10 +132,9 @@ namespace snt::puq {
         std::string message;
 
       public:
-        NoConvExcept(const std::string& s1, const std::string& s2) : message("Conversion '" + s1 + " -> " + s2 + "' is not available!") {}
-        const char* what() const noexcept override {
-            return message.c_str();
-        }
+        NoConvExcept(const std::string& s1, const std::string& s2)
+            : message("Conversion '" + s1 + " -> " + s2 + "' is not available!") {}
+        const char* what() const noexcept override { return message.c_str(); }
     };
 
     class Converter {

@@ -7,11 +7,9 @@
 
 namespace snt::val {
 
-    template <typename T>
-    class ArrayValue;
+    template <typename T> class ArrayValue;
 
-    template <typename T>
-    class ArrayValue : public BaseArrayValue<T> {
+    template <typename T> class ArrayValue : public BaseArrayValue<T> {
       public:
         ArrayValue(const T& val) : BaseArrayValue<T>(val) {};
         ArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh) : BaseArrayValue<T>(arr, sh) {};
@@ -101,9 +99,7 @@ namespace snt::val {
                 return nullptr;
             }
         };
-        BaseValue::PointerType slice(const Array::RangeType& slice) override {
-            return this->slice_value(slice);
-        };
+        BaseValue::PointerType slice(const Array::RangeType& slice) override { return this->slice_value(slice); };
         BaseValue::PointerType math_sin() const override {
             return this->template operate_unary<T>([](T a) { return std::sin(a); });
         };

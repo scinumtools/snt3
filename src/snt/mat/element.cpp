@@ -6,7 +6,8 @@
 
 namespace snt::mat {
 
-    Element::Element(const std::string& expr, int prop, bool nat) : elementProps({0, 0, 0}), Part<int>(prop, expr), natural(nat) {
+    Element::Element(const std::string& expr, int prop, bool nat)
+        : elementProps({0, 0, 0}), Part<int>(prop, expr), natural(nat) {
         if (expr.size() == 3 && expr[0] == '[' && expr[2] == ']') {
             element = expr;
             isotope = 0;
@@ -111,7 +112,9 @@ namespace snt::mat {
             if (isodata.symbol == elem && isodata.natural_abundance > 0) {
                 dmass += isodata.atomic_number * isodata.natural_abundance;
                 elementProps.protons = isodata.protons;
-                elementProps.neutrons += (static_cast<double>(isodata.isotope_number) - static_cast<double>(isodata.protons)) * isodata.natural_abundance;
+                elementProps.neutrons +=
+                    (static_cast<double>(isodata.isotope_number) - static_cast<double>(isodata.protons)) *
+                    isodata.natural_abundance;
                 elementProps.electrons = isodata.protons + ion;
             }
         }
@@ -142,10 +145,8 @@ namespace snt::mat {
         return ss.str();
     }
 
-    void Element::math_add(Element* other) {
-    }
+    void Element::math_add(Element* other) {}
 
-    void Element::math_multiply(Element* other) {
-    }
+    void Element::math_multiply(Element* other) {}
 
 } // namespace snt::mat

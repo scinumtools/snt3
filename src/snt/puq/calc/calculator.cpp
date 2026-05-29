@@ -7,7 +7,12 @@ namespace snt::puq {
     Calculator::Calculator() {
 
         exs::OperatorList operators;
-        operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<exs::OperatorGroup<1>>("par", exs::OperatorGroupSybols("", "( ", " )", " , "), exs::PARENTHESES_OPERATOR));
+        operators.append(
+            exs::PARENTHESES_OPERATOR,
+            std::make_shared<exs::OperatorGroup<1>>(
+                "par", exs::OperatorGroupSybols("", "( ", " )", " , "), exs::PARENTHESES_OPERATOR
+            )
+        );
         operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd>(" + "));
         operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract>(" - "));
         operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(" * "));

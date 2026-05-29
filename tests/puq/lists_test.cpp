@@ -76,9 +76,8 @@ void test_unit_definitions() {
           << puq::math::to_string(unit.result) << " != "
           << puq::math::to_string(dim2.numerical);
         */
-        EXPECT_EQ(m1, m2) << "Dimension of unit '" << unit.first
-                          << "' do not match its definition: "
-                          << m1 << " != " << m2;
+        EXPECT_EQ(m1, m2) << "Dimension of unit '" << unit.first << "' do not match its definition: " << m1
+                          << " != " << m2;
     }
 }
 

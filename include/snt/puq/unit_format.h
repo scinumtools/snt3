@@ -9,36 +9,26 @@
 
 namespace snt::puq {
 
-    template <typename T, typename... Args>
-    std::optional<T> get_option(const Args&... args) {
+    template <typename T, typename... Args> std::optional<T> get_option(const Args&... args) {
         std::optional<T> result;
-        ([&](const auto& arg) {
-            if constexpr (std::is_same_v<std::decay_t<decltype(arg)>, T>) {
-                result = arg;
-            }
-        }(args),
-         ...);
+        (
+            [&](const auto& arg) {
+                if constexpr (std::is_same_v<std::decay_t<decltype(arg)>, T>) {
+                    result = arg;
+                }
+            }(args),
+            ...
+        );
         return result;
     };
 
     namespace Format {
-        enum class System { SHOW,
-                            HIDE };
-        enum class Math { ASCII,
-                          UNICODE,
-                          HTML,
-                          MATH };
-        enum class Display { BOTH,
-                             RESULT,
-                             UNITS };
-        enum class Base { UNITS,
-                          MGS,
-                          MKS,
-                          CGS,
-                          FPS };
-        enum class Uncertainty { SHOW,
-                                 HIDE };
-        typedef int Precision;
+        enum class System { SHOW, HIDE };
+        enum class Math { ASCII, UNICODE, HTML, MATH };
+        enum class Display { BOTH, RESULT, UNITS };
+        enum class Base { UNITS, MGS, MKS, CGS, FPS };
+        enum class Uncertainty { SHOW, HIDE };
+        using Precision = int;
     } // namespace Format
 
     class UnitFormat {
@@ -63,12 +53,14 @@ namespace snt::puq {
         };
 
         UnitFormat merge(const auto&... args) const {
-            UnitFormat uf(get_option<Format::Math>(args...).value_or(math),
-                          get_option<Format::Precision>(args...).value_or(precision),
-                          get_option<Format::System>(args...).value_or(system),
-                          get_option<Format::Display>(args...).value_or(part),
-                          get_option<Format::Base>(args...).value_or(base),
-                          get_option<Format::Uncertainty>(args...).value_or(uncertainty));
+            UnitFormat uf(
+                get_option<Format::Math>(args...).value_or(math),
+                get_option<Format::Precision>(args...).value_or(precision),
+                get_option<Format::System>(args...).value_or(system),
+                get_option<Format::Display>(args...).value_or(part),
+                get_option<Format::Base>(args...).value_or(base),
+                get_option<Format::Uncertainty>(args...).value_or(uncertainty)
+            );
             return uf;
         }
 

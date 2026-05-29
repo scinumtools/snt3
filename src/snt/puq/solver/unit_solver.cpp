@@ -12,7 +12,9 @@ namespace snt::puq {
         exs::OperatorList operators;
         operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses>());
         operators.append(ARRAY_OPERATOR, std::make_shared<OperatorArray>());
-        operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(std::string(Symbols::multiply)));
+        operators.append(
+            exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(std::string(Symbols::multiply))
+        );
         operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide>(std::string(Symbols::divide)));
 
         exs::StepList steps;

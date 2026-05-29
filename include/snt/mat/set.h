@@ -10,13 +10,13 @@ namespace snt::mat {
 
     /**
      * @class Set
-     * @brief A set is a material or object made up of two or more distinct members that remain physically separate and identifiable within the final structure
+     * @brief A set is a material or object made up of two or more distinct members that remain physically separate and
+     * identifiable within the final structure
      *
      * @tparam MEMBER Type of set members
      * @tparam PROPORTION Proportion data type
      */
-    template <typename MEMBER, typename PROPORTION>
-    class Set {
+    template <typename MEMBER, typename PROPORTION> class Set {
       public:
         using PartMap = std::map<std::string, PROPORTION>; ///< Map of parts and their proportions
 

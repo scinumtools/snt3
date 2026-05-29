@@ -7,10 +7,8 @@
 namespace snt::val {
 
     // here we need a forward declaration
-    template <typename T>
-    class BaseArrayValue;
-    template <typename T>
-    class ArrayValue;
+    template <typename T> class BaseArrayValue;
+    template <typename T> class ArrayValue;
 
     /**
      * @class BaseArrayValue
@@ -18,8 +16,7 @@ namespace snt::val {
      *
      * @tparam T Data type of a values
      */
-    template <typename T>
-    class BaseArrayValue : public BaseValue {
+    template <typename T> class BaseArrayValue : public BaseValue {
       protected:
         std::vector<T> value; ///< Internal data container that holds flattend array values
 
@@ -37,7 +34,8 @@ namespace snt::val {
          * @param arr Vector of values
          * @param sh Array shape
          */
-        BaseArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh) : value(arr), BaseValue(this->deduce_dtype(), sh) {};
+        BaseArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh)
+            : value(arr), BaseValue(this->deduce_dtype(), sh) {};
 
         /**
          * @brief Base array value constructor from a BaseValue pointer
@@ -135,9 +133,7 @@ namespace snt::val {
         }
 
       public:
-        friend std::ostream& operator<<(std::ostream& os, const ArrayValue<T>& val) {
-            return os << val.to_string();
-        };
+        friend std::ostream& operator<<(std::ostream& os, const ArrayValue<T>& val) { return os << val.to_string(); };
 
         /**
          * @brief Return string representation of this array object
@@ -153,8 +149,7 @@ namespace snt::val {
          * Operations
          */
       protected:
-        template <typename R, typename Func>
-        std::unique_ptr<ArrayValue<R>> operate_unary(Func f) const {
+        template <typename R, typename Func> std::unique_ptr<ArrayValue<R>> operate_unary(Func f) const {
             // apply operation
             std::vector<R> arr(value.size());
             for (int i = 0; i < value.size(); i++)
@@ -162,8 +157,7 @@ namespace snt::val {
             return std::make_unique<ArrayValue<R>>(arr, this->shape);
         };
 
-        template <typename R, typename Func>
-        void operate_unary_equal(Func f) {
+        template <typename R, typename Func> void operate_unary_equal(Func f) {
             // apply operation
             for (int i = 0; i < value.size(); i++)
                 value[i] = f(value[i]);
@@ -203,8 +197,7 @@ namespace snt::val {
             }
         };
 
-        template <typename R, typename Func>
-        void operate_binary_equal(const BaseValue* other, Func f) {
+        template <typename R, typename Func> void operate_binary_equal(const BaseValue* other, Func f) {
             if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
                 const ArrayValue<T> otherT(other);
                 value[0] = f(this->get_value(0), otherT.get_value(0));
@@ -237,7 +230,8 @@ namespace snt::val {
         template <typename U, typename R, typename Func>
         std::unique_ptr<ArrayValue<R>> operate_ternary(const BaseValue* other1, const BaseValue* other2, Func f) const {
             // test if shape match
-            if (shape.size() != other1->get_shape().size() || shape.size() != other2->get_shape().size()) // Compare shape size
+            if (shape.size() != other1->get_shape().size() ||
+                shape.size() != other2->get_shape().size()) // Compare shape size
                 throw std::runtime_error("Arrays have incompatible shapes");
             for (int i = 0; i < shape.size(); i++) { // Compare shape values
                 if (shape[i] != other1->get_shape()[i])
@@ -278,7 +272,10 @@ namespace snt::val {
          */
         BaseValue::PointerType slice_value(const Array::RangeType& slice) {
             if (slice.size() != this->shape.size())
-                throw std::runtime_error("Array slice size does not correspond with array shape: " + std::to_string(slice.size()) + "!=" + std::to_string(this->shape.size()));
+                throw std::runtime_error(
+                    "Array slice size does not correspond with array shape: " + std::to_string(slice.size()) +
+                    "!=" + std::to_string(this->shape.size())
+                );
             // calculate new shape and size
             Array::ShapeType new_shape;
             new_shape.reserve(this->shape.size());

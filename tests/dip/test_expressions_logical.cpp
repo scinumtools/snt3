@@ -40,7 +40,7 @@ TEST(ExpressionsLogical, Dimensional) {
     d.add_string("bar bool = ({?foo} == 2300 cm)");
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
-    
+
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->name, "bar");
     EXPECT_TRUE(vnode);
@@ -52,7 +52,7 @@ TEST(ExpressionsLogical, Dimensional) {
     d.add_string("bar bool = ({?foo} != 25 cm)");
     env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
-    
+
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->name, "bar");
     EXPECT_TRUE(vnode);
@@ -64,7 +64,7 @@ TEST(ExpressionsLogical, Dimensional) {
     d.add_string("bar bool = ({?foo} <= 25 m)");
     env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
-    
+
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->name, "bar");
     EXPECT_TRUE(vnode);
@@ -76,7 +76,7 @@ TEST(ExpressionsLogical, Dimensional) {
     d.add_string("bar bool = ({?foo} >= 25 cm)");
     env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
-    
+
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->name, "bar");
     EXPECT_TRUE(vnode);
@@ -88,7 +88,7 @@ TEST(ExpressionsLogical, Dimensional) {
     d.add_string("bar bool = ({?foo} < 25 m)");
     env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
-    
+
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->name, "bar");
     EXPECT_TRUE(vnode);
@@ -100,10 +100,9 @@ TEST(ExpressionsLogical, Dimensional) {
     d.add_string("bar bool = ({?foo} > 25 cm)");
     env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
-    
+
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 }
-

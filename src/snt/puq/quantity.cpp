@@ -14,7 +14,10 @@ namespace snt::puq {
                         system = sys.first;
                     else if (system != sys.first) {
                         auto it = SystemMap.find(system);
-                        throw UnitSystemExcept("Selected unit systems are ambiguous: " + it->second->SystemAbbrev + " " + sys.second->SystemAbbrev);
+                        throw UnitSystemExcept(
+                            "Selected unit systems are ambiguous: " + it->second->SystemAbbrev + " " +
+                            sys.second->SystemAbbrev
+                        );
                     }
                     break;
                 }
@@ -76,7 +79,8 @@ namespace snt::puq {
         measurement = Measurement(m, e);
     }
 
-    Quantity::Quantity(const double m, const double e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
+    Quantity::Quantity(const double m, const double e, const BaseUnits::ListType& bu, const SystemType system)
+        : stype(system) {
         UnitSystem us(stype);
         measurement = Measurement(m, e, bu);
     }
@@ -93,7 +97,8 @@ namespace snt::puq {
         measurement = Measurement(std::move(m));
     }
 
-    Quantity::Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
+    Quantity::Quantity(val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system)
+        : stype(system) {
         UnitSystem us(stype);
         measurement = Measurement(std::move(m), bu);
     }
@@ -105,17 +110,27 @@ namespace snt::puq {
         measurement = Measurement(mag, s);
     }
 
-    Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system) : stype(system) {
+    Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system)
+        : stype(system) {
         UnitSystem us(stype);
         measurement = Measurement(std::move(m), std::move(e));
     }
 
-    Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const BaseUnits::ListType& bu, const SystemType system) : stype(system) {
+    Quantity::Quantity(
+        val::BaseValue::PointerType m,
+        val::BaseValue::PointerType e,
+        const BaseUnits::ListType& bu,
+        const SystemType system
+    )
+        : stype(system) {
         UnitSystem us(stype);
         measurement = Measurement(std::move(m), std::move(e), bu);
     }
 
-    Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system) : stype(system) {
+    Quantity::Quantity(
+        val::BaseValue::PointerType m, val::BaseValue::PointerType e, std::string s, const SystemType system
+    )
+        : stype(system) {
         preprocess(s, stype);
         UnitSystem us(stype);
         Result mag(std::move(m), std::move(e));
@@ -313,9 +328,13 @@ namespace snt::puq {
         return Measurement(measurement.result, dim);
     }
 
-    Measurement Quantity::_convert_with_context(UnitSystem& us, const SystemType stt,
-                                                QuantityListType::iterator& qs1, QuantityListType::iterator& qs2,
-                                                const std::string& q) const {
+    Measurement Quantity::_convert_with_context(
+        UnitSystem& us,
+        const SystemType stt,
+        QuantityListType::iterator& qs1,
+        QuantityListType::iterator& qs2,
+        const std::string& q
+    ) const {
         Measurement msr = measurement;
         if (qs1->second.sifactor != "") {
             msr *= Measurement(std::string(Symbols::si_factor_start) + q + std::string(Symbols::si_factor_end));

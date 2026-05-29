@@ -73,6 +73,5 @@ TEST(ExpressionsNumerical, Dimensional) {
     vnode = env.nodes.at(2);
     EXPECT_EQ(vnode->name, "baz");
     EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->to_string(), "0.1095 m");   // 0.233*m / 0.4256*m * 0.2*m = 0.109492... m
-    
+    EXPECT_EQ(vnode->to_string(), "0.1095 m"); // 0.233*m / 0.4256*m * 0.2*m = 0.109492... m
 }

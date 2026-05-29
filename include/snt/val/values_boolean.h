@@ -6,11 +6,9 @@
 
 namespace snt::val {
 
-    template <typename T>
-    class ArrayValue;
+    template <typename T> class ArrayValue;
 
-    template <>
-    class ArrayValue<bool> : public BaseArrayValue<bool> {
+    template <> class ArrayValue<bool> : public BaseArrayValue<bool> {
       public:
         ArrayValue(const bool& val) : BaseArrayValue(val) {};
         ArrayValue(const std::vector<bool>& arr, const Array::ShapeType& sh) : BaseArrayValue(arr, sh) {};
@@ -21,9 +19,7 @@ namespace snt::val {
         BaseValue::PointerType clone() const override {
             return std::make_unique<ArrayValue<bool>>(this->value, this->shape);
         };
-        BaseValue::PointerType slice(const Array::RangeType& slice) override {
-            return this->slice_value(slice);
-        };
+        BaseValue::PointerType slice(const Array::RangeType& slice) override { return this->slice_value(slice); };
         BaseValue::PointerType cast_as(DataType dt) const override;
         BaseValue::PointerType logical_and(const BaseValue* other) const override;
         BaseValue::PointerType logical_or(const BaseValue* other) const override;
@@ -37,9 +33,7 @@ namespace snt::val {
         bool none_of() const override {
             return std::none_of(this->value.begin(), this->value.end(), [](bool b) { return b; });
         };
-        bool is_unity() const override {
-            return all_of();
-        };
+        bool is_unity() const override { return all_of(); };
     };
 
 } // namespace snt::val

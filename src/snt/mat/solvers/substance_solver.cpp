@@ -7,7 +7,9 @@ namespace snt::mat {
     std::unique_ptr<exs::Solver<SubstanceAtom>> SubstanceSolver::solver = [] {
         exs::OperatorList operators;
         operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<exs::OperatorParentheses>());
-        operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(std::string(MAT_SYMBOL_MULTIPLY)));
+        operators.append(
+            exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(std::string(MAT_SYMBOL_MULTIPLY))
+        );
         operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd>(std::string(MAT_SYMBOL_PLUS)));
 
         exs::StepList steps;

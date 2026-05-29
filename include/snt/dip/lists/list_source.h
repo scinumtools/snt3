@@ -26,8 +26,7 @@ namespace snt::dip {
 
       public:
         SourceList();
-        void append(const std::string& name, const std::string& path, const std::string& code,
-                    const Source& parent);
+        void append(const std::string& name, const std::string& path, const std::string& code, const Source& parent);
         void append(const std::string& name, const EnvSource& src);
         EnvSource& at(const std::string& name);
         const EnvSource& at(const std::string& name) const;

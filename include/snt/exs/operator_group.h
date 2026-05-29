@@ -20,12 +20,12 @@ namespace snt::exs {
      *
      * @tparam N Number of group members. Zero means unlimited number
      */
-    template <int N = 0>
-    class OperatorGroup : public OperatorBase {
+    template <int N = 0> class OperatorGroup : public OperatorBase {
       public:
         size_t num_groups = N;
         OperatorGroupSybols symbols;
-        OperatorGroup(const std::string& n, const OperatorGroupSybols& s, const int t) : OperatorBase(n, s.prefix + s.open, t), symbols(s) {}
+        OperatorGroup(const std::string& n, const OperatorGroupSybols& s, const int t)
+            : OperatorBase(n, s.prefix + s.open, t), symbols(s) {}
         virtual void parse(Expression& expr) override {
             this->groups.clear();
             expr.remove(this->symbol);
@@ -50,7 +50,9 @@ namespace snt::exs {
             }
             num_groups = this->groups.size();
             if (N > 0 && num_groups != N) {
-                throw std::logic_error("Wrong number of group members: " + std::to_string(this->groups.size()) + ", " + std::to_string(N));
+                throw std::logic_error(
+                    "Wrong number of group members: " + std::to_string(this->groups.size()) + ", " + std::to_string(N)
+                );
             }
         };
         virtual void operate_group(TokenListBase* tokens) override {}; // this should stay empty

@@ -17,7 +17,19 @@ TEST(PUQCommands, Info) {
         cmd.execute();
         std::string output = testing::internal::GetCapturedStdout();
 
-        EXPECT_EQ(output, "\nExpression:  23*cm\n\nUnit system: SI (International System of Units)\nResult:   23\nBase units:  cm\n\nDimensions:\n\nBase   Num*Mag                   Numerical                 Physical                  \n------ ------------------------- ------------------------- ------------------------- \nMGS    0.23                      0.01                      m                         \nMKS    0.23                      0.01                      m                         \nCGS    23                        1                         cm                        \n\nBase units:\n\nPrefix   Symbol   Exponent   Name                           Definition                     Dimensions MGS         Allowed prefixes       \n-------- -------- ---------- ------------------------------ ------------------------------ ---------------------- ---------------------- \nc        m        1          meter                          m                              0.01*m                 all                    \n\n");
+        EXPECT_EQ(
+            output,
+            "\nExpression:  23*cm\n\nUnit system: SI (International System of Units)\nResult:   23\nBase units:  "
+            "cm\n\nDimensions:\n\nBase   Num*Mag                   Numerical                 Physical                  "
+            "\n------ ------------------------- ------------------------- ------------------------- \nMGS    0.23      "
+            "                0.01                      m                         \nMKS    0.23                      "
+            "0.01                      m                         \nCGS    23                        1                  "
+            "       cm                        \n\nBase units:\n\nPrefix   Symbol   Exponent   Name                     "
+            "      Definition                     Dimensions MGS         Allowed prefixes       \n-------- -------- "
+            "---------- ------------------------------ ------------------------------ ---------------------- "
+            "---------------------- \nc        m        1          meter                          m                    "
+            "          0.01*m                 all                    \n\n"
+        );
     }
     {
         api::PUQInfo cmd("ft2*lb");
@@ -27,7 +39,20 @@ TEST(PUQCommands, Info) {
         cmd.execute();
         std::string output = testing::internal::GetCapturedStdout();
 
-        EXPECT_EQ(output, "\nExpression:  ft2*lb\n\nUnit system: US (United States customary units)\nResult:   1\nBase units:  ft2*lb\n\nDimensions:\n\nBase   Num*Mag                   Numerical                 Physical                  \n------ ------------------------- ------------------------- ------------------------- \nMGS    42.1401                   42.1401                   m2*g                      \nMKS    0.0421401                 0.0421401                 m2*kg                     \nCGS    4.21401e5                 4.21401e5                 cm2*g                     \n\nBase units:\n\nPrefix   Symbol   Exponent   Name                           Definition                     Dimensions MGS         Allowed prefixes       \n-------- -------- ---------- ------------------------------ ------------------------------ ---------------------- ---------------------- \n         ft       2          foot                           0.3048*m                       0.092903*m2                                   \n         lb       1          pound                          453.59237*g                    453.592*g                                     \n\n");
+        EXPECT_EQ(
+            output,
+            "\nExpression:  ft2*lb\n\nUnit system: US (United States customary units)\nResult:   1\nBase units:  "
+            "ft2*lb\n\nDimensions:\n\nBase   Num*Mag                   Numerical                 Physical              "
+            "    \n------ ------------------------- ------------------------- ------------------------- \nMGS    "
+            "42.1401                   42.1401                   m2*g                      \nMKS    0.0421401          "
+            "       0.0421401                 m2*kg                     \nCGS    4.21401e5                 4.21401e5   "
+            "              cm2*g                     \n\nBase units:\n\nPrefix   Symbol   Exponent   Name              "
+            "             Definition                     Dimensions MGS         Allowed prefixes       \n-------- "
+            "-------- ---------- ------------------------------ ------------------------------ ---------------------- "
+            "---------------------- \n         ft       2          foot                           0.3048*m             "
+            "          0.092903*m2                                   \n         lb       1          pound              "
+            "            453.59237*g                    453.592*g                                     \n\n"
+        );
     }
 }
 
@@ -79,7 +104,12 @@ TEST(PUQCommands, List) {
         cmd.execute();
         std::string output = testing::internal::GetCapturedStdout();
 
-        EXPECT_EQ(output, "\nAvailable lists:\n\nprefix  unit prefixes\nbase    base units\nderiv   derived units\nlog     logarithmic units\ntemp    temperature units\nconst   constants\nquant   quantities\nsys     unit systems\n\n");
+        EXPECT_EQ(
+            output,
+            "\nAvailable lists:\n\nprefix  unit prefixes\nbase    base units\nderiv   derived units\nlog     "
+            "logarithmic units\ntemp    temperature units\nconst   constants\nquant   quantities\nsys     unit "
+            "systems\n\n"
+        );
     }
     {
         api::PUQList cmd("deriv");
@@ -89,6 +119,12 @@ TEST(PUQCommands, List) {
         cmd.execute();
         std::string output = testing::internal::GetCapturedStdout();
 
-        EXPECT_EQ(output, "Symbol    Name                   Result        Dimension                      Definition                Allowed prefixes       \n--------- ---------------------- ------------- ------------------------------ ------------------------- ---------------------- \nE_h       hartree                4.3597447276(40)e-15 m2*g*s-2                       {#hbar}2/({#m_e}*{a_0}2)                         \n");
+        EXPECT_EQ(
+            output,
+            "Symbol    Name                   Result        Dimension                      Definition                "
+            "Allowed prefixes       \n--------- ---------------------- ------------- ------------------------------ "
+            "------------------------- ---------------------- \nE_h       hartree                4.3597447276(40)e-15 "
+            "m2*g*s-2                       {#hbar}2/({#m_e}*{a_0}2)                         \n"
+        );
     }
 }

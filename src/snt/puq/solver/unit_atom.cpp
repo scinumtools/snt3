@@ -14,11 +14,16 @@ namespace snt::puq {
             // msr.result = core::to_number(expr);
         } else {
             std::string decimals = m[3].str() == "" ? "." : m[3].str();
-            msr.result.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(m[1].str() + decimals + m[8].str()));
+            msr.result.estimate =
+                std::make_unique<val::ArrayValue<double>>(core::to_number(m[1].str() + decimals + m[8].str()));
             if (m[10] == "")
-                msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size()));
+                msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(
+                    core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size())
+                );
             else
-                msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10])));
+                msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(
+                    core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10]))
+                );
             // msr.result = core::to_number(m[1].str() + decimals + m[8].str());
         }
     }
@@ -55,7 +60,9 @@ namespace snt::puq {
             }
         }
         if (munit.first == "") {
-            throw AtomParsingExcept("Unknown unit base \"" + expr_orig + "\" in " + UnitSystem::Data->SystemAbbrev + " system!");
+            throw AtomParsingExcept(
+                "Unknown unit base \"" + expr_orig + "\" in " + UnitSystem::Data->SystemAbbrev + " system!"
+            );
         } else {
             bu.unit = munit.first;
         }
@@ -72,9 +79,12 @@ namespace snt::puq {
                 bu.prefix = expr;
             // is prefix allowed
             if (munit.second.allowed_prefixes.size() > 0) {
-                if (std::find(munit.second.allowed_prefixes.begin(), munit.second.allowed_prefixes.end(), bu.prefix) == munit.second.allowed_prefixes.end()) {
+                if (std::find(munit.second.allowed_prefixes.begin(), munit.second.allowed_prefixes.end(), bu.prefix) ==
+                    munit.second.allowed_prefixes.end()) {
                     std::stringstream ss;
-                    ss << "Given prefix is not allowed in unit system " + UnitSystem::Data->SystemAbbrev + ": " + expr_orig << '\n';
+                    ss << "Given prefix is not allowed in unit system " + UnitSystem::Data->SystemAbbrev + ": " +
+                              expr_orig
+                       << '\n';
                     ss << "Allowed prefixes are:";
                     for (auto& prefix : munit.second.allowed_prefixes) {
                         ss << " " << prefix;
@@ -92,9 +102,15 @@ namespace snt::puq {
         std::string expr = expr_orig;
         struct Measurement msr;
         std::smatch m;
-        std::regex rx_unit("^(\\{?[a-zA-Z0_%#']+\\}?)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
-        std::regex rx_quantity("^(\\<[a-zA-Z_]+\\>)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
-        std::regex rx_sifactor("^(\\|[a-zA-Z_]+\\|)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$");
+        std::regex rx_unit(
+            "^(\\{?[a-zA-Z0_%#']+\\}?)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$"
+        );
+        std::regex rx_quantity(
+            "^(\\<[a-zA-Z_]+\\>)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$"
+        );
+        std::regex rx_sifactor(
+            "^(\\|[a-zA-Z_]+\\|)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$"
+        );
         std::regex rx_number("^((\\+|-)?[0-9]+)(\\.(([0-9]+)?))?(\\(([0-9]+)\\))?((e|E)((\\+|-)?[0-9]+))?$");
         if (std::regex_match(expr, m, rx_number)) {
             _parse_number(expr, msr, m);

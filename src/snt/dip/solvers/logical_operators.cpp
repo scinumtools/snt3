@@ -6,7 +6,8 @@
 
 namespace snt::dip {
 
-    OperatorDefined::OperatorDefined() : exs::OperatorGroup<1>("def", {"def", "( ", " )", ","}, dip::DEFINED_OPERATOR) {}
+    OperatorDefined::OperatorDefined()
+        : exs::OperatorGroup<1>("def", {"def", "( ", " )", ","}, dip::DEFINED_OPERATOR) {}
 
     void OperatorDefined::operate_group(exs::TokenListBase* tokens) {
         exs::Token group1 = tokens->get_left();
@@ -15,7 +16,8 @@ namespace snt::dip {
         tokens->put_left(group1);
     };
 
-    OperatorNotDefined::OperatorNotDefined() : exs::OperatorGroup<1>("ndef", {"ndef", "( ", " )", ","}, dip::NOT_DEFINED_OPERATOR) {}
+    OperatorNotDefined::OperatorNotDefined()
+        : exs::OperatorGroup<1>("ndef", {"ndef", "( ", " )", ","}, dip::NOT_DEFINED_OPERATOR) {}
 
     void OperatorNotDefined::operate_group(exs::TokenListBase* tokens) {
         exs::Token group1 = tokens->get_left();

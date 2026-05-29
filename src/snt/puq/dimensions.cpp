@@ -26,8 +26,9 @@ namespace snt::puq {
         }
     }
 
-    inline std::string _numerical_to_string(Result numerical, const BaseDimensions& physical,
-                                            const UnitFormat& format) {
+    inline std::string _numerical_to_string(
+        Result numerical, const BaseDimensions& physical, const UnitFormat& format
+    ) {
         std::string multiply = format.multiply_symbol();
         std::stringstream ss;
         if (format.base == Format::Base::MKS) {

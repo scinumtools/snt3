@@ -9,20 +9,24 @@ namespace snt::dip {
 
         exs::OperatorList operators;
         operators.append(
-            exs::SINUS_OPERATOR,
-            std::make_shared<exs::OperatorSinus>(exs::OperatorGroupSybols("sin", "( ", " )", ", ")));
+            exs::SINUS_OPERATOR, std::make_shared<exs::OperatorSinus>(exs::OperatorGroupSybols("sin", "( ", " )", ", "))
+        );
         operators.append(
             exs::COSINUS_OPERATOR,
-            std::make_shared<exs::OperatorCosinus>(exs::OperatorGroupSybols("cos", "( ", " )", ", ")));
+            std::make_shared<exs::OperatorCosinus>(exs::OperatorGroupSybols("cos", "( ", " )", ", "))
+        );
         operators.append(
             exs::TANGENS_OPERATOR,
-            std::make_shared<exs::OperatorTangens>(exs::OperatorGroupSybols("tan", "( ", " )", ", ")));
+            std::make_shared<exs::OperatorTangens>(exs::OperatorGroupSybols("tan", "( ", " )", ", "))
+        );
         operators.append(
             exs::CUBIC_ROOT_OPERATOR,
-            std::make_shared<exs::OperatorCubicRoot>(exs::OperatorGroupSybols("cbrt", "( ", " )", ", ")));
+            std::make_shared<exs::OperatorCubicRoot>(exs::OperatorGroupSybols("cbrt", "( ", " )", ", "))
+        );
         operators.append(
             exs::SQUARE_ROOT_OPERATOR,
-            std::make_shared<exs::OperatorSquareRoot>(exs::OperatorGroupSybols("sqrt", "( ", " )", ", ")));
+            std::make_shared<exs::OperatorSquareRoot>(exs::OperatorGroupSybols("sqrt", "( ", " )", ", "))
+        );
         // operators.append(
         //     exs::POWER_BASE_OPERATOR,
         //     std::make_shared<exs::OperatorPowerBase>("powb( ", " )"));
@@ -31,34 +35,39 @@ namespace snt::dip {
         //     std::make_shared<exs::OperatorLogarithmBase>("logb( ", " )"));
         operators.append(
             exs::LOGARITHM_10_OPERATOR,
-            std::make_shared<exs::OperatorLogarithm10>(exs::OperatorGroupSybols("log10", "( ", " )", ", ")));
+            std::make_shared<exs::OperatorLogarithm10>(exs::OperatorGroupSybols("log10", "( ", " )", ", "))
+        );
         operators.append(
             exs::LOGARITHM_OPERATOR,
-            std::make_shared<exs::OperatorLogarithm>(exs::OperatorGroupSybols("log", "( ", " )", ", ")));
+            std::make_shared<exs::OperatorLogarithm>(exs::OperatorGroupSybols("log", "( ", " )", ", "))
+        );
         operators.append(
             exs::EXPONENT_OPERATOR,
-            std::make_shared<exs::OperatorExponent>(exs::OperatorGroupSybols("exp", "( ", " )", ", ")));
+            std::make_shared<exs::OperatorExponent>(exs::OperatorGroupSybols("exp", "( ", " )", ", "))
+        );
         operators.append(
             exs::PARENTHESES_OPERATOR,
-            std::make_shared<exs::OperatorParentheses>(exs::OperatorGroupSybols("", "( ", " )", ", ")));
-        operators.append(exs::POWER_OPERATOR,
-                         std::make_shared<exs::OperatorPower>(" ** "));
-        operators.append(exs::MULTIPLY_OPERATOR,
-                         std::make_shared<exs::OperatorMultiply>(" * "));
-        operators.append(exs::DIVIDE_OPERATOR,
-                         std::make_shared<exs::OperatorDivide>(" / "));
-        operators.append(exs::ADD_OPERATOR,
-                         std::make_shared<exs::OperatorAdd>(" +"));
-        operators.append(exs::SUBTRACT_OPERATOR,
-                         std::make_shared<exs::OperatorSubtract>(" -"));
+            std::make_shared<exs::OperatorParentheses>(exs::OperatorGroupSybols("", "( ", " )", ", "))
+        );
+        operators.append(exs::POWER_OPERATOR, std::make_shared<exs::OperatorPower>(" ** "));
+        operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(" * "));
+        operators.append(exs::DIVIDE_OPERATOR, std::make_shared<exs::OperatorDivide>(" / "));
+        operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd>(" +"));
+        operators.append(exs::SUBTRACT_OPERATOR, std::make_shared<exs::OperatorSubtract>(" -"));
 
         exs::StepList steps;
-        steps.append(exs::GROUP_OPERATION, {exs::EXPONENT_OPERATOR, exs::LOGARITHM_OPERATOR,
-                                            exs::LOGARITHM_10_OPERATOR,
-                                            // exs::LOGARITHM_BASE_OPERATOR, exs::POWER_BASE_OPERATOR,
-                                            exs::SQUARE_ROOT_OPERATOR,
-                                            exs::CUBIC_ROOT_OPERATOR,
-                                            exs::SINUS_OPERATOR, exs::COSINUS_OPERATOR, exs::TANGENS_OPERATOR});
+        steps.append(
+            exs::GROUP_OPERATION,
+            {exs::EXPONENT_OPERATOR,
+             exs::LOGARITHM_OPERATOR,
+             exs::LOGARITHM_10_OPERATOR,
+             // exs::LOGARITHM_BASE_OPERATOR, exs::POWER_BASE_OPERATOR,
+             exs::SQUARE_ROOT_OPERATOR,
+             exs::CUBIC_ROOT_OPERATOR,
+             exs::SINUS_OPERATOR,
+             exs::COSINUS_OPERATOR,
+             exs::TANGENS_OPERATOR}
+        );
         steps.append(exs::GROUP_OPERATION, {exs::PARENTHESES_OPERATOR});
         steps.append(exs::UNARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
         steps.append(exs::BINARY_OPERATION, {exs::POWER_OPERATOR});
@@ -80,14 +89,16 @@ namespace snt::dip {
             ua.value.value = std::move(quantity.measurement.result.estimate);
             ua.value.units = puq::Quantity(units);
         } else if (ua.value.units) {
-            throw std::runtime_error("NumericalSolver: Trying to convert nondimensional quantity into '" +
-                                     units + "'");
+            throw std::runtime_error("NumericalSolver: Trying to convert nondimensional quantity into '" + units + "'");
         } else if (!units.empty()) {
-            throw std::runtime_error("NumericalSolver: Trying to convert '" + ua.value.units->to_string() +
-                                     "' into a nondimensional quantity");
+            throw std::runtime_error(
+                "NumericalSolver: Trying to convert '" + ua.value.units->to_string() +
+                "' into a nondimensional quantity"
+            );
         }
 
-        return ValueNodeData({std::move(ua.value.value), std::move(ua.value.units)});;
+        return ValueNodeData({std::move(ua.value.value), std::move(ua.value.units)});
+        ;
     }
 
 } // namespace snt::dip

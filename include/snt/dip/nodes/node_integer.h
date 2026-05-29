@@ -8,8 +8,9 @@ namespace snt::dip {
 
     class IntegerNode : public ValueNode {
         val::BaseValue::PointerType cast_scalar_value(const std::string& value_input) const override;
-        val::BaseValue::PointerType cast_array_value(const val::Array::StringType& value_inputs,
-                                                     const val::Array::ShapeType& shape) const override;
+        val::BaseValue::PointerType cast_array_value(
+            const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
+        ) const override;
 
       public:
         static constexpr size_t max_int_size = sizeof(long long) * CHAR_BIT;

@@ -56,7 +56,8 @@ namespace snt::puq {
                 {"mph", {Utype::LIN, "mi/h", "miles per hour", false, {}}},
 
                 // units of energy
-                {"lbf", {Utype::LIN, "4.448222e3*g*m*s-2", "pound-force", false, {}}}};
+                {"lbf", {Utype::LIN, "4.448222e3*g*m*s-2", "pound-force", false, {}}}
+            };
 
             if constexpr (Config::use_units_temperature) {
                 units.insert({

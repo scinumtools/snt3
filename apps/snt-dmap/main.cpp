@@ -116,12 +116,15 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
         for (auto bu : atom.value.baseunits) {
             solve_bu_prefix(dim, bu);
             if (!solve_bu_unit(dmap, dim, bu)) {
-                throw puq::DimensionMapExcept(puq::UnitSystem::Data->SystemAbbrev + " quantity '" + quant.first +
-                                              "' could not be constructued from a definition '" +
-                                              quant.second.definition + "'. Missing unit: " + bu.unit);
+                throw puq::DimensionMapExcept(
+                    puq::UnitSystem::Data->SystemAbbrev + " quantity '" + quant.first +
+                    "' could not be constructued from a definition '" + quant.second.definition +
+                    "'. Missing unit: " + bu.unit
+                );
             }
         }
-        std::string symbol = std::string(puq::Symbols::quantity_start) + quant.first + std::string(puq::Symbols::quantity_end);
+        std::string symbol =
+            std::string(puq::Symbols::quantity_start) + quant.first + std::string(puq::Symbols::quantity_end);
         add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first));
         val::ArrayValue<double> value(dim.numerical.estimate.get());
         if (dim.numerical.uncertainty == nullptr) {
@@ -139,9 +142,11 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
             for (auto bu : atom.value.baseunits) {
                 solve_bu_prefix(dim, bu);
                 if (!solve_bu_unit(dmap, dim, bu)) {
-                    throw puq::DimensionMapExcept(puq::UnitSystem::Data->SystemAbbrev + " quantity '" + quant.first +
-                                                  "' could not be constructued from a definition '" +
-                                                  quant.second.definition + "'. Missing unit: " + bu.unit);
+                    throw puq::DimensionMapExcept(
+                        puq::UnitSystem::Data->SystemAbbrev + " quantity '" + quant.first +
+                        "' could not be constructued from a definition '" + quant.second.definition +
+                        "'. Missing unit: " + bu.unit
+                    );
                 }
             }
             // account for the conversion from MGS to MKS dimensions
@@ -150,7 +155,8 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
             // clear physical dimensions to make conversion factors dimensionless
             std::fill(std::begin(dim.physical), std::end(dim.physical), 0);
             // register the conversion factor
-            symbol = std::string(puq::Symbols::si_factor_start) + quant.first + std::string(puq::Symbols::si_factor_end);
+            symbol =
+                std::string(puq::Symbols::si_factor_start) + quant.first + std::string(puq::Symbols::si_factor_end);
             add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first) + " SI factor");
             val::ArrayValue<double> value(dim.numerical.estimate.get());
             if (dim.numerical.uncertainty == nullptr) {
@@ -188,7 +194,9 @@ void create_map(const std::string& file_header) {
     solve_quantities(ss, dmap, solver);
 
     if (dmap.size() < nmax)
-        throw puq::DimensionMapExcept("Dimension map is not complete: " + std::to_string(dmap.size()) + "/" + std::to_string(nmax));
+        throw puq::DimensionMapExcept(
+            "Dimension map is not complete: " + std::to_string(dmap.size()) + "/" + std::to_string(nmax)
+        );
 
     // Write dimension map table
     auto now = std::chrono::system_clock::now();
@@ -199,7 +207,8 @@ void create_map(const std::string& file_header) {
     fs << " * Do not modify this file!" << '\n';
     fs << " * This file can be updated using 'dmap' executable." << '\n';
     fs << " * " << '\n';
-    fs << " * Unit system:  " << puq::UnitSystem::Data->SystemName << " (" << puq::UnitSystem::Data->SystemAbbrev << ")" << '\n';
+    fs << " * Unit system:  " << puq::UnitSystem::Data->SystemName << " (" << puq::UnitSystem::Data->SystemAbbrev << ")"
+       << '\n';
     fs << " * Last update:  " << std::ctime(&now_time);
     fs << " * Code version: " << CODE_VERSION << '\n';
     fs << " * " << '\n';
@@ -234,9 +243,7 @@ class InputParser {
     bool cmdOptionExists(const std::string& option) const {
         return std::find(this->tokens.begin(), this->tokens.end(), option) != this->tokens.end();
     }
-    bool cmdEmpty() const {
-        return this->tokens.size() == 0;
-    }
+    bool cmdEmpty() const { return this->tokens.size() == 0; }
 
   private:
     std::vector<std::string> tokens;

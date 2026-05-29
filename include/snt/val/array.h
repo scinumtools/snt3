@@ -26,14 +26,12 @@ namespace snt::val {
              *
              * @param other Other range that will be compared
              */
-            bool operator==(const RangeStruct& other) const {
-                return (dmin == other.dmin) && (dmax == other.dmax);
-            };
+            bool operator==(const RangeStruct& other) const { return (dmin == other.dmin) && (dmax == other.dmax); };
         };
 
-        typedef std::vector<std::string> StringType;                     ///< Holds raw string values
-        typedef std::vector<RangeStruct> RangeType;                      ///< Array dimension ranges
-        typedef std::vector<size_t> ShapeType;                           ///< Array shape
+        using StringType = std::vector<std::string>;                     ///< Holds raw string values
+        using RangeType = std::vector<RangeStruct>;                      ///< Array dimension ranges
+        using ShapeType = std::vector<size_t>;                           ///< Array shape
         constexpr size_t max_range = std::numeric_limits<size_t>::max(); ///< Maximum size value indicates open range
     } // namespace Array
 

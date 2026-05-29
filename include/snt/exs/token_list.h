@@ -21,14 +21,9 @@ namespace snt::exs {
         OperatorList* operators;
         BaseSettings* settings;
         AtomList atoms;
-        TokenList(OperatorList* o, BaseSettings* set = nullptr) : operators(o), settings(set) {
-                                                                  };
-        void append(TokenType t) {
-            right.push_back(Token(t));
-        };
-        void append(TokenType t, int o) {
-            right.push_back(Token(t, o));
-        };
+        TokenList(OperatorList* o, BaseSettings* set = nullptr) : operators(o), settings(set) {};
+        void append(TokenType t) { right.push_back(Token(t)); };
+        void append(TokenType t, int o) { right.push_back(Token(t, o)); };
         // void append(TokenType t, std::string s) {
         //   AtomGrand* a = atoms.append(s, settings);
         //   right.push_back(Token(t, a));
@@ -102,9 +97,7 @@ namespace snt::exs {
             // print(true);
             // std::cout << std::endl;
         };
-        void print(bool details = false) {
-            std::cout << to_string(details) << "\n";
-        };
+        void print(bool details = false) { std::cout << to_string(details) << "\n"; };
         std::string to_string(bool details = false) {
             std::stringstream str;
             if (details) {

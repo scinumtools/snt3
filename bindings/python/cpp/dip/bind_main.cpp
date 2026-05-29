@@ -24,7 +24,9 @@ void init_dip(py::module_& m) {
     auto dip = py::class_<dip::DIP>(m, "DIP");
     dip.def(py::init<>());
     dip.def("add_string", &dip::DIP::add_string, py::arg("source_code"));
-    dip.def("add_file", &dip::DIP::add_file, py::arg("source_file"), py::arg("source_name") = "", py::arg("absolute") = true);
+    dip.def(
+        "add_file", &dip::DIP::add_file, py::arg("source_file"), py::arg("source_name") = "", py::arg("absolute") = true
+    );
     dip.def("add_source", &dip::DIP::add_source, py::arg("source_name"), py::arg("source_file"));
     dip.def("add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("value"), py::arg("unit") = "");
     //.def("add_value_function", &dip::DIP::add_value_function, py::arg("name"), py::arg(""))

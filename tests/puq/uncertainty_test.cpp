@@ -56,12 +56,14 @@ TEST(Uncertainty, ErrorConversionArrays) {
 
     val::BaseValue::PointerType val;
 
-    val = puq::Measurement::abs_to_rel(val::ArrayValue<double>::pointer_from_vector({30, 20}),
-                                       val::ArrayValue<double>::pointer_from_vector({0.3, 0.4}));
+    val = puq::Measurement::abs_to_rel(
+        val::ArrayValue<double>::pointer_from_vector({30, 20}), val::ArrayValue<double>::pointer_from_vector({0.3, 0.4})
+    );
     EXPECT_EQ(val->to_string(), "[1, 2]");
 
-    val = puq::Measurement::rel_to_abs(val::ArrayValue<double>::pointer_from_vector({30, 20}),
-                                       val::ArrayValue<double>::pointer_from_vector({20, 10}));
+    val = puq::Measurement::rel_to_abs(
+        val::ArrayValue<double>::pointer_from_vector({30, 20}), val::ArrayValue<double>::pointer_from_vector({20, 10})
+    );
     EXPECT_EQ(val->to_string(), "[6, 2]");
 }
 
@@ -175,11 +177,15 @@ TEST(Uncertainty, Arrays) {
 
     puq::Measurement msr1, msr2;
 
-    msr1 = puq::Measurement(val::ArrayValue<double>::pointer_from_vector({12.1, 22.2}),
-                            val::ArrayValue<double>::pointer_from_vector({0.1, 0.2}));
+    msr1 = puq::Measurement(
+        val::ArrayValue<double>::pointer_from_vector({12.1, 22.2}),
+        val::ArrayValue<double>::pointer_from_vector({0.1, 0.2})
+    );
     EXPECT_EQ(msr1.to_string(), "[1.210(10)e1, 2.220(20)e1]");
 
-    msr1 = puq::Measurement(val::ArrayValue<double>::pointer_from_vector({12.1, 22.2, 32.3}),
-                            val::ArrayValue<double>::pointer_from_vector({0.1, 0.2, 0.3}));
+    msr1 = puq::Measurement(
+        val::ArrayValue<double>::pointer_from_vector({12.1, 22.2, 32.3}),
+        val::ArrayValue<double>::pointer_from_vector({0.1, 0.2, 0.3})
+    );
     EXPECT_EQ(msr1.to_string(), "[1.210(10)e1, 2.220(20)e1, 3.230(30)e1]");
 }

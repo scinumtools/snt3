@@ -18,13 +18,11 @@ namespace snt::puq::math {
     puq::Measurement log(const puq::Measurement& msr) {
         if (msr.baseunits.has_dimensions())
             throw std::runtime_error("Natural logarithm accepts only dimensionless quantities.");
-        return puq::Measurement(log(msr.result),
-                                msr.baseunits);
+        return puq::Measurement(log(msr.result), msr.baseunits);
     }
 
     puq::Quantity log(const puq::Quantity& quant) {
-        return puq::Quantity(log(quant.measurement),
-                             quant.stype);
+        return puq::Quantity(log(quant.measurement), quant.stype);
     }
 
 } // namespace snt::puq::math

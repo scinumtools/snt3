@@ -13,7 +13,9 @@ namespace snt::exs {
             if (std::regex_match(s, rx)) {
                 v = std::stof(s);
             } else {
-                throw std::logic_error("Atom string could not be parsed, probably due to unknown symbol or operator: " + s);
+                throw std::logic_error(
+                    "Atom string could not be parsed, probably due to unknown symbol or operator: " + s
+                );
             }
         }
         return v;

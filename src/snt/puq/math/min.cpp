@@ -11,7 +11,8 @@ namespace snt::puq::math {
         // TODO: this implementation is fishy, need a check, or a Monte Carlo propagation
         val::BaseValue::PointerType estimate = res1.estimate->math_min(res2.estimate.get());
         if (res1.uncertainty && res2.uncertainty) {
-            val::BaseValue::PointerType new_uncertainty = res1.uncertainty->where(estimate->compare_equal(res1.estimate.get()).get(), res2.uncertainty.get());
+            val::BaseValue::PointerType new_uncertainty =
+                res1.uncertainty->where(estimate->compare_equal(res1.estimate.get()).get(), res2.uncertainty.get());
             return puq::Result(std::move(estimate), std::move(new_uncertainty));
         } else if (res1.uncertainty) {
             return puq::Result(std::move(estimate), res1.uncertainty->clone());
@@ -29,12 +30,10 @@ namespace snt::puq::math {
         puq::Dimensions dim2 = msr2.baseunits.dimensions();
         if (dim1.has_dimensions() && dim2.has_dimensions()) {
             if (dim1 == dim2) {
-                return puq::Measurement(min(msr1.result, msr2.result),
-                                        msr1.baseunits);
+                return puq::Measurement(min(msr1.result, msr2.result), msr1.baseunits);
             } else {
                 puq::Measurement msr3 = msr2.convert(msr1.baseunits);
-                return puq::Measurement(min(msr1.result, msr3.result),
-                                        msr1.baseunits);
+                return puq::Measurement(min(msr1.result, msr3.result), msr1.baseunits);
             }
         } else if (dim1.has_dimensions() || dim2.has_dimensions()) {
             throw std::runtime_error("Cannot convert between dimensional and dimensionless quantities.");
@@ -44,8 +43,7 @@ namespace snt::puq::math {
     }
 
     puq::Quantity min(const puq::Quantity& quant1, const puq::Quantity& quant2) {
-        return puq::Quantity(min(quant1.measurement, quant2.measurement),
-                             quant1.stype);
+        return puq::Quantity(min(quant1.measurement, quant2.measurement), quant1.stype);
     }
 
 } // namespace snt::puq::math

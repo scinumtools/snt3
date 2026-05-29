@@ -19,8 +19,7 @@ namespace snt::api {
         /**
          * @brief Default class constructor
          **/
-        PUQInfo(const std::string& expr) : expression(expr),
-                                           input_system(puq::SystemType::NONE) {};
+        PUQInfo(const std::string& expr) : expression(expr), input_system(puq::SystemType::NONE) {};
 
         /**
          * @brief Set input unit system

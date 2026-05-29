@@ -15,8 +15,7 @@ namespace snt::val {
      * @param e Enum value to convert.
      * @return The underlying integral value corresponding to @p e.
      */
-    template <typename E>
-    constexpr auto to_underlying(E e) noexcept {
+    template <typename E> constexpr auto to_underlying(E e) noexcept {
         return static_cast<std::underlying_type_t<E>>(e);
     }
 
@@ -28,8 +27,7 @@ namespace snt::val {
      * @param rhs Right-hand side operand.
      * @return A new enum value representing the union of both flags.
      */
-    template <typename E>
-    constexpr E operator|(E lhs, E rhs) {
+    template <typename E> constexpr E operator|(E lhs, E rhs) {
         using T = std::underlying_type_t<E>;
         return static_cast<E>(static_cast<T>(lhs) | static_cast<T>(rhs));
     }
@@ -42,8 +40,7 @@ namespace snt::val {
      * @param rhs Right-hand side operand.
      * @return Reference to the modified @p lhs.
      */
-    template <typename E>
-    constexpr E& operator|=(E& lhs, E rhs) {
+    template <typename E> constexpr E& operator|=(E& lhs, E rhs) {
         lhs = lhs | rhs;
         return lhs;
     }
@@ -71,8 +68,7 @@ namespace snt::val {
         FloatX = 1 << 13,   // TODO: need to be implemented
 
         // Define data type groups
-        Integer = Integer16 | Integer32 | Integer64 | IntegerX |
-                  Integer16_U | Integer32_U | Integer64_U,
+        Integer = Integer16 | Integer32 | Integer64 | IntegerX | Integer16_U | Integer32_U | Integer64_U,
 
         Integer_S = Integer16 | Integer32 | Integer64 | IntegerX,
         Integer_U = Integer16_U | Integer32_U | Integer64_U,
@@ -96,8 +92,9 @@ namespace snt::val {
      * @return A new DataType value representing the combined flags.
      */
     inline DataType operator|(DataType lhs, DataType rhs) {
-        return static_cast<DataType>(static_cast<std::underlying_type_t<DataType>>(lhs) |
-                                     static_cast<std::underlying_type_t<DataType>>(rhs));
+        return static_cast<DataType>(
+            static_cast<std::underlying_type_t<DataType>>(lhs) | static_cast<std::underlying_type_t<DataType>>(rhs)
+        );
     }
 
     /**
@@ -108,8 +105,9 @@ namespace snt::val {
      * @return A new DataType value representing the intersected flags.
      */
     inline DataType operator&(DataType lhs, DataType rhs) {
-        return static_cast<DataType>(static_cast<std::underlying_type_t<DataType>>(lhs) &
-                                     static_cast<std::underlying_type_t<DataType>>(rhs));
+        return static_cast<DataType>(
+            static_cast<std::underlying_type_t<DataType>>(lhs) & static_cast<std::underlying_type_t<DataType>>(rhs)
+        );
     }
 
     /**

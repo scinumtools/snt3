@@ -22,10 +22,9 @@ namespace snt::api {
         /**
          * @brief Default class constructor
          **/
-        PUQConvert(const std::string& expr1, const std::string& expr2) : expression(expr1),
-                                                                         output_units(expr2),
-                                                                         input_system(puq::SystemType::NONE),
-                                                                         output_system(puq::SystemType::NONE) {};
+        PUQConvert(const std::string& expr1, const std::string& expr2)
+            : expression(expr1), output_units(expr2), input_system(puq::SystemType::NONE),
+              output_system(puq::SystemType::NONE) {};
 
         /**
          * @brief Set input unit system

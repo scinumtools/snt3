@@ -15,14 +15,16 @@ namespace snt::puq {
         BaseUnit() {};
         BaseUnit(const int& n) : exponent(n) {};
         BaseUnit(const int& n, const int& d) : exponent(Exponent(n, d)) {};
-        BaseUnit(const std::string& p, const std::string& u, const ExponentVariant& e) : prefix(p), unit(u), exponent(e) {};
-        BaseUnit(const std::string& p, const std::string& u, const int& n, const int& d) : prefix(p), unit(u), exponent(Exponent(n, d)) {};
+        BaseUnit(const std::string& p, const std::string& u, const ExponentVariant& e)
+            : prefix(p), unit(u), exponent(e) {};
+        BaseUnit(const std::string& p, const std::string& u, const int& n, const int& d)
+            : prefix(p), unit(u), exponent(Exponent(n, d)) {};
         std::string to_string(const UnitFormat& format = UnitFormat());
     };
 
     class BaseUnits {
       public:
-        typedef std::vector<BaseUnit> ListType;
+        using ListType = std::vector<BaseUnit>;
         BaseUnits::ListType baseunits;
         BaseUnits() {}
         BaseUnits(const std::string& s);

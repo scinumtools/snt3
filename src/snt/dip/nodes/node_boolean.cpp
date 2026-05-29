@@ -57,12 +57,12 @@ namespace snt::dip {
         else if (value_input == core::KEYWORD_FALSE)
             return std::make_unique<val::ArrayValue<bool>>(false);
         else
-            throw std::runtime_error("Value cannot be casted as boolean from the given string: " +
-                                     value_input);
+            throw std::runtime_error("Value cannot be casted as boolean from the given string: " + value_input);
     }
 
-    val::BaseValue::PointerType BooleanNode::cast_array_value(const val::Array::StringType& value_inputs,
-                                                              const val::Array::ShapeType& shape) const {
+    val::BaseValue::PointerType BooleanNode::cast_array_value(
+        const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
+    ) const {
         std::vector<bool> bool_values;
         bool_values.reserve(value_inputs.size());
         for (const auto& value : value_inputs) {
@@ -71,8 +71,7 @@ namespace snt::dip {
             else if (value == core::KEYWORD_FALSE)
                 bool_values.push_back(false);
             else
-                throw std::runtime_error("Value cannot be casted as boolean from the given string: " +
-                                         value);
+                throw std::runtime_error("Value cannot be casted as boolean from the given string: " + value);
         }
         return std::make_unique<val::ArrayValue<bool>>(bool_values, shape);
     }
@@ -86,8 +85,7 @@ namespace snt::dip {
 
     void BooleanNode::validate_options() const {
         if (format.size() > 0)
-            throw std::runtime_error("Options property is not implemented for boolean nodes: " +
-                                     line.code);
+            throw std::runtime_error("Options property is not implemented for boolean nodes: " + line.code);
     }
 
     std::string BooleanNode::to_string(const core::StringFormatType& format) const {

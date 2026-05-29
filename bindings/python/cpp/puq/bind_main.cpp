@@ -23,8 +23,7 @@ void init_puq(py::module_& m) {
     init_puq_formats(formats);
 
     // Exposing unit format
-    py::class_<snt::puq::UnitFormat>(m, "UnitFormat")
-        .def(py::init<>()) // exposes default constructor
+    py::class_<snt::puq::UnitFormat>(m, "UnitFormat").def(py::init<>()) // exposes default constructor
         ;
 
     // Exposing lists
@@ -35,10 +34,15 @@ void init_puq(py::module_& m) {
     init_puq_unit_system(m);
 
     // Exposing calculator object
-    m.def("Calculator", [](const std::string& e) -> puq::Quantity {
-    auto calc = puq::Calculator();
-    auto atom = calc.solve(e);
-    return atom.value; }, py::arg("expression"));
+    m.def(
+        "Calculator",
+        [](const std::string& e) -> puq::Quantity {
+            auto calc = puq::Calculator();
+            auto atom = calc.solve(e);
+            return atom.value;
+        },
+        py::arg("expression")
+    );
 
     // Exposing Quantity object
     init_puq_quantity(m);

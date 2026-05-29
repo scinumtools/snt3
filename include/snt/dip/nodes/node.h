@@ -9,9 +9,9 @@ namespace snt::dip {
 
     class Node {
       public:
-        Line line;                            // source code line information; in Python this were 'code' & 'source' variables
-        size_t indent;                        // indent of a node
-        std::string name;                     // node name
+        Line line;        // source code line information; in Python this were 'code' & 'source' variables
+        size_t indent;    // indent of a node
+        std::string name; // node name
         std::array<std::string, 3> dtype_raw; // data type properties (unsigned/type/precision)
         val::Array::StringType value_raw;     // raw value string(s)
         val::Array::ShapeType value_shape;    // shape of an array value

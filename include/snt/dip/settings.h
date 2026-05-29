@@ -86,22 +86,9 @@ namespace snt::dip {
         };
     };
 
-    enum class CaseType {
-        IF,
-        ELIF,
-        ELSE,
-        END
-    };
+    enum class CaseType { IF, ELIF, ELSE, END };
 
-    enum class ValueOrigin {
-        Keyword,
-        Number,
-        String,
-        Reference,
-        ReferenceRaw,
-        Function,
-        Expression
-    };
+    enum class ValueOrigin { Keyword, Number, String, Reference, ReferenceRaw, Function, Expression };
 
     enum class NodeDtype {
         None,

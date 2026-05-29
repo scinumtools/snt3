@@ -52,7 +52,11 @@ TEST(Hierarchy, IndentationChecking) {
         d.parse();
         FAIL() << "Expected std::runtime_error";
     } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Indent of the child node '4' is not exactly 2 white spaces higher than its parent nodes '4':     bar int = 3");
+        EXPECT_STREQ(
+            e.what(),
+            "Indent of the child node '4' is not exactly 2 white spaces higher than its parent nodes '4':     bar int "
+            "= 3"
+        );
     } catch (...) {
         FAIL() << "Expected std::runtime_error";
     }

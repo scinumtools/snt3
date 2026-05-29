@@ -18,8 +18,7 @@ namespace snt::dip {
             branch_id = get_branch_id();
         Branch& branch = branches.at(branch_id);
         if (branch.cases.empty()) {
-            std::string branch_name =
-                std::string(1, SIGN_CONDITION) + "B" + std::to_string(num_branches);
+            std::string branch_name = std::string(1, SIGN_CONDITION) + "B" + std::to_string(num_branches);
             throw std::runtime_error("Branch with an ID '" + branch_name + "' does not have any cases");
         } else {
             return branch.cases.back();
@@ -100,8 +99,7 @@ namespace snt::dip {
                 // continue
             } else if (cnode->case_type == CaseType::ELSE and !cases.empty()) {
                 // continue
-            } else if (cnode->case_type == CaseType::END and !cases.empty() and
-                       path_old.size() >= path_new.size()) {
+            } else if (cnode->case_type == CaseType::END and !cases.empty() and path_old.size() >= path_new.size()) {
                 close_branch();
                 return;
             } else {
@@ -152,8 +150,8 @@ namespace snt::dip {
             // std::cout << '\n';
             // register new case
             std::string expr = (cnode->value_raw.empty()) ? "" : cnode->value_raw.at(0);
-            cases[case_id] = Case(path_new, cnode->line.code, expr, case_value, branch_id, branch_part,
-                                  case_id, cnode->case_type);
+            cases[case_id] =
+                Case(path_new, cnode->line.code, expr, case_value, branch_id, branch_part, case_id, cnode->case_type);
         } else {
             throw std::runtime_error("Invalid condition format: " + node->line.code);
         }

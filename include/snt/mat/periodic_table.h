@@ -13,7 +13,8 @@ namespace snt::mat {
      * This file was generated using the following Python script
      * ```tools/uild_periodic_table.py```
      * from data provided at the website of NIST
-     * [Atomic Weights and Isotopic Compositions for All Elements](https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl)
+     * [Atomic Weights and Isotopic Compositions for All
+     * Elements](https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl)
      */
 
     static constexpr std::array<std::string_view, 2> PT_HEADER = {"Z", "A"};

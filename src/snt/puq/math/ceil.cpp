@@ -30,13 +30,11 @@ namespace snt::puq::math {
     }
 
     puq::Measurement ceil(const puq::Measurement& msr) {
-        return puq::Measurement(ceil(msr.result),
-                                msr.baseunits);
+        return puq::Measurement(ceil(msr.result), msr.baseunits);
     }
 
     puq::Quantity ceil(const puq::Quantity& quant) {
-        return puq::Quantity(ceil(quant.measurement),
-                             quant.stype);
+        return puq::Quantity(ceil(quant.measurement), quant.stype);
     }
 
 } // namespace snt::puq::math

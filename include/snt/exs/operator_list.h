@@ -9,7 +9,7 @@
 namespace snt::exs {
 
     class OperatorList {
-        typedef std::unordered_map<int, std::shared_ptr<OperatorBase>> OperatorListType;
+        using OperatorListType = std::unordered_map<int, std::shared_ptr<OperatorBase>>;
 
       public:
         OperatorListType operators;

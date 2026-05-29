@@ -8,7 +8,9 @@ void init_puq_lists(py::module_& m) {
 
     m.def("prefixes", &puq::lists::prefixes, py::arg("json") = false, py::arg("format") = snt::puq::UnitFormat());
     m.def("base_units", &puq::lists::base_units, py::arg("json") = false, py::arg("format") = snt::puq::UnitFormat());
-    m.def("derived_units", &puq::lists::derived_units, py::arg("json") = false, py::arg("format") = snt::puq::UnitFormat());
+    m.def(
+        "derived_units", &puq::lists::derived_units, py::arg("json") = false, py::arg("format") = snt::puq::UnitFormat()
+    );
     m.def("logarithmic_units", &puq::lists::logarithmic_units, py::arg("json") = false);
     m.def("temperature_units", &puq::lists::temperature_units, py::arg("json") = false);
     m.def("constants", &puq::lists::constants, py::arg("json") = false, py::arg("format") = snt::puq::UnitFormat());

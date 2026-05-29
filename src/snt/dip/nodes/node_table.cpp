@@ -19,8 +19,9 @@ namespace snt::dip {
         return nullptr;
     }
 
-    inline BaseNode::ListType parse_nodes(const std::string& value_raw,
-                                          const std::string& source_name, const char delimiter) {
+    inline BaseNode::ListType parse_nodes(
+        const std::string& value_raw, const std::string& source_name, const char delimiter
+    ) {
         std::queue<Line> lines;
         parse_lines(lines, value_raw, source_name);
         return parse_table_nodes(lines, delimiter);

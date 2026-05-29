@@ -43,14 +43,20 @@ TEST(UnitFormat, DimensionsFormat) {
     format = puq::UnitFormat(puq::Format::Base::CGS); // change unit base
     EXPECT_EQ(d.to_string(format), "2.34034e8*cm*g2*s3");
 
-    format = puq::UnitFormat({// change unit base and show only measurement result
-                              puq::Format::Base::CGS,
-                              puq::Format::Display::RESULT});
+    format = puq::UnitFormat(
+        {// change unit base and show only measurement result
+         puq::Format::Base::CGS,
+         puq::Format::Display::RESULT
+        }
+    );
     EXPECT_EQ(d.to_string(format), "2.34034e8");
 
-    format = puq::UnitFormat({// change unit base and show only units
-                              puq::Format::Base::CGS,
-                              puq::Format::Display::UNITS});
+    format = puq::UnitFormat(
+        {// change unit base and show only units
+         puq::Format::Base::CGS,
+         puq::Format::Display::UNITS
+        }
+    );
     EXPECT_EQ(d.to_string(format), "cm*g2*s3");
 }
 

@@ -18,14 +18,7 @@ namespace snt::mat {
         /**
          * @enum Parser state flags
          */
-        enum class ParserState {
-            START,
-            ELEMENT,
-            STATE,
-            END,
-            OPERATION,
-            ERROR
-        };
+        enum class ParserState { START, ELEMENT, STATE, END, OPERATION, ERROR };
 
       public:
         static std::unique_ptr<exs::Solver<SubstanceAtom>> solver; ///< Pointer to the EXS solver object

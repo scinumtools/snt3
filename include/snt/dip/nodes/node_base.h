@@ -15,8 +15,8 @@ namespace snt::dip {
         NodeDtype dtype; // data type of a node; in Python this was 'keyword' variable in Node class
         size_t branch_id;
         size_t case_id;
-        typedef std::shared_ptr<BaseNode> PointerType;
-        typedef std::deque<BaseNode::PointerType> ListType;
+        using PointerType = std::shared_ptr<BaseNode>;
+        using ListType = std::deque<BaseNode::PointerType>;
         BaseNode() : dtype(NodeDtype::None) {};
         BaseNode(const NodeDtype dt) : dtype(dt) {};
         BaseNode(Parser& parser, const NodeDtype dt);

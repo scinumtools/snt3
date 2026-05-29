@@ -14,12 +14,10 @@ namespace snt::puq::math {
             val::ArrayValue<double> eps(1e-12); // defining a small threshold
             if (cosx->math_abs()->compare_less(&eps)->any_of()) {
                 // TODO: set inf values only to those array values which are truly less than eps
-                return puq::Result(m.estimate->math_tan(),
-                                   m.uncertainty->math_inf());
+                return puq::Result(m.estimate->math_tan(), m.uncertainty->math_inf());
             } else {
                 val::BaseValue::PointerType invcos2 = m.estimate->math_cos()->math_pow(2)->math_inv();
-                return puq::Result(m.estimate->math_tan(),
-                                   m.uncertainty->math_mul(invcos2.get()));
+                return puq::Result(m.estimate->math_tan(), m.uncertainty->math_mul(invcos2.get()));
             }
         } else {
             return puq::Result(m.estimate->math_tan());
@@ -29,13 +27,11 @@ namespace snt::puq::math {
     puq::Measurement tan(const puq::Measurement& msr) {
         if (msr.baseunits.has_dimensions()) // TODO: allow for radians
             throw std::runtime_error("Tangens function accepts only dimensionless quantities.");
-        return puq::Measurement(tan(msr.result),
-                                msr.baseunits);
+        return puq::Measurement(tan(msr.result), msr.baseunits);
     }
 
     puq::Quantity tan(const puq::Quantity& quant) {
-        return puq::Quantity(tan(quant.measurement),
-                             quant.stype);
+        return puq::Quantity(tan(quant.measurement), quant.stype);
     }
 
 } // namespace snt::puq::math

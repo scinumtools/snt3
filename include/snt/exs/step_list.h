@@ -7,7 +7,7 @@
 
 namespace snt::exs {
 
-    typedef std::vector<std::pair<OperationType, std::vector<int>>> StepListType;
+    using StepListType = std::vector<std::pair<OperationType, std::vector<int>>>;
 
     class StepList {
       public:

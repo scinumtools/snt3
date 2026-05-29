@@ -30,10 +30,9 @@ namespace snt::puq {
         for (auto it = baseunits.begin(); it != baseunits.end(); ++it) {
             if (it->prefix == bu.prefix && it->unit == bu.unit) {
                 exists = true;
-                it->exponent = std::visit([](auto const& a, auto const& b) -> ExponentVariant {
-                    return a + b;
-                },
-                                          it->exponent, bu.exponent);
+                it->exponent = std::visit(
+                    [](auto const& a, auto const& b) -> ExponentVariant { return a + b; }, it->exponent, bu.exponent
+                );
                 // removing zero exponents
                 if (exponent_to_float(it->exponent) == 0) {
                     baseunits.erase(it);
@@ -80,10 +79,7 @@ namespace snt::puq {
 
     void BaseUnits::operator/=(const BaseUnits& bu) {
         for (auto unit : bu) {
-            unit.exponent = std::visit([](auto const& v) -> ExponentVariant {
-                return -v;
-            },
-                                       unit.exponent);
+            unit.exponent = std::visit([](auto const& v) -> ExponentVariant { return -v; }, unit.exponent);
             append(unit);
         }
     }
@@ -158,8 +154,7 @@ namespace snt::puq {
                     Result result(dmap->second.estimate, dmap->second.uncertainty);
                     dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
                     for (int i = 0; i < Config::num_basedim; i++) {
-                        dim.physical[i] = add_exp(dim.physical[i],
-                                                  mul_exp(dmap->second.dimensions[i], bu.exponent));
+                        dim.physical[i] = add_exp(dim.physical[i], mul_exp(dmap->second.dimensions[i], bu.exponent));
                     }
                     continue;
                 } else {
@@ -182,8 +177,8 @@ namespace snt::puq {
                         Result result(dmap->second.estimate, dmap->second.uncertainty);
                         dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
                         for (int i = 0; i < Config::num_basedim; i++) {
-                            dim.physical[i] = add_exp(dim.physical[i],
-                                                      mul_exp(dmap->second.dimensions[i], bu.exponent));
+                            dim.physical[i] =
+                                add_exp(dim.physical[i], mul_exp(dmap->second.dimensions[i], bu.exponent));
                         }
                     } else {
                         throw MeasurementExcept("Undefined unit symbol: " + bu.unit);

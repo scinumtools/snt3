@@ -28,8 +28,7 @@ namespace snt::exs {
      * @tparam ATOM Atom type
      * @tparam SETTINGS Atom settings
      */
-    template <class ATOM, class SETTINGS = BaseSettings>
-    class Solver {
+    template <class ATOM, class SETTINGS = BaseSettings> class Solver {
 
       public:
         SETTINGS settings;      ///< Setting structure
@@ -52,9 +51,7 @@ namespace snt::exs {
          * @param o List of operators
          * @param set Solver settings
          */
-        Solver(const OperatorList& o, const SETTINGS& set = {}) : operators(o), settings(set) {
-            init_steps();
-        };
+        Solver(const OperatorList& o, const SETTINGS& set = {}) : operators(o), settings(set) { init_steps(); };
 
         /**
          * @brief Solver constructor with modified operator steps
@@ -62,9 +59,7 @@ namespace snt::exs {
          * @param s List of operator steps
          * @param set Solver settings
          */
-        Solver(const StepList& s, const SETTINGS& set = {}) : steps(s), settings(set) {
-            init_operators();
-        };
+        Solver(const StepList& s, const SETTINGS& set = {}) : steps(s), settings(set) { init_operators(); };
 
         /**
          * @brief Custom solver constructor
@@ -73,8 +68,8 @@ namespace snt::exs {
          * @param s List of operator steps
          * @param set Solver settings
          */
-        Solver(const OperatorList& o, const StepList& s, const SETTINGS& set = {}) : operators(o), steps(s), settings(set) {
-                                                                                     };
+        Solver(const OperatorList& o, const StepList& s, const SETTINGS& set = {})
+            : operators(o), steps(s), settings(set) {};
 
         /**
          * @brief Main solver routine
@@ -151,18 +146,28 @@ namespace snt::exs {
          * @brief Initialisation of a default list of operator steps
          */
         void init_steps() {
-            steps.append(GROUP_OPERATION, {EXPONENT_OPERATOR, LOGARITHM_OPERATOR, LOGARITHM_10_OPERATOR,
-                                           LOGARITHM_BASE_OPERATOR, POWER_BASE_OPERATOR,
-                                           SQUARE_ROOT_OPERATOR, CUBIC_ROOT_OPERATOR,
-                                           SINUS_OPERATOR, COSINUS_OPERATOR, TANGENS_OPERATOR});
+            steps.append(
+                GROUP_OPERATION,
+                {EXPONENT_OPERATOR,
+                 LOGARITHM_OPERATOR,
+                 LOGARITHM_10_OPERATOR,
+                 LOGARITHM_BASE_OPERATOR,
+                 POWER_BASE_OPERATOR,
+                 SQUARE_ROOT_OPERATOR,
+                 CUBIC_ROOT_OPERATOR,
+                 SINUS_OPERATOR,
+                 COSINUS_OPERATOR,
+                 TANGENS_OPERATOR}
+            );
             steps.append(GROUP_OPERATION, {PARENTHESES_OPERATOR});
             steps.append(UNARY_OPERATION, {ADD_OPERATOR, SUBTRACT_OPERATOR});
             steps.append(TERNARY_OPERATION, {CONDITION_OPERATOR});
             steps.append(BINARY_OPERATION, {POWER_OPERATOR});
             steps.append(BINARY_OPERATION, {MULTIPLY_OPERATOR, DIVIDE_OPERATOR, MODULO_OPERATOR});
             steps.append(BINARY_OPERATION, {ADD_OPERATOR, SUBTRACT_OPERATOR});
-            steps.append(BINARY_OPERATION, {LESS_EQUAL_OPERATOR, GREATER_EQUAL_OPERATOR,
-                                            LESS_OPERATOR, GREATER_OPERATOR});
+            steps.append(
+                BINARY_OPERATION, {LESS_EQUAL_OPERATOR, GREATER_EQUAL_OPERATOR, LESS_OPERATOR, GREATER_OPERATOR}
+            );
             steps.append(BINARY_OPERATION, {EQUAL_OPERATOR, NOT_EQUAL_OPERATOR});
             steps.append(UNARY_OPERATION, {NOT_OPERATOR});
             steps.append(BINARY_OPERATION, {AND_OPERATOR});
@@ -183,7 +188,9 @@ namespace snt::exs {
             operators.append(LOGARITHM_10_OPERATOR, std::make_shared<OperatorLogarithm10>());
             operators.append(LOGARITHM_OPERATOR, std::make_shared<OperatorLogarithm>());
             operators.append(EXPONENT_OPERATOR, std::make_shared<OperatorExponent>());
-            operators.append(PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses>()); // should be last of group operators
+            operators.append(
+                PARENTHESES_OPERATOR, std::make_shared<OperatorParentheses>()
+            ); // should be last of group operators
 
             operators.append(CONDITION_OPERATOR, std::make_shared<OperatorCondition>());
 
