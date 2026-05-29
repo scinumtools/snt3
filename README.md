@@ -131,7 +131,7 @@ Expressions of physical units must account for several important aspects, includ
 <SYSTEM>_[<VALUE>]*<UNIT><EXPONENT>
 
 # Examples
-ESU_erg              # sefining erg in ESU unit system
+ESU_erg              # defining erg in ESU unit system
 m2*kg*s-2            # definition of complex units
 kg2*ms3:2*cm         # fractional exponents
 1.346591(30)e27*kg   # uncertainties in measurements
