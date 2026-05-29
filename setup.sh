@@ -138,7 +138,8 @@ function grep_code {
 
 function setup_clang_format {
     find src -name '*.cpp' -o -name '*.h' | xargs clang-format -i
-    find apps -name '*.cpp' -o -name '*.h' | xargs clang-format -i
+    find apps -path 'apps/snt-server/external' -prune -o \( -name '*.cpp' -o -name '*.h' \) -print | xargs clang-format -i
+    #find apps -name '*.cpp' -o -name '*.h' | xargs clang-format -i
     find tests -name '*.cpp' -o -name '*.h' | xargs clang-format -i
     find include -name '*.cpp' -o -name '*.h' | xargs clang-format -i
     find examples -name '*.cpp' -o -name '*.h' | xargs clang-format -i

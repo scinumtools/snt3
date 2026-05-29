@@ -86,7 +86,7 @@ namespace snt::puq {
         return Result(m1.estimate->math_add(m2.estimate.get()), std::move(Dz));
         // Array Dz = m1.uncertainty + m2.uncertainty;
         //// Array Dz = math::sqrt(math::pow(m1.uncertainty,2)+math::pow(m2.uncertainty,2)); // Gaussian uncertainty
-        ///propagation
+        /// propagation
         // return Result(m1.estimate + m2.estimate, Dz);
     }
 
