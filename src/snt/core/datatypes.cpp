@@ -1,6 +1,6 @@
-#include <snt/val/datatypes.h>
+#include <snt/core/datatypes.h>
 
-namespace snt::val {
+namespace snt::core {
 
     std::unordered_map<DataType, std::string> DataTypeNames = {
         {DataType::Boolean, "bool"},

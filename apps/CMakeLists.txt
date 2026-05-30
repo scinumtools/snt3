@@ -1,5 +1,7 @@
 # add submodule directories
-add_subdirectory(snt)
+if (ENABLE_PUQ AND ENABLE_DIP)
+   add_subdirectory(snt)
+endif()
 if (ENABLE_PUQ)
    add_subdirectory(snt-dmap)
 endif()

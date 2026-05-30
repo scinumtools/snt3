@@ -1,6 +1,7 @@
 #ifndef SNT_STRING_FORMAT_H
 #define SNT_STRING_FORMAT_H
 
+#include <snt/core/datatypes.h>
 #include <snt/core/settings.h>
 
 namespace snt::core {
@@ -73,6 +74,7 @@ namespace snt::core {
     std::string _array_to_string(
         const std::vector<T>& value,
         const std::vector<size_t>& shape,
+        const DataType dtype,
         const StringFormatType& format,
         size_t& offset,
         size_t dim
@@ -84,14 +86,20 @@ namespace snt::core {
             if (i > 0)
                 oss << SYMBOL_ARRAY_DELIMITER;
             if (dim + 1 < shape.size()) {
-                oss << _array_to_string(value, shape, format, offset, dim + 1);
+                oss << _array_to_string(value, shape, dtype, format, offset, dim + 1);
             } else {
                 if constexpr (std::is_same_v<T, bool>) {
                     oss << (value[offset] ? KEYWORD_TRUE : KEYWORD_FALSE);
                 } else if constexpr (std::is_same_v<T, char>) {
                     oss << value[offset];
                 } else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) {
-                    oss << number_to_string(value[offset], format);
+                    if (dtype == core::DataType::Boolean) {
+                        oss << (value[offset] ? KEYWORD_TRUE : KEYWORD_FALSE);
+                    } else if (dtype == core::DataType::Character) {
+                        oss << (char)value[offset];
+                    } else {
+                        oss << number_to_string(value[offset], format);
+                    }
                 } else if constexpr (std::is_same_v<T, std::string>) {
                     if (format.stringQuotes)
                         oss << '"';
@@ -116,10 +124,11 @@ namespace snt::core {
     std::string array_to_string(
         const std::vector<T>& value,
         const std::vector<size_t>& shape,
+        const DataType dtype,
         const StringFormatType& format = StringFormatType()
     ) {
         size_t offset = 0;
-        return _array_to_string(value, shape, format, offset, 0);
+        return _array_to_string(value, shape, dtype, format, offset, 0);
     }
 
     // Implementation for value/uncertainty

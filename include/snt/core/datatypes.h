@@ -1,12 +1,12 @@
-#ifndef VAL_DATATYPES_H
-#define VAL_DATATYPES_H
+#ifndef SNT_CORE_DATATYPES_H
+#define SNT_CORE_DATATYPES_H
 
 #include <cstdint>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
 
-namespace snt::val {
+namespace snt::core {
 
     /**
      * @brief Converts a strongly-typed enum value to its underlying integral type.
@@ -142,6 +142,6 @@ namespace snt::val {
         return static_cast<uint16_t>(a) != 0;
     }
 
-} // namespace snt::val
+} // namespace snt::core
 
-#endif // VAL_DATATYPES_H
+#endif // SNT_CORE_DATATYPES_H

@@ -2,72 +2,75 @@
 
 namespace snt::val {
 
-    BaseValue::PointerType ArrayValue<bool>::cast_as(DataType dt) const {
+    BaseValue::PointerType ArrayValue<bool>::cast_as(core::DataType dt) const {
         switch (dt) {
-        case DataType::Boolean: {
-            return std::make_unique<ArrayValue<bool>>(this->value, this->shape);
-        }
-        case DataType::Character: {
-            std::vector<char> arr(this->value.size());
+        case core::DataType::Boolean: {
+            std::vector<uint8_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
-                arr[i] = static_cast<char>(this->value[i]);
-            return std::make_unique<ArrayValue<char>>(arr, this->shape);
+                arr[i] = static_cast<uint8_t>(this->value[i]);
+            return std::make_unique<ArrayValue<uint8_t>>(arr, this->shape, dt);
         }
-        case DataType::Integer16: {
-            std::vector<int16_t> arr(this->value.size());
+        case core::DataType::Character: {
+            std::vector<int8_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
-                arr[i] = static_cast<int16_t>(this->value[i]);
-            return std::make_unique<ArrayValue<int16_t>>(arr, this->shape);
+                arr[i] = static_cast<int8_t>(this->value[i]);
+            return std::make_unique<ArrayValue<int8_t>>(arr, this->shape, dt);
         }
-        case DataType::Integer32: {
-            std::vector<int32_t> arr(this->value.size());
-            for (size_t i = 0; i < this->value.size(); i++)
-                arr[i] = static_cast<int32_t>(this->value[i]);
-            return std::make_unique<ArrayValue<int32_t>>(arr, this->shape);
-        }
-        case DataType::Integer64: {
+        case core::DataType::Integer16: {
             std::vector<int64_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
                 arr[i] = static_cast<int64_t>(this->value[i]);
-            return std::make_unique<ArrayValue<int64_t>>(arr, this->shape);
+            return std::make_unique<ArrayValue<int64_t>>(arr, this->shape, dt);
         }
-        case DataType::Integer16_U: {
-            std::vector<uint16_t> arr(this->value.size());
+        case core::DataType::Integer32: {
+            std::vector<int64_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
-                arr[i] = static_cast<uint16_t>(this->value[i]);
-            return std::make_unique<ArrayValue<uint16_t>>(arr, this->shape);
+                arr[i] = static_cast<int64_t>(this->value[i]);
+            return std::make_unique<ArrayValue<int64_t>>(arr, this->shape, dt);
         }
-        case DataType::Integer32_U: {
-            std::vector<uint32_t> arr(this->value.size());
+        case core::DataType::Integer64: {
+            std::vector<int64_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
-                arr[i] = static_cast<uint32_t>(this->value[i]);
-            return std::make_unique<ArrayValue<uint32_t>>(arr, this->shape);
+                arr[i] = static_cast<int64_t>(this->value[i]);
+            return std::make_unique<ArrayValue<int64_t>>(arr, this->shape, dt);
         }
-        case DataType::Integer64_U: {
+        case core::DataType::Integer16_U: {
             std::vector<uint64_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
                 arr[i] = static_cast<uint64_t>(this->value[i]);
-            return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape);
+            return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape, dt);
         }
-        case DataType::Float32: {
-            std::vector<float> arr(this->value.size());
+        case core::DataType::Integer32_U: {
+            std::vector<uint64_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
-                arr[i] = static_cast<float>(this->value[i]);
-            return std::make_unique<ArrayValue<float>>(arr, this->shape);
+                arr[i] = static_cast<uint64_t>(this->value[i]);
+            return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape, dt);
         }
-        case DataType::Float64: {
+        case core::DataType::Integer64_U: {
+            std::vector<uint64_t> arr(this->value.size());
+            for (size_t i = 0; i < this->value.size(); i++)
+                arr[i] = static_cast<uint64_t>(this->value[i]);
+            return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape, dt);
+        }
+        case core::DataType::Float32: {
             std::vector<double> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
                 arr[i] = static_cast<double>(this->value[i]);
-            return std::make_unique<ArrayValue<double>>(arr, this->shape);
+            return std::make_unique<ArrayValue<double>>(arr, this->shape, dt);
         }
-        case DataType::Float128: {
+        case core::DataType::Float64: {
+            std::vector<double> arr(this->value.size());
+            for (size_t i = 0; i < this->value.size(); i++)
+                arr[i] = static_cast<double>(this->value[i]);
+            return std::make_unique<ArrayValue<double>>(arr, this->shape, dt);
+        }
+        case core::DataType::Float128: {
             std::vector<long double> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
                 arr[i] = static_cast<long double>(this->value[i]);
-            return std::make_unique<ArrayValue<long double>>(arr, this->shape);
+            return std::make_unique<ArrayValue<long double>>(arr, this->shape, dt);
         }
-        case DataType::String: {
+        case core::DataType::String: {
             std::vector<std::string> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++) {
                 if (this->value[i])
@@ -75,7 +78,7 @@ namespace snt::val {
                 else
                     arr[i] = std::string(core::KEYWORD_FALSE);
             }
-            return std::make_unique<ArrayValue<std::string>>(arr, this->shape);
+            return std::make_unique<ArrayValue<std::string>>(arr, this->shape, dt);
         }
         default:
             throw std::runtime_error("Not implemented");

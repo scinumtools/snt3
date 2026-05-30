@@ -1,7 +1,6 @@
 #include "pch_tests.h"
 
-#include <snt/val/value_base.h>
-#include <snt/val/values_boolean.h>
+#include <snt/val/values.h>
 #include <sstream>
 
 using namespace snt;
@@ -12,19 +11,19 @@ TEST(Definitions, Boolean) {
     val::Array::ShapeType sh = {2, 3};
     val::BaseValue::PointerType val;
 
-    val = std::make_unique<val::ArrayValue<bool>>(false);
+    val = std::make_unique<val::ArrayValueBool>(false);
     EXPECT_EQ(val->to_string(), "false");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Boolean);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({1}));
 
-    val = std::make_unique<val::ArrayValue<bool>>(arr);
+    val = std::make_unique<val::ArrayValueBool>(arr);
     EXPECT_EQ(val->to_string(), "[true, false, false, true, true, false]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Boolean);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({6}));
 
-    val = std::make_unique<val::ArrayValue<bool>>(arr, sh);
+    val = std::make_unique<val::ArrayValueBool>(arr, sh);
     EXPECT_EQ(val->to_string(), "[[true, false, false], [true, true, false]]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Boolean);
     EXPECT_EQ(val->get_shape(), sh);
 }
 
@@ -34,19 +33,19 @@ TEST(Definitions, Character) {
     val::Array::ShapeType sh = {2, 3};
     val::BaseValue::PointerType val;
 
-    val = std::make_unique<val::ArrayValue<char>>(65);
+    val = std::make_unique<val::ArrayValueChar>(65);
     EXPECT_EQ(val->to_string(), "A");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Character);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Character);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({1}));
 
-    val = std::make_unique<val::ArrayValue<char>>(arr);
+    val = std::make_unique<val::ArrayValueChar>(arr);
     EXPECT_EQ(val->to_string(), "[A, B, C, D, E, F]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Character);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Character);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({6}));
 
-    val = std::make_unique<val::ArrayValue<char>>(arr, sh);
+    val = std::make_unique<val::ArrayValueChar>(arr, sh);
     EXPECT_EQ(val->to_string(), "[[A, B, C], [D, E, F]]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Character);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Character);
     EXPECT_EQ(val->get_shape(), sh);
 }
 
@@ -56,19 +55,19 @@ TEST(Definitions, Integer) {
     val::Array::ShapeType sh = {2, 3};
     val::BaseValue::PointerType val;
 
-    val = std::make_unique<val::ArrayValue<int>>(4);
+    val = std::make_unique<val::ArrayValueInt32>(4);
     EXPECT_EQ(val->to_string(), "4");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Integer32);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({1}));
 
-    val = std::make_unique<val::ArrayValue<int>>(arr);
+    val = std::make_unique<val::ArrayValueInt32>(arr);
     EXPECT_EQ(val->to_string(), "[0, 2, 33, 45, 2343, 100023]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Integer32);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({6}));
 
-    val = std::make_unique<val::ArrayValue<int>>(arr, sh);
+    val = std::make_unique<val::ArrayValueInt32>(arr, sh);
     EXPECT_EQ(val->to_string(), "[[0, 2, 33], [45, 2343, 100023]]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Integer32);
     EXPECT_EQ(val->get_shape(), sh);
 }
 
@@ -78,19 +77,19 @@ TEST(Definitions, Float) {
     val::Array::ShapeType sh = {2, 3};
     val::BaseValue::PointerType val;
 
-    val = std::make_unique<val::ArrayValue<double>>(-1.234e+05);
+    val = std::make_unique<val::ArrayValueFloat64>(-1.234e+05);
     EXPECT_EQ(val->to_string(), "-1.234e5");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Float64);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Float64);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({1}));
 
-    val = std::make_unique<val::ArrayValue<double>>(arr);
+    val = std::make_unique<val::ArrayValueFloat64>(arr);
     EXPECT_EQ(val->to_string(), "[0, 2, 33.3, 4.5e3, 340, -1e8]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Float64);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Float64);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({6}));
 
-    val = std::make_unique<val::ArrayValue<double>>(arr, sh);
+    val = std::make_unique<val::ArrayValueFloat64>(arr, sh);
     EXPECT_EQ(val->to_string(), "[[0, 2, 33.3], [4.5e3, 340, -1e8]]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::Float64);
+    EXPECT_EQ(val->get_dtype(), core::DataType::Float64);
     EXPECT_EQ(val->get_shape(), sh);
 }
 
@@ -100,25 +99,25 @@ TEST(Definitions, String) {
     val::Array::ShapeType sh = {2, 3};
     val::BaseValue::PointerType val;
 
-    val = std::make_unique<val::ArrayValue<std::string>>("Hello World");
+    val = std::make_unique<val::ArrayValueStr>("Hello World");
     EXPECT_EQ(val->to_string(), "\"Hello World\"");
-    EXPECT_EQ(val->get_dtype(), val::DataType::String);
+    EXPECT_EQ(val->get_dtype(), core::DataType::String);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({1}));
 
-    val = std::make_unique<val::ArrayValue<std::string>>(arr);
+    val = std::make_unique<val::ArrayValueStr>(arr);
     EXPECT_EQ(val->to_string(), "[\"a\", \"b\", \"c\", \"d\", \"e\", \"f\"]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::String);
+    EXPECT_EQ(val->get_dtype(), core::DataType::String);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType({6}));
 
-    val = std::make_unique<val::ArrayValue<std::string>>(arr, sh);
+    val = std::make_unique<val::ArrayValueStr>(arr, sh);
     EXPECT_EQ(val->to_string(), "[[\"a\", \"b\", \"c\"], [\"d\", \"e\", \"f\"]]");
-    EXPECT_EQ(val->get_dtype(), val::DataType::String);
+    EXPECT_EQ(val->get_dtype(), core::DataType::String);
     EXPECT_EQ(val->get_shape(), val::Array::ShapeType(sh));
 }
 
 TEST(Definitions, ToString) {
 
-    val::ArrayValue<int> val(4);
+    val::ArrayValueInt32 val(4);
     EXPECT_EQ(val.to_string(), "4");
 
     std::ostringstream oss;

@@ -106,7 +106,9 @@ add_subdirectory(src)                  # build dip-cpp library
 add_subdirectory(apps)                 # build executable applications
 add_subdirectory(examples)             # build example applications
 add_subdirectory(tests)                # build gtest executable
-add_subdirectory(bindings/python/cpp)  # build Python bindings
+if (ENABLE_PUQ AND ENABLE_DIP)         
+   add_subdirectory(bindings/python/cpp)  # build Python bindings
+endif()
 
 # setup Google Benchmark
 ########################

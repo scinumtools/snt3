@@ -10,17 +10,19 @@ namespace snt::val {
 
     template <> class ArrayValue<bool> : public BaseArrayValue<bool> {
       public:
-        ArrayValue(const bool& val) : BaseArrayValue(val) {};
-        ArrayValue(const std::vector<bool>& arr, const Array::ShapeType& sh) : BaseArrayValue(arr, sh) {};
-        ArrayValue(const std::vector<bool>& arr) : BaseArrayValue(arr, {arr.size()}) {};
-        ArrayValue(const BaseValue* other) : BaseArrayValue<bool>(other) {};
+        ArrayValue(const bool& val, const core::DataType dtype) : BaseArrayValue(val, dtype) {};
+        ArrayValue(const std::vector<bool>& arr, const Array::ShapeType& sh, const core::DataType dtype)
+            : BaseArrayValue(arr, sh, dtype) {};
+        ArrayValue(const std::vector<bool>& arr, const core::DataType dtype)
+            : BaseArrayValue(arr, {arr.size()}, dtype) {};
+        ArrayValue(const BaseValue* other, const core::DataType dtype) : BaseArrayValue<bool>(other, dtype) {};
 
       public:
         BaseValue::PointerType clone() const override {
-            return std::make_unique<ArrayValue<bool>>(this->value, this->shape);
+            return std::make_unique<ArrayValue<bool>>(this->value, this->shape, this->dtype);
         };
         BaseValue::PointerType slice(const Array::RangeType& slice) override { return this->slice_value(slice); };
-        BaseValue::PointerType cast_as(DataType dt) const override;
+        BaseValue::PointerType cast_as(core::DataType dt) const override;
         BaseValue::PointerType logical_and(const BaseValue* other) const override;
         BaseValue::PointerType logical_or(const BaseValue* other) const override;
         BaseValue::PointerType logical_not() const override;

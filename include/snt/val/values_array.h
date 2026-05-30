@@ -25,24 +25,27 @@ namespace snt::val {
          * @brief Base array value constructor from a scalar value
          *
          * @param val Scalar value
+         * @param dtype Datatype flag
          */
-        BaseArrayValue(const T& val) : value({val}), BaseValue(this->deduce_dtype(), {1}) {};
+        BaseArrayValue(const T& val, const core::DataType dtype) : value({val}), BaseValue(dtype, {1}) {};
 
         /**
          * @brief Base array value constructor from a flattened vector of values and a shape
          *
          * @param arr Vector of values
          * @param sh Array shape
+         * @param dtype Datatype flag
          */
-        BaseArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh)
-            : value(arr), BaseValue(this->deduce_dtype(), sh) {};
+        BaseArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh, const core::DataType dtype)
+            : value(arr), BaseValue(dtype, sh) {};
 
         /**
          * @brief Base array value constructor from a BaseValue pointer
          *
          * @param other Pointer to a BaseValue object
+         * @param dtype Datatype flag
          */
-        BaseArrayValue(const BaseValue* other) : BaseValue(this->deduce_dtype(), other->get_shape()) {
+        BaseArrayValue(const BaseValue* other, const core::DataType dtype) : BaseValue(dtype, other->get_shape()) {
             const BaseArrayValue<T>* otherT;
             BaseValue::PointerType casted_other;
             if (this->dtype == other->get_dtype()) {
@@ -101,38 +104,12 @@ namespace snt::val {
          */
         size_t get_size() const override { return value.size(); };
 
-      protected:
-        static constexpr DataType deduce_dtype() {
-            if constexpr (std::is_same_v<T, bool>) {
-                return DataType::Boolean;
-            } else if constexpr (std::is_same_v<T, char>) {
-                return DataType::Character;
-            } else if constexpr (std::is_same_v<T, int16_t>) {
-                return DataType::Integer16;
-            } else if constexpr (std::is_same_v<T, int32_t>) {
-                return DataType::Integer32;
-            } else if constexpr (std::is_same_v<T, int64_t>) {
-                return DataType::Integer64;
-            } else if constexpr (std::is_same_v<T, uint16_t>) {
-                return DataType::Integer16_U;
-            } else if constexpr (std::is_same_v<T, uint32_t>) {
-                return DataType::Integer32_U;
-            } else if constexpr (std::is_same_v<T, uint64_t>) {
-                return DataType::Integer64_U;
-            } else if constexpr (std::is_same_v<T, float>) {
-                return DataType::Float32;
-            } else if constexpr (std::is_same_v<T, double>) {
-                return DataType::Float64;
-            } else if constexpr (std::is_same_v<T, long double>) {
-                return DataType::Float128;
-            } else if constexpr (std::is_same_v<T, std::string>) {
-                return DataType::String;
-            } else {
-                static_assert(sizeof(T) == 0, "Unsupported type T");
-            }
-        }
-
-      public:
+        /**
+         * @brief Print value into a string stream
+         *
+         * @param os String stream
+         * @param val Value object
+         */
         friend std::ostream& operator<<(std::ostream& os, const ArrayValue<T>& val) { return os << val.to_string(); };
 
         /**
@@ -142,7 +119,7 @@ namespace snt::val {
          * @return String representation
          */
         std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override {
-            return core::array_to_string(value, shape, format);
+            return core::array_to_string(value, shape, dtype, format);
         };
 
         /*
@@ -154,7 +131,7 @@ namespace snt::val {
             std::vector<R> arr(value.size());
             for (int i = 0; i < value.size(); i++)
                 arr[i] = f(value[i]);
-            return std::make_unique<ArrayValue<R>>(arr, this->shape);
+            return std::make_unique<ArrayValue<R>>(arr, this->shape, dtype);
         };
 
         template <typename R, typename Func> void operate_unary_equal(Func f) {
@@ -167,20 +144,20 @@ namespace snt::val {
         std::unique_ptr<ArrayValue<R>> operate_binary(const BaseValue* other, Func f) const {
             std::vector<R> arr;
             if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
-                const ArrayValue<T> otherT(other);
-                return std::make_unique<ArrayValue<R>>(f(this->get_value(0), otherT.get_value(0)));
+                const ArrayValue<T> otherT(other, dtype);
+                return std::make_unique<ArrayValue<R>>(f(this->get_value(0), otherT.get_value(0)), dtype);
             } else if (this->get_size() == 1) { // left is a scalar
-                const ArrayValue<T> otherT(other);
+                const ArrayValue<T> otherT(other, dtype);
                 arr.reserve(other->get_size());
                 for (int i = 0; i < other->get_size(); i++)
                     arr.push_back(f(this->get_value(0), otherT.get_value(i)));
-                return std::make_unique<ArrayValue<R>>(arr, otherT.get_shape());
+                return std::make_unique<ArrayValue<R>>(arr, otherT.get_shape(), dtype);
             } else if (other->get_size() == 1) { // right is a scalar
-                const ArrayValue<T> otherT(other);
+                const ArrayValue<T> otherT(other, dtype);
                 arr.reserve(this->get_size());
                 for (int i = 0; i < this->get_size(); i++)
                     arr.push_back(f(this->get_value(i), otherT.get_value(0)));
-                return std::make_unique<ArrayValue<R>>(arr, this->get_shape());
+                return std::make_unique<ArrayValue<R>>(arr, this->get_shape(), dtype);
             } else { // both are arrays
                 // test if shape match
                 if (shape.size() != other->get_shape().size()) // Compare shape size
@@ -189,20 +166,20 @@ namespace snt::val {
                     if (shape[i] != other->get_shape()[i])
                         throw std::runtime_error("Arrays have incompatible shapes");
                 // apply operation
-                const ArrayValue<T> otherT(other);
+                const ArrayValue<T> otherT(other, dtype);
                 arr.reserve(this->get_size());
                 for (int i = 0; i < this->get_size(); i++)
                     arr.push_back(f(this->get_value(i), otherT.get_value(i)));
-                return std::make_unique<ArrayValue<R>>(arr, this->get_shape());
+                return std::make_unique<ArrayValue<R>>(arr, this->get_shape(), dtype);
             }
         };
 
         template <typename R, typename Func> void operate_binary_equal(const BaseValue* other, Func f) {
             if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
-                const ArrayValue<T> otherT(other);
+                const ArrayValue<T> otherT(other, dtype);
                 value[0] = f(this->get_value(0), otherT.get_value(0));
             } else if (this->get_size() == 1) { // left is a scalar
-                const ArrayValue<T> otherT(other);
+                const ArrayValue<T> otherT(other, dtype);
                 T val = this->get_value(0);
                 value.clear();
                 value.reserve(otherT.get_size());
@@ -210,7 +187,7 @@ namespace snt::val {
                 for (int i = 0; i < otherT.get_size(); i++)
                     value.push_back(f(val, otherT.get_value(i)));
             } else if (other->get_size() == 1) { // right is a scalar
-                const ArrayValue<T> otherT(other);
+                const ArrayValue<T> otherT(other, dtype);
                 for (int i = 0; i < this->get_size(); i++)
                     value[i] = f(this->get_value(i), otherT.get_value(0));
             } else { // both are arrays
@@ -221,7 +198,7 @@ namespace snt::val {
                     if (shape[i] != other->get_shape()[i])
                         throw std::runtime_error("Arrays have incompatible shapes");
                 // apply operation
-                const ArrayValue<T> otherT(other);
+                const ArrayValue<T> otherT(other, dtype);
                 for (int i = 0; i < this->get_size(); i++)
                     value[i] = f(this->get_value(i), otherT.get_value(i));
             }
@@ -240,12 +217,12 @@ namespace snt::val {
                     throw std::runtime_error("Second other has incompatible shape");
             }
             // apply operation
-            const ArrayValue<U> other1T(other1);
-            const ArrayValue<R> other2T(other2);
+            const ArrayValue<U> other1T(other1, dtype);
+            const ArrayValue<R> other2T(other2, dtype);
             std::vector<R> arr(value.size());
             for (int i = 0; i < value.size(); i++)
                 arr[i] = f(other1T.get_value(i), value[i], other2T.value[i]);
-            return std::make_unique<ArrayValue<R>>(arr, this->shape);
+            return std::make_unique<ArrayValue<R>>(arr, this->shape, dtype);
         };
 
       public:
@@ -313,9 +290,9 @@ namespace snt::val {
                 }
             }
             if (new_size > 1)
-                return std::make_unique<ArrayValue<T>>(new_value, new_shape);
+                return std::make_unique<ArrayValue<T>>(new_value, new_shape, dtype);
             else
-                return std::make_unique<ArrayValue<T>>(new_value[0]);
+                return std::make_unique<ArrayValue<T>>(new_value[0], dtype);
         };
         BaseValue::PointerType where(const BaseValue* condition, const BaseValue* other) const override {
             return operate_ternary<bool, T>(condition, other, [](bool c, T a, T b) { return c ? a : b; });

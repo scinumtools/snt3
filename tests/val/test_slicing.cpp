@@ -1,6 +1,6 @@
 #include "pch_tests.h"
 
-#include <snt/val/values_array.h>
+#include <snt/val/values.h>
 
 using namespace snt;
 
@@ -8,7 +8,7 @@ TEST(Slicing, Basic) {
 
     std::vector<int> arr = {1, 2, 3, 4, 5, 6};
     val::Array::ShapeType shape({2, 3});
-    val::BaseValue::PointerType val = std::make_unique<val::ArrayValue<int>>(arr, shape);
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueInt32>(arr, shape);
     EXPECT_EQ(val->to_string(), "[[1, 2, 3], [4, 5, 6]]");
     val::BaseValue::PointerType bval;
 

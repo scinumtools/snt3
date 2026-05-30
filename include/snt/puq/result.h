@@ -4,8 +4,7 @@
 #include <snt/puq/exponent.h>
 #include <snt/puq/settings.h>
 #include <snt/puq/unit_format.h>
-#include <snt/val/value_base.h>
-#include <snt/val/values_array.h>
+#include <snt/val/values.h>
 #include <variant>
 
 namespace snt::puq {
@@ -29,11 +28,11 @@ namespace snt::puq {
         }
         Result(Result&&) noexcept = default;
         Result& operator=(Result&&) noexcept = default;
-        Result() : estimate(std::make_unique<val::ArrayValue<double>>(1)), uncertainty(nullptr) {}
-        Result(const double m) : estimate(std::make_unique<val::ArrayValue<double>>(m)), uncertainty(nullptr) {}
+        Result() : estimate(std::make_unique<val::ArrayValueFloat64>(1)), uncertainty(nullptr) {}
+        Result(const double m) : estimate(std::make_unique<val::ArrayValueFloat64>(m)), uncertainty(nullptr) {}
         Result(const double m, const double e)
-            : estimate(std::make_unique<val::ArrayValue<double>>(m)),
-              uncertainty(std::make_unique<val::ArrayValue<double>>(e)) {}
+            : estimate(std::make_unique<val::ArrayValueFloat64>(m)),
+              uncertainty(std::make_unique<val::ArrayValueFloat64>(e)) {}
         Result(val::BaseValue::PointerType m);
         Result(val::BaseValue::PointerType m, val::BaseValue::PointerType e);
 

@@ -26,7 +26,7 @@ namespace snt::dip {
             std::string value_raw;
             std::string units_raw;
         };
-        val::DataType value_dtype;
+        core::DataType value_dtype;
 
       public:
         using PointerType = std::shared_ptr<ValueNode>;
@@ -40,8 +40,8 @@ namespace snt::dip {
         std::vector<OptionStruct> options;
         std::string format;
         ValueNode() : constant(false) {};
-        ValueNode(const val::DataType vdt) : constant(false), value_dtype(vdt) {};
-        ValueNode(const std::string& nm, const val::DataType vdt);
+        ValueNode(const core::DataType vdt) : constant(false), value_dtype(vdt) {};
+        ValueNode(const std::string& nm, const core::DataType vdt);
         ValueNode(
             const std::string& nm, val::BaseValue::PointerType val, std::optional<puq::Quantity> unt = std::nullopt
         );

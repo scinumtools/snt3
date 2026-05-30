@@ -10,10 +10,10 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <snt/core/datatypes.h>
 #include <snt/core/settings.h>
 #include <snt/core/string_format.h>
 #include <snt/val/array.h>
-#include <snt/val/datatypes.h>
 #include <sstream>
 #include <typeinfo>
 #include <unordered_map>
@@ -28,19 +28,19 @@ namespace snt::val {
     class BaseValue {
       protected:
         Array::ShapeType shape;
-        DataType dtype;
+        core::DataType dtype;
 
       public:
         using PointerType = std::unique_ptr<BaseValue>;
-        BaseValue(DataType dt, Array::ShapeType sh) : dtype(dt), shape(sh) {};
+        BaseValue(core::DataType dt, Array::ShapeType sh) : dtype(dt), shape(sh) {};
         virtual ~BaseValue() = default;
         virtual void print() = 0;
         virtual std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const = 0;
         Array::ShapeType get_shape() const { return shape; };
-        DataType get_dtype() const { return dtype; };
+        core::DataType get_dtype() const { return dtype; };
         virtual size_t get_size() const = 0;
         virtual BaseValue::PointerType clone() const = 0;
-        virtual BaseValue::PointerType cast_as(DataType dt) const = 0;
+        virtual BaseValue::PointerType cast_as(core::DataType dt) const = 0;
         virtual BaseValue::PointerType slice(const Array::RangeType& slice) = 0;
         // Arithmetic operators
         virtual BaseValue::PointerType math_add(const BaseValue* other) const {

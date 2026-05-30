@@ -1,7 +1,6 @@
 #include "pch_tests.h"
 
-#include <snt/val/value_base.h>
-#include <snt/val/values_number.h>
+#include <snt/val/values.h>
 
 using namespace snt;
 
@@ -9,9 +8,9 @@ TEST(Math, Add) {
 
     std::vector<double> arr1 = {12.3, 2.3, 1.0345};
     std::vector<double> arr2 = {34e2, 0.004, 3};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<double>>(arr2);
-    val::BaseValue::PointerType val3 = std::make_unique<val::ArrayValue<double>>(2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueFloat64>(arr2);
+    val::BaseValue::PointerType val3 = std::make_unique<val::ArrayValueFloat64>(2);
     val::BaseValue::PointerType val4;
 
     // binary
@@ -45,8 +44,8 @@ TEST(Math, Sub) {
 
     std::vector<double> arr1 = {12.3, 2.3, 1.0345};
     std::vector<double> arr2 = {34e2, 0.004, 3};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<double>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueFloat64>(arr2);
     val::BaseValue::PointerType val4;
 
     val4 = val1->math_sub(val2.get());
@@ -59,7 +58,7 @@ TEST(Math, Sub) {
 TEST(Math, Neg) {
 
     std::vector<double> arr1 = {12.3, 2.3, 1.0345};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr1);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr1);
     val::BaseValue::PointerType val2;
 
     val2 = val1->math_neg();
@@ -70,8 +69,8 @@ TEST(Math, Mul) {
 
     std::vector<double> arr1 = {12.3, 2.3, 1.0345};
     std::vector<double> arr2 = {34e2, 0.004, 3};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<double>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueFloat64>(arr2);
     val::BaseValue::PointerType val4;
 
     val4 = val1->math_mul(val2.get());
@@ -85,8 +84,8 @@ TEST(Math, Div) {
 
     std::vector<double> arr1 = {12.3, 2.3, 1.0345};
     std::vector<double> arr2 = {34e2, 0.004, 3};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<double>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueFloat64>(arr2);
     val::BaseValue::PointerType val4;
 
     val4 = val1->math_div(val2.get());
@@ -99,7 +98,7 @@ TEST(Math, Div) {
 TEST(Math, Inv) {
 
     std::vector<double> arr1 = {12.3, 2.3, 1.0345};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr1);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr1);
     val::BaseValue::PointerType val2;
 
     val2 = val1->math_inv();
@@ -109,7 +108,7 @@ TEST(Math, Inv) {
 TEST(Math, Log) {
 
     std::vector<double> arr = {12e3, 2e4, 1.0345};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr);
     val::BaseValue::PointerType val2;
 
     val2 = val1->math_log();
@@ -119,7 +118,7 @@ TEST(Math, Log) {
 TEST(Math, Log10) {
 
     std::vector<double> arr = {12.3, 2.3, 1.0345};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr);
     val::BaseValue::PointerType val2;
 
     val2 = val1->math_log10();
@@ -129,7 +128,7 @@ TEST(Math, Log10) {
 TEST(Math, Sqrt) {
 
     std::vector<double> arr = {12e3, 2e4, 1.0345};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr);
     val::BaseValue::PointerType val2;
 
     val2 = val1->math_sqrt();
@@ -139,7 +138,7 @@ TEST(Math, Sqrt) {
 TEST(Math, Cbrt) {
 
     std::vector<double> arr = {12.3, 2.3, 1.0345};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr);
     val::BaseValue::PointerType val2;
 
     val2 = val1->math_cbrt();
@@ -149,7 +148,7 @@ TEST(Math, Cbrt) {
 TEST(Math, Exp) {
 
     std::vector<double> arr = {12.3, 2.3, 1.0345};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr);
     val::BaseValue::PointerType val2;
 
     val2 = val1->math_exp();
@@ -159,7 +158,7 @@ TEST(Math, Exp) {
 TEST(Math, Floor) {
 
     std::vector<double> arr = {12.3, 2.3, 1.0345};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr);
     val::BaseValue::PointerType val2;
 
     val2 = val1->math_floor();
@@ -169,7 +168,7 @@ TEST(Math, Floor) {
 TEST(Math, Ceil) {
 
     std::vector<double> arr = {12.3, 2.3, 1.0345};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<double>>(arr);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueFloat64>(arr);
     val::BaseValue::PointerType val2;
 
     val2 = val1->math_ceil();
@@ -180,8 +179,8 @@ TEST(Math, IntFloatConversion) {
 
     std::vector<int> arr1 = {2, 3, 4};
     std::vector<double> arr2 = {3.4, 4.5, 5.6};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<int>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<double>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueInt32>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueFloat64>(arr2);
     val::BaseValue::PointerType val3;
 
     // addition

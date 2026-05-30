@@ -1,7 +1,6 @@
 #include "pch_tests.h"
 
-#include <snt/val/value_base.h>
-#include <snt/val/values_boolean.h>
+#include <snt/val/values.h>
 
 using namespace snt;
 
@@ -9,8 +8,8 @@ TEST(Comparison, Equal) { // ==
 
     std::vector<bool> arr1 = {true, false, false};
     std::vector<bool> arr2 = {false, false, false};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<bool>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<bool>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueBool>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueBool>(arr2);
     val::BaseValue::PointerType val3;
 
     val3 = val1->compare_equal(val1.get());
@@ -24,8 +23,8 @@ TEST(Comparison, NotEqual) { // !=
 
     std::vector<bool> arr1 = {true, false, false};
     std::vector<bool> arr2 = {false, false, false};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<bool>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<bool>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueBool>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueBool>(arr2);
     val::BaseValue::PointerType val3;
 
     val3 = val1->compare_not_equal(val1.get());
@@ -39,8 +38,8 @@ TEST(Comparison, Greater) { // >
 
     std::vector<int> arr1 = {1, 2, 3};
     std::vector<int> arr2 = {3, 1, 2};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<int>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<int>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueInt32>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueInt32>(arr2);
     val::BaseValue::PointerType val3;
 
     val3 = val1->compare_greater(val1.get());
@@ -54,8 +53,8 @@ TEST(Comparison, Less) { // <
 
     std::vector<int> arr1 = {1, 2, 3};
     std::vector<int> arr2 = {3, 1, 2};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<int>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<int>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueInt32>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueInt32>(arr2);
     val::BaseValue::PointerType val3;
 
     val3 = val1->compare_less(val1.get());
@@ -69,8 +68,8 @@ TEST(Comparison, GreaterEqual) { // >=
 
     std::vector<int> arr1 = {1, 2, 3};
     std::vector<int> arr2 = {3, 1, 2};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<int>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<int>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueInt32>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueInt32>(arr2);
     val::BaseValue::PointerType val3;
 
     val3 = val1->compare_greater_equal(val1.get());
@@ -84,8 +83,8 @@ TEST(Comparison, LessEqual) { // <=
 
     std::vector<int> arr1 = {1, 2, 3};
     std::vector<int> arr2 = {3, 1, 2};
-    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValue<int>>(arr1);
-    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValue<int>>(arr2);
+    val::BaseValue::PointerType val1 = std::make_unique<val::ArrayValueInt32>(arr1);
+    val::BaseValue::PointerType val2 = std::make_unique<val::ArrayValueInt32>(arr2);
     val::BaseValue::PointerType val3;
 
     val3 = val1->compare_less_equal(val1.get());

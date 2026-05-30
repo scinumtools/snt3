@@ -47,32 +47,39 @@ TEST(StringFormat, BooleanArrays) {
 
     std::vector<bool> value = {true, false, true, false, true, false};
     std::vector<size_t> shape = {2, 3};
-    EXPECT_EQ(core::array_to_string(value, shape), "[[true, false, true], [false, true, false]]");
+    EXPECT_EQ(
+        core::array_to_string(value, shape, core::DataType::Boolean), "[[true, false, true], [false, true, false]]"
+    );
 }
 
 TEST(StringFormat, CharArrays) {
 
     std::vector<char> value = {'a', 'b', 'c', 'd', 'e', 'f'};
     std::vector<size_t> shape = {2, 3};
-    EXPECT_EQ(core::array_to_string(value, shape), "[[a, b, c], [d, e, f]]");
+    EXPECT_EQ(core::array_to_string(value, shape, core::DataType::Character), "[[a, b, c], [d, e, f]]");
 }
 
 TEST(StringFormat, NumberArrays) {
 
     std::vector<double> value = {1, 2, 3, 4, 5, 6};
     std::vector<size_t> shape = {2, 3};
-    EXPECT_EQ(core::array_to_string(value, shape), "[[1, 2, 3], [4, 5, 6]]");
+    EXPECT_EQ(core::array_to_string(value, shape, core::DataType::Float64), "[[1, 2, 3], [4, 5, 6]]");
 
     value = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     shape = {2, 2, 3};
-    EXPECT_EQ(core::array_to_string(value, shape), "[[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]]");
+    EXPECT_EQ(
+        core::array_to_string(value, shape, core::DataType::Float64),
+        "[[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]]"
+    );
 }
 
 TEST(StringFormat, StringArrays) {
 
     std::vector<std::string> value = {"a", "b", "c", "d", "e", "f"};
     std::vector<size_t> shape = {2, 3};
-    EXPECT_EQ(core::array_to_string(value, shape), "[[\"a\", \"b\", \"c\"], [\"d\", \"e\", \"f\"]]");
+    EXPECT_EQ(
+        core::array_to_string(value, shape, core::DataType::String), "[[\"a\", \"b\", \"c\"], [\"d\", \"e\", \"f\"]]"
+    );
 }
 
 TEST(StringFormat, ToString) {
@@ -82,9 +89,9 @@ TEST(StringFormat, ToString) {
     std::vector<size_t> shape = {1};
 
     // test string settings
-    EXPECT_EQ(core::array_to_string(value, shape), "\"foo\"");
+    EXPECT_EQ(core::array_to_string(value, shape, core::DataType::String), "\"foo\"");
     format.stringQuotes = false;
-    EXPECT_EQ(core::array_to_string(value, shape, format), "foo");
+    EXPECT_EQ(core::array_to_string(value, shape, core::DataType::String, format), "foo");
 
     // TODO: implement more format tests
 }

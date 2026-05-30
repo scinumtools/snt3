@@ -11,17 +11,19 @@ namespace snt::val {
 
     template <> class ArrayValue<std::string> : public BaseArrayValue<std::string> {
       public:
-        ArrayValue(const std::string& val) : BaseArrayValue(val) {};
-        ArrayValue(const val::Array::StringType& arr, const val::Array::ShapeType& sh) : BaseArrayValue(arr, sh) {};
-        ArrayValue(const val::Array::StringType& arr) : BaseArrayValue(arr, {arr.size()}) {};
-        ArrayValue(const BaseValue* other) : BaseArrayValue<std::string>(other) {};
+        ArrayValue(const std::string& val, const core::DataType dtype) : BaseArrayValue(val, dtype) {};
+        ArrayValue(const val::Array::StringType& arr, const val::Array::ShapeType& sh, const core::DataType dtype)
+            : BaseArrayValue(arr, sh, dtype) {};
+        ArrayValue(const val::Array::StringType& arr, const core::DataType dtype)
+            : BaseArrayValue(arr, {arr.size()}, dtype) {};
+        ArrayValue(const BaseValue* other, const core::DataType dtype) : BaseArrayValue<std::string>(other, dtype) {};
 
       public:
         BaseValue::PointerType clone() const override {
-            return std::make_unique<ArrayValue<std::string>>(this->value, this->shape);
+            return std::make_unique<ArrayValue<std::string>>(this->value, this->shape, this->dtype);
         };
         BaseValue::PointerType slice(const Array::RangeType& slice) override { return this->slice_value(slice); };
-        BaseValue::PointerType cast_as(DataType dt) const override;
+        BaseValue::PointerType cast_as(core::DataType dt) const override;
         BaseValue::PointerType logical_and(const BaseValue* other) const override;
         BaseValue::PointerType logical_or(const BaseValue* other) const override;
         BaseValue::PointerType logical_not() const override;
