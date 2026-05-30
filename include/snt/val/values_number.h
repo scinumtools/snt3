@@ -217,13 +217,17 @@ namespace snt::val {
         };
         // logical
         BaseValue::PointerType logical_and(const BaseValue* other) const override {
-            return this->template operate_binary<bool>(other, [](T a, T b) { return a && b; });
+            return this->template operate_binary<uint8_t>(
+                other, [](T a, T b) { return a && b; }, core::DataType::Boolean
+            );
         };
         BaseValue::PointerType logical_or(const BaseValue* other) const override {
-            return this->template operate_binary<bool>(other, [](T a, T b) { return a || b; });
+            return this->template operate_binary<uint8_t>(
+                other, [](T a, T b) { return a || b; }, core::DataType::Boolean
+            );
         };
         BaseValue::PointerType logical_not() const override {
-            return this->template operate_unary<bool>([](T a) { return !a; });
+            return this->template operate_unary<uint8_t>([](T a) { return !a; }, core::DataType::Boolean);
         };
         // quantifies
         bool any_of() const override {

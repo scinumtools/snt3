@@ -1,7 +1,6 @@
 #ifndef VAL_VALUES_H
 #define VAL_VALUES_H
 
-#include <snt/val/values_boolean.h>
 #include <snt/val/values_number.h>
 #include <snt/val/values_string.h>
 

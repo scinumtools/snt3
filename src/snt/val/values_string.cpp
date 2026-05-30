@@ -105,19 +105,23 @@ namespace snt::val {
     };
 
     BaseValue::PointerType ArrayValue<std::string>::logical_and(const BaseValue* other) const {
-        return operate_binary<bool>(other, [](const std::string& a, const std::string& b) {
-            return !a.empty() && !b.empty();
-        });
+        return operate_binary<uint8_t>(
+            other,
+            [](const std::string& a, const std::string& b) { return !a.empty() && !b.empty(); },
+            core::DataType::Boolean
+        );
     }
 
     BaseValue::PointerType ArrayValue<std::string>::logical_or(const BaseValue* other) const {
-        return operate_binary<bool>(other, [](const std::string& a, const std::string& b) {
-            return !a.empty() || !b.empty();
-        });
+        return operate_binary<uint8_t>(
+            other,
+            [](const std::string& a, const std::string& b) { return !a.empty() || !b.empty(); },
+            core::DataType::Boolean
+        );
     };
 
     BaseValue::PointerType ArrayValue<std::string>::logical_not() const {
-        return operate_unary<bool>([](const std::string& a) { return a.empty(); });
+        return operate_unary<uint8_t>([](const std::string& a) { return a.empty(); }, core::DataType::Boolean);
     };
 
 } // namespace snt::val

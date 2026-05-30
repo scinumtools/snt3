@@ -126,38 +126,69 @@ namespace snt::val {
          * Operations
          */
       protected:
-        template <typename R, typename Func> std::unique_ptr<ArrayValue<R>> operate_unary(Func f) const {
+        /**
+         * @brief Perform unary operation on a array value
+         *
+         * @param f operation Function on self and other array value
+         * @param output_dtype DataType flage of the output (needed for booleans)
+         * @tparam R Output data type
+         * @tparam Func Type of the operation function (is deduced)
+         */
+        template <typename R, typename Func>
+        std::unique_ptr<ArrayValue<R>> operate_unary(Func f, core::DataType output_dtype = core::DataType::None) const {
+            if (output_dtype == core::DataType::None)
+                output_dtype = dtype;
             // apply operation
             std::vector<R> arr(value.size());
             for (int i = 0; i < value.size(); i++)
-                arr[i] = f(value[i]);
-            return std::make_unique<ArrayValue<R>>(arr, this->shape, dtype);
+                arr[i] = static_cast<R>(f(value[i]));
+            return std::make_unique<ArrayValue<R>>(arr, this->shape, output_dtype);
         };
 
+        /**
+         * @brief Perform unary assignment operation on a array value
+         *
+         * @param f operation Function on self and other array value
+         * @tparam R Output data type
+         * @tparam Func Type of the operation function (is deduced)
+         */
         template <typename R, typename Func> void operate_unary_equal(Func f) {
             // apply operation
             for (int i = 0; i < value.size(); i++)
                 value[i] = f(value[i]);
         };
 
+        /**
+         * @brief Perform binary operation on two array values
+         *
+         * @param other The right hand array value
+         * @param f operation Function on self and other array value
+         * @param output_dtype DataType flage of the output (needed for booleans)
+         * @tparam R Output data type
+         * @tparam Func Type of the operation function (is deduced)
+         */
         template <typename R, typename Func>
-        std::unique_ptr<ArrayValue<R>> operate_binary(const BaseValue* other, Func f) const {
+        std::unique_ptr<ArrayValue<R>> operate_binary(
+            const BaseValue* other, Func f, core::DataType output_dtype = core::DataType::None
+        ) const {
+            if (output_dtype == core::DataType::None)
+                output_dtype = dtype;
             std::vector<R> arr;
             if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
                 const ArrayValue<T> otherT(other, dtype);
-                return std::make_unique<ArrayValue<R>>(f(this->get_value(0), otherT.get_value(0)), dtype);
+                return std::make_unique<ArrayValue<R>>(f(this->get_value(0), otherT.get_value(0)), output_dtype);
             } else if (this->get_size() == 1) { // left is a scalar
                 const ArrayValue<T> otherT(other, dtype);
                 arr.reserve(other->get_size());
                 for (int i = 0; i < other->get_size(); i++)
                     arr.push_back(f(this->get_value(0), otherT.get_value(i)));
-                return std::make_unique<ArrayValue<R>>(arr, otherT.get_shape(), dtype);
+                return std::make_unique<ArrayValue<R>>(arr, otherT.get_shape(), output_dtype);
             } else if (other->get_size() == 1) { // right is a scalar
                 const ArrayValue<T> otherT(other, dtype);
                 arr.reserve(this->get_size());
                 for (int i = 0; i < this->get_size(); i++)
                     arr.push_back(f(this->get_value(i), otherT.get_value(0)));
-                return std::make_unique<ArrayValue<R>>(arr, this->get_shape(), dtype);
+                return std::make_unique<ArrayValue<R>>(arr, this->get_shape(), output_dtype);
             } else { // both are arrays
                 // test if shape match
                 if (shape.size() != other->get_shape().size()) // Compare shape size
@@ -170,10 +201,18 @@ namespace snt::val {
                 arr.reserve(this->get_size());
                 for (int i = 0; i < this->get_size(); i++)
                     arr.push_back(f(this->get_value(i), otherT.get_value(i)));
-                return std::make_unique<ArrayValue<R>>(arr, this->get_shape(), dtype);
+                return std::make_unique<ArrayValue<R>>(arr, this->get_shape(), output_dtype);
             }
         };
 
+        /**
+         * @brief Perform binary assignment operation with two array values
+         *
+         * @param other The right hand array value
+         * @param f operation Function on self and other array value
+         * @tparam R Output data type
+         * @tparam Func Type of the operation function (is deduced)
+         */
         template <typename R, typename Func> void operate_binary_equal(const BaseValue* other, Func f) {
             if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
                 const ArrayValue<T> otherT(other, dtype);
@@ -227,22 +266,22 @@ namespace snt::val {
 
       public:
         BaseValue::PointerType compare_equal(const BaseValue* other) const override {
-            return operate_binary<bool>(other, [](T a, T b) { return a == b; });
+            return operate_binary<uint8_t>(other, [](T a, T b) { return a == b; }, core::DataType::Boolean);
         };
         BaseValue::PointerType compare_not_equal(const BaseValue* other) const override {
-            return operate_binary<bool>(other, [](T a, T b) { return a != b; });
+            return operate_binary<uint8_t>(other, [](T a, T b) { return a != b; }, core::DataType::Boolean);
         };
         BaseValue::PointerType compare_less(const BaseValue* other) const override {
-            return operate_binary<bool>(other, [](T a, T b) { return a < b; });
+            return operate_binary<uint8_t>(other, [](T a, T b) { return a < b; }, core::DataType::Boolean);
         };
         BaseValue::PointerType compare_greater(const BaseValue* other) const override {
-            return operate_binary<bool>(other, [](T a, T b) { return a > b; });
+            return operate_binary<uint8_t>(other, [](T a, T b) { return a > b; }, core::DataType::Boolean);
         };
         BaseValue::PointerType compare_less_equal(const BaseValue* other) const override {
-            return operate_binary<bool>(other, [](T a, T b) { return a <= b; });
+            return operate_binary<uint8_t>(other, [](T a, T b) { return a <= b; }, core::DataType::Boolean);
         };
         BaseValue::PointerType compare_greater_equal(const BaseValue* other) const override {
-            return operate_binary<bool>(other, [](T a, T b) { return a >= b; });
+            return operate_binary<uint8_t>(other, [](T a, T b) { return a >= b; }, core::DataType::Boolean);
         };
         /*
          * Array slicing
@@ -301,7 +340,6 @@ namespace snt::val {
 
 } // namespace snt::val
 
-#include "values_boolean.h"
 #include "values_number.h"
 #include "values_string.h"
 
