@@ -11,7 +11,7 @@ namespace snt::puq::math {
         if (m.uncertainty) {
             // Treating limits where cos(x)->0, or 1/cos2(x)->inf
             val::BaseValue::PointerType cosx = m.estimate->math_cos();
-            val::ArrayValue<double> eps(1e-12); // defining a small threshold
+            val::ArrayValueFloat64 eps(1e-12); // defining a small threshold
             if (cosx->math_abs()->compare_less(&eps)->any_of()) {
                 // TODO: set inf values only to those array values which are truly less than eps
                 return puq::Result(m.estimate->math_tan(), m.uncertainty->math_inf());

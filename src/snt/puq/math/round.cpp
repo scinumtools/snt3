@@ -13,7 +13,7 @@ namespace snt::puq::math {
         }
 
         // Shift by 0.5 to reuse floor-style boundary detection
-        val::ArrayValue<double> half(0.5);
+        val::ArrayValueFloat64 half(0.5);
 
         // Compute interval bounds
         auto lower = res.estimate->math_sub(res.uncertainty.get())->math_add(&half);
@@ -28,7 +28,7 @@ namespace snt::puq::math {
             return puq::Result(std::move(est), nullptr);
         } else {
             // Discontinuity → result can jump
-            return puq::Result(std::move(est), std::make_unique<val::ArrayValue<double>>(half));
+            return puq::Result(std::move(est), std::make_unique<val::ArrayValueFloat64>(half));
         }
     }
 

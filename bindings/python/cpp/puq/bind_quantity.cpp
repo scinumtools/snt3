@@ -8,7 +8,7 @@
 namespace py = pybind11;
 using namespace snt;
 
-py::array_t<double> array_to_numpy(const val::ArrayValue<double>& varray) {
+py::array_t<double> array_to_numpy(const val::ArrayValueFloat64& varray) {
     py::array_t<double> numpy(varray.get_shape());
     py::buffer_info buf_info = numpy.request();
     double* ptr = static_cast<double*>(buf_info.ptr);
@@ -17,7 +17,7 @@ py::array_t<double> array_to_numpy(const val::ArrayValue<double>& varray) {
 }
 
 std::variant<double, std::vector<double>, py::array_t<double>> quantity_value(puq::Quantity q, bool numpy) {
-    val::ArrayValue<double> varray(q.measurement.result.estimate.get());
+    val::ArrayValueFloat64 varray(q.measurement.result.estimate.get());
     if (numpy) {
         return array_to_numpy(varray);
     } else if (q.measurement.result.estimate->get_size() == 1) {
@@ -30,14 +30,14 @@ std::variant<double, std::vector<double>, py::array_t<double>> quantity_value(pu
 std::variant<double, std::vector<double>, py::array_t<double>> quantity_get_value(
     const puq::Quantity& q, size_t index
 ) {
-    val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
+    val::ArrayValueFloat64* otherT = dynamic_cast<val::ArrayValueFloat64*>(q.measurement.result.estimate.get());
     return otherT->get_value(index);
 }
 
 std::variant<double, std::vector<double>, py::array_t<double>> quantity_uncertainty(
     const puq::Quantity& q, bool numpy
 ) {
-    val::ArrayValue<double> varray(q.measurement.result.uncertainty.get());
+    val::ArrayValueFloat64 varray(q.measurement.result.uncertainty.get());
     if (numpy) {
         return array_to_numpy(varray);
     } else if (varray.get_size() == 1) {
@@ -62,7 +62,7 @@ val::BaseValue::PointerType parseBaseValue(const py::object& other) {
     } else {
         return nullptr;
     }
-    return std::make_unique<val::ArrayValue<double>>(vec);
+    return std::make_unique<val::ArrayValueFloat64>(vec);
 }
 
 val::BaseValue::PointerType buffer_to_array(py::buffer_info& info) {
@@ -75,7 +75,7 @@ val::BaseValue::PointerType buffer_to_array(py::buffer_info& info) {
 
     val::Array::ShapeType s(info.shape.size());
     std::copy(info.shape.begin(), info.shape.end(), s.begin());
-    return std::make_unique<val::ArrayValue<double>>(a, s);
+    return std::make_unique<val::ArrayValueFloat64>(a, s);
 }
 
 void init_puq_quantity(py::module_& m) {
@@ -141,7 +141,7 @@ void init_puq_quantity(py::module_& m) {
      * @brief Convert Quantity into a numpy array
      */
     q.def("to_numpy", [](const puq::Quantity& q) {
-        val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
+        val::ArrayValueFloat64* otherT = dynamic_cast<val::ArrayValueFloat64*>(q.measurement.result.estimate.get());
         std::vector<size_t> shape = otherT->get_shape();
         std::vector<ssize_t> strides(shape.size());
         ssize_t stride = sizeof(otherT);
@@ -152,8 +152,8 @@ void init_puq_quantity(py::module_& m) {
         return py::array_t<double>(shape, strides, otherT->get_data());
     });
     //  q.def("to_numpy", [](const puq::Quantity &q) -> py::buffer_info {
-    //      val::ArrayValue<double>* otherT =
-    //      dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get()); return py::buffer_info(
+    //      val::ArrayValueFloat64* otherT =
+    //      dynamic_cast<val::ArrayValueFloat64*>(q.measurement.result.estimate.get()); return py::buffer_info(
     //			     otherT->get_data(),
     //			     sizeof(double),
     //			     py::format_descriptor<double>::format(),

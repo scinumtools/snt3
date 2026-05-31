@@ -18,7 +18,7 @@ namespace snt::puq::math {
     puq::Result pow(const puq::Result& res, const double exp) {
         // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
         if (res.uncertainty) {
-            std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(exp);
+            std::unique_ptr<val::ArrayValueFloat64> cst = std::make_unique<val::ArrayValueFloat64>(exp);
             return puq::Result(
                 res.estimate->math_pow(exp),
                 res.estimate->math_pow(exp - 1)->math_mul(cst.get())->math_abs()->math_mul(res.uncertainty.get())
@@ -32,7 +32,7 @@ namespace snt::puq::math {
     puq::Result pow(const puq::Result& res1, const puq::Result& res2) {
         // Dz = sqrt(pow(Dzx,2)+pow(Dzy,2))
         // z ± Dz = pow(x ± Dx, y ± Dy)
-        std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(-1);
+        std::unique_ptr<val::ArrayValueFloat64> cst = std::make_unique<val::ArrayValueFloat64>(-1);
         if (res1.uncertainty && res2.uncertainty) {
             val::BaseValue::PointerType Dzx =
                 res2.estimate->math_mul(res1.estimate->math_pow(res2.estimate->math_add(cst.get()).get()).get())

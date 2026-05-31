@@ -22,13 +22,13 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
     ss << "{";
     int precision = std::numeric_limits<double>::digits10;
     ss << std::setfill(' ') << std::setw(25) << std::left;
-    val::ArrayValue<double> value(dim.numerical.estimate.get());
+    val::ArrayValueFloat64 value(dim.numerical.estimate.get());
     ss << core::to_string(value.get_value(0), precision) + ",";
     ss << std::setfill(' ') << std::setw(25) << std::left;
     if (dim.numerical.uncertainty == nullptr) {
         ss << core::to_string(0, precision) + ",";
     } else {
-        val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
+        val::ArrayValueFloat64 uncertainty(dim.numerical.uncertainty.get());
         ss << core::to_string(uncertainty.get_value(0), precision) + ",";
     }
     // ss << std::setfill(' ') << std::setw(25) << std::left;
@@ -95,11 +95,11 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
             dim.numerical = 1; // for logarithmic units this has to be 1
         if (missing == "") {
             add_line(ss, unit.first, dim, unit.second.name);
-            val::ArrayValue<double> value(dim.numerical.estimate.get());
+            val::ArrayValueFloat64 value(dim.numerical.estimate.get());
             if (dim.numerical.uncertainty == nullptr) {
                 dmap.insert({unit.first, {value.get_value(0), 0., dim.physical}});
             } else {
-                val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
+                val::ArrayValueFloat64 uncertainty(dim.numerical.uncertainty.get());
                 dmap.insert({unit.first, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
             }
             // dmap.insert({unit.first, {dim.numerical.estimate[0], dim.numerical.uncertainty[0], dim.physical}});
@@ -126,11 +126,11 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
         std::string symbol =
             std::string(puq::Symbols::quantity_start) + quant.first + std::string(puq::Symbols::quantity_end);
         add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first));
-        val::ArrayValue<double> value(dim.numerical.estimate.get());
+        val::ArrayValueFloat64 value(dim.numerical.estimate.get());
         if (dim.numerical.uncertainty == nullptr) {
             dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
         } else {
-            val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
+            val::ArrayValueFloat64 uncertainty(dim.numerical.uncertainty.get());
             dmap.insert({symbol, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
         }
         // dmap.insert({symbol, {dim.numerical.estimate[0], dim.numerical.uncertainty[0], dim.physical}});
@@ -158,11 +158,11 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
             symbol =
                 std::string(puq::Symbols::si_factor_start) + quant.first + std::string(puq::Symbols::si_factor_end);
             add_line(ss, symbol, dim, puq::QuantityNames.at(quant.first) + " SI factor");
-            val::ArrayValue<double> value(dim.numerical.estimate.get());
+            val::ArrayValueFloat64 value(dim.numerical.estimate.get());
             if (dim.numerical.uncertainty == nullptr) {
                 dmap.insert({symbol, {value.get_value(0), 0., dim.physical}});
             } else {
-                val::ArrayValue<double> uncertainty(dim.numerical.uncertainty.get());
+                val::ArrayValueFloat64 uncertainty(dim.numerical.uncertainty.get());
                 dmap.insert({symbol, {value.get_value(0), uncertainty.get_value(0), dim.physical}});
             }
             // dmap.insert({symbol, {dim.numerical.value[0], dim.numerical.uncertainty[0], dim.physical}});

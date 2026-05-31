@@ -14,7 +14,7 @@ namespace snt::puq::math {
 
     puq::Result sqrt(const puq::Result& res) {
         // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
-        std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(0.5);
+        std::unique_ptr<val::ArrayValueFloat64> cst = std::make_unique<val::ArrayValueFloat64>(0.5);
         return puq::Result(
             res.estimate->math_sqrt(),
             res.estimate->math_pow(-0.5)->math_mul(cst.get())->math_mul(res.uncertainty.get())

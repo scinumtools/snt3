@@ -30,7 +30,8 @@ TEST(Quantity, Initialization) {
     q = puq::Quantity(1.23, "2*km3"); // measurement result and a unit expression with a number
     EXPECT_EQ(q.to_string(), "2.46*km3");
 
-    val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
+    std::vector<double> arr({2, 3, 4, 5});
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueFloat64>(arr);
     q = puq::Quantity(std::move(val), "km");
     EXPECT_EQ(q.to_string(), "[2, 3, 4, 5]*km");
 
@@ -62,8 +63,10 @@ TEST(Quantity, InitializationErrors) {
         EXPECT_EQ(q.to_string(), "8.8541878188(14)e-12*F*m-1");
     }
 
-    val::BaseValue::PointerType vm = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
-    val::BaseValue::PointerType ve = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});
+    std::vector<double> arr1({2, 3, 4, 5});
+    std::vector<double> arr2({0.2, 0.3, 0.4, 0.5});
+    val::BaseValue::PointerType vm = std::make_unique<val::ArrayValueFloat64>(arr1);
+    val::BaseValue::PointerType ve = std::make_unique<val::ArrayValueFloat64>(arr2);
     q = puq::Quantity(std::move(vm), std::move(ve), "km");
     EXPECT_EQ(q.to_string(), "[2.00(20), 3.00(30), 4.00(40), 5.00(50)]*km");
 }
@@ -76,7 +79,8 @@ TEST(Quantity, InitializationArrays) {
     q = puq::Quantity("[2, 3.4, 5e6]*km/s"); // unit expression with an empty space
     EXPECT_EQ(q.to_string(), "[2, 3.4, 5e6]*km*s-1");
 
-    val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3.4, 5e6});
+    std::vector<double> arr({2, 3.4, 5e6});
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueFloat64>(arr);
     q = puq::Quantity(std::move(val), "km2"); // measurement results and units
     EXPECT_EQ(q.to_string(), "[2, 3.4, 5e6]*km2");
 
@@ -88,7 +92,8 @@ TEST(Quantity, InitializationArrays) {
 
 TEST(Quantity, Size) {
 
-    val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
+    std::vector<double> arr({2, 3, 4, 5});
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueFloat64>(arr);
     puq::Quantity q(std::move(val));
     EXPECT_EQ(q.size(), 4);
 }
@@ -97,7 +102,7 @@ TEST(Quantity, Shape) {
 
     val::Array::ShapeType shape({2, 3});
     std::vector<double> arr = {2, 3, 4, 5};
-    val::BaseValue::PointerType val = std::make_unique<val::ArrayValue<double>>(arr, shape);
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueFloat64>(arr, shape);
     puq::Quantity q(std::move(val));
     EXPECT_EQ(q.shape(), shape);
 }
@@ -135,7 +140,8 @@ TEST(Quantity, ArithmeticsAdd) {
     EXPECT_EQ((q1 + 3).to_string(), "7");
 
     q1 = puq::Quantity(4); // adding arrays
-    val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
+    std::vector<double> arr({2, 3, 4});
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueFloat64>(arr);
     EXPECT_EQ((val->clone() + q1).to_string(), "[6, 7, 8]");
     EXPECT_EQ((q1 + val->clone()).to_string(), "[6, 7, 8]");
 }
@@ -162,7 +168,8 @@ TEST(Quantity, ArithmeticsSubtract) {
     EXPECT_EQ((q1 - 3).to_string(), "1");
 
     q1 = puq::Quantity(4); // subtracting arrays
-    val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
+    std::vector<double> arr({2, 3, 4});
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueFloat64>(arr);
     EXPECT_EQ((val->clone() - q1).to_string(), "[-2, -1, 0]");
     EXPECT_EQ((q1 - val->clone()).to_string(), "[2, 1, 0]");
 }
@@ -183,7 +190,8 @@ TEST(Quantity, ArithmeticsMultiply) {
     EXPECT_EQ((q1 * 3).to_string(), "12*cm");
 
     q1 = puq::Quantity(4); // multiplying arrays
-    val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
+    std::vector<double> arr({2, 3, 4});
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueFloat64>(arr);
     EXPECT_EQ((val->clone() * q1).to_string(), "[8, 12, 16]");
     EXPECT_EQ((q1 * val->clone()).to_string(), "[8, 12, 16]");
 }
@@ -204,7 +212,8 @@ TEST(Quantity, ArithmeticsDivide) {
     EXPECT_EQ((q1 / 0.5).to_string(), "4*cm");
 
     q1 = puq::Quantity(4); // dividing arrays
-    val::BaseValue::PointerType val = val::ArrayValue<double>::pointer_from_vector({2, 3, 4});
+    std::vector<double> arr({2, 3, 4});
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueFloat64>(arr);
     EXPECT_EQ((val->clone() / q1).to_string(), "[0.5, 0.75, 1]");
     EXPECT_EQ((q1 / val->clone()).to_string(), "[2, 1.33333, 1]");
 }

@@ -23,11 +23,11 @@ namespace snt::puq {
 
     // DEBUG: need to implement properly
     val::BaseValue::PointerType Measurement::abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType e) {
-        return e->math_div(v.get())->math_mul(std::make_unique<val::ArrayValue<double>>(100).get());
+        return e->math_div(v.get())->math_mul(std::make_unique<val::ArrayValueFloat64>(100).get());
     };
 
     val::BaseValue::PointerType Measurement::rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType e) {
-        return v->math_mul(e.get())->math_div(std::make_unique<val::ArrayValue<double>>(100).get());
+        return v->math_mul(e.get())->math_div(std::make_unique<val::ArrayValueFloat64>(100).get());
     };
 
     /*

@@ -11,21 +11,21 @@ namespace snt::puq {
         for (size_t i = 0; i < num_groups; i++) {
             group = tokens->get_left();
             UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
-            val::ArrayValue<double> value(atom->value.result.estimate.get());
+            val::ArrayValueFloat64 value(atom->value.result.estimate.get());
             nv[i] = value.get_value(0);
             if (atom->value.result.uncertainty) {
                 hasUncertainties = true;
-                val::ArrayValue<double> uncertainty(atom->value.result.uncertainty.get());
+                val::ArrayValueFloat64 uncertainty(atom->value.result.uncertainty.get());
                 ne[i] = uncertainty.get_value(0);
             }
         }
         std::reverse(nv.begin(), nv.end());
         if (group.atom) {
             UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
-            atom->value.result.estimate = std::make_unique<val::ArrayValue<double>>(nv);
+            atom->value.result.estimate = std::make_unique<val::ArrayValueFloat64>(nv);
             if (hasUncertainties) {
                 std::reverse(ne.begin(), ne.end());
-                atom->value.result.uncertainty = std::make_unique<val::ArrayValue<double>>(ne);
+                atom->value.result.uncertainty = std::make_unique<val::ArrayValueFloat64>(ne);
             } else {
                 atom->value.result.uncertainty = nullptr;
             }

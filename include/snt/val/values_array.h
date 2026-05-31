@@ -17,6 +17,10 @@ namespace snt::val {
      * @tparam T Data type of a values
      */
     template <typename T> class BaseArrayValue : public BaseValue {
+        // We explicitely forbit these data types, to make sure only the standard data types are used
+        static_assert(!std::is_same_v<T, bool>, "BaseArrayValue<bool> is not allowed");
+        static_assert(!std::is_same_v<T, char>, "BaseArrayValue<char> is not allowed");
+
       protected:
         std::vector<T> value; ///< Internal data container that holds flattend array values
 
@@ -58,16 +62,6 @@ namespace snt::val {
                 this->value = otherT->value;
             } else
                 throw std::runtime_error("ArrayValue could not be initialized from the given BaseValue.");
-        };
-
-        /**
-         * @brief Create unique pointer from a vector of values
-         *
-         * @param val Reference to a vector of values
-         * @return Unique pointer of a vector of values
-         */
-        static BaseValue::PointerType pointer_from_vector(const std::vector<T>& val) {
-            return std::make_unique<val::ArrayValue<T>>(std::vector<T>(val));
         };
 
         /**
@@ -243,8 +237,30 @@ namespace snt::val {
             }
         };
 
+        /**
+         * @brief Perform ternary operation with three array values
+         *
+         * @param other1 The first ternary argument, usually a boolean condition result
+         * @param other2 The third ternary argument, usually an alternative to this object
+         * @param f operation Ternary function, usually a selection of the second and third argument based on the first
+         * @param first_dtype DataType flag of the first ternary argument (needed for booleans)
+         * @param third_dtype DataType flag of the third ternary argument (needed for booleans)
+         * @tparam U Data type of the first ternary argument
+         * @tparam R Data type of the second and third ternary argument
+         * @tparam Func Type of the operation function (is deduced)
+         */
         template <typename U, typename R, typename Func>
-        std::unique_ptr<ArrayValue<R>> operate_ternary(const BaseValue* other1, const BaseValue* other2, Func f) const {
+        std::unique_ptr<ArrayValue<R>> operate_ternary(
+            const BaseValue* other1,
+            const BaseValue* other2,
+            Func f,
+            core::DataType first_dtype = core::DataType::None,
+            core::DataType third_dtype = core::DataType::None
+        ) const {
+            if (first_dtype == core::DataType::None)
+                first_dtype = dtype;
+            if (third_dtype == core::DataType::None)
+                third_dtype = dtype;
             // test if shape match
             if (shape.size() != other1->get_shape().size() ||
                 shape.size() != other2->get_shape().size()) // Compare shape size
@@ -256,8 +272,8 @@ namespace snt::val {
                     throw std::runtime_error("Second other has incompatible shape");
             }
             // apply operation
-            const ArrayValue<U> other1T(other1, dtype);
-            const ArrayValue<R> other2T(other2, dtype);
+            const ArrayValue<U> other1T(other1, first_dtype);
+            const ArrayValue<R> other2T(other2, third_dtype);
             std::vector<R> arr(value.size());
             for (int i = 0; i < value.size(); i++)
                 arr[i] = f(other1T.get_value(i), value[i], other2T.value[i]);
@@ -333,8 +349,14 @@ namespace snt::val {
             else
                 return std::make_unique<ArrayValue<T>>(new_value[0], dtype);
         };
+
         BaseValue::PointerType where(const BaseValue* condition, const BaseValue* other) const override {
-            return operate_ternary<bool, T>(condition, other, [](bool c, T a, T b) { return c ? a : b; });
+            return operate_ternary<uint8_t, T>(
+                condition,
+                other,
+                [](uint8_t c, T a, T b) { return static_cast<bool>(c) ? a : b; },
+                core::DataType::Boolean
+            );
         };
     };
 

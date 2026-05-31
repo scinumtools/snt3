@@ -36,11 +36,11 @@ namespace snt::puq {
 
     // DEBUG: need to implement properly
     val::BaseValue::PointerType Result::abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType e) {
-        return e->math_div(v.get())->math_mul(std::make_unique<val::ArrayValue<double>>(100).get());
+        return e->math_div(v.get())->math_mul(std::make_unique<val::ArrayValueFloat64>(100).get());
     };
 
     val::BaseValue::PointerType Result::rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType e) {
-        return v->math_mul(e.get())->math_div(std::make_unique<val::ArrayValue<double>>(100).get());
+        return v->math_mul(e.get())->math_div(std::make_unique<val::ArrayValueFloat64>(100).get());
     };
 
     /*
@@ -53,8 +53,8 @@ namespace snt::puq {
         if (uncertainty == nullptr || !format.display_uncertainty()) {
             ss << estimate->to_string(fmt);
         } else {
-            val::ArrayValue<double> dvalue(estimate.get());
-            val::ArrayValue<double> duncertainty(uncertainty.get());
+            val::ArrayValueFloat64 dvalue(estimate.get());
+            val::ArrayValueFloat64 duncertainty(uncertainty.get());
             ss << core::array_to_string(dvalue.get_values(), duncertainty.get_values(), dvalue.get_shape(), fmt);
         }
         return format.format_order(ss.str());
@@ -138,7 +138,7 @@ namespace snt::puq {
      * Multiply measurement result by another measurement result
      */
     const Result multiply(const Result* m, const Result* n) {
-        const val::ArrayValue<double> otherT(n->estimate.get());
+        const val::ArrayValueFloat64 otherT(n->estimate.get());
         Result nm(m->estimate->math_mul(n->estimate.get()));
         if ((m->uncertainty && n->uncertainty) && (m->uncertainty->any_of() && n->uncertainty->any_of())) {
             val::BaseValue::PointerType maxuncertainty =

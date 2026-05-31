@@ -10,18 +10,18 @@ namespace snt::puq {
 
     inline void _parse_number(std::string& expr, Measurement& msr, const std::smatch& m) {
         if (m[6] == "") {
-            msr.result.estimate = std::make_unique<val::ArrayValue<double>>(core::to_number(expr));
+            msr.result.estimate = std::make_unique<val::ArrayValueFloat64>(core::to_number(expr));
             // msr.result = core::to_number(expr);
         } else {
             std::string decimals = m[3].str() == "" ? "." : m[3].str();
             msr.result.estimate =
-                std::make_unique<val::ArrayValue<double>>(core::to_number(m[1].str() + decimals + m[8].str()));
+                std::make_unique<val::ArrayValueFloat64>(core::to_number(m[1].str() + decimals + m[8].str()));
             if (m[10] == "")
-                msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(
+                msr.result.uncertainty = std::make_unique<val::ArrayValueFloat64>(
                     core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size())
                 );
             else
-                msr.result.uncertainty = std::make_unique<val::ArrayValue<double>>(
+                msr.result.uncertainty = std::make_unique<val::ArrayValueFloat64>(
                     core::to_number(m[7]) * std::pow(10, 1 - (int)decimals.size() + std::stoi(m[10]))
                 );
             // msr.result = core::to_number(m[1].str() + decimals + m[8].str());

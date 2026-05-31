@@ -42,7 +42,7 @@ void init_value_node(py::module_& m) {
         case dip::NodeDtype::Boolean: {
             // TODO: in the future bool should be stored as uint8_t because bool is not 8 bit,
             // but 1 bit
-            val::ArrayValue<bool>* val = dynamic_cast<val::ArrayValue<bool>*>(vnode.value.get());
+            val::ArrayValueBool* val = dynamic_cast<val::ArrayValueBool*>(vnode.value.get());
             if (!val)
                 throw std::runtime_error("Type mismatch");
             std::vector<uint8_t> tmp(val->get_size());
@@ -54,21 +54,21 @@ void init_value_node(py::module_& m) {
             return arr;
         }
         case dip::NodeDtype::Integer: {
-            val::ArrayValue<int>* val = dynamic_cast<val::ArrayValue<int>*>(vnode.value.get());
+            val::ArrayValueInt32* val = dynamic_cast<val::ArrayValueInt32*>(vnode.value.get());
             if (!val)
                 throw std::runtime_error("Type mismatch");
             auto strides = compute_strides(sizeof(int));
             return py::array_t<int>(shape, strides, val->get_data(), capsule);
         }
         case dip::NodeDtype::Float: {
-            val::ArrayValue<double>* val = dynamic_cast<val::ArrayValue<double>*>(vnode.value.get());
+            val::ArrayValueFloat64* val = dynamic_cast<val::ArrayValueFloat64*>(vnode.value.get());
             if (!val)
                 throw std::runtime_error("Type mismatch");
             auto strides = compute_strides(sizeof(double));
             return py::array_t<double>(shape, strides, val->get_data(), capsule);
         }
         case dip::NodeDtype::String: {
-            val::ArrayValue<std::string>* val = dynamic_cast<val::ArrayValue<std::string>*>(vnode.value.get());
+            val::ArrayValueStr* val = dynamic_cast<val::ArrayValueStr*>(vnode.value.get());
             py::list list;
             // NOTE: For string-array conversion I could not find an alternative
             //       implementation that would work both on clang/macos and gcc/linux

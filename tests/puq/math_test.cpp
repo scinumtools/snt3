@@ -347,12 +347,18 @@ TEST(Math, AbsoluteValue) {
 TEST(Math, Maximum) {
 
     {
+        setCheckpoint("one");
         // Result
         puq::Result res0;
+        setCheckpoint("1");
         puq::Result res1(4.36, 0.16);
+        setCheckpoint("2");
         puq::Result res2(2.35, 0.04);
+        setCheckpoint("3");
         res0 = puq::math::max(res1, res2);
+        setCheckpoint("4");
         EXPECT_EQ(res0.to_string(), "4.36(16)");
+        setCheckpoint("5");
     }
     {
         // Measurement

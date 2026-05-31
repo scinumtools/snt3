@@ -8,7 +8,7 @@ namespace snt::puq::math {
     puq::Result log10(const puq::Result& m) {
         // y ± Dy = log(x ± Dx) -> Dy = 1 / ln(10) * Dx / x
         if (m.uncertainty) {
-            std::unique_ptr<val::ArrayValue<double>> cst = std::make_unique<val::ArrayValue<double>>(std::log(10));
+            std::unique_ptr<val::ArrayValueFloat64> cst = std::make_unique<val::ArrayValueFloat64>(std::log(10));
             return puq::Result(
                 m.estimate->math_log10(), m.uncertainty->math_div(m.estimate->math_mul(cst.get()).get())
             );

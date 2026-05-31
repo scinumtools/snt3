@@ -29,7 +29,8 @@ TEST(Measurement, Initialization) {
     value = puq::Measurement(2, dim);
     EXPECT_EQ(value.to_string(), "46*m*g2*s3*K4");
 
-    val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5}); // from Array
+    std::vector<int32_t> arr({2, 3, 4, 5});
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueInt32>(arr); // from Array
     value = puq::Measurement(std::move(val), "km");
     EXPECT_EQ(value.to_string(), "[2, 3, 4, 5]*km");
 
@@ -41,7 +42,8 @@ TEST(Measurement, Initialization) {
 
 TEST(Measurement, Size) {
 
-    val::BaseValue::PointerType val = val::ArrayValue<int>::pointer_from_vector({2, 3, 4, 5});
+    std::vector<int32_t> arr({2, 3, 4, 5});
+    val::BaseValue::PointerType val = std::make_unique<val::ArrayValueInt32>(arr);
     puq::Measurement uv(std::move(val));
     EXPECT_EQ(uv.size(), 4);
 }
@@ -134,8 +136,10 @@ TEST(Measurement, InitializationErrors) {
     v = puq::Measurement("3.40(10)*km3"); // unit expression
     EXPECT_EQ(v.to_string(), "3.40(10)*km3");
 
-    val::BaseValue::PointerType am = val::ArrayValue<double>::pointer_from_vector({2, 3, 4, 5});
-    val::BaseValue::PointerType ae = val::ArrayValue<double>::pointer_from_vector({0.2, 0.3, 0.4, 0.5});
+    std::vector<double> arrm({2, 3, 4, 5});
+    std::vector<double> arre({0.2, 0.3, 0.4, 0.5});
+    val::BaseValue::PointerType am = std::make_unique<val::ArrayValueFloat64>(arrm);
+    val::BaseValue::PointerType ae = std::make_unique<val::ArrayValueFloat64>(arre);
     v = puq::Measurement(std::move(am), std::move(ae), "km");
     EXPECT_EQ(v.to_string(), "[2.00(20), 3.00(30), 4.00(40), 5.00(50)]*km");
 }
