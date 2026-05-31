@@ -16,7 +16,7 @@ namespace snt::dip {
         static ValueNode::PointerType is_node(Parser& parser);
         BooleanNode(const std::string& nm, val::BaseValue::PointerType val)
             : BaseNode(NodeDtype::Boolean), ValueNode(nm, std::move(val)) {};
-        BooleanNode(Parser& parser) : BaseNode(parser, NodeDtype::Boolean), ValueNode(val::DataType::Boolean) {};
+        BooleanNode(Parser& parser) : BaseNode(parser, NodeDtype::Boolean), ValueNode(core::DataType::Boolean) {};
         BaseNode::ListType parse(Environment& env) override;
         ValueNode::PointerType clone(const std::string& nm) const override;
         void validate_options() const override;

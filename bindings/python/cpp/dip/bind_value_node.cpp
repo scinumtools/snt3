@@ -42,33 +42,30 @@ void init_value_node(py::module_& m) {
         case dip::NodeDtype::Boolean: {
             // TODO: in the future bool should be stored as uint8_t because bool is not 8 bit,
             // but 1 bit
-            val::ArrayValueBool* val = dynamic_cast<val::ArrayValueBool*>(vnode.value.get());
+            val::ArrayValue<uint8_t>* val = dynamic_cast<val::ArrayValue<uint8_t>*>(vnode.value.get());
             if (!val)
                 throw std::runtime_error("Type mismatch");
-            std::vector<uint8_t> tmp(val->get_size());
-            for (size_t i = 0; i < tmp.size(); ++i)
-                tmp[i] = (*val).get_value(i) ? 1 : 0;
-            // Copy into a NumPy-owned buffer
-            py::array_t<uint8_t> arr(shape);
-            std::memcpy(arr.mutable_data(), tmp.data(), tmp.size());
-            return arr;
+            auto strides = compute_strides(sizeof(uint8_t));
+            return py::array_t<uint8_t>(shape, strides, val->get_data(), capsule);
         }
         case dip::NodeDtype::Integer: {
-            val::ArrayValueInt32* val = dynamic_cast<val::ArrayValueInt32*>(vnode.value.get());
+            val::ArrayValue<int64_t>* val = dynamic_cast<val::ArrayValue<int64_t>*>(vnode.value.get());
             if (!val)
                 throw std::runtime_error("Type mismatch");
-            auto strides = compute_strides(sizeof(int));
-            return py::array_t<int>(shape, strides, val->get_data(), capsule);
+            auto strides = compute_strides(sizeof(int64_t));
+            py::array arr(py::dtype::of<int32_t>(), shape, strides, val->get_data(), capsule);
+            arr.attr("flags").attr("writeable") = false;
+            return arr;
         }
         case dip::NodeDtype::Float: {
-            val::ArrayValueFloat64* val = dynamic_cast<val::ArrayValueFloat64*>(vnode.value.get());
+            val::ArrayValue<double>* val = dynamic_cast<val::ArrayValue<double>*>(vnode.value.get());
             if (!val)
                 throw std::runtime_error("Type mismatch");
             auto strides = compute_strides(sizeof(double));
             return py::array_t<double>(shape, strides, val->get_data(), capsule);
         }
         case dip::NodeDtype::String: {
-            val::ArrayValueStr* val = dynamic_cast<val::ArrayValueStr*>(vnode.value.get());
+            val::ArrayValue<std::string>* val = dynamic_cast<val::ArrayValue<std::string>*>(vnode.value.get());
             py::list list;
             // NOTE: For string-array conversion I could not find an alternative
             //       implementation that would work both on clang/macos and gcc/linux

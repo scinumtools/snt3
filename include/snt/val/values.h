@@ -92,6 +92,7 @@ namespace snt::val {
         ArrayValueFloat32(const std::vector<float>& arr)
             : ArrayValue<double>(std::vector<double>(arr.begin(), arr.end()), core::DataType::Float32) {};
         ArrayValueFloat32(const BaseValue* other) : ArrayValue<double>(other, core::DataType::Float32) {};
+        void get_data(std::vector<float>& output_value) const { output_value.assign(value.begin(), value.end()); };
     };
 
     class ArrayValueFloat64 : public ArrayValue<double> {

@@ -337,12 +337,12 @@ TEST(Properties, TableDelimiter) {
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2}));
     EXPECT_EQ(vnode->value->to_string(), "[1, 2]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->name, "foo.baz");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "false"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2}));
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 }

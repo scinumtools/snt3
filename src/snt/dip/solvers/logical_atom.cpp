@@ -205,10 +205,10 @@ namespace snt::dip {
 
     // Definition operators
     void LogicalAtom::custom_defined() {
-        value.value = std::make_unique<val::ArrayValue<bool>>(value.value != nullptr);
+        value.value = std::make_unique<val::ArrayValueBool>(value.value != nullptr);
     }
     void LogicalAtom::custom_not_defined() {
-        value.value = std::make_unique<val::ArrayValue<bool>>(value.value == nullptr);
+        value.value = std::make_unique<val::ArrayValueBool>(value.value == nullptr);
     }
 
 } // namespace snt::dip

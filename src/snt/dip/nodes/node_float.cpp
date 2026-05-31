@@ -20,11 +20,11 @@ namespace snt::dip {
 
     FloatNode::FloatNode(Parser& parser) : BaseNode(parser, NodeDtype::Float) {
         if (dtype_raw[2] == "32") {
-            value_dtype = val::DataType::Float32;
+            value_dtype = core::DataType::Float32;
         } else if (dtype_raw[2] == "64" or dtype_raw[2] == "") {
-            value_dtype = val::DataType::Float64;
+            value_dtype = core::DataType::Float64;
         } else if (dtype_raw[2] == "128" and max_float_size == 128) {
-            value_dtype = val::DataType::Float128;
+            value_dtype = core::DataType::Float128;
         } else {
             throw std::runtime_error("Value data type cannot be determined from the node settings");
         }
@@ -61,12 +61,12 @@ namespace snt::dip {
     val::BaseValue::PointerType FloatNode::cast_scalar_value(const std::string& value_input) const {
         // TODO: variable precision x should be implemented
         switch (value_dtype) {
-        case val::DataType::Float32:
-            return std::make_unique<val::ArrayValue<float>>(std::stof(value_input));
-        case val::DataType::Float64:
-            return std::make_unique<val::ArrayValue<double>>(std::stod(value_input));
-        case val::DataType::Float128:
-            return std::make_unique<val::ArrayValue<long double>>(std::stold(value_input));
+        case core::DataType::Float32:
+            return std::make_unique<val::ArrayValueFloat32>(std::stof(value_input));
+        case core::DataType::Float64:
+            return std::make_unique<val::ArrayValueFloat64>(std::stod(value_input));
+        case core::DataType::Float128:
+            return std::make_unique<val::ArrayValueFloat128>(std::stold(value_input));
         default:
             throw std::runtime_error(
                 "Value cannot be casted as " + dtype_raw[2] + " bit float type from the given string: " + value_input
@@ -79,26 +79,26 @@ namespace snt::dip {
     ) const {
         // TODO: variable precision x should be implemented
         switch (value_dtype) {
-        case val::DataType::Float32: {
+        case core::DataType::Float32: {
             std::vector<float> arr;
             arr.reserve(value_inputs.size());
             for (const auto& s : value_inputs)
                 arr.push_back(std::stof(s));
-            return std::make_unique<val::ArrayValue<float>>(arr, shape);
+            return std::make_unique<val::ArrayValueFloat32>(arr, shape);
         }
-        case val::DataType::Float64: {
+        case core::DataType::Float64: {
             std::vector<double> arr;
             arr.reserve(value_inputs.size());
             for (const auto& s : value_inputs)
                 arr.push_back(std::stod(s));
-            return std::make_unique<val::ArrayValue<double>>(arr, shape);
+            return std::make_unique<val::ArrayValueFloat64>(arr, shape);
         }
-        case val::DataType::Float128: {
+        case core::DataType::Float128: {
             std::vector<long double> arr;
             arr.reserve(value_inputs.size());
             for (const auto& s : value_inputs)
                 arr.push_back(std::stold(s));
-            return std::make_unique<val::ArrayValue<long double>>(arr, shape);
+            return std::make_unique<val::ArrayValueFloat128>(arr, shape);
         }
         default:
             std::ostringstream oss;

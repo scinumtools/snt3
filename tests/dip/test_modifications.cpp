@@ -18,7 +18,7 @@ TEST(Modifications, DataTypeNode) {
     EXPECT_EQ(vnode->name, "foo");
 
     EXPECT_EQ(vnode->value->to_string(), "3");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 }
 
 TEST(Modifications, ModificationNode) {
@@ -35,7 +35,7 @@ TEST(Modifications, ModificationNode) {
     EXPECT_EQ(vnode->name, "foo");
 
     EXPECT_EQ(vnode->value->to_string(), "3");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     // in case modified node was not defined throw an exception
     d = dip::DIP();
@@ -64,7 +64,7 @@ TEST(Modifications, Declarations) {
     EXPECT_EQ(vnode->name, "foo");
 
     EXPECT_EQ(vnode->value->to_string(), "3");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     // if node is declared but has no value throw an exception
     d = dip::DIP();

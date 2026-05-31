@@ -70,7 +70,7 @@ namespace snt::dip {
             }
         }
         // return value node data
-        val::BaseValue::PointerType value = std::make_unique<val::ArrayValue<std::string>>(ss.str());
+        val::BaseValue::PointerType value = std::make_unique<val::ArrayValueStr>(ss.str());
         return ValueNodeData({std::move(value), std::nullopt});
     }
 

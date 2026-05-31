@@ -53,9 +53,9 @@ namespace snt::dip {
 
     val::BaseValue::PointerType BooleanNode::cast_scalar_value(const std::string& value_input) const {
         if (value_input == core::KEYWORD_TRUE)
-            return std::make_unique<val::ArrayValue<bool>>(true);
+            return std::make_unique<val::ArrayValueBool>(true);
         else if (value_input == core::KEYWORD_FALSE)
-            return std::make_unique<val::ArrayValue<bool>>(false);
+            return std::make_unique<val::ArrayValueBool>(false);
         else
             throw std::runtime_error("Value cannot be casted as boolean from the given string: " + value_input);
     }
@@ -73,7 +73,7 @@ namespace snt::dip {
             else
                 throw std::runtime_error("Value cannot be casted as boolean from the given string: " + value);
         }
-        return std::make_unique<val::ArrayValue<bool>>(bool_values, shape);
+        return std::make_unique<val::ArrayValueBool>(bool_values, shape);
     }
 
     ValueNode::PointerType BooleanNode::clone(const std::string& nm) const {

@@ -4,7 +4,7 @@
 
 namespace snt::dip {
 
-    ValueNode::ValueNode(const std::string& nm, const val::DataType vdt) : constant(false), value_dtype(vdt) {
+    ValueNode::ValueNode(const std::string& nm, const core::DataType vdt) : constant(false), value_dtype(vdt) {
         name = nm;
     };
 

@@ -14,7 +14,8 @@ int main() {
     exs::Atom atom = solver.solve("23 * 34.5 + 4");
     std::cout << atom.to_string() << '\n';
 
-    val::ArrayValue<double> value({1.23, 4.56e7});
+    std::vector<double> arr({1.23, 4.56e7});
+    val::ArrayValueFloat64 value(arr);
     std::cout << value.to_string() << '\n';
 
     puq::Quantity length("1*m");

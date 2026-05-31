@@ -19,7 +19,7 @@ TEST(ParseArrays, BooleanValue) {
     EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
     EXPECT_EQ(vnode->value->to_string(), "[[true, false, true], [true, true, false]]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 }
 
 TEST(ParseArrays, IntegerValue) {
@@ -37,7 +37,7 @@ TEST(ParseArrays, IntegerValue) {
     EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
     EXPECT_EQ(vnode->value->to_string(), "[[1, 2, 3], [-4, -5, -678910111]]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 }
 
 TEST(ParseArrays, FloatValue) {
@@ -55,7 +55,7 @@ TEST(ParseArrays, FloatValue) {
     EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
     EXPECT_EQ(vnode->value->to_string(), "[[1, 2.2, 3.3e3], [-4, -5.5, -6.6e6]]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Float64);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Float64);
 }
 
 TEST(ParseArrays, StringValue) {
@@ -79,7 +79,7 @@ TEST(ParseArrays, StringValue) {
         vnode->value->to_string(),
         "[[\"position\", \"velo,ci\\\"ty\", \"acce]lera'tion\"], [\"jerk\", \"snap\", \"crackle\"]]"
     );
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::String);
 }
 
 TEST(ParseArrays, ArrayToScalarsError) {
@@ -105,11 +105,11 @@ TEST(ParseArrays, WhiteSpace) {
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_EQ(vnode->value->to_string(), "[[true, true], [true, false]]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 
     // vnode = env.nodes.at(1);  // TODO
     // EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3, 4]]");
-    // EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer);
+    // EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer);
 }
 
 TEST(ParseArrays, MultiLine) {
@@ -121,5 +121,5 @@ TEST(ParseArrays, MultiLine) {
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_EQ(vnode->value->to_string(), "[[true, true], [true, false]]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 }

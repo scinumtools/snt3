@@ -1,3 +1,4 @@
+set(Python3_FIND_VIRTUALENV FIRST)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 include_directories(${Python3_INCLUDE_DIRS})
 find_package(pybind11 CONFIG)
@@ -24,6 +25,7 @@ foreach(TEST_FILE ${PYTEST_FILES})
     get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
     string(REGEX REPLACE "^test_" "" TEST_NAME ${TEST_NAME})
     set(TEST_FULL_NAME pytest.${MODULE_DIR}.${TEST_NAME})
+    message(INFO ${Python3_EXECUTABLE})
     add_test(
         NAME ${TEST_FULL_NAME}
         COMMAND ${Python3_EXECUTABLE} -m pytest -v ${TEST_FILE}

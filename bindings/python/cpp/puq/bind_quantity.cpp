@@ -141,10 +141,12 @@ void init_puq_quantity(py::module_& m) {
      * @brief Convert Quantity into a numpy array
      */
     q.def("to_numpy", [](const puq::Quantity& q) {
-        val::ArrayValueFloat64* otherT = dynamic_cast<val::ArrayValueFloat64*>(q.measurement.result.estimate.get());
+        val::ArrayValue<double>* otherT = dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
+        if (!otherT)
+            throw std::runtime_error("Expected ArrayValue<double>");
         std::vector<size_t> shape = otherT->get_shape();
         std::vector<ssize_t> strides(shape.size());
-        ssize_t stride = sizeof(otherT);
+        ssize_t stride = sizeof(double);
         for (ssize_t i = static_cast<ssize_t>(shape.size()) - 1; i >= 0; --i) {
             strides[i] = stride;
             stride *= static_cast<ssize_t>(shape[i]);

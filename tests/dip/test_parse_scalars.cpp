@@ -21,7 +21,7 @@ TEST(ParseScalars, BooleanValue) {
     EXPECT_EQ(vnode->name, "foo1");
 
     EXPECT_EQ(vnode->value->to_string(), "true");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->value_raw.at(0), "false");
@@ -42,7 +42,7 @@ TEST(ParseScalars, IntegerValue) {
     EXPECT_EQ(vnode->name, "foo1");
 
     EXPECT_EQ(vnode->value->to_string(), "23");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->value->to_string(), "23456789");
@@ -67,7 +67,7 @@ TEST(ParseScalars, FloatValue) {
     EXPECT_EQ(vnode->name, "foo1");
 
     EXPECT_EQ(vnode->value->to_string(), "23");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Float64);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Float64);
 
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->value_raw.at(0), "23.456");
@@ -109,7 +109,7 @@ TEST(ParseScalars, StringValue) {
     EXPECT_EQ(vnode->name, "foo");
 
     EXPECT_EQ(vnode->value->to_string(), "\"bar\"");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::String);
 }
 
 TEST(ParseScalars, Cloning) {

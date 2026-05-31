@@ -15,7 +15,7 @@ namespace snt::dip {
       public:
         static constexpr size_t max_int_size = sizeof(long long) * CHAR_BIT;
         static ValueNode::PointerType is_node(Parser& parser);
-        IntegerNode(const std::string& nm, const val::DataType vdt)
+        IntegerNode(const std::string& nm, const core::DataType vdt)
             : BaseNode(NodeDtype::Integer), ValueNode(nm, vdt) {};
         IntegerNode(const std::string& nm, val::BaseValue::PointerType val)
             : BaseNode(NodeDtype::Integer), ValueNode(nm, std::move(val)) {};

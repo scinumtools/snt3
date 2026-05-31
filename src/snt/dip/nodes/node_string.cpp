@@ -53,13 +53,13 @@ namespace snt::dip {
     }
 
     val::BaseValue::PointerType StringNode::cast_scalar_value(const std::string& value_input) const {
-        return std::make_unique<val::ArrayValue<std::string>>(value_input);
+        return std::make_unique<val::ArrayValueStr>(value_input);
     }
 
     val::BaseValue::PointerType StringNode::cast_array_value(
         const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
     ) const {
-        return std::make_unique<val::ArrayValue<std::string>>(value_inputs, shape);
+        return std::make_unique<val::ArrayValueStr>(value_inputs, shape);
     }
 
     ValueNode::PointerType StringNode::clone(const std::string& nm) const {
@@ -83,7 +83,7 @@ namespace snt::dip {
     void StringNode::validate_format() const {
         if (format.size() > 0) {
             std::regex pattern(format);
-            const val::ArrayValue<std::string> valueT(value.get());
+            const val::ArrayValueStr valueT(value.get());
             for (int i = 0; i < valueT.get_size(); i++) {
                 if (!std::regex_match(valueT.get_value(i), pattern)) {
                     throw std::runtime_error(

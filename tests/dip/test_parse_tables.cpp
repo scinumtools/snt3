@@ -25,21 +25,21 @@ TEST(ParseTables, BasicTable) {
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2", "3", "4"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({4}));
     EXPECT_EQ(vnode->value->to_string(), "[1, 2, 3, 4]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->name, "foo.baz");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "true", "false", "true"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({4}));
     EXPECT_EQ(vnode->value->to_string(), "[true, true, false, true]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 
     vnode = env.nodes.at(2);
     EXPECT_EQ(vnode->name, "foo.dig");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"a", "b", "c", "d"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({4}));
     EXPECT_EQ(vnode->value->to_string(), "[\"a\", \"b\", \"c\", \"d\"]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::String);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::String);
 }
 
 TEST(ParseTables, EmptySpaceTrimming) {
@@ -61,14 +61,14 @@ TEST(ParseTables, EmptySpaceTrimming) {
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2", "3"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({3}));
     EXPECT_EQ(vnode->value->to_string(), "[1, 2, 3]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Integer32);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->name, "foo.baz");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "true", "false"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({3}));
     EXPECT_EQ(vnode->value->to_string(), "[true, true, false]");
-    EXPECT_EQ(vnode->value->get_dtype(), val::DataType::Boolean);
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 }
 
 TEST(ParseTables, ExceptionDimensionMismatch) {

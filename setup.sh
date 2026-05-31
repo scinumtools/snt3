@@ -32,7 +32,7 @@ CMAKE_FLAGS=(
   -DENABLE_PUQ_GTEST=ON
   -DENABLE_PUQ_PYTEST=ON
 
-  -DENABLE_DIP=OFF
+  -DENABLE_DIP=ON
   -DENABLE_DIP_GTEST=ON
   -DENABLE_DIP_PYTEST=ON
 
@@ -113,7 +113,7 @@ function test_code {
     	fi
     elif [[ "${parts[0]}" == "pytest" ]]; then
 	export PYTHONPATH=$PWD/build/lib:$PYTHONPATH
-	pytest pytest/${parts[1]}/test_${parts[2]}.py #::test_${parts[3]}
+	pytest bindings/python/tests/${parts[1]}/test_${parts[2]}.py #::test_${parts[3]}"
     else
 	cd $DIR_BUILD
 	ctest --output-on-failure

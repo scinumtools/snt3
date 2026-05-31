@@ -15,7 +15,7 @@ namespace snt::dip {
       public:
         static constexpr size_t max_float_size = sizeof(long double) * CHAR_BIT;
         static ValueNode::PointerType is_node(Parser& parser);
-        FloatNode(const std::string& nm, const val::DataType vdt) : BaseNode(NodeDtype::Float), ValueNode(nm, vdt) {};
+        FloatNode(const std::string& nm, const core::DataType vdt) : BaseNode(NodeDtype::Float), ValueNode(nm, vdt) {};
         FloatNode(const std::string& nm, val::BaseValue::PointerType val)
             : BaseNode(NodeDtype::Float), ValueNode(nm, std::move(val)) {};
         FloatNode(const std::string& nm, val::BaseValue::PointerType val, std::optional<puq::Quantity> quant)
