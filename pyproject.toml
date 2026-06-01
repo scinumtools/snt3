@@ -2,8 +2,6 @@
 requires = [
     "scikit-build-core>=0.9.0",
     "pybind11>=2.11.0",
-    "cmake>=3.24",
-    "ninja",
     "setuptools",
     "wheel"
 ]
@@ -11,7 +9,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "scinumtools3"
-version = "v0.3.0"
+version = "v0.4.0"
 description = "Python bindings for the scinumtools3 C++ core"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -53,15 +51,15 @@ Issues = "https://github.com/vrtulka23/scinumtools3/issues"
 
 [tool.scikit-build]
 build-dir = "build/{wheel_tag}"
-cmake.minimum-version = "3.24"
-cmake.verbose = true
+cmake.version = ">=3.24"
+build.verbose = true
 wheel.expand-macos-universal-tags = true
 
 # Where the python package lives
 wheel.packages = ["scinumtools3"]
 
 # This tells scikit-build where CMakeLists.txt is
-cmake.source-dir = "cpp"
+cmake.source-dir = "./"
 
 # ------------------------
 # CMake configuration
