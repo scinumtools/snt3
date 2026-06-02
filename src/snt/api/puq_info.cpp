@@ -37,13 +37,13 @@ namespace snt::api {
         puq::Dimensions dim_m = bus.dimensions();
         dim_m.numerical *= uv.result;
         std::cout << '\n' << "Expression:  " << expression << '\n' << '\n';
-        std::cout << "Unit system: " << puq::UnitSystem::Data->SystemAbbrev << " (" << puq::UnitSystem::Data->SystemName
-                  << ")" << '\n';
+        std::cout << "Unit system: " << puq::UnitSystem::current.data->SystemAbbrev << " ("
+                  << puq::UnitSystem::current.data->SystemName << ")" << '\n';
         std::cout << "Result:   " << puq::to_string(uv.result) << '\n';
         std::cout << "Base units:  " << puq::to_string(uv.baseunits) << '\n';
         std::stringstream ss;
         bool display = false;
-        for (const auto& unit : puq::UnitSystem::Data->DimensionMap) {
+        for (const auto& unit : puq::UnitSystem::current.data->DimensionMap) {
             if (puq::Dimensions(1, unit.second.dimensions) != dim)
                 continue;
             ss << (display ? ", " : "") << unit.first;
@@ -55,7 +55,7 @@ namespace snt::api {
         }
         ss.str(std::string());
         display = false;
-        for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
+        for (const auto& quant : puq::UnitSystem::current.data->QuantityList) {
             if (puq::BaseUnits(quant.second.definition).dimensions() != dim)
                 continue;
             ss << (display ? ", " : "") << quant.first;
@@ -102,15 +102,15 @@ namespace snt::api {
             // We have to sort the unit names first, because UnitList is an std::unordered_map
             // and the listing of units can change the order
             std::vector<std::string> unit_names;
-            unit_names.reserve(puq::UnitSystem::Data->UnitList.size());
-            for (const auto& unit : puq::UnitSystem::Data->UnitList) {
+            unit_names.reserve(puq::UnitSystem::current.data->UnitList.size());
+            for (const auto& unit : puq::UnitSystem::current.data->UnitList) {
                 unit_names.push_back(unit.first);
             }
             std::sort(unit_names.begin(), unit_names.end());
             // and now we loop over sorted units
             for (auto const& name : unit_names) {
-                auto const& unit = puq::UnitSystem::Data->UnitList.at(name);
-                // for (const auto& unit : puq::UnitSystem::Data->UnitList) {
+                auto const& unit = puq::UnitSystem::current.data->UnitList.at(name);
+                // for (const auto& unit : puq::UnitSystem::current.data->UnitList) {
                 for (const auto& bu : bus) {
                     if (bu.unit != name)
                         continue;
@@ -126,7 +126,7 @@ namespace snt::api {
                     );
                 }
             }
-            for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
+            for (const auto& quant : puq::UnitSystem::current.data->QuantityList) {
                 for (const auto& bu : bus) {
                     if (bu.unit != std::string(puq::Symbols::quantity_start) + quant.first +
                                        std::string(puq::Symbols::quantity_end))

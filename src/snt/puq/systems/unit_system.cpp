@@ -6,7 +6,12 @@
 
 namespace snt::puq {
 
-    inline std::unordered_map<puq::SystemType, SystemDataType*> GetSystemMap() {
+    /**
+     * @brief Initialize map of available unit systems
+     *
+     * @return Map of available unit systems and pointers to their data
+     */
+    inline std::unordered_map<puq::SystemType, SystemDataType*> get_system_map() {
         std::unordered_map<puq::SystemType, SystemDataType*> map = {
             {puq::SystemType::SI, &puq::SystemData::SI},
         };
@@ -35,12 +40,27 @@ namespace snt::puq {
         return map;
     }
 
-    std::unordered_map<puq::SystemType, SystemDataType*> SystemMap = GetSystemMap();
+    std::unordered_map<puq::SystemType, SystemDataType*> SystemMap = get_system_map();
 
-    SystemDataType* UnitSystem::Data = &SystemData::SI;
-    SystemType UnitSystem::System = SystemType::SI;
-    std::stack<SystemDataType*> UnitSystem::systemStack;
+    /**
+     * @brief Initialize curent unit system record
+     *
+     * @return Default unit system record
+     */
+    inline UnitSystem::Record get_default_record() {
+        return UnitSystem::Record(SystemType::SI, &SystemData::SI);
+    }
 
+    UnitSystem::Record UnitSystem::current = get_default_record();
+
+    std::stack<UnitSystem::Record> UnitSystem::stack;
+
+    /**
+     * @brief Find given system type in the system map and return pointer to its data
+     *
+     * @param system Selected system type
+     * @return Pointer to found unit system data
+     */
     inline SystemDataType* select_unit_system(const SystemType& system) {
         auto it = SystemMap.find(system);
         if (it == SystemMap.end())
@@ -49,9 +69,8 @@ namespace snt::puq {
     }
 
     UnitSystem::UnitSystem(const SystemType system) : closed(false) {
-        systemStack.push(Data);
-        Data = select_unit_system(system);
-        System = system;
+        stack.push(current);
+        current = Record(system, select_unit_system(system));
     }
 
     UnitSystem::~UnitSystem() {
@@ -60,24 +79,14 @@ namespace snt::puq {
     }
 
     void UnitSystem::change(const SystemType system) {
-        Data = select_unit_system(system);
-        System = system;
+        current = Record(system, select_unit_system(system));
     }
 
     void UnitSystem::close() {
         if (closed)
             throw UnitSystemExcept("Instance of a unit system environment cannot be closed only once!");
-        Data = systemStack.top();
-        systemStack.pop();
-        bool found = false;
-        for (auto sys : SystemMap) {
-            if (sys.second == Data) {
-                System = sys.first;
-                found = true;
-            }
-        }
-        if (!found)
-            throw UnitSystemExcept("Could not find previous unit system");
+        current = stack.top();
+        stack.pop();
         closed = true;
     }
 

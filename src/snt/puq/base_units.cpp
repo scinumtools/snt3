@@ -147,8 +147,8 @@ namespace snt::puq {
             }
             // quantity
             if (bu.unit.rfind(Symbols::quantity_start, 0) == 0 || bu.unit.rfind(Symbols::si_factor_start, 0) == 0) {
-                auto dmap = UnitSystem::Data->DimensionMap.find(bu.unit);
-                if (dmap != UnitSystem::Data->DimensionMap.end()) {
+                auto dmap = UnitSystem::current.data->DimensionMap.find(bu.unit);
+                if (dmap != UnitSystem::current.data->DimensionMap.end()) {
                     dim.utype = dim.utype | Utype::LIN;
                     dim.symbols.push_back(dmap->first);
                     Result result(dmap->second.estimate, dmap->second.uncertainty);
@@ -162,8 +162,8 @@ namespace snt::puq {
                 }
             }
             // dimensions
-            auto unit = UnitSystem::Data->UnitList.find(bu.unit);
-            if (unit != UnitSystem::Data->UnitList.end()) {
+            auto unit = UnitSystem::current.data->UnitList.find(bu.unit);
+            if (unit != UnitSystem::current.data->UnitList.end()) {
                 if (unit->first == bu.unit) {
                     if ((unit->second.utype & Utype::LIN) == Utype::LIN) // standard linear conversion
                         dim.utype = dim.utype | Utype::LIN;
@@ -172,8 +172,8 @@ namespace snt::puq {
                     if (unit->second.utype == Utype::LOG) // unit requires logarithmic conversions
                         dim.utype = dim.utype | unit->second.utype;
                     dim.symbols.push_back(unit->first);
-                    auto dmap = UnitSystem::Data->DimensionMap.find(unit->first);
-                    if (dmap != UnitSystem::Data->DimensionMap.end()) {
+                    auto dmap = UnitSystem::current.data->DimensionMap.find(unit->first);
+                    if (dmap != UnitSystem::current.data->DimensionMap.end()) {
                         Result result(dmap->second.estimate, dmap->second.uncertainty);
                         dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
                         for (int i = 0; i < Config::num_basedim; i++) {

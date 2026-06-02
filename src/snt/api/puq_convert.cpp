@@ -45,7 +45,7 @@ namespace snt::api {
             }
         } else {
             if (output_system == puq::SystemType::NONE) {
-                q = q.convert(output_units, puq::UnitSystem::System, output_quantity);
+                q = q.convert(output_units, puq::UnitSystem::current.type, output_quantity);
             } else {
                 q = q.convert(output_units, output_system, output_quantity);
             }

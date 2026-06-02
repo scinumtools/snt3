@@ -32,7 +32,7 @@ namespace snt::puq {
         std::string base_units(const bool json, const UnitFormat& format) {
             DataTable tab({{"Symbol", 8}, {"Name", 19}, {"Allowed prefixes", 22}});
             for (auto& symbol : SystemData::BaseUnitOrder) {
-                auto unit = UnitSystem::Data->UnitList.at(symbol);
+                auto unit = UnitSystem::current.data->UnitList.at(symbol);
                 if ((unit.utype & Utype::BAS) != Utype::BAS)
                     continue;
                 tab.append({symbol, unit.name, puq::to_string(unit.use_prefixes, unit.allowed_prefixes)});
@@ -50,7 +50,7 @@ namespace snt::puq {
                  {"Allowed prefixes", 22}}
             );
             std::map<std::string, UnitStruct> ordered(
-                UnitSystem::Data->UnitList.begin(), UnitSystem::Data->UnitList.end()
+                UnitSystem::current.data->UnitList.begin(), UnitSystem::current.data->UnitList.end()
             );
             for (auto& unit : ordered) {
                 if ((unit.second.utype & Utype::LIN) != Utype::LIN)
@@ -78,7 +78,7 @@ namespace snt::puq {
         std::string constants(const bool json, const UnitFormat& format) {
             DataTable tab({{"Symbol", 9}, {"Name", 19}, {"Result", 30}, {"Dimension", 20}, {"Definition", 30}});
             std::map<std::string, UnitStruct> ordered(
-                UnitSystem::Data->UnitList.begin(), UnitSystem::Data->UnitList.end()
+                UnitSystem::current.data->UnitList.begin(), UnitSystem::current.data->UnitList.end()
             );
             for (auto& unit : ordered) {
                 if ((unit.second.utype & Utype::CST) != Utype::CST)
@@ -101,7 +101,7 @@ namespace snt::puq {
                 {{"Symbol", 10}, {"Name", 30}, {"Result", 30}, {"Dimension", 22}, {"Definition", 25}, {"SI factor", 11}}
             );
             std::map<std::string, QuantityStruct> ordered(
-                UnitSystem::Data->QuantityList.begin(), UnitSystem::Data->QuantityList.end()
+                UnitSystem::current.data->QuantityList.begin(), UnitSystem::current.data->QuantityList.end()
             );
             for (auto& quantity : ordered) {
                 std::string symbol =
@@ -123,7 +123,7 @@ namespace snt::puq {
         std::string temperature_units(const bool json) {
             DataTable tab({{"Symbol", 9}, {"Name", 19}, {"Allowed prefixes", 22}});
             std::map<std::string, UnitStruct> ordered(
-                UnitSystem::Data->UnitList.begin(), UnitSystem::Data->UnitList.end()
+                UnitSystem::current.data->UnitList.begin(), UnitSystem::current.data->UnitList.end()
             );
             for (auto& unit : ordered) {
                 if ((unit.second.utype & Utype::TMP) != Utype::TMP)
@@ -140,7 +140,7 @@ namespace snt::puq {
         std::string logarithmic_units(const bool json) {
             DataTable tab({{"Symbol", 9}, {"Name", 19}, {"Allowed prefixes", 22}});
             std::map<std::string, UnitStruct> ordered(
-                UnitSystem::Data->UnitList.begin(), UnitSystem::Data->UnitList.end()
+                UnitSystem::current.data->UnitList.begin(), UnitSystem::current.data->UnitList.end()
             );
             for (auto& unit : ordered) {
                 if ((unit.second.utype & Utype::LOG) != Utype::LOG)

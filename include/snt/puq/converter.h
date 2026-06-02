@@ -19,7 +19,7 @@ namespace snt::puq {
       public:
         ConvDimExcept(std::string m) : message(m) {}
         ConvDimExcept(const BaseUnits& bu1, const BaseUnits& bu2)
-            : ConvDimExcept(bu1, UnitSystem::System, bu2, UnitSystem::System) {}
+            : ConvDimExcept(bu1, UnitSystem::current.type, bu2, UnitSystem::current.type) {}
         ConvDimExcept(const BaseUnits& bu1, const SystemType& s1, const BaseUnits& bu2, const SystemType& s2) {
             UnitSystem us(s1);
             Dimensions dim1 = bu1.dimensions();
@@ -62,7 +62,7 @@ namespace snt::puq {
                 }
             }
             us.change(s1);
-            for (auto unit : UnitSystem::Data->DimensionMap) {
+            for (auto unit : UnitSystem::current.data->DimensionMap) {
                 if (Dimensions(1, unit.second.dimensions) != dim1)
                     continue;
                 if (unit.first == mgs || unit.first == mks || unit.first == cgs)
@@ -70,11 +70,13 @@ namespace snt::puq {
                 if (unit.first[0] == Symbols::quantity_start[0])
                     continue;
                 tab.append(
-                    {SystemMap[s1]->SystemAbbrev, unit.first, UnitSystem::Data->UnitList.find(unit.first)->second.name}
+                    {SystemMap[s1]->SystemAbbrev,
+                     unit.first,
+                     UnitSystem::current.data->UnitList.find(unit.first)->second.name}
                 );
             }
             us.change(s2);
-            for (auto unit : UnitSystem::Data->DimensionMap) {
+            for (auto unit : UnitSystem::current.data->DimensionMap) {
                 if (Dimensions(1, unit.second.dimensions) != dim1)
                     continue;
                 if (unit.first == mgs || unit.first == mks || unit.first == cgs)
@@ -82,12 +84,14 @@ namespace snt::puq {
                 if (unit.first[0] == Symbols::quantity_start[0])
                     continue;
                 tab.append(
-                    {SystemMap[s2]->SystemAbbrev, unit.first, UnitSystem::Data->UnitList.find(unit.first)->second.name}
+                    {SystemMap[s2]->SystemAbbrev,
+                     unit.first,
+                     UnitSystem::current.data->UnitList.find(unit.first)->second.name}
                 );
             }
             if (s1 != s2) {
                 us.change(s1);
-                for (auto quant : UnitSystem::Data->QuantityList) {
+                for (auto quant : UnitSystem::current.data->QuantityList) {
                     Measurement uv(
                         std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end)
                     );
@@ -98,14 +102,14 @@ namespace snt::puq {
                             std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end)
                         );
                         dim_q = uv.baseunits.dimensions();
-                        for (auto unit : UnitSystem::Data->DimensionMap) {
+                        for (auto unit : UnitSystem::current.data->DimensionMap) {
                             if (Dimensions(1, unit.second.dimensions) != dim_q)
                                 continue;
                             if (unit.first == mgs || unit.first == mks || unit.first == cgs)
                                 continue;
                             if (unit.first[0] == Symbols::quantity_start[0])
                                 continue;
-                            UnitStruct uinfo = UnitSystem::Data->UnitList[unit.first];
+                            UnitStruct uinfo = UnitSystem::current.data->UnitList[unit.first];
                             if ((uinfo.utype & Utype::LOG) == Utype::LOG)
                                 continue;
                             if ((uinfo.utype & Utype::TMP) == Utype::TMP)
@@ -113,7 +117,7 @@ namespace snt::puq {
                             tab.append(
                                 {SystemMap[s2]->SystemAbbrev,
                                  unit.first,
-                                 UnitSystem::Data->UnitList.find(unit.first)->second.name,
+                                 UnitSystem::current.data->UnitList.find(unit.first)->second.name,
                                  quant.first}
                             );
                         }

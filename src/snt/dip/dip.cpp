@@ -86,8 +86,10 @@ namespace snt::dip {
         env.sources.append(sname, senv);
     }
 
-    void DIP::add_unit(const std::string& name, const double value, const std::string& unit) {
-        // TODO: implement
+    void DIP::add_unit(const std::string& uname, const std::string& uexpr) {
+        num_units++;
+        EnvUnit uenv = {uname, uexpr};
+        env.units.append(uname, uenv);
     }
 
     void DIP::add_value_function(const std::string& name, FunctionList::ValueFunctionType func) {

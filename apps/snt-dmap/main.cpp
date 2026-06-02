@@ -76,7 +76,7 @@ bool solve_bu_unit(puq::DimensionMapType& dmap, puq::Dimensions& dim, puq::BaseU
 }
 
 inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq::UnitSolver& solver) {
-    for (const auto& unit : puq::UnitSystem::Data->UnitList) {
+    for (const auto& unit : puq::UnitSystem::current.data->UnitList) {
         if (dmap.find(unit.first) != dmap.end())
             continue;
         if ((unit.second.utype & puq::Utype::BAS) == puq::Utype::BAS)
@@ -108,8 +108,8 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
 }
 
 inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap, puq::UnitSolver& solver) {
-    std::cout << "Solving " << puq::UnitSystem::Data->SystemAbbrev << " system" << '\n';
-    for (const auto& quant : puq::UnitSystem::Data->QuantityList) {
+    std::cout << "Solving " << puq::UnitSystem::current.data->SystemAbbrev << " system" << '\n';
+    for (const auto& quant : puq::UnitSystem::current.data->QuantityList) {
         // solve a quantity definition
         puq::UnitAtom atom = solver.solve(quant.second.definition);
         puq::Dimensions dim(atom.value.result);
@@ -117,7 +117,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
             solve_bu_prefix(dim, bu);
             if (!solve_bu_unit(dmap, dim, bu)) {
                 throw puq::DimensionMapExcept(
-                    puq::UnitSystem::Data->SystemAbbrev + " quantity '" + quant.first +
+                    puq::UnitSystem::current.data->SystemAbbrev + " quantity '" + quant.first +
                     "' could not be constructued from a definition '" + quant.second.definition +
                     "'. Missing unit: " + bu.unit
                 );
@@ -143,7 +143,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
                 solve_bu_prefix(dim, bu);
                 if (!solve_bu_unit(dmap, dim, bu)) {
                     throw puq::DimensionMapExcept(
-                        puq::UnitSystem::Data->SystemAbbrev + " quantity '" + quant.first +
+                        puq::UnitSystem::current.data->SystemAbbrev + " quantity '" + quant.first +
                         "' could not be constructued from a definition '" + quant.second.definition +
                         "'. Missing unit: " + bu.unit
                     );
@@ -179,18 +179,18 @@ void create_map(const std::string& file_header) {
         dmap.insert(d);
         puq::Dimensions dim(d.second.estimate, d.second.dimensions);
         std::string name;
-        auto bu = puq::UnitSystem::Data->UnitList.at(d.first);
+        auto bu = puq::UnitSystem::current.data->UnitList.at(d.first);
         add_line(ss, d.first, dim, bu.name);
     }
     // iterate over units until all are solved
     size_t nit = 0;
-    size_t nmax = puq::UnitSystem::Data->UnitList.size();
+    size_t nmax = puq::UnitSystem::current.data->UnitList.size();
     while (dmap.size() < nmax && nit < nmax) {
         nit++;
         solve_units(ss, dmap, solver);
     }
     // construct all quantities and their corresponding SI factors
-    nmax += puq::UnitSystem::Data->QuantityList.size();
+    nmax += puq::UnitSystem::current.data->QuantityList.size();
     solve_quantities(ss, dmap, solver);
 
     if (dmap.size() < nmax)
@@ -207,8 +207,8 @@ void create_map(const std::string& file_header) {
     fs << " * Do not modify this file!" << '\n';
     fs << " * This file can be updated using 'dmap' executable." << '\n';
     fs << " * " << '\n';
-    fs << " * Unit system:  " << puq::UnitSystem::Data->SystemName << " (" << puq::UnitSystem::Data->SystemAbbrev << ")"
-       << '\n';
+    fs << " * Unit system:  " << puq::UnitSystem::current.data->SystemName << " ("
+       << puq::UnitSystem::current.data->SystemAbbrev << ")" << '\n';
     fs << " * Last update:  " << std::ctime(&now_time);
     fs << " * Code version: " << CODE_VERSION << '\n';
     fs << " * " << '\n';

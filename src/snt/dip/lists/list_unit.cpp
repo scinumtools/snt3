@@ -12,10 +12,10 @@ namespace snt::dip {
         units.insert({name, {name, definition}});
     }
 
-    void UnitList::append(const std::string& name, const EnvUnit& src) {
+    void UnitList::append(const std::string& name, const EnvUnit& data) {
         if (units.contains(name))
             throw std::invalid_argument("Unit with the same name already exists: " + name);
-        units.insert({name, src});
+        units.insert({name, data});
     }
 
     EnvUnit& UnitList::at(const std::string& name) {

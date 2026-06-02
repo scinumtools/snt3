@@ -21,7 +21,7 @@ void test_unit_symbols() {
     }
     // unique unit symbols
     std::set<std::string> units;
-    for (const auto& unit : puq::UnitSystem::Data->UnitList) {
+    for (const auto& unit : puq::UnitSystem::current.data->UnitList) {
         // unique unit symbol without a prefix
         check_symbol(units, unit.first);
         if (unit.second.use_prefixes) {
@@ -42,7 +42,7 @@ void test_unit_symbols() {
 
 void test_unit_definitions() {
 
-    for (const auto& unit : puq::UnitSystem::Data->UnitList) {
+    for (const auto& unit : puq::UnitSystem::current.data->UnitList) {
 
         // std::cout << "hello " << unit.first << " " << std::bitset<8>((int)unit.second.utype) << std::endl;
         // if ((unit.second.utype & Utype::LIN)!=Utype::LIN) // check only linear units
@@ -52,7 +52,7 @@ void test_unit_definitions() {
         if ((unit.second.utype & puq::Utype::BAS) == puq::Utype::BAS) // ignore base units
             continue;
 
-        puq::DimensionStruct dmap = puq::UnitSystem::Data->DimensionMap.at(unit.first);
+        puq::DimensionStruct dmap = puq::UnitSystem::current.data->DimensionMap.at(unit.first);
         puq::Dimensions dim1(dmap.estimate, dmap.uncertainty, dmap.dimensions);
         std::string m1 = dim1.to_string();
 
@@ -82,7 +82,7 @@ void test_unit_definitions() {
 }
 
 void test_quantities() {
-    for (const auto& quantity : puq::UnitSystem::Data->QuantityList) {
+    for (const auto& quantity : puq::UnitSystem::current.data->QuantityList) {
 
         // check if quantity symbol is in the quantity name list
         EXPECT_FALSE(puq::QuantityNames.find(quantity.first) == puq::QuantityNames.end())
@@ -189,14 +189,14 @@ TEST(Dmaps, UnitDefinitionsUS) {
 
 TEST(Dmaps, DimensionMap) {
 
-    auto it = puq::UnitSystem::Data->DimensionMap.find("<B>");
-    EXPECT_TRUE(it != puq::UnitSystem::Data->DimensionMap.end());
+    auto it = puq::UnitSystem::current.data->DimensionMap.find("<B>");
+    EXPECT_TRUE(it != puq::UnitSystem::current.data->DimensionMap.end());
 }
 
 TEST(Dmaps, DimensionMapUncertainties) {
 
-    auto it = puq::UnitSystem::Data->DimensionMap.find("{a_0}");
-    EXPECT_TRUE(it != puq::UnitSystem::Data->DimensionMap.end());
+    auto it = puq::UnitSystem::current.data->DimensionMap.find("{a_0}");
+    EXPECT_TRUE(it != puq::UnitSystem::current.data->DimensionMap.end());
     EXPECT_FLOAT_EQ(it->second.estimate, 5.2917721e-11);
     EXPECT_FLOAT_EQ(it->second.uncertainty, 8.2e-21);
 }

@@ -16,14 +16,14 @@ namespace snt::puq {
      */
 
     enum class Utype : std::uint8_t {
-        NUL = 0b00000000, // empty flag
-        BAS = 0b00000001, // base units
-        LIN = 0b00000010, // standard unit (linear conversion)
-        LOG = 0b00000100, // logarithmic unit
-        TMP = 0b00001000, // temperature unit
-        CST = 0b00010000, // constant
-        CSB = 0b00100000, // base constant
-        QUA = 0b01000000, // quantity
+        NUL = 0b00000000, ///< empty flag
+        BAS = 0b00000001, ///< base units
+        LIN = 0b00000010, ///< standard unit (linear conversion)
+        LOG = 0b00000100, ///< logarithmic unit
+        TMP = 0b00001000, ///< temperature unit
+        CST = 0b00010000, ///< constant
+        CSB = 0b00100000, ///< base constant
+        QUA = 0b01000000, ///< quantity
     };
 
     inline Utype operator|(Utype lhs, Utype rhs) {

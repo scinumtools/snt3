@@ -24,24 +24,29 @@ namespace snt::puq {
       public:
         SystemType stype;
         Measurement measurement;
-        Quantity() : stype(UnitSystem::System) {};
+        Quantity() : stype(UnitSystem::current.type) {};
         Quantity(std::string s, const SystemType system = SystemType::NONE);
-        Quantity(const Measurement& v, const SystemType system = UnitSystem::System);
+        Quantity(const Measurement& v, const SystemType system = UnitSystem::current.type);
         Quantity(const Result& m, std::string s, const SystemType system = SystemType::NONE);
-        Quantity(const Result& m, const SystemType system = UnitSystem::System);
-        Quantity(const Result& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+        Quantity(const Result& m, const SystemType system = UnitSystem::current.type);
+        Quantity(const Result& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::current.type);
         Quantity(const double m, std::string s, const SystemType system = SystemType::NONE);
-        Quantity(const double m, const SystemType system = UnitSystem::System);
-        Quantity(const double m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System);
+        Quantity(const double m, const SystemType system = UnitSystem::current.type);
+        Quantity(const double m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::current.type);
         Quantity(const double m, const double e, std::string s, const SystemType system = SystemType::NONE);
-        Quantity(const double m, const double e, const SystemType system = UnitSystem::System);
+        Quantity(const double m, const double e, const SystemType system = UnitSystem::current.type);
         Quantity(
-            const double m, const double e, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System
+            const double m,
+            const double e,
+            const BaseUnits::ListType& bu,
+            const SystemType system = UnitSystem::current.type
         );
         Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system = SystemType::NONE);
-        Quantity(val::BaseValue::PointerType m, const SystemType system = UnitSystem::System);
+        Quantity(val::BaseValue::PointerType m, const SystemType system = UnitSystem::current.type);
         Quantity(
-            val::BaseValue::PointerType m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::System
+            val::BaseValue::PointerType m,
+            const BaseUnits::ListType& bu,
+            const SystemType system = UnitSystem::current.type
         );
         Quantity(
             val::BaseValue::PointerType m,
@@ -50,13 +55,15 @@ namespace snt::puq {
             const SystemType system = SystemType::NONE
         );
         Quantity(
-            val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system = UnitSystem::System
+            val::BaseValue::PointerType m,
+            val::BaseValue::PointerType e,
+            const SystemType system = UnitSystem::current.type
         );
         Quantity(
             val::BaseValue::PointerType m,
             val::BaseValue::PointerType e,
             const BaseUnits::ListType& bu,
-            const SystemType system = UnitSystem::System
+            const SystemType system = UnitSystem::current.type
         );
         std::string unit_system() const;
         std::size_t size() const;

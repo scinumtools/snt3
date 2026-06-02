@@ -50,7 +50,7 @@ namespace snt::puq {
         _parse_exponent(bu, expr, m);
         // determine unit
         std::pair<std::string, UnitStruct> munit; // current candidate unit
-        for (auto& unit : UnitSystem::Data->UnitList) {
+        for (auto& unit : UnitSystem::current.data->UnitList) {
             if (unit.first.size() > expr.size()) // symbol is longer than the expression
                 continue;
             if (unit.first.size() <= munit.first.size()) // symbol is smaller or equal to the current candidate symbol
@@ -61,7 +61,7 @@ namespace snt::puq {
         }
         if (munit.first == "") {
             throw AtomParsingExcept(
-                "Unknown unit base \"" + expr_orig + "\" in " + UnitSystem::Data->SystemAbbrev + " system!"
+                "Unknown unit base \"" + expr_orig + "\" in " + UnitSystem::current.data->SystemAbbrev + " system!"
             );
         } else {
             bu.unit = munit.first;
@@ -82,8 +82,8 @@ namespace snt::puq {
                 if (std::find(munit.second.allowed_prefixes.begin(), munit.second.allowed_prefixes.end(), bu.prefix) ==
                     munit.second.allowed_prefixes.end()) {
                     std::stringstream ss;
-                    ss << "Given prefix is not allowed in unit system " + UnitSystem::Data->SystemAbbrev + ": " +
-                              expr_orig
+                    ss << "Given prefix is not allowed in unit system " + UnitSystem::current.data->SystemAbbrev +
+                              ": " + expr_orig
                        << '\n';
                     ss << "Allowed prefixes are:";
                     for (auto& prefix : munit.second.allowed_prefixes) {

@@ -23,7 +23,7 @@ namespace snt::puq {
                 }
             }
             if (system == SystemType::NONE)
-                system = UnitSystem::System;
+                system = UnitSystem::current.type;
         }
         if constexpr (Config::preprocess_symbols) {
             UnitFormat::preprocess_symbols(expression);
@@ -140,7 +140,7 @@ namespace snt::puq {
     std::string Quantity::unit_system() const {
         auto it = SystemMap.find(stype);
         if (it == SystemMap.end()) {
-            it = SystemMap.find(UnitSystem::System);
+            it = SystemMap.find(UnitSystem::current.type);
         }
         return it->second->SystemAbbrev;
     }
@@ -383,12 +383,12 @@ namespace snt::puq {
                 throw snt::puq::ConvDimExcept(measurement.baseunits, stype, msr1.baseunits, system);
             }
         } else {
-            QuantityListType::iterator qs1 = puq::UnitSystem::Data->QuantityList.find(q);
-            if (qs1 == puq::UnitSystem::Data->QuantityList.end())
+            QuantityListType::iterator qs1 = puq::UnitSystem::current.data->QuantityList.find(q);
+            if (qs1 == puq::UnitSystem::current.data->QuantityList.end())
                 throw UnitSystemExcept("Quantity symbol not found: " + q);
             us.change(system);
-            QuantityListType::iterator qs2 = puq::UnitSystem::Data->QuantityList.find(q);
-            if (qs2 == puq::UnitSystem::Data->QuantityList.end())
+            QuantityListType::iterator qs2 = puq::UnitSystem::current.data->QuantityList.find(q);
+            if (qs2 == puq::UnitSystem::current.data->QuantityList.end())
                 throw UnitSystemExcept("Quantity symbol not found: " + q);
             us.change(stype);
             if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
@@ -420,12 +420,12 @@ namespace snt::puq {
                 throw snt::puq::ConvDimExcept(measurement.baseunits, stype, Measurement(1, bu).baseunits, system);
             }
         } else {
-            QuantityListType::iterator qs1 = puq::UnitSystem::Data->QuantityList.find(q);
-            if (qs1 == puq::UnitSystem::Data->QuantityList.end())
+            QuantityListType::iterator qs1 = puq::UnitSystem::current.data->QuantityList.find(q);
+            if (qs1 == puq::UnitSystem::current.data->QuantityList.end())
                 throw UnitSystemExcept("Quantity symbol not found: " + q);
             us.change(system);
-            QuantityListType::iterator qs2 = puq::UnitSystem::Data->QuantityList.find(q);
-            if (qs2 == puq::UnitSystem::Data->QuantityList.end())
+            QuantityListType::iterator qs2 = puq::UnitSystem::current.data->QuantityList.find(q);
+            if (qs2 == puq::UnitSystem::current.data->QuantityList.end())
                 throw UnitSystemExcept("Quantity symbol not found: " + q);
             us.change(stype);
             if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
@@ -453,12 +453,12 @@ namespace snt::puq {
                 throw snt::puq::ConvDimExcept(measurement.baseunits, stype, Measurement(s).baseunits, system);
             }
         } else {
-            QuantityListType::iterator qs1 = puq::UnitSystem::Data->QuantityList.find(q);
-            if (qs1 == puq::UnitSystem::Data->QuantityList.end())
+            QuantityListType::iterator qs1 = puq::UnitSystem::current.data->QuantityList.find(q);
+            if (qs1 == puq::UnitSystem::current.data->QuantityList.end())
                 throw UnitSystemExcept("Quantity symbol not found: " + q);
             us.change(system);
-            QuantityListType::iterator qs2 = puq::UnitSystem::Data->QuantityList.find(q);
-            if (qs2 == puq::UnitSystem::Data->QuantityList.end())
+            QuantityListType::iterator qs2 = puq::UnitSystem::current.data->QuantityList.find(q);
+            if (qs2 == puq::UnitSystem::current.data->QuantityList.end())
                 throw UnitSystemExcept("Quantity symbol not found: " + q);
             us.change(stype);
             if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {

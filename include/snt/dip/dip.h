@@ -37,7 +37,7 @@ namespace snt::dip {
         void add_string(const std::string& source_code);
         void add_file(const std::string& source_file, std::string source_name = "", const bool absolute = true);
         void add_source(const std::string& source_name, const std::string& source_file);
-        void add_unit(const std::string& name, const double value, const std::string& unit = "");
+        void add_unit(const std::string& unit_name, const std::string& unit_expression);
         void add_value_function(const std::string& name, FunctionList::ValueFunctionType func);
         void add_node_function(const std::string& name, FunctionList::TableFunctionType func);
         Environment parse();
