@@ -24,6 +24,7 @@ namespace snt::puq {
         CST = 0b00010000, ///< constant
         CSB = 0b00100000, ///< base constant
         QUA = 0b01000000, ///< quantity
+        CUS = 0b10000000, ///< custom unit
     };
 
     inline Utype operator|(Utype lhs, Utype rhs) {
@@ -52,6 +53,7 @@ namespace snt::puq {
     const Utype UT_LIN_CSB = Utype::LIN | Utype::CSB;
     const Utype UT_LIN_LOG = Utype::LIN | Utype::LOG;
     const Utype UT_LIN_QUA = Utype::LIN | Utype::QUA;
+    const Utype UT_LIN_CUS = Utype::LIN | Utype::CUS;
 
     /*
      *  Prefix and unit list definitions

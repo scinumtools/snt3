@@ -28,21 +28,13 @@ namespace snt::puq {
     class UnitSystem {
       public:
         /**
-         * @struct CustomUnit
-         * @brief Holds custom unit data
-         */
-        struct CustomUnit {
-            std::string name;
-        };
-
-        /**
          * @struct Record
          * @brief Holds record of an openned unit system
          */
         struct Record {
             SystemType type;
             SystemDataType* data;
-            std::map<std::string, CustomUnit> customUnits;
+            SystemDataType custom;
         };
 
       private:
@@ -51,6 +43,15 @@ namespace snt::puq {
 
       public:
         static Record current; ///< Record of a current openned unit system
+
+        /**
+         * @brief Set a custom unit into the current unit system record
+         *
+         * @param name Unit name
+         * @param definition Defining unit expression
+         * @return Current stack number
+         */
+        static size_t set_custom_unit(const std::string& name, const std::string& definition);
 
         /**
          * @brief Constructor of the UnitSystem class

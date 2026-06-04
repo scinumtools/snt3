@@ -147,14 +147,26 @@ namespace snt::puq {
             }
             // quantity
             if (bu.unit.rfind(Symbols::quantity_start, 0) == 0 || bu.unit.rfind(Symbols::si_factor_start, 0) == 0) {
-                auto dmap = UnitSystem::current.data->DimensionMap.find(bu.unit);
-                if (dmap != UnitSystem::current.data->DimensionMap.end()) {
+                auto dmap_data = UnitSystem::current.data->DimensionMap.find(bu.unit);
+                auto dmap_custom = UnitSystem::current.custom.DimensionMap.find(bu.unit);
+                if (dmap_data != UnitSystem::current.data->DimensionMap.end()) {
                     dim.utype = dim.utype | Utype::LIN;
-                    dim.symbols.push_back(dmap->first);
-                    Result result(dmap->second.estimate, dmap->second.uncertainty);
+                    dim.symbols.push_back(dmap_data->first);
+                    Result result(dmap_data->second.estimate, dmap_data->second.uncertainty);
                     dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
                     for (int i = 0; i < Config::num_basedim; i++) {
-                        dim.physical[i] = add_exp(dim.physical[i], mul_exp(dmap->second.dimensions[i], bu.exponent));
+                        dim.physical[i] =
+                            add_exp(dim.physical[i], mul_exp(dmap_data->second.dimensions[i], bu.exponent));
+                    }
+                    continue;
+                } else if (dmap_custom != UnitSystem::current.custom.DimensionMap.end()) {
+                    dim.utype = dim.utype | Utype::LIN;
+                    dim.symbols.push_back(dmap_custom->first);
+                    Result result(dmap_custom->second.estimate, dmap_custom->second.uncertainty);
+                    dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
+                    for (int i = 0; i < Config::num_basedim; i++) {
+                        dim.physical[i] =
+                            add_exp(dim.physical[i], mul_exp(dmap_custom->second.dimensions[i], bu.exponent));
                     }
                     continue;
                 } else {
@@ -172,13 +184,21 @@ namespace snt::puq {
                     if (unit->second.utype == Utype::LOG) // unit requires logarithmic conversions
                         dim.utype = dim.utype | unit->second.utype;
                     dim.symbols.push_back(unit->first);
-                    auto dmap = UnitSystem::current.data->DimensionMap.find(unit->first);
-                    if (dmap != UnitSystem::current.data->DimensionMap.end()) {
-                        Result result(dmap->second.estimate, dmap->second.uncertainty);
+                    auto dmap_data = UnitSystem::current.data->DimensionMap.find(unit->first);
+                    auto dmap_custom = UnitSystem::current.custom.DimensionMap.find(unit->first);
+                    if (dmap_data != UnitSystem::current.data->DimensionMap.end()) {
+                        Result result(dmap_data->second.estimate, dmap_data->second.uncertainty);
                         dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
                         for (int i = 0; i < Config::num_basedim; i++) {
                             dim.physical[i] =
-                                add_exp(dim.physical[i], mul_exp(dmap->second.dimensions[i], bu.exponent));
+                                add_exp(dim.physical[i], mul_exp(dmap_data->second.dimensions[i], bu.exponent));
+                        }
+                    } else if (dmap_custom != UnitSystem::current.data->DimensionMap.end()) {
+                        Result result(dmap_custom->second.estimate, dmap_custom->second.uncertainty);
+                        dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
+                        for (int i = 0; i < Config::num_basedim; i++) {
+                            dim.physical[i] =
+                                add_exp(dim.physical[i], mul_exp(dmap_custom->second.dimensions[i], bu.exponent));
                         }
                     } else {
                         throw MeasurementExcept("Undefined unit symbol: " + bu.unit);

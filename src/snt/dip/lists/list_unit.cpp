@@ -1,5 +1,6 @@
 #include <snt/dip/environment.h>
 #include <snt/dip/lists/list_unit.h>
+#include <snt/puq/systems/unit_system.h>
 #include <stdexcept>
 
 namespace snt::dip {
@@ -9,12 +10,14 @@ namespace snt::dip {
     void UnitList::append(const std::string& name, const std::string& definition) {
         if (units.contains(name))
             throw std::invalid_argument("Unit with the same name already exists: " + name);
-        units.insert({name, {name, definition}});
+        size_t stack = puq::UnitSystem::set_custom_unit(name, definition);
+        units.insert({name, {name, definition, stack}});
     }
 
-    void UnitList::append(const std::string& name, const EnvUnit& data) {
+    void UnitList::append(const std::string& name, EnvUnit data) {
         if (units.contains(name))
             throw std::invalid_argument("Unit with the same name already exists: " + name);
+        data.stack = puq::UnitSystem::set_custom_unit(name, data.definition);
         units.insert({name, data});
     }
 

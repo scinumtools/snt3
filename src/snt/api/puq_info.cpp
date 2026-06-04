@@ -49,6 +49,12 @@ namespace snt::api {
             ss << (display ? ", " : "") << unit.first;
             display = true;
         }
+        for (const auto& unit : puq::UnitSystem::current.custom.DimensionMap) {
+            if (puq::Dimensions(1, unit.second.dimensions) != dim)
+                continue;
+            ss << (display ? ", " : "") << unit.first;
+            display = true;
+        }
         if (display) {
             std::cout << '\n';
             std::cout << "Conversions: " << ss.str() << '\n';

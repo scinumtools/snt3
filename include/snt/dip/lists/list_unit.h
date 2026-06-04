@@ -13,6 +13,7 @@ namespace snt::dip {
     struct EnvUnit {
         std::string name;       ///< unit key
         std::string definition; ///< unit definition
+        size_t stack;           ///< number of the current unit system stack
     };
 
     /**
@@ -43,7 +44,7 @@ namespace snt::dip {
          * @param name Name of a custom unit
          * @param data Custom unit data object
          */
-        void append(const std::string& name, const EnvUnit& data);
+        void append(const std::string& name, EnvUnit data);
 
         /**
          * @brief Select custom unit data
