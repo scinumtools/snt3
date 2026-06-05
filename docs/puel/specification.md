@@ -13,12 +13,12 @@ Reference Implementation: scinumtools.units (PUQ)
 
 PUEL (Physical Units Expression Language) is a domain-specific language for representing and manipulating physical units and dimensional expressions.
 
-PUEL defines the syntax and structure of unit expressions used in scientific computations. Evaluation, normalization, and conversion of unit expressions are performed by the EXS solver and PUQ module.
+It defines the syntax and structure of unit expressions used in scientific computations within the [SciNumTools3](https://github.com/vrtulka23/scinumtools3) framework. Evaluation, normalization, dimensional analysis, and unit conversion are performed by the underlying EXS and PUQ modules.
 
-PUEL can be used:
-- as part of DIPL for unit-aware parameters
-- as a standalone unit expression language
-- as a backend for programmatic APIs (e.g. Python bindings)
+The language is designed for the following use cases:
+* As a component of DIPL for defining and validating unit-aware parameters.
+* As a standalone language for the concise and machine-readable representation of physical unit expressions.
+* As a backend for programmatic interfaces, such as Python bindings and other language integrations.
 
 ---
 
@@ -36,18 +36,31 @@ PUEL is designed to be:
 
 ## 3. Unit Model
 
-All unit expressions are based on a fixed set of base dimensions:
+### 3.1. Base units
 
-- Length (`m`)
-- Mass (`g`)
-- Time (`s`)
-- Temperature (`K`)
-- Charge (`C`)
-- Luminous intensity (`cd`)
-- Amount of substance (`mol`)
-- Angle (`rad`)
+All unit expressions are ultimately represented in terms of a fixed set of base dimensions:
 
-Derived units are represented as combinations of these base dimensions with an associated result.
+* Length in meters (`m`)
+* Mass in grams (`g`)
+* Time in seconds (`s`)
+* Temperature in kelvins (`K`)
+* Electric charge in coulombs (`C`)
+* Luminous intensity in candelas (`cd`)
+* Amount of substance in moles (`mol`)
+* Angle in radians (`rad`)
+
+Derived units are represented as combinations of these base dimensions together with an associated scaling factor.
+
+The choice of base dimensions is driven by implementation considerations and does not exactly match the SI base-unit system.
+
+ * Mass is represented using grams (`g`) rather than kilograms (`kg`) to avoid embedding a prefix in a base unit.
+ * Electric charge is represented using coulombs (`C`) rather than amperes (`A`), making current a derived quantity (`C/s`).
+ * Angle is included as a base dimension to enable dimensional validation of mathematical functions that require angular arguments.
+
+### 3.1. Scaling factors
+
+Scaling factors add numerical scale to base units. 
+In PUEL units should implement the following set of possible scaling prefixes.
 
 ---
 
@@ -55,17 +68,123 @@ Derived units are represented as combinations of these base dimensions with an a
 
 ### 4.1 General Form
 
-A unit expression consists of unit identifiers combined using algebraic operators.
+A unit expression consists of an optional unit system identifier, an numerical value, and a unit expression.
+
+General form:
+
+```text
+[<system>_][<value>*][<unit-expression>]
+```
+
+where:
+
+* `<system>` is a unit system identifier.
+* `<value>` is a numerical value, optionally including an uncertainty.
+* `<unit-expression>` is a combination of unit identifiers and algebraic operators.
+
+At least one of `<value>` or `<unit-expression>` MUST be present.
 
 Examples:
 
 ```PUEL
 m
-km
-m/s
-kg*m2/s2
-m3/(kg*s2)
+2.5*m
+3.452(3)*kg*m/s2
+US_lb*ft
+SI_9.81*m/s2
 ```
+
+The following rules apply:
+
+* Expressions MUST NOT contain whitespace; all tokens are written without spaces.
+
+  Example:
+
+  ```PUEL
+  kg*m/s2
+  ```
+
+* Unit identifiers MAY be combined using multiplication (`*`), division (`/`), and grouping parentheses (`(`, `)`).
+
+  Examples:
+
+  ```PUEL
+  kg*m
+  m/s
+  kg*m2/(sr*s2)
+  ```
+
+* Exponents are written directly after the corresponding unit identifier and do not use exponentiation operators such as `^` or `**`.
+
+  Example:
+
+  ```PUEL
+  m2
+  ```
+
+* Fractional exponents are written using the `numerator:denominator` notation.
+
+  Example:
+
+  ```PUEL
+  kg3:2
+  ```
+
+* Negative exponents are written using a leading minus sign.
+
+  Example:
+
+  ```PUEL
+  s-1
+  ```
+
+* A unit system MAY be specified at the beginning of an expression and is separated from the remainder of the expression by an underscore (`_`).
+
+  Example:
+
+  ```PUEL
+  US_lb*ft
+  ```
+
+* Numerical values MAY be included in expressions.
+
+  Examples:
+
+  ```PUEL
+  2.34e3*mol
+  -9.81*m/s2
+  ```
+
+* The symbols `+` and `-` denote the sign of a numerical value or exponent; they do not represent addition or subtraction operators.
+
+  Examples:
+
+  ```PUEL
+  +5*m
+  -5*m
+  s-2
+  ```
+
+* Uncertainties are written in parentheses immediately following the last decimal digit of a numerical value. The number of digits in the uncertainty corresponds to the same number of least significant digits in the value.
+
+  Examples:
+
+  ```PUEL
+  3.45234(2)e3
+  3.45234(12)
+  12.3(4)e-2
+  120(5)
+  ```
+
+  Interpretation:
+
+  ```text
+  3.45234(2)e3 = 3452.34 ± 0.02
+  3.45234(12)  = 3.45234 ± 0.00012
+  12.3(4)e-2   = 0.123 ± 0.004
+  120(5)       = 120 ± 5
+  ```
+
 
 ### 4.2 Operators
 
