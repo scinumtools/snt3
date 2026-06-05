@@ -251,8 +251,8 @@ Prefixes scale the numerical value of the unit.
 Physical constants may be referenced symbolically:
 
 ```PUEL
-[c]      # speed of light
-[k]      # Boltzmann constant
+{c}      # speed of light
+{k}      # Boltzmann constant
 ```
 
 ### 4.8 Whitespace
