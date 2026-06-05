@@ -3,6 +3,14 @@ name: C/C++ CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - 'bindings/**'
+      - 'benchmarks/**'
+      - 'examples/**'
+      - 'apps/**'
+      - 'tests/**'
   pull_request:
     branches: [ "main" ]
     paths:
