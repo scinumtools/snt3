@@ -5,6 +5,14 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - 'bindings/**'
+      - 'benchmarks/**'
+      - 'examples/**'
+      - 'apps/**'
+      - 'tests/**'
 
 jobs:
   build:
