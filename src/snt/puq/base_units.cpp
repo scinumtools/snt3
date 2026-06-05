@@ -148,7 +148,7 @@ namespace snt::puq {
             // quantity
             if (bu.unit.rfind(Symbols::quantity_start, 0) == 0 || bu.unit.rfind(Symbols::si_factor_start, 0) == 0) {
                 auto dmap_data = UnitSystem::current.data->DimensionMap.find(bu.unit);
-                auto dmap_custom = UnitSystem::current.custom.DimensionMap.find(bu.unit);
+                auto dmap_custom = UnitSystem::current.custom->DimensionMap.find(bu.unit);
                 if (dmap_data != UnitSystem::current.data->DimensionMap.end()) {
                     dim.utype = dim.utype | Utype::LIN;
                     dim.symbols.push_back(dmap_data->first);
@@ -159,7 +159,7 @@ namespace snt::puq {
                             add_exp(dim.physical[i], mul_exp(dmap_data->second.dimensions[i], bu.exponent));
                     }
                     continue;
-                } else if (dmap_custom != UnitSystem::current.custom.DimensionMap.end()) {
+                } else if (dmap_custom != UnitSystem::current.custom->DimensionMap.end()) {
                     dim.utype = dim.utype | Utype::LIN;
                     dim.symbols.push_back(dmap_custom->first);
                     Result result(dmap_custom->second.estimate, dmap_custom->second.uncertainty);
@@ -174,18 +174,28 @@ namespace snt::puq {
                 }
             }
             // dimensions
-            auto unit = UnitSystem::current.data->UnitList.find(bu.unit);
-            if (unit != UnitSystem::current.data->UnitList.end()) {
-                if (unit->first == bu.unit) {
-                    if ((unit->second.utype & Utype::LIN) == Utype::LIN) // standard linear conversion
+            std::string unit_name;
+            Utype unit_utype = Utype::NUL;
+            auto unit_data = UnitSystem::current.data->UnitList.find(bu.unit);
+            auto unit_custom = UnitSystem::current.custom->UnitList.find(bu.unit);
+            if (unit_data != UnitSystem::current.data->UnitList.end()) {
+                unit_name = unit_data->first;
+                unit_utype = unit_data->second.utype;
+            } else if (unit_custom != UnitSystem::current.custom->UnitList.end()) {
+                unit_name = unit_custom->first;
+                unit_utype = unit_custom->second.utype;
+            }
+            if (unit_utype != Utype::NUL) {
+                if (unit_name == bu.unit) {
+                    if ((unit_utype & Utype::LIN) == Utype::LIN) // standard linear conversion
                         dim.utype = dim.utype | Utype::LIN;
-                    if (unit->second.utype == Utype::TMP) // unit requires conversion of temperatures
-                        dim.utype = dim.utype | unit->second.utype;
-                    if (unit->second.utype == Utype::LOG) // unit requires logarithmic conversions
-                        dim.utype = dim.utype | unit->second.utype;
-                    dim.symbols.push_back(unit->first);
-                    auto dmap_data = UnitSystem::current.data->DimensionMap.find(unit->first);
-                    auto dmap_custom = UnitSystem::current.custom.DimensionMap.find(unit->first);
+                    if (unit_utype == Utype::TMP) // unit requires conversion of temperatures
+                        dim.utype = dim.utype | unit_utype;
+                    if (unit_utype == Utype::LOG) // unit requires logarithmic conversions
+                        dim.utype = dim.utype | unit_utype;
+                    dim.symbols.push_back(unit_name);
+                    auto dmap_data = UnitSystem::current.data->DimensionMap.find(unit_name);
+                    auto dmap_custom = UnitSystem::current.custom->DimensionMap.find(unit_name);
                     if (dmap_data != UnitSystem::current.data->DimensionMap.end()) {
                         Result result(dmap_data->second.estimate, dmap_data->second.uncertainty);
                         dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
@@ -193,7 +203,7 @@ namespace snt::puq {
                             dim.physical[i] =
                                 add_exp(dim.physical[i], mul_exp(dmap_data->second.dimensions[i], bu.exponent));
                         }
-                    } else if (dmap_custom != UnitSystem::current.data->DimensionMap.end()) {
+                    } else if (dmap_custom != UnitSystem::current.custom->DimensionMap.end()) {
                         Result result(dmap_custom->second.estimate, dmap_custom->second.uncertainty);
                         dim.numerical *= math::pow(result, exponent_to_float(bu.exponent));
                         for (int i = 0; i < Config::num_basedim; i++) {

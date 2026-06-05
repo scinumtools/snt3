@@ -59,6 +59,15 @@ namespace snt::puq {
                 munit = unit;
             }
         }
+        for (auto& unit : UnitSystem::current.custom->UnitList) {
+            if (unit.first.size() > expr.size()) // symbol is longer than the expression
+                continue;
+            if (unit.first.size() <= munit.first.size()) // symbol is smaller or equal to the current candidate symbol
+                continue;
+            if (expr.compare(expr.size() - unit.first.size(), unit.first.size(), unit.first) == 0) {
+                munit = unit;
+            }
+        }
         if (munit.first == "") {
             throw AtomParsingExcept(
                 "Unknown unit base \"" + expr_orig + "\" in " + UnitSystem::current.data->SystemAbbrev + " system!"

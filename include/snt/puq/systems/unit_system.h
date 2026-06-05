@@ -10,6 +10,8 @@ namespace snt::puq {
     extern std::unordered_map<SystemType, SystemDataType*>
         SystemMap; ///< Map of sytem types and corresponding pointers to the system data structures
 
+    extern std::unordered_map<SystemType, SystemDataType> CustomSystemMap; ///< Map of custom units for each unit system
+
     /**
      * @class UnitSystem
      * @brief Manages a pointer to the central unit-system registry (`current`).
@@ -34,7 +36,7 @@ namespace snt::puq {
         struct Record {
             SystemType type;
             SystemDataType* data;
-            SystemDataType custom;
+            SystemDataType* custom;
         };
 
       private:

@@ -49,7 +49,7 @@ namespace snt::api {
             ss << (display ? ", " : "") << unit.first;
             display = true;
         }
-        for (const auto& unit : puq::UnitSystem::current.custom.DimensionMap) {
+        for (const auto& unit : puq::UnitSystem::current.custom->DimensionMap) {
             if (puq::Dimensions(1, unit.second.dimensions) != dim)
                 continue;
             ss << (display ? ", " : "") << unit.first;

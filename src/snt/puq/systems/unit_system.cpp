@@ -44,12 +44,28 @@ namespace snt::puq {
     std::unordered_map<SystemType, SystemDataType*> SystemMap = get_system_map();
 
     /**
+     * @brief Initialize map of empty unit systems for custom units
+     *
+     * @return Map of units systems for custom units
+     */
+    inline std::unordered_map<SystemType, SystemDataType> get_custom_system_map() {
+        std::unordered_map<SystemType, SystemDataType> map;
+        for (int i = 0; i < static_cast<int>(SystemType::COUNT); ++i) {
+            auto system = static_cast<SystemType>(i);
+            map[system] = {};
+        }
+        return map;
+    }
+
+    std::unordered_map<SystemType, SystemDataType> CustomSystemMap = get_custom_system_map();
+
+    /**
      * @brief Initialize curent unit system record
      *
      * @return Default unit system record
      */
     inline UnitSystem::Record get_default_record() {
-        return UnitSystem::Record(SystemType::SI, &SystemData::SI, SystemDataType("CUS", "Custom"));
+        return UnitSystem::Record(SystemType::SI, &SystemData::SI, &CustomSystemMap.at(SystemType::SI));
     }
 
     UnitSystem::Record UnitSystem::current = get_default_record();
@@ -58,8 +74,8 @@ namespace snt::puq {
 
     size_t UnitSystem::set_custom_unit(const std::string& name, const std::string& definition) {
         // Check if custom unit with the same name already exists
-        auto it = current.custom.UnitList.find(name);
-        if (it != current.custom.UnitList.end())
+        auto it = current.custom->UnitList.find(name);
+        if (it != current.custom->UnitList.end())
             throw UnitSystemExcept("Custom unit with the same name already exist in the current record: " + name);
         // Extract DimensionStruct values from a quantity
         Quantity quant(definition);
@@ -69,8 +85,8 @@ namespace snt::puq {
         if (!estimate)
             throw std::runtime_error("Custom quantity estimate has invalid type, or is undefined.");
         // Add custom units into UnitList and DimensionMap
-        current.custom.UnitList[name] = UnitStruct(UT_LIN_CUS, definition, name, false);
-        current.custom.DimensionMap[name] = DimensionStruct(
+        current.custom->UnitList[name] = UnitStruct(UT_LIN_CUS, definition, name, false);
+        current.custom->DimensionMap[name] = DimensionStruct(
             estimate->get_value(0),
             (uncertainty ? uncertainty->get_value(0) : 0.),
             quant.measurement.baseunits.dimensions().physical
@@ -93,7 +109,7 @@ namespace snt::puq {
 
     UnitSystem::UnitSystem(const SystemType system) : closed(false) {
         stack.push(current);
-        current = Record(system, select_unit_system(system), SystemDataType("CUS", "Custom"));
+        current = Record(system, select_unit_system(system), &CustomSystemMap.at(system));
     }
 
     UnitSystem::~UnitSystem() {
@@ -102,7 +118,7 @@ namespace snt::puq {
     }
 
     void UnitSystem::change(const SystemType system) {
-        current = Record(system, select_unit_system(system), SystemDataType("CUS", "Custom"));
+        current = Record(system, select_unit_system(system), &CustomSystemMap.at(system));
     }
 
     void UnitSystem::close() {

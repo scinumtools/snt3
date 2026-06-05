@@ -35,14 +35,13 @@ def test_add_source():
     assert env.nodes[0].name == "baz"
     assert env.nodes[0].value == 2
 
-# TODO: needs to be tested
-#def test_add_unit():
-#
-#    dip = DIP()
-#    dip.add_unit("length", "23*au")
-#    dip.add_string("baz int = 3 {length}")
-#    env = dip.parse()
-#    assert env.size == 1
-#    assert env.nodes[0].name == "baz"
-#    assert env.nodes[0].value == 2
+def test_add_unit():
+
+    dip = DIP()
+    dip.add_unit("length", "23*au")
+    dip.add_string("baz int = 3 length")
+    env = dip.parse()
+    assert env.size == 1
+    assert env.nodes[0].name == "baz"
+    assert env.nodes[0].value == 3
     

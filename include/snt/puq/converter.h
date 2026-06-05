@@ -75,6 +75,19 @@ namespace snt::puq {
                      UnitSystem::current.data->UnitList.find(unit.first)->second.name}
                 );
             }
+            for (auto unit : UnitSystem::current.custom->DimensionMap) {
+                if (Dimensions(1, unit.second.dimensions) != dim1)
+                    continue;
+                if (unit.first == mgs || unit.first == mks || unit.first == cgs)
+                    continue;
+                if (unit.first[0] == Symbols::quantity_start[0])
+                    continue;
+                tab.append(
+                    {SystemMap[s1]->SystemAbbrev,
+                     unit.first,
+                     UnitSystem::current.custom->UnitList.find(unit.first)->second.name}
+                );
+            }
             us.change(s2);
             for (auto unit : UnitSystem::current.data->DimensionMap) {
                 if (Dimensions(1, unit.second.dimensions) != dim1)
@@ -87,6 +100,19 @@ namespace snt::puq {
                     {SystemMap[s2]->SystemAbbrev,
                      unit.first,
                      UnitSystem::current.data->UnitList.find(unit.first)->second.name}
+                );
+            }
+            for (auto unit : UnitSystem::current.custom->DimensionMap) {
+                if (Dimensions(1, unit.second.dimensions) != dim1)
+                    continue;
+                if (unit.first == mgs || unit.first == mks || unit.first == cgs)
+                    continue;
+                if (unit.first[0] == Symbols::quantity_start[0])
+                    continue;
+                tab.append(
+                    {SystemMap[s2]->SystemAbbrev,
+                     unit.first,
+                     UnitSystem::current.custom->UnitList.find(unit.first)->second.name}
                 );
             }
             if (s1 != s2) {
@@ -118,6 +144,25 @@ namespace snt::puq {
                                 {SystemMap[s2]->SystemAbbrev,
                                  unit.first,
                                  UnitSystem::current.data->UnitList.find(unit.first)->second.name,
+                                 quant.first}
+                            );
+                        }
+                        for (auto unit : UnitSystem::current.custom->DimensionMap) {
+                            if (Dimensions(1, unit.second.dimensions) != dim_q)
+                                continue;
+                            if (unit.first == mgs || unit.first == mks || unit.first == cgs)
+                                continue;
+                            if (unit.first[0] == Symbols::quantity_start[0])
+                                continue;
+                            UnitStruct uinfo = UnitSystem::current.custom->UnitList[unit.first];
+                            if ((uinfo.utype & Utype::LOG) == Utype::LOG)
+                                continue;
+                            if ((uinfo.utype & Utype::TMP) == Utype::TMP)
+                                continue;
+                            tab.append(
+                                {SystemMap[s2]->SystemAbbrev,
+                                 unit.first,
+                                 UnitSystem::current.custom->UnitList.find(unit.first)->second.name,
                                  quant.first}
                             );
                         }

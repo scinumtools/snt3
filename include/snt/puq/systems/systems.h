@@ -122,32 +122,33 @@ namespace snt::puq {
 
     namespace SystemData {
 #include <snt/puq/systems/system_base.h>
-        extern SystemDataType SI;
-        extern SystemDataType ESU;
-        extern SystemDataType EMU;
-        extern SystemDataType GU;
-        extern SystemDataType IU;
-        extern SystemDataType US;
-        extern SystemDataType AU;
-        extern SystemDataType PU;
-        extern SystemDataType SRU;
-        extern SystemDataType GRU;
-        extern SystemDataType GEO;
+        extern SystemDataType SI;  ///< International system of units
+        extern SystemDataType ESU; ///< Electrostatic CGS system of units
+        extern SystemDataType EMU; ///< Electromagnetic CGS system of units
+        extern SystemDataType GU;  ///< Gauss CGS sytem of units
+        extern SystemDataType IU;  ///< Imperial units
+        extern SystemDataType US;  ///< United States customary system of units
+        extern SystemDataType AU;  ///< Atomic system of units
+        extern SystemDataType PU;  ///< Planck system of units
+        extern SystemDataType SRU; ///< Units for special relativity
+        extern SystemDataType GRU; ///< Units for general relativity
+        extern SystemDataType GEO; ///< Geometrized units
     } // namespace SystemData
 
     enum class SystemType {
-        NONE,
-        SI,
-        ESU,
-        GU,
-        EMU,
-        IU,
-        US,
-        AU,
-        PU,
-        SRU,
-        GRU,
-        GEO,
+        SI,    ///< International system of units
+        ESU,   ///< Electrostatic CGS system of units
+        GU,    ///< Gauss CGS sytem of units
+        EMU,   ///< Electromagnetic CGS system of units
+        IU,    ///< Imperial units
+        US,    ///< United States customary system of units
+        AU,    ///< Atomic system of units
+        PU,    ///< Planck system of units
+        SRU,   ///< Units for special relativity
+        GRU,   ///< Units for general relativity
+        GEO,   ///< Geometrized units
+        COUNT, ///< Number of units systems
+        NONE   ///< No unit system selected
     };
 
 } // namespace snt::puq
