@@ -59,8 +59,11 @@ The choice of base dimensions is driven by implementation considerations and doe
 
 ### 3.1. Scaling factors
 
-Scaling factors add numerical scale to base units. 
-In PUEL units should implement the following set of possible scaling prefixes.
+Scaling prefixes provide a compact way to represent decimal multiples and submultiples of units. A scaling prefix modifies a unit identifier by applying a fixed numerical factor while preserving the unit's dimensionality.
+
+For example, the expressions m, cm, and km all represent units of length, differing only by their scaling factors relative to the base unit.
+
+PUEL defines the following set of scaling prefixes. Implementations MUST recognize and correctly apply these prefixes when parsing unit expressions.
 
 ---
 
@@ -289,7 +292,38 @@ Example:
 **Multiplication/division** always valid  
 **Exponent** must be dimensionless  
 
-## 7. Conversions
+## 7. Tables
+
+### 7.1 Scaling prefixes
+
+| Prefix | Factor  | Name  |
+| ------ | ------- | ----- |
+| `Y`    | `1e24`  | yotta |
+| `Z`    | `1e21`  | zetta |
+| `E`    | `1e18`  | exa   |
+| `P`    | `1e15`  | peta  |
+| `T`    | `1e12`  | tera  |
+| `G`    | `1e9`   | giga  |
+| `M`    | `1e6`   | mega  |
+| `k`    | `1e3`   | kilo  |
+| `h`    | `1e2`   | hecto |
+| `da`   | `1e1`   | deka  |
+| `d`    | `1e-1`  | deci  |
+| `c`    | `1e-2`  | centi |
+| `m`    | `1e-3`  | milli |
+| `u`    | `1e-6`  | micro |
+| `n`    | `1e-9`  | nano  |
+| `p`    | `1e-12` | pico  |
+| `f`    | `1e-15` | femto |
+| `a`    | `1e-18` | atto  |
+| `z`    | `1e-21` | zepto |
+| `y`    | `1e-24` | yocto |
+
+> [!NOTE]
+> The prefix `u` is used to represent micro (`μ`) in ASCII-only unit expressions.
+
+
+## 8. Conversions
 
 PUEL supports conversion between units of identical dimensions:
 
