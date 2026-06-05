@@ -1,8 +1,8 @@
 # **Scientific Numerical Tools v3 (SciNumTools3, SNT)**  
 *``SciNumTools3`` is a C++ library for unit-safe, validated parameters—eliminating hidden assumptions in scientific code.*
 
-[![C/C++ CI](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp.yml)
-[![Linux Build](https://img.shields.io/github/actions/workflow/status/vrtulka23/scinumtools3/c-cpp.yml?label=Linux%20build)](https://github.com/vrtulka23/scinumtools3/actions/workflows/build-linux.yml)
+[![Linux Build](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-linux.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-linux.yml)
+[![macOS Build](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-macos.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-macos.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![GitHub release](https://img.shields.io/github/v/release/vrtulka23/scinumtools3?include_prereleases)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg?logo=c%2B%2B&logoColor=white)
