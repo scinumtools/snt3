@@ -6,7 +6,7 @@
 #include <snt/puq/measurement.h>
 
 namespace snt::puq {
-
+ 
     class AtomParsingExcept : public std::exception {
       private:
         std::string message;
