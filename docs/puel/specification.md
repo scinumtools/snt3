@@ -61,13 +61,30 @@ The choice of base dimensions is driven by implementation considerations and doe
 
 Scaling prefixes provide a compact way to represent decimal multiples and submultiples of units. A scaling prefix modifies a unit identifier by applying a fixed numerical factor while preserving the unit's dimensionality.
 
-For example, the expressions m, cm, and km all represent units of length, differing only by their scaling factors relative to the base unit.
+For example, the expressions `m`, `cm`, and `km` all represent units of length and differ only in their scaling factors relative to the base unit.
 
-PUEL defines the following set of scaling prefixes. Implementations MUST recognize and correctly apply these prefixes when parsing unit expressions.
+PUEL defines a standard set of scaling prefixes. Implementations MUST recognize and correctly apply these prefixes when parsing unit expressions. However, prefixes SHOULD only be permitted for units for which their use is conventional or widely accepted.
+
+The complete list of supported scaling prefixes is provided in [Appendix A.1: Scaling Prefixes](#a1-scaling-prefixes).
+
+### 3.2. Derived Entities
+
+Derived entities in PUEL include all units (e.g., Joule `J`, degree Celsius `Cel`, decibel `dB`), physical constants (e.g., proton mass `{m_p}`, Avogadro constant `{N_A}`, solar luminosity `{L_sol}`), physical quantities (e.g., energy `<E>`, electric flux `<Phi_E>`, radiation dose `<D_r>`), and unit-system scaling factors (e.g., `|E|`, `|Phi_E|`, `|D_r|`). The dimensionality of these entities is defined in terms of the base dimensions described in the previous section.
+
+PUEL distinguishes between these categories using the following notation:
+
+* Units are represented by their symbols: `J`, `Cel`, `dB`
+* Physical constants are enclosed in curly braces: `{m_p}`, `{N_A}`, `{L_sol}`
+* Physical quantities are enclosed in angle brackets: `<E>`, `<Phi_E>`, `<D_r>`
+* Unit-system scaling factors are enclosed in pipe symbols: `|E|`, `|Phi_E|`, `|D_r|`
+
+Unit-system scaling factors represent the numerical coefficients required to convert a physical quantity between the SI system and another system of units. They are primarily intended to support conversions between systems with different dimensional conventions, such as SI and CGS.
+
+Each implementation MUST define the numerical values and dimensional representations of all supported derived entities. These definitions SHOULD be precomputed and stored to avoid repeated evaluation and dimensional derivation during the processing of unit expressions.
 
 ---
 
-## 4. Syntax
+## 4. Syntax of derived units
 
 ### 4.1 General Form
 
@@ -292,9 +309,24 @@ Example:
 **Multiplication/division** always valid  
 **Exponent** must be dimensionless  
 
-## 7. Tables
+## 8. Conversions
 
-### 7.1 Scaling prefixes
+PUEL supports conversion between units of identical dimensions:
+
+``km`` → ``m``  
+``eV`` → ``J``  
+``dB`` → ``W``  
+
+Special handling exists for:
+
+- logarithmic units
+- temperature units
+
+These require custom conversion rules.
+
+## Appendinx A: Tables
+
+### A.1 Scaling prefixes
 
 | Prefix | Factor  | Name  |
 | ------ | ------- | ----- |
@@ -323,17 +355,3 @@ Example:
 > The prefix `u` is used to represent micro (`μ`) in ASCII-only unit expressions.
 
 
-## 8. Conversions
-
-PUEL supports conversion between units of identical dimensions:
-
-``km`` → ``m``  
-``eV`` → ``J``  
-``dB`` → ``W``  
-
-Special handling exists for:
-
-- logarithmic units
-- temperature units
-
-These require custom conversion rules.
