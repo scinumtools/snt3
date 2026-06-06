@@ -1,11 +1,11 @@
 # PUEL Specification
 
-Version: 1.0  
-Status: Stable (Implementation-defined semantics)  
-Date: 2026-03-23  
+**Version:** v1.0  
+**Status:** Stable (Implementation-defined semantics)  
+**Date:** 2026-03-23  
 
-Project: SciNumTools v3  
-Reference Implementation: scinumtools.units (PUQ)
+**Project:** SciNumTools v3  
+**Reference Implementation:** scinumtools.units (PUQ)
 
 ---
 
