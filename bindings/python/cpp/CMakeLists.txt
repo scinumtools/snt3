@@ -2,7 +2,7 @@ find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 include_directories(${Python3_INCLUDE_DIRS})
 find_package(pybind11 CONFIG REQUIRED)
 
-set(MODULE_NAME scinumtools3)
+set(MODULE_NAME _core)
 
 file(GLOB SOURCE_FILES "./*.cpp")
 pybind11_add_module(${MODULE_NAME} ${SOURCE_FILES})
@@ -52,7 +52,7 @@ enable_testing()
 
 # install python module
 install(TARGETS ${MODULE_NAME}
-        LIBRARY DESTINATION ${Python3_SITEARCH})  # or ${Python3_SITELIB}
+        LIBRARY DESTINATION scinumtools3)
 
 ### register pytest into ctest
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)

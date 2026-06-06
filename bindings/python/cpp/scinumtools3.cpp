@@ -12,7 +12,7 @@ void init_puq(py::module_&);
 void init_dip(py::module_&);
 #endif
 
-PYBIND11_MODULE(scinumtools3, m) {
+PYBIND11_MODULE(_core, m) {
 
     m.doc() = "Scientific Numerical Tools v3";
 
