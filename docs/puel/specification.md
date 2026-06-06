@@ -133,6 +133,10 @@ The following rules apply in unit expressions:
 | The symbols `+` and `-` denote the sign of a numerical value or exponent; they do not represent addition or subtraction operators.                                                                                           | `+5*m`<br>`-5*m`<br>`s-2`                                                                                                          |
 | Uncertainties are written in parentheses immediately following the last decimal digit of a numerical value. The number of digits in the uncertainty corresponds to the same number of least significant digits in the value. | `3.45234(2)e3` → `3452.34 ± 0.02`<br>`3.45234(12)` → `3.45234 ± 0.00012`<br>`12.3(4)e-2` → `0.123 ± 0.004`<br>`120(5)` → `120 ± 5` |
 
+Although unit expressions may use division and grouping parentheses for readability, implementations SHOULD internally normalize them to a canonical form in which all unit factors appear in the numerator and division is represented by negative exponents. For example, the expression `kg*m2/(sr*s2)` is canonically represented and typically displayed as `kg*m2*sr-1*s-2`.
+
+This canonical form provides a unique and deterministic text representation. Since the original placement of division operators and parentheses cannot, in general, be reconstructed from a normalized unit expression, implementations SHOULD use the canonical form when serializing unit expressions.
+
 ## 8. Conversions
 
 PUEL supports conversion between units of identical dimensions:
