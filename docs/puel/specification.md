@@ -68,9 +68,9 @@ PUEL defines a standard set of scaling prefixes. Implementations MUST recognize 
 
 The complete list of supported scaling prefixes is provided in [Appendix A.1: Scaling Prefixes](#a1-scaling-prefixes).
 
-### 3.2. Derived Entities
+### 3.2. Named Entities
 
-Derived entities in PUEL include all units (e.g., Joule `J`, degree Celsius `Cel`, decibel `dB`), physical constants (e.g., proton mass `{m_p}`, Avogadro constant `{N_A}`, solar luminosity `{L_sol}`), physical quantities (e.g., energy `<E>`, electric flux `<Phi_E>`, radiation dose `<D_r>`), and unit-system scaling factors (e.g., `|E|`, `|Phi_E|`, `|D_r|`). The dimensionality of these entities is defined in terms of the base dimensions described in the previous section.
+Named entities in PUEL include all units (e.g., Joule `J`, degree Celsius `Cel`, decibel `dB`), physical constants (e.g., proton mass `{m_p}`, Avogadro constant `{N_A}`, solar luminosity `{L_sol}`), physical quantities (e.g., energy `<E>`, electric flux `<Phi_E>`, radiation dose `<D_r>`), and unit-system scaling factors (e.g., `|E|`, `|Phi_E|`, `|D_r|`). The dimensionality of these entities is defined in terms of the base dimensions described in the previous section.
 
 PUEL distinguishes between these categories using the following notation:
 
