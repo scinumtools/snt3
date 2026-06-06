@@ -118,7 +118,7 @@ SI_9.81*m/s2
 
 Although numerical values are typically written at the beginning of an expression, they are not restricted to that position. Numerical factors may also appear within a unit expression as multiplicative constants. For example, `2*kg*m/s2` and `kg*(2*m)/s2` are equivalent. However, placing numerical values at the beginning of the expression is RECOMMENDED, as it improves readability and simplifies parsing.
 
-The following rules apply:
+The following rules apply in unit expressions:
 
 | Rule                                                                                                                                                                                                                         | Examples                                                                                                                           |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
