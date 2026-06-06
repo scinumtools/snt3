@@ -82,9 +82,11 @@ Unit-system scaling factors represent the numerical coefficients required to con
 
 Each implementation MUST define the numerical values and dimensional representations of all supported derived entities. These definitions SHOULD be precomputed and stored to avoid repeated evaluation and dimensional derivation during the processing of unit expressions.
 
+Within a given implementation and unit system, all supported identifiers and scaling-prefix combinations MUST be unique. Consequently, every valid token in a PUEL expression MUST have exactly one interpretation.
+
 ---
 
-## 4. Syntax of derived units
+## 4. Unit expressions
 
 ### 4.1 General Form
 
@@ -114,200 +116,21 @@ US_lb*ft
 SI_9.81*m/s2
 ```
 
+Although numerical values are typically written at the beginning of an expression, they are not restricted to that position. Numerical factors may also appear within a unit expression as multiplicative constants. For example, `2*kg*m/s2` and `kg*(2*m)/s2` are equivalent. However, placing numerical values at the beginning of the expression is RECOMMENDED, as it improves readability and simplifies parsing.
+
 The following rules apply:
 
-* Expressions MUST NOT contain whitespace; all tokens are written without spaces.
-
-  Example:
-
-  ```PUEL
-  kg*m/s2
-  ```
-
-* Unit identifiers MAY be combined using multiplication (`*`), division (`/`), and grouping parentheses (`(`, `)`).
-
-  Examples:
-
-  ```PUEL
-  kg*m
-  m/s
-  kg*m2/(sr*s2)
-  ```
-
-* Exponents are written directly after the corresponding unit identifier and do not use exponentiation operators such as `^` or `**`.
-
-  Example:
-
-  ```PUEL
-  m2
-  ```
-
-* Fractional exponents are written using the `numerator:denominator` notation.
-
-  Example:
-
-  ```PUEL
-  kg3:2
-  ```
-
-* Negative exponents are written using a leading minus sign.
-
-  Example:
-
-  ```PUEL
-  s-1
-  ```
-
-* A unit system MAY be specified at the beginning of an expression and is separated from the remainder of the expression by an underscore (`_`).
-
-  Example:
-
-  ```PUEL
-  US_lb*ft
-  ```
-
-* Numerical values MAY be included in expressions.
-
-  Examples:
-
-  ```PUEL
-  2.34e3*mol
-  -9.81*m/s2
-  ```
-
-* The symbols `+` and `-` denote the sign of a numerical value or exponent; they do not represent addition or subtraction operators.
-
-  Examples:
-
-  ```PUEL
-  +5*m
-  -5*m
-  s-2
-  ```
-
-* Uncertainties are written in parentheses immediately following the last decimal digit of a numerical value. The number of digits in the uncertainty corresponds to the same number of least significant digits in the value.
-
-  Examples:
-
-  ```PUEL
-  3.45234(2)e3
-  3.45234(12)
-  12.3(4)e-2
-  120(5)
-  ```
-
-  Interpretation:
-
-  ```text
-  3.45234(2)e3 = 3452.34 ± 0.02
-  3.45234(12)  = 3.45234 ± 0.00012
-  12.3(4)e-2   = 0.123 ± 0.004
-  120(5)       = 120 ± 5
-  ```
-
-
-### 4.2 Operators
-
-PUEL supports the following operators:
-
-Operator	Meaning
-
-``*``	Multiplication  
-``/``	Division  
-exponent	Power (integer or fractional)  
-
-### 4.3 Exponents
-Integer exponents
-
-```PUEL
-m2
-s-2
-```
-
-Fractional exponents
-
-```PUEL
-m1:2     # equivalent to m^(1/2)
-s-3:2
-```
-
-Fractional exponents are represented as numerator:denominator.
-
-### 4.4 Numeric Factors
-
-Unit expressions may include scalar factors:
-
-```PUEL
-60*s
-365.25*day
-1.67e-24*g
-```
-
-### 4.5 Parentheses
-
-Parentheses define grouping:
-
-```PUEL
-m3/(kg*s2)
-```
-
-### 4.6 Prefixes
-
-Units may include prefixes:
-
-```PUEL
-km
-mm
-MJ
-```
-
-Prefixes scale the numerical value of the unit.
-
-### 4.7 Constants
-
-Physical constants may be referenced symbolically:
-
-```PUEL
-{c}      # speed of light
-{k}      # Boltzmann constant
-```
-
-### 4.8 Whitespace
-
-Unit expressions MUST NOT contain whitespace.
-
-```PUEL
-# valid
-kg*m/s2
-
-# invalid
-kg * m / s2
-```
-
-## 5. Semantics
-
-### 5.1 Dimensional Composition
-
-**Multiplication** → adds dimension exponents  
-**Division** → subtracts dimension exponents  
-**Power** → multiplies exponents  
-
-### 5.2 Canonical Form
-
-Each unit expression resolves to:
-
-a dimension vector  
-a magnitude scaling factor  
-
-Example:
-
-``km`` → ``m`` with factor 1000
-
-### 6.3 Compatibility Rules
-
-**Addition/subtraction** require identical dimensions  
-**Multiplication/division** always valid  
-**Exponent** must be dimensionless  
+| Rule                                                                                                                                                                                                                         | Examples                                                                                                                           |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Expressions MUST NOT contain whitespace; all tokens are written without spaces.                                                                                                                                              | `kg*m/s2`                                                                                                                          |
+| Unit identifiers MAY be combined using multiplication (`*`), division (`/`), and grouping parentheses (`(`, `)`).                                                                                                            | `kg*m`<br>`m/s`<br>`kg*m2/(sr*s2)`                                                                                                 |
+| Exponents are written directly after the corresponding unit identifier and do not use exponentiation operators such as `^` or `**`.                                                                                          | `m2`                                                                                                                               |
+| Fractional exponents are written using the `numerator:denominator` notation.                                                                                                                                                 | `kg3:2`                                                                                                                            |
+| Negative exponents are written using a leading minus sign.                                                                                                                                                                   | `s-1`                                                                                                                              |
+| A unit system MAY be specified at the beginning of an expression and is separated from the remainder of the expression by an underscore (`_`).                                                                               | `US_lb*ft`                                                                                                                         |
+| Numerical values MAY be included in expressions.                                                                                                                                                                             | `2.34e3*mol`<br>`-9.81*m/s2`                                                                                                       |
+| The symbols `+` and `-` denote the sign of a numerical value or exponent; they do not represent addition or subtraction operators.                                                                                           | `+5*m`<br>`-5*m`<br>`s-2`                                                                                                          |
+| Uncertainties are written in parentheses immediately following the last decimal digit of a numerical value. The number of digits in the uncertainty corresponds to the same number of least significant digits in the value. | `3.45234(2)e3` → `3452.34 ± 0.02`<br>`3.45234(12)` → `3.45234 ± 0.00012`<br>`12.3(4)e-2` → `0.123 ± 0.004`<br>`120(5)` → `120 ± 5` |
 
 ## 8. Conversions
 
