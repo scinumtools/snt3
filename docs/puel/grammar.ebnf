@@ -1,106 +1,62 @@
-(* ========================================================================= *)
-(* PUEL - Physical Unit Expression Language                                  *)
-(* ========================================================================= *)
+expression          = [ unit-system "_" ] , product ;
 
-PUEL            = [ System "_" ] Expression ;
+product             = factor ,
+                      { ( "*" | "/" ) , factor } ;
 
-(* ========================================================================= *)
-(* Expressions                                                               *)
-(* ========================================================================= *)
+factor              = quantity
+                    | unit-system-factor
+                    | physical-constant
+                    | physical-quantity
+                    | grouped-expression
+                    | value
+                    | unit ;
 
-Expression      = Term , { ( "*" | "/" ) , Term } ;
+grouped-expression  = "(" , product , ")" ;
 
-Term            = Value
-                | UnitTerm
-                | Value , "*" , UnitTerm
-                ;
+value               = signed-number ,
+                      [ uncertainty ] ;
 
-(* ========================================================================= *)
-(* Values                                                                    *)
-(* ========================================================================= *)
+signed-number       = [ sign ] ,
+                      number ;
 
-Value           = Number
-                | Array
-                ;
+number              = integer
+                    | decimal ,
+                      [ exponent ] ;
 
-Array           = "[" , ValueElement , { "," , ValueElement } , "]" ;
+integer             = digit , { digit } ;
 
-ValueElement    = Number ;
+decimal             = integer ,
+                      [ "." , { digit } ]
+                    | "." , digit , { digit } ;
 
-(* ========================================================================= *)
-(* Numbers                                                                   *)
-(* ========================================================================= *)
+exponent            = ( "e" | "E" ) ,
+                      [ sign ] ,
+                      integer ;
 
-Number          = [ Sign ] ,
-                  Mantissa ,
-                  [ Uncertainty ] ,
-                  [ ExponentPart ] ;
+uncertainty         = "(" , integer , ")" ;
 
-Mantissa        = Digits , [ "." , Digits ]
-                | "." , Digits
-                ;
+unit                = identifier ,
+                      [ exponent-value ] ;
 
-Uncertainty     = "(" , Digits , ")" ;
+exponent-value      = signed-integer
+                    | signed-integer ":" integer ;
 
-ExponentPart    = ( "e" | "E" ) , [ Sign ] , Digits ;
+signed-integer      = [ sign ] ,
+                      integer ;
 
-Sign            = "+" | "-" ;
+physical-constant   = "{" , identifier , "}" ;
 
-(* ========================================================================= *)
-(* Units                                                                     *)
-(* ========================================================================= *)
+physical-quantity   = "<" , identifier , ">" ;
 
-UnitTerm        = UnitSymbol , [ UnitExponent ] ;
+unit-system-factor  = "|" , identifier , "|" ;
 
-UnitExponent    = IntegerExponent
-                | FractionalExponent
-                ;
+unit-system         = identifier ;
 
-IntegerExponent = SignedInteger ;
+identifier          = letter ,
+                      { letter | digit | "_" } ;
 
-FractionalExponent
-                = SignedInteger , ":" , UnsignedInteger ;
+sign                = "+" | "-" ;
 
-(* ========================================================================= *)
-(* Identifiers                                                               *)
-(* ========================================================================= *)
+letter              = "A"…"Z" | "a"…"z" ;
 
-System          = Identifier ;
-
-UnitSymbol      = Identifier ;
-
-Identifier      = Letter , { Letter | Digit } ;
-
-(* ========================================================================= *)
-(* Integers                                                                  *)
-(* ========================================================================= *)
-
-SignedInteger   = [ Sign ] , UnsignedInteger ;
-
-UnsignedInteger = Digits ;
-
-Digits          = Digit , { Digit } ;
-
-(* ========================================================================= *)
-(* Characters                                                                *)
-(* ========================================================================= *)
-
-Letter          = "A".."Z"
-                | "a".."z"
-                | "µ"
-                | "Ω"
-                ;
-
-Digit           = "0".."9" ;
-
-(* ========================================================================= *)
-(* Examples                                                                  *)
-(* ========================================================================= *)
-
-(*
-ESU_erg
-SI_kg*m2/s2
-SI_kg2*m3:2/cm
-SI_1.346591(30)e27*kg
-SI_[2,3,4,5]*km
-*)
+digit               = "0"…"9" ;
