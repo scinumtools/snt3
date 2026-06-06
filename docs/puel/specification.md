@@ -54,8 +54,9 @@ Derived units are represented as combinations of these base dimensions together 
 The choice of base dimensions is driven by implementation considerations and does not exactly match the SI base-unit system.
 
  * Mass is represented using grams (`g`) rather than kilograms (`kg`) to avoid embedding a prefix in a base unit.
- * Electric charge is represented using coulombs (`C`) rather than amperes (`A`), making current a derived quantity (`C/s`).
- * Angle is included as a base dimension to enable dimensional validation of mathematical functions that require angular arguments.
+ * Electric charge is represented using coulombs (`C`) rather than amperes (`A`), making current a derived quantity (`C/s`). This choice defines the electrical dimension in terms of the fundamental conserved quantity of charge rather than the derived quantity of current.
+ * Angle is included as a base dimension to enable dimensional validation of mathematical functions that require angular arguments. However, angular units MUST remain convertible to dimensionless units, reflecting their dimensionless nature in the SI system.
+
 
 ### 3.1. Scaling factors
 
