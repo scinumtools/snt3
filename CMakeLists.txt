@@ -78,11 +78,19 @@ set_module_options(MAT ON)
 ###############
 
 # this needs to be here, so that ctest notice it!
-
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-include(GoogleTest)
-enable_testing()
+if(
+    ENABLE_SNT_GTEST OR
+    ENABLE_EXS_GTEST OR
+    ENABLE_VAL_GTEST OR
+    ENABLE_PUQ_GTEST OR
+    ENABLE_DIP_GTEST OR
+    ENABLE_MAT_GTEST
+)
+  find_package(GTest REQUIRED)
+  include_directories(${GTEST_INCLUDE_DIRS})
+  include(GoogleTest)
+  enable_testing()
+endif()
 
 message("Scientific Numerical Tools (SNT)")
 message("Code version: ${CODE_VERSION}")
