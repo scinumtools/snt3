@@ -11,7 +11,7 @@ set +a
 DIR_ROOT=$(pwd)
 
 NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
-NUM_MAKE_CORES=2 #$NUM_SYSTEM_CORES
+NUM_MAKE_CORES=$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release    # Release/Debug
 ENABLE_CLANG_TIDY=OFF       # Switch Clang Tidy on 
 GITHUB_WORKFLOWS=OFF        # Set specific settings for GitHub workflows
@@ -73,9 +73,11 @@ function build_code {
 	    -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
 	)
     fi
-    cmake -B $DIR_BUILD "${CMAKE_FLAGS[@]}"
-    cd $DIR_BUILD
-    make -j $NUM_MAKE_CORES
+    #cmake -B $DIR_BUILD "${CMAKE_FLAGS[@]}"
+    #cd $DIR_BUILD
+    #make -j $NUM_MAKE_CORES
+    cmake -G Ninja -B "$DIR_BUILD" "${CMAKE_FLAGS[@]}"
+    cmake --build "$DIR_BUILD" --parallel "$NUM_MAKE_CORES"
     cd $DIR_ROOT
 }
 

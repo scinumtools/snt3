@@ -14,7 +14,17 @@ target_include_directories(${MODULE_NAME}
 
 set_target_properties(${MODULE_NAME} PROPERTIES
     OUTPUT_NAME ${MODULE_NAME}
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+    #LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python/scinumtools3
+)
+
+file(MAKE_DIRECTORY
+    ${CMAKE_BINARY_DIR}/python/scinumtools3
+)
+
+file(COPY
+    ${CMAKE_SOURCE_DIR}/bindings/python/src/scinumtools3
+    DESTINATION ${CMAKE_BINARY_DIR}/python
 )
 
 # register pytests
@@ -24,7 +34,6 @@ foreach(TEST_FILE ${PYTEST_FILES})
     get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
     string(REGEX REPLACE "^test_" "" TEST_NAME ${TEST_NAME})
     set(TEST_FULL_NAME pytest.${MODULE_DIR}.${TEST_NAME})
-    message(INFO ${Python3_EXECUTABLE})
     add_test(
         NAME ${TEST_FULL_NAME}
         COMMAND ${Python3_EXECUTABLE} -m pytest -v ${TEST_FILE}
