@@ -79,8 +79,8 @@ before-build = "pip install pybind11"
 
 [tool.scikit-build.cmake.define]
 ENABLE_SNT = "ON"
+ENABLE_SNT_GTEST = "OFF"
 ENABLE_SNT_PYBIND = "ON"
-ENABLE_SNT_PYTEST = "OFF"
 ENABLE_SNT_PYTEST = "OFF"
 ENABLE_EXS = "ON"
 ENABLE_EXS_GTEST = "OFF"
