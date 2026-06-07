@@ -42,7 +42,7 @@ CMAKE_FLAGS=(
   -DENABLE_MAT_PYTEST=ON
 
   -DENABLE_BENCHMARKS=OFF     # build Google Benchmark tests
-  -DENABLE_TIME_TRACE=OFF    # build compilation time tracing outputs
+  -DENABLE_TIME_TRACE=OFF     # build compilation time tracing outputs
 
   -DENABLE_APP_SNT_SERVER=OFF
   -DENABLE_APP_SNT_GUI=OFF

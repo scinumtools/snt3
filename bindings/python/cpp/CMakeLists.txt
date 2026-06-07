@@ -51,19 +51,29 @@ if(
         set_tests_properties(${TEST_FULL_NAME} PROPERTIES DEPENDS ${MODULE_NAME})
     endforeach()
     endfunction()
-    
-    if (ENABLE_SNT_PYBIND)
-       add_subdirectory(snt)
-    endif()
-    
-    if (ENABLE_PUQ_PYBIND)
-       add_subdirectory(puq)
-    endif()
-    
-    if (ENABLE_DIP_PYBIND)
-       add_subdirectory(dip)
-    endif()
-    
+
+endif()
+
+if (ENABLE_SNT_PYBIND)
+   add_subdirectory(snt)
+endif()
+
+if (ENABLE_PUQ_PYBIND)
+   add_subdirectory(puq)
+endif()
+
+if (ENABLE_DIP_PYBIND)
+   add_subdirectory(dip)
+endif()
+
+if(
+    ENABLE_SNT_PYTEST OR
+    ENABLE_EXS_PYTEST OR
+    ENABLE_VAL_PYTEST OR
+    ENABLE_PUQ_PYTEST OR
+    ENABLE_DIP_PYTEST OR
+    ENABLE_MAT_PYTEST
+)
     register_pytests(misc)
     
     enable_testing()
