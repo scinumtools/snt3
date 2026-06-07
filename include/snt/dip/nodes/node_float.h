@@ -1,6 +1,7 @@
 #ifndef DIP_NODE_FLOAT_H
 #define DIP_NODE_FLOAT_H
 
+#include <climits>
 #include <optional>
 #include <snt/dip/nodes/node_value.h>
 
