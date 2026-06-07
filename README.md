@@ -116,8 +116,6 @@ in a single system.
    target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
    ```
 
-### Python module
-
 ### Python Bindings
 
 The Python bindings for `SciNumTools` are available on PyPI and can be installed using `pip`:
