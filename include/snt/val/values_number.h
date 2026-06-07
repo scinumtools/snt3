@@ -27,7 +27,7 @@ namespace snt::val {
             case core::DataType::Boolean: {
                 std::vector<uint8_t> arr(this->value.size());
                 for (size_t i = 0; i < this->value.size(); i++)
-                    arr[i] = this->value[i] != 0.0; // static_cast<uint8_t>(this->value[i]);
+                    arr[i] = this->value[i] != 0.0;
                 return std::make_unique<ArrayValue<uint8_t>>(arr, this->shape, dt);
             }
             case core::DataType::Character: {

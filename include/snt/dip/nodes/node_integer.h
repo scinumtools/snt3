@@ -1,6 +1,7 @@
 #ifndef DIP_NODE_INTEGER_H
 #define DIP_NODE_INTEGER_H
 
+#include <climits>
 #include <optional>
 #include <snt/dip/nodes/node_value.h>
 
