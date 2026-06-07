@@ -74,7 +74,9 @@ in a single system.
 
 ## Installation
 
-### Download and install
+### C++ Module
+
+#### Download and install
 
 1) Manually
 
@@ -101,7 +103,7 @@ in a single system.
    sudo ./setup.sh -b -t -i  # build, run tests, install
    ```
 
-### Link `SciNumTools3` in your `CMAKE` project
+#### Link `SciNumTools3` in your `CMAKE` project
 
 1) Find the package
 
@@ -113,6 +115,18 @@ in a single system.
    add_executable(${EXEC_NAME} ${SOURCE_FILES})
    target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
    ```
+
+### Python module
+
+### Python Bindings
+
+The Python bindings for `SciNumTools` are available on PyPI and can be installed using `pip`:
+
+```bash
+pip install scinumtools3
+```
+
+Package page: https://pypi.org/project/scinumtools3/
 
 ## Quick Example
 
