@@ -81,7 +81,7 @@ inline void solve_units(std::stringstream& ss, puq::DimensionMapType& dmap, puq:
             continue;
         if ((unit.second.utype & puq::Utype::BAS) == puq::Utype::BAS)
             continue;
-        puq::UnitAtom atom = solver.solve(unit.second.definition);
+        puq::UnitAtom atom = solver.eval(unit.second.definition);
         puq::Dimensions dim(atom.value.result);
         std::string missing = "";
         for (auto bu : atom.value.baseunits) {
@@ -111,7 +111,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
     std::cout << "Solving " << puq::UnitSystem::current.data->SystemAbbrev << " system" << '\n';
     for (const auto& quant : puq::UnitSystem::current.data->QuantityList) {
         // solve a quantity definition
-        puq::UnitAtom atom = solver.solve(quant.second.definition);
+        puq::UnitAtom atom = solver.eval(quant.second.definition);
         puq::Dimensions dim(atom.value.result);
         for (auto bu : atom.value.baseunits) {
             solve_bu_prefix(dim, bu);
@@ -137,7 +137,7 @@ inline void solve_quantities(std::stringstream& ss, puq::DimensionMapType& dmap,
 
         // solve a quantity IS conversion factor, if exists
         if (quant.second.sifactor != "") {
-            atom = solver.solve(quant.second.sifactor);
+            atom = solver.eval(quant.second.sifactor);
             dim = puq::Dimensions(atom.value.result);
             for (auto bu : atom.value.baseunits) {
                 solve_bu_prefix(dim, bu);

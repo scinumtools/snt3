@@ -14,67 +14,67 @@ TEST(UnitSolver, Solve) {
 
     puq::UnitSolver solver;
 
-    puq::UnitAtom atom = solver.solve(""); // empty string
+    puq::UnitAtom atom = solver.eval(""); // empty string
     EXPECT_EQ(atom.value.to_string(), "1");
 
-    atom = solver.solve("3*(2.0e1/5.0)"); // only numbers
+    atom = solver.eval("3*(2.0e1/5.0)"); // only numbers
     EXPECT_EQ(atom.value.to_string(), "12");
 
-    atom = solver.solve("2.4*km/s");
+    atom = solver.eval("2.4*km/s");
     EXPECT_EQ(atom.value.to_string(), "2.4*km*s-1"); // simple arithmetics
 
-    atom = solver.solve("3.2e4*kg*m*m/s/s"); // exponent reduction
+    atom = solver.eval("3.2e4*kg*m*m/s/s"); // exponent reduction
     EXPECT_EQ(atom.value.to_string(), "3.2e4*kg*m2*s-2");
 
-    atom = solver.solve("kg/(m*s)"); // simple parentheses
+    atom = solver.eval("kg/(m*s)"); // simple parentheses
     EXPECT_EQ(atom.value.to_string(), "kg*m-1*s-1");
 
-    atom = solver.solve("kg/(m*s)2*C"); // parentheses with eponents
+    atom = solver.eval("kg/(m*s)2*C"); // parentheses with eponents
     EXPECT_EQ(atom.value.to_string(), "kg*m-2*s-2*C");
 
-    atom = solver.solve("(kg*s/(m2*K))2"); // nested parentheses with an exponent
+    atom = solver.eval("(kg*s/(m2*K))2"); // nested parentheses with an exponent
     EXPECT_EQ(atom.value.to_string(), "kg2*s2*m-4*K-2");
 
-    atom = solver.solve("kg*<v>2"); // quantities
+    atom = solver.eval("kg*<v>2"); // quantities
     EXPECT_EQ(atom.value.to_string(), "kg*<v>2");
 }
 
 TEST(UnitSolver, SolveFractions) {
 
     puq::UnitSolver solver;
-    puq::UnitAtom atom = solver.solve("km-2:3"); // units with fractions
+    puq::UnitAtom atom = solver.eval("km-2:3"); // units with fractions
     EXPECT_EQ(atom.value.to_string(), "km-2:3");
 
-    atom = solver.solve("m1:2*m-3:5"); // reduction of fractions
+    atom = solver.eval("m1:2*m-3:5"); // reduction of fractions
     EXPECT_EQ(atom.value.to_string(), "m-1:10");
 
-    atom = solver.solve("kg/(m*s)-1:2*C"); // parentheses with fractions
+    atom = solver.eval("kg/(m*s)-1:2*C"); // parentheses with fractions
     EXPECT_EQ(atom.value.to_string(), "kg*m1:2*s1:2*C");
 
-    atom = solver.solve("(kg3*s4/(m2*K))1:2"); // nested parentheses with an exponent
+    atom = solver.eval("(kg3*s4/(m2*K))1:2"); // nested parentheses with an exponent
     EXPECT_EQ(atom.value.to_string(), "kg3:2*s2*m-1*K-1:2");
 }
 
 TEST(UnitSolver, SolveArrays) {
 
     puq::UnitSolver solver;
-    puq::UnitAtom atom = solver.solve("[20, 40.5, 6.8e1]"); // numerical array only
+    puq::UnitAtom atom = solver.eval("[20, 40.5, 6.8e1]"); // numerical array only
     EXPECT_EQ(atom.value.to_string(), "[20, 40.5, 68]");
 
-    atom = solver.solve("[20, 40.5, 6.8e1]*kg/s"); // numerical array with units
+    atom = solver.eval("[20, 40.5, 6.8e1]*kg/s"); // numerical array with units
     EXPECT_EQ(atom.value.to_string(), "[20, 40.5, 68]*kg*s-1");
 
-    atom = solver.solve("[20, 40.5, 6.8e1]*2"); // multiplied by a scalar
+    atom = solver.eval("[20, 40.5, 6.8e1]*2"); // multiplied by a scalar
     EXPECT_EQ(atom.value.to_string(), "[40, 81, 136]");
 
-    atom = solver.solve("[20, 40.5]*[2,3]"); // multiplication of vectors
+    atom = solver.eval("[20, 40.5]*[2,3]"); // multiplication of vectors
     EXPECT_EQ(atom.value.to_string(), "[40, 121.5]");
 }
 
 TEST(UnitSolver, SolveErrors) {
 
     puq::UnitSolver solver;
-    puq::UnitAtom atom = solver.solve("{#m_p}");
+    puq::UnitAtom atom = solver.eval("{#m_p}");
 
     puq::Measurement uv = atom.value.convert(puq::Format::Base::MKS);
     EXPECT_EQ(uv.to_string(), "1.67262192595(52)e-27*kg");

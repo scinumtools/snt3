@@ -36,14 +36,14 @@ namespace snt::puq {
 
     Measurement::Measurement(const std::string& str) {
         UnitSolver solver;
-        UnitAtom atom = solver.solve(str);
+        UnitAtom atom = solver.eval(str);
         result = atom.value.result;
         baseunits = atom.value.baseunits;
     }
 
     Measurement::Measurement(const Result& est, const std::string& str) {
         UnitSolver solver;
-        UnitAtom atom = solver.solve(str);
+        UnitAtom atom = solver.eval(str);
         result = est * atom.value.result;
         baseunits = atom.value.baseunits;
     }
@@ -58,7 +58,7 @@ namespace snt::puq {
 
     Measurement::Measurement(const Measurement& msr, const std::string& str) {
         UnitSolver solver;
-        UnitAtom atom = solver.solve(str);
+        UnitAtom atom = solver.eval(str);
         result = msr.result * atom.value.result;
         baseunits = atom.value.baseunits;
     }
@@ -81,26 +81,26 @@ namespace snt::puq {
 
     Measurement::Measurement(const double est, const std::string& str) {
         UnitSolver solver;
-        UnitAtom atom = solver.solve(str);
+        UnitAtom atom = solver.eval(str);
         result = Result(est) * atom.value.result;
         baseunits = atom.value.baseunits;
     }
     Measurement::Measurement(const double est, const double unc, const std::string& str) {
         UnitSolver solver;
-        UnitAtom atom = solver.solve(str);
+        UnitAtom atom = solver.eval(str);
         result = Result(est, unc) * atom.value.result;
         baseunits = atom.value.baseunits;
     }
 
     Measurement::Measurement(val::BaseValue::PointerType est, const std::string& str) {
         UnitSolver solver;
-        UnitAtom atom = solver.solve(str);
+        UnitAtom atom = solver.eval(str);
         result = Result(std::move(est)) * atom.value.result;
         baseunits = atom.value.baseunits;
     }
     Measurement::Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const std::string& str) {
         UnitSolver solver;
-        UnitAtom atom = solver.solve(str);
+        UnitAtom atom = solver.eval(str);
         result = Result(std::move(est), std::move(unc)) * atom.value.result;
         baseunits = atom.value.baseunits;
     }

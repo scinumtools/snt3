@@ -9,6 +9,7 @@ dist/*
 **/__pycache__/*
 .venv
 **/.DS_STORE
+benchmarks/**/results/*
 
 # Prerequisites
 *.d

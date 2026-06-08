@@ -41,7 +41,7 @@ CMAKE_FLAGS=(
   -DENABLE_MAT_GTEST=ON
   -DENABLE_MAT_PYTEST=ON
 
-  -DENABLE_BENCHMARKS=OFF     # build Google Benchmark tests
+  -DENABLE_BENCHMARKS=On     # build Google Benchmark tests
   -DENABLE_TIME_TRACE=OFF     # build compilation time tracing outputs
 
   -DENABLE_APP_SNT_SERVER=OFF
@@ -154,6 +154,13 @@ function refactor_code {
     #grep -rl "${1}" ./ --exclude-dir=build --exclude-dir=.venv | xargs sed -i '' "s/${1}/${2}/g"
 }
 
+function run_benchmark {
+    STAMP=$(date +%Y%m%d_%H%M%S)
+    FILE_OUTPUT=benchmarks/puq/results/result_$STAMP.txt
+    ./build/bin/benchmark-puq --benchmark_out=$FILE_OUTPUT   --benchmark_out_format=console
+    echo "Benchmark results: " $FILE_OUTPUT
+}
+
 function show_help {
     echo "Scientific Numerical Tools (SNT, scinumtools)"
     echo ""
@@ -173,6 +180,7 @@ function show_help {
     echo " --num-cores N           number of compiliation cores"
     echo " --refactor <from> <to>  replace <from> a string <to> another string"
     echo " --github-workflows      set a specific configuration of settings for GitHub Workflows"
+    echo " --benchmark             run benchmarks"
     echo ""
     echo "Examples:"
     echo "./setup.sh -c -b               clean and build the code"
@@ -216,6 +224,8 @@ while [[ $# -gt 0 ]]; do
 	    refactor_code $2 $3; shift; shift; shift;;
         --github-workflows)
             GITHUB_WORKFLOWS=ON; shift;;
+        --benchmark)
+            run_benchmark; shift;;
 	-*|--*)
 	    show_help; exit 1;;
 	*)

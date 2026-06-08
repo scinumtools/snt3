@@ -13,7 +13,7 @@ namespace snt::puq {
 
     BaseUnits::BaseUnits(const std::string& s) {
         UnitSolver solver;
-        UnitAtom atom = solver.solve(s);
+        UnitAtom atom = solver.eval(s);
         baseunits = atom.value.baseunits.baseunits;
     }
 

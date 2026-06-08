@@ -3,7 +3,7 @@
  * This file can be updated using 'dmap' executable.
  * 
  * Unit system:  Atomic units (AU)
- * Last update:  Sun Jun  7 22:51:47 2026
+ * Last update:  Mon Jun  8 23:20:13 2026
  * Code version: v0.4.7
  * 
  * Symbol legend:
