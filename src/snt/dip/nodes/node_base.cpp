@@ -7,6 +7,7 @@ namespace snt::dip {
         line = parser.line;
         indent = parser.indent;
         name = parser.name;
+        collections = parser.collections;
         dtype_raw = parser.dtype_raw;
         dimension = parser.dimension;
         value_raw = parser.value_raw;

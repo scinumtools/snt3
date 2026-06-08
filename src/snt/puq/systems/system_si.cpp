@@ -113,7 +113,10 @@ namespace snt::puq {
 
                 // percentages
                 {"%", {Utype::LIN, "1e-2", "percent", false, {}}},
+                {"permille", {Utype::LIN, "1e-3", "promile", false, {}}},
                 {"ppth", {Utype::LIN, "1e-3", "promile", false, {}}},
+                {"ppm", {Utype::LIN, "1e-6", "parts per million", false, {}}},
+                {"ppb", {Utype::LIN, "1e-9", "parts per billion", false, {}}},
 
                 // dimensionless constants
                 {"{alpha}", {UT_LIN_CST, "{#alpha}", "fine str. const.", false, {}}},

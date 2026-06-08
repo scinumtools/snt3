@@ -3,8 +3,8 @@
  * This file can be updated using 'dmap' executable.
  * 
  * Unit system:  Gaussian CGS units (GU)
- * Last update:  Wed Jun  3 00:26:27 2026
- * Code version: v0.4.0
+ * Last update:  Sun Jun  7 22:51:47 2026
+ * Code version: v0.4.7
  * 
  * Symbol legend:
  * ..    units

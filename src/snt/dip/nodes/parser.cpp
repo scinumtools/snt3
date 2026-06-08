@@ -162,19 +162,63 @@ namespace snt::dip {
     }
 
     bool Parser::part_name(const bool required) {
-        constexpr auto pstr = ce_concat<50>("^", PATTERN_PATH, "+");
-        std::regex pattern(pstr.data());
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            name = matchResult[0].str();
-            strip(matchResult[0].str());
-            if (do_continue() and code[0] != ' ')
+        size_t pos = 0;
+        std::string currentPath;
+
+        while (pos < code.size()) {
+            // parse path component
+            std::string part;
+            while (pos < code.size()) {
+                char c = code[pos];
+                if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-') {
+                    part += c;
+                    ++pos;
+                } else {
+                    break;
+                }
+            }
+            if (part.empty()) {
                 throw std::runtime_error("Name has an invalid format: " + line.code);
-            return true;
-        } else if (required) {
-            throw std::runtime_error("Name has an invalid format: " + line.code);
+                return false;
+            }
+            if (!currentPath.empty())
+                currentPath += '.';
+            currentPath += part;
+            // collection?
+            if (pos < code.size() && code[pos] == '[') {
+                ++pos;
+                std::string item;
+                while (pos < code.size() && code[pos] != ']') {
+                    char c = code[pos];
+                    if (!(std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-' || c == '*')) {
+                        throw std::runtime_error("Node collection item has an invalid format: " + line.code);
+                        return false;
+                    }
+                    item += c;
+                    ++pos;
+                }
+                if (pos >= code.size() || code[pos] != ']') {
+                    throw std::runtime_error("Node collection has unclosed brackets: " + line.code);
+                    return false;
+                }
+                ++pos; // skip ']'
+                collections.push_back({std::move(currentPath), std::move(item)});
+                currentPath.clear();
+            }
+            if (pos >= code.size() || code[pos] != '.')
+                break;
+            ++pos; // skip '.'
         }
-        return false;
+        if (!currentPath.empty()) {
+            collections.push_back({std::move(currentPath), ""});
+        }
+
+        // save full name and consume input
+        std::string consumed = code.substr(0, pos);
+        name = consumed;
+        strip(consumed);
+
+        return true;
     }
 
     bool Parser::part_type(const bool required) {
