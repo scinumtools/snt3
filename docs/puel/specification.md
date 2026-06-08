@@ -117,8 +117,6 @@ US_lb*ft
 SI_9.81*m/s2
 ```
 
-Although numerical values are typically written at the beginning of an expression, they are not restricted to that position. Numerical factors may also appear within a unit expression as multiplicative constants. For example, `2*kg*m/s2` and `kg*(2*m)/s2` are equivalent. However, placing numerical values at the beginning of the expression is RECOMMENDED, as it improves readability and simplifies parsing.
-
 The following rules apply in unit expressions:
 
 | Rule                                                                                                                                                                                                                         | Examples                                                                                                                           |
@@ -133,9 +131,23 @@ The following rules apply in unit expressions:
 | The symbols `+` and `-` denote the sign of a numerical value or exponent; they do not represent addition or subtraction operators.                                                                                           | `+5*m`<br>`-5*m`<br>`s-2`                                                                                                          |
 | Uncertainties are written in parentheses immediately following the last decimal digit of a numerical value. The number of digits in the uncertainty corresponds to the same number of least significant digits in the value. | `3.45234(2)e3` → `3452.34 ± 0.02`<br>`3.45234(12)` → `3.45234 ± 0.00012`<br>`12.3(4)e-2` → `0.123 ± 0.004`<br>`120(5)` → `120 ± 5` |
 
-Although unit expressions may use division and grouping parentheses for readability, implementations SHOULD internally normalize them to a canonical form in which all unit factors appear in the numerator and division is represented by negative exponents. For example, the expression `kg*m2/(sr*s2)` is canonically represented and typically displayed as `kg*m2*sr-1*s-2`.
+### 4.2 Expression Parsing
 
-This canonical form provides a unique and deterministic text representation. Since the original placement of division operators and parentheses cannot, in general, be reconstructed from a normalized unit expression, implementations SHOULD use the canonical form when serializing unit expressions.
+Although numerical values are typically written at the beginning of an expression, they are not restricted to that position. Numerical factors MAY appear anywhere within a unit expression as multiplicative constants. For example, `2*kg*m/s2` and `kg*(2*m)/s2` are equivalent.
+
+Implementations SHOULD accept numerical factors in any valid position within a unit expression. However, producers of unit expressions SHOULD place any numerical factor at the beginning of the expression, as this improves readability and simplifies parsing.
+
+Unit expressions MAY use division operators and grouping parentheses for readability. For example, `kg*m2/(sr*s2)` and `kg*m2*sr-1*s-2` represent the same unit expression.
+
+### 4.3 Canonical Representation and Serialization
+
+Implementations SHOULD internally normalize unit expressions to a canonical form in which all unit factors appear in the numerator and division is represented using negative exponents. For example, the expression `kg*m2/(sr*s2)` is canonically represented as `kg*m2*sr-1*s-2`.
+
+The canonical form provides a unique and deterministic textual representation of a unit expression. Because the original placement of division operators and grouping parentheses cannot, in general, be reconstructed from a normalized expression, implementations SHOULD use the canonical form when serializing unit expressions.
+
+If a unit expression contains a numerical factor, serialized expressions MUST place the numerical factor at the beginning of the expression.
+
+When representing base dimensions, only dimensions with non-zero exponents SHOULD be included. The order of the base dimensions MUST be preserved as specified in Section 3.1..
 
 ## 8. Conversions
 
