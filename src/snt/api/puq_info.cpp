@@ -10,6 +10,7 @@
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
 #include <snt/puq/util/data_table.h>
+#include <sstream>
 
 namespace snt::api {
 
@@ -23,7 +24,7 @@ namespace snt::api {
         throw std::runtime_error("Could not find unit system: " + system);
     }
 
-    void PUQInfo::execute() {
+    std::string PUQInfo::execute() {
 
         puq::UnitSystem us(puq::SystemType::SI);
 
@@ -36,43 +37,44 @@ namespace snt::api {
         puq::Dimensions dim = bus.dimensions();
         puq::Dimensions dim_m = bus.dimensions();
         dim_m.numerical *= uv.result;
-        std::cout << '\n' << "Expression:  " << expression << '\n' << '\n';
-        std::cout << "Unit system: " << puq::UnitSystem::current.data->SystemAbbrev << " ("
-                  << puq::UnitSystem::current.data->SystemName << ")" << '\n';
-        std::cout << "Result:   " << puq::to_string(uv.result) << '\n';
-        std::cout << "Base units:  " << puq::to_string(uv.baseunits) << '\n';
         std::stringstream ss;
+        ss << '\n' << "Expression:  " << expression << '\n' << '\n';
+        ss << "Unit system: " << puq::UnitSystem::current.data->SystemAbbrev << " ("
+           << puq::UnitSystem::current.data->SystemName << ")" << '\n';
+        ss << "Result:   " << puq::to_string(uv.result) << '\n';
+        ss << "Base units:  " << puq::to_string(uv.baseunits) << '\n';
+        std::stringstream rr;
         bool display = false;
         for (const auto& unit : puq::UnitSystem::current.data->DimensionMap) {
             if (puq::Dimensions(1, unit.second.dimensions) != dim)
                 continue;
-            ss << (display ? ", " : "") << unit.first;
+            rr << (display ? ", " : "") << unit.first;
             display = true;
         }
         for (const auto& unit : puq::UnitSystem::current.custom->DimensionMap) {
             if (puq::Dimensions(1, unit.second.dimensions) != dim)
                 continue;
-            ss << (display ? ", " : "") << unit.first;
+            rr << (display ? ", " : "") << unit.first;
             display = true;
         }
         if (display) {
-            std::cout << '\n';
-            std::cout << "Conversions: " << ss.str() << '\n';
+            ss << '\n';
+            ss << "Conversions: " << rr.str() << '\n';
         }
-        ss.str(std::string());
+        rr.str(std::string());
         display = false;
         for (const auto& quant : puq::UnitSystem::current.data->QuantityList) {
             if (puq::BaseUnits(quant.second.definition).dimensions() != dim)
                 continue;
-            ss << (display ? ", " : "") << quant.first;
+            rr << (display ? ", " : "") << quant.first;
             display = true;
         }
         if (display) {
-            std::cout << '\n';
-            std::cout << "Quantities:  " << ss.str() << '\n';
+            ss << '\n';
+            ss << "Quantities:  " << rr.str() << '\n';
         }
-        std::cout << '\n';
-        std::cout << "Dimensions:" << '\n' << '\n';
+        ss << '\n';
+        ss << "Dimensions:" << '\n' << '\n';
         puq::DataTable tab({{"Base", 6}, {"Num*Mag", 25}, {"Numerical", 25}, {"Physical", 25}});
         tab.append(
             {"MGS",
@@ -92,10 +94,10 @@ namespace snt::api {
              dim.to_string({puq::Format::Display::RESULT, puq::Format::Base::CGS}),
              dim.to_string({puq::Format::Display::UNITS, puq::Format::Base::CGS})}
         );
-        std::cout << tab.to_string();
-        std::cout << '\n';
+        ss << tab.to_string();
+        ss << '\n';
         if (bus.size() > 0) {
-            std::cout << "Base units:" << '\n' << '\n';
+            ss << "Base units:" << '\n' << '\n';
             puq::DataTable tab(
                 {{"Prefix", 8},
                  {"Symbol", 8},
@@ -149,9 +151,9 @@ namespace snt::api {
                     );
                 }
             }
-            std::cout << tab.to_string();
+            ss << tab.to_string();
         }
-        std::cout << '\n';
+        return ss.str();
     }
 
 } // namespace snt::api

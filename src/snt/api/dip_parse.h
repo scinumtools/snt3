@@ -12,7 +12,7 @@ namespace snt::api {
      * @brief Parsing of a DIP code
      */
     class DIPParse {
-
+      public:
         enum class PrintOptions {
             NONE, ///< Nothing is printed
             ALL,  ///< Both name and value is printed
@@ -20,6 +20,7 @@ namespace snt::api {
             VALUE ///< Only value is printed
         };
 
+      private:
         dip::DIP dip;                  ///< DIP object handle
         std::string request;           ///< Node request query
         std::vector<std::string> tags; ///< List of node tags that should be selected
@@ -73,8 +74,10 @@ namespace snt::api {
 
         /**
          * @brief Executed parsing command
+         *
+         * @return Parsed output
          */
-        void execute();
+        std::string execute();
     };
 
 } // namespace snt::api

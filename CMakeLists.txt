@@ -49,6 +49,19 @@ endif()
 option(ENABLE_APP_SNT_SERVER "Enable SNT REST-API server app" OFF)
 option(ENABLE_APP_SNT_GUI "Enable SNT graphical user interface" OFF)
 
+# pad strings right
+function(pad_right out value width)
+    string(LENGTH "${value}" len)
+    math(EXPR pad "${width} - ${len}")
+
+    if(pad GREATER 0)
+        string(REPEAT " " ${pad} spaces)
+        set(${out} "${value}${spaces}" PARENT_SCOPE)
+    else()
+        set(${out} "${value}" PARENT_SCOPE)
+    endif()
+endfunction()
+
 # set generic options
 function(set_module_options NAME DEFAULT)
     # set default values
@@ -64,18 +77,24 @@ function(set_module_options NAME DEFAULT)
     if(NOT ENABLE_${NAME}_PYBIND)
         set(ENABLE_${NAME}_PYTEST OFF CACHE BOOL "" FORCE)
     endif()
-    message(STATUS "ENABLE_${NAME}=${ENABLE_${NAME}}")
-    message(STATUS "ENABLE_${NAME}_GTEST=${ENABLE_${NAME}_GTEST}")
-    message(STATUS "ENABLE_${NAME}_PYBIND=${ENABLE_${NAME}_PYBIND}")
-    message(STATUS "ENABLE_${NAME}_PYTEST=${ENABLE_${NAME}_PYTEST}")
+    pad_right( STATUS_MODULE "${ENABLE_${NAME}}" 7)
+    pad_right( STATUS_GTEST "${ENABLE_${NAME}_GTEST}" 7)
+    pad_right( STATUS_PYBIND "${ENABLE_${NAME}_PYBIND}" 7)
+    pad_right( STATUS_PYTEST "${ENABLE_${NAME}_PYTEST}" 7)
+    message(STATUS "${NAME}  ${STATUS_MODULE} ${STATUS_GTEST} ${STATUS_PYBIND} ${STATUS_PYTEST}")
 endfunction()
 # set options for all modules
+message("Scientific Numerical Tools (SNT)")
+message("Code version: ${CODE_VERSION}")
+message(STATUS "Compiled parts:")
+message(STATUS "     Module  GTests  PyBind  PyTests")
 set_module_options(SNT ON)
 set_module_options(EXS ON)
 set_module_options(VAL ON)
 set_module_options(PUQ ON)
 set_module_options(DIP ON)
 set_module_options(MAT ON)
+set_module_options(API ON)
 
 # import GTest
 ###############
@@ -94,9 +113,6 @@ if(
   include(GoogleTest)
   enable_testing()
 endif()
-
-message("Scientific Numerical Tools (SNT)")
-message("Code version: ${CODE_VERSION}")
 
 # enable clang-tidy during the compilation
 ##########################################

@@ -77,7 +77,7 @@ void module_dip(ArgParser& argpar) {
             if (argpar.hasKeyword("--print")) {
                 cmd.argument_print();
             }
-            cmd.execute();
+            std::cout << cmd.execute() << '\n';
         }
 
         // TODO: implement tag selectors

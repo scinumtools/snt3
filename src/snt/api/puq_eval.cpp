@@ -32,7 +32,7 @@ namespace snt::api {
         output_quantity = oquantity;
     }
 
-    void PUQEval::execute() {
+    std::string PUQEval::execute() {
 
         puq::UnitSystem us(puq::SystemType::SI);
 
@@ -57,7 +57,7 @@ namespace snt::api {
             }
         }
 
-        std::cout << q.to_string() << '\n';
+        return q.to_string();
     }
 
 } // namespace snt::api

@@ -55,8 +55,10 @@ namespace snt::api {
 
         /**
          * @brief Executed parsing command
+         *
+         * @return Parsed output
          */
-        void execute();
+        std::string execute();
     };
 
 } // namespace snt::api

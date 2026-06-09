@@ -28,7 +28,7 @@ namespace snt::api {
         output_quantity = quantity;
     }
 
-    void PUQConvert::execute() {
+    std::string PUQConvert::execute() {
 
         puq::UnitSystem us(puq::SystemType::SI);
 
@@ -51,7 +51,7 @@ namespace snt::api {
             }
         }
 
-        std::cout << q.to_string() << '\n';
+        return q.to_string();
     }
 
 } // namespace snt::api

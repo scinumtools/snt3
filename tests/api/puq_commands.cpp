@@ -13,9 +13,7 @@ TEST(PUQCommands, Info) {
     {
         api::PUQInfo cmd("23*cm");
 
-        testing::internal::CaptureStdout();
-        cmd.execute();
-        std::string output = testing::internal::GetCapturedStdout();
+        std::string output = cmd.execute();
 
         EXPECT_EQ(
             output,
@@ -28,16 +26,14 @@ TEST(PUQCommands, Info) {
             "      Definition                     Dimensions MGS         Allowed prefixes       \n-------- -------- "
             "---------- ------------------------------ ------------------------------ ---------------------- "
             "---------------------- \nc        m        1          meter                          m                    "
-            "          0.01*m                 all                    \n\n"
+            "          0.01*m                 all                    \n"
         );
     }
     {
         api::PUQInfo cmd("ft2*lb");
         cmd.argument_input_system("US");
 
-        testing::internal::CaptureStdout();
-        cmd.execute();
-        std::string output = testing::internal::GetCapturedStdout();
+        std::string output = cmd.execute();
 
         EXPECT_EQ(
             output,
@@ -51,7 +47,7 @@ TEST(PUQCommands, Info) {
             "-------- ---------- ------------------------------ ------------------------------ ---------------------- "
             "---------------------- \n         ft       2          foot                           0.3048*m             "
             "          0.092903*m2                                   \n         lb       1          pound              "
-            "            453.59237*g                    453.592*g                                     \n\n"
+            "            453.59237*g                    453.592*g                                     \n"
         );
     }
 }
@@ -60,11 +56,9 @@ TEST(PUQCommands, Eval) {
     {
         api::PUQEval cmd("23*cm + 3*m");
 
-        testing::internal::CaptureStdout();
-        cmd.execute();
-        std::string output = testing::internal::GetCapturedStdout();
+        std::string output = cmd.execute();
 
-        EXPECT_EQ(output, "323*cm\n");
+        EXPECT_EQ(output, "323*cm");
     }
     {
         api::PUQEval cmd("23*cm + 3*m");
@@ -73,11 +67,9 @@ TEST(PUQCommands, Eval) {
         cmd.argument_output_units("ft");
         cmd.argument_output_quantity("l");
 
-        testing::internal::CaptureStdout();
-        cmd.execute();
-        std::string output = testing::internal::GetCapturedStdout();
+        std::string output = cmd.execute();
 
-        EXPECT_EQ(output, "10.5971*ft\n");
+        EXPECT_EQ(output, "10.5971*ft");
     }
 }
 
@@ -88,11 +80,9 @@ TEST(PUQCommands, Convert) {
         cmd.argument_output_system("SI");
         cmd.argument_output_quantity("I");
 
-        testing::internal::CaptureStdout();
-        cmd.execute();
-        std::string output = testing::internal::GetCapturedStdout();
+        std::string output = cmd.execute();
 
-        EXPECT_EQ(output, "4.00277e-9*A\n");
+        EXPECT_EQ(output, "4.00277e-9*A");
     }
 }
 
@@ -100,24 +90,20 @@ TEST(PUQCommands, List) {
     {
         api::PUQList cmd;
 
-        testing::internal::CaptureStdout();
-        cmd.execute();
-        std::string output = testing::internal::GetCapturedStdout();
+        std::string output = cmd.execute();
 
         EXPECT_EQ(
             output,
             "\nAvailable lists:\n\nprefix  unit prefixes\nbase    base units\nderiv   derived units\nlog     "
             "logarithmic units\ntemp    temperature units\nconst   constants\nquant   quantities\nsys     unit "
-            "systems\n\n"
+            "systems\n"
         );
     }
     {
         api::PUQList cmd("deriv");
         cmd.argument_system("AU");
 
-        testing::internal::CaptureStdout();
-        cmd.execute();
-        std::string output = testing::internal::GetCapturedStdout();
+        std::string output = cmd.execute();
 
         EXPECT_EQ(
             output,

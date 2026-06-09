@@ -228,3 +228,8 @@ def test_result_numpy():
     ## convert to multidimensional array
     #q = Quantity("[[1,2,3],[4,5,6]]*km")
     #assert np.all(q.to_numpy() == np.array([[1,2,3],[4,5,6]]))
+
+def test_output_units():
+
+    q = Quantity("23*cm")
+    assert q.units == "cm"

@@ -15,7 +15,7 @@ namespace snt::api {
         throw std::runtime_error("Could not find unit system: " + system);
     }
 
-    void PUQList::execute() {
+    std::string PUQList::execute() {
 
         puq::UnitSystem us(puq::SystemType::SI);
 
@@ -24,21 +24,21 @@ namespace snt::api {
         }
 
         if (list == "log")
-            std::cout << puq::lists::logarithmic_units();
+            return puq::lists::logarithmic_units();
         else if (list == "temp")
-            std::cout << puq::lists::temperature_units();
+            return puq::lists::temperature_units();
         else if (list == "prefix")
-            std::cout << puq::lists::prefixes();
+            return puq::lists::prefixes();
         else if (list == "base")
-            std::cout << puq::lists::base_units();
+            return puq::lists::base_units();
         else if (list == "deriv")
-            std::cout << puq::lists::derived_units();
+            return puq::lists::derived_units();
         else if (list == "const")
-            std::cout << puq::lists::constants();
+            return puq::lists::constants();
         else if (list == "quant")
-            std::cout << puq::lists::quantities();
+            return puq::lists::quantities();
         else if (list == "sys")
-            std::cout << puq::lists::unit_systems();
+            return puq::lists::unit_systems();
         else {
             std::stringstream ss;
             ss << '\n';
@@ -53,7 +53,7 @@ namespace snt::api {
             ss << "const   constants" << '\n';
             ss << "quant   quantities" << '\n';
             ss << "sys     unit systems" << '\n';
-            std::cout << ss.str() << '\n';
+            return ss.str();
         }
     }
 

@@ -91,7 +91,7 @@ void module_puq(ArgParser& argpar) {
             if (!arguments.empty()) {
                 cmd.argument_input_system(arguments[0]);
             }
-            cmd.execute();
+            std::cout << cmd.execute() << '\n';
         }
         if (command == "eval") {
             api::PUQEval cmd(argument);
@@ -111,7 +111,7 @@ void module_puq(ArgParser& argpar) {
             if (!arguments.empty()) {
                 cmd.argument_output_quantity(arguments[0]);
             }
-            cmd.execute();
+            std::cout << cmd.execute() << '\n';
         }
         if (command == "convert") {
             std::string argument2 = argpar.getPositionalValue(3);
@@ -128,7 +128,7 @@ void module_puq(ArgParser& argpar) {
             if (!arguments.empty()) {
                 cmd.argument_output_quantity(arguments[0]);
             }
-            cmd.execute();
+            std::cout << cmd.execute() << '\n';
         }
         if (command == "list") {
             api::PUQList cmd(argument);
@@ -136,7 +136,7 @@ void module_puq(ArgParser& argpar) {
             if (!arguments.empty()) {
                 cmd.argument_system(arguments[0]);
             }
-            cmd.execute();
+            std::cout << cmd.execute() << '\n';
         }
     } catch (std::exception& e) {
         std::cout << e.what() << '\n';

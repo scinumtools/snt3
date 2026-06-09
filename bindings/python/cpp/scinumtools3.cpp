@@ -11,6 +11,9 @@ void init_puq(py::module_&);
 #ifdef ENABLE_DIP_PYBIND
 void init_dip(py::module_&);
 #endif
+#ifdef ENABLE_API_PYBIND
+void init_api(py::module_&);
+#endif
 
 PYBIND11_MODULE(_core, m) {
 
@@ -31,5 +34,10 @@ PYBIND11_MODULE(_core, m) {
 #ifdef ENABLE_DIP_PYBIND
     auto dip = m.def_submodule("dip", "Dimensional Input Parameters");
     init_dip(dip);
+#endif
+
+#ifdef ENABLE_API_PYBIND
+    auto api = m.def_submodule("api", "Application programming interface");
+    init_api(api);
 #endif
 }

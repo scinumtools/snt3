@@ -167,27 +167,28 @@ void init_puq_quantity(py::module_& m) {
     //   });
 
     q.def(
-         "convert",
-         py::overload_cast<std::string, puq::SystemType, const std::string&>(&puq::Quantity::convert, py::const_),
-         py::arg("expression"),
-         py::arg("system") = puq::SystemType::NONE,
-         py::arg("quantity") = ""
-    )
-        .def(
-            "convert",
-            py::overload_cast<const puq::Format::Base&, puq::SystemType>(&puq::Quantity::convert, py::const_),
-            py::arg("dformat"),
-            py::arg("system") = puq::SystemType::NONE
-        )
-        .def("unit_system", &puq::Quantity::unit_system)
-        .def("rebase_prefixes", &puq::Quantity::rebase_prefixes)
-        .def("rebase_dimensions", &puq::Quantity::rebase_dimensions)
-        .def("to_string", &puq::Quantity::to_string, py::arg("format") = snt::puq::UnitFormat())
-        .def("size", &puq::Quantity::size)
-        .def("shape", &puq::Quantity::shape);
+        "convert",
+        py::overload_cast<std::string, puq::SystemType, const std::string&>(&puq::Quantity::convert, py::const_),
+        py::arg("expression"),
+        py::arg("system") = puq::SystemType::NONE,
+        py::arg("quantity") = ""
+    );
+    q.def(
+        "convert",
+        py::overload_cast<const puq::Format::Base&, puq::SystemType>(&puq::Quantity::convert, py::const_),
+        py::arg("dformat"),
+        py::arg("system") = puq::SystemType::NONE
+    );
+    q.def("unit_system", &puq::Quantity::unit_system);
+    q.def("rebase_prefixes", &puq::Quantity::rebase_prefixes);
+    q.def("rebase_dimensions", &puq::Quantity::rebase_dimensions);
+    q.def("to_string", &puq::Quantity::to_string, py::arg("format") = snt::puq::UnitFormat());
+    q.def("size", &puq::Quantity::size);
+    q.def("shape", &puq::Quantity::shape);
 
     q.def("value", &quantity_value, py::arg("numpy") = false);
     q.def("uncertainty", &quantity_uncertainty, py::arg("numpy") = false);
+    q.def_property_readonly("units", [](const puq::Quantity& q) { return q.measurement.baseunits.to_string(); });
 
     q.def("__repr__", &puq::Quantity::to_string, py::arg("format") = snt::puq::UnitFormat())
         .def("__str__", &puq::Quantity::to_string, py::arg("format") = snt::puq::UnitFormat())

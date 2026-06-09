@@ -12,9 +12,7 @@ TEST(DIPCommands, Parse) {
     cmd.argument_string("johan int = 32");
     cmd.argument_print();
 
-    testing::internal::CaptureStdout();
-    cmd.execute();
-    std::string output = testing::internal::GetCapturedStdout();
+    std::string output = cmd.execute();
 
     EXPECT_NE(output.find("johan = 32"), std::string::npos);
 }

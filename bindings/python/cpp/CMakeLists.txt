@@ -33,7 +33,8 @@ if(
     ENABLE_VAL_PYTEST OR
     ENABLE_PUQ_PYTEST OR
     ENABLE_DIP_PYTEST OR
-    ENABLE_MAT_PYTEST
+    ENABLE_MAT_PYTEST OR
+    ENABLE_API_PYTEST
 )
 
     # register pytests
@@ -66,13 +67,18 @@ if (ENABLE_DIP_PYBIND)
    add_subdirectory(dip)
 endif()
 
+if (ENABLE_API_PYBIND)
+   add_subdirectory(api)
+endif()
+
 if(
     ENABLE_SNT_PYTEST OR
     ENABLE_EXS_PYTEST OR
     ENABLE_VAL_PYTEST OR
     ENABLE_PUQ_PYTEST OR
     ENABLE_DIP_PYTEST OR
-    ENABLE_MAT_PYTEST
+    ENABLE_MAT_PYTEST OR
+    ENABLE_API_PYTEST
 )
     register_pytests(misc)
     

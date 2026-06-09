@@ -1,6 +1,7 @@
 #include "dip_parse.h"
 
 #include <iostream>
+#include <sstream>
 
 namespace snt::api {
 
@@ -29,7 +30,7 @@ namespace snt::api {
         print = PrintOptions::ALL;
     }
 
-    void DIPParse::execute() {
+    std::string DIPParse::execute() {
         // parse code
         dip::Environment env = dip.parse();
 
@@ -42,11 +43,13 @@ namespace snt::api {
         }
 
         // print if required
+        std::stringstream ss;
         if (print == PrintOptions::ALL) {
             for (const auto& node : vnodes) {
-                std::cout << node->name << " = " << node->to_string() << '\n';
+                ss << node->name << " = " << node->to_string() << '\n';
             }
         }
+        return ss.str();
     }
 
 } // namespace snt::api
