@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "comparison_pypuq"
+version = "0.1.0"
+description = "Python quantity computation benchmark"
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+authors = [
+    { name = "quantbench", email = "quantbench@pm.me" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests>=2.31.0",
+    "pydantic>=2.0.0",
+    "scinumtools3",
+    "pint",
+    "unyt",
+    "astropy",
+    "sympy",
+    "numpy"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "black>=24.0.0",
+    "mypy>=1.8.0",
+]
+
+[project.urls]
+Homepage = "https://github.com"
+Bug-Tracker = "https://github.com/issues"
+
+[project.scripts]
+my-cli-command = "your_package.module:main_function"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
