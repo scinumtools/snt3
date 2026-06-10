@@ -185,6 +185,10 @@ void init_puq_quantity(py::module_& m) {
     q.def("to_string", &puq::Quantity::to_string, py::arg("format") = snt::puq::UnitFormat());
     q.def("size", &puq::Quantity::size);
     q.def("shape", &puq::Quantity::shape);
+    q.def("info", [](const puq::Quantity& q) {
+        std::cout << q.info();
+        std::cout.flush();
+    });
 
     q.def("value", &quantity_value, py::arg("numpy") = false);
     q.def("uncertainty", &quantity_uncertainty, py::arg("numpy") = false);

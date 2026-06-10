@@ -245,3 +245,21 @@ TEST(Quantity, RebaseUnits) {
     q = q.rebase_dimensions();
     EXPECT_EQ(q.to_string(), "2.20967e-31*kph-1*s2");
 }
+
+TEST(Quantity, Info) {
+
+    puq::Quantity q("23*cm");
+    EXPECT_EQ(
+        q.info(),
+        "\nExpression:  23*cm\n\nUnit system: SI (International System of Units)\nResult:   23\nBase units:  "
+        "cm\n\nDimensions:\n\nBase   Num*Mag                   Numerical                 Physical                  "
+        "\n------ ------------------------- ------------------------- ------------------------- \nMGS    0.23      "
+        "                0.01                      m                         \nMKS    0.23                      "
+        "0.01                      m                         \nCGS    23                        1                  "
+        "       cm                        \n\nBase units:\n\nPrefix   Symbol   Exponent   Name                     "
+        "      Definition                     Dimensions MGS         Allowed prefixes       \n-------- -------- "
+        "---------- ------------------------------ ------------------------------ ---------------------- "
+        "---------------------- \nc        m        1          meter                          m                    "
+        "          0.01*m                 all                    \n"
+    );
+}

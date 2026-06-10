@@ -68,6 +68,7 @@ namespace snt::puq {
         std::string unit_system() const;
         std::size_t size() const;
         val::Array::ShapeType shape() const;
+        std::string info() const;
         std::string to_string(const UnitFormat& format = UnitFormat()) const;
         // quantity operations
         friend Quantity operator+(const Quantity& q1, const Quantity& q2);
