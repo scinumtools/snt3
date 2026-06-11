@@ -106,7 +106,19 @@ grandfather str = "John"   # parent of Peter and Cintia
 ```
 
 Both parent and children nodes can be either definitions, modifications or declarations.
-Besides that, nodes can be arranged using another type of node called **group** node.
+Nodes in the above example are equivalent to the fully-qualified **path notation** given below.
+
+``` DIPL
+grandfather str = "John"  
+grandfather.father str = "Peter"     
+grandfather.father.son str = "Benjamin"   
+grandfather.father.daughter str = "Lucia" 
+grandfather.aunt str = "Cintia"  
+```
+
+### 3.1.5. Groups
+
+Nodes can be additionally arranged using special type of node called **group** node.
 
 ``` DIPL-Schema   
 # Group node schema
@@ -128,11 +140,95 @@ family                          # group is not parsed
 family.aunt.dog str = "Lassie"  # using only path notation
 ```
 
-The example above will result in the following flattened set of parameters:
+The example above will result in the following fully-qualified path notation:
 
 ``` DIPL
 family.father = "Peter"
 family.father.son = "Benjamin"
 family.father.daughter = "Lucia"
 family.aunt.dog = "Lassie"
+```
+
+### 3.1.6. Collections
+
+Collections extend group nodes to represent associative and sequential data structures.
+
+A collection is declared by appending square brackets to a group node name:
+
+- `name[key]` denotes an item in a **named collection**.
+- `name[]` denotes an item in a **numbered collection**. Item indices are assigned implicitly.
+
+A collection path shall be used consistently. Once established as named or numbered, all subsequent items on the same path shall use the same collection type.
+Collections may be nested.
+
+```DIPL
+basket
+
+  food[vegetables]
+    carrots float = 0.5 kg
+    potatoes float = 2 kg
+
+  food[fruits]
+    apples int = 3
+    water_melons int = 1
+
+    berries[]
+      name str = "strawberry"
+      weight float = 300 g
+
+    berries[]
+      name str = "cherry"
+      weight float = 500 g
+```
+Equivalent fully-qualified path notation:
+
+```DIPL
+basket.food[vegetables].carrots float = 0.5 kg
+basket.food[vegetables].potatoes float = 2 kg
+
+basket.food[fruits].apples int = 3
+basket.food[fruits].water_melons int = 1
+
+basket.food[fruits].berries[].name str = "strawberry"
+basket.food[fruits].berries[].weight float = 300 g
+
+basket.food[fruits].berries[].name str = "cherry"
+basket.food[fruits].berries[].weight float = 500 g
+```
+
+Or, equivalent JSON representation:
+
+```json
+{
+  "basket": {
+    "food": {
+      "vegetables": {
+        "carrots": 0.5,
+        "potatoes": 2.0
+      },
+      "fruits": {
+        "apples": 3,
+        "water_melons": 1,
+        "berries": [
+          {
+            "name": "strawberry",
+            "weight": 300
+          },
+          {
+            "name": "cherry",
+            "weight": 500
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+Collection items are modified in the same manner as regular nodes.
+For numbered collections, the item index shall be specified explicitly.
+
+```DIPL
+basket.food[fruits].apples = 3
+basket.food[fruits].berries[1].weight = 250 g
 ```
