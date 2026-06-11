@@ -24,8 +24,8 @@ All members of definition are separated with at least one empty space, and their
 **Indentation** is at the beginning of a line and it determines node [hierarchy](nodes.md#hierarchy).
 Every new indentation level should be separated by two empty spaces.
 
-Node **names** are formed from letters, numbers, underscores, hyphens and dots.
-Dots have a special function, because they separate parent and child node names.
+Node **names** are formed from letters, numbers, underscores and hyphens.
+Dots have a special function in names, because they separate atomic (parent and child) node names.
 
 There are four main **data types** in DIPL that are based on data types used in Python language: boolean (``bool``), integer (``int``), float (``float``) and string (``str``).
 
@@ -56,6 +56,7 @@ It is also possible to use comments on empty lines to describe the code.
 
 The first occurrence of a node is called a definition.
 All subsequent occurrences of a node with the same name are called modifications.
+The last modification is the one used in the parameter output.
 The data type of node needs to be set in each definition; however, it can be omitted in subsequent modifications.
 If a node is a dimensional parameter, units have to be set in a definition.
 One can use different units of the same dimension in modifications; however, the final value of the node will always be converted into units set by the definition.
@@ -156,7 +157,7 @@ Collections extend group nodes to represent associative and sequential data stru
 A collection is declared by appending square brackets to a group node name:
 
 - `name[key]` denotes an item in a **keyed collection**.
-- `name[]` denotes an item in a **indexed collection**. Item indices are assigned implicitly.
+- `name[]` denotes an item in a **indexed collection**. Item indices are assigned implicitly and start from 0.
 
 A collection path shall be used consistently. Once established as keyed or indexed, all subsequent items on the same path shall use the same collection type.
 Collections may be nested.
