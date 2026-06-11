@@ -247,8 +247,8 @@ Schemas use the same notation as collections, but replace the collection key or 
 ```DIPL
 car[*]
   manufacturer str;
-  weight float = 0 kg;
-  max_speed float = 0 km/h;
+  weight float kg;
+  max_speed float km/h;
 
 car[civic]
   manufacturer = "Honda"
