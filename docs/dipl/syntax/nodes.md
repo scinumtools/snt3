@@ -155,16 +155,16 @@ Collections extend group nodes to represent associative and sequential data stru
 
 A collection is declared by appending square brackets to a group node name:
 
-- `name[key]` denotes an item in a **named collection**.
-- `name[]` denotes an item in a **numbered collection**. Item indices are assigned implicitly.
+- `name[key]` denotes an item in a **keyed collection**.
+- `name[]` denotes an item in a **indexed collection**. Item indices are assigned implicitly.
 
-A collection path shall be used consistently. Once established as named or numbered, all subsequent items on the same path shall use the same collection type.
+A collection path shall be used consistently. Once established as keyed or indexed, all subsequent items on the same path shall use the same collection type.
 Collections may be nested.
 
 ```DIPL
-basket
+basket                      # group
 
-  food[vegetables]
+  food[vegetables]          # keyed collection
     carrots float = 0.5 kg
     potatoes float = 2 kg
 
@@ -172,7 +172,7 @@ basket
     apples int = 3
     water_melons int = 1
 
-    berries[]
+    berries[]               # indexed collection
       name str = "strawberry"
       weight float = 300 g
 
@@ -226,9 +226,42 @@ Or, equivalent JSON representation:
 ```
 
 Collection items are modified in the same manner as regular nodes.
-For numbered collections, the item index shall be specified explicitly.
+For indexed collections, the item index shall be specified explicitly.
 
 ```DIPL
 basket.food[fruits].apples = 3
 basket.food[fruits].berries[1].weight = 250 g
+```
+
+### 3.1.7. Schemas
+
+Collections may define a **schema** that specifies nodes common to all collection items. A schema acts as a template from which subsequent collection items inherit their structure.
+
+Schemas use the same notation as collections, but replace the collection key or index with an asterisk (`*`).
+
+- `name[*]` defines a schema for a collection.
+- Nodes declared or defined within the schema are inherited by all subsequently appended collection items.
+- A schema shall be declared before the first collection item is defined.
+- Schemas may be used with both keyed and indexed collections.
+
+```DIPL
+car[*]
+  manufacturer str;
+  weight float = 0 kg;
+  max_speed float = 0 km/h;
+
+car[civic]
+  manufacturer = "Honda"
+  weight = 1350 kg
+  max_speed = 200 km/h
+
+car[320i]
+  manufacturer = "BMW"
+  weight = 1570 kg
+  max_speed = 235 km/h
+
+car[xc90]
+  manufacturer = "Volvo"
+  weight = 2100 kg
+  max_speed = 180 km/h
 ```
