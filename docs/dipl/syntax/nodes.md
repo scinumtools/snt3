@@ -5,10 +5,10 @@
 ## 3.1. Nodes
 
 The DIPL language distinguishes three different ways to create a parameter, depending on which parts of the parameter node are specified.
-A parameter can be fully [defined](nodes.md#definition), meaning that all node components—name, type, shape, value, and unit—are provided.
-Alternatively, a parameter can be [declared](nodes.md#declaration) by specifying only its name, type, and shape.
-After a parameter has been either defined or declared, its value component can be [modified](nodes.md#modification).
-Additionally, nodes can be ordered into a [hierarchical](#hierarchy) structure by using indents.
+A parameter can be fully [defined](nodes.md#311-definition), meaning that all node components—name, type, shape, value, and unit—are provided.
+Alternatively, a parameter can be [declared](nodes.md#313-declaration) by specifying only its name, type, and shape.
+After a parameter has been either defined or declared, its value component can be [modified](nodes.md#312-modification).
+Additionally, nodes can be ordered into a [hierarchical](#314-hierarchy) structure by using indents.
 
 ### 3.1.1. Definition
 
