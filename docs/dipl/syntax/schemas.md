@@ -2,7 +2,7 @@
 
 « Back to [specification](../specification.md#language-syntax)
 
-## 4.1 Schemas
+## 3.10 Schemas
 
 Schemas provide a mechanism for defining reusable node structures.
 
@@ -11,7 +11,7 @@ A schema describes a set of nodes that may later be instantiated within groups, 
 Conceptually, a schema is similar to a type definition in a programming language. 
 It defines the structure and properties that its instances shall contain, but does not itself create any nodes within the document hierarchy.
 
-### 4.1.1 Declaration and Instantiation
+### 3.10.1 Declaration and Instantiation
 
 Schemas are declared using the `$schema` directive:
 
@@ -91,7 +91,7 @@ people[] : person
   age = 28 years
 ```
 
-### 4.1.2 Nested Schemas
+### 3.10.2 Nested Schemas
 
 Schemas may contain both value nodes and container nodes, including nested groups, maps, lists, and other schema instances.
 
@@ -110,7 +110,7 @@ $schema person
 
 Because schemas describe structure independently of container type, they provide a uniform mechanism for defining reusable data models throughout a DIPL document.
 
-### 4.1.3 Rules
+### 3.10.3 Rules
 
 The following rules shall apply:
 
