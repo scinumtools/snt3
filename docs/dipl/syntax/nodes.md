@@ -97,6 +97,8 @@ DIPL nodes are organized in a hierarchical way using indentation, i.e. number of
 Multiple levels of hierarchy are also allowed, and there can be empty lines between the nodes.
 The number of empty spaces for each indentation level can vary, as long as indentation of all children nodes is consistent.
 
+#### 3.1.4.1 Value nodes
+
 ``` DIPL
 grandfather str = "John"   # parent of Peter and Cintia
   father str = "Peter"     # John's child, Cintia's sibling
@@ -116,51 +118,73 @@ grandfather.father.son str = "Benjamin"
 grandfather.father.daughter str = "Lucia" 
 grandfather.aunt str = "Cintia"  
 ```
+#### 3.1.4.2 Container nodes
 
-### 3.1.5. Groups
+Besides basic value nodes, DIPL supports three types of container nodes.
 
-Nodes can be additionally arranged using special type of node called **group** node.
+| Structure | Example    | Semantics                    | C++ Equivalent | Python Equivalent |
+|-----------|------------|------------------------------|----------------|-------------------|
+| Group     | `foo`      | Named children               | `struct`       | `@dataclass`      |
+| Map       | `foo[key]` | Children addressed by key    | `std::map`     | `dict`            |
+| List      | `foo[]`    | Children addressed by index  | `std::vector`  | `list`            |
 
-``` DIPL-Schema   
+Unlike value nodes, container nodes do not directly hold values.
+Instead, they serve as organizational structures for child nodes.
+Depending on the container type, child nodes are addressed by name, key, or index.
+
+**Groups**
+
+Nodes may be organized into logical hierarchies using a special container node called a **group**.
+
+```DIPL-Schema
 # Group node schema
 
-<indent><name> 
+<indent><name>
 ```
 
-Group nodes do not carry any value, nor do they declare any parameter for further use.
-Their function is to group multiple child nodes into a logical structure and their name enters the final node path.
+Unlike value nodes, group nodes do not directly store values. Their sole purpose is to organize child nodes into a logical structure. The group's name becomes part of the fully-qualified path of all descendant nodes.
 
-After parsing of nodes, their names are transformed into a path that consists of the original name plus all parent names in the hierarchy separated by a **dot**.
-The original node name can already be a path and will be parsed accordingly.
+During parsing, node names are expanded into fully-qualified paths by prepending the names of all parent groups, separated by dots (`.`).
 
-``` DIPL
-family                          # group is not parsed
-  father str = "Peter"          
-    son str = "Benjamin"        # normal notation
-  father.daughter str = "Lucia" # using both normal and path notation
-family.aunt.dog str = "Lassie"  # using only path notation
+Node names may themselves contain dot-separated path segments. Both hierarchical notation and explicit path notation are equivalent and may be freely combined.
+
+```DIPL
+family                          # group node
+  father str = "Peter"
+    son str = "Benjamin"        # hierarchical notation
+
+  father.daughter str = "Lucia" # mixed notation
+
+family.aunt.dog str = "Lassie"  # explicit path notation
 ```
 
-The example above will result in the following fully-qualified path notation:
+The example above produces the following fully-qualified node paths:
 
-``` DIPL
+```DIPL
 family.father = "Peter"
 family.father.son = "Benjamin"
 family.father.daughter = "Lucia"
 family.aunt.dog = "Lassie"
 ```
 
-### 3.1.6. Collections
+**Collections**
 
 Collections extend group nodes to represent associative and sequential data structures.
 
-A collection is declared by appending square brackets to a group node name:
+A collection item is declared by appending square brackets to a node name:
 
-- `name[key]` denotes an item in a **keyed collection**.
-- `name[]` denotes an item in a **indexed collection**. Item indices are assigned implicitly and start from 0.
+- `name[key]` denotes an item in a **keyed collection** (**map**).
+- `name[]` denotes an item in an **indexed collection** (**list**). Item indices are assigned implicitly, starting at `0`.
 
-A collection path shall be used consistently. Once established as keyed or indexed, all subsequent items on the same path shall use the same collection type.
+A collection path shall be used consistently. Once a collection has been established as keyed or indexed, all subsequent items on the same path shall use the same collection type.
+
 Collections may be nested.
+
+Collection selectors are interpreted according to the type of the referenced collection.
+
+When resolving a fully-qualified path, all parent nodes shall already exist. Since the container type of each parent node is therefore known, selectors of the form `[value]` can be unambiguously interpreted either as map keys or list indices.
+
+Only the final path segment may create a new node or collection item.
 
 ```DIPL
 basket                      # group
@@ -181,6 +205,7 @@ basket                      # group
       name str = "cherry"
       weight float = 500 g
 ```
+
 Equivalent fully-qualified path notation:
 
 ```DIPL
@@ -190,14 +215,14 @@ basket.food[vegetables].potatoes float = 2 kg
 basket.food[fruits].apples int = 3
 basket.food[fruits].water_melons int = 1
 
-basket.food[fruits].berries[].name str = "strawberry"
-basket.food[fruits].berries[].weight float = 300 g
+basket.food[fruits].berries[0].name str = "strawberry"
+basket.food[fruits].berries[0].weight float = 300 g
 
-basket.food[fruits].berries[].name str = "cherry"
-basket.food[fruits].berries[].weight float = 500 g
+basket.food[fruits].berries[1].name str = "cherry"
+basket.food[fruits].berries[1].weight float = 500 g
 ```
 
-Or, equivalent JSON representation:
+Equivalent JSON representation:
 
 ```json
 {
@@ -226,43 +251,9 @@ Or, equivalent JSON representation:
 }
 ```
 
-Collection items are modified in the same manner as regular nodes.
-For indexed collections, the item index shall be specified explicitly.
+Collection items are accessed and modified in the same manner as regular nodes. For indexed collections, the item index shall be specified explicitly.
 
 ```DIPL
 basket.food[fruits].apples = 3
 basket.food[fruits].berries[1].weight = 250 g
-```
-
-### 3.1.7. Schemas
-
-Collections may define a **schema** that specifies nodes common to all collection items. A schema acts as a template from which subsequent collection items inherit their structure.
-
-Schemas use the same notation as collections, but replace the collection key or index with an asterisk (`*`).
-
-- `name[*]` defines a schema for a collection.
-- Nodes declared or defined within the schema are inherited by all subsequently appended collection items.
-- A schema shall be declared before the first collection item is defined.
-- Schemas may be used with both keyed and indexed collections.
-
-```DIPL
-car[*]
-  manufacturer str;
-  weight float kg;
-  max_speed float km/h;
-
-car[civic]
-  manufacturer = "Honda"
-  weight = 1350 kg
-  max_speed = 200 km/h
-
-car[320i]
-  manufacturer = "BMW"
-  weight = 1570 kg
-  max_speed = 235 km/h
-
-car[xc90]
-  manufacturer = "Volvo"
-  weight = 2100 kg
-  max_speed = 180 km/h
 ```
