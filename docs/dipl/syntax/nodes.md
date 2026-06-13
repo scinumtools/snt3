@@ -122,7 +122,7 @@ grandfather.aunt str = "Cintia"
 
 Besides basic value nodes, DIPL supports three types of container nodes.
 
-| Structure | Example    | Semantics                    | C++ Equivalent | Python Equivalent |
+| Structure | Example    | Semantics                    | C++ Analogy    | Python Analogy    |
 |-----------|------------|------------------------------|----------------|-------------------|
 | Group     | `foo`      | Named children               | `struct`       | `@dataclass`      |
 | Map       | `foo[key]` | Children addressed by key    | `std::map`     | `dict`            |
