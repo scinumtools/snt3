@@ -122,15 +122,13 @@ grandfather.aunt str = "Cintia"
 
 Besides basic value nodes, DIPL supports three types of container nodes.
 
-| Structure | Example    | Semantics                    | C++ Analogy    | Python Analogy    |
-|-----------|------------|------------------------------|----------------|-------------------|
-| Group     | `foo`      | Named children               | `struct`       | `@dataclass`      |
-| Map       | `foo[key]` | Children addressed by key    | `std::map`     | `dict`            |
-| List      | `foo[]`    | Children addressed by index  | `std::vector`  | `list`            |
+| Structure | Example    | Semantics                      | Similar in C++ | Similar in Python |
+|-----------|------------|--------------------------------|----------------|-------------------|
+| Group     | `foo`      | Named child nodes              | `struct`       | `@dataclass`      |
+| Map       | `foo[key]` | Child nodes addressed by key   | `std::map`     | `dict`            |
+| List      | `foo[]`    | Child nodes addressed by index | `std::vector`  | `list`            |
 
-Unlike value nodes, container nodes do not directly hold values.
-Instead, they serve as organizational structures for child nodes.
-Depending on the container type, child nodes are addressed by name, key, or index.
+Unlike value nodes, container nodes do not directly hold values. Instead, they organize child nodes into hierarchical structures. Depending on the container type, child nodes are addressed by name, key, or index.
 
 **Groups**
 
