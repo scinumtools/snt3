@@ -96,13 +96,13 @@ The result is a configuration that is both machine-evaluable and semantically va
 - [3.1. Nodes](syntax/nodes.md)
 - [3.2. Data Types](syntax/datatypes.md)
 - [3.3. Values](syntax/values.md)
-- [3.4. Schemas](syntax/schemas.md)
-- [3.5. References](syntax/references.md)
-- [3.6. Expressions](syntax/expressions.md)
-- [3.7. Units](syntax/units.md)
-- [3.8. Functions](syntax/functions.md)
-- [3.9. Properties](syntax/properties.md)
-- [3.10. Conditions](syntax/conditions.md)
+- [3.4. References](syntax/references.md)
+- [3.5. Expressions](syntax/expressions.md)
+- [3.6. Units](syntax/units.md)
+- [3.7. Functions](syntax/functions.md)
+- [3.8. Properties](syntax/properties.md)
+- [3.9. Conditions](syntax/conditions.md)
+- [3.10. Schemas](syntax/schemas.md)
  
 ## 4. File Format
 
