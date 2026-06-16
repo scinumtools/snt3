@@ -53,11 +53,12 @@ class FixtureFunctions : public ::testing::Test {
         std::unique_ptr<val::ArrayValueInt32> val_int = std::make_unique<val::ArrayValueInt32>(1);
         std::unique_ptr<val::ArrayValueFloat64> val_double = std::make_unique<val::ArrayValueFloat64>(2.34e5);
         std::unique_ptr<val::ArrayValueStr> val_string = std::make_unique<val::ArrayValueStr>("baz_value");
+        std::vector<dip::CollectionAccess> col;
         return {
-            std::make_shared<dip::BooleanNode>("scalar_bool", std::move(val_bool)),
-            std::make_shared<dip::IntegerNode>("scalar_int", std::move(val_int)),
-            std::make_shared<dip::FloatNode>("scalar_double", std::move(val_double)),
-            std::make_shared<dip::StringNode>("scalar_str", std::move(val_string)),
+            std::make_shared<dip::BooleanNode>("scalar_bool", col, std::move(val_bool)),
+            std::make_shared<dip::IntegerNode>("scalar_int", col, std::move(val_int)),
+            std::make_shared<dip::FloatNode>("scalar_double", col, std::move(val_double)),
+            std::make_shared<dip::StringNode>("scalar_str", col, std::move(val_string)),
         };
     }
 
@@ -71,11 +72,12 @@ class FixtureFunctions : public ::testing::Test {
         std::unique_ptr<val::ArrayValueInt32> val_int = std::make_unique<val::ArrayValueInt32>(vec_int, sh);
         std::unique_ptr<val::ArrayValueFloat64> val_double = std::make_unique<val::ArrayValueFloat64>(vec_double);
         std::unique_ptr<val::ArrayValueStr> val_string = std::make_unique<val::ArrayValueStr>(vec_string);
+        std::vector<dip::CollectionAccess> col;
         return {
-            std::make_shared<dip::BooleanNode>("array_bool", std::move(val_bool)),
-            std::make_shared<dip::IntegerNode>("array_int", std::move(val_int)),
-            std::make_shared<dip::FloatNode>("array_double", std::move(val_double)),
-            std::make_shared<dip::StringNode>("array_str", std::move(val_string)),
+            std::make_shared<dip::BooleanNode>("array_bool", col, std::move(val_bool)),
+            std::make_shared<dip::IntegerNode>("array_int", col, std::move(val_int)),
+            std::make_shared<dip::FloatNode>("array_double", col, std::move(val_double)),
+            std::make_shared<dip::StringNode>("array_str", col, std::move(val_string)),
         };
     }
 };

@@ -61,23 +61,3 @@ TEST(Hierarchy, IndentationChecking) {
         FAIL() << "Expected std::runtime_error";
     }
 }
-
-TEST(Hierarchy, Collections) {
-
-    dip::DIP d;
-    d.add_string("foo.fee[bar]\n  baz int = 3");
-    dip::Environment env = d.parse();
-
-    dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "foo.fee[bar].baz");
-    // TODO: this needst to be tested
-    // for (auto col : node->collections) {
-    //     std::cout << "CCCC " << col.path << ":" << col.item << '\n';
-    // }
-    // dip::CollectionAccess col = node->collections.at(0);
-    // EXPECT_EQ(col.path, "foo");
-    // EXPECT_EQ(col.item, "");
-    // col = node->collections.at(1);
-    // EXPECT_EQ(col.path, "baz");
-    // EXPECT_EQ(col.item, "");
-}

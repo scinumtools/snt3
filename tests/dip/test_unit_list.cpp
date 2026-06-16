@@ -58,5 +58,3 @@ TEST(UnitList, AddUnitFromCode) {
     // W/(m2*sr*m) = J/(m3*rad2*s) = kg/(m*rad2*s3) = 1e3*m-1*g*s-3*rad-2
     EXPECT_EQ(vnode->units->measurement.baseunits.dimensions().to_string(), "1e3*m-1*g*s-3*rad-2");
 }
-
-// TODO: modify puq so that one can set up custom units

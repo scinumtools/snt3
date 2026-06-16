@@ -1,0 +1,2 @@
+[console_scripts]
+my-cli-command = your_package.module:main_function

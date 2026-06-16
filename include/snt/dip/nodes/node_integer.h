@@ -16,15 +16,20 @@ namespace snt::dip {
       public:
         static constexpr size_t max_int_size = sizeof(long long) * CHAR_BIT;
         static ValueNode::PointerType is_node(Parser& parser);
-        IntegerNode(const std::string& nm, const core::DataType vdt)
-            : BaseNode(NodeDtype::Integer), ValueNode(nm, vdt) {};
-        IntegerNode(const std::string& nm, val::BaseValue::PointerType val)
-            : BaseNode(NodeDtype::Integer), ValueNode(nm, std::move(val)) {};
-        IntegerNode(const std::string& nm, val::BaseValue::PointerType val, std::optional<puq::Quantity> quant)
-            : BaseNode(NodeDtype::Integer), ValueNode(nm, std::move(val), std::move(quant)) {};
+        IntegerNode(const std::string& nm, const std::vector<CollectionAccess>& col, const core::DataType vdt)
+            : BaseNode(NodeDtype::Integer), ValueNode(nm, col, vdt) {};
+        IntegerNode(const std::string& nm, const std::vector<CollectionAccess>& col, val::BaseValue::PointerType val)
+            : BaseNode(NodeDtype::Integer), ValueNode(nm, col, std::move(val)) {};
+        IntegerNode(
+            const std::string& nm,
+            const std::vector<CollectionAccess>& col,
+            val::BaseValue::PointerType val,
+            std::optional<puq::Quantity> quant
+        )
+            : BaseNode(NodeDtype::Integer), ValueNode(nm, col, std::move(val), std::move(quant)) {};
         IntegerNode(Parser& parser);
         BaseNode::ListType parse(Environment& env) override;
-        ValueNode::PointerType clone(const std::string& nm) const override;
+        ValueNode::PointerType clone(const std::string& nm, const std::vector<CollectionAccess>& col) const override;
         std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override;
     };
 

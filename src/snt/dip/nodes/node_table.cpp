@@ -57,6 +57,8 @@ namespace snt::dip {
             size_t size = node->value_raw.size();
             node->indent += indent;
             node->name = name + std::string(1, SIGN_SEPARATOR) + node->name;
+            std::cout << "ttt " << node->collections.size() << '\n';
+            node->collections.insert(node->collections.begin(), collections.begin(), collections.end());
             node->value_shape = {size};
             if (node->dimension.empty())
                 node->dimension = {{size, size}};

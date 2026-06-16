@@ -41,9 +41,12 @@ namespace snt::dip {
         std::string format;
         ValueNode() : constant(false) {};
         ValueNode(const core::DataType vdt) : constant(false), value_dtype(vdt) {};
-        ValueNode(const std::string& nm, const core::DataType vdt);
+        ValueNode(const std::string& nm, const std::vector<CollectionAccess>& col, const core::DataType vdt);
         ValueNode(
-            const std::string& nm, val::BaseValue::PointerType val, std::optional<puq::Quantity> unt = std::nullopt
+            const std::string& nm,
+            const std::vector<CollectionAccess>& col,
+            val::BaseValue::PointerType val,
+            std::optional<puq::Quantity> unt = std::nullopt
         );
         virtual ~ValueNode() = default;
         val::BaseValue::PointerType cast_value();
@@ -51,7 +54,7 @@ namespace snt::dip {
         void set_value(val::BaseValue::PointerType value_input = nullptr);
         void set_units(const std::optional<puq::Quantity>& units_input = std::nullopt);
         void modify_value(const BaseNode::PointerType& node, Environment& env);
-        virtual ValueNode::PointerType clone(const std::string& nm) const = 0;
+        virtual ValueNode::PointerType clone(const std::string& nm, const std::vector<CollectionAccess>& col) const = 0;
         virtual bool set_property(PropertyType property, val::Array::StringType& values, std::string& units) override;
         virtual std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const = 0;
         void validate_constant() const;

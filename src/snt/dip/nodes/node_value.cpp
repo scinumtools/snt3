@@ -4,13 +4,21 @@
 
 namespace snt::dip {
 
-    ValueNode::ValueNode(const std::string& nm, const core::DataType vdt) : constant(false), value_dtype(vdt) {
+    ValueNode::ValueNode(const std::string& nm, const std::vector<CollectionAccess>& col, const core::DataType vdt)
+        : constant(false), value_dtype(vdt) {
         name = nm;
+        collections = col;
     };
 
-    ValueNode::ValueNode(const std::string& nm, val::BaseValue::PointerType val, std::optional<puq::Quantity> unt)
+    ValueNode::ValueNode(
+        const std::string& nm,
+        const std::vector<CollectionAccess>& col,
+        val::BaseValue::PointerType val,
+        std::optional<puq::Quantity> unt
+    )
         : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)) {
         name = nm;
+        collections = col;
         val::Array::ShapeType dims = val->get_shape();
         if (val->get_size() > 1) {
             dimension.clear();

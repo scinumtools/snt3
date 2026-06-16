@@ -7,9 +7,14 @@
 
 namespace snt::dip {
 
+    /**
+     * @struct CollectionAccess
+     * @brief Collection node information
+     */
     struct CollectionAccess {
-        std::string path;
-        std::string item; // empty => no [item]
+        std::string path;    ///< Paths leading to a collection
+        std::string item;    ///< Item value
+        CollectionType type; ////< Collection type
     };
 
     class Node {

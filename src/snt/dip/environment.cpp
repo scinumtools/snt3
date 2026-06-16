@@ -146,7 +146,13 @@ namespace snt::dip {
                         continue;
                     // select node
                     std::string new_name = vnode->name.substr(node_path_child.size(), vnode->name.size());
-                    new_nodes.push_back(vnode->clone(new_name));
+                    std::cout << "hallo node_path_child " << node_path_child << '\n';
+                    std::cout << "hallo name " << new_name << " " << vnode->name << '\n';
+                    std::cout << "hallo coll ";
+                    for (auto& col : vnode->collections)
+                        std::cout << col.path << " " << col.item << " | ";
+                    std::cout << '\n';
+                    new_nodes.push_back(vnode->clone(new_name, vnode->collections));
                 } else if (vnode and vnode->name == node_path) {
                     p = i;
                 }
@@ -157,9 +163,9 @@ namespace snt::dip {
                 size_t pos = node_path.find_last_of('.');
                 if (pos != std::string::npos) {
                     std::string new_name = vnode->name.substr(pos + 1, node_path.size());
-                    new_nodes.push_back(vnode->clone(new_name));
+                    new_nodes.push_back(vnode->clone(new_name, vnode->collections));
                 } else {
-                    new_nodes.push_back(vnode->clone(node_path));
+                    new_nodes.push_back(vnode->clone(node_path, vnode->collections));
                 }
             }
             break;

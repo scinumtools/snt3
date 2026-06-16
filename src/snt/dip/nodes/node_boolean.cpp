@@ -76,11 +76,11 @@ namespace snt::dip {
         return std::make_unique<val::ArrayValueBool>(bool_values, shape);
     }
 
-    ValueNode::PointerType BooleanNode::clone(const std::string& nm) const {
+    ValueNode::PointerType BooleanNode::clone(const std::string& nm, const std::vector<CollectionAccess>& col) const {
         if (value == nullptr)
-            return std::make_shared<BooleanNode>(nm, nullptr);
+            return std::make_shared<BooleanNode>(nm, col, nullptr);
         else
-            return std::make_shared<BooleanNode>(nm, std::move(value->clone()));
+            return std::make_shared<BooleanNode>(nm, col, std::move(value->clone()));
     }
 
     void BooleanNode::validate_options() const {

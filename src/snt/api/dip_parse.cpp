@@ -34,12 +34,12 @@ namespace snt::api {
         // parse code
         dip::Environment env = dip.parse();
 
-        // request nodes    TODO: implement tags
+        // request nodes
         dip::ValueNode::ListType vnodes;
         if (request.empty()) {
-            vnodes = env.request_nodes("?");
+            vnodes = env.request_nodes("?", dip::RequestType::Reference, tags);
         } else {
-            vnodes = env.request_nodes(request);
+            vnodes = env.request_nodes(request, dip::RequestType::Reference, tags);
         }
 
         // print if required

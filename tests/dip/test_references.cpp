@@ -198,7 +198,9 @@ TEST(References, RemoteSource) {
     // create temporary file
     std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
     std::filesystem::path source_filename = temp_dir / "example_source.dip";
-    std::string source_code = "foo\n  bar int = 3\n  baz bool[2] = [false,true]";
+    std::string source_code = "foo\n"
+                              "  bar int = 3\n"
+                              "  baz bool[2] = [false,true]";
     std::string source_name = "foo_source";
     {
         std::ofstream source_file(source_filename);

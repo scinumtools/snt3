@@ -122,20 +122,21 @@ TEST(ParseScalars, Cloning) {
     dip::Environment env = d.parse();
 
     dip::ValueNode::PointerType clone;
+    std::vector<dip::CollectionAccess> col;
 
     dip::ValueNode::PointerType jerk = env.nodes.at(0);
-    clone = jerk->clone("clone");
+    clone = jerk->clone("clone", col);
     EXPECT_EQ(clone->to_string(), "true");
 
     dip::ValueNode::PointerType snap = env.nodes.at(1);
-    clone = snap->clone("clone");
+    clone = snap->clone("clone", col);
     EXPECT_EQ(clone->to_string(), "3 cm");
 
     dip::ValueNode::PointerType crackle = env.nodes.at(2);
-    clone = crackle->clone("clone");
+    clone = crackle->clone("clone", col);
     EXPECT_EQ(clone->to_string(), "1.23 J");
 
     dip::ValueNode::PointerType pop = env.nodes.at(3);
-    clone = pop->clone("clone");
+    clone = pop->clone("clone", col);
     EXPECT_EQ(clone->to_string(), "\"foo\"");
 }

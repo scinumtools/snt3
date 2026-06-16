@@ -1,0 +1,8 @@
+compare.py
+pyproject.toml
+comparison_pypuq.egg-info/PKG-INFO
+comparison_pypuq.egg-info/SOURCES.txt
+comparison_pypuq.egg-info/dependency_links.txt
+comparison_pypuq.egg-info/entry_points.txt
+comparison_pypuq.egg-info/requires.txt
+comparison_pypuq.egg-info/top_level.txt

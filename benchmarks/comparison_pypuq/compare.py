@@ -1,6 +1,10 @@
 import timeit
 import time
 import numpy as np
+import sys
+
+# Include `scinumtools3` from the current build directory
+sys.path.append("../../build/python")
 
 # ==========================================
 # 1. SETUP CODES (Executed once per library)
@@ -59,6 +63,7 @@ test_sympy_scalar = """
 q1 = 10 * meter
 q2 = 5 * foot
 res = convert_to(q1 + q2, inch)
+"""
 
 # ==========================================
 # 3. RUNNING SCALAR BENCHMARKS

@@ -169,6 +169,7 @@ namespace snt::dip {
             }
             // Create hierarchical names
             target.hierarchy.record(node, nodes_nohierarchy);
+            std::cout << "hhh " << node->name << '\n';
             // Add nodes to the node list
             if (std::find(nodes_notypes.begin(), nodes_notypes.end(), node->dtype) != nodes_notypes.end()) {
                 continue;
@@ -193,6 +194,7 @@ namespace snt::dip {
                 bool new_node = true;
                 for (size_t i = 0; i < target.nodes.size(); i++) {
                     if (target.nodes.at(i)->name == node->name) {
+                        std::cout << "mmm " << target.nodes.at(i)->name << " " << node->name << '\n';
                         ValueNode::PointerType mnode = target.nodes.at(i);
                         mnode->validate_constant();
                         mnode->modify_value(node, target);

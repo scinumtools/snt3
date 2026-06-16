@@ -1,0 +1,24 @@
+Metadata-Version: 2.4
+Name: comparison_pypuq
+Version: 0.1.0
+Summary: Python quantity computation benchmark
+Author-email: quantbench <quantbench@pm.me>
+License: MIT
+Project-URL: Homepage, https://github.com
+Project-URL: Bug-Tracker, https://github.com/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.31.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pint
+Requires-Dist: unyt
+Requires-Dist: astropy
+Requires-Dist: sympy
+Requires-Dist: numpy
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: black>=24.0.0; extra == "dev"
+Requires-Dist: mypy>=1.8.0; extra == "dev"

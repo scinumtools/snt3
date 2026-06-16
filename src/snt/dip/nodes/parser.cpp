@@ -202,7 +202,8 @@ namespace snt::dip {
                     return false;
                 }
                 ++pos; // skip ']'
-                collections.push_back({std::move(currentPath), std::move(item)});
+                CollectionType type = item.empty() ? CollectionType::LIST : CollectionType::MAP;
+                collections.push_back({std::move(currentPath), std::move(item), std::move(type)});
                 currentPath.clear();
             }
             if (pos >= code.size() || code[pos] != '.')
@@ -210,7 +211,8 @@ namespace snt::dip {
             ++pos; // skip '.'
         }
         if (!currentPath.empty()) {
-            collections.push_back({std::move(currentPath), ""});
+            // A simple or node group
+            collections.push_back({std::move(currentPath), "", CollectionType::GROUP});
         }
 
         // save full name and consume input
