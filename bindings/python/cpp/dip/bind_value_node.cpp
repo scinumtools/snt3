@@ -12,7 +12,7 @@ void init_value_node(py::module_& m) {
 
     auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(m, "ValueNode");
     val.def("__str__", &dip::ValueNode::to_string, py::arg("format") = core::StringFormatType());
-    val.def_readonly("name", &dip::ValueNode::name);
+    val.def_property_readonly("name", [](const dip::ValueNode& self) -> const std::string& { return self.path.name; });
     val.def_property_readonly(
         "units",
         [](const dip::ValueNode& vnode) -> const puq::Quantity* { return vnode.units ? &(*vnode.units) : nullptr; },

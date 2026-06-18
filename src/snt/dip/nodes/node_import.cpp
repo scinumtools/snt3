@@ -39,9 +39,8 @@ namespace snt::dip {
         for (const auto& node : nodes) {
             size_t size = node->value_raw.size();
             node->indent += indent;
-            if (!name.empty())
-                node->name = name + std::string(1, SIGN_SEPARATOR) + node->name;
-            node->collections.insert(node->collections.begin(), collections.begin(), collections.end());
+            if (!path.name.empty())
+                node->path = Path(path.name + std::string(1, SIGN_SEPARATOR) + node->path.name);
             node->value_shape = {size};
             if (node->dimension.empty())
                 node->dimension = {{size, size}};

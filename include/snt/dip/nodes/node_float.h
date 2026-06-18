@@ -16,20 +16,14 @@ namespace snt::dip {
       public:
         static constexpr size_t max_float_size = sizeof(long double) * CHAR_BIT;
         static ValueNode::PointerType is_node(Parser& parser);
-        FloatNode(const std::string& nm, const std::vector<CollectionAccess>& col, const core::DataType vdt)
-            : BaseNode(NodeDtype::Float), ValueNode(nm, col, vdt) {};
-        FloatNode(const std::string& nm, const std::vector<CollectionAccess>& col, val::BaseValue::PointerType val)
-            : BaseNode(NodeDtype::Float), ValueNode(nm, col, std::move(val)) {};
-        FloatNode(
-            const std::string& nm,
-            const std::vector<CollectionAccess>& col,
-            val::BaseValue::PointerType val,
-            std::optional<puq::Quantity> quant
-        )
-            : BaseNode(NodeDtype::Float), ValueNode(nm, col, std::move(val), std::move(quant)) {};
+        FloatNode(const Path& pth, const core::DataType vdt) : BaseNode(NodeDtype::Float), ValueNode(pth, vdt) {};
+        FloatNode(const Path& pth, val::BaseValue::PointerType val)
+            : BaseNode(NodeDtype::Float), ValueNode(pth, std::move(val)) {};
+        FloatNode(const Path& pth, val::BaseValue::PointerType val, std::optional<puq::Quantity> quant)
+            : BaseNode(NodeDtype::Float), ValueNode(pth, std::move(val), std::move(quant)) {};
         FloatNode(Parser& parser);
         BaseNode::ListType parse(Environment& env) override;
-        ValueNode::PointerType clone(const std::string& nm, const std::vector<CollectionAccess>& col) const override;
+        ValueNode::PointerType clone(const Path& pth) const override;
         std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override;
     };
 

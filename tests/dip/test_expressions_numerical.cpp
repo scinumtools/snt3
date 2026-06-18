@@ -17,17 +17,17 @@ TEST(ExpressionsNumerical, NonDimensional) {
     EXPECT_EQ(env.nodes.size(), 5);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "5");
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "0.9754");
 
     vnode = env.nodes.at(4);
-    EXPECT_EQ(vnode->name, "pop");
+    EXPECT_EQ(vnode->path.name, "pop");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "6.234");
 }
@@ -43,7 +43,7 @@ TEST(ExpressionsNumerical, Dimensional) {
     EXPECT_EQ(env.nodes.size(), 3);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->name, "baz");
+    EXPECT_EQ(vnode->path.name, "baz");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "27450 mm");
 
@@ -57,7 +57,7 @@ TEST(ExpressionsNumerical, Dimensional) {
     EXPECT_EQ(env.nodes.size(), 3);
 
     vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->name, "baz");
+    EXPECT_EQ(vnode->path.name, "baz");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "5.586 dm");
 
@@ -71,7 +71,7 @@ TEST(ExpressionsNumerical, Dimensional) {
     EXPECT_EQ(env.nodes.size(), 3);
 
     vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->name, "baz");
+    EXPECT_EQ(vnode->path.name, "baz");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "0.1095 m"); // 0.233*m / 0.4256*m * 0.2*m = 0.109492... m
 }

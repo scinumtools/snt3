@@ -110,13 +110,13 @@ namespace snt::dip {
         }
     }
 
-    ValueNode::PointerType FloatNode::clone(const std::string& nm, const std::vector<CollectionAccess>& col) const {
+    ValueNode::PointerType FloatNode::clone(const Path& pth) const {
         if (value == nullptr)
-            return std::make_shared<FloatNode>(nm, col, value->get_dtype());
+            return std::make_shared<FloatNode>(pth, value->get_dtype());
         else if (!units)
-            return std::make_shared<FloatNode>(nm, col, std::move(value->clone()));
+            return std::make_shared<FloatNode>(pth, std::move(value->clone()));
         else
-            return std::make_shared<FloatNode>(nm, col, std::move(value->clone()), units);
+            return std::make_shared<FloatNode>(pth, std::move(value->clone()), units);
     }
 
     std::string FloatNode::to_string(const core::StringFormatType& format) const {

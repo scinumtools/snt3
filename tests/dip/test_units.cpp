@@ -14,7 +14,7 @@ TEST(Units, Definition) {
     dip::Environment env = d.parse();
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->units_raw, "km");
     EXPECT_EQ(vnode->value->to_string(), "23");
     EXPECT_TRUE(vnode->units);
@@ -25,7 +25,7 @@ TEST(Units, Definition) {
     env = d.parse();
 
     vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->units_raw, "km");
     EXPECT_EQ(vnode->value->to_string(), "2.34e5");
     EXPECT_TRUE(vnode->units);
@@ -40,7 +40,7 @@ TEST(Units, ScalarModification) {
     dip::Environment env = d.parse();
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->units_raw, "m");
     EXPECT_EQ(vnode->value->to_string(), "23000");
     EXPECT_TRUE(vnode->units);
@@ -52,7 +52,7 @@ TEST(Units, ScalarModification) {
     env = d.parse();
 
     vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->units_raw, "km");
     EXPECT_EQ(vnode->value->to_string(), "0.023");
     EXPECT_TRUE(vnode->units);
@@ -67,7 +67,7 @@ TEST(Units, ArrayModification) {
     dip::Environment env = d.parse();
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->units_raw, "m");
     EXPECT_EQ(vnode->value->to_string(), "[12000, 23000]");
     EXPECT_TRUE(vnode->units);
@@ -79,7 +79,7 @@ TEST(Units, ArrayModification) {
     env = d.parse();
 
     vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->units_raw, "m");
     EXPECT_EQ(vnode->value->to_string(), "[1.2e4, 2.3e4]");
     EXPECT_TRUE(vnode->units);
@@ -94,7 +94,7 @@ TEST(Units, DimlessModification) {
     dip::Environment env = d.parse();
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->units_raw, "km");
     EXPECT_EQ(vnode->value->to_string(), "45");
     EXPECT_TRUE(vnode->units);
@@ -106,7 +106,7 @@ TEST(Units, DimlessModification) {
     env = d.parse();
 
     vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->units_raw, "km");
     EXPECT_EQ(vnode->value->to_string(), "45");
     EXPECT_TRUE(vnode->units);

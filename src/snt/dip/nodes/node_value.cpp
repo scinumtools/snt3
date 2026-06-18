@@ -4,21 +4,13 @@
 
 namespace snt::dip {
 
-    ValueNode::ValueNode(const std::string& nm, const std::vector<CollectionAccess>& col, const core::DataType vdt)
-        : constant(false), value_dtype(vdt) {
-        name = nm;
-        collections = col;
+    ValueNode::ValueNode(const Path& pth, const core::DataType vdt) : constant(false), value_dtype(vdt) {
+        path = pth;
     };
 
-    ValueNode::ValueNode(
-        const std::string& nm,
-        const std::vector<CollectionAccess>& col,
-        val::BaseValue::PointerType val,
-        std::optional<puq::Quantity> unt
-    )
+    ValueNode::ValueNode(const Path& pth, val::BaseValue::PointerType val, std::optional<puq::Quantity> unt)
         : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)) {
-        name = nm;
-        collections = col;
+        path = pth;
         val::Array::ShapeType dims = val->get_shape();
         if (val->get_size() > 1) {
             dimension.clear();
@@ -96,7 +88,7 @@ namespace snt::dip {
     void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
         if (node->dtype != NodeDtype::Modification and node->dtype != dtype)
             throw std::runtime_error(
-                "Node '" + name + "' with type '" + dtype_raw.at(1) + "' cannot modify node '" + node->name +
+                "Node '" + path.name + "' with type '" + dtype_raw.at(1) + "' cannot modify node '" + node->path.name +
                 "' with type '" + node->dtype_raw.at(1) + "'"
             );
         val::BaseValue::PointerType value = cast_value(node->value_raw, node->value_shape);
@@ -150,7 +142,7 @@ namespace snt::dip {
 
     void ValueNode::validate_constant() const {
         if (constant)
-            throw std::runtime_error("Node '" + name + "' is constant and cannot be modified: " + line.code);
+            throw std::runtime_error("Node '" + path.name + "' is constant and cannot be modified: " + line.code);
     }
 
     void ValueNode::validate_definition() const {
@@ -183,7 +175,7 @@ namespace snt::dip {
                     oss << options[i].value->to_string();
                 }
                 throw std::runtime_error(
-                    "Value " + value->to_string() + " of node '" + name +
+                    "Value " + value->to_string() + " of node '" + path.name +
                     "' doesn't match with any option: " + oss.str()
                 );
             }

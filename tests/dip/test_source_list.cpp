@@ -36,12 +36,12 @@ TEST(SourceList, KeywordSourceCode) {
     EXPECT_EQ(senv.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = senv.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "3");
 
     vnode = senv.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "false");
 }
@@ -106,12 +106,12 @@ TEST(SourceList, AddSourceFromCode) {
     EXPECT_EQ(senv.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = senv.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "3");
 
     vnode = senv.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "false");
 }

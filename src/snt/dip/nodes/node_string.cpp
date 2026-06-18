@@ -62,11 +62,11 @@ namespace snt::dip {
         return std::make_unique<val::ArrayValueStr>(value_inputs, shape);
     }
 
-    ValueNode::PointerType StringNode::clone(const std::string& nm, const std::vector<CollectionAccess>& col) const {
+    ValueNode::PointerType StringNode::clone(const Path& pth) const {
         if (value == nullptr)
-            return std::make_shared<StringNode>(nm, col, nullptr);
+            return std::make_shared<StringNode>(pth, nullptr);
         else
-            return std::make_shared<StringNode>(nm, col, std::move(value->clone()));
+            return std::make_shared<StringNode>(pth, std::move(value->clone()));
     }
 
     bool StringNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {

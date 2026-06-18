@@ -9,13 +9,13 @@ namespace snt::dip {
     struct Parent {
         size_t indent;
         std::string name;
-        std::vector<CollectionAccess> collections;
+        std::vector<Path::CollectionAccess> collections;
     };
 
     struct Collection {
         std::string path;
         std::vector<std::string> items;
-        CollectionType type;
+        Path::CollectionType type;
     };
 
     class HierarchyList {

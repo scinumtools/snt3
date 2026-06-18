@@ -13,11 +13,11 @@ namespace snt::dip {
 
       public:
         static ValueNode::PointerType is_node(Parser& parser);
-        StringNode(const std::string& nm, const std::vector<CollectionAccess>& col, val::BaseValue::PointerType val)
-            : BaseNode(NodeDtype::String), ValueNode(nm, col, std::move(val)) {};
+        StringNode(const Path& pth, val::BaseValue::PointerType val)
+            : BaseNode(NodeDtype::String), ValueNode(pth, std::move(val)) {};
         StringNode(Parser& parser) : BaseNode(parser, NodeDtype::String), ValueNode(core::DataType::String) {};
         BaseNode::ListType parse(Environment& env) override;
-        ValueNode::PointerType clone(const std::string& nm, const std::vector<CollectionAccess>& col) const override;
+        ValueNode::PointerType clone(const Path& pth) const override;
         bool set_property(PropertyType property, val::Array::StringType& values, std::string& units) override;
         void validate_format() const override;
         std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override;

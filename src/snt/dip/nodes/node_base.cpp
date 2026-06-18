@@ -6,8 +6,7 @@ namespace snt::dip {
     BaseNode::BaseNode(Parser& parser, const NodeDtype dt) : dtype(dt), branch_id(0), case_id(0) {
         line = parser.line;
         indent = parser.indent;
-        name = parser.name;
-        collections = parser.collections;
+        path = parser.path;
         dtype_raw = parser.dtype_raw;
         dimension = parser.dimension;
         value_raw = parser.value_raw;

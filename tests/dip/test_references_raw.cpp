@@ -30,7 +30,7 @@ TEST(ReferencesRaw, BooleanValues) {
     std::filesystem::remove(source_filename);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "snap");
+    EXPECT_EQ(vnode->path.name, "snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[[true, false], [false, true]]");
 }
@@ -59,7 +59,7 @@ TEST(ReferencesRaw, IntegerValues) {
     std::filesystem::remove(source_filename);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "snap");
+    EXPECT_EQ(vnode->path.name, "snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3, 4]]");
 }
@@ -88,7 +88,7 @@ TEST(ReferencesRaw, FloatValues) {
     std::filesystem::remove(source_filename);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "snap");
+    EXPECT_EQ(vnode->path.name, "snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3.45, 4.56e7]]");
 }
@@ -117,7 +117,7 @@ TEST(ReferencesRaw, StringValues) {
     std::filesystem::remove(source_filename);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "snap");
+    EXPECT_EQ(vnode->path.name, "snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[[\"jerk\", \"snap\"], [\"crackle\", \"pop\"]]");
 }
@@ -151,12 +151,12 @@ TEST(ReferencesRaw, TableNodes) {
     std::filesystem::remove(source_filename);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "snap.bar");
+    EXPECT_EQ(vnode->path.name, "snap.bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[1, 2]");
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "snap.baz");
+    EXPECT_EQ(vnode->path.name, "snap.baz");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");
 }

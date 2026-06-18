@@ -15,7 +15,7 @@ TEST(ParseArrays, BooleanValue) {
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::Boolean);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
     EXPECT_EQ(vnode->value->to_string(), "[[true, false, true], [true, true, false]]");
@@ -33,7 +33,7 @@ TEST(ParseArrays, IntegerValue) {
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
     EXPECT_EQ(vnode->value->to_string(), "[[1, 2, 3], [-4, -5, -678910111]]");
@@ -51,7 +51,7 @@ TEST(ParseArrays, FloatValue) {
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::Float);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
     EXPECT_EQ(vnode->value->to_string(), "[[1, 2.2, 3.3e3], [-4, -5.5, -6.6e6]]");
@@ -72,7 +72,7 @@ TEST(ParseArrays, StringValue) {
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2, 3}));
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::String);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_EQ(vnode->dimension, val::Array::RangeType({{2, 2}, {3, 3}}));
 
     EXPECT_EQ(

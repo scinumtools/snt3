@@ -38,16 +38,16 @@ TEST(Environment, RequestNodes) {
     // filter selection using tags
     nodes = env.request_nodes("?foo", dip::RequestType::Reference, {"crackle"});
     EXPECT_EQ(nodes.size(), 2);
-    EXPECT_EQ(nodes.at(0)->name, "bar");
-    EXPECT_EQ(nodes.at(1)->name, "baz");
+    EXPECT_EQ(nodes.at(0)->path.name, "bar");
+    EXPECT_EQ(nodes.at(1)->path.name, "baz");
 
     nodes = env.request_nodes("?foo", dip::RequestType::Reference, {"snap"});
     EXPECT_EQ(nodes.size(), 1);
-    EXPECT_EQ(nodes.at(0)->name, "bar");
+    EXPECT_EQ(nodes.at(0)->path.name, "bar");
 
     nodes = env.request_nodes("?foo", dip::RequestType::Reference, {"pop"});
     EXPECT_EQ(nodes.size(), 1);
-    EXPECT_EQ(nodes.at(0)->name, "baz");
+    EXPECT_EQ(nodes.at(0)->path.name, "baz");
 }
 
 TEST(Environment, RequestNodeData) {

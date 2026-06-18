@@ -74,9 +74,16 @@ namespace snt::puq {
 
     size_t UnitSystem::set_custom_unit(const std::string& name, const std::string& definition) {
         // Check if custom unit with the same name already exists
-        auto it = current.custom->UnitList.find(name);
-        if (it != current.custom->UnitList.end())
-            throw UnitSystemExcept("Custom unit with the same name already exist in the current record: " + name);
+        {
+            auto it = current.data->UnitList.find(name);
+            if (it != current.data->UnitList.end())
+                throw UnitSystemExcept("Standard unit with the same name already exist in the current record: " + name);
+        }
+        {
+            auto it = current.custom->UnitList.find(name);
+            if (it != current.custom->UnitList.end())
+                throw UnitSystemExcept("Custom unit with the same name already exist in the current record: " + name);
+        }
         // Extract DimensionStruct values from a quantity
         Quantity quant(definition);
         Result res = quant.measurement.result * quant.measurement.baseunits.dimensions().numerical;

@@ -333,14 +333,14 @@ TEST(Properties, TableDelimiter) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo.bar");
+    EXPECT_EQ(vnode->path.name, "foo.bar");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2}));
     EXPECT_EQ(vnode->value->to_string(), "[1, 2]");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "foo.baz");
+    EXPECT_EQ(vnode->path.name, "foo.baz");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "false"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2}));
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");

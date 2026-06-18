@@ -18,11 +18,11 @@ TEST(Collections, MapItems) {
     // test nodes
     EXPECT_EQ(env.nodes.size(), 3);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "foo.fee[bar].baz");
+    EXPECT_EQ(node->path.name, "foo.fee[bar].baz");
     node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "foo.fee[bar].jerk.snap[crackle].pop");
+    EXPECT_EQ(node->path.name, "foo.fee[bar].jerk.snap[crackle].pop");
     node = env.nodes.at(2);
-    EXPECT_EQ(node->name, "foo.fee[bar].jerk.snap[jolt].surge");
+    EXPECT_EQ(node->path.name, "foo.fee[bar].jerk.snap[jolt].surge");
 
     // test collections
     std::unordered_map<std::string, dip::Collection> collections = env.hierarchy.get_collections();
@@ -30,13 +30,13 @@ TEST(Collections, MapItems) {
     {
         auto cl = collections.find("foo.fee");
         EXPECT_NE(cl, collections.end());
-        EXPECT_EQ(cl->second.type, dip::CollectionType::MAP);
+        EXPECT_EQ(cl->second.type, dip::Path::CollectionType::MAP);
         EXPECT_EQ(cl->second.items, std::vector<std::string>({"bar"}));
     }
     {
         auto cl = collections.find("foo.fee[bar].jerk.snap");
         EXPECT_TRUE(cl != collections.end());
-        EXPECT_EQ(cl->second.type, dip::CollectionType::MAP);
+        EXPECT_EQ(cl->second.type, dip::Path::CollectionType::MAP);
         EXPECT_EQ(cl->second.items, std::vector<std::string>({"crackle", "jolt"}));
     }
 }
@@ -55,11 +55,11 @@ TEST(Collections, ListItems) {
     // test nodes
     EXPECT_EQ(env.nodes.size(), 3);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "foo.fee[0].baz");
+    EXPECT_EQ(node->path.name, "foo.fee[0].baz");
     node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "foo.fee[0].jerk.snap[0].pop");
+    EXPECT_EQ(node->path.name, "foo.fee[0].jerk.snap[0].pop");
     node = env.nodes.at(2);
-    EXPECT_EQ(node->name, "foo.fee[0].jerk.snap[1].surge");
+    EXPECT_EQ(node->path.name, "foo.fee[0].jerk.snap[1].surge");
 
     // test collections
     std::unordered_map<std::string, dip::Collection> collections = env.hierarchy.get_collections();
@@ -67,13 +67,13 @@ TEST(Collections, ListItems) {
     {
         auto cl = collections.find("foo.fee");
         EXPECT_NE(cl, collections.end());
-        EXPECT_EQ(cl->second.type, dip::CollectionType::LIST);
+        EXPECT_EQ(cl->second.type, dip::Path::CollectionType::LIST);
         EXPECT_EQ(cl->second.items, std::vector<std::string>({"0"}));
     }
     {
         auto cl = collections.find("foo.fee[0].jerk.snap");
         EXPECT_TRUE(cl != collections.end());
-        EXPECT_EQ(cl->second.type, dip::CollectionType::LIST);
+        EXPECT_EQ(cl->second.type, dip::Path::CollectionType::LIST);
         EXPECT_EQ(cl->second.items, std::vector<std::string>({"0", "1"}));
     }
 }

@@ -118,16 +118,6 @@ namespace snt::dip {
         Delimiter // specific properties
     };
 
-    /**
-     * @brief List of collection types
-     */
-    enum class CollectionType {
-        NONE,  ///< Node is not a collection
-        GROUP, ///< Simple node or group
-        MAP,   ///< Map items are associated with a key
-        LIST,  ///< List items are ordered by indexes
-    };
-
 } // namespace snt::dip
 
 #endif // DIP_SETTINGS_H

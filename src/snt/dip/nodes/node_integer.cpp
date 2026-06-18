@@ -159,13 +159,13 @@ namespace snt::dip {
         }
     }
 
-    ValueNode::PointerType IntegerNode::clone(const std::string& nm, const std::vector<CollectionAccess>& col) const {
+    ValueNode::PointerType IntegerNode::clone(const Path& pth) const {
         if (value == nullptr)
-            return std::make_shared<IntegerNode>(nm, col, value->get_dtype());
+            return std::make_shared<IntegerNode>(pth, value->get_dtype());
         else if (!units)
-            return std::make_shared<IntegerNode>(nm, col, std::move(value->clone()));
+            return std::make_shared<IntegerNode>(pth, std::move(value->clone()));
         else
-            return std::make_shared<IntegerNode>(nm, col, std::move(value->clone()), units);
+            return std::make_shared<IntegerNode>(pth, std::move(value->clone()), units);
     }
 
     std::string IntegerNode::to_string(const core::StringFormatType& format) const {

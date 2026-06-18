@@ -169,7 +169,7 @@ namespace snt::dip {
             }
             // Create hierarchical names
             target.hierarchy.record(node, nodes_nohierarchy);
-            std::cout << "hhh " << node->name << '\n';
+            std::cout << "hhh " << node->path.name << '\n';
             // Add nodes to the node list
             if (std::find(nodes_notypes.begin(), nodes_notypes.end(), node->dtype) != nodes_notypes.end()) {
                 continue;
@@ -180,7 +180,7 @@ namespace snt::dip {
             } else {
                 target.branching.prepare_node(node);
                 // Clean node name from cases
-                node->name = target.branching.clean_name(node->name);
+                node->path = Path(target.branching.clean_name(node->path.name));
                 // Set the node value an unit
                 // TODO: maybe this can be done after modifications?!
                 ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node);
@@ -193,8 +193,8 @@ namespace snt::dip {
                 // If node was previously defined, modify its value
                 bool new_node = true;
                 for (size_t i = 0; i < target.nodes.size(); i++) {
-                    if (target.nodes.at(i)->name == node->name) {
-                        std::cout << "mmm " << target.nodes.at(i)->name << " " << node->name << '\n';
+                    if (target.nodes.at(i)->path.name == node->path.name) {
+                        std::cout << "mmm " << target.nodes.at(i)->path.name << " " << node->path.name << '\n';
                         ValueNode::PointerType mnode = target.nodes.at(i);
                         mnode->validate_constant();
                         mnode->modify_value(node, target);

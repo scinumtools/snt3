@@ -21,21 +21,21 @@ TEST(ParseTables, BasicTable) {
     EXPECT_EQ(env.nodes.size(), 3);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo.bar");
+    EXPECT_EQ(vnode->path.name, "foo.bar");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2", "3", "4"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({4}));
     EXPECT_EQ(vnode->value->to_string(), "[1, 2, 3, 4]");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "foo.baz");
+    EXPECT_EQ(vnode->path.name, "foo.baz");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "true", "false", "true"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({4}));
     EXPECT_EQ(vnode->value->to_string(), "[true, true, false, true]");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 
     vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->name, "foo.dig");
+    EXPECT_EQ(vnode->path.name, "foo.dig");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"a", "b", "c", "d"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({4}));
     EXPECT_EQ(vnode->value->to_string(), "[\"a\", \"b\", \"c\", \"d\"]");
@@ -57,14 +57,14 @@ TEST(ParseTables, EmptySpaceTrimming) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo.bar");
+    EXPECT_EQ(vnode->path.name, "foo.bar");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2", "3"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({3}));
     EXPECT_EQ(vnode->value->to_string(), "[1, 2, 3]");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "foo.baz");
+    EXPECT_EQ(vnode->path.name, "foo.baz");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "true", "false"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({3}));
     EXPECT_EQ(vnode->value->to_string(), "[true, true, false]");

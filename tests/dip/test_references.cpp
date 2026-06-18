@@ -18,12 +18,12 @@ TEST(References, BooleanValues) {
     EXPECT_EQ(env.nodes.size(), 4);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "true");
 
     vnode = env.nodes.at(3);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");
 }
@@ -40,12 +40,12 @@ TEST(References, IntegerValues) {
     EXPECT_EQ(env.nodes.size(), 4);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "32");
 
     vnode = env.nodes.at(3);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[32, 54]");
 }
@@ -62,12 +62,12 @@ TEST(References, FloatValues) {
     EXPECT_EQ(env.nodes.size(), 4);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "2.345e6");
 
     vnode = env.nodes.at(3);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[2.345e6, 3.456e7]");
 }
@@ -84,12 +84,12 @@ TEST(References, StringValues) {
     EXPECT_EQ(env.nodes.size(), 4);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "\"baz\"");
 
     vnode = env.nodes.at(3);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[\"pop\", \"jerk\"]");
 }
@@ -117,7 +117,7 @@ TEST(References, DataTypeConversion) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "\"true\"");
 }
@@ -149,12 +149,12 @@ TEST(References, TableNodes) {
     EXPECT_EQ(env.nodes.size(), 4);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->name, "bar.snap");
+    EXPECT_EQ(vnode->path.name, "bar.snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "\"snap\"");
 
     vnode = env.nodes.at(3);
-    EXPECT_EQ(vnode->name, "bar.crackle");
+    EXPECT_EQ(vnode->path.name, "bar.crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");
 }
@@ -173,22 +173,22 @@ TEST(References, ImportNodes) {
     EXPECT_EQ(env.nodes.size(), 6);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->name, "bar.foo.snap");
+    EXPECT_EQ(vnode->path.name, "bar.foo.snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "\"snap\"");
 
     vnode = env.nodes.at(3);
-    EXPECT_EQ(vnode->name, "bar.foo.crackle");
+    EXPECT_EQ(vnode->path.name, "bar.foo.crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");
 
     vnode = env.nodes.at(4);
-    EXPECT_EQ(vnode->name, "baz.snap");
+    EXPECT_EQ(vnode->path.name, "baz.snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "\"snap\"");
 
     vnode = env.nodes.at(5);
-    EXPECT_EQ(vnode->name, "baz.crackle");
+    EXPECT_EQ(vnode->path.name, "baz.crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");
 }
@@ -222,32 +222,32 @@ TEST(References, RemoteSource) {
     std::filesystem::remove(source_filename);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "snap");
+    EXPECT_EQ(vnode->path.name, "snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "3");
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[false, true]");
 
     vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->name, "pop.bar");
+    EXPECT_EQ(vnode->path.name, "pop.bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "3");
 
     vnode = env.nodes.at(3);
-    EXPECT_EQ(vnode->name, "pop.baz");
+    EXPECT_EQ(vnode->path.name, "pop.baz");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[false, true]");
 
     vnode = env.nodes.at(4);
-    EXPECT_EQ(vnode->name, "jerk.foo.bar");
+    EXPECT_EQ(vnode->path.name, "jerk.foo.bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "3");
 
     vnode = env.nodes.at(5);
-    EXPECT_EQ(vnode->name, "jerk.foo.baz");
+    EXPECT_EQ(vnode->path.name, "jerk.foo.baz");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[false, true]");
 }

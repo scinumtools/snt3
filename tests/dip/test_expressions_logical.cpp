@@ -18,17 +18,17 @@ TEST(ExpressionsLogical, NonDimensional) {
     EXPECT_EQ(env.nodes.size(), 6);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "false");
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "true");
 
     vnode = env.nodes.at(5);
-    EXPECT_EQ(vnode->name, "pop");
+    EXPECT_EQ(vnode->path.name, "pop");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "true");
 }
@@ -42,7 +42,7 @@ TEST(ExpressionsLogical, Dimensional) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 
@@ -54,7 +54,7 @@ TEST(ExpressionsLogical, Dimensional) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 
@@ -66,7 +66,7 @@ TEST(ExpressionsLogical, Dimensional) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 
@@ -78,7 +78,7 @@ TEST(ExpressionsLogical, Dimensional) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 
@@ -90,7 +90,7 @@ TEST(ExpressionsLogical, Dimensional) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 
@@ -102,7 +102,7 @@ TEST(ExpressionsLogical, Dimensional) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "bar");
+    EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 }

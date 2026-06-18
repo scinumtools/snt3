@@ -7,7 +7,7 @@ namespace snt::dip {
 
     BaseNode::PointerType CaseNode::is_node(Parser& parser) {
         if (parser.kwd_case()) {
-            if (parser.name.substr(1) != KEYWORD_ELSE and parser.name.substr(1) != KEYWORD_END)
+            if (parser.path.name.substr(1) != KEYWORD_ELSE and parser.path.name.substr(1) != KEYWORD_END)
                 parser.part_value();
             parser.part_comment();
             return std::make_shared<CaseNode>(parser);
@@ -21,7 +21,7 @@ namespace snt::dip {
         oss << "(" << KEYWORD_IF << "|" << KEYWORD_ELIF << "|" << KEYWORD_ELSE << "|" << KEYWORD_END << ")";
         std::regex pattern(oss.str());
         std::smatch matchResult;
-        if (std::regex_search(name, matchResult, pattern)) {
+        if (std::regex_search(path.name, matchResult, pattern)) {
             case_id = env.branching.register_case();
             if (matchResult[2].str() == KEYWORD_IF) {
                 case_type = CaseType::IF;
@@ -34,7 +34,7 @@ namespace snt::dip {
             } else {
                 throw std::runtime_error("Unsupported case type: " + line.code);
             }
-            name = matchResult[1].str() + "C" + std::to_string(case_id);
+            path = Path(matchResult[1].str() + "C" + std::to_string(case_id));
             if (case_type == CaseType::IF || case_type == CaseType::ELIF) {
                 if (value_raw.empty())
                     throw std::runtime_error("Case node requires an input value: " + line.code);

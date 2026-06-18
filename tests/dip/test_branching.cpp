@@ -21,7 +21,7 @@ TEST_F(Branching, FirstCase) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 1);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "age");
+    EXPECT_EQ(node->path.name, "age");
 }
 
 TEST_F(Branching, SecondCase) {
@@ -38,7 +38,7 @@ TEST_F(Branching, SecondCase) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 1);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "height");
+    EXPECT_EQ(node->path.name, "height");
 }
 
 TEST_F(Branching, FirstAndSecondCase) {
@@ -55,7 +55,7 @@ TEST_F(Branching, FirstAndSecondCase) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 1);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "age");
+    EXPECT_EQ(node->path.name, "age");
 }
 
 TEST_F(Branching, ElseCase) {
@@ -71,7 +71,7 @@ TEST_F(Branching, ElseCase) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 1);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "weight");
+    EXPECT_EQ(node->path.name, "weight");
 }
 
 TEST_F(Branching, ConsecutiveBranches) {
@@ -90,9 +90,9 @@ TEST_F(Branching, ConsecutiveBranches) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "age");
+    EXPECT_EQ(node->path.name, "age");
     node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "weight");
+    EXPECT_EQ(node->path.name, "weight");
 }
 
 TEST_F(Branching, LowerIndentClosing) {
@@ -116,11 +116,11 @@ TEST_F(Branching, LowerIndentClosing) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 3);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "man.boy.age");
+    EXPECT_EQ(node->path.name, "man.boy.age");
     node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "man.age");
+    EXPECT_EQ(node->path.name, "man.age");
     node = env.nodes.at(2);
-    EXPECT_EQ(node->name, "weight");
+    EXPECT_EQ(node->path.name, "weight");
 }
 
 TEST_F(Branching, NestedBranches) {
@@ -149,9 +149,9 @@ TEST_F(Branching, NestedBranches) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "man.age");
+    EXPECT_EQ(node->path.name, "man.age");
     node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "weight");
+    EXPECT_EQ(node->path.name, "weight");
 }
 
 TEST_F(Branching, ValueFunction) {
@@ -164,7 +164,7 @@ TEST_F(Branching, ValueFunction) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 1);
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "age");
+    EXPECT_EQ(node->path.name, "age");
 }
 
 TEST_F(Branching, ValueInjection) {
@@ -177,7 +177,7 @@ TEST_F(Branching, ValueInjection) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
     dip::BaseNode::PointerType node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "age");
+    EXPECT_EQ(node->path.name, "age");
 }
 
 TEST_F(Branching, ValueExpression) {
@@ -190,5 +190,5 @@ TEST_F(Branching, ValueExpression) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
     dip::BaseNode::PointerType node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "age");
+    EXPECT_EQ(node->path.name, "age");
 }

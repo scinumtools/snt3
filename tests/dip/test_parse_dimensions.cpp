@@ -15,7 +15,7 @@ TEST(ParseDimensions, Array2D) {
     EXPECT_EQ(node->value_shape, val::Array::ShapeType({2, 3}));
     EXPECT_EQ(node->dtype, dip::NodeDtype::Integer);
     EXPECT_EQ(node->indent, 0);
-    EXPECT_EQ(node->name, "foo");
+    EXPECT_EQ(node->path.name, "foo");
     EXPECT_EQ(node->dimension, val::Array::RangeType({{2, val::Array::max_range}, {3, 3}}));
 }
 
@@ -30,7 +30,7 @@ TEST(ParseDimensions, Array3D) {
     EXPECT_EQ(node->value_shape, val::Array::ShapeType({2, 3, 2}));
     EXPECT_EQ(node->dtype, dip::NodeDtype::Integer);
     EXPECT_EQ(node->indent, 0);
-    EXPECT_EQ(node->name, "foo");
+    EXPECT_EQ(node->path.name, "foo");
     EXPECT_EQ(node->dimension, val::Array::RangeType({{2, val::Array::max_range}, {0, 3}, {2, 2}}));
 }
 

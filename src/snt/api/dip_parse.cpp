@@ -46,7 +46,7 @@ namespace snt::api {
         std::stringstream ss;
         if (print == PrintOptions::ALL) {
             for (const auto& node : vnodes) {
-                ss << node->name << " = " << node->to_string() << '\n';
+                ss << node->path.name << " = " << node->to_string() << '\n';
             }
         }
         return ss.str();

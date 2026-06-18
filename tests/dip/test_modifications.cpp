@@ -15,7 +15,7 @@ TEST(Modifications, DataTypeNode) {
     EXPECT_EQ(vnode->value_raw.at(0), "3");
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
 
     EXPECT_EQ(vnode->value->to_string(), "3");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
@@ -32,7 +32,7 @@ TEST(Modifications, ModificationNode) {
     EXPECT_EQ(vnode->value_raw.at(0), "3");
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
 
     EXPECT_EQ(vnode->value->to_string(), "3");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
@@ -61,7 +61,7 @@ TEST(Modifications, Declarations) {
     EXPECT_EQ(vnode->value_raw.at(0), "3");
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
 
     EXPECT_EQ(vnode->value->to_string(), "3");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);

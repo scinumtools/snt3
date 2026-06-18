@@ -81,7 +81,7 @@ namespace snt::dip {
         oss << "(.*[" << SIGN_CONDITION << "])C([0-9]+)";
         std::regex pattern(oss.str());
         std::smatch matchResult;
-        if (std::regex_search(node->name, matchResult, pattern)) {
+        if (std::regex_search(node->path.name, matchResult, pattern)) {
             std::shared_ptr<CaseNode> cnode = std::dynamic_pointer_cast<CaseNode>(node);
             if (cnode == nullptr)
                 throw std::runtime_error("Given node must be a case node:  " + node->line.code);
@@ -164,7 +164,7 @@ namespace snt::dip {
         size_t case_id = get_case_id();
         Case& cs = cases.at(case_id);
         // ending case at less indent
-        if (!(node->name.rfind(cs.path, 0) == 0)) {
+        if (!(node->path.name.rfind(cs.path, 0) == 0)) {
             close_branch();
         }
         // register node to a branch
@@ -172,7 +172,7 @@ namespace snt::dip {
             size_t branch_id = get_branch_id();
             node->branch_id = branch_id;
             node->case_id = get_case_id();
-            std::string node_name = clean_name(node->name);
+            std::string node_name = clean_name(node->path.name);
             Branch& branch = branches.at(branch_id);
             auto it = branch.nodes.find(node_name);
             if (it == branch.nodes.end()) {

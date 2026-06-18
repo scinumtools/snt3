@@ -38,7 +38,7 @@ namespace snt::dip {
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode and vnode->name == node_path) {
+                if (vnode and vnode->path.name == node_path) {
                     new_value.value = vnode->value->clone();
                     if (vnode->units)
                         new_value.units = vnode->units;
@@ -72,7 +72,7 @@ namespace snt::dip {
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode and vnode->name == node_path) {
+                if (vnode and vnode->path.name == node_path) {
                     new_value = vnode->value->clone();
                     if (to_unit != core::KEYWORD_NONE) {
                         // NOTE: If unit conversion is not required, the to_unit should be set to
@@ -139,21 +139,15 @@ namespace snt::dip {
             size_t p = node_pool.size(); // parent node index
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode and vnode->name.rfind(node_path_child, 0) == 0 and
-                    vnode->name.size() > node_path_child.size()) {
+                if (vnode and vnode->path.name.rfind(node_path_child, 0) == 0 and
+                    vnode->path.name.size() > node_path_child.size()) {
                     // filter nodes based on tags
                     if (!tags.empty() and !hasIntersection(vnode->tags, tags))
                         continue;
                     // select node
-                    std::string new_name = vnode->name.substr(node_path_child.size(), vnode->name.size());
-                    std::cout << "hallo node_path_child " << node_path_child << '\n';
-                    std::cout << "hallo name " << new_name << " " << vnode->name << '\n';
-                    std::cout << "hallo coll ";
-                    for (auto& col : vnode->collections)
-                        std::cout << col.path << " " << col.item << " | ";
-                    std::cout << '\n';
-                    new_nodes.push_back(vnode->clone(new_name, vnode->collections));
-                } else if (vnode and vnode->name == node_path) {
+                    std::string new_name = vnode->path.name.substr(node_path_child.size(), vnode->path.name.size());
+                    new_nodes.push_back(vnode->clone(Path(new_name)));
+                } else if (vnode and vnode->path.name == node_path) {
                     p = i;
                 }
             }
@@ -162,10 +156,10 @@ namespace snt::dip {
                 ValueNode::PointerType vnode = node_pool.at(p);
                 size_t pos = node_path.find_last_of('.');
                 if (pos != std::string::npos) {
-                    std::string new_name = vnode->name.substr(pos + 1, node_path.size());
-                    new_nodes.push_back(vnode->clone(new_name, vnode->collections));
+                    std::string new_name = vnode->path.name.substr(pos + 1, node_path.size());
+                    new_nodes.push_back(vnode->clone(Path(new_name)));
                 } else {
-                    new_nodes.push_back(vnode->clone(node_path, vnode->collections));
+                    new_nodes.push_back(vnode->clone(Path(node_path)));
                 }
             }
             break;

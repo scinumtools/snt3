@@ -13,7 +13,7 @@ TEST(Expressions, NestedParentheses) {
     EXPECT_EQ(env.nodes.size(), 1);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_TRUE(vnode);
     // 1e7 erg == 1 J
     // 6.2415e18 eV == 1 J
@@ -32,7 +32,7 @@ TEST(Expressions, MultipleLines) {
     EXPECT_EQ(env.nodes.size(), 1);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "2");
 
@@ -45,7 +45,7 @@ TEST(Expressions, MultipleLines) {
     EXPECT_EQ(env.nodes.size(), 3);
 
     vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->name, "c");
+    EXPECT_EQ(vnode->path.name, "c");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 }

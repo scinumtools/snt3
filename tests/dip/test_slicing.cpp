@@ -16,12 +16,12 @@ TEST(ValueSlicing, FixedRanges) {
     EXPECT_EQ(env.nodes.size(), 3);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[5, 6]");
 
     vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->name, "pop");
+    EXPECT_EQ(vnode->path.name, "pop");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [4, 5]]");
 }
@@ -35,7 +35,7 @@ TEST(ValueSlicing, OpenRangesBoolean) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[true, false, true]");
 }
@@ -49,7 +49,7 @@ TEST(ValueSlicing, OpenRangesInteger) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[1, 2, 3]");
 }
@@ -63,7 +63,7 @@ TEST(ValueSlicing, OpenRangesFloat) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[1, 2, 3]");
 }
@@ -77,7 +77,7 @@ TEST(ValueSlicing, OpenRangesString) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[\"a\", \"b\", \"c\"]");
 }
@@ -91,7 +91,7 @@ TEST(ValueSlicing, ArrayToScalar) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(1);
-    EXPECT_EQ(vnode->name, "crackle");
+    EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "4");
 }

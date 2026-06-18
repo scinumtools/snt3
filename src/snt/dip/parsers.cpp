@@ -266,7 +266,7 @@ namespace snt::dip {
                     node->value_raw.push_back(parser.value_raw.at(0));
                 } else {
                     throw std::runtime_error(
-                        "Could not parse column '" + node->name + "' from the table row: " + line.code
+                        "Could not parse column '" + node->path.name + "' from the table row: " + line.code
                     );
                 }
             }

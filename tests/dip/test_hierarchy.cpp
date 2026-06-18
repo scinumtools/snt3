@@ -11,16 +11,16 @@ TEST(Hierarchy, ParentChildNodes) {
     dip::Environment env = d.parse();
 
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "foo");
+    EXPECT_EQ(node->path.name, "foo");
 
     node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "foo.bar");
+    EXPECT_EQ(node->path.name, "foo.bar");
 
     node = env.nodes.at(2);
-    EXPECT_EQ(node->name, "foo.bim");
+    EXPECT_EQ(node->path.name, "foo.bim");
 
     node = env.nodes.at(3);
-    EXPECT_EQ(node->name, "bom");
+    EXPECT_EQ(node->path.name, "bom");
 }
 
 TEST(Hierarchy, GroupNodes) {
@@ -30,7 +30,7 @@ TEST(Hierarchy, GroupNodes) {
     dip::Environment env = d.parse();
 
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "foo.bar");
+    EXPECT_EQ(node->path.name, "foo.bar");
 }
 
 TEST(Hierarchy, IndentationChecking) {

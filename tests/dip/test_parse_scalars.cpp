@@ -18,7 +18,7 @@ TEST(ParseScalars, BooleanValue) {
     EXPECT_EQ(vnode->value_raw.at(0), "true");
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::Boolean);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo1");
+    EXPECT_EQ(vnode->path.name, "foo1");
 
     EXPECT_EQ(vnode->value->to_string(), "true");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
@@ -39,7 +39,7 @@ TEST(ParseScalars, IntegerValue) {
     EXPECT_EQ(vnode->value_raw.at(0), "23");
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::Integer);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo1");
+    EXPECT_EQ(vnode->path.name, "foo1");
 
     EXPECT_EQ(vnode->value->to_string(), "23");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
@@ -64,7 +64,7 @@ TEST(ParseScalars, FloatValue) {
     EXPECT_EQ(vnode->value_raw.at(0), "23");
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::Float);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo1");
+    EXPECT_EQ(vnode->path.name, "foo1");
 
     EXPECT_EQ(vnode->value->to_string(), "23");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Float64);
@@ -106,7 +106,7 @@ TEST(ParseScalars, StringValue) {
     EXPECT_EQ(vnode->value_raw.at(0), "bar");
     EXPECT_EQ(vnode->dtype, dip::NodeDtype::String);
     EXPECT_EQ(vnode->indent, 0);
-    EXPECT_EQ(vnode->name, "foo");
+    EXPECT_EQ(vnode->path.name, "foo");
 
     EXPECT_EQ(vnode->value->to_string(), "\"bar\"");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::String);
@@ -122,21 +122,20 @@ TEST(ParseScalars, Cloning) {
     dip::Environment env = d.parse();
 
     dip::ValueNode::PointerType clone;
-    std::vector<dip::CollectionAccess> col;
 
     dip::ValueNode::PointerType jerk = env.nodes.at(0);
-    clone = jerk->clone("clone", col);
+    clone = jerk->clone(dip::Path("clone"));
     EXPECT_EQ(clone->to_string(), "true");
 
     dip::ValueNode::PointerType snap = env.nodes.at(1);
-    clone = snap->clone("clone", col);
+    clone = snap->clone(dip::Path("clone"));
     EXPECT_EQ(clone->to_string(), "3 cm");
 
     dip::ValueNode::PointerType crackle = env.nodes.at(2);
-    clone = crackle->clone("clone", col);
+    clone = crackle->clone(dip::Path("clone"));
     EXPECT_EQ(clone->to_string(), "1.23 J");
 
     dip::ValueNode::PointerType pop = env.nodes.at(3);
-    clone = pop->clone("clone", col);
+    clone = pop->clone(dip::Path("clone"));
     EXPECT_EQ(clone->to_string(), "\"foo\"");
 }

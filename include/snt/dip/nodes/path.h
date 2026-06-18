@@ -24,20 +24,27 @@ namespace snt::dip {
         };
 
         /**
-         * @struct CollectionAccess
+         * @struct Path::CollectionAccess
          * @brief Collection node information
          */
         struct CollectionAccess {
-            std::string path;    ///< Paths leading to a collection
-            std::string item;    ///< Item value
-            CollectionType type; ////< Collection type
+            std::string path;          ///< Paths leading to a collection
+            std::string item;          ///< Item value
+            Path::CollectionType type; ////< Collection type
         };
 
-        std::string name;                          ///< fully qualified node path
-        std::vector<CollectionAccess> collections; ///< list of collection access pairs derived from a node name
+        std::string name;                                ///< fully qualified node path
+        std::vector<Path::CollectionAccess> collections; ///< list of collection access pairs derived from a node name
 
         /**
          * @brief Class constructor
+         */
+        Path() = default;
+
+        /**
+         * @brief Class constructor
+         *
+         * @param path Path that will be parsed
          */
         Path(const std::string& path);
     };

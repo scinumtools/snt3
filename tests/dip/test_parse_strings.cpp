@@ -18,10 +18,10 @@ TEST(ParseStrings, BlockQuotes) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "foo");
+    EXPECT_EQ(node->path.name, "foo");
     EXPECT_EQ(node->value_raw.at(0), "\nbar1\nbar2\n");
     node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "bar");
+    EXPECT_EQ(node->path.name, "bar");
     EXPECT_EQ(node->value_raw.at(0), " ");
 }
 
@@ -34,10 +34,10 @@ TEST(ParseStrings, EscapeSymbols) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "foo");
+    EXPECT_EQ(node->path.name, "foo");
     EXPECT_EQ(node->value_raw.at(0), "foo \" foo ' foo \n foo");
     node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "bar");
+    EXPECT_EQ(node->path.name, "bar");
     EXPECT_EQ(node->value_raw.at(0), "bar \" bar ' bar \n bar");
 }
 
@@ -50,9 +50,9 @@ TEST(ParseStrings, CommentSymbol) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::BaseNode::PointerType node = env.nodes.at(0);
-    EXPECT_EQ(node->name, "foo");
+    EXPECT_EQ(node->path.name, "foo");
     EXPECT_EQ(node->value_raw.at(0), "bar#baz");
     node = env.nodes.at(1);
-    EXPECT_EQ(node->name, "baz");
+    EXPECT_EQ(node->path.name, "baz");
     EXPECT_EQ(node->value_raw, val::Array::StringType({"foo#", "bar"}));
 }
