@@ -102,6 +102,7 @@ The result is a configuration that is both machine-evaluable and semantically va
 - [3.7. Functions](syntax/functions.md)
 - [3.8. Properties](syntax/properties.md)
 - [3.9. Conditions](syntax/conditions.md)
+- [3.10. Schemas](syntax/schemas.md)
  
 ## 4. File Format
 
