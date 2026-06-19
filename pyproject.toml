@@ -11,7 +11,7 @@ build-backend = "scikit_build_core.build"
 name = "scinumtools3"
 version = "v0.4.9"
 description = "Python bindings for the scinumtools3 C++ core"
-readme = "README.md"
+readme = "bindings/python/README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
