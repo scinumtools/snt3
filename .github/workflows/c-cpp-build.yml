@@ -11,6 +11,8 @@ on:
       - 'examples/**'
       - 'apps/**'
       - 'tests/**'
+      - 'CMakeLists.txt'
+      - '.github/workflows/c-cpp-build.yml'
   pull_request:
     branches: [ "main" ]
     paths:
@@ -21,6 +23,8 @@ on:
       - 'examples/**'
       - 'apps/**'
       - 'tests/**'
+      - 'CMakeLists.txt'
+      - '.github/workflows/c-cpp-build.yml'
 
 jobs:
   build:
