@@ -7,6 +7,7 @@
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg?logo=c%2B%2B&logoColor=white)
 ![GCC](https://img.shields.io/badge/gcc-%3E%3D11-blue)
 ![Clang](https://img.shields.io/badge/clang-%3E%3D20-blue)
+[![PyPI version](https://badge.fury.io/py/scinumtools3.svg)](https://badge.fury.io/py/scinumtools3)   
 
 ---
 
