@@ -1,4 +1,4 @@
-name: Linux Build
+name: Build
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -49,6 +49,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtest-dev pybind11-dev
+          
+      - name: macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install googletest pybind11
           
       - name: Build
         run: ./setup.sh --github-workflows -b
