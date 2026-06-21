@@ -16,19 +16,19 @@ def test_add_string():
     assert env.nodes[0].name == "foo"
     assert env.nodes[1].name == "bar"
 
-def test_add_file():
+def test_add_file(data_dir):
     
     dip = DIP()
-    dip.add_file("dip/example.dip")
+    dip.add_file(str(data_dir / "dip/example.dip"))
     env = dip.parse()
     assert env.size == 2
     assert env.nodes[0].name == "foo"
     assert env.nodes[1].name == "bar"
 
-def test_add_source():
+def test_add_source(data_dir):
 
     dip = DIP()
-    dip.add_source("example", "dip/example.dip")
+    dip.add_source("example", str(data_dir / "dip/example.dip"))
     dip.add_string("baz int = {example?bar}")
     env = dip.parse()
     assert env.size == 1

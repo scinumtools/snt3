@@ -60,7 +60,7 @@ def test_request_nodes():
     dip.add_string("bar bool[2,3] = [[true,false,true],[false,true,false]]")
     env = dip.parse()
 
-    nodes = env.request("?bar")
+    nodes = env.request_nodes("?bar")
     assert len(nodes) == 1
     assert nodes[0].name == "bar"
     np.testing.assert_array_equal(nodes[0].value, np.array([[True,False,True],[False,True,False]]))
@@ -71,7 +71,7 @@ def test_request_nodes():
     dip.add_string("foo.baz int = 3")
     env = dip.parse()
 
-    nodes = env.request("?foo")
+    nodes = env.request_nodes("?foo")
     assert len(nodes) == 2
     assert nodes[0].name == "bar"
     assert nodes[0].value == False
@@ -86,15 +86,15 @@ def test_request_nodes():
     dip.add_string("  !tags [\"crackle\",\"pop\"]")
     env = dip.parse()
 
-    nodes = env.request("?foo",["crackle"])
+    nodes = env.request_nodes("?foo",["crackle"])
     assert len(nodes) == 2
     assert nodes[0].name == "bar"
     assert nodes[1].name == "baz"
 
-    nodes = env.request("?foo",["snap"])
+    nodes = env.request_nodes("?foo",["snap"])
     assert len(nodes) == 1
     assert nodes[0].name == "bar"
 
-    nodes = env.request("?foo",["pop"])
+    nodes = env.request_nodes("?foo",["pop"])
     assert len(nodes) == 1
     assert nodes[0].name == "baz"

@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+import pytest
 
 repo = Path(__file__).resolve().parents[3]
 
@@ -17,3 +18,7 @@ print("\nscinumtools3 spec =", spec)
 if spec:
     print("origin =", spec.origin)
     print("locations =", spec.submodule_search_locations)
+
+@pytest.fixture(scope="session")
+def data_dir():
+    return Path(__file__).parent

@@ -24,7 +24,7 @@ void init_environment(py::module_& m) {
     env.def_property_readonly("size", [](const dip::Environment& e) { return e.nodes.size(); });
 
     env.def(
-        "request",
+        "request_nodes",
         [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& tags) {
             return e.request_nodes(path, dip::RequestType::Reference, tags);
         },

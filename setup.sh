@@ -116,7 +116,13 @@ function test_code {
     	fi
     elif [[ "${parts[0]}" == "pytest" ]]; then
 	export PYTHONPATH=$PWD/build/lib:$PYTHONPATH
-	pytest bindings/python/tests/${parts[1]}/test_${parts[2]}.py #::test_${parts[3]}"
+    	if [[ "${parts[1]}" != "" && "${parts[2]}" != "" ]]; then        # eg. pytest.puq.unit_system
+	    pytest bindings/python/tests/${parts[1]}/test_${parts[2]}.py #::test_${parts[3]}"
+    	elif [[ "${parts[1]}" != "" ]]; then                             # eg. pytest.puq
+	    pytest bindings/python/tests/${parts[1]}/test_*.py           #::test_${parts[3]}"
+        else                                                             # eg. pytest
+            pytest bindings/python/tests/${parts[1]}                     #::test_${parts[3]}"
+        fi
     else
 	cd $DIR_BUILD
 	ctest --output-on-failure
