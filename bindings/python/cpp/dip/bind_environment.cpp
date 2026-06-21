@@ -31,9 +31,15 @@ void init_environment(py::module_& m) {
         py::arg("path"),
         py::arg("tags") = std::vector<std::string>{}
     );
+
+    env.def(
+        "request_value",
+        [](const dip::Environment& e, const std::string& path, const std::string& to_unit) {
+            val::BaseValue::PointerType value = e.request_value(path, dip::RequestType::Reference, to_unit);
+        },
+        py::arg("path"),
+        py::arg("to_units") = ""
+    );
+
     // env.def("request_code", &dip::Environment::request_code, py::arg("source_name"));
-    // env.def("request_value", &dip::Environment::request_value, py::arg("request"),
-    // py::arg("rtype"), py::arg("to_units") = ""); env.def("request_nodes",
-    // &dip::Environment::request_nodes, py::arg("request"), py::arg("rtype")); env.def("get_value",
-    // &dip::Environment::get_value, py::arg("index"));
 }

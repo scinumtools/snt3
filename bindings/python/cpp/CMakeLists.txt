@@ -59,6 +59,11 @@ if (ENABLE_SNT_PYBIND)
    add_subdirectory(snt)
 endif()
 
+
+if (ENABLE_VAL_PYBIND)
+   add_subdirectory(val)
+endif()
+
 if (ENABLE_PUQ_PYBIND)
    add_subdirectory(puq)
 endif()

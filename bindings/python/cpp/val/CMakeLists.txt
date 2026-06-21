@@ -1,0 +1,8 @@
+target_compile_definitions(${MODULE_NAME} PRIVATE ENABLE_VAL_PYBIND)
+file(GLOB SOURCE_FILES "./*.cpp")    
+target_sources(${MODULE_NAME} PRIVATE ${SOURCE_FILES})
+target_link_libraries(${MODULE_NAME} PRIVATE snt-val)
+
+if (ENABLE_VAL_PYTEST)
+    register_pytests(val)
+endif()

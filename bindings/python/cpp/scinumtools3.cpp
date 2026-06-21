@@ -5,6 +5,9 @@ namespace py = pybind11;
 #ifdef ENABLE_SNT_PYBIND
 void init_snt(py::module_&);
 #endif
+#ifdef ENABLE_VAL_PYBIND
+void init_val(py::module_&);
+#endif
 #ifdef ENABLE_PUQ_PYBIND
 void init_puq(py::module_&);
 #endif
@@ -22,22 +25,37 @@ PYBIND11_MODULE(_core, m) {
     m.attr("__version__") = CODE_VERSION;
 
 #ifdef ENABLE_SNT_PYBIND
-    auto snt = m.def_submodule("snt", "Scinumtools common structures and settings");
-    init_snt(snt);
+    {
+        auto smod = m.def_submodule("snt", "Scinumtools common structures and settings");
+        init_snt(smod);
+    }
+#endif
+
+#ifdef ENABLE_VAL_PYBIND
+    {
+        auto smod = m.def_submodule("val", "Array values");
+        init_val(smod);
+    }
 #endif
 
 #ifdef ENABLE_PUQ_PYBIND
-    auto puq = m.def_submodule("puq", "Physical Units & Quantities");
-    init_puq(puq);
+    {
+        auto smod = m.def_submodule("puq", "Physical Units & Quantities");
+        init_puq(smod);
+    }
 #endif
 
 #ifdef ENABLE_DIP_PYBIND
-    auto dip = m.def_submodule("dip", "Dimensional Input Parameters");
-    init_dip(dip);
+    {
+        auto smod = m.def_submodule("dip", "Dimensional Input Parameters");
+        init_dip(smod);
+    }
 #endif
 
 #ifdef ENABLE_API_PYBIND
-    auto api = m.def_submodule("api", "Application programming interface");
-    init_api(api);
+    {
+        auto smod = m.def_submodule("api", "Application programming interface");
+        init_api(smod);
+    }
 #endif
 }

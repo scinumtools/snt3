@@ -21,4 +21,8 @@ if spec:
 
 @pytest.fixture(scope="session")
 def data_dir():
+    """ This fixture is used as a prefix path for all test files
+    in this pytest directory, e.g.:
+    str(data_dir / "dip/example.dip")
+    """
     return Path(__file__).parent
