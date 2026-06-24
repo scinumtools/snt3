@@ -291,9 +291,9 @@ namespace snt::puq {
                 {"spin", {"kg*m2*s-1"}},
 
             }),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_SI.h"
-            })
+            }
 
         };
 

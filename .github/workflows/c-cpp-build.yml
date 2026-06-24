@@ -66,12 +66,6 @@ jobs:
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Install pybind11  
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          pip install pybind11
-
       - name: Build (Linux/macOS)
         if: runner.os != 'Windows'
         run: ./setup.sh --github-workflows -b

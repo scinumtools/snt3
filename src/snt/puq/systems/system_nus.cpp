@@ -48,9 +48,9 @@ namespace snt::puq {
                 {"F", {"E_h/{a_0}"}},
                 {"S_a", {"{#hbar}"}},
             }),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_AU.h"
-            })};
+            }};
 
         SystemDataType PU = {
             "PU", "Planck units",
@@ -74,9 +74,9 @@ namespace snt::puq {
                 {"rho", {"{#c}5/{#hbar}*{#G}-2"}},
                 {"a", {"({#c}7/{#hbar}/{#G})1:2"}},
             }),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_PU.h"
-            })};
+            }};
 
         // https://www.seas.upenn.edu/~amyers/NaturalUnits.pdf
         SystemDataType SRU = {
@@ -97,9 +97,9 @@ namespace snt::puq {
                 {"a", {"m-1", "{#c}2"}},
                 {"rho_E", {"kg/m3", "{#c}2"}},
             }),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_SRU.h"
-            })};
+            }};
 
         SystemDataType GRU = {
             "GRU", "Units for general relativity",
@@ -129,9 +129,9 @@ namespace snt::puq {
                 {"q", {""
                        "{#e}/{e}"}},
             }),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_GRU.h"
-            })};
+            }};
 
         SystemDataType GEO = {
             "GEO", "Geometrized units",
@@ -152,9 +152,9 @@ namespace snt::puq {
                 {"a", {"m-1", "{#c}2"}},
                 {"rho_E", {"m-2", "{#c}4/{#G}"}},
             }),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_GEO.h"
-            })};
+            }};
 
     } // namespace SystemData
 } // namespace snt::puq

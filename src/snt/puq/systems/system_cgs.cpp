@@ -90,9 +90,9 @@ namespace snt::puq {
                                                        {"Phi_M", {"statWb", "({c}*100)*1e-8"}},
                                                        {"mu", {"s2/cm2", "4*{pi}*({c}*100)2*1e-7"}},
                                                    }),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_ESU.h"
-            })};
+            }};
 
         const UnitListType _GU_EMU_UNITS = {
             {"G", {Utype::LIN, "cm-1:2*g1:2*s-1", "Gauss", false, {}}},
@@ -115,9 +115,9 @@ namespace snt::puq {
             "GU", "Gaussian CGS units",
             _BASE_UNITS + _CGS_UNITS + _GU_ESU_UNITS + _GU_EMU_UNITS,
             _CGS_QUANTITIES + _GU_ESU_QUANTITIES + _GU_EMU_QUANTITIES,
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_GU.h"
-            })};
+            }};
 
         SystemDataType EMU = {
             "EMU", "Electromagnetic CGS units",
@@ -147,9 +147,9 @@ namespace snt::puq {
                                                        {"C", {"abF", "1e9"}},
                                                        {"L", {"abH", "1e-9"}},
                                                    }),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_EMU.h"
-            })};
+            }};
 
     } // namespace SystemData
 } // namespace snt::puq

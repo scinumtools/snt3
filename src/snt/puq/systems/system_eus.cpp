@@ -113,9 +113,9 @@ namespace snt::puq {
 
                                        }),
             _EUS_QUANTITIES + QuantityListType({}),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_IU.h"
-            })};
+            }};
 
         SystemDataType US = {
             "US", "United States customary units",
@@ -169,9 +169,9 @@ namespace snt::puq {
 
                                        }),
             _EUS_QUANTITIES + QuantityListType({}),
-            DimensionMapType({
+            DimensionMapType{
 #include "dmaps/dmap_US.h"
-            })};
+            }};
 
     } // namespace SystemData
 } // namespace snt::puq
