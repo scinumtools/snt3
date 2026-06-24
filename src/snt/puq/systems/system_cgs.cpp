@@ -77,19 +77,19 @@ namespace snt::puq {
 
         SystemDataType ESU = {
             "ESU", "Electrostatic CGS units",
-            _BASE_UNITS + _CGS_UNITS + _GU_ESU_UNITS + UnitListType({
+            _BASE_UNITS + _CGS_UNITS + _GU_ESU_UNITS + UnitListType{
                                                            {"statT", {Utype::LIN, "cm-3:2*g1:2", "Stattesla", false, {}}},
                                                            {"statWb", {Utype::LIN, "cm2*g", "Statweber", false, {}}},
                                                            // constants
                                                            {"{mu_B}", {Utype::CST, "2.780278273e-10*statA*cm2 ", "Bohr magneton", false, {}}},
-                                                       }),
-            _CGS_QUANTITIES + _GU_ESU_QUANTITIES + QuantityListType({
+                                                       },
+            _CGS_QUANTITIES + _GU_ESU_QUANTITIES + QuantityListType{
                                                        {"B", {"statT", "1e-4*({c}*100)"}}, // we need {c}*100 because we convert to MKS during conversions
                                                        {"H", {"statA/cm", "1e3/(4*{pi}*({c}*100))"}},
                                                        {"mm", {"statA*cm2", "1e-3/({c}*100)"}},
                                                        {"Phi_M", {"statWb", "({c}*100)*1e-8"}},
                                                        {"mu", {"s2/cm2", "4*{pi}*({c}*100)2*1e-7"}},
-                                                   }),
+                                                   },
             DimensionMapType{
 #include "dmaps/dmap_ESU.h"
             }};
@@ -121,7 +121,7 @@ namespace snt::puq {
 
         SystemDataType EMU = {
             "EMU", "Electromagnetic CGS units",
-            _BASE_UNITS + _CGS_UNITS + _GU_EMU_UNITS + UnitListType({
+            _BASE_UNITS + _CGS_UNITS + _GU_EMU_UNITS + UnitListType{
                                                            {"Bi", {Utype::LIN, "dyn1:2", "biot", false, {}}},
                                                            {"abA", {Utype::LIN, "Bi", "Abampere", false, {}}},
                                                            {"abC", {Utype::LIN, "Bi*s", "Abcoulomb", false, {}}},
@@ -132,8 +132,8 @@ namespace snt::puq {
                                                            {"abH", {Utype::LIN, "cm", "Abhenry", false, {}}},
                                                            // constants
                                                            {"{e}", {Utype::CST, "1.602176634e-20*abC", "elementary charge", false, {}}},
-                                                       }),
-            _CGS_QUANTITIES + _GU_EMU_QUANTITIES + QuantityListType({
+                                                       },
+            _CGS_QUANTITIES + _GU_EMU_QUANTITIES + QuantityListType{
                                                        {"q", {"abC", "1e1"}},
                                                        {"I", {"abA", "1e1"}},
                                                        {"phi_e", {"abV", "1e-8"}},
@@ -146,7 +146,7 @@ namespace snt::puq {
                                                        {"rho_e", {"abOhm*cm", "1e-11"}},
                                                        {"C", {"abF", "1e9"}},
                                                        {"L", {"abH", "1e-9"}},
-                                                   }),
+                                                   },
             DimensionMapType{
 #include "dmaps/dmap_EMU.h"
             }};

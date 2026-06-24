@@ -5,7 +5,7 @@ namespace snt::puq {
 
         SystemDataType AU = {
             "AU", "Atomic units",
-            _BASE_UNITS + _BASE_CONSTANTS + UnitListType({
+            _BASE_UNITS + _BASE_CONSTANTS + UnitListType{
                                                 {"{hbar}", {UT_LIN_CST, "1", "reduced Pl. con.", false, {}}},
                                                 {"{e}", {UT_LIN_CST, "1", "elementary charge", false, {}}},
                                                 {"{m_e}", {UT_LIN_CST, "1", "electr. rest mass", false, {}}},
@@ -17,8 +17,8 @@ namespace snt::puq {
                                                 {"{r_e}", {UT_LIN_CST, "{alpha}2*{a_0}", "class. e. radius", false, {}}},
                                                 {"{lbar}", {UT_LIN_CST, "{alpha}*{a_0}", "red. Com. wavele.", false, {}}},
                                                 {"{m_p}", {UT_LIN_CST, "1836*{#m_e}", "proton mass", false, {}}},
-                                            }),
-            QuantityListType({
+                                            },
+            QuantityListType{
                 {"l", {"{a_0}"}},
                 {"m", {"{#m_e}"}},
                 {"t", {"{#hbar}/E_h"}},
@@ -47,20 +47,20 @@ namespace snt::puq {
                 {"E", {"E_h"}},
                 {"F", {"E_h/{a_0}"}},
                 {"S_a", {"{#hbar}"}},
-            }),
+            },
             DimensionMapType{
 #include "dmaps/dmap_AU.h"
             }};
 
         SystemDataType PU = {
             "PU", "Planck units",
-            _BASE_UNITS + _BASE_CONSTANTS + UnitListType({
+            _BASE_UNITS + _BASE_CONSTANTS + UnitListType{
                                                 {"{c}", {UT_LIN_CST, "1", "speed of light", false, {}}},
                                                 {"{G}", {UT_LIN_CST, "1", "grav. const.", false, {}}},
                                                 {"{hbar}", {UT_LIN_CST, "1", "reduced Pl. con.", false, {}}},
                                                 {"{k_B}", {UT_LIN_CST, "1", "Boltzmann const.", false, {}}},
-                                            }),
-            QuantityListType({
+                                            },
+            QuantityListType{
                 {"l", {"({#hbar}*{#G}/{#c}3)1:2"}},
                 {"m", {"({#hbar}*{#c}/{#G})1:2"}},
                 {"t", {"({#hbar}*{#G}/{#c}5)1:2"}},
@@ -73,7 +73,7 @@ namespace snt::puq {
                 {"F", {"{#c}4/{#G}"}},
                 {"rho", {"{#c}5/{#hbar}*{#G}-2"}},
                 {"a", {"({#c}7/{#hbar}/{#G})1:2"}},
-            }),
+            },
             DimensionMapType{
 #include "dmaps/dmap_PU.h"
             }};
@@ -81,10 +81,10 @@ namespace snt::puq {
         // https://www.seas.upenn.edu/~amyers/NaturalUnits.pdf
         SystemDataType SRU = {
             "SRU", "Units for special relativity",
-            _BASE_UNITS + _BASE_CONSTANTS + UnitListType({
+            _BASE_UNITS + _BASE_CONSTANTS + UnitListType{
                                                 {"{c}", {UT_LIN_CST, "1", "speed of light", false, {}}},
-                                            }),
-            QuantityListType({
+                                            },
+            QuantityListType{
                 {"l", {"m"}},
                 {"m", {"kg"}},
                 {"t", {"m", "{#c}-1"}},
@@ -96,14 +96,14 @@ namespace snt::puq {
                 {"F", {"kg/m", "{#c}2"}},
                 {"a", {"m-1", "{#c}2"}},
                 {"rho_E", {"kg/m3", "{#c}2"}},
-            }),
+            },
             DimensionMapType{
 #include "dmaps/dmap_SRU.h"
             }};
 
         SystemDataType GRU = {
             "GRU", "Units for general relativity",
-            _BASE_UNITS + _BASE_CONSTANTS + UnitListType({
+            _BASE_UNITS + _BASE_CONSTANTS + UnitListType{
                                                 {"{c}", {UT_LIN_CST, "1", "speed of light", false, {}}},
                                                 {"{hbar}", {UT_LIN_CST, "1", "reduced Pl. con.", false, {}}},
                                                 {"{eps_0}", {UT_LIN_CST, "1", "permit. of vac.", false, {}}},
@@ -113,8 +113,8 @@ namespace snt::puq {
                                                 {"{pi}", {UT_LIN_CST, "{#pi}", "pi num.", false, {}}},
                                                 {"{alpha}", {UT_LIN_CST, "{#e}2/(4*{pi}*{#eps_0}*{#hbar}*{#c})", "fine-str. const.", false, {}}},
                                                 {"{e}", {UT_LIN_CST, "(4*{pi}*{alpha})1:2", "elem. charge", false, {}}},
-                                            }),
-            QuantityListType({
+                                            },
+            QuantityListType{
                 {"l", {"GeV-1", "{#hbar}*{#c}"}},
                 {"m", {"GeV", "{#c}-2"}},
                 {"t", {"GeV-1", "{#hbar}"}},
@@ -128,18 +128,18 @@ namespace snt::puq {
                 {"rho_E", {"GeV4", "({#hbar}*{#c})-3"}},
                 {"q", {""
                        "{#e}/{e}"}},
-            }),
+            },
             DimensionMapType{
 #include "dmaps/dmap_GRU.h"
             }};
 
         SystemDataType GEO = {
             "GEO", "Geometrized units",
-            _BASE_UNITS + _BASE_CONSTANTS + UnitListType({
+            _BASE_UNITS + _BASE_CONSTANTS + UnitListType{
                                                 {"{c}", {UT_LIN_CST, "1", "speed of light", false, {}}},
                                                 {"{G}", {UT_LIN_CST, "1", "grav. const.", false, {}}},
-                                            }),
-            QuantityListType({
+                                            },
+            QuantityListType{
                 {"l", {"m"}},
                 {"m", {"m", "{#c}2/{#G}"}},
                 {"t", {"m", "{#c}-1"}},
@@ -151,7 +151,7 @@ namespace snt::puq {
                 {"F", {"1", "{#c}4/{#G}"}},
                 {"a", {"m-1", "{#c}2"}},
                 {"rho_E", {"m-2", "{#c}4/{#G}"}},
-            }),
+            },
             DimensionMapType{
 #include "dmaps/dmap_GEO.h"
             }};

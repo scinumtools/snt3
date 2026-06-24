@@ -185,7 +185,7 @@ namespace snt::puq {
         SystemDataType SI = {
             "SI", "International System of Units",
             _BASE_UNITS + _BASE_CONSTANTS + GetSIUnits(),
-            QuantityListType({
+            QuantityListType{
                 {"l", {"m"}},
                 {"m", {"g"}},
                 {"t", {"s"}},
@@ -290,7 +290,7 @@ namespace snt::puq {
                 {"S_a", {"J/Hz"}},
                 {"spin", {"kg*m2*s-1"}},
 
-            }),
+            },
             DimensionMapType{
 #include "dmaps/dmap_SI.h"
             }

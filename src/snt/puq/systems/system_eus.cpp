@@ -85,7 +85,7 @@ namespace snt::puq {
 
         SystemDataType IU = {
             "IU", "Imperial units",
-            _BASE_UNITS + _EUS_UNITS + UnitListType({
+            _BASE_UNITS + _EUS_UNITS + UnitListType{
 
                                            // units of length
                                            {"bc", {Utype::LIN, "8.4667e-3*m", "barleycorn", false, {}}},
@@ -111,15 +111,15 @@ namespace snt::puq {
                                            {"st", {Utype::LIN, "6.35029318e3*g", "stone", false, {}}},
                                            {"qr", {Utype::LIN, "12.70058636e3*g", "quarter", false, {}}},
 
-                                       }),
-            _EUS_QUANTITIES + QuantityListType({}),
+                                       },
+            _EUS_QUANTITIES + QuantityListType{},
             DimensionMapType{
 #include "dmaps/dmap_IU.h"
             }};
 
         SystemDataType US = {
             "US", "United States customary units",
-            _BASE_UNITS + _EUS_UNITS + UnitListType({
+            _BASE_UNITS + _EUS_UNITS + UnitListType{
 
                                            // units of length
                                            {"p", {Utype::LIN, "352.778e-6*m", "point", false, {}}},
@@ -167,8 +167,8 @@ namespace snt::puq {
                                            {"ozt", {Utype::LIN, "31.1034768*g", "troy ounce", false, {}}},
                                            {"lbt", {Utype::LIN, "373.241721*g", "troy pound", false, {}}},
 
-                                       }),
-            _EUS_QUANTITIES + QuantityListType({}),
+                                       },
+            _EUS_QUANTITIES + QuantityListType{},
             DimensionMapType{
 #include "dmaps/dmap_US.h"
             }};
