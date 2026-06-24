@@ -28,21 +28,23 @@ namespace snt::dip {
 
         const std::string& get_path() const;
 
-        const std::string to_string() const;
-
         val::BaseValue::PointerType get_value() const { return env_->request_value("?" + path_); };
 
-        template <typename T> std::vector<T> get_vector() const {
+        val::Array::ShapeType get_shape() const;
+
+        template <typename T> T to_scalar(size_t index = 0) const {
+            val::BaseValue::PointerType value = env_->request_value("?" + path_);
+            val::ArrayValue<T>* val = dynamic_cast<val::ArrayValue<T>*>(value.get());
+            return val->get_value(index);
+        };
+
+        template <typename T> std::vector<T> to_vector() const {
             val::BaseValue::PointerType value = env_->request_value("?" + path_);
             val::ArrayValue<T>* val = dynamic_cast<val::ArrayValue<T>*>(value.get());
             return val->get_values();
         };
 
-        template <typename T> T get_scalar(size_t index = 0) const {
-            val::BaseValue::PointerType value = env_->request_value("?" + path_);
-            val::ArrayValue<T>* val = dynamic_cast<val::ArrayValue<T>*>(value.get());
-            return val->get_value(index);
-        };
+        const std::string to_string() const;
     };
 
 } // namespace snt::dip

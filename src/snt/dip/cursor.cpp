@@ -45,6 +45,11 @@ namespace snt::dip {
         return path_;
     }
 
+    val::Array::ShapeType Cursor::get_shape() const {
+        val::BaseValue::PointerType value = env_->request_value("?" + path_);
+        return value->get_shape();
+    }
+
     const std::string Cursor::to_string() const {
         val::BaseValue::PointerType value = env_->request_value("?" + path_);
         return path_ + " = " + value->to_string();
