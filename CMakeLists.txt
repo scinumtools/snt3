@@ -108,7 +108,15 @@ if(
     ENABLE_DIP_GTEST OR
     ENABLE_MAT_GTEST
 )
-  find_package(GTest REQUIRED)
+  find_package(GTest QUIET)  # usualy for Linux and macOS build
+  if(NOT GTest_FOUND)  # needed for Windows build
+      include(FetchContent)
+      FetchContent_Declare(
+          googletest
+          URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
+      )
+      FetchContent_MakeAvailable(googletest)
+  endif()
   include_directories(${GTEST_INCLUDE_DIRS})
   include(GoogleTest)
   enable_testing()
