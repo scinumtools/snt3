@@ -66,9 +66,14 @@ jobs:
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Set up vcpkg
+      - name: Install vcpkg
         if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v11
+        shell: pwsh
+        run: |
+          git clone https://github.com/microsoft/vcpkg $env:RUNNER_TEMP\vcpkg
+          & "$env:RUNNER_TEMP\vcpkg\bootstrap-vcpkg.bat"
+          & "$env:RUNNER_TEMP\vcpkg\vcpkg.exe" install gtest:x64-windows pybind11:x64-windows
+          echo "VCPKG_ROOT=$env:RUNNER_TEMP\vcpkg" >> $env:GITHUB_ENV
 
       - name: Install Windows dependencies
         if: runner.os == 'Windows'
