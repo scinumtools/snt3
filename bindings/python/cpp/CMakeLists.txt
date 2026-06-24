@@ -1,5 +1,14 @@
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
-find_package(pybind11 CONFIG REQUIRED)
+find_package(pybind11 QUIET)  # for Linux and macOS build
+if(NOT pybind11_FOUND)        # for Windows build
+    include(FetchContent)
+    FetchContent_Declare(
+        pybind11
+        GIT_REPOSITORY https://github.com/pybind/pybind11.git
+        GIT_TAG v3.0.1
+    )
+    FetchContent_MakeAvailable(pybind11)
+endif()
 
 set(MODULE_NAME _core)
 
