@@ -1,7 +1,7 @@
 #ifndef PUQ_EXPONENT_H
 #define PUQ_EXPONENT_H
 
-#import <snt/puq/settings.h>
+#include <snt/puq/settings.h>
 #include <snt/puq/unit_format.h>
 #include <variant>
 

@@ -1,8 +1,8 @@
-#import "snt/exs/token.h"
-#import "snt/exs/token_list_base.h"
+#include "snt/exs/token.h"
+#include "snt/exs/token_list_base.h"
 
-#import <snt/dip/solvers/logical_atom.h>
-#import <snt/dip/solvers/logical_operators.h>
+#include <snt/dip/solvers/logical_atom.h>
+#include <snt/dip/solvers/logical_operators.h>
 
 namespace snt::dip {
 
