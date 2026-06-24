@@ -161,7 +161,7 @@ namespace snt::dip {
             if (node == nullptr)
                 node = PropertyNode::is_node(parser);
             if (node == nullptr)
-                parser.part_name();
+                parser.part_path();
             if (node == nullptr)
                 node = GroupNode::is_node(parser);
             if (node == nullptr)
@@ -210,7 +210,7 @@ namespace snt::dip {
                 break;
             // parse a node from the current line
             Parser parser(line);
-            parser.part_name();
+            parser.part_path();
             parser.part_type();
             parser.part_dimension();
             parser.part_units();

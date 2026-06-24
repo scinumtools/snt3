@@ -10,6 +10,7 @@ using namespace snt;
 
 void init_environment(py::module_& m);
 void init_value_node(py::module_& m);
+void init_cursor(py::module_& m);
 
 void init_dip(py::module_& m) {
 
@@ -20,6 +21,7 @@ void init_dip(py::module_& m) {
 
     init_value_node(m);
     init_environment(m);
+    init_cursor(m);
 
     auto dip = py::class_<dip::DIP>(m, "DIP");
     dip.def(py::init<>());

@@ -159,7 +159,7 @@ namespace snt::dip {
         return false;
     }
 
-    bool Parser::part_name(const bool required) {
+    bool Parser::part_path(const bool required) {
         size_t pos = code.find(' ');
         path = Path(code.substr(0, pos));
         strip(path.name);

@@ -25,7 +25,7 @@ namespace snt::dip {
 
                     // request node from the environment and extract its value
                     ValueNode::ListType nodes =
-                        environment->request_nodes(parser.value_raw.at(0), RequestType::Reference);
+                        environment->request_group(parser.value_raw.at(0), RequestType::Reference);
                     if (nodes.size() != 1) {
                         throw std::runtime_error(
                             "Reference in a template should return only one node. "

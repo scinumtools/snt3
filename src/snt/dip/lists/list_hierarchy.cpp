@@ -98,4 +98,16 @@ namespace snt::dip {
         node->path.collections = std::move(collections_full);
     }
 
+    const std::unordered_map<std::string, Collection>& HierarchyList::get_collections() const {
+        return collections;
+    }
+
+    const Collection& HierarchyList::get_collection(const std::string& path) const {
+        auto it = collections.find(path);
+        if (it == collections.end()) {
+            throw std::runtime_error("Collection does not exist: " + path);
+        }
+        return (it->second);
+    }
+
 } // namespace snt::dip

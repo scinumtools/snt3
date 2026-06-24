@@ -6,6 +6,7 @@ helpers/*
 docs/build/*
 docs/doxy/*
 dist/*
+bindings/python/.pytest_cache/*
 **/__pycache__/*
 .venv
 **/.DS_STORE

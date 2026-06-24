@@ -12,6 +12,8 @@
 
 namespace snt::dip {
 
+    class Cursor; ///< Forward declaring
+
     /**
      * @enum RequestType
      * @brief Type of an environment request
@@ -74,18 +76,53 @@ namespace snt::dip {
         ) const;
 
         /**
-         * @brief Get list of nodes from a reference or a function based on a request expression
+         * @brief Get group of nodes from a reference or a function based on a request expression
          *
          * @param request Request expression
          * @param rtype Request type: reference, or function
-         * @param tags List of node tags that filter selected set
-         * @return List of selected nodes
+         * @param tags List of tags that filter selected set
+         * @return Group of selected nodes
          */
-        ValueNode::ListType request_nodes(
+        ValueNode::ListType request_group(
             const std::string& request,
             const RequestType rtype = RequestType::Reference,
             const std::vector<std::string>& tags = {}
         ) const;
+
+        /**
+         * @brief Get a keyed collection of  nodes from a reference or a function based on a request expression
+         *
+         * @param request Request expression
+         * @param rtype Request type: reference, or function
+         * @param tags List of tags that filter selected set
+         * @return Keyed collection of nodes
+         */
+        std::unordered_map<std::string, ValueNode::ListType> request_map(
+            const std::string& request,
+            const RequestType rtype = RequestType::Reference,
+            const std::vector<std::string>& tags = {}
+        ) const;
+
+        /**
+         * @brief Get a indexed collection of nodes from a reference or a function based on a request expression
+         *
+         * @param request Request expression
+         * @param rtype Request type: reference, or function
+         * @param tags List of tags that filter selected set
+         * @return Indexed collection of nodes
+         */
+        std::vector<ValueNode::ListType> request_list(
+            const std::string& request,
+            const RequestType rtype = RequestType::Reference,
+            const std::vector<std::string>& tags = {}
+        ) const;
+
+        /**
+         * @brief Request cursor object for node path traversing
+         *
+         * @return Cursor object
+         */
+        Cursor request_cursor();
 
         /**
          * @brief Get parsed node value at the specific index

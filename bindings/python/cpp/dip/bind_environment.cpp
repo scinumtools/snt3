@@ -3,6 +3,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/lists/list_node.h>
 #include <snt/dip/nodes/node_value.h>
@@ -24,9 +25,9 @@ void init_environment(py::module_& m) {
     env.def_property_readonly("size", [](const dip::Environment& e) { return e.nodes.size(); });
 
     env.def(
-        "request_nodes",
+        "request_group",
         [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& tags) {
-            return e.request_nodes(path, dip::RequestType::Reference, tags);
+            return e.request_group(path, dip::RequestType::Reference, tags);
         },
         py::arg("path"),
         py::arg("tags") = std::vector<std::string>{}
@@ -40,6 +41,8 @@ void init_environment(py::module_& m) {
         py::arg("path"),
         py::arg("to_units") = ""
     );
+
+    env.def("request_cursor", &dip::Environment::request_cursor);
 
     // env.def("request_code", &dip::Environment::request_code, py::arg("source_name"));
 }

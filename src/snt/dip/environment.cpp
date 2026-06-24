@@ -1,3 +1,4 @@
+#include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/nodes/node_value.h>
 #include <unordered_set>
@@ -121,7 +122,7 @@ namespace snt::dip {
         return false; // No match found
     }
 
-    ValueNode::ListType Environment::request_nodes(
+    ValueNode::ListType Environment::request_group(
         const std::string& request, const RequestType rtype, const std::vector<std::string>& tags
     ) const {
         ValueNode::ListType new_nodes;
@@ -168,8 +169,84 @@ namespace snt::dip {
             throw std::runtime_error("Unrecognized environment request type");
         }
         if (new_nodes.empty())
-            throw std::runtime_error("Node environment request returns an empty node list: " + request);
+            throw std::runtime_error("Node environment request returns an empty node group: " + request);
         return new_nodes;
+    }
+
+    std::unordered_map<std::string, ValueNode::ListType> Environment::request_map(
+        const std::string& request, const RequestType rtype, const std::vector<std::string>& tags
+    ) const {
+        std::unordered_map<std::string, ValueNode::ListType> map;
+        switch (rtype) {
+        case RequestType::Function: {
+            // TODO: implement functions
+            throw std::runtime_error("Request map from functions is not implemented yet.");
+            break;
+        }
+        case RequestType::Reference: {
+            auto [source_name, node_path] = parse_request(request);
+            std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
+            const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
+            const HierarchyList& hlist =
+                hierarchy;            //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
+            if (!source_name.empty()) // TODO: implemente request map from source
+                throw std::runtime_error("Request map from sources is not implemented yet.");
+
+            const Collection& col = hlist.get_collection(node_path);
+            if (col.type == Path::CollectionType::LIST)
+                throw std::runtime_error("Requested collection is a list: " + request);
+
+            for (const auto& item : col.items) {
+                map.insert({item, request_group(request + "[" + item + "]")});
+            }
+            break;
+        }
+        default:
+            throw std::runtime_error("Unrecognized environment request type");
+        }
+        if (map.empty())
+            throw std::runtime_error("Node environment request returns an empty node map: " + request);
+        return map;
+    }
+
+    std::vector<ValueNode::ListType> Environment::request_list(
+        const std::string& request, const RequestType rtype, const std::vector<std::string>& tags
+    ) const {
+        std::vector<ValueNode::ListType> list;
+        switch (rtype) {
+        case RequestType::Function: {
+            // TODO: implement functions
+            throw std::runtime_error("Request list from functions is not implemented yet.");
+            break;
+        }
+        case RequestType::Reference: {
+            auto [source_name, node_path] = parse_request(request);
+            std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
+            const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
+            const HierarchyList& hlist =
+                hierarchy;            //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
+            if (!source_name.empty()) // TODO: implemente request list from source
+                throw std::runtime_error("Request list from sources is not implemented yet.");
+
+            const Collection& col = hlist.get_collection(node_path);
+            if (col.type == Path::CollectionType::MAP)
+                throw std::runtime_error("Requested collection is a map: " + request);
+
+            for (const auto& item : col.items) {
+                list.push_back(request_group(request + "[" + item + "]"));
+            }
+            break;
+        }
+        default:
+            throw std::runtime_error("Unrecognized environment request type");
+        }
+        if (list.empty())
+            throw std::runtime_error("Node environment request returns an empty node list: " + request);
+        return list;
+    }
+
+    Cursor Environment::request_cursor() {
+        return Cursor(this);
     }
 
     val::BaseValue::PointerType Environment::get_value(size_t index) const {
