@@ -3,8 +3,8 @@
  * This file can be updated using 'dmap' executable.
  * 
  * Unit system:  United States customary units (US)
- * Last update:  Mon Jun  8 23:20:13 2026
- * Code version: v0.4.7
+ * Last update:  Thu Jun 25 06:02:36 2026
+ * Code version: v0.5.0
  * 
  * Symbol legend:
  * ..    units

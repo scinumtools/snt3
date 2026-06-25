@@ -47,7 +47,7 @@ void add_line(std::stringstream& ss, const std::string& symbol, puq::Dimensions&
             if (exp.denominator == 1) {
                 ss << exp.numerator;
             } else {
-                ss << "(FRC){" + std::to_string(exp.numerator) + "," + std::to_string(exp.denominator) + "}";
+                ss << "Exponent{" + std::to_string(exp.numerator) + "," + std::to_string(exp.denominator) + "}";
             }
         }
     }

@@ -1,6 +1,7 @@
 #ifndef PUQ_SYSTEMS_H
 #define PUQ_SYSTEMS_H
 
+#include <array>
 #include <map>
 #include <set>
 #include <snt/puq/result.h>
@@ -109,8 +110,6 @@ namespace snt::puq {
     /*
      *  System of units
      */
-
-    using FRC = int[2];
 
     struct SystemDataType {
         std::string SystemAbbrev;

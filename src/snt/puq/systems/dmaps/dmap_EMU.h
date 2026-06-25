@@ -3,8 +3,8 @@
  * This file can be updated using 'dmap' executable.
  * 
  * Unit system:  Electromagnetic CGS units (EMU)
- * Last update:  Mon Jun  8 23:20:13 2026
- * Code version: v0.4.7
+ * Last update:  Thu Jun 25 06:02:36 2026
+ * Code version: v0.5.0
  * 
  * Symbol legend:
  * ..    units
@@ -22,10 +22,10 @@
 {"mol",         {1,                       0,                       { 0, 0, 0, 0, 0, 0, 1, 0} } },     // mole
 {"m",           {1,                       0,                       { 1, 0, 0, 0, 0, 0, 0, 0} } },     // meter
 {"abH",         {0.01,                    0,                       { 1, 0, 0, 0, 0, 0, 0, 0} } },     // Abhenry
-{"abV",         {0.001,                   0,                       {(FRC){3,2},(FRC){1,2},-2, 0, 0, 0, 0, 0} } },     // Abvolt
+{"abV",         {0.001,                   0,                       {Exponent{3,2},Exponent{1,2},-2, 0, 0, 0, 0, 0} } },     // Abvolt
 {"abF",         {100,                     0,                       {-1, 0, 2, 0, 0, 0, 0, 0} } },     // Abfarad
 {"abOhm",       {0.01,                    0,                       { 1, 0, 1, 0, 0, 0, 0, 0} } },     // Abohm
-{"Oe",          {10,                      0,                       {(FRC){-1,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // Oersted
+{"Oe",          {10,                      0,                       {Exponent{-1,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // Oersted
 {"{pi}",        {3.1415926,               0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // pi num.
 {"{m_e}",       {9.10938371e-28,          0,                       { 0, 1, 0, 0, 0, 0, 0, 0} } },     // electron mass
 {"Gal",         {0.01,                    0,                       { 1, 0,-2, 0, 0, 0, 0, 0} } },     // Gal
@@ -37,71 +37,71 @@
 {"dyn",         {0.01,                    0,                       { 1, 1,-2, 0, 0, 0, 0, 0} } },     // dyne
 {"{alpha}",     {0.007297352564,          0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // fine-str. const.
 {"St",          {0.0001,                  0,                       { 2, 0,-1, 0, 0, 0, 0, 0} } },     // Stokes
-{"Gb",          {0.1,                     0,                       {(FRC){1,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // Gilbert
+{"Gb",          {0.1,                     0,                       {Exponent{1,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // Gilbert
 {"P",           {100,                     0,                       {-1, 1,-1, 0, 0, 0, 0, 0} } },     // Poise
-{"G",           {10,                      0,                       {(FRC){-1,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // Gauss
-{"Mx",          {1e-05,                   0,                       {(FRC){5,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // Maxwell
+{"G",           {10,                      0,                       {Exponent{-1,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // Gauss
+{"Mx",          {1e-05,                   0,                       {Exponent{5,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // Maxwell
 {"Ka",          {100,                     0,                       {-1, 0, 0, 0, 0, 0, 0, 0} } },     // Kayser
-{"Bi",          {0.1,                     0,                       {(FRC){1,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // biot
-{"abA",         {0.1,                     0,                       {(FRC){1,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // Abampere
-{"abC",         {0.1,                     0,                       {(FRC){1,2},(FRC){1,2}, 0, 0, 0, 0, 0, 0} } },     // Abcoulomb
-{"aC",          {0.1,                     0,                       {(FRC){1,2},(FRC){1,2}, 0, 0, 0, 0, 0, 0} } },     // Abcoulomb
+{"Bi",          {0.1,                     0,                       {Exponent{1,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // biot
+{"abA",         {0.1,                     0,                       {Exponent{1,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // Abampere
+{"abC",         {0.1,                     0,                       {Exponent{1,2},Exponent{1,2}, 0, 0, 0, 0, 0, 0} } },     // Abcoulomb
+{"aC",          {0.1,                     0,                       {Exponent{1,2},Exponent{1,2}, 0, 0, 0, 0, 0, 0} } },     // Abcoulomb
 {"Ba",          {100,                     0,                       {-1, 1,-2, 0, 0, 0, 0, 0} } },     // Barye
 {"{G}",         {6.6743e-14,              0,                       { 3,-1,-2, 0, 0, 0, 0, 0} } },     // gravit. const.
 {"erg",         {0.0001,                  0,                       { 2, 1,-2, 0, 0, 0, 0, 0} } },     // erg
-{"{e}",         {1.602176634e-21,         0,                       {(FRC){1,2},(FRC){1,2}, 0, 0, 0, 0, 0, 0} } },     // elementary charge
+{"{e}",         {1.602176634e-21,         0,                       {Exponent{1,2},Exponent{1,2}, 0, 0, 0, 0, 0, 0} } },     // elementary charge
 {"b",           {100,                     0,                       {-1, 1,-2, 0, 0, 0, 0, 0} } },     // Barye
 {"{h}",         {6.62607015e-31,          0,                       { 2, 1,-1, 0, 0, 0, 0, 0} } },     // Planck const.
 {"radd",        {0.01,                    0,                       { 2, 0,-2, 0, 0, 0, 0, 0} } },     // radiation dose
 {"{k}",         {1.380649e-20,            0,                       { 2, 1,-2,-1, 0, 0, 0, 0} } },     // Boltzmann const.
-{"{mu_B}",      {9.274010066e-26,         0,                       {(FRC){5,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // Bohr magneton
+{"{mu_B}",      {9.274010066e-26,         0,                       {Exponent{5,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // Bohr magneton
 {"{hbar}",      {1.054571817e-31,         0,                       { 2, 1,-1, 0, 0, 0, 0, 0} } },     // reduced Pl. con.
-{"<phi_e>",     {0.001,                   0,                       {(FRC){3,2},(FRC){1,2},-2, 0, 0, 0, 0, 0} } },     // electric potential
+{"<phi_e>",     {0.001,                   0,                       {Exponent{3,2},Exponent{1,2},-2, 0, 0, 0, 0, 0} } },     // electric potential
 {"|phi_e|",     {1e-08,                   0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // electric potential SI factor
 {"<C>",         {100,                     0,                       {-1, 0, 2, 0, 0, 0, 0, 0} } },     // capacitance
 {"|C|",         {1000000000,              0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // capacitance SI factor
 {"<eps>",       {10000,                   0,                       {-2, 0, 2, 0, 0, 0, 0, 0} } },     // permittivity
 {"|eps|",       {7957747290.3393,         0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // permittivity SI factor
-{"<I>",         {0.1,                     0,                       {(FRC){1,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // current
+{"<I>",         {0.1,                     0,                       {Exponent{1,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // current
 {"|I|",         {10,                      0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // current SI factor
 {"<k_n>",       {100,                     0,                       {-1, 0, 0, 0, 0, 0, 0, 0} } },     // wave number
 {"<the>",       {1,                       0,                       { 0, 0, 0, 0, 0, 0, 0, 1} } },     // angular displacement
 {"<nu_v>",      {0.0001,                  0,                       { 2, 0,-1, 0, 0, 0, 0, 0} } },     // kinematic viscosity
 {"<P>",         {0.0001,                  0,                       { 2, 1,-3, 0, 0, 0, 0, 0} } },     // power
-{"<D_e>",       {1000,                    0,                       {(FRC){-3,2},(FRC){1,2}, 0, 0, 0, 0, 0, 0} } },     // electric displacement field
+{"<D_e>",       {1000,                    0,                       {Exponent{-3,2},Exponent{1,2}, 0, 0, 0, 0, 0, 0} } },     // electric displacement field
 {"|D_e|",       {7957.7472903393,         0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // electric displacement field SI factor
-{"<Phi_E>",     {0.1,                     0,                       {(FRC){1,2},(FRC){1,2}, 0, 0, 0, 0, 0, 0} } },     // electric flux
+{"<Phi_E>",     {0.1,                     0,                       {Exponent{1,2},Exponent{1,2}, 0, 0, 0, 0, 0, 0} } },     // electric flux
 {"|Phi_E|",     {0.79577472903393,        0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // electric flux SI factor
 {"<Iv>",        {1,                       0,                       { 0, 0, 0, 0, 0, 1, 0, 0} } },     // luminous intensity
-{"<p_e>",       {0.001,                   0,                       {(FRC){3,2},(FRC){1,2}, 0, 0, 0, 0, 0, 0} } },     // electric dipole moment
+{"<p_e>",       {0.001,                   0,                       {Exponent{3,2},Exponent{1,2}, 0, 0, 0, 0, 0, 0} } },     // electric dipole moment
 {"|p_e|",       {0.1,                     0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // electric dipole moment SI factor
 {"<mu>",        {1,                       0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // permeability
 {"|mu|",        {1.25663704e-06,          0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // permeability SI factor
 {"<a>",         {0.01,                    0,                       { 1, 0,-2, 0, 0, 0, 0, 0} } },     // acceleration
 {"<rho_e>",     {0.0001,                  0,                       { 2, 0, 1, 0, 0, 0, 0, 0} } },     // electrical resistivity
 {"|rho_e|",     {1e-11,                   0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // electrical resistivity SI factor
-{"<B>",         {10,                      0,                       {(FRC){-1,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // magnetic flux density
+{"<B>",         {10,                      0,                       {Exponent{-1,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // magnetic flux density
 {"|B|",         {0.0001,                  0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // magnetic flux density SI factor
 {"<v>",         {0.01,                    0,                       { 1, 0,-1, 0, 0, 0, 0, 0} } },     // velocity
 {"<l>",         {0.01,                    0,                       { 1, 0, 0, 0, 0, 0, 0, 0} } },     // length
-{"<H>",         {10,                      0,                       {(FRC){-1,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // magnetic field strenght
+{"<H>",         {10,                      0,                       {Exponent{-1,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // magnetic field strenght
 {"|H|",         {79.577472903393,         0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // magnetic field strenght SI factor
 {"<E>",         {0.0001,                  0,                       { 2, 1,-2, 0, 0, 0, 0, 0} } },     // energy
 {"<mu_v>",      {100,                     0,                       {-1, 1,-1, 0, 0, 0, 0, 0} } },     // dynamic viscosity
 {"<p>",         {100,                     0,                       {-1, 1,-2, 0, 0, 0, 0, 0} } },     // pressure
-{"<q>",         {0.1,                     0,                       {(FRC){1,2},(FRC){1,2}, 0, 0, 0, 0, 0, 0} } },     // electric charge
+{"<q>",         {0.1,                     0,                       {Exponent{1,2},Exponent{1,2}, 0, 0, 0, 0, 0, 0} } },     // electric charge
 {"|q|",         {10,                      0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // electric charge SI factor
-{"<E_e>",       {0.1,                     0,                       {(FRC){1,2},(FRC){1,2},-2, 0, 0, 0, 0, 0} } },     // electric field strength
+{"<E_e>",       {0.1,                     0,                       {Exponent{1,2},Exponent{1,2},-2, 0, 0, 0, 0, 0} } },     // electric field strength
 {"|E_e|",       {1e-06,                   0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // electric field strength SI factor
 {"<t>",         {1,                       0,                       { 0, 0, 1, 0, 0, 0, 0, 0} } },     // time
 {"<n>",         {1,                       0,                       { 0, 0, 0, 0, 0, 0, 1, 0} } },     // amount of substance
 {"<m>",         {1,                       0,                       { 0, 1, 0, 0, 0, 0, 0, 0} } },     // mass
 {"<F>",         {0.01,                    0,                       { 1, 1,-2, 0, 0, 0, 0, 0} } },     // force
-{"<Phi_M>",     {1e-05,                   0,                       {(FRC){5,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // magnetic flux
+{"<Phi_M>",     {1e-05,                   0,                       {Exponent{5,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // magnetic flux
 {"|Phi_M|",     {1e-08,                   0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // magnetic flux SI factor
 {"<L>",         {0.01,                    0,                       { 1, 0, 0, 0, 0, 0, 0, 0} } },     // inductance
 {"|L|",         {1e-09,                   0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // inductance SI factor
-{"<mm>",        {1e-05,                   0,                       {(FRC){5,2},(FRC){1,2},-1, 0, 0, 0, 0, 0} } },     // magnetic dipole moment
+{"<mm>",        {1e-05,                   0,                       {Exponent{5,2},Exponent{1,2},-1, 0, 0, 0, 0, 0} } },     // magnetic dipole moment
 {"|mm|",        {0.001,                   0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // magnetic dipole moment SI factor
 {"<R>",         {0.01,                    0,                       { 1, 0, 1, 0, 0, 0, 0, 0} } },     // electrical resistance
 {"|R|",         {1e-09,                   0,                       { 0, 0, 0, 0, 0, 0, 0, 0} } },     // electrical resistance SI factor
