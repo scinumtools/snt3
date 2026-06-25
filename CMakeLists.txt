@@ -7,7 +7,11 @@ project(scinumtools VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(NOT MSVC)
+if(MSVC)
+    # compile as UTF-8 on Windows
+    add_compile_options(/utf-8)
+else()
+    # use flag only on macOS and linux
     add_compile_options(-Wno-deprecated)
 endif()
 
