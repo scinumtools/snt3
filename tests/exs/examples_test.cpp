@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdio>
+#include <filesystem>
 #include <memory>
 
 std::string run_program(const std::string& cmd) {
