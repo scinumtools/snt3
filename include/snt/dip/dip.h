@@ -4,6 +4,7 @@
 #include "environment.h"
 
 #include <array>
+#include <filesystem>
 #include <iostream>
 #include <queue>
 
@@ -35,7 +36,7 @@ namespace snt::dip {
         DIP();
         DIP(const Source& src);
         void add_string(const std::string& source_code);
-        void add_file(const std::string& source_file, std::string source_name = "", const bool absolute = true);
+        void add_file(const std::filesystem::path& source_file, std::string source_name = {}, bool absolute = false);
         void add_source(const std::string& source_name, const std::string& source_file);
         void add_unit(const std::string& unit_name, const std::string& unit_expression);
         void add_value_function(const std::string& name, FunctionList::ValueFunctionType func);

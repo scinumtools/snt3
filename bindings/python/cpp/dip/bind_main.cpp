@@ -2,6 +2,7 @@
 #include <locale>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl/filesystem.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
 

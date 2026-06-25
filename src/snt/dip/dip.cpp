@@ -56,12 +56,12 @@ namespace snt::dip {
         parse_lines(lines, source_code, source_name);
     }
 
-    void DIP::add_file(const std::string& source_file, std::string source_name, const bool absolute) {
+    void DIP::add_file(const std::filesystem::path& source_file, std::string source_name, bool absolute) {
 
         // prepare source data
         std::ifstream file(source_file);
         if (!file)
-            throw std::runtime_error("Following file could not be found: " + source_file);
+            throw std::runtime_error("Following file could not be found: " + source_file.string());
         std::ostringstream source_code;
         source_code << file.rdbuf();
         if (source_name.empty()) {
