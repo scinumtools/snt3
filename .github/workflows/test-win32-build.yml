@@ -2,8 +2,8 @@ name: Test Windows 32-bit Build
 
 on:
   push:
-    branches: [ main, develop ]
-  workflow_dispatch:  # Allows manual trigger
+    branches: [main, develop]
+  workflow_dispatch:
 
 jobs:
   test_windows_32bit:
@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          architecture: "x86"  # This forces 32-bit Python
+          architecture: "x86"
 
       - name: Install Python dependencies
         run: |
@@ -28,14 +28,11 @@ jobs:
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: win32  # 32-bit architecture
+          arch: win32
 
-      - name: Build wheel with cibuildwheel
-        uses: pypa/cibuildwheel@v2.23
+      - name: Build and test wheel with cibuildwheel
+        uses: pypa/cibuildwheel@v3
         env:
           CIBW_BUILD: cp311-win32
           CIBW_BUILD_VERBOSITY: 1
-
-      - name: Test import
-        run: |
-          python -c "import scinumtools3; print('Success!')"
+          CIBW_TEST_COMMAND: python -c "import scinumtools3; print('Success!')"
