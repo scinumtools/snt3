@@ -31,7 +31,7 @@ jobs:
           arch: win32
 
       - name: Build and test wheel with cibuildwheel
-        uses: pypa/cibuildwheel@v3
+        uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_BUILD: cp311-win32
           CIBW_BUILD_VERBOSITY: 1
