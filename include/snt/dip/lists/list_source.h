@@ -1,6 +1,7 @@
 #ifndef DIP_LIST_SOURCE_H
 #define DIP_LIST_SOURCE_H
 
+#include <filesystem>
 #include <map>
 #include <snt/dip/lists/list_node.h>
 #include <snt/dip/nodes/node_value.h>
@@ -26,7 +27,9 @@ namespace snt::dip {
 
       public:
         SourceList();
-        void append(const std::string& name, const std::string& path, const std::string& code, const Source& parent);
+        void append(
+            const std::string& name, const std::filesystem::path& path, const std::string& code, const Source& parent
+        );
         void append(const std::string& name, const EnvSource& src);
         EnvSource& at(const std::string& name);
         const EnvSource& at(const std::string& name) const;

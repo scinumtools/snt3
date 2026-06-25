@@ -6,11 +6,11 @@ namespace snt::dip {
     SourceList::SourceList() = default;
 
     void SourceList::append(
-        const std::string& name, const std::string& path, const std::string& code, const Source& parent
+        const std::string& name, const std::filesystem::path& path, const std::string& code, const Source& parent
     ) {
         if (sources.contains(name))
             throw std::invalid_argument("Source with the same name already exists: " + name);
-        sources.insert({name, {name, path, code, parent}});
+        sources.insert({name, {name, path.string(), code, parent}});
     }
 
     void SourceList::append(const std::string& name, const EnvSource& src) {
