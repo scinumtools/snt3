@@ -20,26 +20,51 @@ std::string run_program(const std::string& cmd) {
 }
 
 TEST(Examples, SolverUniquePtr) {
-    std::string output = run_program("./bin/ExampleSolverUniquePtr");
+    std::filesystem::path exe = "bin";
+    exe /= "ExampleSolverUniquePtr";
+#ifdef _WIN32
+    exe += ".exe";
+#endif
+    std::string output = run_program(exe.string());
     EXPECT_EQ(output, "false\n");
 }
 
 TEST(Examples, SolverCustom) {
-    std::string output = run_program("./bin/ExampleSolverCustom");
+    std::filesystem::path exe = "bin";
+    exe /= "ExampleSolverCustom";
+#ifdef _WIN32
+    exe += ".exe";
+#endif
+    std::string output = run_program(exe.string());
     EXPECT_EQ(output, "true\n");
 }
 
 TEST(Examples, SolverDefault) {
-    std::string output = run_program("./bin/ExampleSolverDefault");
+    std::filesystem::path exe = "bin";
+    exe /= "ExampleSolverDefault";
+#ifdef _WIN32
+    exe += ".exe";
+#endif
+    std::string output = run_program(exe.string());
     EXPECT_EQ(output, "797.5\n");
 }
 
 TEST(Examples, SolverArray) {
-    std::string output = run_program("./bin/ExampleSolverArray");
+    std::filesystem::path exe = "bin";
+    exe /= "ExampleSolverArray";
+#ifdef _WIN32
+    exe += ".exe";
+#endif
+    std::string output = run_program(exe.string());
     EXPECT_EQ(output, "{5}\n{5 7 9}\n");
 }
 
 TEST(Examples, SolverSettings) {
-    std::string output = run_program("./bin/ExampleSolverSettings");
+    std::filesystem::path exe = "bin";
+    exe /= "ExampleSolverSettings";
+#ifdef _WIN32
+    exe += ".exe";
+#endif
+    std::string output = run_program(exe.string());
     EXPECT_EQ(output, "3\n");
 }
