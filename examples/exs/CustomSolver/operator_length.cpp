@@ -1,6 +1,6 @@
-#import "main.h"
-#import "snt/exs/token.h"
-#import "snt/exs/token_list_base.h"
+#include "main.h"
+#include "snt/exs/token.h"
+#include "snt/exs/token_list_base.h"
 
 OperatorLength::OperatorLength() : OperatorGroup<1>("len", {"len", "(", ")", ","}, LENGTH_OPERATOR) {}
 

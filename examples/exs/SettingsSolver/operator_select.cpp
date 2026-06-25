@@ -1,4 +1,4 @@
-#import "main.h"
+#include "main.h"
 
 OperatorSelect::OperatorSelect() : OperatorGroup<1>("sel", {"", "{", "}", ","}, SELECT_OPERATOR) {}
 

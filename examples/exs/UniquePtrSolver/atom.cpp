@@ -1,5 +1,5 @@
-#import "main.h"
-#import "snt/core/settings.h"
+#include "main.h"
+#include "snt/core/settings.h"
 
 LogicalAtom::LogicalAtom(const LogicalAtom& a) : AtomBase(std::make_unique<bool>(*a.value)) {};
 

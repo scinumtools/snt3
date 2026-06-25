@@ -1,4 +1,4 @@
-#import "main.h"
+#include "main.h"
 
 std::string CustomAtom::to_string() {
     if (std::holds_alternative<std::string>(value)) {

@@ -1,8 +1,8 @@
-#import "main.h"
+#include "main.h"
 
-#import "snt/exs/operators/comparison.h"
-#import "snt/exs/solver.h"
-#import "snt/exs/step_list.h"
+#include "snt/exs/operators/comparison.h"
+#include "snt/exs/solver.h"
+#include "snt/exs/step_list.h"
 
 #include <memory>
 

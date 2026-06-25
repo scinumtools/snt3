@@ -1,8 +1,8 @@
-#import "main.h"
-#import "snt/exs/token.h"
-#import "snt/exs/token_list_base.h"
+#include "main.h"
+#include "snt/exs/token.h"
+#include "snt/exs/token_list_base.h"
 
-#import <algorithm>
+#include <algorithm>
 
 void OperatorArray::operate_group(exs::TokenListBase* tokens) {
     exs::Token group1 = tokens->get_left();

@@ -1,4 +1,4 @@
-#import "main.h"
+#include "main.h"
 
 int CustomAtom::from_string(std::string& s, exs::BaseSettings* set) {
     Settings* cset = static_cast<Settings*>(set);
