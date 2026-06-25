@@ -212,7 +212,7 @@ namespace snt::dip {
             }
         }
         // Validate nodes
-        for (ssize_t i = 0; i < target.nodes.size(); i++) {
+        for (size_t i = 0; i < target.nodes.size(); i++) {
             ValueNode::PointerType vnode = target.nodes.at(i);
             if (vnode) {
                 vnode->validate_definition();
