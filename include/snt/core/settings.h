@@ -37,4 +37,10 @@ namespace snt::core {
 
 } // namespace snt::core
 
+// Windows specific settings
+#ifdef _WIN32
+#define popen _popen
+#define pclose _pclose
+#endif
+
 #endif // SNT_SETTINGS_H
