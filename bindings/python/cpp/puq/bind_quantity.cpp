@@ -1,3 +1,4 @@
+#include <pybind11/iostream.h>
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
@@ -186,8 +187,8 @@ void init_puq_quantity(py::module_& m) {
     q.def("size", &puq::Quantity::size);
     q.def("shape", &puq::Quantity::shape);
     q.def("info", [](const puq::Quantity& q) {
+        py::scoped_ostream_redirect redirect(std::cout, py::module_::import("sys").attr("stdout"));
         std::cout << q.info();
-        std::cout.flush();
     });
 
     q.def("value", &quantity_value, py::arg("numpy") = false);
