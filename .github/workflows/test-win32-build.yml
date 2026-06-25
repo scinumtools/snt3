@@ -1,4 +1,3 @@
-name=.github/workflows/test-win32-build.yml url=https://github.com/vrtulka23/scinumtools3/blob/main/.github/workflows/test-win32-build.yml
 name: Test Windows 32-bit Build
 
 on:
