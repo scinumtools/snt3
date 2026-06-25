@@ -1,5 +1,5 @@
 {% set name = "scinumtools3" %}
-{% set version = "0.5.2a" %}
+{% set version = "0.5.2b" %}
 
 package:
   name: {{ name }}
