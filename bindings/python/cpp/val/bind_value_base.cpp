@@ -13,7 +13,7 @@ void init_value_base(py::module_& m) {}
 
 py::object to_python_value(const val::BaseValue::PointerType& value) {
     std::vector<size_t> shape = value->get_shape();
-    std::vector<ssize_t> strides(shape.size());
+    std::vector<py::ssize_t> strides(shape.size());
 
     // Create a capsule to ensure lifetime safety
     auto capsule = py::capsule(value.get(), [](void*) {
@@ -21,12 +21,12 @@ py::object to_python_value(const val::BaseValue::PointerType& value) {
     });
 
     // Compute strides correctly based on element type size
-    auto compute_strides = [&](ssize_t elem_size) {
-        std::vector<ssize_t> s(shape.size());
-        ssize_t stride = elem_size;
-        for (ssize_t j = static_cast<ssize_t>(shape.size()) - 1; j >= 0; --j) {
+    auto compute_strides = [&](py::ssize_t elem_size) {
+        std::vector<py::ssize_t> s(shape.size());
+        py::ssize_t stride = elem_size;
+        for (py::ssize_t j = static_cast<py::ssize_t>(shape.size()) - 1; j >= 0; --j) {
             s[j] = stride;
-            stride *= static_cast<ssize_t>(shape[j]);
+            stride *= static_cast<py::ssize_t>(shape[j]);
         }
         return s;
     };

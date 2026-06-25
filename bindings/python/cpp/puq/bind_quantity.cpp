@@ -57,7 +57,7 @@ val::BaseValue::PointerType parseBaseValue(const py::object& other) {
         py::array_t<double, py::array::c_style | py::array::forcecast> arr(other);
         auto buf = arr.unchecked<1>();
         vec.resize(buf.shape(0));
-        for (ssize_t i = 0; i < buf.shape(0); ++i)
+        for (py::ssize_t i = 0; i < buf.shape(0); ++i)
             vec[i] = buf(i);
     } else {
         return nullptr;
@@ -145,11 +145,11 @@ void init_puq_quantity(py::module_& m) {
         if (!otherT)
             throw std::runtime_error("Expected ArrayValue<double>");
         std::vector<size_t> shape = otherT->get_shape();
-        std::vector<ssize_t> strides(shape.size());
-        ssize_t stride = sizeof(double);
-        for (ssize_t i = static_cast<ssize_t>(shape.size()) - 1; i >= 0; --i) {
+        std::vector<py::ssize_t> strides(shape.size());
+        py::ssize_t stride = sizeof(double);
+        for (py::ssize_t i = static_cast<py::ssize_t>(shape.size()) - 1; i >= 0; --i) {
             strides[i] = stride;
-            stride *= static_cast<ssize_t>(shape[i]);
+            stride *= static_cast<py::ssize_t>(shape[i]);
         }
         return py::array_t<double>(shape, strides, otherT->get_data());
     });
