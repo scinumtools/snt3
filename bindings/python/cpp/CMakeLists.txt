@@ -15,6 +15,23 @@ set(MODULE_NAME _core)
 file(GLOB SOURCE_FILES "./*.cpp")
 pybind11_add_module(${MODULE_NAME} ${SOURCE_FILES})
 
+# Link the Python import library so the linker can resolve Python C API symbols on Windows.
+# Prefer the managed CMake targets provided by FindPython / FindPython3.
+if (TARGET Python3::Python)
+    message(STATUS "Linking ${MODULE_NAME} against Python3::Python")
+    target_link_libraries(${MODULE_NAME} PRIVATE Python3::Python)
+elseif (TARGET Python::Python)
+    message(STATUS "Linking ${MODULE_NAME} against Python::Python")
+    target_link_libraries(${MODULE_NAME} PRIVATE Python::Python)
+else()
+    # Diagnostic info if CI can't find the dev library
+    message(STATUS "Python library target not found; printing Python3 variables for debugging:")
+    message(STATUS "  Python3_EXECUTABLE: ${Python3_EXECUTABLE}")
+    message(STATUS "  Python3_VERSION: ${Python3_VERSION}")
+    message(STATUS "  Python3_INCLUDE_DIRS: ${Python3_INCLUDE_DIRS}")
+    message(STATUS "  Python3_LIBRARIES: ${Python3_LIBRARIES}")
+endif()
+
 target_include_directories(${MODULE_NAME}
   PRIVATE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
