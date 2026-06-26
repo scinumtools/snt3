@@ -12,6 +12,7 @@ on:
       - 'apps/**'
       - 'tests/**'
       - 'CMakeLists.txt'
+      - 'pyproject.toml'
       - '.github/workflows/c-cpp-build.yml'
   pull_request:
     branches: [ "main" ]
@@ -24,6 +25,7 @@ on:
       - 'apps/**'
       - 'tests/**'
       - 'CMakeLists.txt'
+      - 'pyproject.toml'
       - '.github/workflows/c-cpp-build.yml'
 
 jobs:
