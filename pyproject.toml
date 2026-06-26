@@ -77,9 +77,6 @@ before-build = "pip install pybind11"
 # CMake configuration
 # ------------------------
 
-[tool.scikit-build]
-cmake.args = ["-G", "Ninja"]
-
 [tool.scikit-build.cmake.define]
 ENABLE_UNIT_TESTS = "OFF"
 ENABLE_SNT = "ON"
