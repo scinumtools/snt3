@@ -67,12 +67,12 @@ function(pad_right out value width)
 endfunction()
 
 # set generic options
-function(set_module_options NAME DEFAULT)
+function(set_module_options NAME DEFAULT_MODULES DEFAULT_TESTS)
     # set default values
-    option(ENABLE_${NAME} "Enable ${NAME}" ${DEFAULT})
-    option(ENABLE_${NAME}_GTEST "Enable ${NAME} gtests" ${DEFAULT})
-    option(ENABLE_${NAME}_PYBIND "Enable ${NAME} pytests" ${DEFAULT})
-    option(ENABLE_${NAME}_PYTEST "Enable ${NAME} pytests" ${DEFAULT})
+    option(ENABLE_${NAME} "Enable ${NAME}" ${DEFAULT_MODULES})
+    option(ENABLE_${NAME}_GTEST "Enable ${NAME} gtests" ${DEFAULT_TESTS})
+    option(ENABLE_${NAME}_PYBIND "Enable ${NAME} pytests" ${DEFAULT_MODULES})
+    option(ENABLE_${NAME}_PYTEST "Enable ${NAME} pytests" ${DEFAULT_TESTS})
     # set parts off if main switch is off
     if(NOT ENABLE_${NAME})
         set(ENABLE_${NAME}_GTEST OFF CACHE BOOL "" FORCE)
@@ -92,13 +92,14 @@ message("Scientific Numerical Tools (SNT)")
 message("Code version: ${CODE_VERSION}")
 message(STATUS "Compiled parts:")
 message(STATUS "     Module  GTests  PyBind  PyTests")
-set_module_options(SNT ON)
-set_module_options(EXS ON)
-set_module_options(VAL ON)
-set_module_options(PUQ ON)
-set_module_options(DIP ON)
-set_module_options(MAT ON)
-set_module_options(API ON)
+option(ENABLE_UNIT_TESTS "Main testing enabler" ON)  # this can switch off all tests
+set_module_options(SNT ON "${ENABLE_UNIT_TESTS}")
+set_module_options(EXS ON "${ENABLE_UNIT_TESTS}")
+set_module_options(VAL ON "${ENABLE_UNIT_TESTS}")
+set_module_options(PUQ ON "${ENABLE_UNIT_TESTS}")
+set_module_options(DIP ON "${ENABLE_UNIT_TESTS}")
+set_module_options(MAT ON "${ENABLE_UNIT_TESTS}")
+set_module_options(API ON "${ENABLE_UNIT_TESTS}")
 
 # import GTest
 ###############

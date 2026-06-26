@@ -77,35 +77,25 @@ before-build = "pip install pybind11"
 # CMake configuration
 # ------------------------
 
+[tool.scikit-build]
+cmake.args = ["-G", "Ninja"]
+
 [tool.scikit-build.cmake.define]
+ENABLE_UNIT_TESTS = "OFF"
 ENABLE_SNT = "ON"
-ENABLE_SNT_GTEST = "OFF"
 ENABLE_SNT_PYBIND = "ON"
-ENABLE_SNT_PYTEST = "OFF"
 ENABLE_EXS = "ON"
-ENABLE_EXS_GTEST = "OFF"
 ENABLE_EXS_PYBIND = "ON"
-ENABLE_EXS_PYTEST = "OFF"
 ENABLE_VAL = "ON"
-ENABLE_VAL_GTEST = "OFF"
 ENABLE_VAL_PYBIND = "ON"
-ENABLE_VAL_PYTEST = "OFF"
 ENABLE_PUQ = "ON"
-ENABLE_PUQ_GTEST = "OFF"
 ENABLE_PUQ_PYBIND = "ON"
-ENABLE_PUQ_PYTEST = "OFF"
 ENABLE_DIP = "ON"
-ENABLE_DIP_GTEST = "OFF"
 ENABLE_DIP_PYBIND = "ON"
-ENABLE_DIP_PYTEST = "OFF"
 ENABLE_MAT = "OFF"
-ENABLE_MAT_GTEST = "OFF"
 ENABLE_MAT_PYBIND = "OFF"
-ENABLE_MAT_PYTEST = "OFF"
 ENABLE_API = "ON"
-ENABLE_API_GTEST = "OFF"
 ENABLE_API_PYBIND = "ON"
-ENABLE_API_PYTEST = "OFF"
 
 # ------------------------
 # pytest config
