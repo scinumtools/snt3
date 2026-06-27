@@ -11,11 +11,14 @@ source:
 
 build:
   number: 0
-  script: {{ PYTHON }} -m pip install . --no-deps -vv
+  script: 
+    - export CMAKE_BUILD_PARALLEL_LEVEL=1
+    - {{ PYTHON }} -m pip install . --no-deps -vv
 
 requirements:
   build:
     - {{ compiler('cxx') }}
+    - {{ stdlib("c") }}
     - cmake >=3.24
     - ninja
 
