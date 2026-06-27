@@ -54,6 +54,7 @@ build-dir = "build/{wheel_tag}"
 cmake.version = ">=3.24"
 build.verbose = true
 wheel.expand-macos-universal-tags = true
+generator = "Ninja"
 
 # Where the python package lives
 wheel.packages = ["bindings/python/src/scinumtools3"]
