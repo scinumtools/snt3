@@ -50,7 +50,7 @@ Issues = "https://github.com/vrtulka23/scinumtools3/issues"
 # ------------------------
 
 [tool.scikit-build]
-build-dir = "build/{wheel_tag}"
+#build-dir = "build/{wheel_tag}"
 cmake.version = ">=3.24"
 build.verbose = true
 wheel.expand-macos-universal-tags = true
