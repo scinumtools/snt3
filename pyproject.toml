@@ -99,7 +99,7 @@ ENABLE_API_PYBIND = "ON"
 # ------------------------
 
 [tool.pytest.ini_options]
-minversion = "8.0"
+minversion = "6.2.5"
 addopts = "-ra -q"
 testpaths = [
     "tests"
