@@ -70,7 +70,7 @@ namespace snt::dip {
 
     bool TableNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
         const std::string& delimiter_raw = values.at(0);
-        if (property == PropertyType::Delimiter and !delimiter_raw.empty()) {
+        if (property == PropertyType::Delimiter && !delimiter_raw.empty()) {
             delimiter = delimiter_raw[0];
             return true;
         }

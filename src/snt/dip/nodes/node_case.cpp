@@ -7,7 +7,7 @@ namespace snt::dip {
 
     BaseNode::PointerType CaseNode::is_node(Parser& parser) {
         if (parser.kwd_case()) {
-            if (parser.path.name.substr(1) != KEYWORD_ELSE and parser.path.name.substr(1) != KEYWORD_END)
+            if (parser.path.name.substr(1) != KEYWORD_ELSE && parser.path.name.substr(1) != KEYWORD_END)
                 parser.part_value();
             parser.part_comment();
             return std::make_shared<CaseNode>(parser);

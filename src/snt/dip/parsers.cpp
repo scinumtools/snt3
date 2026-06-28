@@ -60,7 +60,7 @@ namespace snt::dip {
         int line_number = 0;
         while (std::getline(ss, line)) {
             // skip empty lines
-            if (!line.empty() and !std::all_of(line.begin(), line.end(), isspace))
+            if (!line.empty() && !std::all_of(line.begin(), line.end(), isspace))
                 lines.push({line, {source_name, line_number}});
             line_number++;
         }
@@ -293,7 +293,7 @@ namespace snt::dip {
         int dim = 1;
         value_shape.push_back(0);
 
-        while (ss.get(ch) and dim > 0) {
+        while (ss.get(ch) && dim > 0) {
             rm << ch;
             if (ch == SIGN_ARRAY_OPEN) {
                 dim++;
@@ -367,7 +367,7 @@ namespace snt::dip {
                 range = {static_cast<size_t>(std::stoul(dim)), static_cast<size_t>(std::stoul(dim))};
             } else {
                 std::string dmin = dim.substr(0, pos), dmax = dim.substr(pos + 1);
-                if (dmin == "" and dmax == "")
+                if (dmin == "" && dmax == "")
                     range = {0, val::Array::max_range};
                 else if (dmin == "")
                     range = {0, static_cast<size_t>(std::stoul(dmax))};
@@ -376,7 +376,7 @@ namespace snt::dip {
                 else
                     range = {static_cast<size_t>(std::stoul(dmin)), static_cast<size_t>(std::stoul(dmax))};
             }
-            if (range.dmax != val::Array::max_range and range.dmax < range.dmin)
+            if (range.dmax != val::Array::max_range && range.dmax < range.dmin)
                 throw std::runtime_error("Maximum range must be higher or equal than minimum range: " + dim);
             dimension.push_back(range);
         }

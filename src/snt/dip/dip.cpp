@@ -122,7 +122,7 @@ namespace snt::dip {
                     throw std::runtime_error(
                         "Only value nodes (bool, int, float and str) can have properties: " + pnode->line.code
                     );
-                if (previous_node->indent >= pnode->indent or (pnode->indent - previous_node->indent) != INDENT_STEP)
+                if (previous_node->indent >= pnode->indent || (pnode->indent - previous_node->indent) != INDENT_STEP)
                     throw std::runtime_error(
                         "The indent of a property '" + std::to_string(pnode->indent) + "' is not " +
                         std::to_string(INDENT_STEP) + " white spaces higher than the indent of a preceding node '" +
@@ -156,7 +156,7 @@ namespace snt::dip {
             BaseNode::PointerType node = queue.pop_front();
             if (node->dtype == NodeDtype::Property)
                 continue;
-            if (!target.branching.false_case() or node->dtype == NodeDtype::Case) {
+            if (!target.branching.false_case() || node->dtype == NodeDtype::Case) {
                 // Perform specific node parsing outside of a condition block or inside of a valid condition block
                 BaseNode::ListType parsed = node->parse(target);
                 if (parsed.size() > 0) {

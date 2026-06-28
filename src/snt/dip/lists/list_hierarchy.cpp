@@ -12,7 +12,7 @@ namespace snt::dip {
                 return;
 
         // closed children nodes and register new parent
-        while (parents.size() > 0 and node->indent <= parents.back().indent)
+        while (parents.size() > 0 && node->indent <= parents.back().indent)
             parents.pop_back();
         parents.push_back({node->indent, node->path.name, node->path.collections});
 

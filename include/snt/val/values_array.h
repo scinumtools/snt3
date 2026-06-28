@@ -332,7 +332,7 @@ namespace snt::val {
                 for (size_t dim = 0; dim < this->shape.size(); dim++) {
                     int dmin = slice[dim].dmin;
                     int dmax = (slice[dim].dmax == Array::max_range) ? this->shape[dim] - 1 : slice[dim].dmax;
-                    if (coord[dim] < dmin or dmax < coord[dim])
+                    if (coord[dim] < dmin || dmax < coord[dim])
                         push = false;
                 }
                 if (push)

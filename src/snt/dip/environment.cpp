@@ -39,7 +39,7 @@ namespace snt::dip {
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode and vnode->path.name == node_path) {
+                if (vnode && vnode->path.name == node_path) {
                     new_value.value = vnode->value->clone();
                     if (vnode->units)
                         new_value.units = vnode->units;
@@ -73,18 +73,18 @@ namespace snt::dip {
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode and vnode->path.name == node_path) {
+                if (vnode && vnode->path.name == node_path) {
                     new_value = vnode->value->clone();
                     if (to_unit != core::KEYWORD_NONE) {
                         // NOTE: If unit conversion is not required, the to_unit should be set to
                         // "none".
                         //       This is usefull if we want to simply get a reference node as it is.
-                        if (!vnode->units and !to_unit.empty()) {
+                        if (!vnode->units && !to_unit.empty()) {
                             throw std::runtime_error(
                                 "Request: Trying to convert nondimensional quantity into '" + to_unit +
                                 "': " + vnode->line.code
                             );
-                        } else if (vnode->units and to_unit.empty()) {
+                        } else if (vnode->units && to_unit.empty()) {
                             std::cout << vnode->units->to_string() << " " << to_unit << '\n';
                             throw std::runtime_error(
                                 "Request: Trying to convert '" + vnode->units_raw +
@@ -140,15 +140,15 @@ namespace snt::dip {
             size_t p = node_pool.size(); // parent node index
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode and vnode->path.name.rfind(node_path_child, 0) == 0 and
+                if (vnode && vnode->path.name.rfind(node_path_child, 0) == 0 and
                     vnode->path.name.size() > node_path_child.size()) {
                     // filter nodes based on tags
-                    if (!tags.empty() and !hasIntersection(vnode->tags, tags))
+                    if (!tags.empty() && !hasIntersection(vnode->tags, tags))
                         continue;
                     // select node
                     std::string new_name = vnode->path.name.substr(node_path_child.size(), vnode->path.name.size());
                     new_nodes.push_back(vnode->clone(Path(new_name)));
-                } else if (vnode and vnode->path.name == node_path) {
+                } else if (vnode && vnode->path.name == node_path) {
                     p = i;
                 }
             }

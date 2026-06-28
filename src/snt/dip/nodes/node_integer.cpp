@@ -21,7 +21,7 @@ namespace snt::dip {
     IntegerNode::IntegerNode(Parser& parser) : BaseNode(parser, NodeDtype::Integer) {
         if (dtype_raw[2] == "16") {
             value_dtype = (dtype_raw[0] == "u") ? core::DataType::Integer16_U : core::DataType::Integer16;
-        } else if (dtype_raw[2] == "32" or dtype_raw[2] == "") {
+        } else if (dtype_raw[2] == "32" || dtype_raw[2] == "") {
             value_dtype = (dtype_raw[0] == "u") ? core::DataType::Integer32_U : core::DataType::Integer32;
         } else if (dtype_raw[2] == "64") {
             value_dtype = (dtype_raw[0] == "u") ? core::DataType::Integer64_U : core::DataType::Integer64;

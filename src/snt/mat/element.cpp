@@ -79,7 +79,7 @@ namespace snt::mat {
             throw std::runtime_error("Isotope number cannot be zero");
         const Isotope* isodata = nullptr;
         for (size_t i = 0; i < PT_NUM_DATA; i++) {
-            if (PT_DATA[i].symbol == elem and PT_DATA[i].isotope_number == iso) {
+            if (PT_DATA[i].symbol == elem && PT_DATA[i].isotope_number == iso) {
                 isodata = &PT_DATA[i];
             }
         }

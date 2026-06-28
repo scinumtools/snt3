@@ -39,7 +39,7 @@ namespace snt::dip {
 
     void ValueNode::set_value(val::BaseValue::PointerType value_input) {
         value = nullptr;
-        if (value_input == nullptr and !value_raw.empty() and !value_raw.at(0).empty()) {
+        if (value_input == nullptr && !value_raw.empty() && !value_raw.at(0).empty()) {
             value = cast_value();
         } else if (value_input != nullptr) {
             if (value_input->get_dtype() == value_dtype)
@@ -63,7 +63,7 @@ namespace snt::dip {
     void ValueNode::set_units(const std::optional<puq::Quantity>& units_input) {
         // setting node units
         units = std::nullopt;
-        if (!units_input and !units_raw.empty()) {
+        if (!units_input && !units_raw.empty()) {
             units = puq::Quantity(units_raw);
         } else if (units_input) {
             units = units_input;
@@ -86,7 +86,7 @@ namespace snt::dip {
     }
 
     void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
-        if (node->dtype != NodeDtype::Modification and node->dtype != dtype)
+        if (node->dtype != NodeDtype::Modification && node->dtype != dtype)
             throw std::runtime_error(
                 "Node '" + path.name + "' with type '" + dtype_raw.at(1) + "' cannot modify node '" + node->path.name +
                 "' with type '" + node->dtype_raw.at(1) + "'"
@@ -164,7 +164,7 @@ namespace snt::dip {
         if (options.size() > 0) {
             bool match = false;
             for (const auto& option : options) {
-                if (option.value and value->compare_equal(option.value.get())->all_of())
+                if (option.value && value->compare_equal(option.value.get())->all_of())
                     match = true;
             }
             if (!match) {
@@ -199,7 +199,7 @@ namespace snt::dip {
             size_t dmax = dimension[i].dmax; // dimension ranges can be max(size_t)
             if (dmax == val::Array::max_range)
                 dmax = vdim[i];
-            if (vdim[i] < dmin or dmax < vdim[i]) {
+            if (vdim[i] < dmin || dmax < vdim[i]) {
                 std::ostringstream nss, vss;
                 for (size_t j = 0; j < dimension.size(); j++) {
                     if (j > 0) {
@@ -208,7 +208,7 @@ namespace snt::dip {
                     }
                     dmin = dimension[j].dmin;
                     dmax = dimension[j].dmax;
-                    if (dmin == 0 and dmax == val::Array::max_range)
+                    if (dmin == 0 && dmax == val::Array::max_range)
                         nss << SEPARATOR_SLICE;
                     else if (dmin == dmax)
                         nss << dmin;

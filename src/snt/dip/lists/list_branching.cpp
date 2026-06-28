@@ -72,7 +72,7 @@ namespace snt::dip {
         size_t case_id = get_case_id();
         Case& cs = cases.at(case_id);
         // the current case is false if this is the first true case in a branch
-        return (num_true != 1 or !cs.value);
+        return (num_true != 1 || !cs.value);
     }
 
     // Manage condition nodes
@@ -95,11 +95,11 @@ namespace snt::dip {
             // validate correct condition type and process end of the case
             if (cnode->case_type == CaseType::IF) {
                 // continue
-            } else if (cnode->case_type == CaseType::ELIF and !cases.empty()) {
+            } else if (cnode->case_type == CaseType::ELIF && !cases.empty()) {
                 // continue
-            } else if (cnode->case_type == CaseType::ELSE and !cases.empty()) {
+            } else if (cnode->case_type == CaseType::ELSE && !cases.empty()) {
                 // continue
-            } else if (cnode->case_type == CaseType::END and !cases.empty() and path_old.size() >= path_new.size()) {
+            } else if (cnode->case_type == CaseType::END && !cases.empty() && path_old.size() >= path_new.size()) {
                 close_branch();
                 return;
             } else {
@@ -113,7 +113,7 @@ namespace snt::dip {
                 branch_part = switch_case(case_id, cnode->case_type);
             } else if (path_new.size() < path_old.size()) {
                 // close openned branches until the same branch is reached
-                while (path_new != path_old and path_old.size() > 0) {
+                while (path_new != path_old && path_old.size() > 0) {
                     close_branch();
                     if (state.size() > 0) {
                         size_t case_id_old = get_case_id();
@@ -125,7 +125,7 @@ namespace snt::dip {
                 }
                 if (state.empty() && cnode->case_type == CaseType::IF)
                     branch_part = open_branch(case_id);
-                else if (cnode->case_type == CaseType::ELIF or cnode->case_type == CaseType::ELSE)
+                else if (cnode->case_type == CaseType::ELIF || cnode->case_type == CaseType::ELSE)
                     branch_part = switch_case(case_id, cnode->case_type);
                 else
                     throw std::runtime_error("Only @if can open a new case:  " + node->line.code);

@@ -21,9 +21,9 @@ namespace snt::dip {
     FloatNode::FloatNode(Parser& parser) : BaseNode(parser, NodeDtype::Float) {
         if (dtype_raw[2] == "32") {
             value_dtype = core::DataType::Float32;
-        } else if (dtype_raw[2] == "64" or dtype_raw[2] == "") {
+        } else if (dtype_raw[2] == "64" || dtype_raw[2] == "") {
             value_dtype = core::DataType::Float64;
-        } else if (dtype_raw[2] == "128" and max_float_size == 128) {
+        } else if (dtype_raw[2] == "128" && max_float_size == 128) {
             value_dtype = core::DataType::Float128;
         } else {
             throw std::runtime_error("Value data type cannot be determined from the node settings");

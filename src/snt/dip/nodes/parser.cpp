@@ -424,7 +424,7 @@ namespace snt::dip {
     }
 
     bool Parser::part_array() {
-        if (code.empty() or code.at(0) != SIGN_ARRAY_OPEN)
+        if (code.empty() || code.at(0) != SIGN_ARRAY_OPEN)
             return false;
         std::string rm = parse_array(code, value_raw, value_shape);
         strip(rm);
@@ -495,7 +495,7 @@ namespace snt::dip {
             value_raw.push_back(matchResult[0].str());
             value_origin = ValueOrigin::Number;
             strip(matchResult[0].str());
-            if (do_continue() and code[0] != delimiter)
+            if (do_continue() && code[0] != delimiter)
                 throw std::runtime_error("Number was not fully parsed: " + line.code);
             return true;
         } else if (required) {
@@ -512,7 +512,7 @@ namespace snt::dip {
             value_raw.push_back(matchResult[0].str());
             value_origin = ValueOrigin::Keyword;
             strip(matchResult[0].str());
-            if (do_continue() and code[0] != delimiter)
+            if (do_continue() && code[0] != delimiter)
                 throw std::runtime_error("Keyword was not fully parsed: " + line.code);
             return true;
         } else if (required) {
