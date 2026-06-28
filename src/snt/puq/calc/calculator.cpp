@@ -10,7 +10,7 @@ namespace snt::puq {
         operators.append(
             exs::PARENTHESES_OPERATOR,
             std::make_shared<exs::OperatorGroup<1>>(
-                "par", exs::OperatorGroupSybols("", "( ", " )", " , "), exs::PARENTHESES_OPERATOR
+                "par", exs::OperatorGroupSybols{"", "( ", " )", " , "}, exs::PARENTHESES_OPERATOR
             )
         );
         operators.append(exs::ADD_OPERATOR, std::make_shared<exs::OperatorAdd>(" + "));

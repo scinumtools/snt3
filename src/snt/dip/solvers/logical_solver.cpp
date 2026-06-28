@@ -11,7 +11,7 @@ namespace snt::dip {
         exs::OperatorList operators;
         operators.append(
             exs::PARENTHESES_OPERATOR,
-            std::make_shared<exs::OperatorParentheses>(exs::OperatorGroupSybols("", "( ", " )", ", "))
+            std::make_shared<exs::OperatorParentheses>(exs::OperatorGroupSybols{"", "( ", " )", ", "})
         );
         operators.append(dip::DEFINED_OPERATOR, std::make_shared<dip::OperatorDefined>());
         operators.append(dip::NOT_DEFINED_OPERATOR, std::make_shared<dip::OperatorNotDefined>());

@@ -19,7 +19,7 @@ namespace snt::dip {
 
     // concatenate multiple strings at the compile time
     // this is used to compose regular expression patterns
-    template <size_t N> consteval std::array<char, N> ce_to_array(const char* str) {
+    template <size_t N> constexpr std::array<char, N> ce_to_array(const char* str) {
         std::array<char, N> arr = {};
         constexpr size_t len = N - 1;
         for (size_t i = 0; i < len; ++i) {
@@ -29,7 +29,7 @@ namespace snt::dip {
         }
         return arr;
     }
-    template <size_t N> consteval std::array<char, N> ce_to_array(std::string_view str) {
+    template <size_t N> constexpr std::array<char, N> ce_to_array(std::string_view str) {
         std::array<char, N> arr = {};
         constexpr size_t len = N - 1;
         for (size_t i = 0; i < len && i < str.size(); ++i) {
@@ -42,14 +42,14 @@ namespace snt::dip {
         }
         return arr;
     }
-    template <size_t N> consteval std::array<char, N> ce_to_array(char str) {
+    template <size_t N> constexpr std::array<char, N> ce_to_array(char str) {
         return {str, '\0'};
     }
-    template <size_t N> consteval std::array<char, N> ce_to_array(std::array<char, N> str) {
+    template <size_t N> constexpr std::array<char, N> ce_to_array(std::array<char, N> str) {
         return str;
     }
     template <size_t N, typename First, typename Second, typename... Rest>
-    consteval std::array<char, N> ce_concat(First first, Second second, Rest... rest) {
+    constexpr std::array<char, N> ce_concat(First first, Second second, Rest... rest) {
         std::array<char, N> first_array = ce_to_array<N>(first);
         std::array<char, N> second_array = ce_to_array<N>(second);
         size_t first_len = 0;

@@ -4,7 +4,7 @@ set(CMAKE_TRY_ENABLE_TARGET_TYPE STATIC_LIBRARY)
 
 project(scinumtools VERSION 1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(MSVC)
@@ -206,7 +206,7 @@ write_basic_package_version_file(
 # install files
 ###############
 	
-install(DIRECTORY src/
+install(DIRECTORY include/
 	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 	FILES_MATCHING PATTERN "*.h")
 	

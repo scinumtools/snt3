@@ -65,7 +65,7 @@ namespace snt::puq {
      * @return Default unit system record
      */
     inline UnitSystem::Record get_default_record() {
-        return UnitSystem::Record(SystemType::SI, &SystemData::SI, &CustomSystemMap.at(SystemType::SI));
+        return UnitSystem::Record{SystemType::SI, &SystemData::SI, &CustomSystemMap.at(SystemType::SI)};
     }
 
     UnitSystem::Record UnitSystem::current = get_default_record();
@@ -92,12 +92,12 @@ namespace snt::puq {
         if (!estimate)
             throw std::runtime_error("Custom quantity estimate has invalid type, or is undefined.");
         // Add custom units into UnitList and DimensionMap
-        current.custom->UnitList[name] = UnitStruct(UT_LIN_CUS, definition, name, false);
-        current.custom->DimensionMap[name] = DimensionStruct(
+        current.custom->UnitList[name] = UnitStruct{UT_LIN_CUS, definition, name, false};
+        current.custom->DimensionMap[name] = DimensionStruct{
             estimate->get_value(0),
             (uncertainty ? uncertainty->get_value(0) : 0.),
             quant.measurement.baseunits.dimensions().physical
-        );
+        };
         return stack.size();
     }
 
@@ -116,7 +116,7 @@ namespace snt::puq {
 
     UnitSystem::UnitSystem(const SystemType system) : closed(false) {
         stack.push(current);
-        current = Record(system, select_unit_system(system), &CustomSystemMap.at(system));
+        current = Record{system, select_unit_system(system), &CustomSystemMap.at(system)};
     }
 
     UnitSystem::~UnitSystem() {
@@ -125,7 +125,7 @@ namespace snt::puq {
     }
 
     void UnitSystem::change(const SystemType system) {
-        current = Record(system, select_unit_system(system), &CustomSystemMap.at(system));
+        current = Record{system, select_unit_system(system), &CustomSystemMap.at(system)};
     }
 
     void UnitSystem::close() {

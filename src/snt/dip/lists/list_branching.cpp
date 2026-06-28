@@ -29,7 +29,7 @@ namespace snt::dip {
     int BranchingList::open_branch(const size_t case_id) {
         size_t branch_id = ++num_branches;
         state.push_back(branch_id);
-        branches[branch_id] = Branch({case_id}, {CaseType::IF});
+        branches[branch_id] = Branch{{case_id}, {CaseType::IF}};
         return 0;
     }
 
@@ -151,7 +151,7 @@ namespace snt::dip {
             // register new case
             std::string expr = (cnode->value_raw.empty()) ? "" : cnode->value_raw.at(0);
             cases[case_id] =
-                Case(path_new, cnode->line.code, expr, case_value, branch_id, branch_part, case_id, cnode->case_type);
+                Case{path_new, cnode->line.code, expr, case_value, branch_id, branch_part, case_id, cnode->case_type};
         } else {
             throw std::runtime_error("Invalid condition format: " + node->line.code);
         }

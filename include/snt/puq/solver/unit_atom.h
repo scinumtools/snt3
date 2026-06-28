@@ -18,7 +18,7 @@ namespace snt::puq {
 
     class UnitAtom : public exs::AtomBase<UnitAtom, Measurement> {
       public:
-        UnitAtom(UnitAtom& a) : AtomBase(a) {};
+        UnitAtom(const UnitAtom&) = default;
         UnitAtom(Measurement v) : AtomBase(v) {};
         static Measurement from_string(const std::string& s, exs::BaseSettings* set = nullptr);
         std::string to_string();

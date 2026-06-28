@@ -448,7 +448,7 @@ namespace snt::dip {
         }
 
         // Triple-quoted string
-        if (code.substr(start).starts_with("\"\"\"")) {
+        if (code.compare(start, 3, "\"\"\"") == 0) {
             size_t content_start = start + 3;
             size_t pos = content_start;
             while (pos + 2 < code.size()) {

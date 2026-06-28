@@ -8,14 +8,16 @@ namespace snt::dip {
     UnitList::UnitList() = default;
 
     void UnitList::append(const std::string& name, const std::string& definition) {
-        if (units.contains(name))
+        auto it = units.find(name);
+        if (it != units.end())
             throw std::invalid_argument("Custom unit with the same name already exists: " + name);
         size_t stack = puq::UnitSystem::set_custom_unit(name, definition);
         units.insert({name, {name, definition, stack}});
     }
 
     void UnitList::append(const std::string& name, EnvUnit data) {
-        if (units.contains(name))
+        auto it = units.find(name);
+        if (it != units.end())
             throw std::invalid_argument("Custom unit with the same name already exists: " + name);
         data.stack = puq::UnitSystem::set_custom_unit(name, data.definition);
         units.insert({name, data});

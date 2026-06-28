@@ -43,7 +43,7 @@ namespace snt::puq {
         Format::Base base;
         Format::Uncertainty uncertainty;
 
-        UnitFormat(const auto&... args) {
+        template <typename... Args> UnitFormat(const Args&... args) {
             math = get_option<Format::Math>(args...).value_or(Format::Math::ASCII);
             precision = get_option<Format::Precision>(args...).value_or(std::cout.precision());
             system = get_option<Format::System>(args...).value_or(Format::System::HIDE);
@@ -52,7 +52,7 @@ namespace snt::puq {
             uncertainty = get_option<Format::Uncertainty>(args...).value_or(Format::Uncertainty::SHOW);
         };
 
-        UnitFormat merge(const auto&... args) const {
+        template <typename... Args> UnitFormat merge(const Args&... args) const {
             UnitFormat uf(
                 get_option<Format::Math>(args...).value_or(math),
                 get_option<Format::Precision>(args...).value_or(precision),

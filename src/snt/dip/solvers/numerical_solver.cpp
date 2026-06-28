@@ -9,23 +9,23 @@ namespace snt::dip {
 
         exs::OperatorList operators;
         operators.append(
-            exs::SINUS_OPERATOR, std::make_shared<exs::OperatorSinus>(exs::OperatorGroupSybols("sin", "( ", " )", ", "))
+            exs::SINUS_OPERATOR, std::make_shared<exs::OperatorSinus>(exs::OperatorGroupSybols{"sin", "( ", " )", ", "})
         );
         operators.append(
             exs::COSINUS_OPERATOR,
-            std::make_shared<exs::OperatorCosinus>(exs::OperatorGroupSybols("cos", "( ", " )", ", "))
+            std::make_shared<exs::OperatorCosinus>(exs::OperatorGroupSybols{"cos", "( ", " )", ", "})
         );
         operators.append(
             exs::TANGENS_OPERATOR,
-            std::make_shared<exs::OperatorTangens>(exs::OperatorGroupSybols("tan", "( ", " )", ", "))
+            std::make_shared<exs::OperatorTangens>(exs::OperatorGroupSybols{"tan", "( ", " )", ", "})
         );
         operators.append(
             exs::CUBIC_ROOT_OPERATOR,
-            std::make_shared<exs::OperatorCubicRoot>(exs::OperatorGroupSybols("cbrt", "( ", " )", ", "))
+            std::make_shared<exs::OperatorCubicRoot>(exs::OperatorGroupSybols{"cbrt", "( ", " )", ", "})
         );
         operators.append(
             exs::SQUARE_ROOT_OPERATOR,
-            std::make_shared<exs::OperatorSquareRoot>(exs::OperatorGroupSybols("sqrt", "( ", " )", ", "))
+            std::make_shared<exs::OperatorSquareRoot>(exs::OperatorGroupSybols{"sqrt", "( ", " )", ", "})
         );
         // operators.append(
         //     exs::POWER_BASE_OPERATOR,
@@ -35,19 +35,19 @@ namespace snt::dip {
         //     std::make_shared<exs::OperatorLogarithmBase>("logb( ", " )"));
         operators.append(
             exs::LOGARITHM_10_OPERATOR,
-            std::make_shared<exs::OperatorLogarithm10>(exs::OperatorGroupSybols("log10", "( ", " )", ", "))
+            std::make_shared<exs::OperatorLogarithm10>(exs::OperatorGroupSybols{"log10", "( ", " )", ", "})
         );
         operators.append(
             exs::LOGARITHM_OPERATOR,
-            std::make_shared<exs::OperatorLogarithm>(exs::OperatorGroupSybols("log", "( ", " )", ", "))
+            std::make_shared<exs::OperatorLogarithm>(exs::OperatorGroupSybols{"log", "( ", " )", ", "})
         );
         operators.append(
             exs::EXPONENT_OPERATOR,
-            std::make_shared<exs::OperatorExponent>(exs::OperatorGroupSybols("exp", "( ", " )", ", "))
+            std::make_shared<exs::OperatorExponent>(exs::OperatorGroupSybols{"exp", "( ", " )", ", "})
         );
         operators.append(
             exs::PARENTHESES_OPERATOR,
-            std::make_shared<exs::OperatorParentheses>(exs::OperatorGroupSybols("", "( ", " )", ", "))
+            std::make_shared<exs::OperatorParentheses>(exs::OperatorGroupSybols{"", "( ", " )", ", "})
         );
         operators.append(exs::POWER_OPERATOR, std::make_shared<exs::OperatorPower>(" ** "));
         operators.append(exs::MULTIPLY_OPERATOR, std::make_shared<exs::OperatorMultiply>(" * "));

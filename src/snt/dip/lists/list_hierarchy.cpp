@@ -64,7 +64,7 @@ namespace snt::dip {
             auto it = collections.find(name_full);
             if (cnode.type == Path::CollectionType::MAP) {
                 if (it == collections.end()) { // create new collection
-                    collections[name_full] = Collection(name_full, {cnode.item}, Path::CollectionType::MAP);
+                    collections[name_full] = Collection{name_full, {cnode.item}, Path::CollectionType::MAP};
                 } else if (it->second.type != Path::CollectionType::MAP) {
                     throw std::runtime_error("Collection cannot append keyed items: " + name_full);
                 } else if (std::find(it->second.items.begin(), it->second.items.end(), cnode.item) ==
@@ -80,7 +80,7 @@ namespace snt::dip {
                 std::string key;
                 if (it == collections.end()) { // create new collection
                     key = "0";
-                    collections[name_full] = Collection(name_full, {key}, Path::CollectionType::LIST);
+                    collections[name_full] = Collection{name_full, {key}, Path::CollectionType::LIST};
                 } else if (it->second.type != Path::CollectionType::LIST) {
                     throw std::runtime_error("Collection cannot append indexed items: " + name_full);
                 } else { // append new item with an increased index
