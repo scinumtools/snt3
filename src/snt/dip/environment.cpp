@@ -140,7 +140,7 @@ namespace snt::dip {
             size_t p = node_pool.size(); // parent node index
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode && vnode->path.name.rfind(node_path_child, 0) == 0 and
+                if (vnode && vnode->path.name.rfind(node_path_child, 0) == 0 &&
                     vnode->path.name.size() > node_path_child.size()) {
                     // filter nodes based on tags
                     if (!tags.empty() && !hasIntersection(vnode->tags, tags))
