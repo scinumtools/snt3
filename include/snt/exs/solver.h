@@ -128,7 +128,7 @@ namespace snt::exs {
             }
             // CHECKPOINT( tokens.to_string(true) );
 
-            if (tokens.left.size() > 0 or tokens.right.size() > 1) {
+            if (tokens.left.size() > 0 || tokens.right.size() > 1) {
                 // CHECKPOINT( tokens.to_string(true) );
                 throw std::logic_error("Cannot solve expression due to unprocessed tokens: " + tokens.to_string(true));
             }
