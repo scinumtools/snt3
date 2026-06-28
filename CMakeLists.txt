@@ -67,11 +67,11 @@ function(pad_right out value width)
 endfunction()
 
 # set generic options
-function(set_module_options NAME DEFAULT_MODULES DEFAULT_TESTS)
+function(set_module_options NAME DEFAULT_MODULES DEFAULT_PYTHON DEFAULT_TESTS)
     # set default values
     option(ENABLE_${NAME} "Enable ${NAME}" ${DEFAULT_MODULES})
     option(ENABLE_${NAME}_GTEST "Enable ${NAME} gtests" ${DEFAULT_TESTS})
-    option(ENABLE_${NAME}_PYBIND "Enable ${NAME} pytests" ${DEFAULT_MODULES})
+    option(ENABLE_${NAME}_PYBIND "Enable ${NAME} pytests" ${DEFAULT_PYTHON})
     option(ENABLE_${NAME}_PYTEST "Enable ${NAME} pytests" ${DEFAULT_TESTS})
     # set parts off if main switch is off
     if(NOT ENABLE_${NAME})
@@ -92,14 +92,15 @@ message("Scientific Numerical Tools (SNT)")
 message("Code version: ${CODE_VERSION}")
 message(STATUS "Compiled parts:")
 message(STATUS "     Module  GTests  PyBind  PyTests")
-option(ENABLE_UNIT_TESTS "Main testing enabler" ON)  # this can switch off all tests
-set_module_options(SNT ON "${ENABLE_UNIT_TESTS}")
-set_module_options(EXS ON "${ENABLE_UNIT_TESTS}")
-set_module_options(VAL ON "${ENABLE_UNIT_TESTS}")
-set_module_options(PUQ ON "${ENABLE_UNIT_TESTS}")
-set_module_options(DIP ON "${ENABLE_UNIT_TESTS}")
-set_module_options(MAT ON "${ENABLE_UNIT_TESTS}")
-set_module_options(API ON "${ENABLE_UNIT_TESTS}")
+option(ENABLE_UNIT_TESTS "Main testing enabler" ON)  # switch off all tests
+option(ENABLE_BINDING_PYTHON "Main Python bind enabler" ON)  # switch off all pybinds 
+set_module_options(SNT ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
+set_module_options(EXS ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
+set_module_options(VAL ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
+set_module_options(PUQ ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
+set_module_options(DIP ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
+set_module_options(MAT ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
+set_module_options(API ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 
 # import GTest
 ###############
