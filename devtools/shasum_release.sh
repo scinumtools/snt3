@@ -4,8 +4,9 @@ set -euo pipefail
 
 source ./settings.env
 
+echo "Downloading version ${CODE_VERSION}"
 FILE="scinumtools3-${CODE_VERSION}.tar.gz"
-URL="https://github.com/vrtulka23/scinumtools3/archive/refs/tags/${CODE_VERSION}.tar.gz"
+URL="https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v${CODE_VERSION}.tar.gz"
 
 curl -L "$URL" -o "$FILE"
 

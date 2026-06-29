@@ -10,5 +10,6 @@ echo "pyproject.toml                  " $(grep "^version =" $DIR_SOURCE/pyprojec
 echo "settings.env                    " $(grep CODE_VERSION $DIR_SOURCE/settings.env)
 echo "packaging/conda/meta.yaml       " $(grep "version =" $DIR_SOURCE/packaging/conda/meta.yaml)
 echo "packaging/vcpkg/portfile.cmake  " $(grep "REF " $DIR_SOURCE/packaging/vcpkg/portfile.cmake)
+echo "packaging/vcpkg/vcpkg.json      " $(grep "\"version-string\": " $DIR_SOURCE/packaging/vcpkg/vcpkg.json)
 echo "docs/dipl/specification.md      " $(grep "Version:" $DIR_SOURCE/docs/dipl/specification.md) 
 echo "docs/puel/specification.md      " $(grep "Version:" $DIR_SOURCE/docs/puel/specification.md) 

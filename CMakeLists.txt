@@ -152,7 +152,7 @@ add_subdirectory(src)                  # build dip-cpp library
 add_subdirectory(apps)                 # build executable applications
 add_subdirectory(examples)             # build example applications
 add_subdirectory(tests)                # build gtest executable
-if (ENABLE_PUQ AND ENABLE_DIP)         
+if (ENABLE_BINDING_PYTHON)         
    add_subdirectory(bindings/python/cpp)  # build Python bindings
 endif()
 
