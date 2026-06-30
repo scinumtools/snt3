@@ -87,15 +87,14 @@ in a single system.
    cd scinumtools3
    
    # compile
-   cmake -B build
-   cd build
-   make
+   cmake -G Ninja -B build
+   cmake --build build
    
    # run tests
-   ctest
+   ctest --test-dir build
    
    # install
-   sudo make install
+   cmake --install build
    ```
 
 2) Using setup script

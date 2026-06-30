@@ -29,12 +29,18 @@ classifiers = [
 
 dependencies = [
     "numpy"
+    "pytest",
+    "pytest-cmake",
+    "pytest-benchmark",
 ]
 
 [project.optional-dependencies]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "breathe",
+]
 dev = [
-    "pytest",
-    "pytest-benchmark",
     "mypy",
     "black",
     "ruff"

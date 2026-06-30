@@ -35,10 +35,10 @@ int main(int argc, char* argv[]) {
 
     ArgParser argpar(argc, argv);
 
-    if (!argpar.hasPositionals() && (argpar.hasKeyword("-h") || !argpar.hasKeywords())) {
+    if (!argpar.hasPositionals() && (argpar.hasKeyword("-h") || argpar.hasKeyword("--help") || !argpar.hasKeywords())) {
         std::cout << help();
         exit(0);
-    } else if (argpar.hasKeyword("-v")) {
+    } else if (argpar.hasKeyword("-v") || argpar.hasKeyword("--version")) {
         std::cout << CODE_VERSION << '\n';
         exit(0);
     }
