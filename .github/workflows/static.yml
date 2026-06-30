@@ -37,8 +37,10 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build documentation
-        run:
-          sudo apt install -y doxygen graphviz;
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+          python -m pip install --upgrade pip
           pip install -e ".[docs]"
           ./setup.sh -d
       - name: Upload artifact
