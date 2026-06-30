@@ -127,6 +127,15 @@ pip install scinumtools3
 
 Package page: https://pypi.org/project/scinumtools3/
 
+### Homebrew (macOS)
+
+```bash
+brew tap vrtulka23/tap
+brew install scinumtools3
+```
+
+Tap repository: https://github.com/vrtulka23/homebrew-tap
+
 ## Quick Example
 
 ### Domain Specific Languages
