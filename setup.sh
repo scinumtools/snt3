@@ -41,11 +41,11 @@ CMAKE_FLAGS=(
   -DENABLE_MAT_GTEST=ON
   -DENABLE_MAT_PYTEST=ON
 
-  -DENABLE_BENCHMARKS=On     # build Google Benchmark tests
-  -DENABLE_TIME_TRACE=OFF     # build compilation time tracing outputs
-
-  -DENABLE_APP_SNT_SERVER=OFF
-  -DENABLE_APP_SNT_GUI=OFF
+  -DENABLE_TIME_TRACE=OFF       # build compilation time tracing outputs
+ 
+  -DENABLE_EXEC_BENCHMARKS=OFF  # build Google Benchmark tests
+  -DENABLE_EXEC_APPS_SERVER=OFF
+  -DENABLE_EXEC_APPS_GUI=OFF
 )
 
 OS="$(uname -s)"

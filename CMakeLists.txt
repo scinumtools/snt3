@@ -49,10 +49,6 @@ if(ENABLE_TIME_TRACE)
     add_compile_options(-ftime-trace)
 endif()
 
-# enable apps
-option(ENABLE_APP_SNT_SERVER "Enable SNT REST-API server app" OFF)
-option(ENABLE_APP_SNT_GUI "Enable SNT graphical user interface" OFF)
-
 # pad strings right
 function(pad_right out value width)
     string(LENGTH "${value}" len)
@@ -66,7 +62,7 @@ function(pad_right out value width)
     endif()
 endfunction()
 
-# set generic options
+# function that sets generic module options
 function(set_module_options NAME DEFAULT_MODULES DEFAULT_PYTHON DEFAULT_TESTS)
     # set default values
     option(ENABLE_${NAME} "Enable ${NAME}" ${DEFAULT_MODULES})
@@ -87,13 +83,16 @@ function(set_module_options NAME DEFAULT_MODULES DEFAULT_PYTHON DEFAULT_TESTS)
     pad_right( STATUS_PYTEST "${ENABLE_${NAME}_PYTEST}" 7)
     message(STATUS "${NAME}  ${STATUS_MODULE} ${STATUS_GTEST} ${STATUS_PYBIND} ${STATUS_PYTEST}")
 endfunction()
+
 # set options for all modules
 message("Scientific Numerical Tools (SNT)")
 message("Code version: ${CODE_VERSION}")
 message(STATUS "Compiled parts:")
 message(STATUS "     Module  GTests  PyBind  PyTests")
 option(ENABLE_UNIT_TESTS "Main testing enabler" ON)  # switch off all tests
+message(STATUS "ENABLE_UNIT_TESTS            ${ENABLE_UNIT_TESTS}")
 option(ENABLE_BINDING_PYTHON "Main Python bind enabler" ON)  # switch off all pybinds 
+message(STATUS "ENABLE_BINDING_PYTHON        ${ENABLE_BINDING_PYTHON}")
 set_module_options(SNT ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 set_module_options(EXS ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 set_module_options(VAL ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
@@ -102,18 +101,27 @@ set_module_options(DIP ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 set_module_options(MAT ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 set_module_options(API ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 
+# enable building of executables
+option(ENABLE_EXEC_APPS "Enable build of SNT application" ON)
+message(STATUS "ENABLE_EXEC_APPS             ${ENABLE_EXEC_APPS}")
+option(ENABLE_EXEC_APPS_SNT "Enable main SciNumTools CLI executable" "${ENABLE_EXEC_APPS}")
+message(STATUS "ENABLE_EXEC_APPS_SNT         ${ENABLE_EXEC_APPS_SNT}")
+option(ENABLE_EXEC_APPS_DMAP "Enable build of dimension map executable" "${ENABLE_EXEC_APPS}")
+message(STATUS "ENABLE_EXEC_APPS_DMAP        ${ENABLE_EXEC_APPS_DMAP}")
+option(ENABLE_EXEC_APPS_SERVER "Enable SNT REST-API server app" OFF)
+message(STATUS "ENABLE_EXEC_APPS_SERVER      ${ENABLE_EXEC_APPS_SERVER}")
+option(ENABLE_EXEC_APPS_GUI "Enable SNT graphical user interface" OFF)
+message(STATUS "ENABLE_EXEC_APPS_GUI         ${ENABLE_EXEC_APPS_GUI}")
+option(ENABLE_EXEC_EXAMPLES "Enable build of example executables" ON)
+message(STATUS "ENABLE_EXEC_EXAMPLES         ${ENABLE_EXEC_EXAMPLES}")
+option(ENABLE_EXEC_BENCHMARKS "Build benchmarks" OFF)
+message(STATUS "ENABLE_EXEC_BENCHMARKS       ${ENABLE_EXEC_BENCHMARKS}")
+
 # import GTest
 ###############
 
 # this needs to be here, so that ctest notice it!
-if(
-    ENABLE_SNT_GTEST OR
-    ENABLE_EXS_GTEST OR
-    ENABLE_VAL_GTEST OR
-    ENABLE_PUQ_GTEST OR
-    ENABLE_DIP_GTEST OR
-    ENABLE_MAT_GTEST
-)
+if(ENABLE_UNIT_TESTS)
   find_package(GTest QUIET)  # usualy for Linux and macOS build
   if(NOT GTest_FOUND)  # needed for Windows build
       include(FetchContent)
@@ -149,8 +157,12 @@ endif()
 ###################################
 
 add_subdirectory(src)                  # build dip-cpp library
-add_subdirectory(apps)                 # build executable applications
-add_subdirectory(examples)             # build example applications
+if (ENABLE_EXEC_APPS)
+    add_subdirectory(apps)             # build executable applications
+endif()
+if (ENABLE_EXEC_EXAMPLES)
+    add_subdirectory(examples)         # build example applications
+endif()
 add_subdirectory(tests)                # build gtest executable
 if (ENABLE_BINDING_PYTHON)         
    add_subdirectory(bindings/python/cpp)  # build Python bindings
@@ -159,9 +171,7 @@ endif()
 # setup Google Benchmark
 ########################
 
-option(ENABLE_BENCHMARKS "Build benchmarks" OFF)
-
-if(ENABLE_BENCHMARKS)
+if(ENABLE_EXEC_BENCHMARKS)
 
   include(FetchContent)
   
