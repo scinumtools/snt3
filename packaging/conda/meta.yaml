@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 0cdd0149f03cec07dc044b52a41fd009da89bae6953d9d36406116fee72d087d
+  sha256: 3dcc0ba64de5411d834fedfb556769c2f1c02ac464c5a681fc99cd54a74991e7
 
 build:
   number: 0
