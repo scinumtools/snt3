@@ -39,7 +39,7 @@ jobs:
       - name: Build documentation
         run:
           sudo apt install -y doxygen graphviz;
-          pip install ".[docs]"
+          pip install -e ".[docs]"
           ./setup.sh -d
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
