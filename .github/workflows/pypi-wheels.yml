@@ -31,7 +31,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
+          pip install .
 
       - name: Linux dependencies
         if: runner.os == 'Linux'
@@ -50,7 +50,12 @@ jobs:
           CIBW_BUILD_VERBOSITY: 1
           CIBW_ARCHS_WINDOWS: "AMD64 x86"
           CIBW_TEST_COMMAND: python -c "import scinumtools3; print('Success!')"
-
+          CMAKE_ARGS: >-
+            -DENABLE_UNIT_TESTS=OFF
+            -DENABLE_EXEC_APPS=OFF
+            -DENABLE_EXEC_EXAMPLES=OFF
+            -DENABLE_EXEC_BENCHMARKS=OFF
+          
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
