@@ -216,10 +216,6 @@ write_basic_package_version_file(
 # install files
 ###############
 	
-install(DIRECTORY include/
-	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-	FILES_MATCHING PATTERN "*.h")
-	
 install(FILES
 	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}-config.cmake"
 	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}-config-version.cmake"

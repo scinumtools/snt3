@@ -10,7 +10,7 @@ target_include_directories(${EXEC_NAME}
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
 )
 
-target_link_libraries(${EXEC_NAME} PRIVATE GTest::gtest_main snt-puq snt-dip snt-api)
+target_link_libraries(${EXEC_NAME} PRIVATE GTest::gtest_main snt-api)
 
 set_target_properties(${EXEC_NAME} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"

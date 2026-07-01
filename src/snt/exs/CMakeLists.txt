@@ -20,3 +20,7 @@ target_include_directories(${EXEC_NAME}
 install(TARGETS ${EXEC_NAME} EXPORT TargetsSNT
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/${MODULE_NAME})
 
+# install header files 
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/snt/exs/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/snt/exs
+        FILES_MATCHING PATTERN "*.h")

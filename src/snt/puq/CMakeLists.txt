@@ -20,3 +20,8 @@ set_target_properties(${EXEC_NAME} PROPERTIES
 # install libraries and executables
 install(TARGETS ${EXEC_NAME} EXPORT TargetsSNT
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/${MODULE_NAME})
+
+# install header files 
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/snt/puq/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/snt/puq
+        FILES_MATCHING PATTERN "*.h")
