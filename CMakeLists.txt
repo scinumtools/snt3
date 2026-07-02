@@ -117,6 +117,10 @@ message(STATUS "ENABLE_EXEC_EXAMPLES         ${ENABLE_EXEC_EXAMPLES}")
 option(ENABLE_EXEC_BENCHMARKS "Build benchmarks" OFF)
 message(STATUS "ENABLE_EXEC_BENCHMARKS       ${ENABLE_EXEC_BENCHMARKS}")
 
+# run ctests
+option(RUN_UNIT_TESTS "Run tests after building" OFF)
+message(STATUS "RUN_UNIT_TESTS               ${RUN_UNIT_TESTS}")
+
 # import GTest
 ###############
 
@@ -227,3 +231,17 @@ install(EXPORT TargetsSNT
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${MODULE_NAME}"
 )
 
+# running ctest
+###############
+
+if(RUN_UNIT_TESTS)
+    execute_process(
+        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        RESULT_VARIABLE CTEST_RESULT
+    )
+
+    if(NOT CTEST_RESULT EQUAL 0)
+        message(FATAL_ERROR "Unit tests failed.")
+    endif()
+endif()

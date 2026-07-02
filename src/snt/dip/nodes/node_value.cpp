@@ -57,6 +57,8 @@ namespace snt::dip {
             } else {
                 validate_dimensions(); // check if value shape corresponds with dimension ranges
             }
+        } else if (value_origin == ValueOrigin::None && !dimension.empty()) {
+            validate_dimensions(); // check if value shape corresponds allows none
         }
     }
 
@@ -146,7 +148,7 @@ namespace snt::dip {
     }
 
     void ValueNode::validate_definition() const {
-        if (value == nullptr)
+        if (value == nullptr && value_origin != ValueOrigin::None)
             throw std::runtime_error("Declared node has undefined value: " + line.code);
     }
 
@@ -188,12 +190,17 @@ namespace snt::dip {
     }
 
     void ValueNode::validate_dimensions() const {
-        val::Array::ShapeType vdim = value->get_shape();
-        if (dimension.size() != vdim.size())
-            throw std::runtime_error(
-                "Number of value dimensions does not match that of node: " + std::to_string(vdim.size()) +
-                "!=" + std::to_string(dimension.size())
-            );
+        val::Array::ShapeType vdim;
+        if (value == nullptr) {
+            vdim.assign(dimension.size(), 0);
+        } else {
+            vdim = value->get_shape();
+            if (dimension.size() != vdim.size())
+                throw std::runtime_error(
+                    "Number of value dimensions does not match that of node: " + std::to_string(vdim.size()) +
+                    "!=" + std::to_string(dimension.size())
+                );
+        }
         for (size_t i = 0; i < dimension.size(); i++) {
             size_t dmin = dimension[i].dmin;
             size_t dmax = dimension[i].dmax; // dimension ranges can be max(size_t)

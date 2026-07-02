@@ -96,6 +96,13 @@ namespace snt::dip {
         bool part_keyword(const bool required = true, const char delimiter = ' ');
 
         /**
+         * @brief Parse none value from a code
+         *
+         * @return True if the none value was successfully parsed; otherwise, false.
+         */
+        bool part_none();
+
+        /**
          * @brief Parse a number from a code
          *
          * @param required Specifies if number is required or not

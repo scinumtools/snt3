@@ -426,7 +426,9 @@ namespace snt::dip {
     bool Parser::part_array() {
         if (code.empty() || code.at(0) != SIGN_ARRAY_OPEN)
             return false;
+        std::cout << " " << value_shape.size() << " " << value_raw.size() << std::endl;
         std::string rm = parse_array(code, value_raw, value_shape);
+        std::cout << rm << " " << value_shape[0] << " " << value_shape.size() << " " << value_raw.size() << std::endl;
         strip(rm);
         return true;
     }
@@ -521,6 +523,18 @@ namespace snt::dip {
         return false;
     }
 
+    bool Parser::part_none() {
+        auto pos = code.find_first_not_of(" ");
+        if (pos == std::string::npos)
+            return false; // string contains only whitespace
+        if (code.compare(pos, 4, KEYWORD_NONE) == 0) {
+            value_origin = ValueOrigin::None;
+            strip(code.substr(0, pos + 4));
+            return true;
+        }
+        return false;
+    }
+
     bool Parser::part_value() {
         if (part_reference())
             return true;
@@ -533,6 +547,8 @@ namespace snt::dip {
         if (part_string())
             return true;
         if (part_number(false))
+            return true;
+        if (part_none()) // needs to test before of keywords
             return true;
         if (part_keyword(false))
             return true;

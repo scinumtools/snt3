@@ -282,6 +282,17 @@ namespace snt::dip {
         std::stringstream ss(value_string), rm;
         char ch;
 
+        // test if array is empty
+        if (value_string.substr(0, 2) == std::string{SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE}) {
+            value_shape.push_back(0);
+            value_raw.push_back("");
+            ss.get(ch);
+            rm << ch;
+            ss.get(ch);
+            rm << ch;
+            return rm.str();
+        }
+
         // test for an openning bracket
         ss.get(ch);
         rm << ch;

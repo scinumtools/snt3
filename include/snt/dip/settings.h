@@ -40,6 +40,8 @@ namespace snt::dip {
     constexpr std::string_view SIGN_BLOCK = "\"\"\"";
 
     // Keywords
+    constexpr std::string_view KEYWORD_NONE = "none";
+
     constexpr std::string_view KEYWORD_BOOLEAN = "bool";
     constexpr std::string_view KEYWORD_INTEGER = "int";
     constexpr std::string_view KEYWORD_FLOAT = "float";
@@ -88,7 +90,7 @@ namespace snt::dip {
 
     enum class CaseType { IF, ELIF, ELSE, END };
 
-    enum class ValueOrigin { Keyword, Number, String, Reference, ReferenceRaw, Function, Expression };
+    enum class ValueOrigin { None, Keyword, Number, String, Reference, ReferenceRaw, Function, Expression };
 
     enum class NodeDtype {
         None,

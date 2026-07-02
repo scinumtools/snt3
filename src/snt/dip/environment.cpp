@@ -85,7 +85,6 @@ namespace snt::dip {
                                 "': " + vnode->line.code
                             );
                         } else if (vnode->units && to_unit.empty()) {
-                            std::cout << vnode->units->to_string() << " " << to_unit << '\n';
                             throw std::runtime_error(
                                 "Request: Trying to convert '" + vnode->units_raw +
                                 "' into a nondimensional quantity: " + vnode->line.code

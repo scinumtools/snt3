@@ -57,7 +57,6 @@ namespace snt::dip {
             size_t size = node->value_raw.size();
             node->indent += indent;
             node->path.name = path.name + std::string(1, SIGN_SEPARATOR) + node->path.name;
-            std::cout << "ttt " << node->path.collections.size() << '\n';
             node->path.collections.insert(
                 node->path.collections.begin(), path.collections.begin(), path.collections.end()
             );
