@@ -6,23 +6,17 @@ add_executable(${EXEC_NAME} ${TEST_FILES})
 
 # Here we have to define correct build paths for the examples
 # Using Make/Ninja uses 'bin' directory, but Visual Studio uses 'bin/Release', 'bin/Debug', ...
-file(GENERATE
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/example_paths.h"
-    CONTENT
-"#pragma once
-
-#define EXAMPLE_SOLVER_UNIQUE_PTR \"$<TARGET_FILE:ExampleSolverUniquePtr>\"
-#define EXAMPLE_SOLVER_CUSTOM     \"$<TARGET_FILE:ExampleSolverCustom>\"
-#define EXAMPLE_SOLVER_DEFAULT    \"$<TARGET_FILE:ExampleSolverDefault>\"
-#define EXAMPLE_SOLVER_ARRAY      \"$<TARGET_FILE:ExampleSolverArray>\"
-#define EXAMPLE_SOLVER_SETTINGS   \"$<TARGET_FILE:ExampleSolverSettings>\"
-"
+target_compile_definitions(${EXEC_NAME} PRIVATE
+    EXAMPLE_SOLVER_UNIQUE_PTR="$<TARGET_FILE:ExampleSolverUniquePtr>"
+    EXAMPLE_SOLVER_CUSTOM="$<TARGET_FILE:ExampleSolverCustom>"
+    EXAMPLE_SOLVER_DEFAULT="$<TARGET_FILE:ExampleSolverDefault>"
+    EXAMPLE_SOLVER_ARRAY="$<TARGET_FILE:ExampleSolverArray>"
+    EXAMPLE_SOLVER_SETTINGS="$<TARGET_FILE:ExampleSolverSettings>"
 )
 
 target_include_directories(${EXEC_NAME}
   PRIVATE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_link_libraries(${EXEC_NAME} PRIVATE GTest::gtest_main snt-exs)

@@ -1,4 +1,3 @@
-#include "example_paths.h"
 #include "pch_tests.h"
 
 #include <array>
@@ -22,26 +21,26 @@ std::string run_program(const std::string& cmd) {
 }
 
 TEST(Examples, SolverUniquePtr) {
-    std::string output = run_program(EXAMPLE_SOLVER_UNIQUE_PTR);
+    std::string output = run_program(std::string(EXAMPLE_SOLVER_UNIQUE_PTR));
     EXPECT_EQ(output, "false\n");
 }
 
 TEST(Examples, SolverCustom) {
-    std::string output = run_program(EXAMPLE_SOLVER_CUSTOM);
+    std::string output = run_program(std::string(EXAMPLE_SOLVER_CUSTOM));
     EXPECT_EQ(output, "true\n");
 }
 
 TEST(Examples, SolverDefault) {
-    std::string output = run_program(EXAMPLE_SOLVER_DEFAULT);
+    std::string output = run_program(std::string(EXAMPLE_SOLVER_DEFAULT));
     EXPECT_EQ(output, "797.5\n");
 }
 
 TEST(Examples, SolverArray) {
-    std::string output = run_program(EXAMPLE_SOLVER_ARRAY);
+    std::string output = run_program(std::string(EXAMPLE_SOLVER_ARRAY));
     EXPECT_EQ(output, "{5}\n{5 7 9}\n");
 }
 
 TEST(Examples, SolverSettings) {
-    std::string output = run_program(EXAMPLE_SOLVER_SETTINGS);
+    std::string output = run_program(std::string(EXAMPLE_SOLVER_SETTINGS));
     EXPECT_EQ(output, "3\n");
 }
