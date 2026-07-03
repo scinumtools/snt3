@@ -39,8 +39,8 @@ target_include_directories(${MODULE_NAME}
 
 set_target_properties(${MODULE_NAME} PROPERTIES
     OUTPUT_NAME ${MODULE_NAME}
-    #LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python/scinumtools3
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python/scinumtools3    
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python/scinumtools3
 )
 
 file(MAKE_DIRECTORY

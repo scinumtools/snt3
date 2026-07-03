@@ -88,11 +88,11 @@ endfunction()
 message("Scientific Numerical Tools (SNT)")
 message("Code version: ${CODE_VERSION}")
 message(STATUS "Compiled parts:")
-message(STATUS "     Module  GTests  PyBind  PyTests")
 option(ENABLE_UNIT_TESTS "Main testing enabler" ON)  # switch off all tests
 message(STATUS "ENABLE_UNIT_TESTS            ${ENABLE_UNIT_TESTS}")
 option(ENABLE_BINDING_PYTHON "Main Python bind enabler" ON)  # switch off all pybinds 
 message(STATUS "ENABLE_BINDING_PYTHON        ${ENABLE_BINDING_PYTHON}")
+message(STATUS "     Module  GTests  PyBind  PyTests")
 set_module_options(SNT ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 set_module_options(EXS ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 set_module_options(VAL ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
