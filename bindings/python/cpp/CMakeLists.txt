@@ -47,6 +47,13 @@ file(MAKE_DIRECTORY
     ${CMAKE_BINARY_DIR}/python/scinumtools3
 )
 
+# copies _core to where __init__.py expects it (e.g. when Visual Studio uses Release/Debug/... subdirectories)
+add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:${MODULE_NAME}>"
+        "${CMAKE_BINARY_DIR}/python/scinumtools3/"
+)
+
 file(COPY
     ${CMAKE_SOURCE_DIR}/bindings/python/src/scinumtools3
     DESTINATION ${CMAKE_BINARY_DIR}/python

@@ -1,3 +1,4 @@
+#include "example_paths.h"
 #include "pch_tests.h"
 
 #include <array>
@@ -21,51 +22,26 @@ std::string run_program(const std::string& cmd) {
 }
 
 TEST(Examples, SolverUniquePtr) {
-    std::filesystem::path exe = "bin";
-    exe /= "ExampleSolverUniquePtr";
-#ifdef _WIN32
-    exe += ".exe";
-#endif
-    std::string output = run_program(exe.string());
+    std::string output = run_program(EXAMPLE_SOLVER_UNIQUE_PTR);
     EXPECT_EQ(output, "false\n");
 }
 
 TEST(Examples, SolverCustom) {
-    std::filesystem::path exe = "bin";
-    exe /= "ExampleSolverCustom";
-#ifdef _WIN32
-    exe += ".exe";
-#endif
-    std::string output = run_program(exe.string());
+    std::string output = run_program(EXAMPLE_SOLVER_CUSTOM);
     EXPECT_EQ(output, "true\n");
 }
 
 TEST(Examples, SolverDefault) {
-    std::filesystem::path exe = "bin";
-    exe /= "ExampleSolverDefault";
-#ifdef _WIN32
-    exe += ".exe";
-#endif
-    std::string output = run_program(exe.string());
+    std::string output = run_program(EXAMPLE_SOLVER_DEFAULT);
     EXPECT_EQ(output, "797.5\n");
 }
 
 TEST(Examples, SolverArray) {
-    std::filesystem::path exe = "bin";
-    exe /= "ExampleSolverArray";
-#ifdef _WIN32
-    exe += ".exe";
-#endif
-    std::string output = run_program(exe.string());
+    std::string output = run_program(EXAMPLE_SOLVER_ARRAY);
     EXPECT_EQ(output, "{5}\n{5 7 9}\n");
 }
 
 TEST(Examples, SolverSettings) {
-    std::filesystem::path exe = "bin";
-    exe /= "ExampleSolverSettings";
-#ifdef _WIN32
-    exe += ".exe";
-#endif
-    std::string output = run_program(exe.string());
+    std::string output = run_program(EXAMPLE_SOLVER_SETTINGS);
     EXPECT_EQ(output, "3\n");
 }
