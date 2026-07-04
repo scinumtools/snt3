@@ -52,6 +52,13 @@ file(COPY
     DESTINATION ${CMAKE_BINARY_DIR}/python
 )
 
+# copy _core library from 'Release' or 'Debug' directory to the main directory
+add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:${MODULE_NAME}>"
+        "${CMAKE_BINARY_DIR}/python/scinumtools3/"
+)
+
 # this needs to be here, so that ctest notice it!
 if(
     ENABLE_SNT_PYTEST OR
