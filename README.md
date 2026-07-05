@@ -166,6 +166,24 @@ conan create .
 
 The package can then be consumed from your local Conan cache in other CMake projects.
 
+#### Docker
+
+Preconfigured Docker images are provided for both Python users and SciNumTools developers.
+
+Build the desired image from the repository root:
+
+```bash
+docker build -f packaging/docker/python/Dockerfile -t scinumtools3-python .
+```
+
+or
+
+```bash
+docker build -f packaging/docker/dev/Dockerfile -t scinumtools3-dev .
+```
+
+See [`packaging/docker/README.md`](packaging/docker/README.md) for detailed instructions on building, running, and using the available Docker images.
+
 ## Quick Example
 
 ### Domain Specific Languages
