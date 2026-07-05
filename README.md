@@ -75,7 +75,7 @@ in a single system.
 
 ## Installation
 
-### C++ Module
+### From the source code
 
 #### Download and install
 
@@ -116,17 +116,21 @@ in a single system.
    target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
    ```
 
-### Python Bindings
+### Using package managers
 
-The Python bindings for `SciNumTools` are available on PyPI and can be installed using `pip`:
+SciNumTools can be installed using one of the following package managers.
+
+#### PyPI (Python)
+
+The Python bindings are available on PyPI and can be installed with `pip`:
 
 ```bash
 pip install scinumtools3
 ```
 
-Package page: https://pypi.org/project/scinumtools3/
+Package: https://pypi.org/project/scinumtools3/
 
-### Homebrew (macOS)
+#### Homebrew (macOS)
 
 ```bash
 brew tap vrtulka23/tap
@@ -134,6 +138,20 @@ brew install scinumtools3
 ```
 
 Tap repository: https://github.com/vrtulka23/homebrew-tap
+
+#### vcpkg
+
+```bash
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+
+# Bootstrap (run once)
+./bootstrap-vcpkg.sh      # macOS/Linux
+# .\bootstrap-vcpkg.bat   # Windows
+
+# Install SciNumTools
+./vcpkg install scinumtools3
+```
 
 ## Quick Example
 
