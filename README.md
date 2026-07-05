@@ -9,6 +9,7 @@
 ![Clang](https://img.shields.io/badge/clang-%3E%3D15-blue)
 ![MSVC](https://img.shields.io/badge/MSVC-2022-blue)
 [![PyPI version](https://badge.fury.io/py/scinumtools3.svg)](https://badge.fury.io/py/scinumtools3)   
+[![vcpkg](https://img.shields.io/badge/vcpkg-available-blue)](https://vcpkg.io/en/package/scinumtools3.html)
 
 ---
 
@@ -72,117 +73,6 @@ in a single system.
 - hybrid C++ / Python environments
 
 ---
-
-## Installation
-
-### From the source code
-
-#### Download and install
-
-1) Manually
-
-   ```bash
-   # download repository
-   git clone https://github.com/vrtulka23/scinumtools3.git
-   cd scinumtools3
-   
-   # compile
-   cmake -G Ninja -B build
-   cmake --build build
-   
-   # run tests
-   ctest --test-dir build
-   
-   # install
-   cmake --install build
-   ```
-
-2) Using setup script
-
-   ```bash
-   sudo ./setup.sh -b -t -i  # build, run tests, install
-   ```
-
-#### Link `SciNumTools3` in your `CMAKE` project
-
-1) Find the package
-
-   ```bash
-   # find the `SNT` package
-   find_package(snt REQUIRED)
-
-   # link to your executable
-   add_executable(${EXEC_NAME} ${SOURCE_FILES})
-   target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
-   ```
-
-### Using package managers
-
-SciNumTools can be installed using one of the following package managers.
-
-#### PyPI (Python)
-
-The Python bindings are available on PyPI and can be installed with `pip`:
-
-```bash
-pip install scinumtools3
-```
-
-Package: https://pypi.org/project/scinumtools3/
-
-#### Homebrew (macOS)
-
-```bash
-brew tap vrtulka23/tap
-brew install scinumtools3
-```
-
-Tap repository: https://github.com/vrtulka23/homebrew-tap
-
-#### vcpkg
-
-```bash
-git clone https://github.com/microsoft/vcpkg.git
-cd vcpkg
-
-# Bootstrap (run once)
-./bootstrap-vcpkg.sh      # macOS/Linux
-# .\bootstrap-vcpkg.bat   # Windows
-
-# Install SciNumTools
-./vcpkg install scinumtools3
-```
-
-#### Conan
-
-Clone the repository and create the package locally:
-
-```bash
-git clone https://github.com/vrtulka23/scinumtools3.git
-cd scinumtools3
-
-conan create .
-```
-
-The package can then be consumed from your local Conan cache in other CMake projects.
-
-#### Docker
-
-Preconfigured Docker images are provided for both Python users and SciNumTools developers.
-
-Build the desired image from the repository root:
-
-```bash
-docker build -f packaging/docker/python/Dockerfile -t scinumtools3-python .
-```
-
-or
-
-```bash
-docker build -f packaging/docker/dev/Dockerfile -t scinumtools3-dev .
-```
-
-See [`packaging/docker/README.md`](packaging/docker/README.md) for detailed instructions on building, running, and using the available Docker images.
 
 ## Quick Example
 
@@ -311,6 +201,119 @@ snt dip parse \
     --print
 # father = 184 cm
 ```
+
+---
+
+## Installation
+
+### From the source code
+
+#### Download and install
+
+1) Manually
+
+   ```bash
+   # download repository
+   git clone https://github.com/vrtulka23/scinumtools3.git
+   cd scinumtools3
+   
+   # compile
+   cmake -G Ninja -B build
+   cmake --build build
+   
+   # run tests
+   ctest --test-dir build
+   
+   # install
+   cmake --install build
+   ```
+
+2) Using setup script
+
+   ```bash
+   sudo ./setup.sh -b -t -i  # build, run tests, install
+   ```
+
+#### Link `SciNumTools3` in your `CMAKE` project
+
+1) Find the package
+
+   ```bash
+   # find the `SNT` package
+   find_package(snt REQUIRED)
+
+   # link to your executable
+   add_executable(${EXEC_NAME} ${SOURCE_FILES})
+   target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
+   ```
+
+### Using package managers
+
+SciNumTools can be installed using one of the following package managers.
+
+#### PyPI (Python)
+
+The Python bindings are available on PyPI and can be installed with `pip`:
+
+```bash
+pip install scinumtools3
+```
+
+Package: https://pypi.org/project/scinumtools3/
+
+#### Homebrew (macOS)
+
+```bash
+brew tap vrtulka23/tap
+brew install scinumtools3
+```
+
+Tap repository: https://github.com/vrtulka23/homebrew-tap
+
+#### vcpkg
+
+```bash
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+
+# Bootstrap (run once)
+./bootstrap-vcpkg.sh      # macOS/Linux
+# .\bootstrap-vcpkg.bat   # Windows
+
+# Install SciNumTools
+./vcpkg install scinumtools3
+```
+
+#### Conan
+
+Clone the repository and create the package locally:
+
+```bash
+git clone https://github.com/vrtulka23/scinumtools3.git
+cd scinumtools3
+
+conan create .
+```
+
+The package can then be consumed from your local Conan cache in other CMake projects.
+
+#### Docker
+
+Preconfigured Docker images are provided for both Python users and SciNumTools developers.
+
+Build the desired image from the repository root:
+
+```bash
+docker build -f packaging/docker/python/Dockerfile -t scinumtools3-python .
+```
+
+or
+
+```bash
+docker build -f packaging/docker/dev/Dockerfile -t scinumtools3-dev .
+```
+
+See [`packaging/docker/README.md`](packaging/docker/README.md) for detailed instructions on building, running, and using the available Docker images.
 
 ---
 
