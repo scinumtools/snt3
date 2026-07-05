@@ -2,7 +2,12 @@ cmake_minimum_required(VERSION 3.22)
 cmake_policy(SET CMP0074 NEW)
 set(CMAKE_TRY_ENABLE_TARGET_TYPE STATIC_LIBRARY)
 
-project(scinumtools VERSION 1.0 LANGUAGES CXX)
+# set environmental variables
+file(READ "settings.env" ENV_CONTENTS)
+string(REGEX MATCH "CODE_VERSION=([^\n\r]*)" _ ${ENV_CONTENTS})
+string(REGEX REPLACE ".*CODE_VERSION=([^\n\r]*).*" "\\1" CODE_VERSION "${_}")
+
+project(scinumtools3 VERSION "${CODE_VERSION}" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -30,11 +35,6 @@ endif()
 
 # ensure all targets (executables, static libs, shared libs) are built with -fPIC if required
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-# set environmental variables
-file(READ "settings.env" ENV_CONTENTS)
-string(REGEX MATCH "CODE_VERSION=([^\n\r]*)" _ ${ENV_CONTENTS})
-string(REGEX REPLACE ".*CODE_VERSION=([^\n\r]*).*" "\\1" CODE_VERSION "${_}")
 
 # set preprocessor flags
 add_compile_definitions(CODE_VERSION="${CODE_VERSION}")
@@ -85,7 +85,7 @@ function(set_module_options NAME DEFAULT_MODULES DEFAULT_PYTHON DEFAULT_TESTS)
 endfunction()
 
 # set options for all modules
-message("Scientific Numerical Tools (SNT)")
+message("Scientific Numerical Tools v3 (SNT)")
 message("Code version: ${CODE_VERSION}")
 message(STATUS "Compiled parts:")
 option(ENABLE_UNIT_TESTS "Main testing enabler" ON)  # switch off all tests

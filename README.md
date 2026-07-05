@@ -153,6 +153,19 @@ cd vcpkg
 ./vcpkg install scinumtools3
 ```
 
+#### Conan
+
+Clone the repository and create the package locally:
+
+```bash
+git clone https://github.com/vrtulka23/scinumtools3.git
+cd scinumtools3
+
+conan create .
+```
+
+The package can then be consumed from your local Conan cache in other CMake projects.
+
 ## Quick Example
 
 ### Domain Specific Languages
