@@ -30,12 +30,12 @@ def test_cursor_traverse():
     params_parsed.append(group.to_string());
     cmap = cursor.get_map("jerk.snap");
     for key, item in cmap.items():
-        params_parsed.append(item.get_path());
+        params_parsed.append(item.path);
         group = item.get_group("bar");
         if key == "crackle":
             clist = item.get_list("pop");
             for item in clist:
-                params_parsed.append(item.get_path());
+                params_parsed.append(item.path);
                 group = item.get_group("foo");
                 params_parsed.append(group.to_string());
         elif key == "lock":
@@ -80,53 +80,41 @@ def test_cursor_values():
     cursor = env.request_cursor()
 
     group = cursor.get_group("jerk.baz")
-    vscalar = group.to_scalar()
-    assert vscalar == False
-    vlist = group.to_list()
-    assert len(vlist) == 1
-    assert vlist == [False]
+    assert type(group.value) == bool
+    assert group.value == False
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
-    assert vnumpy == np.array([False])
+    assert vnumpy == np.array(False)
     
     group = cursor.get_group("jerk.snap[crackle].pop[0].foo")
-    assert group.get_shape() == [3]
-    vscalar = group.to_scalar()
-    assert vscalar == True
-    vlist = group.to_list()
-    assert len(vlist) == 3
-    assert vlist == [True,False,True]
+    assert group.shape == [3]
+    assert type(group.value) == list
+    assert group.value == [True,False,True]
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
-    assert np.all(vnumpy == np.array([True,False,True]))
+    np.testing.assert_array_equal(vnumpy, np.array([True,False,True]))
     
     group = cursor.get_group("jerk.snap[crackle].pop[1].foo")
-    vscalar = group.to_scalar()
-    assert vscalar == 1
-    vlist = group.to_list()
-    assert len(vlist) == 6
-    assert vlist == [1,2,3,4,5,6]
+    assert group.shape == [2,3]
+    assert type(group.value) == list
+    assert group.value == [1,2,3,4,5,6]
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
-    assert np.all(vnumpy == np.array([[1,2,3],[4,5,6]]))
+    np.testing.assert_array_equal(vnumpy, np.array([[1, 2, 3], [4, 5, 6]]))
     assert vnumpy.shape == (2,3)
     
     group = cursor.get_group("jerk.snap[crackle].pop[2].foo")
-    vscalar = group.to_scalar()
-    assert vscalar == 4e5
-    vlist = group.to_list()
-    assert len(vlist) == 1
-    assert vlist == [4e5]
+    assert group.shape == [1]
+    assert type(group.value) == float
+    assert group.value == 4e5
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
-    assert vnumpy == np.array([4e5])
+    assert vnumpy == np.array(4e5)
 
     group = cursor.get_group("jerk.snap[lock].bar")
-    vscalar = group.to_scalar()
-    assert vscalar == "shot"
-    vlist = group.to_list()
-    assert len(vlist) == 1
-    assert vlist == ["shot"]
+    assert group.shape == [1]
+    assert type(group.value) == str
+    assert group.value == "shot"
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
     assert vnumpy == np.array(["shot"])

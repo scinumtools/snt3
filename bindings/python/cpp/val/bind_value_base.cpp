@@ -12,6 +12,9 @@ using namespace snt;
 void init_value_base(py::module_& m) {}
 
 py::object to_python_value(const val::BaseValue::PointerType& value) {
+    if (value == nullptr)
+        return py::none();
+
     std::vector<size_t> shape = value->get_shape();
     std::vector<py::ssize_t> strides(shape.size());
 
@@ -33,50 +36,181 @@ py::object to_python_value(const val::BaseValue::PointerType& value) {
 
     switch (value->get_dtype()) {
     case core::DataType::Boolean: {
-        // TODO: in the future bool should be stored as uint8_t because bool is not 8 bit,
-        // but 1 bit
         val::ArrayValue<uint8_t>* val = dynamic_cast<val::ArrayValue<uint8_t>*>(value.get());
-        if (!val)
+        if (!val) {
             throw std::runtime_error("Type mismatch");
-        auto strides = compute_strides(sizeof(uint8_t));
-        return py::array_t<uint8_t>(shape, strides, val->get_data(), capsule);
+        } else if (val->get_size() == 0) { // return none value
+            return py::none();
+        } else if (val->get_size() == 1) { // return as a scalar
+            return py::bool_(static_cast<bool>(val->get_value(0)));
+        } else { // return as a list
+            py::list result;
+            for (size_t i = 0; i < val->get_size(); ++i)
+                result.append(py::bool_(static_cast<bool>(val->get_value(i))));
+            return result;
+        }
     }
     case core::DataType::Integer16:
     case core::DataType::Integer32:
     case core::DataType::Integer64:
     case core::DataType::Integer: {
         val::ArrayValue<int64_t>* val = dynamic_cast<val::ArrayValue<int64_t>*>(value.get());
-        if (!val)
+        if (!val) {
             throw std::runtime_error("Type mismatch");
-        auto strides = compute_strides(sizeof(int64_t));
-        py::array arr(py::dtype::of<int32_t>(), shape, strides, val->get_data(), capsule);
-        arr.attr("flags").attr("writeable") = false;
-        return arr;
+        } else if (val->get_size() == 0) { // return none value
+            return py::none();
+        } else if (val->get_size() == 1) { // return as a scalar
+            return py::int_(val->get_value(0));
+        } else { // return as a list
+            py::list result(val->get_size());
+            for (size_t i = 0; i < val->get_size(); ++i)
+                result[i] = py::int_(val->get_data()[i]);
+            return result;
+        }
     }
     case core::DataType::Float32:
     case core::DataType::Float64:
     case core::DataType::Float: {
         val::ArrayValue<double>* val = dynamic_cast<val::ArrayValue<double>*>(value.get());
-        if (!val)
+        if (!val) {
             throw std::runtime_error("Type mismatch");
-        auto strides = compute_strides(sizeof(double));
-        return py::array_t<double>(shape, strides, val->get_data(), capsule);
+        } else if (val->get_size() == 0) { // return none value
+            return py::none();
+        } else if (val->get_size() == 1) { // return as a scalar
+            return py::float_(val->get_value(0));
+        } else { // return as a list
+            py::list result(val->get_size());
+            for (size_t i = 0; i < val->get_size(); ++i)
+                result[i] = py::float_(val->get_data()[i]);
+            return result;
+        }
     }
     case core::DataType::String: {
         val::ArrayValue<std::string>* val = dynamic_cast<val::ArrayValue<std::string>*>(value.get());
-        py::list list;
-        // NOTE: For string-array conversion I could not find an alternative
-        //       implementation that would work both on clang/macos and gcc/linux
-        //       so for now we stick with this one.
-        for (size_t i = 0; i < val->get_size(); i++)
-            list.append(py::str(val->get_value(i)));
-        py::tuple t(shape.size());
-        for (size_t i = 0; i < shape.size(); ++i)
-            t[i] = py::cast(shape[i]);
-        py::module np = py::module::import("numpy");
-        py::object arr = np.attr("array")(list);
-        py::object reshaped = arr.attr("reshape")(t);
-        return reshaped.cast<py::array>();
+        if (!val) {
+            throw std::runtime_error("Type mismatch");
+        } else if (val->get_size() == 0) { // return none value
+            return py::none();
+        } else if (val->get_size() == 1) { // return as a scalar
+            return py::str(val->get_value(0));
+        } else { // return as a list
+            py::list result(val->get_size());
+            for (size_t i = 0; i < val->get_size(); ++i)
+                result[i] = py::str(val->get_data()[i]);
+            return result;
+        }
+    }
+    default:
+        throw py::type_error("Unknown dtype in Environment");
+    }
+}
+
+py::object to_numpy_value(const val::BaseValue::PointerType& value) {
+    if (value == nullptr)
+        return py::none();
+
+    std::vector<size_t> shape = value->get_shape();
+    std::vector<py::ssize_t> strides(shape.size());
+
+    // Create a capsule to ensure lifetime safety
+    auto capsule = py::capsule(value.get(), [](void*) {
+        // Do nothing — environment owns the memory
+    });
+
+    // Compute strides correctly based on element type size
+    auto compute_strides = [&](py::ssize_t elem_size) {
+        std::vector<py::ssize_t> s(shape.size());
+        py::ssize_t stride = elem_size;
+        for (py::ssize_t j = static_cast<py::ssize_t>(shape.size()) - 1; j >= 0; --j) {
+            s[j] = stride;
+            stride *= static_cast<py::ssize_t>(shape[j]);
+        }
+        return s;
+    };
+
+    switch (value->get_dtype()) {
+    case core::DataType::Boolean: {
+        val::ArrayValue<uint8_t>* val = dynamic_cast<val::ArrayValue<uint8_t>*>(value.get());
+        if (!val)
+            throw std::runtime_error("Type mismatch");
+        if (val->get_size() == 0) { // empty array
+            return py::array_t<bool>(0);
+        } else if (val->get_size() == 1) { // scalar array
+            auto result = py::array_t<bool>(shape);
+            *result.mutable_data() = static_cast<bool>(val->get_value(0));
+            return result;
+        } else { // normal array
+            auto result = py::array_t<bool>(shape);
+            std::transform(val->get_data(), val->get_data() + val->get_size(), result.mutable_data(), [](uint8_t x) {
+                return static_cast<bool>(x);
+            });
+            return result;
+        }
+    }
+    case core::DataType::Integer16:
+    case core::DataType::Integer32:
+    case core::DataType::Integer64:
+    case core::DataType::Integer: {
+        val::ArrayValue<int64_t>* val = dynamic_cast<val::ArrayValue<int64_t>*>(value.get());
+        if (!val) {
+            throw std::runtime_error("Type mismatch");
+        } else if (val->get_size() == 0) { // return none value
+            return py::array_t<int64_t>(0);
+        } else if (val->get_size() == 1) { // scalar array
+            auto result = py::array_t<int64_t>({});
+            *result.mutable_data() = val->get_value(0);
+            return result;
+        } else { // return numpy array
+            auto result = py::array_t<int64_t>(shape);
+            std::copy(val->get_data(), val->get_data() + val->get_size(), result.mutable_data());
+            return result;
+        }
+    }
+    case core::DataType::Float32:
+    case core::DataType::Float64:
+    case core::DataType::Float: {
+        val::ArrayValue<double>* val = dynamic_cast<val::ArrayValue<double>*>(value.get());
+        if (!val) {
+            throw std::runtime_error("Type mismatch");
+        } else if (val->get_size() == 0) { // return none value
+            return py::array_t<float_t>(0);
+        } else if (val->get_size() == 1) { // scalar array
+            auto result = py::array_t<float_t>(shape);
+            *result.mutable_data() = val->get_value(0);
+            return result;
+        } else { // return numpy array
+            auto result = py::array_t<float_t>(shape);
+            std::copy(val->get_data(), val->get_data() + val->get_size(), result.mutable_data());
+            return result;
+        }
+    }
+    case core::DataType::String: {
+        val::ArrayValue<std::string>* val = dynamic_cast<val::ArrayValue<std::string>*>(value.get());
+        if (!val) {
+            throw std::runtime_error("Type mismatch");
+        } else if (val->get_size() == 0) { // return none value
+            std::vector<py::ssize_t> shape{0};
+            return py::array(py::dtype("O"), shape);
+        } else if (val->get_size() == 1) { // scalar array
+            std::vector<py::ssize_t> shape;
+            auto result = py::array(py::dtype("O"), shape);
+            *static_cast<py::object*>(result.mutable_data()) = py::str(val->get_value(0));
+            return result;
+        } else { // return numpy array
+            py::list list;
+            // NOTE: For string-array conversion I could not find an alternative
+            //       implementation that would work both on clang/macos and gcc/linux
+            //       so for now we stick with this one.
+            for (size_t i = 0; i < val->get_size(); i++)
+                list.append(py::str(val->get_value(i)));
+            py::tuple t(shape.size());
+            for (size_t i = 0; i < shape.size(); ++i)
+                t[i] = py::cast(shape[i]);
+            py::module np = py::module::import("numpy");
+            py::object arr = np.attr("array")(list);
+            py::object reshaped = arr.attr("reshape")(t);
+            return reshaped.cast<py::array>();
+        }
     }
     default:
         throw py::type_error("Unknown dtype in Environment");

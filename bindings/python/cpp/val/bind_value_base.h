@@ -12,4 +12,6 @@ using namespace snt;
 
 py::object to_python_value(const val::BaseValue::PointerType& value);
 
+py::object to_numpy_value(const val::BaseValue::PointerType& value);
+
 #endif // BINDIGS_PYTHON_DIP_VALUE_BASE_H

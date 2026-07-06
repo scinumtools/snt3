@@ -426,9 +426,10 @@ namespace snt::dip {
     bool Parser::part_array() {
         if (code.empty() || code.at(0) != SIGN_ARRAY_OPEN)
             return false;
-        std::cout << " " << value_shape.size() << " " << value_raw.size() << std::endl;
+        // std::cout << " " << value_shape.size() << " " << value_raw.size() << std::endl;
         std::string rm = parse_array(code, value_raw, value_shape);
-        std::cout << rm << " " << value_shape[0] << " " << value_shape.size() << " " << value_raw.size() << std::endl;
+        // std::cout << rm << " " << value_shape[0] << " " << value_shape.size() << " " << value_raw.size() <<
+        // std::endl;
         strip(rm);
         return true;
     }

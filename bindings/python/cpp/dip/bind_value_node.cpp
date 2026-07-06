@@ -27,4 +27,8 @@ void init_value_node(py::module_& m) {
     val.def_property_readonly("value", [](const dip::ValueNode& vnode) -> py::object {
         return to_python_value(vnode.value);
     });
+
+    val.def_property_readonly("shape", [](const dip::ValueNode& vnode) { return vnode.value->get_shape(); });
+
+    val.def("to_numpy", [](const dip::ValueNode& vnode) -> py::object { return to_numpy_value(vnode.value); });
 }
