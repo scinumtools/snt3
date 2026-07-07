@@ -262,14 +262,15 @@ pip install scinumtools3
 
 Package: https://pypi.org/project/scinumtools3/
 
-#### Homebrew (macOS)
+#### Conda
+
+SciNumTools is available on the **conda-forge** channel and can be installed with Conda:
 
 ```bash
-brew tap vrtulka23/tap
-brew install scinumtools3
+conda install conda-forge::scinumtools3
 ```
 
-Tap repository: https://github.com/vrtulka23/homebrew-tap
+Package: https://anaconda.org/conda-forge/scinumtools3
 
 #### vcpkg
 
@@ -284,6 +285,15 @@ cd vcpkg
 # Install SciNumTools
 ./vcpkg install scinumtools3
 ```
+
+#### Homebrew (macOS)
+
+```bash
+brew tap vrtulka23/tap
+brew install scinumtools3
+```
+
+Tap repository: https://github.com/vrtulka23/homebrew-tap
 
 #### Conan
 
