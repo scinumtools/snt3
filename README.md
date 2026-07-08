@@ -209,6 +209,8 @@ cd vcpkg
 ./vcpkg install scinumtools3
 ```
 
+Package: https://vcpkg.io/en/package/scinumtools3
+
 #### Homebrew (macOS)
 
 ```bash
