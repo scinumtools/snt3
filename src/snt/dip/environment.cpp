@@ -62,10 +62,12 @@ namespace snt::dip {
         const std::string& request, const RequestType rtype, const std::string& to_unit
     ) const {
         val::BaseValue::PointerType new_value = nullptr;
+        bool found = false;
         switch (rtype) {
         case RequestType::Function: {
             FunctionList::ValueFunctionType func = functions.get_value(request);
             new_value = func(*this);
+            found = true;
             break;
         }
         case RequestType::Reference: {
@@ -74,7 +76,13 @@ namespace snt::dip {
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
                 if (vnode && vnode->path.name == node_path) {
-                    new_value = vnode->value->clone();
+                    found = true;
+                    if (vnode->value != nullptr) {
+                        new_value = vnode->value->clone();
+                    } else {
+                        new_value = nullptr;
+                        break;
+                    }
                     if (to_unit != core::KEYWORD_NONE) {
                         // NOTE: If unit conversion is not required, the to_unit should be set to
                         // "none".
@@ -103,7 +111,7 @@ namespace snt::dip {
         default:
             throw std::runtime_error("Unrecognized environment request type");
         }
-        if (new_value == nullptr)
+        if (!found)
             throw std::runtime_error("Value environment request returns an empty pointer: " + request);
         return std::move(new_value);
     }

@@ -1,3 +1,5 @@
+#include "../bindings/python/cpp/val/bind_value_base.h"
+
 #include <codecvt>
 #include <locale>
 #include <pybind11/numpy.h>
@@ -35,11 +37,18 @@ void init_environment(py::module_& m) {
 
     env.def(
         "request_value",
-        [](const dip::Environment& e, const std::string& path, const std::string& to_unit) {
+        [](
+            const dip::Environment& e, const std::string& path, const std::string& to_unit, const bool as_numpy
+        ) -> py::object {
             val::BaseValue::PointerType value = e.request_value(path, dip::RequestType::Reference, to_unit);
+            if (as_numpy)
+                return to_numpy_value(value);
+            else
+                return to_python_value(value);
         },
         py::arg("path"),
-        py::arg("to_units") = ""
+        py::arg("to_units") = "",
+        py::arg("as_numpy") = false
     );
 
     env.def("request_cursor", &dip::Environment::request_cursor);

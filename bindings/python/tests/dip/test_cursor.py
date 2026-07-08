@@ -84,7 +84,7 @@ def test_cursor_values():
     assert group.value == False
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
-    assert vnumpy == np.array(False)
+    np.testing.assert_array_equal(vnumpy, np.array(False))
     
     group = cursor.get_group("jerk.snap[crackle].pop[0].foo")
     assert group.shape == [3]
@@ -97,7 +97,7 @@ def test_cursor_values():
     group = cursor.get_group("jerk.snap[crackle].pop[1].foo")
     assert group.shape == [2,3]
     assert type(group.value) == list
-    assert group.value == [1,2,3,4,5,6]
+    assert group.value == [[1,2,3],[4,5,6]]
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
     np.testing.assert_array_equal(vnumpy, np.array([[1, 2, 3], [4, 5, 6]]))
@@ -109,7 +109,7 @@ def test_cursor_values():
     assert group.value == 4e5
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
-    assert vnumpy == np.array(4e5)
+    np.testing.assert_array_equal(vnumpy, np.array(4e5))
 
     group = cursor.get_group("jerk.snap[lock].bar")
     assert group.shape == [1]
@@ -117,5 +117,5 @@ def test_cursor_values():
     assert group.value == "shot"
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
-    assert vnumpy == np.array(["shot"])
+    np.testing.assert_array_equal(vnumpy, np.array(["shot"]))
     
