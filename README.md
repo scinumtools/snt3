@@ -171,47 +171,6 @@ In addition, parameters commonly require validation rules, numerical constraints
 
 ## Installation
 
-### From the source code
-
-#### Download and install
-
-1) Manually
-
-   ```bash
-   # download repository
-   git clone https://github.com/vrtulka23/scinumtools3.git
-   cd scinumtools3
-   
-   # compile
-   cmake -G Ninja -B build
-   cmake --build build
-   
-   # run tests
-   ctest --test-dir build
-   
-   # install
-   cmake --install build
-   ```
-
-2) Using setup script
-
-   ```bash
-   sudo ./setup.sh -b -t -i  # build, run tests, install
-   ```
-
-#### Link `SciNumTools3` in your `CMAKE` project
-
-1) Find the package
-
-   ```bash
-   # find the `SNT` package
-   find_package(snt REQUIRED)
-
-   # link to your executable
-   add_executable(${EXEC_NAME} ${SOURCE_FILES})
-   target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
-   ```
-
 ### Using package managers
 
 SciNumTools can be installed using one of the following package managers.
@@ -289,6 +248,48 @@ docker build -f packaging/docker/dev/Dockerfile -t scinumtools3-dev .
 ```
 
 See [`packaging/docker/README.md`](packaging/docker/README.md) for detailed instructions on building, running, and using the available Docker images.
+
+### From the source code
+
+#### Download and install
+
+1) Manually
+
+   ```bash
+   # download repository
+   git clone https://github.com/vrtulka23/scinumtools3.git
+   cd scinumtools3
+   
+   # compile
+   cmake -G Ninja -B build
+   cmake --build build
+   
+   # run tests
+   ctest --test-dir build
+   
+   # install
+   cmake --install build
+   ```
+
+2) Using setup script
+
+   ```bash
+   sudo ./setup.sh -b -t -i  # build, run tests, install
+   ```
+
+#### Link `SciNumTools3` in your `CMAKE` project
+
+1) Find the package
+
+   ```bash
+   # find the `SNT` package
+   find_package(snt REQUIRED)
+
+   # link to your executable
+   add_executable(${EXEC_NAME} ${SOURCE_FILES})
+   target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
+   ```
+
 
 ---
 
