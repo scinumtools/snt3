@@ -1,5 +1,6 @@
 #include "../parsers.h"
 
+#include <algorithm>
 #include <snt/dip/environment.h>
 #include <snt/dip/nodes/node_boolean.h>
 #include <snt/dip/nodes/node_value.h>
@@ -64,14 +65,16 @@ namespace snt::dip {
         const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
     ) const {
         std::vector<bool> bool_values;
-        bool_values.reserve(value_inputs.size());
-        for (const auto& value : value_inputs) {
-            if (value == core::KEYWORD_TRUE)
-                bool_values.push_back(true);
-            else if (value == core::KEYWORD_FALSE)
-                bool_values.push_back(false);
-            else
-                throw std::runtime_error("Value cannot be casted as boolean from the given string: " + value);
+        if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+            bool_values.reserve(value_inputs.size());
+            for (const auto& value : value_inputs) {
+                if (value == core::KEYWORD_TRUE)
+                    bool_values.push_back(true);
+                else if (value == core::KEYWORD_FALSE)
+                    bool_values.push_back(false);
+                else
+                    throw std::runtime_error("Value cannot be casted as boolean array from the given string: " + value);
+            }
         }
         return std::make_unique<val::ArrayValueBool>(bool_values, shape);
     }

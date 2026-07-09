@@ -194,7 +194,7 @@ namespace snt::dip {
         if (str == core::KEYWORD_TRUE || str == core::KEYWORD_FALSE) {
             dtype_raw = {"", std::string(KEYWORD_BOOLEAN), ""};
             value_raw.push_back(str);
-            value_origin = ValueOrigin::String;
+            value_origin = ValueOrigin::Boolean;
             return true;
         }
         return false;
@@ -218,7 +218,7 @@ namespace snt::dip {
         if (i < str.size() && std::all_of(str.begin() + i_signed, str.end(), ::isdigit)) {
             dtype_raw = {"", std::string(KEYWORD_INTEGER), ""};
             value_raw.push_back(str);
-            value_origin = ValueOrigin::String;
+            value_origin = ValueOrigin::Number;
             return true;
         }
         return false;
@@ -254,13 +254,13 @@ namespace snt::dip {
             if (exp_digits && i == str.size()) {
                 dtype_raw = {"", std::string(KEYWORD_FLOAT), ""};
                 value_raw.push_back(str);
-                value_origin = ValueOrigin::String;
+                value_origin = ValueOrigin::Number;
                 return true;
             }
         } else if (is_float && has_digits && i == str.size()) {
             dtype_raw = {"", std::string(KEYWORD_FLOAT), ""};
             value_raw.push_back(str);
-            value_origin = ValueOrigin::String;
+            value_origin = ValueOrigin::Number;
             return true;
         }
         return false;
@@ -426,10 +426,8 @@ namespace snt::dip {
     bool Parser::part_array() {
         if (code.empty() || code.at(0) != SIGN_ARRAY_OPEN)
             return false;
-        // std::cout << " " << value_shape.size() << " " << value_raw.size() << std::endl;
         std::string rm = parse_array(code, value_raw, value_shape);
-        // std::cout << rm << " " << value_shape[0] << " " << value_shape.size() << " " << value_raw.size() <<
-        // std::endl;
+        value_origin = ValueOrigin::Array;
         strip(rm);
         return true;
     }

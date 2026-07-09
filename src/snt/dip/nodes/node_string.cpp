@@ -59,7 +59,11 @@ namespace snt::dip {
     val::BaseValue::PointerType StringNode::cast_array_value(
         const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
     ) const {
-        return std::make_unique<val::ArrayValueStr>(value_inputs, shape);
+        if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+            return std::make_unique<val::ArrayValueStr>(value_inputs, shape);
+        } else {
+            return std::make_unique<val::ArrayValueStr>(std::vector<std::string>{}, shape);
+        }
     }
 
     ValueNode::PointerType StringNode::clone(const Path& pth) const {

@@ -90,7 +90,19 @@ namespace snt::dip {
 
     enum class CaseType { IF, ELIF, ELSE, END };
 
-    enum class ValueOrigin { None, Keyword, Number, String, Reference, ReferenceRaw, Function, Expression };
+    enum class ValueOrigin {
+        Empty,        // empty value
+        None,         // value is set as "none"
+        Keyword,      // value is a keyword
+        Boolean,      // value is a boolean
+        Number,       // value is a number
+        String,       // value is a string
+        Array,        // value was parsed from an array
+        Reference,    // value was obtained from a reference
+        ReferenceRaw, // value was optained from a raw reference
+        Function,     // value was returned from a function
+        Expression    // value was parsed from an expression
+    };
 
     enum class NodeDtype {
         None,

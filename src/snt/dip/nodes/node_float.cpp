@@ -81,23 +81,29 @@ namespace snt::dip {
         switch (value_dtype) {
         case core::DataType::Float32: {
             std::vector<float> arr;
-            arr.reserve(value_inputs.size());
-            for (const auto& s : value_inputs)
-                arr.push_back(std::stof(s));
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back(std::stof(s));
+            }
             return std::make_unique<val::ArrayValueFloat32>(arr, shape);
         }
         case core::DataType::Float64: {
             std::vector<double> arr;
-            arr.reserve(value_inputs.size());
-            for (const auto& s : value_inputs)
-                arr.push_back(std::stod(s));
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back(std::stod(s));
+            }
             return std::make_unique<val::ArrayValueFloat64>(arr, shape);
         }
         case core::DataType::Float128: {
             std::vector<long double> arr;
-            arr.reserve(value_inputs.size());
-            for (const auto& s : value_inputs)
-                arr.push_back(std::stold(s));
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back(std::stold(s));
+            }
             return std::make_unique<val::ArrayValueFloat128>(arr, shape);
         }
         default:

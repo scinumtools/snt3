@@ -123,3 +123,70 @@ TEST(ParseArrays, MultiLine) {
     EXPECT_EQ(vnode->value->to_string(), "[[true, true], [true, false]]");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 }
+
+TEST(ParseArrays, Empty) {
+
+    // boolean
+    dip::DIP d;
+    d.add_string(
+        "foo bool[:] = []\n"
+        "bar bool[:,:] = []\n"
+    );
+    dip::Environment env = d.parse();
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->path.name, "foo");
+    EXPECT_EQ(vnode->value->to_string(), "[]");
+
+    vnode = env.nodes.at(1);
+    EXPECT_EQ(vnode->path.name, "bar");
+    EXPECT_EQ(vnode->value->to_string(), "[]");
+
+    // integer
+    d = dip::DIP();
+    d.add_string(
+        "foo int[:] = []\n"
+        "bar int[:,:] = []\n"
+    );
+    env = d.parse();
+
+    vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->path.name, "foo");
+    EXPECT_EQ(vnode->value->to_string(), "[]");
+
+    vnode = env.nodes.at(1);
+    EXPECT_EQ(vnode->path.name, "bar");
+    EXPECT_EQ(vnode->value->to_string(), "[]");
+
+    // float
+    d = dip::DIP();
+    d.add_string(
+        "foo float[:] = []\n"
+        "bar float[:,:] = []\n"
+    );
+    env = d.parse();
+
+    vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->path.name, "foo");
+    EXPECT_EQ(vnode->value->to_string(), "[]");
+
+    vnode = env.nodes.at(1);
+    EXPECT_EQ(vnode->path.name, "bar");
+    EXPECT_EQ(vnode->value->to_string(), "[]");
+
+    // string
+    d = dip::DIP();
+    d.add_string(
+        "foo str[:] = []\n"
+        "bar str[:,:] = []\n"
+    );
+    env = d.parse();
+
+    vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->path.name, "foo");
+    EXPECT_EQ(vnode->value->to_string(), "[]");
+
+    vnode = env.nodes.at(1);
+    EXPECT_EQ(vnode->path.name, "bar");
+    EXPECT_EQ(vnode->value->to_string(), "[]");
+}

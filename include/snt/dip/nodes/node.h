@@ -21,9 +21,9 @@ namespace snt::dip {
         val::Array::RangeType value_slice;    ///< slice of an injected node value
         std::string units_raw;                ///< raw units string
         val::Array::RangeType dimension;      ///< list of array dimensions
-        Node() : indent(0), value_origin(ValueOrigin::String) {};
-        Node(const Line& l) : line(l), indent(0), value_origin(ValueOrigin::String) {};
-        Node(const std::string& nm) : path(nm), indent(0), value_origin(ValueOrigin::String) {};
+        Node() : indent(0), value_origin(ValueOrigin::Empty) {};
+        Node(const Line& l) : line(l), indent(0), value_origin(ValueOrigin::Empty) {};
+        Node(const std::string& nm) : path(nm), indent(0), value_origin(ValueOrigin::Empty) {};
         virtual ~Node() = default;
         std::string to_string();
     };

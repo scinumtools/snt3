@@ -41,6 +41,8 @@ namespace snt::dip {
         value = nullptr;
         if (value_input == nullptr && !value_raw.empty() && !value_raw.at(0).empty()) {
             value = cast_value();
+        } else if (value_input == nullptr && value_origin == ValueOrigin::Array) {
+            value = cast_value();
         } else if (value_input != nullptr) {
             if (value_input->get_dtype() == value_dtype)
                 value = std::move(value_input);
@@ -195,11 +197,14 @@ namespace snt::dip {
             vdim.assign(dimension.size(), 0);
         } else {
             vdim = value->get_shape();
-            if (dimension.size() != vdim.size())
+            if (vdim.size() == 1 && vdim[0] == 0) {
+                vdim.assign(dimension.size(), 0);
+            } else if (dimension.size() != vdim.size()) {
                 throw std::runtime_error(
                     "Number of value dimensions does not match that of node: " + std::to_string(vdim.size()) +
                     "!=" + std::to_string(dimension.size())
                 );
+            }
         }
         for (size_t i = 0; i < dimension.size(); i++) {
             size_t dmin = dimension[i].dmin;

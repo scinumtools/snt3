@@ -80,7 +80,7 @@ namespace snt::core {
         size_t dim
     ) {
         std::ostringstream oss;
-        if (value.size() > 1)
+        if (value.size() > 1 || value.size() == 0)
             oss << SYMBOL_ARRAY_START;
         for (size_t i = 0; i < shape[dim]; i++) {
             if (i > 0)
@@ -115,7 +115,7 @@ namespace snt::core {
                 offset++;
             }
         }
-        if (value.size() > 1)
+        if (value.size() > 1 || value.size() == 0)
             oss << SYMBOL_ARRAY_END;
         return oss.str();
     }

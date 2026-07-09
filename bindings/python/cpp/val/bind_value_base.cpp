@@ -2,6 +2,7 @@
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <snt/dip/settings.h>
 #include <snt/val/value_base.h>
 #include <snt/val/values_number.h>
 #include <snt/val/values_string.h>
@@ -24,7 +25,7 @@ py::object to_python_value(const val::BaseValue::PointerType& value) {
         if (!val) {
             throw std::runtime_error("Type mismatch: uint8_t");
         } else if (val->get_size() == 0) { // return none value
-            return py::none();
+            return py::list();
         } else if (val->get_size() == 1) { // return as a scalar
             return py::bool_(static_cast<bool>(val->get_value(0)));
         } else { // return as a list
@@ -45,7 +46,7 @@ py::object to_python_value(const val::BaseValue::PointerType& value) {
         if (!val) {
             throw std::runtime_error("Type mismatch: int64_t");
         } else if (val->get_size() == 0) { // return none value
-            return py::none();
+            return py::list();
         } else if (val->get_size() == 1) { // return as a scalar
             return py::int_(val->get_value(0));
         } else { // return as a list
@@ -60,7 +61,7 @@ py::object to_python_value(const val::BaseValue::PointerType& value) {
         if (!val) {
             throw std::runtime_error("Type mismatch: double");
         } else if (val->get_size() == 0) { // return none value
-            return py::none();
+            return py::list();
         } else if (val->get_size() == 1) { // return as a scalar
             return py::float_(val->get_value(0));
         } else { // return as a list
@@ -73,7 +74,7 @@ py::object to_python_value(const val::BaseValue::PointerType& value) {
         if (!val) {
             throw std::runtime_error("Type mismatch: string");
         } else if (val->get_size() == 0) { // return none value
-            return py::none();
+            return py::list();
         } else if (val->get_size() == 1) { // return as a scalar
             return py::str(val->get_value(0));
         } else { // return as a list

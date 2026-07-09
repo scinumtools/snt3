@@ -101,44 +101,56 @@ namespace snt::dip {
         switch (value_dtype) {
         case core::DataType::Integer16_U: {
             std::vector<uint16_t> arr;
-            arr.reserve(value_inputs.size());
-            for (const auto& s : value_inputs)
-                arr.push_back((unsigned short)std::stoul(s));
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back((unsigned short)std::stoul(s));
+            }
             return std::make_unique<val::ArrayValueUint16>(arr, shape);
         }
         case core::DataType::Integer16: {
             std::vector<int16_t> arr;
-            arr.reserve(value_inputs.size());
-            for (const auto& s : value_inputs)
-                arr.push_back((short)std::stoi(s));
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back((short)std::stoi(s));
+            }
             return std::make_unique<val::ArrayValueInt16>(arr, shape);
         }
         case core::DataType::Integer32_U: {
             std::vector<uint32_t> arr;
-            arr.reserve(value_inputs.size());
-            for (const auto& s : value_inputs)
-                arr.push_back(std::stoul(s));
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back(std::stoul(s));
+            }
             return std::make_unique<val::ArrayValueUint32>(arr, shape);
         }
         case core::DataType::Integer32: {
             std::vector<int32_t> arr;
-            arr.reserve(value_inputs.size());
-            for (const auto& s : value_inputs)
-                arr.push_back(std::stoi(s));
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back(std::stoi(s));
+            }
             return std::make_unique<val::ArrayValueInt32>(arr, shape);
         }
         case core::DataType::Integer64_U: {
             std::vector<uint64_t> arr;
-            arr.reserve(value_inputs.size());
-            for (const auto& s : value_inputs)
-                arr.push_back(std::stoull(s));
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back(std::stoull(s));
+            }
             return std::make_unique<val::ArrayValueUint64>(arr, shape);
         }
         case core::DataType::Integer64: {
             std::vector<int64_t> arr;
-            arr.reserve(value_inputs.size());
-            for (const auto& s : value_inputs)
-                arr.push_back(std::stoll(s));
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back(std::stoll(s));
+            }
             return std::make_unique<val::ArrayValueInt64>(arr, shape);
         }
         default:
