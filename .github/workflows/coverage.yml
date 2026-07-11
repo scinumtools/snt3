@@ -48,6 +48,7 @@ jobs:
 
       - name: Generate coverage report
         run: |
+          mkdir -p coverage
           gcovr \
             --root . \
             --object-directory build \
