@@ -11,47 +11,52 @@
 #include <snt/dip/nodes/node_value.h>
 
 namespace py = pybind11;
-using namespace snt;
 
-void init_environment(py::module_& m) {
+namespace snt::bind::python {
 
-    auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList");
-    nl.def(py::init<>());
-    nl.def(
-        "__getitem__", [](const dip::NodeList<dip::ValueNode>& self, size_t i) { return self.at(i); }, py::arg("node")
-    );
+    void init_environment(py::module_& m) {
 
-    auto env = py::class_<dip::Environment>(m, "Environment");
-    env.def(py::init<>());
-    env.def_property_readonly("nodes", [](const dip::Environment& e) { return &e.nodes; });
-    env.def_property_readonly("size", [](const dip::Environment& e) { return e.nodes.size(); });
+        auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList");
+        nl.def(py::init<>());
+        nl.def(
+            "__getitem__",
+            [](const dip::NodeList<dip::ValueNode>& self, size_t i) { return self.at(i); },
+            py::arg("node")
+        );
 
-    env.def(
-        "request_group",
-        [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& tags) {
-            return e.request_group(path, dip::RequestType::Reference, tags);
-        },
-        py::arg("path"),
-        py::arg("tags") = std::vector<std::string>{}
-    );
+        auto env = py::class_<dip::Environment>(m, "Environment");
+        env.def(py::init<>());
+        env.def_property_readonly("nodes", [](const dip::Environment& e) { return &e.nodes; });
+        env.def_property_readonly("size", [](const dip::Environment& e) { return e.nodes.size(); });
 
-    env.def(
-        "request_value",
-        [](
-            const dip::Environment& e, const std::string& path, const std::string& to_unit, const bool as_numpy
-        ) -> py::object {
-            val::BaseValue::PointerType value = e.request_value(path, dip::RequestType::Reference, to_unit);
-            if (as_numpy)
-                return to_numpy_value(value);
-            else
-                return to_python_value(value);
-        },
-        py::arg("path"),
-        py::arg("to_units") = "",
-        py::arg("as_numpy") = false
-    );
+        env.def(
+            "request_group",
+            [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& tags) {
+                return e.request_group(path, dip::RequestType::Reference, tags);
+            },
+            py::arg("path"),
+            py::arg("tags") = std::vector<std::string>{}
+        );
 
-    env.def("request_cursor", &dip::Environment::request_cursor);
+        env.def(
+            "request_value",
+            [](
+                const dip::Environment& e, const std::string& path, const std::string& to_unit, const bool as_numpy
+            ) -> py::object {
+                val::BaseValue::PointerType value = e.request_value(path, dip::RequestType::Reference, to_unit);
+                if (as_numpy)
+                    return to_numpy_value(value);
+                else
+                    return to_python_value(value);
+            },
+            py::arg("path"),
+            py::arg("to_units") = "",
+            py::arg("as_numpy") = false
+        );
 
-    // env.def("request_code", &dip::Environment::request_code, py::arg("source_name"));
-}
+        env.def("request_cursor", &dip::Environment::request_cursor);
+
+        // env.def("request_code", &dip::Environment::request_code, py::arg("source_name"));
+    }
+
+} // namespace snt::bind::python

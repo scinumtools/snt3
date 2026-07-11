@@ -2,13 +2,16 @@
 #include <snt/puq/systems/unit_system.h>
 
 namespace py = pybind11;
-using namespace snt;
 
-void init_puq_system(py::module_& m) {
+namespace snt::bind::python {
 
-    auto e = py::enum_<puq::SystemType>(m, "SystemType");
-    for (auto sys : puq::SystemMap) {
-        e.value(sys.second->SystemAbbrev.c_str(), sys.first);
+    void init_puq_system(py::module_& m) {
+
+        auto e = py::enum_<puq::SystemType>(m, "SystemType");
+        for (auto sys : puq::SystemMap) {
+            e.value(sys.second->SystemAbbrev.c_str(), sys.first);
+        }
+        e.export_values();
     }
-    e.export_values();
-}
+
+} // namespace snt::bind::python

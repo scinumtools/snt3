@@ -2,17 +2,21 @@
 
 namespace py = pybind11;
 
-void init_api_dip(py::module_&);
+namespace snt::bind::python {
 
-void init_api_puq(py::module_&);
+    void init_api_dip(py::module_&);
 
-void init_api(py::module_& m) {
+    void init_api_puq(py::module_&);
 
-    // Exposing DIP API
-    auto dip = m.def_submodule("dip", "Dimensional Input Parameters");
-    init_api_dip(dip);
+    void init_api(py::module_& m) {
 
-    // Exposing PUQ API
-    auto puq = m.def_submodule("puq", "Physical Units & Quantities");
-    init_api_puq(puq);
-}
+        // Exposing DIP API
+        auto dip = m.def_submodule("dip", "Dimensional Input Parameters");
+        init_api_dip(dip);
+
+        // Exposing PUQ API
+        auto puq = m.def_submodule("puq", "Physical Units & Quantities");
+        init_api_puq(puq);
+    }
+
+} // namespace snt::bind::python

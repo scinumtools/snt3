@@ -4,11 +4,14 @@
 #include <snt/dip/environment.h>
 
 namespace py = pybind11;
-using namespace snt;
 
-void init_value_base(py::module_& m);
+namespace snt::bind::python {
 
-void init_val(py::module_& m) {
+    void init_value_base(py::module_& m);
 
-    init_value_base(m);
-};
+    void init_val(py::module_& m) {
+
+        init_value_base(m);
+    };
+
+} // namespace snt::bind::python
