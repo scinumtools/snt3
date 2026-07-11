@@ -17,7 +17,7 @@ namespace snt::dip {
         std::string new_path = path_.empty() ? std::string(path) : path_ + "." + std::string(path);
         std::vector<Cursor> list;
         const Collection& col = env_->hierarchy.get_collection(new_path);
-        if (col.type == Path::CollectionType::LIST) {
+        if (col.kind == Path::Kind::LIST) {
             for (auto key : col.items) {
                 list.push_back(Cursor(env_, new_path + "[" + key + "]"));
             }
@@ -31,7 +31,7 @@ namespace snt::dip {
         std::string new_path = path_.empty() ? std::string(path) : path_ + "." + std::string(path);
         std::unordered_map<std::string, Cursor> map;
         const Collection& col = env_->hierarchy.get_collection(new_path);
-        if (col.type == Path::CollectionType::MAP) {
+        if (col.kind == Path::Kind::MAP) {
             for (auto key : col.items) {
                 map.insert({key, Cursor(env_, new_path + "[" + key + "]")});
             }
@@ -47,12 +47,18 @@ namespace snt::dip {
 
     val::Array::ShapeType Cursor::get_shape() const {
         val::BaseValue::PointerType value = env_->request_value("?" + path_);
-        return value->get_shape();
+        if (value)
+            return value->get_shape();
+        else
+            throw std::runtime_error("Requested path does not point to a value node: " + path_);
     }
 
     const std::string Cursor::to_string() const {
         val::BaseValue::PointerType value = env_->request_value("?" + path_);
-        return path_ + " = " + value->to_string();
+        if (value)
+            return "Cursor('" + path_ + "', " + value->to_string() + ")";
+        else
+            return "Cursor('" + path_ + "')";
     }
 
 } // namespace snt::dip

@@ -37,14 +37,14 @@ namespace snt::dip {
             name_full += cnode.path;
             // append FQ item selector and test if parent collections and item key exist
             auto itc = collections.find(name_full);
-            if (cnode.type == Path::CollectionType::MAP) {
+            if (cnode.kind == Path::Kind::MAP) {
                 if (itc == collections.end())
                     throw std::runtime_error("Collection does not exist: " + name_full);
                 else if (std::find(itc->second.items.begin(), itc->second.items.end(), cnode.item) ==
                          itc->second.items.end())
                     throw std::runtime_error("Collection item does not exist: " + cnode.item);
                 name_full += "[" + cnode.item + "]"; // use the key
-            } else if (cnode.type == Path::CollectionType::LIST) {
+            } else if (cnode.kind == Path::Kind::LIST) {
                 if (itc == collections.end())
                     throw std::runtime_error("Collection does not exist: " + name_full);
                 name_full += "[" + itc->second.items.back() + "]"; // use index of the most recent item
@@ -62,10 +62,10 @@ namespace snt::dip {
             name_full += cnode.path;
             // append FQ item selector and register new collections
             auto it = collections.find(name_full);
-            if (cnode.type == Path::CollectionType::MAP) {
+            if (cnode.kind == Path::Kind::MAP) {
                 if (it == collections.end()) { // create new collection
-                    collections[name_full] = Collection{name_full, {cnode.item}, Path::CollectionType::MAP};
-                } else if (it->second.type != Path::CollectionType::MAP) {
+                    collections[name_full] = Collection{name_full, {cnode.item}, Path::Kind::MAP};
+                } else if (it->second.kind != Path::Kind::MAP) {
                     throw std::runtime_error("Collection cannot append keyed items: " + name_full);
                 } else if (std::find(it->second.items.begin(), it->second.items.end(), cnode.item) ==
                            it->second.items.end()) { // append new item with a new key
@@ -76,12 +76,12 @@ namespace snt::dip {
                     );
                 }
                 name_full += "[" + cnode.item + "]";
-            } else if (cnode.type == Path::CollectionType::LIST) {
+            } else if (cnode.kind == Path::Kind::LIST) {
                 std::string key;
                 if (it == collections.end()) { // create new collection
                     key = "0";
-                    collections[name_full] = Collection{name_full, {key}, Path::CollectionType::LIST};
-                } else if (it->second.type != Path::CollectionType::LIST) {
+                    collections[name_full] = Collection{name_full, {key}, Path::Kind::LIST};
+                } else if (it->second.kind != Path::Kind::LIST) {
                     throw std::runtime_error("Collection cannot append indexed items: " + name_full);
                 } else { // append new item with an increased index
                     key = std::to_string(it->second.items.size());

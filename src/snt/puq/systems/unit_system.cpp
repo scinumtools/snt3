@@ -136,4 +136,8 @@ namespace snt::puq {
         closed = true;
     }
 
+    const std::string UnitSystem::to_string() const {
+        return "UnitSystem(" + current.data->SystemAbbrev + ")";
+    }
+
 } // namespace snt::puq

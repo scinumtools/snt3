@@ -17,17 +17,22 @@ namespace snt::bind::python {
     void init_puq_unit_system(py::module_& m) {
 
         // Expose UnitSystem
-        py::class_<puq::UnitSystem>(m, "UnitSystemBase")
-            .def(py::init<const puq::SystemType>())
-            .def("change", &puq::UnitSystem::change)
-            .def("close", &puq::UnitSystem::close);
+        py::class_<puq::UnitSystem> usb(m, "UnitSystemBase");
+        usb.def(py::init<const puq::SystemType>());
+        usb.def("change", &puq::UnitSystem::change);
+        usb.def("close", &puq::UnitSystem::close);
 
-        py::class_<UnitSystem, puq::UnitSystem>(m, "UnitSystem")
-            .def(py::init<const puq::SystemType>())
-            .def("enter", &UnitSystem::enter)
-            .def("exit", &UnitSystem::exit)
-            .def("__enter__", &UnitSystem::enter)
-            .def("__exit__", &UnitSystem::exit);
+        py::class_<UnitSystem, puq::UnitSystem> us(m, "UnitSystem");
+        us.def(py::init<const puq::SystemType>());
+
+        us.def("enter", &UnitSystem::enter);
+        us.def("exit", &UnitSystem::exit);
+        us.def("__enter__", &UnitSystem::enter);
+        us.def("__exit__", &UnitSystem::exit);
+
+        us.def("__repr__", &puq::UnitSystem::to_string);
+        us.def("__str__", &puq::UnitSystem::to_string);
+        us.def("to_string", &puq::UnitSystem::to_string);
     }
 
 } // namespace snt::bind::python

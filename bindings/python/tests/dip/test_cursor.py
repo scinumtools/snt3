@@ -4,6 +4,39 @@ import numpy as np
 from scinumtools3.puq import Quantity
 from scinumtools3.dip import DIP, Environment, ValueNode, Cursor
 
+def test_cursor_print():
+    
+    # prepare node collections
+    dip = DIP()
+    dip.add_string(
+        "foo\n"
+        "  jerk[]\n"
+        "    snap[crackle]\n"
+        "      pop int = 3\n"
+    )
+    env = dip.parse()
+    cursor = env.request_cursor()
+
+    # group collection
+    cur = cursor.get_group("foo");
+    assert repr(cur) == "Cursor('foo')" 
+    assert str(cur) == "Cursor('foo')"
+
+    # list collection
+    cur = cursor.get_list("foo.jerk");
+    assert repr(cur) == "[Cursor('foo.jerk[0]')]"
+    assert str(cur) == "[Cursor('foo.jerk[0]')]"
+
+    # map collection
+    cur = cursor.get_map("foo.jerk[0].snap");
+    assert repr(cur) == "{'crackle': Cursor('foo.jerk[0].snap[crackle]')}"
+    assert str(cur) == "{'crackle': Cursor('foo.jerk[0].snap[crackle]')}"
+
+    # group collection with a value
+    cur = cursor.get_group("foo.jerk[0].snap[crackle].pop");
+    assert repr(cur) == "Cursor('foo.jerk[0].snap[crackle].pop', 3)"
+    assert str(cur) == "Cursor('foo.jerk[0].snap[crackle].pop', 3)"
+    
 def test_cursor_traverse():
 
     # prepare node collections
@@ -30,12 +63,12 @@ def test_cursor_traverse():
     params_parsed.append(group.to_string());
     cmap = cursor.get_map("jerk.snap");
     for key, item in cmap.items():
-        params_parsed.append(item.path);
+        params_parsed.append(item.to_string());
         group = item.get_group("bar");
         if key == "crackle":
             clist = item.get_list("pop");
             for item in clist:
-                params_parsed.append(item.path);
+                params_parsed.append(item.to_string());
                 group = item.get_group("foo");
                 params_parsed.append(group.to_string());
         elif key == "lock":
@@ -44,16 +77,16 @@ def test_cursor_traverse():
 
     # set a reference list
     params_ref = [
-        "jerk.baz = false",
-        "jerk.snap[crackle]",
-        "jerk.snap[crackle].pop[0]",
-        "jerk.snap[crackle].pop[0].foo = true",
-        "jerk.snap[crackle].pop[1]",
-        "jerk.snap[crackle].pop[1].foo = 3",
-        "jerk.snap[crackle].pop[2]",
-        "jerk.snap[crackle].pop[2].foo = 4e5",
-        "jerk.snap[lock]",
-        "jerk.snap[lock].bar = \"shot\"",
+        "Cursor('jerk.baz', false)",
+        "Cursor('jerk.snap[crackle]')",
+        "Cursor('jerk.snap[crackle].pop[0]')",
+        "Cursor('jerk.snap[crackle].pop[0].foo', true)",
+        "Cursor('jerk.snap[crackle].pop[1]')",
+        "Cursor('jerk.snap[crackle].pop[1].foo', 3)",
+        "Cursor('jerk.snap[crackle].pop[2]')",
+        "Cursor('jerk.snap[crackle].pop[2].foo', 4e5)",
+        "Cursor('jerk.snap[lock]')",
+        "Cursor('jerk.snap[lock].bar', \"shot\")",
     ]
 
     # compare values

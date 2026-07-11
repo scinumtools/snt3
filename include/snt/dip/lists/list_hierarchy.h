@@ -23,7 +23,7 @@ namespace snt::dip {
     struct Collection {
         std::string path;               ///< Fully qualified path of a collection
         std::vector<std::string> items; ///< List of collection items
-        Path::CollectionType type;      ///< Collection type
+        Path::Kind kind;                ///< Collection path kind
     };
 
     /**

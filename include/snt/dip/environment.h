@@ -131,6 +131,13 @@ namespace snt::dip {
          * @return ArrayValue of a selected node
          */
         val::BaseValue::PointerType get_value(size_t index) const;
+
+        /**
+         * @brief Represent environment as a string
+         *
+         * @return String representation of an environment
+         */
+        const std::string to_string() const;
     };
 
 } // namespace snt::dip

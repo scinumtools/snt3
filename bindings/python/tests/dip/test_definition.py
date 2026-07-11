@@ -5,6 +5,29 @@ import os
 from scinumtools3.puq import Quantity
 from scinumtools3.dip import DIP, Environment, ValueNode
 
+def test_print():
+    dip = DIP()
+    dip.add_string("foo bool = false")
+    dip.add_string("bar int = 1")
+    env = dip.parse()
+
+    assert str(dip) == "DIP"
+    assert repr(dip) == "DIP"
+    assert dip.to_string() == "DIP"
+
+    assert str(env) == "Environment"
+    assert repr(env) == "Environment"
+    assert env.to_string() == "Environment"
+
+def test_context_manager():
+
+    with DIP() as dip:
+        dip.add_string("foo int = 3")
+        env = dip.parse()
+
+    assert env.size == 1
+    assert env.nodes[0].name == "foo"
+    
 def test_add_string():
 
     dip = DIP()

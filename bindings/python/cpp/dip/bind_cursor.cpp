@@ -38,8 +38,6 @@ namespace snt::bind::python {
 
         val.def(py::init<const dip::Environment*, std::string_view>(), py::arg("env"), py::arg("path") = "");
 
-        val.def("__str__", &dip::Cursor::to_string);
-
         val.def("get_group", &dip::Cursor::get_group, py::arg("path"));
 
         val.def("get_list", &dip::Cursor::get_list, py::arg("path"));
@@ -56,6 +54,8 @@ namespace snt::bind::python {
 
         val.def("to_numpy", [](const dip::Cursor& self) -> py::object { return to_numpy_value(self.get_value()); });
 
+        val.def("__str__", &dip::Cursor::to_string);
+        val.def("__repr__", &dip::Cursor::to_string);
         val.def("to_string", &dip::Cursor::to_string);
     }
 

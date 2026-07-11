@@ -47,7 +47,7 @@ namespace snt::dip {
                     throw std::runtime_error("Node collection has unclosed brackets: " + path);
                 }
                 ++pos; // skip ']'
-                Path::CollectionType type = item.empty() ? Path::CollectionType::LIST : Path::CollectionType::MAP;
+                Path::Kind type = item.empty() ? Path::Kind::LIST : Path::Kind::MAP;
                 collections.push_back({currentPath, std::move(item), std::move(type)});
                 currentPath.clear();
             }
@@ -57,11 +57,13 @@ namespace snt::dip {
         }
         if (pos != path.size())
             throw std::runtime_error("Path is not fully qualified: " + path);
+
         if (!currentPath.empty()) {
             // A simple or node group
-            collections.push_back({std::move(currentPath), "", Path::CollectionType::GROUP});
+            collections.push_back({std::move(currentPath), "", Path::Kind::GROUP});
         }
-        name = path;
+        name = path;                    // set full path name
+        kind = collections.back().kind; // set final path kind
     }
 
 } // namespace snt::dip

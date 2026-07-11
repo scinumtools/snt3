@@ -14,6 +14,14 @@ namespace snt::bind::python {
     void init_value_node(py::module_& m);
     void init_cursor(py::module_& m);
 
+    // Adding Python context manager methods to DIP
+    dip::DIP& dip_enter(dip::DIP& self) {
+        return self;
+    };
+    void dip_exit(
+        dip::DIP& self, const py::object& exc_type, const py::object& exc_value, const py::object& traceback
+    ) {};
+
     void init_dip(py::module_& m) {
 
         auto rt = py::enum_<dip::RequestType>(m, "RequestType");
@@ -41,6 +49,14 @@ namespace snt::bind::python {
         //.def("add_node_function", &dip::DIP::add_node_function, py::arg("name"), py::arg(""))
         dip.def("parse", &dip::DIP::parse);
         // dip.def("parse_docs", &dip::DIP::parse_docs);
+
+        dip.def("enter", &dip_enter);
+        dip.def("exit", &dip_exit);
+        dip.def("__enter__", &dip_enter);
+        dip.def("__exit__", &dip_exit);
+
+        dip.def("__str__", &dip::DIP::to_string);
+        dip.def("__repr__", &dip::DIP::to_string);
         dip.def("to_string", &dip::DIP::to_string);
     }
 

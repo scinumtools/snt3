@@ -62,12 +62,10 @@ namespace snt::dip {
         const std::string& request, const RequestType rtype, const std::string& to_unit
     ) const {
         val::BaseValue::PointerType new_value = nullptr;
-        bool found = false;
         switch (rtype) {
         case RequestType::Function: {
             FunctionList::ValueFunctionType func = functions.get_value(request);
             new_value = func(*this);
-            found = true;
             break;
         }
         case RequestType::Reference: {
@@ -76,7 +74,6 @@ namespace snt::dip {
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
                 if (vnode && vnode->path.name == node_path) {
-                    found = true;
                     if (vnode->value != nullptr) {
                         new_value = vnode->value->clone();
                     } else {
@@ -111,8 +108,6 @@ namespace snt::dip {
         default:
             throw std::runtime_error("Unrecognized environment request type");
         }
-        if (!found)
-            throw std::runtime_error("Value environment request returns an empty pointer: " + request);
         return std::move(new_value);
     }
 
@@ -200,7 +195,7 @@ namespace snt::dip {
                 throw std::runtime_error("Request map from sources is not implemented yet.");
 
             const Collection& col = hlist.get_collection(node_path);
-            if (col.type == Path::CollectionType::LIST)
+            if (col.kind == Path::Kind::LIST)
                 throw std::runtime_error("Requested collection is a list: " + request);
 
             for (const auto& item : col.items) {
@@ -236,7 +231,7 @@ namespace snt::dip {
                 throw std::runtime_error("Request list from sources is not implemented yet.");
 
             const Collection& col = hlist.get_collection(node_path);
-            if (col.type == Path::CollectionType::MAP)
+            if (col.kind == Path::Kind::MAP)
                 throw std::runtime_error("Requested collection is a map: " + request);
 
             for (const auto& item : col.items) {
@@ -258,6 +253,10 @@ namespace snt::dip {
 
     val::BaseValue::PointerType Environment::get_value(size_t index) const {
         return nodes.at(index)->value->clone();
+    }
+
+    const std::string Environment::to_string() const {
+        return "Environment";
     }
 
 } // namespace snt::dip

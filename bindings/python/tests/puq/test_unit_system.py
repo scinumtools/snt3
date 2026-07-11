@@ -16,10 +16,14 @@ def test_quantity():
     assert q.unit_system() == "US"
     q = Quantity('23*ft', US)      # explicitely defined unit system
     assert q.unit_system() == "US"
-
-def test_environment():
+    
+def test_unit_system():
     
     with UnitSystem(EMU) as us:  # set unit system in a context manager
+        assert str(us) == "UnitSystem(EMU)"
+        assert repr(us) == "UnitSystem(EMU)"
+        assert us.to_string() == "UnitSystem(EMU)"
+        
         assert Quantity('abA').unit_system() == "EMU"
     assert Quantity('km').unit_system() == "SI"
         

@@ -16,11 +16,12 @@ namespace snt::dip {
         /**
          * @brief List of collection types
          */
-        enum class CollectionType {
+        enum class Kind {
             NONE,  ///< Node is not a collection
             GROUP, ///< Simple node or group
             MAP,   ///< Map items are associated with a key
             LIST,  ///< List items are ordered by indexes
+            VALUE, ///< Node is a value
         };
 
         /**
@@ -28,12 +29,13 @@ namespace snt::dip {
          * @brief Collection node information
          */
         struct CollectionAccess {
-            std::string path;          ///< Paths leading to a collection
-            std::string item;          ///< Item value
-            Path::CollectionType type; ////< Collection type
+            std::string path; ///< Paths leading to a collection
+            std::string item; ///< Item value
+            Kind kind;        ///< Kind of a collection path
         };
 
         std::string name;                                ///< fully qualified node path
+        Kind kind;                                       ///< kind of a path
         std::vector<Path::CollectionAccess> collections; ///< list of collection access pairs derived from a node name
 
         /**

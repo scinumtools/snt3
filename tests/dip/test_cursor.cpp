@@ -33,12 +33,12 @@ TEST(Cursor, TraverseCollections) {
     params_parsed.push_back(group.to_string());
     const std::unordered_map<std::string, dip::Cursor> map = cursor.get_map("jerk.snap");
     for (auto [key, item] : map) {
-        params_parsed.push_back(item.get_path());
+        params_parsed.push_back(item.to_string());
         dip::Cursor group = item.get_group("bar");
         if (key == "crackle") {
             const std::vector<dip::Cursor> list = item.get_list("pop");
             for (auto item : list) {
-                params_parsed.push_back(item.get_path());
+                params_parsed.push_back(item.to_string());
                 dip::Cursor group = item.get_group("foo");
                 params_parsed.push_back(group.to_string());
             }
@@ -51,16 +51,16 @@ TEST(Cursor, TraverseCollections) {
 
     // prepare reference parameter set
     std::vector<std::string> params_ref = {
-        "jerk.baz = false",
-        "jerk.snap[crackle]",
-        "jerk.snap[crackle].pop[0]",
-        "jerk.snap[crackle].pop[0].foo = true",
-        "jerk.snap[crackle].pop[1]",
-        "jerk.snap[crackle].pop[1].foo = 3",
-        "jerk.snap[crackle].pop[2]",
-        "jerk.snap[crackle].pop[2].foo = 4e5",
-        "jerk.snap[lock]",
-        "jerk.snap[lock].bar = \"shot\"",
+        "Cursor('jerk.baz', false)",
+        "Cursor('jerk.snap[crackle]')",
+        "Cursor('jerk.snap[crackle].pop[0]')",
+        "Cursor('jerk.snap[crackle].pop[0].foo', true)",
+        "Cursor('jerk.snap[crackle].pop[1]')",
+        "Cursor('jerk.snap[crackle].pop[1].foo', 3)",
+        "Cursor('jerk.snap[crackle].pop[2]')",
+        "Cursor('jerk.snap[crackle].pop[2].foo', 4e5)",
+        "Cursor('jerk.snap[lock]')",
+        "Cursor('jerk.snap[lock].bar', \"shot\")",
     };
 
     // compare the two parameter sets

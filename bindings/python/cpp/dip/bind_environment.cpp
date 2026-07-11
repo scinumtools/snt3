@@ -57,6 +57,10 @@ namespace snt::bind::python {
         env.def("request_cursor", &dip::Environment::request_cursor);
 
         // env.def("request_code", &dip::Environment::request_code, py::arg("source_name"));
+
+        env.def("__str__", &dip::Environment::to_string);
+        env.def("__repr__", &dip::Environment::to_string);
+        env.def("to_string", &dip::Environment::to_string);
     }
 
 } // namespace snt::bind::python

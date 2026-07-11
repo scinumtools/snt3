@@ -78,6 +78,13 @@ namespace snt::puq {
          * @brief Close the currently openned unit system
          */
         void close();
+
+        /**
+         * @brief String representation of this class
+         *
+         * @return String representation
+         */
+        const std::string to_string() const;
     };
 
 } // namespace snt::puq

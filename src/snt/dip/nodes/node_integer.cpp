@@ -36,7 +36,11 @@ namespace snt::dip {
             set_value(env.request_value(value_raw.at(0), RequestType::Function, units_raw));
             break;
         case ValueOrigin::Reference: {
-            set_value(env.request_value(value_raw.at(0), RequestType::Reference, units_raw));
+            val::BaseValue::PointerType val = env.request_value(value_raw.at(0), RequestType::Reference, units_raw);
+            if (val)
+                set_value(std::move(val));
+            else
+                throw std::runtime_error("Value environment request returns an empty pointer: " + value_raw.at(0));
             break;
         }
         case ValueOrigin::ReferenceRaw: {

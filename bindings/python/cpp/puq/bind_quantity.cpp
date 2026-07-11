@@ -185,7 +185,6 @@ namespace snt::bind::python {
         q.def("unit_system", &puq::Quantity::unit_system);
         q.def("rebase_prefixes", &puq::Quantity::rebase_prefixes);
         q.def("rebase_dimensions", &puq::Quantity::rebase_dimensions);
-        q.def("to_string", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat());
         q.def("size", &puq::Quantity::size);
         q.def("shape", &puq::Quantity::shape);
         q.def("info", [](const puq::Quantity& q) {
@@ -197,14 +196,9 @@ namespace snt::bind::python {
         q.def("uncertainty", &quantity_uncertainty, py::arg("numpy") = false);
         q.def_property_readonly("units", [](const puq::Quantity& q) { return q.measurement.baseunits.to_string(); });
 
-        q.def("__repr__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat())
-            .def("__str__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat())
-            //.def("__getitem__", &quantity_get_value, py::arg("index"))
-            //.def("__len__", &puq::Quantity::size)
-            .def(py::self + py::self)
-            .def(py::self - py::self)
-            .def(py::self * py::self)
-            .def(py::self / py::self)
+        //.def("__getitem__", &quantity_get_value, py::arg("index"))
+        //.def("__len__", &puq::Quantity::size)
+        q.def(py::self + py::self).def(py::self - py::self).def(py::self * py::self).def(py::self / py::self)
             //.def(double() + py::self)
             //.def(double() - py::self)
             //.def(double() * py::self)
@@ -339,6 +333,10 @@ namespace snt::bind::python {
         q.def("__array__", [](const puq::Quantity& q, const py::object& dtype) {
             throw std::runtime_error("Convert explicitly: use .to_numpy() or .result");
         });
+
+        q.def("__repr__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat());
+        q.def("__str__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat());
+        q.def("to_string", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat());
     }
 
 } // namespace snt::bind::python
