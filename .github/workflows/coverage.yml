@@ -70,4 +70,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: coverage/coverage.xml
-          name: scinumtools3          
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+          
