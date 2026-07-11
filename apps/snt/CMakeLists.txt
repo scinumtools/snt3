@@ -19,3 +19,5 @@ set_target_properties(${EXEC_NAME} PROPERTIES
 # install libraries and executables
 install(TARGETS ${EXEC_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+enable_coverage(${EXEC_NAME})

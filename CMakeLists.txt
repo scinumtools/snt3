@@ -160,7 +160,7 @@ endif()
 # enable coverate calculation
 #############################
 option(ENABLE_COVERAGE "Enable code coverage" OFF)
-message(STATUS "ENABLE_COVERAGE            ${ENABLE_COVERAGE}")
+message(STATUS "ENABLE_COVERAGE              ${ENABLE_COVERAGE}")
 function(enable_coverage target)
     if(ENABLE_COVERAGE)
         target_compile_options(${target} PRIVATE -O0 -g --coverage)

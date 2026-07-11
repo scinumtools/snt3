@@ -131,3 +131,4 @@ endif()
 install(TARGETS ${MODULE_NAME}
         LIBRARY DESTINATION scinumtools3)
 
+enable_coverage(${MODULE_NAME})

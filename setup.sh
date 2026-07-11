@@ -13,7 +13,7 @@ DIR_ROOT=$(pwd)
 NUM_SYSTEM_CORES=$(getconf _NPROCESSORS_ONLN)
 NUM_MAKE_CORES=$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release    # Release/Debug
-ENABLE_CLANG_TIDY=OFF       # Switch Clang Tidy on 
+ENABLE_CLANG_TIDY=OFF       # Switch Clang Tidy on
 GITHUB_WORKFLOWS=OFF        # Set specific settings for GitHub workflows
 
 CMAKE_FLAGS=(
@@ -42,6 +42,7 @@ CMAKE_FLAGS=(
   -DENABLE_MAT_PYTEST=ON
 
   -DENABLE_TIME_TRACE=OFF       # build compilation time tracing outputs
+  -DENABLE_COVERAGE=OFF         # build compilation with coverage
  
   -DENABLE_EXEC_BENCHMARKS=OFF  # build Google Benchmark tests
   -DENABLE_EXEC_APPS_SERVER=OFF

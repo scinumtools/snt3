@@ -33,3 +33,5 @@ gtest_discover_tests(${EXEC_NAME}
   TEST_PREFIX gtest.exs.
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+
+enable_coverage(${EXEC_NAME})

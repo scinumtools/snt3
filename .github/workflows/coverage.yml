@@ -50,21 +50,23 @@ jobs:
         run: |
           gcovr \
             --root . \
-            --filter src \
-            --exclude tests \
-            --exclude examples \
-            --html-details \
-            --html coverage.html \
-            --xml coverage.xml
+            --object-directory build \
+            --filter "src" \
+            --filter "bindings/python/cpp" \
+            --exclude "tests" \
+            --exclude "examples" \
+            --print-summary \
+            --html-details coverage/index.html \
+            --xml coverage/coverage.xml
 
-      - name: Upload HTML report
+      - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage.html
+          path: coverage/            
 
-      # Optional
       - name: Upload to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: coverage.xml
+          files: coverage/coverage.xml
+          name: scinumtools3          

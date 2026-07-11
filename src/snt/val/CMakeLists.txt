@@ -33,5 +33,4 @@ install(
     FILES_MATCHING PATTERN "*.h"
 )
 
-
 enable_coverage(${EXEC_NAME})
