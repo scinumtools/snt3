@@ -70,6 +70,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: coverage/coverage.xml
+          disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
           
