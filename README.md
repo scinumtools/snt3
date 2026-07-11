@@ -12,6 +12,7 @@
 [![PyPI version](https://badge.fury.io/py/scinumtools3.svg)](https://badge.fury.io/py/scinumtools3)   
 [![vcpkg](https://img.shields.io/badge/vcpkg-available-blue)](https://vcpkg.io/en/package/scinumtools3.html)
 [![Conda Version](https://anaconda.org/conda-forge/scinumtools3/badges/version.svg)](https://anaconda.org/conda-forge/scinumtools3)
+[![codecov](https://codecov.io/github/vrtulka23/scinumtools3/graph/badge.svg?token=8A25K1T7XM)](https://codecov.io/github/vrtulka23/scinumtools3)
 
 ---
 
