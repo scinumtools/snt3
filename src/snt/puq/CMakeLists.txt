@@ -32,3 +32,5 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/snt/puq
     FILES_MATCHING PATTERN "*.h"
 )
+
+enable_coverage(${EXEC_NAME})

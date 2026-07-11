@@ -157,6 +157,17 @@ if(ENABLE_CLANG_TIDY)
     			     -p=${CMAKE_BINARY_DIR})
 endif()
 
+# enable coverate calculation
+#############################
+option(ENABLE_COVERAGE "Enable code coverage" OFF)
+message(STATUS "ENABLE_COVERAGE            ${ENABLE_COVERAGE}")
+function(enable_coverage target)
+    if(ENABLE_COVERAGE)
+        target_compile_options(${target} PRIVATE -O0 -g --coverage)
+        target_link_options(${target} PRIVATE --coverage)
+    endif()
+endfunction()
+
 # compile libraries and executables
 ###################################
 
@@ -171,6 +182,7 @@ add_subdirectory(tests)                # build gtest executable
 if (ENABLE_BINDING_PYTHON)         
    add_subdirectory(bindings/python/cpp)  # build Python bindings
 endif()
+
 
 # setup Google Benchmark
 ########################

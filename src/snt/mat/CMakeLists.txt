@@ -25,3 +25,6 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/snt/mat
     FILES_MATCHING PATTERN "*.h"
 )
+
+
+enable_coverage(${EXEC_NAME})

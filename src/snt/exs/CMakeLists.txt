@@ -31,3 +31,6 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/snt/exs
     FILES_MATCHING PATTERN "*.h"
 )
+
+
+enable_coverage(${EXEC_NAME})
