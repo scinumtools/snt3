@@ -33,19 +33,13 @@ jobs:
           cmake \
             -B build \
             -G Ninja \
-            -DCMAKE_CXX_FLAGS="--coverage" \
-            -DCMAKE_C_FLAGS="--coverage" \
-            -DCMAKE_EXE_LINKER_FLAGS="--coverage" \
-            -DCMAKE_SHARED_LINKER_FLAGS="--coverage" \
             -DPython3_EXECUTABLE=$(which python) \
-            -DENABLE_UNIT_TESTS=ON \
-            -DENABLE_COVERAGE=ON \
             -DENABLE_UNIT_TESTS=ON \
             -DENABLE_COVERAGE=ON
 
       - name: Build
         run: |
-          cmake --build build
+          cmake --build build --parallel
 
       - name: Run tests
         run: |
@@ -58,8 +52,6 @@ jobs:
           mkdir -p coverage
           gcovr \
             --root . \
-            --search-cwd \
-            --gcov-ignore-parse-errors \
             --object-directory build \
             --filter "src" \
             --filter "bindings/python/cpp" \
@@ -67,7 +59,7 @@ jobs:
             --exclude "examples" \
             --print-summary \
             --html-details coverage/index.html \
-            --xml coverage/coverage.xml
+            --cobertura coverage/coverage.xml
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
