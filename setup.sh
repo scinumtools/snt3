@@ -15,7 +15,7 @@ NUM_MAKE_CORES=$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release    # Release/Debug
 ENABLE_CLANG_TIDY=OFF       # Switch Clang Tidy on
 GITHUB_WORKFLOWS=OFF        # Set specific settings for GitHub workflows
-ENABLE_COVERAGE=ON      
+ENABLE_COVERAGE=OFF         # Enable code coverage reports      
 
 CMAKE_FLAGS=(
   -DENABLE_SNT=ON
@@ -43,7 +43,6 @@ CMAKE_FLAGS=(
   -DENABLE_MAT_PYTEST=ON
 
   -DENABLE_TIME_TRACE=OFF       # build compilation time tracing outputs
-  -DENABLE_COVERAGE=$ENABLE_COVERAGE         # build compilation with coverage
  
   -DENABLE_EXEC_BENCHMARKS=OFF  # build Google Benchmark tests
   -DENABLE_EXEC_APPS_SERVER=OFF
@@ -67,7 +66,8 @@ function build_code {
     if [[ $ENABLE_CLANG_TIDY == "ON" && $GITHUB_WORKFLOWS == "OFF" ]]; then
 	clang_tidy_flag="clang-tidy;-warnings-as-errors=*"
 	CMAKE_FLAGS+=(
-	    -DENABLE_CLANG_TIDY="${ENABLE_CLANG_TIDY}"
+	    -DENABLE_CLANG_TIDY="${ENABLE_CLANG_TIDY}"     # build with clang tidy
+            -DENABLE_COVERAGE="${ENABLE_COVERAGE}"         # build with coverage
 	    -DCMAKE_EXPORT_ENABLE_COMMANDS=ON
 	    -DCMAKE_CXX_CLANG_TIDY="${clang_tidy_flag}"
 	)
