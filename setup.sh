@@ -15,6 +15,7 @@ NUM_MAKE_CORES=$NUM_SYSTEM_CORES
 CMAKE_BUILD_TYPE=Release    # Release/Debug
 ENABLE_CLANG_TIDY=OFF       # Switch Clang Tidy on
 GITHUB_WORKFLOWS=OFF        # Set specific settings for GitHub workflows
+ENABLE_COVERAGE=ON      
 
 CMAKE_FLAGS=(
   -DENABLE_SNT=ON
@@ -42,7 +43,7 @@ CMAKE_FLAGS=(
   -DENABLE_MAT_PYTEST=ON
 
   -DENABLE_TIME_TRACE=OFF       # build compilation time tracing outputs
-  -DENABLE_COVERAGE=OFF         # build compilation with coverage
+  -DENABLE_COVERAGE=$ENABLE_COVERAGE         # build compilation with coverage
  
   -DENABLE_EXEC_BENCHMARKS=OFF  # build Google Benchmark tests
   -DENABLE_EXEC_APPS_SERVER=OFF
@@ -184,6 +185,7 @@ function show_help {
     echo " -g|--grep <expr>        find expression in a code"
     echo " -h|--help               show this help"
     echo " --debug                 run in a debug mode"
+    echo " --coverage              run with code coverage stats"
     echo " --clang-tidy            run clang-tidy during compilation"
     echo " --clang-format          run clang-format"
     echo " --num-cores N           number of compiliation cores"
@@ -223,6 +225,8 @@ while [[ $# -gt 0 ]]; do
 	    show_help; shift;;
 	--debug)
 	    CMAKE_BUILD_TYPE=Debug; shift;;
+        --coverage)
+            ENABLE_COVERAGE=ON; shift;;
 	--clang-tidy)
 	    ENABLE_CLANG_TIDY=ON; shift;;
 	--clang-format)

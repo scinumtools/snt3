@@ -11,6 +11,7 @@ bindings/python/.pytest_cache/*
 .venv
 **/.DS_STORE
 benchmarks/**/results/*
+coverage/*
 
 # Prerequisites
 *.d
