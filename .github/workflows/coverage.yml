@@ -39,7 +39,7 @@ jobs:
             -DCMAKE_SHARED_LINKER_FLAGS="--coverage" \
             -DPython3_EXECUTABLE=$(which python) \
             -DENABLE_UNIT_TESTS=ON \
-            -DENABLE_COVERAGE=ON
+            -DENABLE_COVERAGE=ON \
             -DENABLE_UNIT_TESTS=ON \
             -DENABLE_COVERAGE=ON
 
