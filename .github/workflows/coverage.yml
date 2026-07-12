@@ -58,6 +58,8 @@ jobs:
           mkdir -p coverage
           gcovr \
             --root . \
+            --search-cwd \
+            --gcov-ignore-parse-errors \
             --object-directory build \
             --filter "src" \
             --filter "bindings/python/cpp" \
