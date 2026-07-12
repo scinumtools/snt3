@@ -53,10 +53,10 @@ jobs:
           gcovr \
             --root . \
             --object-directory build \
-            #--filter "src" \
-            #--filter "bindings/python/cpp" \
-            #--exclude "tests" \
-            #--exclude "examples" \
+            --filter "src" \
+            --filter "bindings/python/cpp" \
+            --exclude "tests" \
+            --exclude "examples" \
             --print-summary \
             --html-details coverage/index.html \
             --lcov coverage/coverage.info
