@@ -51,7 +51,7 @@ jobs:
           mkdir -p coverage
           gcovr \
             --root . \
-            --object-director-y build \
+            --object-directory build \
             --filter "src" \
             --filter "bindings/python/cpp" \
             --exclude "tests" \
