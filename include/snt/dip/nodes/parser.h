@@ -23,10 +23,25 @@ namespace snt::dip {
         bool kwd_case();
         bool kwd_unit();
         bool kwd_source();
+        bool kwd_schema();
         bool kwd_property(PropertyType& ptype);
         bool part_space(const bool required = true);
         bool part_indent();
         bool part_path(const bool required = true);
+
+        /**
+         * @brief Parse schema specifier after group node path
+         *
+         * @return True if schema was parsed; otherwise, false.
+         */
+        bool part_schema();
+
+        /**
+         * @brief Parse node type
+         *
+         * @param required Specifies if this part is required
+         * @return True if type was parsed; otherwise, false.
+         */
         bool part_type(const bool required = true);
 
       private:

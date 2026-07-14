@@ -29,7 +29,7 @@ namespace snt::dip {
         };
         typename T::PointerType at(const size_t index) { return nodes.at(index); };
         typename T::PointerType at(const size_t index) const { return nodes.at(index); };
-        const typename T::ListType& get_nodes() const { return nodes; }
+        const typename T::ListType& get_nodes() const { return nodes; };
     };
 
 } // namespace snt::dip

@@ -28,8 +28,6 @@ namespace snt::dip {
     constexpr char SIGN_DEFINED = '!';
     constexpr char SIGN_SEPARATOR = '.';
     constexpr char SIGN_CONDITION = '@';
-    constexpr char SIGN_VARIABLE = '$';
-    constexpr char SIGN_VALIDATION = '!';
     constexpr char SIGN_ARRAY_OPEN = '[';
     constexpr char SIGN_ARRAY_CLOSE = ']';
     constexpr char SIGN_REFERENCE_OPEN = '{';
@@ -41,27 +39,27 @@ namespace snt::dip {
 
     // Keywords
     constexpr std::string_view KEYWORD_NONE = "none";
-
     constexpr std::string_view KEYWORD_BOOLEAN = "bool";
     constexpr std::string_view KEYWORD_INTEGER = "int";
     constexpr std::string_view KEYWORD_FLOAT = "float";
     constexpr std::string_view KEYWORD_STRING = "str";
 
-    constexpr std::string_view KEYWORD_CONSTANT = "constant";
-    constexpr std::string_view KEYWORD_CONDITION = "condition";
-    constexpr std::string_view KEYWORD_DESCRIPTION = "descr";
-    constexpr std::string_view KEYWORD_FORMAT = "format";
-    constexpr std::string_view KEYWORD_TAGS = "tags";
-    constexpr std::string_view KEYWORD_OPTIONS = "options";
-    constexpr std::string_view KEYWORD_DELIMITER = "delimiter";
+    constexpr std::string_view KEYWORD_CONSTANT = "!constant";
+    constexpr std::string_view KEYWORD_CONDITION = "!condition";
+    constexpr std::string_view KEYWORD_DESCRIPTION = "!descr";
+    constexpr std::string_view KEYWORD_FORMAT = "!format";
+    constexpr std::string_view KEYWORD_TAGS = "!tags";
+    constexpr std::string_view KEYWORD_OPTIONS = "!options";
+    constexpr std::string_view KEYWORD_DELIMITER = "!delimiter";
 
     constexpr std::string_view KEYWORD_IF = "if";
     constexpr std::string_view KEYWORD_ELIF = "elif";
     constexpr std::string_view KEYWORD_ELSE = "else";
     constexpr std::string_view KEYWORD_END = "end";
 
-    constexpr std::string_view KEYWORD_SOURCE = "source";
-    constexpr std::string_view KEYWORD_UNIT = "unit";
+    constexpr std::string_view KEYWORD_SOURCE = "$source";
+    constexpr std::string_view KEYWORD_UNIT = "$unit";
+    constexpr std::string_view KEYWORD_SCHEMA = "$schema";
 
     // Regex Patterns
     constexpr std::string_view PATTERN_KEYWORD = "[a-zA-Z0-9_-]";
@@ -101,7 +99,8 @@ namespace snt::dip {
         Reference,    // value was obtained from a reference
         ReferenceRaw, // value was optained from a raw reference
         Function,     // value was returned from a function
-        Expression    // value was parsed from an expression
+        Expression,   // value was parsed from an expression
+        Schema        // value is a schema name
     };
 
     enum class NodeDtype {
@@ -111,6 +110,7 @@ namespace snt::dip {
         Source, // environment
         Group,
         Case,
+        Schema,
         Import, // node structure
         Boolean,
         Integer,

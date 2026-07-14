@@ -177,7 +177,7 @@ namespace snt::dip {
 
     ValueNode::PointerType IntegerNode::clone(const Path& pth) const {
         if (value == nullptr)
-            return std::make_shared<IntegerNode>(pth, value->get_dtype());
+            return std::make_shared<IntegerNode>(pth, nullptr);
         else if (!units)
             return std::make_shared<IntegerNode>(pth, std::move(value->clone()));
         else

@@ -92,49 +92,63 @@ namespace snt::dip {
     }
 
     bool Parser::kwd_unit() {
-        constexpr auto pstr = ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_VARIABLE, "]", KEYWORD_UNIT, ")[ ]*");
-        std::regex pattern(pstr.data());
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            strip(matchResult[0].str());
-            return true;
-        }
-        return false;
+        constexpr std::string_view keyword = KEYWORD_UNIT;
+        if (code.compare(0, keyword.size(), keyword) != 0)
+            return false;
+        std::size_t pos = keyword.size();
+        while (pos < code.size() && code[pos] == ' ')
+            ++pos;
+        strip(std::string(code.substr(0, pos)));
+        return true;
     }
 
     bool Parser::kwd_source() {
-        constexpr auto pstr = ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_VARIABLE, "]", KEYWORD_SOURCE, ")[ ]*");
-        std::regex pattern(pstr.data());
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            strip(matchResult[0].str());
-            return true;
-        }
-        return false;
+        constexpr std::string_view keyword = KEYWORD_SOURCE;
+        if (code.compare(0, keyword.size(), keyword) != 0)
+            return false;
+        std::size_t pos = keyword.size();
+        while (pos < code.size() && code[pos] == ' ')
+            ++pos;
+        strip(std::string(code.substr(0, pos)));
+        return true;
+    }
+
+    bool Parser::kwd_schema() {
+        constexpr std::string_view keyword = KEYWORD_SCHEMA;
+        if (code.compare(0, keyword.size(), keyword) != 0)
+            return false;
+        std::size_t pos = keyword.size();
+        while (pos < code.size() && code[pos] == ' ')
+            ++pos;
+        strip(std::string(code.substr(0, pos)));
+        return true;
     }
 
     bool Parser::kwd_property(PropertyType& ptype) {
-        constexpr auto pstr = ce_concat<50>("^[", SIGN_VALIDATION, "](", PATTERN_KEYWORD, "+)[ ]*");
-        std::regex pattern(pstr.data());
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            std::string key = matchResult[1].str();
-            if (key == KEYWORD_OPTIONS)
-                ptype = PropertyType::Options;
-            else if (key == KEYWORD_CONSTANT)
-                ptype = PropertyType::Constant;
-            else if (key == KEYWORD_FORMAT)
-                ptype = PropertyType::Format;
-            else if (key == KEYWORD_TAGS)
-                ptype = PropertyType::Tags;
-            else if (key == KEYWORD_DESCRIPTION)
-                ptype = PropertyType::Description;
-            else if (key == KEYWORD_CONDITION)
-                ptype = PropertyType::Condition;
-            else if (key == KEYWORD_DELIMITER)
-                ptype = PropertyType::Delimiter;
+        if (code.empty() || code[0] != '!')
+            return false;
+        struct Keyword {
+            std::string_view text;
+            PropertyType type;
+        };
+        static constexpr Keyword keywords[] = {
+            {KEYWORD_OPTIONS, PropertyType::Options},
+            {KEYWORD_CONSTANT, PropertyType::Constant},
+            {KEYWORD_FORMAT, PropertyType::Format},
+            {KEYWORD_TAGS, PropertyType::Tags},
+            {KEYWORD_DESCRIPTION, PropertyType::Description},
+            {KEYWORD_CONDITION, PropertyType::Condition},
+            {KEYWORD_DELIMITER, PropertyType::Delimiter},
+        };
+        for (const auto& kw : keywords) {
+            if (code.compare(0, kw.text.size(), kw.text) != 0)
+                continue;
+            std::size_t pos = kw.text.size();
+            while (pos < code.size() && code[pos] == ' ')
+                ++pos;
+            ptype = kw.type;
             dimension.push_back({0, val::Array::max_range});
-            strip(matchResult[0].str());
+            strip(std::string(code.substr(0, pos)));
             return true;
         }
         return false;
@@ -149,20 +163,42 @@ namespace snt::dip {
     }
 
     bool Parser::part_indent() {
-        std::regex pattern(R"(^[ ]+)");
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            indent = matchResult[0].str().length();
-            strip(matchResult[0].str());
-            return true;
-        }
-        return false;
+        std::size_t pos = 0;
+        while (pos < code.size() && code[pos] == ' ')
+            ++pos;
+        if (pos == 0)
+            return false;
+        indent = pos;
+        strip(std::string(code.substr(0, pos)));
+        return true;
     }
 
     bool Parser::part_path(const bool required) {
         size_t pos = code.find(' ');
         path = Path(code.substr(0, pos));
         strip(path.name);
+        return true;
+    }
+
+    bool Parser::part_schema() {
+        std::size_t pos = 0;
+        while (pos < code.size() && code[pos] == ' ')
+            ++pos;
+        if (pos >= code.size() || code[pos] != ':')
+            return false;
+        ++pos;
+        while (pos < code.size() && code[pos] == ' ')
+            ++pos;
+        std::size_t start = pos;
+        while (pos < code.size() &&
+               (std::isalnum(static_cast<unsigned char>(code[pos])) || code[pos] == '_' || code[pos] == '-')) {
+            ++pos;
+        }
+        if (start == pos)
+            return false;
+        value_raw.push_back(code.substr(start, pos - start));
+        value_origin = ValueOrigin::Schema;
+        strip(code.substr(0, pos));
         return true;
     }
 
@@ -340,17 +376,21 @@ namespace snt::dip {
         return false;
     }
 
-    bool Parser::part_equal(const bool required) {
-        constexpr auto pstr = ce_concat<50>("^[ ]*[", SIGN_EQUAL, "][ ]*");
-        std::regex pattern(pstr.data());
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            strip(matchResult[0].str());
-            return true;
-        } else if (required) {
-            throw std::runtime_error("Equal sign '" + std::string(1, SIGN_EQUAL) + "' is required: " + line.code);
+    bool Parser::part_equal(bool required) {
+        std::size_t pos = 0;
+        while (pos < code.size() && code[pos] == ' ')
+            ++pos;
+        if (pos >= code.size() || code[pos] != SIGN_EQUAL) {
+            if (required) {
+                throw std::runtime_error("Equal sign '" + std::string(1, SIGN_EQUAL) + "' is required: " + line.code);
+            }
+            return false;
         }
-        return false;
+        ++pos;
+        while (pos < code.size() && code[pos] == ' ')
+            ++pos;
+        strip(std::string(code.substr(0, pos)));
+        return true;
     }
 
     bool Parser::part_reference() {

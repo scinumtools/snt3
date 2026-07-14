@@ -7,6 +7,7 @@
 #include <snt/dip/lists/list_functions.h>
 #include <snt/dip/lists/list_hierarchy.h>
 #include <snt/dip/lists/list_node.h>
+#include <snt/dip/lists/list_schema.h>
 #include <snt/dip/lists/list_source.h>
 #include <snt/dip/lists/list_unit.h>
 
@@ -35,6 +36,7 @@ namespace snt::dip {
         BranchingList branching;   ///< List of code branching (case, else)
         SourceList sources;        ///< List of code sources
         UnitList units;            ///< List of custom units
+        SchemaList schemas;        ///< List of schemas
         FunctionList functions;    ///< List of functions
 
         /**

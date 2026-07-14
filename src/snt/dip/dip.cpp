@@ -109,13 +109,35 @@ namespace snt::dip {
         NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table
     };
 
+    inline void check_indent(BaseNode::PointerType previous_node, BaseNode::PointerType current_node) {
+        // We make sure that the indent spacing is always set by INDENT_STEP
+        if ((current_node->indent % INDENT_STEP) != 0)
+            throw std::runtime_error(
+                "Indent of the current node is not a multiple of " + std::to_string(INDENT_STEP) + " '" +
+                std::to_string(current_node->indent) + "': " + current_node->line.code
+            );
+        if (previous_node != nullptr) {
+            if ((current_node->indent > previous_node->indent) &&
+                (current_node->indent - previous_node->indent) != INDENT_STEP) {
+                throw std::runtime_error(
+                    "Indent of the child node '" + std::to_string(current_node->indent) + "' is not exactly " +
+                    std::to_string(INDENT_STEP) + " white spaces higher than its parent nodes '" +
+                    std::to_string(current_node->indent) + "': " + current_node->line.code
+                );
+            }
+        }
+    }
+
     Environment DIP::parse() {
         NodeList<BaseNode> queue = parse_code_nodes(lines);
-        // set properties to nodes
+        NodeList<BaseNode> queue_filtered;
+
+        // set properties to nodes and aggregate schemas
         BaseNode::PointerType previous_node = nullptr;
         for (size_t i = 0; i < queue.size(); ++i) {
             BaseNode::PointerType current_node = queue.at(i);
             if (current_node->dtype == NodeDtype::Property) {
+                // assign properties to the previous value node
                 PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
                 if (std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
                     preceeding_nodes.end())
@@ -130,32 +152,42 @@ namespace snt::dip {
                     );
                 if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
                     throw std::runtime_error("Property could not be set: " + pnode->line.code);
-            } else {
-                // We make sure that the indent spacing is always set by INDENT_STEP
-                if ((current_node->indent % INDENT_STEP) != 0)
-                    throw std::runtime_error(
-                        "Indent of the current node is not a multiple of " + std::to_string(INDENT_STEP) + " '" +
-                        std::to_string(current_node->indent) + "': " + current_node->line.code
-                    );
-                if (previous_node != nullptr) {
-                    if ((current_node->indent > previous_node->indent) &&
-                        (current_node->indent - previous_node->indent) != INDENT_STEP) {
-                        throw std::runtime_error(
-                            "Indent of the child node '" + std::to_string(current_node->indent) + "' is not exactly " +
-                            std::to_string(INDENT_STEP) + " white spaces higher than its parent nodes '" +
-                            std::to_string(current_node->indent) + "': " + current_node->line.code
-                        );
-                    }
+            } else if (current_node->dtype == NodeDtype::Schema) {
+                // create a schema and aggregate all child nodes
+                check_indent(previous_node, current_node);
+                ValueNode::ListType schema_nodes;
+                while (i + 1 < queue.size()) {
+                    BaseNode::PointerType schema_node = queue.at(i + 1);
+                    check_indent(previous_node, schema_node);
+                    previous_node = schema_node;
+                    if (schema_node->indent <= current_node->indent)
+                        break;
+                    ValueNode::PointerType schema_vnode = std::dynamic_pointer_cast<ValueNode>(schema_node);
+                    if (!schema_vnode)
+                        throw std::runtime_error("Schema must contain only value nodes!");
+                    schema_node->indent -= current_node->indent; // strip schema indent from aggregated nodes
+                    schema_nodes.push_back(schema_vnode);
+                    i++;
+                    previous_node = schema_node;
                 }
+                if (schema_nodes.size() > 0) {
+                    env.schemas.append(current_node->value_raw.at(0), schema_nodes);
+                } else {
+                    PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
+                    throw std::runtime_error("Cannot define an empty schema: " + pnode->line.code);
+                }
+            } else {
+                check_indent(previous_node, current_node);
                 previous_node = current_node;
+                queue_filtered.push_back(current_node);
             }
         }
+        queue = std::move(queue_filtered);
+
         // parse other nodes
         Environment target = env;
         while (queue.size() > 0) {
             BaseNode::PointerType node = queue.pop_front();
-            if (node->dtype == NodeDtype::Property)
-                continue;
             if (!target.branching.false_case() || node->dtype == NodeDtype::Case) {
                 // Perform specific node parsing outside of a condition block or inside of a valid condition block
                 BaseNode::ListType parsed = node->parse(target);

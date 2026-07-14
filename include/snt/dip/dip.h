@@ -19,8 +19,8 @@ namespace snt::dip {
 
         Source source;
 
-        static constexpr std::array<NodeDtype, 3> nodes_special = {
-            NodeDtype::Empty, NodeDtype::Unit, NodeDtype::Source
+        static constexpr std::array<NodeDtype, 4> nodes_special = {
+            NodeDtype::Empty, NodeDtype::Unit, NodeDtype::Source, NodeDtype::Schema
         };
         static constexpr std::array<NodeDtype, 6> nodes_properties = {NodeDtype::Property};
         static constexpr std::array<NodeDtype, 1> nodes_hierarchy = {NodeDtype::Group};

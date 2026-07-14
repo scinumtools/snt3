@@ -123,7 +123,7 @@ namespace snt::dip {
 
     ValueNode::PointerType FloatNode::clone(const Path& pth) const {
         if (value == nullptr)
-            return std::make_shared<FloatNode>(pth, value->get_dtype());
+            return std::make_shared<FloatNode>(pth, nullptr);
         else if (!units)
             return std::make_shared<FloatNode>(pth, std::move(value->clone()));
         else
