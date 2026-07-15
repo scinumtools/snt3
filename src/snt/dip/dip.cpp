@@ -162,9 +162,9 @@ namespace snt::dip {
                     previous_node = schema_node;
                     if (schema_node->indent <= current_node->indent)
                         break;
-                    ValueNode::PointerType schema_vnode = std::dynamic_pointer_cast<ValueNode>(schema_node);
-                    if (!schema_vnode)
-                        throw std::runtime_error("Schema must contain only value nodes!");
+                    // ValueNode::PointerType schema_vnode = std::dynamic_pointer_cast<ValueNode>(schema_node);
+                    // if (!schema_vnode)
+                    //     throw std::runtime_error("Schema must contain only value nodes!");
                     schema_node->indent -= current_node->indent; // strip schema indent from aggregated nodes
                     schema_nodes.push_back(schema_node);
                     i++;
