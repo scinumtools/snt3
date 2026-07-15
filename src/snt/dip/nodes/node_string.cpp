@@ -72,10 +72,10 @@ namespace snt::dip {
     }
 
     BaseNode::PointerType StringNode::clone(const Path& pth) const {
-        if (value == nullptr)
-            return std::make_shared<StringNode>(pth, nullptr);
-        else
-            return std::make_shared<StringNode>(pth, std::move(value->clone()));
+        std::shared_ptr<StringNode> copy = std::make_shared<StringNode>(*this);
+        copy->path = pth;
+        copy->indent = 0;
+        return copy;
     }
 
     bool StringNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {

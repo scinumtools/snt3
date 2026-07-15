@@ -13,6 +13,7 @@ namespace snt::dip {
 
       public:
         static ValueNode::PointerType is_node(Parser& parser);
+        StringNode(const StringNode& other) : ValueNode(other) {};
         StringNode(const Path& pth, val::BaseValue::PointerType val)
             : ValueNode(pth, std::move(val), NodeDtype::String) {};
         StringNode(Parser& parser) : ValueNode(parser, NodeDtype::String, core::DataType::String) {};

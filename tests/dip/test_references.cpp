@@ -141,10 +141,12 @@ TEST(References, TableNodes) {
 
     // referencing scalar and array values
     dip::DIP d;
-    d.add_string("foo");
-    d.add_string("  snap str = \"snap\"");
-    d.add_string("  crackle bool[2] = [true,false]");
-    d.add_string("bar table = {?foo}");
+    d.add_string(
+        "foo\n"
+        "  snap str = \"snap\"\n"
+        "  crackle bool[2] = [true,false]\n"
+        "bar table = {?foo}\n"
+    );
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 4);
 

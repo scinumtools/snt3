@@ -11,11 +11,8 @@ namespace snt::dip {
         for (const auto& option : other.options) {
             options.push_back({option.value->clone(), option.value_raw, option.units_raw});
         }
-        value = other.value->clone();
-    }
-
-    ValueNode::ValueNode(const Path& pth, const core::DataType vdt) : constant(false), value_dtype(vdt) {
-        path = pth;
+        if (other.value)
+            value = other.value->clone();
     }
 
     ValueNode::ValueNode(const Path& pth, const core::DataType vdt, const NodeDtype dt)

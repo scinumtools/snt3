@@ -13,8 +13,9 @@ namespace snt::dip {
     }
 
     BaseNode::PointerType BaseNode::clone(const Path& pth) const {
-        throw std::runtime_error("Clonning is not implemented for this node: " + line.code);
-        return nullptr;
+        std::shared_ptr<BaseNode> copy = std::make_shared<BaseNode>(*this);
+        copy->path = Path(pth.name);
+        return copy;
     }
 
     std::string BaseNode::to_string(const core::StringFormatType& format) const {

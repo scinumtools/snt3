@@ -18,6 +18,11 @@ namespace snt::dip {
         return nullptr;
     }
 
+    FloatNode::FloatNode(const FloatNode& other) : ValueNode(other) {
+        if (!value)
+            value_dtype = core::DataType::Float64;
+    }
+
     FloatNode::FloatNode(Parser& parser) : ValueNode(parser, NodeDtype::Float) {
         if (dtype_raw[2] == "32") {
             value_dtype = core::DataType::Float32;
@@ -122,12 +127,10 @@ namespace snt::dip {
     }
 
     BaseNode::PointerType FloatNode::clone(const Path& pth) const {
-        if (value == nullptr)
-            return std::make_shared<FloatNode>(pth, nullptr);
-        else if (!units)
-            return std::make_shared<FloatNode>(pth, std::move(value->clone()));
-        else
-            return std::make_shared<FloatNode>(pth, std::move(value->clone()), units);
+        std::shared_ptr<FloatNode> copy = std::make_shared<FloatNode>(*this);
+        copy->path = pth;
+        copy->indent = 0;
+        return copy;
     }
 
     std::string FloatNode::to_string(const core::StringFormatType& format) const {

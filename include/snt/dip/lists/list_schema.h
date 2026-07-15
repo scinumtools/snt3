@@ -10,8 +10,8 @@
 namespace snt::dip {
 
     struct EnvSchema {
-        std::string name;          // schema key
-        ValueNode::ListType nodes; // aggregated nodes
+        std::string name;         // schema key
+        BaseNode::ListType nodes; // aggregated nodes
     };
 
     class SchemaList {
@@ -20,7 +20,7 @@ namespace snt::dip {
 
       public:
         SchemaList();
-        void append(const std::string& name, ValueNode::ListType& nodes);
+        void append(const std::string& name, BaseNode::ListType& nodes);
         void append(const std::string& name, const EnvSchema& src);
         EnvSchema& at(const std::string& name);
         const EnvSchema& at(const std::string& name) const;

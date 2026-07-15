@@ -27,10 +27,10 @@ TEST(SchemaList, Assignment) {
     d.add_string(
         "$schema car\n"
         "  speed float kph\n"
-        "  weight float kg\n"
-        //"jaguar : car\n"
-        //"  speed = 230\n"
-        //"  weight = 1450\n"
+        "  weight int kg\n"
+        "jaguar : car\n"
+        "  speed = 230.0\n"
+        "  weight = 1450\n"
     );
     dip::Environment env = d.parse();
     // EXPECT_EQ(env.nodes.size(), 2);

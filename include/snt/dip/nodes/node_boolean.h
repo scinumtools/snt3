@@ -14,6 +14,7 @@ namespace snt::dip {
 
       public:
         static ValueNode::PointerType is_node(Parser& parser);
+        BooleanNode(const BooleanNode& other) : ValueNode(other) {};
         BooleanNode(const Path& pth, val::BaseValue::PointerType val)
             : ValueNode(pth, std::move(val), NodeDtype::Boolean) {};
         BooleanNode(Parser& parser) : ValueNode(parser, NodeDtype::Boolean, core::DataType::Boolean) {};

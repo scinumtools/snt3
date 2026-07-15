@@ -42,11 +42,9 @@ namespace snt::dip {
         ValueNode() : constant(false) {};
         ValueNode(const ValueNode& other);
         ValueNode(const core::DataType vdt) : constant(false), value_dtype(vdt) {};
-        ValueNode(const Parser& parser, const NodeDtype dt) : BaseNode(parser, dt), constant(false) {};
-        ValueNode(const Parser& parser, const NodeDtype dt, const core::DataType vdt)
+        ValueNode(const Parser& parser, const NodeDtype dt, const core::DataType vdt = core::DataType::None)
             : BaseNode(parser, dt), constant(false), value_dtype(vdt) {};
-        ValueNode(const Path& pth, const core::DataType vdt);
-        ValueNode(const Path& pth, const core::DataType vdt, const NodeDtype dt);
+        ValueNode(const Path& pth, const core::DataType vdt, const NodeDtype dt = NodeDtype::None);
         ValueNode(
             const Path& pth,
             val::BaseValue::PointerType val,

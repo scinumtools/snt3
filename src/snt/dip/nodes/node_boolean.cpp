@@ -85,10 +85,10 @@ namespace snt::dip {
     }
 
     BaseNode::PointerType BooleanNode::clone(const Path& pth) const {
-        if (value == nullptr)
-            return std::make_shared<BooleanNode>(pth, nullptr);
-        else
-            return std::make_shared<BooleanNode>(pth, std::move(value->clone()));
+        std::shared_ptr<BooleanNode> copy = std::make_shared<BooleanNode>(*this);
+        copy->path = pth;
+        copy->indent = 0;
+        return copy;
     }
 
     void BooleanNode::validate_options() const {

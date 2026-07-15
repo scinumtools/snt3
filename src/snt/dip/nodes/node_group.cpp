@@ -21,10 +21,10 @@ namespace snt::dip {
         if (value_raw.size() > 0) {
             EnvSchema schema = env.schemas.at(value_raw.at(0));
             BaseNode::ListType nodes;
-            for (const auto& vnode : schema.nodes) {
-                ValueNode::PointerType vnode_new = std::dynamic_pointer_cast<ValueNode>(vnode->clone(vnode->path));
-                vnode_new->indent += indent;
-                nodes.push_back(vnode_new);
+            for (const auto& node : schema.nodes) {
+                BaseNode::PointerType node_new = node->clone(node->path);
+                node_new->indent = indent + INDENT_STEP;
+                nodes.push_back(node_new);
             }
             return nodes;
         } else {

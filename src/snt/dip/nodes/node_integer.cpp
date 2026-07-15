@@ -18,6 +18,11 @@ namespace snt::dip {
         return nullptr;
     }
 
+    IntegerNode::IntegerNode(const IntegerNode& other) : ValueNode(other) {
+        if (!value)
+            value_dtype = core::DataType::Integer64;
+    }
+
     IntegerNode::IntegerNode(Parser& parser) : ValueNode(parser, NodeDtype::Integer) {
         if (dtype_raw[2] == "16") {
             value_dtype = (dtype_raw[0] == "u") ? core::DataType::Integer16_U : core::DataType::Integer16;
@@ -176,12 +181,10 @@ namespace snt::dip {
     }
 
     BaseNode::PointerType IntegerNode::clone(const Path& pth) const {
-        if (value == nullptr)
-            return std::make_shared<IntegerNode>(pth, nullptr);
-        else if (!units)
-            return std::make_shared<IntegerNode>(pth, std::move(value->clone()));
-        else
-            return std::make_shared<IntegerNode>(pth, std::move(value->clone()), units);
+        std::shared_ptr<IntegerNode> copy = std::make_shared<IntegerNode>(*this);
+        copy->path = pth;
+        copy->indent = 0;
+        return copy;
     }
 
     std::string IntegerNode::to_string(const core::StringFormatType& format) const {

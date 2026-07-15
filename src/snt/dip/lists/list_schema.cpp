@@ -5,7 +5,7 @@ namespace snt::dip {
 
     SchemaList::SchemaList() = default;
 
-    void SchemaList::append(const std::string& name, ValueNode::ListType& nodes) {
+    void SchemaList::append(const std::string& name, BaseNode::ListType& nodes) {
         auto it = schemas.find(name);
         if (it != schemas.end())
             throw std::invalid_argument("Schema with the same name already exists: " + name);

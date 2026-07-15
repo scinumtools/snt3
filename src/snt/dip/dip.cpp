@@ -155,7 +155,7 @@ namespace snt::dip {
             } else if (current_node->dtype == NodeDtype::Schema) {
                 // create a schema and aggregate all child nodes
                 check_indent(previous_node, current_node);
-                ValueNode::ListType schema_nodes;
+                BaseNode::ListType schema_nodes;
                 while (i + 1 < queue.size()) {
                     BaseNode::PointerType schema_node = queue.at(i + 1);
                     check_indent(previous_node, schema_node);
@@ -166,7 +166,7 @@ namespace snt::dip {
                     if (!schema_vnode)
                         throw std::runtime_error("Schema must contain only value nodes!");
                     schema_node->indent -= current_node->indent; // strip schema indent from aggregated nodes
-                    schema_nodes.push_back(schema_vnode);
+                    schema_nodes.push_back(schema_node);
                     i++;
                     previous_node = schema_node;
                 }
