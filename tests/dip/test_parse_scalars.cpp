@@ -121,7 +121,7 @@ TEST(ParseScalars, Cloning) {
     d.add_string("pop str = \"foo\"");
     dip::Environment env = d.parse();
 
-    dip::ValueNode::PointerType clone;
+    dip::BaseNode::PointerType clone;
 
     dip::ValueNode::PointerType jerk = env.nodes.at(0);
     clone = jerk->clone(dip::Path("clone"));

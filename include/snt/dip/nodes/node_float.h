@@ -16,14 +16,14 @@ namespace snt::dip {
       public:
         static constexpr size_t max_float_size = sizeof(long double) * CHAR_BIT;
         static ValueNode::PointerType is_node(Parser& parser);
-        FloatNode(const Path& pth, const core::DataType vdt) : BaseNode(NodeDtype::Float), ValueNode(pth, vdt) {};
+        FloatNode(const Path& pth, const core::DataType vdt) : ValueNode(pth, vdt, NodeDtype::Float) {};
         FloatNode(const Path& pth, val::BaseValue::PointerType val)
-            : BaseNode(NodeDtype::Float), ValueNode(pth, std::move(val)) {};
+            : ValueNode(pth, std::move(val), NodeDtype::Float) {};
         FloatNode(const Path& pth, val::BaseValue::PointerType val, std::optional<puq::Quantity> quant)
-            : BaseNode(NodeDtype::Float), ValueNode(pth, std::move(val), std::move(quant)) {};
+            : ValueNode(pth, std::move(val), NodeDtype::Float, std::move(quant)) {};
         FloatNode(Parser& parser);
         BaseNode::ListType parse(Environment& env) override;
-        ValueNode::PointerType clone(const Path& pth) const override;
+        BaseNode::PointerType clone(const Path& pth) const override;
         std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override;
     };
 

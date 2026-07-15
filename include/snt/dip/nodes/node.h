@@ -22,10 +22,10 @@ namespace snt::dip {
         std::string units_raw;                ///< raw units string
         val::Array::RangeType dimension;      ///< list of array dimensions
         Node() : indent(0), value_origin(ValueOrigin::Empty) {};
+        Node(const Node& other) = default;
         Node(const Line& l) : line(l), indent(0), value_origin(ValueOrigin::Empty) {};
         Node(const std::string& nm) : path(nm), indent(0), value_origin(ValueOrigin::Empty) {};
         virtual ~Node() = default;
-        std::string to_string();
     };
 
 } // namespace snt::dip

@@ -22,7 +22,7 @@ namespace snt::dip {
             EnvSchema schema = env.schemas.at(value_raw.at(0));
             BaseNode::ListType nodes;
             for (const auto& vnode : schema.nodes) {
-                ValueNode::PointerType vnode_new = vnode->clone(vnode->path);
+                ValueNode::PointerType vnode_new = std::dynamic_pointer_cast<ValueNode>(vnode->clone(vnode->path));
                 vnode_new->indent += indent;
                 nodes.push_back(vnode_new);
             }

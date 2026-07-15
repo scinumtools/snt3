@@ -18,7 +18,7 @@ namespace snt::dip {
         return nullptr;
     }
 
-    FloatNode::FloatNode(Parser& parser) : BaseNode(parser, NodeDtype::Float) {
+    FloatNode::FloatNode(Parser& parser) : ValueNode(parser, NodeDtype::Float) {
         if (dtype_raw[2] == "32") {
             value_dtype = core::DataType::Float32;
         } else if (dtype_raw[2] == "64" || dtype_raw[2] == "") {
@@ -121,7 +121,7 @@ namespace snt::dip {
         }
     }
 
-    ValueNode::PointerType FloatNode::clone(const Path& pth) const {
+    BaseNode::PointerType FloatNode::clone(const Path& pth) const {
         if (value == nullptr)
             return std::make_shared<FloatNode>(pth, nullptr);
         else if (!units)

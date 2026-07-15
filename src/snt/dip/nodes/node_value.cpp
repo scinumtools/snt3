@@ -4,12 +4,30 @@
 
 namespace snt::dip {
 
+    ValueNode::ValueNode(const ValueNode& other)
+        : units(other.units), tags(other.tags), constant(other.constant), description(other.description),
+          condition(other.condition), format(other.format), BaseNode(other) {
+        options.reserve(other.options.size());
+        for (const auto& option : other.options) {
+            options.push_back({option.value->clone(), option.value_raw, option.units_raw});
+        }
+        value = other.value->clone();
+    }
+
     ValueNode::ValueNode(const Path& pth, const core::DataType vdt) : constant(false), value_dtype(vdt) {
         path = pth;
-    };
+    }
 
-    ValueNode::ValueNode(const Path& pth, val::BaseValue::PointerType val, std::optional<puq::Quantity> unt)
-        : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)) {
+    ValueNode::ValueNode(const Path& pth, const core::DataType vdt, const NodeDtype dt)
+        : constant(false), value_dtype(vdt) {
+        dtype = dt;
+        path = pth;
+    }
+
+    ValueNode::ValueNode(
+        const Path& pth, val::BaseValue::PointerType val, const NodeDtype dt, std::optional<puq::Quantity> unt
+    )
+        : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)), BaseNode(dt) {
         path = pth;
         val::Array::ShapeType dims = val->get_shape();
         if (val->get_size() > 1) {

@@ -71,7 +71,7 @@ namespace snt::dip {
         }
     }
 
-    ValueNode::PointerType StringNode::clone(const Path& pth) const {
+    BaseNode::PointerType StringNode::clone(const Path& pth) const {
         if (value == nullptr)
             return std::make_shared<StringNode>(pth, nullptr);
         else
