@@ -45,6 +45,8 @@ namespace snt::dip {
     ) {
         if (!dimension.empty()) {
             return cast_array_value(value_input, shape);
+        } else if (value_input.empty()) {
+            throw std::runtime_error("Value node does not have any value: " + line.code);
         } else if (value_input.size() > 1) {
             throw std::runtime_error("Value size is an array but node is defined as scalar: " + line.code);
         } else {

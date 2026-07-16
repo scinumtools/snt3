@@ -5,6 +5,13 @@
 namespace snt::dip {
 
     Path::Path(const std::string& path) {
+        if (path.empty()) {
+            // If path is empty the node is not a value, nor a group.
+            // This can happen if property, source, unit, or similar nodes are being cloned.
+            name = "";               // set full path name
+            kind = Path::Kind::NONE; // set final path kind
+            return;
+        }
 
         size_t pos = 0;
         std::string currentPath;
@@ -59,9 +66,10 @@ namespace snt::dip {
             throw std::runtime_error("Path is not fully qualified: " + path);
 
         if (!currentPath.empty()) {
-            // A simple or node group
+            // A simple value or node group
             collections.push_back({std::move(currentPath), "", Path::Kind::GROUP});
         }
+
         name = path;                    // set full path name
         kind = collections.back().kind; // set final path kind
     }

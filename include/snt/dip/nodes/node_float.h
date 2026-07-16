@@ -24,7 +24,7 @@ namespace snt::dip {
             : ValueNode(pth, std::move(val), NodeDtype::Float, std::move(quant)) {};
         FloatNode(Parser& parser);
         BaseNode::ListType parse(Environment& env) override;
-        BaseNode::PointerType clone(const Path& pth) const override;
+        BaseNode::PointerType clone(const Path& pth, std::optional<size_t> indent = std::nullopt) const override;
         std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override;
     };
 

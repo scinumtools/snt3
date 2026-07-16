@@ -21,6 +21,11 @@ namespace snt::dip {
         return nullptr;
     }
 
+    BooleanNode::BooleanNode(const BooleanNode& other) : ValueNode(other) {
+        if (!value)
+            value_dtype = core::DataType::Boolean;
+    }
+
     BaseNode::ListType BooleanNode::parse(Environment& env) {
         if (!units_raw.empty())
             throw std::runtime_error("Boolean data type does not support units: " + line.code);
@@ -84,10 +89,11 @@ namespace snt::dip {
         return std::make_unique<val::ArrayValueBool>(bool_values, shape);
     }
 
-    BaseNode::PointerType BooleanNode::clone(const Path& pth) const {
+    BaseNode::PointerType BooleanNode::clone(const Path& pth, std::optional<size_t> indent) const {
         std::shared_ptr<BooleanNode> copy = std::make_shared<BooleanNode>(*this);
         copy->path = pth;
-        copy->indent = 0;
+        if (indent)
+            copy->indent = indent.value();
         return copy;
     }
 

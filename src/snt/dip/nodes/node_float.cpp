@@ -126,10 +126,11 @@ namespace snt::dip {
         }
     }
 
-    BaseNode::PointerType FloatNode::clone(const Path& pth) const {
+    BaseNode::PointerType FloatNode::clone(const Path& pth, std::optional<size_t> indent) const {
         std::shared_ptr<FloatNode> copy = std::make_shared<FloatNode>(*this);
         copy->path = pth;
-        copy->indent = 0;
+        if (indent)
+            copy->indent = indent.value();
         return copy;
     }
 

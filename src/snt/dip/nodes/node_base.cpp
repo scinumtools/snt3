@@ -12,9 +12,11 @@ namespace snt::dip {
         return false;
     }
 
-    BaseNode::PointerType BaseNode::clone(const Path& pth) const {
+    BaseNode::PointerType BaseNode::clone(const Path& pth, std::optional<size_t> indent) const {
         std::shared_ptr<BaseNode> copy = std::make_shared<BaseNode>(*this);
         copy->path = Path(pth.name);
+        if (indent)
+            copy->indent = indent.value();
         return copy;
     }
 

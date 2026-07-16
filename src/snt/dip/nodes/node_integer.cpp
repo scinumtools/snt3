@@ -180,10 +180,11 @@ namespace snt::dip {
         }
     }
 
-    BaseNode::PointerType IntegerNode::clone(const Path& pth) const {
+    BaseNode::PointerType IntegerNode::clone(const Path& pth, std::optional<size_t> indent) const {
         std::shared_ptr<IntegerNode> copy = std::make_shared<IntegerNode>(*this);
         copy->path = pth;
-        copy->indent = 0;
+        if (indent)
+            copy->indent = indent.value();
         return copy;
     }
 

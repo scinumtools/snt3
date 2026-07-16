@@ -16,15 +16,14 @@ namespace snt::dip {
         // TODO: implement import of a source
         // TODO: implement injection of a source file
         // TODO: implement injection a text file
-        // EnvSource senv = parse_source(value_raw.at(0), value_raw.at(1), line.source);
-        // env.sources.append(value_raw.at(0), senv);
         if (value_raw.size() > 0) {
             EnvSchema schema = env.schemas.at(value_raw.at(0));
+            value_raw.clear(); // We need to clear the value, because it would cause an infinite loop in the queue
             BaseNode::ListType nodes;
+            nodes.push_back(shared_from_this()); // Now we return the group node ...
             for (const auto& node : schema.nodes) {
-                BaseNode::PointerType node_new = node->clone(node->path);
-                node_new->indent = indent + INDENT_STEP;
-                nodes.push_back(node_new);
+                BaseNode::PointerType node_new = node->clone(node->path, node->indent + indent);
+                nodes.push_back(node_new); // ... and unwrap the schema nodes
             }
             return nodes;
         } else {

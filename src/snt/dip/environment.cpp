@@ -150,7 +150,7 @@ namespace snt::dip {
                     // select node
                     std::string new_name = vnode->path.name.substr(node_path_child.size(), vnode->path.name.size());
                     ValueNode::PointerType new_vnode =
-                        std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name)));
+                        std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
                     new_nodes.push_back(new_vnode);
                 } else if (vnode && vnode->path.name == node_path) {
                     p = i;
@@ -163,11 +163,11 @@ namespace snt::dip {
                 if (pos != std::string::npos) {
                     std::string new_name = vnode->path.name.substr(pos + 1, node_path.size());
                     ValueNode::PointerType new_vnode =
-                        std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name)));
+                        std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
                     new_nodes.push_back(new_vnode);
                 } else {
                     ValueNode::PointerType new_vnode =
-                        std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(node_path)));
+                        std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(node_path), 0));
                     new_nodes.push_back(new_vnode);
                 }
             }

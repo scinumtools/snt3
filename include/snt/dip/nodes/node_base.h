@@ -5,12 +5,13 @@
 #include "parser.h"
 
 #include <deque>
+#include <optional>
 
 namespace snt::dip {
 
     class Environment;
 
-    class BaseNode : public Node {
+    class BaseNode : public Node, public std::enable_shared_from_this<BaseNode> {
       public:
         NodeDtype dtype; // data type of a node; in Python this was 'keyword' variable in Node class
         size_t branch_id;
@@ -25,7 +26,15 @@ namespace snt::dip {
         virtual ListType parse(Environment& env);
         virtual bool set_property(PropertyType property, val::Array::StringType& values, std::string& units);
         virtual std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const;
-        virtual BaseNode::PointerType clone(const Path& pth) const;
+
+        /**
+         * Clone node with all its settings
+         *
+         * @param pth Path of the cloned node
+         * @param indent Indent of the cloned node
+         * @return BaseNode pointer of the cloned node
+         */
+        virtual BaseNode::PointerType clone(const Path& pth, std::optional<size_t> indent = std::nullopt) const;
     };
 
 } // namespace snt::dip
