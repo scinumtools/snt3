@@ -2,8 +2,27 @@ name: Coverage
 
 on:
   push:
-    branches: [main]
+    branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - 'bindings/**'
+      - 'benchmarks/**'
+      - 'examples/**'
+      - 'apps/**'
+      - 'tests/**'
+      - '.github/workflows/coverage.yml'
   pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - 'bindings/**'
+      - 'benchmarks/**'
+      - 'examples/**'
+      - 'apps/**'
+      - 'tests/**'
+      - '.github/workflows/coverage.yml'
 
 jobs:
   coverage:
