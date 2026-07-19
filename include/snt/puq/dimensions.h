@@ -22,7 +22,7 @@ namespace snt::puq {
         std::string to_string(const UnitFormat& format = UnitFormat()) const;
 
         /**
-         * @brief Test if there are physical dimensions
+         *  Test if there are physical dimensions
          *
          * @return Returns true if there are some physical dimensions; otherwise returns false
          */

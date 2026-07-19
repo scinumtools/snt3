@@ -16,7 +16,7 @@ namespace snt::exs {
 
     /**
      * @class OperatorGroup
-     * @brief Group operator class
+     *  Group operator class
      *
      * @tparam N Number of group members. Zero means unlimited number
      */

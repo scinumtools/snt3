@@ -8,7 +8,7 @@ namespace snt::api {
 
     /**
      * @class PUQList
-     * @brief Conversion of PUQ unit expressions
+     *  Conversion of PUQ unit expressions
      */
     class PUQList {
 
@@ -17,21 +17,21 @@ namespace snt::api {
 
       public:
         /**
-         * @brief Default class constructor
+         *  Default class constructor
          *
          * @param li Name of a list that should be displayed
          **/
         PUQList(const std::string& li = "") : list(li), input_system(puq::SystemType::NONE) {};
 
         /**
-         * @brief Select unit system
+         *  Select unit system
          *
          * @param system Unit system
          **/
         void argument_system(const std::string& system);
 
         /**
-         * @brief Executed parsing command
+         *  Executed parsing command
          *
          * @return Parsed output
          */

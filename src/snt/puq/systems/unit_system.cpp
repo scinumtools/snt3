@@ -8,7 +8,7 @@
 namespace snt::puq {
 
     /**
-     * @brief Initialize map of available unit systems
+     *  Initialize map of available unit systems
      *
      * @return Map of available unit systems and pointers to their data
      */
@@ -44,7 +44,7 @@ namespace snt::puq {
     std::unordered_map<SystemType, SystemDataType*> SystemMap = get_system_map();
 
     /**
-     * @brief Initialize map of empty unit systems for custom units
+     *  Initialize map of empty unit systems for custom units
      *
      * @return Map of units systems for custom units
      */
@@ -60,7 +60,7 @@ namespace snt::puq {
     std::unordered_map<SystemType, SystemDataType> CustomSystemMap = get_custom_system_map();
 
     /**
-     * @brief Initialize curent unit system record
+     *  Initialize curent unit system record
      *
      * @return Default unit system record
      */
@@ -102,7 +102,7 @@ namespace snt::puq {
     }
 
     /**
-     * @brief Find given system type in the system map and return pointer to its data
+     *  Find given system type in the system map and return pointer to its data
      *
      * @param system Selected system type
      * @return Pointer to found unit system data

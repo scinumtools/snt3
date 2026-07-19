@@ -9,13 +9,13 @@ namespace snt::mat {
 
     /**
      * @class Element
-     * @brief An element is a pure substance that consists entirely of one type of atom
+     *  An element is a pure substance that consists entirely of one type of atom
      */
     class Element : public Part<int>, public Matter {
       public:
         /**
          * @struct ElementProperties
-         * @brief Set of element defining properties
+         *  Set of element defining properties
          */
         struct ElementProperties {
             unsigned int protons;   ///< proton number Z
@@ -29,7 +29,7 @@ namespace snt::mat {
         unsigned int ionisation; ///< ionisation state
 
         /**
-         * @brief Element class constructor
+         *  Element class constructor
          *
          * @param expr Element string representation
          * @param prop Component proportion in a Composite
@@ -39,7 +39,7 @@ namespace snt::mat {
 
       private:
         /**
-         * @brief Set parameters of an isotope element
+         *  Set parameters of an isotope element
          *
          * @param isodata Isotope data from the periodic table
          * @param ion Ionisation state
@@ -47,7 +47,7 @@ namespace snt::mat {
         void set_element(const Isotope* isodata, const int ion);
 
         /**
-         * @brief Set parameters of an isotope element
+         *  Set parameters of an isotope element
          *
          * @param elem Symbol of an element
          * @param iso Isotope number
@@ -56,7 +56,7 @@ namespace snt::mat {
         void set_isotope(const std::string& elem, const int iso, const int ion);
 
         /**
-         * @brief Set parameters of an element with natural isotopic average
+         *  Set parameters of an element with natural isotopic average
          *
          * @param elem Symbol of an element
          * @param iso Isotope number
@@ -65,7 +65,7 @@ namespace snt::mat {
         void set_natural(const std::string& elem, const int iso, const int ion);
 
         /**
-         * @brief Set parameters of the most abundant element
+         *  Set parameters of the most abundant element
          *
          * @param elem Symbol of an element
          * @param iso Isotope number
@@ -75,7 +75,7 @@ namespace snt::mat {
 
       public:
         /**
-         * @brief Get an instance of an Element from an expression
+         *  Get an instance of an Element from an expression
          *
          * @param expr String expression
          * @return An instance of the Element class
@@ -83,21 +83,21 @@ namespace snt::mat {
         static Element from_string(const std::string& expr);
 
         /**
-         * @brief String representation of an element instance
+         *  String representation of an element instance
          *
          * @return String representation
          */
         std::string to_string();
 
         /**
-         * @brief Addition of two elements
+         *  Addition of two elements
          *
          * @param other Pointer of another element
          */
         void math_add(Element* other);
 
         /**
-         * @brief Multiplication of two elements
+         *  Multiplication of two elements
          *
          * @param other Pointer of another element
          */

@@ -8,26 +8,26 @@ namespace snt::mat {
 
     /**
      * @class SubstanceAtom
-     * @brief Substance expression solver
+     *  Substance expression solver
      */
     class SubstanceAtom final : public exs::AtomBase<SubstanceAtom, ElementMap> {
       public:
         /**
-         * @brief Copy constructor
+         *  Copy constructor
          *
          * @param a Reference of an SubstanceAtom object
          */
         SubstanceAtom(SubstanceAtom& a) : AtomBase(a) {};
 
         /**
-         * @brief Create atom from a value
+         *  Create atom from a value
          *
          * @param v ElementMap object
          */
         SubstanceAtom(ElementMap v) : AtomBase(v) {};
 
         /**
-         * @brief Create atom value from a string
+         *  Create atom value from a string
          *
          * @param s String representation of a value
          * @param set Pointer to solver settings
@@ -36,7 +36,7 @@ namespace snt::mat {
         static ElementMap from_string(std::string s, exs::BaseSettings* set = nullptr);
 
         /**
-         * @brief Get a string representation of this atom
+         *  Get a string representation of this atom
          *
          * @return String representation of this atom
          */

@@ -104,7 +104,7 @@ namespace snt::bind::python {
         q.attr("__array_priority__") = 1000;
 
         /**
-         * @brief Initialise Quantity with a value from numpy arrays
+         *  Initialise Quantity with a value from numpy arrays
          */
         q.def(
             py::init([](const py::array_t<double, py::array::c_style | py::array::forcecast>& v,
@@ -120,7 +120,7 @@ namespace snt::bind::python {
         );
 
         /**
-         * @brief Initialise Quantity with a value/uncertainty from numpy arrays
+         *  Initialise Quantity with a value/uncertainty from numpy arrays
          */
         q.def(
             py::init([](const py::array_t<double, py::array::c_style | py::array::forcecast>& v,
@@ -140,7 +140,7 @@ namespace snt::bind::python {
         );
 
         /**
-         * @brief Convert Quantity into a numpy array
+         *  Convert Quantity into a numpy array
          */
         q.def("to_numpy", [](const puq::Quantity& q) {
             val::ArrayValue<double>* otherT =

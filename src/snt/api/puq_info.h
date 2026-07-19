@@ -8,7 +8,7 @@ namespace snt::api {
 
     /**
      * @class PUQInfo
-     * @brief Display information about PUQ expressions
+     *  Display information about PUQ expressions
      */
     class PUQInfo {
 
@@ -17,19 +17,19 @@ namespace snt::api {
 
       public:
         /**
-         * @brief Default class constructor
+         *  Default class constructor
          **/
         PUQInfo(const std::string& expr) : expression(expr), input_system(puq::SystemType::NONE) {};
 
         /**
-         * @brief Set input unit system
+         *  Set input unit system
          *
          * @param system Unit system
          **/
         void argument_input_system(const std::string& isystem);
 
         /**
-         * @brief Executed parsing command
+         *  Executed parsing command
          *
          * @return Parsed output
          */

@@ -9,7 +9,7 @@
 namespace snt::puq {
 
     /**
-     * @brief Initialise EXS solver with predefined operators and steps
+     *  Initialise EXS solver with predefined operators and steps
      *
      * @return Instance of an EXS solver
      */

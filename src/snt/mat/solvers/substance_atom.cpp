@@ -4,7 +4,7 @@
 namespace snt::mat {
 
     /**
-     * @brief Test if a string is an integer
+     *  Test if a string is an integer
      *
      * @param str String that should be tested
      * @return Returns true if input string is an integer

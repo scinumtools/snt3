@@ -26,7 +26,7 @@ TEST(Collections, MapItems) {
 
     // test collections
     std::unordered_map<std::string, dip::Collection> collections = env.hierarchy.get_collections();
-    EXPECT_EQ(collections.size(), 2);
+    EXPECT_EQ(collections.size(), 8);
     {
         auto cl = collections.find("foo.fee");
         EXPECT_NE(cl, collections.end());
@@ -63,7 +63,7 @@ TEST(Collections, ListItems) {
 
     // test collections
     std::unordered_map<std::string, dip::Collection> collections = env.hierarchy.get_collections();
-    EXPECT_EQ(collections.size(), 2);
+    EXPECT_EQ(collections.size(), 8);
     {
         auto cl = collections.find("foo.fee");
         EXPECT_NE(cl, collections.end());

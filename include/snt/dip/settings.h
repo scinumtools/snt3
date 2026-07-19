@@ -132,6 +132,36 @@ namespace snt::dip {
         Delimiter // specific properties
     };
 
+    namespace detail {
+        // is_std_vector
+        template <typename T> struct is_std_vector : std::false_type {};
+        template <typename T, typename Alloc> struct is_std_vector<std::vector<T, Alloc>> : std::true_type {};
+        template <typename T> inline constexpr bool is_std_vector_v = is_std_vector<T>::value;
+        // is_std_array
+        template <typename T> struct is_std_array : std::false_type {};
+        template <typename T, std::size_t N> struct is_std_array<std::array<T, N>> : std::true_type {};
+        template <typename T> inline constexpr bool is_std_array_v = is_std_array<T>::value;
+        // element_type
+        template <typename T> struct element_type {
+            using type = T;
+        };
+        template <typename T, typename Alloc> struct element_type<std::vector<T, Alloc>> {
+            using type = T;
+        };
+        template <typename T, std::size_t N> struct element_type<std::array<T, N>> {
+            using type = T;
+        };
+        template <typename T> using element_type_t = typename element_type<T>::type;
+        // storage_type
+        template <typename T> struct storage_type {
+            using type = T;
+        };
+        template <> struct storage_type<bool> {
+            using type = uint8_t;
+        };
+        template <typename T> using storage_type_t = typename storage_type<T>::type;
+    } // namespace detail
+
 } // namespace snt::dip
 
 #endif // DIP_SETTINGS_H

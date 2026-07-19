@@ -8,7 +8,7 @@ namespace snt::dip {
 
     /**
      * @struct EnvUnit
-     * @brief Custom unit data
+     *  Custom unit data
      */
     struct EnvUnit {
         std::string name;       ///< unit key
@@ -18,7 +18,7 @@ namespace snt::dip {
 
     /**
      * @class UnitList
-     * @brief List of custom units
+     *  List of custom units
      */
     class UnitList {
       private:
@@ -26,12 +26,12 @@ namespace snt::dip {
 
       public:
         /**
-         * @brief Unit list constructor
+         *  Unit list constructor
          */
         UnitList();
 
         /**
-         * @brief Append new custom unit from a name and a definition expression
+         *  Append new custom unit from a name and a definition expression
          *
          * @param name Name of a custom unit
          * @param definition Expression that defines a new unit
@@ -39,7 +39,7 @@ namespace snt::dip {
         void append(const std::string& name, const std::string& definition);
 
         /**
-         * @brief Append new custom unit from a name and a custom unit data
+         *  Append new custom unit from a name and a custom unit data
          *
          * @param name Name of a custom unit
          * @param data Custom unit data object
@@ -47,7 +47,7 @@ namespace snt::dip {
         void append(const std::string& name, EnvUnit data);
 
         /**
-         * @brief Select custom unit data
+         *  Select custom unit data
          *
          * @param name Name of a custom unit
          * @return Custom unit data
@@ -55,7 +55,7 @@ namespace snt::dip {
         EnvUnit& at(const std::string& name);
 
         /**
-         * @brief Select custom unit data for read-only
+         *  Select custom unit data for read-only
          *
          * @param name Name of a custom unit
          * @return Custom unit data

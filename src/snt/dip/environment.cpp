@@ -6,7 +6,7 @@
 namespace snt::dip {
 
     /**
-     * @brief Split request expression into a name and node path
+     *  Split request expression into a name and node path
      *
      * @param request Request expression
      * @return Tuple with the request name and node path
@@ -263,6 +263,10 @@ namespace snt::dip {
 
     const std::string Environment::to_string() const {
         return "Environment";
+    }
+
+    Cursor Environment::operator[](std::string_view path) const {
+        return Cursor(this, path);
     }
 
 } // namespace snt::dip

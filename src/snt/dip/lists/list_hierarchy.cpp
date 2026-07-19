@@ -76,6 +76,7 @@ namespace snt::dip {
                     );
                 }
                 name_full += "[" + cnode.item + "]";
+                collections[name_full] = Collection{name_full, {}, Path::Kind::ITEM};
             } else if (cnode.kind == Path::Kind::LIST) {
                 std::string key;
                 if (it == collections.end()) { // create new collection
@@ -88,6 +89,9 @@ namespace snt::dip {
                     it->second.items.push_back(key);
                 }
                 name_full += "[" + key + "]";
+                collections[name_full] = Collection{name_full, {}, Path::Kind::ITEM};
+            } else if (cnode.kind == Path::Kind::GROUP) {
+                collections[name_full] = Collection{name_full, {}, Path::Kind::GROUP};
             }
         }
 
@@ -108,6 +112,10 @@ namespace snt::dip {
             throw std::runtime_error("Collection does not exist: " + path);
         }
         return (it->second);
+    }
+
+    const size_t num_collections() const {
+        return collections.size();
     }
 
 } // namespace snt::dip

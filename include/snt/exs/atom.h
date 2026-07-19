@@ -17,26 +17,26 @@ namespace snt::exs {
 
     /**
      * @class Atom
-     * @brief Default atom class
+     *  Default atom class
      */
     class Atom final : public AtomBase<Atom, AtomValueType> {
       public:
         /**
-         * @brief Copy constructor of an atom
+         *  Copy constructor of an atom
          *
          * @param a Reference to an atom from which we copy the values
          */
         Atom(const Atom& a) : AtomBase(a) {};
 
         /**
-         * @brief Initialise an empty vector of a specific type
+         *  Initialise an empty vector of a specific type
          *
          * @param v Atom value type
          */
         Atom(AtomValueType v) : AtomBase(v) {};
 
         /**
-         * @brief Create and atom object from a string
+         *  Create and atom object from a string
          *
          * @param s String corresponding to an atom
          * @param set Pointer to solver settings

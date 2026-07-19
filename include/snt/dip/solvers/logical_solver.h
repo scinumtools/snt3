@@ -8,7 +8,7 @@ namespace snt::dip {
 
     /**
      * @class LogicalSolver
-     * @brief Solves logical expressions of DIP nodes
+     *  Solves logical expressions of DIP nodes
      */
     class LogicalSolver {
       public:
@@ -17,7 +17,7 @@ namespace snt::dip {
         LogicalSolver(Environment& env);
 
         /**
-         * @brief Solve logical DIP expression
+         *  Solve logical DIP expression
          *
          * @param expression Logical expression string
          * @returns Data of a value node

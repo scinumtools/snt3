@@ -7,13 +7,13 @@ namespace snt::mat {
 
     /**
      * @class Matter
-     * @brief Matter is anything that has mass and occupies space
+     *  Matter is anything that has mass and occupies space
      */
     class Matter {
       public:
         /**
          * @struct MatterProperties
-         * @brief Set of matter defining properties
+         *  Set of matter defining properties
          */
         struct MatterProperties {
             puq::Quantity volume; ///< Volume

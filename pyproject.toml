@@ -71,7 +71,7 @@ cmake.source-dir = "./"
 
 [tool.cibuildwheel]
 
-build = "cp311-* cp312-* cp313-*"
+build = "cp311-* cp312-* cp313-* cp314-*"
 
 test-command = """
 python -c "import scinumtools3"

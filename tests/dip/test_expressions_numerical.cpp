@@ -75,3 +75,18 @@ TEST(ExpressionsNumerical, Dimensional) {
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "0.1095 m"); // 0.233*m / 0.4256*m * 0.2*m = 0.109492... m
 }
+
+TEST(ExpressionsNumerical, DimToNonDim) {
+
+    dip::DIP d;
+    d.add_string("foo float = 23.3 cm");
+    d.add_string("bar float = 425.6 mm");
+    d.add_string("baz float = ({?foo} / {?bar})");
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 3);
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(2);
+    EXPECT_EQ(vnode->path.name, "baz");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->to_string(), "0.05475");
+}

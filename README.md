@@ -46,6 +46,40 @@ The result is fewer hidden assumptions, earlier error detection and more reliabl
 Below is a quick example how to use the core functionality of `scinumtools3`.
 For more examples and patterns please look into the ``tests``, ``exec``, ``apps`` and ``bindings`` folders.
 
+#### Parameter definition 
+
+``parameters.dip``
+
+``` python
+simulation
+  title str = "Cylinder flow"        # strings
+  mesh
+    file str = "cylinder.msh"
+      !format "[A-Za-z0-9_]+.msh"  # enforce string formats
+  fluid
+    density float = 998.2 kg/m3      # numbers with units
+    viscosity float = 1.003e-3 Pa*s
+  time
+    dt float = 1e-3 s
+    end float = 10 s
+    steps int = ({?simulation.time.end} / {?simulation.time.dt})  # computed value
+      !condition ({?} > 0)                    # validation
+  solver
+    restart_file str = none                   # optional value
+  boundary[inlet]                             # node collections
+    velocity float[3] = [1.0, 0.0, 0.0] m/s   # arrays
+  boundary[outlet]
+    pressure float = 0 Pa
+  boundary[walls]
+    type str = "no_slip"
+      !options ["no_slip", "free_slip", "moving_wall"]   # allowed values
+  output
+    file str = "results.vtk"
+    variables str[:] = ["velocity", "pressure", "vorticity"]
+    every int = 100
+# See the documentation for more features.
+```
+
 #### with C++
 
 ```cpp
@@ -61,23 +95,13 @@ using namespace snt;
 
 int main() {
 
-  exs::Solver<exs::Atom> solver;
-  exs::Atom atom = solver.solve("23 * 34.5 + 4");
-  std::cout << atom.to_string() << std::endl;
-  // 797.5
-
-  val::ArrayValue<double> value({1.23, 4.56e7});
-  std::cout << value.to_string() << std::endl;
-  // [1.23, 4.56e7]
-
   puq::Quantity length("1*m");
   length = length.convert("km");
   std::cout << length.to_string() << std::endl;
   // 1e-3*km
 
   dip::DIP d;
-  d.add_string("foo int m");
-  d.add_string("foo = 3 km");
+  d.add_file("parameters.dip");
   dip::Environment env = d.parse();
   dip::ValueNode::PointerType vnode = env.nodes.at(0);
   std::cout << vnode->value->to_string() << std::endl;

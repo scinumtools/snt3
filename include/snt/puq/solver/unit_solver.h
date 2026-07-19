@@ -9,7 +9,7 @@ namespace snt::puq {
 
     /**
      * @class UnitSolver
-     * @brief Calcuates unit atoms from unit expressions
+     *  Calcuates unit atoms from unit expressions
      *
      * In order to speed up calculations of units this class is caching input unit expression strings and
      * stores already calculated unit atoms in a cache map. This should avoid repeated calculations
@@ -21,12 +21,12 @@ namespace snt::puq {
         static std::unordered_map<std::string, UnitAtom> cache; ///< list of previously calculated atoms
 
         /**
-         * @brief Default constructor
+         *  Default constructor
          */
         UnitSolver() = default;
 
         /**
-         * @brief Solve unit expression
+         *  Solve unit expression
          *
          * @param expression Unit expression that will be solved
          * @return Solved unit atom

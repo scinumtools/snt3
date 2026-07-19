@@ -14,7 +14,7 @@ namespace snt::puq {
 
     /**
      * @class UnitSystem
-     * @brief Manages a pointer to the central unit-system registry (`current`).
+     *  Manages a pointer to the central unit-system registry (`current`).
      *
      * The pointer may reference any unit system registered in `SystemMap`.
      * When a `UnitSystem` instance is opened, the pointer is redirected to
@@ -31,7 +31,7 @@ namespace snt::puq {
       public:
         /**
          * @struct Record
-         * @brief Holds record of an openned unit system
+         *  Holds record of an openned unit system
          */
         struct Record {
             SystemType type;
@@ -47,7 +47,7 @@ namespace snt::puq {
         static Record current; ///< Record of a current openned unit system
 
         /**
-         * @brief Set a custom unit into the current unit system record
+         *  Set a custom unit into the current unit system record
          *
          * @param name Unit name
          * @param definition Defining unit expression
@@ -56,31 +56,31 @@ namespace snt::puq {
         static size_t set_custom_unit(const std::string& name, const std::string& definition);
 
         /**
-         * @brief Constructor of the UnitSystem class
+         *  Constructor of the UnitSystem class
          *
          * @param st Unit system type
          */
         UnitSystem(const SystemType st = SystemType::NONE);
 
         /**
-         * @brief Destructor of the UnitSystem class
+         *  Destructor of the UnitSystem class
          */
         ~UnitSystem();
 
         /**
-         * @brief Change currently openned unit system
+         *  Change currently openned unit system
          *
          * @param st New unit system type
          */
         void change(const SystemType st);
 
         /**
-         * @brief Close the currently openned unit system
+         *  Close the currently openned unit system
          */
         void close();
 
         /**
-         * @brief String representation of this class
+         *  String representation of this class
          *
          * @return String representation
          */

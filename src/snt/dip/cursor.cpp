@@ -4,6 +4,26 @@
 
 namespace snt::dip {
 
+    Cursor::Cursor(const Environment* env, std::string_view path) : env_(env), path_(path) {
+        if (!path_.empty()) {
+            const Collection& col = env_->hierarchy.get_collection(path_);
+            switch (col.kind) {
+            case Path::Kind::NONE:
+                throw std::runtime_error(
+                    "Requested path does not point to any kind of hierarchy: " + std::string(path)
+                );
+                break;
+            case Path::Kind::VALUE:
+            case Path::Kind::GROUP:
+            case Path::Kind::LIST:
+            case Path::Kind::MAP:
+            case Path::Kind::ITEM:
+                kind = col.kind;
+                break;
+            }
+        }
+    }
+
     Cursor Cursor::get_group(std::string_view path) const {
         std::string new_path = path_.empty() ? std::string(path) : path_ + "." + std::string(path);
         ValueNode::ListType nodes = env_->request_group("?" + new_path);

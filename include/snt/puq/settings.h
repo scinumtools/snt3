@@ -7,7 +7,7 @@ namespace snt::puq {
 
     /**
      * @namespace Config
-     * @brief Configuration constants
+     *  Configuration constants
      */
     namespace Config {
         // default settings
@@ -39,7 +39,7 @@ namespace snt::puq {
 
     /**
      * @namespace Symbols
-     * @brief Symbol constants
+     *  Symbol constants
      */
     namespace Symbols {
         // quantity expression symbols

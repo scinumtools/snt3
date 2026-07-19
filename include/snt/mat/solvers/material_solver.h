@@ -8,14 +8,14 @@ namespace snt::mat {
 
     /**
      * @class MaterialSolver
-     * @brief This class solves material expressions
+     *  This class solves material expressions
      */
     class MaterialSolver {
       public:
         // std::unique_ptr<exs::Solver<Substance>> solver;  ///< Pointer to the EXS solver object
 
         /**
-         * @brief Constructor of this class
+         *  Constructor of this class
          */
         MaterialSolver();
     };

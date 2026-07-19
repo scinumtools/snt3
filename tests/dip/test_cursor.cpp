@@ -130,3 +130,91 @@ TEST(Cursor, RetrieveValues) {
         EXPECT_EQ(scalar, "shot");
     }
 }
+
+TEST(Cursor, GetValues) {
+
+    dip::DIP d;
+    d.add_string(
+        "foo[bar]\n"
+        "  jerk bool = true\n"
+        "  snap int = 3\n"
+        "  crackle float = 4e5\n"
+        "  pop str = \"shot\"\n"
+        "foo[baz]\n"
+        "  jerk bool[3] = [true, false, true]\n"
+        "  snap int[3] = [3,2,1]\n"
+        "  crackle float[2] = [4e5, 34e2]\n"
+        "  pop str[2] = [\"shot\",\"puff\"]\n"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 8);
+    {
+        bool jerk = env["foo[bar].jerk"].as<bool>();
+        int64_t snap = env["foo[bar].snap"].as<int64_t>();
+        double crackle = env["foo[bar].crackle"].as<double>();
+        std::string pop = env["foo[bar].pop"].as<std::string>();
+    }
+    {
+        std::array<bool, 3> jerk = env["foo[baz].jerk"].as<std::array<bool, 3>>();
+        std::array<int64_t, 3> snap = env["foo[baz].snap"].as<std::array<int64_t, 3>>();
+        std::array<double, 2> crackle = env["foo[baz].crackle"].as<std::array<double, 2>>();
+        std::array<std::string, 2> pop = env["foo[baz].pop"].as<std::array<std::string, 2>>();
+    }
+    {
+        std::vector<bool> jerk = env["foo[baz].jerk"].as<std::vector<bool>>();
+        std::vector<int64_t> snap = env["foo[baz].snap"].as<std::vector<int64_t>>();
+        std::vector<double> crackle = env["foo[baz].crackle"].as<std::vector<double>>();
+        std::vector<std::string> pop = env["foo[baz].pop"].as<std::vector<std::string>>();
+    }
+}
+
+TEST(Cursor, ParseCollections) {
+
+    dip::DIP d;
+    d.add_string(
+        "foo[bar]\n"
+        "  jerk bool = true\n"
+        "  snap int = 3\n"
+        "foo[baz]\n"
+        "  crackle float = 4e5\n"
+        "  pop str = \"shot\"\n"
+        "  foo[]\n"
+        "    jerk bool[3] = [true, false, true]\n"
+        "    snap int[3] = [3,2,1]\n"
+        "  foo[]\n"
+        "    crackle float[2] = [4e5, 34e2]\n"
+        "    pop str[2] = [\"shot\",\"puff\"]\n"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 8);
+
+    const std::unordered_map<std::string, dip::Collection> colls = env.hierarchy.get_collections();
+    std::vector<std::string> colls_parsed;
+    colls_parsed.reserve(colls.size());
+    for (const auto& [name, coll] : colls) {
+        colls_parsed.push_back(name);
+        std::cout << name << std::endl;
+    }
+    std::sort(colls_parsed.begin(), colls_parsed.end());
+
+    // prepare reference parameter set
+    std::vector<std::string> colls_ref = {
+        "foo",
+        "foo[bar]",
+        "foo[bar].jerk",
+        "foo[bar].snap",
+        "foo[baz]",
+        "foo[baz].crackle",
+        "foo[baz].foo",
+        "foo[baz].foo[0]",
+        "foo[baz].foo[0].jerk",
+        "foo[baz].foo[0].snap",
+        "foo[baz].foo[1]",
+        "foo[baz].foo[1].crackle",
+        "foo[baz].foo[1].pop",
+        "foo[baz].pop"
+    };
+
+    // compare parsed and expected collection names
+    EXPECT_EQ(colls_parsed, colls_ref);
+}

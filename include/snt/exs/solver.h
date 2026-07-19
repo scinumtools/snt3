@@ -19,7 +19,7 @@ namespace snt::exs {
 
     /**
      * @class Solver
-     * @brief Main expression solver class
+     *  Main expression solver class
      *
      * Note that internal solver and operator routines use static_cast to convert between
      * AtomGrand and actual ATOM type. Although it may seem dangerous, within a particular
@@ -36,7 +36,7 @@ namespace snt::exs {
         StepList steps;         ///< List of operator steps
 
         /**
-         * @brief Default solver constructor
+         *  Default solver constructor
          *
          * @param set Solver settings
          */
@@ -46,7 +46,7 @@ namespace snt::exs {
         };
 
         /**
-         * @brief Solver constructor with modified operators
+         *  Solver constructor with modified operators
          *
          * @param o List of operators
          * @param set Solver settings
@@ -54,7 +54,7 @@ namespace snt::exs {
         Solver(const OperatorList& o, const SETTINGS& set = {}) : operators(o), settings(set) { init_steps(); };
 
         /**
-         * @brief Solver constructor with modified operator steps
+         *  Solver constructor with modified operator steps
          *
          * @param s List of operator steps
          * @param set Solver settings
@@ -62,7 +62,7 @@ namespace snt::exs {
         Solver(const StepList& s, const SETTINGS& set = {}) : steps(s), settings(set) { init_operators(); };
 
         /**
-         * @brief Custom solver constructor
+         *  Custom solver constructor
          *
          * @param o List of operators
          * @param s List of operator steps
@@ -72,7 +72,7 @@ namespace snt::exs {
             : operators(o), steps(s), settings(set) {};
 
         /**
-         * @brief Main solver routine
+         *  Main solver routine
          *
          * @param expression Expression that should be solved
          * @return Final atom object with a solution
@@ -143,7 +143,7 @@ namespace snt::exs {
 
       private:
         /**
-         * @brief Initialisation of a default list of operator steps
+         *  Initialisation of a default list of operator steps
          */
         void init_steps() {
             steps.append(
@@ -175,7 +175,7 @@ namespace snt::exs {
         }
 
         /**
-         * @brief Initialisation of default operators
+         *  Initialisation of default operators
          */
         void init_operators() {
             operators.append(TANGENS_OPERATOR, std::make_shared<OperatorTangens>());

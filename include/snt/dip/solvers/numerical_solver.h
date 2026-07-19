@@ -8,7 +8,7 @@ namespace snt::dip {
 
     /**
      * @class NumericalSolver
-     * @brief Solves numerical expressions of DIP nodes
+     *  Solves numerical expressions of DIP nodes
      */
     class NumericalSolver {
       public:
@@ -17,7 +17,7 @@ namespace snt::dip {
         NumericalSolver(Environment& env);
 
         /**
-         * @brief Solve numerical DIP expression
+         *  Solve numerical DIP expression
          *
          * @param expression Numerical expression string
          * @param units Target units of a solved value node

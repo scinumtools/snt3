@@ -15,6 +15,9 @@ namespace snt::dip {
         return *this;
     }
 
+    NumericalAtom::NumericalAtom(const NumericalAtom& a)
+        : AtomBase({(a.value.value) ? a.value.value->clone() : nullptr, a.value.units}) {};
+
     ValueNodeData NumericalAtom::from_string(const std::string& s, exs::BaseSettings* settings) {
         Parser parser({s, {"NUMERICAL_ATOM", 0}});
         NumericalSettings* csettings = static_cast<NumericalSettings*>(settings);

@@ -8,7 +8,7 @@ namespace snt::dip {
 
     /**
      * @struct Parent
-     * @brief Holds information about a paraent node in the hierarchy
+     *  Holds information about a paraent node in the hierarchy
      */
     struct Parent {
         size_t indent;                                   ///< Indent of a parent node
@@ -18,7 +18,7 @@ namespace snt::dip {
 
     /**
      * @struct Collection
-     * @brief Information about a collection, keyed or indexed
+     *  Information about a collection, keyed or indexed
      */
     struct Collection {
         std::string path;               ///< Fully qualified path of a collection
@@ -28,7 +28,7 @@ namespace snt::dip {
 
     /**
      * @class HierarchyList
-     * @brief The main class that manages node hierarchy
+     *  The main class that manages node hierarchy
      */
     class HierarchyList {
       private:
@@ -37,7 +37,7 @@ namespace snt::dip {
 
       public:
         /**
-         * @brief Register node into the node hierarchy
+         *  Register node into the node hierarchy
          *
          * @param node Node that should be registed
          * @param excluded List of node types that will be ignored in a node hierarchy
@@ -45,19 +45,26 @@ namespace snt::dip {
         void record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded);
 
         /**
-         * @brief Gets a reference on a ll collections
+         *  Gets a reference on a ll collections
          *
          * @return Map of all collections
          */
         const std::unordered_map<std::string, Collection>& get_collections() const;
 
         /**
-         * @brief Get reference to a specific collection
+         *  Get reference to a specific collection
          *
          * @param path Collection fully qualified path
          * @return Referenc on a collection
          */
         const Collection& get_collection(const std::string& path) const;
+
+        /**
+         * Get number of collections
+         *
+         * @return Number of collections
+         */
+        const size_t num_collections() const;
     };
 
 } // namespace snt::dip

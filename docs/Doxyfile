@@ -212,7 +212,7 @@ SHORT_NAMES            = NO
 # first line (until the first dot, question mark or exclamation mark) of a
 # Javadoc-style comment as the brief description. If set to NO, the Javadoc-
 # style will behave just like regular Qt-style comments (thus requiring an
-# explicit @brief command for a brief description.)
+# explicit  command for a brief description.)
 # The default value is: NO.
 
 JAVADOC_AUTOBRIEF      = NO

@@ -11,7 +11,7 @@ namespace snt::mat {
 
     /**
      * @class SubstanceSolver
-     * @brief This class solves substance expressions
+     *  This class solves substance expressions
      */
     class SubstanceSolver {
 
@@ -24,19 +24,19 @@ namespace snt::mat {
         static std::unique_ptr<exs::Solver<SubstanceAtom>> solver; ///< Pointer to the EXS solver object
 
         /**
-         * @brief Constructor of this class
+         *  Constructor of this class
          */
         SubstanceSolver() {};
 
         /**
-         * @brief Preprocess expression for the solver
+         *  Preprocess expression for the solver
          *
          * @param expr Substance expression
          */
         std::string preprocess(const std::string& expr);
 
         /**
-         * @brief Solve expression using expression solver
+         *  Solve expression using expression solver
          *
          * @param expr Substance expression
          * @return Map of elements and their proportions

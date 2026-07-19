@@ -89,7 +89,12 @@ namespace snt::dip {
             ua.value.value = std::move(quantity.measurement.result.estimate);
             ua.value.units = puq::Quantity(units);
         } else if (ua.value.units) {
-            throw std::runtime_error("NumericalSolver: Trying to convert nondimensional quantity into '" + units + "'");
+            if (ua.value.units->measurement.baseunits.has_dimensions())
+                throw std::runtime_error(
+                    "NumericalSolver: Trying to convert nondimensional quantity into '" + units + "'"
+                );
+            else // converting nondimensional quantity into an empty 'units' string
+                ua.value.units = std::nullopt;
         } else if (!units.empty()) {
             throw std::runtime_error(
                 "NumericalSolver: Trying to convert '" + ua.value.units->to_string() +

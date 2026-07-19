@@ -30,14 +30,14 @@ namespace snt::dip {
         bool part_path(const bool required = true);
 
         /**
-         * @brief Parse schema specifier after group node path
+         *  Parse schema specifier after group node path
          *
          * @return True if schema was parsed; otherwise, false.
          */
         bool part_schema();
 
         /**
-         * @brief Parse node type
+         *  Parse node type
          *
          * @param required Specifies if this part is required
          * @return True if type was parsed; otherwise, false.
@@ -46,7 +46,7 @@ namespace snt::dip {
 
       private:
         /**
-         * @brief Parse literal boolean values from a string
+         *  Parse literal boolean values from a string
          *
          * @param str String that should be parsed
          * @return True if literal was successfully parsed; otherwise, false.
@@ -54,7 +54,7 @@ namespace snt::dip {
         bool part_literal_boolean(const std::string& str);
 
         /**
-         * @brief Parse literal string values from a string
+         *  Parse literal string values from a string
          *
          * @param str String that should be parsed
          * @return True if literal was successfully parsed; otherwise, false.
@@ -62,7 +62,7 @@ namespace snt::dip {
         bool part_literal_string(const std::string& str);
 
         /**
-         * @brief Parse literal integer values from a string
+         *  Parse literal integer values from a string
          *
          * @param str String that should be parsed
          * @return True if literal was successfully parsed; otherwise, false.
@@ -70,7 +70,7 @@ namespace snt::dip {
         bool part_literal_integer(const std::string& str);
 
         /**
-         * @brief Parse literal float values from a string
+         *  Parse literal float values from a string
          *
          * @param str String that should be parsed
          * @return True if literal was successfully parsed; otherwise, false.
@@ -78,7 +78,7 @@ namespace snt::dip {
         bool part_literal_float(const std::string& str);
 
         /**
-         * @brief Parse literal units values from a string
+         *  Parse literal units values from a string
          *
          * @param str String that should be parsed
          * @return True if literal was successfully parsed; otherwise, false.
@@ -87,7 +87,7 @@ namespace snt::dip {
 
       public:
         /**
-         * @brief Parse literal node values from a string
+         *  Parse literal node values from a string
          *
          * @return True if literal was successfully parsed; otherwise, false.
          */
@@ -102,7 +102,7 @@ namespace snt::dip {
         bool part_string();
 
         /**
-         * @brief Parse a keyword from a code
+         *  Parse a keyword from a code
          *
          * @param required Specifies if keyword is required or not
          * @param delimiter Trailing character after a keyword
@@ -111,14 +111,14 @@ namespace snt::dip {
         bool part_keyword(const bool required = true, const char delimiter = ' ');
 
         /**
-         * @brief Parse none value from a code
+         *  Parse none value from a code
          *
          * @return True if the none value was successfully parsed; otherwise, false.
          */
         bool part_none();
 
         /**
-         * @brief Parse a number from a code
+         *  Parse a number from a code
          *
          * @param required Specifies if number is required or not
          * @param delimiter Trailing character after a number
@@ -127,7 +127,7 @@ namespace snt::dip {
         bool part_number(const bool required = true, const char delimiter = ' ');
 
         /**
-         * @brief Parse node value
+         *  Parse node value
          * @return True if the value was successfully parsed; otherwise, false.
          */
         bool part_value();
@@ -136,7 +136,7 @@ namespace snt::dip {
         bool part_format();
 
         /**
-         * @brief Parse units from a code
+         *  Parse units from a code
          *
          * @param delimiter Leading character before an unit expression
          */

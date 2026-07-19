@@ -10,19 +10,19 @@ namespace snt::val {
 
     /**
      * @namespace Array
-     * @brief Define common array types
+     *  Define common array types
      */
     namespace Array {
         /**
          * @struct RangeStruct
-         * @brief Array dimension range
+         *  Array dimension range
          */
         struct RangeStruct {
             size_t dmin; ///<  Dimension range minimum
             size_t dmax; ///<  Dimension range maximum
 
             /**
-             * @brief Compare equalit of two ranges
+             *  Compare equalit of two ranges
              *
              * @param other Other range that will be compared
              */
