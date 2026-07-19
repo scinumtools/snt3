@@ -11,8 +11,7 @@ namespace snt::val {
     template <typename T> class ArrayValue;
 
     /**
-     * @class BaseArrayValue
-     *  Base class for all array values
+     * Base class for all array values
      *
      * @tparam T Data type of a values
      */
@@ -26,7 +25,7 @@ namespace snt::val {
 
       public:
         /**
-         *  Base array value constructor from a scalar value
+         * Base array value constructor from a scalar value
          *
          * @param val Scalar value
          * @param dtype Datatype flag
@@ -34,7 +33,7 @@ namespace snt::val {
         BaseArrayValue(const T& val, const core::DataType dtype) : value({val}), BaseValue(dtype, {1}) {};
 
         /**
-         *  Base array value constructor from a flattened vector of values and a shape
+         * Base array value constructor from a flattened vector of values and a shape
          *
          * @param arr Vector of values
          * @param sh Array shape
@@ -44,7 +43,7 @@ namespace snt::val {
             : value(arr), BaseValue(dtype, sh) {};
 
         /**
-         *  Base array value constructor from a BaseValue pointer
+         * Base array value constructor from a BaseValue pointer
          *
          * @param other Pointer to a BaseValue object
          * @param dtype Datatype flag
@@ -65,19 +64,19 @@ namespace snt::val {
         };
 
         /**
-         *  Print object as a string
+         * Print object as a string
          */
         void print() override { std::cout << to_string() << std::endl; };
 
         /**
-         *  Get copy of the array values
+         * Get copy of the array values
          *
          * @return Flattened array of values
          */
         std::vector<T> get_values() const { return value; };
 
         /**
-         *  Get copy of a particular value
+         * Get copy of a particular value
          *
          * @param index Index of a value
          * @return Single value
@@ -85,21 +84,21 @@ namespace snt::val {
         T get_value(const size_t index) const { return value.at(index); };
 
         /**
-         *  Get pointer to the internal data container
+         * Get pointer to the internal data container
          *
          * @return Pointer to the value data
          */
         T* get_data() { return value.data(); };
 
         /**
-         *  Get size of an array
+         * Get size of an array
          *
          * @return Size of the flattened array value
          */
         size_t get_size() const override { return value.size(); };
 
         /**
-         *  Print value into a string stream
+         * Print value into a string stream
          *
          * @param os String stream
          * @param val Value object
@@ -107,7 +106,7 @@ namespace snt::val {
         friend std::ostream& operator<<(std::ostream& os, const ArrayValue<T>& val) { return os << val.to_string(); };
 
         /**
-         *  Return string representation of this array object
+         * Return string representation of this array object
          *
          * @param format Object with an output string format
          * @return String representation
@@ -121,7 +120,7 @@ namespace snt::val {
          */
       protected:
         /**
-         *  Perform unary operation on a array value
+         * Perform unary operation on a array value
          *
          * @param f operation Function on self and other array value
          * @param output_dtype DataType flage of the output (needed for booleans)
@@ -140,7 +139,7 @@ namespace snt::val {
         };
 
         /**
-         *  Perform unary assignment operation on a array value
+         * Perform unary assignment operation on a array value
          *
          * @param f operation Function on self and other array value
          * @tparam R Output data type
@@ -153,7 +152,7 @@ namespace snt::val {
         };
 
         /**
-         *  Perform binary operation on two array values
+         * Perform binary operation on two array values
          *
          * @param other The right hand array value
          * @param f operation Function on self and other array value
@@ -200,7 +199,7 @@ namespace snt::val {
         };
 
         /**
-         *  Perform binary assignment operation with two array values
+         * Perform binary assignment operation with two array values
          *
          * @param other The right hand array value
          * @param f operation Function on self and other array value
@@ -238,7 +237,7 @@ namespace snt::val {
         };
 
         /**
-         *  Perform ternary operation with three array values
+         * Perform ternary operation with three array values
          *
          * @param other1 The first ternary argument, usually a boolean condition result
          * @param other2 The third ternary argument, usually an alternative to this object

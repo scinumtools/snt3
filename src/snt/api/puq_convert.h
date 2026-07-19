@@ -7,7 +7,6 @@
 namespace snt::api {
 
     /**
-     * @class PUQConvert
      *  Conversion of PUQ unit expressions
      */
     class PUQConvert {
@@ -20,35 +19,35 @@ namespace snt::api {
 
       public:
         /**
-         *  Default class constructor
+         * Default class constructor
          **/
         PUQConvert(const std::string& expr1, const std::string& expr2)
             : expression(expr1), output_units(expr2), input_system(puq::SystemType::NONE),
               output_system(puq::SystemType::NONE) {};
 
         /**
-         *  Set input unit system
+         * Set input unit system
          *
          * @param system Unit system
          **/
         void argument_input_system(const std::string& system);
 
         /**
-         *  Set output unit system
+         * Set output unit system
          *
          * @param system Unit system
          **/
         void argument_output_system(const std::string& system);
 
         /**
-         *  Set output quantity
+         * Set output quantity
          *
          * @param quantity Output quantity
          **/
         void argument_output_quantity(const std::string& quantity);
 
         /**
-         *  Executed parsing command
+         * Executed parsing command
          *
          * @return Parsed output
          */

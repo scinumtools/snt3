@@ -8,13 +8,12 @@
 namespace snt::dip {
 
     /**
-     * @class Path
-     *  This class manages fully qualified node paths
+     * This class manages fully qualified node paths
      */
     class Path {
       public:
         /**
-         *  List of collection types
+         * List of collection types
          */
         enum class Kind {
             NONE,  ///< Node is not a collection
@@ -22,12 +21,10 @@ namespace snt::dip {
             MAP,   ///< Map items are associated with a key
             LIST,  ///< List items are ordered by indexes
             ITEM,  ///< Item in a map or list collection
-            VALUE, ///< Node is a value
         };
 
         /**
-         * @struct Path::CollectionAccess
-         *  Collection node information
+         * Collection node information
          */
         struct CollectionAccess {
             std::string path; ///< Paths leading to a collection
@@ -40,12 +37,12 @@ namespace snt::dip {
         std::vector<Path::CollectionAccess> collections; ///< list of collection access pairs derived from a node name
 
         /**
-         *  Class constructor
+         * Class constructor
          */
         Path() = default;
 
         /**
-         *  Class constructor
+         * Class constructor
          *
          * @param path Path that will be parsed
          */

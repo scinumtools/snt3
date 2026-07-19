@@ -114,7 +114,7 @@ namespace snt::dip {
         return (it->second);
     }
 
-    const size_t num_collections() const {
+    const size_t HierarchyList::num_collections() const {
         return collections.size();
     }
 

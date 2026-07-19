@@ -16,8 +16,7 @@ namespace snt::dip {
     class Cursor; ///< Forward declaring
 
     /**
-     * @enum RequestType
-     *  Type of an environment request
+     * Type of an environment request
      */
     enum class RequestType {
         Reference, ///< Search in the node list
@@ -25,8 +24,7 @@ namespace snt::dip {
     };
 
     /**
-     * @class Environment
-     *  Object of this class holds the whole DIP parsing environment
+     * Object of this class holds the whole DIP parsing environment
      */
     class Environment {
       private:
@@ -40,12 +38,12 @@ namespace snt::dip {
         FunctionList functions;    ///< List of functions
 
         /**
-         *  Constructor of the Environment class
+         * Constructor of the Environment class
          */
         Environment();
 
         /**
-         *  Get a source code
+         * Get a source code
          *
          * @param source_name Name of a source
          * @return Source code
@@ -53,7 +51,7 @@ namespace snt::dip {
         std::string request_code(const std::string& source_name) const;
 
         /**
-         *  Get node data (value + units) from a reference or a function based on a request expression
+         * Get node data (value + units) from a reference or a function based on a request expression
          *
          * @param request Request expression
          * @param rtype Request type: reference, or function
@@ -64,7 +62,7 @@ namespace snt::dip {
         ) const;
 
         /**
-         *  Get value from a reference or a function based on a request expression
+         * Get value from a reference or a function based on a request expression
          *
          * @param request Request expression
          * @param rtype Request type: reference, or function
@@ -78,7 +76,7 @@ namespace snt::dip {
         ) const;
 
         /**
-         *  Get group of nodes from a reference or a function based on a request expression
+         * Get group of nodes from a reference or a function based on a request expression
          *
          * @param request Request expression
          * @param rtype Request type: reference, or function
@@ -92,7 +90,7 @@ namespace snt::dip {
         ) const;
 
         /**
-         *  Get a keyed collection of  nodes from a reference or a function based on a request expression
+         * Get a keyed collection of  nodes from a reference or a function based on a request expression
          *
          * @param request Request expression
          * @param rtype Request type: reference, or function
@@ -106,7 +104,7 @@ namespace snt::dip {
         ) const;
 
         /**
-         *  Get a indexed collection of nodes from a reference or a function based on a request expression
+         * Get a indexed collection of nodes from a reference or a function based on a request expression
          *
          * @param request Request expression
          * @param rtype Request type: reference, or function
@@ -120,14 +118,14 @@ namespace snt::dip {
         ) const;
 
         /**
-         *  Request cursor object for node path traversing
+         * Request cursor object for node path traversing
          *
          * @return Cursor object
          */
         Cursor request_cursor();
 
         /**
-         *  Get parsed node value at the specific index
+         * Get parsed node value at the specific index
          *
          * @param index Index of a node
          * @return ArrayValue of a selected node
@@ -135,7 +133,7 @@ namespace snt::dip {
         val::BaseValue::PointerType get_value(size_t index) const;
 
         /**
-         *  Represent environment as a string
+         * Represent environment as a string
          *
          * @return String representation of an environment
          */

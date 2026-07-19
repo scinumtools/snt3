@@ -7,17 +7,21 @@
 namespace snt::dip {
 
     /**
-     * @class LogicalSolver
-     *  Solves logical expressions of DIP nodes
+     * Solves logical expressions of DIP nodes
      */
     class LogicalSolver {
       public:
         std::unique_ptr<exs::Solver<LogicalAtom, LogicalSettings>> solver; ///< Instance of an EXS expression solver
 
+        /**
+         * Logical solver constructor
+         *
+         * @param env Environment class object
+         */
         LogicalSolver(Environment& env);
 
         /**
-         *  Solve logical DIP expression
+         * Solve logical DIP expression
          *
          * @param expression Logical expression string
          * @returns Data of a value node

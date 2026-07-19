@@ -7,17 +7,21 @@
 namespace snt::dip {
 
     /**
-     * @class NumericalSolver
-     *  Solves numerical expressions of DIP nodes
+     * Solves numerical expressions of DIP nodes
      */
     class NumericalSolver {
       public:
         std::unique_ptr<exs::Solver<NumericalAtom, NumericalSettings>> solver; ///< Instance of an EXS expression solver
 
+        /**
+         * Numerical solver constructor
+         *
+         * @param env Environment class object
+         */
         NumericalSolver(Environment& env);
 
         /**
-         *  Solve numerical DIP expression
+         * Solve numerical DIP expression
          *
          * @param expression Numerical expression string
          * @param units Target units of a solved value node

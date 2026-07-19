@@ -9,8 +9,7 @@
 namespace snt::mat {
 
     /**
-     * @class Material
-     *  Any substance or mixture of substances that can be used to make objects or structures
+     * Any substance or mixture of substances that can be used to make objects or structures
      */
     class Material : public Set<Substance, double>, public Matter {
       public:

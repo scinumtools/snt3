@@ -6,8 +6,7 @@
 namespace snt::puq {
 
     /**
-     * @namespace Config
-     *  Configuration constants
+     * Configuration constants
      */
     namespace Config {
         // default settings
@@ -38,8 +37,7 @@ namespace snt::puq {
     );
 
     /**
-     * @namespace Symbols
-     *  Symbol constants
+     * Symbol constants
      */
     namespace Symbols {
         // quantity expression symbols

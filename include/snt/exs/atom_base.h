@@ -13,8 +13,7 @@
 namespace snt::exs {
 
     /**
-     * @class AtomBase
-     *  Base atom class
+     * Base atom class
      *
      * @tparam ATOM Atom type class
      * @tparam VALUE Atom value type

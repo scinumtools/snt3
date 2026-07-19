@@ -10,13 +10,12 @@ namespace snt::mat {
     class Substance;
 
     /**
-     * @class SubstanceSolver
-     *  This class solves substance expressions
+     * This class solves substance expressions
      */
     class SubstanceSolver {
 
         /**
-         * @enum Parser state flags
+         * Parser state flags
          */
         enum class ParserState { START, ELEMENT, STATE, END, OPERATION, ERROR };
 
@@ -24,19 +23,19 @@ namespace snt::mat {
         static std::unique_ptr<exs::Solver<SubstanceAtom>> solver; ///< Pointer to the EXS solver object
 
         /**
-         *  Constructor of this class
+         * Constructor of this class
          */
         SubstanceSolver() {};
 
         /**
-         *  Preprocess expression for the solver
+         * Preprocess expression for the solver
          *
          * @param expr Substance expression
          */
         std::string preprocess(const std::string& expr);
 
         /**
-         *  Solve expression using expression solver
+         * Solve expression using expression solver
          *
          * @param expr Substance expression
          * @return Map of elements and their proportions

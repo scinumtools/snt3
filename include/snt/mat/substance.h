@@ -10,20 +10,19 @@
 namespace snt::mat {
 
     /**
-     * @class Substance
-     *  A form of matter with uniform and definite composition and distinct physical and chemical properties.
+     * A form of matter with uniform and definite composition and distinct physical and chemical properties.
      */
     class Substance : public Set<Element, int>, public Part<double>, public Matter {
       public:
         /**
-         *  Substance class constructor from a scalar number
+         * Substance class constructor from a scalar number
          *
          * @param num Number
          */
         Substance(double num);
 
         /**
-         *  Substance class constructor from a map of components and their proportions
+         * Substance class constructor from a map of components and their proportions
          *
          * @param comp Map of components and their proportions
          * @param prop Component proportion in a Composite
@@ -32,7 +31,7 @@ namespace snt::mat {
         Substance(const ElementMap& comp, double prop = 1, bool nat = true);
 
         /**
-         *  Substance class constructor from an expression
+         * Substance class constructor from an expression
          *
          * @param expr Element string representation
          * @param prop Component proportion in a Composite
@@ -41,7 +40,7 @@ namespace snt::mat {
         Substance(const std::string& expr, double prop = 1, bool nat = true);
 
         /**
-         *  Convert element to a string
+         * Convert element to a string
          *
          * @return String representation of a substance
          */

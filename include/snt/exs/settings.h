@@ -6,8 +6,7 @@
 namespace snt::exs {
 
     /**
-     * @enum TokenType
-     *  List of operator types
+     * List of operator types
      */
     enum TokenType {
         EMPTY_TOKEN,    ///< Token is empty
@@ -16,8 +15,7 @@ namespace snt::exs {
     };
 
     /**
-     * @enum OperationType
-     *  Type of an operation
+     * Type of an operation
      */
     enum OperationType {
         UNARY_OPERATION,   ///< Unary operation operates on the atom value
@@ -27,8 +25,7 @@ namespace snt::exs {
     };
 
     /**
-     * @enum OperatorTree
-     *  List of all operators
+     * List of all operators
      */
     enum OperatorType {
         NONE_OPERATOR, ///< Item is not an operator
@@ -69,7 +66,7 @@ namespace snt::exs {
     };
 
     /**
-     *  Remove leading and trailing spaces from a string
+     * Remove leading and trailing spaces from a string
      *
      * @param str String that should be trimmed
      * @param whitespace String with whitespace characters that will be removed
@@ -86,8 +83,7 @@ namespace snt::exs {
     }
 
     /**
-     * @struct BaseSettings
-     *  Base structure for expression solver settings
+     * Base structure for expression solver settings
      */
     struct BaseSettings {};
 

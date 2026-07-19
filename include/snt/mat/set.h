@@ -9,8 +9,7 @@
 namespace snt::mat {
 
     /**
-     * @class Set
-     *  A set is a material or object made up of two or more distinct members that remain physically separate and
+     * A set is a material or object made up of two or more distinct members that remain physically separate and
      * identifiable within the final structure
      *
      * @tparam MEMBER Type of set members
@@ -25,7 +24,7 @@ namespace snt::mat {
         bool natural;                                  ///< true if set is using natural abundances
 
         /**
-         *  Set class constructor
+         * Set class constructor
          *
          * @param comp A map of parts with their proportions
          * @param nat Indicate if substance atoms should use natural abundance

@@ -9,7 +9,7 @@
 namespace snt::core {
 
     /**
-     *  Converts a strongly-typed enum value to its underlying integral type.
+     * Converts a strongly-typed enum value to its underlying integral type.
      *
      * @tparam E Enumeration type.
      * @param e Enum value to convert.
@@ -20,7 +20,7 @@ namespace snt::core {
     }
 
     /**
-     *  Performs a bitwise OR operation between two enum class values.
+     * Performs a bitwise OR operation between two enum class values.
      *
      * @tparam E Enumeration type.
      * @param lhs Left-hand side operand.
@@ -33,7 +33,7 @@ namespace snt::core {
     }
 
     /**
-     *  Performs an in-place bitwise OR assignment on enum class values.
+     * Performs an in-place bitwise OR assignment on enum class values.
      *
      * @tparam E Enumeration type.
      * @param lhs Left-hand side operand to modify.
@@ -46,8 +46,7 @@ namespace snt::core {
     }
 
     /**
-     * @enum DataType
-     *  List of value data types
+     * List of value data types
      */
     enum class DataType : uint16_t {
         // Define individual data types
@@ -85,7 +84,7 @@ namespace snt::core {
     extern std::unordered_map<DataType, std::string> DataTypeNames;
 
     /**
-     *  Performs a bitwise OR operation on two DataType flags.
+     * Performs a bitwise OR operation on two DataType flags.
      *
      * @param lhs Left-hand side flag.
      * @param rhs Right-hand side flag.
@@ -98,7 +97,7 @@ namespace snt::core {
     }
 
     /**
-     *  Performs a bitwise AND operation on two DataType flags.
+     * Performs a bitwise AND operation on two DataType flags.
      *
      * @param lhs Left-hand side flag.
      * @param rhs Right-hand side flag.
@@ -111,7 +110,7 @@ namespace snt::core {
     }
 
     /**
-     *  Performs an in-place bitwise OR assignment on DataType flags.
+     * Performs an in-place bitwise OR assignment on DataType flags.
      *
      * @param lhs Left-hand side flag reference to modify.
      * @param rhs Right-hand side flag.
@@ -123,7 +122,7 @@ namespace snt::core {
     }
 
     /**
-     *  Performs a bitwise NOT operation on a DataType flag.
+     * Performs a bitwise NOT operation on a DataType flag.
      *
      * @param f Input flag to invert.
      * @return A new DataType value with inverted bits.
@@ -133,7 +132,7 @@ namespace snt::core {
     }
 
     /**
-     *  Test if there is some flag in a flag set
+     * Test if there is some flag in a flag set
      *
      * @param a Input flag
      * @return Returns true if some flag is a set

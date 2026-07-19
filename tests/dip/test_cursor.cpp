@@ -176,8 +176,9 @@ TEST(Cursor, ParseCollections) {
         "  jerk bool = true\n"
         "  snap int = 3\n"
         "foo[baz]\n"
-        "  crackle float = 4e5\n"
-        "  pop str = \"shot\"\n"
+        "  yippee\n"
+        "    crackle float = 4e5\n"
+        "    pop str = \"shot\"\n"
         "  foo[]\n"
         "    jerk bool[3] = [true, false, true]\n"
         "    snap int[3] = [3,2,1]\n"
@@ -204,7 +205,6 @@ TEST(Cursor, ParseCollections) {
         "foo[bar].jerk",
         "foo[bar].snap",
         "foo[baz]",
-        "foo[baz].crackle",
         "foo[baz].foo",
         "foo[baz].foo[0]",
         "foo[baz].foo[0].jerk",
@@ -212,7 +212,9 @@ TEST(Cursor, ParseCollections) {
         "foo[baz].foo[1]",
         "foo[baz].foo[1].crackle",
         "foo[baz].foo[1].pop",
-        "foo[baz].pop"
+        "foo[baz].yippee",
+        "foo[baz].yippee.crackle",
+        "foo[baz].yippee.pop"
     };
 
     // compare parsed and expected collection names

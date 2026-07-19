@@ -7,8 +7,7 @@
 namespace snt::mat {
 
     /**
-     * @class Part
-     *  A part is an individual substance or part that combines with others to form a larger whole
+     * A part is an individual substance or part that combines with others to form a larger whole
      *
      * @tparam PROPORTION proportion coefficient type (double or integer)
      */
@@ -19,7 +18,7 @@ namespace snt::mat {
         puq::Quantity part_mass; ///< Part mass
       public:
         /**
-         *  Create a part
+         * Create a part
          *
          * @param prop Proportion of this part in a Composite
          * @param expr String representation of a part
