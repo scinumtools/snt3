@@ -16,11 +16,12 @@ namespace snt::dip {
          * List of collection types
          */
         enum class Kind {
-            NONE,  ///< Node is not a collection
-            GROUP, ///< Simple node or group
-            MAP,   ///< Map items are associated with a key
-            LIST,  ///< List items are ordered by indexes
-            ITEM,  ///< Item in a map or list collection
+            None,  ///< Node is not a collection
+            Empty, ///< Path is empty, or root
+            Group, ///< Simple node or group
+            Map,   ///< Map items are associated with a key
+            List,  ///< List items are ordered by indexes
+            Item,  ///< Item in a map or list collection
         };
 
         /**

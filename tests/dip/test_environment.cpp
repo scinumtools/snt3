@@ -129,16 +129,13 @@ TEST(Environment, RequestCursor) {
     );
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
-    dip::Cursor cursor = env.request_cursor();
 
     {
-        dip::Cursor group = cursor.get_group("foo.bar");
-        uint8_t scalar = group.to_scalar<uint8_t>();
+        bool scalar = env["foo.bar"].as<bool>();
         EXPECT_EQ(scalar, true);
     }
     {
-        dip::Cursor group = cursor.get_group("foo.baz");
-        int64_t scalar = group.to_scalar<int64_t>();
+        int64_t scalar = env["foo.baz"].as<int64_t>();
         EXPECT_EQ(scalar, 3);
     }
 }

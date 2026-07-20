@@ -8,6 +8,7 @@
 #include <snt/val/values_string.h>
 #include <string>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 namespace snt::dip {
@@ -21,11 +22,26 @@ namespace snt::dip {
       public:
         explicit Cursor(const Environment* env, std::string_view path = "");
 
-        Cursor get_group(std::string_view path) const;
+        /**
+         * Get children nodes
+         *
+         * @return Map of children node cursors
+         */
+        std::unordered_map<std::string, Cursor> children() const;
 
-        std::vector<Cursor> get_list(std::string_view path) const;
+        /**
+         * Get list elements
+         *
+         * @return Vector of children cursors
+         */
+        std::vector<Cursor> elements() const;
 
-        std::unordered_map<std::string, Cursor> get_map(std::string_view path) const;
+        /**
+         * Get map items
+         *
+         * @return Map of children cursors
+         */
+        std::unordered_map<std::string, Cursor> items() const;
 
         const std::string& get_path() const;
 
@@ -33,20 +49,13 @@ namespace snt::dip {
 
         val::Array::ShapeType get_shape() const;
 
-        template <typename T> T to_scalar(size_t index = 0) const {
-            val::BaseValue::PointerType value = env_->request_value("?" + path_);
-            val::ArrayValue<T>* val = dynamic_cast<val::ArrayValue<T>*>(value.get());
-            return val->get_value(index);
-        };
-
-        template <typename T> std::vector<T> to_vector() const {
-            val::BaseValue::PointerType value = env_->request_value("?" + path_);
-            val::ArrayValue<T>* val = dynamic_cast<val::ArrayValue<T>*>(value.get());
-            return val->get_values();
-        };
-
         const std::string to_string() const;
 
+        /**
+         * Cast cursor as a specific scalar/array/vector type
+         *
+         * @tparam Expected value type
+         */
         template <typename T> T as() const {
             using ValueType = detail::element_type_t<T>;
             using StorageType = detail::storage_type_t<ValueType>;
@@ -84,6 +93,20 @@ namespace snt::dip {
                     return val->get_value(0);
             }
         };
+
+        /**
+         * Get cursor from a fully qualified path, its part, or a keyed item from a map collection
+         *
+         * @return Cursor at the given path
+         */
+        Cursor operator[](std::string_view path) const;
+
+        /**
+         * Select indexed item from a list collection
+         *
+         * @return Item cursor at the given index
+         */
+        Cursor operator[](size_t index) const;
     };
 
 } // namespace snt::dip

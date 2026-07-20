@@ -201,7 +201,7 @@ namespace snt::dip {
                 throw std::runtime_error("Request map from sources is not implemented yet.");
 
             const Collection& col = hlist.get_collection(node_path);
-            if (col.kind == Path::Kind::LIST)
+            if (col.kind == Path::Kind::List)
                 throw std::runtime_error("Requested collection is a list: " + request);
 
             for (const auto& item : col.items) {
@@ -237,7 +237,7 @@ namespace snt::dip {
                 throw std::runtime_error("Request list from sources is not implemented yet.");
 
             const Collection& col = hlist.get_collection(node_path);
-            if (col.kind == Path::Kind::MAP)
+            if (col.kind == Path::Kind::Map)
                 throw std::runtime_error("Requested collection is a map: " + request);
 
             for (const auto& item : col.items) {
@@ -251,10 +251,6 @@ namespace snt::dip {
         if (list.empty())
             throw std::runtime_error("Node environment request returns an empty node list: " + request);
         return list;
-    }
-
-    Cursor Environment::request_cursor() {
-        return Cursor(this);
     }
 
     val::BaseValue::PointerType Environment::get_value(size_t index) const {

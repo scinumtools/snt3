@@ -54,7 +54,7 @@ namespace snt::bind::python {
             py::arg("as_numpy") = false
         );
 
-        env.def("request_cursor", &dip::Environment::request_cursor);
+        env.def("__getitem__", &dip::Environment::operator[], py::arg("path"));
 
         // env.def("request_code", &dip::Environment::request_code, py::arg("source_name"));
 

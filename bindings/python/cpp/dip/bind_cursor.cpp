@@ -38,11 +38,19 @@ namespace snt::bind::python {
 
         val.def(py::init<const dip::Environment*, std::string_view>(), py::arg("env"), py::arg("path") = "");
 
-        val.def("get_group", &dip::Cursor::get_group, py::arg("path"));
+        val.def("__getitem__", py::overload_cast<std::string_view>(&dip::Cursor::operator[], py::const_));
 
-        val.def("get_list", &dip::Cursor::get_list, py::arg("path"));
+        val.def("__getitem__", py::overload_cast<std::size_t>(&dip::Cursor::operator[], py::const_));
 
-        val.def("get_map", &dip::Cursor::get_map, py::arg("path"));
+        val.def("elements", &dip::Cursor::elements);
+
+        val.def("items", [](const dip::Cursor& c) {
+            py::list result;
+            for (auto&& [key, value] : c.items()) {
+                result.append(py::make_tuple(key, value));
+            }
+            return result;
+        });
 
         val.def_property_readonly("path", &dip::Cursor::get_path);
 

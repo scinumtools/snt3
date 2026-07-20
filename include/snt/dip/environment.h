@@ -118,13 +118,6 @@ namespace snt::dip {
         ) const;
 
         /**
-         * Request cursor object for node path traversing
-         *
-         * @return Cursor object
-         */
-        Cursor request_cursor();
-
-        /**
          * Get parsed node value at the specific index
          *
          * @param index Index of a node

@@ -15,25 +15,24 @@ def test_cursor_print():
         "      pop int = 3\n"
     )
     env = dip.parse()
-    cursor = env.request_cursor()
 
     # group collection
-    cur = cursor.get_group("foo");
+    cur = env["foo"];
     assert repr(cur) == "Cursor('foo')" 
     assert str(cur) == "Cursor('foo')"
 
     # list collection
-    cur = cursor.get_list("foo.jerk");
+    cur = env["foo.jerk"].elements();
     assert repr(cur) == "[Cursor('foo.jerk[0]')]"
     assert str(cur) == "[Cursor('foo.jerk[0]')]"
 
     # map collection
-    cur = cursor.get_map("foo.jerk[0].snap");
-    assert repr(cur) == "{'crackle': Cursor('foo.jerk[0].snap[crackle]')}"
-    assert str(cur) == "{'crackle': Cursor('foo.jerk[0].snap[crackle]')}"
+    cur = env["foo.jerk[0].snap"].items();
+    assert repr(cur) == "[('crackle', Cursor('foo.jerk[0].snap[crackle]'))]"
+    assert str(cur) == "[('crackle', Cursor('foo.jerk[0].snap[crackle]'))]"
 
     # group collection with a value
-    cur = cursor.get_group("foo.jerk[0].snap[crackle].pop");
+    cur = env["foo.jerk[0].snap[crackle].pop"];
     assert repr(cur) == "Cursor('foo.jerk[0].snap[crackle].pop', 3)"
     assert str(cur) == "Cursor('foo.jerk[0].snap[crackle].pop', 3)"
     
@@ -55,24 +54,21 @@ def test_cursor_traverse():
         "jerk.baz bool = false\n"
     ))
     env = dip.parse()
-    cursor = env.request_cursor()
 
     # save parsed list names
     params_parsed = []
-    group = cursor.get_group("jerk.baz");
+    group = env["jerk.baz"];
     params_parsed.append(group.to_string());
-    cmap = cursor.get_map("jerk.snap");
-    for key, item in cmap.items():
+    for key, item in env["jerk.snap"].items():
         params_parsed.append(item.to_string());
-        group = item.get_group("bar");
+        group = item["bar"];
         if key == "crackle":
-            clist = item.get_list("pop");
-            for item in clist:
+            for item in item["pop"].elements():
                 params_parsed.append(item.to_string());
-                group = item.get_group("foo");
+                group = item["foo"];
                 params_parsed.append(group.to_string());
         elif key == "lock":
-            group = item.get_group("bar");
+            group = item["bar"];
             params_parsed.append(group.to_string());
 
     # set a reference list
@@ -110,16 +106,15 @@ def test_cursor_values():
         "jerk.baz bool = false\n"
     ))
     env = dip.parse()
-    cursor = env.request_cursor()
 
-    group = cursor.get_group("jerk.baz")
+    group = env["jerk.baz"]
     assert type(group.value) == bool
     assert group.value == False
     vnumpy = group.to_numpy()
     assert type(vnumpy) == np.ndarray
     np.testing.assert_array_equal(vnumpy, np.array(False))
     
-    group = cursor.get_group("jerk.snap[crackle].pop[0].foo")
+    group = env["jerk.snap[crackle].pop[0].foo"]
     assert group.shape == [3]
     assert type(group.value) == list
     assert group.value == [True,False,True]
@@ -127,7 +122,7 @@ def test_cursor_values():
     assert type(vnumpy) == np.ndarray
     np.testing.assert_array_equal(vnumpy, np.array([True,False,True]))
     
-    group = cursor.get_group("jerk.snap[crackle].pop[1].foo")
+    group = env["jerk.snap[crackle].pop[1].foo"]
     assert group.shape == [2,3]
     assert type(group.value) == list
     assert group.value == [[1,2,3],[4,5,6]]
@@ -136,7 +131,7 @@ def test_cursor_values():
     np.testing.assert_array_equal(vnumpy, np.array([[1, 2, 3], [4, 5, 6]]))
     assert vnumpy.shape == (2,3)
     
-    group = cursor.get_group("jerk.snap[crackle].pop[2].foo")
+    group = env["jerk.snap[crackle].pop[2].foo"]
     assert group.shape == [1]
     assert type(group.value) == float
     assert group.value == 4e5
@@ -144,7 +139,7 @@ def test_cursor_values():
     assert type(vnumpy) == np.ndarray
     np.testing.assert_array_equal(vnumpy, np.array(4e5))
 
-    group = cursor.get_group("jerk.snap[lock].bar")
+    group = env["jerk.snap[lock].bar"]
     assert group.shape == [1]
     assert type(group.value) == str
     assert group.value == "shot"

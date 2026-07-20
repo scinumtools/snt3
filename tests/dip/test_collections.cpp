@@ -30,13 +30,13 @@ TEST(Collections, MapItems) {
     {
         auto cl = collections.find("foo.fee");
         EXPECT_NE(cl, collections.end());
-        EXPECT_EQ(cl->second.kind, dip::Path::Kind::MAP);
+        EXPECT_EQ(cl->second.kind, dip::Path::Kind::Map);
         EXPECT_EQ(cl->second.items, std::vector<std::string>({"bar"}));
     }
     {
         auto cl = collections.find("foo.fee[bar].jerk.snap");
         EXPECT_TRUE(cl != collections.end());
-        EXPECT_EQ(cl->second.kind, dip::Path::Kind::MAP);
+        EXPECT_EQ(cl->second.kind, dip::Path::Kind::Map);
         EXPECT_EQ(cl->second.items, std::vector<std::string>({"crackle", "jolt"}));
     }
 }
@@ -67,13 +67,13 @@ TEST(Collections, ListItems) {
     {
         auto cl = collections.find("foo.fee");
         EXPECT_NE(cl, collections.end());
-        EXPECT_EQ(cl->second.kind, dip::Path::Kind::LIST);
+        EXPECT_EQ(cl->second.kind, dip::Path::Kind::List);
         EXPECT_EQ(cl->second.items, std::vector<std::string>({"0"}));
     }
     {
         auto cl = collections.find("foo.fee[0].jerk.snap");
         EXPECT_TRUE(cl != collections.end());
-        EXPECT_EQ(cl->second.kind, dip::Path::Kind::LIST);
+        EXPECT_EQ(cl->second.kind, dip::Path::Kind::List);
         EXPECT_EQ(cl->second.items, std::vector<std::string>({"0", "1"}));
     }
 }

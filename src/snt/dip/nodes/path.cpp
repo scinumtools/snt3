@@ -9,7 +9,7 @@ namespace snt::dip {
             // If path is empty the node is not a value, nor a group.
             // This can happen if property, source, unit, or similar nodes are being cloned.
             name = "";               // set full path name
-            kind = Path::Kind::NONE; // set final path kind
+            kind = Path::Kind::None; // set final path kind
             return;
         }
 
@@ -54,7 +54,7 @@ namespace snt::dip {
                     throw std::runtime_error("Node collection has unclosed brackets: " + path);
                 }
                 ++pos; // skip ']'
-                Path::Kind type = item.empty() ? Path::Kind::LIST : Path::Kind::MAP;
+                Path::Kind type = item.empty() ? Path::Kind::List : Path::Kind::Map;
                 collections.push_back({currentPath, std::move(item), std::move(type)});
                 currentPath.clear();
             }
@@ -67,7 +67,7 @@ namespace snt::dip {
 
         if (!currentPath.empty()) {
             // A simple value or node group
-            collections.push_back({std::move(currentPath), "", Path::Kind::GROUP});
+            collections.push_back({std::move(currentPath), "", Path::Kind::Group});
         }
 
         name = path;                    // set full path name
