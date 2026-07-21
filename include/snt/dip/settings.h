@@ -1,6 +1,7 @@
 #ifndef DIP_SETTINGS_H
 #define DIP_SETTINGS_H
 
+#include <cstdint>
 #include <snt/core/settings.h>
 #include <sstream>
 #include <string>
