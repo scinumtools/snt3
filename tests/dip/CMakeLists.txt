@@ -19,6 +19,10 @@ set_target_properties(${EXEC_NAME} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
+target_compile_definitions(${EXEC_NAME} PRIVATE 
+    PROJECT_SOURCE_ROOT_DIR="${CMAKE_SOURCE_DIR}/"
+)
+
 gtest_discover_tests(${EXEC_NAME}
   TEST_PREFIX gtest.dip.
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

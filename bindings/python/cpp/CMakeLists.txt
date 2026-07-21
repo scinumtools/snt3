@@ -82,7 +82,10 @@ if(
             COMMAND ${Python3_EXECUTABLE} -m pytest -v ${TEST_FILE}
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bindings/python/tests
         )
-        set_tests_properties(${TEST_FULL_NAME} PROPERTIES DEPENDS ${MODULE_NAME})
+        set_tests_properties(${TEST_FULL_NAME} PROPERTIES 
+            DEPENDS ${MODULE_NAME}
+            ENVIRONMENT "PROJECT_SOURCE_ROOT=${CMAKE_SOURCE_DIR}"
+        )
     endforeach()
     endfunction()
 

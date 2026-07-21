@@ -55,7 +55,7 @@ simulation
   title str = "Cylinder flow"        # strings
   mesh
     file str = "cylinder.msh"
-      !format "[A-Za-z0-9_]+.msh"  # enforce string formats
+      !format "[A-Za-z0-9_]+.msh"    # enforce string formats
   fluid
     density float = 998.2 kg/m3      # numbers with units
     viscosity float = 1.003e-3 Pa*s
@@ -83,29 +83,31 @@ simulation
 #### with C++
 
 ```cpp
-#include <snt/exs/atom.h>
-#include <snt/exs/solver.h>
-#include <snt/val/values_array.h>
+#include <snt/puq/quantity.h>
+#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
-#include <snt/dip/nodes/node_value.h>
+
 #include <iostream>
 
 using namespace snt;
 
 int main() {
 
-  puq::Quantity length("1*m");
-  length = length.convert("km");
-  std::cout << length.to_string() << std::endl;
-  // 1e-3*km
+  puq::Quantity length("3.048*m");
+  length = length.convert("US_ft");
+  std::cout << "Length: " << length.to_string() << std::endl;
+  // Length: 10*ft
 
   dip::DIP d;
   d.add_file("parameters.dip");
   dip::Environment env = d.parse();
-  dip::ValueNode::PointerType vnode = env.nodes.at(0);
-  std::cout << vnode->value->to_string() << std::endl;
-  // 3000
+  double density = env["simulation.fluid.density"].as<double>();
+  int64_t steps = env["simulation.time.steps"].as<int64_t>();
+  std::cout << "Density: " << density << std::endl;
+  std::cout << "Steps:   " << steps << std::endl;
+  // Density: 998.2 
+  // Steps:   10000
 }
 ```
 
@@ -115,30 +117,31 @@ int main() {
 from scinumtools3.puq import Quantity
 from scinumtools3.dip import DIP, Environment
 
-length = Quantity("1*m")
-length = length.convert("km");
-print(length) 
-# 1e-3*km
+length = Quantity(3.048, 'm')
+length = length.convert('US_ft')
+print("Length:", length.to_string())
+# Length: 10*ft
 
-dip = DIP()
-dip.add_string("foo int m");
-dip.add_string("foo = 3 km");
-env = dip.parse();
-print(env.nodes[0])
-# 3000 m
+with DIP() as dip:
+    dip.add_file("parameters.dip")
+    env = dip.parse()
+
+print("Density: ", env["simulation.fluid.density"].value)
+print("Steps:   ", env["simulation.time.steps"].value)
+# Density: 998.2
+# Steps:   10000
 ```
 
 #### with CLI (e.g. BASH)
 
 ``` bash
-snt puq convert "12*statA" "A" -s ESU -S SI -Q "I"
-# 4.00277e-9*A
+snt puq convert "3.048*m" ft -s SI -S US
+# 10*ft
 
-snt dip parse \
-    -f parameters.dip \
-    -r "?family.father" \
-    --print
-# father = 184 cm
+snt dip parse -f examples/dipl/parameters.dip \
+              -r "?simulation.fluid.density" \
+              --print
+# density = 998.2 kg*m-3
 ```
 
 ### Parameter Definition
