@@ -213,18 +213,18 @@ The following metadata properties are currently defined:
 
 ```DIPL
 thermal_conductivity float = 401 W/(m*K)
-    ?descr "Thermal conductivity of high-purity copper measured at 293.15 K"
-    ?authors "John A. Smith, Emily R. Johnson, Michael T. Brown"
-    ?title "Thermal Conductivity of High-Purity Copper from 100 K to 500 K"
-    ?journal "Journal of Materials Science"
-    ?year 2024
-    ?volume 59
-    ?issue 8
-    ?pages "4123-4137"
-    ?doi "10.1007/s10853-024-12345-6"
-    ?url "https://doi.org/10.1007/s10853-024-12345-6"
-    ?version "Published Version"
-    ?created "2024-03-18"
-    ?modified "2024-04-02"
-    ?license "CC BY 4.0"
+  ?descr "Thermal conductivity of high-purity copper measured at 293.15 K"
+  ?authors "John A. Smith, Emily R. Johnson, Michael T. Brown"
+  ?title "Thermal Conductivity of High-Purity Copper from 100 K to 500 K"
+  ?journal "Journal of Materials Science"
+  ?year 2024
+  ?volume 59
+  ?issue 8
+  ?pages "4123-4137"
+  ?doi "10.1007/s10853-024-12345-6"
+  ?url "https://doi.org/10.1007/s10853-024-12345-6"
+  ?version "Published Version"
+  ?created "2024-03-18"
+  ?modified "2024-04-02"
+  ?license "CC BY 4.0"
 ```
