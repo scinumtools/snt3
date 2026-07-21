@@ -25,7 +25,7 @@ namespace snt::dip {
         bool kwd_source();
         bool kwd_schema();
         bool kwd_property(PropertyType& ptype);
-        bool part_space(const bool required = true);
+        bool part_trim();
         bool part_indent();
         bool part_path(const bool required = true);
 

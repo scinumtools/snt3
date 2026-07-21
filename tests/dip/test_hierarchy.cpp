@@ -26,7 +26,10 @@ TEST(Hierarchy, ParentChildNodes) {
 TEST(Hierarchy, GroupNodes) {
 
     dip::DIP d;
-    d.add_string("foo\n  bar int = 3");
+    d.add_string(
+        "foo  \n" // should also accept the empty space after the path
+        "  bar int = 3\n"
+    );
     dip::Environment env = d.parse();
 
     dip::BaseNode::PointerType node = env.nodes.at(0);

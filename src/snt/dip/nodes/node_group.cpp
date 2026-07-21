@@ -7,6 +7,7 @@ namespace snt::dip {
     BaseNode::PointerType GroupNode::is_node(Parser& parser) {
         parser.part_schema();
         parser.part_comment();
+        parser.part_trim();
         if (!parser.do_continue())
             return std::make_shared<GroupNode>(parser);
         return nullptr;

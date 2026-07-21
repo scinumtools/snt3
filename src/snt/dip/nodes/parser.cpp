@@ -173,8 +173,16 @@ namespace snt::dip {
      * Node Parts
      */
 
-    bool Parser::part_space(const bool required) {
-        return false;
+    bool Parser::part_trim() {
+        std::size_t pos = 0;
+        while (pos < code.size() && (code[pos] == ' ' || code[pos] == '\t'))
+            ++pos;
+        if (pos == 0)
+            return false;
+        if (pos < code.size() && code[pos] != '\n')
+            return false;
+        strip(std::string(code.substr(0, pos)));
+        return true;
     }
 
     bool Parser::part_indent() {
