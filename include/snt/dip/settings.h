@@ -45,13 +45,29 @@ namespace snt::dip {
     constexpr std::string_view KEYWORD_FLOAT = "float";
     constexpr std::string_view KEYWORD_STRING = "str";
 
+    // directives
     constexpr std::string_view KEYWORD_CONSTANT = "!constant";
     constexpr std::string_view KEYWORD_CONDITION = "!condition";
-    constexpr std::string_view KEYWORD_DESCRIPTION = "!descr";
     constexpr std::string_view KEYWORD_FORMAT = "!format";
     constexpr std::string_view KEYWORD_TAGS = "!tags";
     constexpr std::string_view KEYWORD_OPTIONS = "!options";
     constexpr std::string_view KEYWORD_DELIMITER = "!delimiter";
+
+    // metadata
+    constexpr std::string_view KEYWORD_DESCRIPTION = "?descr";
+    constexpr std::string_view KEYWORD_AUTHORS = "?authors";
+    constexpr std::string_view KEYWORD_TITLE = "?title";
+    constexpr std::string_view KEYWORD_JOURNAL = "?journal";
+    constexpr std::string_view KEYWORD_YEAR = "?year";
+    constexpr std::string_view KEYWORD_VOLUME = "?volume";
+    constexpr std::string_view KEYWORD_ISSUE = "?issue";
+    constexpr std::string_view KEYWORD_PAGES = "?pages";
+    constexpr std::string_view KEYWORD_DOI = "?doi";
+    constexpr std::string_view KEYWORD_URL = "?url";
+    constexpr std::string_view KEYWORD_VERSION = "?version";
+    constexpr std::string_view KEYWORD_CREATED = "?created";
+    constexpr std::string_view KEYWORD_MODIFIED = "?modified";
+    constexpr std::string_view KEYWORD_LICENSE = "?license";
 
     constexpr std::string_view KEYWORD_IF = "if";
     constexpr std::string_view KEYWORD_ELIF = "elif";
@@ -127,9 +143,24 @@ namespace snt::dip {
         Constant,
         Condition,
         Tags,
-        Description, // global properties
-        Format,
+        Format, // global properties
         Options,
+
+        Description, // proverance metadata
+        Authors,
+        Title,
+        Journal,
+        Year,
+        Volume,
+        Issue,
+        Pages,
+        DOI,
+        URL,
+        Version,
+        Created,
+        Modified,
+        License,
+
         Delimiter // specific properties
     };
 

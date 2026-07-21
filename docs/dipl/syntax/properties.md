@@ -161,17 +161,70 @@ In practice, it is recommended to use string values for tags to ensure consisten
 Once assigned, tags enable nodes to be queried and filtered after parsing through the use of tag selectors.
 Every DIPL implementation SHOULD provide support for selecting parsed nodes based on their associated tags.
 
-### 3.8.6. Description
+### 3.8.6. Metadata
 
-**Used by:** ``int``, ``float``, ``str``, ``bool``
+**Used by:** `int`, `float`, `str`, `bool`
 
-Notes about parameters in DIPL may be written as comments; however, such comments are not included in automatically generated documentation.
-For this purpose, a dedicated node property ``!description`` is provided.
-The abbreviated form ``!desc`` may be used as an alternative.
+Metadata provide additional information about a parameter without affecting its value or interpretation. They are intended for documentation, provenance, licensing, and versioning purposes, and may be used by documentation generators, scientific workflows, and other tooling.
 
-``` DIPL-Schema
-# Schema for node description
+In particular, provenance metadata describe the origin of a parameter's value, such as the publication, dataset, or other source from which it was obtained. This allows scientific and engineering data to remain traceable and properly attributed.
 
-<indent>!description <value>
-<indent>!desc <value>
+Unlike comments, metadata are part of the parsed document and are preserved during processing.
+
+The following metadata properties are currently defined:
+
+| Property    | Description                                                    |
+| ----------- | -------------------------------------------------------------- |
+| `?descr`    | Human-readable description of the parameter.                   |
+| `?authors`  | Author(s) of the referenced publication or data source.        |
+| `?title`    | Title of the referenced publication, report, or dataset.       |
+| `?journal`  | Journal, book, conference proceedings, or other publication.   |
+| `?year`     | Year of publication or release.                                |
+| `?volume`   | Publication volume.                                            |
+| `?issue`    | Publication issue.                                             |
+| `?pages`    | Page range within the publication.                             |
+| `?doi`      | Digital Object Identifier (DOI).                               |
+| `?url`      | URL of the referenced resource.                                |
+| `?version`  | Version of the referenced document or dataset.                 |
+| `?created`  | Creation date of the referenced resource or metadata.          |
+| `?modified` | Last modification date of the referenced resource or metadata. |
+| `?license`  | License governing the referenced resource or dataset.          |
+
+```DIPL-Schema
+# Schema for metadata
+
+<indent>?descr <value>
+<indent>?authors <value>
+<indent>?title <value>
+<indent>?journal <value>
+<indent>?year <value>
+<indent>?volume <value>
+<indent>?issue <value>
+<indent>?pages <value>
+<indent>?doi <value>
+<indent>?url <value>
+<indent>?version <value>
+<indent>?created <value>
+<indent>?modified <value>
+<indent>?license <value>
+```
+
+**Example**
+
+```DIPL
+thermal_conductivity float = 401 W/(m*K)
+    ?descr "Thermal conductivity of high-purity copper measured at 293.15 K"
+    ?authors "John A. Smith, Emily R. Johnson, Michael T. Brown"
+    ?title "Thermal Conductivity of High-Purity Copper from 100 K to 500 K"
+    ?journal "Journal of Materials Science"
+    ?year 2024
+    ?volume 59
+    ?issue 8
+    ?pages "4123-4137"
+    ?doi "10.1007/s10853-024-12345-6"
+    ?url "https://doi.org/10.1007/s10853-024-12345-6"
+    ?version "Published Version"
+    ?created "2024-03-18"
+    ?modified "2024-04-02"
+    ?license "CC BY 4.0"
 ```

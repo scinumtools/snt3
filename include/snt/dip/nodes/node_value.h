@@ -31,14 +31,34 @@ namespace snt::dip {
       public:
         using PointerType = std::shared_ptr<ValueNode>;
         using ListType = std::deque<ValueNode::PointerType>;
+
+        // content
         val::BaseValue::PointerType value;
         std::optional<puq::Quantity> units;
+
+        // directives
         val::Array::StringType tags;
         bool constant;
-        std::string description;
         std::string condition;
         std::vector<OptionStruct> options;
         std::string format;
+
+        // metadata
+        std::string description;
+        std::string authors;
+        std::string title;
+        std::string journal;
+        std::string year;
+        std::string volume;
+        std::string issue;
+        std::string pages;
+        std::string doi;
+        std::string url;
+        std::string version;
+        std::string created;
+        std::string modified;
+        std::string license;
+
         ValueNode() : constant(false) {};
         ValueNode(const ValueNode& other);
         ValueNode(const core::DataType vdt) : constant(false), value_dtype(vdt) {};

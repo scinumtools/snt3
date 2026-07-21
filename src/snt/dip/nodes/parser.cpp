@@ -125,20 +125,35 @@ namespace snt::dip {
     }
 
     bool Parser::kwd_property(PropertyType& ptype) {
-        if (code.empty() || code[0] != '!')
+        if (code.empty() || (code[0] != '!' && code[0] != '?'))
             return false;
         struct Keyword {
             std::string_view text;
             PropertyType type;
         };
         static constexpr Keyword keywords[] = {
+            // directives
             {KEYWORD_OPTIONS, PropertyType::Options},
             {KEYWORD_CONSTANT, PropertyType::Constant},
             {KEYWORD_FORMAT, PropertyType::Format},
             {KEYWORD_TAGS, PropertyType::Tags},
-            {KEYWORD_DESCRIPTION, PropertyType::Description},
             {KEYWORD_CONDITION, PropertyType::Condition},
             {KEYWORD_DELIMITER, PropertyType::Delimiter},
+            // metadata
+            {KEYWORD_DESCRIPTION, PropertyType::Description},
+            {KEYWORD_AUTHORS, PropertyType::Authors},
+            {KEYWORD_TITLE, PropertyType::Title},
+            {KEYWORD_JOURNAL, PropertyType::Journal},
+            {KEYWORD_YEAR, PropertyType::Year},
+            {KEYWORD_VOLUME, PropertyType::Volume},
+            {KEYWORD_ISSUE, PropertyType::Issue},
+            {KEYWORD_PAGES, PropertyType::Pages},
+            {KEYWORD_DOI, PropertyType::DOI},
+            {KEYWORD_URL, PropertyType::URL},
+            {KEYWORD_VERSION, PropertyType::Version},
+            {KEYWORD_CREATED, PropertyType::Created},
+            {KEYWORD_MODIFIED, PropertyType::Modified},
+            {KEYWORD_LICENSE, PropertyType::License},
         };
         for (const auto& kw : keywords) {
             if (code.compare(0, kw.text.size(), kw.text) != 0)

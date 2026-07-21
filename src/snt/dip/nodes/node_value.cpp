@@ -131,6 +131,7 @@ namespace snt::dip {
 
     bool ValueNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
         switch (property) {
+            // directives
         case PropertyType::Options:
             for (const auto& value_option : values) {
                 if (dtype == NodeDtype::Boolean)
@@ -146,11 +147,51 @@ namespace snt::dip {
         case PropertyType::Tags:
             tags = values;
             return true;
+        case PropertyType::Condition:
+            condition = values.at(0);
+            return true;
+            // metadata
         case PropertyType::Description:
             description += values.at(0);
             return true;
-        case PropertyType::Condition:
-            condition = values.at(0);
+        case PropertyType::Authors:
+            authors += values.at(0);
+            return true;
+        case PropertyType::Title:
+            title += values.at(0);
+            return true;
+        case PropertyType::Journal:
+            journal += values.at(0);
+            return true;
+        case PropertyType::Year:
+            year += values.at(0);
+            return true;
+        case PropertyType::Volume:
+            volume += values.at(0);
+            return true;
+        case PropertyType::Issue:
+            issue += values.at(0);
+            return true;
+        case PropertyType::Pages:
+            pages += values.at(0);
+            return true;
+        case PropertyType::DOI:
+            doi += values.at(0);
+            return true;
+        case PropertyType::URL:
+            url += values.at(0);
+            return true;
+        case PropertyType::Version:
+            version += values.at(0);
+            return true;
+        case PropertyType::Created:
+            created += values.at(0);
+            return true;
+        case PropertyType::Modified:
+            modified += values.at(0);
+            return true;
+        case PropertyType::License:
+            license += values.at(0);
             return true;
         default:
             return false;

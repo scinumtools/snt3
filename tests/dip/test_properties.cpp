@@ -50,58 +50,6 @@ TEST(Properties, Constant) {
     }
 }
 
-TEST(Properties, Description) {
-
-    dip::DIP d;
-    d.add_string("foo bool = true");
-    d.add_string("  !descr \"If foo is true, bar is false\"");
-    dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 1); // description is not returned as a separate node
-
-    dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->description, "If foo is true, bar is false");
-
-    // Throw an error if trying to assign description to unsuported node
-    // TODO: The test below works only because the group node is the first node in the list.
-    //       If there are value nodes before the group node, the description will be assigned
-    //       to the first previous value node. This is because description nodes
-    //       currently don't see the group nodes in a node list.
-    //       This needs to be fixed!
-    d = dip::DIP();
-    d.add_string("foo");
-    d.add_string("  !descr \"This is a group node\"");
-    d.add_string("bar int = 3");
-    try {
-        d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(
-            e.what(),
-            "Only value nodes (bool, int, float and str) can have properties:   !descr \"This is a group node\""
-        );
-    } catch (...) {
-        FAIL() << "Expected std::runtime_error";
-    }
-
-    // Throw an error if indent is not higher
-    d = dip::DIP();
-    d.add_string("  foo bool = true");
-    d.add_string("!descr \"If foo is true, bar is false\"");
-    try {
-        d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(
-            e.what(),
-            "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !descr "
-            "\"If foo is true, bar is false\""
-        );
-    } catch (...) {
-        FAIL() << "Expected std::runtime_error";
-    }
-}
-
 TEST(Properties, Format) {
 
     dip::DIP d;
@@ -345,4 +293,84 @@ TEST(Properties, TableDelimiter) {
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2}));
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
+}
+
+TEST(Properties, Metadata) {
+
+    dip::DIP d;
+    d.add_string(
+        "thermal_conductivity float = 401 W/(m*K)\n"
+        "  ?descr \"Thermal conductivity of high-purity copper measured at 293.15 K\"\n"
+        "  ?authors \"John A. Smith, Emily R. Johnson, Michael T. Brown\"\n"
+        "  ?title \"Thermal Conductivity of High-Purity Copper from 100 K to 500 K\"\n"
+        "  ?journal \"Journal of Materials Science\"\n"
+        "  ?year 2024\n"
+        "  ?volume 59\n"
+        "  ?issue 8\n"
+        "  ?pages \"4123-4137\"\n"
+        "  ?doi \"10.1007/s10853-024-12345-6\"\n"
+        "  ?url \"https://doi.org/10.1007/s10853-024-12345-6\"\n"
+        "  ?version \"Published Version\"\n"
+        "  ?created \"2024-03-18\"\n"
+        "  ?modified \"2024-04-02\"\n"
+        "  ?license \"CC BY 4.0\"\n"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 1); // description is not returned as a separate node
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->description, "Thermal conductivity of high-purity copper measured at 293.15 K");
+    EXPECT_EQ(vnode->authors, "John A. Smith, Emily R. Johnson, Michael T. Brown");
+    EXPECT_EQ(vnode->title, "Thermal Conductivity of High-Purity Copper from 100 K to 500 K");
+    EXPECT_EQ(vnode->journal, "Journal of Materials Science");
+    EXPECT_EQ(vnode->year, "2024");
+    EXPECT_EQ(vnode->volume, "59");
+    EXPECT_EQ(vnode->issue, "8");
+    EXPECT_EQ(vnode->pages, "4123-4137");
+    EXPECT_EQ(vnode->doi, "10.1007/s10853-024-12345-6");
+    EXPECT_EQ(vnode->url, "https://doi.org/10.1007/s10853-024-12345-6");
+    EXPECT_EQ(vnode->version, "Published Version");
+    EXPECT_EQ(vnode->created, "2024-03-18");
+    EXPECT_EQ(vnode->modified, "2024-04-02");
+    EXPECT_EQ(vnode->license, "CC BY 4.0");
+
+    // Throw an error if trying to assign description to unsuported node
+    // TODO: The test below works only because the group node is the first node in the list.
+    //       If there are value nodes before the group node, the description will be assigned
+    //       to the first previous value node. This is because description nodes
+    //       currently don't see the group nodes in a node list.
+    //       This needs to be fixed!
+    d = dip::DIP();
+    d.add_string("foo");
+    d.add_string("  ?descr \"This is a group node\"");
+    d.add_string("bar int = 3");
+    try {
+        d.parse();
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(
+            e.what(),
+            "Only value nodes (bool, int, float and str) can have properties:   ?descr \"This is a group node\""
+        );
+    } catch (...) {
+        FAIL() << "Expected std::runtime_error";
+    }
+
+    // Throw an error if indent is not higher
+    d = dip::DIP();
+    d.add_string("  foo bool = true");
+    d.add_string("?descr \"If foo is true, bar is false\"");
+    try {
+        d.parse();
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(
+            e.what(),
+            "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': ?descr "
+            "\"If foo is true, bar is false\""
+        );
+    } catch (...) {
+        FAIL() << "Expected std::runtime_error";
+    }
 }
