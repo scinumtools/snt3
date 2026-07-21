@@ -267,3 +267,23 @@ TEST(References, ExceptionSource) {
         FAIL() << "Expected std::runtime_error";
     }
 }
+
+TEST(References, MatchCollectionPath) {
+
+    // referencing scalar and array values
+    dip::DIP d;
+    d.add_string(
+        "foo[bar]\n"
+        "  baz bool = false\n"
+        "  pop[]\n"
+        "    crackle int = 3\n"
+        "snap int = {?foo[bar].pop[0].crackle}\n"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 3);
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(2);
+    EXPECT_EQ(vnode->path.name, "snap");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->value->to_string(), "3");
+}

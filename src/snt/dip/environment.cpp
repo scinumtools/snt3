@@ -59,7 +59,7 @@ namespace snt::dip {
     }
 
     val::BaseValue::PointerType Environment::request_value(
-        const std::string& request, const RequestType rtype, const std::string& to_unit
+        const std::string& request, const RequestType rtype, std::optional<std::string_view> to_unit
     ) const {
         val::BaseValue::PointerType new_value = nullptr;
         switch (rtype) {
@@ -80,23 +80,23 @@ namespace snt::dip {
                         new_value = nullptr;
                         break;
                     }
-                    if (to_unit != core::KEYWORD_NONE) {
+                    if (to_unit && to_unit.value() != core::KEYWORD_NONE) {
                         // NOTE: If unit conversion is not required, the to_unit should be set to
                         // "none".
                         //       This is usefull if we want to simply get a reference node as it is.
-                        if (!vnode->units && !to_unit.empty()) {
+                        if (!vnode->units && !to_unit->empty()) {
                             throw std::runtime_error(
-                                "Request: Trying to convert nondimensional quantity into '" + to_unit +
-                                "': " + vnode->line.code
+                                "Request: Trying to convert nondimensional quantity into '" +
+                                std::string(to_unit.value()) + "': " + vnode->line.code
                             );
-                        } else if (vnode->units && to_unit.empty()) {
+                        } else if (vnode->units && to_unit->empty()) {
                             throw std::runtime_error(
                                 "Request: Trying to convert '" + vnode->units_raw +
                                 "' into a nondimensional quantity: " + vnode->line.code
                             );
                         } else if (vnode->units) {
                             puq::Quantity quantity = std::move(new_value) * (*vnode->units);
-                            quantity = quantity.convert(to_unit);
+                            quantity = quantity.convert(std::string(to_unit.value()));
                             new_value = std::move(quantity.measurement.result.estimate);
                             break;
                         }

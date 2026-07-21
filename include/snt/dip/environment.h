@@ -3,6 +3,7 @@
 
 #include "nodes/node_value.h"
 
+#include <optional>
 #include <snt/dip/lists/list_branching.h>
 #include <snt/dip/lists/list_functions.h>
 #include <snt/dip/lists/list_hierarchy.h>
@@ -72,7 +73,7 @@ namespace snt::dip {
         val::BaseValue::PointerType request_value(
             const std::string& request,
             const RequestType rtype = RequestType::Reference,
-            const std::string& to_unit = ""
+            const std::optional<std::string_view> to_unit = std::nullopt
         ) const;
 
         /**

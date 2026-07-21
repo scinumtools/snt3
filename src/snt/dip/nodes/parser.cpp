@@ -394,22 +394,52 @@ namespace snt::dip {
     }
 
     bool Parser::part_reference() {
-        constexpr auto pstr = ce_concat<50>("^[ ]*[{](", PATTERN_KEYWORD, "*([?]", PATTERN_PATH, "*|))[}]");
-        std::regex pattern(pstr.data());
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            value_raw.push_back(matchResult[1].str());
-            if (!matchResult[2].str().empty())
-                value_origin = ValueOrigin::Reference;
-            else if (!matchResult[1].str().empty())
-                value_origin = ValueOrigin::ReferenceRaw;
-            else
-                throw std::runtime_error("Reference cannot be empty: " + line.code);
-            strip(matchResult[0].str());
-            part_slice();
-            return true;
+        size_t pos = 0;
+        // match all empty characters
+        while (pos < code.size() && std::isspace(static_cast<unsigned char>(code[pos])))
+            ++pos;
+        size_t pos_start = pos + 1;
+        // start with {
+        if (pos >= code.size() || code[pos] != '{')
+            return false;
+        ++pos;
+        // match a source keyword
+        std::string keyword;
+        while (pos < code.size()) {
+            unsigned char c = static_cast<unsigned char>(code[pos]);
+            if (std::isalnum(c) || c == '_' || c == '-') {
+                keyword += static_cast<char>(c);
+                ++pos;
+            } else {
+                break;
+            }
         }
-        return false;
+        // match a node path
+        if (pos < code.size() && code[pos] == '?') {
+            ++pos;
+            size_t path_begin = pos;
+            while (pos < code.size() && code[pos] != '}')
+                ++pos;
+            if (pos == code.size())
+                throw std::runtime_error("Missing closing '}'.");
+            std::string path = code.substr(path_begin, pos - path_begin);
+            value_origin = ValueOrigin::Reference;
+            if (!path.empty())
+                Path expr(path); // test if request is a fully qualified path?
+        } else {
+            if (keyword.empty())
+                throw std::runtime_error("Reference cannot be empty: " + line.code);
+            value_origin = ValueOrigin::ReferenceRaw;
+        }
+        // match closing }
+        if (pos >= code.size() || code[pos] != '}')
+            return false;
+        ++pos;
+        // Commit only after the entire parse succeeded.
+        value_raw.push_back(code.substr(pos_start, pos - pos_start - 1));
+        strip(code.substr(0, pos));
+        part_slice();
+        return true;
     }
 
     bool Parser::part_function() {

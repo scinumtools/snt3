@@ -2,7 +2,7 @@ simulation
   title str = "Cylinder flow"        # strings
   mesh
     file str = "cylinder.msh"
-      !format "[A-Za-z0-9_]+.msh"  # enforce string formats
+      !format "[A-Za-z0-9_]+.msh"    # enforce string formats
   fluid
     density float = 998.2 kg/m3      # numbers with units
     viscosity float = 1.003e-3 Pa*s

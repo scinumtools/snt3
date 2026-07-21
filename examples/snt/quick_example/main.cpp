@@ -18,6 +18,6 @@ int main() {
     dip::DIP d;
     d.add_file(std::string(PATH_EXAMPLE_DIP) + "parameters.dip");
     dip::Environment env = d.parse();
-    dip::Cursor cursor = env["simulation.fluid.density"];
-    std::cout << cursor.to_string() << '\n';
+    double value = env["simulation.fluid.density"].as<double>();
+    std::cout << value << '\n';
 }
