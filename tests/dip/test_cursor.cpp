@@ -50,6 +50,11 @@ TEST_F(Cursor, TraverseCollections2) {
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 6);
 
+    // test path kinds
+    EXPECT_EQ(env["jerk.baz"].get_kind(), dip::Path::Kind::Group);
+    EXPECT_EQ(env["jerk.snap"].get_kind(), dip::Path::Kind::Map);
+    EXPECT_EQ(env["jerk.snap[crackle].pop"].get_kind(), dip::Path::Kind::List);
+
     // traverse parameter tree and save collection paths and values
     std::vector<std::string> params_parsed;
     params_parsed.reserve(10);

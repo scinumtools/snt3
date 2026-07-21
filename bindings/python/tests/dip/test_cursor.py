@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 from scinumtools3.puq import Quantity
-from scinumtools3.dip import DIP, Environment, ValueNode, Cursor
+from scinumtools3.dip import DIP, Environment, ValueNode, Cursor, PathKind
 
 def test_cursor_print():
     
@@ -55,6 +55,10 @@ def test_cursor_traverse():
     ))
     env = dip.parse()
 
+    assert env["jerk.baz"].kind == PathKind.Group
+    assert env["jerk.snap"].kind == PathKind.Map
+    assert env["jerk.snap[crackle].pop"].kind == PathKind.List
+    
     # save parsed list names
     params_parsed = []
     group = env["jerk.baz"];

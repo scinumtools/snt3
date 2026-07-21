@@ -34,6 +34,14 @@ namespace snt::bind::python {
 
     void init_cursor(py::module_& m) {
 
+        auto k = py::enum_<dip::Path::Kind>(m, "PathKind");
+        k.value("None", dip::Path::Kind::None);
+        k.value("Empty", dip::Path::Kind::Empty);
+        k.value("Group", dip::Path::Kind::Group);
+        k.value("Map", dip::Path::Kind::Map);
+        k.value("List", dip::Path::Kind::List);
+        k.value("Item", dip::Path::Kind::Item);
+
         auto val = py::class_<dip::Cursor, std::shared_ptr<dip::Cursor>>(m, "Cursor");
 
         val.def(py::init<const dip::Environment*, std::string_view>(), py::arg("env"), py::arg("path") = "");
@@ -59,6 +67,8 @@ namespace snt::bind::python {
         val.def_property_readonly("value", [](const dip::Cursor& self) -> py::object {
             return to_python_value(self.get_value());
         });
+
+        val.def_property_readonly("kind", &dip::Cursor::get_kind);
 
         val.def("to_numpy", [](const dip::Cursor& self) -> py::object { return to_numpy_value(self.get_value()); });
 

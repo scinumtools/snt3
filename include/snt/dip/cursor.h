@@ -43,12 +43,39 @@ namespace snt::dip {
          */
         std::unordered_map<std::string, Cursor> items() const;
 
+        /**
+         * Get current cursor path
+         *
+         * @return Fully qualified path of the cursor
+         */
         const std::string& get_path() const;
 
+        /**
+         * Get value node at the current cursor path
+         *
+         * @return Pointer to a value node
+         */
         val::BaseValue::PointerType get_value() const { return env_->request_value("?" + path_); };
 
+        /**
+         * Get shape of a value node at the current cursor path
+         *
+         * @return Shape array of a value node
+         */
         val::Array::ShapeType get_shape() const;
 
+        /**
+         * Get path kind of the current cursor
+         *
+         * @return Cursor path kind
+         */
+        const Path::Kind get_kind() const;
+
+        /**
+         * Get string representation of the cursor
+         *
+         * @return String representation of a cursor
+         */
         const std::string to_string() const;
 
         /**

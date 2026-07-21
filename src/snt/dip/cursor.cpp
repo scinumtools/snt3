@@ -66,6 +66,10 @@ namespace snt::dip {
             throw std::runtime_error("Requested path does not point to a value node: " + path_);
     }
 
+    const Path::Kind Cursor::get_kind() const {
+        return kind;
+    }
+
     const std::string Cursor::to_string() const {
         val::BaseValue::PointerType value = env_->request_value("?" + path_);
         if (value)
