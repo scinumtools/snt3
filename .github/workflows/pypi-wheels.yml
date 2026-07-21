@@ -3,7 +3,9 @@ name: Build and Publish on PyPI
 on:
   release:
     types: [published]
-
+    
+  workflow_dispatch:
+  
 jobs:
   build_wheels:
     name: Build wheels (${{ matrix.os }})
@@ -49,7 +51,7 @@ jobs:
         env:
           CIBW_BUILD_VERBOSITY: 1
           CIBW_ARCHS_WINDOWS: AMD64
-          CIBW_ARCHS_LINUX: "x86_64 aarch64"
+          CIBW_ARCHS_LINUX: auto64
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28  # to enforce GCC 11+
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
           CIBW_TEST_COMMAND: python -c "import scinumtools3; print('Success!')"
