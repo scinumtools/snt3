@@ -39,7 +39,7 @@ namespace snt::api {
         if (request.empty()) {
             vnodes = env.request_group("?", dip::RequestType::Reference, tags);
         } else {
-            vnodes = env.request_group(request, dip::RequestType::Reference, tags);
+            vnodes = env.request_group("?" + request, dip::RequestType::Reference, tags);
         }
 
         // print if required
