@@ -15,9 +15,9 @@ TEST(QuickExample, ParseProperties) {
 
     dip::DIP d;
     d.add_file(full_path);
-    dip::Environment env = d.parse();
-    double density = env["simulation.fluid.density"].as<double>();
-    int64_t steps = env["simulation.time.steps"].as<int64_t>();
+    auto env = d.parse();
+    auto density = env["simulation.fluid.density"].as<double>();
+    auto steps = env["simulation.time.steps"].as<int64_t>();
     EXPECT_EQ(density, 998.2);
     EXPECT_EQ(steps, 10000);
 }

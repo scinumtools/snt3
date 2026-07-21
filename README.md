@@ -44,7 +44,7 @@ The result is fewer hidden assumptions, earlier error detection and more reliabl
 ### Example of Use
 
 Below is a quick example how to use the core functionality of `scinumtools3`.
-For more examples and patterns please look into the ``tests``, ``exec``, ``apps`` and ``bindings`` folders.
+For additional examples, see ``tests/``, ``apps/``, ``exec/``, and ``bindings/``.
 
 #### Parameter definition 
 
@@ -101,9 +101,9 @@ int main() {
 
   dip::DIP d;
   d.add_file("parameters.dip");
-  dip::Environment env = d.parse();
-  double density = env["simulation.fluid.density"].as<double>();
-  int64_t steps = env["simulation.time.steps"].as<int64_t>();
+  auto env = d.parse();
+  auto density = env["simulation.fluid.density"].as<double>();
+  auto steps = env["simulation.time.steps"].as<int64_t>();
   std::cout << "Density: " << density << std::endl;
   std::cout << "Steps:   " << steps << std::endl;
   // Density: 998.2 
@@ -122,9 +122,9 @@ length = length.convert('US_ft')
 print("Length:", length.to_string())
 # Length: 10*ft
 
-with DIP() as dip:
-    dip.add_file("parameters.dip")
-    env = dip.parse()
+dip = DIP()
+dip.add_file("parameters.dip")
+env = dip.parse()
 
 print("Density: ", env["simulation.fluid.density"].value)
 print("Steps:   ", env["simulation.time.steps"].value)
