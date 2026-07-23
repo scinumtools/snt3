@@ -27,12 +27,10 @@ Options:
       Show help.
   -v, --version
       Show version information.
-  -f,--file <filename>
-      Load a .dip file (repeatable).
-  -s,--string <code>
-      Parse inline DIP code (repeatable).
+  -i,--input <type> [<name>] <value>
+      Register a new input type (file/string/unit/source). Unit and source input require name and value.
   -r,--request <query>
-      Request specific nodes (e.g. "?family.father").
+      Request specific nodes (e.g. "family.father").
   --print
       Print nodes.
 
@@ -40,9 +38,9 @@ Examples:
   snt dip parse -f parameters.dip --print
 
   snt dip parse \
-      -f parameters.dip \
-      -s "age int = 23 yr" \
-      -r "?family.father" \
+      -i file parameters.dip \
+      -i string "age int = 23 yr" \
+      -r "family.father" \
       --print
 )";
 }
@@ -58,13 +56,27 @@ void module_dip(ArgParser& argpar) {
         if (command == "parse") {
             api::DIPParse cmd;
             std::vector<std::string> arguments;
-            arguments = argpar.getKeywordValues("-f", "--file");
+            arguments = argpar.getKeywordValues("-i", "--input");
             if (!arguments.empty()) {
-                cmd.argument_file(arguments[0]);
-            }
-            arguments = argpar.getKeywordValues("-s", "--string");
-            if (!arguments.empty()) {
-                cmd.argument_string(arguments);
+                size_t i = 0;
+                size_t arguments_size = arguments.size();
+                while (i < arguments_size) {
+                    if (arguments[i] == "string" && (i + 1) < arguments_size) {
+                        cmd.argument_input(arguments[i], {arguments[i + 1]});
+                        i += 2;
+                    } else if (arguments[i] == "file" && (i + 1) < arguments_size) {
+                        cmd.argument_input(arguments[i], {arguments[i + 1]});
+                        i += 2;
+                    } else if (arguments[i] == "source" && (i + 2) < arguments_size) {
+                        cmd.argument_input(arguments[i], {arguments[i + 1], arguments[i + 2]});
+                        i += 3;
+                    } else if (arguments[i] == "unit" && (i + 2) < arguments_size) {
+                        cmd.argument_input(arguments[i], {arguments[i + 1], arguments[i + 2]});
+                        i += 3;
+                    } else {
+                        throw std::runtime_error("Invalid input type: " + arguments[i]);
+                    }
+                }
             }
             arguments = argpar.getKeywordValues("-r", "--request");
             if (!arguments.empty()) {
@@ -77,7 +89,7 @@ void module_dip(ArgParser& argpar) {
             if (argpar.hasKeyword("--print")) {
                 cmd.argument_print();
             }
-            std::cout << cmd.execute() << '\n';
+            std::cout << cmd.execute();
         }
 
         // TODO: implement tag selectors

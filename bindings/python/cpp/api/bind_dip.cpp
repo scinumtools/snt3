@@ -13,17 +13,7 @@ namespace snt::bind::python {
 
         command.def(py::init<>());
 
-        command.def("argument_file", &api::DIPParse::argument_file, py::arg("file_name"));
-
-        command.def(
-            "argument_string",
-            py::overload_cast<const std::vector<std::string>&>(&api::DIPParse::argument_string),
-            py::arg("list")
-        );
-
-        command.def(
-            "argument_string", py::overload_cast<const std::string&>(&api::DIPParse::argument_string), py::arg("code")
-        );
+        command.def("argument_input", &api::DIPParse::argument_input, py::arg("input_type"), py::arg("input_value"));
 
         command.def("argument_request", &api::DIPParse::argument_request, py::arg("path"));
 

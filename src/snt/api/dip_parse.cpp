@@ -5,17 +5,18 @@
 
 namespace snt::api {
 
-    void DIPParse::argument_file(const std::string& file_name) {
-        dip.add_file(file_name);
-    }
-
-    void DIPParse::argument_string(const std::vector<std::string>& list) {
-        for (const auto& code : list)
-            dip.add_string(code);
-    }
-
-    void DIPParse::argument_string(const std::string& code) {
-        dip.add_string(code);
+    void DIPParse::argument_input(const std::string& input_type, const std::vector<std::string>& input_values) {
+        if (input_type == "file" && input_values.size() == 1) {
+            dip.add_file(input_values[0]);
+        } else if (input_type == "string" && input_values.size() == 1) {
+            dip.add_string(input_values[0]);
+        } else if (input_type == "source" && input_values.size() == 2) {
+            dip.add_source(input_values[0], input_values[1]);
+        } else if (input_type == "unit" && input_values.size() == 2) {
+            dip.add_unit(input_values[0], input_values[1]);
+        } else {
+            throw std::runtime_error("Unrecognized input type or values");
+        }
     }
 
     void DIPParse::argument_request(const std::string& path) {

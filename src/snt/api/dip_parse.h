@@ -32,25 +32,12 @@ namespace snt::api {
         DIPParse() : print(PrintOptions::NONE) {};
 
         /**
-         * Add code from a file
+         * Add code
          *
-         * @param file_name Name of a DIP file
+         * @param input_type Type of the code input
+         * @param input_values Code input values
          **/
-        void argument_file(const std::string& file_name);
-
-        /**
-         * Add code from a list of string
-         *
-         * @param list List of DIP code
-         **/
-        void argument_string(const std::vector<std::string>& list);
-
-        /**
-         * Add code from a string
-         *
-         * @param code DIP code
-         **/
-        void argument_string(const std::string& code);
+        void argument_input(const std::string& input_type, const std::vector<std::string>& input_values);
 
         /**
          * Set a request path
