@@ -84,16 +84,14 @@ jobs:
           ')
 
           {
+            echo "$BODY"
+            echo
             echo "## 📦 Packaging"
             echo
-            echo "| Archive | SHA256 | SHA512 |"
-            echo "|----------|--------|---------|"
-            echo "| Source code (tar.gz) | \`${{ steps.hash.outputs.tar_sha256 }}\` | \`${{ steps.hash.outputs.tar_sha512 }}\` |"
-            echo "| Source code (zip) | \`${{ steps.hash.outputs.zip_sha256 }}\` | \`${{ steps.hash.outputs.zip_sha512 }}\` |"
-            echo
-            echo "---"
-            echo
-            echo "$BODY"
+            echo "| Archive | SHA256 / SHA512 |"
+            echo "|----------|----------------|"
+            echo "| Source code (tar.gz) | \`${{ steps.hash.outputs.tar_sha256 }}\`  \`${{ steps.hash.outputs.tar_sha512 }}\` |"
+            echo "| Source code (zip) | \`${{ steps.hash.outputs.zip_sha256 }}\`  \`${{ steps.hash.outputs.zip_sha512 }}\` |"
           } > body.md
 
           gh release edit "$TAG" \
