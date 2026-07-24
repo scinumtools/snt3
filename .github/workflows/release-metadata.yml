@@ -63,30 +63,22 @@ jobs:
       - name: Update release notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
 
           BODY=$(gh release view "$TAG" --json body --jq .body)
 
-          # Remove an existing Packaging section (if present)
-          BODY=$(printf "%s" "$BODY" | awk '
-            BEGIN {skip=0}
-            /^## 📦 Packaging$/ {skip=1; next}
-            skip && /^---$/ {skip=0; next}
-            !skip {print}
-          ')
+          {
+            echo "## 📦 Packaging"
+            echo
+            echo "| Archive | SHA256 | SHA512 |"
+            echo "|----------|--------|---------|"
+            echo "| Source code (tar.gz) | \`${{ steps.hash.outputs.tar_sha256 }}\` | \`${{ steps.hash.outputs.tar_sha512 }}\` |"
+            echo "| Source code (zip) | \`${{ steps.hash.outputs.zip_sha256 }}\` | \`${{ steps.hash.outputs.zip_sha512 }}\` |"
+            echo
+            echo "---"
+            echo
+            echo "$BODY"
+          } > body.md
 
-          cat > body.md <<EOF
-## 📦 Packaging
-
-| Archive | SHA256 | SHA512 |
-|----------|--------|---------|
-| Source code (tar.gz) | \`${{ steps.hash.outputs.tar_sha256 }}\` | \`${{ steps.hash.outputs.tar_sha512 }}\` |
-| Source code (zip) | \`${{ steps.hash.outputs.zip_sha256 }}\` | \`${{ steps.hash.outputs.zip_sha512 }}\` |
-
----
-
-$BODY
-EOF
-
-          gh release edit "$TAG" --notes-file body.md
