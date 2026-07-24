@@ -78,7 +78,7 @@ jobs:
           # Remove previous Packaging section if present
           BODY=$(printf "%s\n" "$BODY" | awk '
             BEGIN {skip=0}
-            /^## 📦 Packaging$/ {skip=1; next}
+            /^## Packaging$/ {skip=1; next}
             skip && /^---$/ {skip=0; next}
             !skip {print}
           ')
@@ -86,7 +86,7 @@ jobs:
           {
             echo "$BODY"
             echo
-            echo "## 📦 Packaging"
+            echo "## Packaging"
             echo
             echo "| Archive | SHA256 / SHA512 |"
             echo "|----------|----------------|"
