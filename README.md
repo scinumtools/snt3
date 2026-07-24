@@ -139,7 +139,7 @@ snt puq convert "3.048*m" ft -s SI -S US
 # 10*ft
 
 snt dip parse -f examples/dipl/parameters.dip \
-              -r "?simulation.fluid.density" \
+              -r "simulation.fluid.density" \
               --print
 # density = 998.2 kg*m-3
 ```
