@@ -27,8 +27,8 @@ Options:
       Show help.
   -v, --version
       Show version information.
-  -i,--input <type> [<name>] <value>
-      Register a new input type (file/string/unit/source). Unit and source input require name and value.
+  -a,--add <type> [<name>] <value>
+      Add a new source type (file/string/unit/source). Unit and source input require name and value.
   -r,--request <query>
       Request specific nodes (e.g. "family.father").
   --print
@@ -38,8 +38,8 @@ Examples:
   snt dip parse -f parameters.dip --print
 
   snt dip parse \
-      -i file parameters.dip \
-      -i string "age int = 23 yr" \
+      -a file parameters.dip \
+      -a string "age int = 23 yr" \
       -r "family.father" \
       --print
 )";
@@ -62,16 +62,16 @@ void module_dip(ArgParser& argpar) {
                 size_t arguments_size = arguments.size();
                 while (i < arguments_size) {
                     if (arguments[i] == "string" && (i + 1) < arguments_size) {
-                        cmd.argument_input(arguments[i], {arguments[i + 1]});
+                        cmd.argument_add(arguments[i], {arguments[i + 1]});
                         i += 2;
                     } else if (arguments[i] == "file" && (i + 1) < arguments_size) {
-                        cmd.argument_input(arguments[i], {arguments[i + 1]});
+                        cmd.argument_add(arguments[i], {arguments[i + 1]});
                         i += 2;
                     } else if (arguments[i] == "source" && (i + 2) < arguments_size) {
-                        cmd.argument_input(arguments[i], {arguments[i + 1], arguments[i + 2]});
+                        cmd.argument_add(arguments[i], {arguments[i + 1], arguments[i + 2]});
                         i += 3;
                     } else if (arguments[i] == "unit" && (i + 2) < arguments_size) {
-                        cmd.argument_input(arguments[i], {arguments[i + 1], arguments[i + 2]});
+                        cmd.argument_add(arguments[i], {arguments[i + 1], arguments[i + 2]});
                         i += 3;
                     } else {
                         throw std::runtime_error("Invalid input type: " + arguments[i]);
