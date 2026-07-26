@@ -138,7 +138,7 @@ print("Steps:   ", env["simulation.time.steps"].value)
 snt puq convert "3.048*m" ft -s SI -S US
 # 10*ft
 
-snt dip parse -i file examples/dipl/parameters.dip \
+snt dip parse -a file examples/dipl/parameters.dip \
               -r "simulation.fluid.density" \
               --print
 # density = 998.2 kg*m-3
