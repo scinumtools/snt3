@@ -5,7 +5,7 @@
 
 namespace snt::api {
 
-    void DIPParse::argument_input(const std::string& input_type, const std::vector<std::string>& input_values) {
+    void DIPParse::argument_add(const std::string& add_type, const std::vector<std::string>& add_values) {
         if (input_type == "file" && input_values.size() == 1) {
             dip.add_file(input_values[0]);
         } else if (input_type == "string" && input_values.size() == 1) {
