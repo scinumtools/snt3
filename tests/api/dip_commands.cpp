@@ -16,7 +16,7 @@ class DIPCommands : public ::testing::Test {
 
     void SetUp() override {
         // add a string input
-        cmd.argument_input(
+        cmd.argument_add(
             "string",
             {"foo[bar]\n"
              "  jerk bool = true\n"
@@ -25,7 +25,7 @@ class DIPCommands : public ::testing::Test {
     }
 };
 
-TEST_F(DIPCommands, InputFile) {
+TEST_F(DIPCommands, AddFile) {
 
     // create temporary file
     std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
@@ -47,7 +47,7 @@ TEST_F(DIPCommands, InputFile) {
     }
 
     // add a file input
-    cmd.argument_input("file", {example_filename.string()});
+    cmd.argument_add("file", {example_filename.string()});
     cmd.argument_print();
 
     std::string output = cmd.execute();
@@ -76,18 +76,18 @@ TEST_F(DIPCommands, InputSource) {
     }
 
     // add a file input
-    cmd.argument_input("source", {"example", example_filename.string()});
-    cmd.argument_input("string", {"sphinx float = {example?foo[baz].yippee.crackle}"});
+    cmd.argument_add("source", {"example", example_filename.string()});
+    cmd.argument_add("string", {"sphinx float = {example?foo[baz].yippee.crackle}"});
     cmd.argument_print();
 
     std::string output = cmd.execute();
     EXPECT_NE(output.find("sphinx = 4e5"), std::string::npos);
 }
 
-TEST_F(DIPCommands, InputUnit) {
+TEST_F(DIPCommands, AddUnit) {
     // add a file input
-    cmd.argument_input("unit", {"length", "km"});
-    cmd.argument_input(
+    cmd.argument_add("unit", {"length", "km"});
+    cmd.argument_add(
         "string",
         {"baz float cm\n"
          "baz = 1 length\n"}
