@@ -34,10 +34,10 @@ namespace snt::api {
         /**
          * Add code
          *
-         * @param input_type Type of the code input
-         * @param input_values Code input values
+         * @param add_type Type of the code input
+         * @param add_values Code input values
          **/
-        void argument_input(const std::string& input_type, const std::vector<std::string>& input_values);
+        void argument_add(const std::string& add_type, const std::vector<std::string>& add_values);
 
         /**
          * Set a request path
