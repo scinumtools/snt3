@@ -48,6 +48,8 @@ This project is the C++ successor to the original Python project, [SciNumTools v
 Below is a quick example how to use the core functionality of `scinumtools3`.
 For additional examples, see ``tests/``, ``apps/``, ``exec/``, and ``bindings/``.
 
+The same `parameters.dip` file is consumed by C++, Python, the snt CLI, and CMake, allowing a single configuration source to drive applications, scripts, and build systems.
+
 #### Parameter definition 
 
 ``parameters.dip``
@@ -56,8 +58,8 @@ For additional examples, see ``tests/``, ``apps/``, ``exec/``, and ``bindings/``
 simulation
   title str = "Cylinder flow"        # strings
   mesh
-    file str = "cylinder.msh"
-      !format "[A-Za-z0-9_]+.msh"    # enforce string formats
+    file str = "cylinder.hdf5"
+      !format "[A-Za-z0-9_]+.hdf5"    # enforce string formats
   fluid
     density float = 998.2 kg/m3      # numbers with units
     viscosity float = 1.003e-3 Pa*s
@@ -79,6 +81,9 @@ simulation
     file str = "results.vtk"
     variables str[:] = ["velocity", "pressure", "vorticity"]
     every int = 100
+  build
+    hdf5 bool = true
+    cuda bool = false
 # See the documentation for more features.
 ```
 
@@ -140,10 +145,27 @@ print("Steps:   ", env["simulation.time.steps"].value)
 snt puq convert "3.048*m" ft -s SI -S US
 # 10*ft
 
-snt dip parse -a file examples/dipl/parameters.dip \
+snt dip parse -a file parameters.dip \
               -r "simulation.fluid.density" \
               --print
 # density = 998.2 kg*m-3
+```
+
+#### with CMAKE
+
+```cmake
+find_package(snt REQUIRED)
+
+snt_dip_get(
+    FILE parameters.dip
+    PATH build.hdf5
+    OUT USE_HDF5
+    REQUIRED
+)
+
+if(USE_HDF5)
+    find_package(HDF5 REQUIRED)
+endif()
 ```
 
 ### Parameter Definition
