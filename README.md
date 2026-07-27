@@ -39,7 +39,7 @@ Instead of implementing parameter parsing, unit conversions and validation separ
 
 The result is fewer hidden assumptions, earlier error detection and more reliable scientific software.
 
-This project is the C++ successor to the original Python project, SciNumTools v2. SciNumTools v3 aims to provide feature parity with v2 while expanding the library with additional functionality and improved performance.
+This project is the C++ successor to the original Python project, [SciNumTools v2](https://github.com/vrtulka23/scinumtools). SciNumTools v3 aims to provide feature parity with v2 while expanding the library with additional functionality and improved performance.
 
 ## Getting Started
 
