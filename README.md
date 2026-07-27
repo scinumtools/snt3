@@ -59,7 +59,7 @@ simulation
   title str = "Cylinder flow"        # strings
   mesh
     file str = "cylinder.hdf5"
-      !format "[A-Za-z0-9_]+.hdf5"    # enforce string formats
+      !format "[A-Za-z0-9_]+.hdf5"   # enforce string formats
   fluid
     density float = 998.2 kg/m3      # numbers with units
     viscosity float = 1.003e-3 Pa*s
