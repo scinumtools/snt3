@@ -11,3 +11,104 @@ include_directories("@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
 set(SNT_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
 
 message("-- Found snt: ${SNT_INCLUDE_DIR} ${SNT_VERSION}")
+
+################################################################################
+# DIPL helper functions
+################################################################################
+
+find_program(
+    SNT_EXECUTABLE
+    NAMES snt
+    HINTS "${PACKAGE_PREFIX_DIR}/bin"
+)
+
+#
+# snt_dip_get(
+#     FILE <dip-file>
+#     PATH <parameter-path>
+#     OUT  <cmake-variable>
+#     [REQUIRED]
+# )
+#
+# Example:
+#
+#   snt_dip_get(
+#       FILE build.dip
+#       PATH build.features.cuda
+#       OUT ENABLE_CUDA
+#       REQUIRED
+#   )
+#
+function(snt_dip_get)
+
+    set(options REQUIRED)
+    set(oneValueArgs FILE PATH OUT)
+
+    cmake_parse_arguments(ARG
+        "${options}"
+        "${oneValueArgs}"
+        ""
+        ${ARGN}
+    )
+
+    if(NOT ARG_FILE)
+        message(FATAL_ERROR "snt_dip_get(): FILE not specified.")
+    endif()
+
+    if(NOT ARG_PATH)
+        message(FATAL_ERROR "snt_dip_get(): PATH not specified.")
+    endif()
+
+    if(NOT ARG_OUT)
+        message(FATAL_ERROR "snt_dip_get(): OUT not specified.")
+    endif()
+
+    if(NOT SNT_EXECUTABLE)
+        message(FATAL_ERROR
+            "The 'snt' executable was not found. "
+            "Cannot read DIPL parameters.")
+    endif()
+
+    execute_process(
+        COMMAND
+            "${SNT_EXECUTABLE}"
+            dip
+            parse
+            -a file
+            "${ARG_FILE}"
+            -r "${ARG_PATH}"
+            --print
+
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE value
+        ERROR_VARIABLE error
+
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_STRIP_TRAILING_WHITESPACE
+    )
+
+    if(result)
+
+        if(ARG_REQUIRED)
+            message(FATAL_ERROR
+                "Failed to read '${ARG_PATH}' from '${ARG_FILE}'.\n${error}")
+        else()
+            set(${ARG_OUT} "" PARENT_SCOPE)
+            return()
+        endif()
+
+    endif()
+
+    # Convert booleans to native CMake values
+
+    string(TOLOWER "${value}" value_lower)
+
+    if(value_lower STREQUAL "true")
+        set(value TRUE)
+    elseif(value_lower STREQUAL "false")
+        set(value FALSE)
+    endif()
+
+    set(${ARG_OUT} "${value}" PARENT_SCOPE)
+
+endfunction()
