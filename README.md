@@ -106,9 +106,9 @@ int main() {
   std::cout << "Length: " << length.to_string() << std::endl;
   // Length: 10*ft
 
-  dip::DIP d;
-  d.add_file("parameters.dip");
-  auto env = d.parse();
+  dip::DIP dip;
+  dip.add_file("parameters.dip");
+  auto env = dip.parse();
   auto density = env["simulation.fluid.density"].as<double>();
   auto steps = env["simulation.time.steps"].as<int64_t>();
   std::cout << "Density: " << density << std::endl;
