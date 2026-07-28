@@ -185,11 +185,11 @@ Together, they provide a structured, extensible, and implementation-independent 
 <SYSTEM>_[<VALUE>]*<UNIT><EXPONENT>
 
 # Examples
-ESU_erg
-m2*kg*s-2
-kg2*ms3:2*cm
-1.346591(30)e27*kg
-[2, 3, 4, 5]*km
+ESU_erg            # unit systems
+m2*kg*s-2          # unit expressions
+kg2*ms3:2*cm       # fractional exponents
+1.346591(30)e27*kg # uncertainties
+[2, 3, 4, 5]*km    # arrays
 ```
 
 The `PUQ` module builds on this notation to provide parsing, dimensional analysis, arithmetic, and unit conversion.
