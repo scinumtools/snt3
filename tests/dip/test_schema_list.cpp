@@ -156,3 +156,35 @@ TEST(SchemaList, Assignment) {
     EXPECT_EQ(vnode->path.name, "suzuki[0].vrn");
     EXPECT_EQ(vnode->value->to_string(), "\"MH19 ZQD\"");
 }
+
+TEST(SchemaList, Options) {
+
+    // TODO: needs to be debugged
+
+    dip::DIP d;
+    d.add_string(
+        "$schema box\n"
+        "  resolution int\n"
+        "    !options [8,16,32]\n"
+        "space : box\n"
+        "  resolution = 16\n"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 1);
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->options.size(), 3);
+    EXPECT_EQ(vnode->options[0].value->to_string(), "8");
+    EXPECT_EQ(vnode->options[1].value->to_string(), "16");
+    EXPECT_EQ(vnode->options[2].value->to_string(), "32");
+
+    // try {
+    //     d.parse();
+    //     FAIL() << "Expected std::runtime_error";
+    // } catch (const std::runtime_error& e) {
+    //     EXPECT_STREQ(e.what(), "Value 17 of node 'jaguar.speed' doesn't match with any option: 16, 32, 64");
+    // } catch (...) {
+    //     FAIL() << "Expected std::runtime_error";
+    // }
+}

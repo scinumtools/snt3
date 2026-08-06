@@ -18,6 +18,12 @@ TEST(Properties, Constant) {
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->constant, true); // foo node is set as a constant
 
+    // Test if cloning preserves the property
+    vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "copy");
+    EXPECT_EQ(vnode->constant, true); // foo node is set as a constant
+
     // Throw an error if one is trying to override a constant node
     d = dip::DIP();
     d.add_string("foo bool = true");
@@ -60,6 +66,12 @@ TEST(Properties, Format) {
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->format, "[a-z]+");
+
+    // Test if cloning preserves the property
+    vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "copy");
     EXPECT_EQ(vnode->format, "[a-z]+");
 
     // Throw an error if node value does not match expected format
@@ -106,6 +118,13 @@ TEST(Properties, Tags) {
     EXPECT_EQ(vnode->tags[0], "baz");
     EXPECT_EQ(vnode->tags[1], "word");
 
+    // Test if cloning preserves the property
+    vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "copy");
+    EXPECT_EQ(vnode->tags[0], "baz");
+    EXPECT_EQ(vnode->tags[1], "word");
+
     // Throw an error if indent is not higher
     d = dip::DIP();
     d.add_string("  foo str = \"bar\"");
@@ -134,6 +153,12 @@ TEST(Properties, Condition) {
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->condition, "true");
+
+    // Test if cloning preserves the property
+    vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "copy");
     EXPECT_EQ(vnode->condition, "true");
 
     // Throw an error if indent is not higher
@@ -181,6 +206,15 @@ TEST(Properties, OptionsInteger) {
     EXPECT_EQ(vnode->options[1].value->to_string(), "32");
     EXPECT_EQ(vnode->options[2].value->to_string(), "64");
 
+    // Test if cloning preserves the property
+    vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "copy");
+    EXPECT_EQ(vnode->options.size(), 3);
+    EXPECT_EQ(vnode->options[0].value->to_string(), "16");
+    EXPECT_EQ(vnode->options[1].value->to_string(), "32");
+    EXPECT_EQ(vnode->options[2].value->to_string(), "64");
+
     // TODO: implement unit conversion of units
 
     // validate if node value is in options
@@ -212,6 +246,15 @@ TEST(Properties, OptionsFloat) {
     EXPECT_EQ(vnode->options[1].value->to_string(), "2.34");
     EXPECT_EQ(vnode->options[2].value->to_string(), "5.6e7");
 
+    // Test if cloning preserves the property
+    vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "copy");
+    EXPECT_EQ(vnode->options.size(), 3);
+    EXPECT_EQ(vnode->options[0].value->to_string(), "1");
+    EXPECT_EQ(vnode->options[1].value->to_string(), "2.34");
+    EXPECT_EQ(vnode->options[2].value->to_string(), "5.6e7");
+
     // TODO: implement unit conversion of units
 
     // validate if node value is in options
@@ -237,6 +280,15 @@ TEST(Properties, OptionsString) {
     EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->options.size(), 3);
+    EXPECT_EQ(vnode->options[0].value->to_string(), "\"bar\"");
+    EXPECT_EQ(vnode->options[1].value->to_string(), "\"snap\"");
+    EXPECT_EQ(vnode->options[2].value->to_string(), "\"pow\"");
+
+    // Test if cloning preserves the property
+    vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "copy");
     EXPECT_EQ(vnode->options.size(), 3);
     EXPECT_EQ(vnode->options[0].value->to_string(), "\"bar\"");
     EXPECT_EQ(vnode->options[1].value->to_string(), "\"snap\"");
@@ -281,6 +333,7 @@ TEST(Properties, TableDelimiter) {
     EXPECT_EQ(env.nodes.size(), 2);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->path.name, "foo.bar");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"1", "2"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2}));
@@ -288,6 +341,7 @@ TEST(Properties, TableDelimiter) {
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 
     vnode = env.nodes.at(1);
+    EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->path.name, "foo.baz");
     EXPECT_EQ(vnode->value_raw, val::Array::StringType({"true", "false"}));
     EXPECT_EQ(vnode->value_shape, val::Array::ShapeType({2}));
@@ -320,20 +374,39 @@ TEST(Properties, Metadata) {
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->description, "Thermal conductivity of high-purity copper measured at 293.15 K");
-    EXPECT_EQ(vnode->authors, "John A. Smith, Emily R. Johnson, Michael T. Brown");
-    EXPECT_EQ(vnode->title, "Thermal Conductivity of High-Purity Copper from 100 K to 500 K");
-    EXPECT_EQ(vnode->journal, "Journal of Materials Science");
-    EXPECT_EQ(vnode->year, "2024");
-    EXPECT_EQ(vnode->volume, "59");
-    EXPECT_EQ(vnode->issue, "8");
-    EXPECT_EQ(vnode->pages, "4123-4137");
-    EXPECT_EQ(vnode->doi, "10.1007/s10853-024-12345-6");
-    EXPECT_EQ(vnode->url, "https://doi.org/10.1007/s10853-024-12345-6");
-    EXPECT_EQ(vnode->version, "Published Version");
-    EXPECT_EQ(vnode->created, "2024-03-18");
-    EXPECT_EQ(vnode->modified, "2024-04-02");
-    EXPECT_EQ(vnode->license, "CC BY 4.0");
+    EXPECT_EQ(vnode->metadata.description, "Thermal conductivity of high-purity copper measured at 293.15 K");
+    EXPECT_EQ(vnode->metadata.authors, "John A. Smith, Emily R. Johnson, Michael T. Brown");
+    EXPECT_EQ(vnode->metadata.title, "Thermal Conductivity of High-Purity Copper from 100 K to 500 K");
+    EXPECT_EQ(vnode->metadata.journal, "Journal of Materials Science");
+    EXPECT_EQ(vnode->metadata.year, "2024");
+    EXPECT_EQ(vnode->metadata.volume, "59");
+    EXPECT_EQ(vnode->metadata.issue, "8");
+    EXPECT_EQ(vnode->metadata.pages, "4123-4137");
+    EXPECT_EQ(vnode->metadata.doi, "10.1007/s10853-024-12345-6");
+    EXPECT_EQ(vnode->metadata.url, "https://doi.org/10.1007/s10853-024-12345-6");
+    EXPECT_EQ(vnode->metadata.version, "Published Version");
+    EXPECT_EQ(vnode->metadata.created, "2024-03-18");
+    EXPECT_EQ(vnode->metadata.modified, "2024-04-02");
+    EXPECT_EQ(vnode->metadata.license, "CC BY 4.0");
+
+    // Test if cloning preserves the property
+    vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "copy");
+    EXPECT_EQ(vnode->metadata.description, "Thermal conductivity of high-purity copper measured at 293.15 K");
+    EXPECT_EQ(vnode->metadata.authors, "John A. Smith, Emily R. Johnson, Michael T. Brown");
+    EXPECT_EQ(vnode->metadata.title, "Thermal Conductivity of High-Purity Copper from 100 K to 500 K");
+    EXPECT_EQ(vnode->metadata.journal, "Journal of Materials Science");
+    EXPECT_EQ(vnode->metadata.year, "2024");
+    EXPECT_EQ(vnode->metadata.volume, "59");
+    EXPECT_EQ(vnode->metadata.issue, "8");
+    EXPECT_EQ(vnode->metadata.pages, "4123-4137");
+    EXPECT_EQ(vnode->metadata.doi, "10.1007/s10853-024-12345-6");
+    EXPECT_EQ(vnode->metadata.url, "https://doi.org/10.1007/s10853-024-12345-6");
+    EXPECT_EQ(vnode->metadata.version, "Published Version");
+    EXPECT_EQ(vnode->metadata.created, "2024-03-18");
+    EXPECT_EQ(vnode->metadata.modified, "2024-04-02");
+    EXPECT_EQ(vnode->metadata.license, "CC BY 4.0");
 
     // Throw an error if trying to assign description to unsuported node
     // TODO: The test below works only because the group node is the first node in the list.

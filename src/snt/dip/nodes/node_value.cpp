@@ -5,7 +5,7 @@
 namespace snt::dip {
 
     ValueNode::ValueNode(const ValueNode& other)
-        : units(other.units), tags(other.tags), constant(other.constant), description(other.description),
+        : units(other.units), tags(other.tags), constant(other.constant), metadata(other.metadata),
           condition(other.condition), format(other.format), BaseNode(other) {
         options.reserve(other.options.size());
         for (const auto& option : other.options) {
@@ -13,6 +13,8 @@ namespace snt::dip {
         }
         if (other.value)
             value = other.value->clone();
+        if (other.units)
+            units = other.units;
     }
 
     ValueNode::ValueNode(const Path& pth, const core::DataType vdt, const NodeDtype dt)
@@ -152,46 +154,46 @@ namespace snt::dip {
             return true;
             // metadata
         case PropertyType::Description:
-            description += values.at(0);
+            metadata.description += values.at(0);
             return true;
         case PropertyType::Authors:
-            authors += values.at(0);
+            metadata.authors += values.at(0);
             return true;
         case PropertyType::Title:
-            title += values.at(0);
+            metadata.title += values.at(0);
             return true;
         case PropertyType::Journal:
-            journal += values.at(0);
+            metadata.journal += values.at(0);
             return true;
         case PropertyType::Year:
-            year += values.at(0);
+            metadata.year += values.at(0);
             return true;
         case PropertyType::Volume:
-            volume += values.at(0);
+            metadata.volume += values.at(0);
             return true;
         case PropertyType::Issue:
-            issue += values.at(0);
+            metadata.issue += values.at(0);
             return true;
         case PropertyType::Pages:
-            pages += values.at(0);
+            metadata.pages += values.at(0);
             return true;
         case PropertyType::DOI:
-            doi += values.at(0);
+            metadata.doi += values.at(0);
             return true;
         case PropertyType::URL:
-            url += values.at(0);
+            metadata.url += values.at(0);
             return true;
         case PropertyType::Version:
-            version += values.at(0);
+            metadata.version += values.at(0);
             return true;
         case PropertyType::Created:
-            created += values.at(0);
+            metadata.created += values.at(0);
             return true;
         case PropertyType::Modified:
-            modified += values.at(0);
+            metadata.modified += values.at(0);
             return true;
         case PropertyType::License:
-            license += values.at(0);
+            metadata.license += values.at(0);
             return true;
         default:
             return false;

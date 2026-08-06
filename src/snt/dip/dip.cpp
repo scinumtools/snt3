@@ -105,7 +105,7 @@ namespace snt::dip {
     }
 
     // Set nodes that can preceeding an option
-    static constexpr std::array<NodeDtype, 13> preceeding_nodes = {
+    static constexpr std::array<NodeDtype, 5> preceeding_nodes = {
         NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table
     };
 
@@ -128,6 +128,24 @@ namespace snt::dip {
         }
     }
 
+    inline void set_node_property(BaseNode::PointerType current_node, BaseNode::PointerType previous_node) {
+        // assign properties to the previous value node
+        PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
+        if (!previous_node ||
+            std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) == preceeding_nodes.end())
+            throw std::runtime_error(
+                "Only value nodes (bool, int, float and str) can have properties: " + pnode->line.code
+            );
+        if (previous_node->indent >= pnode->indent || (pnode->indent - previous_node->indent) != INDENT_STEP)
+            throw std::runtime_error(
+                "The indent of a property '" + std::to_string(pnode->indent) + "' is not " +
+                std::to_string(INDENT_STEP) + " white spaces higher than the indent of a preceding node '" +
+                std::to_string(previous_node->indent) + "': " + pnode->line.code
+            );
+        if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
+            throw std::runtime_error("Property could not be set: " + pnode->line.code);
+    }
+
     Environment DIP::parse() {
         NodeList<BaseNode> queue = parse_code_nodes(lines);
         NodeList<BaseNode> queue_filtered;
@@ -137,21 +155,7 @@ namespace snt::dip {
         for (size_t i = 0; i < queue.size(); ++i) {
             BaseNode::PointerType current_node = queue.at(i);
             if (current_node->dtype == NodeDtype::Property) {
-                // assign properties to the previous value node
-                PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
-                if (std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
-                    preceeding_nodes.end())
-                    throw std::runtime_error(
-                        "Only value nodes (bool, int, float and str) can have properties: " + pnode->line.code
-                    );
-                if (previous_node->indent >= pnode->indent || (pnode->indent - previous_node->indent) != INDENT_STEP)
-                    throw std::runtime_error(
-                        "The indent of a property '" + std::to_string(pnode->indent) + "' is not " +
-                        std::to_string(INDENT_STEP) + " white spaces higher than the indent of a preceding node '" +
-                        std::to_string(previous_node->indent) + "': " + pnode->line.code
-                    );
-                if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
-                    throw std::runtime_error("Property could not be set: " + pnode->line.code);
+                set_node_property(current_node, previous_node);
             } else if (current_node->dtype == NodeDtype::Schema) {
                 // create a schema and aggregate all child nodes
                 check_indent(previous_node, current_node);
@@ -159,13 +163,16 @@ namespace snt::dip {
                 while (i + 1 < queue.size()) {
                     BaseNode::PointerType schema_node = queue.at(i + 1);
                     check_indent(previous_node, schema_node);
-                    previous_node = schema_node;
                     if (schema_node->indent <= current_node->indent)
                         break;
-                    schema_node->indent -= current_node->indent; // strip schema indent from aggregated nodes
-                    schema_nodes.push_back(schema_node);
+                    schema_node->indent -= current_node->indent; // strip schema indent from aggregated nodest
+                    if (schema_node->dtype == NodeDtype::Property) {
+                        set_node_property(schema_node, previous_node);
+                    } else {
+                        schema_nodes.push_back(schema_node);
+                        previous_node = schema_node;
+                    }
                     i++;
-                    previous_node = schema_node;
                 }
                 if (schema_nodes.size() > 0) {
                     env.schemas.append(current_node->value_raw.at(0), schema_nodes);

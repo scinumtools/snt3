@@ -9,9 +9,34 @@
 
 namespace snt::dip {
 
+    /**
+     * Set of node and value metadata
+     */
+    struct ValueMetadata {
+        std::string description; ///< Value description
+        std::string authors;     ///< Publication authors
+        std::string title;       ///< Publication title
+        std::string journal;     ///< Publication journal
+        std::string year;        ///< Publication year
+        std::string volume;      ///< Publication volume
+        std::string issue;       ///< Publication issue
+        std::string pages;       ///< Publication pages
+        std::string doi;         ///< Publication DOI
+        std::string url;         ///< Online URL of the publication
+        std::string version;     ///< Publication version
+        std::string created;     ///< Date of creation
+        std::string modified;    ///< Date of modification
+        std::string license;     ///< License of the value
+    };
+
+    /**
+     * Structure that holds value node data
+     *
+     * This structure is used in solvers as a lightweight value node data
+     */
     struct ValueNodeData {
-        val::BaseValue::PointerType value;
-        std::optional<puq::Quantity> units;
+        val::BaseValue::PointerType value;  ///< Node value
+        std::optional<puq::Quantity> units; ///< Node quantity
     };
 
     class ValueNode : public BaseNode {
@@ -44,20 +69,7 @@ namespace snt::dip {
         std::string format;
 
         // metadata
-        std::string description;
-        std::string authors;
-        std::string title;
-        std::string journal;
-        std::string year;
-        std::string volume;
-        std::string issue;
-        std::string pages;
-        std::string doi;
-        std::string url;
-        std::string version;
-        std::string created;
-        std::string modified;
-        std::string license;
+        ValueMetadata metadata;
 
         ValueNode() : constant(false) {};
         ValueNode(const ValueNode& other);
