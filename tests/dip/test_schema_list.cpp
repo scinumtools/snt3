@@ -23,7 +23,6 @@ TEST(SchemaList, ValueNodes) {
 }
 
 TEST(SchemaList, Properties) {
-
     dip::DIP d;
     d.add_string(
         "$schema simulation\n"
@@ -159,8 +158,6 @@ TEST(SchemaList, Assignment) {
 
 TEST(SchemaList, Options) {
 
-    // TODO: needs to be debugged
-
     dip::DIP d;
     d.add_string(
         "$schema box\n"
@@ -179,12 +176,22 @@ TEST(SchemaList, Options) {
     EXPECT_EQ(vnode->options[1].value->to_string(), "16");
     EXPECT_EQ(vnode->options[2].value->to_string(), "32");
 
-    // try {
-    //     d.parse();
-    //     FAIL() << "Expected std::runtime_error";
-    // } catch (const std::runtime_error& e) {
-    //     EXPECT_STREQ(e.what(), "Value 17 of node 'jaguar.speed' doesn't match with any option: 16, 32, 64");
-    // } catch (...) {
-    //     FAIL() << "Expected std::runtime_error";
-    // }
+    // test if wrong options throw an exception
+
+    d = dip::DIP();
+    d.add_string(
+        "$schema box\n"
+        "  resolution int\n"
+        "    !options [8,16,32]\n"
+        "space : box\n"
+        "  resolution = 17\n"
+    );
+    try {
+        d.parse();
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(e.what(), "Value 17 of node 'space.resolution' doesn't match with any option: 8, 16, 32");
+    } catch (...) {
+        FAIL() << "Expected std::runtime_error";
+    }
 }
