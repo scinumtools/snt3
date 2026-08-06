@@ -13,7 +13,7 @@ namespace snt::bind::python {
 
         command.def(py::init<>());
 
-        command.def("argument_input", &api::DIPParse::argument_input, py::arg("input_type"), py::arg("input_value"));
+        command.def("argument_add", &api::DIPParse::argument_add, py::arg("add_type"), py::arg("add_value"));
 
         command.def("argument_request", &api::DIPParse::argument_request, py::arg("path"));
 

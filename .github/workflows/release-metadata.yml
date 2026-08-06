@@ -1,0 +1,99 @@
+name: Release Metadata
+
+on:
+  release:
+    types: [published]
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (leave empty for latest)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  packaging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine release tag
+        id: tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            TAG="${{ inputs.tag }}"
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+          else
+            TAG=$(gh release list \
+              --repo "${{ github.repository }}" \
+              --limit 1 \
+              --json tagName \
+              --jq '.[0].tagName')
+          fi
+
+          echo "Using tag: $TAG"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Download source archives
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          mkdir source
+          cd source
+
+          gh api repos/${{ github.repository }}/tarball/${{ steps.tag.outputs.tag }} > source.tar.gz
+          gh api repos/${{ github.repository }}/zipball/${{ steps.tag.outputs.tag }} > source.zip
+
+      - name: Compute hashes
+        id: hash
+        shell: bash
+        run: |
+          cd source
+
+          echo "tar_sha256=$(sha256sum source.tar.gz | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          echo "tar_sha512=$(sha512sum source.tar.gz | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+          echo "zip_sha256=$(sha256sum source.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          echo "zip_sha512=$(sha512sum source.zip | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Update release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
+
+          BODY=$(gh release view "$TAG" \
+            --repo "${{ github.repository }}" \
+            --json body \
+            --jq .body)
+
+          # Remove previous Packaging section if present
+          BODY=$(printf "%s\n" "$BODY" | awk '
+            BEGIN {skip=0}
+            /^## Packaging$/ {skip=1; next}
+            skip && /^---$/ {skip=0; next}
+            !skip {print}
+          ')
+
+          {
+            echo "$BODY"
+            echo
+            echo "## Packaging"
+            echo
+            echo "| Archive | SHA256 / SHA512 |"
+            echo "|----------|----------------|"
+            echo "| Source code (tar.gz) | \`${{ steps.hash.outputs.tar_sha256 }}\`  \`${{ steps.hash.outputs.tar_sha512 }}\` |"
+            echo "| Source code (zip) | \`${{ steps.hash.outputs.zip_sha256 }}\`  \`${{ steps.hash.outputs.zip_sha512 }}\` |"
+          } > body.md
+
+          gh release edit "$TAG" \
+            --repo "${{ github.repository }}" \
+            --notes-file body.md

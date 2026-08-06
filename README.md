@@ -39,12 +39,16 @@ Instead of implementing parameter parsing, unit conversions and validation separ
 
 The result is fewer hidden assumptions, earlier error detection and more reliable scientific software.
 
+This project is the C++ successor to the original Python project, [SciNumTools v2](https://github.com/vrtulka23/scinumtools). SciNumTools v3 aims to provide feature parity with v2 while expanding the library with additional functionality and improved performance.
+
 ## Getting Started
 
-### Example of Use
+### Quick Example
 
 Below is a quick example how to use the core functionality of `scinumtools3`.
 For additional examples, see ``tests/``, ``apps/``, ``exec/``, and ``bindings/``.
+
+The same `parameters.dip` file is consumed by C++, Python, the snt CLI, and CMake, allowing a single configuration source to drive applications, scripts, and build systems.
 
 #### Parameter definition 
 
@@ -54,8 +58,8 @@ For additional examples, see ``tests/``, ``apps/``, ``exec/``, and ``bindings/``
 simulation
   title str = "Cylinder flow"        # strings
   mesh
-    file str = "cylinder.msh"
-      !format "[A-Za-z0-9_]+.msh"    # enforce string formats
+    file str = "cylinder.hdf5"
+      !format "[A-Za-z0-9_]+.hdf5"   # enforce string formats
   fluid
     density float = 998.2 kg/m3      # numbers with units
     viscosity float = 1.003e-3 Pa*s
@@ -77,6 +81,9 @@ simulation
     file str = "results.vtk"
     variables str[:] = ["velocity", "pressure", "vorticity"]
     every int = 100
+  build
+    hdf5 bool = true
+    cuda bool = false
 # See the documentation for more features.
 ```
 
@@ -99,9 +106,9 @@ int main() {
   std::cout << "Length: " << length.to_string() << std::endl;
   // Length: 10*ft
 
-  dip::DIP d;
-  d.add_file("parameters.dip");
-  auto env = d.parse();
+  dip::DIP dip;
+  dip.add_file("parameters.dip");
+  auto env = dip.parse();
   auto density = env["simulation.fluid.density"].as<double>();
   auto steps = env["simulation.time.steps"].as<int64_t>();
   std::cout << "Density: " << density << std::endl;
@@ -138,39 +145,58 @@ print("Steps:   ", env["simulation.time.steps"].value)
 snt puq convert "3.048*m" ft -s SI -S US
 # 10*ft
 
-snt dip parse -f examples/dipl/parameters.dip \
-              -r "?simulation.fluid.density" \
+snt dip parse -a file parameters.dip \
+              -r "simulation.fluid.density" \
               --print
 # density = 998.2 kg*m-3
 ```
 
+#### with CMAKE
+
+```cmake
+find_package(snt REQUIRED)
+
+snt_dip_get(
+    FILE parameters.dip
+    PATH build.hdf5
+    OUT USE_HDF5
+    REQUIRED
+)
+
+if(USE_HDF5)
+    find_package(HDF5 REQUIRED)
+endif()
+```
 ### Parameter Definition
 
-`SciNumTools` is built around two domain-specific languages that form the foundation of the framework and enable consistent handling of scientific notation and dimensional analysis. The first language, [PUEL](docs/puel/specification.md), defines a formal notation system for representing physical units and quantities in a precise and machine-readable way. The second language, [DIPL](docs/dipl/specification.md), provides a textual specification format for defining dimensional parameters and their relationships. Together, these languages establish the core abstraction layer of `SciNumTools`, allowing scientific data, units, and dimensional constraints to be expressed in a structured, interoperable, and extensible manner.
+`SciNumTools` is built around two domain-specific languages that provide a common foundation for scientific software.
 
-#### Physical Units Expression Language - PUEL
+- **[PUEL](docs/puel/specification.md)** (Physical Units Expression Language) defines a machine-readable notation for physical quantities, units, values, uncertainties, and unit systems.
+- **[DIPL](docs/dipl/specification.md)** (Dimensional Input Parameter Language) defines strongly typed scientific parameters together with units, validation rules, constraints, and parameter relationships.
 
-Expressions of physical units must account for several important aspects, including the underlying unit system (such as SI, CGS, Atomic Units, or US Customary Units), unit prefixes and scaling factors (such as `kg`, `mm`, or `MJ`), the associated numerical values (whether scalar values or arrays), uncertainties arising from measurements, the relationship between base units and physical dimensions, as well as support for integer and fractional exponents of units.
+Together, they provide a structured, extensible, and implementation-independent representation of scientific data.
 
-`PUEL` provides a minimal, coherent and extensible notation that integrates all of these concerns into a unified representation. 
+#### Physical Units Expression Language (PUEL)
 
-``` puel
+`PUEL` represents physical quantities with support for multiple unit systems, prefixes, uncertainties, arrays, and fractional unit exponents.
+
+```puel
 # General form
 <SYSTEM>_[<VALUE>]*<UNIT><EXPONENT>
 
 # Examples
-ESU_erg              # defining erg in ESU unit system
-m2*kg*s-2            # definition of complex units
-kg2*ms3:2*cm         # fractional exponents
-1.346591(30)e27*kg   # uncertainties in measurements
-[2, 3, 4, 5]*km      # arrays of values
+ESU_erg            # unit systems
+m2*kg*s-2          # unit expressions
+kg2*ms3:2*cm       # fractional exponents
+1.346591(30)e27*kg # uncertainties
+[2, 3, 4, 5]*km    # arrays
 ```
 
-Building upon this specification, the `PUQ` module of `SciNumTools` implements parsing, dimensional analysis, arithmetic operations, and unit conversion both within a single unit system and across different systems.
+The `PUQ` module builds on this notation to provide parsing, dimensional analysis, arithmetic, and unit conversion.
 
-#### Dimensional Input Parameter Language - DIPL
+#### Dimensional Input Parameter Language (DIPL)
 
-The definition of input parameters for scientific and engineering software involves several recurring requirements that are common across many numerical codes. High-performance applications often require strongly typed parameters with explicitly defined numerical precision. Numerical values frequently carry associated physical units, and many parameters consist not only of scalar values, but also arrays, matrices, or tabulated datasets.
+`DIPL` provides a declarative language for defining scientific input parameters, including types, physical units, validation rules, constraints, options, and derived parameters.
 
 ```dipl
 simulation
@@ -192,7 +218,7 @@ simulation
     !options ["NVE", "NVT", "NPT"]
 ```
 
-In addition, parameters commonly require validation rules, numerical constraints, admissible ranges, or configurable options that govern their behavior and interpretation. Parameter definitions are often interdependent as well, where the validity, availability, or meaning of one setting depends on the values of others. `DIPL` provides a coherent and extensible framework for expressing these definitions, relationships, and constraints in a structured, machine-readable, and implementation-independent form.
+Parameters can reference one another, enabling derived values and validation rules to be expressed in a portable, machine-readable format.
 
 ---
 

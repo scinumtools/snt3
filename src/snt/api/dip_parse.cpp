@@ -5,15 +5,15 @@
 
 namespace snt::api {
 
-    void DIPParse::argument_input(const std::string& input_type, const std::vector<std::string>& input_values) {
-        if (input_type == "file" && input_values.size() == 1) {
-            dip.add_file(input_values[0]);
-        } else if (input_type == "string" && input_values.size() == 1) {
-            dip.add_string(input_values[0]);
-        } else if (input_type == "source" && input_values.size() == 2) {
-            dip.add_source(input_values[0], input_values[1]);
-        } else if (input_type == "unit" && input_values.size() == 2) {
-            dip.add_unit(input_values[0], input_values[1]);
+    void DIPParse::argument_add(const std::string& add_type, const std::vector<std::string>& add_values) {
+        if (add_type == "file" && add_values.size() == 1) {
+            dip.add_file(add_values[0]);
+        } else if (add_type == "string" && add_values.size() == 1) {
+            dip.add_string(add_values[0]);
+        } else if (add_type == "source" && add_values.size() == 2) {
+            dip.add_source(add_values[0], add_values[1]);
+        } else if (add_type == "unit" && add_values.size() == 2) {
+            dip.add_unit(add_values[0], add_values[1]);
         } else {
             throw std::runtime_error("Unrecognized input type or values");
         }
