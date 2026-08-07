@@ -9,7 +9,9 @@ In this section, we summarize properties that can be used in DIPL to restrict no
 Each node property directive is given on a new line immediately after node definitions, declarations or modification.
 All properties must have consistent indent, two whitespaces higher than their parent node.
 
-### 3.8.1. Options
+### 3.8.1. Directives
+
+#### Options
 
 **Used by:** ``int``, ``float``, ``str``
 
@@ -80,7 +82,7 @@ energy float = 23 J
 # all options: [23, 45, 10, 234, 490, 1939, 3.4e-6, 2.34e-7] J
 ```
 
-### 3.8.2. Condition
+#### Condition
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
@@ -104,7 +106,7 @@ energy float = 25 erg
   !condition (23 < {?} && {?} < 26)
 ```
 
-### 3.8.3. Format
+#### Format
 
 **Used by:** ``str``
 
@@ -124,7 +126,7 @@ name str = "Ferdinant"
   !format "[a-zA-Z]+"
 ```
 
-### 3.8.4. Constants
+#### Constants
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
@@ -144,7 +146,7 @@ name str = "John"
 name = "Mary"   # this modification will raise an error exception
 ```
 
-### 3.8.5. Tags
+#### Tags
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
@@ -161,7 +163,41 @@ In practice, it is recommended to use string values for tags to ensure consisten
 Once assigned, tags enable nodes to be queried and filtered after parsing through the use of tag selectors.
 Every DIPL implementation SHOULD provide support for selecting parsed nodes based on their associated tags.
 
-### 3.8.6. Metadata
+``` DIPL
+resolution int = 32
+  !tags ["box", "grid"]
+```
+
+#### Delimiter
+
+**Used by:** `table`
+
+When entering values using a `table` node, columns are separated by whitespace by default.
+
+For some input formats, such as CSV or TSV, a different column delimiter is required. DIPL therefore allows additional options to be specified for `table` nodes to define the delimiter used when parsing the table.
+
+```DIPL-Schema
+# Schema for node tags property
+
+<indent>!delimiter <value>
+```
+
+This makes it possible, for example, to prepend a DIPL header to a standard CSV file and use it directly as a DIPL table.
+
+```DIPL
+output table = """
+snapshot int
+time float s
+intensity float W/m2
+---
+0, 0.234, 2.34
+1, 1.355, 9.4
+2, 2.535, 3.4
+"""
+  !delimiter ","
+```
+
+### 3.8.2. Metadata
 
 **Used by:** `int`, `float`, `str`, `bool`
 
@@ -228,3 +264,4 @@ thermal_conductivity float = 401 W/(m*K)
   ?modified "2024-04-02"
   ?license "CC BY 4.0"
 ```
+
