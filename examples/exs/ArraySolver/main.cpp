@@ -21,10 +21,10 @@ int main() {
     steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 
     exs::Solver<CustomAtom> solver(operators, steps);
-    CustomAtom atom = solver.solve("2 + 3");
+    CustomAtom atom = solver.eval("2 + 3");
     atom.print();
 
-    atom = solver.solve("[1,2,3] + [4,5,6]");
+    atom = solver.eval("[1,2,3] + [4,5,6]");
     atom.print();
 
     /*

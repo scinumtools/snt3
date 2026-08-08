@@ -11,7 +11,7 @@ namespace snt::dip {
      */
     class LogicalSolver {
       public:
-        std::unique_ptr<exs::Solver<LogicalAtom, LogicalSettings>> solver; ///< Instance of an EXS expression solver
+        static exs::Solver<LogicalAtom, LogicalSettings> solver; ///< Instance of an EXS expression solver
 
         /**
          * Logical solver constructor

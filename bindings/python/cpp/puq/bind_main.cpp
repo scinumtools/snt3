@@ -39,7 +39,7 @@ namespace snt::bind::python {
             "Calculator",
             [](const std::string& e) -> puq::Quantity {
                 auto calc = puq::Calculator();
-                auto atom = calc.solve(e);
+                auto atom = calc.eval(e);
                 return atom.value;
             },
             py::arg("expression")

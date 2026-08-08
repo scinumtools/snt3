@@ -8,9 +8,9 @@ namespace snt::puq {
 
     class Calculator {
       public:
-        std::unique_ptr<exs::Solver<CalculatorAtom>> solver;
+        static exs::Solver<CalculatorAtom> solver;
         Calculator();
-        CalculatorAtom solve(const std::string& expression);
+        CalculatorAtom eval(const std::string& expression);
     };
 
 } // namespace snt::puq

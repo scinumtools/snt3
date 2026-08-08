@@ -16,7 +16,7 @@ int main() {
     steps.append(exs::BINARY_OPERATION, {exs::AND_OPERATOR});
 
     exs::Solver<LogicalAtom> solver(operators, steps);
-    LogicalAtom atom = solver.solve("true && false");
+    LogicalAtom atom = solver.eval("true && false");
     atom.print();
 
     /*

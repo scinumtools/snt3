@@ -4,8 +4,7 @@
 
 namespace snt::puq {
 
-    Calculator::Calculator() {
-
+    exs::Solver<CalculatorAtom> Calculator::solver = [] {
         exs::OperatorList operators;
         operators.append(
             exs::PARENTHESES_OPERATOR,
@@ -24,14 +23,16 @@ namespace snt::puq {
         steps.append(exs::BINARY_OPERATION, {exs::MULTIPLY_OPERATOR, exs::DIVIDE_OPERATOR});
         steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 
-        solver = std::make_unique<exs::Solver<CalculatorAtom>>(operators, steps);
-    }
+        return exs::Solver<CalculatorAtom>(operators, steps);
+    }();
 
-    CalculatorAtom Calculator::solve(const std::string& expression) {
+    Calculator::Calculator() {}
+
+    CalculatorAtom Calculator::eval(const std::string& expression) {
         if constexpr (Config::debug_calculator) {
             std::clog << "CALC:  Solving: " << expression << '\n';
         }
-        CalculatorAtom ca = solver->solve((expression == "") ? "1" : expression);
+        CalculatorAtom ca = solver.eval((expression == "") ? "1" : expression);
         if constexpr (Config::debug_calculator) {
             std::clog << "CALC:  Result:  " << ca.value.to_string() << '\n';
         }

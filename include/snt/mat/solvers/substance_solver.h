@@ -20,7 +20,7 @@ namespace snt::mat {
         enum class ParserState { START, ELEMENT, STATE, END, OPERATION, ERROR };
 
       public:
-        static std::unique_ptr<exs::Solver<SubstanceAtom>> solver; ///< Pointer to the EXS solver object
+        static exs::Solver<SubstanceAtom> solver; ///< Pointer to the EXS solver object
 
         /**
          * Constructor of this class
@@ -40,7 +40,7 @@ namespace snt::mat {
          * @param expr Substance expression
          * @return Map of elements and their proportions
          */
-        ElementMap solve(const std::string& expr);
+        ElementMap eval(const std::string& expr);
     };
 
 } // namespace snt::mat

@@ -4,10 +4,7 @@
 
 namespace snt::dip {
 
-    LogicalSolver::LogicalSolver(Environment& env) {
-
-        LogicalSettings settings = {{}, &env};
-
+    exs::Solver<LogicalAtom, LogicalSettings> LogicalSolver::solver = [] {
         exs::OperatorList operators;
         operators.append(
             exs::PARENTHESES_OPERATOR,
@@ -41,13 +38,20 @@ namespace snt::dip {
         steps.append(exs::BINARY_OPERATION, {exs::AND_OPERATOR});
         steps.append(exs::BINARY_OPERATION, {exs::OR_OPERATOR});
 
-        solver = std::make_unique<exs::Solver<LogicalAtom, LogicalSettings>>(operators, steps, settings);
+        return exs::Solver<LogicalAtom, LogicalSettings>(operators, steps);
+    }();
+
+    LogicalSolver::LogicalSolver(Environment& env) {
+
+        LogicalSettings settings = {{}, &env};
+
+        solver.set_settings(settings);
     }
 
     ValueNodeData LogicalSolver::eval(const std::string& expression) {
         if (expression.empty())
             throw std::runtime_error("Logical expression cannot be empty");
-        LogicalAtom ua = solver->solve(expression);
+        LogicalAtom ua = solver.eval(expression);
         return ValueNodeData({std::move(ua.value.value), std::move(ua.value.units)});
     }
 

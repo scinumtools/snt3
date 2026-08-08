@@ -18,7 +18,7 @@ int main() {
     steps.append(UNARY_OPERATION, {NOT_OPERATOR});
 
     Solver<Atom> solver(operators, steps);
-    Atom atom = solver.solve("N false A false O true");
+    Atom atom = solver.eval("N false A false O true");
     atom.print();
 
     /*

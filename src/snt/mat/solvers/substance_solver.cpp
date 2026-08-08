@@ -4,7 +4,7 @@
 
 namespace snt::mat {
 
-    std::unique_ptr<exs::Solver<SubstanceAtom>> SubstanceSolver::solver = [] {
+    exs::Solver<SubstanceAtom> SubstanceSolver::solver = [] {
         exs::OperatorList operators;
         operators.append(exs::PARENTHESES_OPERATOR, std::make_shared<exs::OperatorParentheses>());
         operators.append(
@@ -17,7 +17,7 @@ namespace snt::mat {
         steps.append(exs::BINARY_OPERATION, {exs::MULTIPLY_OPERATOR});
         steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR});
 
-        return std::make_unique<exs::Solver<SubstanceAtom>>(operators, steps);
+        return exs::Solver<SubstanceAtom>(operators, steps);
     }();
 
     std::string SubstanceSolver::preprocess(const std::string& expr) {
@@ -128,11 +128,11 @@ namespace snt::mat {
         return ss.str();
     }
 
-    ElementMap SubstanceSolver::solve(const std::string& expr) {
+    ElementMap SubstanceSolver::eval(const std::string& expr) {
 
         std::string pexpr = preprocess(expr);
 
-        SubstanceAtom atom = solver->solve(pexpr);
+        SubstanceAtom atom = solver.eval(pexpr);
 
         return atom.value;
     }

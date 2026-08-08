@@ -71,12 +71,19 @@ namespace snt::exs {
             : operators(o), steps(s), settings(set) {};
 
         /**
+         * Set solver settings
+         *
+         * @param set New structure with settings
+         */
+        void set_settings(const SETTINGS& set = {}) { settings = set; }
+
+        /**
          * Main solver routine
          *
          * @param expression Expression that should be solved
          * @return Final atom object with a solution
          */
-        ATOM solve(std::string expression) {
+        ATOM eval(std::string expression) {
 
             Expression expr(expression);
             // CHECKPOINT( expr.to_string() );
@@ -100,7 +107,7 @@ namespace snt::exs {
                             std::vector<std::string> groups = op->groups;
                             // CHECKPOINT( groups.size() )
                             for (auto e : groups) {
-                                ATOM atom = solve(e);
+                                ATOM atom = eval(e);
                                 tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
                             }
                         }

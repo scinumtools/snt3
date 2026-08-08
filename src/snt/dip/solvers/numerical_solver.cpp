@@ -3,10 +3,7 @@
 
 namespace snt::dip {
 
-    NumericalSolver::NumericalSolver(Environment& env) {
-
-        NumericalSettings settings = {{}, &env};
-
+    exs::Solver<NumericalAtom, NumericalSettings> NumericalSolver::solver = [] {
         exs::OperatorList operators;
         operators.append(
             exs::SINUS_OPERATOR, std::make_shared<exs::OperatorSinus>(exs::OperatorGroupSybols{"sin", "( ", " )", ", "})
@@ -74,13 +71,20 @@ namespace snt::dip {
         steps.append(exs::BINARY_OPERATION, {exs::MULTIPLY_OPERATOR, exs::DIVIDE_OPERATOR});
         steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 
-        solver = std::make_unique<exs::Solver<NumericalAtom, NumericalSettings>>(operators, steps, settings);
+        return exs::Solver<NumericalAtom, NumericalSettings>(operators, steps);
+    }();
+
+    NumericalSolver::NumericalSolver(Environment& env) {
+
+        NumericalSettings settings = {{}, &env};
+
+        solver.set_settings(settings);
     }
 
     ValueNodeData NumericalSolver::eval(const std::string& expression, const std::string& units) {
         if (expression.empty())
             throw std::runtime_error("Numerical expression cannot be empty");
-        NumericalAtom ua = solver->solve(expression);
+        NumericalAtom ua = solver.eval(expression);
 
         // convert units if necessary
         if (ua.value.units && !units.empty()) {

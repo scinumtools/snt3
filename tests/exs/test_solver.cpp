@@ -11,21 +11,21 @@ TEST(Solver, SolvingMath) {
 
     exs::Solver<exs::Atom> solver;
 
-    exs::Atom atom = solver.solve("1.2 + 34");
+    exs::Atom atom = solver.eval("1.2 + 34");
     EXPECT_EQ(atom.to_string(), "35.2");
-    atom = solver.solve("32 - 34");
+    atom = solver.eval("32 - 34");
     EXPECT_EQ(atom.to_string(), "-2");
-    atom = solver.solve("32 * 2");
+    atom = solver.eval("32 * 2");
     EXPECT_EQ(atom.to_string(), "64");
-    atom = solver.solve("32.4 / 2");
+    atom = solver.eval("32.4 / 2");
     EXPECT_EQ(atom.to_string(), "16.2");
-    atom = solver.solve("3 ** 3");
+    atom = solver.eval("3 ** 3");
     EXPECT_EQ(atom.to_string(), "27");
-    atom = solver.solve("19 % 3");
+    atom = solver.eval("19 % 3");
     EXPECT_EQ(atom.to_string(), "1");
-    atom = solver.solve("1.2 + +68/2 - -2**5 * 93");
+    atom = solver.eval("1.2 + +68/2 - -2**5 * 93");
     EXPECT_EQ(atom.to_string(), "3011.2");
-    atom = solver.solve("1.234e32 * 3.33");
+    atom = solver.eval("1.234e32 * 3.33");
     EXPECT_EQ(atom.to_string(), "4.10922e+32");
 }
 
@@ -34,38 +34,38 @@ TEST(Solver, SolvingComparison) {
 
     exs::Solver<exs::Atom> solver;
 
-    exs::Atom atom = solver.solve("23 == 34");
+    exs::Atom atom = solver.eval("23 == 34");
     EXPECT_EQ(atom.to_string(), "false");
-    atom = solver.solve("23.2 == 23.2");
+    atom = solver.eval("23.2 == 23.2");
     EXPECT_EQ(atom.to_string(), "true");
 
-    atom = solver.solve("23 != 34");
+    atom = solver.eval("23 != 34");
     EXPECT_EQ(atom.to_string(), "true");
-    atom = solver.solve("23.2 != 23.2");
+    atom = solver.eval("23.2 != 23.2");
     EXPECT_EQ(atom.to_string(), "false");
 
-    atom = solver.solve("23 <= 34");
+    atom = solver.eval("23 <= 34");
     EXPECT_EQ(atom.to_string(), "true");
-    atom = solver.solve("34 <= 23");
+    atom = solver.eval("34 <= 23");
     EXPECT_EQ(atom.to_string(), "false");
-    atom = solver.solve("23 <= 23");
+    atom = solver.eval("23 <= 23");
     EXPECT_EQ(atom.to_string(), "true");
 
-    atom = solver.solve("23 >= 34");
+    atom = solver.eval("23 >= 34");
     EXPECT_EQ(atom.to_string(), "false");
-    atom = solver.solve("34 >= 23");
+    atom = solver.eval("34 >= 23");
     EXPECT_EQ(atom.to_string(), "true");
-    atom = solver.solve("23 >= 23");
+    atom = solver.eval("23 >= 23");
     EXPECT_EQ(atom.to_string(), "true");
 
-    atom = solver.solve("23 < 34");
+    atom = solver.eval("23 < 34");
     EXPECT_EQ(atom.to_string(), "true");
-    atom = solver.solve("34.2 < 23.2");
+    atom = solver.eval("34.2 < 23.2");
     EXPECT_EQ(atom.to_string(), "false");
 
-    atom = solver.solve("23 > 34");
+    atom = solver.eval("23 > 34");
     EXPECT_EQ(atom.to_string(), "false");
-    atom = solver.solve("34.2 > 23.2");
+    atom = solver.eval("34.2 > 23.2");
     EXPECT_EQ(atom.to_string(), "true");
 }
 
@@ -74,19 +74,19 @@ TEST(Solver, SolvingLogical) {
 
     exs::Solver<exs::Atom> solver;
 
-    exs::Atom atom = solver.solve("!true");
+    exs::Atom atom = solver.eval("!true");
     EXPECT_EQ(atom.to_string(), "false");
-    atom = solver.solve("!false");
+    atom = solver.eval("!false");
     EXPECT_EQ(atom.to_string(), "true");
 
-    atom = solver.solve("false && true");
+    atom = solver.eval("false && true");
     EXPECT_EQ(atom.to_string(), "false");
-    atom = solver.solve("true && true");
+    atom = solver.eval("true && true");
     EXPECT_EQ(atom.to_string(), "true");
 
-    atom = solver.solve("false || true");
+    atom = solver.eval("false || true");
     EXPECT_EQ(atom.to_string(), "true");
-    atom = solver.solve("false || false");
+    atom = solver.eval("false || false");
     EXPECT_EQ(atom.to_string(), "false");
 }
 
@@ -95,41 +95,41 @@ TEST(Solver, SolvingGroups) {
 
     exs::Solver<exs::Atom> solver;
 
-    exs::Atom atom = solver.solve("(1+2)-3");
+    exs::Atom atom = solver.eval("(1+2)-3");
     EXPECT_EQ(atom.to_string(), "0");
 
-    atom = solver.solve("exp(1+2)-3");
+    atom = solver.eval("exp(1+2)-3");
     EXPECT_EQ(atom.to_string(), "17.0855");
 
-    atom = solver.solve("log(1+2)-3");
+    atom = solver.eval("log(1+2)-3");
     EXPECT_EQ(atom.to_string(), "-1.90139");
 
-    atom = solver.solve("log10(1+2)-3");
+    atom = solver.eval("log10(1+2)-3");
     EXPECT_EQ(atom.to_string(), "-2.52288");
 
-    atom = solver.solve("logb(1+2,2)-3");
+    atom = solver.eval("logb(1+2,2)-3");
     EXPECT_EQ(atom.to_string(), "-1.41504");
 
-    atom = solver.solve("powb(2,3)-3");
+    atom = solver.eval("powb(2,3)-3");
     EXPECT_EQ(atom.to_string(), "5");
 
-    atom = solver.solve("sqrt(16)-3");
+    atom = solver.eval("sqrt(16)-3");
     EXPECT_EQ(atom.to_string(), "1");
 
-    atom = solver.solve("cbrt(27)-2");
+    atom = solver.eval("cbrt(27)-2");
     EXPECT_EQ(atom.to_string(), "1");
 
-    atom = solver.solve("sin(16)-3");
+    atom = solver.eval("sin(16)-3");
     EXPECT_EQ(atom.to_string(), "-3.2879");
 
-    atom = solver.solve("cos(16)-3");
+    atom = solver.eval("cos(16)-3");
     EXPECT_EQ(atom.to_string(), "-3.95766");
 
-    atom = solver.solve("tan(16)-3");
+    atom = solver.eval("tan(16)-3");
     EXPECT_EQ(atom.to_string(), "-2.69937");
 
     // nested group operators
-    atom = solver.solve("exp(1+(5-3))-3");
+    atom = solver.eval("exp(1+(5-3))-3");
     EXPECT_EQ(atom.to_string(), "17.0855");
 }
 
@@ -138,16 +138,16 @@ TEST(Solver, SolvingCondition) {
 
     exs::Solver<exs::Atom> solver;
 
-    exs::Atom atom = solver.solve("true ? 2 : 3");
+    exs::Atom atom = solver.eval("true ? 2 : 3");
     EXPECT_EQ(atom.to_string(), "2");
 
-    atom = solver.solve("(true ? 2 : 3)-3");
+    atom = solver.eval("(true ? 2 : 3)-3");
     EXPECT_EQ(atom.to_string(), "-1");
 
-    atom = solver.solve("(false ? 2 : 3)-3");
+    atom = solver.eval("(false ? 2 : 3)-3");
     EXPECT_EQ(atom.to_string(), "0");
 
-    atom = solver.solve("((2==3) ? 2 : 3)-3");
+    atom = solver.eval("((2==3) ? 2 : 3)-3");
     EXPECT_EQ(atom.to_string(), "0");
 }
 
@@ -161,7 +161,7 @@ TEST(Solver, CustomStepList) {
 
     // test the solver
     exs::Solver<exs::Atom> solver(steps);
-    exs::Atom atom = solver.solve("1.2 + 5 * 4");
+    exs::Atom atom = solver.eval("1.2 + 5 * 4");
     EXPECT_EQ(atom.to_string(), "21.2");
 }
 
@@ -175,7 +175,7 @@ TEST(Solver, CustomOperatorList) {
 
     // test the solver
     exs::Solver<exs::Atom> solver(operators);
-    exs::Atom atom = solver.solve("1.2 + 5 * 2^2");
+    exs::Atom atom = solver.eval("1.2 + 5 * 2^2");
     EXPECT_EQ(atom.to_string(), "21.2");
 }
 
@@ -198,6 +198,6 @@ TEST(Operators, CustomParenthesesOperator) {
 
     // test the solver
     exs::Solver<exs::Atom> solver(operators);
-    exs::Atom atom = solver.solve("2 * (12 / 4)");
+    exs::Atom atom = solver.eval("2 * (12 / 4)");
     EXPECT_EQ(atom.to_string(), "6");
 }

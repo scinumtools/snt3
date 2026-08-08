@@ -8,7 +8,7 @@ namespace snt::mat {
         : Part<double>(prop), Set<Element, int>(comp, nat) {}
 
     Substance::Substance(const std::string& expr, double prop, bool nat)
-        : Part<double>(prop), Set<Element, int>(SubstanceSolver().solve(expr), nat) {}
+        : Part<double>(prop), Set<Element, int>(SubstanceSolver().eval(expr), nat) {}
 
     std::string Substance::to_string() const {
         std::stringstream ss;

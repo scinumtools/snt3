@@ -11,7 +11,7 @@ namespace snt::dip {
      */
     class NumericalSolver {
       public:
-        std::unique_ptr<exs::Solver<NumericalAtom, NumericalSettings>> solver; ///< Instance of an EXS expression solver
+        static exs::Solver<NumericalAtom, NumericalSettings> solver; ///< Instance of an EXS expression solver
 
         /**
          * Numerical solver constructor

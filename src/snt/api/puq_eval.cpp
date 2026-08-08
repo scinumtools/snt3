@@ -41,7 +41,7 @@ namespace snt::api {
         }
 
         puq::Calculator calc;
-        puq::Quantity q = calc.solve(expression).value;
+        puq::Quantity q = calc.eval(expression).value;
         if (!output_quantity.empty()) {
             if (output_quantity == "") {
                 if (output_system == puq::SystemType::NONE)

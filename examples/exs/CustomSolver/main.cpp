@@ -19,7 +19,7 @@ int main() {
     steps.append(exs::BINARY_OPERATION, {exs::LESS_OPERATOR});
 
     exs::Solver<CustomAtom> solver(operators, steps);
-    CustomAtom atom = solver.solve("apple < len(hospital)");
+    CustomAtom atom = solver.eval("apple < len(hospital)");
     atom.print();
 
     /*

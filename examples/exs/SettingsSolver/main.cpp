@@ -18,7 +18,7 @@ int main() {
     steps.append(exs::BINARY_OPERATION, {exs::ADD_OPERATOR, exs::SUBTRACT_OPERATOR});
 
     exs::Solver<CustomAtom, Settings> solver(operators, steps, settings);
-    CustomAtom atom = solver.solve("2 + ? - {3}");
+    CustomAtom atom = solver.eval("2 + ? - {3}");
     atom.print();
 
     /*

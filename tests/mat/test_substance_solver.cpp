@@ -30,15 +30,15 @@ TEST(SubstanceSolver, Solver) {
 
     mat::SubstanceSolver solver;
 
-    EXPECT_EQ(solver.solve("C"), mat::ElementMap({{"C", 1}}));
-    EXPECT_EQ(solver.solve("C{13}2"), mat::ElementMap({{"C{13}", 2}}));
-    EXPECT_EQ(solver.solve("C2Be3"), mat::ElementMap({{"C", 2}, {"Be", 3}}));
-    EXPECT_EQ(solver.solve("Mg(NO3)2"), mat::ElementMap({{"Mg", 1}, {"N", 2}, {"O", 6}}));
-    // EXPECT_EQ(solver.solve("C").to_string(),      "Substance(mass=12.011 Z=6 N=6.011 e=6)");
-    // EXPECT_EQ(solver.solve("C{12}"),  "Substance(mass=12.000 Z=6 N=6.000 e=6)");
-    // EXPECT_EQ(solver.solve("C{-2}"),  "Substance(mass=12.010 Z=6 N=6.011 e=4)");
-    // EXPECT_EQ(solver.solve("C{+}"),   "Substance(mass=12.011 Z=6 N=6.011 e=7)");
-    // EXPECT_EQ(solver.solve("C{12-}"), "Substance(mass=11.999 Z=6 N=6.000 e=5)");
-    // EXPECT_EQ(solver.solve("C{13}"),  "Substance(mass=13.003 Z=6 N=7.000 e=6)");
-    // EXPECT_EQ(solver.solve("C{13-2}"),"Substance(mass=13.002 Z=6 N=7.000 e=4)");
+    EXPECT_EQ(solver.eval("C"), mat::ElementMap({{"C", 1}}));
+    EXPECT_EQ(solver.eval("C{13}2"), mat::ElementMap({{"C{13}", 2}}));
+    EXPECT_EQ(solver.eval("C2Be3"), mat::ElementMap({{"C", 2}, {"Be", 3}}));
+    EXPECT_EQ(solver.eval("Mg(NO3)2"), mat::ElementMap({{"Mg", 1}, {"N", 2}, {"O", 6}}));
+    // EXPECT_EQ(solver.eval("C").to_string(),      "Substance(mass=12.011 Z=6 N=6.011 e=6)");
+    // EXPECT_EQ(solver.eval("C{12}"),  "Substance(mass=12.000 Z=6 N=6.000 e=6)");
+    // EXPECT_EQ(solver.eval("C{-2}"),  "Substance(mass=12.010 Z=6 N=6.011 e=4)");
+    // EXPECT_EQ(solver.eval("C{+}"),   "Substance(mass=12.011 Z=6 N=6.011 e=7)");
+    // EXPECT_EQ(solver.eval("C{12-}"), "Substance(mass=11.999 Z=6 N=6.000 e=5)");
+    // EXPECT_EQ(solver.eval("C{13}"),  "Substance(mass=13.003 Z=6 N=7.000 e=6)");
+    // EXPECT_EQ(solver.eval("C{13-2}"),"Substance(mass=13.002 Z=6 N=7.000 e=4)");
 }
