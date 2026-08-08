@@ -242,7 +242,9 @@ namespace snt::dip {
                             throw std::runtime_error("Modifying undefined node: " + node->line.code);
                     }
                     if (vnode == nullptr)
-                        throw std::runtime_error("Only value nodes can be inserted into an environment.");
+                        throw std::runtime_error(
+                            "Only value nodes can be inserted into an environment: " + node->line.code
+                        );
                     target.nodes.push_back(vnode);
                 }
             }

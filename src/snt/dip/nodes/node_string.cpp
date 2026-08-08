@@ -110,7 +110,10 @@ namespace snt::dip {
     }
 
     std::string StringNode::to_string(const core::StringFormatType& format) const {
-        return value->to_string(format);
+        if (value)
+            return value->to_string(format);
+        else
+            return std::string(KEYWORD_NONE);
     }
 
 } // namespace snt::dip

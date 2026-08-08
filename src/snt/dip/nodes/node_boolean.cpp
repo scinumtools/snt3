@@ -103,7 +103,10 @@ namespace snt::dip {
     }
 
     std::string BooleanNode::to_string(const core::StringFormatType& format) const {
-        return value->to_string();
+        if (value)
+            return value->to_string();
+        else
+            return std::string(KEYWORD_NONE);
     }
 
 } // namespace snt::dip

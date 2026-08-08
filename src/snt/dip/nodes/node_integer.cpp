@@ -190,9 +190,13 @@ namespace snt::dip {
 
     std::string IntegerNode::to_string(const core::StringFormatType& format) const {
         std::stringstream ss;
-        ss << value->to_string(format);
-        if (units)
-            ss << " " << units->to_string();
+        if (value) {
+            ss << value->to_string(format);
+            if (units)
+                ss << " " << units->to_string();
+        } else {
+            ss << std::string(KEYWORD_NONE);
+        }
         return ss.str();
     }
 

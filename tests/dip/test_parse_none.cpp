@@ -19,6 +19,22 @@ TEST(ParseNone, Definition) {
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_EQ(vnode->value_raw.size(), 0);
     EXPECT_EQ(vnode->value, nullptr);
+    EXPECT_EQ(vnode->to_string(), "none");
+
+    vnode = env.nodes.at(1);
+    EXPECT_EQ(vnode->value_raw.size(), 0);
+    EXPECT_EQ(vnode->value, nullptr);
+    EXPECT_EQ(vnode->to_string(), "none");
+
+    vnode = env.nodes.at(2);
+    EXPECT_EQ(vnode->value_raw.size(), 0);
+    EXPECT_EQ(vnode->value, nullptr);
+    EXPECT_EQ(vnode->to_string(), "none");
+
+    vnode = env.nodes.at(3);
+    EXPECT_EQ(vnode->value_raw.size(), 0);
+    EXPECT_EQ(vnode->value, nullptr);
+    EXPECT_EQ(vnode->to_string(), "none");
 }
 
 TEST(ParseNone, Arrays) {
@@ -35,6 +51,22 @@ TEST(ParseNone, Arrays) {
         dip::ValueNode::PointerType vnode = env.nodes.at(0);
         EXPECT_EQ(vnode->value_raw.size(), 0);
         EXPECT_EQ(vnode->value, nullptr);
+        EXPECT_EQ(vnode->to_string(), "none");
+
+        vnode = env.nodes.at(1);
+        EXPECT_EQ(vnode->value_raw.size(), 0);
+        EXPECT_EQ(vnode->value, nullptr);
+        EXPECT_EQ(vnode->to_string(), "none");
+
+        vnode = env.nodes.at(2);
+        EXPECT_EQ(vnode->value_raw.size(), 0);
+        EXPECT_EQ(vnode->value, nullptr);
+        EXPECT_EQ(vnode->to_string(), "none");
+
+        vnode = env.nodes.at(3);
+        EXPECT_EQ(vnode->value_raw.size(), 0);
+        EXPECT_EQ(vnode->value, nullptr);
+        EXPECT_EQ(vnode->to_string(), "none");
     }
 
     // cannot be none if nonzero values are expected
@@ -48,15 +80,4 @@ TEST(ParseNone, Arrays) {
     } catch (...) {
         FAIL() << "Expected std::runtime_error";
     }
-
-    //// test empty arrays
-    //{
-    //    dip::DIP d;
-    //    d.add_string("jerk bool[:] = []");
-    //    dip::Environment env = d.parse();
-    //
-    //    dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    //    EXPECT_EQ(vnode->value_raw.size(), 0);
-    //    EXPECT_EQ(vnode->value, nullptr);
-    //}
 }
