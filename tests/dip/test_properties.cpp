@@ -111,7 +111,7 @@ TEST(Properties, Tags) {
     d.add_string("foo str = \"bar\"");
     d.add_string("  !tags [\"baz\",\"word\"]");
     dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
+    EXPECT_EQ(env.nodes.size(), 1); // tag is not returned as a separate node
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_TRUE(vnode);
@@ -197,7 +197,7 @@ TEST(Properties, OptionsInteger) {
     d.add_string("foo int = 32");
     d.add_string("  !options [16,32,64]");
     dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
+    EXPECT_EQ(env.nodes.size(), 1); // tag is not returned as a separate node
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_TRUE(vnode);
@@ -237,7 +237,7 @@ TEST(Properties, OptionsFloat) {
     d.add_string("foo float = 2.34");
     d.add_string("  !options [1,2.34,5.6e7]");
     dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
+    EXPECT_EQ(env.nodes.size(), 1); // tag is not returned as a separate node
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_TRUE(vnode);
@@ -277,7 +277,7 @@ TEST(Properties, OptionsString) {
     d.add_string("foo str = \"bar\"");
     d.add_string("  !options [\"bar\",\"snap\",\"pow\"]");
     dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
+    EXPECT_EQ(env.nodes.size(), 1); // tag is not returned as a separate node
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->options.size(), 3);
@@ -311,12 +311,33 @@ TEST(Properties, OptionsString) {
 TEST(Properties, OptionsMultiline) {
 
     dip::DIP d;
-    d.add_string("jerk str = \"snap\"");
-    d.add_string("  = snap");
-    d.add_string("  = crackle");
-    d.add_string("  = pop");
+    d.add_string(
+        "foo int = 32\n"
+        "  !options [\n"
+        "     16,  # small \n"
+        "     32,  # middle \n"
+        "     64   # large \n"
+        "  ]"
+    );
     dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 1); // tags is not returned as a separate node
+    EXPECT_EQ(env.nodes.size(), 1); // tag is not returned as a separate node
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->options.size(), 3);
+    EXPECT_EQ(vnode->options[0].value->to_string(), "16");
+    EXPECT_EQ(vnode->options[1].value->to_string(), "32");
+    EXPECT_EQ(vnode->options[2].value->to_string(), "64");
+
+    {
+        dip::DIP d;
+        d.add_string("jerk str = \"snap\"");
+        d.add_string("  = snap");
+        d.add_string("  = crackle");
+        d.add_string("  = pop");
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 1); // tag is not returned as a separate node
+    }
 }
 
 TEST(Properties, TableDelimiter) {

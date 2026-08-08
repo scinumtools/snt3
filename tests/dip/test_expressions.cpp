@@ -22,12 +22,16 @@ TEST(Expressions, NestedParentheses) {
     EXPECT_EQ(vnode->to_string(), "5.3 J");
 }
 
-TEST(Expressions, MultipleLines) {
+TEST(Expressions, MultiLineWithComments) {
 
     // define scalar
     dip::DIP d;
-    d.add_string("foo float = (( 1 + 4 )");
-    d.add_string("             - 3 )");
+    d.add_string(
+        "foo float = (\n"
+        "  ( 1 + 4 ) # first \n"
+        "  - 3       # second \n"
+        ")"
+    );
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 1);
 

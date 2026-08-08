@@ -696,14 +696,20 @@ namespace snt::dip {
     }
 
     bool Parser::part_comment() {
-        std::regex pattern(R"(^[ ]*#[ ]*(.*)$)");
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            comment = matchResult[1].str();
-            strip(matchResult[0].str());
-            return true;
-        }
-        return false;
+        size_t i = 0;
+        // Skip leading spaces.
+        while (i < code.size() && code[i] == ' ')
+            ++i;
+        // Must start with '#'.
+        if (i == code.size() || code[i] != '#')
+            return false;
+        ++i;
+        // Skip spaces after '#'.
+        while (i < code.size() && code[i] == ' ')
+            ++i;
+        comment = code.substr(i);
+        strip(code);
+        return true;
     }
 
     bool Parser::part_delimiter(const char symbol, const bool required) {

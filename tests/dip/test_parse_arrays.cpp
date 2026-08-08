@@ -112,11 +112,15 @@ TEST(ParseArrays, WhiteSpace) {
     // EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer);
 }
 
-TEST(ParseArrays, MultiLine) {
+TEST(ParseArrays, MultiLineWithComments) {
 
     dip::DIP d;
-    d.add_string("foo bool[2,2] = [[true,  true],");
-    d.add_string("                 [true, false]]");
+    d.add_string(
+        "foo bool[2,2] = [\n"
+        "  [true,  true], # first \n"
+        "  [true, false]  # second \n"
+        "]"
+    );
     dip::Environment env = d.parse();
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);

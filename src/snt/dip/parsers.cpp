@@ -88,6 +88,27 @@ namespace snt::dip {
         return balance;
     }
 
+    inline std::string remove_comments(const std::string& str) {
+        bool in_quotes = false;
+        bool escaped = false;
+
+        for (size_t i = 0; i < str.size(); ++i) {
+            char c = str[i];
+
+            if (escaped) {
+                escaped = false;
+            } else if (c == '\\') {
+                escaped = true;
+            } else if (c == '"') {
+                in_quotes = !in_quotes;
+            } else if (c == '#' && !in_quotes) {
+                return str.substr(0, i);
+            }
+        }
+
+        return str;
+    }
+
     BaseNode::ListType parse_code_nodes(std::queue<Line>& lines) {
         BaseNode::ListType nodes;
         while (!lines.empty()) {
@@ -121,7 +142,7 @@ namespace snt::dip {
                 while (balance > 0 && !lines.empty()) {
                     Line next = lines.front();
                     lines.pop();
-                    line.code += next.code;
+                    line.code += remove_comments(next.code);
                     balance += count_group_balance(next.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
                 }
                 if (balance != 0) {
@@ -134,7 +155,7 @@ namespace snt::dip {
                 while (balance > 0 && !lines.empty()) {
                     Line next = lines.front();
                     lines.pop();
-                    line.code += next.code;
+                    line.code += remove_comments(next.code);
                     balance += count_group_balance(next.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
                 }
                 if (balance != 0) {
