@@ -328,16 +328,6 @@ TEST(Properties, OptionsMultiline) {
     EXPECT_EQ(vnode->options[0].value->to_string(), "16");
     EXPECT_EQ(vnode->options[1].value->to_string(), "32");
     EXPECT_EQ(vnode->options[2].value->to_string(), "64");
-
-    {
-        dip::DIP d;
-        d.add_string("jerk str = \"snap\"");
-        d.add_string("  = snap");
-        d.add_string("  = crackle");
-        d.add_string("  = pop");
-        dip::Environment env = d.parse();
-        EXPECT_EQ(env.nodes.size(), 1); // tag is not returned as a separate node
-    }
 }
 
 TEST(Properties, TableDelimiter) {

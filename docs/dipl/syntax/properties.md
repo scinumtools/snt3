@@ -19,46 +19,6 @@ Initial code parameters often accept only a few discrete input values, also call
 These can be explicitly described during node definition or declaration.
 
 ``` DIPL-Schema
-# Schema of a node option
-<indent>= <value> <unit>
-<indent>= <value>
-```
-
-Node options can be specified for all data types except boolean.
-In case of boolean, the two options (``true`` or ``false``) are implicitly set.
-Individual options are specified directly under particular nodes starting with equal sign.
-Options cannot be separated from nodes by an empty line.
-All options corresponding to the same node must have the same indent, higher than the node.
-
-``` DIPL
-coordinates int = 1
-  = 1  # carthesian
-  = 2  # polar
-  = 3  # spherical
-```
-
-If the node has an other value than one of the options, DIPL will throw an error message.
-
-Node definition and individual options can have different units, but they must have the same dimensionality. The final value of such modified node will be, however, converted into units specified in the definition.
-
-``` DIPL
-animal str = "dog"
-  = cat
-  = dog
-  = horse
-
-energy float = 23 erg   # definition
-  = 43                  # option in same units
-  = 23 erg              # option in same units
-  = 3e-7 J              # option in different unit of energy
-
-energy = 3e-7 J         # modification
-# energy = 3 erg        # final value
-```
-
-If the number of options is too large, and it is not practical to write each option on a new line, it is also possible to use a shorthand ``!options`` option notation.
-
-``` DIPL-Schema
 # Schema of an option array
 
 <indent>!options <value> <unit>
@@ -67,21 +27,40 @@ If the number of options is too large, and it is not practical to write each opt
 
 The expected value of this clause is a list of values.
 It can be given explicitly or as a [reference](references.md#3.4.-references).
-Similiarly as in the cases above, units are optional and must be of the same dimension as those given in the corresponding definition.
-   
-Several ``!options`` clauses are allowed for the same node (e.g. each with different units).
-They combine into a single array of options against which the node value is evaluated.
-     
+
+Node options can be specified for all data types except boolean.
+In case of boolean, the two options (``true`` or ``false``) are implicitly set.
+If the node has an other value than one of the options, DIPL will throw an error message.
+
+Node definition and individual options can have different units, but they must have the same dimensionality. 
+The final value of such modified node will be, however, converted into units specified in the definition.
+
 ``` DIPL
 animal str = "dog"
   !options ["cat","dog","horse"]
 
+energy float = 23 erg   # definition
+  !options [43, 89]              # option in same units
+  !options [23, 34] erg          # option in same units
+  !options [3e-7, 5e+3] J        # option in different unit of energy
+
+energy = 3e-7 J         # modification
+# energy = 3 erg        # final value
+```
+   
+Multiple ``!options`` clauses are allowed for the same node (e.g. each with different units).
+They combine into a single array of options against which the node value is evaluated.
+
+```DIPL
 energy float = 23 J
   !options [23, 45, 10, 234, 490, 1939] J
   !options [34, 234] erg
 # all options: [23, 45, 10, 234, 490, 1939, 3.4e-6, 2.34e-7] J
+```
 
-# individual options can have comments
+If individual options need some additional description, this can be included in a comment.
+
+``` DIPL
 resolution int = 16
   !options [
     16,  # low
