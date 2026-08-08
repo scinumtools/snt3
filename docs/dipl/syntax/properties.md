@@ -80,6 +80,14 @@ energy float = 23 J
   !options [23, 45, 10, 234, 490, 1939] J
   !options [34, 234] erg
 # all options: [23, 45, 10, 234, 490, 1939, 3.4e-6, 2.34e-7] J
+
+# individual options can have comments
+resolution int = 16
+  !options [
+    16,  # low
+    32,  # medium
+    64   # high
+  ]
 ```
 
 #### Condition

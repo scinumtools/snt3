@@ -312,11 +312,11 @@ TEST(Properties, OptionsMultiline) {
 
     dip::DIP d;
     d.add_string(
-        "foo int = 32\n"
+        "resolution int = 32\n"
         "  !options [\n"
-        "     16,  # small \n"
-        "     32,  # middle \n"
-        "     64   # large \n"
+        "     16,  # low \n"
+        "     32,  # medium \n"
+        "     64   # high \n"
         "  ]"
     );
     dip::Environment env = d.parse();
