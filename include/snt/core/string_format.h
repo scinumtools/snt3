@@ -29,6 +29,8 @@ namespace snt::core {
                 ss << std::scientific << value;
             } else if (format.specifier == 'f') {
                 ss << std::fixed << value;
+            } else if (format.specifier == 'd') {
+                ss << std::dec << value;
             } else if (format.specifier == 'g') {
                 ss << std::defaultfloat;
                 int exp_val = std::floor(std::log10(std::fabs(value))); // rounded exponent

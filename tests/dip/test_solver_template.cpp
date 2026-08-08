@@ -21,6 +21,7 @@ TEST(SolverTemplate, NumberFormatting) {
 
     dip::DIP d;
     d.add_string("foo float = 1.23456e7 cm");
+    d.add_string("bar int = 123 cm");
     dip::Environment env = d.parse();
 
     dip::TemplateSolver solver(env);
@@ -55,6 +56,10 @@ TEST(SolverTemplate, NumberFormatting) {
     EXPECT_EQ(data.value->to_string(), "\"foo: 012345600.0 cm\"");
     data = solver.eval("foo: {{?foo}:011e}");
     EXPECT_EQ(data.value->to_string(), "\"foo: 01.2346e+07 cm\"");
+
+    // integers with leading zeros
+    data = solver.eval("bar: {{?bar}:05d}");
+    EXPECT_EQ(data.value->to_string(), "\"bar: 00123 cm\"");
 }
 
 TEST(SolverTemplate, ArraySlicing) {

@@ -662,7 +662,7 @@ namespace snt::dip {
     }
 
     bool Parser::part_format() {
-        std::regex pattern(R"(^:([0-9]*)(?:[.]([0-9]+))?([sfeg]+))"); //^\\[([0-9:,]*)\\]");
+        std::regex pattern(R"(^:([0-9]*)(?:[.]([0-9]+))?([sfegd]+))"); //^\\[([0-9:,]*)\\]");
         std::smatch matchResult;
         if (std::regex_search(code, matchResult, pattern)) {
             formatting = {matchResult[1].str(), matchResult[2].str(), matchResult[3].str()};
