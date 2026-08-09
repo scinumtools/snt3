@@ -33,6 +33,8 @@ namespace snt::bind::python {
 
         val.def_property_readonly("shape", [](const dip::ValueNode& vnode) { return vnode.value->get_shape(); });
 
+        val.def("to_string", &dip::ValueNode::to_string, py::arg("format") = core::StringFormatType());
+
         val.def("to_numpy", [](const dip::ValueNode& vnode) -> py::object { return to_numpy_value(vnode.value); });
     }
 

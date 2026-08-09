@@ -16,6 +16,8 @@ def test_select_node():
     assert type(env.nodes[0]) == ValueNode
     assert env.nodes[0].name == "foo"
     assert env.nodes[0].value == False
+    assert env.nodes[0].to_string() == "false"
+    assert str(env.nodes[0]) == "false"
     np.testing.assert_array_equal(env.nodes[1].to_numpy(), np.array([[True,False,True],[False,True,False]]))
 
     # initialize integer nodes
@@ -28,6 +30,8 @@ def test_select_node():
     assert env.nodes[0].name == "foo"
     assert env.nodes[0].value == 3
     assert env.nodes[0].units == Quantity('cm')
+    assert env.nodes[0].to_string() == "3 cm"
+    assert str(env.nodes[0]) == "3 cm"
     np.testing.assert_array_equal(env.nodes[1].to_numpy(), np.array([[1,2,3],[4,5,6]]))
 
     # initialize floating point nodes
@@ -39,6 +43,8 @@ def test_select_node():
     assert env.size == 2
     assert env.nodes[0].name == "foo"
     assert env.nodes[0].value == 3.45
+    assert env.nodes[0].to_string() == "3.45"
+    assert str(env.nodes[0]) == "3.45"
     np.testing.assert_allclose(
         env.nodes[1].to_numpy(),
         np.array([[1.2,2.3,3.4],[4.5,5.6,6.7]]),
@@ -55,6 +61,8 @@ def test_select_node():
     assert env.size == 2
     assert env.nodes[0].name == "foo"
     assert env.nodes[0].value == 'A'
+    assert env.nodes[0].to_string() == "\"A\""
+    assert str(env.nodes[0]) == "\"A\""
     np.testing.assert_array_equal(env.nodes[1].to_numpy(), np.array([['a','b','c'],['d','e','f']]))
     
 def test_request_group():
