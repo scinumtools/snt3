@@ -312,4 +312,21 @@ TEST(References, RelativePath) {
     EXPECT_EQ(vnode->path.name, "foo.bar.snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "3");
+
+    // Throw an error if trying to reference beyond root nodes
+
+    d = dip::DIP();
+    d.add_string(
+        "crackle int = 3\n"
+        "pop\n"
+        "  snap int = {..crackle}\n"
+    );
+    try {
+        d.parse();
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(e.what(), "");
+    } catch (...) {
+        FAIL() << "Expected std::runtime_error";
+    }
 }
