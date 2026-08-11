@@ -2,6 +2,8 @@
 
 *Unit-safe, strongly typed, validated input parameters for scientific and engineering software.*
 
+*Focus on what matters, not on what gets in the way.*
+
 [![Build](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml)
 [![codecov](https://codecov.io/github/vrtulka23/scinumtools3/graph/badge.svg?token=8A25K1T7XM)](https://codecov.io/github/vrtulka23/scinumtools3)
 [![Documentation](https://img.shields.io/badge/docs-online-blue)](https://vrtulka23.github.io/scinumtools3/)
