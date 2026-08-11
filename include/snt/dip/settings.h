@@ -115,6 +115,7 @@ namespace snt::dip {
         Array,        // value was parsed from an array
         Reference,    // value was obtained from a reference
         ReferenceRaw, // value was optained from a raw reference
+        ReferenceRel, // value was obtained from a relative reference
         Function,     // value was returned from a function
         Expression,   // value was parsed from an expression
         Schema        // value is a schema name

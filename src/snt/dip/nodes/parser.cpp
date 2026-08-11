@@ -426,6 +426,12 @@ namespace snt::dip {
         if (pos >= code.size() || code[pos] != '{')
             return false;
         ++pos;
+        // relative path starts with dots .
+        int parent = 0;
+        while (pos < code.size() && code[pos] == SIGN_SEPARATOR) {
+            parent++;
+            ++pos;
+        }
         // match a source keyword
         std::string keyword;
         while (pos < code.size()) {
@@ -452,7 +458,10 @@ namespace snt::dip {
         } else {
             if (keyword.empty())
                 throw std::runtime_error("Reference cannot be empty: " + line.code);
-            value_origin = ValueOrigin::ReferenceRaw;
+            if (parent > 0)
+                value_origin = ValueOrigin::ReferenceRel;
+            else
+                value_origin = ValueOrigin::ReferenceRaw;
         }
         // match closing }
         if (pos >= code.size() || code[pos] != '}')

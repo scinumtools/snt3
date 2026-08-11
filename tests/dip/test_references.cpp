@@ -287,3 +287,29 @@ TEST(References, MatchCollectionPath) {
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "3");
 }
+
+TEST(References, RelativePath) {
+
+    dip::DIP d;
+    d.add_string(
+        "foo\n"
+        "  crackle int = 3\n"
+        "  bar\n"
+        "    pop bool = true\n"
+        "    jerk bool = {.pop}\n"
+        "    snap int = {..crackle}\n"
+    );
+
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 4);
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(2);
+    EXPECT_EQ(vnode->path.name, "foo.bar.jerk");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->value->to_string(), "true");
+
+    vnode = env.nodes.at(3);
+    EXPECT_EQ(vnode->path.name, "foo.bar.snap");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->value->to_string(), "3");
+}

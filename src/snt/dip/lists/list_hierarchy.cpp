@@ -102,6 +102,33 @@ namespace snt::dip {
         node->path.collections = std::move(collections_full);
     }
 
+    const std::string HierarchyList::get_absolute_path(const std::string& path) const {
+        if (!parents.empty()) {
+            size_t pos = 0;
+            size_t last_parent = parents.size();
+            // determine the parent depth from number of dots .
+            while (pos < path.size() && path[pos] == SIGN_SEPARATOR) {
+                if (last_parent > 0) {
+                    last_parent--;
+                    pos++;
+                } else {
+                    throw std::runtime_error("Relative path wants to access parents beyong root node: " + path);
+                }
+            }
+            // create new qualified path
+            std::stringstream new_path;
+            for (size_t parent = 0; parent < last_parent; parent++) {
+                if (parent > 0)
+                    new_path << SIGN_SEPARATOR;
+                new_path << parents[parent].name;
+            }
+            new_path << path.substr(pos - 1);
+            return "?" + new_path.str();
+        } else {
+            throw std::runtime_error("Relative path wants to access parents beyong root node: " + path);
+        }
+    }
+
     const std::unordered_map<std::string, Collection>& HierarchyList::get_collections() const {
         return collections;
     }

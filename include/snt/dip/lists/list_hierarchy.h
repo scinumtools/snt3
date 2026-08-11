@@ -42,6 +42,14 @@ namespace snt::dip {
         void record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded);
 
         /**
+         * Convert relative path to absolute
+         *
+         * @param path Relative path
+         * @return Corresponding absolute path
+         */
+        const std::string get_absolute_path(const std::string& path) const;
+
+        /**
          * Gets a reference on a ll collections
          *
          * @return Map of all collections
