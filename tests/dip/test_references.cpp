@@ -325,7 +325,7 @@ TEST(References, RelativePath) {
         d.parse();
         FAIL() << "Expected std::runtime_error";
     } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "");
+        EXPECT_STREQ(e.what(), "Relative path wants to access parents beyong root node: ..crackle");
     } catch (...) {
         FAIL() << "Expected std::runtime_error";
     }
