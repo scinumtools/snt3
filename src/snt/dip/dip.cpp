@@ -260,7 +260,7 @@ namespace snt::dip {
             if (vnode) {
                 vnode->validate_definition();
                 vnode->validate_options();
-                vnode->validate_condition();
+                vnode->validate_condition(target);
                 vnode->validate_format();
             } else {
                 throw std::runtime_error("Detected non-value node in the node list: " + target.nodes.at(i)->line.code);

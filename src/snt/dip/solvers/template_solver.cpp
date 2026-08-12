@@ -4,8 +4,9 @@
 
 namespace snt::dip {
 
-    TemplateSolver::TemplateSolver(Environment& env) {
+    TemplateSolver::TemplateSolver(Environment& env, Path cur) {
         environment = &env;
+        current = cur;
     }
 
     ValueNodeData TemplateSolver::eval(std::string expression) {
@@ -24,8 +25,12 @@ namespace snt::dip {
                     parser.part_format();
 
                     // request node from the environment and extract its value
-                    ValueNode::ListType nodes =
-                        environment->request_group(parser.value_raw.at(0), RequestType::Reference);
+                    std::string request = parser.value_raw.at(0);
+                    // resolve relative path
+                    if (!request.empty() && request[0] == SIGN_SEPARATOR)
+                        request = std::string(1, SIGN_QUERY) + current.resolve(request).name;
+                    // request absolute path
+                    ValueNode::ListType nodes = environment->request_group(request, RequestType::Reference);
                     if (nodes.size() != 1) {
                         throw std::runtime_error(
                             "Reference in a template should return only one node. "

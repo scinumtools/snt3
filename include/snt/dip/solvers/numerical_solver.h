@@ -17,8 +17,9 @@ namespace snt::dip {
          * Numerical solver constructor
          *
          * @param env Environment class object
+         * @param current Current path in the node hierarchy
          */
-        NumericalSolver(Environment& env);
+        NumericalSolver(Environment& env, Path current = Path(""));
 
         /**
          * Solve numerical DIP expression

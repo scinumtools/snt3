@@ -1,6 +1,8 @@
+#include <algorithm>
 #include <iostream>
 #include <snt/dip/nodes/path.h>
 #include <snt/dip/settings.h>
+#include <stdexcept>
 
 namespace snt::dip {
 
@@ -72,6 +74,35 @@ namespace snt::dip {
 
         name = path;                    // set full path name
         kind = collections.back().kind; // set final path kind
+    }
+
+    Path Path::resolve(const std::string& path) {
+        if (path == ".")
+            return name;
+        const std::size_t nDots = path.find_first_not_of('.');
+        if (nDots == 0)
+            return Path(path);
+        // Number of components in the current path.
+        const std::size_t nComponents = 1 + std::count(name.begin(), name.end(), '.');
+        if (nDots > nComponents)
+            throw std::runtime_error("Path traverses above root: " + path);
+        std::string result = name;
+        for (std::size_t i = 0; i < nDots; ++i) {
+            const std::size_t pos = result.rfind('.');
+            if (pos == std::string::npos) {
+                // Removing the root component.
+                result.clear();
+            } else {
+                result.erase(pos);
+            }
+        }
+        const std::string relative = path.substr(nDots);
+        if (!relative.empty()) {
+            if (!result.empty())
+                result += '.';
+            result += relative;
+        }
+        return Path(result);
     }
 
 } // namespace snt::dip

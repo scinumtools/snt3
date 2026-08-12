@@ -123,10 +123,27 @@ namespace snt::dip {
                 new_path << parents[parent].name;
             }
             new_path << path.substr(pos - 1);
-            return "?" + new_path.str();
+            return std::string(1, SIGN_QUERY) + new_path.str();
         } else {
             throw std::runtime_error("Relative path wants to access parents beyong root node: " + path);
         }
+    }
+
+    const Path HierarchyList::get_current_path(size_t indent, const std::string& path) const {
+        std::stringstream new_path;
+        for (size_t parent = 0; parent < parents.size(); parent++) {
+            if (parents[parent].indent >= indent)
+                continue;
+            if (parent > 0)
+                new_path << SIGN_SEPARATOR;
+            new_path << parents[parent].name;
+        }
+        if (!path.empty()) {
+            if (!new_path.str().empty())
+                new_path << SIGN_SEPARATOR;
+            new_path << path;
+        }
+        return Path(new_path.str());
     }
 
     const std::unordered_map<std::string, Collection>& HierarchyList::get_collections() const {

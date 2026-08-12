@@ -1,5 +1,7 @@
 #include <optional>
+#include <snt/dip/environment.h>
 #include <snt/dip/nodes/node_value.h>
+#include <snt/dip/solvers/logical_solver.h>
 #include <sstream>
 
 namespace snt::dip {
@@ -214,13 +216,18 @@ namespace snt::dip {
             throw std::runtime_error("Declared node has undefined value: " + line.code);
     }
 
-    void ValueNode::validate_condition() const {
+    void ValueNode::validate_condition(Environment& env) const {
         if (!condition.empty()) {
-            if (condition == core::KEYWORD_FALSE)
+            if (condition == core::KEYWORD_FALSE) {
                 throw std::runtime_error("Node does not satisfy the given condition: " + condition);
-            else if (condition == core::KEYWORD_TRUE)
+            } else if (condition == core::KEYWORD_TRUE) {
                 return;
-            // TODO: implement expression solver
+            } else {
+                LogicalSolver solver(env, path);
+                ValueNodeData data = solver.eval(condition);
+                if (data.value->to_string() == std::string(core::KEYWORD_FALSE))
+                    throw std::runtime_error("Node does not satisfy the given condition: " + condition);
+            }
         }
     }
 

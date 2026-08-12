@@ -51,7 +51,7 @@ namespace snt::dip {
                     break;
                 }
                 case ValueOrigin::Expression: {
-                    LogicalSolver solver(env);
+                    LogicalSolver solver(env, path);
                     ValueNodeData data = solver.eval(value_raw.at(0));
                     value = std::move(data.value)->all_of();
                     break;

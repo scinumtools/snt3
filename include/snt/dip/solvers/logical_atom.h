@@ -2,11 +2,13 @@
 #define DIP_LOGICAL_ATOM_H
 
 #include <snt/dip/environment.h>
+#include <snt/dip/nodes/path.h>
 
 namespace snt::dip {
 
     struct LogicalSettings : exs::BaseSettings {
-        Environment* env;
+        Environment* env; ///< Environment for the references
+        Path current;     ///< Current path for in the hierarchy
     };
 
     class LogicalAtom : public exs::AtomBase<LogicalAtom, ValueNodeData> {

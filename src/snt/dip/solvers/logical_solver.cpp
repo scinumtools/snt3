@@ -41,9 +41,9 @@ namespace snt::dip {
         return exs::Solver<LogicalAtom, LogicalSettings>(operators, steps);
     }();
 
-    LogicalSolver::LogicalSolver(Environment& env) {
+    LogicalSolver::LogicalSolver(Environment& env, Path current) {
 
-        LogicalSettings settings = {{}, &env};
+        LogicalSettings settings = {{}, &env, current};
 
         solver.set_settings(settings);
     }

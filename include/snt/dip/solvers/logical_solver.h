@@ -17,8 +17,9 @@ namespace snt::dip {
          * Logical solver constructor
          *
          * @param env Environment class object
+         * @param current Current path in the node hierarchy
          */
-        LogicalSolver(Environment& env);
+        LogicalSolver(Environment& env, Path current = Path(""));
 
         /**
          * Solve logical DIP expression

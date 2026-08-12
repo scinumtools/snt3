@@ -74,9 +74,9 @@ namespace snt::dip {
         return exs::Solver<NumericalAtom, NumericalSettings>(operators, steps);
     }();
 
-    NumericalSolver::NumericalSolver(Environment& env) {
+    NumericalSolver::NumericalSolver(Environment& env, Path current) {
 
-        NumericalSettings settings = {{}, &env};
+        NumericalSettings settings = {{}, &env, current};
 
         solver.set_settings(settings);
     }

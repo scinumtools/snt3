@@ -81,8 +81,9 @@ TEST(SolverNumerical, GroupOperators) {
     EXPECT_EQ(data.value->to_string(), "-0.6536");
 }
 
-TEST(SolverNumerical, Injections) {
+TEST(SolverNumerical, References) {
 
+    // solve expressions
     dip::DIP d;
     d.add_string("foo float = 4.52");
     d.add_string("bar int = 3");
@@ -91,4 +92,23 @@ TEST(SolverNumerical, Injections) {
     dip::NumericalSolver solver(env);
     dip::ValueNodeData data = solver.eval("sin( {?foo} ) - 2 * {?bar}");
     EXPECT_EQ(data.value->to_string(), "-6.982");
+
+    // solve traversing
+    d = dip::DIP();
+    d.add_string(
+        "snap int = 3\n"
+        "foo.bar\n"
+        "  crackle float = 1.23e4\n"
+    );
+    env = d.parse();
+    dip::Path current("foo.bar");
+
+    // solve absolute path
+    solver = dip::NumericalSolver(env, current);
+    data = solver.eval("{?foo.bar.crackle}");
+    EXPECT_EQ(data.value->to_string(), "1.23e4");
+
+    // solve relative path
+    data = solver.eval("{..snap}");
+    EXPECT_EQ(data.value->to_string(), "3");
 }

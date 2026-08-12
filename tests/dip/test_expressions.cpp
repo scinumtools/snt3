@@ -53,3 +53,23 @@ TEST(Expressions, MultiLineWithComments) {
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 }
+
+TEST(Expressions, RelativeReferences) {
+
+    // solve traversing
+    dip::DIP d;
+    d.add_string(
+        "snap int = 30\n"
+        "foo\n"
+        "  bar\n"
+        "    crackle float = 1.23e4\n"
+        "    jerk float = ({.crackle} + {...snap})"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 3);
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(2);
+    EXPECT_EQ(vnode->path.name, "foo.bar.jerk");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->to_string(), "1.233e4");
+}

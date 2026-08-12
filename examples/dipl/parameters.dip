@@ -10,7 +10,7 @@ simulation
     dt float = 1e-3 s
     end float = 10 s
     steps int = ({?simulation.time.end} / {?simulation.time.dt})  # computed value
-      !condition ({?} > 0)                    # validation
+      !condition ({.} > 0)                    # validation
   solver
     restart_file str = none                   # optional value
   boundary[inlet]                             # node collections

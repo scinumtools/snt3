@@ -48,6 +48,22 @@ namespace snt::dip {
          * @param path Path that will be parsed
          */
         Path(const std::string& path);
+
+        /**
+         * Create absolute path from a relative path.
+         *
+         * Each leading dot moves one level up.
+         * A single "." refers to the current path.
+         *
+         * Examples:
+         *   "."              -> foo.bar.baz
+         *   ".snap.crackle"  -> foo.bar.snap.crackle
+         *   "..snap.crackle" -> foo.snap.crackle
+         *
+         * @param path Relative path
+         * @return Absolute path
+         */
+        Path resolve(const std::string& path);
     };
 
 } // namespace snt::dip

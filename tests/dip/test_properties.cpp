@@ -161,7 +161,7 @@ TEST(Properties, Condition) {
     EXPECT_EQ(vnode->path.name, "copy");
     EXPECT_EQ(vnode->condition, "true");
 
-    // Throw an error if indent is not higher
+    // Throw an error if condition is false
     d = dip::DIP();
     d.add_string("foo str = \"bar\"");
     d.add_string("  !condition false");
@@ -173,6 +173,43 @@ TEST(Properties, Condition) {
     } catch (...) {
         FAIL() << "Expected std::runtime_error";
     }
+
+    // Test self reference
+    d = dip::DIP();
+    d.add_string("foo int = 3");
+    d.add_string("  !condition ({.} > 2)");
+    env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 1); // condition is not returned as a separate node
+
+    vnode = env.nodes.at(0);
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->condition, "{.} > 2");
+
+    // Throw an error if condition is false
+    d = dip::DIP();
+    d.add_string("foo int = 1");
+    d.add_string("  !condition ({.} > 2)");
+    try {
+        d.parse();
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(e.what(), "Node does not satisfy the given condition: {.} > 2");
+    } catch (...) {
+        FAIL() << "Expected std::runtime_error";
+    }
+
+    // solve traversing
+    d = dip::DIP();
+    d.add_string(
+        "snap int = 3\n"
+        "foo\n"
+        "  bar\n"
+        "    crackle float = 1.23e4\n"
+        "  jerk float = 3\n"
+        "    !condition ({?foo.bar.crackle} > {..snap} && {.} == 3)"
+    );
+    env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 3); // condition is not returned as a separate node
 }
 
 TEST(Properties, OptionsBolean) {

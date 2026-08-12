@@ -10,6 +10,11 @@
 namespace snt::dip {
 
     /**
+     * Forward declaration of the Environment
+     */
+    class Environment;
+
+    /**
      * Set of node and value metadata
      */
     struct ValueMetadata {
@@ -96,7 +101,7 @@ namespace snt::dip {
         };
         void validate_constant() const;
         void validate_definition() const;
-        void validate_condition() const;
+        void validate_condition(Environment& env) const;
         virtual void validate_options() const;
         virtual void validate_format() const;
 

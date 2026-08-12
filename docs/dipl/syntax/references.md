@@ -69,17 +69,52 @@ The ``.*`` suffix selects all descendant nodes of the target node recursively, i
 If a query path does not exist, evaluation MUST fail.
 If a reference returns multiple nodes in a context that requires a single value, evaluation MUST fail.
 
-#### 3.4.1.4. Self-Reference (``{?}``)
+#### 3.4.1.4. Self-Reference and Relative References (`{.}`, `{.path}`, `{..path}`)
 
-The ``{?}`` reference is only valid within [condition properties](properties.md#3.8.2.-condition) and MUST NOT appear in any other context.
-It refers to the fully evaluated value of the current node after:
-- resolution of all references,
-- evaluation of all expressions, and
-- normalization to the canonical unit representation defined in the Units specification.
+The `{.}` reference is a **self-reference** and is valid only within [condition properties](properties.md#3.8.2.-condition). 
+It MUST NOT appear in any other context.
 
-The resulting value retains its full type, including dimensionality and unit.
+The `{.}` reference evaluates to the **fully evaluated value of the current node**, after:
 
-If evaluation of the node’s value fails for any reason (e.g., unresolved references, type errors, or unit incompatibility), the ``{?}`` reference is undefined and condition evaluation MUST result in an error.
+* resolution of all references;
+* evaluation of all expressions; and
+* normalization to the canonical unit representation defined in the Units specification.
+
+The resulting value retains its complete type information, including dimensionality and unit.
+
+If evaluation of the current node's value fails for any reason, including unresolved references, type errors, or unit incompatibility, the `{.}` reference is undefined. 
+In such a case, evaluation of the condition MUST result in an error.
+
+**Relative references** identify nodes relative to the current node and are written as `{.path}`, `{..path}`, `{...path}`, etc.
+
+The number of leading dots determines the level at which the path is resolved:
+
+* `{.path}` resolves `path` relative to the **current node**;
+* `{..path}` resolves `path` relative to the **parent** of the current node;
+* `{...path}` resolves `path` relative to the **grandparent** of the current node;
+* in general, *N* leading dots resolve `path` relative to the node *N − 1* levels above the current node.
+
+A relative reference MUST NOT traverse beyond the root node. 
+Such a reference is invalid and MUST result in an error.
+
+The following example demonstrates the resolution of self and relative references:
+
+```DIPL
+uncle str = "John"
+aunt str = "Jessica"
+father str = "William"
+  daughter str = {..aunt}
+  son str = "Eliah"
+    grandson str = {...uncle}
+brother-in-law str = {.uncle}
+```
+
+Here:
+
+* `{..aunt}` in `daughter` resolves `aunt` relative to `daughter`'s parent, `father`.
+* `{...uncle}` in `grandson` resolves `uncle` relative to `grandson`'s grandparent.
+* `{.uncle}` in `brother-in-law` resolves `uncle` relative to the current node's parent/context according to the node hierarchy.
+* `{.}` refers exclusively to the fully evaluated value of the current node and is therefore distinct from `{.path}`.
 
 #### 3.4.1.5. Reference Result Types
 
@@ -111,8 +146,9 @@ The expected type MUST match the usage context. Otherwise, evaluation MUST fail.
 {?*}                           # local
 {<source>?*}                   # remote
 
-# node self-reference
-{?}                            # local
+# self and relative rferences
+{.}                            # local
+{...<query>}                   # local
 ```
 
 ### 3.4.2 Imports

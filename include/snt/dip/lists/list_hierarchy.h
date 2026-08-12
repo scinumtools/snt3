@@ -50,6 +50,15 @@ namespace snt::dip {
         const std::string get_absolute_path(const std::string& path) const;
 
         /**
+         * Get path of the current hierarchy level
+         *
+         * @param indent Indent of a new node
+         * @param path Path name of a new node
+         * @return Path of the current hierarchy level
+         */
+        const Path get_current_path(size_t indent = 0, const std::string& path = "") const;
+
+        /**
          * Gets a reference on a ll collections
          *
          * @return Map of all collections

@@ -7,7 +7,8 @@
 namespace snt::dip {
 
     struct NumericalSettings : exs::BaseSettings {
-        Environment* env;
+        Environment* env; ///< Environment for the references
+        Path current;     ///< Current path for in the hierarchy
     };
 
     class NumericalAtom : public exs::AtomBase<NumericalAtom, ValueNodeData> {

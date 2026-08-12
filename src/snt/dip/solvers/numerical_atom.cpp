@@ -22,7 +22,12 @@ namespace snt::dip {
         Parser parser({s, {"NUMERICAL_ATOM", 0}});
         NumericalSettings* csettings = static_cast<NumericalSettings*>(settings);
         if (parser.part_reference()) {
-            return csettings->env->request_node_data(parser.value_raw.at(0), RequestType::Reference);
+            std::string request = parser.value_raw.at(0);
+            // resolve relative path
+            if (!request.empty() && request[0] == SIGN_SEPARATOR)
+                request = std::string(1, SIGN_QUERY) + csettings->current.resolve(request).name;
+            // request absolute path
+            return csettings->env->request_node_data(request, RequestType::Reference);
         } else if (parser.part_literal()) {
             ValueNode::PointerType vnode = nullptr;
             if (vnode == nullptr)

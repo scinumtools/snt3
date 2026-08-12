@@ -50,7 +50,7 @@ namespace snt::dip {
         case ValueOrigin::Keyword:
         case ValueOrigin::Number:
         case ValueOrigin::Expression: {
-            TemplateSolver solver(env);
+            TemplateSolver solver(env, env.hierarchy.get_current_path(indent, path.name));
             ValueNodeData data = solver.eval(value_raw.at(0));
             set_value(std::move(data.value));
             break;

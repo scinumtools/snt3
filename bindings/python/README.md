@@ -121,15 +121,15 @@ Example parameter specification:
 simulation
 
   timestep float = 0.5 fs
-    !condition ({?} > 0.0 fs)
+    !condition ({.} > 0.0 fs)
 
   temperature float = 300 K
-    !condition ({?} > 0 K)
+    !condition ({.} > 0 K)
 
   pressure float = 1 atm
 
   steps int = 1000000
-    !condition ({?} > 1)
+    !condition ({.} > 1)
 
   duration float = ( {?simulation.timestep} * {?simulation.steps} )
 

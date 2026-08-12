@@ -83,7 +83,6 @@ TEST(SolverTemplate, StringFormatting) {
     dip::DIP d;
     d.add_string("foo str = \"bar\"");
     dip::Environment env = d.parse();
-
     dip::TemplateSolver solver(env);
     dip::ValueNodeData data;
 
@@ -92,4 +91,26 @@ TEST(SolverTemplate, StringFormatting) {
 
     data = solver.eval("foo: {{?foo}:5s}");
     EXPECT_EQ(data.value->to_string(), "\"foo:   bar\"");
+}
+
+TEST(SolverNumerical, ReferenceTraversing) {
+
+    // solve traversing
+    dip::DIP d;
+    d.add_string(
+        "snap str = \"pop\"\n"
+        "foo.bar\n"
+        "  crackle float = 1.23e4\n"
+    );
+    dip::Environment env = d.parse();
+    dip::Path current("foo.bar");
+
+    // solve absolute path
+    dip::TemplateSolver solver(env, current);
+    dip::ValueNodeData data = solver.eval("crackle: {{?foo.bar.crackle}}");
+    EXPECT_EQ(data.value->to_string(), "\"crackle: 1.23e4\"");
+
+    // solve relative path
+    data = solver.eval("snap: {{..snap}}");
+    EXPECT_EQ(data.value->to_string(), "\"snap: pop\"");
 }

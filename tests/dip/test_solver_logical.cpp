@@ -104,8 +104,9 @@ TEST(SolverLogical, CombinedExpressions) {
     EXPECT_EQ(data.value->to_string(), "true");
 }
 
-TEST(SolverLogical, Injections) {
+TEST(SolverLogical, References) {
 
+    // solve expression
     dip::DIP d;
     d.add_string("foo bool = false");
     d.add_string("bar int = 3");
@@ -114,4 +115,23 @@ TEST(SolverLogical, Injections) {
     dip::LogicalSolver solver(env);
     dip::ValueNodeData data = solver.eval("2 == {?bar} && {?foo}");
     EXPECT_EQ(data.value->to_string(), "false");
+
+    // solve traversing
+    d = dip::DIP();
+    d.add_string(
+        "snap int = 3\n"
+        "foo.bar\n"
+        "  crackle bool = false\n"
+    );
+    env = d.parse();
+    dip::Path current("foo.bar");
+
+    // solve absolute path
+    solver = dip::LogicalSolver(env, current);
+    data = solver.eval("{?foo.bar.crackle}");
+    EXPECT_EQ(data.value->to_string(), "false");
+
+    // solve relative path
+    data = solver.eval("{..snap} == 3");
+    EXPECT_EQ(data.value->to_string(), "true");
 }

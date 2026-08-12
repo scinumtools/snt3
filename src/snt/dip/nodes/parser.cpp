@@ -444,7 +444,7 @@ namespace snt::dip {
             }
         }
         // match a node path
-        if (pos < code.size() && code[pos] == '?') {
+        if (pos < code.size() && code[pos] == '?') { // absolute path {keyword?path}
             ++pos;
             size_t path_begin = pos;
             while (pos < code.size() && code[pos] != '}')
@@ -456,11 +456,13 @@ namespace snt::dip {
             if (!path.empty())
                 Path expr(path); // test if request is a fully qualified path?
         } else {
-            if (keyword.empty())
-                throw std::runtime_error("Reference cannot be empty: " + line.code);
-            if (parent > 0)
+            if (parent == 1) // self-reference {.} or relative reference {.path}
                 value_origin = ValueOrigin::ReferenceRel;
-            else
+            else if (keyword.empty())
+                throw std::runtime_error("Reference cannot be empty: " + line.code);
+            else if (parent > 1) // relative reference {...path}
+                value_origin = ValueOrigin::ReferenceRel;
+            else // raw reference {source}
                 value_origin = ValueOrigin::ReferenceRaw;
         }
         // match closing }
