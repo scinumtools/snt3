@@ -292,8 +292,10 @@ TEST(References, RelativePath) {
 
     dip::DIP d;
     d.add_string(
+        "pebble str = \"dupl\"\n"
         "foo\n"
         "  crackle int = 3\n"
+        "  kuku str = {..pebble}\n"
         "  bar\n"
         "    pop bool = true\n"
         "    jerk bool = {.pop}\n"
@@ -301,14 +303,19 @@ TEST(References, RelativePath) {
     );
 
     dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 4);
+    EXPECT_EQ(env.nodes.size(), 6);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(2);
+    EXPECT_EQ(vnode->path.name, "foo.kuku");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->value->to_string(), "\"dupl\"");
+
+    vnode = env.nodes.at(4);
     EXPECT_EQ(vnode->path.name, "foo.bar.jerk");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "true");
 
-    vnode = env.nodes.at(3);
+    vnode = env.nodes.at(5);
     EXPECT_EQ(vnode->path.name, "foo.bar.snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "3");
@@ -319,13 +326,13 @@ TEST(References, RelativePath) {
     d.add_string(
         "crackle int = 3\n"
         "pop\n"
-        "  snap int = {..crackle}\n"
+        "  snap int = {...crackle}\n"
     );
     try {
         d.parse();
         FAIL() << "Expected std::runtime_error";
     } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Relative path wants to access parents beyong root node: ..crackle");
+        EXPECT_STREQ(e.what(), "Relative path wants to access parents beyong root node: ...crackle");
     } catch (...) {
         FAIL() << "Expected std::runtime_error";
     }

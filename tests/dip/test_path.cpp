@@ -40,7 +40,7 @@ TEST(Path, ResolveRelativePaths) {
         resolved = path.resolve("....snap.crackle");
         FAIL() << "Expected std::runtime_error";
     } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Path traverses above root: ....snap.crackle");
+        EXPECT_STREQ(e.what(), "Relative path wants to access parents beyong root node: ....snap.crackle");
     } catch (...) {
         FAIL() << "Expected std::runtime_error";
     }

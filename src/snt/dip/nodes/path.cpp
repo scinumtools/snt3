@@ -85,7 +85,7 @@ namespace snt::dip {
         // Number of components in the current path.
         const std::size_t nComponents = 1 + std::count(name.begin(), name.end(), '.');
         if (nDots > nComponents)
-            throw std::runtime_error("Path traverses above root: " + path);
+            throw std::runtime_error("Relative path wants to access parents beyong root node: " + path);
         std::string result = name;
         for (std::size_t i = 0; i < nDots; ++i) {
             const std::size_t pos = result.rfind('.');

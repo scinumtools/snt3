@@ -33,8 +33,14 @@ namespace snt::dip {
         case ValueOrigin::Function:
             set_value(env.request_value(value_raw.at(0), RequestType::Function));
             break;
-        case ValueOrigin::Reference: {
-            val::BaseValue::PointerType val = env.request_value(value_raw.at(0), RequestType::Reference);
+        case ValueOrigin::Reference:
+        case ValueOrigin::ReferenceRel: {
+            std::string query = value_raw.at(0);
+            if (value_origin == ValueOrigin::ReferenceRel) {
+                Path current = env.hierarchy.get_current_path(indent, path.name);
+                query = std::string(1, SIGN_QUERY) + current.resolve(query).name;
+            }
+            val::BaseValue::PointerType val = env.request_value(query, RequestType::Reference);
             if (val)
                 set_value(std::move(val));
             else

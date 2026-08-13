@@ -42,15 +42,12 @@ namespace snt::dip {
         void record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded);
 
         /**
-         * Convert relative path to absolute
-         *
-         * @param path Relative path
-         * @return Corresponding absolute path
-         */
-        const std::string get_absolute_path(const std::string& path) const;
-
-        /**
          * Get path of the current hierarchy level
+         *
+         * If indent and path is not provided, method returns the most recent path composed from
+         * parents in the stack. When provided, the method returns path relative to the given
+         * indent. E.g. if current path is 'foo.bar.baz' and group 'bar' has indent 2, than for
+         * input indent 2 and path `crackle`, the following path will be constructed: `foo.crackle`.
          *
          * @param indent Indent of a new node
          * @param path Path name of a new node
