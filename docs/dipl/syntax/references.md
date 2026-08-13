@@ -69,7 +69,7 @@ The ``.*`` suffix selects all descendant nodes of the target node recursively, i
 If a query path does not exist, evaluation MUST fail.
 If a reference returns multiple nodes in a context that requires a single value, evaluation MUST fail.
 
-#### 3.4.1.4. Self-Reference and Relative References (`{.}`, `{.path}`, `{..path}`)
+#### 3.4.1.4. Self-Reference and Relative References (`{.}`, `{.<query>}`)
 
 The `{.}` reference is a **self-reference** and is valid only within [condition properties](properties.md#3.8.2.-condition). 
 It MUST NOT appear in any other context.
@@ -85,13 +85,13 @@ The resulting value retains its complete type information, including dimensional
 If evaluation of the current node's value fails for any reason, including unresolved references, type errors, or unit incompatibility, the `{.}` reference is undefined. 
 In such a case, evaluation of the condition MUST result in an error.
 
-**Relative references** identify nodes relative to the current node and are written as `{.path}`, `{..path}`, `{...path}`, etc.
+**Relative references** identify nodes relative to the current node and are written as ``{.<query>}``, ``{..<query>}``, ``{...<query>}``, etc.
 
 The number of leading dots determines the level at which the path is resolved:
 
-* `{.path}` resolves `path` relative to the **current node**;
-* `{..path}` resolves `path` relative to the **parent** of the current node;
-* `{...path}` resolves `path` relative to the **grandparent** of the current node;
+* ``{.<query>}`` resolves `path` relative to the **current node**;
+* ``{..<query>}`` resolves `path` relative to the **parent** of the current node;
+* ``{...<query>}`` resolves `path` relative to the **grandparent** of the current node;
 * in general, *N* leading dots resolve `path` relative to the node *N − 1* levels above the current node.
 
 A relative reference MUST NOT traverse beyond the root node. 
@@ -106,15 +106,14 @@ father str = "William"
   daughter str = {..aunt}
   son str = "Eliah"
     grandson str = {...uncle}
-brother-in-law str = {.uncle}
+brother-in-law str = {.father}
 ```
 
 Here:
 
-* `{..aunt}` in `daughter` resolves `aunt` relative to `daughter`'s parent, `father`.
-* `{...uncle}` in `grandson` resolves `uncle` relative to `grandson`'s grandparent.
-* `{.uncle}` in `brother-in-law` resolves `uncle` relative to the current node's parent/context according to the node hierarchy.
-* `{.}` refers exclusively to the fully evaluated value of the current node and is therefore distinct from `{.path}`.
+* ``{..aunt}`` in `daughter` resolves `aunt` relative to `daughter`'s parent, `father`.
+* ``{...uncle}`` in `grandson` resolves `uncle` relative to `grandson`'s grandparent.
+* ``{.father}`` in `brother-in-law` resolves `father` relative to the current node's parent/context according to the node hierarchy.
 
 #### 3.4.1.5. Reference Result Types
 
@@ -122,9 +121,11 @@ Here:
 - raw content for text sources
 - root node set for DIPL sources
 
-``{?<query>}`` and ``{<source>?<query>}`` return:
+absolute references ``{?<query>}``, ``{<source>?<query>}`` and relative references ``{.<query>}`` return:
 - a single node, or
 - a node set (when using *)
+
+self-reference ``{.}`` refers exclusively to the fully evaluated value of the current node and is therefore distinct from `{.<query>}`.
 
 The expected type MUST match the usage context. Otherwise, evaluation MUST fail.
 
@@ -146,9 +147,9 @@ The expected type MUST match the usage context. Otherwise, evaluation MUST fail.
 {?*}                           # local
 {<source>?*}                   # remote
 
-# self and relative rferences
+# self and relative references
 {.}                            # local
-{...<query>}                   # local
+{.<query>}                     # local
 ```
 
 ### 3.4.2 Imports
