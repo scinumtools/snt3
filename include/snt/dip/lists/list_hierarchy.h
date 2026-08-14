@@ -71,6 +71,13 @@ namespace snt::dip {
         const Collection& get_collection(const std::string& path) const;
 
         /**
+         * Set a new collection
+         *
+         * @param path Collection fully qualified path
+         */
+        void set_collection(const std::string& path, Path::Kind kind);
+
+        /**
          * Get number of collections
          *
          * @return Number of collections

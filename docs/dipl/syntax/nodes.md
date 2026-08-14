@@ -169,23 +169,38 @@ family.aunt.dog = "Lassie"
 
 Collections extend group nodes to represent associative and sequential data structures.
 
-A collection item is declared by appending square brackets to a node name:
+Explicit declaration of a map or list collection is optional and is used only when defining collection [schemas](schemas.md). 
+A collection can be explicitly declared by adding the corresponding data type keyword immediately after the group node name:
 
-- `name[key]` denotes an item in a **keyed collection** (**map**).
-- `name[]` denotes an item in an **indexed collection** (**list**). Item indices are assigned implicitly, starting at `0`.
+```DIPL
+cars map    # declaration of a map collection
+ships list  # declaration of a list collection
+```
 
-A collection path shall be used consistently. Once a collection has been established as keyed or indexed, all subsequent items on the same path shall use the same collection type.
+In most cases, explicit declaration is unnecessary. 
+A collection is implicitly established by its first item. 
+A collection item is specified by appending square brackets to the node name:
+
+- `name[key]` denotes an item in a keyed collection (**map**).
+- `name[]` denotes an item in an indexed collection (**list**). Item indices are assigned implicitly, starting at `0`.
+
+A collection path shall use a consistent collection type. 
+Once a collection has been established as keyed or indexed, all subsequent items at the same path shall use the same collection type. 
+Mixing keyed and indexed items within a single collection is not permitted.
 
 Collections may be nested.
 
 Collection selectors are interpreted according to the type of the referenced collection.
 
-When resolving a fully-qualified path, all parent nodes shall already exist. Since the container type of each parent node is therefore known, selectors of the form `[value]` can be unambiguously interpreted either as map keys or list indices.
+When resolving a fully-qualified path, all parent nodes shall already exist. 
+Since the container type of each parent node is therefore known, selectors of the form `[value]` can be unambiguously interpreted either as map keys or list indices.
 
 Only the final path segment may create a new node or collection item.
 
 ```DIPL
 basket                      # group
+
+  food map                  # declaration (optional)
 
   food[vegetables]          # keyed collection
     carrots float = 0.5 kg
@@ -194,6 +209,8 @@ basket                      # group
   food[fruits]
     apples int = 3
     water_melons int = 1
+
+    berries list            # declaration (optional)
 
     berries[]               # indexed collection
       name str = "strawberry"

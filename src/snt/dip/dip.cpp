@@ -192,11 +192,6 @@ namespace snt::dip {
         Environment target = env;
         while (queue.size() > 0) {
             BaseNode::PointerType node = queue.pop_front();
-            // Convert relative reference paths to absolute
-            // if (node->value_origin == ValueOrigin::ReferenceRel && !node->value_raw.empty()) {
-            //    node->value_raw[0] = target.hierarchy.get_absolute_path(node->value_raw[0]);
-            //    node->value_origin = ValueOrigin::Reference;
-            //}
             // Perform specific node parsing outside of a condition block or inside of a valid condition block
             if (!target.branching.false_case() || node->dtype == NodeDtype::Case) {
                 BaseNode::ListType parsed = node->parse(target);

@@ -226,27 +226,48 @@ namespace snt::dip {
     }
 
     bool Parser::part_type(const bool required) {
-        constexpr auto pstr = ce_concat<70>(
-            "^[ ]+(u|)(",
-            KEYWORD_BOOLEAN,
-            "|",
-            KEYWORD_INTEGER,
-            "|",
-            KEYWORD_FLOAT,
-            "|",
-            KEYWORD_STRING,
-            "|table)(16|32|64|128|x|)"
-        );
-        std::regex pattern(pstr.data());
-        std::smatch matchResult;
-        if (std::regex_search(code, matchResult, pattern)) {
-            dtype_raw = {matchResult[1].str(), matchResult[2].str(), matchResult[3].str()};
-            strip(matchResult[0].str());
-            return true;
-        } else if (required) {
-            throw std::runtime_error("Type not recognized: " + line.code);
+        constexpr std::string_view types[] = {
+            KEYWORD_BOOLEAN, KEYWORD_INTEGER, KEYWORD_FLOAT, KEYWORD_STRING, KEYWORD_TABLE, KEYWORD_MAP, KEYWORD_LIST
+        };
+        constexpr std::string_view precisions[] = {"128", "64", "32", "16", "x"};
+        const auto fail = [&] {
+            if (required)
+                throw std::runtime_error("Type not recognized: " + line.code);
+            return false;
+        };
+        // stripping empty characters at the beginning
+        std::size_t n = code.find_first_not_of(' ');
+        if (n == std::string::npos)
+            return fail();
+        // match types
+        const auto match = [&](auto const& values) -> std::string {
+            for (auto v : values)
+                if (code.compare(n, v.size(), v) == 0) {
+                    n += v.size();
+                    return std::string(v);
+                }
+            return {};
+        };
+        std::string sign, type, precision;
+        type = match(types);
+        if (type == KEYWORD_MAP || type == KEYWORD_LIST || type == KEYWORD_TABLE) {
+            // nothing else
+        } else {
+            // match signess
+            if (type.empty() && n < code.size() && code[n] == 'u') {
+                sign = "u";
+                ++n;
+                type = match(types);
+            }
+            if (type.empty())
+                return fail();
+            // match precision
+            precision = match(precisions);
         }
-        return false;
+        // commit type
+        dtype_raw = {sign, type, precision};
+        strip(code.substr(0, n));
+        return true;
     }
 
     bool Parser::part_literal_boolean(const std::string& str) {

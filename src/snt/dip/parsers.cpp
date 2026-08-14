@@ -187,7 +187,7 @@ namespace snt::dip {
             if (node == nullptr)
                 parser.part_path();
             if (node == nullptr)
-                node = GroupNode::is_node(parser);
+                node = GroupNode::is_node(parser); // groups
             if (node == nullptr)
                 node = ImportNode::is_node(parser);
             if (node == nullptr)
@@ -204,6 +204,8 @@ namespace snt::dip {
                 node = StringNode::is_node(parser);
             if (node == nullptr)
                 node = TableNode::is_node(parser);
+            if (node == nullptr)
+                node = GroupNode::is_node(parser); // maps and lists
 
             // make sure that everything was parsed
             if (node == nullptr)

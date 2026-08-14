@@ -91,7 +91,15 @@ namespace snt::dip {
                 name_full += "[" + key + "]";
                 collections[name_full] = Collection{name_full, {}, Path::Kind::Item};
             } else if (cnode.kind == Path::Kind::Group) {
-                collections[name_full] = Collection{name_full, {}, Path::Kind::Group};
+                auto col = collections.find(name_full);
+                if (col != collections.end()) {
+                    // ignore if kind is map, or list
+                    if (col->second.kind != Path::Kind::Map && col->second.kind != Path::Kind::List)
+                        throw std::runtime_error("Collection with this name already exits: " + name_full);
+                } else {
+                    // register new collection
+                    collections[name_full] = Collection{name_full, {}, Path::Kind::Group};
+                }
             }
         }
 
@@ -129,6 +137,12 @@ namespace snt::dip {
             throw std::runtime_error("Collection does not exist: " + path);
         }
         return (it->second);
+    }
+
+    void HierarchyList::set_collection(const std::string& path, Path::Kind kind) {
+        if (collections.find(path) != collections.end())
+            throw std::runtime_error("Collection with this name already exits: " + path);
+        collections[path] = Collection{path, {}, kind};
     }
 
     const size_t HierarchyList::num_collections() const {

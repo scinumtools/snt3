@@ -294,12 +294,12 @@ TEST(References, RelativePath) {
     d.add_string(
         "pebble str = \"dupl\"\n"
         "foo\n"
-        "  crackle int = 3\n"
+        "  crackle float = 3\n"
         "  kuku str = {..pebble}\n"
         "  bar\n"
         "    pop bool = true\n"
         "    jerk bool = {.pop}\n"
-        "    snap int = {..crackle}\n"
+        "    snap float = {..crackle}\n"
     );
 
     dip::Environment env = d.parse();

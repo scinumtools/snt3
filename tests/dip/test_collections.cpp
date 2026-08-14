@@ -77,3 +77,48 @@ TEST(Collections, ListItems) {
         EXPECT_EQ(cl->second.items, std::vector<std::string>({"0", "1"}));
     }
 }
+
+TEST(Collections, Declarations) {
+
+    // declare only
+    dip::DIP d;
+    d.add_string(
+        "foo\n"
+        "  bar.baz map\n"
+        "snap\n"
+        "  crackle.pop list"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 0);
+    EXPECT_EQ(env.hierarchy.num_collections(), 4);
+
+    dip::Collection col = env.hierarchy.get_collection("foo.bar.baz");
+    EXPECT_EQ(col.kind, dip::Path::Kind::Map);
+
+    col = env.hierarchy.get_collection("snap.crackle.pop");
+    EXPECT_EQ(col.kind, dip::Path::Kind::List);
+
+    // declare and added items
+    d = dip::DIP();
+    d.add_string(
+        "foo\n"
+        "  bar map\n"
+        "  bar[baz]\n"
+        "    mut int = 3\n"
+        "snap\n"
+        "  crackle list\n"
+        "  crackle[]\n"
+        "    pow float = 1.23\n"
+    );
+    env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 2);
+    EXPECT_EQ(env.hierarchy.num_collections(), 8);
+
+    col = env.hierarchy.get_collection("foo.bar");
+    EXPECT_EQ(col.items.size(), 1);
+    EXPECT_EQ(col.kind, dip::Path::Kind::Map);
+
+    col = env.hierarchy.get_collection("snap.crackle");
+    EXPECT_EQ(col.items.size(), 1);
+    EXPECT_EQ(col.kind, dip::Path::Kind::List);
+}

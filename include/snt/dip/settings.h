@@ -44,6 +44,9 @@ namespace snt::dip {
     constexpr std::string_view KEYWORD_INTEGER = "int";
     constexpr std::string_view KEYWORD_FLOAT = "float";
     constexpr std::string_view KEYWORD_STRING = "str";
+    constexpr std::string_view KEYWORD_TABLE = "table";
+    constexpr std::string_view KEYWORD_MAP = "map";
+    constexpr std::string_view KEYWORD_LIST = "list";
 
     // directives
     constexpr std::string_view KEYWORD_CONSTANT = "!constant";
