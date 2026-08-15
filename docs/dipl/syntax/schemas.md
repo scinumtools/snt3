@@ -23,7 +23,7 @@ $schema <name>
 The schema name defines a reusable type. 
 Nodes declared within the schema become members of that type and are inherited by all schema instances.
 
-For example, the following schema defines the common structure of a car:
+For example, the following schemas define common structures that can be combined to describe a car:
 
 ```DIPL
 $schema car
