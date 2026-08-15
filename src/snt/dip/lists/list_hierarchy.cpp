@@ -60,6 +60,7 @@ namespace snt::dip {
             if (!name_full.empty())
                 name_full += SIGN_SEPARATOR;
             name_full += cnode.path;
+            std::cout << "hello 1 " << name_full << std::endl;
             // append FQ item selector and register new collections
             auto it = collections.find(name_full);
             if (cnode.kind == Path::Kind::Map) {
@@ -92,11 +93,14 @@ namespace snt::dip {
                 collections[name_full] = Collection{name_full, {}, Path::Kind::Item};
             } else if (cnode.kind == Path::Kind::Group) {
                 auto col = collections.find(name_full);
-                if (col != collections.end()) {
-                    // ignore if kind is map, or list
-                    if (col->second.kind != Path::Kind::Map && col->second.kind != Path::Kind::List)
-                        throw std::runtime_error("Collection with this name already exits: " + name_full);
-                } else {
+                if (col == collections.end()) {
+                    // Actually, the node modifications and collection item declarations
+                    // should not create new collections, and also should throw an error
+                    //    std::cout << "hello 2 " << name_full << std::endl;
+                    //    // ignore if kind is map, or list
+                    //    if (col->second.kind != Path::Kind::Map && col->second.kind != Path::Kind::List)
+                    //        throw std::runtime_error("Collection with this name already exits: " + name_full);
+                    //} else {
                     // register new collection
                     collections[name_full] = Collection{name_full, {}, Path::Kind::Group};
                 }
