@@ -27,14 +27,18 @@ namespace snt::dip {
             return {};
         } else {
             if (value_raw.size() > 0) {
-                EnvSchema schema = env.schemas.at(value_raw.at(0));
-                value_raw.clear(); // We need to clear the value, because it would cause an infinite loop in the queue
                 BaseNode::ListType nodes;
-                nodes.push_back(shared_from_this()); // Now we return the group node ...
-                for (const auto& node : schema.nodes) {
-                    BaseNode::PointerType node_new = node->clone(node->path, node->indent + indent);
-                    nodes.push_back(node_new); // ... and unwrap the schema nodes
+                // Apply all schemas
+                for (const auto& schema_name : value_raw) {
+                    EnvSchema schema = env.schemas.at(schema_name);
+                    nodes.push_back(shared_from_this()); // Now we return the group node ...
+                    for (const auto& node : schema.nodes) {
+                        BaseNode::PointerType node_new = node->clone(node->path, node->indent + indent);
+                        nodes.push_back(node_new); // ... and unwrap the schema nodes
+                    }
                 }
+                // We need to clear the value, because it would cause an infinite loop in the queue
+                value_raw.clear();
                 return nodes;
             } else {
                 return {};

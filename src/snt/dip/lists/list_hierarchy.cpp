@@ -60,7 +60,6 @@ namespace snt::dip {
             if (!name_full.empty())
                 name_full += SIGN_SEPARATOR;
             name_full += cnode.path;
-            std::cout << "hello 1 " << name_full << std::endl;
             // append FQ item selector and register new collections
             auto it = collections.find(name_full);
             if (cnode.kind == Path::Kind::Map) {

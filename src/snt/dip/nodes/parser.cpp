@@ -210,20 +210,51 @@ namespace snt::dip {
         if (pos >= code.size() || code[pos] != ':')
             return false;
         ++pos;
-        while (pos < code.size() && code[pos] == ' ')
-            ++pos;
-        std::size_t start = pos;
-        while (pos < code.size() &&
-               (std::isalnum(static_cast<unsigned char>(code[pos])) || code[pos] == '_' || code[pos] == '-')) {
+        // parse multiple schema names separated by a comma
+        while (true) {
+            while (pos < code.size() && code[pos] == ' ')
+                ++pos;
+            const std::size_t start = pos;
+            while (pos < code.size() &&
+                   (std::isalnum(static_cast<unsigned char>(code[pos])) || code[pos] == '_' || code[pos] == '-')) {
+                ++pos;
+            }
+            if (start == pos)
+                return false;
+            value_raw.push_back(code.substr(start, pos - start));
+            while (pos < code.size() && code[pos] == ' ')
+                ++pos;
+            if (pos >= code.size() || code[pos] != ',')
+                break;
             ++pos;
         }
-        if (start == pos)
-            return false;
-        value_raw.push_back(code.substr(start, pos - start));
+        // register value origin remove from the code line
         value_origin = ValueOrigin::Schema;
         strip(code.substr(0, pos));
         return true;
     }
+
+    // bool Parser::part_schema() {
+    //     std::size_t pos = 0;
+    //     while (pos < code.size() && code[pos] == ' ')
+    //         ++pos;
+    //     if (pos >= code.size() || code[pos] != ':')
+    //         return false;
+    //     ++pos;
+    //     while (pos < code.size() && code[pos] == ' ')
+    //         ++pos;
+    //     std::size_t start = pos;
+    //     while (pos < code.size() &&
+    //            (std::isalnum(static_cast<unsigned char>(code[pos])) || code[pos] == '_' || code[pos] == '-')) {
+    //         ++pos;
+    //     }
+    //     if (start == pos)
+    //         return false;
+    //     value_raw.push_back(code.substr(start, pos - start));
+    //     value_origin = ValueOrigin::Schema;
+    //     strip(code.substr(0, pos));
+    //     return true;
+    // }
 
     bool Parser::part_type(const bool required) {
         constexpr std::string_view types[] = {

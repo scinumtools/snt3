@@ -195,3 +195,35 @@ TEST(SchemaList, Options) {
         FAIL() << "Expected std::runtime_error";
     }
 }
+
+TEST(SchemaList, MultipleSchemas) {
+
+    dip::DIP d;
+    d.add_string(
+        "$schema animal\n"
+        "  sensation int = 19\n"
+        "  memory int = 10\n"
+        "$schema human\n"
+        "  intellect int = 23\n"
+        "  will int = 63\n"
+        "john : animal, human\n"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 4);
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "john.sensation");
+
+    vnode = env.nodes.at(1);
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "john.memory");
+
+    vnode = env.nodes.at(2);
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "john.intellect");
+
+    vnode = env.nodes.at(3);
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->path.name, "john.will");
+}
