@@ -30,31 +30,34 @@ $schema car
   manufacturer str;
   weight float kg;
   max_speed float km/h;
+
+$schema vehicle
+  registration str;
+  year int;
 ```
 
-A schema is instantiated by appending its name after a colon (`:`) to a group, map item, or list item declaration:
+A schema is instantiated by appending one or more schema names after a colon (`:`) to a group, map item, or list item declaration. Multiple schema names are separated by commas:
 
 ```DIPL-Schema
-<node> : <schema-name>
+<node> : <schema-name>[, <schema-name>...]
 ```
 
-The following example creates several instances of the `car` schema:
+For example, the following creates two `car` instances, each of which also conforms to the `vehicle` schema:
 
 ```DIPL
-car[civic] : car
+car[civic] : car, vehicle
   manufacturer = "Honda"
   weight = 1350 kg
   max_speed = 200 km/h
+  registration = "M-AB 1234"
+  year = 2020
 
-car[320i] : car
+car[320i] : car, vehicle
   manufacturer = "BMW"
   weight = 1570 kg
   max_speed = 235 km/h
-
-car[xc90] : car
-  manufacturer = "Volvo"
-  weight = 2100 kg
-  max_speed = 180 km/h
+  registration = "M-CD 5678"
+  year = 2022
 ```
 
 Schemas are independent of container type and may therefore be instantiated within groups, maps, or lists.
