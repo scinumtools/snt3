@@ -97,7 +97,7 @@ DIPL nodes are organized in a hierarchical way using indentation, i.e. number of
 **Parent** nodes have lower indentation as their **children** nodes.
 **Siblings** are nodes which share a common parent and indentation level.
 Multiple levels of hierarchy are also allowed, and there can be empty lines between the nodes.
-The number of empty spaces for each indentation level can vary, as long as indentation of all children nodes is consistent.
+The number of empty spaces for each indentation level is two and tabs are not permitted.
 
 #### 3.1.4.1 Value nodes
 

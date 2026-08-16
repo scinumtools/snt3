@@ -54,7 +54,7 @@ $unit length = 10 pc
 $unit time = 1 Gy
 
 velocity float = 2 [length]/[time]
-density float = 34 [mass]/[lenght]3
+density float = 34 [mass]/[length]3
 ```
 
 Each DIPL implementation MUST support the definition and integration of custom units directly through the code interface.

@@ -103,7 +103,7 @@ The result is a configuration that is both machine-evaluable and semantically va
 - [3.8. Properties](syntax/properties.md)
 - [3.9. Conditions](syntax/conditions.md)
 - [3.10. Schemas](syntax/schemas.md)
- 
+
 ## 4. File Format
 
 The source file MUST have an extension of either `.dip` or `.dipl`.
@@ -217,3 +217,29 @@ In the next versions of DIPL we plan to introduce the following new concepts:
 ## 10. Authors and Contributors
 
 - Ondrej Pego Jaura — Original author
+
+## 11. Glossary
+
+| Term               | Meaning                                                                     |
+|--------------------|-----------------------------------------------------------------------------|
+| **Node**           | Fundamental element of a DIPL document                                      |
+| **Value node**     | Node containing a typed value                                               |
+| **Container node** | Node containing child nodes                                                 |
+| **Group**          | Named container whose children are addressed by name                        |
+| **Map**            | Container whose children are addressed by key                               |
+| **List**           | Container whose children are addressed by index                             |
+| **Parameter**      | Value node representing a model quantity                                    |
+| **Type**           | Defines the value domain of a value node                                    |
+| **Schema**         | Reusable structural contract for nodes                                      |
+| **Definition**     | Statement creating a node and assigning its value                           |
+| **Declaration**    | Statement creating a typed node without a value                             |
+| **Modification**   | Statement assigning a value to an existing node                             |
+| **Reference**      | Expression identifying existing nodes or external content                   |
+| **Injection**      | Use of a reference as the value/content of a node                           |
+| **Import**         | An operation that inserts referenced nodes into the current node hierarchy. |
+| **Source**         | Named external DIPL/text domain                                             |
+| **Unit**           | Named physical or dimensional quantity                                      |
+| **Expression**     | Construct that evaluates to a value                                         |
+| **Property**       | Information attached to a node                                              |
+| **Condition**      | Boolean validation rule                                                     |
+| **Metadata**       | Non-semantic descriptive information attached to a node                     |
