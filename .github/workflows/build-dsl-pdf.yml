@@ -30,11 +30,7 @@ jobs:
           mkdir -p build
 
           pandoc \
-            docs/dipl/specification.md \
-            --from=markdown \
-            --pdf-engine=xelatex \
-            --toc \
-            --number-sections \
+            --defaults=docs/dipl/pandoc.yaml \
             --output=build/dipl-specification.pdf
 
       - name: Determine release tag

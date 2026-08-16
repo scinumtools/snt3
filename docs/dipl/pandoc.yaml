@@ -1,0 +1,17 @@
+from: markdown
+pdf-engine: xelatex
+toc: true
+number-sections: true
+
+input-files:
+  - specification.md
+  - syntax/nodes.md
+  - syntax/datatypes.md
+  - syntax/values.md
+  - syntax/references.md
+  - syntax/expressions.md
+  - syntax/units.md
+  - syntax/functions.md
+  - syntax/properties.md
+  - syntax/conditions.md
+  - syntax/schemas.md
