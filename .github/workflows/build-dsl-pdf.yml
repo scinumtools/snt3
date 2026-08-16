@@ -1,4 +1,4 @@
-name: Build DIPL Specification PDF
+name: Build DSL Specification PDF
 
 on:
   release:
@@ -37,8 +37,29 @@ jobs:
             --number-sections \
             --output=build/dipl-specification.pdf
 
+      - name: Determine release tag
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+          else
+            TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+          fi
+
+          if [ -z "$TAG" ]; then
+            echo "No GitHub Release found."
+            exit 1
+          fi
+
+          echo "Using release: $TAG"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
       - name: Upload PDF to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.release.outputs.tag }}
           files: build/dipl-specification.pdf
           generate_release_notes: false
+          overwrite_files: true
