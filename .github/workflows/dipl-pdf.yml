@@ -31,7 +31,7 @@ jobs:
 
           pandoc \
             docs/dipl/specification.md \
-            --from=pandoc \
+            --from=markdown \
             --pdf-engine=xelatex \
             --toc \
             --number-sections \
