@@ -1,0 +1,44 @@
+name: Build DIPL Specification PDF
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc and LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            pandoc \
+            texlive-xetex \
+            texlive-latex-extra \
+            texlive-fonts-recommended
+
+      - name: Build PDF
+        run: |
+          mkdir -p build
+
+          pandoc \
+            docs/dipl/specification.md \
+            --from=pandoc \
+            --pdf-engine=xelatex \
+            --toc \
+            --number-sections \
+            --output=build/dipl-specification.pdf
+
+      - name: Upload PDF to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/dipl-specification.pdf
+          generate_release_notes: false
