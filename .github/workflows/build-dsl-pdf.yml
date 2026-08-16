@@ -33,6 +33,10 @@ jobs:
             --defaults=docs/dipl/pandoc.yaml \
             --output=build/dipl-specification.pdf
 
+          pandoc \
+            --defaults=docs/puel/pandoc.yaml \
+            --output=build/puel-specification.pdf
+            
       - name: Determine release tag
         id: release
         env:
@@ -56,6 +60,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.release.outputs.tag }}
-          files: build/dipl-specification.pdf
+          files: |
+            build/dipl-specification.pdf
+            build/puel-specification.pdf
           generate_release_notes: false
           overwrite_files: true

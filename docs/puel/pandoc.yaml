@@ -1,0 +1,7 @@
+from: markdown
+pdf-engine: xelatex
+toc: true
+number-sections: true
+
+input-files:
+  - docs/dipl/specification.md
