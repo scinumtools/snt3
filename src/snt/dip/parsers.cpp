@@ -124,7 +124,7 @@ namespace snt::dip {
                     if (next.code[next_indent] == SIGN_EQUAL) {
                         if (line_indent != std::string::npos && next_indent == line_indent + INDENT_STEP &&
                             next_indent < next.code.size()) {
-                            line.code += " " + next.code.substr(next_indent);
+                            line.code = remove_comments(line.code) + " " + next.code.substr(next_indent);
                             lines.pop();
                         } else {
                             throw std::runtime_error(

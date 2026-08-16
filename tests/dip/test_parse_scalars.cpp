@@ -168,4 +168,16 @@ TEST(ParseScalars, NewLineDefinitions) {
             FAIL() << "Expected std::runtime_error";
         }
     }
+    { // multiline comments
+        dip::DIP d;
+        d.add_string(
+            "foo bool    # first line comment\n"
+            "  = true    # second line comment\n"
+        );
+        dip::Environment env = d.parse();
+
+        dip::ValueNode::PointerType node = env.nodes.at(0);
+        EXPECT_EQ(node->path.name, "foo");
+        EXPECT_EQ(node->to_string(), "true");
+    }
 }

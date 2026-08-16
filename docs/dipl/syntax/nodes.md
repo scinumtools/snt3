@@ -16,7 +16,7 @@ Additionally, nodes can be ordered into a [hierarchical](#314-hierarchy) structu
 # Node definition schema
 
 <indent><name> <type> = <value> [<unit>]  # <comment>
-<indent><name> <type> 
+<indent><name> <type>                     # <comment>
   = <value> [<unit>]                      # <comment>
 ```
 
