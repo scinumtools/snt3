@@ -114,7 +114,27 @@ namespace snt::dip {
         while (!lines.empty()) {
             Line line = lines.front();
             lines.pop();
-
+            {
+                // add node definition (after = sign) on a new line
+                // to the node declaration on the current line
+                if (!lines.empty()) {
+                    const Line& next = lines.front();
+                    std::size_t line_indent = line.code.find_first_not_of(' ');
+                    std::size_t next_indent = next.code.find_first_not_of(' ');
+                    if (next.code[next_indent] == SIGN_EQUAL) {
+                        if (line_indent != std::string::npos && next_indent == line_indent + INDENT_STEP &&
+                            next_indent < next.code.size()) {
+                            line.code += " " + next.code.substr(next_indent);
+                            lines.pop();
+                        } else {
+                            throw std::runtime_error(
+                                "Node definition on a new line is not indented by " + std::to_string(INDENT_STEP) +
+                                " spaces: " + std::to_string(next_indent - line_indent)
+                            );
+                        }
+                    }
+                }
+            }
             {
                 // group block strings
                 size_t pos = 0;

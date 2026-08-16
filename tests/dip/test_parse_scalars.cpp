@@ -139,3 +139,33 @@ TEST(ParseScalars, Cloning) {
     clone = pop->clone(dip::Path("clone"));
     EXPECT_EQ(clone->to_string(), "\"foo\"");
 }
+
+TEST(ParseScalars, NewLineDefinitions) {
+    { // define node on a new line
+        dip::DIP d;
+        d.add_string(
+            "very.long.fully.qualified.node.path bool\n"
+            "  = true\n"
+        );
+        dip::Environment env = d.parse();
+
+        dip::ValueNode::PointerType node = env.nodes.at(0);
+        EXPECT_EQ(node->path.name, "very.long.fully.qualified.node.path");
+        EXPECT_EQ(node->to_string(), "true");
+    }
+    { // throw an error if indent is not 2
+        dip::DIP d;
+        d.add_string(
+            "very.long.fully.node.name bool\n"
+            "     = true\n"
+        );
+        try {
+            d.parse();
+            FAIL() << "Expected std::runtime_error";
+        } catch (const std::runtime_error& e) {
+            EXPECT_STREQ(e.what(), "Node definition on a new line is not indented by 2 spaces: 5");
+        } catch (...) {
+            FAIL() << "Expected std::runtime_error";
+        }
+    }
+}

@@ -15,8 +15,9 @@ Additionally, nodes can be ordered into a [hierarchical](#314-hierarchy) structu
 ``` DIPL-Schema
 # Node definition schema
 
-<indent><name> <type> = <value> <unit>  # <comment>
-<indent><name> <type> = <value>         # <comment>
+<indent><name> <type> = <value> [<unit>]  # <comment>
+<indent><name> <type> 
+  = <value> [<unit>]                      # <comment>
 ```
 
 All members of definition are separated with at least one empty space, and their order is not interchangeable.
@@ -31,8 +32,9 @@ There are four main **data types** in DIPL that are based on data types used in 
 
 Node **values** are separated from the left-hand members by an equal sign.
 Unquoted values consist only of non-whitespace characters.
-If a value contains spaces, it must be enclosed in single or double quotes.
+If a value contains spaces, it must be enclosed in double quotes.
 If a node value spans multiple lines, a [block](values.md#blocks) must be used.
+A node value may be continued on the following line by placing an equal sign at the beginning of a line indented exactly two spaces further than the node definition.
 DIPL parameter values are described in detail in a [separate section](values.md).
 
 The two data types that support **units** are integers and floats.
