@@ -19,9 +19,10 @@ namespace snt::dip {
      * Information about a collection, keyed or indexed
      */
     struct Collection {
-        std::string path;               ///< Fully qualified path of a collection
-        std::vector<std::string> items; ///< List of collection items
-        Path::Kind kind;                ///< Collection path kind
+        std::string path;                 ///< Fully qualified path of a collection
+        std::vector<std::string> items;   ///< List of collection items
+        Path::Kind kind;                  ///< Collection path kind
+        std::vector<std::string> schemas; ///< List of item schemas
     };
 
     /**
@@ -49,11 +50,15 @@ namespace snt::dip {
          * indent. E.g. if current path is 'foo.bar.baz' and group 'bar' has indent 2, than for
          * input indent 2 and path `crackle`, the following path will be constructed: `foo.crackle`.
          *
+         * The paramer `show_item` strips the item from the end of the collection path:
+         * e.g. instead of `foo[bar]` only `foo` is returned
+         *
          * @param indent Indent of a new node
          * @param path Path name of a new node
+         * @param show_item Show collection item at the end of the path
          * @return Path of the current hierarchy level
          */
-        const Path get_current_path(size_t indent = 0, const std::string& path = "") const;
+        const Path get_current_path(size_t indent = 0, const std::string& path = "", bool show_item = true) const;
 
         /**
          * Gets a reference on a ll collections
@@ -74,8 +79,18 @@ namespace snt::dip {
          * Set a new collection
          *
          * @param path Collection fully qualified path
+         * @param kind Collection kind (map/list)
+         * @param schemas List of schemas applied to collection items
          */
-        void set_collection(const std::string& path, Path::Kind kind);
+        void set_collection(const std::string& path, Path::Kind kind, std::vector<std::string> schemas);
+
+        /**
+         * Test if collection whith the given path exists
+         *
+         * @param path Collection path that should be found
+         * @return Returns true if collection exists, otherwise returns false
+         */
+        const bool has_collection(const std::string& path) const;
 
         /**
          * Get number of collections

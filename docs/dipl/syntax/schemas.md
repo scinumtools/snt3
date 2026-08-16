@@ -94,7 +94,28 @@ people[] : person
   age = 28 years
 ```
 
-### 3.10.2 Nested Schemas
+### 3.10.2 Collection schemas
+
+Schemas can also be applied to entire `map` and `list` collections. 
+In this case, the schema is specified once in the collection declaration and is automatically applied to all subsequent items.
+
+```DIPL
+$schema vehicle
+  speed float = 212 kph
+  weight float = 1320 kg
+
+$schema road
+  tires str = "Continental"
+
+vehicles map : vehicle       # schema applies to all items
+vehicles[car] : road         # schema applies to this specific item
+vehicles[ship]
+```
+
+In this example, both `car` and `ship` inherit the nodes defined by the `vehicle` schema, because it is applied to the entire `vehicles` collection. 
+The `car` item additionally inherits the nodes defined by the `road` schema, while `ship` does not.
+
+### 3.10.3 Nested Schemas
 
 Schemas may contain both value nodes and container nodes, including nested groups, maps, lists, and other schema instances.
 
@@ -113,7 +134,7 @@ $schema person
 
 Because schemas describe structure independently of container type, they provide a uniform mechanism for defining reusable data models throughout a DIPL document.
 
-### 3.10.3 Rules
+### 3.10.4 Rules
 
 The following rules shall apply:
 

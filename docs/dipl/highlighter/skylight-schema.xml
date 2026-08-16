@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language name="DIPL" version="1.0" kateversion="5.0" section="Sources">
+
+  <highlighting>
+
+    <list name="keywords">
+      <item>$schema</item>
+      <item>$include</item>
+      <item>$define</item>
+    </list>
+
+    <list name="datatypes">
+      <item>int</item>
+      <item>str</item>
+      <item>bool</item>
+      <item>float</item>
+      <item>table</item>
+      <item>map</item>
+      <item>list</item>
+    </list>
+
+    <contexts>
+
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <keyword String="keywords" attribute="Keyword"/>
+        <keyword String="datatypes" attribute="Data Type"/>
+
+        <DetectChar char="#" context="Comment"/>
+        <DetectChar char="&quot;" context="String"/>
+        <DetectChar char="'" context="String"/>
+      </context>
+
+      <context name="Comment" attribute="Comment" lineEndContext="#pop"/>
+
+      <context name="String" attribute="String" lineEndContext="#stay">
+        <DetectChar char="&quot;" context="#pop"/>
+        <DetectChar char="'" context="#pop"/>
+      </context>
+
+    </contexts>
+
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="Data Type" defStyleNum="dsType"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+      <itemData name="String" defStyleNum="dsString"/>
+    </itemDatas>
+
+  </highlighting>
+
+  <general>
+    <comments>
+      <comment name="singleLine" start="#" />
+    </comments>
+  </general>
+
+</language>

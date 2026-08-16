@@ -19,30 +19,40 @@ namespace snt::dip {
         // TODO: implement injection a text file
         if (dtype_raw[1] == KEYWORD_MAP) {
             std::string full_path = env.hierarchy.get_current_path(indent, path.name).name;
-            env.hierarchy.set_collection(full_path, Path::Kind::Map);
+            std::cout << "aaa " << full_path << std::endl;
+            env.hierarchy.set_collection(full_path, Path::Kind::Map, value_raw);
             return {};
         } else if (dtype_raw[1] == KEYWORD_LIST) {
             std::string full_path = env.hierarchy.get_current_path(indent, path.name).name;
-            env.hierarchy.set_collection(full_path, Path::Kind::List);
+            env.hierarchy.set_collection(full_path, Path::Kind::List, value_raw);
             return {};
         } else {
-            if (value_raw.size() > 0) {
-                BaseNode::ListType nodes;
+            BaseNode::ListType nodes;
+            if (schemas.empty()) { // since we output the same node, we have to  avoid infinite loop
+                // Add schemas from collection definitions
+                std::string full_path = env.hierarchy.get_current_path(indent, path.name, false).name;
+                if (env.hierarchy.has_collection(full_path)) {
+                    Collection col = env.hierarchy.get_collection(full_path);
+                    if (!col.schemas.empty())
+                        std::copy(col.schemas.begin(), col.schemas.end(), std::back_inserter(schemas));
+                }
+                // Add all direct schemas
+                if (value_raw.size() > 0) {
+                    std::copy(value_raw.begin(), value_raw.end(), std::back_inserter(schemas));
+                }
                 // Apply all schemas
-                for (const auto& schema_name : value_raw) {
-                    EnvSchema schema = env.schemas.at(schema_name);
-                    nodes.push_back(shared_from_this()); // Now we return the group node ...
-                    for (const auto& node : schema.nodes) {
-                        BaseNode::PointerType node_new = node->clone(node->path, node->indent + indent);
-                        nodes.push_back(node_new); // ... and unwrap the schema nodes
+                if (!schemas.empty()) {
+                    nodes.push_back(shared_from_this()); // Now we return the group node ... (hence infinite loop)
+                    for (const auto& schema_name : schemas) {
+                        EnvSchema schema = env.schemas.at(schema_name);
+                        for (const auto& node : schema.nodes) { // ... and unwrap the schema nodes
+                            BaseNode::PointerType node_new = node->clone(node->path, node->indent + indent);
+                            nodes.push_back(node_new);
+                        }
                     }
                 }
-                // We need to clear the value, because it would cause an infinite loop in the queue
-                value_raw.clear();
-                return nodes;
-            } else {
-                return {};
             }
+            return nodes;
         }
     }
 

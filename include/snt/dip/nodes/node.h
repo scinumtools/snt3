@@ -21,6 +21,7 @@ namespace snt::dip {
         val::Array::RangeType value_slice;    ///< slice of an injected node value
         std::string units_raw;                ///< raw units string
         val::Array::RangeType dimension;      ///< list of array dimensions
+        std::vector<std::string> schemas;     ///< list of parsed schemas
         Node() : indent(0), value_origin(ValueOrigin::Empty) {};
         Node(const Node& other) = default;
         Node(const Line& l) : line(l), indent(0), value_origin(ValueOrigin::Empty) {};

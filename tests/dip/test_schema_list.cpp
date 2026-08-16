@@ -227,3 +227,68 @@ TEST(SchemaList, MultipleSchemas) {
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->path.name, "john.will");
 }
+
+TEST(SchemaList, FromCollection) {
+    { // maps
+        dip::DIP d;
+        d.add_string(
+            "$schema vehicle\n"
+            "  speed float = 212 kph\n"
+            "  weight float = 1320 kg\n"
+            "$schema road\n"
+            "  tires str = \"Continental\"\n"
+            "vehicles map : vehicle\n"
+            "vehicles[car] : road\n"
+            "vehicles[ship]\n"
+        );
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 5);
+
+        dip::ValueNode::PointerType vnode = env.nodes.at(0);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[car].speed");
+        vnode = env.nodes.at(1);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[car].weight");
+        vnode = env.nodes.at(2);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[car].tires");
+        vnode = env.nodes.at(3);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[ship].speed");
+        vnode = env.nodes.at(4);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[ship].weight");
+    }
+    { // list
+        dip::DIP d;
+        d.add_string(
+            "$schema vehicle\n"
+            "  speed float = 212 kph\n"
+            "  weight float = 1320 kg\n"
+            "$schema road\n"
+            "  tires str = \"Continental\"\n"
+            "vehicles list : vehicle\n"
+            "vehicles[] : road\n"
+            "vehicles[]\n"
+        );
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 5);
+
+        dip::ValueNode::PointerType vnode = env.nodes.at(0);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[0].speed");
+        vnode = env.nodes.at(1);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[0].weight");
+        vnode = env.nodes.at(2);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[0].tires");
+        vnode = env.nodes.at(3);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[1].speed");
+        vnode = env.nodes.at(4);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "vehicles[1].weight");
+    }
+}

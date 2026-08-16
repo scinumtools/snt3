@@ -64,7 +64,8 @@ namespace snt::dip {
             auto it = collections.find(name_full);
             if (cnode.kind == Path::Kind::Map) {
                 if (it == collections.end()) { // create new collection
-                    collections[name_full] = Collection{name_full, {cnode.item}, Path::Kind::Map};
+                    collections[name_full] = Collection{name_full, {cnode.item}, Path::Kind::Map, {}};
+                    std::cout << "ccc " << name_full << std::endl;
                 } else if (it->second.kind != Path::Kind::Map) {
                     throw std::runtime_error("Collection cannot append keyed items: " + name_full);
                 } else if (std::find(it->second.items.begin(), it->second.items.end(), cnode.item) ==
@@ -76,12 +77,13 @@ namespace snt::dip {
                     );
                 }
                 name_full += "[" + cnode.item + "]";
-                collections[name_full] = Collection{name_full, {}, Path::Kind::Item};
+                collections[name_full] = Collection{name_full, {}, Path::Kind::Item, {}};
+                std::cout << "ddd " << name_full << std::endl;
             } else if (cnode.kind == Path::Kind::List) {
                 std::string key;
                 if (it == collections.end()) { // create new collection
                     key = "0";
-                    collections[name_full] = Collection{name_full, {key}, Path::Kind::List};
+                    collections[name_full] = Collection{name_full, {key}, Path::Kind::List, {}};
                 } else if (it->second.kind != Path::Kind::List) {
                     throw std::runtime_error("Collection cannot append indexed items: " + name_full);
                 } else { // append new item with an increased index
@@ -89,7 +91,7 @@ namespace snt::dip {
                     it->second.items.push_back(key);
                 }
                 name_full += "[" + key + "]";
-                collections[name_full] = Collection{name_full, {}, Path::Kind::Item};
+                collections[name_full] = Collection{name_full, {}, Path::Kind::Item, {}};
             } else if (cnode.kind == Path::Kind::Group) {
                 auto col = collections.find(name_full);
                 if (col == collections.end()) {
@@ -101,7 +103,7 @@ namespace snt::dip {
                     //        throw std::runtime_error("Collection with this name already exits: " + name_full);
                     //} else {
                     // register new collection
-                    collections[name_full] = Collection{name_full, {}, Path::Kind::Group};
+                    collections[name_full] = Collection{name_full, {}, Path::Kind::Group, {}};
                 }
             }
         }
@@ -113,7 +115,7 @@ namespace snt::dip {
         node->path.collections = std::move(collections_full);
     }
 
-    const Path HierarchyList::get_current_path(size_t indent, const std::string& path) const {
+    const Path HierarchyList::get_current_path(size_t indent, const std::string& path, bool show_item) const {
         std::stringstream new_path;
         for (size_t parent = 0; parent < parents.size(); parent++) {
             if (parents[parent].indent >= indent)
@@ -122,10 +124,16 @@ namespace snt::dip {
                 new_path << SIGN_SEPARATOR;
             new_path << parents[parent].name;
         }
-        if (!path.empty()) {
+        std::string clean_path = path;
+        if (!show_item && !clean_path.empty() && clean_path.back() == ']') {
+            const auto pos = clean_path.rfind('[');
+            if (pos != std::string::npos)
+                clean_path.erase(pos);
+        }
+        if (!clean_path.empty()) {
             if (!new_path.str().empty())
                 new_path << SIGN_SEPARATOR;
-            new_path << path;
+            new_path << clean_path;
         }
         return Path(new_path.str());
     }
@@ -142,10 +150,14 @@ namespace snt::dip {
         return (it->second);
     }
 
-    void HierarchyList::set_collection(const std::string& path, Path::Kind kind) {
+    void HierarchyList::set_collection(const std::string& path, Path::Kind kind, std::vector<std::string> schemas) {
         if (collections.find(path) != collections.end())
             throw std::runtime_error("Collection with this name already exits: " + path);
-        collections[path] = Collection{path, {}, kind};
+        collections[path] = Collection{path, {}, kind, schemas};
+    }
+
+    const bool HierarchyList::has_collection(const std::string& path) const {
+        return collections.find(path) != collections.end();
     }
 
     const size_t HierarchyList::num_collections() const {

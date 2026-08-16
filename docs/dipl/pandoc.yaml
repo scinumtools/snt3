@@ -3,6 +3,11 @@ pdf-engine: xelatex
 toc: true
 number-sections: true
 
+variables:
+  geometry:
+    - a4paper
+    - margin=20mm
+
 input-files:
   - docs/dipl/specification.md
   - docs/dipl/syntax/nodes.md
