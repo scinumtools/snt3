@@ -4,14 +4,14 @@ toc: true
 number-sections: true
 
 input-files:
-  - specification.md
-  - syntax/nodes.md
-  - syntax/datatypes.md
-  - syntax/values.md
-  - syntax/references.md
-  - syntax/expressions.md
-  - syntax/units.md
-  - syntax/functions.md
-  - syntax/properties.md
-  - syntax/conditions.md
-  - syntax/schemas.md
+  - docs/dipl/specification.md
+  - docs/dipl/syntax/nodes.md
+  - docs/dipl/syntax/datatypes.md
+  - docs/dipl/syntax/values.md
+  - docs/dipl/syntax/references.md
+  - docs/dipl/syntax/expressions.md
+  - docs/dipl/syntax/units.md
+  - docs/dipl/syntax/functions.md
+  - docs/dipl/syntax/properties.md
+  - docs/dipl/syntax/conditions.md
+  - docs/dipl/syntax/schemas.md
