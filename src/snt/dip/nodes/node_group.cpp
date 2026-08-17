@@ -19,7 +19,6 @@ namespace snt::dip {
         // TODO: implement injection a text file
         if (dtype_raw[1] == KEYWORD_MAP) {
             std::string full_path = env.hierarchy.get_current_path(indent, path.name).name;
-            std::cout << "aaa " << full_path << std::endl;
             env.hierarchy.set_collection(full_path, Path::Kind::Map, value_raw);
             return {};
         } else if (dtype_raw[1] == KEYWORD_LIST) {

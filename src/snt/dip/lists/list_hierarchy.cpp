@@ -65,7 +65,6 @@ namespace snt::dip {
             if (cnode.kind == Path::Kind::Map) {
                 if (it == collections.end()) { // create new collection
                     collections[name_full] = Collection{name_full, {cnode.item}, Path::Kind::Map, {}};
-                    std::cout << "ccc " << name_full << std::endl;
                 } else if (it->second.kind != Path::Kind::Map) {
                     throw std::runtime_error("Collection cannot append keyed items: " + name_full);
                 } else if (std::find(it->second.items.begin(), it->second.items.end(), cnode.item) ==
@@ -78,7 +77,6 @@ namespace snt::dip {
                 }
                 name_full += "[" + cnode.item + "]";
                 collections[name_full] = Collection{name_full, {}, Path::Kind::Item, {}};
-                std::cout << "ddd " << name_full << std::endl;
             } else if (cnode.kind == Path::Kind::List) {
                 std::string key;
                 if (it == collections.end()) { // create new collection
