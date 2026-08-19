@@ -292,3 +292,53 @@ TEST(SchemaList, FromCollection) {
         EXPECT_EQ(vnode->path.name, "vehicles[1].weight");
     }
 }
+
+TEST(SchemaList, TableDeclarations) {
+    { // table is declared in the schema and defined later
+        dip::DIP d;
+        d.add_string(
+            "$schema blup\n"
+            "  baz int\n"
+            "  bar table\n"
+            "foo : blup\n"
+            "  baz = 3\n"
+            "  bar table = \"\"\"crackle int\n"
+            "pop bool\n"
+            "---\n"
+            "1 true\n"
+            "2 true\n"
+            "3 false\n"
+            "\"\"\""
+        );
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 3);
+
+        dip::ValueNode::PointerType vnode = env.nodes.at(0);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "foo.baz");
+        vnode = env.nodes.at(1);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "foo.bar.crackle");
+        vnode = env.nodes.at(2);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "foo.bar.pop");
+    }
+    { // table is declared in the schema but not defined later
+        dip::DIP d;
+        d.add_string(
+            "$schema blup\n"
+            "  baz int\n"
+            "  bar table\n"
+            "foo : blup\n"
+            "  baz = 3\n"
+        );
+        try {
+            d.parse();
+            FAIL() << "Expected std::runtime_error";
+        } catch (const std::runtime_error& e) {
+            EXPECT_STREQ(e.what(), "Declared node has undefined value:   bar table");
+        } catch (...) {
+            FAIL() << "Expected std::runtime_error";
+        }
+    }
+}

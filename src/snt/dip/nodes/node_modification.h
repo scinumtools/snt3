@@ -8,7 +8,18 @@ namespace snt::dip {
     class ModificationNode : public BaseNode {
       public:
         static BaseNode::PointerType is_node(Parser& parser);
+
+        /**
+         * Modificatio constructor
+         *
+         * @param parser Parsed node object
+         */
         ModificationNode(Parser& parser) : BaseNode(parser, NodeDtype::Modification) {};
+
+        /**
+         * @copydoc BaseNode::parse
+         */
+        BaseNode::ListType parse(Environment& env) override;
     };
 
 } // namespace snt::dip

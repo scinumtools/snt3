@@ -112,3 +112,56 @@ TEST(ParseTables, ExceptionMissingColumn) {
         FAIL() << "Expected std::runtime_error";
     }
 }
+
+TEST(ParseTables, TableDeclaration) {
+    { // declaration is defined later
+        dip::DIP d;
+        d.add_string(
+            "foo\n"
+            "  bar table\n"
+            "  baz int = 3\n"
+            "  bar table = \"\"\"crackle int\n"
+            "pop bool\n"
+            "---\n"
+            "1 true\n"
+            "2 true\n"
+            "3 false\n"
+            "\"\"\""
+        );
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 3);
+    }
+    { // definition without type
+        dip::DIP d;
+        d.add_string(
+            "foo\n"
+            "  bar table\n"
+            "  baz int = 3\n"
+            "  bar = \"\"\"crackle int\n"
+            "pop bool\n"
+            "---\n"
+            "1 true\n"
+            "2 true\n"
+            "3 false\n"
+            "\"\"\""
+        );
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 3);
+    }
+    { // declaration stays undefined
+        dip::DIP d;
+        d.add_string(
+            "foo\n"
+            "  bar table\n"
+            "  baz int = 3\n"
+        );
+        try {
+            d.parse();
+            FAIL() << "Expected std::runtime_error";
+        } catch (const std::runtime_error& e) {
+            EXPECT_STREQ(e.what(), "Declared node has undefined value:   bar table");
+        } catch (...) {
+            FAIL() << "Expected std::runtime_error";
+        }
+    }
+}

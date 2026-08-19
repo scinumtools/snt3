@@ -1,6 +1,7 @@
 #ifndef DIP_NODE_TABLE_H
 #define DIP_NODE_TABLE_H
 
+#include <memory>
 #include <snt/dip/nodes/node_base.h>
 
 namespace snt::dip {

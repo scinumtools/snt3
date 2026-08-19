@@ -1,6 +1,7 @@
 #include "node_table.h"
 
 #include "../parsers.h"
+#include "node_deferred.h"
 
 #include <snt/dip/environment.h>
 #include <stdexcept>
@@ -49,8 +50,27 @@ namespace snt::dip {
         case ValueOrigin::String:
             nodes = parse_nodes(value_raw.at(0), source_name, delimiter);
             break;
+        case ValueOrigin::Empty: {
+            // if value is empty, we have to defer this node until its value will be defined
+            DeferredNode::PointerType node = std::make_shared<DeferredNode>(shared_from_this());
+            nodes.push_back(node);
+            return nodes;
+        }
         default:
             throw std::runtime_error("Table nodes could not be parsed: " + line.code);
+        }
+        // we have to check if a deferred table node is already in the node list
+        std::string full_name = env.hierarchy.get_current_path(indent, path.name).name;
+        for (size_t i = 0; i < env.nodes.size(); i++) {
+            auto node = env.nodes.at(i);
+            if (node->dtype != NodeDtype::Deferred)
+                continue;
+            // if yes, erase it
+            auto dnode = std::dynamic_pointer_cast<DeferredNode>(node);
+            if (dnode && dnode->path.name == full_name) {
+                env.nodes.erase(i);
+                break;
+            }
         }
         // update node settings
         for (const auto& node : nodes) {

@@ -1,5 +1,7 @@
 #include "node_group.h"
 
+#include "node_deferred.h"
+
 #include <snt/dip/environment.h>
 
 namespace snt::dip {
@@ -27,7 +29,7 @@ namespace snt::dip {
             return {};
         } else {
             BaseNode::ListType nodes;
-            if (schemas.empty()) { // since we output the same node, we have to  avoid infinite loop
+            if (schemas.empty()) { // since we output the same node, we have to avoid infinite loops
                 // Add schemas from collection definitions
                 std::string full_path = env.hierarchy.get_current_path(indent, path.name, false).name;
                 if (env.hierarchy.has_collection(full_path)) {
@@ -41,11 +43,14 @@ namespace snt::dip {
                 }
                 // Apply all schemas
                 if (!schemas.empty()) {
-                    nodes.push_back(shared_from_this()); // Now we return the group node ... (hence infinite loop)
+                    nodes.push_back(shared_from_this()); // Now we return the group node ... (hence the infinite loop)
                     for (const auto& schema_name : schemas) {
                         EnvSchema schema = env.schemas.at(schema_name);
                         for (const auto& node : schema.nodes) { // ... and unwrap the schema nodes
                             BaseNode::PointerType node_new = node->clone(node->path, node->indent + indent);
+                            // if schema contains table nodes, we defer it
+                            if (node_new->dtype == NodeDtype::Table)
+                                node_new = std::make_shared<DeferredNode>(node_new);
                             nodes.push_back(node_new);
                         }
                     }

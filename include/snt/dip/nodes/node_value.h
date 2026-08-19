@@ -81,6 +81,9 @@ namespace snt::dip {
         ValueNode(const core::DataType vdt) : constant(false), value_dtype(vdt) {};
         ValueNode(const Parser& parser, const NodeDtype dt, const core::DataType vdt = core::DataType::None)
             : BaseNode(parser, dt), constant(false), value_dtype(vdt) {};
+        ValueNode(
+            const BaseNode::PointerType other, const NodeDtype dt, const core::DataType vdt = core::DataType::None
+        );
         ValueNode(const Path& pth, const core::DataType vdt, const NodeDtype dt = NodeDtype::None);
         ValueNode(
             const Path& pth,
@@ -93,7 +96,7 @@ namespace snt::dip {
         val::BaseValue::PointerType cast_value(val::Array::StringType& value_input, const val::Array::ShapeType& shape);
         void set_value(val::BaseValue::PointerType value_input = nullptr);
         void set_units(const std::optional<puq::Quantity>& units_input = std::nullopt);
-        void modify_value(const BaseNode::PointerType& node, Environment& env);
+        virtual void modify_value(const BaseNode::PointerType& node, Environment& env);
         virtual bool set_property(PropertyType property, val::Array::StringType& values, std::string& units) override;
         virtual std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override {
             throw std::runtime_error("String represenation of the value node is not implemented");

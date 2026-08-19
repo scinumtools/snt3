@@ -40,6 +40,14 @@ namespace snt::dip {
         set_value(std::move(val));
     };
 
+    ValueNode::ValueNode(const BaseNode::PointerType other, const NodeDtype dt, const core::DataType vdt)
+        : value_dtype(vdt) {
+        dtype = dt;
+        path = other->path;
+        indent = other->indent;
+        line = other->line;
+    }
+
     val::BaseValue::PointerType ValueNode::cast_value() {
         return cast_value(value_raw, value_shape);
     }

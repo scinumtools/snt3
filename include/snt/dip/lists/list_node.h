@@ -22,6 +22,7 @@ namespace snt::dip {
             nodes.pop_front();
             return node;
         };
+        void erase(size_t index) { nodes.erase(nodes.begin() + index); }
         typename T::PointerType pop_back() {
             BaseNode::PointerType node = nodes.back();
             nodes.pop_back();

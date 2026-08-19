@@ -139,6 +139,7 @@ namespace snt::dip {
         Float,
         String,
         Table,
+        Deferred,     // deffered value node
         Modification, // data handling
         Property,     // properties
     };
