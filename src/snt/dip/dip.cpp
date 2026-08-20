@@ -181,7 +181,8 @@ namespace snt::dip {
                     throw std::runtime_error("Cannot define an empty schema: " + pnode->line.code);
                 }
             } else {
-                check_indent(previous_node, current_node);
+                if (previous_node && previous_node->dtype != NodeDtype::Empty)
+                    check_indent(previous_node, current_node);
                 previous_node = current_node;
                 queue_filtered.push_back(current_node);
             }

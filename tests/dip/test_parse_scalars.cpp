@@ -181,3 +181,23 @@ TEST(ParseScalars, NewLineDefinitions) {
         EXPECT_EQ(node->to_string(), "true");
     }
 }
+
+TEST(ParseScalars, IndentedComments) {
+    dip::DIP d;
+    d.add_string(
+        "#comment 1\n"
+        "foo\n"
+        "  snap str = None\n"
+        "  # comment 2\n"
+        "  bar\n"
+        "    # comment 31\n"
+        "      # comment 32\n"
+        "   # comment 33\n"
+        "    crackle int = 3\n"
+        "    # comment 4\n"
+        "    pop bool = true\n"
+    );
+    dip::Environment env = d.parse();
+
+    EXPECT_EQ(env.nodes.size(), 3);
+}

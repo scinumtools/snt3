@@ -95,6 +95,7 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 When working with large amounts of data, presenting the information in a table can be more concise and easier to read.
 For this purpose, a dedicated node type called ``table`` is provided.
 This data type parses DIPL nodes from tabulated datasets that are supplied as a block value.
+As a convention, imported tabulated data files should have an extension ``.dipt``.
 
 The table structure closely resembles a standard CSV format but uses a specialized header syntax.
 The table header contains node declarations corresponding to each column in the table. Each declaration must begin on a new line and must not be indented.
