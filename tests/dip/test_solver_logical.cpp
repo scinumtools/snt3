@@ -135,3 +135,15 @@ TEST(SolverLogical, References) {
     data = solver.eval("{..snap} == 3");
     EXPECT_EQ(data.value->to_string(), "true");
 }
+
+TEST(SolverLogical, ArrayAlgebra) {
+
+    // solve expression
+    dip::DIP d;
+    d.add_string("foo int[3] = [-1,2,3]");
+    dip::Environment env = d.parse();
+
+    dip::LogicalSolver solver(env);
+    dip::ValueNodeData data = solver.eval("{?foo} < 0");
+    EXPECT_EQ(data.value->to_string(), "[true, false, false]");
+}

@@ -165,3 +165,68 @@ TEST(ParseTables, TableDeclaration) {
         }
     }
 }
+
+TEST(ParseTables, DeclareTableNodes) {
+    { // Declare table node
+        dip::DIP d;
+        d.add_string(
+            "foo\n"
+            "  bar table\n"
+            "    crackle int[:]\n"
+            "  bar table = \"\"\"crackle int\n"
+            "---\n"
+            "1\n"
+            "2\n"
+            "\"\"\""
+        );
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 1);
+
+        dip::ValueNode::PointerType vnode = env.nodes.at(0);
+        EXPECT_EQ(vnode->path.name, "foo.bar.crackle");
+    }
+    { // Declared node is missing in the table
+        dip::DIP d;
+        d.add_string(
+            "foo\n"
+            "  bar table\n"
+            "    crackle int[:]\n"
+            "    pop bool[:]\n"
+            "  bar table = \"\"\"crackle int\n"
+            "---\n"
+            "1\n"
+            "2\n"
+            "\"\"\""
+        );
+        try {
+            d.parse();
+            FAIL() << "Expected std::runtime_error";
+        } catch (const std::runtime_error& e) {
+            EXPECT_STREQ(e.what(), "Declared node has undefined value:     pop bool[:]");
+        } catch (...) {
+            FAIL() << "Expected std::runtime_error";
+        }
+    }
+    { // Declared node has properties
+        dip::DIP d;
+        d.add_string(
+            "foo\n"
+            "  bar table\n"
+            "    crackle int[:]\n"
+            "      !condition ( {.} < 0 )\n"
+            "  bar table = \"\"\"crackle int\n"
+            "---\n"
+            "1\n"
+            "2\n"
+            "\"\"\""
+        );
+        try {
+            d.parse();
+            FAIL() << "Expected std::runtime_error";
+        } catch (const std::runtime_error& e) {
+            EXPECT_STREQ(e.what(), "Node does not satisfy the given condition:  {.} < 0 ");
+        } catch (...) {
+            FAIL() << "Expected std::runtime_error";
+        }
+    }
+}

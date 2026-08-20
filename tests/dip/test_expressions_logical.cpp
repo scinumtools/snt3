@@ -106,3 +106,19 @@ TEST(ExpressionsLogical, Dimensional) {
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "true");
 }
+
+TEST(ExpressionsLogical, ArrayAlgebra) {
+    // compare equal
+    dip::DIP d;
+    d.add_string(
+        "foo int[3] = [-1,2,3]\n"
+        "bar bool[3] = ({?foo} < 0)"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 2);
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(1);
+    EXPECT_EQ(vnode->path.name, "bar");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->to_string(), "[true, false, false]");
+}

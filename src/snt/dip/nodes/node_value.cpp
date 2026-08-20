@@ -233,7 +233,7 @@ namespace snt::dip {
             } else {
                 LogicalSolver solver(env, path);
                 ValueNodeData data = solver.eval(condition);
-                if (data.value->to_string() == std::string(core::KEYWORD_FALSE))
+                if (!data.value->all_of())
                     throw std::runtime_error("Node does not satisfy the given condition: " + condition);
             }
         }

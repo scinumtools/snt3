@@ -1,10 +1,16 @@
-#ifndef PUQ_EXCEPTIONS_H
-#define PUQ_EXCEPTIONS_H
+#ifndef SNT_PUQ_EXCEPTIONS_H
+#define SNT_PUQ_EXCEPTIONS_H
 
+#include <snt/core/exceptions.h>
 #include <snt/puq/systems/unit_system.h>
 #include <string>
 
 namespace snt::puq {
+
+    class Exception : public core::Exception {
+      public:
+        using core::Exception::Exception;
+    };
 
     class CalculatorExcept : public std::exception {
       private:
@@ -50,4 +56,4 @@ namespace snt::puq {
 
 } // namespace snt::puq
 
-#endif // PUQ_EXCEPTIONS_H
+#endif // SNT_PUQ_EXCEPTIONS_H

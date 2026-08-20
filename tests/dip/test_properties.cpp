@@ -210,6 +210,22 @@ TEST(Properties, Condition) {
     );
     env = d.parse();
     EXPECT_EQ(env.nodes.size(), 3); // condition is not returned as a separate node
+
+    // array algebra
+    d = dip::DIP();
+    d.add_string(
+        "foo int[3]\n"
+        "  !condition ({.} < 0)\n"
+        "foo = [-1,2,3]\n"
+    );
+    try {
+        d.parse();
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error& e) {
+        EXPECT_STREQ(e.what(), "Node does not satisfy the given condition: {.} < 0");
+    } catch (...) {
+        FAIL() << "Expected std::runtime_error";
+    }
 }
 
 TEST(Properties, OptionsBolean) {
