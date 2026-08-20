@@ -123,3 +123,7 @@ output
   time float[5] = [0.234,1.355,2.535,3.255,4.455]
   intensity float[5] = [2.34,9.4,3.4,2.3,23.4] W/m2
 ```
+
+> [!NOTE]
+> Table nodes can be declared similarly to other value nodes and defined later.
+> This is especially useful when using `schemas`.
