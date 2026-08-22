@@ -9,7 +9,8 @@ namespace snt::puq {
 
     class Exception : public core::Exception {
       public:
-        using core::Exception::Exception;
+        explicit Exception(std::string message) : core::Exception(std::move(message), "[SNT-PUQ] ") {}
+        explicit Exception(core::ExceptionInfo info) : core::Exception(std::move(info), "[SNT-PUQ] ") {}
     };
 
     class CalculatorExcept : public std::exception {

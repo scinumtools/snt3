@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -222,11 +223,14 @@ TEST(ParseTables, DeclareTableNodes) {
         );
         try {
             d.parse();
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) {
-            EXPECT_STREQ(e.what(), "Node does not satisfy the given condition:  {.} < 0 ");
+            FAIL() << "Expected dip::SyntaxException";
+        } catch (const dip::SyntaxException& e) {
+            EXPECT_EQ(e.info().message, "Node does not satisfy its condition");
+            EXPECT_EQ(e.info().expected, "Condition ' {.} < 0 ' passes.");
+            EXPECT_EQ(e.info().actual, "Condition failed.");
+            EXPECT_EQ(e.info().suggestion, "Check condition values and references.");
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected dip::SyntaxException";
         }
     }
 }

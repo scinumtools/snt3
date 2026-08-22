@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -40,19 +41,20 @@ TEST(Properties, Constant) {
 
     // Throw an error if indent is not higher
     d = dip::DIP();
-    d.add_string("  foo bool = true");
-    d.add_string("!constant");
+    d.add_string(
+        "  foo bool = true\n"
+        "!constant"
+    );
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(
-            e.what(),
-            "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': "
-            "!constant"
-        );
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Node property has an invalid indent");
+        EXPECT_EQ(e.info().expected, "4");
+        EXPECT_EQ(e.info().actual, "0");
+        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -89,19 +91,20 @@ TEST(Properties, Format) {
 
     // Throw an error if indent is not higher
     d = dip::DIP();
-    d.add_string("  foo str = \"bar\"");
-    d.add_string("!format \"[a-z]+\"");
+    d.add_string(
+        "  foo str = \"bar\"\n"
+        "!format \"[a-z]+\""
+    );
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(
-            e.what(),
-            "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': "
-            "!format \"[a-z]+\""
-        );
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Node property has an invalid indent");
+        EXPECT_EQ(e.info().expected, "4");
+        EXPECT_EQ(e.info().actual, "0");
+        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -131,15 +134,14 @@ TEST(Properties, Tags) {
     d.add_string("!tags \"[a-z]+\"");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(
-            e.what(),
-            "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': !tags "
-            "\"[a-z]+\""
-        );
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Node property has an invalid indent");
+        EXPECT_EQ(e.info().expected, "4");
+        EXPECT_EQ(e.info().actual, "0");
+        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -167,11 +169,14 @@ TEST(Properties, Condition) {
     d.add_string("  !condition false");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Node does not satisfy the given condition: false");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Node does not satisfy its condition");
+        EXPECT_EQ(e.info().expected, "Condition 'false' passes.");
+        EXPECT_EQ(e.info().actual, "Condition failed.");
+        EXPECT_EQ(e.info().suggestion, "Check condition values and references.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 
     // Test self reference
@@ -191,11 +196,14 @@ TEST(Properties, Condition) {
     d.add_string("  !condition ({.} > 2)");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Node does not satisfy the given condition: {.} > 2");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Node does not satisfy its condition");
+        EXPECT_EQ(e.info().expected, "Condition '{.} > 2' passes.");
+        EXPECT_EQ(e.info().actual, "Condition failed.");
+        EXPECT_EQ(e.info().suggestion, "Check condition values and references.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 
     // solve traversing
@@ -220,11 +228,14 @@ TEST(Properties, Condition) {
     );
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Node does not satisfy the given condition: {.} < 0");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Node does not satisfy its condition");
+        EXPECT_EQ(e.info().expected, "Condition '{.} < 0' passes.");
+        EXPECT_EQ(e.info().actual, "Condition failed.");
+        EXPECT_EQ(e.info().suggestion, "Check condition values and references.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -484,14 +495,16 @@ TEST(Properties, Metadata) {
     d.add_string("bar int = 3");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(
-            e.what(),
-            "Only value nodes (bool, int, float and str) can have properties:   ?descr \"This is a group node\""
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Cannot set a property on a non-value node");
+        EXPECT_EQ(
+            e.info().expected, "Only value nodes (boolean, integer, float, string and table) can have properties."
         );
+        EXPECT_EQ(e.info().actual, "Node type is: group");
+        EXPECT_EQ(e.info().suggestion, "Remove the property or move it behind a value node.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 
     // Throw an error if indent is not higher
@@ -500,14 +513,13 @@ TEST(Properties, Metadata) {
     d.add_string("?descr \"If foo is true, bar is false\"");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(
-            e.what(),
-            "The indent of a property '0' is not 2 white spaces higher than the indent of a preceding node '2': ?descr "
-            "\"If foo is true, bar is false\""
-        );
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Node property has an invalid indent");
+        EXPECT_EQ(e.info().expected, "4");
+        EXPECT_EQ(e.info().actual, "0");
+        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }

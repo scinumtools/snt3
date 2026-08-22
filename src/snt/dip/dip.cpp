@@ -62,7 +62,7 @@ namespace snt::dip {
         // prepare source data
         std::ifstream file(source_file);
         if (!file)
-            throw Exception("Following file could not be found: " + source_file.string());
+            throw dip::IOException("File not found", source_file.string(), "", "", __FILE__, __LINE__);
         std::ostringstream source_code;
         source_code << file.rdbuf();
         if (source_name.empty()) {
@@ -112,18 +112,31 @@ namespace snt::dip {
 
     inline void check_indent(BaseNode::PointerType previous_node, BaseNode::PointerType current_node) {
         // We make sure that the indent spacing is always set by INDENT_STEP
-        if ((current_node->indent % INDENT_STEP) != 0)
-            throw Exception(
-                "Indent of the current node is not a multiple of " + std::to_string(INDENT_STEP) + " '" +
-                std::to_string(current_node->indent) + "': " + current_node->line.code
+        if ((current_node->indent % INDENT_STEP) != 0) {
+            std::stringstream suggested;
+            suggested << (current_node->indent - (current_node->indent % INDENT_STEP)) << ", ";
+            suggested << (current_node->indent - (current_node->indent % INDENT_STEP) + INDENT_STEP) << ", ...";
+            throw dip::SyntaxException(
+                "Invalid indent length",
+                "Multiple of " + std::to_string(INDENT_STEP) + ".",
+                std::to_string(current_node->indent),
+                suggested.str(),
+                current_node.get(),
+                __FILE__,
+                __LINE__
             );
+        }
         if (previous_node != nullptr) {
             if ((current_node->indent > previous_node->indent) &&
                 (current_node->indent - previous_node->indent) != INDENT_STEP) {
-                throw Exception(
-                    "Indent of the child node '" + std::to_string(current_node->indent) + "' is not exactly " +
-                    std::to_string(INDENT_STEP) + " white spaces higher than its parent nodes '" +
-                    std::to_string(current_node->indent) + "': " + current_node->line.code
+                throw dip::SyntaxException(
+                    "Child node has an invalid indent",
+                    std::to_string(previous_node->indent + INDENT_STEP),
+                    std::to_string(current_node->indent),
+                    "Indent " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
+                    current_node.get(),
+                    __FILE__,
+                    __LINE__
                 );
             }
         }
@@ -132,17 +145,46 @@ namespace snt::dip {
     inline void set_node_property(BaseNode::PointerType current_node, BaseNode::PointerType previous_node) {
         // assign properties to the previous value node
         PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
-        if (!previous_node ||
-            std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) == preceeding_nodes.end())
-            throw Exception("Only value nodes (bool, int, float and str) can have properties: " + pnode->line.code);
+        if (!previous_node || std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
+                                  preceeding_nodes.end()) {
+            std::stringstream ss;
+            for (size_t i = 0; i < preceeding_nodes.size(); i++) {
+                if (i == preceeding_nodes.size() - 1)
+                    ss << " and ";
+                else if (i > 0)
+                    ss << ", ";
+                ss << NodeDtypeNames.at(preceeding_nodes[i]);
+            }
+            throw dip::SyntaxException(
+                "Cannot set a property on a non-value node",
+                "Only value nodes (" + ss.str() + ") can have properties.",
+                "Node type is: " + NodeDtypeNames.at(previous_node->dtype),
+                "Remove the property or move it behind a value node.",
+                pnode.get(),
+                __FILE__,
+                __LINE__
+            );
+        }
         if (previous_node->indent >= pnode->indent || (pnode->indent - previous_node->indent) != INDENT_STEP)
-            throw Exception(
-                "The indent of a property '" + std::to_string(pnode->indent) + "' is not " +
-                std::to_string(INDENT_STEP) + " white spaces higher than the indent of a preceding node '" +
-                std::to_string(previous_node->indent) + "': " + pnode->line.code
+            throw dip::SyntaxException(
+                "Node property has an invalid indent",
+                std::to_string(previous_node->indent + INDENT_STEP),
+                std::to_string(pnode->indent),
+                "Indent " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
+                pnode.get(),
+                __FILE__,
+                __LINE__
             );
         if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
-            throw Exception("Property could not be set: " + pnode->line.code);
+            throw dip::SyntaxException(
+                "Node property could not be set",
+                "Property is assigned to the preceeding value node.",
+                "Property could not be assigned to the preceeing node: " + previous_node->path.name,
+                "Check the property and preceeding node.",
+                pnode.get(),
+                __FILE__,
+                __LINE__
+            );
     }
 
     Environment DIP::parse() {
@@ -177,8 +219,15 @@ namespace snt::dip {
                 if (schema_nodes.size() > 0) {
                     env.schemas.append(current_node->value_raw.at(0), schema_nodes);
                 } else {
-                    PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
-                    throw Exception("Cannot define an empty schema: " + pnode->line.code);
+                    throw dip::SyntaxException(
+                        "Schema does not contain any value nodes",
+                        "Schema contains some value nodes.",
+                        "Schema is empty.",
+                        "Declare, or define value nodes in the schema.",
+                        current_node.get(),
+                        __FILE__,
+                        __LINE__
+                    );
                 }
             } else {
                 // push rest of the nodes to the filtered node queue
@@ -242,10 +291,26 @@ namespace snt::dip {
                     if (node->dtype == NodeDtype::Modification) {
                         std::string prefix = source.name + "_" + std::string(STRING_SOURCE);
                         if (node->line.source.name.compare(0, prefix.size(), prefix) == 0)
-                            throw Exception("Modifying undefined node: " + node->line.code);
+                            throw dip::SyntaxException(
+                                "Modifying undefined node",
+                                "Node type has to be defined",
+                                "Could not find previous node definition",
+                                "Specify type (e.g. bool, float, ...) or add declaration prior to this node",
+                                node.get(),
+                                __FILE__,
+                                __LINE__
+                            );
                     }
                     if (vnode == nullptr)
-                        throw Exception("Only value nodes can be inserted into an environment: " + node->line.code);
+                        throw dip::ParserException(
+                            "Cannot insert a node without a value into an environment",
+                            "Value of a node is set before inserted to the environment.",
+                            "Value is undefined",
+                            "Check why value was not set properly.",
+                            vnode.get(),
+                            __FILE__,
+                            __LINE__
+                        );
                     target.nodes.push_back(vnode);
                 }
             }
@@ -259,7 +324,15 @@ namespace snt::dip {
                 vnode->validate_condition(target);
                 vnode->validate_format();
             } else {
-                throw Exception("Detected non-value node in the node list: " + target.nodes.at(i)->line.code);
+                throw dip::ParserException(
+                    "Node in a node list has undefined value",
+                    "Nodes in a node list have defined values.",
+                    "Value is undefined",
+                    "Check why value was not set properly.",
+                    target.nodes.at(i).get(),
+                    __FILE__,
+                    __LINE__
+                );
             }
         }
         return target;

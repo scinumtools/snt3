@@ -1,6 +1,7 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -39,28 +40,36 @@ TEST(Hierarchy, GroupNodes) {
 TEST(Hierarchy, IndentationChecking) {
 
     dip::DIP d;
-    d.add_string("foo int = 2\n bar int = 3");
+    d.add_string(
+        "foo int = 2\n"
+        " bar int = 3"
+    );
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Indent of the current node is not a multiple of 2 '1':  bar int = 3");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Invalid indent length");
+        EXPECT_EQ(e.info().expected, "Multiple of 2.");
+        EXPECT_EQ(e.info().actual, "1");
+        EXPECT_EQ(e.info().suggestion, "0, 2, ...");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 
     d = dip::DIP();
-    d.add_string("foo int = 2\n    bar int = 3");
+    d.add_string(
+        "foo int = 2\n"
+        "    bar int = 3"
+    );
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(
-            e.what(),
-            "Indent of the child node '4' is not exactly 2 white spaces higher than its parent nodes '4':     bar int "
-            "= 3"
-        );
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Child node has an invalid indent");
+        EXPECT_EQ(e.info().expected, "2");
+        EXPECT_EQ(e.info().actual, "4");
+        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }

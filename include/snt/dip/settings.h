@@ -2,6 +2,7 @@
 #define DIP_SETTINGS_H
 
 #include <cstdint>
+#include <map>
 #include <snt/core/settings.h>
 #include <sstream>
 #include <string>
@@ -93,7 +94,7 @@ namespace snt::dip {
 
     struct Source {
         std::string name;
-        int line_number;
+        size_t line_number;
     };
 
     struct Line {
@@ -143,6 +144,7 @@ namespace snt::dip {
         Modification, // data handling
         Property,     // properties
     };
+    extern std::unordered_map<NodeDtype, std::string> NodeDtypeNames;
 
     enum class PropertyType {
         None, // not a property

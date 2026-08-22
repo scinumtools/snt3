@@ -1,5 +1,6 @@
 #include <optional>
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/solvers/logical_solver.h>
 #include <sstream>
@@ -225,18 +226,29 @@ namespace snt::dip {
     }
 
     void ValueNode::validate_condition(Environment& env) const {
+        bool passed = true;
         if (!condition.empty()) {
             if (condition == core::KEYWORD_FALSE) {
-                throw std::runtime_error("Node does not satisfy the given condition: " + condition);
+                passed = false;
             } else if (condition == core::KEYWORD_TRUE) {
                 return;
             } else {
                 LogicalSolver solver(env, path);
                 ValueNodeData data = solver.eval(condition);
                 if (!data.value->all_of())
-                    throw std::runtime_error("Node does not satisfy the given condition: " + condition);
+                    passed = false;
             }
         }
+        if (!passed)
+            throw dip::SyntaxException(
+                "Node does not satisfy its condition",
+                "Condition '" + condition + "' passes.",
+                "Condition failed.",
+                "Check condition values and references.",
+                this,
+                __FILE__,
+                __LINE__
+            );
     }
 
     void ValueNode::validate_options() const {

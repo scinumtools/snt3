@@ -58,7 +58,7 @@ namespace snt::dip {
         // parse nodes from a text
         std::string line;
         std::istringstream ss(source_code);
-        int line_number = 0;
+        size_t line_number = 1;
         while (std::getline(ss, line)) {
             // skip empty lines
             if (!line.empty() && !std::all_of(line.begin(), line.end(), isspace))

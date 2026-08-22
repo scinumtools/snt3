@@ -1,6 +1,7 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -42,11 +43,14 @@ TEST(Modifications, ModificationNode) {
     d.add_string("foo = 3");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Modifying undefined node: foo = 3");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Modifying undefined node");
+        EXPECT_EQ(e.info().expected, "Node type has to be defined");
+        EXPECT_EQ(e.info().actual, "Could not find previous node definition");
+        EXPECT_EQ(e.info().suggestion, "Specify type (e.g. bool, float, ...) or add declaration prior to this node");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 

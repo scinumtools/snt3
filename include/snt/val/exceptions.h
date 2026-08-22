@@ -7,7 +7,8 @@ namespace snt::val {
 
     class Exception : public core::Exception {
       public:
-        using core::Exception::Exception;
+        explicit Exception(std::string message) : core::Exception(std::move(message), "[SNT-VAL] ") {}
+        explicit Exception(core::ExceptionInfo info) : core::Exception(std::move(info), "[SNT-VAL] ") {}
     };
 
 } // namespace snt::val
