@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_float.h>
 
 using namespace snt;
@@ -161,11 +162,14 @@ TEST(ParseScalars, NewLineDefinitions) {
         );
         try {
             d.parse();
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) {
-            EXPECT_STREQ(e.what(), "Node definition on a new line is not indented by 2 spaces: 5");
+            FAIL() << "Expected dip::SyntaxException";
+        } catch (const dip::SyntaxException& e) {
+            EXPECT_EQ(e.info().message, "Node definition on a new line has an invalid indent");
+            EXPECT_EQ(e.info().expected, "2");
+            EXPECT_EQ(e.info().actual, "5");
+            EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected dip::SyntaxException";
         }
     }
     { // multiline comments

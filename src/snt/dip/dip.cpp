@@ -121,9 +121,9 @@ namespace snt::dip {
                 "Multiple of " + std::to_string(INDENT_STEP) + ".",
                 std::to_string(current_node->indent),
                 suggested.str(),
-                current_node.get(),
                 __FILE__,
-                __LINE__
+                __LINE__,
+                current_node->line
             );
         }
         if (previous_node != nullptr) {
@@ -134,9 +134,9 @@ namespace snt::dip {
                     std::to_string(previous_node->indent + INDENT_STEP),
                     std::to_string(current_node->indent),
                     "Indent " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
-                    current_node.get(),
                     __FILE__,
-                    __LINE__
+                    __LINE__,
+                    current_node->line
                 );
             }
         }
@@ -160,9 +160,9 @@ namespace snt::dip {
                 "Only value nodes (" + ss.str() + ") can have properties.",
                 "Node type is: " + NodeDtypeNames.at(previous_node->dtype),
                 "Remove the property or move it behind a value node.",
-                pnode.get(),
                 __FILE__,
-                __LINE__
+                __LINE__,
+                pnode->line
             );
         }
         if (previous_node->indent >= pnode->indent || (pnode->indent - previous_node->indent) != INDENT_STEP)
@@ -171,9 +171,9 @@ namespace snt::dip {
                 std::to_string(previous_node->indent + INDENT_STEP),
                 std::to_string(pnode->indent),
                 "Indent " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
-                pnode.get(),
                 __FILE__,
-                __LINE__
+                __LINE__,
+                pnode->line
             );
         if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
             throw dip::SyntaxException(
@@ -181,9 +181,9 @@ namespace snt::dip {
                 "Property is assigned to the preceeding value node.",
                 "Property could not be assigned to the preceeing node: " + previous_node->path.name,
                 "Check the property and preceeding node.",
-                pnode.get(),
                 __FILE__,
-                __LINE__
+                __LINE__,
+                pnode->line
             );
     }
 
@@ -224,9 +224,9 @@ namespace snt::dip {
                         "Schema contains some value nodes.",
                         "Schema is empty.",
                         "Declare, or define value nodes in the schema.",
-                        current_node.get(),
                         __FILE__,
-                        __LINE__
+                        __LINE__,
+                        current_node->line
                     );
                 }
             } else {
@@ -296,9 +296,9 @@ namespace snt::dip {
                                 "Node type has to be defined",
                                 "Could not find previous node definition",
                                 "Specify type (e.g. bool, float, ...) or add declaration prior to this node",
-                                node.get(),
                                 __FILE__,
-                                __LINE__
+                                __LINE__,
+                                node->line
                             );
                     }
                     if (vnode == nullptr)
@@ -307,9 +307,9 @@ namespace snt::dip {
                             "Value of a node is set before inserted to the environment.",
                             "Value is undefined",
                             "Check why value was not set properly.",
-                            vnode.get(),
                             __FILE__,
-                            __LINE__
+                            __LINE__,
+                            vnode->line
                         );
                     target.nodes.push_back(vnode);
                 }
@@ -329,9 +329,9 @@ namespace snt::dip {
                     "Nodes in a node list have defined values.",
                     "Value is undefined",
                     "Check why value was not set properly.",
-                    target.nodes.at(i).get(),
                     __FILE__,
-                    __LINE__
+                    __LINE__,
+                    target.nodes.at(i)->line
                 );
             }
         }

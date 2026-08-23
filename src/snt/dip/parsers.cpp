@@ -14,6 +14,7 @@
 #include <fstream>
 #include <iostream>
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_boolean.h>
 #include <snt/dip/nodes/node_case.h>
 #include <snt/dip/nodes/node_float.h>
@@ -45,7 +46,14 @@ namespace snt::dip {
         } else {
             std::ifstream file(source_file);
             if (!file)
-                throw std::runtime_error("Following file could not be found: " + source_file);
+                throw dip::IOException(
+                    "File could not be found",
+                    "Path points to a valid file: " + source_file,
+                    "File could not be openned.",
+                    "Check if file exists on this path and if you have enough permissions.",
+                    __FILE__,
+                    __LINE__
+                );
             std::ostringstream source_code;
             source_code << file.rdbuf();
             return EnvSource({source_name, source_file, source_code.str(), parent});
@@ -127,9 +135,14 @@ namespace snt::dip {
                             line.code = remove_comments(line.code) + " " + next.code.substr(next_indent);
                             lines.pop();
                         } else {
-                            throw std::runtime_error(
-                                "Node definition on a new line is not indented by " + std::to_string(INDENT_STEP) +
-                                " spaces: " + std::to_string(next_indent - line_indent)
+                            throw dip::SyntaxException(
+                                "Node definition on a new line has an invalid indent",
+                                std::to_string(line_indent + INDENT_STEP),
+                                std::to_string(next_indent),
+                                "Indent " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
+                                __FILE__,
+                                __LINE__,
+                                next
                             );
                         }
                     }
@@ -166,7 +179,7 @@ namespace snt::dip {
                     balance += count_group_balance(next.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
                 }
                 if (balance != 0) {
-                    throw std::runtime_error("Expression: Unbalanced parentheses");
+                    throw dip::Exception("Expression: Unbalanced parentheses");
                 }
             }
             {
@@ -179,7 +192,7 @@ namespace snt::dip {
                     balance += count_group_balance(next.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
                 }
                 if (balance != 0) {
-                    throw std::runtime_error("Array: Unbalanced parentheses");
+                    throw dip::Exception("Array: Unbalanced parentheses");
                 }
             }
 
@@ -229,9 +242,9 @@ namespace snt::dip {
 
             // make sure that everything was parsed
             if (node == nullptr)
-                throw std::runtime_error("Node could not be determined from : " + line.code);
+                throw dip::Exception("Node could not be determined from : " + line.code);
             if (parser.do_continue())
-                throw std::runtime_error("Could not parse all text on the line: " + line.code);
+                throw dip::Exception("Could not parse all text on the line: " + line.code);
 
             // convert escape symbols to original characterss
             for (auto& rval : node->value_raw)
@@ -261,7 +274,7 @@ namespace snt::dip {
             parser.part_dimension();
             parser.part_units();
             if (parser.do_continue())
-                throw std::runtime_error("Incorrect header format: " + line.code);
+                throw dip::Exception("Incorrect header format: " + line.code);
             // initialize actual node
             BaseNode::PointerType node(nullptr);
             if (node == nullptr)
@@ -274,9 +287,9 @@ namespace snt::dip {
                 node = StringNode::is_node(parser);
             // make sure that everything was parsed
             if (node == nullptr)
-                throw std::runtime_error("Node could not be determined from : " + line.code);
+                throw dip::Exception("Node could not be determined from : " + line.code);
             if (parser.do_continue())
-                throw std::runtime_error("Could not parse all text on the line: " + line.code);
+                throw dip::Exception("Could not parse all text on the line: " + line.code);
             node->value_raw.reserve(lines.size()); // roughly reserve some memory to avoid reallocations
             nodes.push_back(node);
         }
@@ -311,13 +324,13 @@ namespace snt::dip {
                 } else if (parser.part_keyword(false, delimiter)) {
                     node->value_raw.push_back(parser.value_raw.at(0));
                 } else {
-                    throw std::runtime_error(
+                    throw dip::Exception(
                         "Could not parse column '" + node->path.name + "' from the table row: " + line.code
                     );
                 }
             }
             if (parser.do_continue())
-                throw std::runtime_error("Could not parse all text on the line: " + line.code);
+                throw dip::Exception("Could not parse all text on the line: " + line.code);
         }
         return nodes;
     }
@@ -343,7 +356,7 @@ namespace snt::dip {
         ss.get(ch);
         rm << ch;
         if (ch != SIGN_ARRAY_OPEN)
-            throw std::runtime_error("Given source code is not a valid array: " + value_string);
+            throw dip::Exception("Given source code is not a valid array: " + value_string);
 
         std::string value;
         bool inString = false;
@@ -386,14 +399,14 @@ namespace snt::dip {
 
         // Check if all nested arrays are closed
         if (dim != 0)
-            throw std::runtime_error("Definition of an array has some unclosed brackets or quotes: " + value_string);
+            throw dip::Exception("Definition of an array has some unclosed brackets or quotes: " + value_string);
 
         // Normalize shape and check coherence of nested arrays
         size_t coef = 1;
         for (int d = 1; d < value_shape.size(); d++) {
             coef *= value_shape[d - 1];
             if (value_shape[d] % coef != 0)
-                throw std::runtime_error(
+                throw dip::Exception(
                     "Items in dimension " + std::to_string(d + 1) + " do not have the same shape: " + value_string
                 );
             value_shape[d] /= coef;
@@ -407,7 +420,7 @@ namespace snt::dip {
         trim(value_string);
         value_string.erase(std::remove(value_string.begin(), value_string.end(), '\n'), value_string.end());
         if (value_string.empty())
-            throw std::runtime_error("Source code of the value is empty");
+            throw dip::Exception("Source code of the value is empty");
         else if (value_string.at(0) == SIGN_ARRAY_OPEN)
             parse_array(value_string, value_raw, value_shape);
         else
@@ -434,7 +447,7 @@ namespace snt::dip {
                     range = {static_cast<size_t>(std::stoul(dmin)), static_cast<size_t>(std::stoul(dmax))};
             }
             if (range.dmax != val::Array::max_range && range.dmax < range.dmin)
-                throw std::runtime_error("Maximum range must be higher or equal than minimum range: " + dim);
+                throw dip::Exception("Maximum range must be higher or equal than minimum range: " + dim);
             dimension.push_back(range);
         }
     }

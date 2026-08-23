@@ -245,9 +245,9 @@ namespace snt::dip {
                 "Condition '" + condition + "' passes.",
                 "Condition failed.",
                 "Check condition values and references.",
-                this,
                 __FILE__,
-                __LINE__
+                __LINE__,
+                this->line
             );
     }
 

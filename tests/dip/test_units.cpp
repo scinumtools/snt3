@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 #include <snt/puq/converter.h>
 
 using namespace snt;
@@ -208,11 +209,14 @@ TEST(Units, DimlessInjectionError) {
     d.add_string("bar float = {?foo}");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Request: Trying to convert 'm' into a nondimensional quantity: foo float = 23 m");
+        FAIL() << "Expected dip::UnitsException";
+    } catch (const dip::UnitsException& e) {
+        EXPECT_EQ(e.info().message, "Conversion between dimensional and nondimensional quantity");
+        EXPECT_EQ(e.info().expected, "Final quantity should have no physical dimensions.");
+        EXPECT_EQ(e.info().actual, "Converted dimension has physical dimensions: m");
+        EXPECT_EQ(e.info().suggestion, "Check the units of the input quantity.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::UnitsException";
     }
 }
 

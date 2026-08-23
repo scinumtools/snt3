@@ -12,32 +12,35 @@ namespace snt::core {
     struct SourceLocation {
         std::string source;
         std::size_t line = 0;
-        std::string code;
-        std::optional<std::size_t> column;
+        std::optional<std::string> code = std::nullopt;
+        std::optional<std::size_t> column = std::nullopt;
     };
 
     struct ExceptionInfo {
-        std::string message;                    ///< Exception message
-        std::string expected;                   ///< Expected value, behavior
-        std::string actual;                     ///< Actual value, behavior
-        std::string suggestion;                 ///< Suggested changes
-        std::optional<SourceLocation> location; ///< Where the error is reported to the user.
-        std::optional<SourceLocation> origin;   ///< Where the operation originated, e.g. DIPL.
+        std::string message;                  ///< Exception message
+        std::string expected;                 ///< Expected value, behavior
+        std::string actual;                   ///< Actual value, behavior
+        std::string suggestion;               ///< Suggested changes
+        std::optional<SourceLocation> origin; ///< Where the error was thrown
     };
 
-    class Exception : public std::runtime_error {
+    template <typename E> class ExceptionBase : public std::runtime_error {
       public:
-        explicit Exception(std::string message, std::string prefix = "[SNT-CORE] ")
-            : std::runtime_error(message), m_info(ExceptionInfo({message})), m_what(format(m_info, prefix)) {}
-        explicit Exception(ExceptionInfo info, std::string prefix = "[SNT-CORE] ")
-            : std::runtime_error(info.message), m_info(std::move(info)), m_what(format(m_info, prefix)) {}
+        explicit ExceptionBase(std::string message, std::string prefix = "[SNT-CORE] ")
+            : std::runtime_error(message), m_info({std::move(message)}) {
+            m_what = format(m_info, "[SNT-CORE] ");
+        }
+        explicit ExceptionBase(E info, std::string prefix = "[SNT-CORE] ")
+            : std::runtime_error(info.message), m_info(std::move(info)) {
+            m_what = format(m_info, "[SNT-CORE] ");
+        }
 
         const char* what() const noexcept override { return m_what.c_str(); }
 
-        const ExceptionInfo& info() const noexcept { return m_info; }
+        const E& info() const noexcept { return m_info; }
 
-      private:
-        static std::string format(const ExceptionInfo& info, std::string prefix = "") {
+      protected:
+        virtual std::string format(const E& info, std::string prefix = "") {
             std::ostringstream out;
             out << prefix << info.message;
             if (!info.expected.empty())
@@ -46,14 +49,11 @@ namespace snt::core {
                 out << "\n  actual:     " << info.actual;
             if (!info.suggestion.empty())
                 out << "\n  suggestion: " << info.suggestion;
-            if (info.origin) {
-                out << "\n  at:         " << format_location(*info.location);
-            }
-            if (info.location)
+            if (info.origin)
                 out << "\n  thrown:     " << format_location(*info.origin);
             return out.str();
         }
-        static std::string format_location(const SourceLocation& location) {
+        std::string format_location(const SourceLocation& location) {
             std::ostringstream out;
             out << location.source;
             if (location.line != 0) {
@@ -62,14 +62,34 @@ namespace snt::core {
                     out << ':' << *location.column;
                 }
             }
-            if (!location.code.empty())
-                out << " | " << location.code;
+            if (location.code)
+                out << " | " << *location.code;
             return out.str();
         }
 
-      private:
-        ExceptionInfo m_info;
+      protected:
+        E m_info;
         std::string m_what;
+    };
+
+    using Exception = core::ExceptionBase<core::ExceptionInfo>;
+
+    /**
+     * Missing exception is triggered when functionality is not implemented yet
+     */
+    class MissingException : public core::Exception {
+      public:
+        MissingException(std::string message, std::string file, std::size_t line)
+            : core::Exception(
+                  core::ExceptionInfo{
+                      std::move(message),
+                      "",
+                      "",
+                      "If you need this functionality, please contact the developers, open an issue or send a pull "
+                      "request on GitHub.",
+                      core::SourceLocation{file, line}
+                  }
+              ) {};
     };
 
 } // namespace snt::core

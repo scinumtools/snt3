@@ -1,6 +1,8 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_value.h>
+#include <snt/exs/exceptions.h>
 #include <unordered_set>
 
 namespace snt::dip {
@@ -14,7 +16,14 @@ namespace snt::dip {
     inline std::tuple<std::string, std::string> parse_request(const std::string& request) {
         size_t pos = request.find(SIGN_QUERY);
         if (pos == std::string::npos)
-            throw std::runtime_error("Environment request must contain a question mark symbol: " + request);
+            throw dip::EnvironmentException(
+                "Invalid node request",
+                "Environment request contains question mark symbol.",
+                "No question mark symbol found in: " + request,
+                "Try adding the question mark at the front: ?" + request,
+                __FILE__,
+                __LINE__
+            );
         else
             return {request.substr(0, pos), request.substr(pos + 1)};
     }
@@ -30,8 +39,7 @@ namespace snt::dip {
 
         switch (rtype) {
         case RequestType::Function: {
-            // TODO: this needs to be implemented
-            std::runtime_error("Functions in the request_node_data are not implemented yet.");
+            core::MissingException("Functions in the request_node_data are not implemented yet.", __FILE__, __LINE__);
             break;
         }
         case RequestType::Reference: {
@@ -49,12 +57,15 @@ namespace snt::dip {
             break;
         }
         default:
-            throw std::runtime_error("Unrecognized environment request type");
+            throw dip::EnvironmentException(
+                "Unrecognised request type",
+                "Requested type can be either a function, or a reference.",
+                "Unknown request type selected.",
+                "Select either a function, or a reference request type.",
+                __FILE__,
+                __LINE__
+            );
         }
-        // NOTE: We need to enable this in order to implemente the def/ndef logical operators
-        // if (new_value.value == nullptr)
-        //    throw std::runtime_error("Value node data environment request returns an empty
-        //    pointer: " + request);
         return new_value;
     }
 
@@ -85,14 +96,24 @@ namespace snt::dip {
                         // "none".
                         //       This is usefull if we want to simply get a reference node as it is.
                         if (!vnode->units && !to_unit->empty()) {
-                            throw std::runtime_error(
-                                "Request: Trying to convert nondimensional quantity into '" +
-                                std::string(to_unit.value()) + "': " + vnode->line.code
+                            throw dip::UnitsException(
+                                "Conversion between nondimensional and dimensional quantity",
+                                "Final quantity should have physical dimension: " + std::string(*to_unit),
+                                "Converted quantity has no physical dimensions.",
+                                "Check the units of the input quantity.",
+                                __FILE__,
+                                __LINE__,
+                                vnode->line // TODO:: this is a referenced node, we should show also referencing node
                             );
                         } else if (vnode->units && to_unit->empty()) {
-                            throw std::runtime_error(
-                                "Request: Trying to convert '" + vnode->units_raw +
-                                "' into a nondimensional quantity: " + vnode->line.code
+                            throw dip::UnitsException(
+                                "Conversion between dimensional and nondimensional quantity",
+                                "Final quantity should have no physical dimensions.",
+                                "Converted dimension has physical dimensions: " + vnode->units_raw,
+                                "Check the units of the input quantity.",
+                                __FILE__,
+                                __LINE__,
+                                vnode->line // TODO:: this is a referenced node, we should show also referencing node
                             );
                         } else if (vnode->units) {
                             puq::Quantity quantity = std::move(new_value) * (*vnode->units);
@@ -106,7 +127,7 @@ namespace snt::dip {
             break;
         }
         default:
-            throw std::runtime_error("Unrecognized environment request type");
+            throw dip::Exception("Unrecognized environment request type");
         }
         return std::move(new_value);
     }
@@ -174,10 +195,10 @@ namespace snt::dip {
             break;
         }
         default:
-            throw std::runtime_error("Unrecognized environment request type");
+            throw dip::Exception("Unrecognized environment request type");
         }
         if (new_nodes.empty())
-            throw std::runtime_error("Node environment request returns an empty node group: " + request);
+            throw dip::Exception("Node environment request returns an empty node group: " + request);
         return new_nodes;
     }
 
@@ -188,7 +209,7 @@ namespace snt::dip {
         switch (rtype) {
         case RequestType::Function: {
             // TODO: implement functions
-            throw std::runtime_error("Request map from functions is not implemented yet.");
+            throw dip::Exception("Request map from functions is not implemented yet.");
             break;
         }
         case RequestType::Reference: {
@@ -198,11 +219,11 @@ namespace snt::dip {
             const HierarchyList& hlist =
                 hierarchy;            //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
             if (!source_name.empty()) // TODO: implemente request map from source
-                throw std::runtime_error("Request map from sources is not implemented yet.");
+                throw dip::Exception("Request map from sources is not implemented yet.");
 
             const Collection& col = hlist.get_collection(node_path);
             if (col.kind == Path::Kind::List)
-                throw std::runtime_error("Requested collection is a list: " + request);
+                throw dip::Exception("Requested collection is a list: " + request);
 
             for (const auto& item : col.items) {
                 map.insert({item, request_group(request + "[" + item + "]")});
@@ -210,10 +231,10 @@ namespace snt::dip {
             break;
         }
         default:
-            throw std::runtime_error("Unrecognized environment request type");
+            throw dip::Exception("Unrecognized environment request type");
         }
         if (map.empty())
-            throw std::runtime_error("Node environment request returns an empty node map: " + request);
+            throw dip::Exception("Node environment request returns an empty node map: " + request);
         return map;
     }
 
@@ -224,7 +245,7 @@ namespace snt::dip {
         switch (rtype) {
         case RequestType::Function: {
             // TODO: implement functions
-            throw std::runtime_error("Request list from functions is not implemented yet.");
+            throw dip::Exception("Request list from functions is not implemented yet.");
             break;
         }
         case RequestType::Reference: {
@@ -234,11 +255,11 @@ namespace snt::dip {
             const HierarchyList& hlist =
                 hierarchy;            //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
             if (!source_name.empty()) // TODO: implemente request list from source
-                throw std::runtime_error("Request list from sources is not implemented yet.");
+                throw dip::Exception("Request list from sources is not implemented yet.");
 
             const Collection& col = hlist.get_collection(node_path);
             if (col.kind == Path::Kind::Map)
-                throw std::runtime_error("Requested collection is a map: " + request);
+                throw dip::Exception("Requested collection is a map: " + request);
 
             for (const auto& item : col.items) {
                 list.push_back(request_group(request + "[" + item + "]"));
@@ -246,10 +267,10 @@ namespace snt::dip {
             break;
         }
         default:
-            throw std::runtime_error("Unrecognized environment request type");
+            throw dip::Exception("Unrecognized environment request type");
         }
         if (list.empty())
-            throw std::runtime_error("Node environment request returns an empty node list: " + request);
+            throw dip::Exception("Node environment request returns an empty node list: " + request);
         return list;
     }
 
