@@ -2,6 +2,7 @@
 #define SNT_DIP_EXCEPTIONS_H
 
 #include <snt/core/exceptions.h>
+#include <snt/dip/settings.h>
 
 namespace snt::dip {
 
@@ -71,6 +72,14 @@ namespace snt::dip {
     };
 
     /**
+     * Solver exceptions occurs when solver cannot process an expression
+     */
+    class SolverException : public dip::Exception {
+      public:
+        using dip::Exception::Exception;
+    };
+
+    /**
      * In/Out exceptions is triggered by problems with a file system (e.g. missing files, timeouts, ...)
      */
     class IOException : public dip::Exception {
@@ -87,9 +96,9 @@ namespace snt::dip {
     };
 
     /**
-     * Units exceptions indicate problems with units and their conversions
+     * Unit exceptions indicate problems with units, conversions and operations
      */
-    class UnitsException : public dip::Exception {
+    class UnitException : public dip::Exception {
       public:
         using dip::Exception::Exception;
     };

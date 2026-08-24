@@ -96,8 +96,8 @@ namespace snt::dip {
                         // "none".
                         //       This is usefull if we want to simply get a reference node as it is.
                         if (!vnode->units && !to_unit->empty()) {
-                            throw dip::UnitsException(
-                                "Conversion between nondimensional and dimensional quantity",
+                            throw dip::UnitException(
+                                "Dimension mismatch",
                                 "Final quantity should have physical dimension: " + std::string(*to_unit),
                                 "Converted quantity has no physical dimensions.",
                                 "Check the units of the input quantity.",
@@ -106,8 +106,8 @@ namespace snt::dip {
                                 vnode->line // TODO:: this is a referenced node, we should show also referencing node
                             );
                         } else if (vnode->units && to_unit->empty()) {
-                            throw dip::UnitsException(
-                                "Conversion between dimensional and nondimensional quantity",
+                            throw dip::UnitException(
+                                "Dimension mismatch",
                                 "Final quantity should have no physical dimensions.",
                                 "Converted dimension has physical dimensions: " + vnode->units_raw,
                                 "Check the units of the input quantity.",
@@ -127,7 +127,14 @@ namespace snt::dip {
             break;
         }
         default:
-            throw dip::Exception("Unrecognized environment request type");
+            throw dip::EnvironmentException(
+                "Unrecognised request type",
+                "Requested type can be either a function, or a reference.",
+                "Unknown request type selected.",
+                "Select either a function, or a reference request type.",
+                __FILE__,
+                __LINE__
+            );
         }
         return std::move(new_value);
     }
@@ -195,10 +202,24 @@ namespace snt::dip {
             break;
         }
         default:
-            throw dip::Exception("Unrecognized environment request type");
+            throw dip::EnvironmentException(
+                "Unrecognised request type",
+                "Requested type can be either a function, or a reference.",
+                "Unknown request type selected.",
+                "Select either a function, or a reference request type.",
+                __FILE__,
+                __LINE__
+            );
         }
         if (new_nodes.empty())
-            throw dip::Exception("Node environment request returns an empty node group: " + request);
+            throw dip::EnvironmentException(
+                "Node request returns empty node group",
+                "Request matches some nodes: " + request,
+                "No nodes were matched.",
+                "Check if request is correct",
+                __FILE__,
+                __LINE__
+            );
         return new_nodes;
     }
 
@@ -208,8 +229,7 @@ namespace snt::dip {
         std::unordered_map<std::string, ValueNode::ListType> map;
         switch (rtype) {
         case RequestType::Function: {
-            // TODO: implement functions
-            throw dip::Exception("Request map from functions is not implemented yet.");
+            throw core::MissingException("Request map from functions is not implemented yet.", __FILE__, __LINE__);
             break;
         }
         case RequestType::Reference: {
@@ -217,24 +237,44 @@ namespace snt::dip {
             std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             const HierarchyList& hlist =
-                hierarchy;            //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
-            if (!source_name.empty()) // TODO: implemente request map from source
-                throw dip::Exception("Request map from sources is not implemented yet.");
+                hierarchy; //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
+            if (!source_name.empty())
+                throw core::MissingException("Request map from sources is not implemented yet.", __FILE__, __LINE__);
 
             const Collection& col = hlist.get_collection(node_path);
             if (col.kind == Path::Kind::List)
-                throw dip::Exception("Requested collection is a list: " + request);
-
+                throw dip::EnvironmentException(
+                    "Requested collection has incorrect type",
+                    "Collection should be a map",
+                    "Collection is a list: " + request,
+                    "Check if requested path is correct",
+                    __FILE__,
+                    __LINE__
+                );
             for (const auto& item : col.items) {
                 map.insert({item, request_group(request + "[" + item + "]")});
             }
             break;
         }
         default:
-            throw dip::Exception("Unrecognized environment request type");
+            throw dip::EnvironmentException(
+                "Unrecognised request type",
+                "Requested type can be either a function, or a reference.",
+                "Unknown request type selected.",
+                "Select either a function, or a reference request type.",
+                __FILE__,
+                __LINE__
+            );
         }
         if (map.empty())
-            throw dip::Exception("Node environment request returns an empty node map: " + request);
+            throw dip::EnvironmentException(
+                "Node request returns empty node map",
+                "Request matches some nodes: " + request,
+                "No nodes were matched.",
+                "Check if request is correct",
+                __FILE__,
+                __LINE__
+            );
         return map;
     }
 
@@ -244,8 +284,7 @@ namespace snt::dip {
         std::vector<ValueNode::ListType> list;
         switch (rtype) {
         case RequestType::Function: {
-            // TODO: implement functions
-            throw dip::Exception("Request list from functions is not implemented yet.");
+            throw core::MissingException("Request list from functions is not implemented yet.", __FILE__, __LINE__);
             break;
         }
         case RequestType::Reference: {
@@ -253,13 +292,20 @@ namespace snt::dip {
             std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             const HierarchyList& hlist =
-                hierarchy;            //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
-            if (!source_name.empty()) // TODO: implemente request list from source
-                throw dip::Exception("Request list from sources is not implemented yet.");
+                hierarchy; //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
+            if (!source_name.empty())
+                throw core::MissingException("Request list from sources is not implemented yet.", __FILE__, __LINE__);
 
             const Collection& col = hlist.get_collection(node_path);
             if (col.kind == Path::Kind::Map)
-                throw dip::Exception("Requested collection is a map: " + request);
+                throw dip::EnvironmentException(
+                    "Requested collection has incorrect type",
+                    "Collection should be a list",
+                    "Collection is a map: " + request,
+                    "Check if requested path is correct",
+                    __FILE__,
+                    __LINE__
+                );
 
             for (const auto& item : col.items) {
                 list.push_back(request_group(request + "[" + item + "]"));
@@ -267,10 +313,24 @@ namespace snt::dip {
             break;
         }
         default:
-            throw dip::Exception("Unrecognized environment request type");
+            throw dip::EnvironmentException(
+                "Unrecognised request type",
+                "Requested type can be either a function, or a reference.",
+                "Unknown request type selected.",
+                "Select either a function, or a reference request type.",
+                __FILE__,
+                __LINE__
+            );
         }
         if (list.empty())
-            throw dip::Exception("Node environment request returns an empty node list: " + request);
+            throw dip::EnvironmentException(
+                "Node request returns empty node list",
+                "Request matches some nodes: " + request,
+                "No nodes were matched.",
+                "Check if request is correct",
+                __FILE__,
+                __LINE__
+            );
         return list;
     }
 

@@ -1,3 +1,4 @@
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_boolean.h>
 #include <snt/dip/nodes/node_float.h>
 #include <snt/dip/nodes/node_integer.h>
@@ -39,7 +40,14 @@ namespace snt::dip {
             if (vnode == nullptr)
                 vnode = StringNode::is_node(parser);
             if (vnode == nullptr)
-                throw std::runtime_error("Value could not be determined from : " + s);
+                throw dip::SolverException(
+                    "Could not determine the value type from the string",
+                    "String can be parsed as a value node (boolean, integer, float, or string).",
+                    "Value type could not be determined from the string: " + s,
+                    "Check whether the syntax is correct.",
+                    __FILE__,
+                    __LINE__
+                );
             vnode->set_value();
             ValueNodeData data;
             data.value = std::move(vnode->value);
@@ -47,7 +55,14 @@ namespace snt::dip {
                 data.units = puq::Quantity(vnode->units_raw);
             return data;
         } else {
-            throw std::runtime_error("Invalid atom value: " + s);
+            throw dip::SolverException(
+                "Could not parse value from a string",
+                "Atom string is either a reference, or a literal value.",
+                "Cannot determine value from the string: " + s,
+                "Check whether the syntax is correct.",
+                __FILE__,
+                __LINE__
+            );
         }
     }
 
@@ -61,35 +76,35 @@ namespace snt::dip {
     // Mathematical operations
     void NumericalAtom::math_sinus() {
         if (!value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_sin();
         }
     }
     void NumericalAtom::math_cosinus() {
         if (!value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_cos();
         }
     }
     void NumericalAtom::math_tangens() {
         if (!value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_tan();
         }
     }
     void NumericalAtom::math_cubic_root() {
         if (!value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_cbrt();
         }
     }
     void NumericalAtom::math_square_root() {
         if (!value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_sqrt();
         }
@@ -102,35 +117,35 @@ namespace snt::dip {
     // }
     void NumericalAtom::math_logarithm_10() {
         if (!value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_log10();
         }
     }
     void NumericalAtom::math_logarithm() {
         if (!value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_log();
         }
     }
     void NumericalAtom::math_exponent() {
         if (!value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_exp();
         }
     }
     void NumericalAtom::math_power(NumericalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_pow(other->value.value.get());
         }
     }
     void NumericalAtom::math_multiply(NumericalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_mul(other->value.value.get());
         }
@@ -142,7 +157,7 @@ namespace snt::dip {
     }
     void NumericalAtom::math_divide(NumericalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_div(other->value.value.get());
         }
@@ -154,19 +169,30 @@ namespace snt::dip {
     }
     void NumericalAtom::math_add(NumericalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->math_add(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error(
-                "NumericalAtom: Trying to add nondimensional quantity to '" + other->value.units->to_string() + "'"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "Only quantities with the same dimensions can be added.",
+                "Trying to add a nondimensional quantity to a quantity with dimensions: '" + value.units->to_string() +
+                    "'.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else if (other->value.units) {
-            throw std::runtime_error(
-                "NumericalAtom: Trying to add '" + value.units->to_string() + "' to a nondimensional quantity"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "Only quantities with the same dimensions can be added.",
+                "Trying to add '" + other->value.units->to_string() + "' to a nondimensional quantity.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else {
             value.value = value.value->math_add(other->value.value.get());
@@ -174,20 +200,30 @@ namespace snt::dip {
     }
     void NumericalAtom::math_subtract(NumericalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->math_sub(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error(
-                "NumericalAtom: Trying to subtract nondimensional quantity from '" + other->value.units->to_string() +
-                "'"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "Only quantities with the same dimensions can be subtracted.",
+                "Trying to subtract a nondimensional quantity from a quantity with dimensions: '" +
+                    value.units->to_string() + "'.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else if (other->value.units) {
-            throw std::runtime_error(
-                "NumericalAtom: Trying to subtract '" + value.units->to_string() + "' from a nondimensional quantity"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "Only quantities with the same dimensions can be subtracted.",
+                "Trying to subtract '" + other->value.units->to_string() + "' from a nondimensional quantity.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else {
             value.value = value.value->math_sub(other->value.value.get());
@@ -195,7 +231,7 @@ namespace snt::dip {
     }
     void NumericalAtom::math_negate() {
         if (!value.value) {
-            throw std::runtime_error("NumericalAtom: Undefined value");
+            throw dip::SolverException("Numerical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->math_neg();
         }

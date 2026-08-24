@@ -1,3 +1,4 @@
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_boolean.h>
 #include <snt/dip/nodes/node_float.h>
 #include <snt/dip/nodes/node_integer.h>
@@ -36,7 +37,14 @@ namespace snt::dip {
             if (vnode == nullptr)
                 vnode = StringNode::is_node(parser);
             if (vnode == nullptr)
-                throw std::runtime_error("Value could not be determined from : " + s);
+                throw dip::SolverException(
+                    "Could not determine the value type from the string",
+                    "String can be parsed as a value node (boolean, integer, float, or string).",
+                    "Value type could not be determined from the string: " + s,
+                    "Check whether the syntax is correct.",
+                    __FILE__,
+                    __LINE__
+                );
             vnode->set_value();
             ValueNodeData data;
             data.value = std::move(vnode->value);
@@ -44,7 +52,14 @@ namespace snt::dip {
                 data.units = puq::Quantity(vnode->units_raw);
             return data;
         } else {
-            throw std::runtime_error("Invalid atom value: " + s);
+            throw dip::SolverException(
+                "Could not parse value from a string",
+                "Atom string is either a reference, or a literal value.",
+                "Cannot determine value from the string: " + s,
+                "Check whether the syntax is correct.",
+                __FILE__,
+                __LINE__
+            );
         }
     }
 
@@ -55,19 +70,30 @@ namespace snt::dip {
     // Comparison operations
     void LogicalAtom::comparison_equal(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("LogicalAtom: Undefined value");
+            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_equal(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '==' operator can only compare quantities with the same dimensions.",
+                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
+                    other->value.units->to_string() + "'.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else if (other->value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '==' operator can only compare quantities with the same dimensions.",
+                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else {
             value.value = value.value->compare_equal(other->value.value.get());
@@ -77,19 +103,30 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_not_equal(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("LogicalAtom: Undefined value");
+            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_not_equal(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '!=' operator can only compare quantities with the same dimensions.",
+                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
+                    other->value.units->to_string() + "'.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else if (other->value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '!=' operator can only compare quantities with the same dimensions.",
+                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else {
             value.value = value.value->compare_not_equal(other->value.value.get());
@@ -99,19 +136,30 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_less_equal(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("LogicalAtom: Undefined value");
+            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_less_equal(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '<=' operator can only compare quantities with the same dimensions.",
+                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
+                    other->value.units->to_string() + "'.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else if (other->value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '<=' operator can only compare quantities with the same dimensions.",
+                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else {
             value.value = value.value->compare_less_equal(other->value.value.get());
@@ -121,19 +169,30 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_greater_equal(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("LogicalAtom: Undefined value");
+            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_greater_equal(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '>=' operator can only compare quantities with the same dimensions.",
+                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
+                    other->value.units->to_string() + "'.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else if (other->value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '>=' operator can only compare quantities with the same dimensions.",
+                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else {
             value.value = value.value->compare_greater_equal(other->value.value.get());
@@ -143,19 +202,30 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_less(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("LogicalAtom: Undefined value");
+            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_less(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '<' operator can only compare quantities with the same dimensions.",
+                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
+                    other->value.units->to_string() + "'.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else if (other->value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '<' operator can only compare quantities with the same dimensions.",
+                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else {
             value.value = value.value->compare_less(other->value.value.get());
@@ -165,19 +235,30 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_greater(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw std::runtime_error("LogicalAtom: Undefined value");
+            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_greater(new_value.get());
         } else if (value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare nondimensional quantity and '" + other->value.units->to_string() + "'"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '>' operator can only compare quantities with the same dimensions.",
+                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
+                    other->value.units->to_string() + "'.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else if (other->value.units) {
-            throw std::runtime_error(
-                "LogicalAtom: Trying to compare '" + value.units->to_string() + "' and a nondimensional quantity"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The '>' operator can only compare quantities with the same dimensions.",
+                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "Check whether the input units are correct.",
+                __FILE__,
+                __LINE__
             );
         } else {
             value.value = value.value->compare_greater(other->value.value.get());
@@ -188,21 +269,21 @@ namespace snt::dip {
     // Logical operations
     void LogicalAtom::logical_not() {
         if (!value.value) {
-            throw std::runtime_error("LogicalAtom: Undefined value");
+            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->logical_not();
         }
     }
     void LogicalAtom::logical_and(LogicalAtom* other) {
         if (!value.value) {
-            throw std::runtime_error("LogicalAtom: Undefined value");
+            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->logical_and(other->value.value.get());
         }
     }
     void LogicalAtom::logical_or(LogicalAtom* other) {
         if (!value.value) {
-            throw std::runtime_error("LogicalAtom: Undefined value");
+            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
         } else {
             value.value = value.value->logical_or(other->value.value.get());
         }

@@ -43,6 +43,13 @@ configure_file(
     ${CMAKE_BINARY_DIR}/settings.h
 )
 
+# force macro paths (__FILE__) to start from the source directory and not from the system root
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+    add_compile_options(
+        "-fmacro-prefix-map=${CMAKE_SOURCE_DIR}=scinumtools3"
+    )
+endif()
+
 # analyze code compilation
 option(ENABLE_TIME_TRACE "Enable Clang time tracing" OFF)
 if(ENABLE_TIME_TRACE)
