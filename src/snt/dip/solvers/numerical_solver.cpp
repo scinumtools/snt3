@@ -86,9 +86,8 @@ namespace snt::dip {
         if (expression.empty())
             throw dip::SolverException(
                 "Empty expression",
-                "The numerical expression must not be empty.",
-                "An empty string was provided.",
-                "Provide a non-empty numerical expression.",
+                "The numerical expression is empty; at least one operand or operation is required.",
+                "Provide a valid numerical expression.",
                 __FILE__,
                 __LINE__
             );
@@ -104,8 +103,8 @@ namespace snt::dip {
             if (ua.value.units->measurement.baseunits.has_dimensions())
                 throw dip::UnitException(
                     "Dimension mismatch",
-                    "Final quantity should have physical dimension: " + units,
-                    "Converted quantity has no physical dimensions.",
+                    "The quantity is dimensionless, but a quantity with physical dimension `" + units +
+                        "` is required.",
                     "Check the units of the input quantity.",
                     __FILE__,
                     __LINE__
@@ -115,8 +114,8 @@ namespace snt::dip {
         } else if (!units.empty()) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "Final quantity should have no physical dimensions.",
-                "Converted dimension has physical dimensions: " + ua.value.units->to_string(),
+                "The quantity has physical dimensions `" + ua.value.units->to_string() +
+                    "`, but no physical dimensions are required.",
                 "Check the units of the input quantity.",
                 __FILE__,
                 __LINE__

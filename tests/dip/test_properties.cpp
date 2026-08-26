@@ -50,9 +50,8 @@ TEST(Properties, Constant) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Node property has an invalid indent");
-        EXPECT_EQ(e.info().expected, "4");
-        EXPECT_EQ(e.info().actual, "0");
-        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
+        EXPECT_EQ(e.info().details, "The property is indented 0 spaces, but it should be 4 spaces.");
+        EXPECT_EQ(e.info().suggestion, "Indent the property 2 spaces more than the preceding node.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }
@@ -100,9 +99,8 @@ TEST(Properties, Format) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Node property has an invalid indent");
-        EXPECT_EQ(e.info().expected, "4");
-        EXPECT_EQ(e.info().actual, "0");
-        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
+        EXPECT_EQ(e.info().details, "The property is indented 0 spaces, but it should be 4 spaces.");
+        EXPECT_EQ(e.info().suggestion, "Indent the property 2 spaces more than the preceding node.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }
@@ -137,9 +135,8 @@ TEST(Properties, Tags) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Node property has an invalid indent");
-        EXPECT_EQ(e.info().expected, "4");
-        EXPECT_EQ(e.info().actual, "0");
-        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
+        EXPECT_EQ(e.info().details, "The property is indented 0 spaces, but it should be 4 spaces.");
+        EXPECT_EQ(e.info().suggestion, "Indent the property 2 spaces more than the preceding node.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }
@@ -172,9 +169,8 @@ TEST(Properties, Condition) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Node does not satisfy its condition");
-        EXPECT_EQ(e.info().expected, "Condition 'false' passes.");
-        EXPECT_EQ(e.info().actual, "Condition failed.");
-        EXPECT_EQ(e.info().suggestion, "Check condition values and references.");
+        EXPECT_EQ(e.info().details, "The condition `false` does not pass.");
+        EXPECT_EQ(e.info().suggestion, "Check the condition values and references.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }
@@ -199,9 +195,8 @@ TEST(Properties, Condition) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Node does not satisfy its condition");
-        EXPECT_EQ(e.info().expected, "Condition '{.} > 2' passes.");
-        EXPECT_EQ(e.info().actual, "Condition failed.");
-        EXPECT_EQ(e.info().suggestion, "Check condition values and references.");
+        EXPECT_EQ(e.info().details, "The condition `{.} > 2` does not pass.");
+        EXPECT_EQ(e.info().suggestion, "Check the condition values and references.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }
@@ -231,9 +226,8 @@ TEST(Properties, Condition) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Node does not satisfy its condition");
-        EXPECT_EQ(e.info().expected, "Condition '{.} < 0' passes.");
-        EXPECT_EQ(e.info().actual, "Condition failed.");
-        EXPECT_EQ(e.info().suggestion, "Check condition values and references.");
+        EXPECT_EQ(e.info().details, "The condition `{.} < 0` does not pass.");
+        EXPECT_EQ(e.info().suggestion, "Check the condition values and references.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }
@@ -499,9 +493,10 @@ TEST(Properties, Metadata) {
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Cannot set a property on a non-value node");
         EXPECT_EQ(
-            e.info().expected, "Only value nodes (boolean, integer, float, string and table) can have properties."
+            e.info().details,
+            "Only value nodes (boolean, integer, float, string and table) can have properties, but the node type is "
+            "`group`."
         );
-        EXPECT_EQ(e.info().actual, "Node type is: group");
         EXPECT_EQ(e.info().suggestion, "Remove the property or move it behind a value node.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
@@ -516,9 +511,8 @@ TEST(Properties, Metadata) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Node property has an invalid indent");
-        EXPECT_EQ(e.info().expected, "4");
-        EXPECT_EQ(e.info().actual, "0");
-        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
+        EXPECT_EQ(e.info().details, "The property is indented 0 spaces, but it should be 4 spaces.");
+        EXPECT_EQ(e.info().suggestion, "Indent the property 2 spaces more than the preceding node.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }

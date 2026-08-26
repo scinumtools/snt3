@@ -11,7 +11,6 @@ namespace snt::dip {
             return state.back();
         throw dip::EnvironmentException(
             "Missing conditional branch",
-            "An active conditional branch must exist.",
             "The conditional branch list is empty.",
             "Enter an `if` or `elif` branch before requesting its ID.",
             __FILE__,
@@ -28,7 +27,6 @@ namespace snt::dip {
             std::string branch_name = std::string(1, SIGN_CONDITION) + "B" + std::to_string(num_branches);
             throw dip::EnvironmentException(
                 "Missing conditional case",
-                "The conditional branch must contain at least one case.",
                 "The branch `" + branch_name + "` does not contain any cases.",
                 "Add an `if` or `elif` case before requesting its ID.",
                 __FILE__,
@@ -61,9 +59,8 @@ namespace snt::dip {
         if (state.empty())
             throw dip::EnvironmentException(
                 "No active conditional branch",
-                "An active conditional branch must exist before it can be closed.",
                 "The conditional branch list is empty.",
-                "Make sure that each branch is closed only after entering an `if` or `elif` branch.",
+                "Enter an `if` or `elif` branch before closing it.",
                 __FILE__,
                 __LINE__
             );
@@ -106,9 +103,8 @@ namespace snt::dip {
             if (cnode == nullptr)
                 throw dip::SyntaxException(
                     "Invalid case node",
-                    "The node must be a case node.",
                     "The node at path `" + node->path.name + "` is not a case node.",
-                    "Check the node type and make sure that the case path is assigned to a case node.",
+                    "Make sure that the case path is assigned to a case node.",
                     __FILE__,
                     __LINE__,
                     node->line
@@ -134,7 +130,6 @@ namespace snt::dip {
                 // std::cout << cases.size() << " " << path_old << " " << path_new << '\n';
                 throw dip::SyntaxException(
                     "Invalid conditional case",
-                    "The conditional case must be valid for the current branching state.",
                     "The case type is not valid in the current branching context.",
                     "Check the order of `if`, `elif`, `else`, and `end` cases and make sure they form a valid "
                     "conditional structure.",
@@ -167,7 +162,6 @@ namespace snt::dip {
                 else
                     throw dip::SyntaxException(
                         "Invalid branch opening",
-                        "A new conditional branch can only be opened by an `if` case.",
                         "The current case cannot open a new conditional branch.",
                         "Use `if` to open a new branch, or use `elif` or `else` only within an existing branch.",
                         __FILE__,
@@ -179,7 +173,6 @@ namespace snt::dip {
             } else {
                 throw dip::SyntaxException(
                     "Invalid branch opening",
-                    "A new conditional branch can only be opened by an `if` case.",
                     "The current case cannot open a new conditional branch.",
                     "Use `if` to open a new branch, or use `elif` or `else` only within an existing branch.",
                     __FILE__,
@@ -208,7 +201,6 @@ namespace snt::dip {
         } else {
             throw dip::SyntaxException(
                 "Invalid conditional path",
-                "The case node path must follow the expected conditional path format.",
                 "The node path does not match the expected conditional case format.",
                 "Check the conditional path and make sure it identifies a case using the expected format.",
                 __FILE__,

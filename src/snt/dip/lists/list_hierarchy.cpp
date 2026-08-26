@@ -25,7 +25,6 @@ namespace snt::dip {
         if (collections_full.empty())
             throw dip::EnvironmentException(
                 "Missing path collection",
-                "The node path must belong to at least one collection.",
                 "The node path `" + node->path.name + "` does not belong to any collection.",
                 "Check the node path and make sure it is associated with a valid collection.",
                 __FILE__,
@@ -50,7 +49,6 @@ namespace snt::dip {
                 if (itc == collections.end())
                     throw dip::EnvironmentException(
                         "Unknown collection",
-                        "The requested collection must exist.",
                         "The collection `" + name_full + "` was not found.",
                         "Check whether the collection path is correct.",
                         __FILE__,
@@ -61,7 +59,6 @@ namespace snt::dip {
                          itc->second.items.end())
                     throw dip::EnvironmentException(
                         "Unknown collection item",
-                        "The requested item must exist in the collection.",
                         "The item `" + cnode.item + "` was not found in the collection `" + name_full + "`.",
                         "Check whether the collection item name is correct.",
                         __FILE__,
@@ -73,7 +70,6 @@ namespace snt::dip {
                 if (itc == collections.end())
                     throw dip::EnvironmentException(
                         "Unknown collection",
-                        "The requested collection must exist.",
                         "The collection `" + name_full + "` was not found.",
                         "Check whether the collection path is correct.",
                         __FILE__,
@@ -101,7 +97,6 @@ namespace snt::dip {
                 } else if (it->second.kind != Path::Kind::Map) {
                     throw dip::EnvironmentException(
                         "Invalid collection type",
-                        "The collection must be a map to append keyed items.",
                         "The collection `" + name_full + "` is not a map.",
                         "Use a map collection when appending keyed items.",
                         __FILE__,
@@ -114,7 +109,6 @@ namespace snt::dip {
                 } else {
                     throw dip::EnvironmentException(
                         "Duplicate collection item",
-                        "Each item in a map collection must have a unique key.",
                         "The collection `" + name_full + "` already contains the key `" + cnode.item + "`.",
                         "Choose a different key for the collection item.",
                         __FILE__,
@@ -132,7 +126,6 @@ namespace snt::dip {
                 } else if (it->second.kind != Path::Kind::List) {
                     throw dip::EnvironmentException(
                         "Invalid collection type",
-                        "The collection must be a list to append indexed items.",
                         "The collection `" + name_full + "` is not a list.",
                         "Use a list collection when appending indexed items.",
                         __FILE__,
@@ -200,7 +193,6 @@ namespace snt::dip {
         if (it == collections.end()) {
             throw dip::EnvironmentException(
                 "Unknown collection",
-                "The requested collection must exist in the environment hierarchy.",
                 "The collection `" + path + "` was not found in the environment hierarchy.",
                 "Check whether the collection path is correct.",
                 __FILE__,
@@ -214,7 +206,6 @@ namespace snt::dip {
         if (collections.find(path) != collections.end())
             throw dip::EnvironmentException(
                 "Duplicate collection",
-                "The collection path must be unique within the environment hierarchy.",
                 "A collection with the path `" + path + "` already exists in the environment hierarchy.",
                 "Choose a different collection path.",
                 __FILE__,

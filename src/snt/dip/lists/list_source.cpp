@@ -13,7 +13,6 @@ namespace snt::dip {
         if (it != sources.end())
             throw dip::EnvironmentException(
                 "Duplicate source",
-                "The source name must be unique within the source list.",
                 "A source named `" + name + "` already exists in the source list.",
                 "Choose a different source name.",
                 __FILE__,
@@ -27,7 +26,6 @@ namespace snt::dip {
         if (it != sources.end())
             throw dip::EnvironmentException(
                 "Duplicate source",
-                "The source name must be unique within the source list.",
                 "A source named `" + name + "` already exists in the source list.",
                 "Choose a different source name.",
                 __FILE__,
@@ -41,7 +39,6 @@ namespace snt::dip {
         if (it == sources.end())
             throw dip::EnvironmentException(
                 "Unknown source",
-                "The requested source must exist in the environment source list.",
                 "The source `" + name + "` was not found in the environment source list.",
                 "Check whether the source name is correct.",
                 __FILE__,
@@ -55,7 +52,6 @@ namespace snt::dip {
         if (it == sources.end())
             throw dip::EnvironmentException(
                 "Unknown source",
-                "The requested source must exist in the environment source list.",
                 "The source `" + name + "` was not found in the environment source list.",
                 "Check whether the source name is correct.",
                 __FILE__,

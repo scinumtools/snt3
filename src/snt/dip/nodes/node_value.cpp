@@ -242,9 +242,8 @@ namespace snt::dip {
         if (!passed)
             throw dip::SyntaxException(
                 "Node does not satisfy its condition",
-                "Condition '" + condition + "' passes.",
-                "Condition failed.",
-                "Check condition values and references.",
+                "The condition `" + condition + "` does not pass.",
+                "Check the condition values and references.",
                 __FILE__,
                 __LINE__,
                 this->line

@@ -11,7 +11,6 @@ namespace snt::dip {
     bool BaseNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
         throw dip::SyntaxException(
             "Unsupported node property",
-            "",
             "This node type does not implement property handling.",
             "Use a node type that supports properties.",
             __FILE__,
@@ -32,7 +31,6 @@ namespace snt::dip {
     std::string BaseNode::to_string(const core::StringFormatType& format) const {
         throw dip::EnvironmentException(
             "Unsupported string representation",
-            "",
             "This node type does not implement `to_string()`.",
             "Use a node type that provides a string representation.",
             __FILE__,

@@ -62,7 +62,13 @@ namespace snt::dip {
         // prepare source data
         std::ifstream file(source_file);
         if (!file)
-            throw dip::IOException("File not found", source_file.string(), "", "", __FILE__, __LINE__);
+            throw dip::IOException(
+                "File not found",
+                "The file `" + source_file.string() + "` could not be opened.",
+                "Check whether the file exists and whether you have sufficient permissions.",
+                __FILE__,
+                __LINE__
+            );
         std::ostringstream source_code;
         source_code << file.rdbuf();
         if (source_name.empty()) {
@@ -118,9 +124,9 @@ namespace snt::dip {
             suggested << (current_node->indent - (current_node->indent % INDENT_STEP) + INDENT_STEP) << ", ...";
             throw dip::SyntaxException(
                 "Invalid indent length",
-                "Multiple of " + std::to_string(INDENT_STEP) + ".",
-                std::to_string(current_node->indent),
-                suggested.str(),
+                "The indentation length is " + std::to_string(current_node->indent) + ", which is not a multiple of " +
+                    std::to_string(INDENT_STEP) + ".",
+                "Use an indentation length of " + suggested.str(),
                 __FILE__,
                 __LINE__,
                 current_node->line
@@ -131,9 +137,9 @@ namespace snt::dip {
                 (current_node->indent - previous_node->indent) != INDENT_STEP) {
                 throw dip::SyntaxException(
                     "Child node has an invalid indent",
-                    std::to_string(previous_node->indent + INDENT_STEP),
-                    std::to_string(current_node->indent),
-                    "Indent " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
+                    "The child node is indented " + std::to_string(current_node->indent) +
+                        " spaces, but it should be " + std::to_string(previous_node->indent + INDENT_STEP) + " spaces.",
+                    "Indent the child node " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
                     __FILE__,
                     __LINE__,
                     current_node->line
@@ -157,8 +163,8 @@ namespace snt::dip {
             }
             throw dip::SyntaxException(
                 "Cannot set a property on a non-value node",
-                "Only value nodes (" + ss.str() + ") can have properties.",
-                "Node type is: " + NodeDtypeNames.at(previous_node->dtype),
+                "Only value nodes (" + ss.str() + ") can have properties, but the node type is `" +
+                    NodeDtypeNames.at(previous_node->dtype) + "`.",
                 "Remove the property or move it behind a value node.",
                 __FILE__,
                 __LINE__,
@@ -168,9 +174,9 @@ namespace snt::dip {
         if (previous_node->indent >= pnode->indent || (pnode->indent - previous_node->indent) != INDENT_STEP)
             throw dip::SyntaxException(
                 "Node property has an invalid indent",
-                std::to_string(previous_node->indent + INDENT_STEP),
-                std::to_string(pnode->indent),
-                "Indent " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
+                "The property is indented " + std::to_string(pnode->indent) + " spaces, but it should be " +
+                    std::to_string(previous_node->indent + INDENT_STEP) + " spaces.",
+                "Indent the property " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
                 __FILE__,
                 __LINE__,
                 pnode->line
@@ -178,9 +184,8 @@ namespace snt::dip {
         if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
             throw dip::SyntaxException(
                 "Node property could not be set",
-                "Property is assigned to the preceeding value node.",
-                "Property could not be assigned to the preceeing node: " + previous_node->path.name,
-                "Check the property and preceeding node.",
+                "The property could not be assigned to the preceding value node `" + previous_node->path.name + "`.",
+                "Check the property and the preceding node.",
                 __FILE__,
                 __LINE__,
                 pnode->line
@@ -221,9 +226,8 @@ namespace snt::dip {
                 } else {
                     throw dip::SyntaxException(
                         "Schema does not contain any value nodes",
-                        "Schema contains some value nodes.",
-                        "Schema is empty.",
-                        "Declare, or define value nodes in the schema.",
+                        "The schema is empty and does not contain any value nodes.",
+                        "Declare or define value nodes in the schema.",
                         __FILE__,
                         __LINE__,
                         current_node->line
@@ -293,9 +297,8 @@ namespace snt::dip {
                         if (node->line.source.name.compare(0, prefix.size(), prefix) == 0)
                             throw dip::SyntaxException(
                                 "Modifying undefined node",
-                                "Node type has to be defined",
-                                "Could not find previous node definition",
-                                "Specify type (e.g. bool, float, ...) or add declaration prior to this node",
+                                "The node type has not been defined and no previous node definition was found.",
+                                "Specify a type such as `bool` or `float`, or add a declaration before this node.",
                                 __FILE__,
                                 __LINE__,
                                 node->line
@@ -304,9 +307,8 @@ namespace snt::dip {
                     if (vnode == nullptr)
                         throw dip::ParserException(
                             "Cannot insert a node without a value into an environment",
-                            "Value of a node is set before inserted to the environment.",
-                            "Value is undefined",
-                            "Check why value was not set properly.",
+                            "The node value is undefined and must be set before insertion into the environment.",
+                            "Check why the node value was not set correctly.",
                             __FILE__,
                             __LINE__,
                             vnode->line
@@ -326,9 +328,8 @@ namespace snt::dip {
             } else {
                 throw dip::ParserException(
                     "Node in a node list has undefined value",
-                    "Nodes in a node list have defined values.",
-                    "Value is undefined",
-                    "Check why value was not set properly.",
+                    "The node value is undefined and must be set before adding it to the node list.",
+                    "Check why the node value was not set correctly.",
                     __FILE__,
                     __LINE__,
                     target.nodes.at(i)->line

@@ -109,8 +109,7 @@ TEST(ParseTables, ExceptionMissingColumn) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Missing delimiter");
-        EXPECT_EQ(e.info().expected, "The delimiter ` ` must be present at this position.");
-        EXPECT_EQ(e.info().actual, "The expected delimiter was not found.");
+        EXPECT_EQ(e.info().details, "The delimiter ` ` was not found at the expected position.");
         EXPECT_EQ(e.info().suggestion, "Add the ` ` delimiter at this position.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
@@ -229,9 +228,8 @@ TEST(ParseTables, DeclareTableNodes) {
             FAIL() << "Expected dip::SyntaxException";
         } catch (const dip::SyntaxException& e) {
             EXPECT_EQ(e.info().message, "Node does not satisfy its condition");
-            EXPECT_EQ(e.info().expected, "Condition ' {.} < 0 ' passes.");
-            EXPECT_EQ(e.info().actual, "Condition failed.");
-            EXPECT_EQ(e.info().suggestion, "Check condition values and references.");
+            EXPECT_EQ(e.info().details, "The condition ` {.} < 0 ` does not pass.");
+            EXPECT_EQ(e.info().suggestion, "Check the condition values and references.");
         } catch (...) {
             FAIL() << "Expected dip::SyntaxException";
         }

@@ -48,9 +48,8 @@ namespace snt::dip {
             if (!file)
                 throw dip::IOException(
                     "File could not be found",
-                    "Path points to a valid file: " + source_file,
-                    "File could not be openned.",
-                    "Check if file exists on this path and if you have enough permissions.",
+                    "The file `" + source_file + "` could not be opened.",
+                    "Check whether the file exists at this path and whether you have sufficient permissions.",
                     __FILE__,
                     __LINE__
                 );
@@ -137,9 +136,10 @@ namespace snt::dip {
                         } else {
                             throw dip::SyntaxException(
                                 "Node definition on a new line has an invalid indent",
-                                std::to_string(line_indent + INDENT_STEP),
-                                std::to_string(next_indent),
-                                "Indent " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
+                                "The node is indented " + std::to_string(next_indent) + " spaces, but it should be " +
+                                    std::to_string(line_indent + INDENT_STEP) + " spaces.",
+                                "Indent the node " + std::to_string(INDENT_STEP) +
+                                    " spaces more than the preceding node.",
                                 __FILE__,
                                 __LINE__,
                                 next
@@ -179,7 +179,14 @@ namespace snt::dip {
                     balance += count_group_balance(next.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
                 }
                 if (balance != 0) {
-                    throw dip::Exception("Expression: Unbalanced parentheses");
+                    throw dip::SyntaxException(
+                        "Unbalanced parentheses",
+                        "The expression contains unmatched parentheses.",
+                        "Check that every opening `(` has a corresponding closing `)`.",
+                        __FILE__,
+                        __LINE__,
+                        line
+                    );
                 }
             }
             {
@@ -192,7 +199,14 @@ namespace snt::dip {
                     balance += count_group_balance(next.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
                 }
                 if (balance != 0) {
-                    throw dip::Exception("Array: Unbalanced parentheses");
+                    throw dip::SyntaxException(
+                        "Unbalanced array brackets",
+                        "The array expression contains unmatched brackets.",
+                        "Check that every opening `[` has a corresponding closing `]`.",
+                        __FILE__,
+                        __LINE__,
+                        line
+                    );
                 }
             }
 
@@ -242,9 +256,23 @@ namespace snt::dip {
 
             // make sure that everything was parsed
             if (node == nullptr)
-                throw dip::Exception("Node could not be determined from : " + line.code);
+                throw dip::SyntaxException(
+                    "Unknown node",
+                    "No node could be determined from the line.",
+                    "Check the syntax of the node definition.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             if (parser.do_continue())
-                throw dip::Exception("Could not parse all text on the line: " + line.code);
+                throw dip::SyntaxException(
+                    "Unparsed input",
+                    "Additional text remains after the parsed node.",
+                    "Check the syntax and remove or correct the unparsed text.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
 
             // convert escape symbols to original characterss
             for (auto& rval : node->value_raw)
@@ -274,7 +302,14 @@ namespace snt::dip {
             parser.part_dimension();
             parser.part_units();
             if (parser.do_continue())
-                throw dip::Exception("Incorrect header format: " + line.code);
+                throw dip::SyntaxException(
+                    "Invalid table header format",
+                    "Additional text remains after the header has been parsed.",
+                    "Check the header syntax and remove or correct the remaining text.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             // initialize actual node
             BaseNode::PointerType node(nullptr);
             if (node == nullptr)
@@ -287,9 +322,23 @@ namespace snt::dip {
                 node = StringNode::is_node(parser);
             // make sure that everything was parsed
             if (node == nullptr)
-                throw dip::Exception("Node could not be determined from : " + line.code);
+                throw dip::SyntaxException(
+                    "Unknown node",
+                    "No supported node type could be determined from the line.",
+                    "Check the node type and syntax.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             if (parser.do_continue())
-                throw dip::Exception("Could not parse all text on the line: " + line.code);
+                throw dip::SyntaxException(
+                    "Unparsed input",
+                    "Additional text remains after the node has been parsed.",
+                    "Check the node syntax and remove or correct the remaining text.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             node->value_raw.reserve(lines.size()); // roughly reserve some memory to avoid reallocations
             nodes.push_back(node);
         }
@@ -324,13 +373,25 @@ namespace snt::dip {
                 } else if (parser.part_keyword(false, delimiter)) {
                     node->value_raw.push_back(parser.value_raw.at(0));
                 } else {
-                    throw dip::Exception(
-                        "Could not parse column '" + node->path.name + "' from the table row: " + line.code
+                    throw dip::SyntaxException(
+                        "Invalid table column value",
+                        "The value for column `" + node->path.name + "` could not be parsed from the table row.",
+                        "Provide a valid string, number, or keyword value.",
+                        __FILE__,
+                        __LINE__,
+                        line
                     );
                 }
             }
             if (parser.do_continue())
-                throw dip::Exception("Could not parse all text on the line: " + line.code);
+                throw dip::SyntaxException(
+                    "Unparsed input",
+                    "Additional text remains after the line has been parsed.",
+                    "Check the syntax and remove or correct the remaining text.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
         }
         return nodes;
     }
@@ -356,7 +417,14 @@ namespace snt::dip {
         ss.get(ch);
         rm << ch;
         if (ch != SIGN_ARRAY_OPEN)
-            throw dip::Exception("Given source code is not a valid array: " + value_string);
+            throw dip::SyntaxException(
+                "Invalid array",
+                "The array must start with `" + std::string(1, SIGN_ARRAY_OPEN) + "`, but the input starts with `" +
+                    std::string(1, ch) + "`.",
+                "Add `" + std::string(1, SIGN_ARRAY_OPEN) + "` at the beginning of the array.",
+                __FILE__,
+                __LINE__
+            );
 
         std::string value;
         bool inString = false;
@@ -399,15 +467,26 @@ namespace snt::dip {
 
         // Check if all nested arrays are closed
         if (dim != 0)
-            throw dip::Exception("Definition of an array has some unclosed brackets or quotes: " + value_string);
+            throw dip::SyntaxException(
+                "Unclosed array",
+                "The array definition `" + value_string + "` contains unclosed brackets or quotes.",
+                "Close all brackets and quotes before the end of the array definition.",
+                __FILE__,
+                __LINE__
+            );
 
         // Normalize shape and check coherence of nested arrays
         size_t coef = 1;
         for (int d = 1; d < value_shape.size(); d++) {
             coef *= value_shape[d - 1];
             if (value_shape[d] % coef != 0)
-                throw dip::Exception(
-                    "Items in dimension " + std::to_string(d + 1) + " do not have the same shape: " + value_string
+                throw dip::SyntaxException(
+                    "Inconsistent array shape",
+                    "Items in dimension " + std::to_string(d + 1) + " do not have a consistent shape in `" +
+                        value_string + "`.",
+                    "Make sure that all nested arrays have the same shape.",
+                    __FILE__,
+                    __LINE__
                 );
             value_shape[d] /= coef;
         }
@@ -420,7 +499,13 @@ namespace snt::dip {
         trim(value_string);
         value_string.erase(std::remove(value_string.begin(), value_string.end(), '\n'), value_string.end());
         if (value_string.empty())
-            throw dip::Exception("Source code of the value is empty");
+            throw dip::SyntaxException(
+                "Empty value",
+                "The source code of the value is empty.",
+                "Provide a value or an array expression.",
+                __FILE__,
+                __LINE__
+            );
         else if (value_string.at(0) == SIGN_ARRAY_OPEN)
             parse_array(value_string, value_raw, value_shape);
         else
@@ -447,7 +532,14 @@ namespace snt::dip {
                     range = {static_cast<size_t>(std::stoul(dmin)), static_cast<size_t>(std::stoul(dmax))};
             }
             if (range.dmax != val::Array::max_range && range.dmax < range.dmin)
-                throw dip::Exception("Maximum range must be higher or equal than minimum range: " + dim);
+                throw dip::SyntaxException(
+                    "Invalid dimension range",
+                    "The maximum range value `" + std::to_string(range.dmax) + "` is smaller than the minimum value `" +
+                        std::to_string(range.dmin) + "` in `" + dim + "`.",
+                    "Specify a range whose maximum value is greater than or equal to its minimum value.",
+                    __FILE__,
+                    __LINE__
+                );
             dimension.push_back(range);
         }
     }

@@ -36,8 +36,7 @@ namespace snt::dip {
         default:
             throw dip::EnvironmentException(
                 "Invalid import origin",
-                "An import must use a function or reference value.",
-                "The import has an unsupported value origin.",
+                "The import uses an unsupported value origin.",
                 "Use a function or reference as the import source.",
                 __FILE__,
                 __LINE__,

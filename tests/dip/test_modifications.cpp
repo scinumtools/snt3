@@ -46,9 +46,10 @@ TEST(Modifications, ModificationNode) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Modifying undefined node");
-        EXPECT_EQ(e.info().expected, "Node type has to be defined");
-        EXPECT_EQ(e.info().actual, "Could not find previous node definition");
-        EXPECT_EQ(e.info().suggestion, "Specify type (e.g. bool, float, ...) or add declaration prior to this node");
+        EXPECT_EQ(e.info().details, "The node type has not been defined and no previous node definition was found.");
+        EXPECT_EQ(
+            e.info().suggestion, "Specify a type such as `bool` or `float`, or add a declaration before this node."
+        );
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }

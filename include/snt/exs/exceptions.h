@@ -17,18 +17,12 @@ namespace snt::exs {
     class ConversionException : public exs::Exception {
       public:
         ConversionException(
-            std::string message,
-            std::string expected,
-            std::string actual,
-            std::string suggestion,
-            std::string file,
-            size_t line
+            std::string message, std::string details, std::string suggestion, std::string file, size_t line
         )
             : Exception(
                   core::ExceptionInfo{
                       std::move(message),
-                      std::move(expected),
-                      std::move(actual),
+                      std::move(details),
                       std::move(suggestion),
                       core::SourceLocation{std::move(file), line}
                   }

@@ -14,8 +14,7 @@ namespace snt::dip {
             case Path::Kind::None:
                 throw dip::EnvironmentException(
                     "Unknown path",
-                    "The requested path must correspond to a collection.",
-                    "The path was not found in the collections: " + std::string(path),
+                    "The path `" + std::string(path) + "` was not found in the collections.",
                     "Check whether the path is correct.",
                     __FILE__,
                     __LINE__
@@ -44,8 +43,8 @@ namespace snt::dip {
         } else {
             throw dip::EnvironmentException(
                 "Unknown path",
-                "The requested path must correspond to a list collection: " + std::string(path_),
-                "The path is the " + Path::KindNames[col.kind] + " collections.",
+                "The path `" + std::string(path_) + "` must correspond to a list collection, but it refers to " +
+                    Path::KindNames[col.kind] + " collection.",
                 "Check whether the path is correct.",
                 __FILE__,
                 __LINE__
@@ -64,8 +63,8 @@ namespace snt::dip {
         } else {
             throw dip::EnvironmentException(
                 "Unknown path",
-                "The requested path must correspond to a map collection: " + std::string(path_),
-                "The path is the " + Path::KindNames[col.kind] + " collections.",
+                "The path `" + std::string(path_) + "` must correspond to a map collection, but it refers to a " +
+                    Path::KindNames[col.kind] + " collection.",
                 "Check whether the path is correct.",
                 __FILE__,
                 __LINE__
@@ -85,8 +84,7 @@ namespace snt::dip {
         else
             throw dip::EnvironmentException(
                 "Unknown path",
-                "The requested path must correspond to a value node: " + path_,
-                "The path was not found in collections.",
+                "The path `" + path_ + "` must correspond to a value node, but it was not found in the collections.",
                 "Check whether the path is correct.",
                 __FILE__,
                 __LINE__
@@ -122,8 +120,8 @@ namespace snt::dip {
         default:
             throw dip::EnvironmentException(
                 "Unknown path",
-                "The requested path must correspond to a collection, or an map key.",
-                "The path was not found in the collections, or items: " + new_path,
+                "The path `" + new_path +
+                    "` must correspond to a collection or map key, but it was not found in the collections or items.",
                 "Check whether the path is correct.",
                 __FILE__,
                 __LINE__
@@ -144,9 +142,8 @@ namespace snt::dip {
         default:
             throw dip::EnvironmentException(
                 "Unknown path",
-                "The requested index must correspond to some list item.",
-                "Couldn't find items with the given index: " + new_path,
-                "Check whether the path is correct.",
+                "The index `" + new_path + "` does not correspond to a list item.",
+                "Check whether the list index is correct.",
                 __FILE__,
                 __LINE__
             );

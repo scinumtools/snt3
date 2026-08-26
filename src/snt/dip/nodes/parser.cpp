@@ -244,7 +244,6 @@ namespace snt::dip {
             if (required)
                 throw dip::SyntaxException(
                     "Could not determine the node type",
-                    "The node type must be specified explicitly.",
                     "No valid node type or type precision could be determined from the current line.",
                     "Specify a node type such as boolean, integer, float, string, table, map, or list, optionally with "
                     "a supported precision such as 128, 64, 32, or 16.",
@@ -426,10 +425,9 @@ namespace snt::dip {
                 if (dimension.empty()) {
                     throw dip::SyntaxException(
                         "Empty dimension settings",
-                        "The dimension block must specify at least one array dimension.",
                         "The dimension block is empty or does not contain a valid dimension specification.",
-                        "Specify at least one dimension using `:`, `x:`, `:y`, or `x:y`; separate multiple dimensions "
-                        "with commas, for example `[:,:10]` or `[1:10,:]`.",
+                        "Specify at least one dimension using `:`, `x:`, `:y`, or `x:y`, and separate multiple "
+                        "dimensions with commas, for example `[:,:10]` or `[1:10,:]`.",
                         __FILE__,
                         __LINE__,
                         line
@@ -456,8 +454,7 @@ namespace snt::dip {
             if (required) {
                 throw dip::SyntaxException(
                     "Missing assignment operator",
-                    "The `=` sign must be present at this position.",
-                    "The expected `=` sign was not found.",
+                    "The `=` sign was not found at the expected position.",
                     "Add an `=` sign after the preceding expression.",
                     __FILE__,
                     __LINE__,
@@ -509,8 +506,7 @@ namespace snt::dip {
             if (pos == code.size())
                 throw dip::SyntaxException(
                     "Missing closing brace",
-                    "A reference expression must be terminated with `}`.",
-                    "The reference expression was not closed.",
+                    "The reference expression was not closed with `}`.",
                     "Add a closing `}` after the reference path.",
                     __FILE__,
                     __LINE__,
@@ -526,8 +522,7 @@ namespace snt::dip {
             else if (keyword.empty())
                 throw dip::SyntaxException(
                     "Empty reference",
-                    "A non-relative reference without query must specify a source.",
-                    "The reference does not contain a source keyword.",
+                    "The non-relative reference does not contain a source keyword.",
                     "Specify a reference source, for example `{source}`.",
                     __FILE__,
                     __LINE__,
@@ -573,8 +568,7 @@ namespace snt::dip {
         if (dtype_raw[1] == std::string(KEYWORD_STRING))
             throw dip::SyntaxException(
                 "Invalid template expression",
-                "String template expressions must use f-prefixed string notation.",
-                "A parenthesized expression was used for a string template.",
+                "A parenthesized expression was used where an f-prefixed string is required.",
                 "Use an f-prefixed string such as `f\"str\"` or `f\"\"\"str\"\"\"`.",
                 __FILE__,
                 __LINE__,
@@ -596,7 +590,6 @@ namespace snt::dip {
         if (depth != 0)
             throw dip::SyntaxException(
                 "Unclosed expression",
-                "The expression must have a matching closing parenthesis.",
                 "The opening parenthesis was not closed.",
                 "Add a closing `)` to complete the expression.",
                 __FILE__,
@@ -608,7 +601,6 @@ namespace snt::dip {
         if (inside.empty())
             throw dip::ParserException(
                 "Empty expression",
-                "The expression must contain a value or operation.",
                 "The expression contains no content between the parentheses.",
                 "Add a valid expression between the parentheses.",
                 __FILE__,
@@ -698,8 +690,7 @@ namespace snt::dip {
             if (do_continue() && code[0] != delimiter)
                 throw dip::SyntaxException(
                     "Incomplete number",
-                    "The complete number must end before the expected delimiter.",
-                    "Only part of the number could be parsed.",
+                    "Only part of the number could be parsed before the expected delimiter.",
                     "Check the number format and make sure it is followed by the expected delimiter.",
                     __FILE__,
                     __LINE__,
@@ -709,7 +700,6 @@ namespace snt::dip {
         } else if (required) {
             throw dip::SyntaxException(
                 "Invalid number",
-                "The value must be a valid number.",
                 "The input does not match the expected number format.",
                 "Check the number format and provide a valid numerical value.",
                 __FILE__,
@@ -731,8 +721,8 @@ namespace snt::dip {
             if (do_continue() && code[0] != delimiter)
                 throw dip::SyntaxException(
                     "Incomplete keyword",
-                    "The complete keyword must end before the expected delimiter '" + std::string(1, delimiter) + "'.",
-                    "Only part of the keyword could be parsed.",
+                    "Only part of the keyword could be parsed before the expected delimiter `" +
+                        std::string(1, delimiter) + "`.",
                     "Check the keyword and make sure it is followed by the expected delimiter.",
                     __FILE__,
                     __LINE__,
@@ -742,9 +732,8 @@ namespace snt::dip {
         } else if (required) {
             throw dip::SyntaxException(
                 "Invalid keyword",
-                "The keyword must contain only letters, digits, underscores, and hyphens.",
-                "The input does not match the expected keyword format: " + code,
-                "Use only characters from `a-z`, `A-Z`, `0-9`, `_`, and `-`.",
+                "The input `" + code + "` contains characters that are not allowed in a keyword.",
+                "Use only letters, digits, underscores, and hyphens.",
                 __FILE__,
                 __LINE__,
                 line
@@ -861,8 +850,7 @@ namespace snt::dip {
         } else if (required) {
             throw dip::SyntaxException(
                 "Missing delimiter",
-                "The delimiter `" + std::string(1, symbol) + "` must be present at this position.",
-                "The expected delimiter was not found.",
+                "The delimiter `" + std::string(1, symbol) + "` was not found at the expected position.",
                 "Add the `" + std::string(1, symbol) + "` delimiter at this position.",
                 __FILE__,
                 __LINE__,

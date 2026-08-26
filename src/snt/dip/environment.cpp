@@ -18,9 +18,8 @@ namespace snt::dip {
         if (pos == std::string::npos)
             throw dip::EnvironmentException(
                 "Invalid node request",
-                "Environment request contains question mark symbol.",
-                "No question mark symbol found in: " + request,
-                "Try adding the question mark at the front: ?" + request,
+                "The environment request must contain a question mark; none was found in `" + request + "`.",
+                "Add a question mark at the front: `?" + request + "`.",
                 __FILE__,
                 __LINE__
             );
@@ -59,9 +58,8 @@ namespace snt::dip {
         default:
             throw dip::EnvironmentException(
                 "Unrecognised request type",
-                "Requested type can be either a function, or a reference.",
-                "Unknown request type selected.",
-                "Select either a function, or a reference request type.",
+                "The requested type is not supported; only function and reference requests are available.",
+                "Select either a function or reference request type.",
                 __FILE__,
                 __LINE__
             );
@@ -98,8 +96,8 @@ namespace snt::dip {
                         if (!vnode->units && !to_unit->empty()) {
                             throw dip::UnitException(
                                 "Dimension mismatch",
-                                "Final quantity should have physical dimension: " + std::string(*to_unit),
-                                "Converted quantity has no physical dimensions.",
+                                "The final quantity should have the physical dimension `" + std::string(*to_unit) +
+                                    "`, but the converted quantity has no physical dimensions.",
                                 "Check the units of the input quantity.",
                                 __FILE__,
                                 __LINE__,
@@ -108,8 +106,9 @@ namespace snt::dip {
                         } else if (vnode->units && to_unit->empty()) {
                             throw dip::UnitException(
                                 "Dimension mismatch",
-                                "Final quantity should have no physical dimensions.",
-                                "Converted dimension has physical dimensions: " + vnode->units_raw,
+                                "The final quantity should have no physical dimensions, but the converted quantity has "
+                                "physical dimensions `" +
+                                    vnode->units_raw + "`.",
                                 "Check the units of the input quantity.",
                                 __FILE__,
                                 __LINE__,
@@ -129,9 +128,8 @@ namespace snt::dip {
         default:
             throw dip::EnvironmentException(
                 "Unrecognised request type",
-                "Requested type can be either a function, or a reference.",
-                "Unknown request type selected.",
-                "Select either a function, or a reference request type.",
+                "The requested type is not supported because only function and reference requests are available.",
+                "Select either a function or reference request type.",
                 __FILE__,
                 __LINE__
             );
@@ -204,9 +202,8 @@ namespace snt::dip {
         default:
             throw dip::EnvironmentException(
                 "Unrecognised request type",
-                "Requested type can be either a function, or a reference.",
-                "Unknown request type selected.",
-                "Select either a function, or a reference request type.",
+                "The requested type is not supported because only function and reference requests are available.",
+                "Select either a function or reference request type.",
                 __FILE__,
                 __LINE__
             );
@@ -214,9 +211,8 @@ namespace snt::dip {
         if (new_nodes.empty())
             throw dip::EnvironmentException(
                 "Node request returns empty node group",
-                "Request matches some nodes: " + request,
-                "No nodes were matched.",
-                "Check if request is correct",
+                "The request `" + request + "` did not match any nodes.",
+                "Check whether the request is correct.",
                 __FILE__,
                 __LINE__
             );
@@ -245,9 +241,8 @@ namespace snt::dip {
             if (col.kind == Path::Kind::List)
                 throw dip::EnvironmentException(
                     "Requested collection has incorrect type",
-                    "Collection should be a map",
-                    "Collection is a list: " + request,
-                    "Check if requested path is correct",
+                    "The requested collection must be a map, but `" + request + "` refers to a list.",
+                    "Check whether the requested path is correct.",
                     __FILE__,
                     __LINE__
                 );
@@ -259,9 +254,8 @@ namespace snt::dip {
         default:
             throw dip::EnvironmentException(
                 "Unrecognised request type",
-                "Requested type can be either a function, or a reference.",
-                "Unknown request type selected.",
-                "Select either a function, or a reference request type.",
+                "The requested type is not supported because only function and reference requests are available.",
+                "Select either a function or reference request type.",
                 __FILE__,
                 __LINE__
             );
@@ -269,9 +263,8 @@ namespace snt::dip {
         if (map.empty())
             throw dip::EnvironmentException(
                 "Node request returns empty node map",
-                "Request matches some nodes: " + request,
-                "No nodes were matched.",
-                "Check if request is correct",
+                "The request `" + request + "` did not match any nodes.",
+                "Check whether the request is correct.",
                 __FILE__,
                 __LINE__
             );
@@ -300,9 +293,8 @@ namespace snt::dip {
             if (col.kind == Path::Kind::Map)
                 throw dip::EnvironmentException(
                     "Requested collection has incorrect type",
-                    "Collection should be a list",
-                    "Collection is a map: " + request,
-                    "Check if requested path is correct",
+                    "The requested collection must be a list, but `" + request + "` refers to a map.",
+                    "Check whether the requested path is correct.",
                     __FILE__,
                     __LINE__
                 );
@@ -315,9 +307,8 @@ namespace snt::dip {
         default:
             throw dip::EnvironmentException(
                 "Unrecognised request type",
-                "Requested type can be either a function, or a reference.",
-                "Unknown request type selected.",
-                "Select either a function, or a reference request type.",
+                "The requested type is not supported because only function and reference requests are available.",
+                "Select either a function or reference request type.",
                 __FILE__,
                 __LINE__
             );
@@ -325,9 +316,8 @@ namespace snt::dip {
         if (list.empty())
             throw dip::EnvironmentException(
                 "Node request returns empty node list",
-                "Request matches some nodes: " + request,
-                "No nodes were matched.",
-                "Check if request is correct",
+                "The request `" + request + "` did not match any nodes.",
+                "Check whether the request is correct.",
                 __FILE__,
                 __LINE__
             );

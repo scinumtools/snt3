@@ -53,9 +53,8 @@ namespace snt::dip {
         if (expression.empty())
             throw dip::SolverException(
                 "Empty expression",
-                "The logical expression must not be empty.",
-                "An empty string was provided.",
-                "Provide a non-empty logical expression.",
+                "The logical expression is empty; at least one operand or operation is required.",
+                "Provide a valid logical expression.",
                 __FILE__,
                 __LINE__
             );

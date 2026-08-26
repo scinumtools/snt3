@@ -18,8 +18,7 @@ namespace snt::core {
 
     struct ExceptionInfo {
         std::string message;                  ///< Exception message
-        std::string expected;                 ///< Expected value, behavior
-        std::string actual;                   ///< Actual value, behavior
+        std::string details;                  ///< Details error description
         std::string suggestion;               ///< Suggested changes
         std::optional<SourceLocation> origin; ///< Where the error was thrown
     };
@@ -43,10 +42,8 @@ namespace snt::core {
         virtual std::string format(const E& info, std::string prefix = "") {
             std::ostringstream out;
             out << prefix << info.message;
-            if (!info.expected.empty())
-                out << "\n  expected:   " << info.expected;
-            if (!info.actual.empty())
-                out << "\n  actual:     " << info.actual;
+            if (!info.details.empty())
+                out << "\n  details:    " << info.details;
             if (!info.suggestion.empty())
                 out << "\n  suggestion: " << info.suggestion;
             if (info.origin)
@@ -83,7 +80,6 @@ namespace snt::core {
             : core::Exception(
                   core::ExceptionInfo{
                       std::move(message),
-                      "",
                       "",
                       "If you need this functionality, please contact the developers, open an issue or send a pull "
                       "request on GitHub.",

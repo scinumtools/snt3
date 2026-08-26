@@ -14,9 +14,8 @@ namespace snt::dip {
         if (expression.empty())
             throw dip::SolverException(
                 "Empty expression",
-                "The template expression must not be empty.",
-                "An empty string was provided.",
-                "Provide a non-empty template expression.",
+                "The template expression is empty; at least one expression element is required.",
+                "Provide a valid template expression.",
                 __FILE__,
                 __LINE__
             );
@@ -44,9 +43,8 @@ namespace snt::dip {
                     if (nodes.size() != 1) {
                         throw dip::SolverException(
                             "Ambiguous request result",
-                            "The path request must return exactly one node: " + request,
-                            "The request returned " + std::to_string(nodes.size()) + " nodes.",
-                            "Check whether the requested path targets only one node.",
+                            "The path request `" + request + "` returned " + std::to_string(nodes.size()) + " nodes.",
+                            "Use a path that identifies exactly one node.",
                             __FILE__,
                             __LINE__
                         );

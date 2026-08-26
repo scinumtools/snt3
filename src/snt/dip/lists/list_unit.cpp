@@ -13,7 +13,6 @@ namespace snt::dip {
         if (it != units.end())
             throw dip::EnvironmentException(
                 "Duplicate custom unit",
-                "The custom unit name must be unique within the environment unit list.",
                 "A custom unit named `" + name + "` already exists in the environment unit list.",
                 "Choose a different custom unit name.",
                 __FILE__,
@@ -28,7 +27,6 @@ namespace snt::dip {
         if (it != units.end())
             throw dip::EnvironmentException(
                 "Duplicate custom unit",
-                "The custom unit name must be unique within the environment unit list.",
                 "A custom unit named `" + name + "` already exists in the environment unit list.",
                 "Choose a different custom unit name.",
                 __FILE__,
@@ -43,7 +41,6 @@ namespace snt::dip {
         if (it == units.end())
             throw dip::EnvironmentException(
                 "Unknown unit",
-                "The requested unit must exist in the environment unit list.",
                 "The unit `" + name + "` was not found in the environment unit list.",
                 "Check whether the unit name is correct.",
                 __FILE__,
@@ -57,7 +54,6 @@ namespace snt::dip {
         if (it == units.end())
             throw dip::EnvironmentException(
                 "Unknown unit",
-                "The requested unit must exist in the environment unit list.",
                 "The unit `" + name + "` was not found in the environment unit list.",
                 "Check whether the unit name is correct.",
                 __FILE__,

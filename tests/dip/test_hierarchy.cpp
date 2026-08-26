@@ -49,9 +49,8 @@ TEST(Hierarchy, IndentationChecking) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Invalid indent length");
-        EXPECT_EQ(e.info().expected, "Multiple of 2.");
-        EXPECT_EQ(e.info().actual, "1");
-        EXPECT_EQ(e.info().suggestion, "0, 2, ...");
+        EXPECT_EQ(e.info().details, "The indentation length is 1, which is not a multiple of 2.");
+        EXPECT_EQ(e.info().suggestion, "Use an indentation length of 0, 2, ...");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }
@@ -66,9 +65,8 @@ TEST(Hierarchy, IndentationChecking) {
         FAIL() << "Expected dip::SyntaxException";
     } catch (const dip::SyntaxException& e) {
         EXPECT_EQ(e.info().message, "Child node has an invalid indent");
-        EXPECT_EQ(e.info().expected, "2");
-        EXPECT_EQ(e.info().actual, "4");
-        EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
+        EXPECT_EQ(e.info().details, "The child node is indented 4 spaces, but it should be 2 spaces.");
+        EXPECT_EQ(e.info().suggestion, "Indent the child node 2 spaces more than the preceding node.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }

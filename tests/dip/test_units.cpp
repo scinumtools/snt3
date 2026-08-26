@@ -212,8 +212,11 @@ TEST(Units, DimlessInjectionError) {
         FAIL() << "Expected dip::UnitException";
     } catch (const dip::UnitException& e) {
         EXPECT_EQ(e.info().message, "Dimension mismatch");
-        EXPECT_EQ(e.info().expected, "Final quantity should have no physical dimensions.");
-        EXPECT_EQ(e.info().actual, "Converted dimension has physical dimensions: m");
+        EXPECT_EQ(
+            e.info().details,
+            "The final quantity should have no physical dimensions, but the converted quantity has physical dimensions "
+            "`m`."
+        );
         EXPECT_EQ(e.info().suggestion, "Check the units of the input quantity.");
     } catch (...) {
         FAIL() << "Expected dip::UnitException";

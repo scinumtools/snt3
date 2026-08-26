@@ -92,8 +92,7 @@ TEST(UnitList, UniqeNames) {
             EXPECT_STREQ(e.what(), "Custom unit with the same name already exist in the current record: Lrad");
         } catch (const dip::EnvironmentException& e) {
             EXPECT_EQ(e.info().message, "Duplicate custom unit");
-            EXPECT_EQ(e.info().expected, "The custom unit name must be unique within the environment unit list.");
-            EXPECT_EQ(e.info().actual, "A custom unit named `Lrad` already exists in the environment unit list.");
+            EXPECT_EQ(e.info().details, "A custom unit named `Lrad` already exists in the environment unit list.");
             EXPECT_EQ(e.info().suggestion, "Choose a different custom unit name.");
         } catch (...) {
             FAIL() << "Expected puq::UnitSystemExcept with custom units";

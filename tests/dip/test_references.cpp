@@ -264,8 +264,7 @@ TEST(References, ExceptionSource) {
         FAIL() << "Expected dip::EnvironmentException";
     } catch (const dip::EnvironmentException& e) {
         EXPECT_EQ(e.info().message, "Unknown source");
-        EXPECT_EQ(e.info().expected, "The requested source must exist in the environment source list.");
-        EXPECT_EQ(e.info().actual, "The source `bar` was not found in the environment source list.");
+        EXPECT_EQ(e.info().details, "The source `bar` was not found in the environment source list.");
         EXPECT_EQ(e.info().suggestion, "Check whether the source name is correct.");
     } catch (...) {
         FAIL() << "Expected dip::EnvironmentException";

@@ -39,8 +39,7 @@ namespace snt::dip {
             if (vnode == nullptr)
                 throw dip::SolverException(
                     "Could not determine the value type from the string",
-                    "String can be parsed as a value node (boolean, integer, float, or string).",
-                    "Value type could not be determined from the string: " + s,
+                    "The string `" + s + "` could not be parsed as a boolean, integer, float, or string value.",
                     "Check whether the syntax is correct.",
                     __FILE__,
                     __LINE__
@@ -54,8 +53,7 @@ namespace snt::dip {
         } else {
             throw dip::SolverException(
                 "Could not parse value from a string",
-                "Atom string is either a reference, or a literal value.",
-                "Cannot determine value from the string: " + s,
+                "The string `" + s + "` could not be parsed as a reference or literal value.",
                 "Check whether the syntax is correct.",
                 __FILE__,
                 __LINE__
@@ -72,8 +70,7 @@ namespace snt::dip {
         if (!value.value || !other->value.value) {
             throw dip::SolverException(
                 "Undefined logical atom value",
-                "Both operands in '==' must have a defined value.",
-                "One or both operands do not have a defined value.",
+                "One or both operands in `==` do not have a defined value.",
                 "Define both operands before performing the comparison.",
                 __FILE__,
                 __LINE__
@@ -86,9 +83,8 @@ namespace snt::dip {
         } else if (value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '==' operator can only compare quantities with the same dimensions.",
-                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
-                    other->value.units->to_string() + "'.",
+                "The `==` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
+                    other->value.units->to_string() + "`.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -96,8 +92,8 @@ namespace snt::dip {
         } else if (other->value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '==' operator can only compare quantities with the same dimensions.",
-                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "The `==` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
+                    "` with a nondimensional quantity.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -112,8 +108,7 @@ namespace snt::dip {
         if (!value.value || !other->value.value) {
             throw dip::SolverException(
                 "Undefined logical atom value",
-                "Both operands in '!=' must have a defined value.",
-                "One or both operands do not have a defined value.",
+                "One or both operands in `!=` do not have a defined value.",
                 "Define both operands before performing the comparison.",
                 __FILE__,
                 __LINE__
@@ -126,9 +121,8 @@ namespace snt::dip {
         } else if (value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '!=' operator can only compare quantities with the same dimensions.",
-                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
-                    other->value.units->to_string() + "'.",
+                "The `!=` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
+                    other->value.units->to_string() + "`.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -136,8 +130,8 @@ namespace snt::dip {
         } else if (other->value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '!=' operator can only compare quantities with the same dimensions.",
-                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "The `!=` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
+                    "` with a nondimensional quantity.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -152,8 +146,7 @@ namespace snt::dip {
         if (!value.value || !other->value.value) {
             throw dip::SolverException(
                 "Undefined logical atom value",
-                "Both operands in '<=' must have a defined value.",
-                "One or both operands do not have a defined value.",
+                "One or both operands in `<=` do not have a defined value.",
                 "Define both operands before performing the comparison.",
                 __FILE__,
                 __LINE__
@@ -166,9 +159,8 @@ namespace snt::dip {
         } else if (value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '<=' operator can only compare quantities with the same dimensions.",
-                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
-                    other->value.units->to_string() + "'.",
+                "The `<=` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
+                    other->value.units->to_string() + "`.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -176,8 +168,8 @@ namespace snt::dip {
         } else if (other->value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '<=' operator can only compare quantities with the same dimensions.",
-                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "The `<=` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
+                    "` with a nondimensional quantity.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -192,8 +184,7 @@ namespace snt::dip {
         if (!value.value || !other->value.value) {
             throw dip::SolverException(
                 "Undefined logical atom value",
-                "Both operands in '>=' must have a defined value.",
-                "One or both operands do not have a defined value.",
+                "One or both operands in `>=` do not have a defined value.",
                 "Define both operands before performing the comparison.",
                 __FILE__,
                 __LINE__
@@ -206,9 +197,8 @@ namespace snt::dip {
         } else if (value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '>=' operator can only compare quantities with the same dimensions.",
-                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
-                    other->value.units->to_string() + "'.",
+                "The `>=` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
+                    other->value.units->to_string() + "`.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -216,8 +206,8 @@ namespace snt::dip {
         } else if (other->value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '>=' operator can only compare quantities with the same dimensions.",
-                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "The `>=` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
+                    "` with a nondimensional quantity.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -232,8 +222,7 @@ namespace snt::dip {
         if (!value.value || !other->value.value) {
             throw dip::SolverException(
                 "Undefined logical atom value",
-                "Both operands in '<' must have a defined value.",
-                "One or both operands do not have a defined value.",
+                "One or both operands in `<` do not have a defined value.",
                 "Define both operands before performing the comparison.",
                 __FILE__,
                 __LINE__
@@ -246,9 +235,8 @@ namespace snt::dip {
         } else if (value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '<' operator can only compare quantities with the same dimensions.",
-                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
-                    other->value.units->to_string() + "'.",
+                "The `<` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
+                    other->value.units->to_string() + "`.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -256,8 +244,8 @@ namespace snt::dip {
         } else if (other->value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '<' operator can only compare quantities with the same dimensions.",
-                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "The `<` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
+                    "` with a nondimensional quantity.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -272,8 +260,7 @@ namespace snt::dip {
         if (!value.value || !other->value.value) {
             throw dip::SolverException(
                 "Undefined logical atom value",
-                "Both operands in '>' must have a defined value.",
-                "One or both operands do not have a defined value.",
+                "One or both operands in `>` do not have a defined value.",
                 "Define both operands before performing the comparison.",
                 __FILE__,
                 __LINE__
@@ -286,9 +273,8 @@ namespace snt::dip {
         } else if (value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '>' operator can only compare quantities with the same dimensions.",
-                "Trying to compare a nondimensional quantity with a quantity with dimensions: '" +
-                    other->value.units->to_string() + "'.",
+                "The `>` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
+                    other->value.units->to_string() + "`.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -296,8 +282,8 @@ namespace snt::dip {
         } else if (other->value.units) {
             throw dip::UnitException(
                 "Dimension mismatch",
-                "The '>' operator can only compare quantities with the same dimensions.",
-                "Trying to compare '" + value.units->to_string() + "' with a nondimensional quantity.",
+                "The `>` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
+                    "` with a nondimensional quantity.",
                 "Check whether the input units are correct.",
                 __FILE__,
                 __LINE__
@@ -312,9 +298,8 @@ namespace snt::dip {
     void LogicalAtom::logical_not() {
         if (!value.value) {
             throw dip::SolverException(
-                "Undefined logical atom value.",
-                "The operand in '~' must have a defined value.",
-                "The operand does not have a defined value.",
+                "Undefined logical atom value",
+                "The operand in `~` does not have a defined value.",
                 "Define the logical atom before applying the logical NOT operation.",
                 __FILE__,
                 __LINE__
@@ -326,10 +311,9 @@ namespace snt::dip {
     void LogicalAtom::logical_and(LogicalAtom* other) {
         if (!value.value) {
             throw dip::SolverException(
-                "Undefined logical atom value.",
-                "The operand in '&&' must have a defined value.",
-                "The operand does not have a defined value.",
-                "Define the logical atom before applying the logical NOT operation.",
+                "Undefined logical atom value",
+                "The operand in `&&` does not have a defined value.",
+                "Define the logical atom before applying the logical AND operation.",
                 __FILE__,
                 __LINE__
             );
@@ -340,10 +324,9 @@ namespace snt::dip {
     void LogicalAtom::logical_or(LogicalAtom* other) {
         if (!value.value) {
             throw dip::SolverException(
-                "Undefined logical atom value.",
-                "The operand in '||' must have a defined value.",
-                "The operand does not have a defined value.",
-                "Define the logical atom before applying the logical NOT operation.",
+                "Undefined logical atom value",
+                "The operand in `||` does not have a defined value.",
+                "Define the logical atom before applying the logical OR operation.",
                 __FILE__,
                 __LINE__
             );

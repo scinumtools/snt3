@@ -22,8 +22,7 @@ namespace snt::dip {
         }
         explicit Exception(
             std::string message,
-            std::string expected,
-            std::string actual,
+            std::string details,
             std::string suggestion,
             std::string origin_file,
             size_t origin_line,
@@ -32,8 +31,7 @@ namespace snt::dip {
             : dip::Exception(
                   dip::ExceptionInfo{
                       std::move(message),
-                      std::move(expected),
-                      std::move(actual),
+                      std::move(details),
                       std::move(suggestion),
                       core::SourceLocation{std::move(origin_file), origin_line},
                       location_line
@@ -48,15 +46,12 @@ namespace snt::dip {
         std::string format(const dip::ExceptionInfo& info, std::string prefix = "") override {
             std::ostringstream out;
             out << prefix << info.message;
-            if (!info.expected.empty())
-                out << "\n  expected:   " << info.expected;
-            if (!info.actual.empty())
-                out << "\n  actual:     " << info.actual;
+            if (!info.details.empty())
+                out << "\n  details:    " << info.details;
+            if (info.location)
+                out << "\n    at:       " << format_location(*info.location);
             if (!info.suggestion.empty())
                 out << "\n  suggestion: " << info.suggestion;
-            if (info.location) {
-                out << "\n    at:       " << format_location(*info.location);
-            }
             if (info.origin)
                 out << "\n  thrown:     " << format_location(*info.origin);
             return out.str();

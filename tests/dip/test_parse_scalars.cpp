@@ -165,9 +165,8 @@ TEST(ParseScalars, NewLineDefinitions) {
             FAIL() << "Expected dip::SyntaxException";
         } catch (const dip::SyntaxException& e) {
             EXPECT_EQ(e.info().message, "Node definition on a new line has an invalid indent");
-            EXPECT_EQ(e.info().expected, "2");
-            EXPECT_EQ(e.info().actual, "5");
-            EXPECT_EQ(e.info().suggestion, "Indent 2 spaces more than the preceding node.");
+            EXPECT_EQ(e.info().details, "The node is indented 5 spaces, but it should be 2 spaces.");
+            EXPECT_EQ(e.info().suggestion, "Indent the node 2 spaces more than the preceding node.");
         } catch (...) {
             FAIL() << "Expected dip::SyntaxException";
         }

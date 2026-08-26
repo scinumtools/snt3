@@ -10,7 +10,6 @@ namespace snt::dip {
         if (!result.second)
             throw dip::EnvironmentException(
                 "Duplicate value function",
-                "The value function name must be unique within the environment function list.",
                 "A value function named `" + name + "` already exists in the environment function list.",
                 "Choose a different value function name.",
                 __FILE__,
@@ -23,7 +22,6 @@ namespace snt::dip {
         if (!result.second)
             throw dip::EnvironmentException(
                 "Duplicate table function",
-                "The table function name must be unique within the environment function list.",
                 "A table function named `" + name + "` already exists in the environment function list.",
                 "Choose a different table function name.",
                 __FILE__,
@@ -36,7 +34,6 @@ namespace snt::dip {
         if (it == value_functions.end())
             throw dip::EnvironmentException(
                 "Unknown value function",
-                "The requested value function must exist in the environment function list.",
                 "The value function `" + name + "` was not found in the environment function list.",
                 "Check whether the value function name is correct.",
                 __FILE__,
@@ -50,7 +47,6 @@ namespace snt::dip {
         if (it == table_functions.end())
             throw dip::EnvironmentException(
                 "Unknown table function",
-                "The requested table function must exist in the environment function list.",
                 "The table function `" + name + "` was not found in the environment function list.",
                 "Check whether the table function name is correct.",
                 __FILE__,

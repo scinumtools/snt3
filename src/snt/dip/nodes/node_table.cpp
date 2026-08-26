@@ -60,9 +60,8 @@ namespace snt::dip {
         default:
             throw dip::SyntaxException(
                 "Invalid table node origin",
-                "A table node must be defined using a function, reference, string, or empty value origin.",
                 "The node has an unsupported value origin.",
-                "Check the node value and use a supported value origin.",
+                "Use a function, reference, string, or empty value origin.",
                 __FILE__,
                 __LINE__,
                 line
