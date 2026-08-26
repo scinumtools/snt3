@@ -5,6 +5,7 @@
 #include <map>
 #include <snt/core/settings.h>
 #include <sstream>
+#include <unordered_map>
 #include <string>
 
 namespace snt::dip {
