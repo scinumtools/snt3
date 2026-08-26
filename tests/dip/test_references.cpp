@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -260,11 +261,14 @@ TEST(References, ExceptionSource) {
     d.add_string("foo int = {bar?baz}");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Following source was not found in the environment source list: bar");
+        FAIL() << "Expected dip::EnvironmentException";
+    } catch (const dip::EnvironmentException& e) {
+        EXPECT_EQ(e.info().message, "Unknown source");
+        EXPECT_EQ(e.info().expected, "The requested source must exist in the environment source list.");
+        EXPECT_EQ(e.info().actual, "The source `bar` was not found in the environment source list.");
+        EXPECT_EQ(e.info().suggestion, "Check whether the source name is correct.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::EnvironmentException";
     }
 }
 

@@ -1,3 +1,4 @@
+#include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_source.h>
 #include <stdexcept>
 
@@ -10,31 +11,57 @@ namespace snt::dip {
     ) {
         auto it = sources.find(name);
         if (it != sources.end())
-            throw std::invalid_argument("Source with the same name already exists: " + name);
+            throw dip::EnvironmentException(
+                "Duplicate source",
+                "The source name must be unique within the source list.",
+                "A source named `" + name + "` already exists in the source list.",
+                "Choose a different source name.",
+                __FILE__,
+                __LINE__
+            );
         sources.insert({name, {name, path.string(), code, parent}});
     }
 
     void SourceList::append(const std::string& name, const EnvSource& src) {
         auto it = sources.find(name);
         if (it != sources.end())
-            throw std::invalid_argument("Source with the same name already exists: " + name);
+            throw dip::EnvironmentException(
+                "Duplicate source",
+                "The source name must be unique within the source list.",
+                "A source named `" + name + "` already exists in the source list.",
+                "Choose a different source name.",
+                __FILE__,
+                __LINE__
+            );
         sources.insert({name, src});
     }
 
     EnvSource& SourceList::at(const std::string& name) {
         auto it = sources.find(name);
         if (it == sources.end())
-            throw std::runtime_error("Following source was not found in the environment source list: " + name);
-        else
-            return it->second;
+            throw dip::EnvironmentException(
+                "Unknown source",
+                "The requested source must exist in the environment source list.",
+                "The source `" + name + "` was not found in the environment source list.",
+                "Check whether the source name is correct.",
+                __FILE__,
+                __LINE__
+            );
+        return it->second;
     }
 
     const EnvSource& SourceList::at(const std::string& name) const {
         auto it = sources.find(name);
         if (it == sources.end())
-            throw std::runtime_error("Following source was not found in the environment source list: " + name);
-        else
-            return it->second;
+            throw dip::EnvironmentException(
+                "Unknown source",
+                "The requested source must exist in the environment source list.",
+                "The source `" + name + "` was not found in the environment source list.",
+                "Check whether the source name is correct.",
+                __FILE__,
+                __LINE__
+            );
+        return it->second;
     }
 
 } // namespace snt::dip

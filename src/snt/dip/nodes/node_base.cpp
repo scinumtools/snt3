@@ -1,3 +1,4 @@
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_base.h>
 #include <sstream>
 
@@ -8,7 +9,15 @@ namespace snt::dip {
     }
 
     bool BaseNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
-        throw std::runtime_error("Properties are not implemented for this node: " + line.code);
+        throw dip::SyntaxException(
+            "Unsupported node property",
+            "",
+            "This node type does not implement property handling.",
+            "Use a node type that supports properties.",
+            __FILE__,
+            __LINE__,
+            line
+        );
         return false;
     }
 
@@ -21,7 +30,15 @@ namespace snt::dip {
     }
 
     std::string BaseNode::to_string(const core::StringFormatType& format) const {
-        throw std::runtime_error("String representation of a node is not implemented: " + line.code);
+        throw dip::EnvironmentException(
+            "Unsupported string representation",
+            "",
+            "This node type does not implement `to_string()`.",
+            "Use a node type that provides a string representation.",
+            __FILE__,
+            __LINE__,
+            line
+        );
         return "";
     }
 

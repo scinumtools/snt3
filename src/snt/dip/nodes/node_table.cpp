@@ -4,6 +4,7 @@
 #include "node_deferred.h"
 
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 #include <stdexcept>
 
 namespace snt::dip {
@@ -57,7 +58,15 @@ namespace snt::dip {
             return nodes;
         }
         default:
-            throw std::runtime_error("Table nodes could not be parsed: " + line.code);
+            throw dip::SyntaxException(
+                "Invalid table node origin",
+                "A table node must be defined using a function, reference, string, or empty value origin.",
+                "The node has an unsupported value origin.",
+                "Check the node value and use a supported value origin.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         }
         // we have to check if a deferred table node is already in the node list
         std::string full_name = env.hierarchy.get_current_path(indent, path.name).name;

@@ -3,6 +3,7 @@
 #include <array>
 #include <fstream>
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 
 namespace snt::dip {
 
@@ -33,7 +34,15 @@ namespace snt::dip {
             break;
         }
         default:
-            throw std::runtime_error("Import nodes could not be parsed: " + line.code);
+            throw dip::EnvironmentException(
+                "Invalid import origin",
+                "An import must use a function or reference value.",
+                "The import has an unsupported value origin.",
+                "Use a function or reference as the import source.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         }
         // update node settings
         for (const auto& node : nodes) {

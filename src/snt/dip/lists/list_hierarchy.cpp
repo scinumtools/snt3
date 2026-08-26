@@ -1,4 +1,5 @@
 #include <iostream>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_hierarchy.h>
 #include <sstream>
 
@@ -22,7 +23,15 @@ namespace snt::dip {
         for (const auto& parent : parents)
             collections_full.insert(collections_full.end(), parent.collections.begin(), parent.collections.end());
         if (collections_full.empty())
-            throw std::runtime_error("Node does not belong to any collection: " + node->path.name);
+            throw dip::EnvironmentException(
+                "Missing path collection",
+                "The node path must belong to at least one collection.",
+                "The node path `" + node->path.name + "` does not belong to any collection.",
+                "Check the node path and make sure it is associated with a valid collection.",
+                __FILE__,
+                __LINE__,
+                node->line
+            );
 
         //  resolve fully qualified (FQ) names of all but last collection
         std::string name_full;
@@ -39,14 +48,38 @@ namespace snt::dip {
             auto itc = collections.find(name_full);
             if (cnode.kind == Path::Kind::Map) {
                 if (itc == collections.end())
-                    throw std::runtime_error("Collection does not exist: " + name_full);
+                    throw dip::EnvironmentException(
+                        "Unknown collection",
+                        "The requested collection must exist.",
+                        "The collection `" + name_full + "` was not found.",
+                        "Check whether the collection path is correct.",
+                        __FILE__,
+                        __LINE__,
+                        node->line
+                    );
                 else if (std::find(itc->second.items.begin(), itc->second.items.end(), cnode.item) ==
                          itc->second.items.end())
-                    throw std::runtime_error("Collection item does not exist: " + cnode.item);
+                    throw dip::EnvironmentException(
+                        "Unknown collection item",
+                        "The requested item must exist in the collection.",
+                        "The item `" + cnode.item + "` was not found in the collection `" + name_full + "`.",
+                        "Check whether the collection item name is correct.",
+                        __FILE__,
+                        __LINE__,
+                        node->line
+                    );
                 name_full += "[" + cnode.item + "]"; // use the key
             } else if (cnode.kind == Path::Kind::List) {
                 if (itc == collections.end())
-                    throw std::runtime_error("Collection does not exist: " + name_full);
+                    throw dip::EnvironmentException(
+                        "Unknown collection",
+                        "The requested collection must exist.",
+                        "The collection `" + name_full + "` was not found.",
+                        "Check whether the collection path is correct.",
+                        __FILE__,
+                        __LINE__,
+                        node->line
+                    );
                 name_full += "[" + itc->second.items.back() + "]"; // use index of the most recent item
             }
         }
@@ -66,13 +99,27 @@ namespace snt::dip {
                 if (it == collections.end()) { // create new collection
                     collections[name_full] = Collection{name_full, {cnode.item}, Path::Kind::Map, {}};
                 } else if (it->second.kind != Path::Kind::Map) {
-                    throw std::runtime_error("Collection cannot append keyed items: " + name_full);
+                    throw dip::EnvironmentException(
+                        "Invalid collection type",
+                        "The collection must be a map to append keyed items.",
+                        "The collection `" + name_full + "` is not a map.",
+                        "Use a map collection when appending keyed items.",
+                        __FILE__,
+                        __LINE__,
+                        node->line
+                    );
                 } else if (std::find(it->second.items.begin(), it->second.items.end(), cnode.item) ==
                            it->second.items.end()) { // append new item with a new key
                     it->second.items.push_back(cnode.item);
                 } else {
-                    throw std::runtime_error(
-                        "Collection '" + name_full + "'already contains item with the key: " + cnode.item
+                    throw dip::EnvironmentException(
+                        "Duplicate collection item",
+                        "Each item in a map collection must have a unique key.",
+                        "The collection `" + name_full + "` already contains the key `" + cnode.item + "`.",
+                        "Choose a different key for the collection item.",
+                        __FILE__,
+                        __LINE__,
+                        node->line
                     );
                 }
                 name_full += "[" + cnode.item + "]";
@@ -83,7 +130,15 @@ namespace snt::dip {
                     key = "0";
                     collections[name_full] = Collection{name_full, {key}, Path::Kind::List, {}};
                 } else if (it->second.kind != Path::Kind::List) {
-                    throw std::runtime_error("Collection cannot append indexed items: " + name_full);
+                    throw dip::EnvironmentException(
+                        "Invalid collection type",
+                        "The collection must be a list to append indexed items.",
+                        "The collection `" + name_full + "` is not a list.",
+                        "Use a list collection when appending indexed items.",
+                        __FILE__,
+                        __LINE__,
+                        node->line
+                    );
                 } else { // append new item with an increased index
                     key = std::to_string(it->second.items.size());
                     it->second.items.push_back(key);
@@ -143,14 +198,28 @@ namespace snt::dip {
     const Collection& HierarchyList::get_collection(const std::string& path) const {
         auto it = collections.find(path);
         if (it == collections.end()) {
-            throw std::runtime_error("Collection does not exist: " + path);
+            throw dip::EnvironmentException(
+                "Unknown collection",
+                "The requested collection must exist in the environment hierarchy.",
+                "The collection `" + path + "` was not found in the environment hierarchy.",
+                "Check whether the collection path is correct.",
+                __FILE__,
+                __LINE__
+            );
         }
         return (it->second);
     }
 
     void HierarchyList::set_collection(const std::string& path, Path::Kind kind, std::vector<std::string> schemas) {
         if (collections.find(path) != collections.end())
-            throw std::runtime_error("Collection with this name already exits: " + path);
+            throw dip::EnvironmentException(
+                "Duplicate collection",
+                "The collection path must be unique within the environment hierarchy.",
+                "A collection with the path `" + path + "` already exists in the environment hierarchy.",
+                "Choose a different collection path.",
+                __FILE__,
+                __LINE__
+            );
         collections[path] = Collection{path, {}, kind, schemas};
     }
 

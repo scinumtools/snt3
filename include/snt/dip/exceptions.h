@@ -55,7 +55,7 @@ namespace snt::dip {
             if (!info.suggestion.empty())
                 out << "\n  suggestion: " << info.suggestion;
             if (info.location) {
-                out << "\n  at:         " << format_location(*info.location);
+                out << "\n    at:       " << format_location(*info.location);
             }
             if (info.origin)
                 out << "\n  thrown:     " << format_location(*info.origin);

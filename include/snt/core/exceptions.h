@@ -28,11 +28,11 @@ namespace snt::core {
       public:
         explicit ExceptionBase(std::string message, std::string prefix = "[SNT-CORE] ")
             : std::runtime_error(message), m_info({std::move(message)}) {
-            m_what = format(m_info, "[SNT-CORE] ");
+            m_what = format(m_info, prefix);
         }
         explicit ExceptionBase(E info, std::string prefix = "[SNT-CORE] ")
             : std::runtime_error(info.message), m_info(std::move(info)) {
-            m_what = format(m_info, "[SNT-CORE] ");
+            m_what = format(m_info, prefix);
         }
 
         const char* what() const noexcept override { return m_what.c_str(); }

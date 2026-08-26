@@ -32,9 +32,18 @@ PUEL is designed to be:
 - **Extensible** — supports custom units and prefixes  
 - **Solver-backed** — evaluation delegated to EXS  
 
+### Relationship to Existing Unit Standards
+
+PUEL is designed as a machine-readable language for representing physical quantities and unit expressions, rather than as a replacement for established unit coding systems. 
+In particular, PUEL is intended to be interoperable with standards and vocabularies such as the International System of Units (SI), the Unified Code for Units of Measure (UCUM), UDUNITS, QUDT, and the OM ontology. 
+PUEL extends the scope of conventional unit notations by providing a unified syntax for numerical values, units, uncertainties, physical constants, symbolic quantities, and algebraic expressions. 
+Where applicable, PUEL unit expressions SHOULD be convertible to and from established unit representations, while the semantic interpretation of a PUEL expression remains independent of any particular serialization format. 
+This design allows PUEL to serve as a compact interchange notation for scientific quantities while remaining compatible with existing unit standards and ontologies.
+
 ---
 
 ## 3. Unit Model
+
 
 ### 3.1. Base units
 
