@@ -70,7 +70,14 @@ namespace snt::dip {
     // Comparison operations
     void LogicalAtom::comparison_equal(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
+            throw dip::SolverException(
+                "Undefined logical atom value",
+                "Both operands in '==' must have a defined value.",
+                "One or both operands do not have a defined value.",
+                "Define both operands before performing the comparison.",
+                __FILE__,
+                __LINE__
+            );
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
@@ -103,7 +110,14 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_not_equal(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
+            throw dip::SolverException(
+                "Undefined logical atom value",
+                "Both operands in '!=' must have a defined value.",
+                "One or both operands do not have a defined value.",
+                "Define both operands before performing the comparison.",
+                __FILE__,
+                __LINE__
+            );
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
@@ -136,7 +150,14 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_less_equal(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
+            throw dip::SolverException(
+                "Undefined logical atom value",
+                "Both operands in '<=' must have a defined value.",
+                "One or both operands do not have a defined value.",
+                "Define both operands before performing the comparison.",
+                __FILE__,
+                __LINE__
+            );
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
@@ -169,7 +190,14 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_greater_equal(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
+            throw dip::SolverException(
+                "Undefined logical atom value",
+                "Both operands in '>=' must have a defined value.",
+                "One or both operands do not have a defined value.",
+                "Define both operands before performing the comparison.",
+                __FILE__,
+                __LINE__
+            );
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
@@ -202,7 +230,14 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_less(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
+            throw dip::SolverException(
+                "Undefined logical atom value",
+                "Both operands in '<' must have a defined value.",
+                "One or both operands do not have a defined value.",
+                "Define both operands before performing the comparison.",
+                __FILE__,
+                __LINE__
+            );
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
@@ -235,7 +270,14 @@ namespace snt::dip {
 
     void LogicalAtom::comparison_greater(LogicalAtom* other) {
         if (!value.value || !other->value.value) {
-            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
+            throw dip::SolverException(
+                "Undefined logical atom value",
+                "Both operands in '>' must have a defined value.",
+                "One or both operands do not have a defined value.",
+                "Define both operands before performing the comparison.",
+                __FILE__,
+                __LINE__
+            );
         } else if (value.units && other->value.units) {
             puq::Quantity quantity = std::move(other->value.value) * (*other->value.units);
             quantity = quantity.convert(*value.units);
@@ -269,21 +311,42 @@ namespace snt::dip {
     // Logical operations
     void LogicalAtom::logical_not() {
         if (!value.value) {
-            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
+            throw dip::SolverException(
+                "Undefined logical atom value.",
+                "The operand in '~' must have a defined value.",
+                "The operand does not have a defined value.",
+                "Define the logical atom before applying the logical NOT operation.",
+                __FILE__,
+                __LINE__
+            );
         } else {
             value.value = value.value->logical_not();
         }
     }
     void LogicalAtom::logical_and(LogicalAtom* other) {
         if (!value.value) {
-            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
+            throw dip::SolverException(
+                "Undefined logical atom value.",
+                "The operand in '&&' must have a defined value.",
+                "The operand does not have a defined value.",
+                "Define the logical atom before applying the logical NOT operation.",
+                __FILE__,
+                __LINE__
+            );
         } else {
             value.value = value.value->logical_and(other->value.value.get());
         }
     }
     void LogicalAtom::logical_or(LogicalAtom* other) {
         if (!value.value) {
-            throw dip::SolverException("Logical atom value is not defined", "", "", "", __FILE__, __LINE__);
+            throw dip::SolverException(
+                "Undefined logical atom value.",
+                "The operand in '||' must have a defined value.",
+                "The operand does not have a defined value.",
+                "Define the logical atom before applying the logical NOT operation.",
+                __FILE__,
+                __LINE__
+            );
         } else {
             value.value = value.value->logical_or(other->value.value.get());
         }

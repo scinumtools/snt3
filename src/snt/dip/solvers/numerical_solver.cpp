@@ -1,3 +1,4 @@
+#include <snt/dip/exceptions.h>
 #include <snt/dip/solvers/numerical_atom.h>
 #include <snt/dip/solvers/numerical_solver.h>
 
@@ -83,7 +84,14 @@ namespace snt::dip {
 
     ValueNodeData NumericalSolver::eval(const std::string& expression, const std::string& units) {
         if (expression.empty())
-            throw std::runtime_error("Numerical expression cannot be empty");
+            throw dip::SolverException(
+                "Empty expression",
+                "The numerical expression must not be empty.",
+                "An empty string was provided.",
+                "Provide a non-empty numerical expression.",
+                __FILE__,
+                __LINE__
+            );
         NumericalAtom ua = solver.eval(expression);
 
         // convert units if necessary
@@ -94,20 +102,28 @@ namespace snt::dip {
             ua.value.units = puq::Quantity(units);
         } else if (ua.value.units) {
             if (ua.value.units->measurement.baseunits.has_dimensions())
-                throw std::runtime_error(
-                    "NumericalSolver: Trying to convert nondimensional quantity into '" + units + "'"
+                throw dip::UnitException(
+                    "Dimension mismatch",
+                    "Final quantity should have physical dimension: " + units,
+                    "Converted quantity has no physical dimensions.",
+                    "Check the units of the input quantity.",
+                    __FILE__,
+                    __LINE__
                 );
             else // converting nondimensional quantity into an empty 'units' string
                 ua.value.units = std::nullopt;
         } else if (!units.empty()) {
-            throw std::runtime_error(
-                "NumericalSolver: Trying to convert '" + ua.value.units->to_string() +
-                "' into a nondimensional quantity"
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "Final quantity should have no physical dimensions.",
+                "Converted dimension has physical dimensions: " + ua.value.units->to_string(),
+                "Check the units of the input quantity.",
+                __FILE__,
+                __LINE__
             );
         }
 
         return ValueNodeData({std::move(ua.value.value), std::move(ua.value.units)});
-        ;
     }
 
 } // namespace snt::dip

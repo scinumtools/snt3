@@ -1,3 +1,4 @@
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/nodes/parser.h>
 #include <snt/dip/solvers/template_solver.h>
@@ -10,6 +11,15 @@ namespace snt::dip {
     }
 
     ValueNodeData TemplateSolver::eval(std::string expression) {
+        if (expression.empty())
+            throw dip::SolverException(
+                "Empty expression",
+                "The template expression must not be empty.",
+                "An empty string was provided.",
+                "Provide a non-empty template expression.",
+                __FILE__,
+                __LINE__
+            );
         std::stringstream ss;
         bool openned = false;
         while (!expression.empty()) {
@@ -32,10 +42,13 @@ namespace snt::dip {
                     // request absolute path
                     ValueNode::ListType nodes = environment->request_group(request, RequestType::Reference);
                     if (nodes.size() != 1) {
-                        throw std::runtime_error(
-                            "Reference in a template should return only one node. "
-                            "Number of nodes returned: " +
-                            std::to_string(nodes.size())
+                        throw dip::SolverException(
+                            "Ambiguous request result",
+                            "The path request must return exactly one node: " + request,
+                            "The request returned " + std::to_string(nodes.size()) + " nodes.",
+                            "Check whether the requested path targets only one node.",
+                            __FILE__,
+                            __LINE__
                         );
                     }
                     const ValueNode::PointerType& vnode = nodes.front();

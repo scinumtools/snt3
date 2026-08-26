@@ -13,8 +13,8 @@ namespace snt::dip {
         // static constexpr std::array<std::string, 3> ESCAPE_SYMBOLS = {"\\\"", "\\'", "\\n"};
 
       public:
-        std::string code; // in Python this was 'ccode', the original 'code' is now in the 'line' struct
-        std::string comment;
+        std::string code;    ///< in Python this was 'ccode', the original 'code' is now in the 'line' struct
+        std::string comment; ///< parsed comment
         std::array<std::string, 3> formatting;
         Parser(const Line& l) : Node(l), code(l.code) {};
         static void encode_escape_symbols(std::string& str);

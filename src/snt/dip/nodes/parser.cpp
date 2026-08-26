@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <regex>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/parser.h>
 #include <sstream>
 #include <stdexcept>
@@ -234,28 +235,6 @@ namespace snt::dip {
         return true;
     }
 
-    // bool Parser::part_schema() {
-    //     std::size_t pos = 0;
-    //     while (pos < code.size() && code[pos] == ' ')
-    //         ++pos;
-    //     if (pos >= code.size() || code[pos] != ':')
-    //         return false;
-    //     ++pos;
-    //     while (pos < code.size() && code[pos] == ' ')
-    //         ++pos;
-    //     std::size_t start = pos;
-    //     while (pos < code.size() &&
-    //            (std::isalnum(static_cast<unsigned char>(code[pos])) || code[pos] == '_' || code[pos] == '-')) {
-    //         ++pos;
-    //     }
-    //     if (start == pos)
-    //         return false;
-    //     value_raw.push_back(code.substr(start, pos - start));
-    //     value_origin = ValueOrigin::Schema;
-    //     strip(code.substr(0, pos));
-    //     return true;
-    // }
-
     bool Parser::part_type(const bool required) {
         constexpr std::string_view types[] = {
             KEYWORD_BOOLEAN, KEYWORD_INTEGER, KEYWORD_FLOAT, KEYWORD_STRING, KEYWORD_TABLE, KEYWORD_MAP, KEYWORD_LIST
@@ -263,7 +242,16 @@ namespace snt::dip {
         constexpr std::string_view precisions[] = {"128", "64", "32", "16", "x"};
         const auto fail = [&] {
             if (required)
-                throw std::runtime_error("Type not recognized: " + line.code);
+                throw dip::SyntaxException(
+                    "Could not determine the node type",
+                    "The node type must be specified explicitly.",
+                    "No valid node type or type precision could be determined from the current line.",
+                    "Specify a node type such as boolean, integer, float, string, table, map, or list, optionally with "
+                    "a supported precision such as 128, 64, 32, or 16.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             return false;
         };
         // stripping empty characters at the beginning
@@ -436,7 +424,16 @@ namespace snt::dip {
                 std::string slices = code.substr(1, pos - 1);
                 parse_slices(slices, dimension);
                 if (dimension.empty()) {
-                    throw std::runtime_error("Dimension settings cannot be empty: " + line.code);
+                    throw dip::SyntaxException(
+                        "Empty dimension settings",
+                        "The dimension block must specify at least one array dimension.",
+                        "The dimension block is empty or does not contain a valid dimension specification.",
+                        "Specify at least one dimension using `:`, `x:`, `:y`, or `x:y`; separate multiple dimensions "
+                        "with commas, for example `[:,:10]` or `[1:10,:]`.",
+                        __FILE__,
+                        __LINE__,
+                        line
+                    );
                 }
                 strip(code.substr(0, pos + 1));
                 return true;
@@ -457,7 +454,15 @@ namespace snt::dip {
             ++pos;
         if (pos >= code.size() || code[pos] != SIGN_EQUAL) {
             if (required) {
-                throw std::runtime_error("Equal sign '" + std::string(1, SIGN_EQUAL) + "' is required: " + line.code);
+                throw dip::SyntaxException(
+                    "Missing assignment operator",
+                    "The `=` sign must be present at this position.",
+                    "The expected `=` sign was not found.",
+                    "Add an `=` sign after the preceding expression.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             }
             return false;
         }
@@ -502,7 +507,15 @@ namespace snt::dip {
             while (pos < code.size() && code[pos] != '}')
                 ++pos;
             if (pos == code.size())
-                throw std::runtime_error("Missing closing '}'.");
+                throw dip::SyntaxException(
+                    "Missing closing brace",
+                    "A reference expression must be terminated with `}`.",
+                    "The reference expression was not closed.",
+                    "Add a closing `}` after the reference path.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             std::string path = code.substr(path_begin, pos - path_begin);
             value_origin = ValueOrigin::Reference;
             if (!path.empty())
@@ -511,7 +524,15 @@ namespace snt::dip {
             if (parent == 1) // self-reference {.} or relative reference {.path}
                 value_origin = ValueOrigin::ReferenceRel;
             else if (keyword.empty())
-                throw std::runtime_error("Reference cannot be empty: " + line.code);
+                throw dip::SyntaxException(
+                    "Empty reference",
+                    "A non-relative reference without query must specify a source.",
+                    "The reference does not contain a source keyword.",
+                    "Specify a reference source, for example `{source}`.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             else if (parent > 1) // relative reference {...path}
                 value_origin = ValueOrigin::ReferenceRel;
             else // raw reference {source}
@@ -550,8 +571,14 @@ namespace snt::dip {
         if (start == std::string::npos || (code[start] != '('))
             return false;
         if (dtype_raw[1] == std::string(KEYWORD_STRING))
-            throw std::runtime_error(
-                "Template expressions should use f-prefixed strings notation: f\"str\", or f\"\"\"str\"\"\""
+            throw dip::SyntaxException(
+                "Invalid template expression",
+                "String template expressions must use f-prefixed string notation.",
+                "A parenthesized expression was used for a string template.",
+                "Use an f-prefixed string such as `f\"str\"` or `f\"\"\"str\"\"\"`.",
+                __FILE__,
+                __LINE__,
+                line
             );
         int depth = 0;
         size_t i = start;
@@ -567,11 +594,27 @@ namespace snt::dip {
         }
         // No matching closing parenthesis
         if (depth != 0)
-            throw std::runtime_error("Expression contains unclosed parentheses: " + line.code);
+            throw dip::SyntaxException(
+                "Unclosed expression",
+                "The expression must have a matching closing parenthesis.",
+                "The opening parenthesis was not closed.",
+                "Add a closing `)` to complete the expression.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         // Extract inside content
         std::string inside = code.substr(start + 1, i - start - 1);
         if (inside.empty())
-            throw std::runtime_error("Expression cannot be empty: " + line.code);
+            throw dip::ParserException(
+                "Empty expression",
+                "The expression must contain a value or operation.",
+                "The expression contains no content between the parentheses.",
+                "Add a valid expression between the parentheses.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         value_raw.push_back(inside);
         value_origin = ValueOrigin::Expression;
         // Strip including leading whitespace + full "(...)"
@@ -653,10 +696,26 @@ namespace snt::dip {
             value_origin = ValueOrigin::Number;
             strip(matchResult[0].str());
             if (do_continue() && code[0] != delimiter)
-                throw std::runtime_error("Number was not fully parsed: " + line.code);
+                throw dip::SyntaxException(
+                    "Incomplete number",
+                    "The complete number must end before the expected delimiter.",
+                    "Only part of the number could be parsed.",
+                    "Check the number format and make sure it is followed by the expected delimiter.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             return true;
         } else if (required) {
-            throw std::runtime_error("Number has an invalid format: " + line.code);
+            throw dip::SyntaxException(
+                "Invalid number",
+                "The value must be a valid number.",
+                "The input does not match the expected number format.",
+                "Check the number format and provide a valid numerical value.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         }
         return false;
     }
@@ -670,10 +729,26 @@ namespace snt::dip {
             value_origin = ValueOrigin::Keyword;
             strip(matchResult[0].str());
             if (do_continue() && code[0] != delimiter)
-                throw std::runtime_error("Keyword was not fully parsed: " + line.code);
+                throw dip::SyntaxException(
+                    "Incomplete keyword",
+                    "The complete keyword must end before the expected delimiter '" + std::string(1, delimiter) + "'.",
+                    "Only part of the keyword could be parsed.",
+                    "Check the keyword and make sure it is followed by the expected delimiter.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             return true;
         } else if (required) {
-            throw std::runtime_error("Keyword has an invalid format: " + line.code);
+            throw dip::SyntaxException(
+                "Invalid keyword",
+                "The keyword must contain only letters, digits, underscores, and hyphens.",
+                "The input does not match the expected keyword format: " + code,
+                "Use only characters from `a-z`, `A-Z`, `0-9`, `_`, and `-`.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         }
         return false;
     }
@@ -784,7 +859,15 @@ namespace snt::dip {
             strip(matchResult[0].str());
             return true;
         } else if (required) {
-            throw std::runtime_error("Delimiter '" + std::string(1, symbol) + "' is required: " + line.code);
+            throw dip::SyntaxException(
+                "Missing delimiter",
+                "The delimiter `" + std::string(1, symbol) + "` must be present at this position.",
+                "The expected delimiter was not found.",
+                "Add the `" + std::string(1, symbol) + "` delimiter at this position.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         }
         return false;
     }

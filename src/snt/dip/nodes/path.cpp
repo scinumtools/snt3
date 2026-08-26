@@ -6,6 +6,15 @@
 
 namespace snt::dip {
 
+    std::unordered_map<Path::Kind, std::string> Path::KindNames{
+        {Kind::None, "none"},
+        {Kind::Empty, "empty"},
+        {Kind::Group, "group"},
+        {Kind::Map, "map"},
+        {Kind::List, "list"},
+        {Kind::Item, "item"},
+    };
+
     Path::Path(const std::string& path) {
         if (path.empty()) {
             // If path is empty the node is not a value, nor a group.

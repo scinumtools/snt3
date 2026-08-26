@@ -106,11 +106,14 @@ TEST(ParseTables, ExceptionMissingColumn) {
     d.add_string("\"\"\"");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Delimiter ' ' is required: 1");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Missing delimiter");
+        EXPECT_EQ(e.info().expected, "The delimiter ` ` must be present at this position.");
+        EXPECT_EQ(e.info().actual, "The expected delimiter was not found.");
+        EXPECT_EQ(e.info().suggestion, "Add the ` ` delimiter at this position.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 

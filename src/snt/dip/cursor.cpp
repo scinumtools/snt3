@@ -1,5 +1,6 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_value.h>
 
 namespace snt::dip {
@@ -11,8 +12,13 @@ namespace snt::dip {
             const Collection& col = env_->hierarchy.get_collection(path_);
             switch (col.kind) {
             case Path::Kind::None:
-                throw std::runtime_error(
-                    "Requested path does not point to any kind of hierarchy: " + std::string(path)
+                throw dip::EnvironmentException(
+                    "Unknown path",
+                    "The requested path must correspond to a collection.",
+                    "The path was not found in the collections: " + std::string(path),
+                    "Check whether the path is correct.",
+                    __FILE__,
+                    __LINE__
                 );
                 break;
             case Path::Kind::Empty:
@@ -36,7 +42,14 @@ namespace snt::dip {
                 list.push_back(Cursor(env_, path_ + "[" + key + "]"));
             }
         } else {
-            throw std::runtime_error("Requested path does not point to a list: " + path_);
+            throw dip::EnvironmentException(
+                "Unknown path",
+                "The requested path must correspond to a list collection: " + std::string(path_),
+                "The path is the " + Path::KindNames[col.kind] + " collections.",
+                "Check whether the path is correct.",
+                __FILE__,
+                __LINE__
+            );
         }
         return list;
     }
@@ -49,7 +62,14 @@ namespace snt::dip {
                 map.insert({key, Cursor(env_, path_ + "[" + key + "]")});
             }
         } else {
-            throw std::runtime_error("Requested path does not point to a map: " + path_);
+            throw dip::EnvironmentException(
+                "Unknown path",
+                "The requested path must correspond to a map collection: " + std::string(path_),
+                "The path is the " + Path::KindNames[col.kind] + " collections.",
+                "Check whether the path is correct.",
+                __FILE__,
+                __LINE__
+            );
         }
         return map;
     }
@@ -63,7 +83,14 @@ namespace snt::dip {
         if (value)
             return value->get_shape();
         else
-            throw std::runtime_error("Requested path does not point to a value node: " + path_);
+            throw dip::EnvironmentException(
+                "Unknown path",
+                "The requested path must correspond to a value node: " + path_,
+                "The path was not found in collections.",
+                "Check whether the path is correct.",
+                __FILE__,
+                __LINE__
+            );
     }
 
     const Path::Kind Cursor::get_kind() const {
@@ -93,7 +120,15 @@ namespace snt::dip {
             new_path += std::string(path);
             break;
         default:
-            throw std::runtime_error("Unknown access collection: " + new_path);
+            throw dip::EnvironmentException(
+                "Unknown path",
+                "The requested path must correspond to a collection, or an map key.",
+                "The path was not found in the collections, or items: " + new_path,
+                "Check whether the path is correct.",
+                __FILE__,
+                __LINE__
+            );
+            break;
         }
         // return new cursor
         return Cursor(env_, new_path);
@@ -107,7 +142,14 @@ namespace snt::dip {
             new_path += "[" + std::to_string(index) + "]";
             break;
         default:
-            throw std::runtime_error("Unknown access collection");
+            throw dip::EnvironmentException(
+                "Unknown path",
+                "The requested index must correspond to some list item.",
+                "Couldn't find items with the given index: " + new_path,
+                "Check whether the path is correct.",
+                __FILE__,
+                __LINE__
+            );
         }
         // return new cursor
         return Cursor(env_, new_path);

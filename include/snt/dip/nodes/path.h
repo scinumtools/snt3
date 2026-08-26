@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace snt::dip {
@@ -23,6 +24,7 @@ namespace snt::dip {
             List,  ///< List items are ordered by indexes
             Item,  ///< Item in a map or list collection
         };
+        static std::unordered_map<Kind, std::string> KindNames;
 
         /**
          * Collection node information

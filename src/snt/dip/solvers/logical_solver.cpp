@@ -1,3 +1,4 @@
+#include <snt/dip/exceptions.h>
 #include <snt/dip/solvers/logical_atom.h>
 #include <snt/dip/solvers/logical_operators.h>
 #include <snt/dip/solvers/logical_solver.h>
@@ -50,7 +51,14 @@ namespace snt::dip {
 
     ValueNodeData LogicalSolver::eval(const std::string& expression) {
         if (expression.empty())
-            throw std::runtime_error("Logical expression cannot be empty");
+            throw dip::SolverException(
+                "Empty expression",
+                "The logical expression must not be empty.",
+                "An empty string was provided.",
+                "Provide a non-empty logical expression.",
+                __FILE__,
+                __LINE__
+            );
         LogicalAtom ua = solver.eval(expression);
         return ValueNodeData({std::move(ua.value.value), std::move(ua.value.units)});
     }
