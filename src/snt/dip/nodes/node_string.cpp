@@ -26,7 +26,14 @@ namespace snt::dip {
 
     BaseNode::ListType StringNode::parse(Environment& env) {
         if (!units_raw.empty())
-            throw std::runtime_error("String data type does not support units: " + line.code);
+            throw dip::UnitException(
+                "Invalid units",
+                "The string data type does not support units.",
+                "Remove the units from the string node.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         switch (value_origin) {
         case ValueOrigin::Function:
             set_value(env.request_value(value_raw.at(0), RequestType::Function));
@@ -42,7 +49,14 @@ namespace snt::dip {
             if (val)
                 set_value(std::move(val));
             else
-                throw std::runtime_error("Value environment request returns an empty pointer: " + value_raw.at(0));
+                throw dip::SyntaxException(
+                    "Undefined reference",
+                    "The requested value reference `" + value_raw.at(0) + "` does not resolve to a value.",
+                    "Ensure that the referenced node exists and has a defined value.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             break;
         }
         case ValueOrigin::ReferenceRaw: {
@@ -107,8 +121,14 @@ namespace snt::dip {
             const val::ArrayValueStr valueT(value.get());
             for (int i = 0; i < valueT.get_size(); i++) {
                 if (!std::regex_match(valueT.get_value(i), pattern)) {
-                    throw std::runtime_error(
-                        "Node value " + value->to_string() + " does not match with expected format '" + format + "'"
+                    throw dip::SyntaxException(
+                        "Format mismatch",
+                        "The node value `" + valueT.get_value(i) + "` does not match the expected format `" + format +
+                            "`.",
+                        "Provide a string value that matches the specified regular expression format.",
+                        __FILE__,
+                        __LINE__,
+                        line
                     );
                 }
             }

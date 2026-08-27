@@ -101,11 +101,13 @@ TEST(References, ExceptionMissingNode) {
     d.add_string("bar str = {?foo}");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Value environment request returns an empty pointer: ?foo");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Undefined reference");
+        EXPECT_EQ(e.info().details, "The requested value reference `?foo` does not resolve to a value.");
+        EXPECT_EQ(e.info().suggestion, "Ensure that the referenced node exists and has a defined value.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 

@@ -5,6 +5,7 @@
 
 #include <deque>
 #include <optional>
+#include <snt/dip/exceptions.h>
 #include <snt/puq/quantity.h>
 
 namespace snt::dip {
@@ -99,7 +100,9 @@ namespace snt::dip {
         virtual void modify_value(const BaseNode::PointerType& node, Environment& env);
         virtual bool set_property(PropertyType property, val::Array::StringType& values, std::string& units) override;
         virtual std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override {
-            throw std::runtime_error("String represenation of the value node is not implemented");
+            throw dip::MissingException(
+                "String representation of this value node is not implemented.", __FILE__, __LINE__, line
+            );
             return "";
         };
         void validate_constant() const;

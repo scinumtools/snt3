@@ -1,6 +1,7 @@
 #include "../parsers.h"
 
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_integer.h>
 #include <snt/dip/solvers/numerical_solver.h>
 
@@ -31,7 +32,14 @@ namespace snt::dip {
         } else if (dtype_raw[2] == "64") {
             value_dtype = (dtype_raw[0] == "u") ? core::DataType::Integer64_U : core::DataType::Integer64;
         } else {
-            throw std::runtime_error("Value data type cannot be determined from the node settings");
+            throw dip::SyntaxException(
+                "Invalid integer data type",
+                "The integer data type cannot be determined from the node settings.",
+                "Use `16`, `32`, or `64` as the integer size, optionally prefixed with `u` for an unsigned integer.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         }
     };
 
@@ -51,7 +59,14 @@ namespace snt::dip {
             if (val)
                 set_value(std::move(val));
             else
-                throw std::runtime_error("Value environment request returns an empty pointer: " + value_raw.at(0));
+                throw dip::SyntaxException(
+                    "Undefined reference",
+                    "The requested value reference `" + value_raw.at(0) + "` does not resolve to a value.",
+                    "Ensure that the referenced node exists and has a defined value.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             break;
         }
         case ValueOrigin::ReferenceRaw: {
@@ -95,17 +110,20 @@ namespace snt::dip {
         case core::DataType::Integer64:
             return std::make_unique<val::ArrayValueInt64>(std::stoll(value_input));
             break;
-        default:
-            if (dtype_raw[0] == "u")
-                throw std::runtime_error(
-                    "Value cannot be casted as unsigned " + dtype_raw[0] +
-                    " bit integer type from the given string: " + value_input
-                );
-            else
-                throw std::runtime_error(
-                    "Value cannot be casted as " + dtype_raw[0] +
-                    " bit integer type from the given string: " + value_input
-                );
+        default: {
+            const bool is_unsigned = dtype_raw[0] == "u";
+            const std::string integer_type = is_unsigned ? "unsigned integer" : "signed integer";
+            throw dip::SyntaxException(
+                "Invalid integer cast",
+                "The value cannot be cast to the specified " + integer_type + " type from the given string: `" +
+                    value_input + "`.",
+                is_unsigned ? "Use a valid non-negative integer within the range of the selected unsigned integer type."
+                            : "Use a valid integer within the range of the selected signed integer type.",
+                __FILE__,
+                __LINE__,
+                line
+            );
+        }
         }
     }
 
@@ -168,21 +186,26 @@ namespace snt::dip {
             }
             return std::make_unique<val::ArrayValueInt64>(arr, shape);
         }
-        default:
+        default: {
             std::ostringstream oss;
             for (const auto& s : value_inputs)
                 oss << s;
-            if (dtype_raw[0] == "u") {
-                throw std::runtime_error(
-                    "Value cannot be casted as unsigned " + dtype_raw[0] +
-                    " bit integer type from the given string: " + oss.str()
-                );
-            } else {
-                throw std::runtime_error(
-                    "Value cannot be casted as " + dtype_raw[0] +
-                    " bit integer type from the given string: " + oss.str()
-                );
-            }
+
+            const bool is_unsigned = dtype_raw[0] == "u";
+            const std::string integer_type = is_unsigned ? "unsigned integer" : "signed integer";
+
+            throw dip::SyntaxException(
+                "Invalid integer cast",
+                "The values cannot be cast to the specified " + integer_type + " type from the given strings: `" +
+                    oss.str() + "`.",
+                is_unsigned ? "Use valid non-negative integer values within the range of the selected unsigned "
+                              "integer type."
+                            : "Use valid integer values within the range of the selected signed integer type.",
+                __FILE__,
+                __LINE__,
+                line
+            );
+        }
         }
     }
 

@@ -141,14 +141,6 @@ namespace snt::dip {
             } else if (cnode.kind == Path::Kind::Group) {
                 auto col = collections.find(name_full);
                 if (col == collections.end()) {
-                    // Actually, the node modifications and collection item declarations
-                    // should not create new collections, and also should throw an error
-                    //    std::cout << "hello 2 " << name_full << std::endl;
-                    //    // ignore if kind is map, or list
-                    //    if (col->second.kind != Path::Kind::Map && col->second.kind != Path::Kind::List)
-                    //        throw std::runtime_error("Collection with this name already exits: " + name_full);
-                    //} else {
-                    // register new collection
                     collections[name_full] = Collection{name_full, {}, Path::Kind::Group, {}};
                 }
             }

@@ -108,7 +108,6 @@ namespace snt::dip {
                         __LINE__,
                         line
                     );
-                // throw std::runtime_error("Assigning array value to the scalar node: " + line.code);
             } else {
                 validate_dimensions(); // check if value shape corresponds with dimension ranges
             }

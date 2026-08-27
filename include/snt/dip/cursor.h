@@ -2,6 +2,7 @@
 #define DIP_CURSOR_H
 
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/path.h>
 #include <snt/val/value_base.h>
 #include <snt/val/values_number.h>
@@ -89,7 +90,13 @@ namespace snt::dip {
             auto value = env_->request_value("?" + path_);
             auto* val = dynamic_cast<val::ArrayValue<StorageType>*>(value.get());
             if (!val)
-                throw std::runtime_error("Type mismatch for node: " + path_);
+                throw dip::SyntaxException(
+                    "Type mismatch",
+                    "The value of node `" + path_ + "` cannot be converted to the requested type.",
+                    "Request the value using a type that matches the node's data type.",
+                    __FILE__,
+                    __LINE__
+                );
             if constexpr (detail::is_std_vector_v<T>) {
                 if constexpr (std::is_same_v<ValueType, bool>) {
                     std::vector<bool> result;
@@ -103,7 +110,15 @@ namespace snt::dip {
             } else if constexpr (detail::is_std_array_v<T>) {
                 auto values = val->get_values();
                 if (values.size() != std::tuple_size_v<T>)
-                    throw std::runtime_error("Array size mismatch for node: " + path_);
+                    throw dip::EnvironmentException(
+                        "Array size mismatch",
+                        "The value of node `" + path_ + "` contains " + std::to_string(values.size()) +
+                            " elements, but the requested array contains " + std::to_string(std::tuple_size_v<T>) +
+                            " elements.",
+                        "Request an array with the same number of elements as the node value.",
+                        __FILE__,
+                        __LINE__
+                    );
                 T result;
                 if constexpr (std::is_same_v<ValueType, bool>) {
                     std::transform(values.begin(), values.end(), result.begin(), [](uint8_t v) { return v != 0; });
@@ -113,7 +128,14 @@ namespace snt::dip {
                 return result;
             } else {
                 if (val->get_size() != 1)
-                    throw std::runtime_error("Expected scalar value from node: " + path_);
+                    throw dip::SyntaxException(
+                        "Expected scalar value",
+                        "The value of node `" + path_ + "` contains " + std::to_string(val->get_size()) +
+                            " elements, but a scalar value was requested.",
+                        "Request a scalar node value or use a vector or array type for multiple elements.",
+                        __FILE__,
+                        __LINE__
+                    );
                 if constexpr (std::is_same_v<ValueType, bool>)
                     return val->get_value(0) != 0;
                 else

@@ -38,7 +38,7 @@ namespace snt::dip {
 
         switch (rtype) {
         case RequestType::Function: {
-            core::MissingException("Functions in the request_node_data are not implemented yet.", __FILE__, __LINE__);
+            dip::MissingException("Functions in the request_node_data are not implemented yet.", __FILE__, __LINE__);
             break;
         }
         case RequestType::Reference: {
@@ -225,7 +225,7 @@ namespace snt::dip {
         std::unordered_map<std::string, ValueNode::ListType> map;
         switch (rtype) {
         case RequestType::Function: {
-            throw core::MissingException("Request map from functions is not implemented yet.", __FILE__, __LINE__);
+            throw dip::MissingException("Request map from functions is not implemented yet.", __FILE__, __LINE__);
             break;
         }
         case RequestType::Reference: {
@@ -235,7 +235,7 @@ namespace snt::dip {
             const HierarchyList& hlist =
                 hierarchy; //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
             if (!source_name.empty())
-                throw core::MissingException("Request map from sources is not implemented yet.", __FILE__, __LINE__);
+                throw dip::MissingException("Request map from sources is not implemented yet.", __FILE__, __LINE__);
 
             const Collection& col = hlist.get_collection(node_path);
             if (col.kind == Path::Kind::List)
@@ -277,7 +277,7 @@ namespace snt::dip {
         std::vector<ValueNode::ListType> list;
         switch (rtype) {
         case RequestType::Function: {
-            throw core::MissingException("Request list from functions is not implemented yet.", __FILE__, __LINE__);
+            throw dip::MissingException("Request list from functions is not implemented yet.", __FILE__, __LINE__);
             break;
         }
         case RequestType::Reference: {
@@ -287,7 +287,7 @@ namespace snt::dip {
             const HierarchyList& hlist =
                 hierarchy; //(source_name.empty()) ? hierarchy : sources.at(source_name).hierarchy;
             if (!source_name.empty())
-                throw core::MissingException("Request list from sources is not implemented yet.", __FILE__, __LINE__);
+                throw dip::MissingException("Request list from sources is not implemented yet.", __FILE__, __LINE__);
 
             const Collection& col = hlist.get_collection(node_path);
             if (col.kind == Path::Kind::Map)

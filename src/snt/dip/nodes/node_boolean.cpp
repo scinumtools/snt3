@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_boolean.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/solvers/logical_solver.h>
@@ -28,7 +29,14 @@ namespace snt::dip {
 
     BaseNode::ListType BooleanNode::parse(Environment& env) {
         if (!units_raw.empty())
-            throw std::runtime_error("Boolean data type does not support units: " + line.code);
+            throw dip::UnitException(
+                "Invalid units",
+                "The boolean data type does not support units.",
+                "Remove the units from the boolean node.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         switch (value_origin) {
         case ValueOrigin::Function:
             set_value(env.request_value(value_raw.at(0), RequestType::Function));
@@ -44,7 +52,14 @@ namespace snt::dip {
             if (val)
                 set_value(std::move(val));
             else
-                throw std::runtime_error("Value environment request returns an empty pointer: " + value_raw.at(0));
+                throw dip::SyntaxException(
+                    "Undefined reference",
+                    "The requested value reference `" + value_raw.at(0) + "` does not resolve to a value.",
+                    "Ensure that the referenced node exists and has a defined value.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             break;
         }
         case ValueOrigin::ReferenceRaw: {
@@ -74,7 +89,14 @@ namespace snt::dip {
         else if (value_input == core::KEYWORD_FALSE)
             return std::make_unique<val::ArrayValueBool>(false);
         else
-            throw std::runtime_error("Value cannot be casted as boolean from the given string: " + value_input);
+            throw dip::SyntaxException(
+                "Invalid boolean value",
+                "The value cannot be cast to a boolean from the given string: `" + value_input + "`.",
+                "Use `true` or `false` as the boolean value.",
+                __FILE__,
+                __LINE__,
+                line
+            );
     }
 
     val::BaseValue::PointerType BooleanNode::cast_array_value(
@@ -89,7 +111,14 @@ namespace snt::dip {
                 else if (value == core::KEYWORD_FALSE)
                     bool_values.push_back(false);
                 else
-                    throw std::runtime_error("Value cannot be casted as boolean array from the given string: " + value);
+                    throw dip::SyntaxException(
+                        "Invalid boolean value",
+                        "The value cannot be cast to a boolean array from the given string: `" + value + "`.",
+                        "Use `true` or `false` for every element of the boolean array.",
+                        __FILE__,
+                        __LINE__,
+                        line
+                    );
             }
         }
         return std::make_unique<val::ArrayValueBool>(bool_values, shape);
@@ -105,7 +134,14 @@ namespace snt::dip {
 
     void BooleanNode::validate_options() const {
         if (format.size() > 0)
-            throw std::runtime_error("Options property is not implemented for boolean nodes: " + line.code);
+            throw dip::SyntaxException(
+                "Invalid property",
+                "The `options` property is not supported for boolean nodes.",
+                "Use `options` only with integer, float, or string nodes.",
+                __FILE__,
+                __LINE__,
+                line
+            );
     }
 
     std::string BooleanNode::to_string(const core::StringFormatType& format) const {

@@ -105,6 +105,26 @@ namespace snt::dip {
       public:
         using dip::Exception::Exception;
     };
+
+    /**
+     * Missing exception is triggered when functionality is not implemented yet
+     */
+    class MissingException : public dip::Exception {
+      public:
+        MissingException(
+            std::string message, std::string file, std::size_t line, std::optional<Line> location_line = std::nullopt
+        )
+            : dip::Exception(
+                  std::move(message),
+                  "",
+                  "If you need this functionality, please contact the developers, open an issue or send a pull "
+                  "request on GitHub.",
+                  file,
+                  line,
+                  location_line
+              ) {};
+    };
+
 } // namespace snt::dip
 
 #endif // SNT_DIP_EXCEPTIONS_H

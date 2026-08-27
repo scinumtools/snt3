@@ -83,11 +83,13 @@ TEST(Properties, Format) {
     d.add_string("  !format \"[a-z]+\"");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Node value \"sdf34\" does not match with expected format '[a-z]+'");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Format mismatch");
+        EXPECT_EQ(e.info().details, "The node value `sdf34` does not match the expected format `[a-z]+`.");
+        EXPECT_EQ(e.info().suggestion, "Provide a string value that matches the specified regular expression format.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 
     // Throw an error if indent is not higher
