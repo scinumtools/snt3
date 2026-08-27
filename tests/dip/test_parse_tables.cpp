@@ -85,11 +85,18 @@ TEST(ParseTables, ExceptionDimensionMismatch) {
     d.add_string("\"\"\"");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Value dimensions do not correspond to the node dimension ranges: [3] != [10]");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Dimension range mismatch");
+        EXPECT_EQ(
+            e.info().details, "The value dimensions `[3]` do not correspond to the node dimension ranges `[10]`."
+        );
+        EXPECT_EQ(
+            e.info().suggestion,
+            "Ensure that each value dimension falls within the corresponding dimension range of the node."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -160,11 +167,13 @@ TEST(ParseTables, TableDeclaration) {
         );
         try {
             d.parse();
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) {
-            EXPECT_STREQ(e.what(), "Declared node has undefined value:   bar table");
+            FAIL() << "Expected dip::SyntaxException";
+        } catch (const dip::SyntaxException& e) {
+            EXPECT_EQ(e.info().message, "Undefined value");
+            EXPECT_EQ(e.info().details, "The node has a value origin but no value has been defined.");
+            EXPECT_EQ(e.info().suggestion, "Provide a valid value for the declared node.");
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected dip::SyntaxException";
         }
     }
 }
@@ -203,11 +212,13 @@ TEST(ParseTables, DeclareTableNodes) {
         );
         try {
             d.parse();
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) {
-            EXPECT_STREQ(e.what(), "Declared node has undefined value:     pop bool[:]");
+            FAIL() << "Expected dip::SyntaxException";
+        } catch (const dip::SyntaxException& e) {
+            EXPECT_EQ(e.info().message, "Undefined value");
+            EXPECT_EQ(e.info().details, "The node has a value origin but no value has been defined.");
+            EXPECT_EQ(e.info().suggestion, "Provide a valid value for the declared node.");
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected dip::SyntaxException";
         }
     }
     { // Declared node has properties

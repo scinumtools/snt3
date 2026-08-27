@@ -1,6 +1,7 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -40,11 +41,13 @@ TEST(ParseDimensions, DimensionSize) {
     d.add_string("foo int[2] = [[1,2],[3,4]]");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Number of value dimensions does not match that of node: 2!=1");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Dimension mismatch");
+        EXPECT_EQ(e.info().details, "The value has 2 dimensions, but the node has 1 dimensions.");
+        EXPECT_EQ(e.info().suggestion, "Ensure that the value and node have the same number of dimensions.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -61,11 +64,18 @@ TEST(ParseDimensions, ExactDimensions) {
     d.add_string("foo int[2,3] = [[1,2,3,4]]");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Value dimensions do not correspond to the node dimension ranges: [1,4] != [2,3]");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Dimension range mismatch");
+        EXPECT_EQ(
+            e.info().details, "The value dimensions `[1,4]` do not correspond to the node dimension ranges `[2,3]`."
+        );
+        EXPECT_EQ(
+            e.info().suggestion,
+            "Ensure that each value dimension falls within the corresponding dimension range of the node."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -82,10 +92,17 @@ TEST(ParseDimensions, DimensionRanges) {
     d.add_string("foo int[2:,:2] = [[1,2,3]]");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Value dimensions do not correspond to the node dimension ranges: [1,3] != [2:,:2]");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Dimension range mismatch");
+        EXPECT_EQ(
+            e.info().details, "The value dimensions `[1,3]` do not correspond to the node dimension ranges `[2:,:2]`."
+        );
+        EXPECT_EQ(
+            e.info().suggestion,
+            "Ensure that each value dimension falls within the corresponding dimension range of the node."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }

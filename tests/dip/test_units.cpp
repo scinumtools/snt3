@@ -194,11 +194,15 @@ TEST(Units, DimlessModificationError) {
     d.add_string("foo = 23 m");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Modifications: Trying to convert 'm' into a nondimensional quantity: foo float = 23");
+        FAIL() << "Expected dip::UnitException";
+    } catch (const dip::UnitException& e) {
+        EXPECT_EQ(e.info().message, "Dimension mismatch");
+        EXPECT_EQ(e.info().details, "The modification specifies units `m` but the target node is nondimensional.");
+        EXPECT_EQ(
+            e.info().suggestion, "Specify units for the target node that are compatible with the modification units."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::UnitException";
     }
 }
 

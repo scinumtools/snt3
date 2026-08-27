@@ -59,9 +59,23 @@ namespace snt::dip {
         if (!dimension.empty()) {
             return cast_array_value(value_input, shape);
         } else if (value_input.empty()) {
-            throw std::runtime_error("Value node does not have any value: " + line.code);
+            throw dip::SyntaxException(
+                "Missing value",
+                "The value node does not contain any value.",
+                "Provide a value for the node or define it as an array if no scalar value is intended.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         } else if (value_input.size() > 1) {
-            throw std::runtime_error("Value size is an array but node is defined as scalar: " + line.code);
+            throw dip::SyntaxException(
+                "Unexpected array value",
+                "The value node is defined as a scalar but contains multiple values.",
+                "Provide exactly one value for a scalar node, or define the node with a dimension to accept an array.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         } else {
             return cast_scalar_value(value_input.at(0));
         }
@@ -85,7 +99,16 @@ namespace snt::dip {
             }
             if (dimension.empty()) {
                 if (value->get_size() > 1)
-                    throw std::runtime_error("Assigning array value to the scalar node: " + line.code);
+                    throw dip::SyntaxException(
+                        "Array assigned to scalar",
+                        "The resulting value contains multiple elements but the node is defined as a scalar.",
+                        "Assign a single-element value to the scalar node, or define the node with a dimension to "
+                        "accept an array.",
+                        __FILE__,
+                        __LINE__,
+                        line
+                    );
+                // throw std::runtime_error("Assigning array value to the scalar node: " + line.code);
             } else {
                 validate_dimensions(); // check if value shape corresponds with dimension ranges
             }
@@ -107,8 +130,13 @@ namespace snt::dip {
             std::string option_units = option.units_raw;
             if (!option_units.empty()) {
                 if (!units)
-                    throw std::runtime_error(
-                        "Options: Trying to convert '" + option_units + "' into a nondimensional quantity: " + line.code
+                    throw dip::SyntaxException(
+                        "Dimension mismatch",
+                        "The option specifies units `" + option_units + "` but the node is nondimensional.",
+                        "Specify units for the node that are compatible with the option units.",
+                        __FILE__,
+                        __LINE__,
+                        line
                     );
                 else {
                     puq::Quantity quantity(std::move(option.value), option_units);
@@ -121,18 +149,27 @@ namespace snt::dip {
 
     void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
         if (node->dtype != NodeDtype::Modification && node->dtype != dtype)
-            throw std::runtime_error(
-                "Node '" + path.name + "' with type '" + dtype_raw.at(1) + "' cannot modify node '" + node->path.name +
-                "' with type '" + node->dtype_raw.at(1) + "'"
+            throw dip::SyntaxException(
+                "Type mismatch",
+                "A node of type `" + dtype_raw.at(1) + "` cannot modify a node of type `" + node->dtype_raw.at(1) +
+                    "`.",
+                "Use a modification node or a node with a compatible type.",
+                __FILE__,
+                __LINE__,
+                line
             );
         val::BaseValue::PointerType value = cast_value(node->value_raw, node->value_shape);
         if (!node->units_raw.empty()) {
-            if (!this->units)
-                throw std::runtime_error(
-                    "Modifications: Trying to convert '" + node->units_raw +
-                    "' into a nondimensional quantity: " + line.code
+            if (!this->units) {
+                throw dip::UnitException(
+                    "Dimension mismatch",
+                    "The modification specifies units `" + node->units_raw + "` but the target node is nondimensional.",
+                    "Specify units for the target node that are compatible with the modification units.",
+                    __FILE__,
+                    __LINE__,
+                    line
                 );
-            else {
+            } else {
                 puq::Quantity quantity(std::move(value), node->units_raw);
                 quantity = quantity.convert(*this->units);
                 value = std::move(quantity.measurement.result.estimate);
@@ -148,7 +185,14 @@ namespace snt::dip {
         case PropertyType::Options:
             for (const auto& value_option : values) {
                 if (dtype == NodeDtype::Boolean)
-                    throw std::runtime_error("Option property is not implemented for boolean nodes: " + line.code);
+                    throw dip::SyntaxException(
+                        "Invalid property",
+                        "The `Options` property is not supported for boolean nodes.",
+                        "Use `Options` only with integer, float, or string nodes.",
+                        __FILE__,
+                        __LINE__,
+                        line
+                    );
                 // TODO: account for multidimensional arrays as individual options
                 val::BaseValue::PointerType ovalue = cast_scalar_value(value_option);
                 options.push_back({std::move(ovalue), value_option, units});
@@ -217,12 +261,26 @@ namespace snt::dip {
 
     void ValueNode::validate_constant() const {
         if (constant)
-            throw std::runtime_error("Node '" + path.name + "' is constant and cannot be modified: " + line.code);
+            throw dip::SyntaxException(
+                "Constant node",
+                "The node `" + path.name + "` is constant and cannot be modified.",
+                "Remove the `constant` property or modify a different node.",
+                __FILE__,
+                __LINE__,
+                line
+            );
     }
 
     void ValueNode::validate_definition() const {
         if (value == nullptr && value_origin != ValueOrigin::None)
-            throw std::runtime_error("Declared node has undefined value: " + line.code);
+            throw dip::SyntaxException(
+                "Undefined value",
+                "The node has a value origin but no value has been defined.",
+                "Provide a valid value for the declared node.",
+                __FILE__,
+                __LINE__,
+                line
+            );
     }
 
     void ValueNode::validate_condition(Environment& env) const {
@@ -264,9 +322,14 @@ namespace snt::dip {
                         oss << ", ";
                     oss << options[i].value->to_string();
                 }
-                throw std::runtime_error(
-                    "Value " + value->to_string() + " of node '" + path.name +
-                    "' doesn't match with any option: " + oss.str()
+                throw dip::SyntaxException(
+                    "Invalid option",
+                    "The value `" + value->to_string() + "` does not match any of the defined options: `" + oss.str() +
+                        "`.",
+                    "Use one of the values defined by the node's `options` property.",
+                    __FILE__,
+                    __LINE__,
+                    line
                 );
             }
         }
@@ -274,7 +337,14 @@ namespace snt::dip {
 
     void ValueNode::validate_format() const {
         if (format.size() > 0)
-            throw std::runtime_error("Format property can be used only with string nodes: " + line.code);
+            throw dip::SyntaxException(
+                "Invalid property",
+                "The `format` property is only supported for string nodes.",
+                "Use the `format` property only with a string node.",
+                __FILE__,
+                __LINE__,
+                line
+            );
     }
 
     void ValueNode::validate_dimensions() const {
@@ -286,9 +356,14 @@ namespace snt::dip {
             if (vdim.size() == 1 && vdim[0] == 0) {
                 vdim.assign(dimension.size(), 0);
             } else if (dimension.size() != vdim.size()) {
-                throw std::runtime_error(
-                    "Number of value dimensions does not match that of node: " + std::to_string(vdim.size()) +
-                    "!=" + std::to_string(dimension.size())
+                throw dip::SyntaxException(
+                    "Dimension mismatch",
+                    "The value has " + std::to_string(vdim.size()) + " dimensions, but the node has " +
+                        std::to_string(dimension.size()) + " dimensions.",
+                    "Ensure that the value and node have the same number of dimensions.",
+                    __FILE__,
+                    __LINE__,
+                    line
                 );
             }
         }
@@ -318,9 +393,14 @@ namespace snt::dip {
                         nss << dmin << SEPARATOR_SLICE << dmax;
                     vss << vdim[j];
                 }
-                throw std::runtime_error(
-                    "Value dimensions do not correspond to the node dimension ranges: [" + vss.str() + "] != [" +
-                    nss.str() + "]"
+                throw dip::SyntaxException(
+                    "Dimension range mismatch",
+                    "The value dimensions `[" + vss.str() + "]` do not correspond to the node dimension ranges `[" +
+                        nss.str() + "]`.",
+                    "Ensure that each value dimension falls within the corresponding dimension range of the node.",
+                    __FILE__,
+                    __LINE__,
+                    line
                 );
             }
         }

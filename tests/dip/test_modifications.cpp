@@ -76,10 +76,12 @@ TEST(Modifications, Declarations) {
     d.add_string("foo int");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Declared node has undefined value: foo int");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Undefined value");
+        EXPECT_EQ(e.info().details, "The node has a value origin but no value has been defined.");
+        EXPECT_EQ(e.info().suggestion, "Provide a valid value for the declared node.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }

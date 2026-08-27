@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/path.h>
 #include <snt/dip/settings.h>
 #include <stdexcept>
@@ -44,7 +45,13 @@ namespace snt::dip {
                 }
             }
             if (part.empty()) {
-                throw std::runtime_error("Name has an invalid format: " + path);
+                throw dip::SyntaxException(
+                    "Invalid name",
+                    "The name contains characters that are not allowed: `" + path + "`.",
+                    "Use only letters, digits, underscores, and hyphens in the name.",
+                    __FILE__,
+                    __LINE__
+                );
             }
             if (!currentPath.empty())
                 currentPath += '.';
@@ -56,13 +63,26 @@ namespace snt::dip {
                 while (pos < path.size() && path[pos] != ']') {
                     char c = path[pos];
                     if (!(std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-' || c == '*')) {
-                        throw std::runtime_error("Node collection item has an invalid format: " + path);
+                        throw dip::SyntaxException(
+                            "Invalid node collection item",
+                            "The node collection item contains an invalid character `" + std::string(1, c) +
+                                "` in path: `" + path + "`",
+                            "Use only letters, digits, underscores, hyphens, and `*` in the node collection item.",
+                            __FILE__,
+                            __LINE__
+                        );
                     }
                     item += c;
                     ++pos;
                 }
                 if (pos >= path.size() || path[pos] != ']') {
-                    throw std::runtime_error("Node collection has unclosed brackets: " + path);
+                    throw dip::SyntaxException(
+                        "Unclosed brackets",
+                        "The node collection is missing its closing bracket `]`: `" + path + "`",
+                        "Add a closing `]` bracket to complete the node collection.",
+                        __FILE__,
+                        __LINE__
+                    );
                 }
                 ++pos; // skip ']'
                 Path::Kind type = item.empty() ? Path::Kind::List : Path::Kind::Map;
@@ -74,7 +94,16 @@ namespace snt::dip {
             ++pos; // skip '.'
         }
         if (pos != path.size())
-            throw std::runtime_error("Path is not fully qualified: " + path);
+            if (pos != path.size()) {
+                throw dip::SyntaxException(
+                    "Path is not fully qualified",
+                    "The path contains unexpected characters after the complete path expression: `" + path + "`.",
+                    "Remove the unexpected characters and ensure that path nodes names contain only letters, digits, "
+                    "underscores, and hyphens.",
+                    __FILE__,
+                    __LINE__
+                );
+            }
 
         if (!currentPath.empty()) {
             // A simple value or node group
@@ -94,7 +123,13 @@ namespace snt::dip {
         // Number of components in the current path.
         const std::size_t nComponents = 1 + std::count(name.begin(), name.end(), '.');
         if (nDots > nComponents)
-            throw std::runtime_error("Relative path wants to access parents beyong root node: " + path);
+            throw dip::SyntaxException(
+                "Relative path exceeds root",
+                "The relative path attempts to access a parent beyond the root node: `" + path + "`.",
+                "Reduce the number of parent references `.` so that the path does not go beyond the root node.",
+                __FILE__,
+                __LINE__
+            );
         std::string result = name;
         for (std::size_t i = 0; i < nDots; ++i) {
             const std::size_t pos = result.rfind('.');

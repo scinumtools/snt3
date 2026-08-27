@@ -130,11 +130,18 @@ TEST(References, ExceptionDimension) {
     d.add_string("bar int = {?foo}");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Assigning array value to the scalar node: bar int = {?foo}");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Array assigned to scalar");
+        EXPECT_EQ(
+            e.info().details, "The resulting value contains multiple elements but the node is defined as a scalar."
+        );
+        EXPECT_EQ(
+            e.info().suggestion,
+            "Assign a single-element value to the scalar node, or define the node with a dimension to accept an array."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -333,10 +340,17 @@ TEST(References, RelativePath) {
     );
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Relative path wants to access parents beyong root node: ...crackle");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Relative path exceeds root");
+        EXPECT_EQ(
+            e.info().details, "The relative path attempts to access a parent beyond the root node: `...crackle`."
+        );
+        EXPECT_EQ(
+            e.info().suggestion,
+            "Reduce the number of parent references `.` so that the path does not go beyond the root node."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }

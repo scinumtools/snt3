@@ -32,11 +32,13 @@ TEST(Properties, Constant) {
     d.add_string("foo bool = false");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Node 'foo' is constant and cannot be modified: foo bool = true");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Constant node");
+        EXPECT_EQ(e.info().details, "The node `foo` is constant and cannot be modified.");
+        EXPECT_EQ(e.info().suggestion, "Remove the `constant` property or modify a different node.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 
     // Throw an error if indent is not higher
@@ -241,11 +243,13 @@ TEST(Properties, OptionsBolean) {
     d.add_string("  !options [false,true]");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Option property is not implemented for boolean nodes: foo bool = true");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Invalid property");
+        EXPECT_EQ(e.info().details, "The `Options` property is not supported for boolean nodes.");
+        EXPECT_EQ(e.info().suggestion, "Use `Options` only with integer, float, or string nodes.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -281,11 +285,13 @@ TEST(Properties, OptionsInteger) {
     d.add_string("  !options [16,32,64]");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Value 1 of node 'foo' doesn't match with any option: 16, 32, 64");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Invalid option");
+        EXPECT_EQ(e.info().details, "The value `1` does not match any of the defined options: `16, 32, 64`.");
+        EXPECT_EQ(e.info().suggestion, "Use one of the values defined by the node's `options` property.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -321,11 +327,13 @@ TEST(Properties, OptionsFloat) {
     d.add_string("  !options [1,2.34,5.6e7]");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Value 2 of node 'foo' doesn't match with any option: 1, 2.34, 5.6e7");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Invalid option");
+        EXPECT_EQ(e.info().details, "The value `2` does not match any of the defined options: `1, 2.34, 5.6e7`.");
+        EXPECT_EQ(e.info().suggestion, "Use one of the values defined by the node's `options` property.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -358,11 +366,16 @@ TEST(Properties, OptionsString) {
     d.add_string("  !options [\"bar\",\"snap\",\"pow\"]");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Value \"baz\" of node 'foo' doesn't match with any option: \"bar\", \"snap\", \"pow\"");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Invalid option");
+        EXPECT_EQ(
+            e.info().details,
+            "The value `\"baz\"` does not match any of the defined options: `\"bar\", \"snap\", \"pow\"`."
+        );
+        EXPECT_EQ(e.info().suggestion, "Use one of the values defined by the node's `options` property.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -494,7 +507,8 @@ TEST(Properties, Metadata) {
         EXPECT_EQ(e.info().message, "Cannot set a property on a non-value node");
         EXPECT_EQ(
             e.info().details,
-            "Only value nodes (boolean, integer, float, string and table) can have properties, but the node type is "
+            "Only value nodes (boolean, integer, float, string and table) can have properties, but the node type "
+            "is "
             "`group`."
         );
         EXPECT_EQ(e.info().suggestion, "Remove the property or move it behind a value node.");

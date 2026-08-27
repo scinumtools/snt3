@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/path.h>
 
 using namespace snt;
@@ -12,11 +13,20 @@ TEST(Path, FullyQualifiedPaths) {
 
     try {
         path = dip::Path("foo#.[2d).skd");
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Path is not fully qualified: foo#.[2d).skd");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Path is not fully qualified");
+        EXPECT_EQ(
+            e.info().details,
+            "The path contains unexpected characters after the complete path expression: `foo#.[2d).skd`."
+        );
+        EXPECT_EQ(
+            e.info().suggestion,
+            "Remove the unexpected characters and ensure that path nodes names contain only letters, digits, "
+            "underscores, and hyphens."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -38,10 +48,17 @@ TEST(Path, ResolveRelativePaths) {
 
     try {
         resolved = path.resolve("....snap.crackle");
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Relative path wants to access parents beyong root node: ....snap.crackle");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Relative path exceeds root");
+        EXPECT_EQ(
+            e.info().details, "The relative path attempts to access a parent beyond the root node: `....snap.crackle`."
+        );
+        EXPECT_EQ(
+            e.info().suggestion,
+            "Reduce the number of parent references `.` so that the path does not go beyond the root node."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }

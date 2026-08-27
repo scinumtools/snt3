@@ -1,6 +1,7 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -188,11 +189,13 @@ TEST(SchemaList, Options) {
     );
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Value 17 of node 'space.resolution' doesn't match with any option: 8, 16, 32");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Invalid option");
+        EXPECT_EQ(e.info().details, "The value `17` does not match any of the defined options: `8, 16, 32`.");
+        EXPECT_EQ(e.info().suggestion, "Use one of the values defined by the node's `options` property.");
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 
@@ -334,11 +337,13 @@ TEST(SchemaList, TableDeclarations) {
         );
         try {
             d.parse();
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) {
-            EXPECT_STREQ(e.what(), "Declared node has undefined value:   bar table");
+            FAIL() << "Expected dip::SyntaxException";
+        } catch (const dip::SyntaxException& e) {
+            EXPECT_EQ(e.info().message, "Undefined value");
+            EXPECT_EQ(e.info().details, "The node has a value origin but no value has been defined.");
+            EXPECT_EQ(e.info().suggestion, "Provide a valid value for the declared node.");
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected dip::SyntaxException";
         }
     }
 }

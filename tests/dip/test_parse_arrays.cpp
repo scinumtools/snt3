@@ -1,6 +1,7 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -88,11 +89,16 @@ TEST(ParseArrays, ArrayToScalarsError) {
     d.add_string("foo int = [1,2,3]");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Value size is an array but node is defined as scalar: foo int = [1,2,3]");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Unexpected array value");
+        EXPECT_EQ(e.info().details, "The value node is defined as a scalar but contains multiple values.");
+        EXPECT_EQ(
+            e.info().suggestion,
+            "Provide exactly one value for a scalar node, or define the node with a dimension to accept an array."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 

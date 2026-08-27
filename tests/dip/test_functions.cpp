@@ -2,6 +2,7 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -118,11 +119,18 @@ TEST_F(Functions, ExceptionDimension) {
     d.add_string("bar str = foo()");
     try {
         d.parse();
-        FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
-        EXPECT_STREQ(e.what(), "Assigning array value to the scalar node: bar str = foo()");
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Array assigned to scalar");
+        EXPECT_EQ(
+            e.info().details, "The resulting value contains multiple elements but the node is defined as a scalar."
+        );
+        EXPECT_EQ(
+            e.info().suggestion,
+            "Assign a single-element value to the scalar node, or define the node with a dimension to accept an array."
+        );
     } catch (...) {
-        FAIL() << "Expected std::runtime_error";
+        FAIL() << "Expected dip::SyntaxException";
     }
 }
 

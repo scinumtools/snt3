@@ -1,6 +1,7 @@
 #include "../parsers.h"
 
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_float.h>
 #include <snt/dip/solvers/numerical_solver.h>
 
@@ -31,7 +32,15 @@ namespace snt::dip {
         } else if (dtype_raw[2] == "128" && max_float_size == 128) {
             value_dtype = core::DataType::Float128;
         } else {
-            throw std::runtime_error("Value data type cannot be determined from the node settings");
+            throw dip::SyntaxException(
+                "Invalid float data type",
+                "The float data type cannot be determined from the node settings.",
+                "Use `32`, `64`, or `128` as the float size; `128` is only available when the maximum supported float "
+                "size is 128.",
+                __FILE__,
+                __LINE__,
+                line
+            );
         }
     };
 
@@ -51,7 +60,15 @@ namespace snt::dip {
             if (val)
                 set_value(std::move(val));
             else
-                throw std::runtime_error("Value environment request returns an empty pointer: " + value_raw.at(0));
+                throw dip::SyntaxException(
+                    "Empty value reference",
+                    "The value environment returned an empty pointer for the requested reference: `" + value_raw.at(0) +
+                        "`.",
+                    "Ensure that the referenced value exists and can be resolved in the current environment.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
             break;
         }
         case ValueOrigin::ReferenceRaw: {
@@ -84,8 +101,15 @@ namespace snt::dip {
         case core::DataType::Float128:
             return std::make_unique<val::ArrayValueFloat128>(std::stold(value_input));
         default:
-            throw std::runtime_error(
-                "Value cannot be casted as " + dtype_raw[2] + " bit float type from the given string: " + value_input
+            throw dip::SyntaxException(
+                "Invalid float cast",
+                "The value cannot be cast to a `" + dtype_raw[2] + "`-bit float from the given string: `" +
+                    value_input + "`.",
+                "Provide a valid floating-point literal, such as `1.23`, `-4.5`, `1e-6`, or `inf`, that is "
+                "representable by the selected float type.",
+                __FILE__,
+                __LINE__,
+                line
             );
         }
     }
@@ -126,8 +150,15 @@ namespace snt::dip {
             std::ostringstream oss;
             for (const auto& s : value_inputs)
                 oss << s;
-            throw std::runtime_error(
-                "Value cannot be casted as " + dtype_raw[2] + " bit float type from the given string: " + oss.str()
+            throw dip::SyntaxException(
+                "Invalid float data type",
+                "The array values cannot be cast to the specified `" + dtype_raw[2] + "`-bit float data type: `" +
+                    oss.str() + "`.",
+                "Use a supported floating-point data type: `32`, `64`, or `128`, and ensure that each array element is "
+                "a valid floating-point literal representable by the selected type.",
+                __FILE__,
+                __LINE__,
+                line
             );
         }
     }
