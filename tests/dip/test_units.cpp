@@ -232,5 +232,5 @@ TEST(Units, UnitConversionError) {
     dip::DIP d;
     d.add_string("foo float = 23 km");
     d.add_string("foo = 23 g");
-    EXPECT_THROW(d.parse(), puq::ConvDimExcept);
+    EXPECT_THROW(d.parse(), puq::ConverterException);
 }

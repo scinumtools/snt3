@@ -170,7 +170,13 @@ namespace snt::puq {
                     }
                     continue;
                 } else {
-                    throw MeasurementExcept("Undefined quantity symbol: " + bu.unit);
+                    throw puq::SystemException(
+                        "Undefined quantity symbol",
+                        "The quantity symbol `" + bu.unit + "` is not defined in the current unit system.",
+                        "Use a quantity symbol that is defined in the current unit system.",
+                        __FILE__,
+                        __LINE__
+                    );
                 }
             }
             // dimensions
@@ -211,11 +217,23 @@ namespace snt::puq {
                                 add_exp(dim.physical[i], mul_exp(dmap_custom->second.dimensions[i], bu.exponent));
                         }
                     } else {
-                        throw MeasurementExcept("Undefined unit symbol: " + bu.unit);
+                        throw puq::SystemException(
+                            "Undefined unit symbol",
+                            "The unit symbol `" + bu.unit + "` is not defined in the current unit system.",
+                            "Use a unit symbol that is defined in the current unit system.",
+                            __FILE__,
+                            __LINE__
+                        );
                     }
                 }
             } else {
-                throw MeasurementExcept("Undefined unit symbol: " + bu.unit);
+                throw puq::SystemException(
+                    "Undefined unit symbol",
+                    "The unit symbol `" + bu.unit + "` is not defined in the current unit system.",
+                    "Use a unit symbol that is defined in the current unit system.",
+                    __FILE__,
+                    __LINE__
+                );
             }
         }
         if ((dim.utype & Utype::NUL) == Utype::NUL) // add liear utype for dimensionless values

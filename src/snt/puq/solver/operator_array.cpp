@@ -1,5 +1,7 @@
 #include "operator_array.h"
 
+#include <snt/puq/exceptions.h>
+
 namespace snt::puq {
 
     // TODO: this needs probably templates because of the ArrayValue
@@ -30,7 +32,13 @@ namespace snt::puq {
                 atom->value.result.uncertainty = nullptr;
             }
         } else {
-            throw std::runtime_error("Detected empty atom in a group");
+            throw puq::ParserException(
+                "Empty unit atom",
+                "The unit expression contains an empty atom where a grouped value was expected.",
+                "Provide a valid unit atom inside the group.",
+                __FILE__,
+                __LINE__
+            );
         }
         tokens->put_left(group);
     };

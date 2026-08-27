@@ -1,4 +1,5 @@
 #include <snt/puq/base_units.h>
+#include <snt/puq/exceptions.h>
 #include <snt/puq/exponent.h>
 #include <snt/puq/math/pow.h>
 #include <snt/puq/measurement.h>
@@ -76,7 +77,13 @@ namespace snt::puq::math {
 
     puq::Measurement pow(const puq::Measurement& msr1, const puq::Measurement& msr2) {
         if (msr2.baseunits.has_dimensions())
-            throw std::runtime_error("Exponent in the power function must be dimensionless quantity.");
+            throw puq::UnitException(
+                "Dimension mismatch",
+                "The exponent in the power function must be dimensionless.",
+                "Provide a dimensionless quantity as the exponent.",
+                __FILE__,
+                __LINE__
+            );
         return puq::Measurement(pow(msr1.result, msr2.result), msr1.baseunits);
     }
 

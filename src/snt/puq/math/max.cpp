@@ -1,3 +1,4 @@
+#include <snt/puq/exceptions.h>
 #include <snt/puq/math/max.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
@@ -36,7 +37,13 @@ namespace snt::puq::math {
                 return puq::Measurement(max(msr1.result, msr3.result), msr1.baseunits);
             }
         } else if (dim1.has_dimensions() || dim2.has_dimensions()) {
-            throw std::runtime_error("Cannot convert between dimensional and dimensionless quantities.");
+            throw puq::UnitException(
+                "Dimension mismatch",
+                "The maximum function cannot compare a dimensional quantity with a dimensionless quantity.",
+                "Provide quantities that are either both dimensional with compatible dimensions or both dimensionless.",
+                __FILE__,
+                __LINE__
+            );
         } else {
             return puq::Measurement(max(msr1.result, msr2.result));
         }

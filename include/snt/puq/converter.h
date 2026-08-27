@@ -12,15 +12,33 @@
 
 namespace snt::puq {
 
-    class ConvDimExcept : public std::exception {
+    class Converter {
+      private:
+        BaseUnits baseunits1;
+        BaseUnits baseunits2;
+        Result _convert_linear(const Result& m1, const Result& m2);
+        Result _convert_logarithmic(const Result& m);
+        Result _convert_temperature(Result m);
+
+      public:
+        Utype utype;
+        Dimensions dimensions1;
+        Dimensions dimensions2;
+        Converter() : utype(Utype::NUL) {};
+        Converter(const BaseUnits& bu1, const BaseUnits& bu2);
+        Converter(const std::string& s1, const std::string& s2) : Converter(BaseUnits(s1), BaseUnits(s2)) {};
+        Result convert(const Result& m1, const Result& m2 = 1);
+    };
+
+    class ConverterException : public std::exception {
       private:
         std::string message;
 
       public:
-        ConvDimExcept(std::string m) : message(m) {}
-        ConvDimExcept(const BaseUnits& bu1, const BaseUnits& bu2)
-            : ConvDimExcept(bu1, UnitSystem::current.type, bu2, UnitSystem::current.type) {}
-        ConvDimExcept(const BaseUnits& bu1, const SystemType& s1, const BaseUnits& bu2, const SystemType& s2) {
+        ConverterException(std::string m) : message(m) {}
+        ConverterException(const BaseUnits& bu1, const BaseUnits& bu2)
+            : ConverterException(bu1, UnitSystem::current.type, bu2, UnitSystem::current.type) {}
+        ConverterException(const BaseUnits& bu1, const SystemType& s1, const BaseUnits& bu2, const SystemType& s2) {
             UnitSystem us(s1);
             Dimensions dim1 = bu1.dimensions();
             us.change(s2);
@@ -174,34 +192,6 @@ namespace snt::puq {
             message = ss.str();
         }
         const char* what() const noexcept override { return message.c_str(); }
-    };
-
-    class NoConvExcept : public std::exception {
-      private:
-        std::string message;
-
-      public:
-        NoConvExcept(const std::string& s1, const std::string& s2)
-            : message("Conversion '" + s1 + " -> " + s2 + "' is not available!") {}
-        const char* what() const noexcept override { return message.c_str(); }
-    };
-
-    class Converter {
-      private:
-        BaseUnits baseunits1;
-        BaseUnits baseunits2;
-        Result _convert_linear(const Result& m1, const Result& m2);
-        Result _convert_logarithmic(const Result& m);
-        Result _convert_temperature(Result m);
-
-      public:
-        Utype utype;
-        Dimensions dimensions1;
-        Dimensions dimensions2;
-        Converter() : utype(Utype::NUL) {};
-        Converter(const BaseUnits& bu1, const BaseUnits& bu2);
-        Converter(const std::string& s1, const std::string& s2) : Converter(BaseUnits(s1), BaseUnits(s2)) {};
-        Result convert(const Result& m1, const Result& m2 = 1);
     };
 
 } // namespace snt::puq

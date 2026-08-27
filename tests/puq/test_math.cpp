@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <snt/puq/exceptions.h>
 #include <snt/puq/math.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
@@ -45,11 +46,13 @@ TEST(Math, Power) {
         EXPECT_EQ(msr0.to_string(), "1.58(13)e1*km2"); // est 15.79607529212455 unc 1.2832583987008226
         try {
             puq::math::pow(msr1, msr1);
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) {
-            EXPECT_STREQ(e.what(), "Exponent in the power function must be dimensionless quantity.");
+            FAIL() << "Expected puq::UnitException";
+        } catch (const puq::UnitException& e) {
+            EXPECT_EQ(e.info().message, "Dimension mismatch");
+            EXPECT_EQ(e.info().details, "The exponent in the power function must be dimensionless.");
+            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity as the exponent.");
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected puq::SyntaxException";
         }
     }
     {
@@ -82,11 +85,15 @@ TEST(Math, Exponent) {
         EXPECT_EQ(msr0.to_string(), "1.380(97)e3");
         try {
             puq::math::exp(msr2);
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) {
-            EXPECT_STREQ(e.what(), "Exponential function accepts only dimensionless quantities.");
+            FAIL() << "Expected puq::UnitException";
+        } catch (const puq::UnitException& e) {
+            EXPECT_EQ(e.info().message, "Dimension mismatch");
+            EXPECT_EQ(e.info().details, "The exponential function accepts only dimensionless quantities.");
+            EXPECT_EQ(
+                e.info().suggestion, "Provide a dimensionless quantity as the argument of the exponential function."
+            );
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected puq::SyntaxException";
         }
     }
     {
@@ -116,11 +123,15 @@ TEST(Math, LogarithmNatural) {
         EXPECT_EQ(msr0.to_string(), "1.9782(97)"); // est 1.9782390361706734 unc 0.009681881008027917
         try {
             puq::math::log(msr2);
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) {
-            EXPECT_STREQ(e.what(), "Natural logarithm accepts only dimensionless quantities.");
+            FAIL() << "Expected puq::UnitException";
+        } catch (const puq::UnitException& e) {
+            EXPECT_EQ(e.info().message, "Dimension mismatch");
+            EXPECT_EQ(e.info().details, "The natural logarithm cannot be applied to a dimensional quantity.");
+            EXPECT_EQ(
+                e.info().suggestion, "Provide a dimensionless quantity as the argument of the natural logarithm."
+            );
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected puq::SyntaxException";
         }
     }
     {
@@ -150,11 +161,15 @@ TEST(Math, LogarithmDecadic) {
         EXPECT_EQ(msr0.to_string(), "8.591(42)e-1"); // est 0.8591382972945308 unc 0.00420478755147613
         try {
             puq::math::log10(msr2);
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) {
-            EXPECT_STREQ(e.what(), "Decadic logarithm accepts only dimensionless quantities.");
+            FAIL() << "Expected puq::UnitException";
+        } catch (const puq::UnitException& e) {
+            EXPECT_EQ(e.info().message, "Dimension mismatch");
+            EXPECT_EQ(e.info().details, "The decadic logarithm accepts only dimensionless quantities.");
+            EXPECT_EQ(
+                e.info().suggestion, "Provide a dimensionless quantity as the argument of the decadic logarithm."
+            );
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected puq::SyntaxException";
         }
     }
     {
@@ -234,11 +249,13 @@ TEST(Math, Sinus) {
         EXPECT_EQ(msr0.to_string(), "8.12(41)e-1"); // est 0.8115585420741488 unc 0.040898975084413536
         try {
             puq::math::sin(msr2);
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) { // TODO: should accept also radians
-            EXPECT_STREQ(e.what(), "Sinus function accepts only dimensionless quantities.");
+            FAIL() << "Expected puq::UnitException";
+        } catch (const puq::UnitException& e) {
+            EXPECT_EQ(e.info().message, "Dimension mismatch");
+            EXPECT_EQ(e.info().details, "The sine function accepts only dimensionless quantities.");
+            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity as the argument of the sine function.");
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected puq::SyntaxException";
         }
     }
     {
@@ -268,11 +285,13 @@ TEST(Math, Cosinus) {
         EXPECT_EQ(msr0.to_string(), "5.84(57)e-1"); // est 0.5842711124011541 unc 0.0568091001573734
         try {
             puq::math::cos(msr2);
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) { // TODO: should accept also radians
-            EXPECT_STREQ(e.what(), "Cosinus function accepts only dimensionless quantities.");
+            FAIL() << "Expected puq::UnitException";
+        } catch (const puq::UnitException& e) { // TOTO: should accept also radians
+            EXPECT_EQ(e.info().message, "Dimension mismatch");
+            EXPECT_EQ(e.info().details, "The cosine function accepts only dimensionless quantities.");
+            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity as the argument of the cosine function.");
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected puq::SyntaxException";
         }
     }
     {
@@ -302,11 +321,13 @@ TEST(Math, Tangens) {
         EXPECT_EQ(msr0.to_string(), "1.39(21)"); // est 1.3890102126372825 unc 0.20505448494745337
         try {
             puq::math::tan(msr2);
-            FAIL() << "Expected std::runtime_error";
-        } catch (const std::runtime_error& e) { // TODO: should accept also radians
-            EXPECT_STREQ(e.what(), "Tangens function accepts only dimensionless quantities.");
+            FAIL() << "Expected puq::UnitException";
+        } catch (const puq::UnitException& e) {
+            EXPECT_EQ(e.info().message, "Dimension mismatch");
+            EXPECT_EQ(e.info().details, "The tangent function accepts only dimensionless quantities.");
+            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity as the argument of the tangent function.");
         } catch (...) {
-            FAIL() << "Expected std::runtime_error";
+            FAIL() << "Expected puq::SyntaxException";
         }
         // TODO: Implement test with limiting values
     }

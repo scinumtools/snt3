@@ -13,7 +13,14 @@ namespace snt::puq {
         if (std::regex_match(expr, m, rx_number)) {
             return Quantity(expr);
         } else {
-            throw CalculatorExcept("Invalid unit expression: " + expr_orig);
+            throw puq::ParserException(
+                "Invalid unit expression",
+                "The unit expression contains whitespace and cannot be parsed as a single quantity: `" + expr_orig +
+                    "`.",
+                "Provide a valid quantity expression without whitespace.",
+                __FILE__,
+                __LINE__
+            );
         }
     }
 

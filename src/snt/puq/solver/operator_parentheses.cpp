@@ -1,5 +1,6 @@
 #include "operator_parentheses.h"
 
+#include <snt/puq/exceptions.h>
 #include <snt/puq/solver/unit_atom.h>
 
 namespace snt::puq {
@@ -36,7 +37,13 @@ namespace snt::puq {
 
     void OperatorParentheses::operate_group(exs::TokenListBase* tokens) {
         if (exponent.size() == 0)
-            throw AtomParsingExcept("Number of exponents does not match number of opened parentheses!");
+            throw puq::ParserException(
+                "Exponent mismatch",
+                "The number of exponents does not match the number of opened parentheses.",
+                "Provide one exponent for each opened parenthesis.",
+                __FILE__,
+                __LINE__
+            );
         ExponentVariant exp = exponent.back();
         exponent.pop_back();
         if (exponent_to_float(exp) != 1) {

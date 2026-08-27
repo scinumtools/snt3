@@ -7,15 +7,6 @@
 
 namespace snt::puq {
 
-    class AtomParsingExcept : public std::exception {
-      private:
-        std::string message;
-
-      public:
-        AtomParsingExcept(const std::string& m) : message(m) {}
-        const char* what() const noexcept override { return message.c_str(); }
-    };
-
     class UnitAtom : public exs::AtomBase<UnitAtom, Measurement> {
       public:
         UnitAtom(const UnitAtom&) = default;

@@ -44,7 +44,7 @@ TEST(Calculator, UnitSystems) {
     atom = calc.eval("IU_33*yd - SI_3*m"); // subtraction
     EXPECT_EQ(atom.value.to_string(), "29.7192*yd");
 
-    puq::Quantity q1("SI_12*cm"), q2("US_3*ft");  // multiplication and division is not supported
-    EXPECT_THROW(q1 * q2, puq::UnitSystemExcept); // because we do not know conversion units
-    EXPECT_THROW(q1 / q2, puq::UnitSystemExcept);
+    puq::Quantity q1("SI_12*cm"), q2("US_3*ft"); // multiplication and division is not supported
+    EXPECT_THROW(q1 * q2, puq::SystemException); // because we do not know conversion units
+    EXPECT_THROW(q1 / q2, puq::SystemException);
 }

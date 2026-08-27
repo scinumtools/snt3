@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <regex>
 #include <snt/core/to_number.h>
+#include <snt/puq/exceptions.h>
 #include <snt/puq/math/pow.h>
 #include <snt/puq/solver/unit_atom.h>
 #include <snt/puq/systems/unit_system.h>
@@ -69,8 +70,13 @@ namespace snt::puq {
             }
         }
         if (munit.first == "") {
-            throw AtomParsingExcept(
-                "Unknown unit base \"" + expr_orig + "\" in " + UnitSystem::current.data->SystemAbbrev + " system!"
+            throw puq::ParserException(
+                "Unknown unit base",
+                "The unit base `" + expr_orig + "` is not defined in the `" + UnitSystem::current.data->SystemAbbrev +
+                    "` unit system.",
+                "Use a unit base that is defined in the selected unit system.",
+                __FILE__,
+                __LINE__
             );
         } else {
             bu.unit = munit.first;
@@ -80,10 +86,22 @@ namespace snt::puq {
         if (expr.size() > 0) {
             // no prefixes are allowed
             if (!munit.second.use_prefixes)
-                throw AtomParsingExcept("Prefixes are not allowed for this unit: " + expr_orig);
+                throw puq::ParserException(
+                    "Prefix not allowed",
+                    "The unit `" + expr_orig + "` does not allow the prefix `" + expr + "`.",
+                    "Use the unit without a prefix or choose a unit that supports prefixes.",
+                    __FILE__,
+                    __LINE__
+                );
             // is symbol in the prefix list
             if (UnitPrefixList.find(expr) == UnitPrefixList.end())
-                throw AtomParsingExcept("Unknown prefix '" + expr + "' detected in unit: " + expr_orig);
+                throw puq::ParserException(
+                    "Unknown prefix",
+                    "The prefix `" + expr + "` in the unit `" + expr_orig + "` is not recognized.",
+                    "Use a valid unit prefix.",
+                    __FILE__,
+                    __LINE__
+                );
             else
                 bu.prefix = expr;
             // is prefix allowed
@@ -98,7 +116,14 @@ namespace snt::puq {
                     for (auto& prefix : munit.second.allowed_prefixes) {
                         ss << " " << prefix;
                     }
-                    throw AtomParsingExcept(ss.str());
+                    throw puq::ParserException(
+                        "Prefix not allowed",
+                        "The prefix `" + bu.prefix + "` is not allowed for unit `" + munit.first + "` in the `" +
+                            UnitSystem::current.data->SystemAbbrev + "` unit system.",
+                        ss.str(),
+                        __FILE__,
+                        __LINE__
+                    );
                 }
             }
         }
@@ -130,7 +155,13 @@ namespace snt::puq {
         } else if (std::regex_match(expr, m, rx_unit)) {
             _parse_unit(expr, msr, m, expr_orig);
         } else {
-            throw AtomParsingExcept("Invalid unit expression: " + expr_orig);
+            throw puq::ParserException(
+                "Invalid unit expression",
+                "The unit expression could not be parsed: `" + expr_orig + "`.",
+                "Provide a valid number, quantity, SI factor, or unit expression.",
+                __FILE__,
+                __LINE__
+            );
         }
         return msr;
     }

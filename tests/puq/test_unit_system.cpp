@@ -55,9 +55,9 @@ TEST(UnitSystem, EnvironmentSetting) {
     EXPECT_EQ(q2.to_string(), "0.034*Fr*ms-1");
 
     us.close(); // switch to previous system
-    EXPECT_THROW(us.close(), puq::UnitSystemExcept);
+    EXPECT_THROW(us.close(), puq::SystemException);
 
-    EXPECT_THROW(puq::Quantity(2, "statA"), puq::AtomParsingExcept); // ESU is no more available
+    EXPECT_THROW(puq::Quantity(2, "statA"), puq::ParserException); // ESU is no more available
 
     q1 = puq::Quantity(2, "A");
     EXPECT_EQ(q1.to_string(), "2*A"); // SI is available
@@ -134,7 +134,7 @@ TEST(UnitSystem, ContextConversionESU) {
     EXPECT_EQ(q2.to_string(), "2*statA");
 
     q1 = puq::Quantity("1.13412e-08*A", puq::SystemType::SI); // error without given context
-    EXPECT_THROW(q1.convert("statA", puq::SystemType::ESU), puq::ConvDimExcept);
+    EXPECT_THROW(q1.convert("statA", puq::SystemType::ESU), puq::SystemException);
 
     q1 = puq::Quantity(1, "statT", puq::SystemType::ESU);
     q2 = q1.convert("T", puq::SystemType::SI, "B"); // specify conversion context
@@ -149,7 +149,7 @@ TEST(UnitSystem, ContextConversionESU) {
     if constexpr (puq::Config::preprocess_system) {
         // throw an error if preprocessor system does not match selected system
         q1 = puq::Quantity("6.671282e-10*A");
-        EXPECT_THROW(q1.convert("ESU_statA", puq::SystemType::SI, "I"), puq::UnitSystemExcept);
+        EXPECT_THROW(q1.convert("ESU_statA", puq::SystemType::SI, "I"), puq::SystemException);
     }
 }
 

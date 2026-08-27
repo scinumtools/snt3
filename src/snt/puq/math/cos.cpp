@@ -1,3 +1,4 @@
+#include <snt/puq/exceptions.h>
 #include <snt/puq/exponent.h>
 #include <snt/puq/math/cos.h>
 #include <snt/puq/measurement.h>
@@ -19,7 +20,13 @@ namespace snt::puq::math {
 
     puq::Measurement cos(const puq::Measurement& msr) {
         if (msr.baseunits.has_dimensions()) // TODO: allow for radians
-            throw std::runtime_error("Cosinus function accepts only dimensionless quantities.");
+            throw puq::UnitException(
+                "Dimension mismatch",
+                "The cosine function accepts only dimensionless quantities.",
+                "Provide a dimensionless quantity as the argument of the cosine function.",
+                __FILE__,
+                __LINE__
+            );
         return puq::Measurement(cos(msr.result), msr.baseunits);
     }
 

@@ -1,3 +1,4 @@
+#include <snt/puq/exceptions.h>
 #include <snt/puq/math/exp.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
@@ -16,7 +17,13 @@ namespace snt::puq::math {
 
     puq::Measurement exp(const puq::Measurement& msr) {
         if (msr.baseunits.has_dimensions())
-            throw std::runtime_error("Exponential function accepts only dimensionless quantities.");
+            throw puq::UnitException(
+                "Dimension mismatch",
+                "The exponential function accepts only dimensionless quantities.",
+                "Provide a dimensionless quantity as the argument of the exponential function.",
+                __FILE__,
+                __LINE__
+            );
         return puq::Measurement(exp(msr.result), msr.baseunits);
     }
 

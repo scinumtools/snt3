@@ -1,3 +1,4 @@
+#include <snt/puq/exceptions.h>
 #include <snt/puq/exponent.h>
 #include <snt/puq/math/sin.h>
 #include <snt/puq/measurement.h>
@@ -19,7 +20,13 @@ namespace snt::puq::math {
 
     puq::Measurement sin(const puq::Measurement& msr) {
         if (msr.baseunits.has_dimensions()) // TODO: allow for radians
-            throw std::runtime_error("Sinus function accepts only dimensionless quantities.");
+            throw puq::UnitException(
+                "Dimension mismatch",
+                "The sine function accepts only dimensionless quantities.",
+                "Provide a dimensionless quantity as the argument of the sine function.",
+                __FILE__,
+                __LINE__
+            );
         return puq::Measurement(sin(msr.result), msr.baseunits);
     }
 

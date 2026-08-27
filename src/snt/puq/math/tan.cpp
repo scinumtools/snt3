@@ -1,3 +1,4 @@
+#include <snt/puq/exceptions.h>
 #include <snt/puq/exponent.h>
 #include <snt/puq/math/tan.h>
 #include <snt/puq/measurement.h>
@@ -26,7 +27,13 @@ namespace snt::puq::math {
 
     puq::Measurement tan(const puq::Measurement& msr) {
         if (msr.baseunits.has_dimensions()) // TODO: allow for radians
-            throw std::runtime_error("Tangens function accepts only dimensionless quantities.");
+            throw puq::UnitException(
+                "Dimension mismatch",
+                "The tangent function accepts only dimensionless quantities.",
+                "Provide a dimensionless quantity as the argument of the tangent function.",
+                __FILE__,
+                __LINE__
+            );
         return puq::Measurement(tan(msr.result), msr.baseunits);
     }
 

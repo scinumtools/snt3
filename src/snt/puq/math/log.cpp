@@ -1,3 +1,4 @@
+#include <snt/puq/exceptions.h>
 #include <snt/puq/exponent.h>
 #include <snt/puq/math/log.h>
 #include <snt/puq/measurement.h>
@@ -17,7 +18,13 @@ namespace snt::puq::math {
 
     puq::Measurement log(const puq::Measurement& msr) {
         if (msr.baseunits.has_dimensions())
-            throw std::runtime_error("Natural logarithm accepts only dimensionless quantities.");
+            throw puq::UnitException(
+                "Dimension mismatch",
+                "The natural logarithm cannot be applied to a dimensional quantity.",
+                "Provide a dimensionless quantity as the argument of the natural logarithm.",
+                __FILE__,
+                __LINE__
+            );
         return puq::Measurement(log(msr.result), msr.baseunits);
     }
 

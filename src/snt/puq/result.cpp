@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <snt/puq/exceptions.h>
 #include <snt/puq/result.h>
 #include <sstream>
 
@@ -9,17 +10,33 @@ namespace snt::puq {
 
     Result::Result(val::BaseValue::PointerType m) : estimate(std::move(m)), uncertainty(nullptr) {
         if (!estimate)
-            throw std::invalid_argument("Result value cannot be a null pointer.");
+            throw puq::ParserException(
+                "Null result value",
+                "The result value is a null pointer.",
+                "Provide a valid result value.",
+                __FILE__,
+                __LINE__
+            );
     }
 
     Result::Result(val::BaseValue::PointerType m, val::BaseValue::PointerType e)
         : estimate(std::move(m)), uncertainty(std::move(e)) {
         if (!estimate)
-            throw std::invalid_argument("Result value cannot be a null pointer.");
+            throw puq::ParserException(
+                "Null result value",
+                "The result value is a null pointer.",
+                "Provide a valid result value.",
+                __FILE__,
+                __LINE__
+            );
         if (uncertainty && estimate->get_size() != uncertainty->get_size())
-            throw std::invalid_argument(
-                "Value and uncertainty arrays have different size: " + std::to_string(estimate->get_size()) +
-                " != " + std::to_string(uncertainty->get_size())
+            throw puq::ParserException(
+                "Size mismatch",
+                "The result value and its uncertainty have different sizes: `" + std::to_string(estimate->get_size()) +
+                    "` != `" + std::to_string(uncertainty->get_size()) + "`.",
+                "Provide an uncertainty value with the same number of elements as the result value.",
+                __FILE__,
+                __LINE__
             );
     }
 

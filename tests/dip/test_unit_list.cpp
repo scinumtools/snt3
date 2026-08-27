@@ -71,11 +71,13 @@ TEST(UnitList, UniqeNames) {
             dip::DIP d;
             d.add_unit(unit_name, unit_definition);
             dip::Environment env = d.parse();
-            FAIL() << "Expected puq::UnitSystemExcept with standard units";
-        } catch (const puq::UnitSystemExcept& e) {
-            EXPECT_STREQ(e.what(), "Standard unit with the same name already exist in the current record: m");
+            FAIL() << "Expected puq::SystemException";
+        } catch (const puq::SystemException& e) {
+            EXPECT_EQ(e.info().message, "Duplicate unit name");
+            EXPECT_EQ(e.info().details, "A standard unit with the name `m` already exists in the current unit system.");
+            EXPECT_EQ(e.info().suggestion, "Choose a different name for the custom unit.");
         } catch (...) {
-            FAIL() << "Expected puq::UnitSystemExcept with standard units";
+            FAIL() << "Expected puq::SystemException";
         }
     }
     {
@@ -87,15 +89,15 @@ TEST(UnitList, UniqeNames) {
             d.add_unit(unit_name, unit_definition);
             d.add_unit(unit_name, unit_definition);
             dip::Environment env = d.parse();
-            FAIL() << "Expected puq::UnitSystemExcept with custom units";
-        } catch (const puq::UnitSystemExcept& e) {
+            FAIL() << "Expected puq::SystemException with custom units";
+        } catch (const puq::SystemException& e) {
             EXPECT_STREQ(e.what(), "Custom unit with the same name already exist in the current record: Lrad");
         } catch (const dip::EnvironmentException& e) {
             EXPECT_EQ(e.info().message, "Duplicate custom unit");
             EXPECT_EQ(e.info().details, "A custom unit named `Lrad` already exists in the environment unit list.");
             EXPECT_EQ(e.info().suggestion, "Choose a different custom unit name.");
         } catch (...) {
-            FAIL() << "Expected puq::UnitSystemExcept with custom units";
+            FAIL() << "Expected puq::SystemException with custom units";
         }
     }
 }

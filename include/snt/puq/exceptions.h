@@ -11,48 +11,62 @@ namespace snt::puq {
       public:
         explicit Exception(std::string message) : core::Exception(std::move(message), "[SNT-PUQ] ") {}
         explicit Exception(core::ExceptionInfo info) : core::Exception(std::move(info), "[SNT-PUQ] ") {}
+        explicit Exception(
+            std::string message,
+            std::string details,
+            std::string suggestion,
+            std::string origin_file,
+            size_t origin_line
+        )
+            : puq::Exception(
+                  core::ExceptionInfo{
+                      std::move(message),
+                      std::move(details),
+                      std::move(suggestion),
+                      core::SourceLocation{std::move(origin_file), origin_line}
+                  }
+              ) {}
     };
 
-    class CalculatorExcept : public std::exception {
-      private:
-        std::string message;
-
+    /**
+     * Parser exceptions occurs when internal PUQ parsers fails
+     */
+    class ParserException : public puq::Exception {
       public:
-        CalculatorExcept(const std::string& m) : message(m) {}
-        const char* what() const noexcept override { return message.c_str(); }
+        using puq::Exception::Exception;
     };
 
-    class MeasurementExcept : public std::exception {
-      private:
-        std::string message;
-
+    /**
+     * Unit exceptions indicate problems with units, conversions and operations
+     */
+    class UnitException : public puq::Exception {
       public:
-        MeasurementExcept(std::string m) : message(m) {}
-        const char* what() const noexcept override { return message.c_str(); }
+        using puq::Exception::Exception;
     };
 
-    class UnitSystemExcept : public std::exception {
-      private:
-        std::string message;
-
+    /**
+     * Unit system exceptions indicate problems with unit systems
+     */
+    class SystemException : public puq::Exception {
       public:
-        UnitSystemExcept(const std::string m) : message(m) {}
-        UnitSystemExcept(const SystemType st1, const SystemType st2) {
-            auto it1 = SystemMap.find(st1);
-            auto it2 = SystemMap.find(st2);
-            if (it1 == SystemMap.end() || it2 == SystemMap.end()) {
-                message = "Unknown system type";
-            } else {
-                std::stringstream ss;
-                ss << "Incompatible unit systems: ";
-                ss << it1->second->SystemAbbrev;
-                ss << " != ";
-                ss << it2->second->SystemAbbrev;
-                ss << std::endl;
-                message = ss.str();
-            }
-        }
-        const char* what() const noexcept override { return message.c_str(); }
+        using puq::Exception::Exception;
+    };
+
+    /**
+     * Missing exception is triggered when functionality is not implemented yet
+     */
+    class MissingException : public puq::Exception {
+      public:
+        MissingException(std::string message, std::string file, std::size_t line)
+            : puq::Exception(
+                  core::ExceptionInfo{
+                      std::move(message),
+                      "",
+                      "If you need this functionality, please contact the developers, open an issue or send a pull "
+                      "request on GitHub.",
+                      core::SourceLocation{file, line}
+                  }
+              ) {};
     };
 
 } // namespace snt::puq

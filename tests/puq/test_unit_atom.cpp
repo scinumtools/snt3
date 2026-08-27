@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <snt/puq/exceptions.h>
 #include <snt/puq/solver/unit_atom.h>
 
 using namespace snt;
@@ -27,11 +28,11 @@ TEST(UnitAtom, FromString) {
     value = puq::UnitAtom::from_string("mrad");
     EXPECT_EQ(value.to_string(), "mrad"); // allowed specific prefix
 
-    EXPECT_THROW(puq::UnitAtom::from_string("kau"), puq::AtomParsingExcept); // prefixes are not allowed
+    EXPECT_THROW(puq::UnitAtom::from_string("kau"), puq::ParserException); // prefixes are not allowed
 
-    EXPECT_THROW(puq::UnitAtom::from_string("crad"), puq::AtomParsingExcept); // unit prefix is not allowed
+    EXPECT_THROW(puq::UnitAtom::from_string("crad"), puq::ParserException); // unit prefix is not allowed
 
-    EXPECT_THROW(puq::UnitAtom::from_string("Hm"), puq::AtomParsingExcept); // unknown unit prefix
+    EXPECT_THROW(puq::UnitAtom::from_string("Hm"), puq::ParserException); // unknown unit prefix
 
     value = puq::UnitAtom::from_string("kg2");
     EXPECT_EQ(value.to_string(), "kg2"); // units with exponents

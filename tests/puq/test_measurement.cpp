@@ -106,10 +106,10 @@ TEST(Measurement, RebaseDimensions) {
     EXPECT_EQ(value.to_string(), "2.20967e-31*kph-1*s2");
 
     value = puq::Measurement("km*au*K/Cel"); // rebasing temperature units
-    EXPECT_THROW(value.rebase_dimensions(), puq::MeasurementExcept);
+    EXPECT_THROW(value.rebase_dimensions(), puq::UnitException);
 
     value = puq::Measurement("km*au*dB/B"); // rebasing logarithmic units
-    EXPECT_THROW(value.rebase_dimensions(), puq::MeasurementExcept);
+    EXPECT_THROW(value.rebase_dimensions(), puq::UnitException);
 }
 
 TEST(Measurement, InitializationFractions) {
@@ -199,7 +199,7 @@ TEST(Measurement, ArithmeticsAdd) {
     EXPECT_EQ(q1.to_string(), "3.0006e4*cm2*s-2");
 
     q3 = puq::Measurement(3, "cm2"); // different units
-    EXPECT_THROW(q1 + q3, puq::ConvDimExcept);
+    EXPECT_THROW(q1 + q3, puq::ConverterException);
 
     q1 = +puq::Measurement(3, "cm2"); // uniary plus
     EXPECT_EQ(q1.to_string(), "3*cm2");
@@ -224,7 +224,7 @@ TEST(Measurement, ArithmeticsSubtract) {
     EXPECT_EQ(q1.to_string(), "5.9997*m2*s-2");
 
     q3 = puq::Measurement(3, "cm2"); // different units
-    EXPECT_THROW(q1 - q3, puq::ConvDimExcept);
+    EXPECT_THROW(q1 - q3, puq::ConverterException);
 
     q1 = -puq::Measurement(3, "cm2"); // unary minus
     EXPECT_EQ(q1.to_string(), "-3*cm2");
@@ -281,7 +281,7 @@ TEST(Measurement, ArithmeticsLog) {
     // addition of different units throws an error
     q1 = puq::Measurement(20, "dBW");
     q2 = puq::Measurement(23, "dBA");
-    EXPECT_THROW(q1 + q2, puq::ConvDimExcept);
+    EXPECT_THROW(q1 + q2, puq::ConverterException);
 
     // subtraction
     q1 = puq::Measurement(87, "dBA");

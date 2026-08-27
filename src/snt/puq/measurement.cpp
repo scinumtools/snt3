@@ -145,7 +145,7 @@ namespace snt::puq {
                 }
             }
             return msr1.result == conv.convert(msr2.result);
-        } catch (const snt::puq::ConvDimExcept& e) {
+        } catch (const puq::ConverterException& e) {
             return false;
         }
     }
@@ -165,7 +165,7 @@ namespace snt::puq {
                 }
             }
             return msr1.result != conv.convert(msr2.result);
-        } catch (const snt::puq::ConvDimExcept& e) {
+        } catch (const puq::ConverterException& e) {
             return true;
         }
     }
@@ -350,9 +350,21 @@ namespace snt::puq {
         for (const auto& bun : baseunits) {
             Dimensions dim = BaseUnits(bun.prefix + bun.unit).dimensions();
             if ((dim.utype & Utype::LOG) == Utype::LOG)
-                throw MeasurementExcept("Dimensions of logarithmic units cannot be rebased: " + baseunits.to_string());
+                throw puq::UnitException(
+                    "Invalid dimension rebasing",
+                    "Logarithmic units cannot be rebased: `" + baseunits.to_string() + "`.",
+                    "Do not rebase dimensions containing logarithmic units.",
+                    __FILE__,
+                    __LINE__
+                );
             if ((dim.utype & Utype::TMP) == Utype::TMP)
-                throw MeasurementExcept("Dimensions of temperature units cannot be rebased: " + baseunits.to_string());
+                throw puq::UnitException(
+                    "Invalid dimension rebasing",
+                    "Temperature units cannot be rebased: `" + baseunits.to_string() + "`.",
+                    "Do not rebase dimensions containing temperature units.",
+                    __FILE__,
+                    __LINE__
+                );
             std::string key = dim.to_string({Format::Display::UNITS});
             if (bumap.find(key) == bumap.end()) {
                 bumap.insert({key, {bun.prefix, bun.unit, bun.exponent}});

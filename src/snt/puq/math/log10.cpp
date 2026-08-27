@@ -1,3 +1,4 @@
+#include <snt/puq/exceptions.h>
 #include <snt/puq/math/log10.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
@@ -20,7 +21,13 @@ namespace snt::puq::math {
 
     puq::Measurement log10(const puq::Measurement& msr) {
         if (msr.baseunits.has_dimensions())
-            throw std::runtime_error("Decadic logarithm accepts only dimensionless quantities.");
+            throw puq::UnitException(
+                "Dimension mismatch",
+                "The decadic logarithm accepts only dimensionless quantities.",
+                "Provide a dimensionless quantity as the argument of the decadic logarithm.",
+                __FILE__,
+                __LINE__
+            );
         return puq::Measurement(log10(msr.result), msr.baseunits);
     }
 

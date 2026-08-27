@@ -130,7 +130,7 @@ TEST(Quantity, ArithmeticsAdd) {
     EXPECT_EQ(q1.to_string(), "9*cm");
 
     q3 = puq::Quantity(3, "cm2"); // different units
-    EXPECT_THROW(q1 + q3, puq::ConvDimExcept);
+    EXPECT_THROW(q1 + q3, puq::ConverterException);
 
     q1 = +puq::Quantity(6, "cm"); // unary addition
     EXPECT_EQ(q1.to_string(), "6*cm");
@@ -158,7 +158,7 @@ TEST(Quantity, ArithmeticsSubtract) {
     EXPECT_EQ(q1.to_string(), "3*cm");
 
     q3 = puq::Quantity(3, "cm2"); // differet units
-    EXPECT_THROW(q1 - q3, puq::ConvDimExcept);
+    EXPECT_THROW(q1 - q3, puq::ConverterException);
 
     q1 = -puq::Quantity(6, "cm"); // unary subtraction
     EXPECT_EQ(q1.to_string(), "-6*cm");

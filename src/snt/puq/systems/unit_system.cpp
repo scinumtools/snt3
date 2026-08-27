@@ -77,12 +77,24 @@ namespace snt::puq {
         {
             auto it = current.data->UnitList.find(name);
             if (it != current.data->UnitList.end())
-                throw UnitSystemExcept("Standard unit with the same name already exist in the current record: " + name);
+                throw puq::SystemException(
+                    "Duplicate unit name",
+                    "A standard unit with the name `" + name + "` already exists in the current unit system.",
+                    "Choose a different name for the custom unit.",
+                    __FILE__,
+                    __LINE__
+                );
         }
         {
             auto it = current.custom->UnitList.find(name);
             if (it != current.custom->UnitList.end())
-                throw UnitSystemExcept("Custom unit with the same name already exist in the current record: " + name);
+                throw puq::SystemException(
+                    "Duplicate unit name",
+                    "A custom unit with the name `" + name + "` already exists in the current unit system.",
+                    "Choose a different name for the custom unit.",
+                    __FILE__,
+                    __LINE__
+                );
         }
         // Extract DimensionStruct values from a quantity
         Quantity quant(definition);
@@ -90,7 +102,13 @@ namespace snt::puq {
         auto* estimate = dynamic_cast<val::BaseArrayValue<double>*>(res.estimate.get());
         auto* uncertainty = dynamic_cast<val::BaseArrayValue<double>*>(res.uncertainty.get());
         if (!estimate)
-            throw std::runtime_error("Custom quantity estimate has invalid type, or is undefined.");
+            throw puq::SystemException(
+                "Invalid custom quantity",
+                "The custom quantity definition `" + definition + "` does not produce a valid numerical estimate.",
+                "Provide a custom quantity definition that evaluates to a defined scalar numerical value.",
+                __FILE__,
+                __LINE__
+            );
         // Add custom units into UnitList and DimensionMap
         current.custom->UnitList[name] = UnitStruct{UT_LIN_CUS, definition, name, false};
         current.custom->DimensionMap[name] = DimensionStruct{
@@ -110,7 +128,13 @@ namespace snt::puq {
     inline SystemDataType* select_unit_system(const SystemType& system) {
         auto it = SystemMap.find(system);
         if (it == SystemMap.end())
-            throw UnitSystemExcept("Unknown system of units: " + std::to_string((int)system));
+            throw puq::SystemException(
+                "Unknown unit system",
+                "The unit system with type `" + std::to_string(static_cast<int>(system)) + "` could not be found.",
+                "Select a unit system that is registered in the system map.",
+                __FILE__,
+                __LINE__
+            );
         return it->second;
     }
 
@@ -130,7 +154,13 @@ namespace snt::puq {
 
     void UnitSystem::close() {
         if (closed)
-            throw UnitSystemExcept("Instance of a unit system environment cannot be closed only once!");
+            throw puq::SystemException(
+                "Unit system already closed",
+                "The unit system environment has already been closed.",
+                "Close the unit system environment only once.",
+                __FILE__,
+                __LINE__
+            );
         current = stack.top();
         stack.pop();
         closed = true;

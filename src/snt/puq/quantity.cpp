@@ -15,9 +15,13 @@ namespace snt::puq {
                         system = sys.first;
                     else if (system != sys.first) {
                         auto it = SystemMap.find(system);
-                        throw UnitSystemExcept(
-                            "Selected unit systems are ambiguous: " + it->second->SystemAbbrev + " " +
-                            sys.second->SystemAbbrev
+                        throw puq::SystemException(
+                            "Ambiguous unit systems",
+                            "The expression specifies conflicting unit systems `" + it->second->SystemAbbrev +
+                                "` and `" + sys.second->SystemAbbrev + "`.",
+                            "Use units from a single unit system in the expression.",
+                            __FILE__,
+                            __LINE__
                         );
                     }
                     break;
@@ -314,25 +318,57 @@ namespace snt::puq {
     }
     Quantity operator*(const Quantity& q1, const Quantity& q2) {
         if (q1.stype != q2.stype)
-            throw UnitSystemExcept(q1.stype, q2.stype);
+            throw puq::SystemException(
+                "Unit system mismatch",
+                "The quantities use different unit systems and cannot be multiplied: `" +
+                    std::to_string(static_cast<int>(q1.stype)) + "` != `" + std::to_string(static_cast<int>(q2.stype)) +
+                    "`.",
+                "Convert both quantities to the same unit system before multiplying them.",
+                __FILE__,
+                __LINE__
+            );
         UnitSystem us(q1.stype);
         return Quantity(q1.measurement * q2.measurement);
     }
     Quantity operator/(const Quantity& q1, const Quantity& q2) {
         if (q1.stype != q2.stype)
-            throw UnitSystemExcept(q1.stype, q2.stype);
+            throw puq::SystemException(
+                "Unit system mismatch",
+                "The quantities use different unit systems and cannot be divided: `" +
+                    std::to_string(static_cast<int>(q1.stype)) + "` != `" + std::to_string(static_cast<int>(q2.stype)) +
+                    "`.",
+                "Convert both quantities to the same unit system before dividing them.",
+                __FILE__,
+                __LINE__
+            );
         UnitSystem us(q1.stype);
         return Quantity(q1.measurement / q2.measurement);
     }
     bool operator==(const Quantity& q1, const Quantity& q2) {
         if (q1.stype != q2.stype)
-            throw UnitSystemExcept(q1.stype, q2.stype);
+            throw puq::SystemException(
+                "Unit system mismatch",
+                "The quantities use different unit systems and cannot be compared: `" +
+                    std::to_string(static_cast<int>(q1.stype)) + "` != `" + std::to_string(static_cast<int>(q2.stype)) +
+                    "`.",
+                "Convert both quantities to the same unit system before comparing them.",
+                __FILE__,
+                __LINE__
+            );
         UnitSystem us(q1.stype);
         return q1.measurement == q2.measurement;
     }
     bool operator!=(const Quantity& q1, const Quantity& q2) {
         if (q1.stype != q2.stype)
-            throw UnitSystemExcept(q1.stype, q2.stype);
+            throw puq::SystemException(
+                "Unit system mismatch",
+                "The quantities use different unit systems and cannot be compared: `" +
+                    std::to_string(static_cast<int>(q1.stype)) + "` != `" + std::to_string(static_cast<int>(q2.stype)) +
+                    "`.",
+                "Convert both quantities to the same unit system before comparing them.",
+                __FILE__,
+                __LINE__
+            );
         UnitSystem us(q1.stype);
         return q1.measurement != q2.measurement;
     }
@@ -438,13 +474,29 @@ namespace snt::puq {
     }
     void Quantity::operator*=(Quantity& q) {
         if (stype != q.stype)
-            throw UnitSystemExcept(stype, q.stype);
+            throw puq::SystemException(
+                "Unit system mismatch",
+                "The quantities use different unit systems and cannot be multiplied: `" +
+                    std::to_string(static_cast<int>(stype)) + "` != `" + std::to_string(static_cast<int>(q.stype)) +
+                    "`.",
+                "Convert both quantities to the same unit system before multiplying them.",
+                __FILE__,
+                __LINE__
+            );
         UnitSystem us(stype);
         measurement *= q.measurement;
     }
     void Quantity::operator/=(Quantity& q) {
         if (stype != q.stype)
-            throw UnitSystemExcept(stype, q.stype);
+            throw puq::SystemException(
+                "Unit system mismatch",
+                "The quantities use different unit systems and cannot be divided: `" +
+                    std::to_string(static_cast<int>(stype)) + "` != `" + std::to_string(static_cast<int>(q.stype)) +
+                    "`.",
+                "Convert both quantities to the same unit system before dividing them.",
+                __FILE__,
+                __LINE__
+            );
         UnitSystem us(stype);
         measurement /= q.measurement;
     }
@@ -507,17 +559,38 @@ namespace snt::puq {
             Measurement msr2 = _convert_without_context(us, system);
             try {
                 return Quantity(msr2.convert(msr1), system);
-            } catch (const snt::puq::ConvDimExcept& e) {
-                throw snt::puq::ConvDimExcept(measurement.baseunits, stype, msr1.baseunits, system);
+            } catch (const puq::ConverterException& e) {
+                throw puq::SystemException(
+                    "Unit system conversion failed",
+                    "The quantity cannot be converted from base units `" + measurement.baseunits.to_string() +
+                        "` in unit system `" + std::to_string(static_cast<int>(stype)) + "` to base units `" +
+                        msr1.baseunits.to_string() + "` in unit system `" + std::to_string(static_cast<int>(system)) +
+                        "`.",
+                    "Use compatible base units and unit systems for the conversion.",
+                    __FILE__,
+                    __LINE__
+                );
             }
         } else {
             QuantityListType::iterator qs1 = puq::UnitSystem::current.data->QuantityList.find(q);
             if (qs1 == puq::UnitSystem::current.data->QuantityList.end())
-                throw UnitSystemExcept("Quantity symbol not found: " + q);
+                throw puq::SystemException(
+                    "Unknown quantity symbol",
+                    "The quantity symbol `" + q + "` is not defined in the current unit system.",
+                    "Use a quantity symbol that is defined in the selected unit system.",
+                    __FILE__,
+                    __LINE__
+                );
             us.change(system);
             QuantityListType::iterator qs2 = puq::UnitSystem::current.data->QuantityList.find(q);
             if (qs2 == puq::UnitSystem::current.data->QuantityList.end())
-                throw UnitSystemExcept("Quantity symbol not found: " + q);
+                throw puq::SystemException(
+                    "Unknown quantity symbol",
+                    "The quantity symbol `" + q + "` is not defined in the selected unit system.",
+                    "Use a quantity symbol that is defined in the selected unit system.",
+                    __FILE__,
+                    __LINE__
+                );
             us.change(stype);
             if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
                 Measurement msr2 = _convert_without_context(us, system);
@@ -544,17 +617,38 @@ namespace snt::puq {
             Measurement msr = _convert_without_context(us, system);
             try {
                 return Quantity(msr.convert(bu), system);
-            } catch (const snt::puq::ConvDimExcept& e) {
-                throw snt::puq::ConvDimExcept(measurement.baseunits, stype, Measurement(1, bu).baseunits, system);
+            } catch (const puq::ConverterException& e) {
+                throw puq::SystemException(
+                    "Unit system conversion failed",
+                    "The quantity cannot be converted from base units `" + measurement.baseunits.to_string() +
+                        "` in unit system `" + SystemMap.at(stype)->SystemAbbrev + "` to base units `" +
+                        Measurement(1, bu).baseunits.to_string() + "` in unit system `" +
+                        SystemMap.at(system)->SystemAbbrev + "`.",
+                    "Use compatible base units and unit systems for the conversion.",
+                    __FILE__,
+                    __LINE__
+                );
             }
         } else {
             QuantityListType::iterator qs1 = puq::UnitSystem::current.data->QuantityList.find(q);
             if (qs1 == puq::UnitSystem::current.data->QuantityList.end())
-                throw UnitSystemExcept("Quantity symbol not found: " + q);
+                throw puq::SystemException(
+                    "Unknown quantity symbol",
+                    "The quantity symbol `" + q + "` is not defined in the current unit system.",
+                    "Use a quantity symbol that is defined in the current unit system.",
+                    __FILE__,
+                    __LINE__
+                );
             us.change(system);
             QuantityListType::iterator qs2 = puq::UnitSystem::current.data->QuantityList.find(q);
             if (qs2 == puq::UnitSystem::current.data->QuantityList.end())
-                throw UnitSystemExcept("Quantity symbol not found: " + q);
+                throw puq::SystemException(
+                    "Unknown quantity symbol",
+                    "The quantity symbol `" + q + "` is not defined in the selected unit system.",
+                    "Use a quantity symbol that is defined in the selected unit system.",
+                    __FILE__,
+                    __LINE__
+                );
             us.change(stype);
             if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
                 Measurement msr = _convert_without_context(us, system);
@@ -577,17 +671,38 @@ namespace snt::puq {
             Measurement msr = _convert_without_context(us, system);
             try {
                 return Quantity(msr.convert(s), system);
-            } catch (const snt::puq::ConvDimExcept& e) {
-                throw snt::puq::ConvDimExcept(measurement.baseunits, stype, Measurement(s).baseunits, system);
+            } catch (const puq::ConverterException& e) {
+                throw puq::SystemException(
+                    "Unit system conversion failed",
+                    "The quantity cannot be converted from base units `" + measurement.baseunits.to_string() +
+                        "` in unit system `" + SystemMap.at(stype)->SystemAbbrev + "` to base units `" +
+                        Measurement(s).baseunits.to_string() + "` in unit system `" +
+                        SystemMap.at(system)->SystemAbbrev + "`.",
+                    "Use compatible base units and unit systems for the conversion.",
+                    __FILE__,
+                    __LINE__
+                );
             }
         } else {
             QuantityListType::iterator qs1 = puq::UnitSystem::current.data->QuantityList.find(q);
             if (qs1 == puq::UnitSystem::current.data->QuantityList.end())
-                throw UnitSystemExcept("Quantity symbol not found: " + q);
+                throw puq::SystemException(
+                    "Unknown quantity symbol",
+                    "The quantity symbol `" + q + "` is not defined in the current unit system.",
+                    "Use a quantity symbol that is defined in the current unit system.",
+                    __FILE__,
+                    __LINE__
+                );
             us.change(system);
             QuantityListType::iterator qs2 = puq::UnitSystem::current.data->QuantityList.find(q);
             if (qs2 == puq::UnitSystem::current.data->QuantityList.end())
-                throw UnitSystemExcept("Quantity symbol not found: " + q);
+                throw puq::SystemException(
+                    "Unknown quantity symbol",
+                    "The quantity symbol `" + q + "` is not defined in the selected unit system.",
+                    "Use a quantity symbol that is defined in the selected unit system.",
+                    __FILE__,
+                    __LINE__
+                );
             us.change(stype);
             if (qs1->second.sifactor == "" && qs2->second.sifactor == "") {
                 Measurement msr = _convert_without_context(us, system);

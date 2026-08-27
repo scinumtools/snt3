@@ -1,6 +1,7 @@
 #include <iostream>
 #include <set>
 #include <snt/puq/converter.h>
+#include <snt/puq/exceptions.h>
 #include <snt/puq/math/exp.h>
 #include <snt/puq/math/log.h>
 #include <snt/puq/math/log10.h>
@@ -116,7 +117,13 @@ namespace snt::puq {
                 }
             }
         }
-        throw NoConvExcept(s1, s2);
+        throw puq::UnitException(
+            "Conversion unavailable",
+            "The conversion from `" + s1 + "` to `" + s2 + "` is not available.",
+            "Use a supported conversion between compatible units.",
+            __FILE__,
+            __LINE__
+        );
     }
 
     Result Converter::_convert_temperature(Result m) {
@@ -150,7 +157,13 @@ namespace snt::puq {
         } else if (s1 == "degF" && s2 == "degR") {
             m = (m + (Result)459.67) * const5div9;
         } else {
-            throw NoConvExcept(s1, s2);
+            throw puq::UnitException(
+                "Conversion unavailable",
+                "The conversion from `" + s1 + "` to `" + s2 + "` is not available.",
+                "Use a supported conversion between compatible units.",
+                __FILE__,
+                __LINE__
+            );
         }
         return m / dimensions2.numerical;
     }
@@ -164,7 +177,7 @@ namespace snt::puq {
         // make sure that physical dimensions are matching
         for (int i = 0; i < Config::num_basedim; i++) {
             if (dimensions1.physical[i] != dimensions2.physical[i])
-                throw snt::puq::ConvDimExcept(bu1, bu2);
+                throw puq::ConverterException(bu1, bu2);
         }
 
         // determine conversion type
@@ -219,7 +232,14 @@ namespace snt::puq {
         if (utype == Utype::LIN)
             mag = _convert_linear(m1, m2);
         else
-            throw NoConvExcept(baseunits1.to_string(), baseunits2.to_string());
+            throw puq::UnitException(
+                "Conversion unavailable",
+                "The conversion from base units `" + baseunits1.to_string() + "` to base units `" +
+                    baseunits2.to_string() + "` is not available.",
+                "Use compatible base units with a supported conversion.",
+                __FILE__,
+                __LINE__
+            );
     converted:
         if constexpr (Config::debug_converter) {
             std::clog << "CONV:  Result: ";
