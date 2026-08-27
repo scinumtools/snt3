@@ -1,4 +1,5 @@
 #include <snt/exs/atom.h>
+#include <snt/exs/exceptions.h>
 
 namespace snt::exs {
 
@@ -13,8 +14,12 @@ namespace snt::exs {
             if (std::regex_match(s, rx)) {
                 v = std::stof(s);
             } else {
-                throw std::logic_error(
-                    "Atom string could not be parsed, probably due to unknown symbol or operator: " + s
+                throw exs::ParserException(
+                    "Invalid atom",
+                    "The atom cannot be parsed from the given string: `" + s + "`.",
+                    "Use a boolean value (`true` or `false`) or a valid numeric value.",
+                    __FILE__,
+                    __LINE__
                 );
             }
         }

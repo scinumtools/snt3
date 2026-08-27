@@ -12,7 +12,13 @@ namespace snt::val {
                 else if (this->value[i] == core::KEYWORD_FALSE)
                     arr[i] = false;
                 else
-                    throw std::runtime_error("Could not cast value as boolean: " + this->value[i]);
+                    throw val::TypeException(
+                        "Invalid type conversion",
+                        "The string value `" + this->value[i] + "` cannot be converted to a boolean.",
+                        "Use `true` or `false` as the string value.",
+                        __FILE__,
+                        __LINE__
+                    );
             }
             return std::make_unique<ArrayValue<uint8_t>>(arr, this->shape, dt);
         }
@@ -22,7 +28,13 @@ namespace snt::val {
                 if (this->value[i].size() == 1)
                     arr[i] = this->value[i][0];
                 else
-                    throw std::runtime_error("Could not cast value as character: " + this->value[i]);
+                    throw val::TypeException(
+                        "Invalid type conversion",
+                        "The string value `" + this->value[i] + "` cannot be converted to a character.",
+                        "Use a string containing exactly one character.",
+                        __FILE__,
+                        __LINE__
+                    );
             return std::make_unique<ArrayValue<int8_t>>(arr, this->shape, dt);
         }
         case core::DataType::Integer16: {
@@ -36,7 +48,13 @@ namespace snt::val {
             for (size_t i = 0; i < this->value.size(); i++) {
                 long n = std::stol(this->value[i]);
                 if (n < INT32_MIN || n > INT32_MAX)
-                    throw std::out_of_range("Value out of int32_t range");
+                    throw val::TypeException(
+                        "Integer range mismatch",
+                        "The value `" + this->value[i] + "` is outside the range of a 32-bit signed integer.",
+                        "Use an integer between `-2147483648` and `2147483647`.",
+                        __FILE__,
+                        __LINE__
+                    );
                 arr[i] = static_cast<int64_t>(n);
             }
             return std::make_unique<ArrayValue<int64_t>>(arr, this->shape, dt);
@@ -46,7 +64,13 @@ namespace snt::val {
             for (size_t i = 0; i < this->value.size(); i++) {
                 long long n = std::stoll(this->value[i]);
                 if (n < INT64_MIN || n > INT64_MAX)
-                    throw std::out_of_range("Value out of int64_t range");
+                    throw val::TypeException(
+                        "Integer range mismatch",
+                        "The value `" + this->value[i] + "` is outside the range of a 64-bit signed integer.",
+                        "Use an integer between `-9223372036854775808` and `9223372036854775807`.",
+                        __FILE__,
+                        __LINE__
+                    );
                 arr[i] = static_cast<int64_t>(n);
             }
             return std::make_unique<ArrayValue<int64_t>>(arr, this->shape, dt);
@@ -62,7 +86,13 @@ namespace snt::val {
             for (size_t i = 0; i < this->value.size(); i++) {
                 unsigned long n = std::stoul(this->value[i]);
                 if (n > UINT32_MAX)
-                    throw std::out_of_range("Value out of uint32_t range");
+                    throw val::TypeException(
+                        "Integer range mismatch",
+                        "The value `" + this->value[i] + "` is outside the range of a 32-bit unsigned integer.",
+                        "Use an integer between `0` and `4294967295`.",
+                        __FILE__,
+                        __LINE__
+                    );
                 arr[i] = static_cast<uint64_t>(n);
             }
             return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape, dt);
@@ -72,7 +102,13 @@ namespace snt::val {
             for (size_t i = 0; i < this->value.size(); i++) {
                 unsigned long long n = std::stoull(this->value[i]);
                 if (n > UINT64_MAX)
-                    throw std::out_of_range("Value out of uint64_t range");
+                    throw val::TypeException(
+                        "Integer range mismatch",
+                        "The value `" + this->value[i] + "` is outside the range of a 64-bit unsigned integer.",
+                        "Use an integer between `0` and `18446744073709551615`.",
+                        __FILE__,
+                        __LINE__
+                    );
                 arr[i] = static_cast<uint64_t>(n);
             }
             return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape, dt);
@@ -99,7 +135,7 @@ namespace snt::val {
             return std::make_unique<ArrayValue<std::string>>(this->value, this->shape, dt);
         }
         default:
-            throw std::runtime_error("Not implemented");
+            throw val::MissingException("Not implemented", __FILE__, __LINE__);
             return nullptr;
         }
     };

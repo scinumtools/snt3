@@ -1,6 +1,7 @@
 #ifndef EXS_OPERATOR_GROUP_H
 #define EXS_OPERATOR_GROUP_H
 
+#include <snt/exs/exceptions.h>
 #include <snt/exs/operator_base.h>
 #include <snt/exs/settings.h>
 #include <stdexcept>
@@ -31,7 +32,13 @@ namespace snt::exs {
             int depth = 1;
             while (depth > 0) {
                 if (expr.right.length() == 0) {
-                    throw std::logic_error("Unclosed parentheses: " + expr.expr);
+                    throw exs::ParserException(
+                        "Unclosed parentheses",
+                        "The expression is missing a closing parenthesis: `" + expr.expr + "`.",
+                        "Add a closing `)` parenthesis to complete the expression.",
+                        __FILE__,
+                        __LINE__
+                    );
                 } else if (expr.right.rfind(this->symbol, 0) == 0 || expr.right.rfind(symbols.open, 0) == 0) {
                     depth++;
                 } else if (expr.right.rfind(symbols.separator, 0) == 0 && depth == 1) {
@@ -49,8 +56,13 @@ namespace snt::exs {
             }
             num_groups = this->groups.size();
             if (N > 0 && num_groups != N) {
-                throw std::logic_error(
-                    "Wrong number of group members: " + std::to_string(this->groups.size()) + ", " + std::to_string(N)
+                throw exs::ParserException(
+                    "Invalid number of groups",
+                    "The expression contains `" + std::to_string(num_groups) + "` groups, but `" + std::to_string(N) +
+                        "` are required: `" + expr.expr + "`.",
+                    "Provide exactly `" + std::to_string(N) + "` groups.",
+                    __FILE__,
+                    __LINE__
                 );
             }
         };

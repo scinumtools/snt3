@@ -1,5 +1,6 @@
 #include <regex>
 #include <snt/mat/element.h>
+#include <snt/mat/exceptions.h>
 #include <snt/mat/periodic_table.h>
 #include <snt/puq/quantity.h>
 #include <sstream>
@@ -23,7 +24,13 @@ namespace snt::mat {
                 matterProps.mass = puq::Quantity("{m_e}");
                 elementProps = {0, 0, 1};
             } else {
-                throw std::runtime_error("Element could not be determined from the expression: " + expr);
+                throw mat::SyntaxException(
+                    "Invalid particle",
+                    "The particle expression `" + expr + "` does not identify a supported particle.",
+                    "Use `[p]` for a proton, `[n]` for a neutron, or `[e]` for an electron.",
+                    __FILE__,
+                    __LINE__
+                );
             }
         } else {
             std::smatch m;
@@ -57,7 +64,14 @@ namespace snt::mat {
                 else
                     set_abundant(elem, iso, ion);
             } else {
-                throw std::runtime_error("Element could not be determined from the expression: " + expr);
+                throw mat::SyntaxException(
+                    "Invalid element",
+                    "The element expression could not be parsed: `" + expr + "`.",
+                    "Use an element symbol such as `H` or `He`, optionally followed by an isotope and ionisation state "
+                    "in `{}`.",
+                    __FILE__,
+                    __LINE__
+                );
             }
         }
     }
@@ -71,12 +85,24 @@ namespace snt::mat {
         elementProps.neutrons = static_cast<double>(isodata->isotope_number) - static_cast<double>(isodata->protons);
         elementProps.electrons = isodata->protons + ion;
         if (elementProps.electrons < 0)
-            throw std::runtime_error("Number of electrons cannot be negative.");
+            throw mat::SyntaxException(
+                "Invalid ionisation state",
+                "The ionisation state `" + std::to_string(ion) + "` results in a negative number of electrons.",
+                "Use an ionisation state that results in zero or more electrons.",
+                __FILE__,
+                __LINE__
+            );
     }
 
     void Element::set_isotope(const std::string& elem, const int iso, const int ion) {
         if (iso == 0)
-            throw std::runtime_error("Isotope number cannot be zero");
+            throw mat::SyntaxException(
+                "Invalid isotope number",
+                "The isotope number cannot be zero.",
+                "Specify a positive isotope number.",
+                __FILE__,
+                __LINE__
+            );
         const Isotope* isodata = nullptr;
         for (size_t i = 0; i < PT_NUM_DATA; i++) {
             if (PT_DATA[i].symbol == elem && PT_DATA[i].isotope_number == iso) {
@@ -84,7 +110,13 @@ namespace snt::mat {
             }
         }
         if (isodata == nullptr)
-            throw std::runtime_error("Could not finde isotope " + std::to_string(iso) + " of element " + elem);
+            throw mat::SyntaxException(
+                "Unknown isotope",
+                "The isotope `" + std::to_string(iso) + "` of element `" + elem + "` could not be found.",
+                "Specify a valid isotope for the given element.",
+                __FILE__,
+                __LINE__
+            );
         set_element(isodata, ion);
     }
 
@@ -98,7 +130,13 @@ namespace snt::mat {
             }
         }
         if (isodata == nullptr)
-            throw std::runtime_error("Could not find the most abundant isotope of " + elem);
+            throw mat::SyntaxException(
+                "Unknown element",
+                "The element `" + elem + "` could not be found in the isotope data.",
+                "Specify a valid chemical element symbol.",
+                __FILE__,
+                __LINE__
+            );
         set_element(isodata, ion);
     }
 
@@ -119,7 +157,13 @@ namespace snt::mat {
             }
         }
         if (dmass == 0)
-            throw std::runtime_error("Element has no natural abundance: " + elem);
+            throw mat::SyntaxException(
+                "Unknown element",
+                "The element `" + elem + "` has no naturally abundant isotopes in the isotope data.",
+                "Specify a valid element with natural isotopic abundance, or use an explicit isotope.",
+                __FILE__,
+                __LINE__
+            );
         matterProps.mass = puq::Quantity(dmass, "u") + puq::Quantity(ion, "{m_e}");
     }
 

@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <snt/core/settings.h>
+#include <snt/exs/exceptions.h>
 #include <snt/exs/operators/arithmetic.h>
 #include <snt/exs/operators/comparison.h>
 #include <snt/exs/operators/control.h>
@@ -136,13 +137,26 @@ namespace snt::exs {
 
             if (tokens.left.size() > 0 || tokens.right.size() > 1) {
                 // CHECKPOINT( tokens.to_string(true) );
-                throw std::logic_error("Cannot solve expression due to unprocessed tokens: " + tokens.to_string(true));
+                throw exs::ParserException(
+                    "Unprocessed tokens",
+                    "The expression cannot be fully evaluated because it contains unprocessed tokens: `" +
+                        tokens.to_string(true) + "`.",
+                    "Check the expression for unsupported or incorrectly placed operators and operands.",
+                    __FILE__,
+                    __LINE__
+                );
             }
 
             Token token = tokens.get_right();
             // std::cout << &token << " " << token.atom << " " << token.atom->value << std::endl;
             if (!token.atom)
-                throw std::runtime_error("Cannot dereference a null atom pointer");
+                throw exs::ParserException(
+                    "Null atom",
+                    "The final expression token does not contain an atom.",
+                    "Ensure that the expression contains a valid operand and can be fully evaluated.",
+                    __FILE__,
+                    __LINE__
+                );
             ATOM* catom = static_cast<ATOM*>(token.atom);
             return ATOM(*catom);
         };

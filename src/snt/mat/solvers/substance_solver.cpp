@@ -1,3 +1,4 @@
+#include <snt/mat/exceptions.h>
 #include <snt/mat/settings.h>
 #include <snt/mat/solvers/substance_solver.h>
 #include <snt/mat/substance.h>
@@ -121,7 +122,14 @@ namespace snt::mat {
                 }
                 break;
             case ParserState::ERROR:
-                throw std::runtime_error("Invalid substance expression on: " + expr);
+                throw mat::SyntaxException(
+                    "Invalid substance expression",
+                    "The chemical substance expression contains invalid syntax: `" + expr + "`.",
+                    "Use valid element symbols, optional isotope or ionisation states in `{}`, numbers, `+` and `*` "
+                    "operators, and balanced parentheses.",
+                    __FILE__,
+                    __LINE__
+                );
                 break;
             }
         }

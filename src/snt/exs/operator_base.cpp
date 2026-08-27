@@ -13,19 +13,19 @@ namespace snt::exs {
     };
 
     void OperatorBase::operate_unary(TokenListBase* tokens) {
-        throw std::logic_error("Unary operation is not implemented");
+        throw exs::MissingException("Unary operation is not implemented", __FILE__, __LINE__);
     };
 
     void OperatorBase::operate_binary(TokenListBase* tokens) {
-        throw std::logic_error("Binary operation is not implemented");
+        throw exs::MissingException("Binary operation is not implemented", __FILE__, __LINE__);
     };
 
     void OperatorBase::operate_ternary(TokenListBase* tokens) {
-        throw std::logic_error("Ternary operation is not implemented");
+        throw exs::MissingException("Ternary operation is not implemented", __FILE__, __LINE__);
     };
 
     void OperatorBase::operate_group(TokenListBase* tokens) {
-        throw std::logic_error("Group operation is not implemented");
+        throw exs::MissingException("Group operation is not implemented", __FILE__, __LINE__);
     };
 
     void OperatorBase::operate_unary(TokenListBase* tokens, BaseSettings* settings) {

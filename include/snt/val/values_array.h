@@ -60,7 +60,14 @@ namespace snt::val {
             if (otherT) {
                 this->value = otherT->value;
             } else
-                throw std::runtime_error("ArrayValue could not be initialized from the given BaseValue.");
+                throw val::ArrayException(
+                    "Invalid array initialization",
+                    "The array value could not be initialized from the given value.",
+                    "Provide a value with a compatible array type or a type that can be converted to the requested "
+                    "data type.",
+                    __FILE__,
+                    __LINE__
+                );
         };
 
         /**
@@ -185,10 +192,24 @@ namespace snt::val {
             } else { // both are arrays
                 // test if shape match
                 if (shape.size() != other->get_shape().size()) // Compare shape size
-                    throw std::runtime_error("Arrays have incompatible shapes");
+                    throw val::ArrayException(
+                        "Dimension mismatch",
+                        "The arrays have different numbers of dimensions: `" + std::to_string(shape.size()) + "` != `" +
+                            std::to_string(other->get_shape().size()) + "`.",
+                        "Use arrays with the same number of dimensions.",
+                        __FILE__,
+                        __LINE__
+                    );
                 for (int i = 0; i < shape.size(); i++) // Compare shape values
                     if (shape[i] != other->get_shape()[i])
-                        throw std::runtime_error("Arrays have incompatible shapes");
+                        throw val::ArrayException(
+                            "Shape mismatch",
+                            "The arrays have different sizes in dimension `" + std::to_string(i) + "`: `" +
+                                std::to_string(shape[i]) + "` != `" + std::to_string(other->get_shape()[i]) + "`.",
+                            "Use arrays with the same size in every dimension.",
+                            __FILE__,
+                            __LINE__
+                        );
                 // apply operation
                 const ArrayValue<T> otherT(other, dtype);
                 arr.reserve(this->get_size());
@@ -225,10 +246,24 @@ namespace snt::val {
             } else { // both are arrays
                 // test if shape match
                 if (shape.size() != other->get_shape().size()) // Compare shape size
-                    throw std::runtime_error("Arrays have incompatible shapes");
+                    throw val::ArrayException(
+                        "Dimension mismatch",
+                        "The arrays have different numbers of dimensions: `" + std::to_string(shape.size()) + "` != `" +
+                            std::to_string(other->get_shape().size()) + "`.",
+                        "Use arrays with the same number of dimensions.",
+                        __FILE__,
+                        __LINE__
+                    );
                 for (int i = 0; i < shape.size(); i++) // Compare shape values
                     if (shape[i] != other->get_shape()[i])
-                        throw std::runtime_error("Arrays have incompatible shapes");
+                        throw val::ArrayException(
+                            "Shape mismatch",
+                            "The arrays have different sizes in dimension `" + std::to_string(i) + "`: `" +
+                                std::to_string(shape[i]) + "` != `" + std::to_string(other->get_shape()[i]) + "`.",
+                            "Use arrays with the same size in every dimension.",
+                            __FILE__,
+                            __LINE__
+                        );
                 // apply operation
                 const ArrayValue<T> otherT(other, dtype);
                 for (int i = 0; i < this->get_size(); i++)
@@ -261,14 +296,43 @@ namespace snt::val {
             if (third_dtype == core::DataType::None)
                 third_dtype = dtype;
             // test if shape match
-            if (shape.size() != other1->get_shape().size() ||
-                shape.size() != other2->get_shape().size()) // Compare shape size
-                throw std::runtime_error("Arrays have incompatible shapes");
+            if (shape.size() != other1->get_shape().size())
+                throw val::ArrayException(
+                    "Dimension mismatch",
+                    "The first other array has a different number of dimensions: `" + std::to_string(shape.size()) +
+                        "` != `" + std::to_string(other1->get_shape().size()) + "`.",
+                    "Use arrays with the same number of dimensions.",
+                    __FILE__,
+                    __LINE__
+                );
+            if (shape.size() != other2->get_shape().size())
+                throw val::ArrayException(
+                    "Dimension mismatch",
+                    "The second other array has a different number of dimensions: `" + std::to_string(shape.size()) +
+                        "` != `" + std::to_string(other2->get_shape().size()) + "`.",
+                    "Use arrays with the same number of dimensions.",
+                    __FILE__,
+                    __LINE__
+                );
             for (int i = 0; i < shape.size(); i++) { // Compare shape values
                 if (shape[i] != other1->get_shape()[i])
-                    throw std::runtime_error("First other has incompatible shape");
+                    throw val::ArrayException(
+                        "Shape mismatch",
+                        "The first other array has a different size in dimension `" + std::to_string(i) + "`: `" +
+                            std::to_string(shape[i]) + "` != `" + std::to_string(other1->get_shape()[i]) + "`.",
+                        "Use arrays with the same size in every dimension.",
+                        __FILE__,
+                        __LINE__
+                    );
                 if (shape[i] != other2->get_shape()[i])
-                    throw std::runtime_error("Second other has incompatible shape");
+                    throw val::ArrayException(
+                        "Shape mismatch",
+                        "The second other array has a different size in dimension `" + std::to_string(i) + "`: `" +
+                            std::to_string(shape[i]) + "` != `" + std::to_string(other2->get_shape()[i]) + "`.",
+                        "Use arrays with the same size in every dimension.",
+                        __FILE__,
+                        __LINE__
+                    );
             }
             // apply operation
             const ArrayValue<U> other1T(other1, first_dtype);
@@ -303,9 +367,13 @@ namespace snt::val {
          */
         BaseValue::PointerType slice_value(const Array::RangeType& slice) {
             if (slice.size() != this->shape.size())
-                throw std::runtime_error(
-                    "Array slice size does not correspond with array shape: " + std::to_string(slice.size()) +
-                    "!=" + std::to_string(this->shape.size())
+                throw val::ArrayException(
+                    "Dimension mismatch",
+                    "The slice has `" + std::to_string(slice.size()) + "` dimensions, but the array has `" +
+                        std::to_string(this->shape.size()) + "` dimensions.",
+                    "Specify a slice with the same number of dimensions as the array.",
+                    __FILE__,
+                    __LINE__
                 );
             // calculate new shape and size
             Array::ShapeType new_shape;

@@ -1,6 +1,7 @@
 #include "dip_parse.h"
 
 #include <iostream>
+#include <snt/api/exceptions.h>
 #include <sstream>
 
 namespace snt::api {
@@ -15,7 +16,13 @@ namespace snt::api {
         } else if (add_type == "unit" && add_values.size() == 2) {
             dip.add_unit(add_values[0], add_values[1]);
         } else {
-            throw std::runtime_error("Unrecognized input type or values");
+            throw api::ArgumentException(
+                "Invalid add argument",
+                "The input type `" + add_type + "` was not recognized or has an invalid number of values.",
+                "Use `file` or `string` with one value, or `source` or `unit` with two values.",
+                __FILE__,
+                __LINE__
+            );
         }
     }
 

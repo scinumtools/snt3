@@ -1,3 +1,4 @@
+#include <snt/mat/exceptions.h>
 #include <snt/mat/solvers/substance_atom.h>
 #include <sstream>
 
@@ -50,7 +51,13 @@ namespace snt::mat {
                 val *= exponent;
             }
         } else {
-            throw std::runtime_error("Multiplication exponent is not a scalar value");
+            throw mat::ParserException(
+                "Invalid multiplication exponent",
+                "The multiplication exponent is not a scalar value.",
+                "Use a single scalar value as the multiplication exponent.",
+                __FILE__,
+                __LINE__
+            );
         }
     }
 

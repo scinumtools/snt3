@@ -69,7 +69,36 @@ namespace snt::core {
         std::string m_what;
     };
 
-    using Exception = core::ExceptionBase<core::ExceptionInfo>;
+    // using Exception = core::ExceptionBase<core::ExceptionInfo>;
+
+    class Exception : public ExceptionBase<ExceptionInfo> {
+      public:
+        using ExceptionBase<ExceptionInfo>::ExceptionBase;
+
+        Exception(
+            std::string message,
+            std::string details,
+            std::string suggestion,
+            std::string origin_file,
+            size_t origin_line
+        )
+            : ExceptionBase(
+                  ExceptionInfo{
+                      std::move(message),
+                      std::move(details),
+                      std::move(suggestion),
+                      SourceLocation{std::move(origin_file), origin_line}
+                  }
+              ) {}
+    };
+
+    /**
+     * Parse exceptions are triggered during parsing
+     */
+    class ParserException : public core::Exception {
+      public:
+        using core::Exception::Exception;
+    };
 
     /**
      * Missing exception is triggered when functionality is not implemented yet

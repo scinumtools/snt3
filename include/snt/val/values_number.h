@@ -105,7 +105,7 @@ namespace snt::val {
                 return std::make_unique<ArrayValue<std::string>>(arr, this->shape, dt);
             }
             default:
-                throw std::runtime_error("Not implemented");
+                throw val::MissingException("Not implemented", __FILE__, __LINE__);
                 return nullptr;
             }
         };

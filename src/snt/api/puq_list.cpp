@@ -1,5 +1,6 @@
 #include "puq_list.h"
 
+#include <snt/api/exceptions.h>
 #include <snt/puq/lists.h>
 #include <snt/puq/systems/unit_system.h>
 
@@ -12,7 +13,20 @@ namespace snt::api {
                 return;
             }
         }
-        throw std::runtime_error("Could not find unit system: " + system);
+
+        std::ostringstream oss;
+        for (const auto& sys : puq::SystemMap) {
+            if (oss.tellp() > 0)
+                oss << ", ";
+            oss << "`" << sys.second->SystemAbbrev << "`";
+        }
+        throw api::ArgumentException(
+            "Unknown unit system",
+            "The unit system `" + system + "` could not be found.",
+            "Use one of the supported unit systems: " + oss.str() + ".",
+            __FILE__,
+            __LINE__
+        );
     }
 
     std::string PUQList::execute() {

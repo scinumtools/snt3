@@ -1,5 +1,6 @@
 #include "puq_convert.h"
 
+#include <snt/api/exceptions.h>
 #include <snt/puq/quantity.h>
 
 namespace snt::api {
@@ -11,7 +12,20 @@ namespace snt::api {
                 return;
             }
         }
-        throw std::runtime_error("Could not find unit system: " + system);
+
+        std::ostringstream oss;
+        for (const auto& sys : puq::SystemMap) {
+            if (oss.tellp() > 0)
+                oss << ", ";
+            oss << "`" << sys.second->SystemAbbrev << "`";
+        }
+        throw api::ArgumentException(
+            "Unknown unit system",
+            "The unit system `" + system + "` could not be found.",
+            "Use one of the supported unit systems: " + oss.str() + ".",
+            __FILE__,
+            __LINE__
+        );
     }
 
     void PUQConvert::argument_output_system(const std::string& system) {
@@ -21,7 +35,20 @@ namespace snt::api {
                 return;
             }
         }
-        throw std::runtime_error("Could not find unit system: " + system);
+
+        std::ostringstream oss;
+        for (const auto& sys : puq::SystemMap) {
+            if (oss.tellp() > 0)
+                oss << ", ";
+            oss << "`" << sys.second->SystemAbbrev << "`";
+        }
+        throw api::ArgumentException(
+            "Unknown unit system",
+            "The unit system `" + system + "` could not be found.",
+            "Use one of the supported unit systems: " + oss.str() + ".",
+            __FILE__,
+            __LINE__
+        );
     }
 
     void PUQConvert::argument_output_quantity(const std::string& quantity) {

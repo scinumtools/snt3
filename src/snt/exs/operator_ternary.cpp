@@ -1,3 +1,4 @@
+#include <snt/exs/exceptions.h>
 #include <snt/exs/operator_ternary.h>
 
 namespace snt::exs {
@@ -17,7 +18,13 @@ namespace snt::exs {
             expr.shift();
         }
         if (!closed) {
-            throw std::logic_error("Incomplete ternary operator: " + expr.expr);
+            throw exs::ParserException(
+                "Incomplete ternary operator",
+                "The ternary expression is missing its closing `" + symbol_other + "` operator: `" + expr.expr + "`.",
+                "Complete the ternary expression by providing the `" + symbol_other + "` operator.",
+                __FILE__,
+                __LINE__
+            );
         }
     };
 

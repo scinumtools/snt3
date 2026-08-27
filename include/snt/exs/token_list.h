@@ -5,6 +5,7 @@
 #include <deque>
 #include <iostream>
 #include <snt/exs/atom_list.h>
+#include <snt/exs/exceptions.h>
 #include <snt/exs/operator_list.h>
 #include <snt/exs/settings.h>
 #include <snt/exs/token.h>
@@ -83,7 +84,13 @@ namespace snt::exs {
                     } else if (oitype == GROUP_OPERATION) {
                         op->operate_group(this, settings);
                     } else {
-                        throw std::invalid_argument("Invalid operation type: " + std::to_string(oitype));
+                        throw exs::ParserException(
+                            "Invalid operation type",
+                            "The operation type `" + std::to_string(oitype) + "` is not supported.",
+                            "Use a valid unary, binary, ternary, or group operation type.",
+                            __FILE__,
+                            __LINE__
+                        );
                     }
                 } else {
                     // token is something else

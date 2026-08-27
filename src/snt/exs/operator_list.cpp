@@ -1,3 +1,4 @@
+#include <snt/exs/exceptions.h>
 #include <snt/exs/operator_list.h>
 
 namespace snt::exs {
@@ -7,7 +8,13 @@ namespace snt::exs {
         if (it != operators.end()) {
             return &(*(it->second));
         } else {
-            throw std::logic_error("Selecting non existing operator");
+            throw exs::ParserException(
+                "Operator not found",
+                "The requested operator does not exist in the operator list.",
+                "Use an operator type that is registered in the parser.",
+                __FILE__,
+                __LINE__
+            );
         }
     };
 

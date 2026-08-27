@@ -6,6 +6,7 @@
 #include <exception>
 #include <iomanip>
 #include <iostream>
+#include <snt/api/exceptions.h>
 #include <snt/puq/base_units.h>
 #include <snt/puq/dimensions.h>
 #include <snt/puq/measurement.h>
@@ -24,7 +25,20 @@ namespace snt::api {
                 return;
             }
         }
-        throw std::runtime_error("Could not find unit system: " + system);
+
+        std::ostringstream oss;
+        for (const auto& sys : puq::SystemMap) {
+            if (oss.tellp() > 0)
+                oss << ", ";
+            oss << "`" << sys.second->SystemAbbrev << "`";
+        }
+        throw api::ArgumentException(
+            "Unknown unit system",
+            "The unit system `" + system + "` could not be found.",
+            "Use one of the supported unit systems: " + oss.str() + ".",
+            __FILE__,
+            __LINE__
+        );
     }
 
     std::string PUQInfo::execute() {

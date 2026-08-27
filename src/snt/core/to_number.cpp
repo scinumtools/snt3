@@ -1,5 +1,6 @@
 #include "to_number.h"
 
+#include <snt/core/exceptions.h>
 #include <stdexcept>
 #include <typeinfo>
 
@@ -13,7 +14,13 @@ namespace snt::core {
         else if (typeid(double) == typeid(long double))
             return std::stold(value);
         else
-            throw std::range_error("Unsupported numerical precision.");
+            throw core::ParserException(
+                "Unsupported numerical precision",
+                "The numerical precision required to convert the value `" + value + "` is not supported.",
+                "Use a supported numerical precision for the conversion.",
+                __FILE__,
+                __LINE__
+            );
     }
 
 } // namespace snt::core
