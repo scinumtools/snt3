@@ -25,10 +25,6 @@ namespace snt::core {
 
     template <typename E> class ExceptionBase : public std::runtime_error {
       public:
-        explicit ExceptionBase(std::string message, std::string prefix = "[SNT-CORE] ")
-            : std::runtime_error(message), m_info({std::move(message)}) {
-            m_what = format(m_info, prefix);
-        }
         explicit ExceptionBase(E info, std::string prefix = "[SNT-CORE] ")
             : std::runtime_error(info.message), m_info(std::move(info)) {
             m_what = format(m_info, prefix);

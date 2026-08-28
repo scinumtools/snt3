@@ -7,7 +7,6 @@ namespace snt::exs {
 
     class Exception : public core::Exception {
       public:
-        explicit Exception(std::string message) : core::Exception(std::move(message), "[SNT-EXS] ") {}
         explicit Exception(core::ExceptionInfo info) : core::Exception(std::move(info), "[SNT-EXS] ") {}
         explicit Exception(
             std::string message,

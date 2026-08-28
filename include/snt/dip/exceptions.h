@@ -12,10 +12,6 @@ namespace snt::dip {
 
     class Exception : public core::ExceptionBase<dip::ExceptionInfo> {
       public:
-        explicit Exception(std::string message)
-            : core::ExceptionBase<dip::ExceptionInfo>(std::move(message), "[SNT-DIP] ") {
-            m_what = format(m_info, "[SNT-DIP] ");
-        }
         explicit Exception(dip::ExceptionInfo info)
             : core::ExceptionBase<dip::ExceptionInfo>(std::move(info), "[SNT-DIP] ") {
             m_what = format(m_info, "[SNT-DIP] ");
@@ -49,7 +45,7 @@ namespace snt::dip {
             if (!info.details.empty())
                 out << "\n  details:    " << info.details;
             if (info.location)
-                out << "\n    at:       " << format_location(*info.location);
+                out << "\n  at:         " << format_location(*info.location);
             if (!info.suggestion.empty())
                 out << "\n  suggestion: " << info.suggestion;
             if (info.origin)

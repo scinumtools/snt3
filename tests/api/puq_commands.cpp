@@ -1,9 +1,9 @@
+#include "pch_tests.h"
 #include "snt/api/puq_convert.h"
 #include "snt/api/puq_eval.h"
 #include "snt/api/puq_info.h"
 #include "snt/api/puq_list.h"
 
-#include <gtest/gtest.h>
 #include <string>
 #include <vector>
 

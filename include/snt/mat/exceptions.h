@@ -7,7 +7,6 @@ namespace snt::mat {
 
     class Exception : public core::Exception {
       public:
-        explicit Exception(std::string message) : core::Exception(std::move(message), "[SNT-MAT] ") {}
         explicit Exception(core::ExceptionInfo info) : core::Exception(std::move(info), "[SNT-MAT] ") {}
         explicit Exception(
             std::string message,

@@ -9,7 +9,6 @@ namespace snt::puq {
 
     class Exception : public core::Exception {
       public:
-        explicit Exception(std::string message) : core::Exception(std::move(message), "[SNT-PUQ] ") {}
         explicit Exception(core::ExceptionInfo info) : core::Exception(std::move(info), "[SNT-PUQ] ") {}
         explicit Exception(
             std::string message,

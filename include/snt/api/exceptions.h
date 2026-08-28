@@ -7,7 +7,6 @@ namespace snt::api {
 
     class Exception : public core::Exception {
       public:
-        explicit Exception(std::string message) : core::Exception(std::move(message), "[SNT-API] ") {}
         explicit Exception(core::ExceptionInfo info) : core::Exception(std::move(info), "[SNT-API] ") {}
         explicit Exception(
             std::string message,

@@ -1,8 +1,8 @@
+#include "pch_tests.h"
 #include "snt/api/dip_parse.h"
 
 #include <filesystem>
 #include <fstream>
-#include <gtest/gtest.h>
 #include <string>
 #include <vector>
 
