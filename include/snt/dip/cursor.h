@@ -56,7 +56,21 @@ namespace snt::dip {
          *
          * @return Pointer to a value node
          */
-        val::BaseValue::PointerType get_value() const { return env_->request_value("?" + path_); };
+        val::BaseValue::PointerType get_value() const;
+
+        /**
+         * Get units of a value node at the current cursor path
+         *
+         * @return Units of a value node
+         */
+        std::optional<puq::Quantity> get_units() const;
+
+        /**
+         * Get a value node at the current cursor path
+         *
+         * @return A value node pointer
+         */
+        dip::ValueNode::PointerType get_node() const;
 
         /**
          * Get shape of a value node at the current cursor path

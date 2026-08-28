@@ -15,7 +15,7 @@ class Cursor : public ::testing::Test {
         d.add_string(
             "foo[bar]\n"
             "  jerk bool = true\n"
-            "  snap int = 3\n"
+            "  snap int = 3 cm\n"
             "foo[baz]\n"
             "  yippee\n"
             "    crackle float = 4e5\n"
@@ -170,4 +170,23 @@ TEST_F(Cursor, ParseCollections) {
 
     // compare parsed and expected collection names
     EXPECT_EQ(colls_parsed, colls_ref);
+}
+
+TEST_F(Cursor, GetValueNode) {
+    {
+        dip::ValueNode::PointerType node = env["foo[bar].snap"].get_node();
+        EXPECT_EQ(node->path.name, "foo[bar].snap");
+        EXPECT_EQ(node->value->to_string(), "3");
+        EXPECT_EQ(node->units->to_string(), "cm");
+    }
+    {
+        val::BaseValue::PointerType value = env["foo[bar].snap"].get_value();
+        ASSERT_NE(value, nullptr);
+        EXPECT_EQ(value->to_string(), "3");
+    }
+    {
+        std::optional<puq::Quantity> units = env["foo[bar].snap"].get_units();
+        EXPECT_TRUE(units.has_value());
+        EXPECT_EQ(units->to_string(), "cm");
+    }
 }

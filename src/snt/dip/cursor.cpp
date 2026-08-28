@@ -77,6 +77,18 @@ namespace snt::dip {
         return path_;
     }
 
+    val::BaseValue::PointerType Cursor::get_value() const {
+        return env_->get_node(path_)->value->clone();
+    }
+
+    std::optional<puq::Quantity> Cursor::get_units() const {
+        return env_->get_node(path_)->units;
+    }
+
+    dip::ValueNode::PointerType Cursor::get_node() const {
+        return env_->get_node(path_);
+    }
+
     val::Array::ShapeType Cursor::get_shape() const {
         val::BaseValue::PointerType value = env_->request_value("?" + path_);
         if (value)

@@ -49,7 +49,7 @@ namespace snt::dip {
             if (!info.suggestion.empty())
                 out << "\n  suggestion: " << info.suggestion;
             if (info.origin)
-                out << "\n  thrown:     " << format_location(*info.origin);
+                out << "\n  source:     " << format_location(*info.origin);
             return out.str();
         }
     };

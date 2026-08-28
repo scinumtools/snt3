@@ -140,4 +140,20 @@ TEST(Environment, RequestCursor) {
     }
 }
 
+TEST(Environment, GetNode) {
+
+    dip::DIP d;
+    d.add_string(
+        "foo\n"
+        "  baz int = 3 cm\n"
+    );
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 1);
+
+    dip::ValueNode::PointerType node = env.get_node("foo.baz");
+    EXPECT_EQ(node->path.name, "foo.baz");
+    EXPECT_EQ(node->value->to_string(), "3");
+    EXPECT_EQ(node->units->to_string(), "cm");
+}
+
 // TODO: tests more requests with RequestType::Function

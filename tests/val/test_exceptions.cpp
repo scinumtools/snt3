@@ -20,7 +20,7 @@ TEST(Exceptions, BaseException) {
             "[SNT-VAL] message\n"
             "  details:    details\n"
             "  suggestion: suggestion\n"
-            "  thrown:     source:111"
+            "  source:     source:111"
         );
     }
 
@@ -40,7 +40,7 @@ TEST(Exceptions, BaseException) {
             "[SNT-VAL] message\n"
             "  details:    details\n"
             "  suggestion: suggestion\n"
-            "  thrown:     source:111"
+            "  source:     source:111"
         );
     }
 }

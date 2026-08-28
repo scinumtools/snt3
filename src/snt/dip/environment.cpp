@@ -328,6 +328,21 @@ namespace snt::dip {
         return nodes.at(index)->value->clone();
     }
 
+    ValueNode::PointerType Environment::get_node(const std::string& path) const {
+
+        for (const auto& node : nodes.get_nodes()) {
+            if (node->path.name == path)
+                return node;
+        }
+        throw dip::EnvironmentException(
+            "Path does not exist",
+            "The requested path `" + path + "` does not point to any node.",
+            "Check whether the path is correct.",
+            __FILE__,
+            __LINE__
+        );
+    }
+
     const std::string Environment::to_string() const {
         return "Environment";
     }

@@ -267,7 +267,7 @@ namespace snt::dip {
             if (parser.do_continue())
                 throw dip::SyntaxException(
                     "Unparsed input",
-                    "Additional text remains after the parsed node.",
+                    "Additional text remains after the parsed node type.",
                     "Check the syntax and remove or correct the unparsed text.",
                     __FILE__,
                     __LINE__,

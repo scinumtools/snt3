@@ -127,6 +127,14 @@ namespace snt::dip {
         val::BaseValue::PointerType get_value(size_t index) const;
 
         /**
+         * Get pointer to a node with a specific name
+         *
+         * @param path Path name of a searched node
+         * @return Pointer to a selected node
+         */
+        ValueNode::PointerType get_node(const std::string& path) const;
+
+        /**
          * Represent environment as a string
          *
          * @return String representation of an environment

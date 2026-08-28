@@ -27,7 +27,7 @@ TEST(Exceptions, BaseException) {
             "  details:    details\n"
             "  at:         name:222 | code\n"
             "  suggestion: suggestion\n"
-            "  thrown:     source:111"
+            "  source:     source:111"
         );
     }
 
@@ -57,7 +57,7 @@ TEST(Exceptions, BaseException) {
             "  details:    details\n"
             "  at:         name:222 | code\n"
             "  suggestion: suggestion\n"
-            "  thrown:     source:111"
+            "  source:     source:111"
         );
     }
 }

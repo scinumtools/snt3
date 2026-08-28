@@ -68,6 +68,13 @@ namespace snt::bind::python {
             return to_python_value(self.get_value());
         });
 
+        val.def_property_readonly("units", [](const dip::Cursor& self) -> py::object {
+            auto units = self.get_units();
+            if (!units)
+                return py::none();
+            return py::cast(*units);
+        });
+
         val.def_property_readonly("kind", &dip::Cursor::get_kind);
 
         val.def("to_numpy", [](const dip::Cursor& self) -> py::object { return to_numpy_value(self.get_value()); });

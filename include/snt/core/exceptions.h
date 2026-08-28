@@ -20,7 +20,7 @@ namespace snt::core {
         std::string message;                  ///< Exception message
         std::string details;                  ///< Details error description
         std::string suggestion;               ///< Suggested changes
-        std::optional<SourceLocation> origin; ///< Where the error was thrown
+        std::optional<SourceLocation> origin; ///< Where the error was thrown in the source
     };
 
     template <typename E> class ExceptionBase : public std::runtime_error {
@@ -43,7 +43,7 @@ namespace snt::core {
             if (!info.suggestion.empty())
                 out << "\n  suggestion: " << info.suggestion;
             if (info.origin)
-                out << "\n  thrown:     " << format_location(*info.origin);
+                out << "\n  source:     " << format_location(*info.origin);
             return out.str();
         }
         std::string format_location(const SourceLocation& location) {

@@ -151,3 +151,16 @@ def test_cursor_values():
     assert type(vnumpy) == np.ndarray
     np.testing.assert_array_equal(vnumpy, np.array(["shot"]))
     
+def test_cursor_units():
+
+    # prepare node collections
+    dip = DIP()
+    dip.add_string((
+        "foo\n"
+        "  bar int = 3 cm\n"
+        "  baz float = 39.2"
+    ))
+    env = dip.parse()
+
+    assert env["foo.bar"].units == Quantity("cm")
+    assert env["foo.baz"].units == None
