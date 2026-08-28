@@ -3,6 +3,7 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -31,7 +32,7 @@ class Cursor : public ::testing::Test {
     }
 };
 
-TEST_F(Cursor, TraverseCollections2) {
+TEST_F(Cursor, TraverseCollections) {
 
     dip::DIP d;
     d.add_string(
@@ -94,6 +95,25 @@ TEST_F(Cursor, TraverseCollections2) {
 
     // compare the two parameter sets
     EXPECT_EQ(params_parsed, params_ref);
+
+    // test if map collection has an item
+    EXPECT_TRUE(env["jerk.snap"].has_item("crackle"));
+    EXPECT_FALSE(env["jerk.snap"].has_item("flock"));
+
+    // test to find an item other than a map collection
+    try {
+        env["jerk.snap[crackle].pop"].has_item("flop");
+        FAIL() << "Expected dip::EnvironmentException";
+    } catch (const dip::EnvironmentException& e) {
+        EXPECT_EQ(e.info().message, "Wrong collection kind");
+        EXPECT_EQ(
+            e.info().details,
+            "The path `jerk.snap[crackle].pop` must correspond to a map collection, but it refers to a list collection."
+        );
+        EXPECT_EQ(e.info().suggestion, "Check whether the path is correct.");
+    } catch (...) {
+        FAIL() << "Expected dip::EnvironmentException";
+    }
 }
 
 TEST_F(Cursor, ValuesFullPath) {

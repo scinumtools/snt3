@@ -45,6 +45,13 @@ namespace snt::dip {
         std::unordered_map<std::string, Cursor> items() const;
 
         /**
+         * Test if keyed item exists for the current path
+         *
+         * @return true if item exists, false if not
+         */
+        bool has_item(const std::string& item) const;
+
+        /**
          * Get current cursor path
          *
          * @return Fully qualified path of the cursor

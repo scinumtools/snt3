@@ -92,6 +92,11 @@ def test_cursor_traverse():
     # compare values
     assert sorted(params_parsed) == params_ref
 
+    # test if key exists in a map
+    assert ('crackle' in env['jerk.snap'])
+    assert ('flock' not in env['jerk.snap'])
+    assert env['jerk.snap'].has_item('crackle')
+    
 def test_cursor_values():
 
     # prepare node collections

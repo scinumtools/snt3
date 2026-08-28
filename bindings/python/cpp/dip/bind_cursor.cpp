@@ -50,6 +50,8 @@ namespace snt::bind::python {
 
         val.def("__getitem__", py::overload_cast<std::size_t>(&dip::Cursor::operator[], py::const_));
 
+        val.def("__contains__", [](const dip::Cursor& self, const std::string& item) { return self.has_item(item); });
+
         val.def("elements", &dip::Cursor::elements);
 
         val.def("items", [](const dip::Cursor& c) {
@@ -59,6 +61,8 @@ namespace snt::bind::python {
             }
             return result;
         });
+
+        val.def("has_item", &dip::Cursor::has_item);
 
         val.def_property_readonly("path", &dip::Cursor::get_path);
 

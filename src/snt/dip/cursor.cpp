@@ -42,7 +42,7 @@ namespace snt::dip {
             }
         } else {
             throw dip::EnvironmentException(
-                "Unknown path",
+                "Wrong collection kind",
                 "The path `" + std::string(path_) + "` must correspond to a list collection, but it refers to " +
                     Path::KindNames[col.kind] + " collection.",
                 "Check whether the path is correct.",
@@ -62,7 +62,7 @@ namespace snt::dip {
             }
         } else {
             throw dip::EnvironmentException(
-                "Unknown path",
+                "Wrong collection kind",
                 "The path `" + std::string(path_) + "` must correspond to a map collection, but it refers to a " +
                     Path::KindNames[col.kind] + " collection.",
                 "Check whether the path is correct.",
@@ -71,6 +71,26 @@ namespace snt::dip {
             );
         }
         return map;
+    }
+
+    bool Cursor::has_item(const std::string& item) const {
+        const Collection& col = env_->hierarchy.get_collection(path_);
+        if (col.kind == Path::Kind::Map) {
+            for (auto key : col.items) {
+                if (key == item)
+                    return true;
+            }
+            return false;
+        } else {
+            throw dip::EnvironmentException(
+                "Wrong collection kind",
+                "The path `" + std::string(path_) + "` must correspond to a map collection, but it refers to a " +
+                    Path::KindNames[col.kind] + " collection.",
+                "Check whether the path is correct.",
+                __FILE__,
+                __LINE__
+            );
+        }
     }
 
     const std::string& Cursor::get_path() const {
