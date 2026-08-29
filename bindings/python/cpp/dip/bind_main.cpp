@@ -45,8 +45,8 @@ namespace snt::bind::python {
         );
         dip.def("add_source", &dip::DIP::add_source, py::arg("source_name"), py::arg("source_file"));
         dip.def("add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"));
-        //.def("add_value_function", &dip::DIP::add_value_function, py::arg("name"), py::arg(""))
-        //.def("add_node_function", &dip::DIP::add_node_function, py::arg("name"), py::arg(""))
+        // dip.def("add_value_function", &dip::DIP::add_value_function, py::arg("name"), py::arg(""))
+        // dip.def("add_node_function", &dip::DIP::add_node_function, py::arg("name"), py::arg(""))
         dip.def("parse", &dip::DIP::parse);
         // dip.def("parse_docs", &dip::DIP::parse_docs);
 
