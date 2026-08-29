@@ -103,6 +103,14 @@ namespace snt::dip {
     };
 
     /**
+     * Pybind exceptions are thrown during incorrect Python binding
+     */
+    class PybindException : public dip::Exception {
+      public:
+        using dip::Exception::Exception;
+    };
+
+    /**
      * Missing exception is triggered when functionality is not implemented yet
      */
     class MissingException : public dip::Exception {

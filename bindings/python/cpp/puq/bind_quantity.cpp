@@ -3,6 +3,7 @@
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <snt/puq/exceptions.h>
 #include <snt/puq/quantity.h>
 #include <variant>
 
@@ -71,7 +72,16 @@ namespace snt::bind::python {
         std::vector<double> a(info.size);
 
         if (info.format != py::format_descriptor<double>::format())
-            throw std::runtime_error("Incompatible format: expected a double array!");
+            throw puq::PybindException(
+                "Incompatible buffer format",
+                "The provided buffer has format `" + info.format + "` with item size `" +
+                    std::to_string(info.itemsize) + "` bytes; double with format `" +
+                    py::format_descriptor<double>::format() + "` and item size `" + std::to_string(sizeof(double)) +
+                    "` bytes is required.",
+                "Provide a buffer with dtype `float64`.",
+                __FILE__,
+                __LINE__
+            );
 
         std::copy(static_cast<double*>(info.ptr), static_cast<double*>(info.ptr) + info.size, a.begin());
 
@@ -146,7 +156,14 @@ namespace snt::bind::python {
             val::ArrayValue<double>* otherT =
                 dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
             if (!otherT)
-                throw std::runtime_error("Expected ArrayValue<double>");
+                throw puq::PybindException(
+                    "Unexpected array value type",
+                    "The quantity contains an incompatible value type; "
+                    "`ArrayValue<double>` is required for NumPy conversion.",
+                    "Ensure that the quantity contains a floating-point array value.",
+                    __FILE__,
+                    __LINE__
+                );
             std::vector<size_t> shape = otherT->get_shape();
             std::vector<py::ssize_t> strides(shape.size());
             py::ssize_t stride = sizeof(double);
@@ -331,7 +348,13 @@ namespace snt::bind::python {
         );
 
         q.def("__array__", [](const puq::Quantity& q, const py::object& dtype) {
-            throw std::runtime_error("Convert explicitly: use .to_numpy() or .result");
+            throw puq::PybindException(
+                "Implicit NumPy conversion is not supported",
+                "Quantity objects cannot be converted to NumPy arrays implicitly.",
+                "Convert explicitly using `.to_numpy()` or access the result with `.result`.",
+                __FILE__,
+                __LINE__
+            );
         });
 
         q.def("__repr__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat());

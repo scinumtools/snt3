@@ -42,6 +42,14 @@ namespace snt::val {
     };
 
     /**
+     * Pybind exceptions occurs when internal VAL parsers fails
+     */
+    class PybindException : public val::Exception {
+      public:
+        using val::Exception::Exception;
+    };
+
+    /**
      * Missing exception is triggered when functionality is not implemented yet
      */
     class MissingException : public val::Exception {

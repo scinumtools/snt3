@@ -3,6 +3,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <snt/dip/settings.h>
+#include <snt/val/exceptions.h>
 #include <snt/val/value_base.h>
 #include <snt/val/values_number.h>
 #include <snt/val/values_string.h>
@@ -24,7 +25,13 @@ namespace snt::bind::python {
         case core::DataType::Boolean: {
             val::ArrayValue<uint8_t>* val = dynamic_cast<val::ArrayValue<uint8_t>*>(value.get());
             if (!val) {
-                throw std::runtime_error("Type mismatch: uint8_t");
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as `Boolean` but is not stored as `ArrayValue<uint8_t>`.",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
             } else if (val->get_size() == 0) { // return none value
                 return py::list();
             } else if (val->get_size() == 1) { // return as a scalar
@@ -45,7 +52,13 @@ namespace snt::bind::python {
         case core::DataType::Integer: {
             val::ArrayValue<int64_t>* val = dynamic_cast<val::ArrayValue<int64_t>*>(value.get());
             if (!val) {
-                throw std::runtime_error("Type mismatch: int64_t");
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as an integer type but is not stored as `ArrayValue<int64_t>`.",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
             } else if (val->get_size() == 0) { // return none value
                 return py::list();
             } else if (val->get_size() == 1) { // return as a scalar
@@ -60,7 +73,13 @@ namespace snt::bind::python {
         case core::DataType::Float: {
             val::ArrayValue<double>* val = dynamic_cast<val::ArrayValue<double>*>(value.get());
             if (!val) {
-                throw std::runtime_error("Type mismatch: double");
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as a floating-point type but is not stored as `ArrayValue<double>`.",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
             } else if (val->get_size() == 0) { // return none value
                 return py::list();
             } else if (val->get_size() == 1) { // return as a scalar
@@ -73,7 +92,13 @@ namespace snt::bind::python {
         case core::DataType::String: {
             val::ArrayValue<std::string>* val = dynamic_cast<val::ArrayValue<std::string>*>(value.get());
             if (!val) {
-                throw std::runtime_error("Type mismatch: string");
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as a string type but is not stored as `ArrayValue<std::string>`.",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
             } else if (val->get_size() == 0) { // return none value
                 return py::list();
             } else if (val->get_size() == 1) { // return as a scalar
@@ -84,7 +109,13 @@ namespace snt::bind::python {
             }
         }
         default:
-            throw py::type_error("Unknown dtype in Environment");
+            throw val::PybindException(
+                "Unknown data type",
+                "The value has a data type that is not supported by the Python conversion.",
+                "Provide a value with a supported data type.",
+                __FILE__,
+                __LINE__
+            );
         }
     }
 
@@ -99,7 +130,13 @@ namespace snt::bind::python {
         case core::DataType::Boolean: {
             val::ArrayValue<uint8_t>* val = dynamic_cast<val::ArrayValue<uint8_t>*>(value.get());
             if (!val)
-                throw std::runtime_error("Type mismatch");
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as `Boolean` but is not stored as `ArrayValue<uint8_t>`.",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
             if (val->get_size() == 0) { // empty array
                 return py::array_t<bool>(0);
             } else if (val->get_size() == 1) { // scalar array
@@ -125,7 +162,13 @@ namespace snt::bind::python {
         case core::DataType::Integer: {
             val::ArrayValue<int64_t>* val = dynamic_cast<val::ArrayValue<int64_t>*>(value.get());
             if (!val) {
-                throw std::runtime_error("Type mismatch");
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as an integer type but is not stored as `ArrayValue<int64_t>`.",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
             } else if (val->get_size() == 0) { // return none value
                 return py::array_t<int64_t>(0);
             } else if (val->get_size() == 1) { // scalar array
@@ -143,7 +186,13 @@ namespace snt::bind::python {
         case core::DataType::Float: {
             val::ArrayValue<double>* val = dynamic_cast<val::ArrayValue<double>*>(value.get());
             if (!val) {
-                throw std::runtime_error("Type mismatch");
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as a floating-point type but is not stored as `ArrayValue<double>`.",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
             } else if (val->get_size() == 0) { // return none value
                 return py::array_t<double>(0);
             } else if (val->get_size() == 1) { // scalar array
@@ -159,7 +208,13 @@ namespace snt::bind::python {
         case core::DataType::String: {
             val::ArrayValue<std::string>* val = dynamic_cast<val::ArrayValue<std::string>*>(value.get());
             if (!val) {
-                throw std::runtime_error("Type mismatch");
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as a string type but is not stored as `ArrayValue<std::string>`.",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
             } else if (val->get_size() == 0) { // return none value
                 py::module_ np = py::module_::import("numpy");
                 return np.attr("array")(py::list());
@@ -183,7 +238,13 @@ namespace snt::bind::python {
             }
         }
         default:
-            throw py::type_error("Unknown dtype in Environment");
+            throw val::PybindException(
+                "Unknown data type",
+                "The value has a data type that is not supported by the NumPy conversion.",
+                "Provide a value with a supported data type.",
+                __FILE__,
+                __LINE__
+            );
         }
     }
 

@@ -52,6 +52,14 @@ namespace snt::puq {
     };
 
     /**
+     * Pybind exceptions are thrown during incorrect Python binding
+     */
+    class PybindException : public puq::Exception {
+      public:
+        using puq::Exception::Exception;
+    };
+
+    /**
      * Missing exception is triggered when functionality is not implemented yet
      */
     class MissingException : public puq::Exception {
