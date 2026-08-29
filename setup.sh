@@ -18,9 +18,9 @@ GITHUB_WORKFLOWS=OFF        # Set specific settings for GitHub workflows
 ENABLE_COVERAGE=OFF         # Enable code coverage reports      
 
 CMAKE_FLAGS=(
-  -DENABLE_SNT=ON
-  -DENABLE_SNT_GTEST=ON
-  -DENABLE_SNT_PYTEST=ON
+  -DENABLE_CORE=ON
+  -DENABLE_CORE_GTEST=ON
+  -DENABLE_CORE_PYTEST=ON
 
   -DENABLE_EXS=ON
   -DENABLE_EXS_GTEST=ON

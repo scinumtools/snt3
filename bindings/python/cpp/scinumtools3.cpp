@@ -4,8 +4,8 @@ namespace py = pybind11;
 
 namespace snt::bind::python {
 
-#ifdef ENABLE_SNT_PYBIND
-    void init_snt(py::module_&);
+#ifdef ENABLE_CORE_PYBIND
+    void init_core(py::module_&);
 #endif
 #ifdef ENABLE_VAL_PYBIND
     void init_val(py::module_&);
@@ -20,16 +20,16 @@ namespace snt::bind::python {
     void init_api(py::module_&);
 #endif
 
-    PYBIND11_MODULE(_core, m) {
+    PYBIND11_MODULE(_snt, m) {
 
         m.doc() = "Scientific Numerical Tools v3";
 
         m.attr("__version__") = CODE_VERSION;
 
-#ifdef ENABLE_SNT_PYBIND
+#ifdef ENABLE_CORE_PYBIND
         {
-            auto smod = m.def_submodule("snt", "Scinumtools common structures and settings");
-            init_snt(smod);
+            auto smod = m.def_submodule("core", "Scinumtools core structures and settings");
+            init_core(smod);
         }
 #endif
 

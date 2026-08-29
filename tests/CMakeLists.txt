@@ -1,5 +1,5 @@
 # add submodule tests
-if (ENABLE_SNT AND ENABLE_SNT_GTEST)
+if (ENABLE_CORE AND ENABLE_CORE_GTEST)
    add_subdirectory(snt)
 endif()
 if (ENABLE_EXS AND ENABLE_EXS_GTEST)

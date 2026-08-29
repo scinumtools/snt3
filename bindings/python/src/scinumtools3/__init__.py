@@ -1,5 +1,5 @@
-from . import _core
+from . import _snt
 
-__version__ = _core.__version__
+__version__ = _snt.__version__
 
-from ._core import *
+from ._snt import *

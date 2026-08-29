@@ -10,7 +10,7 @@ if(NOT pybind11_FOUND)        # for Windows build
     FetchContent_MakeAvailable(pybind11)
 endif()
 
-set(MODULE_NAME _core)
+set(MODULE_NAME _snt)
 
 file(GLOB SOURCE_FILES "./*.cpp")
 pybind11_add_module(${MODULE_NAME} ${SOURCE_FILES})
@@ -52,7 +52,7 @@ file(COPY
     DESTINATION ${CMAKE_BINARY_DIR}/python
 )
 
-# copy _core library from 'Release' or 'Debug' directory to the main directory
+# copy _snt library from 'Release' or 'Debug' directory to the main directory
 add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:${MODULE_NAME}>"
@@ -61,7 +61,7 @@ add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
 
 # this needs to be here, so that ctest notice it!
 if(
-    ENABLE_SNT_PYTEST OR
+    ENABLE_CORE_PYTEST OR
     ENABLE_EXS_PYTEST OR
     ENABLE_VAL_PYTEST OR
     ENABLE_PUQ_PYTEST OR
@@ -91,10 +91,9 @@ if(
 
 endif()
 
-if (ENABLE_SNT_PYBIND)
-   add_subdirectory(snt)
+if (ENABLE_CORE_PYBIND)
+   add_subdirectory(core)
 endif()
-
 
 if (ENABLE_VAL_PYBIND)
    add_subdirectory(val)
@@ -113,7 +112,7 @@ if (ENABLE_API_PYBIND)
 endif()
 
 if(
-    ENABLE_SNT_PYTEST OR
+    ENABLE_CORE_PYTEST OR
     ENABLE_EXS_PYTEST OR
     ENABLE_VAL_PYTEST OR
     ENABLE_PUQ_PYTEST OR

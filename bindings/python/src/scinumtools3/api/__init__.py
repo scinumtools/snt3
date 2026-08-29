@@ -1,4 +1,4 @@
-from .._core import api as _api
+from .._snt import api as _api
 
 import sys
 

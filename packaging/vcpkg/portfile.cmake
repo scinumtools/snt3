@@ -11,7 +11,7 @@ vcpkg_cmake_configure(
         -DENABLE_UNIT_TESTS=OFF
         -DENABLE_BINDING_PYTHON=OFF
 
-        -DENABLE_SNT=ON
+        -DENABLE_CORE=ON
         -DENABLE_EXS=ON
         -DENABLE_VAL=ON
         -DENABLE_PUQ=ON

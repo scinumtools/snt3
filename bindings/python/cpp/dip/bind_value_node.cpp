@@ -4,6 +4,7 @@
 #include <locale>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <snt/core/string_format.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_boolean.h>
@@ -30,6 +31,18 @@ namespace snt::bind::python {
 
                     if (!units.is_none())
                         quantity = puq::Quantity(units.cast<std::string>());
+
+                    if (py::isinstance<py::bool_>(value) || py::isinstance<py::str>(value)) {
+                        if (quantity.has_value()) {
+                            throw dip::PybindException(
+                                "Units not supported for boolean and string values",
+                                "Boolean and string values cannot have an associated quantity or unit.",
+                                "Remove the units argument when providing a boolean and string values.",
+                                __FILE__,
+                                __LINE__
+                            );
+                        }
+                    }
 
                     // Scalar bool
                     if (py::isinstance<py::bool_>(value)) {
@@ -86,6 +99,18 @@ namespace snt::bind::python {
                         }
 
                         py::handle first = list[0];
+
+                        if (py::isinstance<py::bool_>(first) || py::isinstance<py::str>(first)) {
+                            if (quantity.has_value()) {
+                                throw dip::PybindException(
+                                    "Units not supported for boolean and string values",
+                                    "Boolean and string values cannot have an associated quantity or unit.",
+                                    "Remove the units argument when providing a boolean and string values.",
+                                    __FILE__,
+                                    __LINE__
+                                );
+                            }
+                        }
 
                         // List of bool
                         if (py::isinstance<py::bool_>(first)) {
@@ -186,6 +211,90 @@ namespace snt::bind::python {
                             __LINE__
                         );
                     }
+
+                    // NumPy array
+                    if (py::isinstance<py::array>(value)) {
+                        py::array array = value.cast<py::array>();
+                        py::buffer_info info = array.request();
+
+                        if (array.dtype().is(py::dtype::of<bool>()) || array.dtype().kind() == 'U' ||
+                            array.dtype().kind() == 'S') {
+                            if (quantity.has_value()) {
+                                throw dip::PybindException(
+                                    "Units not supported for boolean and string values",
+                                    "Boolean and string values cannot have an associated quantity or unit.",
+                                    "Remove the units argument when providing a boolean and string values.",
+                                    __FILE__,
+                                    __LINE__
+                                );
+                            }
+                        }
+
+                        if (array.dtype().is(py::dtype::of<bool>())) {
+
+                            // booleans
+                            const bool* ptr = static_cast<const bool*>(info.ptr);
+                            std::vector<uint8_t> data(info.size);
+                            for (size_t i = 0; i < static_cast<size_t>(info.size); ++i) {
+                                data[i] = ptr[i] ? 1 : 0;
+                            }
+                            val::Array::ShapeType shape(info.shape.begin(), info.shape.end());
+                            return std::make_shared<dip::BooleanNode>(
+                                path, std::make_unique<val::ArrayValue<uint8_t>>(data, shape, core::DataType::Boolean)
+                            );
+
+                        } else if (array.dtype().is(py::dtype::of<int64_t>())) {
+
+                            // integers
+                            py::array_t<int64_t, py::array::c_style | py::array::forcecast> int_array(array);
+                            py::buffer_info int_info = int_array.request();
+                            const int64_t* ptr = static_cast<const int64_t*>(int_info.ptr);
+                            std::vector<int64_t> data(ptr, ptr + int_info.size);
+                            val::Array::ShapeType shape(int_info.shape.begin(), int_info.shape.end());
+                            return std::make_shared<dip::IntegerNode>(
+                                path,
+                                std::make_unique<val::ArrayValue<int64_t>>(data, shape, core::DataType::Integer64),
+                                std::move(quantity)
+                            );
+
+                        } else if (array.dtype().is(py::dtype::of<double>())) {
+
+                            // floating-point values
+                            const double* ptr = static_cast<const double*>(info.ptr);
+                            std::vector<double> data(ptr, ptr + info.size);
+                            val::Array::ShapeType shape(info.shape.begin(), info.shape.end());
+                            return std::make_shared<dip::FloatNode>(
+                                path,
+                                std::make_unique<val::ArrayValue<double>>(data, shape, core::DataType::Float64),
+                                std::move(quantity)
+                            );
+
+                        } else if (array.dtype().kind() == 'U' || array.dtype().kind() == 'S') {
+
+                            // strings
+                            py::array flat = array.attr("reshape")(py::make_tuple(-1));
+                            std::vector<std::string> data;
+                            data.reserve(info.size);
+                            for (py::handle item : flat) {
+                                data.push_back(item.cast<std::string>());
+                            }
+                            val::Array::ShapeType shape(info.shape.begin(), info.shape.end());
+                            return std::make_shared<dip::StringNode>(
+                                path,
+                                std::make_unique<val::ArrayValue<std::string>>(data, shape, core::DataType::String)
+                            );
+
+                        } else {
+                            throw dip::PybindException(
+                                "Unsupported NumPy data type",
+                                "The NumPy array has an unsupported data format: `" + info.format + "`.",
+                                "Provide a NumPy array with dtype `bool`, `int64`, or `float64`.",
+                                __FILE__,
+                                __LINE__
+                            );
+                        }
+                    }
+
                     throw dip::PybindException(
                         "Invalid ValueNode type",
                         "A ValueNode value must have type bool, int, float, str, or list.",
@@ -217,6 +326,8 @@ namespace snt::bind::python {
         });
 
         val.def_property_readonly("shape", [](const dip::ValueNode& vnode) { return vnode.value->get_shape(); });
+
+        val.def_property_readonly("dtype", [](const dip::ValueNode& vnode) { return vnode.value->get_dtype(); });
 
         val.def("to_string", &dip::ValueNode::to_string, py::arg("format") = core::StringFormatType());
 
