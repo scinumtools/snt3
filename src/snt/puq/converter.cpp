@@ -177,7 +177,7 @@ namespace snt::puq {
         // make sure that physical dimensions are matching
         for (int i = 0; i < Config::num_basedim; i++) {
             if (dimensions1.physical[i] != dimensions2.physical[i])
-                throw puq::ConverterException(bu1, bu2);
+                throw puq::ConverterException(bu1, bu2, __FILE__, __LINE__);
         }
 
         // determine conversion type

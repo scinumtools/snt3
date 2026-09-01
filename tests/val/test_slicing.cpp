@@ -19,3 +19,11 @@ TEST(Slicing, Basic) {
     bval = val->slice(slice);
     EXPECT_EQ(bval->to_string(), "[1, 2]");
 }
+
+TEST(Slicing, CompareRanges) {
+
+    val::Array::RangeStruct range1({0, 0});
+    val::Array::RangeStruct range2({0, 1});
+
+    EXPECT_FALSE(range1 == range2);
+}

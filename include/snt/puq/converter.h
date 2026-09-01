@@ -5,6 +5,7 @@
 #include <memory>
 #include <snt/puq/base_units.h>
 #include <snt/puq/dimensions.h>
+#include <snt/puq/exceptions.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/systems/unit_system.h>
 #include <snt/puq/util/data_table.h>
@@ -30,21 +31,38 @@ namespace snt::puq {
         Result convert(const Result& m1, const Result& m2 = 1);
     };
 
-    class ConverterException : public std::exception {
+    class ConverterException : public puq::Exception {
       private:
         std::string message;
 
       public:
-        ConverterException(std::string m) : message(m) {}
-        ConverterException(const BaseUnits& bu1, const BaseUnits& bu2)
-            : ConverterException(bu1, UnitSystem::current.type, bu2, UnitSystem::current.type) {}
-        ConverterException(const BaseUnits& bu1, const SystemType& s1, const BaseUnits& bu2, const SystemType& s2) {
+        ConverterException(const BaseUnits& bu1, const BaseUnits& bu2, const std::string& file, size_t line)
+            : ConverterException(bu1, UnitSystem::current.type, bu2, UnitSystem::current.type, file, line) {};
+        ConverterException(
+            const BaseUnits& bu1,
+            const SystemType& s1,
+            const BaseUnits& bu2,
+            const SystemType& s2,
+            const std::string& file,
+            const size_t line
+        )
+            : puq::Exception(prepare_info(bu1, s1, bu2, s2, file, line)) {};
+
+        core::ExceptionInfo prepare_info(
+            const BaseUnits& bu1,
+            const SystemType& s1,
+            const BaseUnits& bu2,
+            const SystemType& s2,
+            const std::string& file,
+            const size_t line
+        ) {
+
             UnitSystem us(s1);
             Dimensions dim1 = bu1.dimensions();
             us.change(s2);
             Dimensions dim2 = bu2.dimensions();
-            std::stringstream ss;
-            ss << "Incompatible dimensions:" << std::endl << std::endl;
+            std::stringstream details;
+            details << "Diemensions are different:" << '\n';
             DataTable tab({{"", 8}, {"System", 10}, {"Unit", 26}, {"Dimensions", 26}});
             us.change(s1);
             tab.append(
@@ -60,16 +78,16 @@ namespace snt::puq {
                  bu2.to_string(),
                  ((dim2.to_string(Format::Display::UNITS) == "") ? "1" : dim2.to_string(Format::Display::UNITS))}
             );
-            ss << tab.to_string() << std::endl;
-            ;
+            details << tab.to_string();
             us.change(s1);
-            ss << "Possible conversions:" << std::endl << std::endl;
+            std::stringstream suggestion;
+            suggestion << "Possible conversions:" << '\n';
             tab = DataTable({{"System", 10}, {"Units", 26}, {"Name", 26}, {"Context", 10}});
             std::string mgs = dim1.to_string({Format::Display::UNITS});
             std::string mks = dim1.to_string({Format::Display::UNITS, Format::Base::MKS});
             std::string cgs = dim1.to_string({Format::Display::UNITS, Format::Base::CGS});
             if (mgs == "") {
-                ss << "1";
+                suggestion << "1";
             } else {
                 tab.append({"BASE", mgs, "MGS base units"});
                 if (mgs != mks) {
@@ -188,10 +206,12 @@ namespace snt::puq {
                     }
                 }
             }
-            ss << tab.to_string();
-            message = ss.str();
+            suggestion << tab.to_string();
+
+            return core::ExceptionInfo{
+                "Incompatible dimensions", details.str(), suggestion.str(), core::SourceLocation{std::move(file), line}
+            };
         }
-        const char* what() const noexcept override { return message.c_str(); }
     };
 
 } // namespace snt::puq

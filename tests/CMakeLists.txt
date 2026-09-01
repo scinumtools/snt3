@@ -1,7 +1,9 @@
-# add submodule tests
+# test core functionality
 if (ENABLE_CORE AND ENABLE_CORE_GTEST)
-   add_subdirectory(snt)
+   add_subdirectory(core)
 endif()
+
+# test submodules
 if (ENABLE_EXS AND ENABLE_EXS_GTEST)
    add_subdirectory(exs)
 endif()
@@ -18,6 +20,7 @@ if (ENABLE_MAT AND ENABLE_MAT_GTEST)
    add_subdirectory(mat)  
 endif()
 
+# test api
 if (ENABLE_DIP AND ENABLE_DIP_GTEST
     AND ENABLE_PUQ AND ENABLE_PUQ_GTEST)
    add_subdirectory(api)

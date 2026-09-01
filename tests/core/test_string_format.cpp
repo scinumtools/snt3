@@ -16,10 +16,13 @@ TEST(StringFormat, Integers) {
     EXPECT_EQ(core::number_to_string(int(1234567890), int(12345)), "1234567(12)e3");
     EXPECT_EQ(core::number_to_string(int(-123), int(2)), "-123(2)"); // negative values
 
-    core::StringFormatType prec;
-    prec.uncertaintyPrecision = 5;
-    EXPECT_EQ(core::number_to_string(int(1234567890), int(12345), prec), "1234567890(12345)"); // extened precision
-    EXPECT_EQ(core::number_to_string(int(123), int(2), prec), "123(2)");                       // higher precision
+    core::StringFormatType format;
+    format.uncertaintyPrecision = 5;
+    EXPECT_EQ(core::number_to_string(int(1234567890), int(12345), format), "1234567890(12345)"); // extened precision
+    EXPECT_EQ(core::number_to_string(int(123), int(2), format), "123(2)");                       // higher precision
+    format.paddingSize = 10;
+    format.paddingZeros = true;
+    EXPECT_EQ(core::number_to_string(int(123), int(2), format), "0000123(2)"); // number padding
 }
 
 TEST(StringFormat, Floats) {

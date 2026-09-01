@@ -1,6 +1,6 @@
 # build test
 file(GLOB TEST_FILES "*.cpp")
-set(EXEC_NAME gtest-snt)
+set(EXEC_NAME gtest-core)
 
 add_executable(${EXEC_NAME} ${TEST_FILES})
 
@@ -17,7 +17,7 @@ set_target_properties(${EXEC_NAME} PROPERTIES
 )
 
 gtest_discover_tests(${EXEC_NAME}
-  TEST_PREFIX gtest.snt.
+  TEST_PREFIX gtest.core.
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
