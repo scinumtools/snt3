@@ -296,6 +296,34 @@ TEST(SchemaList, FromCollection) {
     }
 }
 
+TEST(SchemaList, DoubleUse) {
+    // same schema was applied multiple times
+    dip::DIP d;
+    d.add_string(
+        "$schema vehicle\n"
+        "  speed float kph\n"
+        "  weight float kg\n"
+        "vehicles map : vehicle\n"
+        "vehicles[porsche] : vehicle\n"
+        "  speed = 212\n"
+        "  weight = 1320\n"
+    );
+    try {
+        d.parse();
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Duplicated schema");
+        EXPECT_EQ(e.info().details, "The schema `vehicle` is applied more than once to the same item.");
+        EXPECT_EQ(
+            e.info().suggestion,
+            "The schema was probably declared both in the collection definition and on the item. Remove one of the "
+            "duplicate schema declarations."
+        );
+    } catch (...) {
+        FAIL() << "Expected dip::SyntaxException";
+    }
+}
+
 TEST(SchemaList, TableDeclarations) {
     { // table is declared in the schema and defined later
         dip::DIP d;

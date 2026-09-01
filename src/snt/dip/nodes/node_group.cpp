@@ -34,12 +34,37 @@ namespace snt::dip {
                 std::string full_path = env.hierarchy.get_current_path(indent, path.name, false).name;
                 if (env.hierarchy.has_collection(full_path)) {
                     Collection col = env.hierarchy.get_collection(full_path);
-                    if (!col.schemas.empty())
-                        std::copy(col.schemas.begin(), col.schemas.end(), std::back_inserter(schemas));
+                    for (const auto& schema : col.schemas) {
+                        if (std::find(schemas.begin(), schemas.end(), schema) == schemas.end()) {
+                            schemas.push_back(schema);
+                        } else {
+                            throw dip::SyntaxException(
+                                "Duplicated schema",
+                                "The schema `" + schema + "` is applied twice to the same item.",
+                                "The schema was declared more than once on the same collection. "
+                                "Remove one of the declarations.",
+                                __FILE__,
+                                __LINE__,
+                                line
+                            );
+                        }
+                    }
                 }
                 // Add all direct schemas
-                if (value_raw.size() > 0) {
-                    std::copy(value_raw.begin(), value_raw.end(), std::back_inserter(schemas));
+                for (const auto& schema : value_raw) {
+                    if (std::find(schemas.begin(), schemas.end(), schema) != schemas.end()) {
+                        throw dip::SyntaxException(
+                            "Duplicated schema",
+                            "The schema `" + schema + "` is applied more than once to the same item.",
+                            "The schema was probably declared both in the collection definition and on the item. "
+                            "Remove one of the duplicate schema declarations.",
+                            __FILE__,
+                            __LINE__,
+                            line
+                        );
+                    }
+
+                    schemas.push_back(schema);
                 }
                 // Apply all schemas
                 if (!schemas.empty()) {
