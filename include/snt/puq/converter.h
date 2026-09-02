@@ -62,7 +62,7 @@ namespace snt::puq {
             us.change(s2);
             Dimensions dim2 = bu2.dimensions();
             std::stringstream details;
-            details << "Diemensions are different:" << '\n';
+            details << "Dimensions are incompatible for the requested conversion:" << '\n';
             DataTable tab({{"", 8}, {"System", 10}, {"Unit", 26}, {"Dimensions", 26}});
             us.change(s1);
             tab.append(
@@ -81,7 +81,7 @@ namespace snt::puq {
             details << tab.to_string();
             us.change(s1);
             std::stringstream suggestion;
-            suggestion << "Possible conversions:" << '\n';
+            suggestion << "The following compatible conversions are available:" << '\n';
             tab = DataTable({{"System", 10}, {"Units", 26}, {"Name", 26}, {"Context", 10}});
             std::string mgs = dim1.to_string({Format::Display::UNITS});
             std::string mks = dim1.to_string({Format::Display::UNITS, Format::Base::MKS});
@@ -97,7 +97,9 @@ namespace snt::puq {
                     tab.append({"BASE", cgs, "CGS base units"});
                 }
             }
+            // list units with the same dimensions from the first unit system
             us.change(s1);
+            std::cout << "current dmap " << UnitSystem::current.data->DimensionMap.size() << std::endl;
             for (auto unit : UnitSystem::current.data->DimensionMap) {
                 if (Dimensions(1, unit.second.dimensions) != dim1)
                     continue;
@@ -124,34 +126,36 @@ namespace snt::puq {
                      UnitSystem::current.custom->UnitList.find(unit.first)->second.name}
                 );
             }
-            us.change(s2);
-            for (auto unit : UnitSystem::current.data->DimensionMap) {
-                if (Dimensions(1, unit.second.dimensions) != dim1)
-                    continue;
-                if (unit.first == mgs || unit.first == mks || unit.first == cgs)
-                    continue;
-                if (unit.first[0] == Symbols::quantity_start[0])
-                    continue;
-                tab.append(
-                    {SystemMap[s2]->SystemAbbrev,
-                     unit.first,
-                     UnitSystem::current.data->UnitList.find(unit.first)->second.name}
-                );
-            }
-            for (auto unit : UnitSystem::current.custom->DimensionMap) {
-                if (Dimensions(1, unit.second.dimensions) != dim1)
-                    continue;
-                if (unit.first == mgs || unit.first == mks || unit.first == cgs)
-                    continue;
-                if (unit.first[0] == Symbols::quantity_start[0])
-                    continue;
-                tab.append(
-                    {SystemMap[s2]->SystemAbbrev,
-                     unit.first,
-                     UnitSystem::current.custom->UnitList.find(unit.first)->second.name}
-                );
-            }
+            // if the two unit systems are different, list additional conversions
             if (s1 != s2) {
+                // list units with the same dimensions from the second unit system
+                us.change(s2);
+                for (auto unit : UnitSystem::current.data->DimensionMap) {
+                    if (Dimensions(1, unit.second.dimensions) != dim1)
+                        continue;
+                    if (unit.first == mgs || unit.first == mks || unit.first == cgs)
+                        continue;
+                    if (unit.first[0] == Symbols::quantity_start[0])
+                        continue;
+                    tab.append(
+                        {SystemMap[s2]->SystemAbbrev,
+                         unit.first,
+                         UnitSystem::current.data->UnitList.find(unit.first)->second.name}
+                    );
+                }
+                for (auto unit : UnitSystem::current.custom->DimensionMap) {
+                    if (Dimensions(1, unit.second.dimensions) != dim1)
+                        continue;
+                    if (unit.first == mgs || unit.first == mks || unit.first == cgs)
+                        continue;
+                    if (unit.first[0] == Symbols::quantity_start[0])
+                        continue;
+                    tab.append(
+                        {SystemMap[s2]->SystemAbbrev,
+                         unit.first,
+                         UnitSystem::current.custom->UnitList.find(unit.first)->second.name}
+                    );
+                }
                 us.change(s1);
                 for (auto quant : UnitSystem::current.data->QuantityList) {
                     Measurement uv(

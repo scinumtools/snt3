@@ -43,11 +43,11 @@ namespace snt::dip {
             std::ostringstream out;
             out << prefix << info.message;
             if (!info.details.empty())
-                out << "\n  details:    " << info.details;
+                out << "\n  details:    " << indent_lines(info.details);
             if (info.location)
                 out << "\n  at:         " << format_location(*info.location);
             if (!info.suggestion.empty())
-                out << "\n  suggestion: " << info.suggestion;
+                out << "\n  suggestion: " << indent_lines(info.suggestion);
             if (info.origin)
                 out << "\n  source:     " << format_location(*info.origin);
             return out.str();

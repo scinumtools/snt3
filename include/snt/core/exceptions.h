@@ -1,6 +1,7 @@
 #ifndef SNT_CORE_EXCEPTIONS_H
 #define SNT_CORE_EXCEPTIONS_H
 
+#include <iostream>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
@@ -35,13 +36,27 @@ namespace snt::core {
         const E& info() const noexcept { return m_info; }
 
       protected:
+        /**
+         * Add specific indent in front of every new line
+         */
+        std::string indent_lines(const std::string& str) {
+            std::string result = str;
+            std::size_t pos = 0;
+            std::string indent(14, ' ');
+            while ((pos = result.find('\n', pos)) != std::string::npos) {
+                result.insert(pos + 1, indent);
+                pos += 1 + indent.size();
+            }
+            return result;
+        }
+
         virtual std::string format(const E& info, std::string prefix = "") {
             std::ostringstream out;
             out << prefix << info.message;
             if (!info.details.empty())
-                out << "\n  details:    " << info.details;
+                out << "\n  details:    " << indent_lines(info.details);
             if (!info.suggestion.empty())
-                out << "\n  suggestion: " << info.suggestion;
+                out << "\n  suggestion: " << indent_lines(info.suggestion);
             if (info.origin)
                 out << "\n  source:     " << format_location(*info.origin);
             return out.str();

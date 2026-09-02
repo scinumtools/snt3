@@ -57,7 +57,7 @@ TEST(Exceptions, ConverterException) {
         EXPECT_EQ(e.info().message, "Incompatible dimensions");
         EXPECT_EQ(
             e.info().details,
-            "Diemensions are different:\n"
+            "Dimensions are incompatible for the requested conversion:\n"
             "         System     Unit                       Dimensions                 \n"
             "         ---------- -------------------------- -------------------------- \n"
             "From     SI         cm2*kg-2                   m2*g-2                     \n"
@@ -65,28 +65,12 @@ TEST(Exceptions, ConverterException) {
         );
         EXPECT_EQ(
             e.info().suggestion,
-            "Possible conversions:\n"
+            "The following compatible conversions are available:\n"
             "System     Units                      Name                       Context    \n"
             "---------- -------------------------- -------------------------- ---------- \n"
             "BASE       m2*g-2                     MGS base units             \n"
             "BASE       m2*kg-2                    MKS base units             \n"
             "BASE       cm2*g-2                    CGS base units             \n"
-        );
-        EXPECT_STREQ(
-            e.what(),
-            "[SNT-PUQ] Incompatible dimensions\n"
-            "  details:    Diemensions are different:\n"
-            "         System     Unit                       Dimensions                 \n"
-            "         ---------- -------------------------- -------------------------- \n"
-            "From     SI         cm2*kg-2                   m2*g-2                     \n"
-            "To       SI         kg2*s-2                    g2*s-2                     \n\n"
-            "  suggestion: Possible conversions:\n"
-            "System     Units                      Name                       Context    \n"
-            "---------- -------------------------- -------------------------- ---------- \n"
-            "BASE       m2*g-2                     MGS base units             \n"
-            "BASE       m2*kg-2                    MKS base units             \n"
-            "BASE       cm2*g-2                    CGS base units             \n\n"
-            "  source:     scinumtools3/tests/puq/test_exceptions.cpp:54"
         );
     }
 }

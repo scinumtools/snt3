@@ -171,6 +171,14 @@ function run_benchmark {
     echo "Benchmark results: " $FILE_OUTPUT
 }
 
+function run_python_build {
+    source .venv/bin/activate
+    cd build/python
+    python3
+    deactivate
+}
+ 
+
 function show_help {
     echo "Scientific Numerical Tools (SNT, scinumtools)"
     echo ""
@@ -192,6 +200,7 @@ function show_help {
     echo " --refactor <from> <to>  replace <from> a string <to> another string"
     echo " --github-workflows      set a specific configuration of settings for GitHub Workflows"
     echo " --benchmark             run benchmarks"
+    echo " --pyrun                 run python with the newest scinumtools3 build"
     echo ""
     echo "Examples:"
     echo "./setup.sh -c -b               clean and build the code"
@@ -239,6 +248,8 @@ while [[ $# -gt 0 ]]; do
             GITHUB_WORKFLOWS=ON; shift;;
         --benchmark)
             run_benchmark; shift;;
+        --pyrun)
+            run_python_build; shift;;
 	-*|--*)
 	    show_help; exit 1;;
 	*)
