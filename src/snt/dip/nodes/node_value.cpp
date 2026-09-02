@@ -2,7 +2,10 @@
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_value.h>
+#include <snt/dip/parsers.h>
 #include <snt/dip/solvers/logical_solver.h>
+#include <snt/dip/solvers/numerical_solver.h>
+#include <snt/dip/solvers/template_solver.h>
 #include <sstream>
 
 namespace snt::dip {
@@ -49,13 +52,94 @@ namespace snt::dip {
         line = other->line;
     }
 
-    val::BaseValue::PointerType ValueNode::cast_value() {
+    val::BaseValue::PointerType ValueNode::parse_function(
+        Environment& env, const std::string& name, std::optional<std::string_view> units
+    ) const {
+        return env.request_value(name, RequestType::Function, units);
+    }
+
+    val::BaseValue::PointerType ValueNode::parse_reference(
+        Environment& env, std::string query, std::optional<std::string_view> units, ValueOrigin origin
+    ) const {
+        switch (origin) {
+        case ValueOrigin::Reference:
+        case ValueOrigin::ReferenceRel: {
+            if (origin == ValueOrigin::ReferenceRel) {
+                Path current = env.hierarchy.get_current_path(indent, path.name);
+                query = std::string(1, SIGN_QUERY) + current.resolve(query).name;
+            }
+            val::BaseValue::PointerType val = env.request_value(query, RequestType::Reference, units);
+            if (val)
+                return std::move(val);
+            else
+                throw dip::SyntaxException(
+                    "Undefined reference",
+                    "The requested value reference `" + query + "` does not resolve to a value.",
+                    "Ensure that the referenced node exists and has a defined value.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
+        }
+        case ValueOrigin::ReferenceRaw: {
+            std::string source_code = env.request_code(query);
+            val::Array::StringType source_value_raw;
+            val::Array::ShapeType source_value_shape;
+            parse_value(source_code, source_value_raw, source_value_shape);
+            return cast_value(source_value_raw, source_value_shape);
+        }
+        default:
+            throw dip::SyntaxException(
+                "Unknown value origin",
+                "Node value origin is not a reference: `" + ValueOriginNames.at(origin) + "`.",
+                "Ensure that the node value origin is either an absolute, relative, or raw reference.",
+                __FILE__,
+                __LINE__,
+                line
+            );
+        }
+    }
+
+    val::BaseValue::PointerType ValueNode::parse_expression(
+        Environment& env, const std::string& expression, std::optional<std::string_view> units, const NodeDtype ntype
+    ) const {
+        Path current_path = env.hierarchy.get_current_path(indent, path.name);
+        switch (ntype) {
+        case NodeDtype::Integer:
+        case NodeDtype::Float: {
+            NumericalSolver solver(env, current_path);
+            ValueNodeData data = solver.eval(expression, std::string(units ? units.value() : ""));
+            return std::move(data.value);
+        }
+        case NodeDtype::Boolean: {
+            LogicalSolver solver(env, current_path);
+            ValueNodeData data = solver.eval(expression);
+            return std::move(data.value);
+        }
+        case NodeDtype::String: {
+            TemplateSolver solver(env, current_path);
+            ValueNodeData data = solver.eval(expression);
+            return std::move(data.value);
+        }
+        default:
+            throw dip::SyntaxException(
+                "No expression solver available",
+                "No expression solver is available for the current node type: `" + NodeDtypeNames.at(ntype) + "`.",
+                "Expression solving is supported only for boolean, integer, float, and string nodes.",
+                __FILE__,
+                __LINE__,
+                line
+            );
+        }
+    }
+
+    val::BaseValue::PointerType ValueNode::cast_value() const {
         return cast_value(value_raw, value_shape);
     }
 
     val::BaseValue::PointerType ValueNode::cast_value(
-        val::Array::StringType& value_input, const val::Array::ShapeType& shape
-    ) {
+        const val::Array::StringType& value_input, const val::Array::ShapeType& shape
+    ) const {
         if (!dimension.empty()) {
             return cast_array_value(value_input, shape);
         } else if (value_input.empty()) {
@@ -147,6 +231,7 @@ namespace snt::dip {
     }
 
     void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
+        // check if modification and target node have the same node type
         if (node->dtype != NodeDtype::Modification && node->dtype != dtype)
             throw dip::SyntaxException(
                 "Type mismatch",
@@ -157,7 +242,26 @@ namespace snt::dip {
                 __LINE__,
                 line
             );
-        val::BaseValue::PointerType value = cast_value(node->value_raw, node->value_shape);
+        // parse value from raw data
+        val::BaseValue::PointerType value;
+        switch (node->value_origin) {
+        case ValueOrigin::Function:
+            value = parse_function(env, node->value_raw.at(0), node->units_raw);
+            break;
+        case ValueOrigin::Reference:
+        case ValueOrigin::ReferenceRel:
+        case ValueOrigin::ReferenceRaw:
+            value = parse_reference(env, node->value_raw.at(0), node->units_raw, node->value_origin);
+            break;
+        case ValueOrigin::Expression: {
+            value = parse_expression(env, node->value_raw.at(0), node->units_raw, dtype);
+            break;
+        }
+        default:
+            value = cast_value(node->value_raw, node->value_shape);
+            break;
+        }
+        // convert units if necessary
         if (!node->units_raw.empty()) {
             if (!this->units) {
                 throw dip::UnitException(

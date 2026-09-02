@@ -93,8 +93,22 @@ namespace snt::dip {
             std::optional<puq::Quantity> unt = std::nullopt
         );
         virtual ~ValueNode() = default;
-        val::BaseValue::PointerType cast_value();
-        val::BaseValue::PointerType cast_value(val::Array::StringType& value_input, const val::Array::ShapeType& shape);
+        val::BaseValue::PointerType parse_function(
+            Environment& env, const std::string& name, std::optional<std::string_view> units
+        ) const;
+        val::BaseValue::PointerType parse_reference(
+            Environment& env, std::string query, std::optional<std::string_view> units, ValueOrigin origin
+        ) const;
+        val::BaseValue::PointerType parse_expression(
+            Environment& env,
+            const std::string& expression,
+            std::optional<std::string_view> units,
+            const NodeDtype ntype
+        ) const;
+        val::BaseValue::PointerType cast_value() const;
+        val::BaseValue::PointerType cast_value(
+            const val::Array::StringType& value_input, const val::Array::ShapeType& shape
+        ) const;
         void set_value(val::BaseValue::PointerType value_input = nullptr);
         void set_units(const std::optional<puq::Quantity>& units_input = std::nullopt);
         virtual void modify_value(const BaseNode::PointerType& node, Environment& env);

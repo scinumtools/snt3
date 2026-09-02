@@ -39,47 +39,20 @@ namespace snt::dip {
             );
         switch (value_origin) {
         case ValueOrigin::Function:
-            set_value(env.request_value(value_raw.at(0), RequestType::Function));
+            set_value(parse_function(env, value_raw.at(0), std::nullopt));
             break;
         case ValueOrigin::Reference:
-        case ValueOrigin::ReferenceRel: {
-            std::string query = value_raw.at(0);
-            if (value_origin == ValueOrigin::ReferenceRel) {
-                Path current = env.hierarchy.get_current_path(indent, path.name);
-                query = std::string(1, SIGN_QUERY) + current.resolve(query).name;
-            }
-            val::BaseValue::PointerType val = env.request_value(query, RequestType::Reference);
-            if (val)
-                set_value(std::move(val));
-            else
-                throw dip::SyntaxException(
-                    "Undefined reference",
-                    "The requested value reference `" + value_raw.at(0) + "` does not resolve to a value.",
-                    "Ensure that the referenced node exists and has a defined value.",
-                    __FILE__,
-                    __LINE__,
-                    line
-                );
+        case ValueOrigin::ReferenceRel:
+        case ValueOrigin::ReferenceRaw:
+            set_value(parse_reference(env, value_raw.at(0), std::nullopt, value_origin));
             break;
-        }
-        case ValueOrigin::ReferenceRaw: {
-            std::string source_code = env.request_code(value_raw.at(0));
-            val::Array::StringType source_value_raw;
-            val::Array::ShapeType source_value_shape;
-            parse_value(source_code, source_value_raw, source_value_shape);
-            set_value(cast_value(source_value_raw, source_value_shape));
-            break;
-        }
         case ValueOrigin::Expression: {
-            LogicalSolver solver(env, env.hierarchy.get_current_path(indent, path.name));
-            ValueNodeData data = solver.eval(value_raw.at(0));
-            set_value(std::move(data.value));
+            set_value(parse_expression(env, value_raw.at(0), std::nullopt, dtype));
             break;
         }
         default:
             break;
         }
-        // TODO: process expression
         return {};
     }
 

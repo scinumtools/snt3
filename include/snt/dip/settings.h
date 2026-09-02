@@ -5,8 +5,8 @@
 #include <map>
 #include <snt/core/settings.h>
 #include <sstream>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 namespace snt::dip {
 
@@ -126,6 +126,7 @@ namespace snt::dip {
         Expression,    // value was parsed from an expression
         Schema         // value is a schema name
     };
+    extern std::unordered_map<ValueOrigin, std::string> ValueOriginNames;
 
     enum class NodeDtype {
         None,
