@@ -118,12 +118,13 @@ namespace snt::dip {
         Number,        // value is a number
         String,        // value is a string
         Array,         // value was parsed from an array
-        Reference,     // value was obtained from a reference
-        ReferenceRaw,  // value was optained from a raw reference
-        ReferenceRel,  // value was obtained from a relative reference
-        ReferenceSelf, // value was obtained from a self reference
-        Function,      // value was returned from a function
-        Expression,    // value was parsed from an expression
+        Reference,     // value should be parsed from a reference
+        ReferenceRaw,  // value should be parsed from a raw reference
+        ReferenceRel,  // value should be parsed from a relative reference
+        ReferenceSelf, // value should be parsed from a self reference
+        Function,      // value should be parsed from a function
+        FunctionRes,   // value was parsed and set from a function request
+        Expression,    // value should be parsed from an expression
         Schema         // value is a schema name
     };
     extern std::unordered_map<ValueOrigin, std::string> ValueOriginNames;

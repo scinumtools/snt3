@@ -99,7 +99,6 @@ namespace snt::puq {
             }
             // list units with the same dimensions from the first unit system
             us.change(s1);
-            std::cout << "current dmap " << UnitSystem::current.data->DimensionMap.size() << std::endl;
             for (auto unit : UnitSystem::current.data->DimensionMap) {
                 if (Dimensions(1, unit.second.dimensions) != dim1)
                     continue;

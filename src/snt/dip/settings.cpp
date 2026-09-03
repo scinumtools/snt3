@@ -15,6 +15,7 @@ namespace snt::dip {
         {ValueOrigin::ReferenceRel, "relative reference"},
         {ValueOrigin::ReferenceSelf, "self reference"},
         {ValueOrigin::Function, "function"},
+        {ValueOrigin::FunctionRes, "function result"},
         {ValueOrigin::Expression, "expression"},
         {ValueOrigin::Schema, "schema"},
     };

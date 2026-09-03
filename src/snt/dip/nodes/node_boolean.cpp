@@ -38,6 +38,8 @@ namespace snt::dip {
                 line
             );
         switch (value_origin) {
+        case ValueOrigin::FunctionRes:
+            break;
         case ValueOrigin::Function:
             set_value(parse_function(env, value_raw.at(0), std::nullopt));
             break;
@@ -51,6 +53,7 @@ namespace snt::dip {
             break;
         }
         default:
+            set_value();
             break;
         }
         return {};

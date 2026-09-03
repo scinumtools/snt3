@@ -70,7 +70,7 @@ namespace snt::core {
                     out << ':' << *location.column;
                 }
             }
-            if (location.code)
+            if (location.code && !location.code->empty())
                 out << " | " << *location.code;
             return out.str();
         }

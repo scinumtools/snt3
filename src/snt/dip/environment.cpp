@@ -158,6 +158,13 @@ namespace snt::dip {
         case RequestType::Function: {
             FunctionList::TableFunctionType func = functions.get_table(request);
             new_nodes = func(*this);
+            for (auto& vnode : new_nodes) {
+                Line line;
+                line.code = "";
+                line.source = Source{request + "()", 0};
+                vnode->line = line;
+                vnode->value_origin = ValueOrigin::FunctionRes;
+            }
             break;
         }
         case RequestType::Reference: {

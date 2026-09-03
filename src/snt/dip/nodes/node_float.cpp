@@ -46,6 +46,8 @@ namespace snt::dip {
 
     BaseNode::ListType FloatNode::parse(Environment& env) {
         switch (value_origin) {
+        case ValueOrigin::FunctionRes:
+            break;
         case ValueOrigin::Function:
             set_value(parse_function(env, value_raw.at(0), units_raw));
             break;
@@ -59,8 +61,10 @@ namespace snt::dip {
             break;
         }
         default:
+            set_value();
             break;
         }
+        set_units();
         return {};
     }
 

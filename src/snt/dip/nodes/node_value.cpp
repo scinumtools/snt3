@@ -12,7 +12,7 @@ namespace snt::dip {
 
     ValueNode::ValueNode(const ValueNode& other)
         : units(other.units), tags(other.tags), constant(other.constant), metadata(other.metadata),
-          condition(other.condition), format(other.format), BaseNode(other) {
+          condition(other.condition), format(other.format), value_dtype(other.value_dtype), BaseNode(other) {
         options.reserve(other.options.size());
         for (const auto& option : other.options) {
             options.push_back({option.value->clone(), option.value_raw, option.units_raw});
@@ -38,14 +38,22 @@ namespace snt::dip {
         if (val->get_size() > 1) {
             dimension.clear();
             dimension.reserve(dims.size());
-            for (size_t dim : dims)
+            for (size_t dim : dims) {
                 dimension.push_back({dim, dim});
+            }
         }
         set_value(std::move(val));
     };
 
     ValueNode::ValueNode(const BaseNode::PointerType other, const NodeDtype dt, const core::DataType vdt)
         : value_dtype(vdt) {
+        dtype = dt;
+        path = other->path;
+        indent = other->indent;
+        line = other->line;
+    }
+
+    ValueNode::ValueNode(const ValueNode::PointerType other, const NodeDtype dt) : value_dtype(other->value_dtype) {
         dtype = dt;
         path = other->path;
         indent = other->indent;

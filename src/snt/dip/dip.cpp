@@ -272,16 +272,7 @@ namespace snt::dip {
                 target.branching.prepare_node(node);
                 // Clean node name from cases
                 node->path = Path(target.branching.clean_name(node->path.name));
-                // Set the node value an unit
-                // TODO: maybe this can be done after modifications?!
-                ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node);
-                if (vnode) {
-                    if (vnode->value == nullptr)
-                        vnode->set_value();
-                    if (!vnode->units)
-                        vnode->set_units();
-                }
-                // If node was previously defined, modify its value
+                //  If node was previously defined, modify its value
                 bool new_node = true;
                 for (size_t i = 0; i < target.nodes.size(); i++) {
                     if (target.nodes.at(i)->path.name == node->path.name) {
@@ -304,7 +295,8 @@ namespace snt::dip {
                                 node->line
                             );
                     }
-                    if (vnode == nullptr)
+                    ValueNode::PointerType vnode = std::dynamic_pointer_cast<ValueNode>(node);
+                    if (!vnode)
                         throw dip::ParserException(
                             "Cannot insert a node without a value into an environment",
                             "The node value is undefined and must be set before insertion into the environment.",

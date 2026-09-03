@@ -45,6 +45,8 @@ namespace snt::dip {
 
     BaseNode::ListType IntegerNode::parse(Environment& env) {
         switch (value_origin) {
+        case ValueOrigin::FunctionRes:
+            break;
         case ValueOrigin::Function:
             set_value(parse_function(env, value_raw.at(0), units_raw));
             break;
@@ -58,8 +60,10 @@ namespace snt::dip {
             break;
         }
         default:
+            set_value();
             break;
         }
+        set_units();
         return {};
     }
 
@@ -89,7 +93,7 @@ namespace snt::dip {
             const std::string integer_type = is_unsigned ? "unsigned integer" : "signed integer";
             throw dip::SyntaxException(
                 "Invalid integer cast",
-                "The value cannot be cast to the specified " + integer_type + " type from the given string: `" +
+                "The scalar value cannot be cast to the specified " + integer_type + " type from the given string: `" +
                     value_input + "`.",
                 is_unsigned ? "Use a valid non-negative integer within the range of the selected unsigned integer type."
                             : "Use a valid integer within the range of the selected signed integer type.",
@@ -170,7 +174,7 @@ namespace snt::dip {
 
             throw dip::SyntaxException(
                 "Invalid integer cast",
-                "The values cannot be cast to the specified " + integer_type + " type from the given strings: `" +
+                "The array values cannot be cast to the specified " + integer_type + " type from the given strings: `" +
                     oss.str() + "`.",
                 is_unsigned ? "Use valid non-negative integer values within the range of the selected unsigned "
                               "integer type."

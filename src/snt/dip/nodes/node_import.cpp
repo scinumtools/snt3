@@ -19,18 +19,14 @@ namespace snt::dip {
     }
 
     BaseNode::ListType ImportNode::parse(Environment& env) {
-        BaseNode::ListType nodes;
+        ValueNode::ListType vnodes;
         switch (value_origin) {
         case ValueOrigin::Function: {
-            ValueNode::ListType vnodes = env.request_group(value_raw.at(0), RequestType::Function);
-            for (const auto& node : vnodes)
-                nodes.push_back(node);
+            vnodes = env.request_group(value_raw.at(0), RequestType::Function);
             break;
         }
         case ValueOrigin::Reference: {
-            ValueNode::ListType vnodes = env.request_group(value_raw.at(0), RequestType::Reference);
-            for (const auto& node : vnodes)
-                nodes.push_back(node);
+            vnodes = env.request_group(value_raw.at(0), RequestType::Reference);
             break;
         }
         default:
@@ -44,14 +40,17 @@ namespace snt::dip {
             );
         }
         // update node settings
-        for (const auto& node : nodes) {
-            size_t size = node->value_raw.size();
-            node->indent += indent;
+        BaseNode::ListType nodes;
+        for (const auto& vnode : vnodes) {
+            vnode->indent += indent;
             if (!path.name.empty())
-                node->path = Path(path.name + std::string(1, SIGN_SEPARATOR) + node->path.name);
-            node->value_shape = {size};
-            if (node->dimension.empty())
-                node->dimension = {{size, size}};
+                vnode->path = Path(path.name + std::string(1, SIGN_SEPARATOR) + vnode->path.name);
+            size_t size = vnode->value_raw.size();
+            vnode->value_shape = {size};
+            if (vnode->dimension.empty() && size > 1) {
+                vnode->dimension = {{size, size}};
+            }
+            nodes.push_back(vnode);
         }
         return nodes;
     }

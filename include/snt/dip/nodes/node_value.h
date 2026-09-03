@@ -57,9 +57,9 @@ namespace snt::dip {
             std::string value_raw;
             std::string units_raw;
         };
-        core::DataType value_dtype;
 
       public:
+        core::DataType value_dtype;
         using PointerType = std::shared_ptr<ValueNode>;
         using ListType = std::deque<ValueNode::PointerType>;
 
@@ -85,6 +85,7 @@ namespace snt::dip {
         ValueNode(
             const BaseNode::PointerType other, const NodeDtype dt, const core::DataType vdt = core::DataType::None
         );
+        ValueNode(const ValueNode::PointerType other, const NodeDtype dt);
         ValueNode(const Path& pth, const core::DataType vdt, const NodeDtype dt = NodeDtype::None);
         ValueNode(
             const Path& pth,
