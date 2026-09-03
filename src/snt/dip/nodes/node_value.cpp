@@ -235,26 +235,29 @@ namespace snt::dip {
         if (node->dtype != NodeDtype::Modification && node->dtype != dtype)
             throw dip::SyntaxException(
                 "Type mismatch",
-                "A node of type `" + dtype_raw.at(1) + "` cannot modify a node of type `" + node->dtype_raw.at(1) +
-                    "`.",
+                "A node of type `" + NodeDtypeNames.at(dtype) + "` cannot modify a node of type `" +
+                    NodeDtypeNames.at(node->dtype) + "`.",
                 "Use a modification node or a node with a compatible type.",
                 __FILE__,
                 __LINE__,
                 line
             );
         // parse value from raw data
+        std::optional<std::string_view> units;
+        if (dtype == NodeDtype::Integer || dtype == NodeDtype::Float)
+            units = node->units_raw;
         val::BaseValue::PointerType value;
         switch (node->value_origin) {
         case ValueOrigin::Function:
-            value = parse_function(env, node->value_raw.at(0), node->units_raw);
+            value = parse_function(env, node->value_raw.at(0), units);
             break;
         case ValueOrigin::Reference:
         case ValueOrigin::ReferenceRel:
         case ValueOrigin::ReferenceRaw:
-            value = parse_reference(env, node->value_raw.at(0), node->units_raw, node->value_origin);
+            value = parse_reference(env, node->value_raw.at(0), units, node->value_origin);
             break;
         case ValueOrigin::Expression: {
-            value = parse_expression(env, node->value_raw.at(0), node->units_raw, dtype);
+            value = parse_expression(env, node->value_raw.at(0), units, dtype);
             break;
         }
         default:
