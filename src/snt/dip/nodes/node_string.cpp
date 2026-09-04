@@ -94,18 +94,20 @@ namespace snt::dip {
     void StringNode::validate_format() const {
         if (format.size() > 0) {
             std::regex pattern(format);
-            const val::ArrayValueStr valueT(value.get());
-            for (int i = 0; i < valueT.get_size(); i++) {
-                if (!std::regex_match(valueT.get_value(i), pattern)) {
-                    throw dip::SyntaxException(
-                        "Format mismatch",
-                        "The node value `" + valueT.get_value(i) + "` does not match the expected format `" + format +
-                            "`.",
-                        "Provide a string value that matches the specified regular expression format.",
-                        __FILE__,
-                        __LINE__,
-                        line
-                    );
+            if (value) {
+                const val::ArrayValueStr valueT(value.get());
+                for (int i = 0; i < valueT.get_size(); i++) {
+                    if (!std::regex_match(valueT.get_value(i), pattern)) {
+                        throw dip::SyntaxException(
+                            "Format mismatch",
+                            "The node value `" + valueT.get_value(i) + "` does not match the expected format `" +
+                                format + "`.",
+                            "Provide a string value that matches the specified regular expression format.",
+                            __FILE__,
+                            __LINE__,
+                            line
+                        );
+                    }
                 }
             }
         }

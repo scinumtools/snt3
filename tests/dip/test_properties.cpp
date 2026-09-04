@@ -60,53 +60,63 @@ TEST(Properties, Constant) {
 }
 
 TEST(Properties, Format) {
+    { // using basic regexp format
+        dip::DIP d;
+        d.add_string("foo str = \"bar\"");
+        d.add_string("  !format \"[a-z]+\"");
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 1); // format is not returned as a separate node
 
-    dip::DIP d;
-    d.add_string("foo str = \"bar\"");
-    d.add_string("  !format \"[a-z]+\"");
-    dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 1); // format is not returned as a separate node
+        dip::ValueNode::PointerType vnode = env.nodes.at(0);
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->format, "[a-z]+");
 
-    dip::ValueNode::PointerType vnode = env.nodes.at(0);
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->format, "[a-z]+");
-
-    // Test if cloning preserves the property
-    vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->path.name, "copy");
-    EXPECT_EQ(vnode->format, "[a-z]+");
-
-    // Throw an error if node value does not match expected format
-    d = dip::DIP();
-    d.add_string("foo str = \"sdf34\"");
-    d.add_string("  !format \"[a-z]+\"");
-    try {
-        d.parse();
-        FAIL() << "Expected dip::SyntaxException";
-    } catch (const dip::SyntaxException& e) {
-        EXPECT_EQ(e.info().message, "Format mismatch");
-        EXPECT_EQ(e.info().details, "The node value `sdf34` does not match the expected format `[a-z]+`.");
-        EXPECT_EQ(e.info().suggestion, "Provide a string value that matches the specified regular expression format.");
-    } catch (...) {
-        FAIL() << "Expected dip::SyntaxException";
+        // Test if cloning preserves the property
+        vnode = std::dynamic_pointer_cast<dip::ValueNode>(vnode->clone(dip::Path("copy")));
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->path.name, "copy");
+        EXPECT_EQ(vnode->format, "[a-z]+");
     }
-
-    // Throw an error if indent is not higher
-    d = dip::DIP();
-    d.add_string(
-        "  foo str = \"bar\"\n"
-        "!format \"[a-z]+\""
-    );
-    try {
-        d.parse();
-        FAIL() << "Expected dip::SyntaxException";
-    } catch (const dip::SyntaxException& e) {
-        EXPECT_EQ(e.info().message, "Node property has an invalid indent");
-        EXPECT_EQ(e.info().details, "The property is indented 0 spaces, but it should be 4 spaces.");
-        EXPECT_EQ(e.info().suggestion, "Indent the property 2 spaces more than the preceding node.");
-    } catch (...) {
-        FAIL() << "Expected dip::SyntaxException";
+    { // ignore format if value is none
+        dip::DIP d;
+        d.add_string("foo str = none");
+        d.add_string("  !format \"[a-z]+\"");
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 1); // format is not returned as a separate node
+    }
+    { // Throw an error if node value does not match expected format
+        dip::DIP d;
+        d.add_string("foo str = \"sdf34\"");
+        d.add_string("  !format \"[a-z]+\"");
+        try {
+            d.parse();
+            FAIL() << "Expected dip::SyntaxException";
+        } catch (const dip::SyntaxException& e) {
+            EXPECT_EQ(e.info().message, "Format mismatch");
+            EXPECT_EQ(e.info().details, "The node value `sdf34` does not match the expected format `[a-z]+`.");
+            EXPECT_EQ(
+                e.info().suggestion, "Provide a string value that matches the specified regular expression format."
+            );
+        } catch (...) {
+            FAIL() << "Expected dip::SyntaxException";
+        }
+    }
+    { // Throw an error if indent is not higher
+        dip::DIP d;
+        d.add_string(
+            "  foo str = \"bar\"\n"
+            "!format \"[a-z]+\""
+        );
+        try {
+            d.parse();
+            FAIL() << "Expected dip::SyntaxException";
+        } catch (const dip::SyntaxException& e) {
+            EXPECT_EQ(e.info().message, "Node property has an invalid indent");
+            EXPECT_EQ(e.info().details, "The property is indented 0 spaces, but it should be 4 spaces.");
+            EXPECT_EQ(e.info().suggestion, "Indent the property 2 spaces more than the preceding node.");
+        } catch (...) {
+            FAIL() << "Expected dip::SyntaxException";
+        }
     }
 }
 
