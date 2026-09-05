@@ -7,11 +7,13 @@ namespace py = pybind11;
 
 namespace snt::bind::python {
 
-    void init_value_base(py::module_& m);
+    void init_to_value(py::module_& m);
+
+    void init_from_value(py::module_& m);
 
     void init_val(py::module_& m) {
 
-        init_value_base(m);
+        init_to_value(m);
     };
 
 } // namespace snt::bind::python

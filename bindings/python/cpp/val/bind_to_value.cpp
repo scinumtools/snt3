@@ -1,4 +1,4 @@
-#include "../bindings/python/cpp/val/bind_value_base.h"
+#include "../bindings/python/cpp/val/bind_to_value.h"
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -12,7 +12,7 @@ namespace py = pybind11;
 
 namespace snt::bind::python {
 
-    void init_value_base(py::module_& m) {}
+    void init_to_value(py::module_& m) {}
 
     py::object to_python_value(const val::BaseValue::PointerType& value) {
         if (value == nullptr)

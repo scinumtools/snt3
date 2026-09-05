@@ -1,5 +1,5 @@
-#ifndef BINDIGS_PYTHON_DIP_VALUE_BASE_H
-#define BINDIGS_PYTHON_DIP_VALUE_BASE_H
+#ifndef BINDIGS_PYTHON_DIP_TO_VALUE_H
+#define BINDIGS_PYTHON_DIP_TO_VALUE_H
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -35,4 +35,4 @@ namespace snt::bind::python {
 
 } // namespace snt::bind::python
 
-#endif // BINDIGS_PYTHON_DIP_VALUE_BASE_H
+#endif // BINDIGS_PYTHON_DIP_TO_VALUE_H
