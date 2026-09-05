@@ -156,7 +156,7 @@ namespace snt::dip {
         ValueNode::ListType new_nodes;
         switch (rtype) {
         case RequestType::Function: {
-            FunctionList::TableFunctionType func = functions.get_table(request);
+            FunctionList::NodesFunctionType func = functions.get_nodes(request);
             new_nodes = func(*this);
             for (auto& vnode : new_nodes) {
                 Line line;

@@ -103,8 +103,8 @@ namespace snt::dip {
         env.functions.append_value(name, func);
     }
 
-    void DIP::add_node_function(const std::string& name, FunctionList::TableFunctionType func) {
-        env.functions.append_table(name, func);
+    void DIP::add_nodes_function(const std::string& name, FunctionList::NodesFunctionType func) {
+        env.functions.append_nodes(name, func);
     }
 
     std::string DIP::to_string() {

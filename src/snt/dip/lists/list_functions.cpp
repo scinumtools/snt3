@@ -17,7 +17,7 @@ namespace snt::dip {
             );
     }
 
-    void FunctionList::append_table(const std::string& name, TableFunctionType func) {
+    void FunctionList::append_nodes(const std::string& name, NodesFunctionType func) {
         auto result = table_functions.insert({name, func});
         if (!result.second)
             throw dip::EnvironmentException(
@@ -42,7 +42,7 @@ namespace snt::dip {
         return it->second;
     }
 
-    FunctionList::TableFunctionType FunctionList::get_table(const std::string& name) const {
+    FunctionList::NodesFunctionType FunctionList::get_nodes(const std::string& name) const {
         auto it = table_functions.find(name);
         if (it == table_functions.end())
             throw dip::EnvironmentException(

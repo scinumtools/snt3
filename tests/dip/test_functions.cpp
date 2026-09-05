@@ -137,8 +137,8 @@ TEST_F(Functions, ExceptionDimension) {
 TEST_F(Functions, TableNodes) {
 
     dip::DIP d;
-    d.add_node_function("scalar_nodes", FixtureFunctions::get_scalar_nodes);
-    d.add_node_function("array_nodes", FixtureFunctions::get_array_nodes);
+    d.add_nodes_function("scalar_nodes", FixtureFunctions::get_scalar_nodes);
+    d.add_nodes_function("array_nodes", FixtureFunctions::get_array_nodes);
     d.add_string("foo table = scalar_nodes()");
     d.add_string("bar table = array_nodes()");
     dip::Environment env = d.parse();
@@ -188,8 +188,8 @@ TEST_F(Functions, TableNodes) {
 TEST_F(Functions, ImportNodes) {
 
     dip::DIP d;
-    d.add_node_function("scalar_nodes", FixtureFunctions::get_scalar_nodes);
-    d.add_node_function("array_nodes", FixtureFunctions::get_array_nodes);
+    d.add_nodes_function("scalar_nodes", FixtureFunctions::get_scalar_nodes);
+    d.add_nodes_function("array_nodes", FixtureFunctions::get_array_nodes);
     d.add_string("foo");
     d.add_string("  scalar_nodes()");
     d.add_string("bar array_nodes()");

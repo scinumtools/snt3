@@ -101,7 +101,7 @@ namespace snt::dip {
          * @param name Name of the function
          * @param func Function pointer
          */
-        void add_node_function(const std::string& name, FunctionList::TableFunctionType func);
+        void add_nodes_function(const std::string& name, FunctionList::NodesFunctionType func);
 
         /**
          * Parse DIPL code lines
