@@ -28,18 +28,44 @@ namespace snt::bind::python {
         val.def(
             py::init(
                 [](const std::string& path, py::object value, py::object units) -> std::shared_ptr<dip::ValueNode> {
-                    std::shared_ptr<dip::ValueNode> node;
+                    // prepare value
+                    val::BaseValue::PointerType val;
                     if (py::isinstance<py::list>(value)) { // 1-D list
-                        node = from_python_list(path, value, units);
+                        val = from_python_list(path, value, units);
                     } else if (py::isinstance<py::array>(value)) { // NumPy array
-                        node = from_python_array(path, value, units);
+                        val = from_python_array(path, value, units);
                     } else {
-                        node = from_python_scalar(path, value, units);
+                        val = from_python_scalar(path, value, units);
                     }
-
-                    if (node)
-                        return node;
-                    else
+                    // prepare quantity
+                    std::optional<puq::Quantity> quantity;
+                    if (!units.is_none()) {
+                        quantity = puq::Quantity(units.cast<std::string>());
+                        if (quantity.has_value() && (val->get_dtype() == core::DataType::Boolean ||
+                                                     val->get_dtype() == core::DataType::String)) {
+                            throw dip::PybindException(
+                                "Units not supported for value type",
+                                "A value of data type `" + core::DataTypeNames[val->get_dtype()] +
+                                    "` cannot have units. Units are only supported for integer "
+                                    "and floating-point values.",
+                                "Remove the units or provide a numeric value.",
+                                __FILE__,
+                                __LINE__
+                            );
+                        }
+                    }
+                    // prepare a value node
+                    std::shared_ptr<dip::ValueNode> node;
+                    switch (val->get_dtype()) {
+                    case core::DataType::Boolean:
+                        return std::make_shared<dip::BooleanNode>(path, std::move(val));
+                    case core::DataType::Integer64:
+                        return std::make_shared<dip::IntegerNode>(path, std::move(val), std::move(quantity));
+                    case core::DataType::Float64:
+                        return std::make_shared<dip::FloatNode>(path, std::move(val), std::move(quantity));
+                    case core::DataType::String:
+                        return std::make_shared<dip::StringNode>(path, std::move(val));
+                    default:
                         throw dip::PybindException(
                             "Invalid ValueNode type",
                             "A ValueNode value must have type bool, int, float, str, or list.",
@@ -47,6 +73,7 @@ namespace snt::bind::python {
                             __FILE__,
                             __LINE__
                         );
+                    }
                 }
             ),
             py::arg("path"),

@@ -11,11 +11,11 @@ namespace py = pybind11;
 
 namespace snt::bind::python {
 
-    std::shared_ptr<dip::ValueNode> from_python_scalar(const std::string& path, py::object value, py::object units);
+    val::BaseValue::PointerType from_python_scalar(const std::string& path, py::object value, py::object units);
 
-    std::shared_ptr<dip::ValueNode> from_python_list(const std::string& path, py::object value, py::object units);
+    val::BaseValue::PointerType from_python_list(const std::string& path, py::object value, py::object units);
 
-    std::shared_ptr<dip::ValueNode> from_python_array(const std::string& path, py::object value, py::object units);
+    val::BaseValue::PointerType from_python_array(const std::string& path, py::object value, py::object units);
 
 } // namespace snt::bind::python
 

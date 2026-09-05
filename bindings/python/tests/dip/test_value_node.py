@@ -27,9 +27,9 @@ def test_value_bool():
     with pytest.raises(PybindException) as exc_info:
         ValueNode("foo.bar", True, "m")
     exc = exc_info.value    
-    assert exc.message == "Units not supported for boolean and string values"
-    assert exc.details == "Boolean and string values cannot have an associated quantity or unit."
-    assert exc.suggestion == "Remove the units argument when providing a boolean and string values."
+    assert exc.message == "Units not supported for value type"
+    assert exc.details == "A value of data type `bool` cannot have units. Units are only supported for integer and floating-point values."
+    assert exc.suggestion == "Remove the units or provide a numeric value."
             
 def test_value_integer():
 
@@ -101,6 +101,6 @@ def test_value_string():
     with pytest.raises(PybindException) as exc_info:
         ValueNode("foo.bar", "baz", "m")
     exc = exc_info.value    
-    assert exc.message == "Units not supported for boolean and string values"
-    assert exc.details == "Boolean and string values cannot have an associated quantity or unit."
-    assert exc.suggestion == "Remove the units argument when providing a boolean and string values."
+    assert exc.message == "Units not supported for value type"
+    assert exc.details == "A value of data type `str` cannot have units. Units are only supported for integer and floating-point values."
+    assert exc.suggestion == "Remove the units or provide a numeric value."

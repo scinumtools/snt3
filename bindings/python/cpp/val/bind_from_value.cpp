@@ -19,63 +19,25 @@ namespace snt::bind::python {
 
     void init_from_value(py::module_& m) {}
 
-    std::shared_ptr<dip::ValueNode> from_python_scalar(const std::string& path, py::object value, py::object units) {
-        std::optional<puq::Quantity> quantity;
-        if (!units.is_none())
-            quantity = puq::Quantity(units.cast<std::string>());
-
-        if (py::isinstance<py::bool_>(value) || py::isinstance<py::str>(value)) {
-            if (quantity.has_value()) {
-                throw dip::PybindException(
-                    "Units not supported for boolean and string values",
-                    "Boolean and string values cannot have an associated quantity or unit.",
-                    "Remove the units argument when providing a boolean and string values.",
-                    __FILE__,
-                    __LINE__
-                );
-            }
-        }
+    val::BaseValue::PointerType from_python_scalar(const std::string& path, py::object value, py::object units) {
 
         // Scalar bool
-        if (py::isinstance<py::bool_>(value)) {
-            return std::make_shared<dip::BooleanNode>(
-                path, std::make_unique<val::ArrayValue<uint8_t>>(value.cast<bool>() ? 1 : 0, core::DataType::Boolean)
-            );
-        }
-
+        if (py::isinstance<py::bool_>(value))
+            return std::make_unique<val::ArrayValue<uint8_t>>(value.cast<bool>() ? 1 : 0, core::DataType::Boolean);
         // Scalar integer
-        if (py::isinstance<py::int_>(value)) {
-            return std::make_shared<dip::IntegerNode>(
-                path,
-                std::make_unique<val::ArrayValue<int64_t>>(value.cast<int64_t>(), core::DataType::Integer64),
-                std::move(quantity)
-            );
-        }
-
+        if (py::isinstance<py::int_>(value))
+            return std::make_unique<val::ArrayValue<int64_t>>(value.cast<int64_t>(), core::DataType::Integer64);
         // Scalar float
-        if (py::isinstance<py::float_>(value)) {
-            return std::make_shared<dip::FloatNode>(
-                path,
-                std::make_unique<val::ArrayValue<double>>(value.cast<double>(), core::DataType::Float64),
-                std::move(quantity)
-            );
-        }
-
+        if (py::isinstance<py::float_>(value))
+            return std::make_unique<val::ArrayValue<double>>(value.cast<double>(), core::DataType::Float64);
         // Scalar string
-        if (py::isinstance<py::str>(value)) {
-            return std::make_shared<dip::StringNode>(
-                path, std::make_unique<val::ArrayValue<std::string>>(value.cast<std::string>(), core::DataType::String)
-            );
-        }
+        if (py::isinstance<py::str>(value))
+            return std::make_unique<val::ArrayValue<std::string>>(value.cast<std::string>(), core::DataType::String);
 
         return nullptr;
     }
 
-    std::shared_ptr<dip::ValueNode> from_python_list(const std::string& path, py::object value, py::object units) {
-        std::optional<puq::Quantity> quantity;
-        if (!units.is_none())
-            quantity = puq::Quantity(units.cast<std::string>());
-
+    val::BaseValue::PointerType from_python_list(const std::string& path, py::object value, py::object units) {
         py::list list = value.cast<py::list>();
 
         if (list.empty()) {
@@ -89,18 +51,6 @@ namespace snt::bind::python {
         }
 
         py::handle first = list[0];
-
-        if (py::isinstance<py::bool_>(first) || py::isinstance<py::str>(first)) {
-            if (quantity.has_value()) {
-                throw dip::PybindException(
-                    "Units not supported for boolean and string values",
-                    "Boolean and string values cannot have an associated quantity or unit.",
-                    "Remove the units argument when providing a boolean and string values.",
-                    __FILE__,
-                    __LINE__
-                );
-            }
-        }
 
         // List of bool
         if (py::isinstance<py::bool_>(first)) {
@@ -118,9 +68,7 @@ namespace snt::bind::python {
                 }
                 data.push_back(item.cast<bool>() ? 1 : 0);
             }
-            return std::make_shared<dip::BooleanNode>(
-                path, std::make_unique<val::ArrayValue<uint8_t>>(data, core::DataType::Boolean)
-            );
+            return std::make_unique<val::ArrayValue<uint8_t>>(data, core::DataType::Boolean);
         }
 
         // List of int
@@ -142,9 +90,7 @@ namespace snt::bind::python {
                 }
                 data.push_back(item.cast<int64_t>());
             }
-            return std::make_shared<dip::IntegerNode>(
-                path, std::make_unique<val::ArrayValue<int64_t>>(data, core::DataType::Integer64), std::move(quantity)
-            );
+            return std::make_unique<val::ArrayValue<int64_t>>(data, core::DataType::Integer64);
         }
 
         // List of float
@@ -164,9 +110,7 @@ namespace snt::bind::python {
 
                 data.push_back(item.cast<double>());
             }
-            return std::make_shared<dip::FloatNode>(
-                path, std::make_unique<val::ArrayValue<double>>(data, core::DataType::Float64), std::move(quantity)
-            );
+            return std::make_unique<val::ArrayValue<double>>(data, core::DataType::Float64);
         }
 
         // List of string
@@ -185,9 +129,7 @@ namespace snt::bind::python {
                 }
                 data.push_back(item.cast<std::string>());
             }
-            return std::make_shared<dip::StringNode>(
-                path, std::make_unique<val::ArrayValue<std::string>>(data, core::DataType::String)
-            );
+            return std::make_unique<val::ArrayValue<std::string>>(data, core::DataType::String);
         }
         throw dip::PybindException(
             "Invalid ValueNode list type",
@@ -196,29 +138,12 @@ namespace snt::bind::python {
             __FILE__,
             __LINE__
         );
-
         return nullptr;
     }
 
-    std::shared_ptr<dip::ValueNode> from_python_array(const std::string& path, py::object value, py::object units) {
-        std::optional<puq::Quantity> quantity;
-        if (!units.is_none())
-            quantity = puq::Quantity(units.cast<std::string>());
-
+    val::BaseValue::PointerType from_python_array(const std::string& path, py::object value, py::object units) {
         py::array array = value.cast<py::array>();
         py::buffer_info info = array.request();
-
-        if (array.dtype().is(py::dtype::of<bool>()) || array.dtype().kind() == 'U' || array.dtype().kind() == 'S') {
-            if (quantity.has_value()) {
-                throw dip::PybindException(
-                    "Units not supported for boolean and string values",
-                    "Boolean and string values cannot have an associated quantity or unit.",
-                    "Remove the units argument when providing a boolean and string values.",
-                    __FILE__,
-                    __LINE__
-                );
-            }
-        }
 
         if (array.dtype().is(py::dtype::of<bool>())) {
 
@@ -229,9 +154,7 @@ namespace snt::bind::python {
                 data[i] = ptr[i] ? 1 : 0;
             }
             val::Array::ShapeType shape(info.shape.begin(), info.shape.end());
-            return std::make_shared<dip::BooleanNode>(
-                path, std::make_unique<val::ArrayValue<uint8_t>>(data, shape, core::DataType::Boolean)
-            );
+            return std::make_unique<val::ArrayValue<uint8_t>>(data, shape, core::DataType::Boolean);
 
         } else if (array.dtype().is(py::dtype::of<int64_t>())) {
 
@@ -241,11 +164,7 @@ namespace snt::bind::python {
             const int64_t* ptr = static_cast<const int64_t*>(int_info.ptr);
             std::vector<int64_t> data(ptr, ptr + int_info.size);
             val::Array::ShapeType shape(int_info.shape.begin(), int_info.shape.end());
-            return std::make_shared<dip::IntegerNode>(
-                path,
-                std::make_unique<val::ArrayValue<int64_t>>(data, shape, core::DataType::Integer64),
-                std::move(quantity)
-            );
+            return std::make_unique<val::ArrayValue<int64_t>>(data, shape, core::DataType::Integer64);
 
         } else if (array.dtype().is(py::dtype::of<double>())) {
 
@@ -253,11 +172,7 @@ namespace snt::bind::python {
             const double* ptr = static_cast<const double*>(info.ptr);
             std::vector<double> data(ptr, ptr + info.size);
             val::Array::ShapeType shape(info.shape.begin(), info.shape.end());
-            return std::make_shared<dip::FloatNode>(
-                path,
-                std::make_unique<val::ArrayValue<double>>(data, shape, core::DataType::Float64),
-                std::move(quantity)
-            );
+            return std::make_unique<val::ArrayValue<double>>(data, shape, core::DataType::Float64);
 
         } else if (array.dtype().kind() == 'U' || array.dtype().kind() == 'S') {
 
@@ -269,9 +184,7 @@ namespace snt::bind::python {
                 data.push_back(item.cast<std::string>());
             }
             val::Array::ShapeType shape(info.shape.begin(), info.shape.end());
-            return std::make_shared<dip::StringNode>(
-                path, std::make_unique<val::ArrayValue<std::string>>(data, shape, core::DataType::String)
-            );
+            return std::make_unique<val::ArrayValue<std::string>>(data, shape, core::DataType::String);
 
         } else {
             throw dip::PybindException(
