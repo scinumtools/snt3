@@ -94,14 +94,14 @@ namespace snt::dip {
          * @param name Name of the function
          * @param func Function pointer
          */
-        void add_value_function(const std::string& name, FunctionList::ValueFunctionType func);
+        void add_function_value(const std::string& name, FunctionList::ValueFunctionType func);
 
         /**
          * Add function that returns list of nodes
          * @param name Name of the function
          * @param func Function pointer
          */
-        void add_nodes_function(const std::string& name, FunctionList::NodesFunctionType func);
+        void add_function_nodes(const std::string& name, FunctionList::NodesFunctionType func);
 
         /**
          * Parse DIPL code lines

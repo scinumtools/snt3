@@ -12,8 +12,8 @@ TEST_F(Functions, BooleanValues) {
 
     // define scalar
     dip::DIP d;
-    d.add_value_function("scalar_value", FixtureFunctions::get_scalar_boolean);
-    d.add_value_function("array_value", FixtureFunctions::get_array_boolean);
+    d.add_function_value("scalar_value", FixtureFunctions::get_scalar_boolean);
+    d.add_function_value("array_value", FixtureFunctions::get_array_boolean);
     d.add_string("foo bool = scalar_value()");
     d.add_string("bar bool[3] = array_value()");
     dip::Environment env = d.parse();
@@ -34,8 +34,8 @@ TEST_F(Functions, IntegerValues) {
 
     // define scalar
     dip::DIP d;
-    d.add_value_function("scalar_value", FixtureFunctions::get_scalar_integer);
-    d.add_value_function("array_value", FixtureFunctions::get_array_integer);
+    d.add_function_value("scalar_value", FixtureFunctions::get_scalar_integer);
+    d.add_function_value("array_value", FixtureFunctions::get_array_integer);
     d.add_string("foo int = scalar_value()");
     d.add_string("bar int[2,2] = array_value()");
     dip::Environment env = d.parse();
@@ -56,8 +56,8 @@ TEST_F(Functions, FloatValues) {
 
     // define scalar
     dip::DIP d;
-    d.add_value_function("scalar_value", FixtureFunctions::get_scalar_double);
-    d.add_value_function("array_value", FixtureFunctions::get_array_double);
+    d.add_function_value("scalar_value", FixtureFunctions::get_scalar_double);
+    d.add_function_value("array_value", FixtureFunctions::get_array_double);
     d.add_string("foo float = scalar_value()");
     d.add_string("bar float[3] = array_value()");
     dip::Environment env = d.parse();
@@ -78,8 +78,8 @@ TEST_F(Functions, StringValues) {
 
     // define scalar
     dip::DIP d;
-    d.add_value_function("scalar_value", FixtureFunctions::get_scalar_string);
-    d.add_value_function("array_value", FixtureFunctions::get_array_string);
+    d.add_function_value("scalar_value", FixtureFunctions::get_scalar_string);
+    d.add_function_value("array_value", FixtureFunctions::get_array_string);
     d.add_string("foo str = scalar_value()");
     d.add_string("bar str[3] = array_value()");
     dip::Environment env = d.parse();
@@ -100,7 +100,7 @@ TEST_F(Functions, DataTypeConversion) {
 
     // returning incompatible value
     dip::DIP d;
-    d.add_value_function("foo", FixtureFunctions::get_scalar_boolean);
+    d.add_function_value("foo", FixtureFunctions::get_scalar_boolean);
     d.add_string("bar str = foo()");
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 1);
@@ -115,7 +115,7 @@ TEST_F(Functions, ExceptionDimension) {
 
     // returning incompatible value
     dip::DIP d;
-    d.add_value_function("foo", FixtureFunctions::get_array_string);
+    d.add_function_value("foo", FixtureFunctions::get_array_string);
     d.add_string("bar str = foo()");
     try {
         d.parse();
@@ -137,8 +137,8 @@ TEST_F(Functions, ExceptionDimension) {
 TEST_F(Functions, TableNodes) {
 
     dip::DIP d;
-    d.add_nodes_function("scalar_nodes", FixtureFunctions::get_scalar_nodes);
-    d.add_nodes_function("array_nodes", FixtureFunctions::get_array_nodes);
+    d.add_function_nodes("scalar_nodes", FixtureFunctions::get_scalar_nodes);
+    d.add_function_nodes("array_nodes", FixtureFunctions::get_array_nodes);
     d.add_string("foo table = scalar_nodes()");
     d.add_string("bar table = array_nodes()");
     dip::Environment env = d.parse();
@@ -188,8 +188,8 @@ TEST_F(Functions, TableNodes) {
 TEST_F(Functions, ImportNodes) {
 
     dip::DIP d;
-    d.add_nodes_function("scalar_nodes", FixtureFunctions::get_scalar_nodes);
-    d.add_nodes_function("array_nodes", FixtureFunctions::get_array_nodes);
+    d.add_function_nodes("scalar_nodes", FixtureFunctions::get_scalar_nodes);
+    d.add_function_nodes("array_nodes", FixtureFunctions::get_array_nodes);
     d.add_string("foo");
     d.add_string("  scalar_nodes()");
     d.add_string("bar array_nodes()");

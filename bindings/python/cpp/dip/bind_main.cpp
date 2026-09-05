@@ -2,6 +2,7 @@
 #include <locale>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <pybind11/stl/filesystem.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
@@ -47,8 +48,20 @@ namespace snt::bind::python {
         );
         dip.def("add_source", &dip::DIP::add_source, py::arg("source_name"), py::arg("source_file"));
         dip.def("add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"));
-        // dip.def("add_value_function", &dip::DIP::add_value_function, py::arg("name"), py::arg(""))
-        // dip.def("add_node_function", &dip::DIP::add_node_function, py::arg("name"), py::arg(""))
+
+        // dip.def("add_function_value", [](dip::DIP& self, const std::string& name, py::function func) {
+        //     self.add_function_value(name, [func](const dip::Environment& env) {
+        //         py::gil_scoped_acquire gil;
+        //         return func(env).cast<val::BaseValue::PointerType>();
+        //     });
+        // });
+        dip.def("add_function_nodes", [](dip::DIP& self, const std::string& name, py::function func) {
+            self.add_function_nodes(name, [func](const dip::Environment& env) {
+                py::gil_scoped_acquire gil;
+                return func(env).cast<dip::ValueNode::ListType>();
+            });
+        });
+
         dip.def("parse", &dip::DIP::parse);
         // dip.def("parse_docs", &dip::DIP::parse_docs);
 

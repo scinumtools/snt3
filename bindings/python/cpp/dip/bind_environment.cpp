@@ -23,6 +23,7 @@ namespace snt::bind::python {
             [](const dip::NodeList<dip::ValueNode>& self, size_t i) { return self.at(i); },
             py::arg("node")
         );
+        nl.def("size", &dip::NodeList<dip::ValueNode>::size);
 
         auto env = py::class_<dip::Environment>(m, "Environment");
         env.def(py::init<>());

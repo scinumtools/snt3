@@ -1,6 +1,7 @@
 #ifndef DIP_FUNCTION_LIST_H
 #define DIP_FUNCTION_LIST_H
 
+#include <functional>
 #include <map>
 #include <snt/dip/nodes/node_value.h>
 
@@ -10,9 +11,9 @@ namespace snt::dip {
 
     class FunctionList {
       public:
-        using ValueFunctionType = val::BaseValue::PointerType (*)(const Environment& env);
-        using DataFunctionType = ValueNodeData (*)(const Environment& env);
-        using NodesFunctionType = ValueNode::ListType (*)(const Environment& env);
+        using ValueFunctionType = std::function<val::BaseValue::PointerType(const Environment&)>;
+        using DataFunctionType = std::function<ValueNodeData(const Environment&)>;
+        using NodesFunctionType = std::function<ValueNode::ListType(const Environment&)>;
 
       private:
         std::map<std::string, ValueFunctionType> value_functions;
