@@ -11,11 +11,33 @@ namespace py = pybind11;
 
 namespace snt::bind::python {
 
-    val::BaseValue::PointerType from_python_scalar(const std::string& path, py::object value, py::object units);
+    /**
+     * Parse a SNT array value from a python object
+     * @param value Python object with a value
+     * @return Pointer to a SNT array value
+     */
+    val::BaseValue::PointerType from_python(py::object value);
 
-    val::BaseValue::PointerType from_python_list(const std::string& path, py::object value, py::object units);
+    /**
+     * Parse a SNT array value from a python scalar object
+     * @param value Python object with a value
+     * @return Pointer to a SNT array value
+     */
+    val::BaseValue::PointerType from_python_scalar(py::object value);
 
-    val::BaseValue::PointerType from_python_array(const std::string& path, py::object value, py::object units);
+    /**
+     * Parse a SNT array value from a python list object
+     * @param value Python object with a value
+     * @return Pointer to a SNT array value
+     */
+    val::BaseValue::PointerType from_python_list(py::object value);
+
+    /**
+     * Parse a SNT array value from a numpy array object
+     * @param value Python object with a value
+     * @return Pointer to a SNT array value
+     */
+    val::BaseValue::PointerType from_python_array(py::object value);
 
 } // namespace snt::bind::python
 

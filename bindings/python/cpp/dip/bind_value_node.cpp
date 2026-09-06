@@ -23,20 +23,27 @@ namespace snt::bind::python {
 
     void init_value_node(py::module_& m) {
 
+        auto vdata = py::class_<dip::ValueNodeData>(m, "ValueNodeData");
+        vdata.def(
+            py::init([](py::object value, py::object units) {
+                dip::ValueNodeData data;
+                data.value = from_python(value);
+                if (!units.is_none()) {
+                    data.units = puq::Quantity(units.cast<std::string>());
+                }
+                return data;
+            }),
+            py::arg("value"),
+            py::arg("units") = py::none()
+        );
+
         auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(m, "ValueNode");
 
         val.def(
             py::init(
                 [](const std::string& path, py::object value, py::object units) -> std::shared_ptr<dip::ValueNode> {
                     // prepare value
-                    val::BaseValue::PointerType val;
-                    if (py::isinstance<py::list>(value)) { // 1-D list
-                        val = from_python_list(path, value, units);
-                    } else if (py::isinstance<py::array>(value)) { // NumPy array
-                        val = from_python_array(path, value, units);
-                    } else {
-                        val = from_python_scalar(path, value, units);
-                    }
+                    val::BaseValue::PointerType val = from_python(value);
                     // prepare quantity
                     std::optional<puq::Quantity> quantity;
                     if (!units.is_none()) {

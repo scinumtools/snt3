@@ -1,3 +1,5 @@
+#include "../val/bind_from_value.h"
+
 #include <codecvt>
 #include <locale>
 #include <pybind11/numpy.h>
@@ -49,12 +51,20 @@ namespace snt::bind::python {
         dip.def("add_source", &dip::DIP::add_source, py::arg("source_name"), py::arg("source_file"));
         dip.def("add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"));
 
-        // dip.def("add_function_value", [](dip::DIP& self, const std::string& name, py::function func) {
+        // dip_class.def("add_function_value", [](dip::DIP& self, const std::string& name, py::function func) {
         //     self.add_function_value(name, [func](const dip::Environment& env) {
         //         py::gil_scoped_acquire gil;
-        //         return func(env).cast<val::BaseValue::PointerType>();
+        //         return func(env).cast<dip::ValueNodeData>();
         //     });
         // });
+
+        dip.def("add_function_value", [](dip::DIP& self, const std::string& name, py::function func) {
+            self.add_function_value(name, [func](const dip::Environment& env) {
+                py::object result = func(env);
+                return from_python(result);
+            });
+        });
+
         dip.def("add_function_nodes", [](dip::DIP& self, const std::string& name, py::function func) {
             self.add_function_nodes(name, [func](const dip::Environment& env) {
                 py::gil_scoped_acquire gil;

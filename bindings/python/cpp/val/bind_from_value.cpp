@@ -19,7 +19,27 @@ namespace snt::bind::python {
 
     void init_from_value(py::module_& m) {}
 
-    val::BaseValue::PointerType from_python_scalar(const std::string& path, py::object value, py::object units) {
+    val::BaseValue::PointerType from_python(py::object value) {
+        val::BaseValue::PointerType val;
+        if (py::isinstance<py::list>(value)) { // 1-D list
+            val = from_python_list(value);
+        } else if (py::isinstance<py::array>(value)) { // NumPy array
+            val = from_python_array(value);
+        } else {
+            val = from_python_scalar(value);
+        }
+        if (!val)
+            throw dip::PybindException(
+                "Invalid Python value",
+                "The provided Python value could not be converted to a supported value type.",
+                "Provide a valid scalar, list, or NumPy array.",
+                __FILE__,
+                __LINE__
+            );
+        return std::move(val);
+    }
+
+    val::BaseValue::PointerType from_python_scalar(py::object value) {
 
         // Scalar bool
         if (py::isinstance<py::bool_>(value))
@@ -37,7 +57,7 @@ namespace snt::bind::python {
         return nullptr;
     }
 
-    val::BaseValue::PointerType from_python_list(const std::string& path, py::object value, py::object units) {
+    val::BaseValue::PointerType from_python_list(py::object value) {
         py::list list = value.cast<py::list>();
 
         if (list.empty()) {
@@ -141,7 +161,7 @@ namespace snt::bind::python {
         return nullptr;
     }
 
-    val::BaseValue::PointerType from_python_array(const std::string& path, py::object value, py::object units) {
+    val::BaseValue::PointerType from_python_array(py::object value) {
         py::array array = value.cast<py::array>();
         py::buffer_info info = array.request();
 
