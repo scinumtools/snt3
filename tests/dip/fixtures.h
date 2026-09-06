@@ -15,36 +15,36 @@ using namespace snt;
 class FixtureFunctions : public ::testing::Test {
   protected:
     // scalar values
-    static val::BaseValue::PointerType get_scalar_boolean(const dip::Environment& env) {
-        return std::make_unique<val::ArrayValueBool>(true);
+    static dip::ValueNodeData get_scalar_boolean(const dip::Environment& env) {
+        return dip::ValueNodeData{std::make_unique<val::ArrayValueBool>(true)};
     }
-    static val::BaseValue::PointerType get_scalar_integer(const dip::Environment& env) {
-        return std::make_unique<val::ArrayValueInt32>(2);
+    static dip::ValueNodeData get_scalar_integer(const dip::Environment& env) {
+        return dip::ValueNodeData{std::make_unique<val::ArrayValueInt32>(2)};
     }
-    static val::BaseValue::PointerType get_scalar_double(const dip::Environment& env) {
-        return std::make_unique<val::ArrayValueFloat64>(2.34e5);
+    static dip::ValueNodeData get_scalar_double(const dip::Environment& env) {
+        return dip::ValueNodeData{std::make_unique<val::ArrayValueFloat64>(2.34e5)};
     }
-    static val::BaseValue::PointerType get_scalar_string(const dip::Environment& env) {
-        return std::make_unique<val::ArrayValueStr>("string");
+    static dip::ValueNodeData get_scalar_string(const dip::Environment& env) {
+        return dip::ValueNodeData{std::make_unique<val::ArrayValueStr>("string")};
     }
 
     // array values
-    static val::BaseValue::PointerType get_array_boolean(const dip::Environment& env) {
+    static dip::ValueNodeData get_array_boolean(const dip::Environment& env) {
         std::vector<bool> val = {false, true, false};
-        return std::make_unique<val::ArrayValueBool>(val);
+        return dip::ValueNodeData{std::make_unique<val::ArrayValueBool>(val)};
     }
-    static val::BaseValue::PointerType get_array_integer(const dip::Environment& env) {
+    static dip::ValueNodeData get_array_integer(const dip::Environment& env) {
         std::vector<int> val = {2, 3, 4, 5};
         val::Array::ShapeType sh = {2, 2};
-        return std::make_unique<val::ArrayValueInt32>(val, sh);
+        return dip::ValueNodeData{std::make_unique<val::ArrayValueInt32>(val, sh)};
     }
-    static val::BaseValue::PointerType get_array_double(const dip::Environment& env) {
+    static dip::ValueNodeData get_array_double(const dip::Environment& env) {
         std::vector<double> val = {2.34e5, 3.45e6, 4.56e7};
-        return std::make_unique<val::ArrayValueFloat64>(val);
+        return dip::ValueNodeData{std::make_unique<val::ArrayValueFloat64>(val)};
     }
-    static val::BaseValue::PointerType get_array_string(const dip::Environment& env) {
+    static dip::ValueNodeData get_array_string(const dip::Environment& env) {
         std::vector<std::string> val = {"foo", "bar", "baz"};
-        return std::make_unique<val::ArrayValueStr>(val);
+        return dip::ValueNodeData{std::make_unique<val::ArrayValueStr>(val)};
     }
 
     // node lists

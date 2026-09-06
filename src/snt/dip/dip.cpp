@@ -99,7 +99,7 @@ namespace snt::dip {
         env.units.append(uname, uenv);
     }
 
-    void DIP::add_function_value(const std::string& name, FunctionList::ValueFunctionType func) {
+    void DIP::add_function_value(const std::string& name, FunctionList::DataFunctionType func) {
         env.functions.append_value(name, func);
     }
 

@@ -38,7 +38,8 @@ namespace snt::dip {
 
         switch (rtype) {
         case RequestType::Function: {
-            dip::MissingException("Functions in the request_node_data are not implemented yet.", __FILE__, __LINE__);
+            FunctionList::DataFunctionType func = functions.get_value(request);
+            new_value = func(*this);
             break;
         }
         case RequestType::Reference: {
@@ -73,8 +74,41 @@ namespace snt::dip {
         val::BaseValue::PointerType new_value = nullptr;
         switch (rtype) {
         case RequestType::Function: {
-            FunctionList::ValueFunctionType func = functions.get_value(request);
-            new_value = func(*this);
+            FunctionList::DataFunctionType func = functions.get_value(request);
+            ValueNodeData new_data = func(*this);
+            new_value = std::move(new_data.value);
+            if (to_unit && to_unit.value() != core::KEYWORD_NONE) {
+                Line line{"", Source{request, 0}};
+                // NOTE: If unit conversion is not required, the to_unit should be set to
+                // "none". This is usefull if we want to simply get a reference node as it is.
+                if (!new_data.units && !to_unit->empty()) {
+                    throw dip::UnitException(
+                        "Dimension mismatch",
+                        "The final quantity should have the physical dimension `" + std::string(*to_unit) +
+                            "`, but the converted quantity has no physical dimensions.",
+                        "Check the units of the input quantity.",
+                        __FILE__,
+                        __LINE__,
+                        line // TODO:: this is a referenced node, we should show also referencing node
+                    );
+                } else if (new_data.units && to_unit->empty()) {
+                    throw dip::UnitException(
+                        "Dimension mismatch",
+                        "The final quantity should have no physical dimensions, but the converted quantity has "
+                        "physical dimensions `" +
+                            new_data.units->to_string() + "`.",
+                        "Check the units of the input quantity.",
+                        __FILE__,
+                        __LINE__,
+                        line // TODO:: this is a referenced node, we should show also referencing node
+                    );
+                } else if (new_data.units) {
+                    puq::Quantity quantity = std::move(new_value) * (*new_data.units);
+                    quantity = quantity.convert(std::string(to_unit.value()));
+                    new_value = std::move(quantity.measurement.result.estimate);
+                    break;
+                }
+            }
             break;
         }
         case RequestType::Reference: {
@@ -91,8 +125,7 @@ namespace snt::dip {
                     }
                     if (to_unit && to_unit.value() != core::KEYWORD_NONE) {
                         // NOTE: If unit conversion is not required, the to_unit should be set to
-                        // "none".
-                        //       This is usefull if we want to simply get a reference node as it is.
+                        // "none". This is usefull if we want to simply get a reference node as it is.
                         if (!vnode->units && !to_unit->empty()) {
                             throw dip::UnitException(
                                 "Dimension mismatch",

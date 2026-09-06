@@ -51,17 +51,10 @@ namespace snt::bind::python {
         dip.def("add_source", &dip::DIP::add_source, py::arg("source_name"), py::arg("source_file"));
         dip.def("add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"));
 
-        // dip_class.def("add_function_value", [](dip::DIP& self, const std::string& name, py::function func) {
-        //     self.add_function_value(name, [func](const dip::Environment& env) {
-        //         py::gil_scoped_acquire gil;
-        //         return func(env).cast<dip::ValueNodeData>();
-        //     });
-        // });
-
         dip.def("add_function_value", [](dip::DIP& self, const std::string& name, py::function func) {
             self.add_function_value(name, [func](const dip::Environment& env) {
-                py::object result = func(env);
-                return from_python(result);
+                py::gil_scoped_acquire gil;
+                return func(env).cast<dip::ValueNodeData>();
             });
         });
 

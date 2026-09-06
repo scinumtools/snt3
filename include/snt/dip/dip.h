@@ -94,7 +94,7 @@ namespace snt::dip {
          * @param name Name of the function
          * @param func Function pointer
          */
-        void add_function_value(const std::string& name, FunctionList::ValueFunctionType func);
+        void add_function_value(const std::string& name, FunctionList::DataFunctionType func);
 
         /**
          * Add function that returns list of nodes

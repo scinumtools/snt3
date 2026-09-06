@@ -5,8 +5,8 @@
 
 namespace snt::dip {
 
-    void FunctionList::append_value(const std::string& name, ValueFunctionType func) {
-        auto result = value_functions.insert({name, func});
+    void FunctionList::append_value(const std::string& name, DataFunctionType func) {
+        auto result = data_functions.insert({name, func});
         if (!result.second)
             throw dip::EnvironmentException(
                 "Duplicate value function",
@@ -18,7 +18,7 @@ namespace snt::dip {
     }
 
     void FunctionList::append_nodes(const std::string& name, NodesFunctionType func) {
-        auto result = table_functions.insert({name, func});
+        auto result = nodes_functions.insert({name, func});
         if (!result.second)
             throw dip::EnvironmentException(
                 "Duplicate table function",
@@ -29,9 +29,9 @@ namespace snt::dip {
             );
     }
 
-    FunctionList::ValueFunctionType FunctionList::get_value(const std::string& name) const {
-        auto it = value_functions.find(name);
-        if (it == value_functions.end())
+    FunctionList::DataFunctionType FunctionList::get_value(const std::string& name) const {
+        auto it = data_functions.find(name);
+        if (it == data_functions.end())
             throw dip::EnvironmentException(
                 "Unknown value function",
                 "The value function `" + name + "` was not found in the environment function list.",
@@ -43,8 +43,8 @@ namespace snt::dip {
     }
 
     FunctionList::NodesFunctionType FunctionList::get_nodes(const std::string& name) const {
-        auto it = table_functions.find(name);
-        if (it == table_functions.end())
+        auto it = nodes_functions.find(name);
+        if (it == nodes_functions.end())
             throw dip::EnvironmentException(
                 "Unknown table function",
                 "The table function `" + name + "` was not found in the environment function list.",
