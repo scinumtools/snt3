@@ -472,77 +472,153 @@ namespace snt::dip {
 
     bool Parser::part_reference() {
         size_t pos = 0;
-        // match all empty characters
         while (pos < code.size() && std::isspace(static_cast<unsigned char>(code[pos])))
             ++pos;
-        size_t pos_start = pos + 1;
-        // start with {
         if (pos >= code.size() || code[pos] != '{')
             return false;
-        ++pos;
-        // relative path starts with dots .
-        int parent = 0;
-        while (pos < code.size() && code[pos] == SIGN_SEPARATOR) {
-            parent++;
-            ++pos;
-        }
-        // match a source keyword
-        std::string keyword;
-        while (pos < code.size()) {
-            unsigned char c = static_cast<unsigned char>(code[pos]);
-            if (std::isalnum(c) || c == '_' || c == '-') {
-                keyword += static_cast<char>(c);
+        const size_t start = pos++;
+        // Relative:
+        //   {.}
+        //   {.path}
+        //   {..path}
+        //   {...path}
+        if (pos < code.size() && code[pos] == SIGN_SEPARATOR) {
+            int parent = 0;
+            while (pos < code.size() && code[pos] == SIGN_SEPARATOR) {
+                ++parent;
+                ++pos;
+            }
+            value_origin = ValueOrigin::ReferenceRel;
+            // Self reference: {.}
+            if (parent == 1 && pos < code.size() && code[pos] == '}') {
                 ++pos;
             } else {
-                break;
+                const size_t path_start = pos;
+                while (pos < code.size() && code[pos] != '}')
+                    ++pos;
+                if (pos >= code.size() || pos == path_start)
+                    return false;
+                Path expr(code.substr(path_start, pos - path_start));
+                ++pos;
             }
         }
-        // match a node path
-        if (pos < code.size() && code[pos] == '?') { // absolute path {keyword?path}
-            ++pos;
-            size_t path_begin = pos;
-            while (pos < code.size() && code[pos] != '}')
+        // Non-relative:
+        //   {source}
+        //   {?}
+        //   {?path}
+        //   {source?path}
+        else {
+            const size_t source_start = pos;
+            // Optional source.
+            while (pos < code.size()) {
+                const unsigned char c = static_cast<unsigned char>(code[pos]);
+                if (!std::isalnum(c) && c != '_' && c != '-')
+                    break;
                 ++pos;
-            if (pos == code.size())
-                throw dip::SyntaxException(
-                    "Missing closing brace",
-                    "The reference expression was not closed with `}`.",
-                    "Add a closing `}` after the reference path.",
-                    __FILE__,
-                    __LINE__,
-                    line
-                );
-            std::string path = code.substr(path_begin, pos - path_begin);
-            value_origin = ValueOrigin::Reference;
-            if (!path.empty())
-                Path expr(path); // test if request is a fully qualified path?
-        } else {
-            if (parent == 1) // self-reference {.} or relative reference {.path}
-                value_origin = ValueOrigin::ReferenceRel;
-            else if (keyword.empty())
-                throw dip::SyntaxException(
-                    "Empty reference",
-                    "The non-relative reference does not contain a source keyword.",
-                    "Specify a reference source, for example `{source}`.",
-                    __FILE__,
-                    __LINE__,
-                    line
-                );
-            else if (parent > 1) // relative reference {...path}
-                value_origin = ValueOrigin::ReferenceRel;
-            else // raw reference {source}
+            }
+            const bool has_source = pos > source_start;
+            // Optional ?path.
+            if (pos < code.size() && code[pos] == '?') {
+                ++pos;
+                const size_t path_start = pos;
+                while (pos < code.size() && code[pos] != '}')
+                    ++pos;
+                if (pos >= code.size())
+                    return false;
+                // {?} means everything from the local source.
+                if (pos > path_start)
+                    Path expr(code.substr(path_start, pos - path_start));
+                value_origin = ValueOrigin::Reference;
+            }
+            // Raw source: {source}
+            else if (has_source) {
+                if (pos >= code.size() || code[pos] != '}')
+                    return false;
                 value_origin = ValueOrigin::ReferenceRaw;
+            } else {
+                return false;
+            }
+            ++pos; // }
         }
-        // match closing }
-        if (pos >= code.size() || code[pos] != '}')
-            return false;
-        ++pos;
         // Commit only after the entire parse succeeded.
-        value_raw.push_back(code.substr(pos_start, pos - pos_start - 1));
+        value_raw.push_back(code.substr(start + 1, pos - start - 2));
         strip(code.substr(0, pos));
         part_slice();
         return true;
     }
+    // bool Parser::part_reference() {
+    //     size_t pos = 0;
+    //     // match all empty characters
+    //     while (pos < code.size() && std::isspace(static_cast<unsigned char>(code[pos])))
+    //         ++pos;
+    //     size_t pos_start = pos + 1;
+    //     // start with {
+    //     if (pos >= code.size() || code[pos] != '{')
+    //         return false;
+    //     ++pos;
+    //     // relative path starts with dots .
+    //     int parent = 0;
+    //     while (pos < code.size() && code[pos] == SIGN_SEPARATOR) {
+    //         parent++;
+    //         ++pos;
+    //     }
+    //     // match a source keyword
+    //     std::string keyword;
+    //     while (pos < code.size()) {
+    //         unsigned char c = static_cast<unsigned char>(code[pos]);
+    //         if (std::isalnum(c) || c == '_' || c == '-') {
+    //             keyword += static_cast<char>(c);
+    //             ++pos;
+    //         } else {
+    //             break;
+    //         }
+    //     }
+    //     // match a node path
+    //     if (pos < code.size() && code[pos] == '?') { // absolute path {keyword?path}
+    //         ++pos;
+    //         size_t path_begin = pos;
+    //         while (pos < code.size() && code[pos] != '}')
+    //             ++pos;
+    //         if (pos == code.size())
+    //             throw dip::SyntaxException(
+    //                 "Missing closing brace",
+    //                 "The reference expression was not closed with `}`.",
+    //                 "Add a closing `}` after the reference path.",
+    //                 __FILE__,
+    //                 __LINE__,
+    //                 line
+    //             );
+    //         std::string path = code.substr(path_begin, pos - path_begin);
+    //         value_origin = ValueOrigin::Reference;
+    //         if (!path.empty())
+    //             Path expr(path); // test if request is a fully qualified path?
+    //     } else {
+    //         if (parent == 1) // self-reference {.} or relative reference {.path}
+    //             value_origin = ValueOrigin::ReferenceRel;
+    //         else if (keyword.empty())
+    //             throw dip::SyntaxException(
+    //                 "Empty reference",
+    //                 "The non-relative reference does not contain a source keyword.",
+    //                 "Specify a reference source, for example `{source}`.",
+    //                 __FILE__,
+    //                 __LINE__,
+    //                 line
+    //             );
+    //         else if (parent > 1) // relative reference {...path}
+    //             value_origin = ValueOrigin::ReferenceRel;
+    //         else // raw reference {source}
+    //             value_origin = ValueOrigin::ReferenceRaw;
+    //     }
+    //     // match closing }
+    //     if (pos >= code.size() || code[pos] != '}')
+    //         return false;
+    //     ++pos;
+    //     // Commit only after the entire parse succeeded.
+    //     value_raw.push_back(code.substr(pos_start, pos - pos_start - 1));
+    //     strip(code.substr(0, pos));
+    //     part_slice();
+    //     return true;
+    // }
 
     bool Parser::part_function() {
         constexpr auto pstr = ce_concat<50>("^[ ]*(", PATTERN_KEYWORD, "+)[(][)]");

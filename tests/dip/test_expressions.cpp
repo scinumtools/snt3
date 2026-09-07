@@ -56,20 +56,33 @@ TEST(Expressions, MultiLineWithComments) {
 
 TEST(Expressions, RelativeReferences) {
 
-    // solve traversing
-    dip::DIP d;
-    d.add_string(
-        "snap int = 30\n"
-        "foo\n"
-        "  bar\n"
-        "    crackle float = 1.23e4\n"
-        "    jerk float = ({.crackle} + {...snap})"
-    );
-    dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 3);
+    { // solve traversing
+        dip::DIP d;
+        d.add_string(
+            "snap int = 30\n"
+            "foo\n"
+            "  bar\n"
+            "    crackle float = 1.23e4\n"
+            "    jerk float = ({.crackle} + {...snap})"
+        );
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 3);
 
-    dip::ValueNode::PointerType vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->path.name, "foo.bar.jerk");
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->to_string(), "1.233e4");
+        dip::ValueNode::PointerType vnode = env.nodes.at(2);
+        EXPECT_EQ(vnode->path.name, "foo.bar.jerk");
+        EXPECT_TRUE(vnode);
+        EXPECT_EQ(vnode->to_string(), "1.233e4");
+    }
+    { // relative reference with path {.resolution.xsize}
+        dip::DIP d;
+        d.add_string(
+            "box\n"
+            "  density float = 1.23e4 g/cm\n"
+            "  resolution float = 64 cm\n"
+            "    xsize float = {..resolution} cm\n"
+            "  mass float = ({.resolution.xsize} * {?box.density}) g"
+        );
+        dip::Environment env = d.parse();
+        EXPECT_EQ(env.nodes.size(), 4);
+    }
 }
