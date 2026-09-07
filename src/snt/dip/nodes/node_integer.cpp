@@ -63,7 +63,8 @@ namespace snt::dip {
             set_value();
             break;
         }
-        set_units();
+        if (!units) // units might be provided by the ValueOrigin::Function
+            set_units();
         return {};
     }
 
@@ -199,8 +200,9 @@ namespace snt::dip {
         std::stringstream ss;
         if (value) {
             ss << value->to_string(format);
-            if (units)
+            if (units) {
                 ss << " " << units->to_string();
+            }
         } else {
             ss << std::string(KEYWORD_NONE);
         }

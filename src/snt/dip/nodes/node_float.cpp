@@ -64,7 +64,8 @@ namespace snt::dip {
             set_value();
             break;
         }
-        set_units();
+        if (!units) // units might be provided by the ValueOrigin::Function
+            set_units();
         return {};
     }
 

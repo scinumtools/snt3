@@ -236,3 +236,30 @@ TEST_F(Functions, ImportNodes) {
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[\"foo\", \"bar\", \"baz\"]");
 }
+
+TEST_F(Functions, Quantities) {
+
+    dip::DIP d;
+    d.add_function_nodes("quantity_nodes", FixtureFunctions::get_quantity_nodes);
+    d.add_string("foo quantity_nodes()");
+    dip::Environment env = d.parse();
+    EXPECT_EQ(env.nodes.size(), 2);
+
+    dip::ValueNode::PointerType vnode = env.nodes.at(0);
+    EXPECT_EQ(vnode->path.name, "foo.quantity_int");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->to_string(), "1 cm");
+    EXPECT_TRUE(vnode->value);
+    EXPECT_EQ(vnode->value->to_string(), "1");
+    EXPECT_TRUE(vnode->units);
+    EXPECT_EQ(vnode->units->to_string(), "cm");
+
+    vnode = env.nodes.at(1);
+    EXPECT_EQ(vnode->path.name, "foo.quantity_double");
+    EXPECT_TRUE(vnode);
+    EXPECT_EQ(vnode->to_string(), "2.34e5 kg");
+    EXPECT_TRUE(vnode->value);
+    EXPECT_EQ(vnode->value->to_string(), "2.34e5");
+    EXPECT_TRUE(vnode->units);
+    EXPECT_EQ(vnode->units->to_string(), "kg");
+}

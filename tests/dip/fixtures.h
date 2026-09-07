@@ -8,6 +8,7 @@
 #include <snt/dip/nodes/node_float.h>
 #include <snt/dip/nodes/node_integer.h>
 #include <snt/dip/nodes/node_string.h>
+#include <snt/puq/quantity.h>
 #include <snt/val/value_base.h>
 
 using namespace snt;
@@ -58,6 +59,15 @@ class FixtureFunctions : public ::testing::Test {
             std::make_shared<dip::IntegerNode>(dip::Path("scalar_int"), std::move(val_int)),
             std::make_shared<dip::FloatNode>(dip::Path("scalar_double"), std::move(val_double)),
             std::make_shared<dip::StringNode>(dip::Path("scalar_str"), std::move(val_string)),
+        };
+    }
+
+    static dip::ValueNode::ListType get_quantity_nodes(const dip::Environment& env) {
+        std::unique_ptr<val::ArrayValueInt32> val_int = std::make_unique<val::ArrayValueInt32>(1);
+        std::unique_ptr<val::ArrayValueFloat64> val_double = std::make_unique<val::ArrayValueFloat64>(2.34e5);
+        return {
+            std::make_shared<dip::IntegerNode>(dip::Path("quantity_int"), std::move(val_int), puq::Quantity("cm")),
+            std::make_shared<dip::FloatNode>(dip::Path("quantity_double"), std::move(val_double), puq::Quantity("kg")),
         };
     }
 

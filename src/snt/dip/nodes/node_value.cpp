@@ -32,7 +32,7 @@ namespace snt::dip {
     ValueNode::ValueNode(
         const Path& pth, val::BaseValue::PointerType val, const NodeDtype dt, std::optional<puq::Quantity> unt
     )
-        : constant(false), value_dtype(val->get_dtype()), units(std::move(unt)), BaseNode(dt) {
+        : constant(false), value_dtype(val->get_dtype()), units(unt), BaseNode(dt) {
         path = pth;
         val::Array::ShapeType dims = val->get_shape();
         if (val->get_size() > 1) {
@@ -43,6 +43,8 @@ namespace snt::dip {
             }
         }
         set_value(std::move(val));
+        if (unt)
+            set_units(unt);
     };
 
     ValueNode::ValueNode(const BaseNode::PointerType other, const NodeDtype dt, const core::DataType vdt)
