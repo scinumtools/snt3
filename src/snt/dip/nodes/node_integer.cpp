@@ -78,7 +78,7 @@ namespace snt::dip {
             return std::make_unique<val::ArrayValueInt16>((short)std::stoi(value_input));
             break;
         case core::DataType::Integer32_U:
-            return std::make_unique<val::ArrayValueUint32>(std::stoi(value_input));
+            return std::make_unique<val::ArrayValueUint32>(std::stoul(value_input));
             break;
         case core::DataType::Integer32:
             return std::make_unique<val::ArrayValueInt32>(std::stoi(value_input));

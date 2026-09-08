@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <limits>
+#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_float.h>
@@ -203,4 +204,52 @@ TEST(ParseScalars, IndentedComments) {
     dip::Environment env = d.parse();
 
     EXPECT_EQ(env.nodes.size(), 3);
+}
+
+TEST(ParseScalars, DataTypeRanges) {
+
+    dip::DIP d;
+
+    d.add_string(
+        "int16_min int16 = -32768\n"
+        "int16_max int16 = 32767\n"
+        "int32_min int32 = -2147483648\n"
+        "int32_max int32 = 2147483647\n"
+        "int64_min int64 = -9223372036854775808\n"
+        "int64_max int64 = 9223372036854775807\n"
+        "uint16_max uint16 = 65535\n"
+        "uint32_max uint32 = 4294967295\n"
+        "uint64_max uint64 = 18446744073709551615\n"
+        "float32_min float32 = -3.4028234663852886e+38\n"
+        "float32_max float32 = 3.4028234663852886e+38\n"
+        "float64_min float64 = -1.7976931348623157e+308\n"
+        "float64_max float64 = 1.7976931348623157e+308\n"
+    );
+
+    if (dip::FloatNode::max_float_size == 128)
+        d.add_string(
+            "float128_min float128 = -1.189731495357231765e+4932\n"
+            "float128_max float128 = 1.189731495357231765e+4932\n"
+        );
+
+    dip::Environment env = d.parse();
+
+    EXPECT_EQ(env["int16_min"].as<int64_t>(), std::numeric_limits<int16_t>::lowest());
+    EXPECT_EQ(env["int16_max"].as<int64_t>(), std::numeric_limits<int16_t>::max());
+
+    EXPECT_EQ(env["int32_min"].as<int64_t>(), std::numeric_limits<int32_t>::lowest());
+    EXPECT_EQ(env["int32_max"].as<int64_t>(), std::numeric_limits<int32_t>::max());
+
+    EXPECT_EQ(env["int64_min"].as<int64_t>(), std::numeric_limits<int64_t>::lowest());
+    EXPECT_EQ(env["int64_max"].as<int64_t>(), std::numeric_limits<int64_t>::max());
+
+    EXPECT_EQ(env["uint16_max"].as<uint64_t>(), std::numeric_limits<uint16_t>::max());
+    EXPECT_EQ(env["uint32_max"].as<uint64_t>(), std::numeric_limits<uint32_t>::max());
+    EXPECT_EQ(env["uint64_max"].as<uint64_t>(), std::numeric_limits<uint64_t>::max());
+
+    EXPECT_DOUBLE_EQ(env["float32_min"].as<double>(), std::numeric_limits<float>::lowest());
+    EXPECT_DOUBLE_EQ(env["float32_max"].as<double>(), std::numeric_limits<float>::max());
+
+    EXPECT_DOUBLE_EQ(env["float64_min"].as<double>(), std::numeric_limits<double>::lowest());
+    EXPECT_DOUBLE_EQ(env["float64_max"].as<double>(), std::numeric_limits<double>::max());
 }
