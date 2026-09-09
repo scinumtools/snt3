@@ -1,24 +1,12 @@
-# DIPL - Language Specification
-
-« Back to [specification](../specification.md#language-syntax)
-
-## 3.1. Nodes
+# Nodes
 
 The DIPL language distinguishes three different ways to create a parameter, depending on which parts of the parameter node are specified.
-A parameter can be fully [defined](nodes.md#311-definition), meaning that all node components—name, type, shape, value, and unit—are provided.
-Alternatively, a parameter can be [declared](nodes.md#313-declaration) by specifying only its name, type, and shape.
-After a parameter has been either defined or declared, its value component can be [modified](nodes.md#312-modification).
-Additionally, nodes can be ordered into a [hierarchical](#314-hierarchy) structure by using indents.
+A parameter can be fully [defined](nodes.md#definition), meaning that all node components—name, type, shape, value, and unit—are provided.
+Alternatively, a parameter can be [declared](nodes.md#declaration) by specifying only its name, type, and shape.
+After a parameter has been either defined or declared, its value component can be [modified](nodes.md#modification).
+Additionally, nodes can be ordered into a [hierarchical](#hierarchy) structure by using indents.
 
-### 3.1.1. Definition
-
-``` DIPL-Schema
-# Node definition schema
-
-<indent><name> <type> = <value> [<unit>]  # <comment>
-<indent><name> <type>                     # <comment>
-  = <value> [<unit>]                      # <comment>
-```
+## Definition
 
 All members of definition are separated with at least one empty space, and their order is not interchangeable.
 
@@ -37,24 +25,31 @@ If a node value spans multiple lines, a [block](values.md#blocks) must be used.
 A node value may be continued on the following line by placing an equal sign at the beginning of a line indented exactly two spaces further than the node definition.
 DIPL parameter values are described in detail in a [separate section](values.md).
 
+```DIPL
+street str = "Fifth Avenue"
+number int = 350
+sizes float
+  = [3.14, 2.718, -1.25, 0.577, 42.0, -7.5, 1.618, 0.001, 12.345, -0.333]
+```
+
 The two data types that support **units** are integers and floats.
 Units are written directly after a node value and are separated with an empty space.
 More detailed description of units is given in a chapter about [units](units.md).
 In this subsection, we only describe basic syntax with respect to the nodes.
 
+```DIPL
+weight int = 87 kg
+height float = 185 cm
+```
+
 **Comments** are always at the end of lines and start with a hash sign.
 It is also possible to use comments on empty lines to describe the code.
 
-### 3.1.2. Modification
-
-``` DIPL-Schema
-# Node modification schema
-          
-<indent><name> <type> = <value> <unit> 
-<indent><name> <type> = <value> 
-<indent><name> = <value> <unit> 
-<indent><name> = <value> 
+```DIPL
+resolution int = 32  # low resolution
 ```
+
+## Modification
 
 The first occurrence of a node is called a definition.
 All subsequent occurrences of a node with the same name are called modifications.
@@ -74,24 +69,21 @@ size = 1 pc           # using different units of length
 # size = 3.086e18 cm  
 ```
 
-### 3.1.3. Declaration
-
-``` DIPL-Schema	     
-# Node declaration schema
-
-<indent><name> <type> <unit> 
-<indent><name> <type> 
-```
+## Declaration
 
 Declaration in DIPL is a special case of definition where equal sign and value part is not specified.
 The value must be later set in subsequent DIPL code using modifications, otherwise code will not be valid.
+Similarly to definitions, modification units are automatically converted to their declared units.
 
 ``` DIPL
-weight float kg  # declaration
-weight = 88      # modification
+weight float kg   # declaration
+weight = 2.3 t    # modification
+
+# Final parameter value is:
+# weight = 2.3e3 kg
 ```
 
-### 3.1.4. Hierarchy
+## Hierarchy
 
 DIPL nodes are organized in a hierarchical way using indentation, i.e. number of empty spaces before nodes.
 **Parent** nodes have lower indentation as their **children** nodes.
@@ -99,7 +91,7 @@ DIPL nodes are organized in a hierarchical way using indentation, i.e. number of
 Multiple levels of hierarchy are also allowed, and there can be empty lines between the nodes.
 The number of empty spaces for each indentation level is two and tabs are not permitted.
 
-#### 3.1.4.1 Value nodes
+### Value nodes
 
 ``` DIPL
 grandfather str = "John"   # parent of Peter and Cintia
@@ -120,7 +112,7 @@ grandfather.father.son str = "Benjamin"
 grandfather.father.daughter str = "Lucia" 
 grandfather.aunt str = "Cintia"  
 ```
-#### 3.1.4.2 Container nodes
+### Container nodes
 
 Besides basic value nodes, DIPL supports three types of container nodes.
 
@@ -135,12 +127,6 @@ Unlike value nodes, container nodes do not directly hold values. Instead, they o
 **Groups**
 
 Nodes may be organized into logical hierarchies using a special container node called a **group**.
-
-```DIPL-Schema
-# Group node schema
-
-<indent><name>
-```
 
 Unlike value nodes, group nodes do not directly store values. Their sole purpose is to organize child nodes into a logical structure. The group's name becomes part of the fully-qualified path of all descendant nodes.
 

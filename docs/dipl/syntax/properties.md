@@ -1,29 +1,18 @@
-# DIPL - Language Specification
-
-« Back to [specification](../specification.md#language-syntax)
-
-## 3.8. Properties
+# Properties
 
 Numerical codes usually require initial parameter values with a specific format.
 In this section, we summarize properties that can be used in DIPL to restrict node values and describe their format.
 Each node property directive is given on a new line immediately after node definitions, declarations or modification.
 All properties must have consistent indent, two whitespaces higher than their parent node.
 
-### 3.8.1. Directives
+## Directives
 
-#### Options
+### Options
 
 **Used by:** ``int``, ``float``, ``str``
 
 Initial code parameters often accept only a few discrete input values, also called options.
 These can be explicitly described during node definition or declaration.
-
-``` DIPL-Schema
-# Schema of an option array
-
-<indent>!options <value> <unit>
-<indent>!options <value>
-```
 
 The expected value of this clause is a list of values.
 It can be given explicitly or as a [reference](references.md#3.4.-references).
@@ -69,21 +58,13 @@ resolution int = 16
   ]
 ```
 
-#### Condition
+### Condition
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
 Numerical values can usually have values ranging in some intervals.
 To restrict node values to some particular interval, it is possible to set a logical condition using ``!condition`` directive and a logical expression.
 A given expression has to be evaluated as ``true`` after each definition or modification of a node.
-
-``` DIPL-Schema
-# Schema of a node condition requirement
-
-<indent>!condition (<expression>)    
-<indent>!condition (<expression>
-                    <expression>)                                   
-```
 
 In the example below, node ``energy`` can have values in a range of 23 and 26 erg.
 The actual value of node ``energy`` is matched using a special [self-reference sign](references.md#3.4.-references) ``{?}``.
@@ -93,18 +74,12 @@ energy float = 25 erg
   !condition (23 < {?} && {?} < 26)
 ```
 
-#### Format
+### Format
 
 **Used by:** ``str``
 
 In general, string values wrapped into quote marks can contain all characters and can be arbitrary long.
 This can be restricted by defining their ``!format`` using standard regular expressions.
-
-``` DIPL-Schema
-# Schema of a node format requirement
-
-<indent>!format <value>
-```
 
 In the following example, node 'name' can contain only small and capital letters:
    
@@ -113,17 +88,12 @@ name str = "Ferdinant"
   !format "[a-zA-Z]+"
 ```
 
-#### Constants
+### Constants
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
 Sometimes nodes have to stay constant and exclude all possible modifications.
 This can be achieved by a directive ``!constant``.
-
-``` DIPL-Schema
-# Schema of a constant node requirement
-<indent>!constant
-```
 
 Node ``name`` in the following example cannot be further modified.
      
@@ -133,19 +103,13 @@ name str = "John"
 name = "Mary"   # this modification will raise an error exception
 ```
 
-#### Tags
+### Tags
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
 Tags provide a simple and effective mechanism for organizing and categorizing large sets of parameters.
 Any data type that supports tagging may define the dedicated ``!tags`` property, which accepts a list of tag values.
 In practice, it is recommended to use string values for tags to ensure consistency and interoperability.
-
-``` DIPL-Schema
-# Schema for node tags property
-
-<indent>!tags <value>
-```
 
 Once assigned, tags enable nodes to be queried and filtered after parsing through the use of tag selectors.
 Every DIPL implementation SHOULD provide support for selecting parsed nodes based on their associated tags.
@@ -155,19 +119,13 @@ resolution int = 32
   !tags ["box", "grid"]
 ```
 
-#### Delimiter
+### Delimiter
 
 **Used by:** `table`
 
 When entering values using a `table` node, columns are separated by whitespace by default.
 
 For some input formats, such as CSV or TSV, a different column delimiter is required. DIPL therefore allows additional options to be specified for `table` nodes to define the delimiter used when parsing the table.
-
-```DIPL-Schema
-# Schema for node tags property
-
-<indent>!delimiter <value>
-```
 
 This makes it possible, for example, to prepend a DIPL header to a standard CSV file and use it directly as a DIPL table.
 
@@ -184,7 +142,7 @@ intensity float W/m2
   !delimiter ","
 ```
 
-### 3.8.2. Metadata
+## Metadata
 
 **Used by:** `int`, `float`, `str`, `bool`
 
@@ -212,25 +170,6 @@ The following metadata properties are currently defined:
 | `?created`  | Creation date of the referenced resource or metadata.          |
 | `?modified` | Last modification date of the referenced resource or metadata. |
 | `?license`  | License governing the referenced resource or dataset.          |
-
-```DIPL-Schema
-# Schema for metadata
-
-<indent>?descr <value>
-<indent>?authors <value>
-<indent>?title <value>
-<indent>?journal <value>
-<indent>?year <value>
-<indent>?volume <value>
-<indent>?issue <value>
-<indent>?pages <value>
-<indent>?doi <value>
-<indent>?url <value>
-<indent>?version <value>
-<indent>?created <value>
-<indent>?modified <value>
-<indent>?license <value>
-```
 
 **Example**
 

@@ -1,21 +1,15 @@
-# DIPL - Language Specification
-
-« Back to [specification](../specification.md#language-syntax)
-
-## 3.5. Expressions
+# Expressions
 
 Node values can also be defined indirectly using expressions.
-Expression values consist of multiple values combined with mathematical expressions wrapped in additional parentheses, while they can span on multiple lines. The code will be automatically wrapped into a single line based on the balance of the parentheses
+Expression values consist of multiple values combined with mathematical expressions wrapped in additional parentheses, while they can span on multiple lines. 
+The code will be automatically wrapped into a single line based on the balance of the parentheses
 
-``` DIPL-Schema
-# Expression schema
-   
-# using double quotes
-(<expression>)
+``` DIPL
+result float = (
+  12 + 3.43 - ( 6 * 7.89 ) / 1.2e3
+)
 
-# using block notation
-(<expression>       # first part
- <expression>)      # second part
+# result = 15.39055
 ```
 
 There are 4 different types of expressions in DIPL.
@@ -38,7 +32,7 @@ Possible input values used by expressions are summarized in the following table:
 
 Operators summarized below are evaluated according to their priority from highest `1` to lowest `4`, and can be nested accordingly.
 
-### 3.5.1. Logical
+## Logical
 
 Logical expressions are used to generate values for boolean nodes.
 The expressions can be composed of multiple nested logical operators that always return a true or false value.
@@ -92,7 +86,7 @@ Numerical values with dimensions compared using comparison operations are automa
 |-----------|----------|-------------------------------------------------------------------------|
 | `~<bool>` | 4        | Negation operator returns true if value `A` is false                    |
 
-### 3.5.2. Numerical
+## Numerical
 
 Numerical expressions are used to generate values for numerical node types.
 If given, the expression result is automatically converted into node units.
@@ -151,7 +145,7 @@ Most of the following operators require, that the final value has no dimensions.
 > Unlike the outer parentheses that define an expression, the inner parentheses must contain at least one whitespace separating the enclosed content. 
 > For example, `exp(2 cm)` is invalid, whereas `exp( 2 cm )` is valid.
 	   
-### 3.5.3. Templates
+## Templates
 
 Templates, or formatted text values, are used to convert node values into a textual representation.
 They follow the same syntax as standard string values, but are prefixed with an `f` before the opening quotation mark.

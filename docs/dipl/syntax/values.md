@@ -1,34 +1,43 @@
-# DIPL - Language Specification
+# Values
 
-« Back to [specification](../specification.md#language-syntax)
-
-## 3.3. Values
-
-### 3.3.1. Empty values
+## Empty values
 
 Similarly, as in Python, DIPL parameters can also be set empty using a special keyword ``none``.
 Operations with empty parameters conform to basic Python rules and may lead to corresponding warnings, or errors.
 DIPL parameters with ``none`` values are considered to be fully defined, rather than only declared.
 
-### 3.3.2. Scalars
+```DIPL
+john
+  car str = none
+```
+
+## Scalars
 
 Nodes with a single boolean, number or string value are called scalar nodes.
 If a node is scalar at its definition, it can be modified only with one value, or as empty.
 Example of scalar node values were already shown in section about [data types](datatypes.md#standard-data-types).
 
-### 3.3.3. Arrays
+```DIPL
+hair bool = false
+name str = "John"
+age int = 73
+height float = 173 cm
+```
+
+## Arrays
 
 Nodes can also store multiple values in arrays.
 Dimensionality of such arrays have to be specified next to the type using bracket notation.
 
 **Dimensionality of arrays**
-| Example,        | Description                                                |
-|-----------------|------------------------------------------------------------|
-| ``[:]``         | Array can have arbitrary number of values		       |
-| ``[3:]``        | Array must have minimum of 3 values			       |
-| ``[:5]``        | Array must have maximum of 5 values			       |
-| ``[1:4]``       | Array must have between 1 and 4 values		       |
-| ``[6:,:8,2:7]`` | Settings of individual dimensions are separated by comma   |
+
+| Example,        | Description                                              |
+|-----------------|----------------------------------------------------------|
+| ``[:]``         | Array can have arbitrary number of values                |
+| ``[3:]``        | Array must have minimum of 3 values                      |
+| ``[:5]``        | Array must have maximum of 5 values                      |
+| ``[1:4]``       | Array must have between 1 and 4 values                   |
+| ``[6:,:8,2:7]`` | Settings of individual dimensions are separated by comma |
 
 Parsing of array values is handled by a custom parser that extracts individual values and array shape.
 Final values of nodes are automatically validated according to defined conditions.
@@ -63,7 +72,7 @@ Node units apply to all values in an array.
 mass float[2:,:2] = [[25,50],[34.2,95.1],[1e3,1e4]] kg
 ```
 
-### 3.3.4. Blocks
+## Blocks
 
 If node values are large or span over several lines, it is possible to use block notation.
 Block notation wraps values into triple quote marks, similarly as in Python.
@@ -90,7 +99,7 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.
 """
 ```
 
-### 3.3.5. Tables
+## Tables
 
 When working with large amounts of data, presenting the information in a table can be more concise and easier to read.
 For this purpose, a dedicated node type called ``table`` is provided.

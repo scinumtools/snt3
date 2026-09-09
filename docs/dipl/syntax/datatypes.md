@@ -1,14 +1,19 @@
-# DIPL - Language Specification
-
-« Back to [specification](../specification.md#language-syntax)
-
-## 3.2. Data Types
+# Data Types
 
 In this section we describe standard and derived data types that can be used in DIPL code.
 Standard types are categorized based on their value types into **booleans**, **integer numbers**, **floating-point numbers** and **strings**.
-Numerical types can have additionally derived types that specify their **signedness** and **precision**.
 
-### 3.2.1. Standard data types
+Numerical types may have derived types that specify additional representation
+properties such as **width**, **precision**, or **signedness**.
+
+For integer types, derived types include signed and unsigned variants with
+different widths, such as `int8`, `int16`, `int32`, `int64`, `uint8`,
+`uint16`, `uint32`, and `uint64`.
+
+For floating-point types, derived types specify the floating-point precision,
+such as `float16`, `float32`, `float64`, and `float128`.
+
+## Standard data types
 
 DIPL provides a minimal set of four built-in scalar data types. These types are designed to cover the most common use cases while keeping the language simple and predictable. Each type represents a distinct category of values and enforces basic constraints on how data is stored and interpreted.
 
@@ -23,19 +28,23 @@ day bool = true
 night bool = false
 ```
 
-**Integer** (``int``, signed 32-bit)
+**Integer** (`int`, or equivalently `int32`, internally represented as signed 64-bit)
 
-The Integer type represents whole numbers without fractional components.
-It uses a signed 32-bit representation, allowing both positive and negative values within a fixed range.
+The Integer type represents whole numbers without fractional components. It has a
+signed 32-bit semantic range, allowing both positive and negative values within
+a fixed range. In the reference implementation, Integer values are internally
+represented using a signed 64-bit integer (`int64_t`).
 
 ``` DIPL
 year int = 2023
 ```
 
-**Float** (``float``, 64-bit)
+**Float** (`float`, or equivalently `float64`, internally represented as a 64-bit floating-point value)
 
-The Float type represents real numbers with fractional components.
-It uses a 64-bit floating-point representation, allowing for a wide range of values, including very large and very small numbers.
+The Float type represents real numbers with fractional components. It has a
+64-bit floating-point semantic representation, providing a wide range of
+values, including very large and very small numbers. In the reference
+implementation, Float values are internally represented using `double`.
 
 ``` DIPL
 duration float = 10            # integer form
@@ -51,40 +60,59 @@ It is used for textual data, labels, and any form of human-readable content.
 
 ``` DIPL
 country str = "United States"  # single line text
-address str = """              # text on multiple lines
+address str = """
 350 Fifth Avenue
 NY 10118
-"""
+"""                            # text on multiple lines
 ```
 
-### 3.2.2. Derived data types
+## Derived data types
 
-When DIPL parses parameters for programming languages such as C/C++ and Fortran, it is sometimes necessary to explicitly specify the precision and representation of integer and floating-point values. 
-This is achieved through the use of derived data types.
+When DIPL parses parameters for programming languages such as C/C++ and
+Fortran, it is sometimes necessary to explicitly specify the precision
+and representation of integer and floating-point values. This is
+achieved through the use of derived data types.
 
+Derived data types are semantically related to their corresponding
+standard types but may use a different internal representation. They
+carry additional metadata describing properties such as signedness and
+precision. Multiple DIPL types may share the same internal
+representation while retaining distinct semantics.
 
-Derived data types are internally equivalent to their corresponding standard types but carry additional metadata describing properties such as signedness (for integers) and precision (for both integers and floating-point numbers).
+In C/C++, a string is typically represented as a sequence of characters.
+In DIPL, ``char`` and ``string`` are distinct types. The ``char`` type
+represents a single unsigned 8-bit character value, while ``string``
+represents a sequence of characters. This distinction facilitates
+interoperability with C/C++ without imposing C/C++'s implementation-
+defined ``char`` signedness on DIPL.
 
-In C/C++, a string is typically defined as a sequence of characters. 
-In DIPL, this relationship is conceptually inverted: ``char`` is defined as a derived type of string to better support interoperability with C/C++.
-
-The ``byte`` and ``char`` types are optional 8-bit types representing a single byte. 
-The ``byte`` type is a numeric type intended for raw binary data and is equivalent to an implementation-defined 8-bit integer type (``int8`` or ``uint8``), while ``char`` is provided for compatibility with C/C++ character types. 
-Neither type has inherent text encoding semantics.
+The ``byte`` and ``char`` types are optional 8-bit types representing a
+single byte. Both are internally represented by ``uint8_t``. The
+``byte`` type represents an unsigned 8-bit numeric value intended for
+raw binary data, while ``char`` represents an unsigned 8-bit character
+value. Neither type specifies an inherent text encoding.
 
 **List of standard and derived data types**
-   
-| Standard   | Derived                                                                                            |
-|------------|----------------------------------------------------------------------------------------------------|
-| ``int``    | ``byte``, ``int8``, ``int16``, ``int32``, ``int64``, ``uint8``, ``uint16``, ``uint32``, ``uint64`` |
-| ``float``  | ``float32``, ``float64``, ``float128``                                                             |
-| ``string`` | ``char``                                                                                           |
+  
+| Standard     | Derived                                       | Internal representation |
+|--------------|-----------------------------------------------|-------------------------|
+| ``bool``     |                                               | ``uint8_t``             |
+| ``int``      | ``int8``, ``int16``, ``int32``, ``int64``     | ``int64_t``             |
+| ``uint``     | ``uint8``, ``uint16``, ``uint32``, ``uint64`` | ``uint64_t``            |
+| ``float``    | ``float16``, ``float32``, ``float64``         | ``double``              |
+| ``float128`` |                                               | implementation-defined  |
+| ``char``     |                                               | ``uint8_t``             |
+| ``byte``     |                                               | ``uint8_t``             |
+| ``string``   |                                               | ``string``              |
 
 > [!NOTE]
-> The ``float128`` type is optional. 
-> Many platforms and compilers do not provide native support for 128-bit floating-point arithmetic. 
-> If supported, its availability must be explicitly documented by the respective DIPL implementation.
+> The float16 and float128 types are optional. 
+> Many platforms and compilers do not provide native support for 16-bit and 128-bit floating-point arithmetic. 
+> If supported, their availability and internal representation must be explicitly documented by the respective 
+> DIPL implementation.The ``float16`` and ``float128`` types are optional.
 >
-> The ``byte`` and ``char`` types are optional. 
-> Implementations shall specify:
-> whether each type is signed or unsigned, and whether values can be assigned from integer literals, string literals, or both.
+> The ``byte`` and ``char`` types are optional.
+> Both types are unsigned 8-bit types and are internally represented
+> by ``uint8_t``. ``byte`` values may be assigned from integer literals,
+> while ``char`` values may be assigned from character or string
+> literals. Neither type specifies a text encoding.

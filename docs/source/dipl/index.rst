@@ -22,3 +22,12 @@ command-line and REST API, avoiding the need to implement separate
 parameter handling and validation logic for each application.
 
  `DIPL Specification <https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/specification.md>`_
+
+.. raw:: html
+
+   <iframe
+       src="_static/specification.pdf"
+       width="100%"
+       height="800px"
+       style="border: none;">
+   </iframe>

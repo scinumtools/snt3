@@ -20,3 +20,6 @@ input-files:
   - docs/dipl/syntax/properties.md
   - docs/dipl/syntax/conditions.md
   - docs/dipl/syntax/schemas.md
+
+syntax-definitions:
+  - docs/dipl/highlight/skylight/dipl.xml

@@ -1,8 +1,4 @@
-# DIPL - Language Specification
-
-« Back to [specification](../specification.md#language-syntax)
-
-## 3.10 Schemas
+# Schemas
 
 Schemas provide a mechanism for defining reusable node structures.
 
@@ -11,15 +7,9 @@ A schema describes a set of nodes that may later be instantiated within groups, 
 Conceptually, a schema is similar to a type definition in a programming language. 
 It defines the structure and properties that its instances shall contain, but does not itself create any nodes within the document hierarchy.
 
-### 3.10.1 Declaration and Instantiation
+## Declaration and Instantiation
 
-Schemas are declared using the `$schema` directive:
-
-```DIPL-Schema
-$schema <name>
-  <node declarations>
-```
-
+Schemas are declared using the `$schema` directive.
 The schema name defines a reusable type. 
 Nodes declared within the schema become members of that type and are inherited by all schema instances.
 
@@ -36,12 +26,8 @@ $schema vehicle
   year int;
 ```
 
-A schema is instantiated by appending one or more schema names after a colon (`:`) to a group, map item, or list item declaration. Multiple schema names are separated by commas:
-
-```DIPL-Schema
-<node> : <schema-name>[, <schema-name>...]
-```
-
+A schema is instantiated by appending one or more schema names after a colon (`:`) to a group, map item, or list item declaration. 
+Multiple schema names are separated by commas.
 For example, the following creates two `car` instances, each of which also conforms to the `vehicle` schema:
 
 ```DIPL
@@ -94,7 +80,7 @@ people[] : person
   age = 28 years
 ```
 
-### 3.10.2 Collection schemas
+## Collection schemas
 
 Schemas can also be applied to entire `map` and `list` collections. 
 In this case, the schema is specified once in the collection declaration and is automatically applied to all subsequent items.
@@ -115,7 +101,7 @@ vehicles[ship]
 In this example, both `car` and `ship` inherit the nodes defined by the `vehicle` schema, because it is applied to the entire `vehicles` collection. 
 The `car` item additionally inherits the nodes defined by the `road` schema, while `ship` does not.
 
-### 3.10.3 Nested Schemas
+## Nested Schemas
 
 Schemas may contain both value nodes and container nodes, including nested groups, maps, lists, and other schema instances.
 
@@ -134,7 +120,7 @@ $schema person
 
 Because schemas describe structure independently of container type, they provide a uniform mechanism for defining reusable data models throughout a DIPL document.
 
-### 3.10.4 Rules
+## Rules
 
 The following rules shall apply:
 

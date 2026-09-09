@@ -9,7 +9,7 @@
 
 ---
 
-## 1. Overview
+## Overview
 
 PUEL (Physical Units Expression Language) is a domain-specific language for representing and manipulating physical units and dimensional expressions.
 
@@ -22,7 +22,7 @@ The language is designed for the following use cases:
 
 ---
 
-## 2. Design Principles
+## Design Principles
 
 PUEL is designed to be:
 
@@ -42,10 +42,10 @@ This design allows PUEL to serve as a compact interchange notation for scientifi
 
 ---
 
-## 3. Unit Model
+## Unit Model
 
 
-### 3.1. Base units
+### Base units
 
 All unit expressions are ultimately represented in terms of a fixed set of base dimensions:
 
@@ -67,7 +67,7 @@ The choice of base dimensions is driven by implementation considerations and doe
  * Angle is included as a base dimension to enable dimensional validation of mathematical functions that require angular arguments. However, angular units MUST remain convertible to dimensionless units, reflecting their dimensionless nature in the SI system.
 
 
-### 3.1. Scaling factors
+### Scaling factors
 
 Scaling prefixes provide a compact way to represent decimal multiples and submultiples of units. A scaling prefix modifies a unit identifier by applying a fixed numerical factor while preserving the unit's dimensionality.
 
@@ -77,7 +77,7 @@ PUEL defines a standard set of scaling prefixes. Implementations MUST recognize 
 
 The complete list of supported scaling prefixes is provided in [Appendix A.1: Scaling Prefixes](#a1-scaling-prefixes).
 
-### 3.2. Named Entities
+### Named Entities
 
 Named entities in PUEL include all units (e.g., Joule `J`, degree Celsius `Cel`, decibel `dB`), physical constants (e.g., proton mass `{m_p}`, Avogadro constant `{N_A}`, solar luminosity `{L_sol}`), physical quantities (e.g., energy `<E>`, electric flux `<Phi_E>`, radiation dose `<D_r>`), and unit-system scaling factors (e.g., `|E|`, `|Phi_E|`, `|D_r|`). The dimensionality of these entities is defined in terms of the base dimensions described in the previous section.
 
@@ -96,9 +96,9 @@ Within a given implementation and unit system, all supported identifiers and sca
 
 ---
 
-## 4. Unit expressions
+## Unit expressions
 
-### 4.1 General Form
+### General Form
 
 A unit expression consists of an optional unit system identifier, an numerical value, and a unit expression.
 
@@ -140,7 +140,7 @@ The following rules apply in unit expressions:
 | The symbols `+` and `-` denote the sign of a numerical value or exponent; they do not represent addition or subtraction operators.                                                                                           | `+5*m`<br>`-5*m`<br>`s-2`                                                                                                          |
 | Uncertainties are written in parentheses immediately following the last decimal digit of a numerical value. The number of digits in the uncertainty corresponds to the same number of least significant digits in the value. | `3.45234(2)e3` → `3452.34 ± 0.02`<br>`3.45234(12)` → `3.45234 ± 0.00012`<br>`12.3(4)e-2` → `0.123 ± 0.004`<br>`120(5)` → `120 ± 5` |
 
-### 4.2 Expression Parsing
+### Expression Parsing
 
 Although numerical values are typically written at the beginning of an expression, they are not restricted to that position. Numerical factors MAY appear anywhere within a unit expression as multiplicative constants. For example, `2*kg*m/s2` and `kg*(2*m)/s2` are equivalent.
 
@@ -148,7 +148,7 @@ Implementations SHOULD accept numerical factors in any valid position within a u
 
 Unit expressions MAY use division operators and grouping parentheses for readability. For example, `kg*m2/(sr*s2)` and `kg*m2*sr-1*s-2` represent the same unit expression.
 
-### 4.3 Canonical Representation and Serialization
+### Canonical Representation and Serialization
 
 Implementations SHOULD internally normalize unit expressions to a canonical form in which all unit factors appear in the numerator and division is represented using negative exponents. For example, the expression `kg*m2/(sr*s2)` is canonically represented as `kg*m2*sr-1*s-2`.
 
@@ -158,7 +158,7 @@ If a unit expression contains a numerical factor, serialized expressions MUST pl
 
 When representing base dimensions, only dimensions with non-zero exponents SHOULD be included. The order of the base dimensions MUST be preserved as specified in Section 3.1..
 
-## 8. Conversions
+## Conversions
 
 PUEL supports conversion between units of identical dimensions:
 
@@ -175,7 +175,7 @@ These require custom conversion rules.
 
 ## Appendinx A: Tables
 
-### A.1 Scaling prefixes
+### Scaling prefixes
 
 | Prefix | Factor  | Name  |
 | ------ | ------- | ----- |

@@ -5,7 +5,7 @@
 **Date:** 2026-03-17  
 **Reference Implementation:** SciNumTools v3
 
-## 1. Introduction
+## Introduction
 
 DIPL (Dimensional Input Parameter Language) is a domain-specific language for
 defining typed, unit-aware parameters for scientific simulations and numerical
@@ -26,7 +26,7 @@ The language provides:
 DIPL is intended to replace fragile configuration formats such as JSON, YAML,
 or INI files when physical units, precision and validation are required.
 
-## 2. Language Overview
+## Language Overview
 
 DIPL is a declarative, strongly-typed domain-specific language for defining structured scientific parameters, constraints, and relationships in a human-readable format.
 
@@ -41,7 +41,7 @@ A DIPL document consists of parameter declarations organized into hierarchical b
 
 This design allows DIPL to represent not only data, but also semantic rules and domain-specific logic in a single, unified format.
 
-### 2.1. Structure
+### Structure
 
 Parameters are defined line-by-line. Indentation introduces hierarchical grouping, enabling nested structures without additional syntax.
 
@@ -54,7 +54,7 @@ parameter_name type = value [unit]
 - Properties (prefixed with ``!``) attach constraints or metadata to the preceding parameter
 - Expressions may reference other parameters and include numerical or logical operations
 
-### 2.2. Example
+### Example
 
 ```DIPL
 velocity float32[1,2:] = [[23.45, 23e-34, 45.1]] SI_km/s
@@ -63,7 +63,7 @@ velocity float32[1,2:] = [[23.45, 23e-34, 45.1]] SI_km/s
 burst_energy float64 = 2.34e5 US_btu
 ```
 
-### 2.3. Key Characteristics
+### Key Characteristics
 
 **Strong typing**  
 All parameters declare explicit types (e.g., float32, int, arrays, tables), enabling predictable behavior and validation.
@@ -80,7 +80,7 @@ Indentation-based structure allows grouping of related parameters without additi
 **Referential expressions**  
 Parameters can reference other values within the document, enabling dependency-aware configurations.
 
-### 2.4. Conceptual Model
+### Conceptual Model
 
 A DIPL file is not just static data; it represents a validated configuration graph:
 
@@ -91,27 +91,27 @@ A DIPL file is not just static data; it represents a validated configuration gra
 
 The result is a configuration that is both machine-evaluable and semantically validated.
 
-## 3. Language Syntax
+## Language Syntax
 
-- [3.1. Nodes](syntax/nodes.md)
-- [3.2. Data Types](syntax/datatypes.md)
-- [3.3. Values](syntax/values.md)
-- [3.4. References](syntax/references.md)
-- [3.5. Expressions](syntax/expressions.md)
-- [3.6. Units](syntax/units.md)
-- [3.7. Functions](syntax/functions.md)
-- [3.8. Properties](syntax/properties.md)
-- [3.9. Conditions](syntax/conditions.md)
-- [3.10. Schemas](syntax/schemas.md)
+- [Nodes](syntax/nodes.md)
+- [Data Types](syntax/datatypes.md)
+- [Values](syntax/values.md)
+- [References](syntax/references.md)
+- [Expressions](syntax/expressions.md)
+- [Units](syntax/units.md)
+- [Functions](syntax/functions.md)
+- [Properties](syntax/properties.md)
+- [Conditions](syntax/conditions.md)
+- [Schemas](syntax/schemas.md)
 
-## 4. File Format
+## File Format
 
 The source file MUST have an extension of either `.dip` or `.dipl`.
 Nodes with the smallest [indentations](syntax/nodes.md#3.1.1.-definition) in the file should be considered as the root nodes with an indentation level of 0.
 
-## 5. Execution Model
+## Execution Model
 
-### 5.1 Normative Execution Model
+### Normative Execution Model
 
 Evaluation of a DIPL document MUST proceed in the following stages, in order:
 
@@ -150,7 +150,7 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
 All conforming implementations MUST produce identical results for identical inputs and sources.
 If any stage fails, evaluation MUST terminate with an error.
 
-### 5.2 Implementation Notes (Non-Normative)
+### Implementation Notes (Non-Normative)
 
 A DIPL processor may implement the above stages using steps such as:
 
@@ -170,7 +170,7 @@ A DIPL processor may implement the above stages using steps such as:
 
 These steps are provided for guidance only. Implementations MAY use different internal strategies, provided the observable behavior conforms to the normative execution model defined above.
 
-## 6. Error Handling
+## Error Handling
 
 The following conditions MUST result in evaluation failure:
 
@@ -183,7 +183,7 @@ The following conditions MUST result in evaluation failure:
 
 Errors MUST be deterministic and MUST NOT be ignored.
 
-## 7. Versioning
+## Versioning
 
 Language versioning is independent of any particular implementation. 
 Each implementation MUST explicitly declare the version of the DIPL language it supports.
@@ -191,7 +191,7 @@ Each implementation MUST explicitly declare the version of the DIPL language it 
 Future versions of the language MAY introduce extensions or modifications. 
 Backward compatibility SHOULD be preserved where feasible.
 
-## 8. Reference Implementation
+## Reference Implementation
 
 A reference implementation of the DIPL language is provided as part of the SciNumTools v3 project.
 
@@ -205,7 +205,7 @@ The reference implementation includes:
 
 Independent implementations of the DIPL language (e.g., in Rust or Julia) are encouraged and welcome, and can be added to this list on request.
 
-## 9. Future Development
+## Future Development
 
 In the next versions of DIPL we plan to introduce the following new concepts:
 
@@ -214,11 +214,11 @@ In the next versions of DIPL we plan to introduce the following new concepts:
 - container item schemas
 - node templating
 
-## 10. Authors and Contributors
+## Authors and Contributors
 
 - Ondrej Pego Jaura — Original author
 
-## 11. Glossary
+## Glossary
 
 | Term               | Meaning                                                                     |
 |--------------------|-----------------------------------------------------------------------------|

@@ -1,39 +1,8 @@
-# DIPL - Language Specification
-
-« Back to [specification](../specification.md#language-syntax)
-
-## 3.9. Conditions
+# Conditions
 
 Conditions in DIPL provide a mechanism for controlling node parsing flow based on the evaluation of logical expressions.
 They allow values and parameters to be assigned dynamically depending on runtime state, enabling branching behavior within scripts and configurations.
 Each condition is evaluated in sequence, and only the first matching branch is executed.
-
-``` DIPL-Schema
-# Schemas of condition directives
-
-# condition with only one case
-@if (<expression>)
-  ...
-@end                   # end is optional
-
-# condition with multiple cases
-@if (<expression>)
-  ...
-@elif (<expression>)
-  ...
-@else                  # else is optional
-  ...
-@end                   # end is optional
-
-# consecutive conditions
-@if (<expression>)     # first condition
-  ...
-@else
-  ...
-@end                   # end is necessary
-@if (<expression>)     # second condition
-  ...
-```
 
 DIPL supports the following set of condition clauses that define this branching structure.
 These clauses can be combined to express simple decisions as well as more complex, multi-branch logic.
@@ -61,7 +30,7 @@ The structure is indentation-sensitive, meaning that all statements belonging to
 ``` DIPL
 winner int = 1
 
-@if ({?winner} == 1)        # first case
+@if ({?winner} == 1)         # first case
   name str = "John"
 @elif ({?winner} == 2)       # second case
   name str = "Jenny"

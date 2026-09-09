@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language name="dipl" version="1.0" kateversion="5.0" section="Sources" extensions="*.dip;*.dipl">
+
+  <highlighting>
+
+    <contexts>
+
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+
+        <!-- Constants / language directives -->
+        <RegExpr
+            attribute="Constant"
+            String="\$(schema|source|unit)"
+            context="#stay"/>
+        <RegExpr
+            attribute="Constant"
+            String="\b(true|false|none)\b"
+            context="#stay"/>
+
+        <!-- Branching -->
+        <RegExpr
+            attribute="Control Flow"
+            String="@(if|elif|else|end)"
+            context="#stay"/>
+
+        <!-- Data types -->
+        <RegExpr
+            attribute="Datatype"
+            String="\b(int64|int32|int16|int8|int|uint64|uint32|uint16|uint8|uint|float128|float64|float32|float16|float|str|bool|char|byte|table|map|list)\b"
+            context="#stay"/>
+
+        <!-- Option directives -->
+        <RegExpr
+            attribute="Directive"
+            String="!(options|condition|format|constant|tags|delimiter)"
+            context="#stay"/>
+
+        <!-- Metadata -->
+        <RegExpr
+            attribute="Metadata"
+            String="\?(descr|authors|title|journal|year|volume|issue|pages|doi|url|version|created|modified|license)"
+            context="#stay"/>
+
+        <!-- Numbers -->
+        <RegExpr
+            attribute="Number"
+            String="[-+]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][-+]?[0-9]+)?"
+            context="#stay"/>
+        
+        <!-- References -->
+        <RegExpr
+            attribute="Reference"
+            String="\{\{[^}]*\}:[^}]*\}"
+            context="#stay"/>
+        <RegExpr
+            attribute="Reference"
+            String="\{\{[^}]*\}\}"
+            context="#stay"/>
+        <RegExpr
+            attribute="Reference"
+            String="\{\{[^}]*\}(?:\[[^]]*\])?(?::[^}]*)?\}"
+            context="#stay"/>
+        <RegExpr
+            attribute="Reference"
+            String="\{[^}]*\}"
+            context="#stay"/>
+        <RegExpr
+            attribute="Reference"
+            String="\{\{[^{}]*\}(?:[^{}]*)?\}"
+            context="#stay"/>
+        
+        <!-- Comments -->
+        <DetectChar char="#" attribute="Comment" context="Comment"/>
+
+        <!-- Strings -->
+        <RegExpr
+            attribute="String"
+            String="f?&quot;&quot;&quot;"
+            context="Template"/>
+        <DetectChar
+            char="&quot;"
+            attribute="String"
+            context="StringDouble"/>
+        
+      </context>
+
+      <context name="Template" attribute="String" lineEndContext="#stay">
+        <!-- closing """ -->
+        <RegExpr
+            attribute="String"
+            String="&quot;&quot;&quot;"
+            context="#pop"/>
+        <!-- template reference -->
+        <RegExpr
+            attribute="Reference"
+            String="\{\{[^}]*\}(?:\[[^]]*\])?(?::[^}]*)?\}"
+            context="#stay"/>
+      </context>
+            
+      <context name="Comment" attribute="Comment" lineEndContext="#pop"/>
+
+      <context name="StringDouble" attribute="String" lineEndContext="#pop">
+        <DetectChar char="&quot;" attribute="String" context="#pop"/>
+      </context>
+
+      <context name="StringSingle" attribute="String" lineEndContext="#pop">
+        <DetectChar char="'" attribute="String" context="#pop"/>
+      </context>
+
+    </contexts>
+
+    <itemDatas>
+      <itemData name="Constant"   defStyleNum="dsVariable"/>
+      <itemData name="Control Flow" defStyleNum="dsControlFlow"/>
+      <itemData name="Datatype"    defStyleNum="dsDataType"/>
+      <itemData name="Directive"      defStyleNum="dsAttribute"/>
+      <itemData name="Metadata"    defStyleNum="dsAnnotation"/>
+      <itemData name="Reference" defStyleNum="dsPreprocessor"/>
+      
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+      <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="Number" defStyleNum="dsDecVal"/>
+    </itemDatas>
+
+  </highlighting>
+
+  <general>
+    <comments>
+      <comment name="singleLine" start="#"/>
+    </comments>
+  </general>
+
+</language>

@@ -1,75 +1,62 @@
-# DIPL - Language Specification
-
-« Back to [specification](../specification.md#language-syntax)
-
-## 3.4. References
+# References
 
 References have two main applications.
 One can either [import](references.md#3.4.2-imports) some already parsed DIPL nodes into a new location, or [inject](references.md#3.4.3.-injections) other node values or contents of text files into a new node.
 Besides the two cases, references are also used in [conditions](conditions.md#3.9.-conditions) and [condition properties](properties.md#3.8.2.-condition) that are explained in a separate chapter.
 		      
-### 3.4.1. Node Referencing
+## Node Referencing
 
 Node referencing is a core feature of DIPL that enables the creation of reusable code structures. 
-A reference consists of a source identifier and an optional query component separated by ``?`` (i.e., ``{<source>?<query>}``).
+A reference consists of a source identifier and an optional path component separated by ``?`` (i.e., ``{<source>?<path>}``).
 
 The ``source`` identifier refers to a named source, which maps to a file path. 
-The ``query`` component specifies a node path within the referenced domain.
+The ``path`` component specifies a node path within the referenced domain.
 
 Sources are defined once using the ``$source`` declaration and may be referenced multiple times throughout the DIPL document.
 
-``` DIPL-Schema
-# Source Definition Schema
-
-<indent>$source <name> = <path>
+``` DIPL
+$source name = "path/to/file.dip"
 ```
-
-``<name>`` is the source identifier.  
-``<path>`` specifies the location of the referenced file.
 
 All implementations of the DIPL language SHOULD support defining sources through the host environment (code interface).
 - Source paths defined via the code interface MUST be interpreted relative to the calling context.
 - Source paths defined within DIPL files MUST be interpreted relative to the location of the respective DIPL file.
 
-#### 3.4.1.1. Domains
+### Domains
 
 Depending on the context, sources may refer to:
-- Text files, when no query is provided (raw content access), or
-- DIPL files, when a query is provided (node-based access), or when the entire file is referenced.
+- Text files, when no path is provided (raw content access), or
+- DIPL files, when a path is provided (node-based access), or when the entire file is referenced.
 
 The **local domain** consists of all nodes parsed within the current DIPL file.
 A **remote domain** refers to a separate DIPL file, which is processed independently.
 
-#### 3.4.1.2. Local References
+### Local References
 
 If the source component is omitted, the reference implicitly targets the local domain.
 
-```DIPL-Schema
-{?<query>}
+```DIPL
+size float = 34 cm
+human
+  height float = {?size}
 ```
 
-is equivalent to:
+In this example the height of a human is set to the size defined by the preceeding ``size`` node.
 
-```DIPL-Schema
-{<local>?<query>}
-```
+### Path Semantics
 
-where ```<local>``` denotes the current document.
+The path component specifies which nodes are selected from a domain.
 
-#### 3.4.1.3. Query Semantics
-
-The query component specifies which nodes are selected from a domain.
-
-A query path MUST resolve to either:
+A path path MUST resolve to either:
 - a single node, or
 - a set of nodes (when using ``*``)
 
 The ``.*`` suffix selects all descendant nodes of the target node recursively, including the entire subtree rooted at that node.
 
-If a query path does not exist, evaluation MUST fail.
+If a path does not exist, evaluation MUST fail.
 If a reference returns multiple nodes in a context that requires a single value, evaluation MUST fail.
 
-#### 3.4.1.4. Self-Reference and Relative References (`{.}`, `{.<query>}`)
+### Self-Reference and Relative References (`{.}`, `{.<path>}`)
 
 The `{.}` reference is a **self-reference** and is valid only within [condition properties](properties.md#3.8.2.-condition). 
 It MUST NOT appear in any other context.
@@ -85,13 +72,13 @@ The resulting value retains its complete type information, including dimensional
 If evaluation of the current node's value fails for any reason, including unresolved references, type errors, or unit incompatibility, the `{.}` reference is undefined. 
 In such a case, evaluation of the condition MUST result in an error.
 
-**Relative references** identify nodes relative to the current node and are written as ``{.<query>}``, ``{..<query>}``, ``{...<query>}``, etc.
+**Relative references** identify nodes relative to the current node and are written as ``{.<path>}``, ``{..<path>}``, ``{...<path>}``, etc.
 
 The number of leading dots determines the level at which the path is resolved:
 
-* ``{.<query>}`` resolves `path` relative to the **current node**;
-* ``{..<query>}`` resolves `path` relative to the **parent** of the current node;
-* ``{...<query>}`` resolves `path` relative to the **grandparent** of the current node;
+* ``{.<path>}`` resolves `path` relative to the **current node**;
+* ``{..<path>}`` resolves `path` relative to the **parent** of the current node;
+* ``{...<path>}`` resolves `path` relative to the **grandparent** of the current node;
 * in general, *N* leading dots resolve `path` relative to the node *N − 1* levels above the current node.
 
 A relative reference MUST NOT traverse beyond the root node. 
@@ -115,54 +102,57 @@ Here:
 * ``{...uncle}`` in `grandson` resolves `uncle` relative to `grandson`'s grandparent.
 * ``{.father}`` in `brother-in-law` resolves `father` relative to the current node's parent/context according to the node hierarchy.
 
-#### 3.4.1.5. Reference Result Types
+### Reference Result Types
 
 ``{<source>}`` returns:
 - raw content for text sources
 - root node set for DIPL sources
 
-absolute references ``{?<query>}``, ``{<source>?<query>}`` and relative references ``{.<query>}`` return:
+absolute references ``{?<path>}``, ``{<source>?<path>}`` and relative references ``{.<path>}`` return:
 - a single node, or
 - a node set (when using *)
 
-self-reference ``{.}`` refers exclusively to the fully evaluated value of the current node and is therefore distinct from `{.<query>}`.
+self-reference ``{.}`` refers exclusively to the fully evaluated value of the current node and is therefore distinct from `{.<path>}`.
 
 The expected type MUST match the usage context. Otherwise, evaluation MUST fail.
 
-``` DIPL-Schema
-# Schema of reference requests
+``` DIPL
+# Reference requests
 
-# content of a source is returned
-{<source>}                     # remote
-          
-# single node is returned
-{?<query>}                     # local
-{<source>?<query>}             # remote
+# Inject source content
+corpus str = {book}             # remote
 
-# children nodes are returned
-{?<query>.*}                   # local
-{<source>?<query>.*}           # remote
+# Inject node value
+chapter str = {?introduction}   # local
+paragraph str = {law?preamble}  # remote
 
-# all nodes are returned
-{?*}                           # local
-{<source>?*}                   # remote
+# Import single node
+driver
+  {?child}                      # local
+  {garage?worker}               # remote
 
-# self and relative references
-{.}                            # local
-{.<query>}                     # local
+# Import child nodes
+passengers
+  {?family.*}                   # local
+  {tourists?family.*}           # remote
+
+# Import all nodes
+sites
+  {?*}                          # local
+  {london?*}                    # remote
+
+# Self reference
+speed int = 78 kph
+  !condition ({.} < 80 kph)     # local
+
+# Relative reference
+father str = "John"
+  son str = {.father}           # local
 ```
 
-### 3.4.2 Imports
+## Imports
 
 Imports can be used to insert referenced nodes directly into the current DIPL hierarchy.
-
-``` DIPL-Schema
-# Schema of node imports
-
-<indent>{<request>}
-<indent><name> {<request>}
-```
-
 Name paths of imported nodes are embedded into the current node hierarchy as shown in the following examples.
 
 
@@ -204,17 +194,10 @@ plate {pantry?veggies.*}       # selecting all subnodes
 
 So far, we have shown how to import regular nodes from a local or remote source.
 It is, however, also possible to import sources and custom [units](units.md#36-units) in the similar way.
-The request can select either one ``{<source>?<query>}`` or all ``{<source>?*}`` sources/units.
-
-``` DIPL-Schema
-# Schema for importing sources and units
-
-<indent>$source {<request>}
-<indent>$unit {<request>}
-```
+The request can select either one ``{<source>?<path>}`` or all ``{<source>?*}`` sources/units.
 
 > [!NOTE]
-> Request query is in this case not a node path but name of a source/unit.
+> Request path is in this case not a node path but name of a source/unit.
 
 Importing sources/units enables users to dynamically modify numerical code units and setting scripts via their DIPL.
 
@@ -225,19 +208,10 @@ $unit {units?*}            # all units are imported from an imported source 'uni
 weight float = 23 [mass]   # using imported unit
 ```
 
-### 3.4.3. Injections
+## Injections
 
 Injections do not insert whole nodes.
 They are used in node definitions and modifications instead of values.
-
-``` DIPL-Schema
-# Schema of node value injections
-
-<indent><name> <type> = {<request>} <unit>	     
-<indent><name> <type> = {<request>}
-<indent><name> = {<request>} <unit>	     
-<indent><name> = {<request>}
-```
 
 A valid injection can reference only a single node or a text content of a file.
 
@@ -261,15 +235,7 @@ $source pressure = "pressures.dip"
 pressure float = {pressure?magnetic}
 ```
    
-Arrays can be imported either directly or can be sliced to match dimensions of a host node using the following schemas:
-
-``` DIPL-Schema
-# Schema of an array slice reference
-
-{?<query>}[<slice>]            # node query from a local domain
-{<source>?<query>}[<slice>]    # node query from a remote domain
-```
-
+Arrays can be imported either directly or can be sliced to match dimensions of a host node.
 Slicing of arrays and also strings adopts the same notation as used in Python.
 An example of sliced injected arrays is below:
 
@@ -297,7 +263,7 @@ mymass float[2] = {?masses}[:,1]
 
 Value injection can also be used to keep large text blocks in external files.
 This makes both the code and text data more readable and easily editable.
-Note that when requests do not include a question mark with a query, DIPL imports files as a text and not as a node list.
+Note that when requests do not include a question mark with a path, DIPL imports files as a text and not as a node list.
 
 ``` DIPL   
 $source velocity = "velocity.txt"
@@ -311,15 +277,8 @@ message str = {message}               # import a text
 
 Values of source and unit definitions can also be injected from other nodes.
 
-``` DIPL-Schema
-# Schema of node value injections
-
-<indent>$unit <name> = {<request>}
-<indent>$source <name> = {<request>}
-```
-
 > [!NOTE]
-> In comparison to imports, request query in injections is always path of a node.
+> In comparison to imports, request path in injections is always path of a node.
 
 This adds an additional scalability to the code.
 Referenced nodes by sources have to be strings and referenced nodes by units have to be floats or integers.
