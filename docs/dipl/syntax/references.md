@@ -105,10 +105,12 @@ Here:
 ### Reference Result Types
 
 ``{<source>}`` returns:
+
 - raw content for text sources
 - root node set for DIPL sources
 
 absolute references ``{?<path>}``, ``{<source>?<path>}`` and relative references ``{.<path>}`` return:
+
 - a single node, or
 - a node set (when using *)
 
@@ -116,16 +118,9 @@ self-reference ``{.}`` refers exclusively to the fully evaluated value of the cu
 
 The expected type MUST match the usage context. Otherwise, evaluation MUST fail.
 
+Imports return nodes:
+
 ``` DIPL
-# Reference requests
-
-# Inject source content
-corpus str = {book}             # remote
-
-# Inject node value
-chapter str = {?introduction}   # local
-paragraph str = {law?preamble}  # remote
-
 # Import single node
 driver
   {?child}                      # local
@@ -140,14 +135,21 @@ passengers
 sites
   {?*}                          # local
   {london?*}                    # remote
+  
+# Inject source content
+corpus str = {book}             # remote
 
-# Self reference
+# Inject node value
+chapter str = {?introduction}   # local
+citation str = {law?paragraph}  # remote
+
+# Inject self reference
 speed int = 78 kph
   !condition ({.} < 80 kph)     # local
 
-# Relative reference
+# Inject relative reference
 father str = "John"
-  son str = {.father}           # local
+  son str = {.father}           # local  
 ```
 
 ## Imports
