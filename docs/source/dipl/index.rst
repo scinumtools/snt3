@@ -21,12 +21,14 @@ used from C++ or Python and exposed through interfaces such as the
 command-line and REST API, avoiding the need to implement separate
 parameter handling and validation logic for each application.
 
- `DIPL Specification <https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/specification.md>`_
+* Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/specification.md>`_
+* Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/grammar.ebnf>`_
+* Syntax highliters: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/highlight>`_
 
 .. raw:: html
 
    <iframe
-       src="_static/specification.pdf"
+       src="../_static/dipl-specification.pdf"
        width="100%"
        height="800px"
        style="border: none;">

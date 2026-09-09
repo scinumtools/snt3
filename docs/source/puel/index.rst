@@ -20,4 +20,14 @@ consistent representation of physical quantities across SciNumTools,
 whether they are used in C++, Python, configuration files, command-line
 interfaces, or other APIs.
 
-** `PUEL Specification <https://github.com/vrtulka23/scinumtools3/blob/main/docs/puel/specification.md>`_
+* Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/puel/specification.md>`_
+* Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/puel/grammar.ebnf>`_
+
+.. raw:: html
+
+   <iframe
+       src="../_static/puel-specification.pdf"
+       width="100%"
+       height="800px"
+       style="border: none;">
+   </iframe>

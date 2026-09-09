@@ -41,7 +41,7 @@ human
   height float = {?size}
 ```
 
-In this example the height of a human is set to the size defined by the preceeding ``size`` node.
+In this example the height of a human is set to the size defined by the preceding ``size`` node.
 
 ### Path Semantics
 

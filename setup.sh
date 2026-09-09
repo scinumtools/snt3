@@ -138,6 +138,18 @@ function run_code {
 }
 
 function compile_docs {
+    dir_static=docs/source/_static
+    file_dipl_spec=$dir_static/dipl-specification.pdf
+    file_puel_spec=$dir_static/puel-specification.pdf
+    if [[ ! -f $file_dipl_spec ]]; then
+        echo "Building DIPL specification"
+        pandoc --defaults=docs/dipl/pandoc.yaml --output=$file_dipl_spec
+    fi
+    if [[ ! -f $file_puel_spec ]]; then
+        echo "Building PUEL specification"
+        pandoc --defaults=docs/puel/pandoc.yaml --output=$file_puel_spec
+    fi
+    echo "Building Sphinx documentation"
     cd docs
     doxygen
     sphinx-build -b html source build/html

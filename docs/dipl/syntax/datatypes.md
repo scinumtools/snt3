@@ -28,15 +28,20 @@ day bool = true
 night bool = false
 ```
 
-**Integer** (`int`, or equivalently `int32`, internally represented as signed 64-bit)
+**Integer** (`int`, `int32`, or `uint`, `uint32`)
 
-The Integer type represents whole numbers without fractional components. It has a
-signed 32-bit semantic range, allowing both positive and negative values within
-a fixed range. In the reference implementation, Integer values are internally
-represented using a signed 64-bit integer (`int64_t`).
+The Integer types represent whole numbers without fractional components. The
+signed Integer type (`int`, or equivalently `int32`) has a signed 32-bit semantic
+range, allowing both positive and negative values within a fixed range. The
+unsigned Integer type (`uint`, or equivalently `uint32`) has an unsigned 32-bit
+semantic range and therefore represents only non-negative values.
 
-``` DIPL
+In the reference implementation, Integer values are internally represented
+using signed or unsigned 64-bit integers (`int64_t` or `uint64_t`), respectively.
+
+```DIPL
 year int = 2023
+count uint = 42
 ```
 
 **Float** (`float`, or equivalently `float64`, internally represented as a 64-bit floating-point value)

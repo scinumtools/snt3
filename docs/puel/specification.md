@@ -1,13 +1,13 @@
-# PUEL Specification
-
-**Version:** v1.0  
-**Status:** Stable (Implementation-defined semantics)  
-**Date:** 2026-03-23  
-
-**Project:** SciNumTools v3  
-**Reference Implementation:** scinumtools.units (PUQ)
-
 ---
+title: "Physical Units Expression Language"
+subtitle: "PUEL Specification for SciNumTools v3"
+author: "Ondrej Pego Jaura"
+version: "0.1.0"
+date: "September 2026"
+titlepage: true
+---
+
+# PUEL Specification
 
 ## Overview
 

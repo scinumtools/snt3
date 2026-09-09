@@ -77,7 +77,7 @@ Numerical values with dimensions compared using comparison operations are automa
 | `A != B` | 3        | Inequality operator returns true if `A` and `B` do not have same dimension or numerical value up to EQUAL\_PRECISION |
 | `A >= B` | 3        | Greater or equal operator returns true if `A` is greater or equal (up to EQUAL\_PRECISION) than `B`                  |
 | `A <= B` | 3        | Smaller or equal operator returns true if `A` is smaller or equal (up to EQUAL\_PRECISION) than `B`                  |
-| `A > B`  | 3        | Greather than operator returns true if `A` is greater than `B`                                                       |
+| `A > B`  | 3        | Greater than operator returns true if `A` is greater than `B`                                                        |
 | `A < B`  | 3        | Smaller than operator returns true if `A` is smaller than `B`                                                        |
   
 **Single value operators**
@@ -110,15 +110,15 @@ Operators used in numerical expressions are summarized below:
 
 **Arithmetics**
 
-| Syntax   | Priority | Description                                    |
-|----------|----------|------------------------------------------------|
-| `A + B`  | 6        | Addition of two values of a same dimension     |
-| `A - B`  | 6        | Substraction of two values of a same dimension |
-| `A * B`  | 5        | Multiplication of two values                   |
-| `A / B`  | 5        | Division of two values                         |
-| `A ** B` | 4        | First value on the power of the second value   |
-| ` +B`    | 3        | Unary plus                                     |
-| ` -B`    | 3        | Unary minus                                    |
+| Syntax   | Priority | Description                                   |
+|----------|----------|-----------------------------------------------|
+| `A + B`  | 6        | Addition of two values of a same dimension    |
+| `A - B`  | 6        | Subtraction of two values of a same dimension |
+| `A * B`  | 5        | Multiplication of two values                  |
+| `A / B`  | 5        | Division of two values                        |
+| `A ** B` | 4        | First value on the power of the second value  |
+| ` +B`    | 3        | Unary plus                                    |
+| ` -B`    | 3        | Unary minus                                   |
 
 Parentheses operators evaluate expressions in a separate thread and return its final value.
 Most of the following operators require, that the final value has no dimensions.
@@ -131,10 +131,10 @@ Most of the following operators require, that the final value has no dimensions.
 | `exp( <expr> )`         | 1        | Returns exponential value of a dimensionless expression.                      |
 | `pow( <expr>, <expr> )` | 1        | Returns first expression risen on a power of second dimensionless expression. |
 | `ln( <expr> )`          | 1        | Returns natural logarithmic value of a dimensionless expression.              |
-| `log10( <expr> )`       | 1        | Returns common logarithmic value of a dimmensionless expression.              |
+| `log10( <expr> )`       | 1        | Returns common logarithmic value of a dimensionless expression.               |
 | `sin( <expr> )`         | 1        | Returns sine value of a dimensionless expression.                             |
 | `cos( <expr> )`         | 1        | Returns cosine value of a dimensionless expression.                           |
-| `tan( <expr> )`         | 1        | Returns tangens value of a dimensionless expression.                          |
+| `tan( <expr> )`         | 1        | Returns tangent value of a dimensionless expression.                          |
 | `min( <expr>, <expr> )` | 1        | Returns minimum of the two expressions.                                       |
 | `max( <expr>, <expr> )` | 1        | Returns maximum of the two expressions.                                       |
 | `floor( <expr> )`       | 1        | Returns the greatest integer less than or equal to the expression             |
