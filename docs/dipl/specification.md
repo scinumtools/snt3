@@ -45,7 +45,7 @@ A DIPL document consists of parameter declarations organized into hierarchical b
 
 ```DIPL
 velocity float32[1,2:] = [[23.45, 23e-34, 45.1]] SI_km/s
-    !condition ({?} < {?cfl_limit})
+    !condition ({.} < {?cfl_limit})
 
 burst_energy float64 = 2.34e5 US_btu
 ```
@@ -143,7 +143,7 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
    Unit incompatibility MUST result in an error.
 6. **Condition Evaluation**  
    All conditions MUST be evaluated using the normalized value of the node.
-   The ``{?}`` self-reference refers to this value.
+   The ``{.}`` self-reference refers to this value.
    - If a condition evaluates to false, the node MUST be considered invalid.
    - If condition evaluation fails, evaluation MUST fail.
 7. **Validation**  
@@ -154,7 +154,8 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
    
    Any violation MUST result in an error.
 
-All conforming implementations MUST produce identical results for identical inputs and sources.
+Except for host-defined functions, conforming implementations MUST produce identical results for identical inputs and sources.
+Functions in DIPL are exception from this rule, because they are user defined and depend on the particular implementation and use case.
 If any stage fails, evaluation MUST terminate with an error.
 
 ### Implementation Notes (Non-Normative)
@@ -230,7 +231,6 @@ Independent implementations of the DIPL language (e.g., in Rust or Julia) are en
 | **Modification**   | Statement assigning a value to an existing node                            |
 | **Source**         | Named external DIPL/text domain                                            |
 | **Reference**      | Expression identifying existing nodes or external content                  |
-| **Injection**      | Use of a reference as the value/content of a node                          |
 | **Import**         | An operation that inserts referenced nodes into the current node hierarchy |
 | **Injection**      | An operation that injects value to a node from local, or remote sources    |
 | **Unit**           | Named physical or dimensional quantity                                     |

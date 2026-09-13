@@ -38,7 +38,7 @@ winner int = 1
   name str = "Jonas"
 @end                         # end of first condition
 
-@if ({?name} == 'Jenny')
+@if ({?name} == "Jenny")
   toy str = "doll"
 @else
   toy str = "robot"
@@ -56,7 +56,7 @@ Nested conditions are also possible, provided that each child condition has inde
   @elif false
     color str = "blue"
   @else
-    @elif true
+    @if true
       leaves int = 234
     color str = "yellow"
   tree str = "maple"

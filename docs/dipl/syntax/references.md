@@ -194,7 +194,7 @@ plate {pantry?veggies.}        # selecting all subnodes
 ```
 
 So far, we have shown how to import regular nodes from a local or remote source.
-It is, however, also possible to import sources and custom [units](units.md#36-units) in the similar way.
+It is, however, also possible to import sources and custom [units](units.md#units) in the similar way.
 The request can select either one ``{<source>?<path>}`` or all ``{<source>?.}`` sources/units.
 
 > [!NOTE]
@@ -225,8 +225,8 @@ When a node is referenced, its value is injected into the receiving expression a
 ```DIPL
 pop float = 5 km
 foo float = 34 cm
-bar float = {foo} m    # resulting value is 0.34 m
-baz float = {foo}      # dimension mismatch
+bar float = {?foo} m    # resulting value is 0.34 m
+baz float = {?foo}      # dimension mismatch
 foo = {?pop}            # modification results in 500000 cm
 ```
 

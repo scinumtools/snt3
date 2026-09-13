@@ -1,216 +1,457 @@
-(* ===================================================== *)
-(* DIPL 1.0 Minimal Grammar                             *)
-(* Reference Implementation Grammar                     *)
-(* ===================================================== *)
+(* ========================================================================== *)
+(* DIPL grammar                                                               *)
+(*                                                                            *)
+(* This grammar follows docs/dipl/specification.md and docs/dipl/syntax/*.md. *)
+(* PUEL-unit-expression is defined by the separate PUEL specification.        *)
+(*                                                                            *)
+(* INDENT and DEDENT are lexer tokens.  An INDENT represents an increase of   *)
+(* two spaces on a non-blank, non-comment line; a DEDENT represents a        *)
+(* decrease. Tabs are not valid indentation.                                  *)
+(* ========================================================================== *)
 
 document
-= { line } ;
-
-line
-= statement newline
-| newline ;
+  = { blank-line | comment-line | statement } ;
 
 statement
-= source_decl
-| node_decl
-| node_update
-| conditional
-;
+  = source-declaration
+  | unit-declaration
+  | schema-declaration
+  | conditional
+  | node-statement ;
 
-(* ----------------------------------------------------- *)
-(* Sources                                               *)
-(* ----------------------------------------------------- *)
+(* -------------------------------------------------------------------------- *)
+(* Nodes and hierarchy                                                        *)
+(* -------------------------------------------------------------------------- *)
 
-source_decl
-= "$source" identifier "=" string ;
+node-statement
+  = value-definition
+  | value-declaration
+  | value-modification
+  | container-declaration
+  | collection-item
+  | node-import
+  | function-import ;
 
-(* ----------------------------------------------------- *)
-(* Nodes                                                 *)
-(* ----------------------------------------------------- *)
+value-definition
+  = node-path whitespace type-spec [ shape-spec ] whitespace "=" whitespace
+    value [ whitespace PUEL-unit-expression ] [ comment ] newline
+    { property-line } ;
 
-node_decl
-= identifier
-type_spec
-[ array_spec ]
-"="
-expression
-[ unit_spec ] ;
+value-declaration
+  = node-path whitespace type-spec [ shape-spec ]
+    [ whitespace PUEL-unit-expression ] [ ";" ] [ comment ] newline
+    { property-line } ;
 
-node_update
-= identifier
-"="
-expression
-[ unit_spec ] ;
+value-modification
+  = node-path whitespace "=" whitespace value
+    [ whitespace PUEL-unit-expression ] [ comment ] newline
+    { property-line } ;
 
-(* ----------------------------------------------------- *)
-(* Types                                                 *)
-(* ----------------------------------------------------- *)
+(* A group has no explicit type. map/list declarations establish a collection *)
+(* type before items are added.                                                *)
+container-declaration
+  = node-path [ whitespace collection-kind ] [ schema-use ] [ comment ] newline
+    [ block ] ;
 
-type_spec
-= "bool"
-| "int"
-| "float"
-| "str"
-| "table" ;
+collection-kind
+  = "map" | "list" ;
 
-(* ----------------------------------------------------- *)
-(* Arrays                                                *)
-(* ----------------------------------------------------- *)
+collection-item
+  = node-path-with-selector [ schema-use ] [ comment ] newline [ block ] ;
 
-array_spec
-= "["
-integer
-{ "," integer }
-"]" ;
+(* Imports insert a node or selected subtree at the current path. *)
+node-import
+  = [ node-path whitespace ] node-reference [ comment ] newline ;
 
-array
-= "["
-[ expression { "," expression } ]
-"]" ;
+(* A host function may return a list of nodes and be used as an import. *)
+function-import
+  = [ node-path whitespace ] function-call [ comment ] newline ;
 
-(* ----------------------------------------------------- *)
-(* Units                                                 *)
-(* ----------------------------------------------------- *)
+block
+  = INDENT { blank-line | comment-line | statement } DEDENT ;
 
-unit_spec
-= identifier
-{ ( "*" | "/" ) identifier } ;
+(* -------------------------------------------------------------------------- *)
+(* Sources, custom units, and schemas                                         *)
+(* -------------------------------------------------------------------------- *)
 
-(* ----------------------------------------------------- *)
-(* References                                            *)
-(* ----------------------------------------------------- *)
+source-declaration
+  = "$source" whitespace source-name whitespace "=" whitespace source-value
+    [ comment ] newline ;
 
-reference
-= "{"
-reference_path
-"}" ;
+source-value
+  = string | node-reference ;
 
-reference_path
-= "?"
-| "?" identifier
-| identifier "?" identifier
-| identifier
-;
+unit-declaration
+  = "$unit" whitespace unit-name whitespace "=" whitespace unit-value
+    [ comment ] newline ;
 
-(* ----------------------------------------------------- *)
-(* Expressions                                           *)
-(* ----------------------------------------------------- *)
+unit-value
+  = PUEL-unit-expression | node-reference ;
 
-expression
-= logical_or ;
+schema-declaration
+  = "$schema" whitespace schema-name [ comment ] newline schema-block ;
 
-logical_or
-= logical_and
-{ "||" logical_and } ;
+schema-block
+  = INDENT { blank-line | comment-line | schema-member } DEDENT ;
 
-logical_and
-= equality
-{ "&&" equality } ;
+schema-member
+  = value-declaration
+  | container-declaration
+  | collection-item ;
 
-equality
-= comparison
-{ ( "==" | "!=" ) comparison } ;
+schema-use
+  = whitespace ":" whitespace schema-name
+    { optional-whitespace "," optional-whitespace schema-name } ;
 
-comparison
-= additive
-{ ( "<" | "<=" | ">" | ">=" ) additive } ;
+(* -------------------------------------------------------------------------- *)
+(* Properties and metadata                                                    *)
+(* -------------------------------------------------------------------------- *)
 
-additive
-= multiplicative
-{ ( "+" | "-" ) multiplicative } ;
+property-line
+  = INDENT property [ comment ] newline ;
 
-multiplicative
-= unary
-{ ( "*" | "/" ) unary } ;
+property
+  = options-property
+  | condition-property
+  | format-property
+  | constant-property
+  | tags-property
+  | delimiter-property
+  | metadata-property ;
 
-unary
-= [ "-" | "!" ]
-primary ;
+options-property
+  = "!options" whitespace array [ whitespace PUEL-unit-expression ] ;
 
-primary
-= literal
-| array
-| reference
-| function_call
-| "(" expression ")" ;
+condition-property
+  = "!condition" whitespace logical-expression ;
 
-(* ----------------------------------------------------- *)
-(* Functions                                             *)
-(* ----------------------------------------------------- *)
+format-property
+  = "!format" whitespace string ;
 
-function_call
-= identifier
-"("
-[ argument_list ]
-")" ;
+constant-property
+  = "!constant" ;
 
-argument_list
-= expression
-{ "," expression } ;
+tags-property
+  = "!tags" whitespace array ;
 
-(* ----------------------------------------------------- *)
-(* Conditionals                                          *)
-(* ----------------------------------------------------- *)
+delimiter-property
+  = "!delimiter" whitespace string ;
+
+metadata-property
+  = metadata-key whitespace metadata-value ;
+
+metadata-key
+  = "?descr" | "?authors" | "?title" | "?journal" | "?year"
+  | "?volume" | "?issue" | "?pages" | "?doi" | "?url" | "?version"
+  | "?created" | "?modified" | "?license" ;
+
+metadata-value
+  = string | integer | float | boolean | "none" ;
+
+(* -------------------------------------------------------------------------- *)
+(* Conditions                                                                 *)
+(* -------------------------------------------------------------------------- *)
 
 conditional
-= if_stmt
-| elif_stmt
-| else_stmt
-| end_stmt ;
+  = if-clause { elif-clause } [ else-clause ] [ end-clause ] ;
 
-if_stmt
-= "@if"
-"(" expression ")" ;
+if-clause
+  = "@if" whitespace condition-value [ comment ] newline block ;
 
-elif_stmt
-= "@elif"
-"(" expression ")" ;
+elif-clause
+  = "@elif" whitespace condition-value [ comment ] newline block ;
 
-else_stmt
-= "@else" ;
+else-clause
+  = "@else" [ comment ] newline block ;
 
-end_stmt
-= "@end" ;
+end-clause
+  = "@end" [ comment ] newline ;
 
-(* ----------------------------------------------------- *)
-(* Literals                                              *)
-(* ----------------------------------------------------- *)
+condition-value
+  = boolean | node-reference | function-call | logical-expression ;
 
-literal
-= boolean
-| integer
-| float
-| string
-| "none" ;
+(* -------------------------------------------------------------------------- *)
+(* References, paths, and slices                                              *)
+(* -------------------------------------------------------------------------- *)
+
+reference
+  = raw-source-reference | node-reference | self-reference ;
+
+(* Raw content of a named source. *)
+raw-source-reference
+  = "{" source-name "}" ;
+
+(* An omitted source name selects the local domain. An omitted path selects   *)
+(* the complete node tree. A trailing dot selects a subtree.                  *)
+node-reference
+  = absolute-node-reference | relative-node-reference ;
+
+absolute-node-reference
+  = "{" [ source-name ] "?" [ absolute-path ] [ subtree-selector ] "}" ;
+
+relative-node-reference
+  = "{" relative-prefix node-path [ subtree-selector ] "}" ;
+
+absolute-path
+  = node-path ;
+
+relative-prefix
+  = "." { "." } ;
+
+subtree-selector
+  = "." ;
+
+(* Valid only inside a !condition expression. *)
+self-reference
+  = "{.}" ;
+
+node-path
+  = path-segment { "." path-segment } ;
+
+node-path-with-selector
+  = path-segment { "." path-segment } "." selected-path-segment
+  | selected-path-segment ;
+
+path-segment
+  = name [ collection-selector ] ;
+
+selected-path-segment
+  = name collection-selector ;
+
+collection-selector
+  = "[" [ collection-key ] "]" ;
+
+collection-key
+  = name | integer ;
+
+slice
+  = "[" slice-item { "," slice-item } "]" ;
+
+slice-item
+  = integer | [ integer ] ":" [ integer ] ;
+
+(* -------------------------------------------------------------------------- *)
+(* Values, arrays, tables, and templates                                      *)
+(* -------------------------------------------------------------------------- *)
+
+value
+  = "none"
+  | boolean
+  | integer
+  | float
+  | string
+  | string-block
+  | template
+  | array
+  | table-block
+  | reference [ slice ]
+  | function-call
+  | numerical-expression
+  | logical-expression ;
+
+array
+  = "[" [ value { optional-whitespace "," optional-whitespace value } ] "]" ;
+
+string-block
+  = triple-quote { block-character | newline } triple-quote ;
+
+(* Table headers are unindented declarations, followed by --- and data rows. *)
+table-block
+  = triple-quote table-header "---" newline { table-row newline } triple-quote ;
+
+table-header
+  = { table-column newline } ;
+
+table-column
+  = name whitespace type-spec [ shape-spec ] [ whitespace PUEL-unit-expression ] ;
+
+table-row
+  = table-field { table-delimiter table-field } ;
+
+template
+  = "f" ( string | string-block ) ;
+
+template-substitution
+  = "{{" node-reference [ slice ] [ ":" format-spec ] "}}" ;
+
+(* -------------------------------------------------------------------------- *)
+(* Expressions                                                                 *)
+(* -------------------------------------------------------------------------- *)
+
+logical-expression
+  = logical-or ;
+
+logical-or
+  = logical-and { whitespace "||" whitespace logical-and } ;
+
+logical-and
+  = comparison { whitespace "&&" whitespace comparison } ;
+
+comparison
+  = numerical-expression
+    [ whitespace comparison-operator whitespace numerical-expression ] ;
+
+comparison-operator
+  = "==" | "!=" | ">=" | "<=" | ">" | "<" ;
+
+numerical-expression
+  = additive-expression ;
+
+additive-expression
+  = multiplicative-expression
+    { whitespace ( "+" | "-" ) whitespace multiplicative-expression } ;
+
+multiplicative-expression
+  = power-expression
+    { whitespace ( "*" | "/" ) whitespace power-expression } ;
+
+power-expression
+  = unary-expression [ whitespace "**" whitespace power-expression ] ;
+
+unary-expression
+  = [ "+" | "-" | "~" ] primary-expression ;
+
+primary-expression
+  = quantity
+  | scalar
+  | node-reference [ slice ]
+  | self-reference
+  | function-call
+  | built-in-call
+  | "(" optional-whitespace logical-expression optional-whitespace ")" ;
+
+quantity
+  = ( integer | float ) [ whitespace PUEL-unit-expression ] ;
+
+built-in-call
+  = definition-test | numerical-function ;
+
+definition-test
+  = ( "def" | "ndef" ) "(" whitespace node-reference whitespace ")" ;
+
+numerical-function
+  = ( "exp" | "ln" | "log10" | "sin" | "cos" | "tan" | "floor" | "ceil" | "round" )
+    "(" whitespace numerical-expression whitespace ")"
+  | ( "pow" | "min" | "max" )
+    "(" whitespace numerical-expression whitespace "," whitespace numerical-expression whitespace ")" ;
+
+function-call
+  = function-name "(" [ function-arguments ] ")" ;
+
+function-arguments
+  = value { optional-whitespace "," optional-whitespace value } ;
+
+(* -------------------------------------------------------------------------- *)
+(* Types, shapes, and lexical syntax                                          *)
+(* -------------------------------------------------------------------------- *)
+
+type-spec
+  = "bool" | "int" | "uint" | "float" | "float128" | "str" | "char"
+  | "byte" | "table" | signed-integer-type | unsigned-integer-type
+  | floating-type ;
+
+signed-integer-type
+  = "int8" | "int16" | "int32" | "int64" ;
+
+unsigned-integer-type
+  = "uint8" | "uint16" | "uint32" | "uint64" ;
+
+floating-type
+  = "float16" | "float32" | "float64" ;
+
+shape-spec
+  = "[" shape-dimension { "," shape-dimension } "]" ;
+
+shape-dimension
+  = non-negative-integer
+  | [ non-negative-integer ] ":" [ non-negative-integer ] ;
+
+scalar
+  = boolean | integer | float | string | "none" ;
 
 boolean
-= "true"
-| "false" ;
-
-(* ----------------------------------------------------- *)
-(* Lexer Rules                                           *)
-(* ----------------------------------------------------- *)
-
-identifier
-= letter
-{ letter | digit | "_" } ;
+  = "true" | "false" ;
 
 integer
-= digit
-{ digit } ;
+  = [ "+" | "-" ] digit { digit } ;
 
 float
-= integer "." integer ;
+  = [ "+" | "-" ]
+    ( digit { digit } [ "." { digit } ] | "." digit { digit } )
+    [ ( "e" | "E" ) [ "+" | "-" ] digit { digit } ] ;
 
 string
-= '"' { character } '"' ;
+  = '"' { string-character | escape-sequence } '"' ;
 
-letter
-= "A"…"Z"
-| "a"…"z" ;
+triple-quote
+  = '"""' ;
 
-digit
-= "0"…"9" ;
+escape-sequence
+  = "\\\"" | "\\n" | "\\\\" ;
+
+name
+  = name-character { name-character } ;
+
+name-character
+  = letter | digit | "_" | "-" ;
+
+source-name
+  = name ;
+
+unit-name
+  = name ;
+
+schema-name
+  = name ;
+
+function-name
+  = name ;
+
+comment
+  = "#" { character } ;
+
+blank-line
+  = [ whitespace ] newline ;
+
+comment-line
+  = [ whitespace ] comment newline ;
+
+whitespace
+  = " " { " " } ;
+
+optional-whitespace
+  = { " " } ;
 
 newline
-= "\n" ;
+  = "\n" | "\r\n" ;
+
+letter
+  = "A" … "Z" | "a" … "z" ;
+
+digit
+  = "0" … "9" ;
+
+non-negative-integer
+  = digit { digit } ;
+
+(* character, string-character, block-character, format-spec, table-field,  *)
+(* and table-delimiter are lexical productions. Their exact treatment is     *)
+(* defined by the Values, Expressions, and Properties chapters.              *)
+
+(* -------------------------------------------------------------------------- *)
+(* Context-sensitive constraints                                               *)
+(* -------------------------------------------------------------------------- *)
+
+(* - A definition/declaration establishes a node's type, shape, and default  *)
+(*   unit. A modification must be compatible with those properties.           *)
+(* - Units are valid only for numerical value nodes and numerical table       *)
+(*   columns.                                                                 *)
+(* - Properties immediately follow their node and are one indentation level   *)
+(*   deeper. Their applicability is defined in syntax/properties.md.          *)
+(* - {.} is valid only in a !condition expression.                            *)
+(* - A trailing dot in a reference selects a subtree and is invalid where a   *)
+(*   single value is required.                                                *)
+(* - Map and list selectors cannot be mixed at the same collection path.      *)
+(* - Schemas must be declared before use; source and unit names are unique.   *)
+(* - Functions are host-defined extensions; their availability and semantics  *)
+(*   are implementation-specific.                                            *)

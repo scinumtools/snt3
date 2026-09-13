@@ -1,6 +1,9 @@
 # Functions
 
-DIPL allows functions provided by the host implementation to be invoked from within a DIPL document. Functions extend the built-in expression syntax with custom logic and allow parameter values or nodes to be generated dynamically.
+DIPL allows functions provided by the host implementation to be invoked from within a DIPL document.
+Functions extend the built-in expression syntax with custom logic and allow parameter values or nodes to be generated dynamically.
+
+**Note:** The input and output data of a user-defined function may differ depending on the host implementation and the particular use case. However, the function interface defined by DIPL remains consistent: the environment list is passed to the function in the defined form, and the function returns a value/node list in the defined form.
 
 ## Function Calls
 
@@ -34,7 +37,7 @@ Explicit arguments may additionally be supplied in the function call. These argu
 
 ```DIPL 
 scale float = 10 cm
-result float = calculate({scale}, 2)
+result float = calculate({?scale}, 2)
 ```
 
 The exact representation and calling convention of the implicit `data` argument are implementation-defined.

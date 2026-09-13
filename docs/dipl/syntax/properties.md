@@ -15,7 +15,7 @@ Initial code parameters often accept only a few discrete input values, also call
 These can be explicitly described during node definition or declaration.
 
 The expected value of this clause is a list of values.
-It can be given explicitly or as a [reference](references.md#3.4.-references).
+It can be given explicitly or as a [reference](references.md#references).
 
 Node options can be specified for all data types except boolean.
 In case of boolean, the two options (``true`` or ``false``) are implicitly set.
@@ -67,11 +67,11 @@ To restrict node values to some particular interval, it is possible to set a log
 A given expression has to be evaluated as ``true`` after each definition or modification of a node.
 
 In the example below, node ``energy`` can have values in a range of 23 and 26 erg.
-The actual value of node ``energy`` is matched using a special [self-reference sign](references.md#3.4.-references) ``{?}``.
+The actual value of node ``energy`` is matched using a special [self-reference sign](references.md#references) ``{.}``.
 
 ``` DIPL
 energy float = 25 erg
-  !condition (23 < {?} && {?} < 26)
+  !condition (23 < {.} && {.} < 26)
 ```
 
 ### Format

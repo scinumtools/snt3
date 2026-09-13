@@ -14,10 +14,10 @@ result float = (
 
 There are 4 different types of expressions in DIPL.
 Three of them (logical, numerical and textual, i.e. templates) are described below.
-Dimensional expressions, i.e. [units](units.md#3.6.-units), are described in a separate chapter.
+Dimensional expressions, i.e. [units](units.md#units), are described in a separate chapter.
 
 > [!NOTE]
-> All operators used in expressions must be separated from values with at least one empty space.
+> All but unary operators used in expressions must be separated from values with at least one empty space.
 
 Possible input values used by expressions are summarized in the following table:
 
@@ -30,7 +30,7 @@ Possible input values used by expressions are summarized in the following table:
 | ``<ref>``  | reference  | ``{?energy}``                 |
 | ``<expr>`` | expression | ``12 cm == {?width} && true`` |
 
-Operators summarized below are evaluated according to their priority from highest `1` to lowest `4`, and can be nested accordingly.
+Operators summarized below are evaluated according to their priority from highest `1` to lowest `6`, and can be nested accordingly.
 
 ## Logical
 
@@ -182,10 +182,12 @@ Single curly brackets are interpreted as a plain test.
 
 Basic syntax of parsing operators is described below:
     
-| Syntax             | Description                          |
-|--------------------|--------------------------------------|
-| `{<ref>}`          | Default reference of a node value.   |
-| `{<ref>:<format>}` | Formatted reference of a node value. |
+| Syntax                        | Description                                |
+|-------------------------------|--------------------------------------------|
+| `{{<ref>}}`                   | Default reference of a node value.         |
+| `{{<ref>}[<slice>]}`          | Default reference of a node value slice.   |
+| `{{<ref>}:<format>}`          | Formatted reference of a node value.       |
+| `{{<ref>}[<slice>]:<format>}` | Formatted reference of a node value slice. |
 	
 Arrays can also be parsed using templates, however, without specifying a format.
 The format depends on the default Python string casting functions:

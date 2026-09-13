@@ -1,8 +1,8 @@
 # Nodes
 
 The DIPL language distinguishes three different ways to create a parameter, depending on which parts of the parameter node are specified.
-A parameter can be fully [defined](nodes.md#definition), meaning that all node components—name, type, shape, value, and unit—are provided.
-Alternatively, a parameter can be [declared](nodes.md#declaration) by specifying only its name, type, and shape.
+A parameter can be fully [defined](nodes.md#definition), meaning that all node components—name, type, value, and optionally shape and units—are provided.
+Alternatively, a parameter can be [declared](nodes.md#declaration) by specifying only its name, type, and optional shape/units.
 After a parameter has been either defined or declared, its value component can be [modified](nodes.md#modification).
 Additionally, nodes can be ordered into a [hierarchical](#hierarchy) structure by using indents.
 
@@ -180,7 +180,7 @@ Collections may be nested.
 
 Collection selectors are interpreted according to the type of the referenced collection.
 
-When resolving a fully-qualified path, all parent nodes shall already exist. 
+When resolving a fully-qualified path, all parent collections shall already exist.
 Since the container type of each parent node is therefore known, selectors of the form `[value]` can be unambiguously interpreted either as map keys or list indices.
 
 Only the final path segment may create a new node or collection item.

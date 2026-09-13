@@ -11,7 +11,7 @@ different widths, such as `int8`, `int16`, `int32`, `int64`, `uint8`,
 `uint16`, `uint32`, and `uint64`.
 
 For floating-point types, derived types specify the floating-point precision,
-such as `float16`, `float32`, `float64`, and `float128`.
+such as `float16`, `float32`, `float64`. The special case `float128` is a separate standard type, because its support on different platforms varies.
 
 ## Standard data types
 
@@ -85,8 +85,8 @@ precision. Multiple DIPL types may share the same internal
 representation while retaining distinct semantics.
 
 In C/C++, a string is typically represented as a sequence of characters.
-In DIPL, ``char`` and ``string`` are distinct types. The ``char`` type
-represents a single unsigned 8-bit character value, while ``string``
+In DIPL, ``char`` and ``str`` are distinct types. The ``char`` type
+represents a single unsigned 8-bit character value, while ``str``
 represents a sequence of characters. This distinction facilitates
 interoperability with C/C++ without imposing C/C++'s implementation-
 defined ``char`` signedness on DIPL.
@@ -108,13 +108,13 @@ value. Neither type specifies an inherent text encoding.
 | ``float128`` |                                               | implementation-defined  |
 | ``char``     |                                               | ``uint8_t``             |
 | ``byte``     |                                               | ``uint8_t``             |
-| ``string``   |                                               | ``string``              |
+| ``str``      |                                               | ``string``              |
 
 > [!NOTE]
-> The float16 and float128 types are optional. 
+> The ``float16`` and ``float128`` types are optional. 
 > Many platforms and compilers do not provide native support for 16-bit and 128-bit floating-point arithmetic. 
 > If supported, their availability and internal representation must be explicitly documented by the respective 
-> DIPL implementation.The ``float16`` and ``float128`` types are optional.
+> DIPL implementation.
 >
 > The ``byte`` and ``char`` types are optional.
 > Both types are unsigned 8-bit types and are internally represented
