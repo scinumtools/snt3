@@ -11,7 +11,10 @@ different widths, such as `int8`, `int16`, `int32`, `int64`, `uint8`,
 `uint16`, `uint32`, and `uint64`.
 
 For floating-point types, derived types specify the floating-point precision,
-such as `float16`, `float32`, `float64`. The special case `float128` is a separate standard type, because its support on different platforms varies.
+such as `float16`, `float32`, and `float64`. `float16` is optional: an
+implementation may provide the type when its compiler and runtime support a
+usable 16-bit floating-point representation. The special case `float128` is a
+separate standard type, because its support on different platforms varies.
 
 ## Standard data types
 
@@ -104,17 +107,19 @@ value. Neither type specifies an inherent text encoding.
 | ``bool``     |                                               | ``uint8_t``             |
 | ``int``      | ``int8``, ``int16``, ``int32``, ``int64``     | ``int64_t``             |
 | ``uint``     | ``uint8``, ``uint16``, ``uint32``, ``uint64`` | ``uint64_t``            |
-| ``float``    | ``float16``, ``float32``, ``float64``         | ``double``              |
+| ``float``    | ``float16`` (optional), ``float32``, ``float64`` | ``double``           |
 | ``float128`` |                                               | implementation-defined  |
 | ``char``     |                                               | ``uint8_t``             |
 | ``byte``     |                                               | ``uint8_t``             |
 | ``str``      |                                               | ``string``              |
 
 > [!NOTE]
-> The ``float16`` and ``float128`` types are optional. 
-> Many platforms and compilers do not provide native support for 16-bit and 128-bit floating-point arithmetic. 
-> If supported, their availability and internal representation must be explicitly documented by the respective 
-> DIPL implementation.
+> The ``float16`` and ``float128`` types are optional. Many platforms and
+> compilers do not provide native support for 16-bit and 128-bit
+> floating-point arithmetic. An implementation that does not support
+> ``float16`` MUST reject it as an unsupported datatype; an implementation
+> that supports it MUST document its representation, conversion, and
+> arithmetic behavior.
 >
 > The ``byte`` and ``char`` types are optional.
 > Both types are unsigned 8-bit types and are internally represented
