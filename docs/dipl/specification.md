@@ -130,7 +130,7 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
    - Unresolved sources or node references MUST result in an error.
    - Cyclic dependencies MUST result in an error.
 3. **Reference Evaluation**  
-   All reference expressions (e.g. ``{<source>?<query>}``, ``{?<query>}``) MUST be resolved to their corresponding values or node sets.
+   All reference expressions (e.g. ``{<source>?<path>}``, ``{?<path>}``) MUST be resolved to their corresponding values or node sets.
    Remote sources MUST be processed independently before their results are used.
 4. **Expression and Value Evaluation**  
    All node values MUST be evaluated, including:
