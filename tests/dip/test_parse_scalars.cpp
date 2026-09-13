@@ -211,6 +211,8 @@ TEST(ParseScalars, DataTypeRanges) {
     dip::DIP d;
 
     d.add_string(
+        "int8_min int8 = -128\n"
+        "int8_max int8 = 127\n"
         "int16_min int16 = -32768\n"
         "int16_max int16 = 32767\n"
         "int32_min int32 = -2147483648\n"
@@ -218,6 +220,7 @@ TEST(ParseScalars, DataTypeRanges) {
         "int64_min int64 = -9223372036854775808\n"
         "int64_max int64 = 9223372036854775807\n"
         "uint16_max uint16 = 65535\n"
+        "uint8_max uint8 = 255\n"
         "uint32_max uint32 = 4294967295\n"
         "uint64_max uint64 = 18446744073709551615\n"
         "float32_min float32 = -3.4028234663852886e+38\n"
@@ -235,6 +238,9 @@ TEST(ParseScalars, DataTypeRanges) {
     dip::Environment env = d.parse();
 
     EXPECT_EQ(env["int16_min"].as<int64_t>(), std::numeric_limits<int16_t>::lowest());
+    EXPECT_EQ(env["int8_min"].as<int64_t>(), std::numeric_limits<int8_t>::lowest());
+    EXPECT_EQ(env["int8_max"].as<int64_t>(), std::numeric_limits<int8_t>::max());
+    EXPECT_EQ(env["int8_min"].get_node()->value->get_dtype(), core::DataType::Integer8);
     EXPECT_EQ(env["int16_max"].as<int64_t>(), std::numeric_limits<int16_t>::max());
 
     EXPECT_EQ(env["int32_min"].as<int64_t>(), std::numeric_limits<int32_t>::lowest());
@@ -244,6 +250,8 @@ TEST(ParseScalars, DataTypeRanges) {
     EXPECT_EQ(env["int64_max"].as<int64_t>(), std::numeric_limits<int64_t>::max());
 
     EXPECT_EQ(env["uint16_max"].as<uint64_t>(), std::numeric_limits<uint16_t>::max());
+    EXPECT_EQ(env["uint8_max"].as<uint64_t>(), std::numeric_limits<uint8_t>::max());
+    EXPECT_EQ(env["uint8_max"].get_node()->value->get_dtype(), core::DataType::Integer8_U);
     EXPECT_EQ(env["uint32_max"].as<uint64_t>(), std::numeric_limits<uint32_t>::max());
     EXPECT_EQ(env["uint64_max"].as<uint64_t>(), std::numeric_limits<uint64_t>::max());
 

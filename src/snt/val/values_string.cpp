@@ -43,6 +43,12 @@ namespace snt::val {
                 arr[i] = (int64_t)std::stoi(this->value[i]);
             return std::make_unique<ArrayValue<int64_t>>(arr, this->shape, dt);
         }
+        case core::DataType::Integer8: {
+            std::vector<int64_t> arr(this->value.size());
+            for (size_t i = 0; i < this->value.size(); i++)
+                arr[i] = static_cast<int64_t>(std::stol(this->value[i]));
+            return std::make_unique<ArrayValue<int64_t>>(arr, this->shape, dt);
+        }
         case core::DataType::Integer32: {
             std::vector<int64_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++) {
@@ -79,6 +85,12 @@ namespace snt::val {
             std::vector<uint64_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++)
                 arr[i] = (uint64_t)std::stoi(this->value[i]);
+            return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape, dt);
+        }
+        case core::DataType::Integer8_U: {
+            std::vector<uint64_t> arr(this->value.size());
+            for (size_t i = 0; i < this->value.size(); i++)
+                arr[i] = static_cast<uint64_t>(std::stoul(this->value[i]));
             return std::make_unique<ArrayValue<uint64_t>>(arr, this->shape, dt);
         }
         case core::DataType::Integer32_U: {

@@ -65,12 +65,15 @@ namespace snt::core {
         Float64 = 1 << 11,
         Float128 = 1 << 12, // TODO: this is not percise, could be less precision
         FloatX = 1 << 13,   // TODO: need to be implemented
+        Integer8 = 1 << 14,
+        Integer8_U = 1 << 15,
 
         // Define data type groups
-        Integer = Integer16 | Integer32 | Integer64 | IntegerX | Integer16_U | Integer32_U | Integer64_U,
+        Integer = Integer8 | Integer16 | Integer32 | Integer64 | IntegerX | Integer8_U | Integer16_U | Integer32_U |
+                  Integer64_U,
 
-        Integer_S = Integer16 | Integer32 | Integer64 | IntegerX,
-        Integer_U = Integer16_U | Integer32_U | Integer64_U,
+        Integer_S = Integer8 | Integer16 | Integer32 | Integer64 | IntegerX,
+        Integer_U = Integer8_U | Integer16_U | Integer32_U | Integer64_U,
 
         Float = Float32 | Float64 | Float128 | FloatX
 

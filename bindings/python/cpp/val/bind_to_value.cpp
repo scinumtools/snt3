@@ -43,12 +43,10 @@ namespace snt::bind::python {
                 });
             }
         }
+        case core::DataType::Integer8:
         case core::DataType::Integer16:
         case core::DataType::Integer32:
         case core::DataType::Integer64:
-        case core::DataType::Integer16_U:
-        case core::DataType::Integer32_U:
-        case core::DataType::Integer64_U:
         case core::DataType::Integer: {
             val::ArrayValue<int64_t>* val = dynamic_cast<val::ArrayValue<int64_t>*>(value.get());
             if (!val) {
@@ -66,6 +64,28 @@ namespace snt::bind::python {
             } else { // return as a list
                 size_t index = 0;
                 return make_nested_list(val->get_data(), shape, 0, index, [](int64_t v) { return py::int_(v); });
+            }
+        }
+        case core::DataType::Integer8_U:
+        case core::DataType::Integer16_U:
+        case core::DataType::Integer32_U:
+        case core::DataType::Integer64_U: {
+            val::ArrayValue<uint64_t>* val = dynamic_cast<val::ArrayValue<uint64_t>*>(value.get());
+            if (!val) {
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as an unsigned integer type but is not stored as `ArrayValue<uint64_t>`. ",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
+            } else if (val->get_size() == 0) {
+                return py::list();
+            } else if (val->get_size() == 1) {
+                return py::int_(val->get_value(0));
+            } else {
+                size_t index = 0;
+                return make_nested_list(val->get_data(), shape, 0, index, [](uint64_t v) { return py::int_(v); });
             }
         }
         case core::DataType::Float32:
@@ -153,12 +173,10 @@ namespace snt::bind::python {
                 return result;
             }
         }
+        case core::DataType::Integer8:
         case core::DataType::Integer16:
         case core::DataType::Integer32:
         case core::DataType::Integer64:
-        case core::DataType::Integer16_U:
-        case core::DataType::Integer32_U:
-        case core::DataType::Integer64_U:
         case core::DataType::Integer: {
             val::ArrayValue<int64_t>* val = dynamic_cast<val::ArrayValue<int64_t>*>(value.get());
             if (!val) {
@@ -177,6 +195,31 @@ namespace snt::bind::python {
                 return result;
             } else { // return numpy array
                 auto result = py::array_t<int64_t>(shape);
+                std::copy(val->get_data(), val->get_data() + val->get_size(), result.mutable_data());
+                return result;
+            }
+        }
+        case core::DataType::Integer8_U:
+        case core::DataType::Integer16_U:
+        case core::DataType::Integer32_U:
+        case core::DataType::Integer64_U: {
+            val::ArrayValue<uint64_t>* val = dynamic_cast<val::ArrayValue<uint64_t>*>(value.get());
+            if (!val) {
+                throw val::PybindException(
+                    "Value type mismatch",
+                    "The value is marked as an unsigned integer type but is not stored as `ArrayValue<uint64_t>`. ",
+                    "Ensure that the value's data type matches its stored value type.",
+                    __FILE__,
+                    __LINE__
+                );
+            } else if (val->get_size() == 0) {
+                return py::array_t<uint64_t>(0);
+            } else if (val->get_size() == 1) {
+                auto result = py::array_t<uint64_t>({});
+                *result.mutable_data() = val->get_value(0);
+                return result;
+            } else {
+                auto result = py::array_t<uint64_t>(shape);
                 std::copy(val->get_data(), val->get_data() + val->get_size(), result.mutable_data());
                 return result;
             }

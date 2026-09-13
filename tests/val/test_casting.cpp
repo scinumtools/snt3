@@ -72,6 +72,16 @@ TEST(Casting, Integer) {
     EXPECT_EQ(bval->to_string(), "B");
 }
 
+TEST(Casting, Integer8) {
+    val::ArrayValueInt8 sint(static_cast<int8_t>(-128));
+    EXPECT_EQ(sint.to_string(), "-128");
+    EXPECT_EQ(sint.get_dtype(), core::DataType::Integer8);
+
+    val::ArrayValueUint8 uint(static_cast<uint8_t>(255));
+    EXPECT_EQ(uint.to_string(), "255");
+    EXPECT_EQ(uint.get_dtype(), core::DataType::Integer8_U);
+}
+
 TEST(Casting, Float) {
 
     std::vector<double> arr = {0, 2, 33.3, 45e2, -100023e3};

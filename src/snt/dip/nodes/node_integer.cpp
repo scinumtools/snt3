@@ -25,7 +25,9 @@ namespace snt::dip {
     }
 
     IntegerNode::IntegerNode(Parser& parser) : ValueNode(parser, NodeDtype::Integer) {
-        if (dtype_raw[2] == "16") {
+        if (dtype_raw[2] == "8") {
+            value_dtype = (dtype_raw[0] == "u") ? core::DataType::Integer8_U : core::DataType::Integer8;
+        } else if (dtype_raw[2] == "16") {
             value_dtype = (dtype_raw[0] == "u") ? core::DataType::Integer16_U : core::DataType::Integer16;
         } else if (dtype_raw[2] == "32" || dtype_raw[2] == "") {
             value_dtype = (dtype_raw[0] == "u") ? core::DataType::Integer32_U : core::DataType::Integer32;
@@ -35,7 +37,7 @@ namespace snt::dip {
             throw dip::SyntaxException(
                 "Invalid integer data type",
                 "The integer data type cannot be determined from the node settings.",
-                "Use `16`, `32`, or `64` as the integer size, optionally prefixed with `u` for an unsigned integer.",
+                "Use `8`, `16`, `32`, or `64` as the integer size, optionally prefixed with `u` for an unsigned integer.",
                 __FILE__,
                 __LINE__,
                 line
@@ -71,6 +73,10 @@ namespace snt::dip {
     val::BaseValue::PointerType IntegerNode::cast_scalar_value(const std::string& value_input) const {
         // TODO: variable precision x should be implemented
         switch (value_dtype) {
+        case core::DataType::Integer8_U:
+            return std::make_unique<val::ArrayValueUint8>(static_cast<uint8_t>(std::stoul(value_input)));
+        case core::DataType::Integer8:
+            return std::make_unique<val::ArrayValueInt8>(static_cast<int8_t>(std::stol(value_input)));
         case core::DataType::Integer16_U:
             return std::make_unique<val::ArrayValueUint16>((unsigned short)std::stoi(value_input));
             break;
@@ -111,6 +117,24 @@ namespace snt::dip {
     ) const {
         // TODO: variable precision x should be implemented
         switch (value_dtype) {
+        case core::DataType::Integer8_U: {
+            std::vector<uint8_t> arr;
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back(static_cast<uint8_t>(std::stoul(s)));
+            }
+            return std::make_unique<val::ArrayValueUint8>(arr, shape);
+        }
+        case core::DataType::Integer8: {
+            std::vector<int8_t> arr;
+            if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
+                arr.reserve(value_inputs.size());
+                for (const auto& s : value_inputs)
+                    arr.push_back(static_cast<int8_t>(std::stol(s)));
+            }
+            return std::make_unique<val::ArrayValueInt8>(arr, shape);
+        }
         case core::DataType::Integer16_U: {
             std::vector<uint16_t> arr;
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {

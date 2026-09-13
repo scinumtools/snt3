@@ -239,14 +239,14 @@ namespace snt::dip {
         constexpr std::string_view types[] = {
             KEYWORD_BOOLEAN, KEYWORD_INTEGER, KEYWORD_FLOAT, KEYWORD_STRING, KEYWORD_TABLE, KEYWORD_MAP, KEYWORD_LIST
         };
-        constexpr std::string_view precisions[] = {"128", "64", "32", "16", "x"};
+        constexpr std::string_view precisions[] = {"128", "64", "32", "16", "8", "x"};
         const auto fail = [&] {
             if (required)
                 throw dip::SyntaxException(
                     "Could not determine the node type",
                     "No valid node type or type precision could be determined from the current line.",
                     "Specify a node type such as boolean, integer, float, string, table, map, or list, optionally with "
-                    "a supported precision such as 128, 64, 32, or 16.",
+                    "a supported precision such as 128, 64, 32, 16, or 8.",
                     __FILE__,
                     __LINE__,
                     line

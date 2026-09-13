@@ -6,6 +6,16 @@
 
 namespace snt::val {
 
+    class ArrayValueInt8 : public ArrayValue<int64_t> {
+      public:
+        ArrayValueInt8(const int8_t& val) : ArrayValue<int64_t>(val, core::DataType::Integer8) {};
+        ArrayValueInt8(const std::vector<int8_t>& arr, const Array::ShapeType& sh)
+            : ArrayValue<int64_t>(std::vector<int64_t>(arr.begin(), arr.end()), sh, core::DataType::Integer8) {};
+        ArrayValueInt8(const std::vector<int8_t>& arr)
+            : ArrayValue<int64_t>(std::vector<int64_t>(arr.begin(), arr.end()), core::DataType::Integer8) {};
+        ArrayValueInt8(const BaseValue* other) : ArrayValue<int64_t>(other, core::DataType::Integer8) {};
+    };
+
     class ArrayValueBool : public ArrayValue<uint8_t> {
       public:
         ArrayValueBool(const bool& val) : ArrayValue<uint8_t>(val, core::DataType::Boolean) {};
@@ -63,6 +73,16 @@ namespace snt::val {
         ArrayValueUint16(const std::vector<uint16_t>& arr)
             : ArrayValue<uint64_t>(std::vector<uint64_t>(arr.begin(), arr.end()), core::DataType::Integer16_U) {};
         ArrayValueUint16(const BaseValue* other) : ArrayValue<uint64_t>(other, core::DataType::Integer16_U) {};
+    };
+
+    class ArrayValueUint8 : public ArrayValue<uint64_t> {
+      public:
+        ArrayValueUint8(const uint8_t& val) : ArrayValue<uint64_t>(val, core::DataType::Integer8_U) {};
+        ArrayValueUint8(const std::vector<uint8_t>& arr, const Array::ShapeType& sh)
+            : ArrayValue<uint64_t>(std::vector<uint64_t>(arr.begin(), arr.end()), sh, core::DataType::Integer8_U) {};
+        ArrayValueUint8(const std::vector<uint8_t>& arr)
+            : ArrayValue<uint64_t>(std::vector<uint64_t>(arr.begin(), arr.end()), core::DataType::Integer8_U) {};
+        ArrayValueUint8(const BaseValue* other) : ArrayValue<uint64_t>(other, core::DataType::Integer8_U) {};
     };
 
     class ArrayValueUint32 : public ArrayValue<uint64_t> {
