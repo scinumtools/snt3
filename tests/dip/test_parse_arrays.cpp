@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 
@@ -199,4 +200,27 @@ TEST(ParseArrays, Empty) {
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_EQ(vnode->value->to_string(), "[]");
+}
+
+TEST(ParseArrays, ArrayFromString) {
+
+    dip::DIP d;
+    d.add_string(
+        "velocity int[4,4] = \"\"\"\n"
+        "[[ 0, 1, 2, 4],\n"
+        "[ 5, 6, 7, 8],\n"
+        "[ 9,10,11,12],\n"
+        "[13,14,15,16]]\n"
+        "\"\"\" km/s"
+    );
+    d.add_string("flags bool[2] = \"\"\"[true, false]\"\"\"");
+    d.add_string("labels str[2] = \"\"\"[\"left\", \"right\"]\"\"\"");
+    dip::Environment env = d.parse();
+
+    auto value = env["velocity"].as<std::vector<int64_t>>();
+    ASSERT_EQ(value.size(), 16);
+    EXPECT_EQ(value.front(), 0);
+    EXPECT_EQ(value.back(), 16);
+    EXPECT_EQ(env["flags"].as<std::vector<bool>>(), (std::vector<bool>{true, false}));
+    EXPECT_EQ(env["labels"].as<std::vector<std::string>>(), (std::vector<std::string>{"left", "right"}));
 }

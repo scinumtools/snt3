@@ -178,7 +178,17 @@ namespace snt::dip {
     void ValueNode::set_value(val::BaseValue::PointerType value_input) {
         value = nullptr;
         if (value_input == nullptr && !value_raw.empty() && !value_raw.at(0).empty()) {
-            value = cast_value();
+            // Triple-quoted values are initially parsed as a single string. When
+            // an array dimension is declared, parse an array literal contained
+            // in that string before converting it to the node's value type.
+            if (value_origin == ValueOrigin::String && !dimension.empty() && value_shape.empty()) {
+                val::Array::StringType parsed_values;
+                val::Array::ShapeType parsed_shape;
+                parse_value(value_raw.at(0), parsed_values, parsed_shape);
+                value = cast_value(parsed_values, parsed_shape);
+            } else {
+                value = cast_value();
+            }
         } else if (value_input == nullptr && value_origin == ValueOrigin::Array) {
             value = cast_value();
         } else if (value_input != nullptr) {
