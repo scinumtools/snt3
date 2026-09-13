@@ -145,10 +145,10 @@ function compile_docs {
         echo "Building DIPL specification"
         pandoc --defaults=docs/dipl/pandoc.yaml --output=$file_dipl_spec
     #fi
-    if [[ ! -f $file_puel_spec ]]; then
+    #if [[ ! -f $file_puel_spec ]]; then
         echo "Building PUEL specification"
         pandoc --defaults=docs/puel/pandoc.yaml --output=$file_puel_spec
-    fi
+    #fi
     echo "Building Sphinx documentation"
     cd docs
     doxygen

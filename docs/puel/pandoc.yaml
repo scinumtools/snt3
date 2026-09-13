@@ -10,3 +10,17 @@ variables:
 
 input-files:
   - docs/puel/specification.md
+  - docs/puel/tables/prefixes.md
+  - docs/puel/tables/systems.md
+  - docs/puel/tables/common.md
+  - docs/puel/tables/si.md
+  - docs/puel/tables/esu.md
+  - docs/puel/tables/emu.md
+  - docs/puel/tables/gu.md
+  - docs/puel/tables/iu.md
+  - docs/puel/tables/us.md
+  - docs/puel/tables/au.md
+  - docs/puel/tables/pu.md
+  - docs/puel/tables/sru.md
+  - docs/puel/tables/gru.md
+  - docs/puel/tables/geo.md
