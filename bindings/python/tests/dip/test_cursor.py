@@ -109,6 +109,8 @@ def test_cursor_values():
         "  pop[]\n"
         "    foo int[2,3] = [[1,2,3],[4,5,6]]\n"
         "  pop[]\n"
+        "    foo uint32 = 2993\n"
+        "  pop[]\n"
         "    foo float = 4e5\n"
         "jerk.snap[lock]\n"
         "  bar str = \"shot\"\n"
@@ -141,6 +143,11 @@ def test_cursor_values():
     assert vnumpy.shape == (2,3)
     
     group = env["jerk.snap[crackle].pop[2].foo"]
+    assert type(group.value) == int
+    assert group.value == 2993
+    np.testing.assert_array_equal(group.to_numpy(), np.array(2993, dtype=np.uint64))
+    
+    group = env["jerk.snap[crackle].pop[3].foo"]
     assert group.shape == [1]
     assert type(group.value) == float
     assert group.value == 4e5
