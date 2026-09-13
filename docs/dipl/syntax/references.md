@@ -1,90 +1,90 @@
 # References
 
 References have two main applications.
-One can either [import](references.md#3.4.2-imports) some already parsed DIPL nodes into a new location, or [inject](references.md#3.4.3.-injections) other node values or contents of text files into a new node.
-Besides the two cases, references are also used in [conditions](conditions.md#3.9.-conditions) and [condition properties](properties.md#3.8.2.-condition) that are explained in a separate chapter.
+One can either [import](references.md#imports) some already parsed DIPL nodes into a new location, or [inject](references.md#injections) other node values or contents of text files into a new node.
+Besides the two cases, references are also used in [conditions](conditions.md#conditions) and [condition properties](properties.md#condition) that are explained in a separate chapter.
 		      
-## Node Referencing
+## Reference Notation
 
-Node referencing is a core feature of DIPL that enables the creation of reusable code structures. 
-A reference consists of a source identifier and an optional path component separated by ``?`` (i.e., ``{<source>?<path>}``).
+A DIPL reference identifies either content from a source or a node within a domain. 
+A reference consists of an optional source identifier and an optional path, separated by `?`. 
+The `.` symbol has different meanings depending on its position within a reference: 
+within a path, it separates hierarchical node names; 
+at the beginning of a relative reference, it determines the reference level; 
+at the end of a path, it selects the complete subtree rooted at the target node rather than the node itself; 
+and alone, `{.}`, it denotes a self-reference to the current node.
 
-The ``source`` identifier refers to a named source, which maps to a file path. 
-The ``path`` component specifies a node path within the referenced domain.
+### Source and absolute references
 
-Sources are defined once using the ``$source`` declaration and may be referenced multiple times throughout the DIPL document.
+The following forms are absolute references:
 
-``` DIPL
-$source name = "path/to/file.dip"
-```
+| Reference                  | Meaning                                       |
+|----------------------------|-----------------------------------------------|
+| `{source}`                 | Raw content of `source`                       |
+| `{?path}`                  | Value of the node `path` in the local domain  |
+| `{?path.}`                 | All descendants of `path` in the local domain |
+| `{?}` / `{?.}`             | Complete source node tree in the local domain |
+| `{source?path}`            | Value of the node `path` in `source`          |
+| `{source?path.}`           | All descendants of `path` in `source`         |
+| `{source?}` / `{source?.}` | Complete source node tree in `source`         |
 
-All implementations of the DIPL language SHOULD support defining sources through the host environment (code interface).
-- Source paths defined via the code interface MUST be interpreted relative to the calling context.
-- Source paths defined within DIPL files MUST be interpreted relative to the location of the respective DIPL file.
+The `?` separates the source identifier from the node path. If the source component is omitted, the reference targets the **local domain**, consisting of the nodes parsed from the current DIPL file.
 
-### Domains
+A path without a trailing `.` MUST resolve to a single node. A path ending in `.` selects the complete subtree rooted at the target node, including all descendant nodes recursively, and therefore produces a node set. A path MUST resolve to an existing node; otherwise evaluation MUST fail. A node set used where a single value is required MUST also cause evaluation to fail.
+The trailing `.` MAY be omitted when the entire source node tree is imported (`{?}`, `{source?}`). In these cases, the omitted trailing `.` is semantically equivalent to the `?` symbol.
 
-Depending on the context, sources may refer to:
-- Text files, when no path is provided (raw content access), or
-- DIPL files, when a path is provided (node-based access), or when the entire file is referenced.
+A reference of the form {source} has no path component and returns the raw content of the referenced source as a string. 
+Node-based access is provided only when a path component is specified. 
+A referenced DIPL source is processed as a separate remote domain.
 
-The **local domain** consists of all nodes parsed within the current DIPL file.
-A **remote domain** refers to a separate DIPL file, which is processed independently.
-
-### Local References
-
-If the source component is omitted, the reference implicitly targets the local domain.
+Absolute references can therefore be used both to **import nodes** and to **inject values**:
 
 ```DIPL
-size float = 34 cm
-human
-  height float = {?size}
+driver
+  {?child}                       # single local node
+  {garage?worker}                # single remote node
+
+passengers
+  {?family.}                     # local subtree
+  {tourists?family.}             # remote subtree
+
+sites
+  {?.}                           # all local nodes
+  {london?.}                     # all remote nodes 
+  # can be used also without trailing dot: {?} and {london?}
+
+corpus str = {book}              # raw source content
+chapter str = {?introduction}    # local node value
+citation str = {law?paragraph}   # remote node value
 ```
 
-In this example the height of a human is set to the size defined by the preceding ``size`` node.
+The expected result type MUST be compatible with the context in which the reference is used.
 
-### Path Semantics
+### Relative references
 
-The path component specifies which nodes are selected from a domain.
+A relative reference resolves its path against a node in the current node hierarchy:
 
-A path path MUST resolve to either:
-- a single node, or
-- a set of nodes (when using ``*``)
+```text
+{.<path>}
+{..<path>}
+{...<path>}
+...
+{.<path>.}
+{..<path>.}
+{...<path>.}
+...
+```
 
-The ``.*`` suffix selects all descendant nodes of the target node recursively, including the entire subtree rooted at that node.
+The number of leading dots determines the reference level:
 
-If a path does not exist, evaluation MUST fail.
-If a reference returns multiple nodes in a context that requires a single value, evaluation MUST fail.
+* `{.<path>}` resolves `path` relative to the current node;
+* `{..<path>}` resolves `path` relative to the parent;
+* `{...<path>}` resolves `path` relative to the grandparent;
+* in general, **N** leading dots resolve the path relative to the node **N − 1** levels above the current node.
 
-### Self-Reference and Relative References (`{.}`, `{.<path>}`)
+As with absolute references, a trailing `.` selects the complete descendant subtree rather than a single node.
 
-The `{.}` reference is a **self-reference** and is valid only within [condition properties](properties.md#3.8.2.-condition). 
-It MUST NOT appear in any other context.
-
-The `{.}` reference evaluates to the **fully evaluated value of the current node**, after:
-
-* resolution of all references;
-* evaluation of all expressions; and
-* normalization to the canonical unit representation defined in the Units specification.
-
-The resulting value retains its complete type information, including dimensionality and unit.
-
-If evaluation of the current node's value fails for any reason, including unresolved references, type errors, or unit incompatibility, the `{.}` reference is undefined. 
-In such a case, evaluation of the condition MUST result in an error.
-
-**Relative references** identify nodes relative to the current node and are written as ``{.<path>}``, ``{..<path>}``, ``{...<path>}``, etc.
-
-The number of leading dots determines the level at which the path is resolved:
-
-* ``{.<path>}`` resolves `path` relative to the **current node**;
-* ``{..<path>}`` resolves `path` relative to the **parent** of the current node;
-* ``{...<path>}`` resolves `path` relative to the **grandparent** of the current node;
-* in general, *N* leading dots resolve `path` relative to the node *N − 1* levels above the current node.
-
-A relative reference MUST NOT traverse beyond the root node. 
-Such a reference is invalid and MUST result in an error.
-
-The following example demonstrates the resolution of self and relative references:
+A relative reference MUST NOT traverse beyond the root node. Such a reference is invalid and MUST result in an error.
 
 ```DIPL
 uncle str = "John"
@@ -96,61 +96,60 @@ father str = "William"
 brother-in-law str = {.father}
 ```
 
-Here:
+Here `{..aunt}` resolves `aunt` from the parent context of `daughter`, while `{...uncle}` resolves `uncle` from the corresponding ancestor context of `grandson`. `{.father}` resolves `father` relative to the hierarchy containing `brother-in-law`.
 
-* ``{..aunt}`` in `daughter` resolves `aunt` relative to `daughter`'s parent, `father`.
-* ``{...uncle}`` in `grandson` resolves `uncle` relative to `grandson`'s grandparent.
-* ``{.father}`` in `brother-in-law` resolves `father` relative to the current node's parent/context according to the node hierarchy.
+### Self-reference
 
-### Reference Result Types
+`{.}` is a special self-reference and is distinct from `{.<path>}`. It refers to the **fully evaluated value of the current node** and is valid only within condition properties.
 
-``{<source>}`` returns:
+Before `{.}` is evaluated, the current node MUST have undergone:
 
-- raw content for text sources
-- root node set for DIPL sources
+1. resolution of all references;
+2. evaluation of all expressions; and
+3. normalization to the canonical unit representation defined by PUEL.
 
-absolute references ``{?<path>}``, ``{<source>?<path>}`` and relative references ``{.<path>}`` return:
+The resulting value retains its complete type information, including dimensionality and unit.
 
-- a single node, or
-- a node set (when using *)
+If evaluation of the current node fails, including because of an unresolved reference, type error, or unit incompatibility, `{.}` is undefined and evaluation of the containing condition MUST result in an error.
 
-self-reference ``{.}`` refers exclusively to the fully evaluated value of the current node and is therefore distinct from `{.<path>}`.
-
-The expected type MUST match the usage context. Otherwise, evaluation MUST fail.
-
-Imports return nodes:
-
-``` DIPL
-# Import single node
-driver
-  {?child}                      # local
-  {garage?worker}               # remote
-
-# Import child nodes
-passengers
-  {?family.*}                   # local
-  {tourists?family.*}           # remote
-
-# Import all nodes
-sites
-  {?*}                          # local
-  {london?*}                    # remote
-  
-# Inject source content
-corpus str = {book}             # remote
-
-# Inject node value
-chapter str = {?introduction}   # local
-citation str = {law?paragraph}  # remote
-
-# Inject self reference
+```DIPL
 speed int = 78 kph
-  !condition ({.} < 80 kph)     # local
-
-# Inject relative reference
-father str = "John"
-  son str = {.father}           # local  
+  !condition ({.} < 80 kph)
 ```
+
+`{.}` MUST NOT be used outside condition properties.
+
+## Source Declarations
+
+Sources are named using the `$source` declarator:
+
+```DIPL
+$source name = "path/to/file.dip"
+```
+
+A source declaration associates a source identifier with a file path. The source may subsequently be referenced any number of times using the absolute reference forms described above.
+
+Sources declared inside a DIPL file MUST resolve their paths relative to the location of that DIPL file.
+
+Implementations SHOULD additionally support defining sources through the host environment (code interface). Source paths supplied through the code interface MUST be interpreted relative to the calling context.
+
+For example:
+
+```DIPL
+$source garage = "vehicles/garage.dip"
+$source tourists = "people/tourists.dip"
+$source book = "texts/book.txt"
+
+driver
+  {garage?worker}
+
+passengers
+  {tourists?family.}
+
+corpus str = {book}
+```
+
+Thus, `$source` declarations establish the mapping between source identifiers and external files, while reference notation determines whether the reference accesses raw source content, a node value, a node subtree, or the evaluated value of a node in the current hierarchy.
 
 ## Imports
 
@@ -166,7 +165,7 @@ icecream
     chocolate int = 2
 
 bowl
-  {?icecream.scoops.*}      # select all children nodes
+  {?icecream.scoops.}       # select all children nodes
 plate {?icecream.waffle}    # select a specific node
 ```
 
@@ -187,16 +186,16 @@ In this case, a source name must be specified before the question mark.
 ``` DIPL
 $source pantry = "pantry.dip"
 
-bag {pantry?*}                 # import all nodes
+bag {pantry?.}                 # import all nodes
 bowl 
   {pantry?fruits}              # selecting a specific node
   {pantry?veggies.potato}      # selecting a specific subnode
-plate {pantry?veggies.*}       # selecting all subnodes   
+plate {pantry?veggies.}        # selecting all subnodes   
 ```
 
 So far, we have shown how to import regular nodes from a local or remote source.
 It is, however, also possible to import sources and custom [units](units.md#36-units) in the similar way.
-The request can select either one ``{<source>?<path>}`` or all ``{<source>?*}`` sources/units.
+The request can select either one ``{<source>?<path>}`` or all ``{<source>?.}`` sources/units.
 
 > [!NOTE]
 > Request path is in this case not a node path but name of a source/unit.
@@ -205,90 +204,108 @@ Importing sources/units enables users to dynamically modify numerical code units
 
 ``` DIPL
 $source init = "initial/settings.dip"
-$source {init?*}           # all sources of 'init' are imported
-$unit {units?*}            # all units are imported from an imported source 'units'
+$source {init?.}           # all sources of 'init' are imported
+$unit {units?.}            # all units are imported from an imported source 'units'
 weight float = 23 [mass]   # using imported unit
 ```
 
 ## Injections
 
-Injections do not insert whole nodes.
-They are used in node definitions and modifications instead of values.
+Injections provide values to node definitions and modifications. They do not insert complete nodes or node sets.
 
-A valid injection can reference only a single node or a text content of a file.
+### Value Injection
 
-``` DIPL
-size1 float = 34 cm       # standard definition
-size2 float = {?size1} m  # definition using import with other units
-size3 float = {?size2}    # definition using import with same units
-size1 = {?size2}          # modifying by import
+A valid value injection MUST resolve to either:
 
-# Nodes above will have the following values:
-#
-# size1 = 3400 cm
-# size2 = 34 m
-# size3 = 34 m
+* a single node, referenced without a trailing `.`;
+* raw source content, referenced without a path.
+
+When a node is referenced, its value is injected into the receiving expression and is subject to the type, dimensionality, and unit rules of that expression.
+
+```DIPL
+pop float = 5 km
+foo float = 34 cm
+bar float = {foo} m    # resulting value is 0.34 m
+baz float = {foo}      # dimension mismatch
+foo = {?pop}            # modification results in 500000 cm
 ```
 
-It is also possible to inject values from remote DIPL files:
+Values can also be injected from remote DIPL sources:
 
-``` DIPL
+```DIPL
 $source pressure = "pressures.dip"
 pressure float = {pressure?magnetic}
 ```
-   
-Arrays can be imported either directly or can be sliced to match dimensions of a host node.
-Slicing of arrays and also strings adopts the same notation as used in Python.
-An example of sliced injected arrays is below:
 
-``` DIPL
-person str = "Will Smith"
-surname str = {?person}[5:]   # slicing a string
+For injections, a path always identifies the node whose **value** is to be injected. Unlike node imports, injection paths MUST NOT select a node set.
 
-# selecting a single value
-sizes float[3] = [34,23.34,1e34] cm      
-mysize float = {?sizes}[1]  
+### Array and String Slicing
 
-# selecting range of values
-masses float[2,2] = [[34,23.34],[1,1e34]] cm    
-mymass float[2] = {?masses}[:,1]              
+Array values can be injected directly or sliced to match the required dimensions of the receiving node. Strings and arrays use the same slicing notation as Python.
 
-# Above nodes will have values:
-#
-# person = "Will Smith"
-# surname = "Smith"
-# sizes = [3.400e+01, 2.334e+01, 1.000e+34]
-# mysize = [2.334e+01]
-# masses = [[34,23.34],[1,1e34]]
-# mymass = [23.34,1e34]
+A single array element can be selected:
+
+```DIPL
+sizes float[3] = [34,23.34,1e34] cm
+mysize float = {?sizes}[1]
 ```
 
-Value injection can also be used to keep large text blocks in external files.
-This makes both the code and text data more readable and easily editable.
-Note that when requests do not include a question mark with a path, DIPL imports files as a text and not as a node list.
+A range of elements can be selected:
 
-``` DIPL   
+```DIPL
+masses float[2,2] = [[34,23.34],[1,1e34]] cm
+mymass float[2] = {?masses}[:,1]
+```
+
+Strings can be sliced in the same way:
+
+```DIPL
+person str = "Will Smith"
+surname str = {?person}[5:]
+```
+
+The resulting values are:
+
+```text
+sizes = [3.400e+01, 2.334e+01, 1.000e+34]
+mysize = 2.334e+01
+masses = [[34,23.34],[1,1e34]]
+mymass = [23.34,1e34]
+person = "Will Smith"
+surname = "Smith"
+```
+
+### Raw Source Injection
+
+Raw source injection provides a convenient way to keep large text or data blocks in external files. This separates data from the DIPL structure and makes both the source and the data easier to maintain.
+
+When a reference contains no `?` path component, the referenced source is injected as text rather than as a node list.
+
+```DIPL
 $source velocity = "velocity.txt"
 $source outputs = "outputs.txt"
 $source message = "message.txt"
 
 velocity int[3,4] = {velocity} km/s   # import an array
 outputs table = {outputs}             # import a table
-message str = {message}               # import a text
+message str = {message}               # import text
 ```
 
-Values of source and unit definitions can also be injected from other nodes.
+The receiving node is responsible for interpreting the injected text according to its declared type.
 
-> [!NOTE]
-> In comparison to imports, request path in injections is always path of a node.
+### Source and Unit Declaration Injection
 
-This adds an additional scalability to the code.
-Referenced nodes by sources have to be strings and referenced nodes by units have to be floats or integers.
+Values used by `$source` and `$unit` declarations can themselves be injected from nodes. In these declarations, the injected value supplies the declaration argument rather than the value of an ordinary node.
 
-``` DIPL
-refs str = "path/to/sources.dip"  # node named 'refs'
-$source refs = {?refs}            # source named 'refs'
+For `$source`, the referenced node MUST contain a string. For `$unit`, the referenced node MUST contain a floating-point or integer value.
 
-mass float = 1 kg                 # node named 'mass'
-$unit mass = {?mass}              # unit named 'mass'
+```DIPL
+refs str = "path/to/sources.dip"
+$source refs = {?refs}
+
+mass float = 1 kg
+$unit mass = {?mass}
 ```
+
+In both cases, the path in the injection refers to the **value of a node**. Injection paths therefore differ from node imports: injections always request a node value and cannot request a node set.
+

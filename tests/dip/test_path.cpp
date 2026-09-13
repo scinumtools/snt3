@@ -62,3 +62,12 @@ TEST(Path, ResolveRelativePaths) {
         FAIL() << "Expected dip::SyntaxException";
     }
 }
+
+TEST(Path, PartExtraction) {
+
+    dip::Path path("foo.bar[0].baz[pop]");
+
+    EXPECT_EQ(path.basename(), "baz[pop]");
+    EXPECT_EQ(path.root().name, "foo.bar[0].");
+    EXPECT_EQ(path.parent().name, "foo.bar[0]");
+}

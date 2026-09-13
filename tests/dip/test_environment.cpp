@@ -32,21 +32,21 @@ TEST(Environment, RequestGroup) {
     dip::Environment env = d.parse();
 
     // select all children
-    dip::ValueNode::ListType nodes = env.request_group("?foo");
+    dip::ValueNode::ListType nodes = env.request_group("?foo.");
     EXPECT_EQ(nodes.at(0)->to_string(), "true");
     EXPECT_EQ(nodes.at(1)->to_string(), "3");
 
     // filter selection using tags
-    nodes = env.request_group("?foo", dip::RequestType::Reference, {"crackle"});
+    nodes = env.request_group("?foo.", dip::RequestType::Reference, {"crackle"});
     EXPECT_EQ(nodes.size(), 2);
     EXPECT_EQ(nodes.at(0)->path.name, "bar");
     EXPECT_EQ(nodes.at(1)->path.name, "baz");
 
-    nodes = env.request_group("?foo", dip::RequestType::Reference, {"snap"});
+    nodes = env.request_group("?foo.", dip::RequestType::Reference, {"snap"});
     EXPECT_EQ(nodes.size(), 1);
     EXPECT_EQ(nodes.at(0)->path.name, "bar");
 
-    nodes = env.request_group("?foo", dip::RequestType::Reference, {"pop"});
+    nodes = env.request_group("?foo.", dip::RequestType::Reference, {"pop"});
     EXPECT_EQ(nodes.size(), 1);
     EXPECT_EQ(nodes.at(0)->path.name, "baz");
 }

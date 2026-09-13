@@ -25,6 +25,7 @@ namespace snt::dip {
             case Path::Kind::List:
             case Path::Kind::Map:
             case Path::Kind::Item:
+            case Path::Kind::Root:
                 kind = col.kind;
                 break;
             }

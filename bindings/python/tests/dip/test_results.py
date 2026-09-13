@@ -84,7 +84,7 @@ def test_request_group():
     dip.add_string("foo.baz int = 3")
     env = dip.parse()
 
-    nodes = env.request_group("?foo")
+    nodes = env.request_group("?foo.")
     assert len(nodes) == 2
     assert nodes[0].name == "bar"
     assert nodes[0].value == False
@@ -99,15 +99,15 @@ def test_request_group():
     dip.add_string("  !tags [\"crackle\",\"pop\"]")
     env = dip.parse()
 
-    nodes = env.request_group("?foo",["crackle"])
+    nodes = env.request_group("?foo.",["crackle"])
     assert len(nodes) == 2
     assert nodes[0].name == "bar"
     assert nodes[1].name == "baz"
 
-    nodes = env.request_group("?foo",["snap"])
+    nodes = env.request_group("?foo.",["snap"])
     assert len(nodes) == 1
     assert nodes[0].name == "bar"
 
-    nodes = env.request_group("?foo",["pop"])
+    nodes = env.request_group("?foo.",["pop"])
     assert len(nodes) == 1
     assert nodes[0].name == "baz"

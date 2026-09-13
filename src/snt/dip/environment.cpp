@@ -8,14 +8,17 @@
 namespace snt::dip {
 
     /**
-     *  Split request expression into a name and node path
+     * Split request expression into a name and node path
+     *
+     * Request expects a single node {source?path}
+     * Request is a root {source?path.}
      *
      * @param request Request expression
-     * @return Tuple with the request name and node path
+     * @return Tuple with the request source, node path and root status
      */
-    inline std::tuple<std::string, std::string> parse_request(const std::string& request) {
+    inline std::tuple<std::string, std::string, bool> parse_request(const std::string& request) {
         size_t pos = request.find(SIGN_QUERY);
-        if (pos == std::string::npos)
+        if (pos == std::string::npos) {
             throw dip::EnvironmentException(
                 "Invalid node request",
                 "The environment request must contain a question mark; none was found in `" + request + "`.",
@@ -23,8 +26,13 @@ namespace snt::dip {
                 __FILE__,
                 __LINE__
             );
-        else
-            return {request.substr(0, pos), request.substr(pos + 1)};
+        } else {
+            char lastChar = request[request.size() - 1];
+            if (lastChar == SIGN_SEPARATOR || lastChar == SIGN_QUERY) // request expects nodes
+                return {request.substr(0, pos), request.substr(pos + 1, request.size() - pos - 2), true};
+            else // request expect a single node
+                return {request.substr(0, pos), request.substr(pos + 1), false};
+        }
     }
 
     Environment::Environment() = default;
@@ -43,7 +51,7 @@ namespace snt::dip {
             break;
         }
         case RequestType::Reference: {
-            auto [source_name, node_path] = parse_request(request);
+            auto [source_name, node_path, is_root] = parse_request(request);
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
@@ -112,7 +120,7 @@ namespace snt::dip {
             break;
         }
         case RequestType::Reference: {
-            auto [source_name, node_path] = parse_request(request);
+            auto [source_name, node_path, is_root] = parse_request(request);
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
@@ -201,40 +209,43 @@ namespace snt::dip {
             break;
         }
         case RequestType::Reference: {
-            auto [source_name, node_path] = parse_request(request);
+            auto [source_name, node_path, is_root] = parse_request(request);
             std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
-            // if node has children, select them all
             size_t p = node_pool.size(); // parent node index
-            for (size_t i = 0; i < node_pool.size(); i++) {
-                ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode && vnode->path.name.rfind(node_path_child, 0) == 0 &&
-                    vnode->path.name.size() > node_path_child.size()) {
-                    // filter nodes based on tags
-                    if (!tags.empty() && !hasIntersection(vnode->tags, tags))
-                        continue;
-                    // select node
-                    std::string new_name = vnode->path.name.substr(node_path_child.size(), vnode->path.name.size());
-                    ValueNode::PointerType new_vnode =
-                        std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
-                    new_nodes.push_back(new_vnode);
-                } else if (vnode && vnode->path.name == node_path) {
-                    p = i;
+            if (is_root) {
+                // if path is a root, select its children nodes
+                for (size_t i = 0; i < node_pool.size(); i++) {
+                    ValueNode::PointerType vnode = node_pool.at(i);
+                    if (vnode && vnode->path.name.rfind(node_path_child, 0) == 0 &&
+                        vnode->path.name.size() > node_path_child.size()) {
+                        // filter nodes based on tags
+                        if (!tags.empty() && !hasIntersection(vnode->tags, tags))
+                            continue;
+                        // select node
+                        std::string new_name = vnode->path.name.substr(node_path_child.size(), vnode->path.name.size());
+                        ValueNode::PointerType new_vnode =
+                            std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
+                        new_nodes.push_back(new_vnode);
+                    } else if (vnode && vnode->path.name == node_path) {
+                        p = i;
+                    }
                 }
-            }
-            // if node does not have childs, but exists, return it
-            if (new_nodes.empty() && p < node_pool.size()) {
-                ValueNode::PointerType vnode = node_pool.at(p);
-                size_t pos = node_path.find_last_of('.');
-                if (pos != std::string::npos) {
-                    std::string new_name = vnode->path.name.substr(pos + 1, node_path.size());
-                    ValueNode::PointerType new_vnode =
-                        std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
-                    new_nodes.push_back(new_vnode);
-                } else {
-                    ValueNode::PointerType new_vnode =
-                        std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(node_path), 0));
-                    new_nodes.push_back(new_vnode);
+            } else {
+                // otherwise we select only a node with exactly same path
+                for (size_t i = 0; i < node_pool.size(); i++) {
+                    ValueNode::PointerType vnode = node_pool.at(i);
+                    if (node_path == vnode->path.name) {
+                        // filter nodes based on tags
+                        if (!tags.empty() && !hasIntersection(vnode->tags, tags))
+                            continue;
+                        // select node
+                        std::string new_name = vnode->path.basename();
+                        ValueNode::PointerType new_vnode =
+                            std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
+                        new_nodes.push_back(new_vnode);
+                        break;
+                    }
                 }
             }
             break;
@@ -269,7 +280,7 @@ namespace snt::dip {
             break;
         }
         case RequestType::Reference: {
-            auto [source_name, node_path] = parse_request(request);
+            auto [source_name, node_path, is_root] = parse_request(request);
             std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             const HierarchyList& hlist =
@@ -287,7 +298,7 @@ namespace snt::dip {
                     __LINE__
                 );
             for (const auto& item : col.items) {
-                map.insert({item, request_group(request + "[" + item + "]")});
+                map.insert({item, request_group(request + "[" + item + "]" + std::string(1, SIGN_SEPARATOR))});
             }
             break;
         }
@@ -321,7 +332,7 @@ namespace snt::dip {
             break;
         }
         case RequestType::Reference: {
-            auto [source_name, node_path] = parse_request(request);
+            auto [source_name, node_path, is_root] = parse_request(request);
             std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
             const HierarchyList& hlist =
@@ -340,7 +351,7 @@ namespace snt::dip {
                 );
 
             for (const auto& item : col.items) {
-                list.push_back(request_group(request + "[" + item + "]"));
+                list.push_back(request_group(request + "[" + item + "]" + std::string(1, SIGN_SEPARATOR)));
             }
             break;
         }

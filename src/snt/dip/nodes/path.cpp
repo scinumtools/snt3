@@ -45,16 +45,22 @@ namespace snt::dip {
                 }
             }
             if (part.empty()) {
-                throw dip::SyntaxException(
-                    "Invalid name",
-                    "The name contains characters that are not allowed: `" + path + "`.",
-                    "Use only letters, digits, underscores, and hyphens in the name.",
-                    __FILE__,
-                    __LINE__
-                );
+                if (path[pos] == SIGN_SEPARATOR) {
+                    name = path;             // set full path name
+                    kind = Path::Kind::Root; // set final path kind
+                    return;
+                } else {
+                    throw dip::SyntaxException(
+                        "Invalid name",
+                        "The name contains characters that are not allowed: `" + path + "`.",
+                        "Use only letters, digits, underscores, and hyphens in the name.",
+                        __FILE__,
+                        __LINE__
+                    );
+                }
             }
             if (!currentPath.empty())
-                currentPath += '.';
+                currentPath += SIGN_SEPARATOR;
             currentPath += part;
             // collection?
             if (pos < path.size() && path[pos] == '[') {
@@ -62,7 +68,7 @@ namespace snt::dip {
                 std::string item;
                 while (pos < path.size() && path[pos] != ']') {
                     char c = path[pos];
-                    if (!(std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-' || c == '*')) {
+                    if (!(std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-')) {
                         throw dip::SyntaxException(
                             "Invalid node collection item",
                             "The node collection item contains an invalid character `" + std::string(1, c) +
@@ -89,7 +95,7 @@ namespace snt::dip {
                 collections.push_back({currentPath, std::move(item), std::move(type)});
                 currentPath.clear();
             }
-            if (pos >= path.size() || path[pos] != '.')
+            if (pos >= path.size() || path[pos] != SIGN_SEPARATOR)
                 break;
             ++pos; // skip '.'
         }
@@ -117,11 +123,11 @@ namespace snt::dip {
     Path Path::resolve(const std::string& path) {
         if (path == ".")
             return name;
-        const std::size_t nDots = path.find_first_not_of('.');
+        const std::size_t nDots = path.find_first_not_of(SIGN_SEPARATOR);
         if (nDots == 0)
             return Path(path);
         // Number of components in the current path.
-        const std::size_t nComponents = 1 + std::count(name.begin(), name.end(), '.');
+        const std::size_t nComponents = 1 + std::count(name.begin(), name.end(), SIGN_SEPARATOR);
         if (nDots > nComponents)
             throw dip::SyntaxException(
                 "Relative path exceeds root",
@@ -132,7 +138,7 @@ namespace snt::dip {
             );
         std::string result = name;
         for (std::size_t i = 0; i < nDots; ++i) {
-            const std::size_t pos = result.rfind('.');
+            const std::size_t pos = result.rfind(SIGN_SEPARATOR);
             if (pos == std::string::npos) {
                 // Removing the root component.
                 result.clear();
@@ -143,10 +149,25 @@ namespace snt::dip {
         const std::string relative = path.substr(nDots);
         if (!relative.empty()) {
             if (!result.empty())
-                result += '.';
+                result += SIGN_SEPARATOR;
             result += relative;
         }
         return Path(result);
+    }
+
+    std::string Path::basename() const {
+        auto pos = name.rfind(SIGN_SEPARATOR);
+        return name.substr(pos + 1, name.size() - pos);
+    }
+
+    Path Path::root() const {
+        auto pos = name.rfind(SIGN_SEPARATOR);
+        return Path(name.substr(0, pos + 1));
+    }
+
+    Path Path::parent() const {
+        auto pos = name.rfind(SIGN_SEPARATOR);
+        return Path(name.substr(0, pos));
     }
 
 } // namespace snt::dip

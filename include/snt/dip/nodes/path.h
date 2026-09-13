@@ -23,6 +23,7 @@ namespace snt::dip {
             Map,   ///< Map items are associated with a key
             List,  ///< List items are ordered by indexes
             Item,  ///< Item in a map or list collection
+            Root,  ///< Path points to some hierarchy root (with a trailing .)
         };
         static std::unordered_map<Kind, std::string> KindNames;
 
@@ -66,6 +67,33 @@ namespace snt::dip {
          * @return Absolute path
          */
         Path resolve(const std::string& path);
+
+        /**
+         * Return name of the last node in the path
+         *
+         * For a path `foo.bar.baz`, `baz` string will be returned.
+         *
+         * @return String with the last name
+         */
+        std::string basename() const;
+
+        /**
+         * Return root of the node in the path
+         *
+         * For a path `foo.bar.baz`, `foo.bar.` path will be returned.
+         *
+         * @return Root path
+         */
+        Path root() const;
+
+        /**
+         * Return parent of the node in the path
+         *
+         * For a path `foo.bar.baz`, `foo.bar` path will be returned.
+         *
+         * @return Parent path
+         */
+        Path parent() const;
     };
 
 } // namespace snt::dip

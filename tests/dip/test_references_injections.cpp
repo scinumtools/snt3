@@ -7,7 +7,7 @@
 
 using namespace snt;
 
-TEST(References, BooleanValues) {
+TEST(ReferencesInjections, BooleanValues) {
 
     // referencing scalar and array values
     dip::DIP d;
@@ -29,7 +29,7 @@ TEST(References, BooleanValues) {
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");
 }
 
-TEST(References, IntegerValues) {
+TEST(ReferencesInjections, IntegerValues) {
 
     // referencing scalar and array values
     dip::DIP d;
@@ -51,7 +51,7 @@ TEST(References, IntegerValues) {
     EXPECT_EQ(vnode->value->to_string(), "[32, 54]");
 }
 
-TEST(References, FloatValues) {
+TEST(ReferencesInjections, FloatValues) {
 
     // referencing scalar and array values
     dip::DIP d;
@@ -73,7 +73,7 @@ TEST(References, FloatValues) {
     EXPECT_EQ(vnode->value->to_string(), "[2.345e6, 3.456e7]");
 }
 
-TEST(References, StringValues) {
+TEST(ReferencesInjections, StringValues) {
 
     // referencing scalar and array values
     dip::DIP d;
@@ -95,7 +95,7 @@ TEST(References, StringValues) {
     EXPECT_EQ(vnode->value->to_string(), "[\"pop\", \"jerk\"]");
 }
 
-TEST(References, ExceptionMissingNode) {
+TEST(ReferencesInjections, ExceptionMissingNode) {
 
     dip::DIP d;
     d.add_string("bar str = {?foo}");
@@ -111,7 +111,7 @@ TEST(References, ExceptionMissingNode) {
     }
 }
 
-TEST(References, DataTypeConversion) {
+TEST(ReferencesInjections, DataTypeConversion) {
 
     dip::DIP d;
     d.add_string("foo bool = true");
@@ -125,7 +125,7 @@ TEST(References, DataTypeConversion) {
     EXPECT_EQ(vnode->value->to_string(), "\"true\"");
 }
 
-TEST(References, ExceptionDimension) {
+TEST(ReferencesInjections, ExceptionDimension) {
 
     dip::DIP d;
     d.add_string("foo int[2] = [1,2]");
@@ -147,7 +147,7 @@ TEST(References, ExceptionDimension) {
     }
 }
 
-TEST(References, TableNodes) {
+TEST(ReferencesInjections, TableNodes) {
 
     // referencing scalar and array values
     dip::DIP d;
@@ -155,7 +155,7 @@ TEST(References, TableNodes) {
         "foo\n"
         "  snap str = \"snap\"\n"
         "  crackle bool[2] = [true,false]\n"
-        "bar table = {?foo}\n"
+        "bar table = {?foo.}\n"
     );
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 4);
@@ -171,41 +171,7 @@ TEST(References, TableNodes) {
     EXPECT_EQ(vnode->value->to_string(), "[true, false]");
 }
 
-TEST(References, ImportNodes) {
-
-    // referencing scalar and array values
-    dip::DIP d;
-    d.add_string("foo");
-    d.add_string("  snap str = \"snap\"");
-    d.add_string("  crackle bool[2] = [true,false]");
-    d.add_string("bar {?}");
-    d.add_string("baz");
-    d.add_string("  {?foo}");
-    dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 6);
-
-    dip::ValueNode::PointerType vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->path.name, "bar.foo.snap");
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->value->to_string(), "\"snap\"");
-
-    vnode = env.nodes.at(3);
-    EXPECT_EQ(vnode->path.name, "bar.foo.crackle");
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->value->to_string(), "[true, false]");
-
-    vnode = env.nodes.at(4);
-    EXPECT_EQ(vnode->path.name, "baz.snap");
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->value->to_string(), "\"snap\"");
-
-    vnode = env.nodes.at(5);
-    EXPECT_EQ(vnode->path.name, "baz.crackle");
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->value->to_string(), "[true, false]");
-}
-
-TEST(References, RemoteSource) {
+TEST(ReferencesInjections, RemoteSource) {
 
     // create temporary file
     std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
@@ -225,10 +191,8 @@ TEST(References, RemoteSource) {
     d.add_string("$source " + source_name + " = \"" + source_filename.string() + "\"");
     d.add_string("snap int = {" + source_name + "?foo.bar}");
     d.add_string("crackle bool[2] = {" + source_name + "?foo.baz}");
-    d.add_string("pop {" + source_name + "?foo}");
-    d.add_string("jerk {" + source_name + "?}");
     dip::Environment env = d.parse();
-    EXPECT_EQ(env.nodes.size(), 6);
+    EXPECT_EQ(env.nodes.size(), 2);
 
     // remove temporary file
     std::filesystem::remove(source_filename);
@@ -242,29 +206,9 @@ TEST(References, RemoteSource) {
     EXPECT_EQ(vnode->path.name, "crackle");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "[false, true]");
-
-    vnode = env.nodes.at(2);
-    EXPECT_EQ(vnode->path.name, "pop.bar");
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->value->to_string(), "3");
-
-    vnode = env.nodes.at(3);
-    EXPECT_EQ(vnode->path.name, "pop.baz");
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->value->to_string(), "[false, true]");
-
-    vnode = env.nodes.at(4);
-    EXPECT_EQ(vnode->path.name, "jerk.foo.bar");
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->value->to_string(), "3");
-
-    vnode = env.nodes.at(5);
-    EXPECT_EQ(vnode->path.name, "jerk.foo.baz");
-    EXPECT_TRUE(vnode);
-    EXPECT_EQ(vnode->value->to_string(), "[false, true]");
 }
 
-TEST(References, ExceptionSource) {
+TEST(ReferencesInjections, ExceptionSource) {
 
     dip::DIP d;
     d.add_string("foo int = {bar?baz}");
@@ -280,7 +224,7 @@ TEST(References, ExceptionSource) {
     }
 }
 
-TEST(References, MatchCollectionPath) {
+TEST(ReferencesInjections, MatchCollectionPath) {
 
     // referencing scalar and array values
     dip::DIP d;
@@ -300,7 +244,7 @@ TEST(References, MatchCollectionPath) {
     EXPECT_EQ(vnode->value->to_string(), "3");
 }
 
-TEST(References, RelativePath) {
+TEST(ReferencesInjections, RelativePath) {
 
     dip::DIP d;
     d.add_string(

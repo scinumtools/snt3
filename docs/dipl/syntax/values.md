@@ -61,9 +61,14 @@ data3 str[3:4]  = "[\"John\", \"Peter\", \"Simon\"]"
 ```
 
 Multidimensional arrays are defined similarly using nested bracket notation.
+Irregular array shapes, in which items along the same dimension contain different numbers of elements, are not allowed.
+Array values may span multiple lines.
 
 ``` DIPL
-matrix int[2,3] = [[0,1,2],[3,4,5]]
+matrix int[2,3] = [
+  [0,1,2],
+  [3,4,5]
+]
 ```
 
 Node units apply to all values in an array.
@@ -74,9 +79,12 @@ mass float[2:,:2] = [[25,50],[34.2,95.1],[1e3,1e4]] kg
 
 ## Blocks
 
-If node values are large or span over several lines, it is possible to use block notation.
-Block notation wraps values into triple quote marks, similarly as in Python.
-For numerical data types, units can be set after the end of a block.
+If node values are large or span multiple lines, block notation can be used. 
+Block notation encloses values in triple quotation marks, similarly to Python. 
+For numerical data types, units can be specified after the closing quotation marks.
+
+An important advantage of parsing arrays from strings is that large datasets can be imported from external files using raw imports. 
+See the chapter on references for more information.
 
 ``` DIPL
 # velocity field
@@ -106,9 +114,13 @@ For this purpose, a dedicated node type called ``table`` is provided.
 This data type parses DIPL nodes from tabulated datasets that are supplied as a block value.
 As a convention, imported tabulated data files should have an extension ``.dipt``.
 
-The table structure closely resembles a standard CSV format but uses a specialized header syntax.
-The table header contains node declarations corresponding to each column in the table. Each declaration must begin on a new line and must not be indented.
-The table data section is separated from the header by a line containing three minus signs (``---``). Within the table body, individual values are separated by a single space.
+The table structure closely resembles the standard CSV format but uses a specialized header syntax. 
+The table header contains node declarations corresponding to the columns of the table. 
+Each declaration must begin on a new line and must not be indented.
+
+The table data section is separated from the header by a line containing three minus signs (`---`). 
+Within the table body, individual values are separated by a single space. 
+Alternative delimiters can be specified using the `!delimiter` node option, as described in the chapter on node properties.
 
 ``` DIPL
 output table = """
