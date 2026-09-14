@@ -84,5 +84,5 @@ and failures return a nonzero status. `--print` retains the human-readable
 `name = value` form. Input is supplied through `--input file config.dip` or its
 short form `-i file config.dip`.
 
-A [standalone example](../examples/cmake-dipl) demonstrates creating or removing a
+A [standalone example](../examples/dip/CMakeIntegration) demonstrates creating or removing a
 build target based on a DIPL boolean.

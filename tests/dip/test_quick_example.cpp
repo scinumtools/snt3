@@ -7,7 +7,7 @@
 using namespace snt;
 
 constexpr std::string_view SOURCE_ROOT{PROJECT_SOURCE_ROOT_DIR};
-constexpr std::string_view PATH_EXAMPLE_DIP = "examples/dipl/";
+constexpr std::string_view PATH_EXAMPLE_DIP = "examples/dip/QuickExample/";
 
 TEST(QuickExample, ParseProperties) {
 

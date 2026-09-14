@@ -49,7 +49,7 @@ The installed command-line executable is selected automatically. Set
 a different SNT installation should be used. The executable is also exported
 as the imported target ``snt::snt``.
 
-The standalone example in ``examples/cmake-dipl`` demonstrates using a DIPL
+The standalone example in ``examples/dip/CMakeIntegration`` demonstrates using a DIPL
 boolean to create a target. The complete helper contract is documented in
 ``bindings/cmake/README.md``.
 

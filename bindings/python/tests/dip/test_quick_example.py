@@ -5,7 +5,7 @@ from scinumtools3.dip import DIP, Environment
 
 def test_quick_example():
 
-    full_path = os.getenv("PROJECT_SOURCE_ROOT") + "/examples/dipl/parameters.dip"
+    full_path = os.getenv("PROJECT_SOURCE_ROOT") + "/examples/dip/QuickExample/parameters.dip"
     
     dip = DIP()
     dip.add_file(full_path)
