@@ -100,10 +100,13 @@
       <context name="Comment" attribute="Comment" lineEndContext="#pop"/>
 
       <context name="StringDouble" attribute="String" lineEndContext="#pop">
+        <!-- escaped quotes remain inside the string -->
+        <RegExpr String="\\\\&quot;" attribute="String" context="#stay"/>
         <DetectChar char="&quot;" attribute="String" context="#pop"/>
       </context>
 
       <context name="StringSingle" attribute="String" lineEndContext="#pop">
+        <RegExpr String="\\\\'" attribute="String" context="#stay"/>
         <DetectChar char="'" attribute="String" context="#pop"/>
       </context>
 

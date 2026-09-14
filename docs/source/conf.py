@@ -23,6 +23,8 @@ import sysconfig
 # wrapper source. This lets autodoc inspect real pybind11 classes after the
 # normal build while keeping documentation builds possible before compilation.
 _docs_root = os.path.abspath('../..')
+_dipl_highlight = os.path.join(_docs_root, 'docs', 'dipl', 'highlight', 'pygments')
+sys.path.insert(0, _dipl_highlight)
 _python_builds = [os.path.join(_docs_root, 'build', 'python')]
 _python_builds.extend(glob.glob(os.path.join(_docs_root, 'build', '*', 'python')))
 for _python_build in reversed(_python_builds):
@@ -32,6 +34,11 @@ sys.path.insert(1, os.path.join(_docs_root, 'bindings', 'python', 'src'))
 extensions = [
    'sphinx.ext.autodoc',
 ]
+
+from sphinx.highlighting import lexers
+from syntax_lexer import SyntaxLexer
+
+lexers['dipl'] = SyntaxLexer()
 
 _extension_suffix = sysconfig.get_config_var('EXT_SUFFIX') or ''
 _extension_candidates = [
@@ -52,3 +59,4 @@ exclude_patterns = []
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+html_css_files = ['dipl.css']

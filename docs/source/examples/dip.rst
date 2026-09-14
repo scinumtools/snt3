@@ -18,7 +18,7 @@ The test does not exercise a separate application workflow; it checks that
 this compact definition remains valid and produces an evaluable parameter
 tree.
 
-.. code-block:: dip
+.. code-block:: dipl
 
    length float = 2.5 m
    width float = 40 cm

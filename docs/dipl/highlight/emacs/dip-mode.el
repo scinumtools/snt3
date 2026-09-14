@@ -1,4 +1,4 @@
-;;; dip-mode.el --- Syntax highlighter for DIP serialization language. -*- coding: utf-8; lexical-binding: t; -*-
+;;; dip-mode.el --- Syntax highlighter for DIPL. -*- coding: utf-8; lexical-binding: t; -*-
 
 ;; Copyright © 2023, by Ondrej Pego Jaura
 
@@ -23,9 +23,9 @@
             ;; define several category of keywords
             (x-keywords '("true" "false"))
             (x-types '("float" "int" "bool" "str" "table" "float32" "float64" "float128" "int16" "int32" "int64" "uint16" "uint32" "uint64"))
-            (x-constants '("$source" "$unit"))
-            (x-events '("!options" "!constant" "!format" "!condition" "!tags" "!description"))
-            (x-functions '("@case" "@else" "@end"))
+            (x-constants '("$source" "$unit" "$schema"))
+            (x-events '("!options" "!constant" "!format" "!condition" "!tags" "!description" "!delimiter"))
+            (x-functions '("@if" "@elif" "@else" "@end"))
 
             ;; generate regex string for each category of keywords
             (x-keywords-regexp (regexp-opt x-keywords 'words))
