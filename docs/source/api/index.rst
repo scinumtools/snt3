@@ -36,3 +36,14 @@ submodules when they are enabled in the build.
 
 C++ implementation details will be added to the C++ API documentation in a
 future version.
+
+CMake API
+---------
+
+The CMake integration exposes the installed ``snt`` executable and helper
+functions for evaluating DIPL configuration during project configuration.
+
+.. toctree::
+   :maxdepth: 1
+
+   cmake
