@@ -1,6 +1,8 @@
 # DIPL Emacs highlighter
 
-`dip-mode.el` defines a lightweight Emacs major mode for DIPL files. Copy the
+`dip-mode.el` defines a lightweight, standalone Emacs major mode for DIPL
+files. It is based on `fundamental-mode` and does not require Python mode.
+Copy the
 file to a directory on Emacs’ `load-path`, then enable it for `.dip` and
 `.dipl` files:
 

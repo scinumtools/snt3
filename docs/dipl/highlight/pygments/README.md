@@ -18,3 +18,6 @@ To use it in another Sphinx project, add this directory to `sys.path`, import
 `SyntaxLexer`, and register it through `sphinx.highlighting.lexers['dipl']`.
 Apply the token colors from `StyleLexer` through the project’s Pygments/CSS
 configuration.
+
+`../highlighting-test.dipl` is a deliberately broad fixture for checking
+lexer output across the DIPL syntax.

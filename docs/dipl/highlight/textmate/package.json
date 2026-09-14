@@ -1,0 +1,28 @@
+{
+  "name": "dipl-language-support",
+  "displayName": "DIPL Language Support",
+  "description": "Syntax highlighting for the Dimensional Input Parameter Language.",
+  "version": "0.1.0",
+  "publisher": "scinumtools",
+  "engines": {
+    "vscode": ">=1.80.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "dipl",
+        "aliases": ["DIPL"],
+        "extensions": [".dip", ".dipl"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "dipl",
+        "scopeName": "source.dipl",
+        "path": "./dipl.tmLanguage.json"
+      }
+    ]
+  }
+}

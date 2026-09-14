@@ -1,0 +1,37 @@
+{
+  "name": "DIPL",
+  "scopeName": "source.dipl",
+  "fileTypes": ["dip", "dipl"],
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#declaration" },
+    { "include": "#directive" },
+    { "include": "#branch" },
+    { "include": "#formatted-string" },
+    { "include": "#string" },
+    { "include": "#reference" },
+    { "include": "#number" },
+    { "include": "#type" },
+    { "include": "#boolean" }
+  ],
+  "repository": {
+    "comment": { "match": "#.*$", "name": "comment.line.number-sign.dipl" },
+    "declaration": { "match": "\\$(?:source|unit|schema)\\b", "name": "keyword.control.dipl" },
+    "directive": { "match": "!(?:options|format|condition|constant|tags|description|delimiter)\\b", "name": "keyword.other.dipl" },
+    "branch": { "match": "@(?:if|elif|else|end)\\b", "name": "keyword.control.dipl" },
+    "type": { "match": "\\b(?:bool|char|byte|str|table|map|list|u?int(?:8|16|32|64)?|float(?:16|32|64|128)?)\\b", "name": "storage.type.dipl" },
+    "boolean": { "match": "\\b(?:true|false|none)\\b", "name": "constant.language.dipl" },
+    "number": { "match": "[-+]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][-+]?[0-9]+)?", "name": "constant.numeric.dipl" },
+    "reference": { "match": "\\{[^{}]*\\}(?:\\[[^]]*\\])?", "name": "variable.other.readwrite.dipl" },
+    "formatted-string": {
+      "begin": "f(?=\"|')",
+      "beginCaptures": { "0": { "name": "keyword.other.dipl" } },
+      "end": "(?=\\n)|(?<!\\\\)(?:\"\"\"|\"|')",
+      "patterns": [
+        { "match": "\\{\\{[^{}]*\\}\\}(?:\\[[^]]*\\])?", "name": "variable.other.readwrite.dipl" },
+        { "match": "\\\\.", "name": "constant.character.escape.dipl" }
+      ]
+    },
+    "string": { "begin": "\"\"\"|\"|'", "end": "(?<!\\\\)\"\"\"|(?<!\\\\)\"|(?<!\\\\)'", "name": "string.quoted.dipl" }
+  }
+}

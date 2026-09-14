@@ -1,0 +1,67 @@
+# DIPL highlighting fixture: covers the syntax categories used by the lexer.
+
+# Declarations: external sources, custom units, and schemas.
+$source imported = "data/other.dip"
+$unit local_length = 2.5 m
+$schema vehicle
+
+# Strings and scalar values.
+name str = "escaped quote: \"DIPL\""
+single str = 'single quoted value'
+multiline str = """triple quoted
+value without interpolation and # text"""
+formatted str = f"Length: {{?length}}"
+formatted_slice str = f"Surname: {{?name}[9:]}"
+formatted_multiline str = f"""Length: {{?length}}
+Width: {{?width}}"""
+
+enabled bool = true
+disabled bool = false
+missing bool = none
+count int = -42
+unsigned uint64 = 18446744073709551615
+ratio float = 3.14159e-4
+length float = 2.5 m
+duration float = 12.0 s
+
+# Arrays and table-like values.
+values float[3] = [1.0, 2.0, 3.0] m
+labels str[3:4] = "[\"John\", \"Peter\", \"Simon\"]"
+table table = [1, 2, 3]
+
+# Local and remote references, including subtree imports.
+copied float = {?length}
+selected float = {?values}[1]
+row float[2] = {?values}[:2]
+surname str = {?name}[9:]
+remote float = {imported?length}
+children
+  {?vehicle.}
+
+# Expressions and node properties.
+calculated float = ({?length} * 2) cm
+  !condition ({.} > 0 cm)
+  !constant
+  !format "%.3f"
+  !tags ["example", "highlight"]
+  !options [1, 2, 3] cm
+  !delimiter ","
+  !description "A highlighted test value"
+
+# Conditional branches.
+@if ({?enabled})
+  selected str = "yes"
+@elif ({?count} > 0)
+  selected str = "positive"
+@else
+  selected str = "no"
+@end
+
+# Nested nodes and additional units.
+vehicle
+  wheels int = 4
+  mass float = 1200 kg
+
+# Import complete source and unit trees.
+$source {imported?.}
+$unit {imported?units?.}

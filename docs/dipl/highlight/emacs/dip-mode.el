@@ -1,12 +1,12 @@
 ;;; dip-mode.el --- Syntax highlighter for DIPL. -*- coding: utf-8; lexical-binding: t; -*-
 
-;; Copyright © 2023, by Ondrej Pego Jaura
+;; Copyright © 2026, by Ondrej Pego Jaura
 
 ;; Author: Ondrej Pego Jaura 
 ;; Version: 1.0.0
-;; Created: 5. Oct. 2023
+;; Created: 14. Sept. 2026
 ;; Keywords: languages, DIP
-;; Homepage: https://github.com/vrtulka23/scinumtools
+;; Homepage: https://github.com/vrtulka23/scinumtools3
 
 ;; This file is not part of GNU Emacs.
 
@@ -21,7 +21,7 @@
 (setq dip-font-lock-keywords
       (let* (
             ;; define several category of keywords
-            (x-keywords '("true" "false"))
+            (x-keywords '("true" "false" "none"))
             (x-types '("float" "int" "bool" "str" "table" "float32" "float64" "float128" "int16" "int32" "int64" "uint16" "uint32" "uint64"))
             (x-constants '("$source" "$unit" "$schema"))
             (x-events '("!options" "!constant" "!format" "!condition" "!tags" "!description" "!delimiter"))
@@ -40,6 +40,8 @@
           (,x-events-regexp . 'font-lock-builtin-face)
           (,x-functions-regexp . 'font-lock-function-name-face)
           (,x-keywords-regexp . 'font-lock-keyword-face)
+          ("{{[^}\n]*}\\(?:\\[[^]\n]*\\]\\)?}" . 'font-lock-variable-name-face)
+          ("#[^\n]*" . 'font-lock-comment-face)
           ;; note: order above matters, because once colored, that part won't change.
           ;; in general, put longer words first
           )))
@@ -66,8 +68,8 @@
   "Syntax table for dip-mode")
 
 ;;;###autoload
-(define-derived-mode dip-mode python-mode "dip mode"
-  "Major mode for editing LSL (Linden Scripting Language)…"
+(define-derived-mode dip-mode fundamental-mode "DIPL"
+  "Major mode for editing DIPL source files."
 
   ;; code for syntax highlighting
   (setq font-lock-defaults '((dip-font-lock-keywords))))
