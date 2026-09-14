@@ -99,6 +99,7 @@ message(STATUS "Compiled parts:")
 option(ENABLE_UNIT_TESTS "Main testing enabler" ON)  # switch off all tests
 message(STATUS "ENABLE_UNIT_TESTS            ${ENABLE_UNIT_TESTS}")
 option(ENABLE_BINDING_PYTHON "Main Python bind enabler" ON)  # switch off all pybinds 
+option(ENABLE_BINDING_C "Build the C ABI binding" ON)
 message(STATUS "ENABLE_BINDING_PYTHON        ${ENABLE_BINDING_PYTHON}")
 message(STATUS "     Module  GTests  PyBind  PyTests")
 set_module_options(CORE ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
@@ -194,6 +195,9 @@ endif()
 
 if (ENABLE_BINDING_PYTHON)
    add_subdirectory(bindings/python/cpp)  # build Python bindings
+endif()
+if (ENABLE_BINDING_C)
+   add_subdirectory(bindings/c)
 endif()
 
 
