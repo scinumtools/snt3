@@ -41,8 +41,8 @@ that make up the SciNumTools framework.
    :maxdepth: 2
    :caption: Guides
    
-   integrations/index
    modules/index
+   integrations/index
    examples/index
 
 .. toctree::

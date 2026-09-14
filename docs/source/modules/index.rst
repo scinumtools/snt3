@@ -140,6 +140,11 @@ used consistently across different applications and services, providing a
 common interface for defining, querying, evaluating, and exchanging
 scientific data.
 
+.. toctree::
+   :maxdepth: 1
+
+   api
+
 Module Architecture
 -------------------
 
