@@ -81,8 +81,8 @@ snt dip parse --input file config.dip --request build.python --value --type bool
 
 `--value` writes one raw scalar followed by a newline. Diagnostics go to stderr
 and failures return a nonzero status. `--print` retains the human-readable
-`name = value` form. Input can also be supplied through `--input file config.dip`;
-Input is supplied through `--input file config.dip`; `--add` / `-a` remain aliases for `--input` / `-i`.
+`name = value` form. Input is supplied through `--input file config.dip` or its
+short form `-i file config.dip`.
 
 A [standalone example](../examples/cmake-dipl) demonstrates creating or removing a
 build target based on a DIPL boolean.

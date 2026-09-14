@@ -68,7 +68,7 @@ void module_dip(ArgParser& argpar) {
     for (const auto& argument : argpar.getAllKeywords()) {
         const auto& key = argument.key;
         const auto& values = argument.values;
-        if (key == "-i" || key == "--input" || key == "-a" || key == "--add") {
+        if (key == "-i" || key == "--input") {
             if (values.empty())
                 throw std::runtime_error(key + " requires an input type and value.");
             for (size_t i = 0; i < values.size();) {
