@@ -8,6 +8,7 @@ namespace snt::bind::python {
     void init_puq_system(py::module_& m) {
 
         auto e = py::enum_<puq::SystemType>(m, "SystemType");
+        e.value("NONE", puq::SystemType::NONE);
         for (auto sys : puq::SystemMap) {
             e.value(sys.second->SystemAbbrev.c_str(), sys.first);
         }
