@@ -23,7 +23,6 @@ parameter handling and validation logic for each application.
 
 * Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/specification.md>`_
 * Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/grammar.ebnf>`_
-* Syntax highliters: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/highlight>`_
 
 .. raw:: html
 
@@ -33,3 +32,20 @@ parameter handling and validation logic for each application.
        height="800px"
        style="border: none;">
    </iframe>
+   </br></br>
+   
+Syntax highlighting
+-------------------
+
+The repository includes syntax definitions for the main editors and
+documentation tools. The `Pygments lexer and style
+<https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/pygments>`_
+are used for ``dipl`` code blocks in this Sphinx documentation. An
+`Emacs mode <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/emacs>`_,
+`Skylight/Kate definition <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/skylight>`_,
+and `TextMate package <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/textmate>`_
+are provided for editing DIPL files. The shared
+`highlighting test fixture <https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/highlight/highlighting-test.dipl>`_
+covers the language constructs supported by these highlighters.
+
+* Syntax highlighters: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/highlight>`_
