@@ -8,15 +8,15 @@ namespace snt::bind::python {
 
     void init_core(py::module_& m) {
 
-        py::class_<core::StringFormatType>(m, "StringFormatType")
+        py::class_<core::StringFormatType>(m, "StringFormatType", "Formatting options for numerical and string output.")
             .def(py::init<>()) // default constructor
-            .def_readwrite("specifier", &core::StringFormatType::specifier)
-            .def_readwrite("valuePrecision", &core::StringFormatType::valuePrecision)
-            .def_readwrite("uncertaintyPrecision", &core::StringFormatType::uncertaintyPrecision)
-            .def_readwrite("thresholdScientific", &core::StringFormatType::thresholdScientific)
-            .def_readwrite("paddingZeros", &core::StringFormatType::paddingZeros)
-            .def_readwrite("paddingSize", &core::StringFormatType::paddingSize)
-            .def_readwrite("stringQuotes", &core::StringFormatType::stringQuotes)
+            .def_readwrite("specifier", &core::StringFormatType::specifier, "Numeric format specifier.")
+            .def_readwrite("valuePrecision", &core::StringFormatType::valuePrecision, "Displayed value precision.")
+            .def_readwrite("uncertaintyPrecision", &core::StringFormatType::uncertaintyPrecision, "Displayed uncertainty precision.")
+            .def_readwrite("thresholdScientific", &core::StringFormatType::thresholdScientific, "Threshold for scientific notation.")
+            .def_readwrite("paddingZeros", &core::StringFormatType::paddingZeros, "Whether to pad values with zeros.")
+            .def_readwrite("paddingSize", &core::StringFormatType::paddingSize, "Minimum padded field size.")
+            .def_readwrite("stringQuotes", &core::StringFormatType::stringQuotes, "Whether string values include quotes.")
             // Optional: provide a nice __repr__ for debugging in Python
             .def("__repr__", [](const core::StringFormatType& s) {
                 return "<StringFormatType specifier='" + std::string(1, s.specifier) +
@@ -28,7 +28,7 @@ namespace snt::bind::python {
                        ", stringQuotes=" + std::string(s.stringQuotes ? "True" : "False") + ">";
             });
 
-        py::enum_<core::DataType>(m, "DataType")
+        py::enum_<core::DataType>(m, "DataType", "Data types used by the SNT value and node layers.")
             .value("None", core::DataType::None)
             .value("Boolean", core::DataType::Boolean)
             .value("String", core::DataType::String)
