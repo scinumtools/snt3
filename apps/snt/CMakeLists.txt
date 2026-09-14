@@ -18,6 +18,12 @@ set_target_properties(${EXEC_NAME} PROPERTIES
 
 # install libraries and executables
 install(TARGETS ${EXEC_NAME}
+        EXPORT SNTExecutables
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(EXPORT SNTExecutables
+        FILE snt-executables.cmake
+        NAMESPACE snt::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/snt)
 
 enable_coverage(${EXEC_NAME})

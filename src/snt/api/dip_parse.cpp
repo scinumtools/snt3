@@ -1,6 +1,8 @@
 #include "dip_parse.h"
 
 #include <iostream>
+#include <limits>
+#include <map>
 #include <snt/api/exceptions.h>
 #include <sstream>
 
@@ -27,7 +29,7 @@ namespace snt::api {
     }
 
     void DIPParse::argument_request(const std::string& path) {
-        request = path;
+        request = (!path.empty() && path.front() == '?') ? path.substr(1) : path;
     }
 
     void DIPParse::argument_tags(const std::vector<std::string>& list) {
@@ -36,6 +38,20 @@ namespace snt::api {
 
     void DIPParse::argument_print() {
         print = PrintOptions::ALL;
+    }
+
+    void DIPParse::argument_value(const std::string& type) {
+        if (type != "" && type != "bool" && type != "integer" && type != "float" && type != "string") {
+            throw api::ArgumentException(
+                "Invalid scalar type",
+                "Unknown type: " + type,
+                "Use bool, integer, float, or string.",
+                __FILE__,
+                __LINE__
+            );
+        }
+        print = PrintOptions::VALUE;
+        value_type = type;
     }
 
     std::string DIPParse::execute() {
@@ -52,6 +68,46 @@ namespace snt::api {
 
         // print if required
         std::stringstream ss;
+        if (print == PrintOptions::VALUE) {
+            if (request.empty() || vnodes.size() != 1) {
+                throw api::ArgumentException(
+                    "Invalid scalar request",
+                    "Request: " + request,
+                    "Select exactly one scalar value with --request.",
+                    __FILE__,
+                    __LINE__
+                );
+            }
+            const auto& node = vnodes.front();
+            if (!node->value || !node->dimension.empty() || node->value->get_size() != 1 || node->units) {
+                throw api::ArgumentException(
+                    "Invalid scalar value",
+                    "Request: " + request,
+                    "Scalar output requires a defined value without arrays or units.",
+                    __FILE__,
+                    __LINE__
+                );
+            }
+            const std::map<std::string, dip::NodeDtype> types = {
+                {"bool", dip::NodeDtype::Boolean},
+                {"integer", dip::NodeDtype::Integer},
+                {"float", dip::NodeDtype::Float},
+                {"string", dip::NodeDtype::String}
+            };
+            if (!value_type.empty() && node->dtype != types.at(value_type)) {
+                throw api::ArgumentException(
+                    "Scalar type mismatch",
+                    "Request: " + request,
+                    "Expected a DIPL " + value_type + " value.",
+                    __FILE__,
+                    __LINE__
+                );
+            }
+            core::StringFormatType format;
+            format.stringQuotes = false;
+            format.valuePrecision = std::numeric_limits<double>::max_digits10;
+            return node->value->to_string(format) + '\n';
+        }
         if (print == PrintOptions::ALL) {
             for (const auto& node : vnodes) {
                 ss << node->path.name << " = " << node->to_string() << '\n';

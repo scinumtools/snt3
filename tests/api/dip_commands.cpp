@@ -114,3 +114,50 @@ TEST_F(DIPCommands, Request) {
     std::string output = cmd.execute();
     EXPECT_NE(output.find("snap = 3"), std::string::npos);
 }
+
+TEST_F(DIPCommands, ScalarBoolean) {
+    cmd.argument_request("?foo[bar].jerk");
+    cmd.argument_value("bool");
+    EXPECT_EQ(cmd.execute(), "true\n");
+}
+
+TEST_F(DIPCommands, ScalarInteger) {
+    cmd.argument_request("foo[bar].snap");
+    cmd.argument_value("integer");
+    EXPECT_EQ(cmd.execute(), "3\n");
+}
+
+TEST_F(DIPCommands, ScalarStringPreservesContent) {
+    cmd.argument_add("string", {"text str = \"  a;b ${literal}  \"\n"});
+    cmd.argument_request("text");
+    cmd.argument_value("string");
+    EXPECT_EQ(cmd.execute(), "  a;b ${literal}  \n");
+}
+
+TEST_F(DIPCommands, ScalarTypeMismatch) {
+    cmd.argument_request("foo[bar].snap");
+    cmd.argument_value("bool");
+    EXPECT_THROW(cmd.execute(), std::exception);
+}
+
+TEST_F(DIPCommands, ScalarRejectsMultipleValues) {
+    cmd.argument_request("foo[bar]");
+    cmd.argument_value();
+    EXPECT_THROW(cmd.execute(), std::exception);
+}
+
+TEST_F(DIPCommands, ScalarRejectsMissingValue) {
+    cmd.argument_request("missing");
+    cmd.argument_value();
+    EXPECT_THROW(cmd.execute(), std::exception);
+}
+
+TEST_F(DIPCommands, ScalarRejectsArrayAndUnits) {
+    for (const auto& source : {"array int[1] = [3]\n", "array float = 3 m\n", "array int\n"}) {
+        api::DIPParse scalar;
+        scalar.argument_add("string", {source});
+        scalar.argument_request("array");
+        scalar.argument_value();
+        EXPECT_THROW(scalar.execute(), std::exception);
+    }
+}

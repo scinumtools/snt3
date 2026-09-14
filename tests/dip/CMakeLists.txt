@@ -24,6 +24,7 @@ target_compile_definitions(${EXEC_NAME} PRIVATE
 )
 
 gtest_discover_tests(${EXEC_NAME}
+  DISCOVERY_TIMEOUT 30
   TEST_PREFIX gtest.dip.
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )

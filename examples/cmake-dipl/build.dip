@@ -1,0 +1,4 @@
+build
+  tools bool = true
+  standard int = 17
+  message str = "Configured by DIPL"

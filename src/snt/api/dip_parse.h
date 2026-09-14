@@ -24,6 +24,7 @@ namespace snt::api {
         std::string request;           ///< Node request query
         std::vector<std::string> tags; ///< List of node tags that should be selected
         PrintOptions print;            ///< Printing option
+        std::string value_type;        ///< Optional scalar output type constraint
 
       public:
         /**
@@ -57,6 +58,10 @@ namespace snt::api {
          * Print parsed nodes with values
          **/
         void argument_print();
+
+        /// Print exactly one unitless scalar, without a name or string quotes.
+        /// type is empty, bool, integer, float, or string.
+        void argument_value(const std::string& type = "");
 
         /**
          * Executed parsing command

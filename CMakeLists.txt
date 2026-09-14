@@ -187,7 +187,12 @@ if (ENABLE_EXEC_EXAMPLES)
     add_subdirectory(examples)         # build example applications
 endif()
 add_subdirectory(tests)                # build gtest executable
-if (ENABLE_BINDING_PYTHON)         
+
+if(ENABLE_UNIT_TESTS AND TARGET snt AND NOT CMAKE_CROSSCOMPILING)
+    add_subdirectory(bindings/cmake/tests)
+endif()
+
+if (ENABLE_BINDING_PYTHON)
    add_subdirectory(bindings/python/cpp)  # build Python bindings
 endif()
 
@@ -241,6 +246,7 @@ write_basic_package_version_file(
 ###############
 	
 install(FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/bindings/cmake/SNTDIPL.cmake"
 	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}-config.cmake"
 	"${CMAKE_CURRENT_BINARY_DIR}/${MODULE_NAME}-config-version.cmake"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${MODULE_NAME}

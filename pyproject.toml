@@ -40,7 +40,7 @@ test = [
 docs = [
     "sphinx",
     "sphinx-rtd-theme",
-    "pypandoc",
+    "pypandoc-binary",
     "breathe",
 ]
 dev = [

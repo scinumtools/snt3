@@ -27,76 +27,96 @@ Options:
       Show help.
   -v, --version
       Show version information.
-  -a,--add <type> [<name>] <value>
+  -i,--input <type> [<name>] <value>
       Add a new source type (file/string/unit/source). Unit and source input require name and value.
   -r,--request <query>
       Request specific nodes (e.g. "family.father").
   --print
-      Print nodes.
+      Print nodes with their names and units.
+  --value
+      Print exactly one defined, unitless scalar without a name or quotes.
+      Requires --request. Errors are written to stderr with a nonzero exit status.
+  --type <bool|integer|float|string>
+      Require this DIPL type with --value (no implicit conversion).
 
 Examples:
-  snt dip parse -f parameters.dip --print
+  snt dip parse -i file parameters.dip --print
 
   snt dip parse \
-      -a file parameters.dip \
-      -a string "age int = 23 yr" \
+      -i file parameters.dip \
+      -i string "age int = 23 yr" \
       -r "family.father" \
       --print
 )";
 }
 
 void module_dip(ArgParser& argpar) {
-
-    if (argpar.hasKeyword("-h") || argpar.numPositional() < 2) {
+    if (argpar.hasKeyword("-h") || argpar.hasKeyword("--help") || argpar.numPositional() < 2) {
         std::cout << help_dip();
+        return;
     }
-    try {
+    if (argpar.getPositionalValue(1) != "parse" || argpar.numPositional() != 2) {
+        throw std::runtime_error("Unknown DIP command. Use 'snt dip parse --help'.");
+    }
 
-        std::string command = argpar.getPositionalValue(1);
-        if (command == "parse") {
-            api::DIPParse cmd;
-            std::vector<std::string> arguments;
-            arguments = argpar.getKeywordValues("-i", "--input");
-            if (!arguments.empty()) {
-                size_t i = 0;
-                size_t arguments_size = arguments.size();
-                while (i < arguments_size) {
-                    if (arguments[i] == "string" && (i + 1) < arguments_size) {
-                        cmd.argument_add(arguments[i], {arguments[i + 1]});
-                        i += 2;
-                    } else if (arguments[i] == "file" && (i + 1) < arguments_size) {
-                        cmd.argument_add(arguments[i], {arguments[i + 1]});
-                        i += 2;
-                    } else if (arguments[i] == "source" && (i + 2) < arguments_size) {
-                        cmd.argument_add(arguments[i], {arguments[i + 1], arguments[i + 2]});
-                        i += 3;
-                    } else if (arguments[i] == "unit" && (i + 2) < arguments_size) {
-                        cmd.argument_add(arguments[i], {arguments[i + 1], arguments[i + 2]});
-                        i += 3;
-                    } else {
-                        throw std::runtime_error("Invalid input type: " + arguments[i]);
-                    }
-                }
+    api::DIPParse cmd;
+    bool has_input = false;
+    bool has_request = false;
+    bool print = false;
+    bool value = false;
+    std::string type;
+    for (const auto& argument : argpar.getAllKeywords()) {
+        const auto& key = argument.key;
+        const auto& values = argument.values;
+        if (key == "-i" || key == "--input" || key == "-a" || key == "--add") {
+            if (values.empty())
+                throw std::runtime_error(key + " requires an input type and value.");
+            for (size_t i = 0; i < values.size();) {
+                const auto& kind = values[i];
+                size_t count = (kind == "file" || kind == "string") ? 1 : 2;
+                if (i + count >= values.size())
+                    throw std::runtime_error("Incomplete DIP input: " + kind);
+                cmd.argument_add(
+                    kind, std::vector<std::string>(values.begin() + i + 1, values.begin() + i + count + 1)
+                );
+                i += count + 1;
             }
-            arguments = argpar.getKeywordValues("-r", "--request");
-            if (!arguments.empty()) {
-                cmd.argument_request(arguments[0]);
-            }
-            arguments = argpar.getKeywordValues("-t", "--tags");
-            if (!arguments.empty()) {
-                cmd.argument_tags(arguments);
-            }
-            if (argpar.hasKeyword("--print")) {
-                cmd.argument_print();
-            }
-            std::cout << cmd.execute();
+            has_input = true;
+        } else if (key == "-r" || key == "--request") {
+            if (values.size() != 1 || has_request)
+                throw std::runtime_error("Specify exactly one request.");
+            cmd.argument_request(values.front());
+            has_request = true;
+        } else if (key == "-t" || key == "--tags") {
+            if (values.empty())
+                throw std::runtime_error(key + " requires tags.");
+            cmd.argument_tags(values);
+        } else if (key == "--print" || key == "--value") {
+            if (!values.empty())
+                throw std::runtime_error(key + " does not take arguments.");
+            if (key == "--print")
+                print = true;
+            else
+                value = true;
+        } else if (key == "--type") {
+            if (values.size() != 1)
+                throw std::runtime_error("--type requires one scalar type.");
+            type = values.front();
+        } else {
+            throw std::runtime_error("Unknown DIP option: " + key);
         }
-
-        // TODO: implement tag selectors
-        // TODO: print can have an argument: format
-        // TODO: implement exports to other languages: yaml, toml, c/c++, fortran,...
-        // TODO: implement output into a file
-    } catch (std::exception& e) {
-        std::cout << e.what() << '\n';
     }
+    if (!has_input)
+        throw std::runtime_error("Specify a DIP input with --input.");
+    if (print && value)
+        throw std::runtime_error("Use either --print or --value.");
+    if (!type.empty() && !value)
+        throw std::runtime_error("--type requires --value.");
+    if (value && !has_request)
+        throw std::runtime_error("--value requires --request.");
+    if (print)
+        cmd.argument_print();
+    if (value)
+        cmd.argument_value(type);
+    std::cout << cmd.execute();
 }

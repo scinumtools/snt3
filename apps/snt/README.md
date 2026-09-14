@@ -17,7 +17,7 @@ snt puq convert "12*statA" "A" -s ESU -S SI -Q "I"
 # 4.00277e-9*A
 
 snt dip parse \
-    -f parameters.dip \
+    -i file parameters.dip \
     -r "?family.father" \
     --print
 # father = 184 cm
@@ -29,4 +29,11 @@ For more help and examples use the following:
 snt -h
 snt puq -h
 snt dip -h
+```
+
+For configure-time build switches, use the [DIPL CMake integration](../../bindings/cmake/README.md).
+The CLI's `--value` mode returns a single unitless scalar for scripts:
+
+```bash
+snt dip parse --input file config.dip --request build.python --value --type bool
 ```

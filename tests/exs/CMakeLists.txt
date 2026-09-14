@@ -30,6 +30,7 @@ set_target_properties(${EXEC_NAME} PROPERTIES
 )
 
 gtest_discover_tests(${EXEC_NAME}
+  DISCOVERY_TIMEOUT 30
   TEST_PREFIX gtest.exs.
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
