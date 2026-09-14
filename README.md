@@ -69,7 +69,7 @@ simulation
     dt float = 1e-3 s
     end float = 10 s
     steps int = ({?simulation.time.end} / {?simulation.time.dt})  # computed value
-      !condition ({?} > 0)                    # validation
+      !condition ({.} > 0)                    # validation
   solver
     restart_file str = none                   # optional value
   boundary[inlet]                             # node collections
@@ -204,15 +204,15 @@ The `PUQ` module builds on this notation to provide parsing, dimensional analysi
 simulation
 
   timestep float = 0.5 fs
-    !condition ({?} > 0.0 fs)
+    !condition ({.} > 0.0 fs)
 
   temperature float = 300 K
-    !condition ({?} > 0 K)
+    !condition ({.} > 0 K)
 
   pressure float = 1 atm
 
   steps int = 1000000
-    !condition ({?} > 1)
+    !condition ({.} > 1)
 
   duration float = ( {?simulation.timestep} * {?simulation.steps} )
 
