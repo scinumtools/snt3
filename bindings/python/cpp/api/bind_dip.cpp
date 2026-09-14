@@ -9,7 +9,7 @@ namespace snt::bind::python {
 
     void init_api_dip(py::module_& m) {
 
-        auto command = py::class_<api::DIPParse>(m, "DIPParse");
+        auto command = py::class_<api::DIPParse>(m, "DIPParse", "Command object for parsing and querying DIPL input.");
 
         command.def(py::init<>());
 
@@ -21,7 +21,7 @@ namespace snt::bind::python {
 
         command.def("argument_print", &api::DIPParse::argument_print);
 
-        command.def("execute", &api::DIPParse::execute);
+        command.def("execute", &api::DIPParse::execute, "Execute the configured DIPL query.");
     }
 
 } // namespace snt::bind::python

@@ -25,7 +25,7 @@ namespace snt::bind::python {
         );
         nl.def("size", &dip::NodeList<dip::ValueNode>::size);
 
-        auto env = py::class_<dip::Environment>(m, "Environment");
+        auto env = py::class_<dip::Environment>(m, "Environment", "Evaluation environment containing DIPL sources, units, functions, and nodes.");
         env.def(py::init<>());
         env.def_property_readonly("nodes", [](const dip::Environment& e) { return &e.nodes; });
         env.def_property_readonly("size", [](const dip::Environment& e) { return e.nodes.size(); });

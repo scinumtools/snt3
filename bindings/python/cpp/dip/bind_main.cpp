@@ -38,9 +38,9 @@ namespace snt::bind::python {
         init_cursor(m);
         init_exceptions(m);
 
-        auto dip = py::class_<dip::DIP>(m, "DIP");
+        auto dip = py::class_<dip::DIP>(m, "DIP", "Parser and evaluator for DIPL source definitions.");
         dip.def(py::init<>());
-        dip.def("add_string", &dip::DIP::add_string, py::arg("source_code"));
+        dip.def("add_string", &dip::DIP::add_string, py::arg("source_code"), "Add DIPL source text to the parser.");
         dip.def(
             "add_file",
             &dip::DIP::add_file,
@@ -48,8 +48,8 @@ namespace snt::bind::python {
             py::arg("source_name") = "",
             py::arg("absolute") = true
         );
-        dip.def("add_source", &dip::DIP::add_source, py::arg("source_name"), py::arg("source_file"));
-        dip.def("add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"));
+        dip.def("add_source", &dip::DIP::add_source, py::arg("source_name"), py::arg("source_file"), "Register a named DIPL source file.");
+        dip.def("add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"), "Register a custom unit definition.");
 
         dip.def("add_function_value", [](dip::DIP& self, const std::string& name, py::function func) {
             self.add_function_value(name, [func](const dip::Environment& env) {
@@ -65,7 +65,7 @@ namespace snt::bind::python {
             });
         });
 
-        dip.def("parse", &dip::DIP::parse);
+        dip.def("parse", &dip::DIP::parse, "Parse and evaluate all added DIPL input.");
         // dip.def("parse_docs", &dip::DIP::parse_docs);
 
         dip.def("enter", &dip_enter);

@@ -92,7 +92,9 @@ namespace snt::bind::python {
 
     void init_puq_quantity(py::module_& m) {
 
-        auto q = py::class_<puq::Quantity>(m, "Quantity", py::buffer_protocol());
+        auto q = py::class_<puq::Quantity>(
+            m, "Quantity", "A numerical value with physical units and optional measurement uncertainty.", py::buffer_protocol()
+        );
 
         q.def(py::init<std::string>())
             .def(py::init<std::string, puq::SystemType>())

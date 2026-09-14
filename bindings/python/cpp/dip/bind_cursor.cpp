@@ -42,7 +42,7 @@ namespace snt::bind::python {
         k.value("List", dip::Path::Kind::List);
         k.value("Item", dip::Path::Kind::Item);
 
-        auto val = py::class_<dip::Cursor, std::shared_ptr<dip::Cursor>>(m, "Cursor");
+        auto val = py::class_<dip::Cursor, std::shared_ptr<dip::Cursor>>(m, "Cursor", "Cursor for traversing and querying evaluated DIPL nodes.");
 
         val.def(py::init<const dip::Environment*, std::string_view>(), py::arg("env"), py::arg("path") = "");
 

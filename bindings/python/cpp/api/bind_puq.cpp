@@ -12,7 +12,7 @@ namespace snt::bind::python {
     void init_api_puq(py::module_& m) {
 
         {
-            auto command = py::class_<api::PUQConvert>(m, "PUQConvert");
+            auto command = py::class_<api::PUQConvert>(m, "PUQConvert", "Command object for converting a PUQ quantity between units.");
 
             command.def(py::init<const std::string&, const std::string&>(), py::arg("expr1"), py::arg("expr2"));
 
@@ -22,11 +22,11 @@ namespace snt::bind::python {
 
             command.def("argument_output_quantity", &api::PUQConvert::argument_output_quantity, py::arg("quantity"));
 
-            command.def("execute", &api::PUQConvert::execute);
+            command.def("execute", &api::PUQConvert::execute, "Convert and return the requested quantity.");
         }
 
         {
-            auto command = py::class_<api::PUQEval>(m, "PUQEval");
+            auto command = py::class_<api::PUQEval>(m, "PUQEval", "Command object for evaluating a PUQ expression.");
 
             command.def(py::init<const std::string&>(), py::arg("expr"));
 
@@ -38,27 +38,27 @@ namespace snt::bind::python {
 
             command.def("argument_output_quantity", &api::PUQEval::argument_output_quantity, py::arg("quantity"));
 
-            command.def("execute", &api::PUQEval::execute);
+            command.def("execute", &api::PUQEval::execute, "Evaluate and return the PUQ expression.");
         }
 
         {
-            auto command = py::class_<api::PUQInfo>(m, "PUQInfo");
+            auto command = py::class_<api::PUQInfo>(m, "PUQInfo", "Command object for querying PUQ expression information.");
 
             command.def(py::init<const std::string&>(), py::arg("expr"));
 
             command.def("argument_input_system", &api::PUQInfo::argument_input_system, py::arg("isystem"));
 
-            command.def("execute", &api::PUQInfo::execute);
+            command.def("execute", &api::PUQInfo::execute, "Return information about the PUQ expression.");
         }
 
         {
-            auto command = py::class_<api::PUQList>(m, "PUQList");
+            auto command = py::class_<api::PUQList>(m, "PUQList", "Command object for listing available PUQ definitions.");
 
             command.def(py::init<const std::string&>(), py::arg("li") = "");
 
             command.def("argument_system", &api::PUQList::argument_system, py::arg("system"));
 
-            command.def("execute", &api::PUQList::execute);
+            command.def("execute", &api::PUQList::execute, "Return the requested PUQ definition list.");
         }
     }
 

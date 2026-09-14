@@ -23,7 +23,7 @@ namespace snt::bind::python {
 
     void init_value_node(py::module_& m) {
 
-        auto vdata = py::class_<dip::ValueNodeData>(m, "ValueNodeData");
+        auto vdata = py::class_<dip::ValueNodeData>(m, "ValueNodeData", "Evaluated value data returned by DIPL functions and nodes.");
         vdata.def(
             py::init([](py::object value, py::object units) {
                 dip::ValueNodeData data;
@@ -37,7 +37,7 @@ namespace snt::bind::python {
             py::arg("units") = py::none()
         );
 
-        auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(m, "ValueNode");
+        auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(m, "ValueNode", "A DIPL parameter node with value, type, units, and metadata.");
 
         val.def(
             py::init(

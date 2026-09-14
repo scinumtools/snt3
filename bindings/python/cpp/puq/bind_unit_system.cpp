@@ -17,12 +17,12 @@ namespace snt::bind::python {
     void init_puq_unit_system(py::module_& m) {
 
         // Expose UnitSystem
-        py::class_<puq::UnitSystem> usb(m, "UnitSystemBase");
+        py::class_<puq::UnitSystem> usb(m, "UnitSystemBase", "Base context manager for selecting a unit system.");
         usb.def(py::init<const puq::SystemType>());
         usb.def("change", &puq::UnitSystem::change);
         usb.def("close", &puq::UnitSystem::close);
 
-        py::class_<UnitSystem, puq::UnitSystem> us(m, "UnitSystem");
+        py::class_<UnitSystem, puq::UnitSystem> us(m, "UnitSystem", "Context manager for changing the active unit system.");
         us.def(py::init<const puq::SystemType>());
 
         us.def("enter", &UnitSystem::enter);
