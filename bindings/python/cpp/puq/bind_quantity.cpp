@@ -128,7 +128,8 @@ namespace snt::bind::python {
             }),
             py::arg("value"),
             py::arg("unit") = "",
-            py::arg("system") = puq::SystemType::NONE
+            py::arg("system") = puq::SystemType::NONE,
+            "Create a Quantity from a NumPy array."
         );
 
         /**
@@ -148,7 +149,8 @@ namespace snt::bind::python {
             py::arg("value"),
             py::arg("uncertainty"),
             py::arg("unit") = "",
-            py::arg("system") = puq::SystemType::NONE
+            py::arg("system") = puq::SystemType::NONE,
+            "Create a Quantity from NumPy values and uncertainties."
         );
 
         /**
@@ -174,7 +176,7 @@ namespace snt::bind::python {
                 stride *= static_cast<py::ssize_t>(shape[i]);
             }
             return py::array_t<double>(shape, strides, otherT->get_data());
-        });
+        }, "Return the quantity value as a NumPy array.");
         //  q.def("to_numpy", [](const puq::Quantity &q) -> py::buffer_info {
         //      val::ArrayValueFloat64* otherT =
         //      dynamic_cast<val::ArrayValueFloat64*>(q.measurement.result.estimate.get()); return py::buffer_info(
@@ -193,27 +195,29 @@ namespace snt::bind::python {
             py::overload_cast<std::string, puq::SystemType, const std::string&>(&puq::Quantity::convert, py::const_),
             py::arg("expression"),
             py::arg("system") = puq::SystemType::NONE,
-            py::arg("quantity") = ""
+            py::arg("quantity") = "",
+            "Convert to target units or a target unit-system expression."
         );
         q.def(
             "convert",
             py::overload_cast<const puq::Format::Base&, puq::SystemType>(&puq::Quantity::convert, py::const_),
             py::arg("dformat"),
-            py::arg("system") = puq::SystemType::NONE
+            py::arg("system") = puq::SystemType::NONE,
+            "Convert using a base-dimension format and optional unit system."
         );
-        q.def("unit_system", &puq::Quantity::unit_system);
-        q.def("rebase_prefixes", &puq::Quantity::rebase_prefixes);
-        q.def("rebase_dimensions", &puq::Quantity::rebase_dimensions);
-        q.def("size", &puq::Quantity::size);
-        q.def("shape", &puq::Quantity::shape);
+        q.def("unit_system", &puq::Quantity::unit_system, "Return the quantity's unit system.");
+        q.def("rebase_prefixes", &puq::Quantity::rebase_prefixes, "Rebase units using the selected prefixes.");
+        q.def("rebase_dimensions", &puq::Quantity::rebase_dimensions, "Rebase the quantity dimensions.");
+        q.def("size", &puq::Quantity::size, "Return the number of stored values.");
+        q.def("shape", &puq::Quantity::shape, "Return the shape of the stored value.");
         q.def("info", [](const puq::Quantity& q) {
             py::scoped_ostream_redirect redirect(std::cout, py::module_::import("sys").attr("stdout"));
             std::cout << q.info();
-        });
+        }, "Print detailed information about the quantity.");
 
-        q.def("value", &quantity_value, py::arg("numpy") = false);
-        q.def("uncertainty", &quantity_uncertainty, py::arg("numpy") = false);
-        q.def_property_readonly("units", [](const puq::Quantity& q) { return q.measurement.baseunits.to_string(); });
+        q.def("value", &quantity_value, py::arg("numpy") = false, "Return the value as a scalar, list, or NumPy array.");
+        q.def("uncertainty", &quantity_uncertainty, py::arg("numpy") = false, "Return uncertainty as a scalar, list, or NumPy array.");
+        q.def_property_readonly("units", [](const puq::Quantity& q) { return q.measurement.baseunits.to_string(); }, "Return the quantity's units as text.");
 
         //.def("__getitem__", &quantity_get_value, py::arg("index"))
         //.def("__len__", &puq::Quantity::size)
@@ -360,8 +364,8 @@ namespace snt::bind::python {
         });
 
         q.def("__repr__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat());
-        q.def("__str__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat());
-        q.def("to_string", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat());
+        q.def("__str__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat(), "Format the quantity as text.");
+        q.def("to_string", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat(), "Format the quantity as text.");
     }
 
 } // namespace snt::bind::python

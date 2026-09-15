@@ -24,8 +24,8 @@ namespace snt::bind::python {
         init_puq_formats(formats);
 
         // Exposing unit format
-        py::class_<puq::UnitFormat>(m, "UnitFormat").def(py::init<>()) // exposes default constructor
-            ;
+        py::class_<puq::UnitFormat>(m, "UnitFormat", "Formatting options used by PUQ listing functions.")
+            .def(py::init<>(), "Create default unit-formatting options.");
 
         // Exposing lists
         auto lists = m.def_submodule("lists", "Unit system lists");
@@ -42,7 +42,8 @@ namespace snt::bind::python {
                 auto atom = calc.eval(e);
                 return atom.value;
             },
-            py::arg("expression")
+            py::arg("expression"),
+            "Evaluate a PUEL expression and return a Quantity."
         );
 
         // Exposing Quantity object

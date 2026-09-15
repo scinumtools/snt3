@@ -17,10 +17,10 @@ namespace snt::bind::python {
 
     void init_exceptions(py::module_& m) {
 
-        py::class_<dip::ExceptionInfo>(m, "ExceptionInfo")
-            .def_readonly("message", &dip::ExceptionInfo::message)
-            .def_readonly("details", &dip::ExceptionInfo::details)
-            .def_readonly("suggestion", &dip::ExceptionInfo::suggestion);
+        py::class_<dip::ExceptionInfo>(m, "ExceptionInfo", "Structured information attached to a DIPL exception.")
+            .def_readonly("message", &dip::ExceptionInfo::message, "Short error message.")
+            .def_readonly("details", &dip::ExceptionInfo::details, "Detailed error explanation.")
+            .def_readonly("suggestion", &dip::ExceptionInfo::suggestion, "Suggested correction, when available.");
 
         pybind_exception = py::register_exception<dip::PybindException>(m, "PybindException").ptr();
         py::register_exception_translator([](std::exception_ptr p) {

@@ -7,7 +7,7 @@ namespace snt::bind::python {
 
     void init_puq_formats(py::module_& m) {
 
-        auto d = py::enum_<puq::Format::Base>(m, "Dformat");
+        auto d = py::enum_<puq::Format::Base>(m, "Dformat", "Base dimensions used when formatting PUQ units.");
         d.value("MKS", puq::Format::Base::MKS);
         d.value("MGS", puq::Format::Base::MGS);
         d.value("CGS", puq::Format::Base::CGS);

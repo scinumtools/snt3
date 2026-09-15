@@ -16,19 +16,19 @@ namespace snt::bind::python {
 
     void init_environment(py::module_& m) {
 
-        auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList");
-        nl.def(py::init<>());
+        auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList", "Sequence of evaluated DIPL value nodes.");
+        nl.def(py::init<>(), "Create an empty node list.");
         nl.def(
             "__getitem__",
             [](const dip::NodeList<dip::ValueNode>& self, size_t i) { return self.at(i); },
-            py::arg("node")
+            py::arg("node"), "Return the node at an index."
         );
-        nl.def("size", &dip::NodeList<dip::ValueNode>::size);
+        nl.def("size", &dip::NodeList<dip::ValueNode>::size, "Return the number of nodes.");
 
         auto env = py::class_<dip::Environment>(m, "Environment", "Evaluation environment containing DIPL sources, units, functions, and nodes.");
-        env.def(py::init<>());
-        env.def_property_readonly("nodes", [](const dip::Environment& e) { return &e.nodes; });
-        env.def_property_readonly("size", [](const dip::Environment& e) { return e.nodes.size(); });
+        env.def(py::init<>(), "Create an empty evaluation environment.");
+        env.def_property_readonly("nodes", [](const dip::Environment& e) { return &e.nodes; }, "Evaluated top-level nodes.");
+        env.def_property_readonly("size", [](const dip::Environment& e) { return e.nodes.size(); }, "Number of top-level nodes.");
 
         env.def(
             "request_group",
@@ -36,7 +36,8 @@ namespace snt::bind::python {
                 return e.request_group(path, dip::RequestType::Reference, tags);
             },
             py::arg("path"),
-            py::arg("tags") = std::vector<std::string>{}
+            py::arg("tags") = std::vector<std::string>{},
+            "Return a group cursor at a DIPL path."
         );
 
         env.def(
@@ -52,10 +53,11 @@ namespace snt::bind::python {
             },
             py::arg("path"),
             py::arg("to_units") = "",
-            py::arg("as_numpy") = false
+            py::arg("as_numpy") = false,
+            "Return the value at a path, optionally converted to a NumPy array."
         );
 
-        env.def("__getitem__", &dip::Environment::operator[], py::arg("path"));
+        env.def("__getitem__", &dip::Environment::operator[], py::arg("path"), "Return a Cursor for a DIPL path.");
 
         // env.def("request_code", &dip::Environment::request_code, py::arg("source_name"));
 
