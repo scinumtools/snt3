@@ -23,6 +23,24 @@ Both commands below use `.venv/bin/python` when it exists, otherwise
 interpreter, use `PYTHON=/absolute/path/to/python ./setup.sh -d` or
 `make -C docs html PYTHON=/absolute/path/to/python`.
 
+Install the `doxygen` executable as well. Both commands regenerate
+`docs/doxy/xml` from `include/snt/` and `src/snt/api/` before building the HTML.
+Breathe renders the C++ reference in topic pages under `docs/source/api/cpp/`;
+the `cpp_*.rst` module pages provide navigation. The local `doxygentopic`
+directive selects public declarations by their headers and includes nested
+namespaces without duplicating namespace declarations across pages. New
+declarations in listed headers are picked up automatically; when adding a
+header, add it to the appropriate topic's `:headers:` option. Header glob
+patterns are also supported. Sphinx autodoc renders the Python bindings.
+Private members and the
+implementation helpers listed in `EXCLUDE_SYMBOLS` in `docs/Doxyfile` are
+omitted; MAT is documented as experimental.
+
+The HTML target rebuilds Sphinx's environment (`-E`) after regenerating
+Doxygen XML. This prevents stale C++ cross-references after API declarations
+move between pages. When invoking Sphinx directly after such changes, include
+`-E` as well.
+
 * Using the setup script
 
   ```bash

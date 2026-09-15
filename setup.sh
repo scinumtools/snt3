@@ -151,7 +151,6 @@ function compile_docs {
     fi
     echo "Building Sphinx documentation"
     cd docs
-    doxygen
     make html
 }
 

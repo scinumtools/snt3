@@ -17,6 +17,29 @@ The ``API`` module supplies command-oriented application operations such as
 PUQ evaluation and DIPL parsing. It is documented as part of the C++ module
 API, rather than as a separate code API.
 
+The reference below is generated from C++ declarations and comments using
+Doxygen and Breathe. It covers the namespaces in ``include/snt/`` and the
+``snt::api`` command headers in ``src/snt/api``, including public members,
+free functions, enums, and aliases. Private members, the ``dip::detail``
+template helpers, and the recursive ``core::_array_to_string`` helpers are
+omitted. The VAL page also omits the string-array template specialization
+to avoid duplicate documentation links. MAT is included as an experimental
+module.
+
+Each module overview links to topic pages that group related types and
+operations, such as quantities, unit systems, or DIPL nodes.
+
+.. toctree::
+   :maxdepth: 1
+
+   cpp_core
+   cpp_val
+   cpp_exs
+   cpp_puq
+   cpp_dip
+   cpp_mat
+   cpp_api
+
 Python API
 ----------
 
@@ -33,9 +56,6 @@ submodules when they are enabled in the build.
    python_puq
    python_dip
    python_api
-
-C++ implementation details will be added to the C++ API documentation in a
-future version.
 
 CMake API
 ---------

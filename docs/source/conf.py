@@ -45,7 +45,14 @@ except ImportError as exc:
 
 extensions = [
    'sphinx.ext.autodoc',
+   'breathe',
+   'cpp_topics',
 ]
+
+sys.path.insert(0, os.path.join(_docs_root, 'docs', 'source', '_ext'))
+
+breathe_projects = {'snt': os.path.join(_docs_root, 'docs', 'doxy', 'xml')}
+breathe_default_project = 'snt'
 
 from sphinx.highlighting import lexers
 from syntax_lexer import SyntaxLexer

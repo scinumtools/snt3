@@ -8,10 +8,8 @@
 namespace snt::mat {
 
     /**
-     * @file build_periodic_table.py
-     *
      * This file was generated using the following Python script
-     * ```tools/uild_periodic_table.py```
+     * `devtools/build_periodic_table.py`
      * from data provided at the website of NIST
      * [Atomic Weights and Isotopic Compositions for All
      * Elements](https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl)

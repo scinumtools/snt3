@@ -23,7 +23,7 @@ namespace snt::api {
         /**
          * Set input unit system
          *
-         * @param system Unit system
+         * @param isystem Unit system
          **/
         void argument_input_system(const std::string& isystem);
 
