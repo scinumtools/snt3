@@ -152,7 +152,7 @@ function compile_docs {
     echo "Building Sphinx documentation"
     cd docs
     doxygen
-    sphinx-build -b html source build/html
+    make html
 }
 
 function grep_code {

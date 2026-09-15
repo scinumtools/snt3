@@ -24,6 +24,9 @@ parameter handling and validation logic for each application.
 * Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/specification.md>`_
 * Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/grammar.ebnf>`_
 
+Specification
+-------------
+
 .. raw:: html
 
    <iframe

@@ -23,6 +23,9 @@ interfaces, or other APIs.
 * Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/puel/specification.md>`_
 * Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/puel/grammar.ebnf>`_
 
+Specification
+-------------
+
 .. raw:: html
 
    <iframe
