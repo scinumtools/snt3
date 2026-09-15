@@ -8,26 +8,78 @@ Python and C++.
 
 After installation, import the module or one of its submodules:
 
+PUQ quantities
+--------------
+
+PUQ represents numerical values together with their physical units and,
+when needed, uncertainties. Quantities can be added, multiplied, compared,
+formatted, and converted between compatible unit systems while retaining
+dimensional information. Use it when calculations should prevent accidental
+mixing of incompatible units.
+
 .. code-block:: python
 
-   import scinumtools3
    from scinumtools3.puq import Quantity
    from scinumtools3.dip import DIP
 
    length = Quantity(2.5, "m")
    print(length.convert("cm"))
 
-Python values support scalar and array data, physical units, uncertainty
-propagation, dimensional conversion, and DIPL parameter evaluation. The
-package includes bindings for the core value layer, PUQ, DIP, and the public
-API where those components are enabled in the build.
+DIP parameters
+--------------
 
-The binding follows the C++ module layout. The ``scinumtools3.val`` module
-provides values and data containers, ``scinumtools3.exs`` evaluates
-expressions, ``scinumtools3.puq`` handles quantities and units, and
-``scinumtools3.dip`` handles dimensional input parameters. This keeps the
-same concepts and names available when an application moves between the C++
-and Python interfaces.
+The Python binding can load a DIPL definition from a file, evaluate its
+parameters, and return a value in Python. For example, given a file named
+``parameters.dip``:
+
+.. code-block:: dipl
+
+   length float = 2.5 dm
+   width float = 40 mm
+   area float = ( {?length} * {?width} ) m2
+
+Parse and query it with ``DIP.add_file`` and the environment cursor:
+
+.. code-block:: python
+
+   from pathlib import Path
+   from scinumtools3.dip import DIP
+
+   dip = DIP()
+   dip.add_file(Path("parameters.dip"))
+   env = dip.parse()
+
+   area = env["area"]
+   print(area.value, area.units)  # 0.01 m2
+
+The cursor also provides values and units for unitless scalars. For example,
+a file containing ``count int = 42`` can be queried with
+``env["count"].value``. The cursor returned by ``env["area"]`` exposes both
+``value`` and ``units``; pass the value to ``Quantity`` when an explicit unit
+conversion is needed:
+
+.. code-block:: python
+
+   from scinumtools3.puq import Quantity
+
+   area_in_cm2 = Quantity(area.value, area.units).convert("cm2")
+   print(area_in_cm2)  # 100 cm2
+
+Python values and NumPy
+-----------------------
+
+The C++ VAL layer maps to ordinary Python values: ``int``, ``float``,
+``str``, ``bool``, lists, and ``numpy.ndarray``. There is no separate VAL
+value class to learn, so results work directly with normal Python and NumPy
+code.
+
+Why EXS is not exposed
+----------------------
+
+EXS is used internally by PUQ and DIP, but is not exposed as a standalone
+Python module. Python already has mature tools for custom expression
+evaluation and grammars; a direct EXS binding would be useful mainly when the
+same custom language must run across Python, C++, the CLI, and REST services.
 
 For application-oriented operations, use the Python API helpers exposed by
 the installed package. They evaluate PUQ and DIPL definitions through the

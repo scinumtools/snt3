@@ -46,7 +46,9 @@ Python API
 The Python API is generated from the installed ``scinumtools3`` binding. It
 documents the public module objects and functions exposed by the compiled
 extension, including the ``core``, ``val``, ``puq``, ``dip``, and ``api``
-submodules when they are enabled in the build.
+submodules when they are enabled in the build. EXS is used internally by
+PUQ and DIP and is not exposed as a standalone Python module; see
+:doc:`../integrations/python` for the rationale.
 
 .. toctree::
    :maxdepth: 2

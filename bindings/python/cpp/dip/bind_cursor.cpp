@@ -64,22 +64,30 @@ namespace snt::bind::python {
 
         val.def("has_item", &dip::Cursor::has_item);
 
-        val.def_property_readonly("path", &dip::Cursor::get_path);
+        val.def_property_readonly("path", &dip::Cursor::get_path, "Path of this cursor in the DIPL environment.");
 
-        val.def_property_readonly("shape", [](const dip::Cursor& self) { return self.get_shape(); });
+        val.def_property_readonly(
+            "shape", [](const dip::Cursor& self) { return self.get_shape(); }, "Shape of the value at this path."
+        );
 
-        val.def_property_readonly("value", [](const dip::Cursor& self) -> py::object {
-            return to_python_value(self.get_value());
-        });
+        val.def_property_readonly(
+            "value",
+            [](const dip::Cursor& self) -> py::object { return to_python_value(self.get_value()); },
+            "Python value stored at this path (scalar, string, list, or NumPy-compatible array)."
+        );
 
-        val.def_property_readonly("units", [](const dip::Cursor& self) -> py::object {
-            auto units = self.get_units();
-            if (!units)
-                return py::none();
-            return py::cast(*units);
-        });
+        val.def_property_readonly(
+            "units",
+            [](const dip::Cursor& self) -> py::object {
+                auto units = self.get_units();
+                if (!units)
+                    return py::none();
+                return py::cast(*units);
+            },
+            "Unit string for a dimensional value, or None when the value is unitless."
+        );
 
-        val.def_property_readonly("kind", &dip::Cursor::get_kind);
+        val.def_property_readonly("kind", &dip::Cursor::get_kind, "Kind of DIPL path represented by this cursor.");
 
         val.def("to_numpy", [](const dip::Cursor& self) -> py::object { return to_numpy_value(self.get_value()); });
 
