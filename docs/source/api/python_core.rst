@@ -30,23 +30,5 @@ that accept a format argument.
 .. autoclass:: scinumtools3.core.StringFormatType
    :members:
 
-Attributes
-~~~~~~~~~~
-
-``specifier``
-   Numeric format specifier.
-``valuePrecision``
-   Number of digits displayed for the value.
-``uncertaintyPrecision``
-   Number of digits displayed for the uncertainty.
-``thresholdScientific``
-   Threshold at which scientific notation is selected.
-``paddingZeros``
-   Enables zero padding.
-``paddingSize``
-   Minimum padded field width.
-``stringQuotes``
-   Enables quotes around string values.
-
 .. autoclass:: scinumtools3.core.DataType
    :members:

@@ -1,0 +1,71 @@
+C bindings
+==========
+
+.. note::
+
+   The C bindings are experimental and still under development. The interface
+   is incomplete, and function signatures and behavior may change in future
+   releases.
+
+The C binding exposes PUQ quantities and DIPL parsing through ``<snt/c.h>``.
+It uses opaque handles: C applications hold pointers to SNT objects and
+operate on them through functions, while the implementation remains in C++.
+
+Building and linking
+--------------------
+
+Build and install SciNumTools with ``ENABLE_BINDING_C=ON`` (the default)
+and the PUQ and DIP modules enabled. See :doc:`../installation` for the
+source build instructions. In a consuming CMake project, link to ``snt-c``:
+
+.. code-block:: cmake
+
+   cmake_minimum_required(VERSION 3.22)
+   project(snt_c_example LANGUAGES C CXX)
+
+   find_package(snt CONFIG REQUIRED)
+   add_executable(snt-c-example main.c)
+   target_link_libraries(snt-c-example PRIVATE snt-c)
+   set_target_properties(snt-c-example PROPERTIES LINKER_LANGUAGE CXX)
+
+The C++ linker supplies the runtime needed by the underlying C++ libraries;
+the application source can remain C.
+
+Quantities and unit conversion
+------------------------------
+
+Use ``snt_quantity_eval`` to evaluate a PUEL expression,
+``snt_quantity_convert`` to create a quantity in the requested units, and
+``snt_quantity_format`` to write its textual representation into a buffer.
+This complete example converts metres to centimetres:
+
+.. literalinclude:: ../../../examples/puq/CBinding/main.c
+   :language: c
+
+DIPL parameters
+---------------
+
+Create a parser with ``snt_dip_create``, add definitions with
+``snt_dip_add_string`` or ``snt_dip_add_file``, and call ``snt_dip_parse``.
+Then retrieve a value as text with ``snt_dip_get``. Pass a node path such as
+``answer`` or ``project.name`` without a leading ``?``:
+
+.. literalinclude:: ../../../examples/dip/CBinding/main.c
+   :language: c
+
+Errors and ownership
+--------------------
+
+Operations returning ``int`` return zero on success and nonzero on error.
+Pass an ``snt_error`` to receive the error code and message. The message is
+owned by the library; copy it if it must survive a later error on the same
+thread.
+
+Release every created quantity with ``snt_quantity_free`` and every parser
+with ``snt_dip_free``. Conversion creates a separate quantity, so both the
+original and converted handles must be released. The free functions also
+accept null pointers.
+
+Output buffers belong to the caller. Their capacity must include space for
+the terminating null character; insufficient capacity is reported as an
+error.

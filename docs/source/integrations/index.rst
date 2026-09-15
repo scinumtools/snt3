@@ -1,8 +1,8 @@
-Integrations
-============
+Interfaces and integrations
+===========================
 
 SciNumTools exposes the same scientific data model through language bindings
-and build-system integrations. These interfaces allow PUEL quantities and DIPL
+and command-line and build-system interfaces. These interfaces allow PUEL quantities and DIPL
 parameter definitions to be reused without duplicating parsing or conversion
 logic in each application.
 
@@ -10,4 +10,6 @@ logic in each application.
    :maxdepth: 2
 
    python
+   c
+   cli
    cmake
