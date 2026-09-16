@@ -35,6 +35,7 @@ simulation
   title str = "Cylinder flow"
   fluid
     density float = 998.2 kg/m3
+      !condition ({.} > 0 kg/m3)
     viscosity float = 1.003e-3 Pa*s
   time
     timestep float = 1e-3 s
@@ -42,7 +43,13 @@ simulation
     steps int = ({?simulation.time.end} / {?simulation.time.timestep})
   boundary[inlet]
     velocity float[3] = [1.0, 0.0, 0.0] m/s
+  solver
+    type str = "steady"
+      !options ["steady", "transient"]
 ```
+
+DIPL also preserves provenance metadata such as authors, DOI, source URL,
+creation date, and license alongside parameter values.
 
 The parsed environment remains available throughout the application, so the
 same validated parameters can be passed between its components.
@@ -172,12 +179,11 @@ snt_dip_get(
 - **C++ API:** modular libraries under `include/snt/`, documented with Doxygen
   and Breathe.
 - **Python:** PUQ, VAL, DIP, and API bindings. VAL values are represented by
-  native Python values and NumPy arrays.
+  native Python values and NumPy arrays. EXS is available internally to the
+  C++ implementation but has no standalone Python binding.
 - **CLI:** commands for PUQ conversion and DIP parsing.
 - **C binding:** experimental and incomplete; use it only where its current
   scope is sufficient.
-- **EXS:** available as a C++ module, without a standalone Python binding.
-- **MAT:** currently available through the C++ API only.
 
 The [integration guides](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
 cover Python, C, CLI, CMake, and REST usage.
@@ -192,7 +198,8 @@ SciNumTools v3 is the compiled successor to the original
 on units and validated scientific parameters.
 
 Contributions and issue reports are welcome through
-[GitHub](https://github.com/vrtulka23/scinumtools3).
+[GitHub](https://github.com/vrtulka23/scinumtools3). See
+[CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow.
 
 ## License
 

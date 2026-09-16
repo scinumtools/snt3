@@ -142,6 +142,10 @@ if(ENABLE_UNIT_TESTS)
   find_package(GTest QUIET)  # usualy for Linux and macOS build
   if(NOT GTest_FOUND)  # needed for Windows build
       include(FetchContent)
+      if(WIN32)
+          set(gtest_disable_pthreads ON CACHE BOOL
+              "Disable pthreads for GoogleTest on Windows" FORCE)
+      endif()
       FetchContent_Declare(
           googletest
           URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
