@@ -57,6 +57,7 @@ jobs:
           CIBW_TEST_COMMAND: python -c "import scinumtools3; print('Success!')"
           CMAKE_ARGS: >-
             -DENABLE_UNIT_TESTS=OFF
+            -DENABLE_BINDING_C=OFF
             -DENABLE_EXEC_APPS=OFF
             -DENABLE_EXEC_EXAMPLES=OFF
             -DENABLE_EXEC_BENCHMARKS=OFF

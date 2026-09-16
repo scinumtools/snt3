@@ -103,8 +103,13 @@ class SciNumToolsConan(ConanFile):
         # Build only the C++ library
         #
         tc.variables["ENABLE_BINDING_PYTHON"] = False
+        tc.variables["ENABLE_BINDING_C"] = False
         tc.variables["ENABLE_UNIT_TESTS"] = False
         tc.variables["RUN_UNIT_TESTS"] = False
+        tc.variables["ENABLE_EXEC_APPS"] = False
+        tc.variables["ENABLE_EXEC_APPS_SNT"] = False
+        tc.variables["ENABLE_EXEC_APPS_SERVER"] = False
+        tc.variables["ENABLE_EXEC_APPS_GUI"] = False
         tc.variables["ENABLE_MAT"] = False
         tc.variables["ENABLE_EXEC_APPS_DMAP"] = False
         tc.variables["ENABLE_EXEC_EXAMPLES"] = False
@@ -130,17 +135,7 @@ class SciNumToolsConan(ConanFile):
         cmake = CMake(self)
         cmake.install()
 
-        root = Path(__file__).resolve().parents[2]
-
-        license_file = root / "LICENSE"
-
-        if license_file.exists():
-            copy(
-                self,
-                "LICENSE",
-                src=str(root),
-                dst="licenses",
-            )
+        copy(self, "LICENSE", src=self.recipe_folder, dst="licenses")
 
     #
     # Information for consumers
@@ -149,4 +144,26 @@ class SciNumToolsConan(ConanFile):
         self.cpp_info.set_property("cmake_file_name", "snt")
         self.cpp_info.set_property("cmake_target_name", "snt::snt")
 
-        self.cpp_info.libs = ["snt"]
+        self.cpp_info.libs = [
+            "snt-api",
+            "snt-dip",
+            "snt-puq",
+            "snt-val",
+            "snt-exs",
+            "snt-core",
+        ]
+
+        components = {
+            "core": ("snt-core", []),
+            "exs": ("snt-exs", []),
+            "val": ("snt-val", ["core"]),
+            "puq": ("snt-puq", ["core", "exs", "val"]),
+            "dip": ("snt-dip", ["puq"]),
+            "api": ("snt-api", ["puq", "dip"]),
+        }
+
+        for name, (library, requirements) in components.items():
+            component = self.cpp_info.components[name]
+            component.libs = [library]
+            component.requires = requirements
+            component.set_property("cmake_target_name", f"snt::{name}")

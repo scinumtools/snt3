@@ -119,7 +119,7 @@ function test_code {
 	    $EXEC_PROGRAM ./bin/gtest-${parts[1]} $EXEC_FLAGS
     	fi
     elif [[ "${parts[0]}" == "pytest" ]]; then
-	export PYTHONPATH=$PWD/build/lib:$PYTHONPATH
+	export PYTHONPATH=$PWD/build/python:$PYTHONPATH
     	if [[ "${parts[1]}" != "" && "${parts[2]}" != "" ]]; then        # eg. pytest.puq.unit_system
 	    pytest bindings/python/tests/${parts[1]}/test_${parts[2]}.py #::test_${parts[3]}"
     	elif [[ "${parts[1]}" != "" ]]; then                             # eg. pytest.puq

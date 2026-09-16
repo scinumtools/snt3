@@ -88,10 +88,14 @@ before-build = "pip install pybind11"
 
 [tool.scikit-build.cmake.define]
 ENABLE_UNIT_TESTS = "OFF"
+ENABLE_BINDING_C = "OFF"
+ENABLE_EXEC_APPS = "OFF"
+ENABLE_EXEC_EXAMPLES = "OFF"
+ENABLE_EXEC_BENCHMARKS = "OFF"
 ENABLE_CORE = "ON"
 ENABLE_CORE_PYBIND = "ON"
 ENABLE_EXS = "ON"
-ENABLE_EXS_PYBIND = "ON"
+# EXS is used internally by PUQ and has no standalone Python binding.
 ENABLE_VAL = "ON"
 ENABLE_VAL_PYBIND = "ON"
 ENABLE_PUQ = "ON"
@@ -99,7 +103,7 @@ ENABLE_PUQ_PYBIND = "ON"
 ENABLE_DIP = "ON"
 ENABLE_DIP_PYBIND = "ON"
 ENABLE_MAT = "OFF"
-ENABLE_MAT_PYBIND = "OFF"
+# MAT currently has a C++ API only; its Python binding is not supported.
 ENABLE_API = "ON"
 ENABLE_API_PYBIND = "ON"
 

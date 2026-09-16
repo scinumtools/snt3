@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 cmake_policy(SET CMP0074 NEW)
-set(CMAKE_TRY_ENABLE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 # set environmental variables
 file(READ "settings.env" ENV_CONTENTS)
@@ -103,11 +103,15 @@ option(ENABLE_BINDING_C "Build the C ABI binding" ON)
 message(STATUS "ENABLE_BINDING_PYTHON        ${ENABLE_BINDING_PYTHON}")
 message(STATUS "     Module  GTests  PyBind  PyTests")
 set_module_options(CORE ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
-set_module_options(EXS ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
+set_module_options(EXS ON OFF "${ENABLE_UNIT_TESTS}")
+# EXS is a C++ implementation detail used by PUQ; it has no standalone
+# Python binding, so its Python binding option is intentionally disabled.
 set_module_options(VAL ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 set_module_options(PUQ ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 set_module_options(DIP ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
-set_module_options(MAT ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
+set_module_options(MAT ON OFF "${ENABLE_UNIT_TESTS}")
+# MAT is currently exposed through the C++ API only; a Python binding is not
+# supported yet and is therefore disabled by default.
 set_module_options(API ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 
 # enable building of executables
@@ -196,7 +200,7 @@ endif()
 if (ENABLE_BINDING_PYTHON)
    add_subdirectory(bindings/python/cpp)  # build Python bindings
 endif()
-if (ENABLE_BINDING_C)
+if (ENABLE_BINDING_C AND ENABLE_PUQ AND ENABLE_DIP)
    add_subdirectory(bindings/c)
 endif()
 
