@@ -1,394 +1,199 @@
-# **Scientific Numerical Tools v3 (SciNumTools3, SNT)**
+# Scientific Numerical Tools v3 (SciNumTools3, SNT)
 
-*Unit-safe, strongly typed, validated input parameters for scientific and engineering software.*
-
-*Focus on what matters, not on what gets in the way.*
+Unit-safe, strongly typed, validated input parameters for scientific and
+engineering software.
 
 [![Build](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml)
 [![codecov](https://codecov.io/github/vrtulka23/scinumtools3/graph/badge.svg?token=8A25K1T7XM)](https://codecov.io/github/vrtulka23/scinumtools3)
 [![Documentation](https://img.shields.io/badge/docs-online-blue)](https://vrtulka23.github.io/scinumtools3/)
-![GitHub release](https://img.shields.io/github/v/release/vrtulka23/scinumtools3?include_prereleases)
-[![PyPI version](https://badge.fury.io/py/scinumtools3.svg)](https://badge.fury.io/py/scinumtools3)   
+[![GitHub release](https://img.shields.io/github/v/release/vrtulka23/scinumtools3?include_prereleases)](https://github.com/vrtulka23/scinumtools3/releases)
+[![PyPI version](https://badge.fury.io/py/scinumtools3.svg)](https://pypi.org/project/scinumtools3/)
 [![Conda Version](https://anaconda.org/conda-forge/scinumtools3/badges/version.svg)](https://anaconda.org/conda-forge/scinumtools3)
 [![vcpkg](https://img.shields.io/badge/vcpkg-available-blue)](https://vcpkg.io/en/package/scinumtools3.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg?logo=c%2B%2B&logoColor=white)
 ![Compilers](https://img.shields.io/badge/Compilers-GCC%2011%2B%20%7C%20Clang%2015%2B%20%7C%20MSVC%202022-blue)
 
----
+SciNumTools provides a common representation for physical quantities and
+validated scientific input parameters. Its C++17 libraries can be used from
+C++, Python, the command line, CMake, and REST applications.
 
-## Overview
+The project is built around two languages:
 
-Every scientific or engineering application relies on input parameters. 
-In many projects these parameters are scattered across configuration files, command-line options and source code, with little or no validation. 
-As applications grow, this often leads to
+- **PUEL** describes values, units, uncertainties, arrays, and unit systems.
+- **DIPL** describes typed input parameters, constraints, and relationships.
 
-- incorrect or inconsistent units
-- invalid parameter values
-- duplicated validation logic
-- difficult-to-maintain configuration code
-- discrepancies between simulation, analysis and post-processing tools
+The [online documentation](https://vrtulka23.github.io/scinumtools3/) contains
+the concepts, language specifications, tutorials, examples, and API reference.
 
-**SciNumTools3 (SNT)** solves this problem by providing a single, consistent parameter system that is
+## Quick example
 
-- **Strongly typed** – parameters have well-defined data types.
-- **Unit-aware** – physical units are checked and converted automatically.
-- **Validated** – ranges, constraints and relationships are verified before computation begins.
-- **Expression-based** – parameters can depend on other parameters without recompilation.
-- **Shared across C++, Python and the command line** – the same parameter definitions are used throughout an entire workflow.
+Define parameters in a `parameters.dip` file:
 
-Instead of implementing parameter parsing, unit conversions and validation separately in every application, SNT provides a **single source of truth** for scientific input data.
-
-The result is fewer hidden assumptions, earlier error detection and more reliable scientific software.
-
-This project is the C++ successor to the original Python project, [SciNumTools v2](https://github.com/vrtulka23/scinumtools). SciNumTools v3 aims to provide feature parity with v2 while expanding the library with additional functionality and improved performance.
-
-## Getting Started
-
-### Quick Example
-
-Below is a quick example how to use the core functionality of `scinumtools3`.
-For additional examples, see ``tests/``, ``apps/``, ``exec/``, and ``bindings/``.
-
-The same `parameters.dip` file is consumed by C++, Python, the snt CLI, and CMake, allowing a single configuration source to drive applications, scripts, and build systems.
-
-#### Parameter definition 
-
-``parameters.dip``
-
-``` python
+```dipl
 simulation
-  title str = "Cylinder flow"        # strings
-  mesh
-    file str = "cylinder.hdf5"
-      !format "[A-Za-z0-9_]+.hdf5"   # enforce string formats
+  title str = "Cylinder flow"
   fluid
-    density float = 998.2 kg/m3      # numbers with units
+    density float = 998.2 kg/m3
     viscosity float = 1.003e-3 Pa*s
   time
-    dt float = 1e-3 s
+    timestep float = 1e-3 s
     end float = 10 s
-    steps int = ({?simulation.time.end} / {?simulation.time.dt})  # computed value
-      !condition ({.} > 0)                    # validation
-  solver
-    restart_file str = none                   # optional value
-  boundary[inlet]                             # node collections
-    velocity float[3] = [1.0, 0.0, 0.0] m/s   # arrays
-  boundary[outlet]
-    pressure float = 0 Pa
-  boundary[walls]
-    type str = "no_slip"
-      !options ["no_slip", "free_slip", "moving_wall"]   # allowed values
-  output
-    file str = "results.vtk"
-    variables str[:] = ["velocity", "pressure", "vorticity"]
-    every int = 100
-  build
-    hdf5 bool = true
-    cuda bool = false
-# See the documentation for more features.
+    steps int = ({?simulation.time.end} / {?simulation.time.timestep})
+  boundary[inlet]
+    velocity float[3] = [1.0, 0.0, 0.0] m/s
 ```
 
-#### with C++
+The parsed environment remains available throughout the application, so the
+same validated parameters can be passed between its components.
+
+Use the PUQ and DIP APIs from C++:
 
 ```cpp
 #include <snt/puq/quantity.h>
-#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
-#include <snt/dip/environment.h>
-
+#include <cstdint>
 #include <iostream>
 
-using namespace snt;
-
 int main() {
+  snt::puq::Quantity length("3.048*m");
+  std::cout << length.convert("US_ft").to_string() << "\n";
 
-  puq::Quantity length("3.048*m");
-  length = length.convert("US_ft");
-  std::cout << "Length: " << length.to_string() << std::endl;
-  // Length: 10*ft
-
-  dip::DIP dip;
+  snt::dip::DIP dip;
   dip.add_file("parameters.dip");
   auto env = dip.parse();
-  auto density = env["simulation.fluid.density"].as<double>();
-  auto steps = env["simulation.time.steps"].as<int64_t>();
-  std::cout << "Density: " << density << std::endl;
-  std::cout << "Steps:   " << steps << std::endl;
-  // Density: 998.2 
-  // Steps:   10000
+
+  std::cout << env["simulation.fluid.density"].as<double>() << "\n";
+  std::cout << env["simulation.time.steps"].as<int64_t>() << "\n";
 }
 ```
 
-#### with Python 
+Use the same functionality from Python:
 
-``` python
+```python
 from scinumtools3.puq import Quantity
-from scinumtools3.dip import DIP, Environment
+from scinumtools3.dip import DIP
 
-length = Quantity(3.048, 'm')
-length = length.convert('US_ft')
-print("Length:", length.to_string())
-# Length: 10*ft
+length = Quantity(3.048, "m").convert("US_ft")
+print(length.to_string())
 
 dip = DIP()
 dip.add_file("parameters.dip")
 env = dip.parse()
 
-print("Density: ", env["simulation.fluid.density"].value)
-print("Steps:   ", env["simulation.time.steps"].value)
-# Density: 998.2
-# Steps:   10000
+print(env["simulation.fluid.density"].value)
+print(env["simulation.time.steps"].value)
 ```
 
-#### with CLI (e.g. BASH)
+The command-line interface can consume the same definitions:
 
-``` bash
-snt puq convert "3.048*m" ft -s SI -S US
-# 10*ft
-
-snt dip parse -a file parameters.dip \
-              -r "simulation.fluid.density" \
-              --print
-# density = 998.2 kg*m-3
+```console
+$ snt puq convert "3.048*m" ft -s SI -S US
+10*ft
+$ snt dip parse -a file parameters.dip -r simulation.fluid.density --print
+density = 998.2 kg*m-3
 ```
 
-#### with CMAKE
+See the [quickstart](https://vrtulka23.github.io/scinumtools3/quickstart.html)
+and [examples](https://vrtulka23.github.io/scinumtools3/examples/index.html)
+for complete examples.
+
+## Installation
+
+### Python
+
+```console
+pip install scinumtools3
+```
+
+The package is also available from conda-forge:
+
+```console
+conda install conda-forge::scinumtools3
+```
+
+### C++
+
+SciNumTools is available through vcpkg, Conan, and Homebrew (macOS):
+
+```console
+vcpkg install scinumtools3
+brew tap vrtulka23/tap
+brew install scinumtools3
+```
+
+For Conan, clone the repository and run `conan create .` from its root.
+
+The Conan package builds the C++ libraries. Applications and language bindings
+are configured separately.
+
+### From source
+
+```console
+git clone https://github.com/vrtulka23/scinumtools3.git
+cd scinumtools3
+cmake -G Ninja -B build
+cmake --build build
+ctest --test-dir build
+```
+
+For build options, installation, Docker images, and package-manager details,
+see the [installation guide](https://vrtulka23.github.io/scinumtools3/installation.html).
+
+## CMake
+
+After installation, find the package and link the modules required by an
+application:
+
+```cmake
+find_package(snt REQUIRED)
+
+add_executable(my_app main.cpp)
+target_link_libraries(my_app PRIVATE snt-api snt-dip)
+```
+
+The CMake integration can also parse a DIP file while configuring a project.
+The resulting values are available as CMake variables for the rest of the
+configuration process:
 
 ```cmake
 find_package(snt REQUIRED)
 
 snt_dip_get(
     FILE parameters.dip
-    PATH build.hdf5
-    OUT USE_HDF5
+    PATH simulation.time.steps
+    OUT SIMULATION_STEPS
     REQUIRED
 )
-
-if(USE_HDF5)
-    find_package(HDF5 REQUIRED)
-endif()
-```
-### Parameter Definition
-
-`SciNumTools` is built around two domain-specific languages that provide a common foundation for scientific software.
-
-- **[PUEL](docs/puel/specification.md)** (Physical Units Expression Language) defines a machine-readable notation for physical quantities, units, values, uncertainties, and unit systems.
-- **[DIPL](docs/dipl/specification.md)** (Dimensional Input Parameter Language) defines strongly typed scientific parameters together with units, validation rules, constraints, and parameter relationships.
-
-Together, they provide a structured, extensible, and implementation-independent representation of scientific data.
-
-#### Physical Units Expression Language (PUEL)
-
-`PUEL` represents physical quantities with support for multiple unit systems, prefixes, uncertainties, arrays, and fractional unit exponents.
-
-```puel
-# General form
-<SYSTEM>_[<VALUE>]*<UNIT><EXPONENT>
-
-# Examples
-ESU_erg            # unit systems
-m2*kg*s-2          # unit expressions
-kg2*ms3:2*cm       # fractional exponents
-1.346591(30)e27*kg # uncertainties
-[2, 3, 4, 5]*km    # arrays
 ```
 
-The `PUQ` module builds on this notation to provide parsing, dimensional analysis, arithmetic, and unit conversion.
-
-#### Dimensional Input Parameter Language (DIPL)
-
-`DIPL` provides a declarative language for defining scientific input parameters, including types, physical units, validation rules, constraints, options, and derived parameters.
-
-```dipl
-simulation
-
-  timestep float = 0.5 fs
-    !condition ({.} > 0.0 fs)
-
-  temperature float = 300 K
-    !condition ({.} > 0 K)
-
-  pressure float = 1 atm
-
-  steps int = 1000000
-    !condition ({.} > 1)
-
-  duration float = ( {?simulation.timestep} * {?simulation.steps} )
-
-  ensemble string = "NPT"
-    !options ["NVE", "NVT", "NPT"]
-```
-
-Parameters can reference one another, enabling derived values and validation rules to be expressed in a portable, machine-readable format.
-
----
-
-## Installation
-
-### Using package managers
-
-SciNumTools can be installed using one of the following package managers.
-
-#### PyPI (Python)
-
-The Python bindings are available on PyPI and can be installed with `pip`:
-
-```bash
-pip install scinumtools3
-```
-
-Package: https://pypi.org/project/scinumtools3/
-
-#### Conda
-
-SciNumTools is available on the **conda-forge** channel and can be installed with Conda:
-
-```bash
-conda install conda-forge::scinumtools3
-```
-
-Package: https://anaconda.org/conda-forge/scinumtools3
-
-#### vcpkg
-
-```bash
-git clone https://github.com/microsoft/vcpkg.git
-cd vcpkg
-
-# Bootstrap (run once)
-./bootstrap-vcpkg.sh      # macOS/Linux
-# .\bootstrap-vcpkg.bat   # Windows
-
-# Install SciNumTools
-./vcpkg install scinumtools3
-```
-
-Package: https://vcpkg.io/en/package/scinumtools3
-
-#### Homebrew (macOS)
-
-```bash
-brew tap vrtulka23/tap
-brew install scinumtools3
-```
-
-Tap repository: https://github.com/vrtulka23/homebrew-tap
-
-#### Conan
-
-Clone the repository and create the package locally:
-
-```bash
-git clone https://github.com/vrtulka23/scinumtools3.git
-cd scinumtools3
-
-conan create .
-```
-
-The package can then be consumed from your local Conan cache in other CMake projects.
-
-#### Docker
-
-Preconfigured Docker images are provided for both Python users and SciNumTools developers.
-
-Build the desired image from the repository root:
-
-```bash
-docker build -f packaging/docker/python/Dockerfile -t scinumtools3-python .
-```
-
-or
-
-```bash
-docker build -f packaging/docker/dev/Dockerfile -t scinumtools3-dev .
-```
-
-See [`packaging/docker/README.md`](packaging/docker/README.md) for detailed instructions on building, running, and using the available Docker images.
-
-### From the source code
-
-#### Download and install
-
-1) Manually
-
-   ```bash
-   # download repository
-   git clone https://github.com/vrtulka23/scinumtools3.git
-   cd scinumtools3
-   
-   # compile
-   cmake -G Ninja -B build
-   cmake --build build
-   
-   # run tests
-   ctest --test-dir build
-   
-   # install
-   cmake --install build
-   ```
-
-2) Using setup script
-
-   ```bash
-   sudo ./setup.sh -b -t -i  # build, run tests, install
-   ```
-
-#### Link `SciNumTools3` in your `CMAKE` project
-
-1) Find the package
-
-   ```bash
-   # find the `SNT` package
-   find_package(snt REQUIRED)
-
-   # link to your executable
-   add_executable(${EXEC_NAME} ${SOURCE_FILES})
-   target_link_libraries(${EXEC_NAME} PRIVATE snt-exs snt-puq snt-dip)
-   ```
-
-
----
-
-## Documentation
-
-The ``docs/`` directory contains the complete API reference and user guides for the project.
-The online documentation for the C++ reference implementation, including Python bindings and the CLI, is available [here](https://vrtulka23.github.io/scinumtools3/).
-
-It also provides detailed specifications for the DIPL and PUEL domain-specific languages:
-
-[DIPL](docs/dipl/specification.md) is used to define validated, structured input parameters.  
-[PUEL](docs/puel/specification.md) defines a syntax for unit-aware expressions and calculations.  
-
----
-
-## Contributing
-
-Contributions are welcome — please follow these guidelines:
-
-1. Fork the repo and create a feature branch:
-
-   ```bash
-   git clone https://github.com/vrtulka23/scinumtools3.git
-   git checkout -b feature/my-feature
-   ```
-2. Follow the coding style (`.clang-format`) and use modern C++ (C++17+).
-3. Add unit tests for new features or bug fixes (see `tests/`).
-4. Build and run tests locally:
-
-   ```bash
-   ./setup.sh -b -t   # build, run tests
-   ```
-5. Open a Pull Request with a clear description and link to any related issues.
-
-See [CONTRIBUTING.md](https://github.com/vrtulka23/scinumtools3/blob/main/CONTRIBUTING.md) for full instructions.
+## Interfaces
+
+- **C++ API:** modular libraries under `include/snt/`, documented with Doxygen
+  and Breathe.
+- **Python:** PUQ, VAL, DIP, and API bindings. VAL values are represented by
+  native Python values and NumPy arrays.
+- **CLI:** commands for PUQ conversion and DIP parsing.
+- **C binding:** experimental and incomplete; use it only where its current
+  scope is sufficient.
+- **EXS:** available as a C++ module, without a standalone Python binding.
+- **MAT:** currently available through the C++ API only.
+
+The [integration guides](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
+cover Python, C, CLI, CMake, and REST usage.
+
+## Development
+
+The repository contains the C++ sources, Python bindings, command-line
+applications, tests, examples, packaging recipes, and documentation.
+
+SciNumTools v3 is the compiled successor to the original
+[SciNumTools v2](https://github.com/vrtulka23/scinumtools), with the same focus
+on units and validated scientific parameters.
+
+Contributions and issue reports are welcome through
+[GitHub](https://github.com/vrtulka23/scinumtools3).
 
 ## License
 
-This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/vrtulka23/scinumtools3/blob/main/LICENSE) file for full text.
-
-## Contact / Issues
-
-Found a bug or have a feature request? Open an issue at:
-[https://github.com/vrtulka23/scinumtools3/issues](https://github.com/vrtulka23/scinumtools3/issues)
-
+SciNumTools is released under the [MIT License](LICENSE).
