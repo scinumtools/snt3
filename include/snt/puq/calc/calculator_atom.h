@@ -5,6 +5,7 @@
 
 namespace snt::puq {
 
+    /** EXS atom that evaluates a PUQ quantity expression. */
     class CalculatorAtom : public exs::AtomBase<CalculatorAtom, Quantity> {
       public:
         CalculatorAtom(CalculatorAtom& a) : AtomBase(a) {};

@@ -5,6 +5,7 @@
 
 namespace snt::val::math {
 
+    /** Return the element-wise absolute value of a VAL value. */
     extern val::BaseValue::PointerType abs(val::BaseValue::PointerType a);
 
 } // namespace snt::val::math

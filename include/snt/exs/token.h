@@ -8,6 +8,7 @@
 
 namespace snt::exs {
 
+    /** Lexical token produced by the EXS expression parser. */
     class Token {
       public:
         TokenType type;

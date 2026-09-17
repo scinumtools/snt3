@@ -6,10 +6,15 @@
 
 namespace snt::puq {
 
+    /** Format a PUQ result. */
     extern std::string to_string(const puq::Result& value, int precision = std::cout.precision());
+    /** Format a base-unit expression. */
     extern std::string to_string(const puq::BaseUnits& value, int precision = std::cout.precision());
+    /** Format dimensions using unit-format options. */
     extern std::string to_string(const puq::Dimensions& value, const puq::UnitFormat& format = puq::UnitFormat());
+    /** Format an exponent using unit-format options. */
     extern std::string to_string(const puq::ExponentVariant& value, const puq::UnitFormat& format = puq::UnitFormat());
+    /** Format an allowed-prefix map. */
     extern std::string to_string(const bool& use_prefixes, const puq::AllowedPrefixes& value);
 
 } // namespace snt::puq

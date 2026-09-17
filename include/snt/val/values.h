@@ -6,6 +6,7 @@
 
 namespace snt::val {
 
+    /** Concrete value classes selected by the VAL data type. */
     class ArrayValueInt8 : public ArrayValue<int64_t> {
       public:
         ArrayValueInt8(const int8_t& val) : ArrayValue<int64_t>(val, core::DataType::Integer8) {};

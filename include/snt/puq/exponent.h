@@ -7,6 +7,7 @@
 
 namespace snt::puq {
 
+    /** Rational exponent represented by an integer numerator and denominator. */
     class Exponent {
       public:
         int numerator;

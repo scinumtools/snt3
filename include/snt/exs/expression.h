@@ -7,6 +7,7 @@
 
 namespace snt::exs {
 
+    /** Parsed expression with an ordered list of executable steps. */
     class Expression {
       public:
         std::string left;  // left side

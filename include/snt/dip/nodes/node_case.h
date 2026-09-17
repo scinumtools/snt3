@@ -7,6 +7,7 @@ namespace snt::dip {
 
     class Environment;
 
+    /** Conditional branch node in a DIPL hierarchy. */
     class CaseNode : public BaseNode {
       public:
         bool value;         // case value

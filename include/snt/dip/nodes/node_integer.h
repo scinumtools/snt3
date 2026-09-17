@@ -7,6 +7,7 @@
 
 namespace snt::dip {
 
+    /** DIPL value node containing integer data. */
     class IntegerNode : public ValueNode {
         val::BaseValue::PointerType cast_scalar_value(const std::string& value_input) const override;
         val::BaseValue::PointerType cast_array_value(

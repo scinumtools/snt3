@@ -8,6 +8,7 @@
 
 namespace snt::exs {
 
+    /** Ordered collection of EXS expression atoms. */
     class AtomList {
       public:
         std::vector<std::unique_ptr<AtomGrand>> atoms;

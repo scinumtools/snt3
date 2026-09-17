@@ -31,6 +31,7 @@ namespace snt::puq {
         using Precision = int;
     } // namespace Format
 
+    /** Formatting options for quantities, units, arrays, and uncertainties. */
     class UnitFormat {
         static const std::unordered_map<char, std::string> superscript_map;
         static const std::unordered_map<std::string, std::string> symbol_map;

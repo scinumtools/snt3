@@ -7,6 +7,7 @@
 
 namespace snt::puq {
 
+    /** EXS atom that resolves a unit expression to a PUQ measurement. */
     class UnitAtom : public exs::AtomBase<UnitAtom, Measurement> {
       public:
         UnitAtom(const UnitAtom&) = default;

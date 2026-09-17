@@ -8,6 +8,7 @@
 
 namespace snt::exs {
 
+    /** Registry of operators used by an EXS solver. */
     class OperatorList {
         using OperatorListType = std::unordered_map<int, std::shared_ptr<OperatorBase>>;
 

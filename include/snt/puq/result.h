@@ -9,12 +9,14 @@
 
 namespace snt::puq {
 
+    /** Variant accepted for scalar or polymorphic value storage. */
     using ValueVariant = std::variant<double, val::BaseValue::PointerType>;
 
+    /** Numerical estimate with an optional absolute uncertainty. */
     class Result {
       public:
-        val::BaseValue::PointerType estimate;
-        val::BaseValue::PointerType uncertainty;
+        val::BaseValue::PointerType estimate;     ///< Estimated value
+        val::BaseValue::PointerType uncertainty;  ///< Optional absolute uncertainty
         Result(const Result& other) {
             estimate = other.estimate ? other.estimate->clone() : nullptr;
             uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
@@ -41,8 +43,11 @@ namespace snt::puq {
         static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);
         static val::BaseValue::PointerType rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType r);
 
+        /** Return the number of stored estimates. */
         std::size_t size() const;
+        /** Return the estimate array shape. */
         val::Array::ShapeType shape() const;
+        /** Format the estimate and uncertainty. */
         std::string to_string(const UnitFormat& format = UnitFormat()) const;
         friend Result operator-(const Result& m1);
         friend Result operator+(const Result& m1, const Result& m2);
@@ -56,6 +61,7 @@ namespace snt::puq {
         void operator/=(const Result& m);
         bool operator==(const Result& a) const;
         bool operator!=(const Result& a) const;
+        /** Raise the result to an exponent. */
         void pow(const ExponentVariant& e);
     };
 

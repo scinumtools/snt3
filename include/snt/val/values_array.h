@@ -15,6 +15,7 @@ namespace snt::val {
      *
      * @tparam T Data type of a values
      */
+    /** Typed array storage and arithmetic implementation. */
     template <typename T> class BaseArrayValue : public BaseValue {
         // We explicitely forbit these data types, to make sure only the standard data types are used
         static_assert(!std::is_same_v<T, bool>, "BaseArrayValue<bool> is not allowed");

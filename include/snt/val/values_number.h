@@ -9,6 +9,7 @@ namespace snt::val {
 
     template <typename T> class ArrayValue;
 
+    /** Numeric array value implementation for one scalar storage type. */
     template <typename T> class ArrayValue : public BaseArrayValue<T> {
       public:
         ArrayValue(const T& val, const core::DataType dtype) : BaseArrayValue<T>(val, dtype) {};

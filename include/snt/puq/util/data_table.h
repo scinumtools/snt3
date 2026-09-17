@@ -8,11 +8,13 @@
 
 namespace snt::puq {
 
+    /** One row or column definition used by a formatted data table. */
     struct DataTableStruct {
         std::string title;
         int width;
     };
 
+    /** Lightweight text table formatter used in diagnostics and output. */
     class DataTable {
         static const int padding = 1;
         std::vector<std::vector<std::string>> data;

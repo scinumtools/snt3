@@ -7,6 +7,7 @@
 namespace snt::dip {
 
     // Node List
+    /** Ordered, named collection of DIPL nodes. */
     template <typename T> class NodeList {
       private:
         typename T::ListType nodes;

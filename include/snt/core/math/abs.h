@@ -3,6 +3,7 @@
 
 namespace snt::core::math {
 
+    /** Return the absolute value of a scalar. */
     extern double abs(const double m);
 
 } // namespace snt::core::math

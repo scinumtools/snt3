@@ -12,6 +12,7 @@ namespace snt::dip {
 
     class SourceList; // EnvSource needs a forward declaration
 
+    /** Named DIPL source text together with its parsed nodes. */
     struct EnvSource {
         std::string name;          // source key
         std::string path;          // source path
@@ -21,6 +22,7 @@ namespace snt::dip {
                                    // std::shared_ptr<SourceList> sources;
     };
 
+    /** Collection of named DIPL sources. */
     class SourceList {
       private:
         std::map<std::string, EnvSource> sources;

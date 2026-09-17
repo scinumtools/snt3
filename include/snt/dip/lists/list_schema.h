@@ -9,6 +9,7 @@
 
 namespace snt::dip {
 
+    /** Schema source and nodes registered in a DIPL environment. */
     struct EnvSchema {
         std::string name;         // schema key
         BaseNode::ListType nodes; // aggregated nodes

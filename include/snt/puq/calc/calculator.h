@@ -6,6 +6,7 @@
 
 namespace snt::puq {
 
+    /** Evaluates PUEL expressions and returns PUQ results. */
     class Calculator {
       public:
         static exs::Solver<CalculatorAtom> solver;

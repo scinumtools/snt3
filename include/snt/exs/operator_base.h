@@ -9,6 +9,7 @@
 
 namespace snt::exs {
 
+    /** Base interface for an EXS operator. */
     class OperatorBase {
       public:
         std::string name;

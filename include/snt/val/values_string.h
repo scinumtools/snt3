@@ -9,6 +9,7 @@ namespace snt::val {
 
     template <typename T> class ArrayValue;
 
+    /** String array value implementation. */
     template <> class ArrayValue<std::string> : public BaseArrayValue<std::string> {
       public:
         ArrayValue(const std::string& val, const core::DataType dtype) : BaseArrayValue(val, dtype) {};

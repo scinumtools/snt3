@@ -5,6 +5,7 @@
 
 namespace snt::exs {
 
+    /** Common storage and operations for EXS token lists. */
     class TokenListBase {
       public:
         virtual Token get_left() = 0;

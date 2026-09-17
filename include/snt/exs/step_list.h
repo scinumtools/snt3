@@ -9,6 +9,7 @@ namespace snt::exs {
 
     using StepListType = std::vector<std::pair<OperationType, std::vector<int>>>;
 
+    /** Ordered execution steps generated from an EXS expression. */
     class StepList {
       public:
         StepListType steps;

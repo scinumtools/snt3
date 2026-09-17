@@ -9,6 +9,7 @@
 
 namespace snt::puq {
 
+    /** Physical quantity combining a numerical result with units and a unit system. */
     class Quantity {
       private:
         void preprocess(std::string& expression, SystemType& system) const;
@@ -22,8 +23,8 @@ namespace snt::puq {
         ) const;
 
       public:
-        SystemType stype;
-        Measurement measurement;
+        SystemType stype;       ///< Unit system used by this quantity
+        Measurement measurement; ///< Numerical value, uncertainty, and units
         Quantity() : stype(UnitSystem::current.type) {};
         Quantity(std::string s, const SystemType system = SystemType::NONE);
         Quantity(const Measurement& v, const SystemType system = UnitSystem::current.type);
@@ -65,10 +66,15 @@ namespace snt::puq {
             const BaseUnits::ListType& bu,
             const SystemType system = UnitSystem::current.type
         );
+        /** Return the active unit system name. */
         std::string unit_system() const;
+        /** Return the number of stored values. */
         std::size_t size() const;
+        /** Return the shape of the stored value. */
         val::Array::ShapeType shape() const;
+        /** Return a human-readable description of the quantity. */
         std::string info() const;
+        /** Format the quantity using the requested options. */
         std::string to_string(const UnitFormat& format = UnitFormat()) const;
         // quantity operations
         friend Quantity operator+(const Quantity& q1, const Quantity& q2);
@@ -106,14 +112,29 @@ namespace snt::puq {
         void operator-=(Quantity& q);
         void operator*=(Quantity& q);
         void operator/=(Quantity& q);
+        /** Convert to a base-unit representation in the selected system.
+         *  @param format Base-unit formatting mode.
+         *  @param system Target unit system.
+         *  @return Converted quantity.
+         */
         Quantity convert(const Format::Base& format, SystemType system = SystemType::NONE) const;
+        /** Convert to the units represented by another quantity.
+         *  @param q Quantity providing the target units.
+         *  @return Converted quantity.
+         */
         Quantity convert(const Quantity& q) const;
+        /** Convert to the units represented by a measurement.
+         *  @param uv Measurement providing the target units.
+         *  @return Converted quantity.
+         */
         Quantity convert(const Measurement& uv) const;
         Quantity convert(const Measurement& uv, const SystemType system, const std::string& q = "") const;
         Quantity convert(const BaseUnits& bu) const;
         Quantity convert(const BaseUnits& bu, const SystemType system, const std::string& q = "") const;
         Quantity convert(std::string s, SystemType system = SystemType::NONE, const std::string& q = "") const;
+        /** Re-express units using their base prefixes. */
         Quantity rebase_prefixes();
+        /** Re-express units using base dimensions. */
         Quantity rebase_dimensions();
     };
 

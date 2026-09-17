@@ -7,6 +7,7 @@
 
 namespace snt::exs {
 
+    /** EXS operator with three input branches, such as a conditional. */
     class OperatorTernary : public OperatorBase {
       public:
         std::string symbol_other;

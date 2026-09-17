@@ -15,6 +15,7 @@
 
 namespace snt::exs {
 
+    /** Collection of tokens used during expression parsing. */
     class TokenList : public TokenListBase {
       public:
         std::deque<Token> left;

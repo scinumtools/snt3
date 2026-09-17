@@ -7,6 +7,7 @@
 
 namespace snt::dip {
 
+    /** One conditional case in a DIPL branching structure. */
     struct Case {
         std::string path;   // case path up to last @ sign
         std::string code;   // code line with the case
@@ -18,12 +19,14 @@ namespace snt::dip {
         CaseType case_type; // one of the types: case/else/end
     };
 
+    /** Branch containing the cases selected during DIPL evaluation. */
     struct Branch {
         std::vector<size_t> cases;           // list of case IDs
         std::vector<CaseType> types;         // list of case types
         std::map<std::string, size_t> nodes; // number of node definitions
     };
 
+    /** Collection of DIPL branches and their selected cases. */
     class BranchingList {
       private:
         std::vector<size_t> state;         // list of openned branches

@@ -1,6 +1,7 @@
 #ifndef PUQ_QUANTITIES_H
 #define PUQ_QUANTITIES_H
 
+/** Definition of a named quantity in a unit system. */
 struct QuantityStruct {
     std::string definition;
     std::string sifactor;

@@ -13,6 +13,7 @@
 
 namespace snt::puq {
 
+    /** Converts values between compatible unit systems and dimensions. */
     class Converter {
       private:
         BaseUnits baseunits1;

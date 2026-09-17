@@ -25,7 +25,7 @@ namespace snt::val {
     // Forward declaration
     template <typename T> class ArrayValue;
 
-    // Define base value class
+    /** Polymorphic base class for scalar and array values. */
     class BaseValue {
       protected:
         Array::ShapeType shape;

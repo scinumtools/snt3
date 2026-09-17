@@ -9,6 +9,7 @@ namespace snt::dip {
 
     class Environment;
 
+    /** Registry of functions callable from DIPL expressions. */
     class FunctionList {
       public:
         using DataFunctionType = std::function<ValueNodeData(const Environment&)>;

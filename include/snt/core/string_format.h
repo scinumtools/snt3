@@ -6,6 +6,7 @@
 
 namespace snt::core {
 
+    /** Formatting options shared by textual value and array renderers. */
     struct StringFormatType {
         char specifier = 'g';         // format data type specifier
         int valuePrecision = 4;       // number of significant digits of value

@@ -8,10 +8,11 @@
 
 namespace snt::puq {
 
+    /** Numerical result associated with a set of physical base units. */
     class Measurement {
       public:
-        Result result;
-        BaseUnits baseunits;
+        Result result;       ///< Numerical estimate and uncertainty
+        BaseUnits baseunits; ///< Units associated with the result
 
         static double abs_to_rel(const double v, const double a);
         static double rel_to_abs(const double v, const double r);
@@ -52,8 +53,11 @@ namespace snt::puq {
         Measurement(const Measurement& msr, const Dimensions& dim);
         Measurement(const Measurement& msr, const BaseUnits& bun) : result(msr.result), baseunits(bun) {};
         Measurement(const Measurement& msr, const BaseUnits::ListType& bun) : result(msr.result), baseunits(bun) {};
+        /** Return the number of stored values. */
         std::size_t size() const;
+        /** Return the value shape. */
         val::Array::ShapeType shape() const;
+        /** Format the measurement and its units. */
         std::string to_string(const UnitFormat& format = UnitFormat()) const;
         friend bool operator==(const Measurement& msr1, const Measurement& msr2);
         friend bool operator!=(const Measurement& msr1, const Measurement& msr2);
@@ -69,9 +73,13 @@ namespace snt::puq {
         void operator*=(const Measurement& msr);
         void operator/=(const Measurement& msr);
         // void pow(const ExponentVariant& exp);
+        /** Convert to a selected base-unit representation. */
         Measurement convert(const Format::Base& format) const;
+        /** Convert to units parsed from a string. */
         Measurement convert(const std::string& str) const;
+        /** Convert to explicit base units. */
         Measurement convert(const BaseUnits& bun) const;
+        /** Convert to another measurement's units. */
         Measurement convert(const Measurement& msr) const;
         Measurement rebase_prefixes();
         Measurement rebase_dimensions();
