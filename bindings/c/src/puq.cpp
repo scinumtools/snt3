@@ -13,7 +13,7 @@ struct snt_puq_quantity {
 };
 namespace {
     thread_local std::string last;
-    int fail(snt_c_error* e, const std::exception& x) {
+    int fail(snt_puq_error* e, const std::exception& x) {
         last = x.what();
         if (e) {
             e->code = 1;
@@ -22,7 +22,7 @@ namespace {
         return 1;
     }
 } // namespace
-extern "C" int snt_puq_eval(const char* expr, snt_puq_quantity** out, snt_c_error* e) {
+extern "C" int snt_puq_quantity_eval(const char* expr, snt_puq_quantity** out, snt_puq_error* e) {
     try {
         if (!expr || !out)
             throw std::invalid_argument("expression and output are required");
@@ -36,7 +36,7 @@ extern "C" int snt_puq_eval(const char* expr, snt_puq_quantity** out, snt_c_erro
         return fail(e, x);
     }
 }
-extern "C" int snt_puq_convert(const snt_puq_quantity* q, const char* units, snt_puq_quantity** out, snt_c_error* e) {
+extern "C" int snt_puq_quantity_convert(const snt_puq_quantity* q, const char* units, snt_puq_quantity** out, snt_puq_error* e) {
     try {
         if (!q || !units || !out)
             throw std::invalid_argument("quantity, units, and output are required");
@@ -50,7 +50,7 @@ extern "C" int snt_puq_convert(const snt_puq_quantity* q, const char* units, snt
         return fail(e, x);
     }
 }
-extern "C" int snt_puq_format(const snt_puq_quantity* q, char* buf, size_t n, snt_c_error* e) {
+extern "C" int snt_puq_quantity_format(const snt_puq_quantity* q, char* buf, size_t n, snt_puq_error* e) {
     try {
         if (!q || !buf || !n)
             throw std::invalid_argument("quantity, buffer, and capacity are required");

@@ -1,6 +1,6 @@
 # DIP C binding example
 
-This standalone C project uses `snt/c.h` to add and parse DIPL text, then
+This standalone C project uses `snt/c/dip.h` to add and parse DIPL text, then
 retrieve a scalar value by its node path.
 
 ```sh

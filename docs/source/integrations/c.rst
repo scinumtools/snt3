@@ -7,8 +7,8 @@ C bindings
    is incomplete, and function signatures and behavior may change in future
    releases.
 
-The C binding exposes PUQ quantities and DIPL parsing through ``<snt/c.h>``.
-It uses opaque handles: C applications hold pointers to SNT objects and
+The C binding exposes PUQ quantities through ``<snt/c/puq.h>`` and DIPL parsing
+through ``<snt/c/dip.h>``. It uses opaque handles: C applications hold pointers to SNT objects and
 operate on them through functions, while the implementation remains in C++.
 
 Building and linking
@@ -34,9 +34,9 @@ the application source can remain C.
 Quantities and unit conversion
 ------------------------------
 
-Use ``snt_quantity_eval`` to evaluate a PUEL expression,
-``snt_quantity_convert`` to create a quantity in the requested units, and
-``snt_quantity_format`` to write its textual representation into a buffer.
+Use ``snt_puq_quantity_eval`` to evaluate a PUEL expression,
+``snt_puq_quantity_convert`` to create a quantity in the requested units, and
+``snt_puq_quantity_format`` to write its textual representation into a buffer.
 This complete example converts metres to centimetres:
 
 .. literalinclude:: ../../../examples/puq/CBinding/main.c
@@ -45,9 +45,10 @@ This complete example converts metres to centimetres:
 DIPL parameters
 ---------------
 
-Create a parser with ``snt_dip_create``, add definitions with
-``snt_dip_add_string`` or ``snt_dip_add_file``, and call ``snt_dip_parse``.
-Then retrieve a value as text with ``snt_dip_get``. Pass a node path such as
+Create a parser with ``snt_dip_parser_create``, add definitions with
+``snt_dip_parser_add_string`` or ``snt_dip_parser_add_file``, and call
+``snt_dip_parser_parse``. Then retrieve a value as text with
+``snt_dip_parser_get``. Pass a node path such as
 ``answer`` or ``project.name`` without a leading ``?``:
 
 .. literalinclude:: ../../../examples/dip/CBinding/main.c
@@ -57,12 +58,12 @@ Errors and ownership
 --------------------
 
 Operations returning ``int`` return zero on success and nonzero on error.
-Pass an ``snt_error`` to receive the error code and message. The message is
+Pass an ``snt_puq_error`` or ``snt_dip_error`` to receive the error code and message. The message is
 owned by the library; copy it if it must survive a later error on the same
 thread.
 
-Release every created quantity with ``snt_quantity_free`` and every parser
-with ``snt_dip_free``. Conversion creates a separate quantity, so both the
+Release every created quantity with ``snt_puq_quantity_free`` and every parser
+with ``snt_dip_parser_free``. Conversion creates a separate quantity, so both the
 original and converted handles must be released. The free functions also
 accept null pointers.
 

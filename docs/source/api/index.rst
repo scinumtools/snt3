@@ -69,3 +69,14 @@ functions for evaluating DIPL configuration during project configuration.
    :maxdepth: 1
 
    cmake
+
+C API
+-----
+
+The C ABI reference documents the experimental opaque-handle interface for
+PUQ quantities and DIPL parsing.
+
+.. toctree::
+   :maxdepth: 1
+
+   c

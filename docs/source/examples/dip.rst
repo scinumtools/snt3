@@ -53,12 +53,12 @@ C binding
 ---------
 
 The `DIP C binding example <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/CBinding>`_
-uses only ``snt/c.h`` to add DIPL text, parse it, and retrieve the ``answer``
+uses only ``snt/c/dip.h`` to add DIPL text, parse it, and retrieve the ``answer``
 node through an opaque C handle.
 
 .. code-block:: c
 
-   snt_dip_create(&dip, &error);
-   snt_dip_add_string(dip, "answer int = 42", &error);
-   snt_dip_parse(dip, &error);
-   snt_dip_get(dip, "answer", value, sizeof(value), &error);
+   snt_dip_parser_create(&dip, &error);
+   snt_dip_parser_add_string(dip, "answer int = 42", &error);
+   snt_dip_parser_parse(dip, &error);
+   snt_dip_parser_get(dip, "answer", value, sizeof(value), &error);
