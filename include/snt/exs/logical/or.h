@@ -1,3 +1,4 @@
+/** @file Compatibility include for logical OR expression support. */
 #ifndef EXS_OPERATOR_OR_H
 #define EXS_OPERATOR_OR_H
 

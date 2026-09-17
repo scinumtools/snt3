@@ -17,8 +17,7 @@ namespace snt::puq {
                     result = arg;
                 }
             }(args),
-            ...
-        );
+            ...);
         return result;
     };
 

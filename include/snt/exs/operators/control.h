@@ -6,18 +6,19 @@
 
 namespace snt::exs {
 
-    // parentheses
-
+    /** Parenthesized expression grouping operator. */
     class OperatorParentheses : public OperatorGroup<1> {
       public:
+        /** Construct a parenthesis grouping operator. */
         OperatorParentheses(const OperatorGroupSybols& s = {"", "(", ")", ","});
     };
 
-    // conditional operator
-
+    /** Ternary conditional operator. */
     class OperatorCondition : public OperatorTernary {
       public:
+        /** Construct a conditional operator. */
         OperatorCondition();
+        /** @copydoc OperatorTernary::operate_ternary */
         void operate_ternary(TokenListBase* tokens) override;
     };
 

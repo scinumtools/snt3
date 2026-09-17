@@ -1,3 +1,4 @@
+/** @file Convenience header for value mathematical operations. */
 #ifndef VAL_MATH_H
 #define VAL_MATH_H
 

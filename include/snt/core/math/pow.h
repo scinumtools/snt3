@@ -3,6 +3,10 @@
 
 namespace snt::core::math {
 
+    /** Return @p m raised to the power @p e.
+     *  @param m Base value.
+     *  @param e Exponent.
+     */
     extern double pow(const double m, const double e);
 
 } // namespace snt::core::math

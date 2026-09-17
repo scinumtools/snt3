@@ -13,11 +13,22 @@ namespace snt::bind::python {
 
         command.def(py::init<>(), "Create an empty DIPL command.");
 
-        command.def("argument_add", &api::DIPParse::argument_add, py::arg("add_type"), py::arg("add_value"), "Add a file or inline DIPL source.");
+        command.def(
+            "argument_add",
+            &api::DIPParse::argument_add,
+            py::arg("add_type"),
+            py::arg("add_value"),
+            "Add a file or inline DIPL source."
+        );
 
         command.def("argument_request", &api::DIPParse::argument_request, py::arg("path"), "Select a DIPL node path.");
 
-        command.def("argument_tags", &api::DIPParse::argument_tags, py::arg("tags"), "Restrict output to nodes carrying these tags.");
+        command.def(
+            "argument_tags",
+            &api::DIPParse::argument_tags,
+            py::arg("tags"),
+            "Restrict output to nodes carrying these tags."
+        );
 
         command.def("argument_print", &api::DIPParse::argument_print, "Request named, formatted output.");
 

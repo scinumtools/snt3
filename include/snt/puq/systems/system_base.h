@@ -1,6 +1,7 @@
 #ifndef PUQ_SYSTEM_BASE_H
 #define PUQ_SYSTEM_BASE_H
 
+/** Add two vectors element by element. */
 template <typename T> std::vector<T> operator+(const std::vector<T>& v1, const std::vector<T>& v2) {
     std::vector<T> vr(std::begin(v1), std::end(v1));
     vr.insert(std::end(vr), std::begin(v2), std::end(v2));

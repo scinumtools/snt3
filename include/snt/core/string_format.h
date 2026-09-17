@@ -8,17 +8,18 @@ namespace snt::core {
 
     /** Formatting options shared by textual value and array renderers. */
     struct StringFormatType {
-        char specifier = 'g';         // format data type specifier
-        int valuePrecision = 4;       // number of significant digits of value
-        int uncertaintyPrecision = 2; // number of significant digits of an uncertainty
-        int thresholdScientific = 3;  // exponent from which fixed notation switch to scientific
-        bool paddingZeros = false;    // use zeros for string padding
-        int paddingSize = 0;          // string padding
-        bool stringQuotes = true;     // add quotes to string values
+        char specifier = 'g';         ///< Format specifier: general, scientific (`e`), fixed (`f`), or decimal (`d`).
+        int valuePrecision = 4;       ///< Number of significant digits used for values.
+        int uncertaintyPrecision = 2; ///< Number of significant digits used for uncertainties.
+        int thresholdScientific = 3;  ///< Exponent at which general notation switches to scientific notation.
+        bool paddingZeros = false;    ///< Pad formatted output with zeroes instead of spaces.
+        int paddingSize = 0;          ///< Minimum width of formatted output.
+        bool stringQuotes = true;     ///< Surround string values with quotes and escape embedded quotes.
     };
 
     // Implementation for value only
 
+    /** Format a scalar value according to @p format. */
     template <typename T>
     std::string number_to_string(const T& value, const StringFormatType& format = StringFormatType()) {
         std::stringstream ss;
@@ -58,6 +59,7 @@ namespace snt::core {
         return ss.str();
     }
 
+    /** Escape double quotes in a string when requested. */
     inline std::string escape_quotes(const std::string& value, bool escape) {
         if (escape) {
             std::string output;
@@ -123,6 +125,7 @@ namespace snt::core {
         return oss.str();
     }
 
+    /** Format a multidimensional array of values according to its shape and type. */
     template <typename T>
     std::string array_to_string(
         const std::vector<T>& value,
@@ -136,6 +139,7 @@ namespace snt::core {
 
     // Implementation for value/uncertainty
 
+    /** Format a value together with its uncertainty. */
     template <typename T>
     std::string number_to_string(
         const T& value, const T& uncertainty, const StringFormatType& format = StringFormatType()
@@ -213,6 +217,7 @@ namespace snt::core {
         return oss.str();
     }
 
+    /** Format a multidimensional array of values and uncertainties. */
     template <typename T>
     std::string array_to_string(
         const std::vector<T>& value,

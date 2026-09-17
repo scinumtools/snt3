@@ -5,6 +5,9 @@
 
 namespace snt::val::math {
 
+    /** Apply the sqrt operation to this operand.
+     * @param a Input operand.
+     */
     extern val::BaseValue::PointerType sqrt(val::BaseValue::PointerType a);
 
 } // namespace snt::val::math

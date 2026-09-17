@@ -1,3 +1,4 @@
+/** @file Convenience header for PUQ mathematical operations. */
 #ifndef PUQ_MATH_H
 #define PUQ_MATH_H
 

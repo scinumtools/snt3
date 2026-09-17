@@ -1,3 +1,4 @@
+/** @file Compatibility include for logical NOT expression support. */
 #ifndef EXS_OPERATOR_NOT_H
 #define EXS_OPERATOR_NOT_H
 

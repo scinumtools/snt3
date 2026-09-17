@@ -5,29 +5,29 @@
 
 namespace snt::exs {
 
-    // sinus
-
+    /** Sine function operator. */
     class OperatorSinus : public OperatorGroup<1> {
       public:
         OperatorSinus(const OperatorGroupSybols& s = {"sin", "(", ")", ","});
 
+        /** @copydoc OperatorGroup<1>::operate_group */
         void operate_group(TokenListBase* tokens) override;
     };
 
-    // cosinus
-
+    /** Cosine function operator. */
     class OperatorCosinus : public OperatorGroup<1> {
       public:
         OperatorCosinus(const OperatorGroupSybols& s = {"cos", "(", ")", ","});
+        /** @copydoc OperatorGroup<1>::operate_group */
         void operate_group(TokenListBase* tokens) override;
     };
 
-    // tangens
-
+    /** Tangent function operator. */
     class OperatorTangens : public OperatorGroup<1> {
       public:
         OperatorTangens(const OperatorGroupSybols& s = {"tan", "(", ")", ","});
 
+        /** @copydoc OperatorGroup<1>::operate_group */
         void operate_group(TokenListBase* tokens) override;
     };
 

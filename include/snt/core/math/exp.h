@@ -3,6 +3,9 @@
 
 namespace snt::core::math {
 
+    /** Return the natural exponential of @p e.
+     *  @param e Exponent.
+     */
     extern double exp(const double e);
 
 } // namespace snt::core::math

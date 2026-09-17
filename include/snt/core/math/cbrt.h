@@ -3,6 +3,9 @@
 
 namespace snt::core::math {
 
+    /** Return the real cube root of @p m.
+     *  @param m Input value.
+     */
     extern double cbrt(const double m);
 
 } // namespace snt::core::math

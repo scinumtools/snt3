@@ -1,3 +1,4 @@
+/** @file Public list aliases used by the PUQ module. */
 #ifndef PUQ_LISTS_H
 #define PUQ_LISTS_H
 

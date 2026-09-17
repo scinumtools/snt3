@@ -93,7 +93,10 @@ namespace snt::bind::python {
     void init_puq_quantity(py::module_& m) {
 
         auto q = py::class_<puq::Quantity>(
-            m, "Quantity", "A numerical value with physical units and optional measurement uncertainty.", py::buffer_protocol()
+            m,
+            "Quantity",
+            "A numerical value with physical units and optional measurement uncertainty.",
+            py::buffer_protocol()
         );
 
         q.def(py::init<std::string>())
@@ -156,27 +159,31 @@ namespace snt::bind::python {
         /**
          *  Convert Quantity into a numpy array
          */
-        q.def("to_numpy", [](const puq::Quantity& q) {
-            val::ArrayValue<double>* otherT =
-                dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
-            if (!otherT)
-                throw puq::PybindException(
-                    "Unexpected array value type",
-                    "The quantity contains an incompatible value type; "
-                    "`ArrayValue<double>` is required for NumPy conversion.",
-                    "Ensure that the quantity contains a floating-point array value.",
-                    __FILE__,
-                    __LINE__
-                );
-            std::vector<size_t> shape = otherT->get_shape();
-            std::vector<py::ssize_t> strides(shape.size());
-            py::ssize_t stride = sizeof(double);
-            for (py::ssize_t i = static_cast<py::ssize_t>(shape.size()) - 1; i >= 0; --i) {
-                strides[i] = stride;
-                stride *= static_cast<py::ssize_t>(shape[i]);
-            }
-            return py::array_t<double>(shape, strides, otherT->get_data());
-        }, "Return the quantity value as a NumPy array.");
+        q.def(
+            "to_numpy",
+            [](const puq::Quantity& q) {
+                val::ArrayValue<double>* otherT =
+                    dynamic_cast<val::ArrayValue<double>*>(q.measurement.result.estimate.get());
+                if (!otherT)
+                    throw puq::PybindException(
+                        "Unexpected array value type",
+                        "The quantity contains an incompatible value type; "
+                        "`ArrayValue<double>` is required for NumPy conversion.",
+                        "Ensure that the quantity contains a floating-point array value.",
+                        __FILE__,
+                        __LINE__
+                    );
+                std::vector<size_t> shape = otherT->get_shape();
+                std::vector<py::ssize_t> strides(shape.size());
+                py::ssize_t stride = sizeof(double);
+                for (py::ssize_t i = static_cast<py::ssize_t>(shape.size()) - 1; i >= 0; --i) {
+                    strides[i] = stride;
+                    stride *= static_cast<py::ssize_t>(shape[i]);
+                }
+                return py::array_t<double>(shape, strides, otherT->get_data());
+            },
+            "Return the quantity value as a NumPy array."
+        );
         //  q.def("to_numpy", [](const puq::Quantity &q) -> py::buffer_info {
         //      val::ArrayValueFloat64* otherT =
         //      dynamic_cast<val::ArrayValueFloat64*>(q.measurement.result.estimate.get()); return py::buffer_info(
@@ -210,14 +217,29 @@ namespace snt::bind::python {
         q.def("rebase_dimensions", &puq::Quantity::rebase_dimensions, "Rebase the quantity dimensions.");
         q.def("size", &puq::Quantity::size, "Return the number of stored values.");
         q.def("shape", &puq::Quantity::shape, "Return the shape of the stored value.");
-        q.def("info", [](const puq::Quantity& q) {
-            py::scoped_ostream_redirect redirect(std::cout, py::module_::import("sys").attr("stdout"));
-            std::cout << q.info();
-        }, "Print detailed information about the quantity.");
+        q.def(
+            "info",
+            [](const puq::Quantity& q) {
+                py::scoped_ostream_redirect redirect(std::cout, py::module_::import("sys").attr("stdout"));
+                std::cout << q.info();
+            },
+            "Print detailed information about the quantity."
+        );
 
-        q.def("value", &quantity_value, py::arg("numpy") = false, "Return the value as a scalar, list, or NumPy array.");
-        q.def("uncertainty", &quantity_uncertainty, py::arg("numpy") = false, "Return uncertainty as a scalar, list, or NumPy array.");
-        q.def_property_readonly("units", [](const puq::Quantity& q) { return q.measurement.baseunits.to_string(); }, "Return the quantity's units as text.");
+        q.def(
+            "value", &quantity_value, py::arg("numpy") = false, "Return the value as a scalar, list, or NumPy array."
+        );
+        q.def(
+            "uncertainty",
+            &quantity_uncertainty,
+            py::arg("numpy") = false,
+            "Return uncertainty as a scalar, list, or NumPy array."
+        );
+        q.def_property_readonly(
+            "units",
+            [](const puq::Quantity& q) { return q.measurement.baseunits.to_string(); },
+            "Return the quantity's units as text."
+        );
 
         //.def("__getitem__", &quantity_get_value, py::arg("index"))
         //.def("__len__", &puq::Quantity::size)
@@ -364,8 +386,15 @@ namespace snt::bind::python {
         });
 
         q.def("__repr__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat());
-        q.def("__str__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat(), "Format the quantity as text.");
-        q.def("to_string", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat(), "Format the quantity as text.");
+        q.def(
+            "__str__", &puq::Quantity::to_string, py::arg("format") = puq::UnitFormat(), "Format the quantity as text."
+        );
+        q.def(
+            "to_string",
+            &puq::Quantity::to_string,
+            py::arg("format") = puq::UnitFormat(),
+            "Format the quantity as text."
+        );
     }
 
 } // namespace snt::bind::python

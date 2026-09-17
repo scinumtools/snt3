@@ -6,6 +6,7 @@
 
 namespace snt::puq {
 
+    /** Return the display width of a UTF-8 string in characters. */
     static size_t display_length(const std::string& str) {
         size_t length = 0;
 

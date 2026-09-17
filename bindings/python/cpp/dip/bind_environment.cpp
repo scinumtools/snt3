@@ -21,14 +21,21 @@ namespace snt::bind::python {
         nl.def(
             "__getitem__",
             [](const dip::NodeList<dip::ValueNode>& self, size_t i) { return self.at(i); },
-            py::arg("node"), "Return the node at an index."
+            py::arg("node"),
+            "Return the node at an index."
         );
         nl.def("size", &dip::NodeList<dip::ValueNode>::size, "Return the number of nodes.");
 
-        auto env = py::class_<dip::Environment>(m, "Environment", "Evaluation environment containing DIPL sources, units, functions, and nodes.");
+        auto env = py::class_<dip::Environment>(
+            m, "Environment", "Evaluation environment containing DIPL sources, units, functions, and nodes."
+        );
         env.def(py::init<>(), "Create an empty evaluation environment.");
-        env.def_property_readonly("nodes", [](const dip::Environment& e) { return &e.nodes; }, "Evaluated top-level nodes.");
-        env.def_property_readonly("size", [](const dip::Environment& e) { return e.nodes.size(); }, "Number of top-level nodes.");
+        env.def_property_readonly(
+            "nodes", [](const dip::Environment& e) { return &e.nodes; }, "Evaluated top-level nodes."
+        );
+        env.def_property_readonly(
+            "size", [](const dip::Environment& e) { return e.nodes.size(); }, "Number of top-level nodes."
+        );
 
         env.def(
             "request_group",

@@ -9,8 +9,17 @@ namespace snt::puq {
 
 namespace snt::puq::math {
 
+    /** Apply the floor operation to this operand.
+     * @param res Input operand.
+     */
     extern puq::Result floor(const puq::Result& res);
+    /** Apply the floor operation to this operand.
+     * @param msr Input operand.
+     */
     extern puq::Measurement floor(const puq::Measurement& msr);
+    /** Apply the floor operation to this operand.
+     * @param quant Input operand.
+     */
     extern puq::Quantity floor(const puq::Quantity& quant);
 
 } // namespace snt::puq::math

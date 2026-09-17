@@ -12,11 +12,21 @@ namespace snt::bind::python {
             .def(py::init<>()) // default constructor
             .def_readwrite("specifier", &core::StringFormatType::specifier, "Numeric format specifier.")
             .def_readwrite("valuePrecision", &core::StringFormatType::valuePrecision, "Displayed value precision.")
-            .def_readwrite("uncertaintyPrecision", &core::StringFormatType::uncertaintyPrecision, "Displayed uncertainty precision.")
-            .def_readwrite("thresholdScientific", &core::StringFormatType::thresholdScientific, "Threshold for scientific notation.")
+            .def_readwrite(
+                "uncertaintyPrecision",
+                &core::StringFormatType::uncertaintyPrecision,
+                "Displayed uncertainty precision."
+            )
+            .def_readwrite(
+                "thresholdScientific",
+                &core::StringFormatType::thresholdScientific,
+                "Threshold for scientific notation."
+            )
             .def_readwrite("paddingZeros", &core::StringFormatType::paddingZeros, "Whether to pad values with zeros.")
             .def_readwrite("paddingSize", &core::StringFormatType::paddingSize, "Minimum padded field size.")
-            .def_readwrite("stringQuotes", &core::StringFormatType::stringQuotes, "Whether string values include quotes.")
+            .def_readwrite(
+                "stringQuotes", &core::StringFormatType::stringQuotes, "Whether string values include quotes."
+            )
             // Optional: provide a nice __repr__ for debugging in Python
             .def("__repr__", [](const core::StringFormatType& s) {
                 return "<StringFormatType specifier='" + std::string(1, s.specifier) +

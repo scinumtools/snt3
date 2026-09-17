@@ -3,6 +3,9 @@
 
 namespace snt::core::math {
 
+    /** Return the natural logarithm of @p m.
+     *  @param m Positive input value.
+     */
     extern double log(const double m);
 
 } // namespace snt::core::math

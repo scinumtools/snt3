@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <vector>
 
+/** Return the final component of a slash- or backslash-separated path. */
 constexpr const char* file_basename(const char* path) {
     const char* last = path;
     for (const char* p = path; *p; ++p)
@@ -17,6 +18,7 @@ constexpr const char* file_basename(const char* path) {
     return last;
 }
 
+/** Print a source location and optional diagnostic values to standard output. */
 #define setCheckpoint(...)                                                                                             \
     do {                                                                                                               \
         std::cout << "[" << file_basename(__FILE__) << ":" << __LINE__ << "]";                                         \
@@ -27,12 +29,17 @@ constexpr const char* file_basename(const char* path) {
 
 namespace snt::core {
 
-    // Keywords
+    /// Keyword used for an absent value.
     constexpr std::string_view KEYWORD_NONE = "none";
+    /// Keyword used for a true Boolean value.
     constexpr std::string_view KEYWORD_TRUE = "true";
+    /// Keyword used for a false Boolean value.
     constexpr std::string_view KEYWORD_FALSE = "false";
+    /// Opening delimiter used for array rendering.
     constexpr std::string_view SYMBOL_ARRAY_START = "[";
+    /// Closing delimiter used for array rendering.
     constexpr std::string_view SYMBOL_ARRAY_END = "]";
+    /// Element delimiter used for array rendering.
     constexpr std::string_view SYMBOL_ARRAY_DELIMITER = ", ";
 
 } // namespace snt::core

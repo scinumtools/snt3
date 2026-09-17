@@ -23,7 +23,7 @@ namespace snt::puq {
         ) const;
 
       public:
-        SystemType stype;       ///< Unit system used by this quantity
+        SystemType stype;        ///< Unit system used by this quantity
         Measurement measurement; ///< Numerical value, uncertainty, and units
         Quantity() : stype(UnitSystem::current.type) {};
         Quantity(std::string s, const SystemType system = SystemType::NONE);

@@ -22,7 +22,9 @@ namespace snt::bind::python {
         usb.def("change", &puq::UnitSystem::change, py::arg("system"), "Change the active unit system.");
         usb.def("close", &puq::UnitSystem::close, "Restore the previously active unit system.");
 
-        py::class_<UnitSystem, puq::UnitSystem> us(m, "UnitSystem", "Context manager for changing the active unit system.");
+        py::class_<UnitSystem, puq::UnitSystem> us(
+            m, "UnitSystem", "Context manager for changing the active unit system."
+        );
         us.def(py::init<const puq::SystemType>(), py::arg("system"), "Create a unit-system context manager.");
 
         us.def("enter", &UnitSystem::enter, "Enter the unit-system context.");

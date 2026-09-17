@@ -42,25 +42,51 @@ namespace snt::bind::python {
         k.value("List", dip::Path::Kind::List);
         k.value("Item", dip::Path::Kind::Item);
 
-        auto val = py::class_<dip::Cursor, std::shared_ptr<dip::Cursor>>(m, "Cursor", "Cursor for traversing and querying evaluated DIPL nodes.");
+        auto val = py::class_<dip::Cursor, std::shared_ptr<dip::Cursor>>(
+            m, "Cursor", "Cursor for traversing and querying evaluated DIPL nodes."
+        );
 
-        val.def(py::init<const dip::Environment*, std::string_view>(), py::arg("env"), py::arg("path") = "", "Create a cursor at a DIPL path.");
+        val.def(
+            py::init<const dip::Environment*, std::string_view>(),
+            py::arg("env"),
+            py::arg("path") = "",
+            "Create a cursor at a DIPL path."
+        );
 
-        val.def("__getitem__", py::overload_cast<std::string_view>(&dip::Cursor::operator[], py::const_), py::arg("name"), "Select a child by name.");
+        val.def(
+            "__getitem__",
+            py::overload_cast<std::string_view>(&dip::Cursor::operator[], py::const_),
+            py::arg("name"),
+            "Select a child by name."
+        );
 
-        val.def("__getitem__", py::overload_cast<std::size_t>(&dip::Cursor::operator[], py::const_), py::arg("index"), "Select a child by index.");
+        val.def(
+            "__getitem__",
+            py::overload_cast<std::size_t>(&dip::Cursor::operator[], py::const_),
+            py::arg("index"),
+            "Select a child by index."
+        );
 
-        val.def("__contains__", [](const dip::Cursor& self, const std::string& item) { return self.has_item(item); }, py::arg("item"), "Return whether a named child exists.");
+        val.def(
+            "__contains__",
+            [](const dip::Cursor& self, const std::string& item) { return self.has_item(item); },
+            py::arg("item"),
+            "Return whether a named child exists."
+        );
 
         val.def("elements", &dip::Cursor::elements, "Return child elements.");
 
-        val.def("items", [](const dip::Cursor& c) {
-            py::list result;
-            for (auto&& [key, value] : c.items()) {
-                result.append(py::make_tuple(key, value));
-            }
-            return result;
-        }, "Return child names and values as pairs.");
+        val.def(
+            "items",
+            [](const dip::Cursor& c) {
+                py::list result;
+                for (auto&& [key, value] : c.items()) {
+                    result.append(py::make_tuple(key, value));
+                }
+                return result;
+            },
+            "Return child names and values as pairs."
+        );
 
         val.def("has_item", &dip::Cursor::has_item, py::arg("name"), "Return whether a named child exists.");
 
@@ -89,7 +115,11 @@ namespace snt::bind::python {
 
         val.def_property_readonly("kind", &dip::Cursor::get_kind, "Kind of DIPL path represented by this cursor.");
 
-        val.def("to_numpy", [](const dip::Cursor& self) -> py::object { return to_numpy_value(self.get_value()); }, "Return the cursor value as a NumPy array.");
+        val.def(
+            "to_numpy",
+            [](const dip::Cursor& self) -> py::object { return to_numpy_value(self.get_value()); },
+            "Return the cursor value as a NumPy array."
+        );
 
         val.def("__str__", &dip::Cursor::to_string, "Format the cursor as text.");
         val.def("__repr__", &dip::Cursor::to_string, "Format the cursor as text.");

@@ -5,6 +5,10 @@
 
 namespace snt::val::math {
 
+    /** Apply the max operation to this operand.
+     * @param a1 Input operand.
+     * @param a2 Input operand.
+     */
     extern val::BaseValue::PointerType max(val::BaseValue::PointerType a1, val::BaseValue::PointerType a2);
 
 } // namespace snt::val::math

@@ -38,10 +38,12 @@ namespace snt::dip {
                 source_file.size() - FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1
             ) == 0) {
             return parse_file_source(source_name, source_file, parent);
-        } else if (source_file.size() >= FILE_SUFFIX_DIP2.size() &&
-                   source_file.compare(
-                       source_file.size() - FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2
-                   ) == 0) {
+        } else if (
+            source_file.size() >= FILE_SUFFIX_DIP2.size() &&
+            source_file.compare(
+                source_file.size() - FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2
+            ) == 0
+        ) {
             return parse_file_source(source_name, source_file, parent);
         } else {
             std::ifstream file(source_file);

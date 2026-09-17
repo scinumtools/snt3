@@ -55,8 +55,9 @@ namespace snt::dip {
                         __LINE__,
                         node->line
                     );
-                else if (std::find(itc->second.items.begin(), itc->second.items.end(), cnode.item) ==
-                         itc->second.items.end())
+                else if (
+                    std::find(itc->second.items.begin(), itc->second.items.end(), cnode.item) == itc->second.items.end()
+                )
                     throw dip::EnvironmentException(
                         "Unknown collection item",
                         "The item `" + cnode.item + "` was not found in the collection `" + name_full + "`.",
@@ -103,8 +104,9 @@ namespace snt::dip {
                         __LINE__,
                         node->line
                     );
-                } else if (std::find(it->second.items.begin(), it->second.items.end(), cnode.item) ==
-                           it->second.items.end()) { // append new item with a new key
+                } else if (
+                    std::find(it->second.items.begin(), it->second.items.end(), cnode.item) == it->second.items.end()
+                ) { // append new item with a new key
                     it->second.items.push_back(cnode.item);
                 } else {
                     throw dip::EnvironmentException(

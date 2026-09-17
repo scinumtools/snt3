@@ -37,7 +37,8 @@ namespace snt::dip {
             throw dip::SyntaxException(
                 "Invalid integer data type",
                 "The integer data type cannot be determined from the node settings.",
-                "Use `8`, `16`, `32`, or `64` as the integer size, optionally prefixed with `u` for an unsigned integer.",
+                "Use `8`, `16`, `32`, or `64` as the integer size, optionally prefixed with `u` for an unsigned "
+                "integer.",
                 __FILE__,
                 __LINE__,
                 line

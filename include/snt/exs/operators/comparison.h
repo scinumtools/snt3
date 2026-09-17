@@ -5,57 +5,63 @@
 
 namespace snt::exs {
 
-    // equal
-
+    /** Equality comparison operator. */
     class OperatorEqual : public OperatorBase {
       public:
+        /** Construct an equality operator. */
         OperatorEqual(std::string s = "==");
 
+        /** @copydoc OperatorBase::operate_binary */
         void operate_binary(TokenListBase* tokens) override;
     };
 
-    // not equal
-
+    /** Inequality comparison operator. */
     class OperatorNotEqual : public OperatorBase {
       public:
+        /** Construct an inequality operator. */
         OperatorNotEqual(std::string s = "!=");
 
+        /** @copydoc OperatorBase::operate_binary */
         void operate_binary(TokenListBase* tokens) override;
     };
 
-    // greater
-
+    /** Greater-than comparison operator. */
     class OperatorGreater : public OperatorBase {
       public:
+        /** Construct a greater-than operator. */
         OperatorGreater(std::string s = ">");
 
+        /** @copydoc OperatorBase::operate_binary */
         void operate_binary(TokenListBase* tokens) override;
     };
 
-    // less
-
+    /** Less-than comparison operator. */
     class OperatorLess : public OperatorBase {
       public:
+        /** Construct a less-than operator. */
         OperatorLess(std::string s = "<");
 
+        /** @copydoc OperatorBase::operate_binary */
         void operate_binary(TokenListBase* tokens) override;
     };
 
-    // greater equal
-
+    /** Greater-than-or-equal comparison operator. */
     class OperatorGreaterEqual : public OperatorBase {
       public:
+        /** Construct a greater-than-or-equal operator. */
         OperatorGreaterEqual(std::string s = ">=");
 
+        /** @copydoc OperatorBase::operate_binary */
         void operate_binary(TokenListBase* tokens) override;
     };
 
-    // less equal
-
+    /** Less-than-or-equal comparison operator. */
     class OperatorLessEqual : public OperatorBase {
       public:
+        /** Construct a less-than-or-equal operator. */
         OperatorLessEqual(std::string s = "<=");
 
+        /** @copydoc OperatorBase::operate_binary */
         void operate_binary(TokenListBase* tokens) override;
     };
 

@@ -1,3 +1,4 @@
+/** @file Convenience header for the scalar core math functions. */
 #ifndef CORE_MATH_H
 #define CORE_MATH_H
 

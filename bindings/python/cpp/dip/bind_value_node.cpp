@@ -23,7 +23,9 @@ namespace snt::bind::python {
 
     void init_value_node(py::module_& m) {
 
-        auto vdata = py::class_<dip::ValueNodeData>(m, "ValueNodeData", "Evaluated value data returned by DIPL functions and nodes.");
+        auto vdata = py::class_<dip::ValueNodeData>(
+            m, "ValueNodeData", "Evaluated value data returned by DIPL functions and nodes."
+        );
         vdata.def(
             py::init([](py::object value, py::object units) {
                 dip::ValueNodeData data;
@@ -38,7 +40,9 @@ namespace snt::bind::python {
             "Create value data from a Python value and optional units."
         );
 
-        auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(m, "ValueNode", "A DIPL parameter node with value, type, units, and metadata.");
+        auto val = py::class_<dip::ValueNode, std::shared_ptr<dip::ValueNode>>(
+            m, "ValueNode", "A DIPL parameter node with value, type, units, and metadata."
+        );
 
         val.def(
             py::init(
@@ -90,11 +94,18 @@ namespace snt::bind::python {
             "Create a DIPL value node."
         );
 
-        val.def("__str__", &dip::ValueNode::to_string, py::arg("format") = core::StringFormatType(), "Format this node as text.");
+        val.def(
+            "__str__",
+            &dip::ValueNode::to_string,
+            py::arg("format") = core::StringFormatType(),
+            "Format this node as text."
+        );
 
-        val.def_property_readonly("name", [](const dip::ValueNode& self) -> const std::string& {
-            return self.path.name;
-        }, "Name of the parameter node.");
+        val.def_property_readonly(
+            "name",
+            [](const dip::ValueNode& self) -> const std::string& { return self.path.name; },
+            "Name of the parameter node."
+        );
 
         val.def_property_readonly(
             "units",
@@ -103,17 +114,34 @@ namespace snt::bind::python {
             "Quantity units attached to the node, or None."
         );
 
-        val.def_property_readonly("value", [](const dip::ValueNode& vnode) -> py::object {
-            return to_python_value(vnode.value);
-        }, "Python value stored by the node.");
+        val.def_property_readonly(
+            "value",
+            [](const dip::ValueNode& vnode) -> py::object { return to_python_value(vnode.value); },
+            "Python value stored by the node."
+        );
 
-        val.def_property_readonly("shape", [](const dip::ValueNode& vnode) { return vnode.value->get_shape(); }, "Shape of the stored value.");
+        val.def_property_readonly(
+            "shape", [](const dip::ValueNode& vnode) { return vnode.value->get_shape(); }, "Shape of the stored value."
+        );
 
-        val.def_property_readonly("dtype", [](const dip::ValueNode& vnode) { return vnode.value->get_dtype(); }, "SNT data type of the stored value.");
+        val.def_property_readonly(
+            "dtype",
+            [](const dip::ValueNode& vnode) { return vnode.value->get_dtype(); },
+            "SNT data type of the stored value."
+        );
 
-        val.def("to_string", &dip::ValueNode::to_string, py::arg("format") = core::StringFormatType(), "Format this node as text.");
+        val.def(
+            "to_string",
+            &dip::ValueNode::to_string,
+            py::arg("format") = core::StringFormatType(),
+            "Format this node as text."
+        );
 
-        val.def("to_numpy", [](const dip::ValueNode& vnode) -> py::object { return to_numpy_value(vnode.value); }, "Return the stored value as a NumPy array.");
+        val.def(
+            "to_numpy",
+            [](const dip::ValueNode& vnode) -> py::object { return to_numpy_value(vnode.value); },
+            "Return the stored value as a NumPy array."
+        );
     }
 
 } // namespace snt::bind::python

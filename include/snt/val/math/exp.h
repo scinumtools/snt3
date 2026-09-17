@@ -5,6 +5,9 @@
 
 namespace snt::val::math {
 
+    /** Apply the exp operation to this operand.
+     * @param e Input operand.
+     */
     extern val::BaseValue::PointerType exp(val::BaseValue::PointerType e);
 
 } // namespace snt::val::math

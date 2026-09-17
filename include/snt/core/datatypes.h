@@ -48,34 +48,36 @@ namespace snt::core {
     /**
      * List of value data types
      */
+    /** Bit flags describing the scalar and grouped data types supported by SNT. */
     enum class DataType : uint16_t {
         // Define individual data types
-        None = 0,
-        Boolean = 1 << 0,
-        String = 1 << 1,
-        Character = 1 << 2,
-        Integer16 = 1 << 3,
-        Integer32 = 1 << 4,
-        Integer64 = 1 << 5,
-        IntegerX = 1 << 6, // TODO: need to be implemented
-        Integer16_U = 1 << 7,
-        Integer32_U = 1 << 8,
-        Integer64_U = 1 << 9,
-        Float32 = 1 << 10,
-        Float64 = 1 << 11,
-        Float128 = 1 << 12, // TODO: this is not percise, could be less precision
-        FloatX = 1 << 13,   // TODO: need to be implemented
-        Integer8 = 1 << 14,
-        Integer8_U = 1 << 15,
+        None = 0,             ///< No type.
+        Boolean = 1 << 0,     ///< Boolean value.
+        String = 1 << 1,      ///< UTF-8 string value.
+        Character = 1 << 2,   ///< Character value.
+        Integer16 = 1 << 3,   ///< Signed 16-bit integer.
+        Integer32 = 1 << 4,   ///< Signed 32-bit integer.
+        Integer64 = 1 << 5,   ///< Signed 64-bit integer.
+        IntegerX = 1 << 6,    ///< Extended signed integer (reserved).
+        Integer16_U = 1 << 7, ///< Unsigned 16-bit integer.
+        Integer32_U = 1 << 8, ///< Unsigned 32-bit integer.
+        Integer64_U = 1 << 9, ///< Unsigned 64-bit integer.
+        Float32 = 1 << 10,    ///< 32-bit floating-point value.
+        Float64 = 1 << 11,    ///< 64-bit floating-point value.
+        Float128 = 1 << 12,   ///< Extended precision floating-point value.
+        FloatX = 1 << 13,     ///< Extended floating-point type (reserved).
+        Integer8 = 1 << 14,   ///< Signed 8-bit integer.
+        Integer8_U = 1 << 15, ///< Unsigned 8-bit integer.
 
         // Define data type groups
         Integer = Integer8 | Integer16 | Integer32 | Integer64 | IntegerX | Integer8_U | Integer16_U | Integer32_U |
-                  Integer64_U,
+            Integer64_U,
+        ///< Group containing all signed and unsigned integer types.
 
-        Integer_S = Integer8 | Integer16 | Integer32 | Integer64 | IntegerX,
-        Integer_U = Integer8_U | Integer16_U | Integer32_U | Integer64_U,
+        Integer_S = Integer8 | Integer16 | Integer32 | Integer64 | IntegerX, ///< Group containing signed integers.
+        Integer_U = Integer8_U | Integer16_U | Integer32_U | Integer64_U,    ///< Group containing unsigned integers.
 
-        Float = Float32 | Float64 | Float128 | FloatX
+        Float = Float32 | Float64 | Float128 | FloatX ///< Group containing floating-point types.
 
     };
 

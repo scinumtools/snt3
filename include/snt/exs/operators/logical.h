@@ -5,27 +5,30 @@
 
 namespace snt::exs {
 
-    // and
-
+    /** Logical AND operator. */
     class OperatorAnd : public OperatorBase {
       public:
+        /** Construct a logical AND operator. */
         OperatorAnd(std::string s = "&&");
+        /** @copydoc OperatorBase::operate_binary */
         void operate_binary(TokenListBase* tokens) override;
     };
 
-    // or
-
+    /** Logical OR operator. */
     class OperatorOr : public OperatorBase {
       public:
+        /** Construct a logical OR operator. */
         OperatorOr(std::string s = "||");
+        /** @copydoc OperatorBase::operate_binary */
         void operate_binary(TokenListBase* tokens) override;
     };
 
-    // not
-
+    /** Logical NOT operator. */
     class OperatorNot : public OperatorBase {
       public:
+        /** Construct a logical NOT operator. */
         OperatorNot(std::string s = "!");
+        /** @copydoc OperatorBase::operate_unary */
         void operate_unary(TokenListBase* tokens) override;
     };
 

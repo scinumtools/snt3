@@ -15,8 +15,8 @@ namespace snt::puq {
     /** Numerical estimate with an optional absolute uncertainty. */
     class Result {
       public:
-        val::BaseValue::PointerType estimate;     ///< Estimated value
-        val::BaseValue::PointerType uncertainty;  ///< Optional absolute uncertainty
+        val::BaseValue::PointerType estimate;    ///< Estimated value
+        val::BaseValue::PointerType uncertainty; ///< Optional absolute uncertainty
         Result(const Result& other) {
             estimate = other.estimate ? other.estimate->clone() : nullptr;
             uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;

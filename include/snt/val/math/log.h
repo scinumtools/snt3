@@ -5,6 +5,9 @@
 
 namespace snt::val::math {
 
+    /** Apply the log operation to this operand.
+     * @param a Input operand.
+     */
     extern val::BaseValue::PointerType log(val::BaseValue::PointerType a);
 
 } // namespace snt::val::math
