@@ -73,10 +73,11 @@ functions for evaluating DIPL configuration during project configuration.
 C API
 -----
 
-The C ABI reference documents the experimental opaque-handle interface for
+The C ABI reference documents the experimental opaque-handle interfaces for
 PUQ quantities and DIPL parsing.
 
 .. toctree::
    :maxdepth: 1
 
-   c
+   c_puq
+   c_dip
