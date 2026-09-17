@@ -753,7 +753,7 @@ namespace snt::dip {
     }
 
     bool Parser::part_none() {
-        auto pos = code.find_first_not_of(" ");
+        auto pos = code.find_first_not_of(' ');
         if (pos == std::string::npos)
             return false; // string contains only whitespace
         if (code.compare(pos, 4, KEYWORD_NONE) == 0) {

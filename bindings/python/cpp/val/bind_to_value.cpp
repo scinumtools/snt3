@@ -125,7 +125,7 @@ namespace snt::bind::python {
                 return py::str(val->get_value(0));
             } else { // return as a list
                 size_t index = 0;
-                return make_nested_list(val->get_data(), shape, 0, index, [](std::string v) { return py::str(v); });
+                return make_nested_list(val->get_data(), shape, 0, index, [](const std::string& v) { return py::str(v); });
             }
         }
         default:

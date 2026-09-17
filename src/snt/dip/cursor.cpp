@@ -38,7 +38,7 @@ namespace snt::dip {
         std::vector<Cursor> list;
         const Collection& col = env_->hierarchy.get_collection(path_);
         if (col.kind == Path::Kind::List) {
-            for (auto key : col.items) {
+            for (const auto& key : col.items) {
                 list.push_back(Cursor(env_, path_ + "[" + key + "]"));
             }
         } else {
@@ -58,7 +58,7 @@ namespace snt::dip {
         std::unordered_map<std::string, Cursor> map;
         const Collection& col = env_->hierarchy.get_collection(path_);
         if (col.kind == Path::Kind::Map) {
-            for (auto key : col.items) {
+            for (const auto& key : col.items) {
                 map.insert({key, Cursor(env_, path_ + "[" + key + "]")});
             }
         } else {
@@ -77,7 +77,7 @@ namespace snt::dip {
     bool Cursor::has_item(const std::string& item) const {
         const Collection& col = env_->hierarchy.get_collection(path_);
         if (col.kind == Path::Kind::Map) {
-            for (auto key : col.items) {
+            for (const auto& key : col.items) {
                 if (key == item)
                     return true;
             }

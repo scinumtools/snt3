@@ -8,14 +8,14 @@ struct Settings : exs::BaseSettings {
     int value;
     std::array<int, 5> options;
 
-    Settings(std::string s, int v, std::array<int, 5> o) : symbol(s), value(v), options(o) {}
+    Settings(std::string s, int v, std::array<int, 5> o) : symbol(std::move(s)), value(v), options(o) {}
 };
 
 enum CustomOperatorType { SELECT_OPERATOR = exs::NUM_OPERATOR_TYPES };
 
 class CustomAtom final : public exs::AtomBase<CustomAtom, int> {
   public:
-    CustomAtom(CustomAtom& a) : AtomBase(a) {};
+    CustomAtom(const CustomAtom& a) = default;
     CustomAtom(int v) : AtomBase(v) {};
     static int from_string(std::string& s, exs::BaseSettings* set = nullptr);
     std::string to_string() override;

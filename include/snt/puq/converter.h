@@ -116,7 +116,7 @@ namespace snt::puq {
             }
             // list units with the same dimensions from the first unit system
             us.change(s1);
-            for (auto unit : UnitSystem::current.data->DimensionMap) {
+            for (const auto& unit : UnitSystem::current.data->DimensionMap) {
                 if (Dimensions(1, unit.second.dimensions) != dim1)
                     continue;
                 if (unit.first == mgs || unit.first == mks || unit.first == cgs)
@@ -129,7 +129,7 @@ namespace snt::puq {
                      UnitSystem::current.data->UnitList.find(unit.first)->second.name}
                 );
             }
-            for (auto unit : UnitSystem::current.custom->DimensionMap) {
+            for (const auto& unit : UnitSystem::current.custom->DimensionMap) {
                 if (Dimensions(1, unit.second.dimensions) != dim1)
                     continue;
                 if (unit.first == mgs || unit.first == mks || unit.first == cgs)
@@ -146,7 +146,7 @@ namespace snt::puq {
             if (s1 != s2) {
                 // list units with the same dimensions from the second unit system
                 us.change(s2);
-                for (auto unit : UnitSystem::current.data->DimensionMap) {
+                for (const auto& unit : UnitSystem::current.data->DimensionMap) {
                     if (Dimensions(1, unit.second.dimensions) != dim1)
                         continue;
                     if (unit.first == mgs || unit.first == mks || unit.first == cgs)
@@ -159,7 +159,7 @@ namespace snt::puq {
                          UnitSystem::current.data->UnitList.find(unit.first)->second.name}
                     );
                 }
-                for (auto unit : UnitSystem::current.custom->DimensionMap) {
+                for (const auto& unit : UnitSystem::current.custom->DimensionMap) {
                     if (Dimensions(1, unit.second.dimensions) != dim1)
                         continue;
                     if (unit.first == mgs || unit.first == mks || unit.first == cgs)
@@ -173,7 +173,7 @@ namespace snt::puq {
                     );
                 }
                 us.change(s1);
-                for (auto quant : UnitSystem::current.data->QuantityList) {
+                for (const auto& quant : UnitSystem::current.data->QuantityList) {
                     Measurement uv(
                         std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end)
                     );
@@ -184,7 +184,7 @@ namespace snt::puq {
                             std::string(Symbols::quantity_start) + quant.first + std::string(Symbols::quantity_end)
                         );
                         dim_q = uv.baseunits.dimensions();
-                        for (auto unit : UnitSystem::current.data->DimensionMap) {
+                        for (const auto& unit : UnitSystem::current.data->DimensionMap) {
                             if (Dimensions(1, unit.second.dimensions) != dim_q)
                                 continue;
                             if (unit.first == mgs || unit.first == mks || unit.first == cgs)
@@ -203,7 +203,7 @@ namespace snt::puq {
                                  quant.first}
                             );
                         }
-                        for (auto unit : UnitSystem::current.custom->DimensionMap) {
+                        for (const auto& unit : UnitSystem::current.custom->DimensionMap) {
                             if (Dimensions(1, unit.second.dimensions) != dim_q)
                                 continue;
                             if (unit.first == mgs || unit.first == mks || unit.first == cgs)
@@ -229,7 +229,7 @@ namespace snt::puq {
             suggestion << tab.to_string();
 
             return core::ExceptionInfo{
-                "Incompatible dimensions", details.str(), suggestion.str(), core::SourceLocation{std::move(file), line}
+                "Incompatible dimensions", details.str(), suggestion.str(), core::SourceLocation{file, line}
             };
         }
     };

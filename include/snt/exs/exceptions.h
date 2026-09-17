@@ -45,7 +45,7 @@ namespace snt::exs {
                       "",
                       "If you need this functionality, please contact the developers, open an issue or send a pull "
                       "request on GitHub.",
-                      core::SourceLocation{file, line}
+                      core::SourceLocation{std::move(file), line}
                   }
               ) {};
     };

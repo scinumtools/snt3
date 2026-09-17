@@ -25,7 +25,7 @@ namespace snt::bind::python {
         pybind_exception = py::register_exception<dip::PybindException>(m, "PybindException").ptr();
         py::register_exception_translator([](std::exception_ptr p) {
             try {
-                std::rethrow_exception(p);
+                std::rethrow_exception(std::move(p));
             } catch (const dip::PybindException& e) {
                 py::object type = py::reinterpret_borrow<py::object>(pybind_exception);
                 py::object instance = type(e.what());

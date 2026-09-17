@@ -10,9 +10,9 @@ namespace snt::puq {
       public:
         std::vector<ExponentVariant> exponent;
         OperatorParentheses() : OperatorGroup<1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
-        virtual bool check(exs::Expression& expr);
-        virtual void parse(exs::Expression& expr);
-        void operate_group(exs::TokenListBase* tokens);
+        bool check(exs::Expression& expr) override;
+        void parse(exs::Expression& expr) override;
+        void operate_group(exs::TokenListBase* tokens) override;
     };
 
 } // namespace snt::puq

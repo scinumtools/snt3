@@ -24,7 +24,7 @@ void CustomAtom::math_add(CustomAtom* other) {
     for (size_t i = 0; i < value.size(); i++) {
         nv.push_back(value[i] + other->value[i]);
     }
-    value = nv;
+    value = std::move(nv);
 }
 
 void CustomAtom::math_subtract(CustomAtom* other) {
@@ -38,7 +38,7 @@ void CustomAtom::math_subtract(CustomAtom* other) {
     for (size_t i = 0; i < value.size(); i++) {
         nv.push_back(value[i] - other->value[i]);
     }
-    value = nv;
+    value = std::move(nv);
 }
 
 void CustomAtom::math_negate() {
@@ -46,5 +46,5 @@ void CustomAtom::math_negate() {
     for (double val : value) {
         nv.push_back(-val);
     }
-    value = nv;
+    value = std::move(nv);
 }

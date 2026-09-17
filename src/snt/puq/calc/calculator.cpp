@@ -26,8 +26,6 @@ namespace snt::puq {
         return exs::Solver<CalculatorAtom>(operators, steps);
     }();
 
-    Calculator::Calculator() {}
-
     CalculatorAtom Calculator::eval(const std::string& expression) {
         if constexpr (Config::debug_calculator) {
             std::clog << "CALC:  Solving: " << expression << '\n';

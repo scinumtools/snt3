@@ -11,7 +11,9 @@ namespace snt::val {
      *  @param precision Number of significant digits.
      *  @return Formatted value.
      */
-    extern std::string to_string(val::BaseValue::PointerType value, int precision = std::cout.precision());
+    extern std::string to_string(
+        val::BaseValue::PointerType value, int precision = static_cast<int>(std::cout.precision())
+    );
 
     /** Format an array shape.
      *  @param shape Dimensions of the array.

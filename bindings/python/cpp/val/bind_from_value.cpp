@@ -19,7 +19,7 @@ namespace snt::bind::python {
 
     void init_from_value(py::module_& m) {}
 
-    val::BaseValue::PointerType from_python(py::object value) {
+    val::BaseValue::PointerType from_python(const py::object& value) {
         val::BaseValue::PointerType val;
         if (py::isinstance<py::list>(value)) { // 1-D list
             val = from_python_list(value);
@@ -39,7 +39,7 @@ namespace snt::bind::python {
         return std::move(val);
     }
 
-    val::BaseValue::PointerType from_python_scalar(py::object value) {
+    val::BaseValue::PointerType from_python_scalar(const py::object& value) {
 
         // Scalar bool
         if (py::isinstance<py::bool_>(value))
@@ -57,7 +57,7 @@ namespace snt::bind::python {
         return nullptr;
     }
 
-    val::BaseValue::PointerType from_python_list(py::object value) {
+    val::BaseValue::PointerType from_python_list(const py::object& value) {
         py::list list = value.cast<py::list>();
 
         if (list.empty()) {
@@ -161,7 +161,7 @@ namespace snt::bind::python {
         return nullptr;
     }
 
-    val::BaseValue::PointerType from_python_array(py::object value) {
+    val::BaseValue::PointerType from_python_array(const py::object& value) {
         py::array array = value.cast<py::array>();
         py::buffer_info info = array.request();
 

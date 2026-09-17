@@ -37,7 +37,7 @@ namespace snt::dip {
         };
 
         std::string name;                                ///< fully qualified node path
-        Kind kind;                                       ///< kind of a path
+        Kind kind = Kind::None;                           ///< kind of a path
         std::vector<Path::CollectionAccess> collections; ///< list of collection access pairs derived from a node name
 
         /**

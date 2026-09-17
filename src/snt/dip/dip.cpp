@@ -100,11 +100,11 @@ namespace snt::dip {
     }
 
     void DIP::add_function_value(const std::string& name, FunctionList::DataFunctionType func) {
-        env.functions.append_value(name, func);
+        env.functions.append_value(name, std::move(func));
     }
 
     void DIP::add_function_nodes(const std::string& name, FunctionList::NodesFunctionType func) {
-        env.functions.append_nodes(name, func);
+        env.functions.append_nodes(name, std::move(func));
     }
 
     std::string DIP::to_string() {
@@ -116,7 +116,7 @@ namespace snt::dip {
         NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table
     };
 
-    inline void check_indent(BaseNode::PointerType previous_node, BaseNode::PointerType current_node) {
+    inline void check_indent(const BaseNode::PointerType& previous_node, const BaseNode::PointerType& current_node) {
         // We make sure that the indent spacing is always set by INDENT_STEP
         if ((current_node->indent % INDENT_STEP) != 0) {
             std::stringstream suggested;
@@ -148,7 +148,7 @@ namespace snt::dip {
         }
     }
 
-    inline void set_node_property(BaseNode::PointerType current_node, BaseNode::PointerType previous_node) {
+    inline void set_node_property(const BaseNode::PointerType& current_node, const BaseNode::PointerType& previous_node) {
         // assign properties to the previous value node
         PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
         if (!previous_node || std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==

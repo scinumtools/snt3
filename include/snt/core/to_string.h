@@ -8,7 +8,7 @@ namespace snt::core {
      *  @param precision Number of significant digits.
      *  @return Formatted value.
      */
-    extern std::string to_string(const double value, int precision = std::cout.precision());
+    extern std::string to_string(const double value, int precision = static_cast<int>(std::cout.precision()));
 
 } // namespace snt::core
 

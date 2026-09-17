@@ -16,14 +16,14 @@ namespace snt::mat {
          *
          * @param a Reference of an SubstanceAtom object
          */
-        SubstanceAtom(SubstanceAtom& a) : AtomBase(a) {};
+        SubstanceAtom(const SubstanceAtom& a) = default;
 
         /**
          * Create atom from a value
          *
          * @param v ElementMap object
          */
-        SubstanceAtom(ElementMap v) : AtomBase(v) {};
+        SubstanceAtom(ElementMap v) : AtomBase(std::move(v)) {};
 
         /**
          * Create atom value from a string

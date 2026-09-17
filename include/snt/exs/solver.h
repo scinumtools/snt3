@@ -107,7 +107,7 @@ namespace snt::exs {
                         if (op->groups.size() > 0) {
                             std::vector<std::string> groups = op->groups;
                             // CHECKPOINT( groups.size() )
-                            for (auto e : groups) {
+                            for (const auto& e : groups) {
                                 ATOM atom = eval(e);
                                 tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
                             }
@@ -129,7 +129,7 @@ namespace snt::exs {
             }
             // CHECKPOINT( expr.to_string() );
 
-            for (auto s : steps.steps) {
+            for (const auto& s : steps.steps) {
                 // CHECKPOINT( tokens.to_string(true) );
                 tokens.operate(s.second, s.first);
             }

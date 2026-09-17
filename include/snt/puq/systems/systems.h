@@ -85,10 +85,10 @@ namespace snt::puq {
     using AllowedPrefixes = std::set<std::string>;
 
     struct UnitStruct {
-        Utype utype;
+        Utype utype = Utype::NUL;
         std::string definition;
         std::string name;
-        bool use_prefixes;
+        bool use_prefixes = false;
         AllowedPrefixes allowed_prefixes;
     };
     using UnitListType = std::unordered_map<std::string, UnitStruct>;
@@ -113,8 +113,8 @@ namespace snt::puq {
     };
 
     struct DimensionStruct {
-        double estimate;
-        double uncertainty;
+        double estimate = 0.0;
+        double uncertainty = 0.0;
         BaseDimensions dimensions;
     };
     using DimensionMapType = std::unordered_map<std::string, DimensionStruct>;

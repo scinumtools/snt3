@@ -1,6 +1,7 @@
 #ifndef EXS_SETTINGS_H
 #define EXS_SETTINGS_H
 
+#include <cstdint>
 #include <string>
 
 namespace snt::exs {

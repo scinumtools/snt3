@@ -3,6 +3,7 @@
 #include "snt/api/dip_parse.h"
 
 #include <deque>
+#include <cstddef>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -77,7 +78,11 @@ void module_dip(ArgParser& argpar) {
                 if (i + count >= values.size())
                     throw std::runtime_error("Incomplete DIP input: " + kind);
                 cmd.argument_add(
-                    kind, std::vector<std::string>(values.begin() + i + 1, values.begin() + i + count + 1)
+                    kind,
+                    std::vector<std::string>(
+                        values.begin() + static_cast<std::ptrdiff_t>(i + 1),
+                        values.begin() + static_cast<std::ptrdiff_t>(i + count + 1)
+                    )
                 );
                 i += count + 1;
             }

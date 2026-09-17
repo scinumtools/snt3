@@ -12,11 +12,11 @@ namespace snt::dip {
         std::string path;   // case path up to last @ sign
         std::string code;   // code line with the case
         std::string expr;   // case logical expression
-        bool value;         // final value of the case
-        size_t branch_id;   // branch ID
-        size_t branch_part; // part on the branch
-        size_t case_id;     // case ID
-        CaseType case_type; // one of the types: case/else/end
+        bool value = false;          // final value of the case
+        size_t branch_id = 0;        // branch ID
+        size_t branch_part = 0;      // part on the branch
+        size_t case_id = 0;          // case ID
+        CaseType case_type = CaseType::IF; // one of the types: case/else/end
     };
 
     /** Branch containing the cases selected during DIPL evaluation. */

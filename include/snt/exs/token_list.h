@@ -45,7 +45,7 @@ namespace snt::exs {
             AtomGrand* a = atoms.append(std::move(at));
             right.push_back(Token(t, a));
         };
-        Token get_left() {
+        Token get_left() override {
             if (left.empty()) {
                 return Token(EMPTY_TOKEN);
             } else {
@@ -54,7 +54,7 @@ namespace snt::exs {
                 return t;
             }
         };
-        Token get_right() {
+        Token get_right() override {
             if (right.empty()) {
                 return Token(EMPTY_TOKEN);
             } else {
@@ -63,12 +63,12 @@ namespace snt::exs {
                 return t;
             }
         };
-        void put_left(Token t) {
+        void put_left(Token t) override {
             if (t.type != EMPTY_TOKEN) {
                 left.push_back(t);
             }
         };
-        void put_right(Token t) {
+        void put_right(Token t) override {
             if (t.type != EMPTY_TOKEN) {
                 right.push_front(t);
             }
@@ -119,17 +119,17 @@ namespace snt::exs {
         /** Format the object as text.
          * @param details Detailed diagnostic explanation.
          */
-        void print(bool details = false) { std::cout << to_string(details) << "\n"; };
+        void print(bool details = false) override { std::cout << to_string(details) << "\n"; };
         std::string to_string(bool details = false) {
             std::stringstream str;
             if (details) {
                 str << "TokenList( ";
-                for (auto i = left.begin(); i != left.end(); ++i) {
-                    str << print_details(i->type, i->optype, i->atom);
+                for (const auto& token : left) {
+                    str << print_details(token.type, token.optype, token.atom);
                 }
                 str << "| ";
-                for (auto i = right.begin(); i != right.end(); ++i) {
-                    str << print_details(i->type, i->optype, i->atom);
+                for (const auto& token : right) {
+                    str << print_details(token.type, token.optype, token.atom);
                 }
                 str << ")\n";
             } else {

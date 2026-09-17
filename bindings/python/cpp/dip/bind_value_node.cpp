@@ -27,7 +27,7 @@ namespace snt::bind::python {
             m, "ValueNodeData", "Evaluated value data returned by DIPL functions and nodes."
         );
         vdata.def(
-            py::init([](py::object value, py::object units) {
+            py::init([](const py::object& value, const py::object& units) {
                 dip::ValueNodeData data;
                 data.value = from_python(value);
                 if (!units.is_none()) {
@@ -46,7 +46,7 @@ namespace snt::bind::python {
 
         val.def(
             py::init(
-                [](const std::string& path, py::object value, py::object units) -> std::shared_ptr<dip::ValueNode> {
+                [](const std::string& path, const py::object& value, const py::object& units) -> std::shared_ptr<dip::ValueNode> {
                     // prepare value
                     val::BaseValue::PointerType val = from_python(value);
                     // prepare quantity

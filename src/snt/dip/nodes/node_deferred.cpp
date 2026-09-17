@@ -9,7 +9,7 @@ namespace snt::dip {
         return {};
     }
 
-    DeferredNode::DeferredNode(BaseNode::PointerType nd) : node(nd), ValueNode(nd, NodeDtype::Deferred) {}
+    DeferredNode::DeferredNode(const BaseNode::PointerType& nd) : node(nd), ValueNode(nd, NodeDtype::Deferred) {}
 
     val::BaseValue::PointerType DeferredNode::cast_scalar_value(const std::string& value_input) const {
         return nullptr;

@@ -3,11 +3,13 @@
 #include <snt/dip/nodes/parser.h>
 #include <snt/dip/solvers/template_solver.h>
 
+#include <utility>
+
 namespace snt::dip {
 
     TemplateSolver::TemplateSolver(Environment& env, Path cur) {
         environment = &env;
-        current = cur;
+        current = std::move(cur);
     }
 
     ValueNodeData TemplateSolver::eval(std::string expression) {

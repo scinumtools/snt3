@@ -5,6 +5,7 @@
 #include <snt/puq/util/display_length.h>
 #include <sstream>
 #include <vector>
+#include <utility>
 
 namespace snt::puq {
 
@@ -21,32 +22,32 @@ namespace snt::puq {
         std::vector<DataTableStruct> settings;
 
       public:
-        DataTable(std::vector<DataTableStruct> s) : settings(s) {};
+        DataTable(std::vector<DataTableStruct> s) : settings(std::move(s)) {};
 
         /** Append an item to the collection.
          * @param columns Column names to append.
          */
-        void append(std::vector<std::string> columns) { data.push_back(columns); };
+        void append(std::vector<std::string> columns) { data.push_back(std::move(columns)); };
 
         std::string to_string() {
             std::stringstream ss;
-            for (size_t i = 0; i < settings.size(); i++) {
-                ss << std::setfill(' ') << std::setw(settings[i].width) << std::left << settings[i].title
+            for (const auto& setting : settings) {
+                ss << std::setfill(' ') << std::setw(setting.width) << std::left << setting.title
                    << std::string(padding, ' ');
             }
             ss << '\n';
-            for (size_t i = 0; i < settings.size(); i++) {
-                if (settings[i].title.size() == 0)
-                    ss << std::string(settings[i].width + padding, ' ');
+            for (const auto& setting : settings) {
+                if (setting.title.empty())
+                    ss << std::string(setting.width + padding, ' ');
                 else
-                    ss << std::setfill(' ') << std::setw(settings[i].width) << std::left
-                       << std::string(settings[i].width, '-') << std::string(padding, ' ');
+                    ss << std::setfill(' ') << std::setw(setting.width) << std::left
+                       << std::string(setting.width, '-') << std::string(padding, ' ');
             }
             ss << '\n';
-            for (size_t row = 0; row < data.size(); row++) {
-                for (size_t col = 0; col < data[row].size(); col++) {
-                    size_t dwidth = data[row][col].size() - display_length(data[row][col]);
-                    ss << std::setfill(' ') << std::setw(settings[col].width + dwidth) << std::left << data[row][col]
+            for (const auto& row : data) {
+                for (size_t col = 0; col < row.size(); col++) {
+                    size_t dwidth = row[col].size() - display_length(row[col]);
+                    ss << std::setfill(' ') << std::setw(static_cast<int>(settings[col].width + dwidth)) << std::left << row[col]
                        << std::string(padding, ' ');
                 }
                 ss << '\n';

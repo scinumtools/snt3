@@ -16,28 +16,28 @@ namespace snt::bind::python {
      * @param value Python object with a value
      * @return Pointer to a SNT array value
      */
-    val::BaseValue::PointerType from_python(py::object value);
+    val::BaseValue::PointerType from_python(const py::object& value);
 
     /**
      * Parse a SNT array value from a python scalar object
      * @param value Python object with a value
      * @return Pointer to a SNT array value
      */
-    val::BaseValue::PointerType from_python_scalar(py::object value);
+    val::BaseValue::PointerType from_python_scalar(const py::object& value);
 
     /**
      * Parse a SNT array value from a python list object
      * @param value Python object with a value
      * @return Pointer to a SNT array value
      */
-    val::BaseValue::PointerType from_python_list(py::object value);
+    val::BaseValue::PointerType from_python_list(const py::object& value);
 
     /**
      * Parse a SNT array value from a numpy array object
      * @param value Python object with a value
      * @return Pointer to a SNT array value
      */
-    val::BaseValue::PointerType from_python_array(py::object value);
+    val::BaseValue::PointerType from_python_array(const py::object& value);
 
 } // namespace snt::bind::python
 

@@ -90,11 +90,11 @@ TEST(Environment, RequestList) {
     std::vector<dip::ValueNode::ListType> list = env.request_list("?jerk.snap");
     EXPECT_EQ(list.size(), 2);
     {
-        dip::ValueNode::ListType nodes = list.at(0);
+        const dip::ValueNode::ListType& nodes = list.at(0);
         EXPECT_EQ(nodes.at(0)->path.name, "foo");
     }
     {
-        dip::ValueNode::ListType nodes = list.at(1);
+        const dip::ValueNode::ListType& nodes = list.at(1);
         EXPECT_EQ(nodes.at(0)->path.name, "bar");
     }
 }

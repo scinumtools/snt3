@@ -17,7 +17,7 @@ namespace snt::puq {
                   {"", std::string(core::SYMBOL_ARRAY_START), std::string(core::SYMBOL_ARRAY_END), ","},
                   ARRAY_OPERATOR
               ) {};
-        void operate_group(exs::TokenListBase* tokens);
+        void operate_group(exs::TokenListBase* tokens) override;
     };
 
 } // namespace snt::puq

@@ -62,7 +62,7 @@ namespace snt::bind::python {
 
         dip.def(
             "add_function_value",
-            [](dip::DIP& self, const std::string& name, py::function func) {
+            [](dip::DIP& self, const std::string& name, const py::function& func) {
                 self.add_function_value(name, [func](const dip::Environment& env) {
                     py::gil_scoped_acquire gil;
                     return func(env).cast<dip::ValueNodeData>();
@@ -73,7 +73,7 @@ namespace snt::bind::python {
 
         dip.def(
             "add_function_nodes",
-            [](dip::DIP& self, const std::string& name, py::function func) {
+            [](dip::DIP& self, const std::string& name, const py::function& func) {
                 self.add_function_nodes(name, [func](const dip::Environment& env) {
                     py::gil_scoped_acquire gil;
                     return func(env).cast<dip::ValueNode::ListType>();

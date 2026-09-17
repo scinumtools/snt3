@@ -77,7 +77,7 @@ namespace snt::dip {
 
     NumericalSolver::NumericalSolver(Environment& env, Path current) {
 
-        NumericalSettings settings = {{}, &env, current};
+        NumericalSettings settings = {{}, &env, std::move(current)};
 
         solver.set_settings(settings);
     }

@@ -33,7 +33,7 @@ namespace snt::dip {
          *
          * @param nd Pointer of a declared non-value node
          */
-        DeferredNode(BaseNode::PointerType nd);
+        DeferredNode(const BaseNode::PointerType& nd);
 
         /**
          * @copydoc BaseNode::parse

@@ -62,12 +62,12 @@ TEST_F(Cursor, TraverseCollections) {
     dip::Cursor group = env["jerk.baz"];
     params_parsed.push_back(group.to_string());
     const std::unordered_map<std::string, dip::Cursor> map = env["jerk.snap"].items();
-    for (auto [key, item] : map) {
+    for (const auto& [key, item] : map) {
         params_parsed.push_back(item.to_string());
         dip::Cursor group = item["bar"];
         if (key == "crackle") {
             const std::vector<dip::Cursor> list = item["pop"].elements();
-            for (auto item : list) {
+            for (const auto& item : list) {
                 params_parsed.push_back(item.to_string());
                 dip::Cursor group = item["foo"];
                 params_parsed.push_back(group.to_string());
@@ -121,16 +121,24 @@ TEST_F(Cursor, ValuesFullPath) {
     EXPECT_EQ(env.nodes.size(), 8);
 
     {
-        bool jerk = env["foo[bar].jerk"].as<bool>();
-        int64_t snap = env["foo[bar].snap"].as<int64_t>();
-        double crackle = env["foo[baz].yippee.crackle"].as<double>();
+        const bool jerk = env["foo[bar].jerk"].as<bool>();
+        const int64_t snap = env["foo[bar].snap"].as<int64_t>();
+        const double crackle = env["foo[baz].yippee.crackle"].as<double>();
         std::string pop = env["foo[baz].yippee.pop"].as<std::string>();
+        EXPECT_TRUE(jerk);
+        EXPECT_EQ(snap, 3);
+        EXPECT_EQ(crackle, 4e5);
+        EXPECT_EQ(pop, "shot");
     }
     {
-        std::array<bool, 3> jerk = env["foo[baz].qux[0].jerk"].as<std::array<bool, 3>>();
-        std::array<int64_t, 3> snap = env["foo[baz].qux[0].snap"].as<std::array<int64_t, 3>>();
-        std::array<double, 2> crackle = env["foo[baz].qux[1].crackle"].as<std::array<double, 2>>();
+        const auto jerk = env["foo[baz].qux[0].jerk"].as<std::array<bool, 3>>();
+        const auto snap = env["foo[baz].qux[0].snap"].as<std::array<int64_t, 3>>();
+        const auto crackle = env["foo[baz].qux[1].crackle"].as<std::array<double, 2>>();
         std::array<std::string, 2> pop = env["foo[baz].qux[1].pop"].as<std::array<std::string, 2>>();
+        EXPECT_EQ(jerk, (std::array<bool, 3>{true, false, true}));
+        EXPECT_EQ(snap, (std::array<int64_t, 3>{3, 2, 1}));
+        EXPECT_EQ(crackle, (std::array<double, 2>{4e5, 34e2}));
+        EXPECT_EQ(pop, (std::array<std::string, 2>{"shot", "puff"}));
     }
     {
         std::vector<bool> jerk = env["foo[baz].qux[0].jerk"].as<std::vector<bool>>();
@@ -145,16 +153,24 @@ TEST_F(Cursor, ValuesPartialPaths) {
     EXPECT_EQ(env.nodes.size(), 8);
 
     {
-        bool jerk = env["foo"]["bar"]["jerk"].as<bool>();
-        int64_t snap = env["foo[bar]"]["snap"].as<int64_t>();
-        double crackle = env["foo"]["baz"]["yippee"]["crackle"].as<double>();
+        const bool jerk = env["foo"]["bar"]["jerk"].as<bool>();
+        const int64_t snap = env["foo[bar]"]["snap"].as<int64_t>();
+        const double crackle = env["foo"]["baz"]["yippee"]["crackle"].as<double>();
         std::string pop = env["foo[baz]"]["yippee.pop"].as<std::string>();
+        EXPECT_TRUE(jerk);
+        EXPECT_EQ(snap, 3);
+        EXPECT_EQ(crackle, 4e5);
+        EXPECT_EQ(pop, "shot");
     }
     {
-        std::array<bool, 3> jerk = env["foo"]["baz"]["qux"][0]["jerk"].as<std::array<bool, 3>>();
-        std::array<int64_t, 3> snap = env["foo[baz]"]["qux[0]"]["snap"].as<std::array<int64_t, 3>>();
-        std::array<double, 2> crackle = env["foo"]["baz"]["qux"][1]["crackle"].as<std::array<double, 2>>();
+        const auto jerk = env["foo"]["baz"]["qux"][0]["jerk"].as<std::array<bool, 3>>();
+        const auto snap = env["foo[baz]"]["qux[0]"]["snap"].as<std::array<int64_t, 3>>();
+        const auto crackle = env["foo"]["baz"]["qux"][1]["crackle"].as<std::array<double, 2>>();
         std::array<std::string, 2> pop = env["foo[baz]"]["qux[1]"]["pop"].as<std::array<std::string, 2>>();
+        EXPECT_EQ(jerk, (std::array<bool, 3>{true, false, true}));
+        EXPECT_EQ(snap, (std::array<int64_t, 3>{3, 2, 1}));
+        EXPECT_EQ(crackle, (std::array<double, 2>{4e5, 34e2}));
+        EXPECT_EQ(pop, (std::array<std::string, 2>{"shot", "puff"}));
     }
 }
 

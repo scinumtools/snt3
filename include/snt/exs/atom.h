@@ -25,7 +25,7 @@ namespace snt::exs {
          *
          * @param a Reference to an atom from which we copy the values
          */
-        Atom(const Atom& a) : AtomBase(a) {};
+        Atom(const Atom& a) = default;
 
         /**
          * Initialise an empty vector of a specific type

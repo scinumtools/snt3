@@ -13,7 +13,7 @@ namespace snt::puq {
         std::string prefix;       ///< Unit prefix, such as k or m
         std::string unit;         ///< Unit symbol
         ExponentVariant exponent; ///< Unit exponent
-        BaseUnit() {};
+        BaseUnit() = default;
         /** Construct an unnamed unit factor with an integer exponent.
          * @param n Integer exponent stored in the factor.
          */
@@ -49,7 +49,7 @@ namespace snt::puq {
       public:
         using ListType = std::vector<BaseUnit>;
         BaseUnits::ListType baseunits; ///< Ordered base-unit factors
-        BaseUnits() {}
+        BaseUnits() = default;
         /** Parse a unit expression into base-unit factors.
          * @param s Unit expression to parse.
          */

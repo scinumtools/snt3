@@ -13,7 +13,7 @@ namespace snt::dip {
         typename T::ListType nodes;
 
       public:
-        NodeList() {};
+        NodeList() = default;
         NodeList(const typename T::ListType& nl) : nodes(nl) {};
         size_t size() const { return nodes.size(); };
         void push_front(const typename T::PointerType& node) { nodes.push_front(node); };

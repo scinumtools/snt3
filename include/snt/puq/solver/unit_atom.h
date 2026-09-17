@@ -13,11 +13,11 @@ namespace snt::puq {
         UnitAtom(const UnitAtom&) = default;
         UnitAtom(Measurement v) : AtomBase(v) {};
         static Measurement from_string(const std::string& s, exs::BaseSettings* set = nullptr);
-        std::string to_string();
+        std::string to_string() override;
         void math_power(ExponentVariant& e);
-        void math_power(UnitAtom* other);
-        void math_multiply(UnitAtom* other);
-        void math_divide(UnitAtom* other);
+        void math_power(UnitAtom* other) override;
+        void math_multiply(UnitAtom* other) override;
+        void math_divide(UnitAtom* other) override;
     };
 
 } // namespace snt::puq

@@ -78,7 +78,7 @@ namespace snt::dip {
         ValueMetadata metadata;
 
         /** Construct an empty value node. */
-        ValueNode() : constant(false) {};
+        ValueNode() : constant(false), value_dtype(core::DataType::None) {};
         /** Copy a value node.
          * @param other Node whose metadata and value are copied.
          */
@@ -125,7 +125,7 @@ namespace snt::dip {
             const NodeDtype dt,
             std::optional<puq::Quantity> unt = std::nullopt
         );
-        virtual ~ValueNode() = default;
+        ~ValueNode() override = default;
         val::BaseValue::PointerType parse_function(
             Environment& env, const std::string& name, std::optional<std::string_view> units
         ) const;
@@ -151,8 +151,8 @@ namespace snt::dip {
          */
         void set_units(const std::optional<puq::Quantity>& units_input = std::nullopt);
         virtual void modify_value(const BaseNode::PointerType& node, Environment& env);
-        virtual bool set_property(PropertyType property, val::Array::StringType& values, std::string& units) override;
-        virtual std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override {
+        bool set_property(PropertyType property, val::Array::StringType& values, std::string& units) override;
+        std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override {
             throw dip::MissingException(
                 "String representation of this value node is not implemented.", __FILE__, __LINE__, line
             );

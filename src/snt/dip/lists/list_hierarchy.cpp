@@ -2,6 +2,7 @@
 #include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_hierarchy.h>
 #include <sstream>
+#include <utility>
 
 namespace snt::dip {
 
@@ -205,7 +206,7 @@ namespace snt::dip {
                 __FILE__,
                 __LINE__
             );
-        collections[path] = Collection{path, {}, kind, schemas};
+        collections[path] = Collection{path, {}, kind, std::move(schemas)};
     }
 
     const bool HierarchyList::has_collection(const std::string& path) const {

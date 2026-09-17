@@ -31,7 +31,7 @@ namespace snt::exs {
          */
         OperatorGroup(const std::string& n, const OperatorGroupSybols& s, const int t)
             : OperatorBase(n, s.prefix + s.open, t), symbols(s) {}
-        virtual void parse(Expression& expr) override {
+        void parse(Expression& expr) override {
             this->groups.clear();
             expr.remove(this->symbol);
             int depth = 1;
@@ -71,8 +71,8 @@ namespace snt::exs {
                 );
             }
         };
-        virtual void operate_group(TokenListBase* tokens) override {}; // this should stay empty
-        virtual void operate_group(TokenListBase* tokens, BaseSettings* settings) override { operate_group(tokens); };
+        void operate_group(TokenListBase* tokens) override {}; // this should stay empty
+        void operate_group(TokenListBase* tokens, BaseSettings* settings) override { operate_group(tokens); };
     };
 
 } // namespace snt::exs

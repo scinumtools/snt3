@@ -30,7 +30,8 @@ namespace snt::dip {
     }
 
     ValueNode::ValueNode(
-        const Path& pth, val::BaseValue::PointerType val, const NodeDtype dt, std::optional<puq::Quantity> unt
+        const Path& pth, val::BaseValue::PointerType val, const NodeDtype dt,
+        std::optional<puq::Quantity> unt
     )
         : constant(false), value_dtype(val->get_dtype()), units(unt), BaseNode(dt) {
         path = pth;
@@ -48,14 +49,15 @@ namespace snt::dip {
     };
 
     ValueNode::ValueNode(const BaseNode::PointerType other, const NodeDtype dt, const core::DataType vdt)
-        : value_dtype(vdt) {
+        : constant(false), value_dtype(vdt) {
         dtype = dt;
         path = other->path;
         indent = other->indent;
         line = other->line;
     }
 
-    ValueNode::ValueNode(const ValueNode::PointerType other, const NodeDtype dt) : value_dtype(other->value_dtype) {
+    ValueNode::ValueNode(const ValueNode::PointerType other, const NodeDtype dt)
+        : constant(false), value_dtype(other->value_dtype) {
         dtype = dt;
         path = other->path;
         indent = other->indent;

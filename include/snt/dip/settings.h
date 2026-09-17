@@ -95,7 +95,7 @@ namespace snt::dip {
 
     struct Source {
         std::string name;
-        size_t line_number;
+        size_t line_number = 0;
     };
 
     struct Line {

@@ -212,7 +212,6 @@ namespace snt::dip {
             auto [source_name, node_path, is_root] = parse_request(request);
             std::string node_path_child = (!node_path.empty()) ? node_path + std::string(1, SIGN_SEPARATOR) : node_path;
             const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
-            size_t p = node_pool.size(); // parent node index
             if (is_root) {
                 // if path is a root, select its children nodes
                 for (size_t i = 0; i < node_pool.size(); i++) {
@@ -227,8 +226,6 @@ namespace snt::dip {
                         ValueNode::PointerType new_vnode =
                             std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
                         new_nodes.push_back(new_vnode);
-                    } else if (vnode && vnode->path.name == node_path) {
-                        p = i;
                     }
                 }
             } else {
@@ -298,7 +295,12 @@ namespace snt::dip {
                     __LINE__
                 );
             for (const auto& item : col.items) {
-                map.insert({item, request_group(request + "[" + item + "]" + std::string(1, SIGN_SEPARATOR))});
+                std::string child_request = request;
+                child_request += '[';
+                child_request += item;
+                child_request += ']';
+                child_request += SIGN_SEPARATOR;
+                map.insert({item, request_group(child_request)});
             }
             break;
         }
@@ -351,7 +353,12 @@ namespace snt::dip {
                 );
 
             for (const auto& item : col.items) {
-                list.push_back(request_group(request + "[" + item + "]" + std::string(1, SIGN_SEPARATOR)));
+                std::string child_request = request;
+                child_request += '[';
+                child_request += item;
+                child_request += ']';
+                child_request += SIGN_SEPARATOR;
+                list.push_back(request_group(child_request));
             }
             break;
         }

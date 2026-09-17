@@ -25,7 +25,7 @@ namespace snt::mat {
         /**
          * Constructor of this class
          */
-        SubstanceSolver() {};
+        SubstanceSolver() = default;
 
         /**
          * Preprocess expression for the solver

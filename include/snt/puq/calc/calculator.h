@@ -10,7 +10,7 @@ namespace snt::puq {
     class Calculator {
       public:
         static exs::Solver<CalculatorAtom> solver;
-        Calculator();
+        Calculator() = default;
         CalculatorAtom eval(const std::string& expression);
     };
 

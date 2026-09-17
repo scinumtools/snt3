@@ -21,7 +21,7 @@ namespace snt::dip {
     struct Collection {
         std::string path;                 ///< Fully qualified path of a collection
         std::vector<std::string> items;   ///< List of collection items
-        Path::Kind kind;                  ///< Collection path kind
+        Path::Kind kind = Path::Kind::None; ///< Collection path kind
         std::vector<std::string> schemas; ///< List of item schemas
     };
 

@@ -4,6 +4,7 @@
 #include <snt/exs/operator_base.h>
 #include <snt/exs/settings.h>
 #include <stdexcept>
+#include <utility>
 
 namespace snt::exs {
 
@@ -18,8 +19,8 @@ namespace snt::exs {
          * @param t Operator type or precedence.
          */
         OperatorTernary(std::string n, std::string s, std::string so, int t)
-            : OperatorBase(n, s, t), symbol_other(so) {}
-        virtual void parse(Expression& expr) override;
+           : OperatorBase(std::move(n), std::move(s), t), symbol_other(std::move(so)) {}
+        void parse(Expression& expr) override;
     };
 
 } // namespace snt::exs

@@ -37,7 +37,7 @@ namespace snt::val {
          * @param dt Target data type flag.
          * @param sh Array shape.
          */
-        BaseValue(core::DataType dt, Array::ShapeType sh) : dtype(dt), shape(sh) {};
+        BaseValue(core::DataType dt, Array::ShapeType sh) : dtype(dt), shape(std::move(sh)) {};
         virtual ~BaseValue() = default;
         virtual void print() = 0;
         /** Format the object as text.

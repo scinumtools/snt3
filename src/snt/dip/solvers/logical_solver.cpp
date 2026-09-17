@@ -44,7 +44,7 @@ namespace snt::dip {
 
     LogicalSolver::LogicalSolver(Environment& env, Path current) {
 
-        LogicalSettings settings = {{}, &env, current};
+        LogicalSettings settings = {{}, &env, std::move(current)};
 
         solver.set_settings(settings);
     }

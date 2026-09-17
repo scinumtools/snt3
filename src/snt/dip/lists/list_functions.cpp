@@ -2,11 +2,12 @@
 #include <snt/dip/lists/list_functions.h>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace snt::dip {
 
     void FunctionList::append_value(const std::string& name, DataFunctionType func) {
-        auto result = data_functions.insert({name, func});
+        auto result = data_functions.insert({name, std::move(func)});
         if (!result.second)
             throw dip::EnvironmentException(
                 "Duplicate value function",
@@ -18,7 +19,7 @@ namespace snt::dip {
     }
 
     void FunctionList::append_nodes(const std::string& name, NodesFunctionType func) {
-        auto result = nodes_functions.insert({name, func});
+        auto result = nodes_functions.insert({name, std::move(func)});
         if (!result.second)
             throw dip::EnvironmentException(
                 "Duplicate table function",

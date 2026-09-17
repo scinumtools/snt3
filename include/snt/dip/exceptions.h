@@ -123,9 +123,9 @@ namespace snt::dip {
                   "",
                   "If you need this functionality, please contact the developers, open an issue or send a pull "
                   "request on GitHub.",
-                  file,
+                  std::move(file),
                   line,
-                  location_line
+                  std::move(location_line)
               ) {};
     };
 

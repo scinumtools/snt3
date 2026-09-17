@@ -21,7 +21,7 @@ namespace snt::exs {
          * @param s Operator symbol or source string.
          * @param t Operator type or precedence.
          */
-        OperatorBase(std::string n, std::string s, int t) : name(n), symbol(s), type(t) {};
+        OperatorBase(std::string n, std::string s, int t) : name(std::move(n)), symbol(std::move(s)), type(t) {};
         virtual ~OperatorBase() = default;
         /** Check whether the expression supports this operator.
          * @param expr Expression being parsed.

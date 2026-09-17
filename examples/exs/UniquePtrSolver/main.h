@@ -2,7 +2,7 @@
 
 using namespace snt;
 
-typedef std::unique_ptr<bool> UniquePtrType;
+using UniquePtrType = std::unique_ptr<bool>;
 
 class LogicalAtom final : public exs::AtomBase<LogicalAtom, UniquePtrType> {
   public:

@@ -92,7 +92,7 @@ namespace snt::dip {
                 }
                 ++pos; // skip ']'
                 Path::Kind type = item.empty() ? Path::Kind::List : Path::Kind::Map;
-                collections.push_back({currentPath, std::move(item), std::move(type)});
+                collections.push_back({currentPath, std::move(item), type});
                 currentPath.clear();
             }
             if (pos >= path.size() || path[pos] != SIGN_SEPARATOR)

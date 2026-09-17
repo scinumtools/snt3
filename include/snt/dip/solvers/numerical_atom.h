@@ -7,7 +7,7 @@
 namespace snt::dip {
 
     struct NumericalSettings : exs::BaseSettings {
-        Environment* env; ///< Environment for the references
+        Environment* env = nullptr; ///< Environment for the references
         Path current;     ///< Current path for in the hierarchy
     };
 

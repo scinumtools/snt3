@@ -16,6 +16,6 @@ namespace snt::mat {
     //     return exs::Solver<MaterialAtom>(operators, steps);
     // }();
 
-    MaterialSolver::MaterialSolver() {}
+    MaterialSolver::MaterialSolver() = default;
 
 } // namespace snt::mat

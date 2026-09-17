@@ -14,15 +14,17 @@ namespace snt::dip {
     class BaseNode : public Node, public std::enable_shared_from_this<BaseNode> {
       public:
         NodeDtype dtype; // data type of a node; in Python this was 'keyword' variable in Node class
-        size_t branch_id;
-        size_t case_id;
+        size_t branch_id = 0;
+        size_t case_id = 0;
         using PointerType = std::shared_ptr<BaseNode>;
         using ListType = std::deque<BaseNode::PointerType>;
         BaseNode() : dtype(NodeDtype::None) {};
         BaseNode(const BaseNode& other) = default;
         BaseNode(const NodeDtype dt) : dtype(dt) {};
-        BaseNode(const Parser& parser, const NodeDtype dt) : dtype(dt), branch_id(0), case_id(0), Node(parser) {};
-        virtual ~BaseNode() = default;
+        BaseNode(const Parser& parser, const NodeDtype dt)
+            : dtype(dt), branch_id(0), case_id(0), Node(parser) {}
+            ;
+        ~BaseNode() override = default;
         /** Parse the supplied expression.
          * @param env Environment providing symbols and configuration.
          */
