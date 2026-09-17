@@ -6,13 +6,13 @@
 namespace snt::val::math {
 
     /** Apply the pow operation to this operand.
-     * @param a Input operand.
-     * @param e Input operand.
+     * @param a First operand.
+     * @param e Exponent value.
      */
     extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, const double e);
     /** Apply the pow operation to this operand.
-     * @param a Input operand.
-     * @param e Input operand.
+     * @param a First operand.
+     * @param e Exponent value.
      */
     extern val::BaseValue::PointerType pow(val::BaseValue::PointerType a, val::BaseValue::PointerType e);
 

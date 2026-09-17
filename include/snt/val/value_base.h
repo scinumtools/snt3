@@ -33,41 +33,78 @@ namespace snt::val {
 
       public:
         using PointerType = std::unique_ptr<BaseValue>;
+        /** Initialize a value with its data type and shape.
+         * @param dt Target data type flag.
+         * @param sh Array shape.
+         */
         BaseValue(core::DataType dt, Array::ShapeType sh) : dtype(dt), shape(sh) {};
         virtual ~BaseValue() = default;
         virtual void print() = 0;
+        /** Format the object as text.
+         * @param format Formatting options controlling the textual representation.
+         */
         virtual std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const = 0;
         Array::ShapeType get_shape() const { return shape; };
         core::DataType get_dtype() const { return dtype; };
         virtual size_t get_size() const = 0;
         virtual BaseValue::PointerType clone() const = 0;
+        /** Convert the value to the requested data type.
+         * @param dt Target data type flag.
+         */
         virtual BaseValue::PointerType cast_as(core::DataType dt) const = 0;
+        /** Return the requested array slice.
+         * @param slice Ranges selecting the requested elements.
+         */
         virtual BaseValue::PointerType slice(const Array::RangeType& slice) = 0;
         // Arithmetic operators
+        /** Add another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType math_add(const BaseValue* other) const {
             throw val::MissingException("Method `math_add` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Add another value in place.
+         * @param other Other value used in the operation.
+         */
         virtual void math_add_equal(const BaseValue* other) {
             throw val::MissingException("Method `math_add_equal` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Subtract another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType math_sub(const BaseValue* other) const {
             throw val::MissingException("Method `math_sub` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Subtract another value in place.
+         * @param other Other value used in the operation.
+         */
         virtual void math_sub_equal(const BaseValue* other) {
             throw val::MissingException("Method `math_sub_equal` is not implemented for this type", __FILE__, __LINE__);
         };
         virtual BaseValue::PointerType math_inv() const {
             throw val::MissingException("Method `math_inv` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Multiply by another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType math_mul(const BaseValue* other) const {
             throw val::MissingException("Method `math_mul` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Multiply by another value in place.
+         * @param other Other value used in the operation.
+         */
         virtual void math_mul_equal(const BaseValue* other) {
             throw val::MissingException("Method `math_mul_equal` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Divide by another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType math_div(const BaseValue* other) const {
             throw val::MissingException("Method `math_div` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Divide by another value in place.
+         * @param other Other value used in the operation.
+         */
         virtual void math_div_equal(const BaseValue* other) {
             throw val::MissingException("Method `math_div_equal` is not implemented for this type", __FILE__, __LINE__);
         };
@@ -111,15 +148,24 @@ namespace snt::val {
         virtual BaseValue::PointerType math_neg() const {
             throw val::MissingException("Method `math_neg` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Raise the value to an element-wise exponent value.
+         * @param other Exponent value represented as another VAL object.
+         */
         virtual BaseValue::PointerType math_pow(const BaseValue* other) const {
             throw val::MissingException("Method `math_pow` is not implemented for this type", __FILE__, __LINE__);
         };
         virtual BaseValue::PointerType math_pow(const double exp) const {
             throw val::MissingException("Method `math_pow` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Return the element-wise maximum with another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType math_max(const BaseValue* other) const {
             throw val::MissingException("Method `math_max` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Return the element-wise minimum with another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType math_min(const BaseValue* other) const {
             throw val::MissingException("Method `math_min` is not implemented for this type", __FILE__, __LINE__);
         };
@@ -127,36 +173,60 @@ namespace snt::val {
             throw val::MissingException("Method `math_inf` is not implemented for this type", __FILE__, __LINE__);
         };
         // Comparison operators
+        /** Compare this value for equality.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType compare_equal(const BaseValue* other) const {
             throw val::MissingException("Method `compare_equal` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Compare this value for inequality.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType compare_not_equal(const BaseValue* other) const {
             throw val::MissingException(
                 "Method `compare_not_equal` is not implemented for this type", __FILE__, __LINE__
             );
         };
+        /** Compare this value as less than another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType compare_less(const BaseValue* other) const {
             throw val::MissingException("Method `compare_less` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Compare this value as greater than another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType compare_greater(const BaseValue* other) const {
             throw val::MissingException(
                 "Method `compare_greater` is not implemented for this type", __FILE__, __LINE__
             );
         };
+        /** Compare this value as less than or equal to another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType compare_less_equal(const BaseValue* other) const {
             throw val::MissingException(
                 "Method `compare_less_equal` is not implemented for this type", __FILE__, __LINE__
             );
         };
+        /** Compare this value as greater than or equal to another value.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType compare_greater_equal(const BaseValue* other) const {
             throw val::MissingException(
                 "Method `compare_greater_equal` is not implemented for this type", __FILE__, __LINE__
             );
         };
         // Logical operators
+        /** Apply a logical AND operation.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType logical_and(const BaseValue* other) const {
             throw val::MissingException("Method `logical_and` is not implemented for this type", __FILE__, __LINE__);
         };
+        /** Apply a logical OR operation.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType logical_or(const BaseValue* other) const {
             throw val::MissingException("Method `logical_or` is not implemented for this type", __FILE__, __LINE__);
         };
@@ -164,6 +234,10 @@ namespace snt::val {
             throw val::MissingException("Method `logical_not` is not implemented for this type", __FILE__, __LINE__);
         };
         // Ternanry operators
+        /** Select values according to a Boolean condition.
+         * @param condition Boolean condition used to select the result.
+         * @param other Other value used in the operation.
+         */
         virtual BaseValue::PointerType where(const BaseValue* condition, const BaseValue* other) const = 0;
         // Qualifiers
         virtual bool any_of() const = 0;

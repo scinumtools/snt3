@@ -5,8 +5,8 @@
 
 namespace snt::val::math {
 
-    /** Apply the log10 operation to this operand.
-     * @param a Input operand.
+    /** Return the element-wise base-10 logarithm of a VAL value.
+     * @param a Value whose logarithm is evaluated.
      */
     extern val::BaseValue::PointerType log10(val::BaseValue::PointerType a);
 

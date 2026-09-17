@@ -13,6 +13,10 @@ namespace snt::exs {
     class StepList {
       public:
         StepListType steps;
+        /** Append one execution step.
+         * @param t Operation category to execute.
+         * @param s Operator identifiers executed for this step.
+         */
         void append(OperationType t, const std::vector<int>& s);
     };
 

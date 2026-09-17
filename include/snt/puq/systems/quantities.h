@@ -8,6 +8,10 @@ struct QuantityStruct {
 };
 using QuantityListType = std::unordered_map<std::string, QuantityStruct>;
 
+/** Add two quantity maps element-wise.
+ * @param map1 First quantity map.
+ * @param map2 Second quantity map.
+ */
 template <typename T>
 std::unordered_map<std::string, T> operator+(
     const std::unordered_map<std::string, T>& map1, const std::unordered_map<std::string, T>& map2

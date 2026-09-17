@@ -28,18 +28,30 @@ namespace snt::puq {
         CUS = 0b10000000, ///< custom unit
     };
 
+    /** Combine two unit-system flags.
+     * @param lhs Left-hand operand or flag set.
+     * @param rhs Right-hand operand or flag set.
+     */
     inline Utype operator|(Utype lhs, Utype rhs) {
         return static_cast<Utype>(
             static_cast<std::underlying_type_t<Utype>>(lhs) | static_cast<std::underlying_type_t<Utype>>(rhs)
         );
     }
 
+    /** Intersect two unit-system flags.
+     * @param lhs Left-hand operand or flag set.
+     * @param rhs Right-hand operand or flag set.
+     */
     inline Utype operator&(Utype lhs, Utype rhs) {
         return static_cast<Utype>(
             static_cast<std::underlying_type_t<Utype>>(lhs) & static_cast<std::underlying_type_t<Utype>>(rhs)
         );
     }
 
+    /** Compute the symmetric difference of two unit-system flags.
+     * @param lhs Left-hand operand or flag set.
+     * @param rhs Right-hand operand or flag set.
+     */
     inline Utype operator^(Utype lhs, Utype rhs) {
         return static_cast<Utype>(
             static_cast<std::underlying_type_t<Utype>>(lhs) ^ static_cast<std::underlying_type_t<Utype>>(rhs)

@@ -77,16 +77,48 @@ namespace snt::dip {
         // metadata
         ValueMetadata metadata;
 
+        /** Construct an empty value node. */
         ValueNode() : constant(false) {};
+        /** Copy a value node.
+         * @param other Node whose metadata and value are copied.
+         */
         ValueNode(const ValueNode& other);
+        /** Construct a value node with a declared value data type.
+         * @param vdt Data type of the stored value.
+         */
         ValueNode(const core::DataType vdt) : constant(false), value_dtype(vdt) {};
+        /** Construct a value node from parser state.
+         * @param parser Parser providing node metadata.
+         * @param dt DIP node data type.
+         * @param vdt Stored value data type.
+         */
         ValueNode(const Parser& parser, const NodeDtype dt, const core::DataType vdt = core::DataType::None)
             : BaseNode(parser, dt), constant(false), value_dtype(vdt) {};
+        /** Construct a value node by copying another node's value.
+         * @param other Source node.
+         * @param dt DIP node data type.
+         * @param vdt Stored value data type.
+         */
         ValueNode(
             const BaseNode::PointerType other, const NodeDtype dt, const core::DataType vdt = core::DataType::None
         );
+        /** Construct a value node from an existing value node.
+         * @param other Source node.
+         * @param dt DIP node data type.
+         */
         ValueNode(const ValueNode::PointerType other, const NodeDtype dt);
+        /** Construct a value node at a path with a value data type.
+         * @param pth Node path.
+         * @param vdt Stored value data type.
+         * @param dt DIP node data type.
+         */
         ValueNode(const Path& pth, const core::DataType vdt, const NodeDtype dt = NodeDtype::None);
+        /** Construct a value node at a path from a value and optional units.
+         * @param pth Node path.
+         * @param val Stored value.
+         * @param dt DIP node data type.
+         * @param unt Optional physical quantity units.
+         */
         ValueNode(
             const Path& pth,
             val::BaseValue::PointerType val,
@@ -110,7 +142,13 @@ namespace snt::dip {
         val::BaseValue::PointerType cast_value(
             const val::Array::StringType& value_input, const val::Array::ShapeType& shape
         ) const;
+        /** Replace the node's stored value and update its value metadata.
+         * @param value_input Owned VAL value; `nullptr` clears the current value.
+         */
         void set_value(val::BaseValue::PointerType value_input = nullptr);
+        /** Replace the physical quantity metadata associated with the node.
+         * @param units_input Quantity metadata to assign; `std::nullopt` removes the units.
+         */
         void set_units(const std::optional<puq::Quantity>& units_input = std::nullopt);
         virtual void modify_value(const BaseNode::PointerType& node, Environment& env);
         virtual bool set_property(PropertyType property, val::Array::StringType& values, std::string& units) override;

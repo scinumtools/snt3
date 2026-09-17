@@ -23,6 +23,9 @@ namespace snt::puq {
       public:
         DataTable(std::vector<DataTableStruct> s) : settings(s) {};
 
+        /** Append an item to the collection.
+         * @param columns Column names to append.
+         */
         void append(std::vector<std::string> columns) { data.push_back(columns); };
 
         std::string to_string() {

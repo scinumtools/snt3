@@ -6,9 +6,6 @@
 namespace snt::val::math {
 
     /** Apply the cube root operation to a value. */
-    /** Apply the cbrt operation to this operand.
-     * @param a Input operand.
-     */
     extern val::BaseValue::PointerType cbrt(val::BaseValue::PointerType a);
 
 } // namespace snt::val::math

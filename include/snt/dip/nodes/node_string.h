@@ -13,10 +13,16 @@ namespace snt::dip {
         ) const override;
 
       public:
+        /** Return a string node when the parser is positioned at a string literal.
+         * @param parser Parser state to inspect.
+         */
         static ValueNode::PointerType is_node(Parser& parser);
+        /** Copy a string node. @param other Node to copy. */
         StringNode(const StringNode& other);
+        /** Construct a string node from a value at a path. */
         StringNode(const Path& pth, val::BaseValue::PointerType val)
             : ValueNode(pth, std::move(val), NodeDtype::String) {};
+        /** Construct a string node from parser input. */
         StringNode(Parser& parser) : ValueNode(parser, NodeDtype::String, core::DataType::String) {};
         BaseNode::ListType parse(Environment& env) override;
         BaseNode::PointerType clone(const Path& pth, std::optional<size_t> indent = std::nullopt) const override;

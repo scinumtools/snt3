@@ -12,11 +12,23 @@ namespace snt::val {
     /** Numeric array value implementation for one scalar storage type. */
     template <typename T> class ArrayValue : public BaseArrayValue<T> {
       public:
+        /** Create a scalar typed array value.
+         * @param val Scalar value to store.
+         * @param dtype Data type tag exposed to callers.
+         */
         ArrayValue(const T& val, const core::DataType dtype) : BaseArrayValue<T>(val, dtype) {};
         ArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh, const core::DataType dtype)
             : BaseArrayValue<T>(arr, sh, dtype) {};
+        /** Create a one-dimensional typed array value.
+         * @param arr Values to store; the shape is set to `{arr.size()}`.
+         * @param dtype Data type tag exposed to callers.
+         */
         ArrayValue(const std::vector<T>& arr, const core::DataType dtype)
             : BaseArrayValue<T>(arr, {arr.size()}, dtype) {};
+        /** Construct a typed array by converting an existing VAL value.
+         * @param other Source value to convert.
+         * @param dtype Data type tag for the new value.
+         */
         ArrayValue(const BaseValue* other, const core::DataType dtype) : BaseArrayValue<T>(other, dtype) {};
 
       public:

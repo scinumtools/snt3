@@ -23,8 +23,14 @@ namespace snt::dip {
         BaseNode(const NodeDtype dt) : dtype(dt) {};
         BaseNode(const Parser& parser, const NodeDtype dt) : dtype(dt), branch_id(0), case_id(0), Node(parser) {};
         virtual ~BaseNode() = default;
+        /** Parse the supplied expression.
+         * @param env Environment providing symbols and configuration.
+         */
         virtual ListType parse(Environment& env);
         virtual bool set_property(PropertyType property, val::Array::StringType& values, std::string& units);
+        /** Format the object as text.
+         * @param format Formatting options controlling the textual representation.
+         */
         virtual std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const;
 
         /**

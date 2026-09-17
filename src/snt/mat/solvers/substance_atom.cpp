@@ -13,8 +13,8 @@ namespace snt::mat {
     inline bool is_integer(const std::string& str) {
         try {
             size_t pos;
-            std::stoi(str, &pos);     // Convert string to int
-            return pos == str.size(); // Ensure entire string was used
+            (void)std::stoi(str, &pos); // Convert string to int
+            return pos == str.size();   // Ensure entire string was used
         } catch (std::invalid_argument&) {
             return false; // Not a number
         } catch (std::out_of_range&) {

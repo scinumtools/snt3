@@ -18,6 +18,9 @@ namespace snt::dip {
         // Deep copy constructor
         LogicalAtom(const LogicalAtom& a)
             : AtomBase({a.value.value ? a.value.value->clone() : nullptr, a.value.units}) {};
+        /** Copy the logical atom value into this object.
+         * @param a Source atom whose value is copied.
+         */
         LogicalAtom& operator=(const LogicalAtom& a);
         // Move constructor
         LogicalAtom(LogicalAtom&& a) noexcept = default;
@@ -32,7 +35,13 @@ namespace snt::dip {
         void comparison_less(LogicalAtom* other) override;
         void comparison_greater(LogicalAtom* other) override;
         void logical_not() override;
+        /** Apply a logical AND operation.
+         * @param other Other value used in the operation.
+         */
         void logical_and(LogicalAtom* other) override;
+        /** Apply a logical OR operation.
+         * @param other Other value used in the operation.
+         */
         void logical_or(LogicalAtom* other) override;
         void custom_defined();
         void custom_not_defined();

@@ -10,15 +10,15 @@ namespace snt::puq {
 namespace snt::puq::math {
 
     /** Apply the log10 operation to this operand.
-     * @param m Input operand.
+     * @param m Result whose estimate and uncertainty are transformed.
      */
     extern puq::Result log10(const puq::Result& m);
     /** Apply the log10 operation to this operand.
-     * @param msr Input operand.
+     * @param msr Measurement whose value and uncertainty are transformed.
      */
     extern puq::Measurement log10(const puq::Measurement& msr);
     /** Apply the log10 operation to this operand.
-     * @param quant Input operand.
+     * @param quant Quantity whose value and uncertainty are transformed.
      */
     extern puq::Quantity log10(const puq::Quantity& quant);
 

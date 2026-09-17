@@ -21,6 +21,10 @@ namespace snt::dip {
 
       public:
         SchemaList();
+        /** Append an item to the collection.
+         * @param name Name used to identify the item.
+         * @param nodes Nodes defining the schema.
+         */
         void append(const std::string& name, BaseNode::ListType& nodes);
         void append(const std::string& name, const EnvSchema& src);
         EnvSchema& at(const std::string& name);

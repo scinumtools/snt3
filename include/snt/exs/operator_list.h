@@ -15,7 +15,14 @@ namespace snt::exs {
       public:
         OperatorListType operators;
         std::vector<int> order;
+        /** Select an operator implementation by type.
+         * @param otype Operator category to select.
+         */
         OperatorBase* select(int otype);
+        /** Append an item to the collection.
+         * @param t Operator type identifier used as the registry key.
+         * @param o Operator implementation to register; ownership is shared.
+         */
         void append(int t, std::shared_ptr<OperatorBase> o);
     };
 

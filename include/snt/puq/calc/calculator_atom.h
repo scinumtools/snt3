@@ -12,6 +12,9 @@ namespace snt::puq {
         CalculatorAtom(Quantity v) : AtomBase(v) {};
         static Quantity from_string(std::string& s, exs::BaseSettings* set = nullptr);
         std::string to_string();
+        /** Add another quantity atom, including its units and uncertainty.
+         * @param other Quantity atom to add; dimensions must be compatible.
+         */
         void math_add(CalculatorAtom* other);
         void math_subtract(CalculatorAtom* other);
         void math_negate();

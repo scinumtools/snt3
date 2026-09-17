@@ -23,24 +23,19 @@ namespace snt::dip {
       public:
         explicit Cursor(const Environment* env, std::string_view path = "");
 
-        /**
-         * Get children nodes
-         *
-         * @return Map of children node cursors
+        /** Return cursors for named children when group traversal is implemented.
+         * @return A map keyed by child name.
+         * @note Group-child traversal is currently not implemented.
          */
         std::unordered_map<std::string, Cursor> children() const;
 
-        /**
-         * Get list elements
-         *
-         * @return Vector of children cursors
+        /** Return cursors for elements of the current sequence node in index order.
+         * @return A vector of element cursors; throws if the cursor is not a sequence.
          */
         std::vector<Cursor> elements() const;
 
-        /**
-         * Get map items
-         *
-         * @return Map of children cursors
+        /** Return cursors for entries of the current mapping node.
+         * @return A map keyed by entry name; throws if the cursor is not a mapping.
          */
         std::unordered_map<std::string, Cursor> items() const;
 
@@ -58,17 +53,13 @@ namespace snt::dip {
          */
         const std::string& get_path() const;
 
-        /**
-         * Get value node at the current cursor path
-         *
-         * @return Pointer to a value node
+        /** Return the value stored at this path.
+         * @return A newly allocated VAL value; throws when the path is absent or not a value node.
          */
         val::BaseValue::PointerType get_value() const;
 
-        /**
-         * Get units of a value node at the current cursor path
-         *
-         * @return Units of a value node
+        /** Return the physical quantity metadata attached to the value at this path.
+         * @return The quantity metadata, or `std::nullopt` when the node has no units.
          */
         std::optional<puq::Quantity> get_units() const;
 
@@ -167,6 +158,7 @@ namespace snt::dip {
         /**
          * Get cursor from a fully qualified path, its part, or a keyed item from a map collection
          *
+         * @param path Relative path, map key, or child name.
          * @return Cursor at the given path
          */
         Cursor operator[](std::string_view path) const;
@@ -174,6 +166,7 @@ namespace snt::dip {
         /**
          * Select indexed item from a list collection
          *
+         * @param index Zero-based list index.
          * @return Item cursor at the given index
          */
         Cursor operator[](size_t index) const;

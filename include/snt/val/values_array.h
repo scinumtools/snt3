@@ -366,6 +366,9 @@ namespace snt::val {
         /*
          * Array slicing
          */
+        /** Create a value containing the selected array ranges.
+         * @param slice Ranges selecting the requested elements.
+         */
         BaseValue::PointerType slice_value(const Array::RangeType& slice) {
             if (slice.size() != this->shape.size())
                 throw val::ArrayException(

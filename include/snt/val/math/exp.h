@@ -5,8 +5,8 @@
 
 namespace snt::val::math {
 
-    /** Apply the exp operation to this operand.
-     * @param e Input operand.
+    /** Return the element-wise exponential of a VAL value.
+     * @param e Value whose exponential is evaluated.
      */
     extern val::BaseValue::PointerType exp(val::BaseValue::PointerType e);
 

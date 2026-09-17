@@ -24,6 +24,11 @@ namespace snt::exs {
       public:
         size_t num_groups = N;
         OperatorGroupSybols symbols;
+        /** Create an operator for grouped function arguments.
+         * @param n Operator or object name.
+         * @param s Delimiters and separator used for grouped arguments.
+         * @param t Operator precedence/type identifier.
+         */
         OperatorGroup(const std::string& n, const OperatorGroupSybols& s, const int t)
             : OperatorBase(n, s.prefix + s.open, t), symbols(s) {}
         virtual void parse(Expression& expr) override {

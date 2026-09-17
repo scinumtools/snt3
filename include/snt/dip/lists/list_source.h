@@ -29,6 +29,12 @@ namespace snt::dip {
 
       public:
         SourceList();
+        /** Append an item to the collection.
+         * @param name Name used to identify the item.
+         * @param path Path identifying the requested node or source.
+         * @param code Source code associated with the source entry.
+         * @param parent Parent source metadata used to preserve include provenance.
+         */
         void append(
             const std::string& name, const std::filesystem::path& path, const std::string& code, const Source& parent
         );

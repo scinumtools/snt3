@@ -41,6 +41,9 @@ namespace snt::exs {
         // Constructor from value
         AtomBase(VALUE v) : value(std::move(v)) {}
         // Copy assignment
+        /** Copy the atom value into this object.
+         * @param a Source atom whose value is copied.
+         */
         AtomBase& operator=(const AtomBase& a) {
             if constexpr (std::is_copy_assignable_v<VALUE>) {
                 value = a.value;
@@ -50,6 +53,9 @@ namespace snt::exs {
             return *this;
         }
         // Move assignment
+        /** Move the atom value into this object.
+         * @param a Source atom whose value is moved.
+         */
         AtomBase& operator=(AtomBase&& a) noexcept {
             if constexpr (std::is_move_assignable_v<VALUE>) {
                 value = std::move(a.value);
@@ -60,6 +66,9 @@ namespace snt::exs {
         }
 
         // Math operations
+        /** Add another value.
+         * @param other Other value used in the operation.
+         */
         virtual void math_add(ATOM* other) {
             throw exs::MissingException("Atom method 'math_add' is not implemented", __FILE__, __LINE__);
         };
@@ -166,6 +175,9 @@ namespace snt::exs {
         };
 
         // Logical operations
+        /** Apply a logical AND operation.
+         * @param other Other value used in the operation.
+         */
         virtual void logical_and(ATOM* other) {
             throw exs::MissingException("Atom method 'logical_and' is not implemented", __FILE__, __LINE__);
         };
@@ -173,6 +185,9 @@ namespace snt::exs {
             auto* casted = static_cast<ATOM*>(other);
             static_cast<ATOM*>(this)->logical_and(casted);
         };
+        /** Apply a logical OR operation.
+         * @param other Other value used in the operation.
+         */
         virtual void logical_or(ATOM* other) {
             throw exs::MissingException("Atom method 'logical_or' is not implemented", __FILE__, __LINE__);
         };

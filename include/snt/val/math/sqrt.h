@@ -5,8 +5,8 @@
 
 namespace snt::val::math {
 
-    /** Apply the sqrt operation to this operand.
-     * @param a Input operand.
+    /** Return the element-wise square root of a VAL value.
+     * @param a Value whose square root is evaluated.
      */
     extern val::BaseValue::PointerType sqrt(val::BaseValue::PointerType a);
 

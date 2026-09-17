@@ -8,8 +8,11 @@
 
 namespace snt::mat {
 
-    /**
-     * Any substance or mixture of substances that can be used to make objects or structures
+    /** A material represented as a set of substances and their composition.
+     *
+     * The set stores substance amounts as `double` values; the interpretation of
+     * those amounts (mass, fraction, or another quantity) follows the material
+     * construction and solver context.
      */
     class Material : public Set<Substance, double>, public Matter {
       public:

@@ -9,7 +9,13 @@
 
 namespace snt::puq {
 
-    /** Physical quantity combining a numerical result with units and a unit system. */
+    /**
+     * A numerical value with optional uncertainty, physical units, and a unit system.
+     *
+     * Quantities preserve the shape of the underlying VAL value. Arithmetic combines
+     * values and derives dimensions according to the unit algebra; addition and
+     * subtraction require compatible dimensions. Conversions return a new quantity.
+     */
     class Quantity {
       private:
         void preprocess(std::string& expression, SystemType& system) const;
@@ -23,18 +29,56 @@ namespace snt::puq {
         ) const;
 
       public:
-        SystemType stype;        ///< Unit system used by this quantity
-        Measurement measurement; ///< Numerical value, uncertainty, and units
+        SystemType stype;        ///< Unit system used to parse and format this quantity.
+        Measurement measurement; ///< Value and absolute uncertainty together with its base units.
+        /// Construct a dimensionless quantity with value one in the current unit system.
         Quantity() : stype(UnitSystem::current.type) {};
+        /// Parse a quantity expression such as `"3.2 m/s"`.
+        /// @param s Quantity expression containing a value and unit expression.
+        /// @param system Unit system used for resolving unit names; `NONE` selects the current system.
         Quantity(std::string s, const SystemType system = SystemType::NONE);
+        /// Construct a quantity from an existing measurement.
+        /// @param v Measurement providing value, uncertainty, and units.
+        /// @param system Unit system associated with the quantity.
         Quantity(const Measurement& v, const SystemType system = UnitSystem::current.type);
+        /// Construct from a numerical result and parse the target unit expression.
+        /// @param m Estimate and optional uncertainty.
+        /// @param s Unit or quantity expression.
+        /// @param system Unit system used to resolve `s`.
         Quantity(const Result& m, std::string s, const SystemType system = SystemType::NONE);
+        /// Construct from a result using the current unit system.
+        /// @param m Estimate and optional uncertainty.
+        /// @param system Unit system associated with the quantity.
         Quantity(const Result& m, const SystemType system = UnitSystem::current.type);
+        /// Construct from a result and explicit base-unit components.
+        /// @param m Estimate and optional uncertainty.
+        /// @param bu Base-unit components describing the dimensions.
+        /// @param system Unit system associated with the quantity.
         Quantity(const Result& m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::current.type);
+        /// Construct a quantity from a scalar and a unit expression.
+        /// @param m Numerical estimate.
+        /// @param s Unit or quantity expression.
+        /// @param system Unit system used to resolve `s`.
         Quantity(const double m, std::string s, const SystemType system = SystemType::NONE);
+        /// Construct a dimensionless scalar quantity.
+        /// @param m Numerical estimate.
+        /// @param system Unit system associated with the quantity.
         Quantity(const double m, const SystemType system = UnitSystem::current.type);
+        /// Construct a scalar quantity from explicit base-unit components.
+        /// @param m Numerical estimate.
+        /// @param bu Base-unit components describing the dimensions.
+        /// @param system Unit system associated with the quantity.
         Quantity(const double m, const BaseUnits::ListType& bu, const SystemType system = UnitSystem::current.type);
+        /// Construct a quantity from an estimate, absolute uncertainty, and unit expression.
+        /// @param m Numerical estimate.
+        /// @param e Absolute uncertainty in the same units as `m`.
+        /// @param s Unit or quantity expression.
+        /// @param system Unit system used to resolve `s`.
         Quantity(const double m, const double e, std::string s, const SystemType system = SystemType::NONE);
+        /// Construct a dimensionless quantity with an absolute uncertainty.
+        /// @param m Numerical estimate.
+        /// @param e Absolute uncertainty matching `m`.
+        /// @param system Unit system associated with the quantity.
         Quantity(const double m, const double e, const SystemType system = UnitSystem::current.type);
         Quantity(
             const double m,
@@ -108,9 +152,21 @@ namespace snt::puq {
         friend Quantity operator+(const Quantity& q);
         friend Quantity operator-(const Quantity& q);
         friend std::ostream& operator<<(std::ostream& os, const Quantity& q);
+        /** Add the right-hand value in place.
+         * @param q Quantity name or expression.
+         */
         void operator+=(Quantity& q);
+        /** Subtract the right-hand value in place.
+         * @param q Quantity name or expression.
+         */
         void operator-=(Quantity& q);
+        /** Multiply by the right-hand value in place.
+         * @param q Quantity name or expression.
+         */
         void operator*=(Quantity& q);
+        /** Divide by the right-hand value in place.
+         * @param q Quantity name or expression.
+         */
         void operator/=(Quantity& q);
         /** Convert to a base-unit representation in the selected system.
          *  @param format Base-unit formatting mode.
@@ -124,13 +180,32 @@ namespace snt::puq {
          */
         Quantity convert(const Quantity& q) const;
         /** Convert to the units represented by a measurement.
-         *  @param uv Measurement providing the target units.
-         *  @return Converted quantity.
+         * @param uv Measurement whose units define the target dimensions and scale.
+         * @return A converted copy; the source quantity is unchanged.
          */
         Quantity convert(const Measurement& uv) const;
+        /** Convert using explicit target units and an optional unit-system context.
+         * @param uv Measurement whose units define the target dimensions and scale.
+         * @param system Unit system used while resolving contextual conversions.
+         * @param q Optional quantity name used by contextual conversion rules.
+         * @return A converted copy; throws when dimensions are incompatible.
+         */
         Quantity convert(const Measurement& uv, const SystemType system, const std::string& q = "") const;
+        /// Convert to explicit base units, preserving the numerical value's shape.
         Quantity convert(const BaseUnits& bu) const;
+        /** Convert to explicit base units in a selected system.
+         * @param bu Target base-unit expression.
+         * @param system Unit system used for contextual conversion rules.
+         * @param q Optional quantity name for contextual conversions.
+         * @return A converted copy; throws when dimensions are incompatible.
+         */
         Quantity convert(const BaseUnits& bu, const SystemType system, const std::string& q = "") const;
+        /** Parse target units and convert to them.
+         * @param s Unit or quantity expression describing the target units.
+         * @param system Unit system used to resolve the expression.
+         * @param q Optional quantity name for contextual conversion rules.
+         * @return A converted copy; throws for invalid or incompatible units.
+         */
         Quantity convert(std::string s, SystemType system = SystemType::NONE, const std::string& q = "") const;
         /** Re-express units using their base prefixes. */
         Quantity rebase_prefixes();

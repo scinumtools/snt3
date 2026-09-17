@@ -11,6 +11,12 @@ namespace snt::exs {
     class OperatorTernary : public OperatorBase {
       public:
         std::string symbol_other;
+        /** Create a ternary operator.
+         * @param n Operator or object name.
+         * @param s Operator symbol or source string.
+         * @param so Secondary operator symbol.
+         * @param t Operator type or precedence.
+         */
         OperatorTernary(std::string n, std::string s, std::string so, int t)
             : OperatorBase(n, s, t), symbol_other(so) {}
         virtual void parse(Expression& expr) override;

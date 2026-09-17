@@ -17,6 +17,9 @@ namespace snt::dip {
         NumericalAtom(ValueNodeData b) : AtomBase({std::move(b.value), std::move(b.units)}) {};
         // Deep copy constructor
         NumericalAtom(const NumericalAtom& a);
+        /** Copy the numerical atom value into this object.
+         * @param a Source atom whose value is copied.
+         */
         NumericalAtom& operator=(const NumericalAtom& a);
         // Move constructor
         NumericalAtom(NumericalAtom&& a) noexcept = default;
@@ -37,6 +40,9 @@ namespace snt::dip {
         void math_power(NumericalAtom* other) override;
         void math_multiply(NumericalAtom* other) override;
         void math_divide(NumericalAtom* other) override;
+        /** Add another value.
+         * @param other Other value used in the operation.
+         */
         void math_add(NumericalAtom* other) override;
         void math_subtract(NumericalAtom* other) override;
         void math_negate() override;

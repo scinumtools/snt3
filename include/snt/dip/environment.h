@@ -144,6 +144,7 @@ namespace snt::dip {
         /**
          * Get cursor from a fully qualified path
          *
+         * @param path Relative or fully qualified DIPL path.
          * @return Cursor at the given path
          */
         Cursor operator[](std::string_view path) const;

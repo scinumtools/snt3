@@ -14,10 +14,16 @@ namespace snt::dip {
         ) const override;
 
       public:
+        /** Return a Boolean node when the parser is positioned at a Boolean literal.
+         * @param parser Parser state to inspect.
+         */
         static ValueNode::PointerType is_node(Parser& parser);
+        /** Copy a Boolean node. @param other Node to copy. */
         BooleanNode(const BooleanNode& other);
+        /** Construct a Boolean node at a path from an existing value. */
         BooleanNode(const Path& pth, val::BaseValue::PointerType val)
             : ValueNode(pth, std::move(val), NodeDtype::Boolean) {};
+        /** Construct a Boolean node from parser input. */
         BooleanNode(Parser& parser) : ValueNode(parser, NodeDtype::Boolean, core::DataType::Boolean) {};
         BaseNode::ListType parse(Environment& env) override;
         BaseNode::PointerType clone(const Path& pth, std::optional<size_t> indent = std::nullopt) const override;

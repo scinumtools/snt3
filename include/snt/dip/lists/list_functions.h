@@ -22,6 +22,9 @@ namespace snt::dip {
       public:
         void append_value(const std::string& name, DataFunctionType func);
         void append_nodes(const std::string& name, NodesFunctionType func);
+        /** Return the registered value-producing function.
+         * @param name Function name to look up.
+         */
         DataFunctionType get_value(const std::string& name) const;
         NodesFunctionType get_nodes(const std::string& name) const;
     };

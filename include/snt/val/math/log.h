@@ -5,8 +5,8 @@
 
 namespace snt::val::math {
 
-    /** Apply the log operation to this operand.
-     * @param a Input operand.
+    /** Return the element-wise natural logarithm of a VAL value.
+     * @param a Value whose logarithm is evaluated.
      */
     extern val::BaseValue::PointerType log(val::BaseValue::PointerType a);
 

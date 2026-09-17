@@ -12,6 +12,9 @@ namespace snt::exs {
     class AtomList {
       public:
         std::vector<std::unique_ptr<AtomGrand>> atoms;
+        /** Append an item to the collection.
+         * @param a First operand.
+         */
         AtomGrand* append(std::unique_ptr<AtomGrand> a);
     };
 

@@ -13,7 +13,12 @@
 
 namespace snt::puq {
 
-    /** Converts values between compatible unit systems and dimensions. */
+    /** Converts values between two compatible unit expressions.
+     *
+     * The converter is created with source and target units. Linear, logarithmic,
+     * and temperature conversions are selected from those unit definitions. A
+     * conversion with incompatible dimensions raises `ConverterException`.
+     */
     class Converter {
       private:
         BaseUnits baseunits1;
@@ -27,8 +32,19 @@ namespace snt::puq {
         Dimensions dimensions1;
         Dimensions dimensions2;
         Converter() : utype(Utype::NUL) {};
+        /// Construct a converter between two explicit unit expressions.
+        /// @param bu1 Source units.
+        /// @param bu2 Target units; must have compatible dimensions with `bu1`.
         Converter(const BaseUnits& bu1, const BaseUnits& bu2);
+        /// Construct a converter by parsing source and target unit expressions.
+        /// @param s1 Source unit expression.
+        /// @param s2 Target unit expression.
         Converter(const std::string& s1, const std::string& s2) : Converter(BaseUnits(s1), BaseUnits(s2)) {};
+        /** Convert a result from the source units to the target units.
+         * @param m1 Value (and optional uncertainty) to convert.
+         * @param m2 Context value required by contextual conversion rules; defaults to one.
+         * @return Converted result with uncertainty propagated through the conversion.
+         */
         Result convert(const Result& m1, const Result& m2 = 1);
     };
 

@@ -19,6 +19,9 @@ namespace snt::puq {
         Dimensions(const double m, const double e);
         Dimensions(const double m, const double e, const BaseDimensions& p)
             : utype(Utype::NUL), numerical(m, e), physical(p) {};
+        /** Format the object as text.
+         * @param format Formatting options controlling the textual representation.
+         */
         std::string to_string(const UnitFormat& format = UnitFormat()) const;
 
         /**
@@ -29,7 +32,13 @@ namespace snt::puq {
         bool has_dimensions() const;
 
         friend std::ostream& operator<<(std::ostream& os, const Dimensions& d);
+        /** Compare two dimension descriptors, including numerical and physical parts.
+         * @param d Dimension descriptor to compare.
+         */
         bool operator==(const Dimensions& d) const;
+        /** Compare two dimension descriptors for inequality.
+         * @param d Dimension descriptor to compare.
+         */
         bool operator!=(const Dimensions& d) const;
     };
 

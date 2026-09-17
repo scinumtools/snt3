@@ -8,13 +8,26 @@
 
 namespace snt::puq {
 
-    /** Numerical result associated with a set of physical base units. */
+    /** Numerical estimate and absolute uncertainty associated with physical base units.
+     *
+     * The `result` and `baseunits` members describe one object: arithmetic propagates
+     * uncertainty and combines dimensions, while conversion changes only the unit
+     * representation and numerical scale.
+     */
     class Measurement {
       public:
-        Result result;       ///< Numerical estimate and uncertainty
-        BaseUnits baseunits; ///< Units associated with the result
+        Result result;       ///< Estimate and optional absolute uncertainty; arrays retain their shape.
+        BaseUnits baseunits; ///< Physical dimensions and units attached to the estimate.
 
+        /** Convert an absolute uncertainty to a relative uncertainty.
+         * @param v Central value.
+         * @param a Absolute uncertainty in the same units as `v`.
+         */
         static double abs_to_rel(const double v, const double a);
+        /** Convert a relative uncertainty to an absolute uncertainty.
+         * @param v Central value.
+         * @param r Relative uncertainty expressed as a fraction of `v`.
+         */
         static double rel_to_abs(const double v, const double r);
         static val::BaseValue::PointerType abs_to_rel(val::BaseValue::PointerType v, val::BaseValue::PointerType a);
         static val::BaseValue::PointerType rel_to_abs(val::BaseValue::PointerType v, val::BaseValue::PointerType r);
@@ -68,9 +81,21 @@ namespace snt::puq {
         friend Measurement operator+(const Measurement& msr);
         friend Measurement operator-(const Measurement& msr);
         friend std::ostream& operator<<(std::ostream& os, const Measurement& msr);
+        /** Add the right-hand value in place.
+         * @param msr Measurement whose units or value are used.
+         */
         void operator+=(const Measurement& msr);
+        /** Subtract the right-hand value in place.
+         * @param msr Measurement whose units or value are used.
+         */
         void operator-=(const Measurement& msr);
+        /** Multiply by the right-hand value in place.
+         * @param msr Measurement whose units or value are used.
+         */
         void operator*=(const Measurement& msr);
+        /** Divide by the right-hand value in place.
+         * @param msr Measurement whose units or value are used.
+         */
         void operator/=(const Measurement& msr);
         // void pow(const ExponentVariant& exp);
         /** Convert to a selected base-unit representation. */

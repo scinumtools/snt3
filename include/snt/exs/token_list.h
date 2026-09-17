@@ -24,9 +24,20 @@ namespace snt::exs {
         BaseSettings* settings;
         AtomList atoms;
         TokenList(OperatorList* o, BaseSettings* set = nullptr) : operators(o), settings(set) {};
+        /** Append a token with no integer payload.
+         * @param t Token category.
+         */
         void append(TokenType t) { right.push_back(Token(t)); };
+        /** Append a token carrying an integer payload.
+         * @param t Token category.
+         * @param o Integer token payload, such as an operator index.
+         */
         void append(TokenType t, int o) { right.push_back(Token(t, o)); };
         // void append(TokenType t, std::string s) {
+        /** Append a token that owns an expression atom.
+         * @param t Token category.
+         * @param at Atom stored in the token list.
+         */
         //   AtomGrand* a = atoms.append(s, settings);
         //   right.push_back(Token(t, a));
         // };
@@ -105,6 +116,9 @@ namespace snt::exs {
             // print(true);
             // std::cout << std::endl;
         };
+        /** Format the object as text.
+         * @param details Detailed diagnostic explanation.
+         */
         void print(bool details = false) { std::cout << to_string(details) << "\n"; };
         std::string to_string(bool details = false) {
             std::stringstream str;

@@ -12,7 +12,16 @@ namespace snt::val {
     /** String array value implementation. */
     template <> class ArrayValue<std::string> : public BaseArrayValue<std::string> {
       public:
+        /** Create a scalar string value.
+         * @param val String value to store.
+         * @param dtype Data type tag exposed to callers.
+         */
         ArrayValue(const std::string& val, const core::DataType dtype) : BaseArrayValue(val, dtype) {};
+        /** Create a string array with an explicit shape.
+         * @param arr String values to store.
+         * @param sh Shape whose product must match `arr.size()`.
+         * @param dtype Data type tag exposed to callers.
+         */
         ArrayValue(const val::Array::StringType& arr, const val::Array::ShapeType& sh, const core::DataType dtype)
             : BaseArrayValue(arr, sh, dtype) {};
         ArrayValue(const val::Array::StringType& arr, const core::DataType dtype)
