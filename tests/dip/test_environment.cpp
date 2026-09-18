@@ -3,8 +3,44 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
+
+namespace {
+    dip::Environment parsed_environment() {
+        dip::DIP parser;
+        parser.add_string(
+            "title str = \"C++ environment\"\n"
+            "simulation\n"
+            "  steps int = 100\n"
+            "  timestep float = 0.5 fs\n"
+            "  enabled bool = true"
+        );
+        return parser.parse();
+    }
+} // namespace
+
+TEST(Environment, Load) {
+    dip::Environment env = parsed_environment();
+    ASSERT_EQ(env.nodes.size(), 4);
+
+    EXPECT_THROW(env.load("environment.h5"), dip::MissingException);
+}
+
+TEST(Environment, Save) {
+    dip::Environment env = parsed_environment();
+    ASSERT_EQ(env.nodes.size(), 4);
+
+    EXPECT_THROW(env.save("environment.h5"), dip::MissingException);
+}
+
+TEST(Environment, Generate) {
+    dip::Environment env = parsed_environment();
+    ASSERT_EQ(env.nodes.size(), 4);
+
+    EXPECT_THROW(env.generate(dip::OutputFormat::JSON, "parameters.json"), dip::MissingException);
+}
 
 TEST(Environment, RequestValue) {
 

@@ -3,3 +3,7 @@ target_include_directories(snt-c PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE
 target_link_libraries(snt-c PUBLIC snt-puq snt-dip)
 install(TARGETS snt-c EXPORT TargetsSNT ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+if(ENABLE_CABI_GTEST)
+    add_subdirectory(tests)
+endif()

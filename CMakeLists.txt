@@ -100,7 +100,12 @@ option(ENABLE_UNIT_TESTS "Main testing enabler" ON)  # switch off all tests
 message(STATUS "ENABLE_UNIT_TESTS            ${ENABLE_UNIT_TESTS}")
 option(ENABLE_BINDING_PYTHON "Main Python bind enabler" ON)  # switch off all pybinds 
 option(ENABLE_BINDING_C "Build the C ABI binding" ON)
+option(ENABLE_CABI_GTEST "Enable C ABI gtests" "${ENABLE_UNIT_TESTS}")
+if(NOT ENABLE_UNIT_TESTS OR NOT ENABLE_BINDING_C)
+    set(ENABLE_CABI_GTEST OFF CACHE BOOL "" FORCE)
+endif()
 message(STATUS "ENABLE_BINDING_PYTHON        ${ENABLE_BINDING_PYTHON}")
+message(STATUS "ENABLE_CABI_GTEST            ${ENABLE_CABI_GTEST}")
 message(STATUS "     Module  GTests  PyBind  PyTests")
 set_module_options(CORE ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 set_module_options(EXS ON OFF "${ENABLE_UNIT_TESTS}")
