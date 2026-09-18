@@ -28,7 +28,7 @@ namespace snt::dip {
     /**
      * List of available DIP generators that produce static parameter lists
      */
-    enum class OutputFormat {
+    enum class ExportFormat {
         CPP,
         C,
         FORTRAN,
@@ -76,7 +76,7 @@ namespace snt::dip {
          * @param format Output format of a generated parameter list
          * @param file File name of the generated parameter list
          */
-        void generate(OutputFormat format, const std::filesystem::path& file) const;
+        void generate(ExportFormat format, const std::filesystem::path& file) const;
 
         /**
          * Get a source code

@@ -37,7 +37,7 @@ namespace snt::dip {
 
     Environment::Environment() = default;
 
-    void Environment::generate(OutputFormat, const std::filesystem::path&) const {
+    void Environment::generate(ExportFormat, const std::filesystem::path&) const {
         throw dip::MissingException("Generating a static parameter list is not implemented yet.", __FILE__, __LINE__);
     }
 

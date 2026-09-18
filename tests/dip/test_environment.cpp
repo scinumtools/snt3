@@ -213,7 +213,7 @@ TEST(Environment, Generate) {
     dip::Environment env = parsed_environment();
     ASSERT_EQ(env.nodes.size(), 8);
 
-    EXPECT_THROW(env.generate(dip::OutputFormat::JSON, "parameters.json"), dip::MissingException);
+    EXPECT_THROW(env.generate(dip::ExportFormat::JSON, "parameters.json"), dip::MissingException);
 }
 
 TEST(Environment, RequestValue) {

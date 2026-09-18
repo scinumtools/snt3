@@ -6,6 +6,6 @@ DIP = _dip.DIP
 ValueNode = _dip.ValueNode
 ValueNodeData = _dip.ValueNodeData
 PathKind = _dip.PathKind
-OutputFormat = _dip.OutputFormat
+ExportFormat = _dip.ExportFormat
 
 PybindException = _dip.PybindException

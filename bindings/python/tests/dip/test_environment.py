@@ -1,6 +1,6 @@
 import pytest
 
-from scinumtools3.dip import DIP, Environment, OutputFormat
+from scinumtools3.dip import DIP, Environment, ExportFormat
 
 
 @pytest.fixture
@@ -50,4 +50,4 @@ def test_generate(env, tmp_path):
     assert env.size == 7
 
     with pytest.raises(RuntimeError, match="Generating a static parameter list is not implemented yet"):
-        env.generate(OutputFormat.JSON, tmp_path / "parameters.json")
+    env.generate(ExportFormat.JSON, tmp_path / "parameters.json")

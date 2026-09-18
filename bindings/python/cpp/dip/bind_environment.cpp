@@ -17,18 +17,18 @@ namespace snt::bind::python {
 
     void init_environment(py::module_& m) {
 
-        auto output_format =
-            py::enum_<dip::OutputFormat>(m, "OutputFormat", "Output format for generated parameter lists.");
-        output_format.value("CPP", dip::OutputFormat::CPP);
-        output_format.value("C", dip::OutputFormat::C);
-        output_format.value("FORTRAN", dip::OutputFormat::FORTRAN);
-        output_format.value("RUST", dip::OutputFormat::RUST);
-        output_format.value("R", dip::OutputFormat::R);
-        output_format.value("JULIA", dip::OutputFormat::JULIA);
-        output_format.value("JSON", dip::OutputFormat::JSON);
-        output_format.value("TOML", dip::OutputFormat::TOML);
-        output_format.value("YAML", dip::OutputFormat::YAML);
-        output_format.export_values();
+        auto export_format =
+            py::enum_<dip::ExportFormat>(m, "ExportFormat", "Export format for generated parameter lists.");
+        export_format.value("CPP", dip::ExportFormat::CPP);
+        export_format.value("C", dip::ExportFormat::C);
+        export_format.value("FORTRAN", dip::ExportFormat::FORTRAN);
+        export_format.value("RUST", dip::ExportFormat::RUST);
+        export_format.value("R", dip::ExportFormat::R);
+        export_format.value("JULIA", dip::ExportFormat::JULIA);
+        export_format.value("JSON", dip::ExportFormat::JSON);
+        export_format.value("TOML", dip::ExportFormat::TOML);
+        export_format.value("YAML", dip::ExportFormat::YAML);
+        export_format.export_values();
 
         auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList", "Sequence of evaluated DIPL value nodes.");
         nl.def(py::init<>(), "Create an empty node list.");

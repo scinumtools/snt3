@@ -31,26 +31,26 @@ void ok(snt_dip_error* error) {
     }
 }
 
-snt::dip::OutputFormat output_format(snt_dip_output_format format) {
+snt::dip::ExportFormat export_format(snt_dip_export_format format) {
     switch (format) {
     case SNT_DIP_OUTPUT_CPP:
-        return snt::dip::OutputFormat::CPP;
+        return snt::dip::ExportFormat::CPP;
     case SNT_DIP_OUTPUT_C:
-        return snt::dip::OutputFormat::C;
+        return snt::dip::ExportFormat::C;
     case SNT_DIP_OUTPUT_FORTRAN:
-        return snt::dip::OutputFormat::FORTRAN;
+        return snt::dip::ExportFormat::FORTRAN;
     case SNT_DIP_OUTPUT_RUST:
-        return snt::dip::OutputFormat::RUST;
+        return snt::dip::ExportFormat::RUST;
     case SNT_DIP_OUTPUT_R:
-        return snt::dip::OutputFormat::R;
+        return snt::dip::ExportFormat::R;
     case SNT_DIP_OUTPUT_JULIA:
-        return snt::dip::OutputFormat::JULIA;
+        return snt::dip::ExportFormat::JULIA;
     case SNT_DIP_OUTPUT_JSON:
-        return snt::dip::OutputFormat::JSON;
+        return snt::dip::ExportFormat::JSON;
     case SNT_DIP_OUTPUT_TOML:
-        return snt::dip::OutputFormat::TOML;
+        return snt::dip::ExportFormat::TOML;
     case SNT_DIP_OUTPUT_YAML:
-        return snt::dip::OutputFormat::YAML;
+        return snt::dip::ExportFormat::YAML;
     default:
         throw std::invalid_argument("invalid DIP output format");
     }
@@ -152,12 +152,12 @@ extern "C" int snt_dip_environment_save(snt_dip* dip, const char* path, snt_dip_
 }
 
 extern "C" int snt_dip_environment_generate(
-    snt_dip* dip, snt_dip_output_format format, const char* path, snt_dip_error* error
+    snt_dip* dip, snt_dip_export_format format, const char* path, snt_dip_error* error
 ) {
     try {
         if (!dip || !path)
             throw std::invalid_argument("DIP and filename are required");
-        dip->env.generate(output_format(format), path);
+        dip->env.generate(export_format(format), path);
         ok(error);
         return 0;
     } catch (const std::exception& exception) {

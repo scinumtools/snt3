@@ -26,7 +26,7 @@ typedef enum {
     SNT_DIP_OUTPUT_JSON,
     SNT_DIP_OUTPUT_TOML,
     SNT_DIP_OUTPUT_YAML,
-} snt_dip_output_format;
+} snt_dip_export_format;
 
 /** Create a DIPL parser. */
 int snt_dip_parser_create(snt_dip** result, snt_dip_error* error);
@@ -44,7 +44,7 @@ int snt_dip_environment_load(snt_dip* dip, const char* path, snt_dip_error* erro
 int snt_dip_environment_save(snt_dip* dip, const char* path, snt_dip_error* error);
 /** Generate a static parameter list from the environment. */
 int snt_dip_environment_generate(
-    snt_dip* dip, snt_dip_output_format format, const char* path, snt_dip_error* error
+    snt_dip* dip, snt_dip_export_format format, const char* path, snt_dip_error* error
 );
 /** Release a DIPL parser. Accepts null. */
 void snt_dip_parser_free(snt_dip* dip);
