@@ -149,19 +149,20 @@ TEST(Environment, SaveHdf5Content) {
     const auto file = environment_file("save-content");
     parsed_environment().save(file);
 
-    H5Handle hdf5_file(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
-    ASSERT_GE(hdf5_file, 0);
-    expect_hdf5_string_attribute(hdf5_file, "_DIPL_Format", "SciNumTools3 Environment");
+    {
+        H5Handle hdf5_file(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
+        ASSERT_GE(hdf5_file, 0);
+        expect_hdf5_string_attribute(hdf5_file, "_DIPL_Format", "SciNumTools3 Environment");
 
-    H5Handle version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version", H5P_DEFAULT), H5Aclose);
-    uint64_t version = 0;
-    ASSERT_GE(H5Aread(version_attribute, H5T_NATIVE_UINT64, &version), 0);
-    EXPECT_EQ(version, 1);
+        H5Handle version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version", H5P_DEFAULT), H5Aclose);
+        uint64_t version = 0;
+        ASSERT_GE(H5Aread(version_attribute, H5T_NATIVE_UINT64, &version), 0);
+        EXPECT_EQ(version, 1);
 
-    ASSERT_GT(H5Lexists(hdf5_file, "/simulation", H5P_DEFAULT), 0);
-    H5Handle simulation(H5Gopen2(hdf5_file, "/simulation", H5P_DEFAULT), H5Gclose);
-    expect_hdf5_string_attribute(simulation, "_DIPL_Kind", "group");
-    expect_hdf5_string_attribute(simulation, "_DIPL_Path", "simulation");
+        ASSERT_GT(H5Lexists(hdf5_file, "/simulation", H5P_DEFAULT), 0);
+        H5Handle simulation(H5Gopen2(hdf5_file, "/simulation", H5P_DEFAULT), H5Gclose);
+        expect_hdf5_string_attribute(simulation, "_DIPL_Kind", "group");
+        expect_hdf5_string_attribute(simulation, "_DIPL_Path", "simulation");
 
     H5Handle steps(H5Dopen2(hdf5_file, "/simulation/steps", H5P_DEFAULT), H5Dclose);
     H5Handle steps_space(H5Dget_space(steps), H5Sclose);
@@ -202,6 +203,8 @@ TEST(Environment, SaveHdf5Content) {
     expect_hdf5_string_attribute(title, "description", "Environment round-trip fixture");
     EXPECT_GT(H5Aexists(title, "_DIPL_Tags"), 0);
     EXPECT_GT(H5Aexists(title, "_DIPL_Options"), 0);
+
+    }
 
     std::filesystem::remove(file);
 }
