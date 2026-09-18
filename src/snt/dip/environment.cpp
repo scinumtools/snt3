@@ -1,6 +1,7 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
+#include "generate/export.h"
 #include <snt/dip/nodes/node_value.h>
 #include <snt/exs/exceptions.h>
 #include <unordered_set>
@@ -37,8 +38,8 @@ namespace snt::dip {
 
     Environment::Environment() = default;
 
-    void Environment::generate(ExportFormat, const std::filesystem::path&) const {
-        throw dip::MissingException("Generating a static parameter list is not implemented yet.", __FILE__, __LINE__);
+    void Environment::generate(ExportFormat format, const std::filesystem::path& file) const {
+        generate::write(*this, format, file);
     }
 
     std::string Environment::request_code(const std::string& source_name) const {
