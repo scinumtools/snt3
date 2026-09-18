@@ -80,6 +80,7 @@ python -c "import scinumtools3"
 
 [tool.cibuildwheel.linux]
 
+before-all = "yum install -y hdf5-devel"
 before-build = "pip install pybind11"
 
 # ------------------------
