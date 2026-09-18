@@ -58,6 +58,28 @@ units, and ``--request`` selects a node:
 
 Repeat ``--input`` to combine sources before evaluating a request.
 
+Environment persistence
+-----------------------
+
+Use ``--save`` to write the full evaluated environment to a DIPH5 file.
+Use ``--load`` instead of ``--input`` to query saved parameters without
+reevaluating their DIPL sources:
+
+.. code-block:: bash
+
+   snt dip parse --input string "simulation.steps int = 100" --save parameters.diph5
+   snt dip parse --load parameters.diph5 --print
+   snt dip parse --load parameters.diph5 --request simulation.steps --value --type integer
+   snt dip parse --load parameters.diph5 --save copy.diph5
+
+``--load`` cannot be combined with any ``--input``. ``--save`` overwrites an
+existing file and does not require ``--print`` or ``--value``. It saves the
+entire environment even when ``--request`` or ``--tags`` restricts printed
+output. If output validation fails, the destination is not written.
+File errors are reported on standard error with a nonzero exit status.
+See :doc:`DIP environment persistence <../modules/dip/persistence>` for
+the format and its limitations.
+
 Values for shell scripts
 ------------------------
 

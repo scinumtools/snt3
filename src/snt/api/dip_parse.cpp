@@ -9,6 +9,15 @@
 namespace snt::api {
 
     void DIPParse::argument_add(const std::string& add_type, const std::vector<std::string>& add_values) {
+        if (!load_file.empty()) {
+            throw api::ArgumentException(
+                "Conflicting DIP inputs",
+                "A DIPH5 input is already configured.",
+                "Use either DIPL inputs or a DIPH5 load, not both.",
+                __FILE__,
+                __LINE__
+            );
+        }
         if (add_type == "file" && add_values.size() == 1) {
             dip.add_file(add_values[0]);
         } else if (add_type == "string" && add_values.size() == 1) {
@@ -26,6 +35,34 @@ namespace snt::api {
                 __LINE__
             );
         }
+        has_input = true;
+    }
+
+    void DIPParse::argument_load(const std::string& file) {
+        if (has_input) {
+            throw api::ArgumentException(
+                "Conflicting DIP inputs",
+                "DIPL inputs are already configured.",
+                "Use either DIPL inputs or a DIPH5 load, not both.",
+                __FILE__,
+                __LINE__
+            );
+        }
+        if (file.empty()) {
+            throw api::ArgumentException(
+                "Invalid load path", "The file path is empty.", "Provide a DIPH5 input file path.", __FILE__, __LINE__
+            );
+        }
+        load_file = file;
+    }
+
+    void DIPParse::argument_save(const std::string& file) {
+        if (file.empty()) {
+            throw api::ArgumentException(
+                "Invalid save path", "The file path is empty.", "Provide a DIPH5 output file path.", __FILE__, __LINE__
+            );
+        }
+        save_file = file;
     }
 
     void DIPParse::argument_request(const std::string& path) {
@@ -55,8 +92,12 @@ namespace snt::api {
     }
 
     std::string DIPParse::execute() {
-        // parse code
-        dip::Environment env = dip.parse();
+        // Parse DIPL or restore an already evaluated environment.
+        dip::Environment env;
+        if (load_file.empty())
+            env = dip.parse();
+        else
+            env.load(load_file);
 
         // request nodes
         dip::ValueNode::ListType vnodes;
@@ -106,13 +147,15 @@ namespace snt::api {
             core::StringFormatType format;
             format.stringQuotes = false;
             format.valuePrecision = std::numeric_limits<double>::max_digits10;
-            return node->value->to_string(format) + '\n';
+            ss << node->value->to_string(format) << '\n';
         }
         if (print == PrintOptions::ALL) {
             for (const auto& node : vnodes) {
                 ss << node->path.name << " = " << node->to_string() << '\n';
             }
         }
+        if (!save_file.empty())
+            env.save(save_file);
         return ss.str();
     }
 

@@ -80,6 +80,9 @@ unit expressions. The PUQ unit solver and calculator are built on the
 calculations to be parsed and evaluated using the same general mechanism
 as other SciNumTools expression languages.
 
+* :doc:`PUQ C++ API <../api/puq>` — command-oriented evaluation, conversion,
+  inspection, and definition listing.
+
 .. _dip-dimensional-input-parameters:
 
 DIP — Dimensional Input Parameters
@@ -108,6 +111,8 @@ calculated*, and *what constraints it must satisfy*.
   and input sources.
 * :doc:`Environment persistence <dip/persistence>` — saving and loading
   evaluated environments in DIPH5 format from C++.
+* :doc:`DIP C++ API <../api/dip>` — command-oriented DIPL parsing and DIPH5
+  loading and saving.
 
 .. toctree::
    :maxdepth: 1
@@ -151,11 +156,6 @@ This allows the same PUEL quantities and DIPL parameter definitions to be
 used consistently across different applications and services, providing a
 common interface for defining, querying, evaluating, and exchanging
 scientific data.
-
-.. toctree::
-   :maxdepth: 1
-
-   api
 
 Module Architecture
 -------------------

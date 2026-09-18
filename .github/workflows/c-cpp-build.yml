@@ -59,12 +59,13 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtest-dev pybind11-dev
+          sudo apt-get install -y libgtest-dev libhdf5-dev pybind11-dev
           
       - name: macOS dependencies
         if: runner.os == 'macOS'
         run: |
-          brew install googletest pybind11
+          brew install googletest hdf5 pybind11
+          echo "HDF5_ROOT=$(brew --prefix hdf5)" >> "$GITHUB_ENV"
 
       - name: Set up MSVC
         if: runner.os == 'Windows'

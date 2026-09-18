@@ -87,6 +87,31 @@ Save evaluated parameters to a DIPH5 file and restore them through
 See :doc:`Environment persistence <../modules/dip/persistence>` for the
 format, save/load behavior, and current limitations.
 
+The command-oriented API also supports persistence. Configure the command
+with ``argument_save()`` or ``argument_load()``; the file is written or read
+when ``execute()`` is called:
+
+.. code-block:: python
+
+   from scinumtools3.api.dip import DIPParse
+
+   save = DIPParse()
+   save.argument_add("string", ["simulation.steps int = 100"])
+   save.argument_save("parameters.diph5")
+   save.execute()
+
+   load = DIPParse()
+   load.argument_load("parameters.diph5")
+   load.argument_request("simulation.steps")
+   load.argument_value("integer")
+   assert load.execute() == "100\n"
+
+``argument_load()`` cannot be combined with ``argument_add()``. Saving
+overwrites the destination and always includes the full environment,
+regardless of request or tag filters. Output validation must succeed before
+saving. These command methods take file paths as strings; use ``str(path)``
+for a ``pathlib.Path``.
+
 Python values and NumPy
 -----------------------
 

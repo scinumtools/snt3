@@ -78,6 +78,23 @@ namespace snt::dip::hdf5 {
 
             PersistedValueNode(const Path& path, core::DataType value_type, NodeDtype node_type)
                 : ValueNode(path, value_type, node_type) {}
+
+            BaseNode::PointerType clone(const Path& path, std::optional<size_t> indent = std::nullopt) const override {
+                auto copy = std::make_shared<PersistedValueNode>(*this);
+                copy->path = path;
+                if (indent)
+                    copy->indent = *indent;
+                return copy;
+            }
+
+            std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override {
+                if (!value)
+                    return std::string(core::KEYWORD_NONE);
+                std::string output = value->to_string(format);
+                if (units)
+                    output += " " + units->to_string();
+                return output;
+            }
         };
 
         Id string_type(size_t size) {

@@ -29,6 +29,11 @@ module.
 Each module overview links to topic pages that group related types and
 operations, such as quantities, unit systems, or DIPL nodes.
 
+The application-facing API overview is split by domain:
+
+* :doc:`PUQ API <puq>` — evaluation, conversion, inspection, and listing.
+* :doc:`DIP API <dip>` — DIPL parsing and DIPH5 loading and saving.
+
 .. toctree::
    :maxdepth: 1
 
@@ -39,6 +44,8 @@ operations, such as quantities, unit systems, or DIPL nodes.
    cpp_dip
    cpp_mat
    cpp_api
+   puq
+   dip
 
 Python API
 ----------

@@ -2,8 +2,8 @@
 #include "main.h"
 #include "snt/api/dip_parse.h"
 
-#include <deque>
 #include <cstddef>
+#include <deque>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -30,6 +30,11 @@ Options:
       Show version information.
   -i,--input <type> [<name>] <value>
       Add a new source type (file/string/unit/source). Unit and source input require name and value.
+  --load <file>
+      Load an evaluated DIPH5 environment instead of --input.
+  --save <file>
+      Save the full environment as DIPH5, overwriting the file.
+      Request and tag filters affect printed output only.
   -r,--request <query>
       Request specific nodes (e.g. "family.father").
   --print
@@ -42,6 +47,9 @@ Options:
 
 Examples:
   snt dip parse -i file parameters.dip --print
+
+  snt dip parse -i file parameters.dip --save parameters.diph5
+  snt dip parse --load parameters.diph5 --print
 
   snt dip parse \
       -i file parameters.dip \
@@ -62,6 +70,8 @@ void module_dip(ArgParser& argpar) {
 
     api::DIPParse cmd;
     bool has_input = false;
+    bool has_load = false;
+    bool has_save = false;
     bool has_request = false;
     bool print = false;
     bool value = false;
@@ -87,6 +97,16 @@ void module_dip(ArgParser& argpar) {
                 i += count + 1;
             }
             has_input = true;
+        } else if (key == "--load") {
+            if (values.size() != 1 || has_load)
+                throw std::runtime_error("Specify exactly one --load file.");
+            cmd.argument_load(values.front());
+            has_load = true;
+        } else if (key == "--save") {
+            if (values.size() != 1 || has_save)
+                throw std::runtime_error("Specify exactly one --save file.");
+            cmd.argument_save(values.front());
+            has_save = true;
         } else if (key == "-r" || key == "--request") {
             if (values.size() != 1 || has_request)
                 throw std::runtime_error("Specify exactly one request.");
@@ -111,8 +131,8 @@ void module_dip(ArgParser& argpar) {
             throw std::runtime_error("Unknown DIP option: " + key);
         }
     }
-    if (!has_input)
-        throw std::runtime_error("Specify a DIP input with --input.");
+    if (!has_input && !has_load)
+        throw std::runtime_error("Specify a DIP input with --input or --load.");
     if (print && value)
         throw std::runtime_error("Use either --print or --value.");
     if (!type.empty() && !value)

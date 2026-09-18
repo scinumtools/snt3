@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 #include "snt/api/dip_parse.h"
+#include "snt/api/exceptions.h"
+#include "snt/dip/cursor.h"
 
 #include <filesystem>
 #include <fstream>
@@ -160,4 +162,103 @@ TEST_F(DIPCommands, ScalarRejectsArrayAndUnits) {
         scalar.argument_value();
         EXPECT_THROW(scalar.execute(), std::exception);
     }
+}
+
+class DIPPersistenceCommands : public DIPCommands {
+  protected:
+    std::filesystem::path file;
+
+    void SetUp() override {
+        DIPCommands::SetUp();
+        file = std::filesystem::temp_directory_path() /
+               (std::string("snt-api-") + ::testing::UnitTest::GetInstance()->current_test_info()->name() + ".diph5");
+    }
+
+    void TearDown() override { std::filesystem::remove(file); }
+
+    void prepare_file() {
+        dip::DIP parser;
+        parser.add_string("simulation.steps int = 100\nsimulation.enabled bool = true\n");
+        auto env = parser.parse();
+        env.save(file);
+    }
+};
+
+TEST_F(DIPPersistenceCommands, Save) {
+    cmd.argument_save(file.string());
+    EXPECT_EQ(cmd.execute(), "");
+    ASSERT_TRUE(std::filesystem::exists(file));
+    dip::Environment env;
+    env.load(file);
+    EXPECT_EQ(env["foo[bar].snap"].as<int64_t>(), 3);
+    EXPECT_TRUE(env["foo[bar].jerk"].as<bool>());
+}
+
+TEST_F(DIPPersistenceCommands, Load) {
+    prepare_file();
+    api::DIPParse loaded;
+    loaded.argument_load(file.string());
+    loaded.argument_request("simulation.steps");
+    loaded.argument_value("integer");
+    EXPECT_EQ(loaded.execute(), "100\n");
+}
+
+TEST_F(DIPPersistenceCommands, SaveIgnoresOutputFilters) {
+    cmd.argument_request("foo[bar].snap");
+    cmd.argument_value("integer");
+    cmd.argument_save(file.string());
+    EXPECT_EQ(cmd.execute(), "3\n");
+    dip::Environment env;
+    env.load(file);
+    EXPECT_TRUE(env["foo[bar].jerk"].as<bool>());
+}
+
+TEST_F(DIPPersistenceCommands, LoadAndSaveSameFile) {
+    prepare_file();
+    api::DIPParse loaded;
+    loaded.argument_load(file.string());
+    loaded.argument_save(file.string());
+    loaded.argument_print();
+    EXPECT_NE(loaded.execute().find("simulation.steps = 100"), std::string::npos);
+    dip::Environment env;
+    env.load(file);
+    EXPECT_EQ(env["simulation.steps"].as<int64_t>(), 100);
+}
+
+TEST_F(DIPPersistenceCommands, FailedQueryDoesNotOverwrite) {
+    prepare_file();
+    cmd.argument_save(file.string());
+    cmd.argument_request("foo[bar].snap");
+    cmd.argument_value("bool");
+    EXPECT_THROW(cmd.execute(), api::ArgumentException);
+    dip::Environment env;
+    env.load(file);
+    EXPECT_EQ(env["simulation.steps"].as<int64_t>(), 100);
+}
+
+TEST_F(DIPPersistenceCommands, RejectsMixedInputs) {
+    EXPECT_THROW(cmd.argument_load(file.string()), api::ArgumentException);
+    for (const auto& kind : {"file", "string", "source", "unit"}) {
+        api::DIPParse loaded;
+        loaded.argument_load(file.string());
+        EXPECT_THROW(loaded.argument_add(kind, {"unused"}), api::ArgumentException);
+    }
+}
+
+TEST_F(DIPPersistenceCommands, RejectsEmptyPaths) {
+    api::DIPParse loaded;
+    EXPECT_THROW(loaded.argument_load(""), api::ArgumentException);
+    EXPECT_THROW(cmd.argument_save(""), api::ArgumentException);
+}
+
+TEST_F(DIPPersistenceCommands, LoadFailure) {
+    api::DIPParse loaded;
+    loaded.argument_load((file / "missing.diph5").string());
+    EXPECT_THROW(loaded.execute(), std::exception);
+}
+
+TEST_F(DIPPersistenceCommands, SaveFailure) {
+    prepare_file();
+    cmd.argument_save((file / "invalid.diph5").string());
+    EXPECT_THROW(cmd.execute(), std::exception);
 }

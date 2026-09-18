@@ -25,6 +25,9 @@ namespace snt::api {
         std::vector<std::string> tags; ///< List of node tags that should be selected
         PrintOptions print;            ///< Printing option
         std::string value_type;        ///< Optional scalar output type constraint
+        std::string load_file;         ///< Optional DIPH5 input path
+        std::string save_file;         ///< Optional DIPH5 output path
+        bool has_input = false;        ///< Whether DIPL inputs have been added
 
       public:
         /**
@@ -39,6 +42,15 @@ namespace snt::api {
          * @param add_values Code input values
          **/
         void argument_add(const std::string& add_type, const std::vector<std::string>& add_values);
+
+        /// Load an evaluated DIPH5 environment during execute(), instead of parsing.
+        /// Cannot be combined with argument_add(). The file path must be nonempty.
+        void argument_load(const std::string& file);
+
+        /// Save the complete evaluated environment during execute(), overwriting file.
+        /// Request/tag filters affect text output only. The file path must be nonempty.
+        /// Saving occurs after successful output validation.
+        void argument_save(const std::string& file);
 
         /**
          * Set a request path

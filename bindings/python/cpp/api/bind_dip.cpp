@@ -24,6 +24,19 @@ namespace snt::bind::python {
         command.def("argument_request", &api::DIPParse::argument_request, py::arg("path"), "Select a DIPL node path.");
 
         command.def(
+            "argument_load",
+            &api::DIPParse::argument_load,
+            py::arg("file"),
+            "Load a DIPH5 environment on execute(), instead of DIPL inputs."
+        );
+        command.def(
+            "argument_save",
+            &api::DIPParse::argument_save,
+            py::arg("file"),
+            "Save the full environment on execute(), overwriting the file; output filters do not limit the saved nodes."
+        );
+
+        command.def(
             "argument_tags",
             &api::DIPParse::argument_tags,
             py::arg("tags"),
@@ -31,6 +44,13 @@ namespace snt::bind::python {
         );
 
         command.def("argument_print", &api::DIPParse::argument_print, "Request named, formatted output.");
+
+        command.def(
+            "argument_value",
+            &api::DIPParse::argument_value,
+            py::arg("type") = "",
+            "Request one defined, unitless scalar, optionally requiring bool, integer, float, or string."
+        );
 
         command.def("execute", &api::DIPParse::execute, "Execute the configured DIPL query.");
     }

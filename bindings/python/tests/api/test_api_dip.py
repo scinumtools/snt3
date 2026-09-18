@@ -3,6 +3,60 @@ import tempfile
 import os
 
 from scinumtools3.api.dip import DIPParse
+from scinumtools3.dip import DIP, Environment
+
+
+def test_save(tmp_path):
+    file = tmp_path / "parameters.diph5"
+    c = DIPParse()
+    c.argument_add("string", ["simulation.steps int = 100\nsimulation.enabled bool = true\n"])
+    c.argument_request("simulation.steps")
+    c.argument_value("integer")
+    c.argument_save(str(file))
+    assert not file.exists()  # Configuration does not perform I/O.
+    assert c.execute() == "100\n"
+    env = Environment()
+    env.load(file)
+    assert env["simulation.steps"].value == 100
+    assert env["simulation.enabled"].value is True
+
+
+def test_load(tmp_path):
+    file = tmp_path / "parameters.diph5"
+    dip = DIP()
+    dip.add_string("simulation.steps int = 100\n")
+    env = dip.parse()
+    env.save(file)
+    c = DIPParse()
+    c.argument_load(str(file))
+    c.argument_print()
+    assert c.execute() == "simulation.steps = 100\n"
+
+
+def test_load_rejects_dipl_inputs(tmp_path):
+    c = DIPParse()
+    c.argument_load(str(tmp_path / "parameters.diph5"))
+    with pytest.raises(RuntimeError, match="Conflicting DIP inputs"):
+        c.argument_add("string", ["steps int = 100"])
+    c = DIPParse()
+    c.argument_add("string", ["steps int = 100"])
+    with pytest.raises(RuntimeError, match="Conflicting DIP inputs"):
+        c.argument_load(str(tmp_path / "parameters.diph5"))
+
+
+def test_load_failure(tmp_path):
+    c = DIPParse()
+    c.argument_load(str(tmp_path / "missing.diph5"))
+    with pytest.raises(RuntimeError):
+        c.execute()
+
+
+def test_save_failure(tmp_path):
+    c = DIPParse()
+    c.argument_add("string", ["steps int = 100"])
+    c.argument_save(str(tmp_path / "missing" / "parameters.diph5"))
+    with pytest.raises(RuntimeError):
+        c.execute()
 
 def test_add_string():
 

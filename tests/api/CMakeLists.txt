@@ -23,3 +23,13 @@ gtest_discover_tests(${EXEC_NAME}
 )
 
 enable_coverage(${EXEC_NAME})
+
+if(TARGET snt)
+  add_test(
+    NAME cli.dip.persistence
+    COMMAND ${CMAKE_COMMAND}
+      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/dip-persistence"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/dip_persistence.cmake"
+  )
+endif()

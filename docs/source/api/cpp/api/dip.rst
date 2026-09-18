@@ -1,7 +1,8 @@
 DIPL commands
 =============
 
-Parse DIPL sources and request output for application interfaces.
+Parse DIPL sources or load evaluated DIPH5 environments, request formatted
+output, and save environments for application interfaces.
 
 .. doxygentopic:: snt::api
    :members:

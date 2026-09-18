@@ -103,6 +103,36 @@ TEST(Environment, Load) {
     std::filesystem::remove(file);
 }
 
+TEST(Environment, QueryLoadedNodes) {
+    const auto file = environment_file("query-loaded");
+    const auto source = parsed_environment();
+    source.save(file);
+    dip::Environment env;
+    env.load(file);
+
+    const auto expected = source.request_group("?");
+    const auto actual = env.request_group("?");
+    ASSERT_EQ(actual.size(), expected.size());
+    for (const auto& node : actual) {
+        ASSERT_NE(node, nullptr);
+        const auto original = source.get_node(node->path.name);
+        ASSERT_NE(original, nullptr);
+        EXPECT_EQ(node->to_string(), original->to_string());
+        EXPECT_NE(node.get(), env.get_node(node->path.name).get());
+    }
+    const auto selected = env.request_group("?", dip::RequestType::Reference, {"hdf5"});
+    ASSERT_EQ(selected.size(), 1);
+    ASSERT_EQ(selected.front()->options.size(), 2);
+    EXPECT_EQ(selected.front()->options[1].value->to_string(), "\"Other\"");
+    EXPECT_EQ(selected.front()->metadata.description, "Environment round-trip fixture");
+    const auto steps = env.request_group("?simulation.steps");
+    ASSERT_EQ(steps.size(), 1);
+    EXPECT_EQ(steps.front()->path.name, "steps");
+    EXPECT_EQ(steps.front()->to_string(), "100");
+
+    std::filesystem::remove(file);
+}
+
 TEST(Environment, Save) {
     const auto file = environment_file("save");
     dip::Environment env = parsed_environment();
