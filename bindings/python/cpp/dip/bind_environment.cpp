@@ -5,6 +5,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl/filesystem.h>
 #include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/lists/list_node.h>
@@ -15,6 +16,19 @@ namespace py = pybind11;
 namespace snt::bind::python {
 
     void init_environment(py::module_& m) {
+
+        auto output_format =
+            py::enum_<dip::OutputFormat>(m, "OutputFormat", "Output format for generated parameter lists.");
+        output_format.value("CPP", dip::OutputFormat::CPP);
+        output_format.value("C", dip::OutputFormat::C);
+        output_format.value("FORTRAN", dip::OutputFormat::FORTRAN);
+        output_format.value("RUST", dip::OutputFormat::RUST);
+        output_format.value("R", dip::OutputFormat::R);
+        output_format.value("JULIA", dip::OutputFormat::JULIA);
+        output_format.value("JSON", dip::OutputFormat::JSON);
+        output_format.value("TOML", dip::OutputFormat::TOML);
+        output_format.value("YAML", dip::OutputFormat::YAML);
+        output_format.export_values();
 
         auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList", "Sequence of evaluated DIPL value nodes.");
         nl.def(py::init<>(), "Create an empty node list.");
@@ -35,6 +49,16 @@ namespace snt::bind::python {
         );
         env.def_property_readonly(
             "size", [](const dip::Environment& e) { return e.nodes.size(); }, "Number of top-level nodes."
+        );
+
+        env.def("load", &dip::Environment::load, py::arg("file"), "Load an environment from an HDF5 file.");
+        env.def("save", &dip::Environment::save, py::arg("file"), "Save the environment to an HDF5 file.");
+        env.def(
+            "generate",
+            &dip::Environment::generate,
+            py::arg("format"),
+            py::arg("file"),
+            "Generate a static parameter list."
         );
 
         env.def(

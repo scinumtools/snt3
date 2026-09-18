@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 from scinumtools3.puq import Quantity
-from scinumtools3.dip import DIP, Environment, ValueNode
+from scinumtools3.dip import DIP, Environment, OutputFormat, ValueNode
 
 def test_print():
     dip = DIP()
@@ -18,6 +18,18 @@ def test_print():
     assert str(env) == "Environment"
     assert repr(env) == "Environment"
     assert env.to_string() == "Environment"
+
+def test_environment_io_placeholders(tmp_path):
+    env = Environment()
+
+    with pytest.raises(RuntimeError, match="Loading an environment from HDF5 is not implemented yet"):
+        env.load(tmp_path / "environment.h5")
+
+    with pytest.raises(RuntimeError, match="Saving an environment to HDF5 is not implemented yet"):
+        env.save(tmp_path / "environment.h5")
+
+    with pytest.raises(RuntimeError, match="Generating a static parameter list is not implemented yet"):
+        env.generate(OutputFormat.JSON, tmp_path / "parameters.json")
 
 def test_context_manager():
 

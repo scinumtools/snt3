@@ -15,6 +15,19 @@ typedef struct {
     const char* message;
 } snt_dip_error;
 
+/** Output format for generated parameter lists. */
+typedef enum {
+    SNT_DIP_OUTPUT_CPP,
+    SNT_DIP_OUTPUT_C,
+    SNT_DIP_OUTPUT_FORTRAN,
+    SNT_DIP_OUTPUT_RUST,
+    SNT_DIP_OUTPUT_R,
+    SNT_DIP_OUTPUT_JULIA,
+    SNT_DIP_OUTPUT_JSON,
+    SNT_DIP_OUTPUT_TOML,
+    SNT_DIP_OUTPUT_YAML,
+} snt_dip_output_format;
+
 /** Create a DIPL parser. */
 int snt_dip_parser_create(snt_dip** result, snt_dip_error* error);
 /** Add DIPL source text to a parser. */
@@ -25,6 +38,14 @@ int snt_dip_parser_add_file(snt_dip* dip, const char* path, snt_dip_error* error
 int snt_dip_parser_parse(snt_dip* dip, snt_dip_error* error);
 /** Format a parsed DIPL value into a caller-provided buffer. */
 int snt_dip_parser_get(const snt_dip* dip, const char* path, char* buffer, size_t capacity, snt_dip_error* error);
+/** Load the environment from an HDF5 file. */
+int snt_dip_environment_load(snt_dip* dip, const char* path, snt_dip_error* error);
+/** Save the environment to an HDF5 file. */
+int snt_dip_environment_save(snt_dip* dip, const char* path, snt_dip_error* error);
+/** Generate a static parameter list from the environment. */
+int snt_dip_environment_generate(
+    snt_dip* dip, snt_dip_output_format format, const char* path, snt_dip_error* error
+);
 /** Release a DIPL parser. Accepts null. */
 void snt_dip_parser_free(snt_dip* dip);
 

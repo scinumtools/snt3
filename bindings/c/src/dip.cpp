@@ -30,6 +30,31 @@ void ok(snt_dip_error* error) {
         error->message = nullptr;
     }
 }
+
+snt::dip::OutputFormat output_format(snt_dip_output_format format) {
+    switch (format) {
+    case SNT_DIP_OUTPUT_CPP:
+        return snt::dip::OutputFormat::CPP;
+    case SNT_DIP_OUTPUT_C:
+        return snt::dip::OutputFormat::C;
+    case SNT_DIP_OUTPUT_FORTRAN:
+        return snt::dip::OutputFormat::FORTRAN;
+    case SNT_DIP_OUTPUT_RUST:
+        return snt::dip::OutputFormat::RUST;
+    case SNT_DIP_OUTPUT_R:
+        return snt::dip::OutputFormat::R;
+    case SNT_DIP_OUTPUT_JULIA:
+        return snt::dip::OutputFormat::JULIA;
+    case SNT_DIP_OUTPUT_JSON:
+        return snt::dip::OutputFormat::JSON;
+    case SNT_DIP_OUTPUT_TOML:
+        return snt::dip::OutputFormat::TOML;
+    case SNT_DIP_OUTPUT_YAML:
+        return snt::dip::OutputFormat::YAML;
+    default:
+        throw std::invalid_argument("invalid DIP output format");
+    }
+}
 } // namespace
 
 extern "C" int snt_dip_parser_create(snt_dip** result, snt_dip_error* error) {
@@ -94,6 +119,45 @@ extern "C" int snt_dip_parser_get(
         if (output.size() + 1 > capacity)
             throw std::invalid_argument("output buffer is too small");
         std::memcpy(buffer, output.c_str(), output.size() + 1);
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
+extern "C" int snt_dip_environment_load(snt_dip* dip, const char* path, snt_dip_error* error) {
+    try {
+        if (!dip || !path)
+            throw std::invalid_argument("DIP and filename are required");
+        dip->env.load(path);
+        dip->parsed = true;
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
+extern "C" int snt_dip_environment_save(snt_dip* dip, const char* path, snt_dip_error* error) {
+    try {
+        if (!dip || !path)
+            throw std::invalid_argument("DIP and filename are required");
+        dip->env.save(path);
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
+extern "C" int snt_dip_environment_generate(
+    snt_dip* dip, snt_dip_output_format format, const char* path, snt_dip_error* error
+) {
+    try {
+        if (!dip || !path)
+            throw std::invalid_argument("DIP and filename are required");
+        dip->env.generate(output_format(format), path);
         ok(error);
         return 0;
     } catch (const std::exception& exception) {

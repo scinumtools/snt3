@@ -3,6 +3,7 @@
 
 #include "nodes/node_value.h"
 
+#include <filesystem>
 #include <optional>
 #include <snt/dip/lists/list_branching.h>
 #include <snt/dip/lists/list_functions.h>
@@ -25,6 +26,21 @@ namespace snt::dip {
     };
 
     /**
+     * List of available DIP generators that produce static parameter lists
+     */
+    enum class OutputFormat {
+        CPP,
+        C,
+        FORTRAN,
+        RUST,
+        R,
+        JULIA,
+        JSON,
+        TOML,
+        YAML,
+    };
+
+    /**
      * Object of this class holds the whole DIP parsing environment
      */
     class Environment {
@@ -42,6 +58,25 @@ namespace snt::dip {
          * Constructor of the Environment class
          */
         Environment();
+
+        /**
+         * Load DIP environment from a HDF5 file
+         * @param file File name of the environment file
+         */
+        void load(const std::filesystem::path& file);
+
+        /**
+         * Save DIP environment into a HDF5 file
+         * @param file File name of the environment file
+         */
+        void save(const std::filesystem::path& file);
+
+        /**
+         * Generate static parameter lists from the environment nodes
+         * @param format Output format of a generated parameter list
+         * @param file File name of the generated parameter list
+         */
+        void generate(OutputFormat format, const std::filesystem::path& file);
 
         /**
          * Get a source code

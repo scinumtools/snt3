@@ -10,21 +10,6 @@
 
 namespace snt::dip {
 
-    /**
-     * List of available DIP generators that produce static parameter lists
-     */
-    enum class OutputFormat {
-        CPP,
-        C,
-        FORTRAN,
-        RUST,
-        R,
-        JULIA,
-        JSON,
-        TOML,
-        YAML,
-    };
-
     class DIP {
       private:
         static int num_instances; ///< counter of DIP class instances
@@ -107,25 +92,6 @@ namespace snt::dip {
          * Parse DIPL code lines
          */
         Environment parse();
-
-        /**
-         * Load DIP environment from a HDF5 file
-         * @param file File name of the enviroment file
-         */
-        void load(const std::filesystem::path& file);
-
-        /**
-         * Save DIP environment into a HDF5 file
-         * @param file File name of the enviroment file
-         */
-        void save(const std::filesystem::path& file);
-
-        /**
-         * Generate static parameter lists from the environment nodes
-         * @param file File name of the generated parameter list
-         * @param format Output format of a generated parameter list
-         */
-        void generate(const std::filesystem::path& file, OutputFormat format);
 
         /**
          * Get a string representation of the current DIPL instance

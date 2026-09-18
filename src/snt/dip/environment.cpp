@@ -37,6 +37,18 @@ namespace snt::dip {
 
     Environment::Environment() = default;
 
+    void Environment::load(const std::filesystem::path&) {
+        throw dip::MissingException("Loading an environment from HDF5 is not implemented yet.", __FILE__, __LINE__);
+    }
+
+    void Environment::save(const std::filesystem::path&) {
+        throw dip::MissingException("Saving an environment to HDF5 is not implemented yet.", __FILE__, __LINE__);
+    }
+
+    void Environment::generate(OutputFormat, const std::filesystem::path&) {
+        throw dip::MissingException("Generating a static parameter list is not implemented yet.", __FILE__, __LINE__);
+    }
+
     std::string Environment::request_code(const std::string& source_name) const {
         return sources.at(source_name).code;
     }
