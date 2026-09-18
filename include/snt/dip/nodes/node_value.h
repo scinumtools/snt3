@@ -51,14 +51,13 @@ namespace snt::dip {
             const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
         ) const = 0;
 
-      protected:
+      public:
         struct OptionStruct {
             val::BaseValue::PointerType value;
             std::string value_raw;
             std::string units_raw;
         };
 
-      public:
         core::DataType value_dtype;
         using PointerType = std::shared_ptr<ValueNode>;
         using ListType = std::deque<ValueNode::PointerType>;

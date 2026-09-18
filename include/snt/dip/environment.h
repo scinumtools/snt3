@@ -69,14 +69,14 @@ namespace snt::dip {
          * Save DIP environment into a HDF5 file
          * @param file File name of the environment file
          */
-        void save(const std::filesystem::path& file);
+        void save(const std::filesystem::path& file) const;
 
         /**
          * Generate static parameter lists from the environment nodes
          * @param format Output format of a generated parameter list
          * @param file File name of the generated parameter list
          */
-        void generate(OutputFormat format, const std::filesystem::path& file);
+        void generate(OutputFormat format, const std::filesystem::path& file) const;
 
         /**
          * Get a source code

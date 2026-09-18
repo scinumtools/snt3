@@ -19,10 +19,10 @@ namespace snt::dip {
      * Information about a collection, keyed or indexed
      */
     struct Collection {
-        std::string path;                 ///< Fully qualified path of a collection
-        std::vector<std::string> items;   ///< List of collection items
+        std::string path;                   ///< Fully qualified path of a collection
+        std::vector<std::string> items;     ///< List of collection items
         Path::Kind kind = Path::Kind::None; ///< Collection path kind
-        std::vector<std::string> schemas; ///< List of item schemas
+        std::vector<std::string> schemas;   ///< List of item schemas
     };
 
     /**
@@ -83,6 +83,11 @@ namespace snt::dip {
          * @param schemas List of schemas applied to collection items
          */
         void set_collection(const std::string& path, Path::Kind kind, std::vector<std::string> schemas);
+
+        /** Restore a collection and its item order from persisted environment data. */
+        void set_collection(
+            const std::string& path, Path::Kind kind, std::vector<std::string> schemas, std::vector<std::string> items
+        );
 
         /**
          * Test if collection whith the given path exists

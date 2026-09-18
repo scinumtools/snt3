@@ -1,0 +1,15 @@
+from: markdown
+pdf-engine: xelatex
+toc: true
+number-sections: true
+
+variables:
+  geometry:
+    - a4paper
+    - margin=20mm
+
+input-files:
+  - docs/diph5/specification.md
+
+syntax-definitions:
+  - docs/dipl/highlight/skylight/dipl.xml

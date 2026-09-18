@@ -1,8 +1,7 @@
-#include <gtest/gtest.h>
-
-#include <snt/c/dip.h>
-
 #include <array>
+#include <filesystem>
+#include <gtest/gtest.h>
+#include <snt/c/dip.h>
 #include <string>
 
 class Environment : public testing::Test {
@@ -27,9 +26,7 @@ class Environment : public testing::Test {
         ASSERT_EQ(snt_dip_parser_parse(dip, &error), 0);
     }
 
-    void TearDown() override {
-        snt_dip_parser_free(dip);
-    }
+    void TearDown() override { snt_dip_parser_free(dip); }
 };
 
 TEST(DIP, ParseAndGet) {
@@ -60,15 +57,29 @@ TEST(DIP, ReportsErrors) {
 }
 
 TEST_F(Environment, Load) {
-    EXPECT_NE(snt_dip_environment_load(dip, "environment.h5", &error), 0);
-    ASSERT_NE(error.message, nullptr);
-    EXPECT_NE(std::string(error.message).find("Loading an environment from HDF5"), std::string::npos);
+    const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-load.diph5";
+    ASSERT_EQ(snt_dip_environment_save(dip, file.string().c_str(), &error), 0);
+
+    snt_dip* loaded = nullptr;
+    ASSERT_EQ(snt_dip_parser_create(&loaded, &error), 0);
+    ASSERT_EQ(snt_dip_environment_load(loaded, file.string().c_str(), &error), 0);
+
+    std::array<char, 64> output{};
+    EXPECT_EQ(snt_dip_parser_get(loaded, "simulation.steps", output.data(), output.size(), &error), 0);
+    EXPECT_EQ(std::string(output.data()), "100");
+
+    snt_dip_parser_free(loaded);
+    std::filesystem::remove(file);
 }
 
 TEST_F(Environment, Save) {
-    EXPECT_NE(snt_dip_environment_save(dip, "environment.h5", &error), 0);
-    ASSERT_NE(error.message, nullptr);
-    EXPECT_NE(std::string(error.message).find("Saving an environment to HDF5"), std::string::npos);
+    const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-save.diph5";
+
+    EXPECT_EQ(snt_dip_environment_save(dip, file.string().c_str(), &error), 0);
+    EXPECT_TRUE(std::filesystem::is_regular_file(file));
+    EXPECT_GT(std::filesystem::file_size(file), 0);
+
+    std::filesystem::remove(file);
 }
 
 TEST_F(Environment, Generate) {

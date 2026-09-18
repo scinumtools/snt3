@@ -3,7 +3,7 @@ file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
 set(EXEC_NAME snt-dip)
 
 add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries(${EXEC_NAME} PRIVATE snt-puq)
+target_link_libraries(${EXEC_NAME} PRIVATE snt-puq HDF5::HDF5)
 
 target_include_directories(${EXEC_NAME}
   PUBLIC	

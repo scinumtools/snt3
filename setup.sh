@@ -141,11 +141,14 @@ function compile_docs {
     dir_static=docs/source/_static
     file_dipl_spec=$dir_static/dipl-specification.pdf
     file_puel_spec=$dir_static/puel-specification.pdf
+    file_diph5_spec=$dir_static/diph5-specification.pdf
     if command -v pandoc >/dev/null 2>&1; then
         echo "Building DIPL specification"
         pandoc --defaults=docs/dipl/pandoc.yaml --output=$file_dipl_spec
         echo "Building PUEL specification"
         pandoc --defaults=docs/puel/pandoc.yaml --output=$file_puel_spec
+        echo "Building DIPH5 specification"
+        pandoc --defaults=docs/diph5/pandoc.yaml --output=$file_diph5_spec
     else
         echo "Pandoc is not available; skipping specification PDF generation." >&2
     fi

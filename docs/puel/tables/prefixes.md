@@ -24,4 +24,4 @@
 | `y`    | `1e-24` | yocto |
 
 > [!NOTE]
-> The prefix `u` is used to represent micro (`μ`) in ASCII-only unit expressions.
+> The prefix `u` is used to represent micro (Unicode U+03BC) in ASCII-only unit expressions.

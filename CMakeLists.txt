@@ -119,6 +119,10 @@ set_module_options(MAT ON OFF "${ENABLE_UNIT_TESTS}")
 # supported yet and is therefore disabled by default.
 set_module_options(API ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 
+if(ENABLE_DIP)
+    find_package(HDF5 REQUIRED COMPONENTS C)
+endif()
+
 # enable building of executables
 option(ENABLE_EXEC_APPS "Enable build of SNT application" ON)
 message(STATUS "ENABLE_EXEC_APPS             ${ENABLE_EXEC_APPS}")

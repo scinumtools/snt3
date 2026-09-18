@@ -181,9 +181,9 @@ When no identifier is supplied, PUQ uses the active unit system of the surroundi
 
 ### Display notation
 
-In addition to ASCII notation, PUQ can produce Unicode and HTML representations for display. When Unicode input preprocessing is enabled, it accepts superscript exponents, `⋅` for multiplication, `−` for a minus sign, and `×10` for scientific notation. For example, `6.23537×10⁻²⋅C³` corresponds to `6.23537e-2*C3`.
+In addition to ASCII notation, PUQ can produce Unicode and HTML representations for display. When Unicode input preprocessing is enabled, it accepts superscript exponents, the Unicode middle dot (U+22C5) for multiplication, the Unicode minus sign (U+2212), and the multiplication sign (U+00D7) for scientific notation. For example, a displayed form using U+00D7 before `10` and superscript U+2212/U+22C5 symbols corresponds to the portable expression `6.23537e-2*C3`.
 
-Unicode input conveniences are optional; ASCII notation remains the portable form. A system identifier MUST retain its leading position and underscore separator even when Unicode notation is used, as in `US_23⋅ft²`. HTML output is a display format, not an expression input format.
+Unicode input conveniences are optional; ASCII notation remains the portable form. A system identifier MUST retain its leading position and underscore separator even when Unicode notation is used, as in the displayed form of `US_23*ft2`. HTML output is a display format, not an expression input format.
 
 ### Canonical Representation and Serialization
 

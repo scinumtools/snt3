@@ -104,6 +104,15 @@ consistent, and reproducible. The result is a parameter system that can
 capture not only *what* a value is, but also *what it means*, *how it is
 calculated*, and *what constraints it must satisfy*.
 
+The :doc:`DIPH5 environment format <diph5>` provides an HDF5 interchange
+representation for parsed environments.
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   diph5
+
 .. _mat-materials:
 
 MAT — Materials

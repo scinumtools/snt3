@@ -209,6 +209,20 @@ namespace snt::dip {
         collections[path] = Collection{path, {}, kind, std::move(schemas)};
     }
 
+    void HierarchyList::set_collection(
+        const std::string& path, Path::Kind kind, std::vector<std::string> schemas, std::vector<std::string> items
+    ) {
+        if (collections.find(path) != collections.end())
+            throw dip::EnvironmentException(
+                "Duplicate collection",
+                "A collection with the path `" + path + "` already exists in the environment hierarchy.",
+                "Choose a different collection path.",
+                __FILE__,
+                __LINE__
+            );
+        collections[path] = Collection{path, std::move(items), kind, std::move(schemas)};
+    }
+
     const bool HierarchyList::has_collection(const std::string& path) const {
         return collections.find(path) != collections.end();
     }

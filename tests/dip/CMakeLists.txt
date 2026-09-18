@@ -9,7 +9,7 @@ target_include_directories(${EXEC_NAME}
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
-target_link_libraries(${EXEC_NAME} PRIVATE GTest::gtest_main snt-dip)
+target_link_libraries(${EXEC_NAME} PRIVATE GTest::gtest_main snt-dip HDF5::HDF5)
 
 if(NOT ENABLE_CLANG_TIDY)
 target_precompile_headers(${EXEC_NAME} PRIVATE pch_tests.h)

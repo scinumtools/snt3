@@ -36,6 +36,10 @@ jobs:
           pandoc \
             --defaults=docs/puel/pandoc.yaml \
             --output=build/puel-specification.pdf
+
+          pandoc \
+            --defaults=docs/diph5/pandoc.yaml \
+            --output=build/diph5-specification.pdf
             
       - name: Determine release tag
         id: release
@@ -63,5 +67,6 @@ jobs:
           files: |
             build/dipl-specification.pdf
             build/puel-specification.pdf
+            build/diph5-specification.pdf
           generate_release_notes: false
           overwrite_files: true
