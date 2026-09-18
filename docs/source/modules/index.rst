@@ -104,14 +104,17 @@ consistent, and reproducible. The result is a parameter system that can
 capture not only *what* a value is, but also *what it means*, *how it is
 calculated*, and *what constraints it must satisfy*.
 
-The :doc:`DIPH5 environment format <diph5>` provides an HDF5 interchange
-representation for parsed environments.
+* :doc:`Basic DIP usage <dip/basic-usage>` — C++ parsing, environments,
+  and input sources.
+* :doc:`Environment persistence <dip/persistence>` — saving and loading
+  evaluated environments in DIPH5 format from C++.
 
 .. toctree::
    :maxdepth: 1
    :hidden:
 
-   diph5
+   dip/basic-usage
+   dip/persistence
 
 .. _mat-materials:
 

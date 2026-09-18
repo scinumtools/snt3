@@ -74,7 +74,7 @@ For lower-level use, invoke the installed executable directly. The
 
    execute_process(
        COMMAND "${SNT_EXECUTABLE}" dip parse
-               --input config.dip
+               --input file "${CMAKE_CURRENT_SOURCE_DIR}/config.dip"
                --request "?project.name"
                --value
        OUTPUT_VARIABLE PROJECT_NAME

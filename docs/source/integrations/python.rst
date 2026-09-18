@@ -65,6 +65,28 @@ conversion is needed:
    area_in_cm2 = Quantity(area.value, area.units).convert("cm2")
    print(area_in_cm2)  # 100 cm2
 
+Persisting DIP environments
+----------------------------
+
+Save evaluated parameters to a DIPH5 file and restore them through
+``Environment``:
+
+.. code-block:: python
+
+   from scinumtools3.dip import DIP, Environment
+
+   parser = DIP()
+   parser.add_string("simulation.steps int = 100")
+   env = parser.parse()
+   env.save("parameters.diph5")
+
+   restored = Environment()
+   restored.load("parameters.diph5")
+   assert restored["simulation.steps"].value == 100
+
+See :doc:`Environment persistence <../modules/dip/persistence>` for the
+format, save/load behavior, and current limitations.
+
 Python values and NumPy
 -----------------------
 

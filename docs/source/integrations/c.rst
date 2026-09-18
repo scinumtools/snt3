@@ -54,6 +54,15 @@ Create a parser with ``snt_dip_parser_create``, add definitions with
 .. literalinclude:: ../../../examples/dip/CBinding/main.c
    :language: c
 
+Persisting DIP environments
+----------------------------
+
+Use ``snt_dip_environment_save`` and ``snt_dip_environment_load`` with a DIP
+handle, a ``const char*`` filename, and an ``snt_dip_error`` object. They
+return zero on success, using the same error convention as parsing.
+See :doc:`Environment persistence <../modules/dip/persistence>` for the
+DIPH5 format and current limitations.
+
 Errors and ownership
 --------------------
 

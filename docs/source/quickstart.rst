@@ -65,7 +65,7 @@ rectangular object:
    dip = DIP()
    dip.add_string(
        "length float = 2.5 dm\n"
-       "width float = 40 mm"
+       "width float = 40 mm\n"
        "area float = ( {?length} * {?width} ) m2"
    )
    env = dip.parse()
