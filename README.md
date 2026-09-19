@@ -26,6 +26,13 @@ The project is built around two languages:
 The [online documentation](https://vrtulka23.github.io/scinumtools3/) contains
 the concepts, language specifications, tutorials, examples, and API reference.
 
+## Used in applications
+
+[Nuclide Atlas](https://github.com/vrtulka23/nuclide-atlas) is a unit-aware
+nuclear-isotope database and decay-chain calculator built with SciNumTools3.
+It uses DIPL for validated nuclide data, scenarios, provenance, and CMake build
+configuration.
+
 ## Quick example
 
 Define parameters in a `parameters.dip` file:

@@ -32,7 +32,8 @@ operations, such as quantities, unit systems, or DIPL nodes.
 The application-facing API overview is split by domain:
 
 * :doc:`PUQ API <puq>` — evaluation, conversion, inspection, and listing.
-* :doc:`DIP API <dip>` — DIPL parsing and DIPH5 loading and saving.
+* :doc:`DIP API <dip>` — DIPL parsing, DIPH5 loading and saving, and static
+  parameter generation.
 
 .. toctree::
    :maxdepth: 1

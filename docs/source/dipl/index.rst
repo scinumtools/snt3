@@ -24,6 +24,15 @@ parameter handling and validation logic for each application.
 * Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/specification.md>`_
 * Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/grammar.ebnf>`_
 
+Application
+-----------
+
+`Nuclide Atlas <https://github.com/vrtulka23/nuclide-atlas>`_ is a unit-aware
+nuclear-isotope database and decay-chain calculator built with SciNumTools3.
+It uses DIPL sources for validated nuclide records and scenarios, including
+units and provenance metadata, and its CMake build configuration is driven by
+DIPL through the SNT CMake integration.
+
 Specification
 -------------
 

@@ -22,6 +22,10 @@ applications, and interfaces without duplicating the underlying logic.
 This documentation introduces the concepts, languages, modules, and APIs
 that make up the SciNumTools framework.
 
+DIP environments can be persisted in the DIPH5 HDF5 format for exchange and
+later reuse, or exported as native C++, C, Fortran, Rust, or Julia parameters,
+as well as JSON and YAML data files.
+
 .. toctree::
    :maxdepth: 2
    :caption: Getting Started
