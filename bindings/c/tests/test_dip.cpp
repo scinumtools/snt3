@@ -95,5 +95,6 @@ TEST_F(Environment, Generate) {
     EXPECT_NE(contents.str().find("\"simulation\""), std::string::npos);
     EXPECT_NE(contents.str().find("\"steps\": 100"), std::string::npos);
 
+    generated.close();
     std::filesystem::remove(file);
 }

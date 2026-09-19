@@ -75,6 +75,13 @@ TEST(Environment, Generate) {
     EXPECT_NE(fortran_text.str().find("type :: BoundaryEntry"), std::string::npos);
     EXPECT_NE(fortran_text.str().find("character(len=5) :: key"), std::string::npos);
 
+    json.close();
+    yaml.close();
+    cpp.close();
+    c.close();
+    rust.close();
+    julia.close();
+    fortran.close();
     std::filesystem::remove(json_file);
     std::filesystem::remove(yaml_file);
     std::filesystem::remove(cpp_file);
@@ -101,6 +108,7 @@ TEST(Environment, GenerateMultiDimensionalArray) {
     );
     EXPECT_NE(text.str().find("{{{{1, 2, 3}}, {{4, 5, 6}}}}"), std::string::npos);
 
+    cpp.close();
     std::filesystem::remove(cpp_file);
 }
 
@@ -152,6 +160,11 @@ TEST(Environment, GenerateThreeDimensionalArray) {
     EXPECT_NE(fortran_text.str().find("dimension(2, 2, 3) :: volume"), std::string::npos);
     EXPECT_NE(fortran_text.str().find("reshape([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], [2, 2, 3], order=[3, 2, 1])"), std::string::npos);
 
+    cpp.close();
+    c.close();
+    rust.close();
+    julia.close();
+    fortran.close();
     std::filesystem::remove(cpp_file);
     std::filesystem::remove(c_file);
     std::filesystem::remove(rust_file);
