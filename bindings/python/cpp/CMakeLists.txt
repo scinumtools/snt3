@@ -111,6 +111,18 @@ if (ENABLE_API_PYBIND)
    add_subdirectory(api)
 endif()
 
+# snt-dip is static. Link HDF5 directly to the extension after its module
+# sources have been added, so ELF linkers retain the dependency and auditwheel
+# can bundle it into Linux wheels.
+if (ENABLE_DIP_PYBIND)
+    target_link_libraries(${MODULE_NAME} PRIVATE HDF5::HDF5)
+    # GNU linkers may otherwise discard HDF5 before resolving symbols pulled
+    # from the static snt-dip archive. Keep a DT_NEEDED entry for auditwheel.
+    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        target_link_options(${MODULE_NAME} PRIVATE "LINKER:--no-as-needed")
+    endif()
+endif()
+
 if(
     ENABLE_CORE_PYTEST OR
     ENABLE_EXS_PYTEST OR
