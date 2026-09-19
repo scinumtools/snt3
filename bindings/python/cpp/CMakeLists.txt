@@ -121,9 +121,13 @@ if (ENABLE_DIP_PYBIND)
     # HDF5_LIBRARIES contains the libraries reported by the wrapper.
     target_link_libraries(${MODULE_NAME} PRIVATE ${HDF5_LIBRARIES})
 
-    # Preserve the dynamic dependency even when the linker sees HDF5 before
-    # symbols pulled from the static snt-dip archive.
+    # With the manylinux HDF5 RPM, FindHDF5 can instead report that HDF5 is
+    # "Included by compiler wrappers", leaving both link interfaces empty.
+    # Resolve the installed shared library explicitly in that case, so the
+    # extension has a DT_NEEDED entry that auditwheel can bundle.
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        find_library(SNT_HDF5_C_LIBRARY NAMES hdf5 REQUIRED)
+        target_link_libraries(${MODULE_NAME} PRIVATE ${SNT_HDF5_C_LIBRARY})
         target_link_options(${MODULE_NAME} PRIVATE "LINKER:--no-as-needed")
     endif()
 endif()
