@@ -17,7 +17,9 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest
+          # Homebrew dependencies built on macos-latest currently require
+          # macOS 26. Pin the wheel builder to retain a macOS 14 baseline.
+          - macos-14
 
     steps:
       - uses: actions/checkout@v4
@@ -41,10 +43,13 @@ jobs:
           sudo apt-get install -y libgtest-dev libhdf5-dev pybind11-dev
 
       - name: macOS dependencies
+        id: macos_hdf5
         if: runner.os == 'macOS'
         run: |
           brew install googletest hdf5 pybind11
-          echo "HDF5_ROOT=$(brew --prefix hdf5)" >> "$GITHUB_ENV"
+          hdf5_root="$(brew --prefix hdf5)"
+          echo "HDF5_ROOT=$hdf5_root" >> "$GITHUB_ENV"
+          echo "hdf5_root=$hdf5_root" >> "$GITHUB_OUTPUT"
 
       - name: Windows dependencies
         if: runner.os == 'Windows'
@@ -68,6 +73,18 @@ jobs:
             CMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
             VCPKG_TARGET_TRIPLET=x64-windows
             HDF5_ROOT=C:/vcpkg/installed/x64-windows
+          CIBW_ENVIRONMENT_MACOS: >-
+            HDF5_ROOT=${{ steps.macos_hdf5.outputs.hdf5_root }}
+            DYLD_FALLBACK_LIBRARY_PATH=${{ steps.macos_hdf5.outputs.hdf5_root }}/lib
+            MACOSX_DEPLOYMENT_TARGET=14.0
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: >-
+            MACOSX_DEPLOYMENT_TARGET=14.0
+            DYLD_FALLBACK_LIBRARY_PATH=${{ steps.macos_hdf5.outputs.hdf5_root }}/lib
+            delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}
+          CIBW_BEFORE_BUILD_WINDOWS: pip install delvewheel
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >-
+            delvewheel repair --add-path C:/vcpkg/installed/x64-windows/bin
+            -w {dest_dir} {wheel}
           CIBW_TEST_COMMAND: python -c "import scinumtools3; print('Success!')"
           CMAKE_ARGS: >-
             -DENABLE_UNIT_TESTS=OFF

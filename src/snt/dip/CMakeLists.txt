@@ -3,7 +3,9 @@ file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
 set(EXEC_NAME snt-dip)
 
 add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries(${EXEC_NAME} PRIVATE snt-puq HDF5::HDF5)
+# snt-dip is static.  HDF5 must therefore propagate to every final binary
+# that consumes it, including the Python extension built for wheels.
+target_link_libraries(${EXEC_NAME} PUBLIC snt-puq HDF5::HDF5)
 
 target_include_directories(${EXEC_NAME}
   PUBLIC	
