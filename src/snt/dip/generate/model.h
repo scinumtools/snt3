@@ -30,6 +30,8 @@ namespace snt::dip::generate {
         core::DataType dtype = core::DataType::None;
         std::string literal;
         std::vector<size_t> shape;
+        bool is_array = false;
+        bool has_value = false;
         std::vector<std::unique_ptr<Node>> children;
     };
 

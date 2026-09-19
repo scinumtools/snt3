@@ -87,9 +87,12 @@ namespace snt::dip::generate {
                 );
             }
 
-            current->kind = NodeKind::Value;
+            if (current->kind != NodeKind::MapItem && current->kind != NodeKind::ListItem)
+                current->kind = NodeKind::Value;
             current->dtype = value_node->value->get_dtype();
             current->shape = value_node->value->get_shape();
+            current->is_array = !value_node->dimension.empty();
+            current->has_value = true;
             core::StringFormatType format;
             format.valuePrecision = std::numeric_limits<double>::max_digits10;
             current->literal = value_node->value->to_string(format);

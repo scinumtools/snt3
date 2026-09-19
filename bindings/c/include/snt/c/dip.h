@@ -17,15 +17,15 @@ typedef struct {
 
 /** Output format for generated parameter lists. */
 typedef enum {
-    SNT_DIP_OUTPUT_CPP,
-    SNT_DIP_OUTPUT_C,
-    SNT_DIP_OUTPUT_FORTRAN,
-    SNT_DIP_OUTPUT_RUST,
-    SNT_DIP_OUTPUT_R,
-    SNT_DIP_OUTPUT_JULIA,
-    SNT_DIP_OUTPUT_JSON,
-    SNT_DIP_OUTPUT_TOML,
-    SNT_DIP_OUTPUT_YAML,
+    SNT_DIP_EXPORT_CPP,
+    SNT_DIP_EXPORT_C,
+    SNT_DIP_EXPORT_FORTRAN,
+    SNT_DIP_EXPORT_RUST,
+    SNT_DIP_EXPORT_R,
+    SNT_DIP_EXPORT_JULIA,
+    SNT_DIP_EXPORT_JSON,
+    SNT_DIP_EXPORT_TOML,
+    SNT_DIP_EXPORT_YAML,
 } snt_dip_export_format;
 
 /** Create a DIPL parser. */

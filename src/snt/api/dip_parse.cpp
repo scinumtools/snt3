@@ -65,6 +65,32 @@ namespace snt::api {
         save_file = file;
     }
 
+    void DIPParse::argument_generate(const std::string& format, const std::string& file) {
+        if (file.empty()) {
+            throw api::ArgumentException(
+                "Invalid generate path", "The file path is empty.", "Provide an output file path.", __FILE__, __LINE__
+            );
+        }
+        const std::map<std::string, dip::ExportFormat> formats = {
+            {"cpp", dip::ExportFormat::CPP}, {"c", dip::ExportFormat::C},
+            {"fortran", dip::ExportFormat::FORTRAN}, {"rust", dip::ExportFormat::RUST},
+            {"julia", dip::ExportFormat::JULIA},
+            {"json", dip::ExportFormat::JSON}, {"yaml", dip::ExportFormat::YAML}
+        };
+        const auto selected = formats.find(format);
+        if (selected == formats.end()) {
+            throw api::ArgumentException(
+                "Invalid export format",
+                "Unknown static export format: " + format,
+                "Use cpp, c, fortran, rust, julia, json, or yaml.",
+                __FILE__,
+                __LINE__
+            );
+        }
+        generate_format = selected->second;
+        generate_file = file;
+    }
+
     void DIPParse::argument_request(const std::string& path) {
         request = (!path.empty() && path.front() == '?') ? path.substr(1) : path;
     }
@@ -156,6 +182,8 @@ namespace snt::api {
         }
         if (!save_file.empty())
             env.save(save_file);
+        if (generate_format)
+            env.generate(*generate_format, generate_file);
         return ss.str();
     }
 

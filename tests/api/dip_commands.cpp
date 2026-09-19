@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -194,6 +195,31 @@ TEST_F(DIPPersistenceCommands, Save) {
     EXPECT_TRUE(env["foo[bar].jerk"].as<bool>());
 }
 
+TEST_F(DIPPersistenceCommands, Generate) {
+    const std::filesystem::path output = file.parent_path() / (file.stem().string() + ".json");
+    cmd.argument_generate("json", output.string());
+    EXPECT_EQ(cmd.execute(), "");
+    ASSERT_TRUE(std::filesystem::exists(output));
+    std::ifstream generated(output);
+    std::stringstream contents;
+    contents << generated.rdbuf();
+    EXPECT_NE(contents.str().find("\"foo\""), std::string::npos);
+    EXPECT_NE(contents.str().find("\"bar\""), std::string::npos);
+    std::filesystem::remove(output);
+}
+
+TEST_F(DIPPersistenceCommands, GenerateJulia) {
+    const std::filesystem::path output = file.parent_path() / (file.stem().string() + ".jl");
+    cmd.argument_generate("julia", output.string());
+    EXPECT_EQ(cmd.execute(), "");
+    std::ifstream generated(output);
+    std::stringstream contents;
+    contents << generated.rdbuf();
+    EXPECT_NE(contents.str().find("const parameters"), std::string::npos);
+    EXPECT_NE(contents.str().find("\"bar\" =>"), std::string::npos);
+    std::filesystem::remove(output);
+}
+
 TEST_F(DIPPersistenceCommands, Load) {
     prepare_file();
     api::DIPParse loaded;
@@ -249,6 +275,8 @@ TEST_F(DIPPersistenceCommands, RejectsEmptyPaths) {
     api::DIPParse loaded;
     EXPECT_THROW(loaded.argument_load(""), api::ArgumentException);
     EXPECT_THROW(cmd.argument_save(""), api::ArgumentException);
+    EXPECT_THROW(cmd.argument_generate("json", ""), api::ArgumentException);
+    EXPECT_THROW(cmd.argument_generate("toml", file.string()), api::ArgumentException);
 }
 
 TEST_F(DIPPersistenceCommands, LoadFailure) {

@@ -45,6 +45,25 @@ environment. Output validation must succeed before saving. See
 :doc:`DIP environment persistence <../modules/dip/persistence>` for the
 format and its limitations.
 
+Generating static parameters
+----------------------------
+
+Use ``argument_generate()`` to generate static parameters during
+``execute()``. Its format is one of ``cpp``, ``c``, ``fortran``, ``rust``,
+``julia``, ``json``, or ``yaml``:
+
+.. code-block:: cpp
+
+   snt::api::DIPParse generate;
+   generate.argument_add("file", {"parameters.dip"});
+   generate.argument_generate("cpp", "parameters.hpp");
+   generate.execute();
+
+Generation can follow parsing or DIPH5 loading, and can accompany saving.
+It always exports the complete evaluated environment; request and tag filters
+only affect text output. See :doc:`Static parameter generation
+<../modules/dip/generation>` for the generated representations.
+
 The API command classes return formatted text, while the underlying
 ``snt::dip`` classes provide typed environments and values for code that needs
 to inspect or manipulate results directly. API errors are reported through
@@ -52,4 +71,3 @@ the SNT exception hierarchy.
 
 For the complete declaration and member reference, see the
 :doc:`C++ DIP API <cpp/api/dip>`.
-

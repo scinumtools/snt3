@@ -1,5 +1,5 @@
-DIP — Basic Usage
-=================
+Basic Usage
+===========
 
 The usual C++ DIP workflow is to create a ``DIP`` parser, add one or more DIPL
 inputs, and call ``parse()``. Parsing evaluates the definitions and returns an

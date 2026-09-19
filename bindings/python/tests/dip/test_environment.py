@@ -49,5 +49,12 @@ def test_save(env, tmp_path):
 def test_generate(env, tmp_path):
     assert env.size == 7
 
-    with pytest.raises(RuntimeError, match="Generating a static parameter list is not implemented yet"):
-    env.generate(ExportFormat.JSON, tmp_path / "parameters.json")
+    file = tmp_path / "parameters.json"
+    julia_file = tmp_path / "parameters.jl"
+    env.generate(ExportFormat.JSON, file)
+    env.generate(ExportFormat.JULIA, julia_file)
+
+    assert file.is_file()
+    assert '"simulation"' in file.read_text()
+    assert '"inlet"' in file.read_text()
+    assert "const parameters" in julia_file.read_text()

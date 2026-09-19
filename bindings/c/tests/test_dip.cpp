@@ -1,7 +1,9 @@
 #include <array>
 #include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <snt/c/dip.h>
+#include <sstream>
 #include <string>
 
 class Environment : public testing::Test {
@@ -83,7 +85,15 @@ TEST_F(Environment, Save) {
 }
 
 TEST_F(Environment, Generate) {
-    EXPECT_NE(snt_dip_environment_generate(dip, SNT_DIP_OUTPUT_JSON, "parameters.json", &error), 0);
-    ASSERT_NE(error.message, nullptr);
-    EXPECT_NE(std::string(error.message).find("Generating a static parameter list"), std::string::npos);
+    const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-parameters.json";
+
+    EXPECT_EQ(snt_dip_environment_generate(dip, SNT_DIP_EXPORT_JSON, file.string().c_str(), &error), 0);
+    ASSERT_TRUE(std::filesystem::is_regular_file(file));
+    std::ifstream generated(file);
+    std::stringstream contents;
+    contents << generated.rdbuf();
+    EXPECT_NE(contents.str().find("\"simulation\""), std::string::npos);
+    EXPECT_NE(contents.str().find("\"steps\": 100"), std::string::npos);
+
+    std::filesystem::remove(file);
 }

@@ -80,6 +80,25 @@ File errors are reported on standard error with a nonzero exit status.
 See :doc:`DIP environment persistence <../modules/dip/persistence>` for
 the format and its limitations.
 
+Generating static parameters
+----------------------------
+
+Use ``--generate <format> <file>`` to export the complete evaluated
+environment as language-native source or a data file. It works after parsing
+DIPL input or loading a DIPH5 environment:
+
+.. code-block:: bash
+
+   snt dip parse --input file parameters.dip --generate cpp parameters.hpp
+   snt dip parse --load parameters.diph5 --generate julia parameters.jl
+   snt dip parse --input file parameters.dip --generate json parameters.json
+
+Supported format names are ``cpp``, ``c``, ``fortran``, ``rust``, ``julia``,
+``json``, and ``yaml``. ``--generate`` can accompany ``--save``. Requests and
+tags only affect text printed by the command, not the generated environment.
+See :doc:`Static parameter generation <../modules/dip/generation>` for the
+native representations and format-specific behavior.
+
 Values for shell scripts
 ------------------------
 

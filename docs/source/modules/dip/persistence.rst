@@ -1,5 +1,5 @@
-DIP — Environment Persistence
-=============================
+Environment Persistence
+=======================
 
 DIP can persist an evaluated environment in the DIPH5 HDF5 format. This is
 useful when a DIPL input has already been parsed and evaluated and the

@@ -63,6 +63,27 @@ return zero on success, using the same error convention as parsing.
 See :doc:`Environment persistence <../modules/dip/persistence>` for the
 DIPH5 format and current limitations.
 
+Generating static parameters
+----------------------------
+
+After parsing or loading an environment, call
+``snt_dip_environment_generate`` with an ``snt_dip_export_format`` and an
+output path. It follows the normal C binding error convention:
+
+.. code-block:: c
+
+   snt_dip_error error = {0};
+   if (snt_dip_environment_generate(
+           dip, SNT_DIP_EXPORT_CPP, "parameters.hpp", &error) != 0) {
+       fprintf(stderr, "%s\n", error.message);
+   }
+
+The supported C ABI formats are ``SNT_DIP_EXPORT_CPP``,
+``SNT_DIP_EXPORT_C``, ``SNT_DIP_EXPORT_FORTRAN``, ``SNT_DIP_EXPORT_RUST``,
+``SNT_DIP_EXPORT_JULIA``, ``SNT_DIP_EXPORT_JSON``, and
+``SNT_DIP_EXPORT_YAML``. See :doc:`Static parameter generation
+<../modules/dip/generation>` for the generated representations.
+
 Errors and ownership
 --------------------
 

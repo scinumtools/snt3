@@ -33,23 +33,23 @@ void ok(snt_dip_error* error) {
 
 snt::dip::ExportFormat export_format(snt_dip_export_format format) {
     switch (format) {
-    case SNT_DIP_OUTPUT_CPP:
+    case SNT_DIP_EXPORT_CPP:
         return snt::dip::ExportFormat::CPP;
-    case SNT_DIP_OUTPUT_C:
+    case SNT_DIP_EXPORT_C:
         return snt::dip::ExportFormat::C;
-    case SNT_DIP_OUTPUT_FORTRAN:
+    case SNT_DIP_EXPORT_FORTRAN:
         return snt::dip::ExportFormat::FORTRAN;
-    case SNT_DIP_OUTPUT_RUST:
+    case SNT_DIP_EXPORT_RUST:
         return snt::dip::ExportFormat::RUST;
-    case SNT_DIP_OUTPUT_R:
+    case SNT_DIP_EXPORT_R:
         return snt::dip::ExportFormat::R;
-    case SNT_DIP_OUTPUT_JULIA:
+    case SNT_DIP_EXPORT_JULIA:
         return snt::dip::ExportFormat::JULIA;
-    case SNT_DIP_OUTPUT_JSON:
+    case SNT_DIP_EXPORT_JSON:
         return snt::dip::ExportFormat::JSON;
-    case SNT_DIP_OUTPUT_TOML:
+    case SNT_DIP_EXPORT_TOML:
         return snt::dip::ExportFormat::TOML;
-    case SNT_DIP_OUTPUT_YAML:
+    case SNT_DIP_EXPORT_YAML:
         return snt::dip::ExportFormat::YAML;
     default:
         throw std::invalid_argument("invalid DIP output format");

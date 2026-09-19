@@ -35,6 +35,13 @@ namespace snt::bind::python {
             py::arg("file"),
             "Save the full environment on execute(), overwriting the file; output filters do not limit the saved nodes."
         );
+        command.def(
+            "argument_generate",
+            &api::DIPParse::argument_generate,
+            py::arg("format"),
+            py::arg("file"),
+            "Generate static parameters on execute(); format is cpp, c, fortran, rust, julia, json, or yaml."
+        );
 
         command.def(
             "argument_tags",

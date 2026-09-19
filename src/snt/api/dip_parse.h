@@ -2,6 +2,7 @@
 #define SNT_CLI_DIP_PARSE
 
 #include <snt/dip/dip.h>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -27,6 +28,8 @@ namespace snt::api {
         std::string value_type;        ///< Optional scalar output type constraint
         std::string load_file;         ///< Optional DIPH5 input path
         std::string save_file;         ///< Optional DIPH5 output path
+        std::optional<dip::ExportFormat> generate_format; ///< Optional static export format
+        std::string generate_file;     ///< Optional static export output path
         bool has_input = false;        ///< Whether DIPL inputs have been added
 
       public:
@@ -51,6 +54,10 @@ namespace snt::api {
         /// Request/tag filters affect text output only. The file path must be nonempty.
         /// Saving occurs after successful output validation.
         void argument_save(const std::string& file);
+
+        /// Generate static parameters during execute().
+        /// format is one of cpp, c, fortran, rust, julia, json, or yaml.
+        void argument_generate(const std::string& format, const std::string& file);
 
         /**
          * Set a request path

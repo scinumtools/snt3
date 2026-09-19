@@ -21,6 +21,17 @@ def test_save(tmp_path):
     assert env["simulation.enabled"].value is True
 
 
+def test_generate(tmp_path):
+    file = tmp_path / "parameters.json"
+    c = DIPParse()
+    c.argument_add("string", ["simulation.steps int = 100\n"])
+    c.argument_generate("json", str(file))
+
+    assert not file.exists()  # Configuration does not perform I/O.
+    assert c.execute() == ""
+    assert '"simulation"' in file.read_text()
+
+
 def test_load(tmp_path):
     file = tmp_path / "parameters.diph5"
     dip = DIP()
@@ -57,6 +68,14 @@ def test_save_failure(tmp_path):
     c.argument_save(str(tmp_path / "missing" / "parameters.diph5"))
     with pytest.raises(RuntimeError):
         c.execute()
+
+
+def test_generate_rejects_invalid_arguments(tmp_path):
+    c = DIPParse()
+    with pytest.raises(RuntimeError, match="Invalid export format"):
+        c.argument_generate("toml", str(tmp_path / "parameters.toml"))
+    with pytest.raises(RuntimeError, match="Invalid generate path"):
+        c.argument_generate("json", "")
 
 def test_add_string():
 

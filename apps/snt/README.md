@@ -37,3 +37,10 @@ The CLI's `--value` mode returns a single unitless scalar for scripts:
 ```bash
 snt dip parse --input file config.dip --request build.python --value --type bool
 ```
+
+Generate static parameters directly from a DIPL file (supported formats are
+`cpp`, `c`, `fortran`, `rust`, `julia`, `json`, and `yaml`):
+
+```bash
+snt dip parse --input file config.dip --generate cpp parameters.hpp
+```

@@ -35,6 +35,9 @@ Options:
   --save <file>
       Save the full environment as DIPH5, overwriting the file.
       Request and tag filters affect printed output only.
+  --generate <cpp|c|fortran|rust|julia|json|yaml> <file>
+      Generate static parameters in the selected format, overwriting the file.
+      Request and tag filters affect printed output only.
   -r,--request <query>
       Request specific nodes (e.g. "family.father").
   --print
@@ -50,6 +53,7 @@ Examples:
 
   snt dip parse -i file parameters.dip --save parameters.diph5
   snt dip parse --load parameters.diph5 --print
+  snt dip parse -i file parameters.dip --generate cpp parameters.hpp
 
   snt dip parse \
       -i file parameters.dip \
@@ -72,6 +76,7 @@ void module_dip(ArgParser& argpar) {
     bool has_input = false;
     bool has_load = false;
     bool has_save = false;
+    bool has_generate = false;
     bool has_request = false;
     bool print = false;
     bool value = false;
@@ -107,6 +112,11 @@ void module_dip(ArgParser& argpar) {
                 throw std::runtime_error("Specify exactly one --save file.");
             cmd.argument_save(values.front());
             has_save = true;
+        } else if (key == "--generate") {
+            if (values.size() != 2 || has_generate)
+                throw std::runtime_error("Specify one export format and one output file with --generate.");
+            cmd.argument_generate(values[0], values[1]);
+            has_generate = true;
         } else if (key == "-r" || key == "--request") {
             if (values.size() != 1 || has_request)
                 throw std::runtime_error("Specify exactly one request.");

@@ -112,6 +112,41 @@ regardless of request or tag filters. Output validation must succeed before
 saving. These command methods take file paths as strings; use ``str(path)``
 for a ``pathlib.Path``.
 
+Generating static parameters
+----------------------------
+
+Export an evaluated environment with ``Environment.generate()`` when a
+validated DIPL configuration should become a source or data file consumed by
+another application. Import ``ExportFormat`` from ``scinumtools3.dip`` and
+choose one of ``CPP``, ``C``, ``FORTRAN``, ``RUST``, ``JULIA``, ``JSON``, or
+``YAML``:
+
+.. code-block:: python
+
+   from scinumtools3.dip import DIP, ExportFormat
+
+   parser = DIP()
+   parser.add_string("simulation.steps int = 100")
+   env = parser.parse()
+   env.generate(ExportFormat.CPP, "parameters.hpp")
+   env.generate(ExportFormat.JSON, "parameters.json")
+
+The command-oriented Python API can generate during ``execute()`` as well:
+
+.. code-block:: python
+
+   from scinumtools3.api.dip import DIPParse
+
+   generate = DIPParse()
+   generate.argument_add("file", ["parameters.dip"])
+   generate.argument_generate("rust", "parameters.rs")
+   generate.execute()
+
+Generation always exports the complete evaluated environment; requests and
+tags only restrict textual output. See :doc:`Static parameter generation
+<../modules/dip/generation>` for native representations and format-specific
+behavior.
+
 Python values and NumPy
 -----------------------
 
