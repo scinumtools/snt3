@@ -1,6 +1,6 @@
 % SciNumTools DIPH5
 % Environment HDF5 Format Specification
-% Version 1.0
+% Version 2.0
 
 # Scope
 
@@ -25,9 +25,10 @@ attributes.
 
 Implementation-specific runtime registries are not serialized as independent
 objects. This includes global function definitions, branching state, and the
-complete source, unit, and schema registries. Information from those registries
-that belongs to an individual evaluated node is retained on that node where
-possible. A loaded DIPH5 file must therefore be treated as an evaluated
+complete unit and schema registries. DIPH5 version 2 additionally stores a
+source manifest containing source identities, paths, parent relationships, and
+content fingerprints. It does not embed complete source text or parsed source
+nodes. A loaded DIPH5 file must therefore be treated as an evaluated
 environment, not as a source from which the original DIPL program can be
 reconstructed exactly.
 
@@ -38,11 +39,12 @@ The HDF5 root object MUST contain the following scalar attributes:
 | Attribute | Type | Required value |
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
-| `_DIPL_Schema_Version` | unsigned integer | `1` |
+| `_DIPL_Schema_Version` | unsigned integer | `2` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Future schema revisions MUST preserve the meaning of existing
-attributes or increment the schema version.
+schema version. Version 2 readers support both version 1 files, which have no
+source manifest, and version 2 files. Future schema revisions MUST preserve
+the meaning of existing attributes or increment the schema version.
 
 ## File naming
 
@@ -136,6 +138,28 @@ Source and provenance information uses `_DIPL_Source`, `_DIPL_Source_Line`,
 `title`, `journal`, `year`, `volume`, `issue`, `pages`, `doi`, `url`,
 `version`, `created`, `modified`, and `license`. Physical units are stored in
 the `units` attribute using their canonical PUEL representation.
+
+## Source manifest
+
+Version 2 files contain a root `/_DIPL_Sources` group. Each child is a
+numbered source-manifest entry so DIPL source names never need to be encoded as
+HDF5 object names. Each entry has the following attributes:
+
+| Attribute | Type | Meaning |
+| --- | --- | --- |
+| `_DIPL_Source_Name` | UTF-8 string | Named DIPL source identifier. |
+| `_DIPL_Source_Path` | UTF-8 string | Path recorded when the source was parsed; it may be empty for inline input. |
+| `_DIPL_Source_Parent` | UTF-8 string | Parent source identifier, when one exists. |
+| `_DIPL_Source_Parent_Line` | unsigned integer | Parent source line associated with the registration. |
+| `_DIPL_Source_Hash_Algorithm` | UTF-8 string | Digest algorithm, currently `SHA-256`. |
+| `_DIPL_Source_Hash` | UTF-8 string | Lowercase hexadecimal digest of the exact UTF-8 bytes parsed by DIP. |
+
+The manifest is an integrity and provenance aid, not a source archive. A
+consumer can hash an available source file and compare the result with the
+stored digest, but loading DIPH5 does not recreate executable source
+definitions or enable source-qualified lookups. `_DIPL_Sources` is reserved at
+the DIPH5 root; a DIPL environment with that top-level path cannot be saved as
+a version 2 file.
 
 # Examples
 

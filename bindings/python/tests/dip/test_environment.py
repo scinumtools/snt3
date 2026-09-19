@@ -46,6 +46,28 @@ def test_save(env, tmp_path):
     assert file.stat().st_size > 0
 
 
+def test_source_manifest_and_provenance(tmp_path):
+    parser = DIP()
+    parser.add_string("value int = 1\n")
+    environment = parser.parse()
+
+    provenance = environment["value"].provenance
+    assert provenance.source_name
+    assert provenance.source_line == 1
+    assert provenance.source_code == "value int = 1"
+    assert provenance.source is not None
+    assert provenance.source.name == provenance.source_name
+    assert provenance.source.hash_algorithm == "SHA-256"
+    assert provenance.source.hash == "cf4c47b9b0b584c2bfe69a84ca55d3b34513d9b9a07594e9aa879e555c1ee9ef"
+    assert any(source.name == provenance.source_name for source in environment.source_manifest)
+
+    file = tmp_path / "environment.diph5"
+    environment.save(file)
+    loaded = Environment()
+    loaded.load(file)
+    assert loaded["value"].provenance.source.hash == provenance.source.hash
+
+
 def test_generate(env, tmp_path):
     assert env.size == 7
 

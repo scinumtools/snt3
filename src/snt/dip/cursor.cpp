@@ -110,6 +110,17 @@ namespace snt::dip {
         return env_->get_node(path_);
     }
 
+    Provenance Cursor::get_provenance() const {
+        const dip::ValueNode::PointerType node = get_node();
+        return {
+            node->line.source.name,
+            node->line.source.line_number,
+            node->line.code,
+            node->metadata,
+            env_->get_source_info(node->line.source.name),
+        };
+    }
+
     val::Array::ShapeType Cursor::get_shape() const {
         val::BaseValue::PointerType value = env_->request_value("?" + path_);
         if (value)

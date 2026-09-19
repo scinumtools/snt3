@@ -697,10 +697,68 @@ namespace snt::dip::hdf5 {
             return name.data();
         }
 
-        void read_group(Environment& env, hid_t group) {
+        void read_source_manifest(Environment& env, hid_t file) {
+            const std::string manifest_path = "/" + std::string(GROUP_SOURCES);
+            const htri_t exists = H5Lexists(file, manifest_path.c_str(), H5P_DEFAULT);
+            if (exists < 0)
+                throw Error("Unable to inspect the HDF5 source manifest");
+            if (exists == 0)
+                throw dip::IOException(
+                    "Invalid HDF5 source manifest",
+                    "A DIPH5 version 2 file does not contain its required source manifest.",
+                    "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
+                    __FILE__,
+                    __LINE__
+                );
+
+            Id manifest(
+                H5Gopen2(file, manifest_path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the HDF5 source manifest"
+            );
+            std::vector<SourceInfo> sources;
+            const hsize_t count = object_count(manifest);
+            sources.reserve(count);
+            for (hsize_t index = 0; index < count; ++index) {
+                const std::string entry_name = object_name(manifest, index);
+                if (H5Gget_objtype_by_idx(manifest, index) != H5G_GROUP)
+                    throw dip::IOException(
+                        "Invalid HDF5 source manifest",
+                        "A source-manifest entry is not an HDF5 group.",
+                        "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
+                        __FILE__,
+                        __LINE__
+                    );
+                Id entry(
+                    H5Gopen2(manifest, entry_name.c_str(), H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to open an HDF5 source-manifest entry"
+                );
+                SourceInfo source{
+                    read_string(entry, ATTR_SOURCE_NAME),
+                    read_string(entry, ATTR_SOURCE_PATH),
+                    read_string(entry, ATTR_SOURCE_PARENT),
+                    static_cast<size_t>(read_scalar<uint64_t>(entry, ATTR_SOURCE_PARENT_LINE, H5T_NATIVE_UINT64)),
+                    read_string(entry, ATTR_SOURCE_HASH_ALGORITHM),
+                    read_string(entry, ATTR_SOURCE_HASH),
+                };
+                if (source.name.empty() || source.hash_algorithm.empty() || source.hash.empty())
+                    throw dip::IOException(
+                        "Invalid HDF5 source manifest",
+                        "A source-manifest entry is missing its identity or content fingerprint.",
+                        "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
+                        __FILE__,
+                        __LINE__
+                    );
+                sources.push_back(std::move(source));
+            }
+            env.set_source_manifest(std::move(sources));
+        }
+
+        void read_group(Environment& env, hid_t group, bool root = false) {
             const hsize_t count = object_count(group);
             for (hsize_t i = 0; i < count; ++i) {
                 const std::string name = object_name(group, i);
+                if (root && name == std::string(GROUP_SOURCES))
+                    continue;
                 const int type = H5Gget_objtype_by_idx(group, i);
                 if (type == H5G_GROUP) {
                     Id child(H5Gopen2(group, name.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open an HDF5 group");
@@ -745,6 +803,36 @@ namespace snt::dip::hdf5 {
                 }
             }
         }
+
+        void write_source_manifest(hid_t file, const Environment& env) {
+            const std::string manifest_path = "/" + std::string(GROUP_SOURCES);
+            Id manifest(
+                H5Gcreate2(file, manifest_path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                H5Gclose,
+                "Unable to create the HDF5 source manifest"
+            );
+            const auto sources = env.get_source_manifest();
+            for (size_t index = 0; index < sources.size(); ++index) {
+                const SourceInfo& source = sources[index];
+                const std::string entry_name = std::to_string(index);
+                Id entry(
+                    H5Gcreate2(manifest, entry_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to create an HDF5 source-manifest entry"
+                );
+                write_string(entry, ATTR_SOURCE_NAME, source.name);
+                write_string(entry, ATTR_SOURCE_PATH, source.path);
+                write_string(entry, ATTR_SOURCE_PARENT, source.parent_name);
+                write_scalar<uint64_t>(entry, ATTR_SOURCE_PARENT_LINE, H5T_NATIVE_UINT64, source.parent_line);
+                write_string(entry, ATTR_SOURCE_HASH_ALGORITHM, source.hash_algorithm);
+                write_string(entry, ATTR_SOURCE_HASH, source.hash);
+            }
+        }
+
+        bool uses_source_manifest_path(const std::string& path) {
+            const std::string name(GROUP_SOURCES);
+            return path == name || path.rfind(name + ".", 0) == 0 || path.rfind(name + "[", 0) == 0;
+        }
     } // namespace
 
     void save(const Environment& env, const std::filesystem::path& file) {
@@ -756,6 +844,17 @@ namespace snt::dip::hdf5 {
         );
         write_string(output, ATTR_FORMAT, std::string(FORMAT));
         write_scalar<uint64_t>(output, ATTR_VERSION, H5T_NATIVE_UINT64, VERSION);
+        for (const auto& node : env.nodes.get_nodes()) {
+            if (node && uses_source_manifest_path(node->path.name))
+                throw dip::IOException(
+                    "Reserved DIPH5 path",
+                    "The DIPL path `" + node->path.name + "` conflicts with the reserved DIPH5 source manifest.",
+                    "Rename the top-level `_DIPL_Sources` group before saving this environment.",
+                    __FILE__,
+                    __LINE__
+                );
+        }
+        write_source_manifest(output, env);
         for (const auto& node : env.nodes.get_nodes())
             if (node)
                 write_node(output, env, *node);
@@ -774,7 +873,7 @@ namespace snt::dip::hdf5 {
                 __LINE__
             );
         const uint64_t version = read_scalar<uint64_t>(input, ATTR_VERSION, H5T_NATIVE_UINT64);
-        if (version != VERSION)
+        if (version < FIRST_SUPPORTED_VERSION || version > VERSION)
             throw dip::IOException(
                 "Unsupported HDF5 environment version",
                 "The file schema version is not supported.",
@@ -782,7 +881,9 @@ namespace snt::dip::hdf5 {
                 __FILE__,
                 __LINE__
             );
-        read_group(env, input);
+        if (version >= 2)
+            read_source_manifest(env, input);
+        read_group(env, input, true);
     }
 
 } // namespace snt::dip::hdf5

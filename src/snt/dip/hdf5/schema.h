@@ -6,7 +6,8 @@
 namespace snt::dip::hdf5::schema {
 
     inline constexpr std::string_view FORMAT = "SciNumTools3 Environment";
-    inline constexpr uint64_t VERSION = 1;
+    inline constexpr uint64_t VERSION = 2;
+    inline constexpr uint64_t FIRST_SUPPORTED_VERSION = 1;
 
     inline constexpr std::string_view ATTR_FORMAT = "_DIPL_Format";
     inline constexpr std::string_view ATTR_VERSION = "_DIPL_Schema_Version";
@@ -28,6 +29,13 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_SOURCE = "_DIPL_Source";
     inline constexpr std::string_view ATTR_SOURCE_LINE = "_DIPL_Source_Line";
     inline constexpr std::string_view ATTR_SOURCE_CODE = "_DIPL_Source_Code";
+    inline constexpr std::string_view GROUP_SOURCES = "_DIPL_Sources";
+    inline constexpr std::string_view ATTR_SOURCE_NAME = "_DIPL_Source_Name";
+    inline constexpr std::string_view ATTR_SOURCE_PATH = "_DIPL_Source_Path";
+    inline constexpr std::string_view ATTR_SOURCE_PARENT = "_DIPL_Source_Parent";
+    inline constexpr std::string_view ATTR_SOURCE_PARENT_LINE = "_DIPL_Source_Parent_Line";
+    inline constexpr std::string_view ATTR_SOURCE_HASH_ALGORITHM = "_DIPL_Source_Hash_Algorithm";
+    inline constexpr std::string_view ATTR_SOURCE_HASH = "_DIPL_Source_Hash";
 
 } // namespace snt::dip::hdf5::schema
 

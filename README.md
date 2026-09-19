@@ -55,9 +55,10 @@ The parsed environment remains available throughout the application, so the
 same validated parameters can be passed between its components.
 
 An evaluated environment can be saved in the DIPH5 HDF5 format for later use
-or exchange, or generated as native C++, C, Fortran, Rust, or Julia parameters
-and as JSON or YAML data files for applications that should not parse DIPL at
-run time.
+or exchange. DIPH5 retains node provenance and a SHA-256 source manifest for
+later verification. Environments can also be generated as native C++, C,
+Fortran, Rust, or Julia parameters and as JSON or YAML data files for
+applications that should not parse DIPL at run time.
 
 Use the PUQ and DIP APIs from C++:
 

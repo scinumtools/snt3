@@ -60,4 +60,8 @@ namespace snt::dip {
         return it->second;
     }
 
+    const std::map<std::string, EnvSource>& SourceList::entries() const {
+        return sources;
+    }
+
 } // namespace snt::dip

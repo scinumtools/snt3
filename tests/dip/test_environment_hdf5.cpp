@@ -8,22 +8,22 @@
 using namespace snt;
 
 namespace {
-class H5Handle {
-  public:
-    using Closer = herr_t (*)(hid_t);
-    H5Handle(hid_t id, Closer closer) : id_(id), closer_(closer) {}
-    H5Handle(const H5Handle&) = delete;
-    ~H5Handle() {
-        if (id_ >= 0)
-            closer_(id_);
-    }
-    operator hid_t() const { return id_; }
+    class H5Handle {
+      public:
+        using Closer = herr_t (*)(hid_t);
+        H5Handle(hid_t id, Closer closer) : id_(id), closer_(closer) {}
+        H5Handle(const H5Handle&) = delete;
+        ~H5Handle() {
+            if (id_ >= 0)
+                closer_(id_);
+        }
+        operator hid_t() const { return id_; }
 
-  private:
-    hid_t id_;
-    Closer closer_;
-};
-}
+      private:
+        hid_t id_;
+        Closer closer_;
+    };
+} // namespace
 
 TEST(Environment, Load) {
     const auto file = environment_file("load");
@@ -37,9 +37,7 @@ TEST(Environment, Load) {
     EXPECT_DOUBLE_EQ(env["simulation.timestep"].as<double>(), 0.5);
     EXPECT_TRUE(env["simulation.enabled"].as<bool>());
     EXPECT_EQ(env.get_node("simulation.restart_file")->value, nullptr);
-    EXPECT_EQ(
-        (env["boundary[inlet].velocity"].as<std::array<double, 3>>()), (std::array<double, 3>{1.0, 0.0, 0.0})
-    );
+    EXPECT_EQ((env["boundary[inlet].velocity"].as<std::array<double, 3>>()), (std::array<double, 3>{1.0, 0.0, 0.0}));
     EXPECT_EQ(env["boundary"].items().size(), 1);
     EXPECT_EQ(env["samples"].elements().size(), 2);
     EXPECT_EQ(env["samples[1].time"].as<double>(), 1.0);
@@ -47,6 +45,56 @@ TEST(Environment, Load) {
     ASSERT_EQ(env.get_node("title")->options.size(), 2);
     EXPECT_EQ(env.get_node("title")->options[1].value_raw, "Other");
     EXPECT_EQ(env.get_node("title")->metadata.description, "Environment round-trip fixture");
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, SourceManifestAndCursorProvenance) {
+    dip::DIP parser;
+    parser.add_string("value int = 1\n");
+    dip::Environment source = parser.parse();
+
+    const dip::Provenance parsed_provenance = source["value"].get_provenance();
+    ASSERT_TRUE(parsed_provenance.source.has_value());
+    EXPECT_EQ(parsed_provenance.source_name, parsed_provenance.source->name);
+    EXPECT_EQ(parsed_provenance.source_line, 1);
+    EXPECT_EQ(parsed_provenance.source_code, "value int = 1");
+    EXPECT_EQ(parsed_provenance.source->hash_algorithm, "SHA-256");
+    EXPECT_EQ(parsed_provenance.source->hash, "cf4c47b9b0b584c2bfe69a84ca55d3b34513d9b9a07594e9aa879e555c1ee9ef");
+
+    const auto file = environment_file("source-manifest");
+    source.save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+
+    const dip::Provenance loaded_provenance = loaded["value"].get_provenance();
+    ASSERT_TRUE(loaded_provenance.source.has_value());
+    EXPECT_EQ(loaded_provenance.source_name, parsed_provenance.source_name);
+    EXPECT_EQ(loaded_provenance.source_line, parsed_provenance.source_line);
+    EXPECT_EQ(loaded_provenance.source_code, parsed_provenance.source_code);
+    EXPECT_EQ(loaded_provenance.source->hash, parsed_provenance.source->hash);
+    EXPECT_EQ(loaded.get_source_manifest().size(), source.get_source_manifest().size());
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, LoadSchemaVersion1WithoutSourceManifest) {
+    const auto file = environment_file("load-version-1");
+    dip::Environment source = parsed_environment();
+    source.save(file);
+    {
+        H5Handle hdf5_file(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        ASSERT_GE(hdf5_file, 0);
+        ASSERT_GE(H5Ldelete(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
+        H5Handle version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version", H5P_DEFAULT), H5Aclose);
+        ASSERT_GE(version_attribute, 0);
+        const uint64_t version = 1;
+        ASSERT_GE(H5Awrite(version_attribute, H5T_NATIVE_UINT64, &version), 0);
+    }
+
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_TRUE(loaded.get_source_manifest().empty());
+    EXPECT_FALSE(loaded["title"].get_provenance().source.has_value());
+    EXPECT_EQ(loaded["title"].get_provenance().source_name, source["title"].get_provenance().source_name);
     std::filesystem::remove(file);
 }
 
@@ -102,7 +150,15 @@ TEST(Environment, SaveHdf5Content) {
         H5Handle version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version", H5P_DEFAULT), H5Aclose);
         uint64_t version = 0;
         ASSERT_GE(H5Aread(version_attribute, H5T_NATIVE_UINT64, &version), 0);
-        EXPECT_EQ(version, 1);
+        EXPECT_EQ(version, 2);
+        ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
+        H5Handle source_manifest(H5Gopen2(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), H5Gclose);
+        ASSERT_GE(source_manifest, 0);
+        H5Handle source_entry(H5Gopen2(source_manifest, "0", H5P_DEFAULT), H5Gclose);
+        ASSERT_GE(source_entry, 0);
+        EXPECT_GT(H5Aexists(source_entry, "_DIPL_Source_Name"), 0);
+        EXPECT_GT(H5Aexists(source_entry, "_DIPL_Source_Hash_Algorithm"), 0);
+        EXPECT_GT(H5Aexists(source_entry, "_DIPL_Source_Hash"), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/simulation", H5P_DEFAULT), 0);
         H5Handle simulation(H5Gopen2(hdf5_file, "/simulation", H5P_DEFAULT), H5Gclose);
         EXPECT_GT(H5Aexists(simulation, "_DIPL_Kind"), 0);

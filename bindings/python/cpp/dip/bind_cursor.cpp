@@ -34,6 +34,15 @@ namespace snt::bind::python {
 
     void init_cursor(py::module_& m) {
 
+        auto provenance = py::class_<dip::Provenance>(
+            m, "Provenance", "Read-only DIPL source and citation provenance for a resolved value."
+        );
+        provenance.def_readonly("source_name", &dip::Provenance::source_name);
+        provenance.def_readonly("source_line", &dip::Provenance::source_line);
+        provenance.def_readonly("source_code", &dip::Provenance::source_code);
+        provenance.def_readonly("metadata", &dip::Provenance::metadata);
+        provenance.def_readonly("source", &dip::Provenance::source);
+
         auto k = py::enum_<dip::Path::Kind>(m, "PathKind", "Kind of path within a DIPL node hierarchy.");
         k.value("None", dip::Path::Kind::None);
         k.value("Empty", dip::Path::Kind::Empty);
@@ -111,6 +120,10 @@ namespace snt::bind::python {
                 return py::cast(*units);
             },
             "Unit string for a dimensional value, or None when the value is unitless."
+        );
+
+        val.def_property_readonly(
+            "provenance", &dip::Cursor::get_provenance, "Source and citation provenance for the value at this path."
         );
 
         val.def_property_readonly("kind", &dip::Cursor::get_kind, "Kind of DIPL path represented by this cursor.");

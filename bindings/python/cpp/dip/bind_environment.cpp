@@ -17,6 +17,15 @@ namespace snt::bind::python {
 
     void init_environment(py::module_& m) {
 
+        auto source_info =
+            py::class_<dip::SourceInfo>(m, "SourceInfo", "Durable identity and content fingerprint for a DIPL source.");
+        source_info.def_readonly("name", &dip::SourceInfo::name);
+        source_info.def_readonly("path", &dip::SourceInfo::path);
+        source_info.def_readonly("parent_name", &dip::SourceInfo::parent_name);
+        source_info.def_readonly("parent_line", &dip::SourceInfo::parent_line);
+        source_info.def_readonly("hash_algorithm", &dip::SourceInfo::hash_algorithm);
+        source_info.def_readonly("hash", &dip::SourceInfo::hash);
+
         auto export_format =
             py::enum_<dip::ExportFormat>(m, "ExportFormat", "Export format for generated parameter lists.");
         export_format.value("CPP", dip::ExportFormat::CPP);
@@ -49,6 +58,11 @@ namespace snt::bind::python {
         );
         env.def_property_readonly(
             "size", [](const dip::Environment& e) { return e.nodes.size(); }, "Number of top-level nodes."
+        );
+        env.def_property_readonly(
+            "source_manifest",
+            &dip::Environment::get_source_manifest,
+            "Source identities and SHA-256 fingerprints available for this environment."
         );
 
         env.def("load", &dip::Environment::load, py::arg("file"), "Load an environment from an HDF5 file.");

@@ -18,6 +18,21 @@ namespace snt::dip {
     class Cursor; ///< Forward declaring
 
     /**
+     * Durable identity information for one DIPL source.
+     *
+     * The digest covers the exact UTF-8 bytes parsed by DIP. It is a
+     * fingerprint, not embedded source content.
+     */
+    struct SourceInfo {
+        std::string name;
+        std::string path;
+        std::string parent_name;
+        size_t parent_line = 0;
+        std::string hash_algorithm;
+        std::string hash;
+    };
+
+    /**
      * Type of an environment request
      */
     enum class RequestType {
@@ -45,6 +60,8 @@ namespace snt::dip {
      */
     class Environment {
       private:
+        std::vector<SourceInfo> source_manifest_;
+
       public:
         NodeList<ValueNode> nodes; ///< List of parsed nodes
         HierarchyList hierarchy;   ///< List of node hierarchy (parent nodes)
@@ -77,6 +94,23 @@ namespace snt::dip {
          * @param file File name of the generated parameter list
          */
         void generate(ExportFormat format, const std::filesystem::path& file) const;
+
+        /**
+         * Return durable source identities for the parsed or loaded environment.
+         *
+         * Parsed environments derive the manifest from their registered sources;
+         * loaded DIPH5 environments return the manifest stored in the file.
+         */
+        std::vector<SourceInfo> get_source_manifest() const;
+
+        /** Return the durable identity of a named DIPL source, when available. */
+        std::optional<SourceInfo> get_source_info(const std::string& name) const;
+
+        /**
+         * Replace persisted source-manifest information during environment loading.
+         * This does not recreate executable source definitions or source code.
+         */
+        void set_source_manifest(std::vector<SourceInfo> manifest);
 
         /**
          * Get a source code

@@ -14,6 +14,15 @@
 
 namespace snt::dip {
 
+    /** Read-only provenance associated with the value selected by a cursor. */
+    struct Provenance {
+        std::string source_name;
+        size_t source_line = 0;
+        std::string source_code;
+        ValueMetadata metadata;
+        std::optional<SourceInfo> source;
+    };
+
     class Cursor {
       protected:
         const Environment* env_;
@@ -69,6 +78,14 @@ namespace snt::dip {
          * @return A value node pointer
          */
         dip::ValueNode::PointerType get_node() const;
+
+        /**
+         * Return source and citation provenance for the value at this path.
+         *
+         * The source manifest entry is present when the environment has a
+         * registered source (after parsing) or a DIPH5 v2 source manifest.
+         */
+        Provenance get_provenance() const;
 
         /**
          * Get shape of a value node at the current cursor path

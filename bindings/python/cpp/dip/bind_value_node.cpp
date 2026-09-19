@@ -23,6 +23,25 @@ namespace snt::bind::python {
 
     void init_value_node(py::module_& m) {
 
+        auto metadata = py::class_<dip::ValueMetadata>(
+            m, "ValueMetadata", "Citation, licensing, and descriptive metadata attached to a DIPL value."
+        );
+        metadata.def(py::init<>(), "Create empty DIPL value metadata.");
+        metadata.def_readonly("description", &dip::ValueMetadata::description);
+        metadata.def_readonly("authors", &dip::ValueMetadata::authors);
+        metadata.def_readonly("title", &dip::ValueMetadata::title);
+        metadata.def_readonly("journal", &dip::ValueMetadata::journal);
+        metadata.def_readonly("year", &dip::ValueMetadata::year);
+        metadata.def_readonly("volume", &dip::ValueMetadata::volume);
+        metadata.def_readonly("issue", &dip::ValueMetadata::issue);
+        metadata.def_readonly("pages", &dip::ValueMetadata::pages);
+        metadata.def_readonly("doi", &dip::ValueMetadata::doi);
+        metadata.def_readonly("url", &dip::ValueMetadata::url);
+        metadata.def_readonly("version", &dip::ValueMetadata::version);
+        metadata.def_readonly("created", &dip::ValueMetadata::created);
+        metadata.def_readonly("modified", &dip::ValueMetadata::modified);
+        metadata.def_readonly("license", &dip::ValueMetadata::license);
+
         auto vdata = py::class_<dip::ValueNodeData>(
             m, "ValueNodeData", "Evaluated value data returned by DIPL functions and nodes."
         );
@@ -46,7 +65,9 @@ namespace snt::bind::python {
 
         val.def(
             py::init(
-                [](const std::string& path, const py::object& value, const py::object& units) -> std::shared_ptr<dip::ValueNode> {
+                [](const std::string& path,
+                   const py::object& value,
+                   const py::object& units) -> std::shared_ptr<dip::ValueNode> {
                     // prepare value
                     val::BaseValue::PointerType val = from_python(value);
                     // prepare quantity

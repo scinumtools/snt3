@@ -147,6 +147,23 @@ tags only restrict textual output. See :doc:`Static parameter generation
 <../modules/dip/generation>` for native representations and format-specific
 behavior.
 
+Source provenance
+-----------------
+
+Each value cursor exposes a read-only ``provenance`` object. It contains the
+source name, source line, captured source line, and DIPL citation metadata.
+DIPH5 version 2 also preserves a source manifest, available as
+``environment.source_manifest``, with recorded source paths and SHA-256
+content fingerprints:
+
+.. code-block:: python
+
+   provenance = env["simulation.steps"].provenance
+   print(provenance.source_name, provenance.source_line)
+   print(provenance.metadata.doi)
+   if provenance.source is not None:
+       print(provenance.source.path, provenance.source.hash)
+
 Python values and NumPy
 -----------------------
 

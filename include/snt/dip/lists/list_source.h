@@ -41,6 +41,9 @@ namespace snt::dip {
         void append(const std::string& name, const EnvSource& src);
         EnvSource& at(const std::string& name);
         const EnvSource& at(const std::string& name) const;
+
+        /** Return all registered sources keyed by their DIPL source name. */
+        const std::map<std::string, EnvSource>& entries() const;
     };
 
 } // namespace snt::dip

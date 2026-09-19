@@ -51,6 +51,12 @@ lists can be traversed when a definition contains collections. Use
 ``env.load("parameters.diph5")`` to restore a previously persisted evaluated environment
 without parsing the original DIPL files.
 
+``env["path.to.value"].get_provenance()`` returns the source name, line,
+captured source line, and citation metadata for a resolved value. When the
+environment was parsed directly or loaded from a DIPH5 version 2 file, the
+result also includes the matching source-manifest entry with its recorded path
+and SHA-256 content fingerprint.
+
 For custom behavior, DIP also supports registered value- and node-producing
 functions. Those functions are evaluated while parsing and are not part of a
 persisted DIPH5 environment; applications that load DIPH5 should treat the

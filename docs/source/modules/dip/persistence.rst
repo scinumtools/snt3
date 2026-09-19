@@ -50,10 +50,12 @@ round trip:
 * Groups and collections without value-node descendants are not written:
   the writer constructs the hierarchy from the saved value paths.
 
-Source identifiers, line numbers, and captured source text remain node-level
-provenance. Loading does not reopen the original source files or restore the
-source registry, so full source-text retrieval and source-qualified lookups
-are not available from that provenance alone.
+Source identifiers, line numbers, captured source lines, and citation metadata
+remain node-level provenance. DIPH5 version 2 also stores a source manifest
+with each source's name, recorded path, parent relationship, and SHA-256 hash
+of the exact parsed content. This permits later verification of an available
+source file. Loading does not embed or recreate complete source text, parsed
+source nodes, or source-qualified lookups.
 
 HDF5 mapping
 ------------
