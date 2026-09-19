@@ -3,9 +3,9 @@ name: Build and Publish on PyPI
 on:
   release:
     types: [published]
-    
+
   workflow_dispatch:
-  
+
 jobs:
   build_wheels:
     name: Build wheels (${{ matrix.os }})
@@ -17,8 +17,6 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          # Homebrew dependencies built on macos-latest currently require
-          # macOS 26. Pin the wheel builder to retain a macOS 14 baseline.
           - macos-14
 
     steps:
@@ -26,8 +24,6 @@ jobs:
         with:
           submodules: recursive
 
-      # Only used for helper commands below.
-      # cibuildwheel uses its own Python installations.
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -60,7 +56,7 @@ jobs:
           echo "VCPKG_TARGET_TRIPLET=x64-windows" >> "$GITHUB_ENV"
           echo "HDF5_ROOT=C:/vcpkg/installed/x64-windows" >> "$GITHUB_ENV"
 
-        - name: Build wheels
+      - name: Build wheels
         uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_BUILD_VERBOSITY: 1
@@ -77,9 +73,11 @@ jobs:
           CIBW_ENVIRONMENT_WINDOWS: >-
             CMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
             VCPKG_TARGET_TRIPLET=x64-windows
+            CMAKE_PREFIX_PATH=C:/vcpkg/installed/x64-windows
             HDF5_ROOT=C:/vcpkg/installed/x64-windows
           CIBW_ENVIRONMENT_MACOS: >-
             HDF5_ROOT=${{ steps.macos_hdf5.outputs.hdf5_root }}
+            CMAKE_PREFIX_PATH=${{ steps.macos_hdf5.outputs.hdf5_root }}
             DYLD_FALLBACK_LIBRARY_PATH=${{ steps.macos_hdf5.outputs.hdf5_root }}/lib
             MACOSX_DEPLOYMENT_TARGET=14.0
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: >-
@@ -92,14 +90,13 @@ jobs:
             -w {dest_dir} {wheel}
           CIBW_TEST_COMMAND: python -c "import scinumtools3; print('Success!')"
           CMAKE_ARGS: >-
-            -DHDF5_ROOT=/usr
             -DHDF5_USE_STATIC_LIBRARIES=OFF
             -DENABLE_UNIT_TESTS=OFF
             -DENABLE_BINDING_C=OFF
             -DENABLE_EXEC_APPS=OFF
             -DENABLE_EXEC_EXAMPLES=OFF
-            -DENABLE_EXEC_BENCHMARKS=OFF            
-          
+            -DENABLE_EXEC_BENCHMARKS=OFF
+
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
