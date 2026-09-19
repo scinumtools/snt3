@@ -116,6 +116,10 @@ endif()
 # can bundle it into Linux wheels.
 if (ENABLE_DIP_PYBIND)
     target_link_libraries(${MODULE_NAME} PRIVATE HDF5::HDF5)
+    # FindHDF5 can report that HDF5 is supplied by a compiler wrapper on
+    # manylinux. In that mode its imported target has no link items, while
+    # HDF5_LIBRARIES contains the concrete libraries reported by the wrapper.
+    target_link_libraries(${MODULE_NAME} PRIVATE ${HDF5_LIBRARIES})
     # GNU linkers may otherwise discard HDF5 before resolving symbols pulled
     # from the static snt-dip archive. Keep a DT_NEEDED entry for auditwheel.
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
