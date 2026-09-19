@@ -111,6 +111,23 @@ if (ENABLE_API_PYBIND)
    add_subdirectory(api)
 endif()
 
+# snt-dip is a static library.  Link HDF5 explicitly to the final Python
+# extension so ELF linkers retain the dependency and auditwheel can bundle it.
+if (ENABLE_DIP_PYBIND)
+    target_link_libraries(${MODULE_NAME} PRIVATE HDF5::HDF5)
+
+    # FindHDF5 may discover HDF5 through a compiler wrapper on manylinux.  In
+    # that case the imported target can have no concrete link items, while
+    # HDF5_LIBRARIES contains the libraries reported by the wrapper.
+    target_link_libraries(${MODULE_NAME} PRIVATE ${HDF5_LIBRARIES})
+
+    # Preserve the dynamic dependency even when the linker sees HDF5 before
+    # symbols pulled from the static snt-dip archive.
+    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        target_link_options(${MODULE_NAME} PRIVATE "LINKER:--no-as-needed")
+    endif()
+endif()
+
 if(
     ENABLE_CORE_PYTEST OR
     ENABLE_EXS_PYTEST OR
