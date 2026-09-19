@@ -26,13 +26,6 @@ The project is built around two languages:
 The [online documentation](https://vrtulka23.github.io/scinumtools3/) contains
 the concepts, language specifications, tutorials, examples, and API reference.
 
-## Used in applications
-
-[Nuclide Atlas](https://github.com/vrtulka23/nuclide-atlas) is a unit-aware
-nuclear-isotope database and decay-chain calculator built with SciNumTools3.
-It uses DIPL for validated nuclide data, scenarios, provenance, and CMake build
-configuration.
-
 ## Quick example
 
 Define parameters in a `parameters.dip` file:
@@ -60,6 +53,11 @@ creation date, and license alongside parameter values.
 
 The parsed environment remains available throughout the application, so the
 same validated parameters can be passed between its components.
+
+An evaluated environment can be saved in the DIPH5 HDF5 format for later use
+or exchange, or generated as native C++, C, Fortran, Rust, or Julia parameters
+and as JSON or YAML data files for applications that should not parse DIPL at
+run time.
 
 Use the PUQ and DIP APIs from C++:
 
@@ -188,12 +186,20 @@ snt_dip_get(
 - **Python:** PUQ, VAL, DIP, and API bindings. VAL values are represented by
   native Python values and NumPy arrays. EXS is available internally to the
   C++ implementation but has no standalone Python binding.
-- **CLI:** commands for PUQ conversion and DIP parsing.
+- **CLI:** commands for PUQ conversion, DIP parsing, DIPH5 persistence, and
+  static parameter generation.
 - **C binding:** experimental and incomplete; use it only where its current
   scope is sufficient.
 
 The [integration guides](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
 cover Python, C, CLI, CMake, and REST usage.
+
+## Used in applications
+
+[Nuclide Atlas](https://github.com/vrtulka23/nuclide-atlas) is a unit-aware
+nuclear-isotope database and decay-chain calculator built with SciNumTools3.
+It uses DIPL for validated nuclide data, scenarios, provenance, and CMake build
+configuration.
 
 ## Development
 
