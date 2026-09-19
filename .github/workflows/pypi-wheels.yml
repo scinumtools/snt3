@@ -28,67 +28,114 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
 
-      - name: Linux dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtest-dev libhdf5-dev pybind11-dev
+      # -----------------------------------------------------------------------
+      # macOS dependencies
+      # -----------------------------------------------------------------------
 
-      - name: macOS dependencies
-        id: macos_hdf5
+      - name: Install macOS dependencies
+        id: macos_deps
         if: runner.os == 'macOS'
+        shell: bash
         run: |
-          brew install googletest hdf5 pybind11
-          hdf5_root="$(brew --prefix hdf5)"
-          echo "HDF5_ROOT=$hdf5_root" >> "$GITHUB_ENV"
-          echo "hdf5_root=$hdf5_root" >> "$GITHUB_OUTPUT"
+          brew install hdf5
 
-      - name: Windows dependencies
+          HDF5_ROOT="$(brew --prefix hdf5)"
+
+          echo "HDF5_ROOT=$HDF5_ROOT" >> "$GITHUB_ENV"
+          echo "hdf5_root=$HDF5_ROOT" >> "$GITHUB_OUTPUT"
+
+      # -----------------------------------------------------------------------
+      # Windows dependencies
+      # -----------------------------------------------------------------------
+
+      - name: Install Windows dependencies
         if: runner.os == 'Windows'
         shell: bash
         run: |
           vcpkg install hdf5:x64-windows
+
           echo "CMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_ENV"
           echo "VCPKG_TARGET_TRIPLET=x64-windows" >> "$GITHUB_ENV"
           echo "HDF5_ROOT=C:/vcpkg/installed/x64-windows" >> "$GITHUB_ENV"
+
+      # -----------------------------------------------------------------------
+      # Build wheels
+      # -----------------------------------------------------------------------
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.23
         env:
           CIBW_BUILD_VERBOSITY: 1
-          CIBW_ARCHS_WINDOWS: AMD64
+
+          # -------------------------------------------------------------------
+          # Architectures
+          # -------------------------------------------------------------------
+
           CIBW_ARCHS_LINUX: auto64
+          CIBW_ARCHS_WINDOWS: AMD64
+          CIBW_ARCHS_MACOS: auto64
+
+          # -------------------------------------------------------------------
+          # Linux
+          #
+          # Linux wheels are built INSIDE the manylinux container.
+          # Therefore HDF5 must be installed inside that container.
+          # -------------------------------------------------------------------
+
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
-          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
+          
           CIBW_BEFORE_ALL_LINUX: >-
-            yum install -y hdf5 hdf5-devel
+            dnf install -y hdf5 hdf5-devel
+          
           CIBW_ENVIRONMENT_LINUX: >-
             HDF5_ROOT=/usr
             CMAKE_PREFIX_PATH=/usr
-            LD_LIBRARY_PATH=/usr/lib64:/usr/lib
+          
+          # -------------------------------------------------------------------
+          # macOS
+          # -------------------------------------------------------------------
+
+          CIBW_ENVIRONMENT_MACOS: >-
+            HDF5_ROOT=${{ steps.macos_deps.outputs.hdf5_root }}
+            CMAKE_PREFIX_PATH=${{ steps.macos_deps.outputs.hdf5_root }}
+            DYLD_FALLBACK_LIBRARY_PATH=${{ steps.macos_deps.outputs.hdf5_root }}/lib
+            MACOSX_DEPLOYMENT_TARGET=14.0
+
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: >-
+            MACOSX_DEPLOYMENT_TARGET=14.0
+            DYLD_FALLBACK_LIBRARY_PATH=${{ steps.macos_deps.outputs.hdf5_root }}/lib
+            delocate-wheel
+            --require-archs {delocate_archs}
+            -w {dest_dir}
+            -v
+            {wheel}
+
+          # -------------------------------------------------------------------
+          # Windows
+          # -------------------------------------------------------------------
+
           CIBW_ENVIRONMENT_WINDOWS: >-
             CMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
             VCPKG_TARGET_TRIPLET=x64-windows
             CMAKE_PREFIX_PATH=C:/vcpkg/installed/x64-windows
             HDF5_ROOT=C:/vcpkg/installed/x64-windows
-          CIBW_ENVIRONMENT_MACOS: >-
-            HDF5_ROOT=${{ steps.macos_hdf5.outputs.hdf5_root }}
-            CMAKE_PREFIX_PATH=${{ steps.macos_hdf5.outputs.hdf5_root }}
-            DYLD_FALLBACK_LIBRARY_PATH=${{ steps.macos_hdf5.outputs.hdf5_root }}/lib
-            MACOSX_DEPLOYMENT_TARGET=14.0
-          CIBW_REPAIR_WHEEL_COMMAND_MACOS: >-
-            MACOSX_DEPLOYMENT_TARGET=14.0
-            DYLD_FALLBACK_LIBRARY_PATH=${{ steps.macos_hdf5.outputs.hdf5_root }}/lib
-            delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}
-          CIBW_BEFORE_BUILD_WINDOWS: pip install delvewheel
+
+          CIBW_BEFORE_BUILD_WINDOWS: >-
+            pip install delvewheel
+
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >-
-            delvewheel repair --add-path C:/vcpkg/installed/x64-windows/bin
-            -w {dest_dir} {wheel}
-          CIBW_TEST_COMMAND: python -c "import scinumtools3; print('Success!')"
+            delvewheel repair
+            --add-path C:/vcpkg/installed/x64-windows/bin
+            -w {dest_dir}
+            {wheel}
+
+          # -------------------------------------------------------------------
+          # CMake
+          # -------------------------------------------------------------------
+
           CMAKE_ARGS: >-
             -DHDF5_USE_STATIC_LIBRARIES=OFF
             -DENABLE_UNIT_TESTS=OFF
@@ -97,17 +144,34 @@ jobs:
             -DENABLE_EXEC_EXAMPLES=OFF
             -DENABLE_EXEC_BENCHMARKS=OFF
 
+          # -------------------------------------------------------------------
+          # Test installed wheel
+          # -------------------------------------------------------------------
+
+          CIBW_TEST_COMMAND: >-
+            python -c "import scinumtools3; print('Success!')"
+
+      # -----------------------------------------------------------------------
+      # Upload
+      # -----------------------------------------------------------------------
+
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.os }}
           path: wheelhouse/*.whl
 
+  # ===========================================================================
+  # Source distribution
+  # ===========================================================================
+
   build_sdist:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - uses: actions/setup-python@v5
         with:
@@ -123,6 +187,10 @@ jobs:
         with:
           name: sdist
           path: dist/*.tar.gz
+
+  # ===========================================================================
+  # Publish
+  # ===========================================================================
 
   publish:
     needs:
@@ -146,7 +214,8 @@ jobs:
       - name: Flatten artifact directories
         run: |
           mkdir upload
-          find dist -type f \( -name "*.whl" -o -name "*.tar.gz" \) -exec cp {} upload/ \;
+          find dist -type f \( -name "*.whl" -o -name "*.tar.gz" \) \
+            -exec cp {} upload/ \;
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
