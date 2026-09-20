@@ -12,7 +12,8 @@ is used with:
 
 `style_lexer.py` contains the matching DIPL token palette. The lexer supports
 declarations, directives, branching, values, units, references, arrays,
-strings, and expressions from the current DIPL specification.
+strings, expressions, and collection items such as ``units[]`` and
+``sources[constants]`` from the current DIPL specification.
 
 To use it in another Sphinx project, add this directory to `sys.path`, import
 `SyntaxLexer`, and register it through `sphinx.highlighting.lexers['dipl']`.

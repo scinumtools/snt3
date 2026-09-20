@@ -1,5 +1,6 @@
 /* Palette corresponding to docs/dipl/highlight/pygments/style_lexer.py. */
 .highlight .-DIP-Keyword { color: #757575; }
+.highlight .-DIP-Metadata { color: #00838f; }
 .highlight .-DIP-Name { color: #616161; font-weight: bold; }
 .highlight .-DIP-Type { color: #616161; }
 .highlight .-DIP-Dimension { color: #9e9e9e; }

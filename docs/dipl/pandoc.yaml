@@ -20,6 +20,10 @@ input-files:
   - docs/dipl/syntax/properties.md
   - docs/dipl/syntax/conditions.md
   - docs/dipl/syntax/schemas.md
+  - docs/dipl/appendix/highlighting.md
 
 syntax-definitions:
   - docs/dipl/highlight/skylight/dipl.xml
+
+filters:
+  - docs/dipl/pandoc-include-code.lua

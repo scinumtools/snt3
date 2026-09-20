@@ -60,4 +60,12 @@ are provided for editing DIPL files. The shared
 `highlighting test fixture <https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/highlight/highlighting-test.dipl>`_
 covers the language constructs supported by these highlighters.
 
+See the :doc:`rendered Pygments fixture <highlighting>` to verify the Sphinx
+highlighting directly.
+
 * Syntax highlighters: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/highlight>`_
+
+.. toctree::
+   :hidden:
+
+   highlighting

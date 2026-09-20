@@ -24,7 +24,8 @@
             (x-keywords '("true" "false" "none"))
             (x-types '("float" "int" "bool" "str" "table" "float32" "float64" "float128" "int16" "int32" "int64" "uint16" "uint32" "uint64"))
             (x-constants '("$source" "$unit" "$schema"))
-            (x-events '("!options" "!constant" "!format" "!condition" "!tags" "!description" "!delimiter"))
+            (x-events '("!options" "!constant" "!format" "!condition" "!tags" "!delimiter"))
+            (x-metadata '("?descr" "?authors" "?title" "?journal" "?year" "?volume" "?issue" "?pages" "?doi" "?url" "?version" "?created" "?modified" "?license"))
             (x-functions '("@if" "@elif" "@else" "@end"))
 
             ;; generate regex string for each category of keywords
@@ -32,22 +33,44 @@
             (x-types-regexp (regexp-opt x-types 'words))
             (x-constants-regexp (regexp-opt x-constants 'signs))
             (x-events-regexp (regexp-opt x-events 'signs))
+            (x-metadata-regexp (regexp-opt x-metadata 'signs))
             (x-functions-regexp (regexp-opt x-functions 'signs)))
 
         `(
           (,x-types-regexp . 'font-lock-type-face)
           (,x-constants-regexp . 'font-lock-constant-face)
-          (,x-events-regexp . 'font-lock-builtin-face)
+          (,x-events-regexp . 'dip-directive-face)
+          (,x-metadata-regexp . 'dip-metadata-face)
           (,x-functions-regexp . 'font-lock-function-name-face)
           (,x-keywords-regexp . 'font-lock-keyword-face)
-          ("{{[^}\n]*}\\(?:\\[[^]\n]*\\]\\)?}" . 'font-lock-variable-name-face)
+          ("{{[^}\n]*}\\(?:\\[[^]\n]*\\]\\)?}" (0 'dip-reference-face prepend))
+          ("{[^{}\n]*}\\[\\([0-9:., ]*\\)\\]"
+           (0 'dip-reference-face prepend)
+           (1 'dip-slice-face prepend))
+          ("{[^{}\n]*}\\(?:\\[[^]\n]*\\)?" (0 'dip-reference-face prepend))
           ("#[^\n]*" . 'font-lock-comment-face)
           ;; note: order above matters, because once colored, that part won't change.
           ;; in general, put longer words first
           )))
 
+(defface dip-metadata-face
+  '((t :foreground "#4f8585"))
+  "Subdued face for DIPL provenance metadata.")
+
+(defface dip-directive-face
+  '((t :foreground "#806a58"))
+  "Subdued face for DIPL property directives.")
+
+(defface dip-reference-face
+  '((t :foreground "#a66f43"))
+  "Subtle face for DIPL references and template substitutions.")
+
+(defface dip-slice-face
+  '((t :foreground "#c18a5d"))
+  "Subtle face for DIPL reference slice indices.")
+
 (defface my-number-face
-  '((t :foreground "red")) ; You can customize the face attributes as desired
+  '((t :foreground "#d47b7b"))
   "Face for highlighting numbers")
 
 ;; Highlight numbers and scientific notation in all programming modes
@@ -62,8 +85,8 @@
 
 (defvar dip-mode-syntax-table
   (let ((st (make-syntax-table)))
-    (modify-syntax-entry ?{ "<b" st)
-    (modify-syntax-entry ?} ">b" st)
+    (modify-syntax-entry ?{ "." st)
+    (modify-syntax-entry ?} "." st)
     st)
   "Syntax table for dip-mode")
 

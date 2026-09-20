@@ -41,8 +41,15 @@ external DIPL file immediately in a separate source environment. Its values
 can then be referenced using expressions such as ``{shared?scale}``; they
 are not automatically added to the local node tree. Register custom units
 with ``add_unit(name, expression)`` before parsing the local definitions.
-Use :doc:`DIPfile projects <projects>` when these inputs should be gathered
-into a reusable project manifest.
+
+For a reusable :doc:`DIPfile project <projects>`, load the complete manifest
+instead of registering its units, sources, and code inputs individually:
+
+.. code-block:: cpp
+
+   snt::dip::DIP dip;
+   dip.add_project("DIPfile");
+   snt::dip::Environment env = dip.parse();
 
 Environment
 -----------

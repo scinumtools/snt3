@@ -73,9 +73,18 @@
         <DetectChar char="#" attribute="Comment" context="Comment"/>
 
         <!-- Strings -->
+        <!-- Keep an f prefix unstyled, then choose the matching template form. -->
+        <RegExpr
+            attribute="Normal Text"
+            String="f(?=&quot;&quot;&quot;)"
+            context="#stay"/>
+        <RegExpr
+            attribute="Normal Text"
+            String="f(?=&quot;(?!&quot;&quot;))"
+            context="TemplateDoubleStart"/>
         <RegExpr
             attribute="String"
-            String="f?&quot;&quot;&quot;"
+            String="&quot;&quot;&quot;"
             context="Template"/>
         <DetectChar
             char="&quot;"
@@ -96,12 +105,30 @@
             String="\{\{[^}]*\}(?:\[[^]]*\])?(?::[^}]*)?\}"
             context="#stay"/>
       </context>
+
+      <context name="TemplateDoubleStart" attribute="Normal Text" lineEndContext="#pop">
+        <DetectChar
+            char="&quot;"
+            attribute="String"
+            context="TemplateDouble"/>
+      </context>
+
+      <context name="TemplateDouble" attribute="String" lineEndContext="#pop">
+        <!-- Escaped quotes remain part of the string. -->
+        <RegExpr String="\\&quot;" attribute="String" context="#stay"/>
+        <!-- Template references use the same syntax as triple-quoted templates. -->
+        <RegExpr
+            attribute="Reference"
+            String="\{\{[^}]*\}(?:\[[^]]*\])?(?::[^}]*)?\}"
+            context="#stay"/>
+        <DetectChar char="&quot;" attribute="String" context="#pop"/>
+      </context>
             
       <context name="Comment" attribute="Comment" lineEndContext="#pop"/>
 
       <context name="StringDouble" attribute="String" lineEndContext="#pop">
         <!-- escaped quotes remain inside the string -->
-        <RegExpr String="\\\\&quot;" attribute="String" context="#stay"/>
+        <RegExpr String="\\&quot;" attribute="String" context="#stay"/>
         <DetectChar char="&quot;" attribute="String" context="#pop"/>
       </context>
 

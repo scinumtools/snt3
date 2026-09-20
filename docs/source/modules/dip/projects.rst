@@ -6,12 +6,6 @@ definitions used by one parameter environment. It is itself ordinary DIPL:
 the project loader supplies the schemas for its three lists and parses the
 file with the standard DIP parser.
 
-Use a project from C++ with ``DIP::add_project()`` or from the command line:
-
-.. code-block:: bash
-
-   snt dip parse --project DIPfile --print
-
 Project format
 --------------
 
@@ -45,24 +39,12 @@ The project manifest is an input description rather than part of the final
 parameter environment. It cannot be combined with individual ``--input``
 arguments or a DIPH5 ``--load`` command.
 
-Interfaces
-----------
+Using projects
+--------------
 
-The same feature is available through all primary bindings:
-
-.. code-block:: cpp
-
-   snt::dip::DIP dip;
-   dip.add_project("DIPfile");
-   snt::dip::Environment env = dip.parse();
-
-.. code-block:: python
-
-   dip = DIP()
-   dip.add_project("DIPfile")
-   env = dip.parse()
-
-In C, call ``snt_dip_parser_add_project(dip, "DIPfile", &error)`` before
-``snt_dip_parser_parse``. The command-oriented C++ and Python API accepts
-``argument_add("project", {"DIPfile"})`` and
-``argument_add("project", ["DIPfile"])``, respectively.
+The project-loading call and command syntax are documented with their
+respective interfaces: :doc:`C++ basic usage <basic-usage>`,
+:doc:`the command-line interface <../../integrations/cli>`,
+:doc:`the Python binding <../../integrations/python>`, :doc:`the C bindings
+<../../integrations/c>`, and the command-oriented :doc:`C++ API
+<../../api/dip>`.

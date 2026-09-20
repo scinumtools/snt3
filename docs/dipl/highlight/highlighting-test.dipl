@@ -7,7 +7,6 @@ $schema vehicle
 
 # Strings and scalar values.
 name str = "escaped quote: \"DIPL\""
-single str = 'single quoted value'
 multiline str = """triple quoted
 value without interpolation and # text"""
 formatted str = f"Length: {{?length}}"
@@ -46,7 +45,20 @@ calculated float = ({?length} * 2) cm
   !tags ["example", "highlight"]
   !options [1, 2, 3] cm
   !delimiter ","
-  !description "A highlighted test value"
+  ?descr "A highlighted test value"
+  ?authors "Ada Lovelace, Emmy Noether"
+  ?title "DIPL Highlighting Fixture"
+  ?journal "Scientific Numerical Tools Examples"
+  ?year "2026"
+  ?volume "8"
+  ?issue "1"
+  ?pages "1-2"
+  ?doi "10.0000/example.dipl"
+  ?url "https://example.invalid/dipl-fixture"
+  ?version "1.0"
+  ?created "2026-09-21"
+  ?modified "2026-09-21"
+  ?license "CC BY 4.0"
 
 # Conditional branches.
 @if ({?enabled})
@@ -61,6 +73,13 @@ calculated float = ({?length} * 2) cm
 vehicle
   wheels int = 4
   mass float = 1200 kg
+
+# Indexed collection items.
+units[]
+  name str = "length"
+  unit str = "23*au"
+sources[constants]
+  filepath str = "data/constants.dip"
 
 # Import complete source and unit trees.
 $source {imported?.}

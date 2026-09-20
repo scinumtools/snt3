@@ -7,6 +7,7 @@ class StyleLexer(Style):
         # node components
         Token.DIP.Indent:                 '#BDBDBD',        # indent tag
         Token.DIP.Keyword:                '#757575',        # directives $ and !
+        Token.DIP.Metadata:               '#00838F',        # provenance metadata
         Token.DIP.Name:                   'bold #616161',   # node name
         Token.DIP.Type:                   '#616161',        # node type
         Token.DIP.Dimension:              '#9E9E9E',        # node dimension
