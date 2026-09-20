@@ -21,3 +21,20 @@ directory through the extension's `.pkgdef` file. Visual Studio then uses the
 same `source.dipl` grammar for `.dip` and `.dipl` files.
 
 For VS Code, the package can be packaged with `vsce package`.
+
+## Test in VS Code
+
+From the repository root, install this working copy as a local VS Code
+extension and reload an open VS Code window:
+
+```bash
+mkdir -p ~/.vscode/extensions && ln -sfn "$PWD/docs/dipl/highlight/textmate" ~/.vscode/extensions/scinumtools.dipl-language-support-0.1.0 && code --reload-window
+```
+
+Open `docs/dipl/highlight/highlighting-test.dipl` afterwards. The language
+indicator in the lower-right corner should show `DIPL` and the fixture should
+be highlighted automatically.
+
+The command requires the VS Code `code` shell command. If it is unavailable,
+open the Command Palette (`Shift+Command+P`) in VS Code and run `Shell Command:
+Install 'code' command in PATH`, then restart the terminal.

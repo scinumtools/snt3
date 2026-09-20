@@ -9,6 +9,21 @@
   },
   "categories": ["Programming Languages"],
   "contributes": {
+    "configurationDefaults": {
+      "[dipl]": {
+        "editor.bracketPairColorization.enabled": false,
+        "editor.tokenColorCustomizations": {
+          "textMateRules": [
+            {
+              "scope": "variable.other.readwrite.dipl",
+              "settings": {
+                "foreground": "#d6b86f"
+              }
+            }
+          ]
+        }
+      }
+    },
     "languages": [
       {
         "id": "dipl",

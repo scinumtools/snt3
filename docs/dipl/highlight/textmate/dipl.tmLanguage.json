@@ -6,8 +6,11 @@
     { "include": "#comment" },
     { "include": "#declaration" },
     { "include": "#directive" },
+    { "include": "#metadata" },
     { "include": "#branch" },
-    { "include": "#formatted-string" },
+    { "include": "#formatted-triple-string" },
+    { "include": "#formatted-double-string" },
+    { "include": "#formatted-single-string" },
     { "include": "#string" },
     { "include": "#reference" },
     { "include": "#number" },
@@ -17,18 +20,68 @@
   "repository": {
     "comment": { "match": "#.*$", "name": "comment.line.number-sign.dipl" },
     "declaration": { "match": "\\$(?:source|unit|schema)\\b", "name": "keyword.control.dipl" },
-    "directive": { "match": "!(?:options|format|condition|constant|tags|description|delimiter)\\b", "name": "keyword.other.dipl" },
+    "directive": { "match": "!(?:options|format|condition|constant|tags|delimiter)\\b", "name": "keyword.other.dipl" },
+    "metadata": { "match": "\\?(?:descr|authors|title|journal|year|volume|issue|pages|doi|url|version|created|modified|license)\\b", "name": "storage.modifier.dipl" },
     "branch": { "match": "@(?:if|elif|else|end)\\b", "name": "keyword.control.dipl" },
     "type": { "match": "\\b(?:bool|char|byte|str|table|map|list|u?int(?:8|16|32|64)?|float(?:16|32|64|128)?)\\b", "name": "storage.type.dipl" },
     "boolean": { "match": "\\b(?:true|false|none)\\b", "name": "constant.language.dipl" },
     "number": { "match": "[-+]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][-+]?[0-9]+)?", "name": "constant.numeric.dipl" },
-    "reference": { "match": "\\{[^{}]*\\}(?:\\[[^]]*\\])?", "name": "variable.other.readwrite.dipl" },
-    "formatted-string": {
-      "begin": "f(?=\"|')",
-      "beginCaptures": { "0": { "name": "keyword.other.dipl" } },
-      "end": "(?=\\n)|(?<!\\\\)(?:\"\"\"|\"|')",
+    "reference": {
+      "match": "(\\{[^{}]*\\})(\\[([0-9:., ]*)\\])?",
+      "captures": {
+        "1": { "name": "variable.other.readwrite.dipl" },
+        "2": { "name": "punctuation.section.brackets.dipl" },
+        "3": { "name": "constant.numeric.dipl" }
+      }
+    },
+    "formatted-triple-string": {
+      "begin": "f\"\"\"",
+      "end": "(?<!\\\\)\"\"\"",
+      "name": "string.quoted.triple.dipl",
       "patterns": [
-        { "match": "\\{\\{[^{}]*\\}\\}(?:\\[[^]]*\\])?", "name": "variable.other.readwrite.dipl" },
+        {
+          "match": "(\\{\\{[^{}]*\\})(\\[([0-9:., ]*)\\])?(\\})",
+          "captures": {
+            "1": { "name": "variable.other.readwrite.dipl" },
+            "2": { "name": "punctuation.section.brackets.dipl" },
+            "3": { "name": "constant.numeric.dipl" },
+            "4": { "name": "variable.other.readwrite.dipl" }
+          }
+        },
+        { "match": "\\\\.", "name": "constant.character.escape.dipl" }
+      ]
+    },
+    "formatted-double-string": {
+      "begin": "f\"",
+      "end": "(?<!\\\\)\"",
+      "name": "string.quoted.double.dipl",
+      "patterns": [
+        {
+          "match": "(\\{\\{[^{}]*\\})(\\[([0-9:., ]*)\\])?(\\})",
+          "captures": {
+            "1": { "name": "variable.other.readwrite.dipl" },
+            "2": { "name": "punctuation.section.brackets.dipl" },
+            "3": { "name": "constant.numeric.dipl" },
+            "4": { "name": "variable.other.readwrite.dipl" }
+          }
+        },
+        { "match": "\\\\.", "name": "constant.character.escape.dipl" }
+      ]
+    },
+    "formatted-single-string": {
+      "begin": "f'",
+      "end": "(?<!\\\\)'",
+      "name": "string.quoted.single.dipl",
+      "patterns": [
+        {
+          "match": "(\\{\\{[^{}]*\\})(\\[([0-9:., ]*)\\])?(\\})",
+          "captures": {
+            "1": { "name": "variable.other.readwrite.dipl" },
+            "2": { "name": "punctuation.section.brackets.dipl" },
+            "3": { "name": "constant.numeric.dipl" },
+            "4": { "name": "variable.other.readwrite.dipl" }
+          }
+        },
         { "match": "\\\\.", "name": "constant.character.escape.dipl" }
       ]
     },
