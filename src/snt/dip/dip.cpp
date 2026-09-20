@@ -2,6 +2,9 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <set>
+#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_property.h>
@@ -11,6 +14,78 @@
 #include <string>
 
 namespace snt::dip {
+
+    namespace {
+
+        constexpr std::string_view project_preamble = R"DIPL($schema snt_project_unit
+  name str
+  unit str
+$schema snt_project_source
+  name str
+  filepath str
+$schema snt_project_code
+  file str = none
+  string str = none
+units list : snt_project_unit
+sources list : snt_project_source
+code list : snt_project_code
+)DIPL";
+
+        std::string top_level_name(const std::string& path) {
+            const size_t end = path.find_first_of(".[");
+            return path.substr(0, end);
+        }
+
+        void validate_project_manifest(const Environment& manifest) {
+            const std::set<std::string> collections = {"units", "sources", "code"};
+            const std::map<std::string, std::set<std::string>> fields = {
+                {"units", {"name", "unit"}},
+                {"sources", {"name", "filepath"}},
+                {"code", {"file", "string"}},
+            };
+
+            for (const auto& [path, collection] : manifest.hierarchy.get_collections()) {
+                (void)collection;
+                if (collections.find(top_level_name(path)) == collections.end()) {
+                    throw SyntaxException(
+                        "Invalid DIP project manifest",
+                        "The manifest contains the unsupported top-level collection `" + top_level_name(path) + "`.",
+                        "Use only the units[], sources[], and code[] collections.",
+                        __FILE__,
+                        __LINE__
+                    );
+                }
+            }
+
+            for (size_t index = 0; index < manifest.nodes.size(); ++index) {
+                const auto& node = manifest.nodes.at(index);
+                const std::string& path = node->path.name;
+                const std::string top = top_level_name(path);
+                const size_t item_end = path.find(']');
+                const size_t field_start = (item_end == std::string::npos) ? std::string::npos : item_end + 2;
+                const bool valid_item = collections.find(top) != collections.end() && item_end != std::string::npos &&
+                                        field_start != std::string::npos && field_start < path.size() &&
+                                        path.find('.', field_start) == std::string::npos &&
+                                        fields.at(top).find(path.substr(field_start)) != fields.at(top).end();
+                if (!valid_item) {
+                    throw SyntaxException(
+                        "Invalid DIP project manifest",
+                        "The manifest node `" + path + "` is not part of the DIPfile schema.",
+                        "Use only the declared fields of units[], sources[], and code[] items.",
+                        __FILE__,
+                        __LINE__,
+                        node->line
+                    );
+                }
+            }
+        }
+
+        std::filesystem::path project_path(const std::filesystem::path& base, const std::string& value) {
+            const std::filesystem::path path(value);
+            return path.is_absolute() ? path : base / path;
+        }
+
+    } // namespace
 
     int DIP::num_instances = 0;
 
@@ -44,20 +119,31 @@ namespace snt::dip {
     }
 
     void DIP::add_string(const std::string& source_code) {
-
-        // prepare source data
-        std::string source_file = env.sources.at(source.name).path;
-        std::string source_name = source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings);
-        num_strings++;
-
-        // create a new source
-        env.sources.append(source_name, source_file, source_code, {source.name, source.line_number});
-
-        // parse lines from the source code
-        parse_lines(lines, source_code, source_name);
+        add_string_input(source_code, env.sources.at(source.name).path, {source.name, source.line_number});
     }
 
     void DIP::add_file(const std::filesystem::path& source_file, std::string source_name, bool absolute) {
+
+        add_file_input(source_file, std::move(source_name), absolute, {source.name, source.line_number});
+    }
+
+    void DIP::add_string_input(
+        const std::string& source_code,
+        const std::filesystem::path& source_file,
+        const Source& parent,
+        std::string source_name
+    ) {
+        if (source_name.empty()) {
+            source_name = source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings);
+            num_strings++;
+        }
+        env.sources.append(source_name, source_file, source_code, parent);
+        parse_lines(lines, source_code, source_name);
+    }
+
+    void DIP::add_file_input(
+        const std::filesystem::path& source_file, std::string source_name, bool absolute, const Source& parent
+    ) {
 
         // prepare source data
         std::ifstream file(source_file);
@@ -78,18 +164,23 @@ namespace snt::dip {
         }
 
         // create a new source
-        // TODO: treat source lineno and source_file with respect to where this method is called
-        env.sources.append(source_name, source_file, source_code.str(), {source.name, source.line_number});
+        (void)absolute;
+        env.sources.append(source_name, source_file, source_code.str(), parent);
 
         // parse lines from the source code
         parse_lines(lines, source_code.str(), source_name);
     }
 
     void DIP::add_source(const std::string& sname, const std::string& spath) {
+        add_source_input(sname, spath, {source.name, source.line_number});
+    }
+
+    void DIP::add_source_input(const std::string& sname, const std::string& spath, const Source& parent) {
         std::string source_name = source.name + "_" + std::string(DIRECT_SOURCE) + std::to_string(num_sources);
         num_sources++;
-        Source sparent = {source_name, 0};
+        Source sparent = {source_name, parent.line_number};
         EnvSource senv = parse_source(sname, spath, sparent);
+        senv.parent = parent;
         env.sources.append(sname, senv);
     }
 
@@ -97,6 +188,69 @@ namespace snt::dip {
         num_units++;
         EnvUnit uenv = {uname, uexpr};
         env.units.append(uname, uenv);
+    }
+
+    void DIP::add_project(const std::filesystem::path& project_file) {
+        const std::filesystem::path absolute_project = std::filesystem::absolute(project_file);
+        const std::string project_source = source.name + "_project" + std::to_string(num_projects++);
+
+        DIP manifest;
+        manifest.add_string(std::string(project_preamble));
+        manifest.add_file(absolute_project, project_source, true);
+        const Environment project = manifest.parse();
+        validate_project_manifest(project);
+
+        const EnvSource& project_definition = project.sources.at(project_source);
+        env.sources.append(project_source, absolute_project, project_definition.code, {source.name, source.line_number});
+        const std::filesystem::path project_directory = absolute_project.parent_path();
+
+        if (project.hierarchy.has_collection("units")) {
+            const Collection& collection = project.hierarchy.get_collection("units");
+            for (const std::string& index : collection.items) {
+                const std::string item = "units[" + index + "]";
+                add_unit(project[item + ".name"].as<std::string>(), project[item + ".unit"].as<std::string>());
+            }
+        }
+        if (project.hierarchy.has_collection("sources")) {
+            const Collection& collection = project.hierarchy.get_collection("sources");
+            for (const std::string& index : collection.items) {
+                const std::string item = "sources[" + index + "]";
+                const auto filepath = project_path(project_directory, project[item + ".filepath"].as<std::string>());
+                const auto node = project.get_node(item + ".filepath");
+                add_source_input(
+                    project[item + ".name"].as<std::string>(),
+                    filepath.string(),
+                    {project_source, node->line.source.line_number}
+                );
+            }
+        }
+        if (project.hierarchy.has_collection("code")) {
+            const Collection& collection = project.hierarchy.get_collection("code");
+            for (const std::string& index : collection.items) {
+                const std::string item = "code[" + index + "]";
+                const auto file = project.get_node(item + ".file");
+                const auto string = project.get_node(item + ".string");
+                const bool has_file = file->value != nullptr;
+                const bool has_string = string->value != nullptr;
+                if (has_file == has_string) {
+                    throw SyntaxException(
+                        "Invalid DIP project code entry",
+                        "Each code[] item must define exactly one of `file` or `string`.",
+                        "Set one field and leave the other as none.",
+                        __FILE__,
+                        __LINE__,
+                        file->line
+                    );
+                }
+                const auto location_node = has_file ? file : string;
+                const Source parent = {project_source, location_node->line.source.line_number};
+                if (has_file) {
+                    add_file_input(project_path(project_directory, project[item + ".file"].as<std::string>()), {}, true, parent);
+                } else {
+                    add_string_input(project[item + ".string"].as<std::string>(), absolute_project, parent);
+                }
+            }
+        }
     }
 
     void DIP::add_function_value(const std::string& name, FunctionList::DataFunctionType func) {

@@ -18,7 +18,7 @@ namespace snt::bind::python {
             &api::DIPParse::argument_add,
             py::arg("add_type"),
             py::arg("add_value"),
-            "Add a file or inline DIPL source."
+            "Add a DIP project, file, inline source, named source, or custom unit."
         );
 
         command.def("argument_request", &api::DIPParse::argument_request, py::arg("path"), "Select a DIPL node path.");

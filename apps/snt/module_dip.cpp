@@ -30,6 +30,8 @@ Options:
       Show version information.
   -i,--input <type> [<name>] <value>
       Add a new source type (file/string/unit/source). Unit and source input require name and value.
+  --project <file>
+      Load a DIPfile project manifest instead of --input.
   --load <file>
       Load an evaluated DIPH5 environment instead of --input.
   --save <file>
@@ -50,6 +52,8 @@ Options:
 
 Examples:
   snt dip parse -i file parameters.dip --print
+
+  snt dip parse --project DIPfile --print
 
   snt dip parse -i file parameters.dip --save parameters.diph5
   snt dip parse --load parameters.diph5 --print
@@ -74,6 +78,7 @@ void module_dip(ArgParser& argpar) {
 
     api::DIPParse cmd;
     bool has_input = false;
+    bool has_project = false;
     bool has_load = false;
     bool has_save = false;
     bool has_generate = false;
@@ -85,6 +90,8 @@ void module_dip(ArgParser& argpar) {
         const auto& key = argument.key;
         const auto& values = argument.values;
         if (key == "-i" || key == "--input") {
+            if (has_project)
+                throw std::runtime_error("--input cannot be combined with --project.");
             if (values.empty())
                 throw std::runtime_error(key + " requires an input type and value.");
             for (size_t i = 0; i < values.size();) {
@@ -102,6 +109,13 @@ void module_dip(ArgParser& argpar) {
                 i += count + 1;
             }
             has_input = true;
+        } else if (key == "--project") {
+            if (values.size() != 1 || has_project)
+                throw std::runtime_error("Specify exactly one --project file.");
+            if (has_input || has_load)
+                throw std::runtime_error("--project cannot be combined with --input or --load.");
+            cmd.argument_add("project", {values.front()});
+            has_project = true;
         } else if (key == "--load") {
             if (values.size() != 1 || has_load)
                 throw std::runtime_error("Specify exactly one --load file.");
@@ -141,8 +155,8 @@ void module_dip(ArgParser& argpar) {
             throw std::runtime_error("Unknown DIP option: " + key);
         }
     }
-    if (!has_input && !has_load)
-        throw std::runtime_error("Specify a DIP input with --input or --load.");
+    if (!has_input && !has_project && !has_load)
+        throw std::runtime_error("Specify a DIP input with --input, --project, or --load.");
     if (print && value)
         throw std::runtime_error("Use either --print or --value.");
     if (!type.empty() && !value)

@@ -115,6 +115,20 @@ def test_add_file():
 
     os.unlink(filename)
 
+def test_add_project(tmp_path):
+
+    (tmp_path / "parameters.dip").write_text("answer int = 42\n")
+    (tmp_path / "DIPfile").write_text(
+        "code[]\n"
+        "  file = \"parameters.dip\"\n"
+    )
+
+    c = DIPParse()
+    c.argument_add("project", [str(tmp_path / "DIPfile")])
+    c.argument_request("answer")
+    c.argument_value("integer")
+    assert c.execute() == "42\n"
+
 def test_request():
 
     c = DIPParse()

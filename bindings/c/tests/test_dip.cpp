@@ -58,6 +58,34 @@ TEST(DIP, ReportsErrors) {
     snt_dip_parser_free(nullptr);
 }
 
+TEST(DIP, ParseProject) {
+    const auto directory = std::filesystem::temp_directory_path() / "scinumtools3-cabi-project";
+    std::filesystem::remove_all(directory);
+    ASSERT_TRUE(std::filesystem::create_directories(directory));
+    {
+        std::ofstream parameters(directory / "parameters.dip");
+        parameters << "answer int = 42\n";
+    }
+    {
+        std::ofstream project(directory / "DIPfile");
+        project << "code[]\n"
+                   "  file = \"parameters.dip\"\n";
+    }
+
+    snt_dip* dip = nullptr;
+    snt_dip_error error{};
+    ASSERT_EQ(snt_dip_parser_create(&dip, &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_project(dip, (directory / "DIPfile").string().c_str(), &error), 0);
+    ASSERT_EQ(snt_dip_parser_parse(dip, &error), 0);
+
+    std::array<char, 64> output{};
+    EXPECT_EQ(snt_dip_parser_get(dip, "answer", output.data(), output.size(), &error), 0);
+    EXPECT_EQ(std::string(output.data()), "42");
+
+    snt_dip_parser_free(dip);
+    std::filesystem::remove_all(directory);
+}
+
 TEST_F(Environment, Load) {
     const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-load.diph5";
     ASSERT_EQ(snt_dip_environment_save(dip, file.string().c_str(), &error), 0);

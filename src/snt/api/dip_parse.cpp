@@ -18,7 +18,27 @@ namespace snt::api {
                 __LINE__
             );
         }
-        if (add_type == "file" && add_values.size() == 1) {
+        if (add_type == "project" && add_values.size() == 1) {
+            if (has_input) {
+                throw api::ArgumentException(
+                    "Conflicting DIP inputs",
+                    "A DIP project cannot be combined with other DIPL inputs.",
+                    "Use either one project input or individual file, string, source, and unit inputs.",
+                    __FILE__,
+                    __LINE__
+                );
+            }
+            dip.add_project(add_values[0]);
+            has_project = true;
+        } else if (has_project) {
+            throw api::ArgumentException(
+                "Conflicting DIP inputs",
+                "A DIP project is already configured.",
+                "Use either one project input or individual file, string, source, and unit inputs.",
+                __FILE__,
+                __LINE__
+            );
+        } else if (add_type == "file" && add_values.size() == 1) {
             dip.add_file(add_values[0]);
         } else if (add_type == "string" && add_values.size() == 1) {
             dip.add_string(add_values[0]);
@@ -30,7 +50,7 @@ namespace snt::api {
             throw api::ArgumentException(
                 "Invalid add argument",
                 "The input type `" + add_type + "` was not recognized or has an invalid number of values.",
-                "Use `file` or `string` with one value, or `source` or `unit` with two values.",
+                "Use `project`, `file`, or `string` with one value, or `source` or `unit` with two values.",
                 __FILE__,
                 __LINE__
             );

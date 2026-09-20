@@ -58,6 +58,16 @@ units, and ``--request`` selects a node:
 
 Repeat ``--input`` to combine sources before evaluating a request.
 
+For a reusable set of units, named sources, DIPL files, and inline DIPL,
+place the declarations in a :doc:`DIPfile project <../modules/dip/projects>`:
+
+.. code-block:: bash
+
+   snt dip parse --project DIPfile --request simulation.steps --print
+
+``--project`` replaces ``--input`` for that command and resolves paths within
+the project relative to the DIPfile.
+
 Environment persistence
 -----------------------
 

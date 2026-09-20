@@ -101,6 +101,29 @@ TEST_F(DIPCommands, AddUnit) {
     EXPECT_NE(output.find("baz = 1e5 cm"), std::string::npos);
 }
 
+TEST(DIPParse, AddProject) {
+    const auto directory = std::filesystem::temp_directory_path() / "scinumtools3-api-project";
+    std::filesystem::remove_all(directory);
+    ASSERT_TRUE(std::filesystem::create_directories(directory));
+    {
+        std::ofstream parameters(directory / "parameters.dip");
+        parameters << "answer int = 42\n";
+    }
+    {
+        std::ofstream project(directory / "DIPfile");
+        project << "code[]\n"
+                   "  file = \"parameters.dip\"\n";
+    }
+
+    api::DIPParse command;
+    command.argument_add("project", {(directory / "DIPfile").string()});
+    command.argument_request("answer");
+    command.argument_value("integer");
+    EXPECT_EQ(command.execute(), "42\n");
+
+    std::filesystem::remove_all(directory);
+}
+
 TEST_F(DIPCommands, Print) {
 
     cmd.argument_print();

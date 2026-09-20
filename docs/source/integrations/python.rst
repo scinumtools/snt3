@@ -65,6 +65,17 @@ conversion is needed:
    area_in_cm2 = Quantity(area.value, area.units).convert("cm2")
    print(area_in_cm2)  # 100 cm2
 
+For a reusable DIPfile manifest, call ``add_project`` instead of adding each
+file, source, and unit individually:
+
+.. code-block:: python
+
+   dip = DIP()
+   dip.add_project("DIPfile")
+   env = dip.parse()
+
+See :doc:`DIPfile projects <../modules/dip/projects>` for the manifest format.
+
 Persisting DIP environments
 ----------------------------
 

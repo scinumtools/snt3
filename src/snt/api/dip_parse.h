@@ -31,6 +31,7 @@ namespace snt::api {
         std::optional<dip::ExportFormat> generate_format; ///< Optional static export format
         std::string generate_file;     ///< Optional static export output path
         bool has_input = false;        ///< Whether DIPL inputs have been added
+        bool has_project = false;      ///< Whether a DIPfile project has been added
 
       public:
         /**

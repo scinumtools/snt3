@@ -67,4 +67,23 @@ def test_add_unit():
     assert env.size == 1
     assert env.nodes[0].name == "baz"
     assert env.nodes[0].value == 3
+
+def test_add_project(tmp_path):
+
+    (tmp_path / "parameters.dip").write_text("answer int = 42\n")
+    (tmp_path / "DIPfile").write_text(
+        "code[]\n"
+        "  file = \"parameters.dip\"\n"
+        "code[]\n"
+        "  string = \"\"\"\n"
+        "next int = ({?answer} + 1)\n"
+        "\"\"\"\n"
+    )
+
+    dip = DIP()
+    dip.add_project(str(tmp_path / "DIPfile"))
+    env = dip.parse()
+
+    assert env["answer"].value == 42
+    assert env["next"].value == 43
     

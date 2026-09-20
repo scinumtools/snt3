@@ -34,6 +34,8 @@ int snt_dip_parser_create(snt_dip** result, snt_dip_error* error);
 int snt_dip_parser_add_string(snt_dip* dip, const char* source, snt_dip_error* error);
 /** Add a DIPL source file to a parser. */
 int snt_dip_parser_add_file(snt_dip* dip, const char* path, snt_dip_error* error);
+/** Add a DIPfile project manifest to a parser. */
+int snt_dip_parser_add_project(snt_dip* dip, const char* path, snt_dip_error* error);
 /** Parse and evaluate all sources added to a parser. */
 int snt_dip_parser_parse(snt_dip* dip, snt_dip_error* error);
 /** Format a parsed DIPL value into a caller-provided buffer. */

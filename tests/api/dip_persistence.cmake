@@ -1,6 +1,7 @@
 file(MAKE_DIRECTORY "${TEST_DIR}")
 set(saved "${TEST_DIR}/parameters with spaces.diph5")
 set(copied "${TEST_DIR}/copy.diph5")
+set(project_dir "${TEST_DIR}/project")
 
 function(run_cli expected_status expected_output)
   execute_process(
@@ -47,3 +48,9 @@ run_cli(failure "" --load "${saved}" --save "${saved}/invalid.diph5")
 run_cli(success "" --input string "steps int = 2" --save "${saved}")
 run_cli(success "2\n" --load "${saved}" --request steps --value)
 file(REMOVE "${saved}" "${copied}")
+
+file(MAKE_DIRECTORY "${project_dir}")
+file(WRITE "${project_dir}/parameters.dip" "answer int = 42\n")
+file(WRITE "${project_dir}/DIPfile" "code[]\n  file = \"parameters.dip\"\n")
+run_cli(success "42\n" --project "${project_dir}/DIPfile" --request answer --value --type integer)
+run_cli(failure "" --project "${project_dir}/DIPfile" --input string "other int = 1")

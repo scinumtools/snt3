@@ -106,6 +106,8 @@ calculated*, and *what constraints it must satisfy*.
 
 * :doc:`Basic DIP usage <dip/basic-usage>` — C++ parsing, environments,
   and input sources.
+* :doc:`DIPfile projects <dip/projects>` — reusable manifests for complete
+  parameter environments.
 * :doc:`Environment persistence <dip/persistence>` — saving and loading
   evaluated environments in DIPH5 format from C++.
 * :doc:`Static parameter generation <dip/generation>` — exporting evaluated
@@ -116,6 +118,7 @@ calculated*, and *what constraints it must satisfy*.
    :hidden:
 
    dip/basic-usage
+   dip/projects
    dip/persistence
    dip/generation
 

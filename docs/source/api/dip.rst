@@ -18,6 +18,10 @@ Parsing and querying DIPL
    parse.argument_value("bool");
    std::string value = parse.execute();
 
+For a complete DIPfile manifest, use ``parse.argument_add("project",
+{"DIPfile"})``. It cannot be combined with other DIPL input arguments; see
+:doc:`DIPfile projects <../modules/dip/projects>`.
+
 Persisting an evaluated environment
 ------------------------------------
 

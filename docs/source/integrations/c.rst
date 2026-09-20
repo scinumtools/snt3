@@ -54,6 +54,10 @@ Create a parser with ``snt_dip_parser_create``, add definitions with
 .. literalinclude:: ../../../examples/dip/CBinding/main.c
    :language: c
 
+To load a DIPfile manifest, replace the individual input calls with
+``snt_dip_parser_add_project(dip, "DIPfile", &error)`` before parsing. See
+:doc:`DIPfile projects <../modules/dip/projects>` for the format.
+
 Persisting DIP environments
 ----------------------------
 

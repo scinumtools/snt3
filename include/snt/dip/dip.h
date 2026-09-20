@@ -33,6 +33,21 @@ namespace snt::dip {
         size_t num_files = 0;   ///< counter of code inputs from a file
         size_t num_sources = 0; ///< number of explicitely added sources
         size_t num_units = 0;   ///< number of explicitely added units
+        size_t num_projects = 0; ///< number of project manifests added to this parser
+
+        void add_string_input(
+            const std::string& source_code,
+            const std::filesystem::path& source_file,
+            const Source& parent,
+            std::string source_name = {}
+        );
+        void add_file_input(
+            const std::filesystem::path& source_file,
+            std::string source_name,
+            bool absolute,
+            const Source& parent
+        );
+        void add_source_input(const std::string& source_name, const std::string& source_file, const Source& parent);
 
       public:
         /**
@@ -73,6 +88,17 @@ namespace snt::dip {
          * @param unit_expression Unit definition
          */
         void add_unit(const std::string& unit_name, const std::string& unit_expression);
+
+        /**
+         * Add a DIP project manifest.
+         *
+         * The manifest is ordinary DIPL containing ``units[]``, ``sources[]``,
+         * and ordered ``code[]`` records. Relative paths are resolved from the
+         * manifest's directory.
+         *
+         * @param project_file Path to the DIPfile manifest.
+         */
+        void add_project(const std::filesystem::path& project_file);
 
         /**
          * Add function that returns a value

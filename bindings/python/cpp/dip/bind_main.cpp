@@ -59,6 +59,12 @@ namespace snt::bind::python {
         dip.def(
             "add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"), "Register a custom unit definition."
         );
+        dip.def(
+            "add_project",
+            &dip::DIP::add_project,
+            py::arg("project_file"),
+            "Add a DIPfile project manifest and its declared DIPL inputs."
+        );
 
         dip.def(
             "add_function_value",
