@@ -80,6 +80,21 @@ unit expressions. The PUQ unit solver and calculator are built on the
 calculations to be parsed and evaluated using the same general mechanism
 as other SciNumTools expression languages.
 
+* :doc:`Quantities and arithmetic <puq/quantities>` — construct quantities,
+  retain units and uncertainties, and use dimensional arithmetic.
+* :doc:`PUEL calculation <puq/calculation>` — evaluate unit-aware expressions
+  with the PUQ calculator.
+* :doc:`Conversion and unit systems <puq/conversion>` — convert compatible
+  quantities and work with unit-system context.
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   puq/quantities
+   puq/calculation
+   puq/conversion
+
 .. _dip-dimensional-input-parameters:
 
 DIP — Dimensional Input Parameters

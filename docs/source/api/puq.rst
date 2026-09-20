@@ -16,7 +16,7 @@ output, and execute it:
 
    #include "snt/api/puq_eval.h"
 
-   snt::api::PUQEval eval("12 km / 3 h");
+   snt::api::PUQEval eval("12*km / 3*h");
    eval.argument_output_units("m/s");
    std::string speed = eval.execute();
 
@@ -39,4 +39,3 @@ directly. API errors are reported through the SNT exception hierarchy.
 
 For the complete declaration and member reference, see the
 :doc:`C++ PUQ API <cpp/api/puq>`.
-

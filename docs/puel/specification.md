@@ -16,6 +16,7 @@ PUEL (Physical Units Expression Language) is a domain-specific language for repr
 It defines the syntax and structure of unit expressions used in scientific computations within the [SciNumTools3](https://github.com/vrtulka23/scinumtools3) framework. Evaluation, normalization, dimensional analysis, and unit conversion are performed by the underlying EXS and PUQ modules.
 
 The language is designed for the following use cases:
+
 * As a component of DIPL for defining and validating unit-aware parameters.
 * As a standalone language for the concise and machine-readable representation of physical unit expressions.
 * As a backend for programmatic interfaces, such as Python bindings and other language integrations.
@@ -81,12 +82,14 @@ The complete list of supported scaling prefixes is provided in [Scaling Prefixes
 
 ### Named Entities
 
-Named entities in PUEL include all units (e.g., Joule `J`, degree Celsius `Cel`, decibel `dB`), physical constants (e.g., proton mass `{m_p}`, Avogadro constant `{N_A}`, solar luminosity `{L_sol}`), physical quantities (e.g., energy `<E>`, electric flux `<Phi_E>`, radiation dose `<D_r>`), and unit-system scaling factors (e.g., `|E|`, `|Phi_E|`, `|D_r|`). The dimensionality of these entities is defined in terms of the base dimensions described in the previous section.
+Named entities in PUEL include all units (e.g., Joule `J`, degree Celsius `Cel`, decibel `dB`), physical constants (e.g., fixed proton mass `{#m_p}`, system-specific Avogadro constant `{N_A}`, solar luminosity `{L_sol}`), physical quantities (e.g., energy `<E>`, electric flux `<Phi_E>`, radiation dose `<D_r>`), and unit-system scaling factors (e.g., `|E|`, `|Phi_E|`, `|D_r|`). The dimensionality of these entities is defined in terms of the base dimensions described in the previous section.
 
 PUEL distinguishes between these categories using the following notation:
 
 * Units are represented by their symbols: `J`, `Cel`, `dB`
-* Physical constants are enclosed in curly braces: `{m_p}`, `{N_A}`, `{L_sol}`
+* Physical constants are enclosed in curly braces. A leading `#` denotes a
+  fixed reference constant, such as `{#m_p}`; without it, the constant is
+  resolved in the active unit system, such as `{N_A}` or `{L_sol}`.
 * Physical quantities are enclosed in angle brackets: `<E>`, `<Phi_E>`, `<D_r>`
 * Unit-system scaling factors are enclosed in pipe symbols: `|E|`, `|Phi_E|`, `|D_r|`
 
@@ -141,14 +144,14 @@ The following rules apply in unit expressions:
 | Rule                                                                                                                                                                                                                         | Examples                                                                                                                           |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Expressions MUST NOT contain whitespace except for spaces after array separators.                                                                                                                                           | `kg*m/s2`                                                                                                                          |
-| Unit identifiers MAY be combined using multiplication (`*`), division (`/`), and grouping parentheses (`(`, `)`).                                                                                                            | `kg*m`<br>`m/s`<br>`kg*m2/(sr*s2)`                                                                                                 |
+| Unit identifiers MAY be combined using multiplication (`*`), division (`/`), and grouping parentheses (`(`, `)`).                                                                                                            | `kg*m`; `m/s`; `kg*m2/(sr*s2)`                                                                                                     |
 | Exponents are written directly after the corresponding unit identifier and do not use exponentiation operators such as `^` or `**`.                                                                                          | `m2`                                                                                                                               |
 | Fractional exponents are written using the `numerator:denominator` notation.                                                                                                                                                 | `kg3:2`                                                                                                                            |
 | Negative exponents are written using a leading minus sign.                                                                                                                                                                   | `s-1`                                                                                                                              |
 | A unit system MAY be specified. When present, it MUST appear at the beginning of the expression and MUST be separated from the remainder by an underscore (`_`).                                                              | `US_lb*ft`                                                                                                                         |
-| Numerical values MAY be included in expressions.                                                                                                                                                                             | `2.34e3*mol`<br>`-9.81*m/s2`                                                                                                       |
-| The symbols `+` and `-` denote the sign of a numerical value or exponent; they do not represent addition or subtraction operators.                                                                                           | `+5*m`<br>`-5*m`<br>`s-2`                                                                                                          |
-| Uncertainties are written in parentheses immediately following the last decimal digit of a numerical value. The number of digits in the uncertainty corresponds to the same number of least significant digits in the value. | `3.45234(2)e3` → `3452.34 ± 0.02`<br>`3.45234(12)` → `3.45234 ± 0.00012`<br>`12.3(4)e-2` → `0.123 ± 0.004`<br>`120(5)` → `120 ± 5` |
+| Numerical values MAY be included in expressions.                                                                                                                                                                             | `2.34e3*mol`; `-9.81*m/s2`                                                                                                         |
+| The symbols `+` and `-` denote the sign of a numerical value or exponent; they do not represent addition or subtraction operators.                                                                                           | `+5*m`; `-5*m`; `s-2`                                                                                                              |
+| Uncertainties are written in parentheses immediately following the last decimal digit of a numerical value. The number of digits in the uncertainty corresponds to the same number of least significant digits in the value. | `3.45234(2)e3` → `3452.34 ± 0.02`; `3.45234(12)` → `3.45234 ± 0.00012`; `12.3(4)e-2` → `0.123 ± 0.004`; `120(5)` → `120 ± 5`     |
 
 ### Expression Parsing
 
@@ -195,9 +198,30 @@ If a unit expression contains a numerical factor, serialized expressions MUST pl
 
 When representing base dimensions, only dimensions with non-zero exponents SHOULD be included. The order of the base dimensions MUST be preserved as specified in Section 3.1..
 
+## Calculator expressions
+
+The grammar in `grammar.ebnf` defines a single, whitespace-free PUEL unit
+expression. ``Quantity`` and ``UnitSolver`` parse that form directly; for
+example, write `12*km`, not `12 km`.
+
+PUQ also provides a calculator layer for arithmetic between complete PUEL
+quantities. Its binary operators are written with spaces around them, so each
+operand remains a valid PUEL expression:
+
+```PUEL
+23*cm + 3*m
+2*g * ( 6*m2/s2 - 3*cm2 / 1.5*s2 )
+```
+
+The calculator supports grouping, unary `+` and `-`, and binary `+`, `-`,
+`*`, and `/`, in the usual precedence order. Calculator syntax is a PUQ host
+operation rather than an additional form accepted by the standalone PUEL unit
+solver.
+
 ## Conversions
 
-PUEL supports conversion between units of identical dimensions:
+PUQ conversion APIs operate on quantities parsed from PUEL and can convert
+between units of identical dimensions:
 
 ``km`` → ``m``  
 ``eV`` → ``J``  

@@ -3,35 +3,32 @@ expression          = [ unit-system "_" ] , product ;
 product             = factor ,
                       { ( "*" | "/" ) , factor } ;
 
-factor              = quantity
-                    | unit-system-factor
+factor              = unit-system-factor
                     | physical-constant
                     | physical-quantity
                     | grouped-expression
                     | value
                     | unit ;
 
-grouped-expression  = "(" , product , ")" ;
+grouped-expression  = "(" , product , ")" ,
+                      [ exponent-value ] ;
 
-value               = signed-number ,
-                      [ uncertainty ] ;
+value               = scalar-value
+                    | array ;
 
-signed-number       = [ sign ] ,
-                      number ;
+scalar-value        = [ sign ] , mantissa ,
+                      [ uncertainty ] ,
+                      [ scientific-exponent ] ;
 
-number              = integer
-                    | decimal ,
-                      [ exponent ] ;
+mantissa            = integer , [ "." , { digit } ]
+                    | "." , digit , { digit } ;
 
 integer             = digit , { digit } ;
 
-decimal             = integer ,
-                      [ "." , { digit } ]
-                    | "." , digit , { digit } ;
+array               = "[" , scalar-value ,
+                      { "," , [ whitespace ] , scalar-value } , "]" ;
 
-exponent            = ( "e" | "E" ) ,
-                      [ sign ] ,
-                      integer ;
+scientific-exponent = ( "e" | "E" ) , [ sign ] , integer ;
 
 uncertainty         = "(" , integer , ")" ;
 
@@ -44,11 +41,14 @@ exponent-value      = signed-integer
 signed-integer      = [ sign ] ,
                       integer ;
 
-physical-constant   = "{" , identifier , "}" ;
+physical-constant   = "{" , [ "#" ] , identifier , "}" ,
+                      [ exponent-value ] ;
 
-physical-quantity   = "<" , identifier , ">" ;
+physical-quantity   = "<" , identifier , ">" ,
+                      [ exponent-value ] ;
 
-unit-system-factor  = "|" , identifier , "|" ;
+unit-system-factor  = "|" , identifier , "|" ,
+                      [ exponent-value ] ;
 
 unit-system         = identifier ;
 
@@ -56,6 +56,8 @@ identifier          = letter ,
                       { letter | digit | "_" } ;
 
 sign                = "+" | "-" ;
+
+whitespace          = " " ;
 
 letter              = "A"…"Z" | "a"…"z" ;
 
