@@ -67,7 +67,7 @@ source repository:
 
 .. code-block:: console
 
-   git clone https://github.com/vrtulka23/scinumtools3.git
+   git clone --recurse-submodules https://github.com/vrtulka23/scinumtools3.git
    cd scinumtools3
 
    conan create .
@@ -97,11 +97,13 @@ If HDF5 is installed outside the standard search paths, pass its installation
 prefix as ``-DHDF5_ROOT=/path/to/hdf5`` when running CMake. The commands below
 also require the Ninja build tool.
 
-Clone the repository and configure the build:
+Clone the repository with its ``cpp-httplib`` submodule and configure the
+build. The submodule provides the optional REST server; omit it only when
+configuring with ``-DENABLE_EXEC_APPS_SERVER=OFF``.
 
 .. code-block:: console
 
-   git clone https://github.com/vrtulka23/scinumtools3.git
+   git clone --recurse-submodules https://github.com/vrtulka23/scinumtools3.git
    cd scinumtools3
 
    cmake -G Ninja -B build

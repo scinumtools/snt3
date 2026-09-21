@@ -69,8 +69,8 @@ namespace snt::api {
 
         puq::Calculator calc;
         puq::Quantity q = calc.eval(expression).value;
-        if (!output_quantity.empty()) {
-            if (output_quantity == "") {
+        if (!output_units.empty()) {
+            if (output_quantity.empty()) {
                 if (output_system == puq::SystemType::NONE)
                     q = q.convert(output_units);
                 else

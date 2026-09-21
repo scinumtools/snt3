@@ -43,7 +43,7 @@ the concepts, language specifications, tutorials, examples, and API reference.
   with source-content hashes, or generate native C++, C, Fortran, Rust, Julia,
   JSON, and YAML representations.
 - **One definition, many entry points:** use the same semantics from C++17,
-  Python, C, command-line, and CMake applications.
+  Python, C, command-line, CMake, and the optional local REST service.
 
 ## Quick example
 
@@ -162,7 +162,7 @@ are configured separately.
 ### From source
 
 ```console
-git clone https://github.com/vrtulka23/scinumtools3.git
+git clone --recurse-submodules https://github.com/vrtulka23/scinumtools3.git
 cd scinumtools3
 cmake -G Ninja -B build
 cmake --build build
@@ -211,6 +211,8 @@ snt_dip_get(
   PUQ evaluation and conversion, DIP parsing, DIPH5 persistence, and export.
 - **[CMake](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html):**
   package integration and DIPL evaluation during project configuration.
+- **[REST API server](https://vrtulka23.github.io/scinumtools3/integrations/rest.html):**
+  optional local HTTP access to the command-oriented PUQ and DIP API.
 
 See the [integration overview](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
 for the complete usage guides.

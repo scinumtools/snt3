@@ -1,26 +1,53 @@
-#include "httplib.h"
+#include "server.h"
 #include "settings.h"
 
+#include <charconv>
 #include <iostream>
+#include <stdexcept>
+#include <string_view>
 
-int main(int argc, char* argv[]) {
+namespace {
 
-    std::cout << "Starting SNT REST-API server on: http://localhost:" << SERVER_PORT << "/" << '\n';
+    int parse_port(const std::string_view value) {
+        int port = 0;
+        const auto [end, error] = std::from_chars(value.data(), value.data() + value.size(), port);
+        if (error != std::errc{} || end != value.data() + value.size() || port < 1 || port > 65535)
+            throw std::invalid_argument("Port must be an integer from 1 through 65535.");
+        return port;
+    }
 
-    httplib::Server svr;
+    void print_usage(const char* executable) {
+        std::cout << "Usage: " << executable << " [--port PORT]\n";
+    }
 
-    svr.Get("/", [](const httplib::Request&, httplib::Response& res) {
-        res.set_content(
-            R"(SNT REST-API Server
+} // namespace
 
-Example of use:
-http://localhost:)" +
-                std::to_string(SERVER_PORT) + R"(/snt/puq/
+int main(const int argc, char* argv[]) {
+    int port = SERVER_PORT;
+    for (int argument = 1; argument < argc; ++argument) {
+        const std::string_view option(argv[argument]);
+        if (option == "--help" || option == "-h") {
+            print_usage(argv[0]);
+            return 0;
+        }
+        if (option == "--port") {
+            if (++argument == argc) {
+                std::cerr << "Missing value for --port.\n";
+                print_usage(argv[0]);
+                return 2;
+            }
+            try {
+                port = parse_port(argv[argument]);
+            } catch (const std::invalid_argument& exception) {
+                std::cerr << exception.what() << '\n';
+                return 2;
+            }
+            continue;
+        }
+        std::cerr << "Unknown option: " << option << '\n';
+        print_usage(argv[0]);
+        return 2;
+    }
 
-)",
-            "text/plain"
-        );
-    });
-
-    svr.listen(std::string(SERVER_ADDRESS), SERVER_PORT);
+    return snt::server::run(SERVER_ADDRESS, port);
 }

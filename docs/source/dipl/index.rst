@@ -170,8 +170,8 @@ map items, lists, or complete collections:
      conductivity float W/(m*K);
 
    materials[copper] : material
-     density = 8960 kg/m3
-     conductivity = 401 W/(m*K)
+     density = 8960
+     conductivity = 401
 
 Conditional definitions
 ^^^^^^^^^^^^^^^^^^^^^^^

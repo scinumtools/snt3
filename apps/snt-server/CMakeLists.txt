@@ -1,5 +1,13 @@
 # create executable
 set(EXEC_NAME snt-server)
+set(CPPHTTPLIB_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/external/cpp-httplib/httplib.h")
+
+if(NOT EXISTS "${CPPHTTPLIB_HEADER}")
+  message(FATAL_ERROR
+    "snt-server requires the cpp-httplib Git submodule. Run:\n"
+    "  git submodule update --init --recursive"
+  )
+endif()
 
 file(GLOB EXEC_FILES "./*.cpp" "./**/*.cpp")
 add_executable(${EXEC_NAME} ${EXEC_FILES} )
@@ -20,3 +28,7 @@ set_target_properties(${EXEC_NAME} PROPERTIES
 # install libraries and executables
 install(TARGETS ${EXEC_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+if(ENABLE_UNIT_TESTS)
+  add_subdirectory(tests)
+endif()

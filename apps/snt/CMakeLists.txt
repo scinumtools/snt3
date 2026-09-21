@@ -26,4 +26,14 @@ install(EXPORT SNTExecutables
         NAMESPACE snt::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/snt)
 
+if(ENABLE_UNIT_TESTS)
+  add_test(
+    NAME cli.dip.persistence
+    COMMAND ${CMAKE_COMMAND}
+      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-persistence"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dip_persistence.cmake"
+  )
+endif()
+
 enable_coverage(${EXEC_NAME})

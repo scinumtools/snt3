@@ -130,7 +130,7 @@ option(ENABLE_EXEC_APPS_SNT "Enable main SciNumTools CLI executable" "${ENABLE_E
 message(STATUS "ENABLE_EXEC_APPS_SNT         ${ENABLE_EXEC_APPS_SNT}")
 option(ENABLE_EXEC_APPS_DMAP "Enable build of dimension map executable" "${ENABLE_EXEC_APPS}")
 message(STATUS "ENABLE_EXEC_APPS_DMAP        ${ENABLE_EXEC_APPS_DMAP}")
-option(ENABLE_EXEC_APPS_SERVER "Enable SNT REST-API server app" OFF)
+option(ENABLE_EXEC_APPS_SERVER "Enable SNT REST-API server app" "${ENABLE_EXEC_APPS}")
 message(STATUS "ENABLE_EXEC_APPS_SERVER      ${ENABLE_EXEC_APPS_SERVER}")
 option(ENABLE_EXEC_APPS_GUI "Enable SNT graphical user interface" OFF)
 message(STATUS "ENABLE_EXEC_APPS_GUI         ${ENABLE_EXEC_APPS_GUI}")

@@ -45,7 +45,7 @@ CMAKE_FLAGS=(
   -DENABLE_TIME_TRACE=OFF       # build compilation time tracing outputs
  
   -DENABLE_EXEC_BENCHMARKS=OFF  # build Google Benchmark tests
-  -DENABLE_EXEC_APPS_SERVER=OFF
+  -DENABLE_EXEC_APPS_SERVER=ON
   -DENABLE_EXEC_APPS_GUI=OFF
 
   -DRUN_UNIT_TESTS=OFF

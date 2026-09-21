@@ -13,3 +13,4 @@ logic in each application.
    c
    cli
    cmake
+   rest

@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+<defs>
+  <linearGradient id="head" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#f8fbff"/><stop offset="1" stop-color="#dceeff"/></linearGradient>
+  <linearGradient id="core" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#082b4b"/><stop offset="1" stop-color="#0b4168"/></linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-opacity=".16"/></filter>
+  <style>
+    .sans{font-family:Arial,Helvetica,sans-serif}.mono{font-family:"Courier New",monospace}
+    .navy{fill:#082b4b}.blue{fill:#0877bd}.muted{fill:#55718c}.white{fill:#fff}
+    .h1{font-size:74px;font-weight:800}.h2{font-size:30px;font-weight:700}.h3{font-size:22px;font-weight:700}
+    .body{font-size:16px}.small{font-size:14px}.code{font-size:17px}
+    .panel{fill:#fff;stroke:#aac8dd;stroke-width:1.5}.darkpanel{fill:url(#core);stroke:#16a5df;stroke-width:2}
+    .card{fill:#0c3556;stroke:#72b7db;stroke-width:1.2}.arrow{fill:#13a8df}
+  </style>
+</defs>
+
+<!-- Header -->
+<rect width="1600" height="165" fill="url(#head)"/>
+<path d="M560 165 L720 55 800 120 900 30 1020 145 1110 80 1220 165Z" fill="#b8d2e8" opacity=".65"/>
+<path d="M770 165 L900 60 990 145 1080 75 1180 165Z" fill="#779dbd" opacity=".5"/>
+<text x="35" y="86" class="sans navy h1">DIPL</text>
+<text x="36" y="123" class="sans navy h2">Dimensional Input Parameter Language</text>
+<text x="38" y="149" class="sans muted body" letter-spacing="3">ONE LANGUAGE · PHYSICAL MEANING · ONE SOURCE OF TRUTH</text>
+<text x="1290" y="62" class="sans navy h3">Same parameters.</text>
+<text x="1290" y="90" class="sans blue h3">Everywhere.</text>
+
+<!-- Left DIPL file -->
+<g id="dipl-file" filter="url(#shadow)">
+<rect x="30" y="185" rx="12" width="480" height="545" class="panel"/>
+<rect x="30" y="185" rx="12" width="480" height="70" fill="#eef7fd"/>
+<text x="55" y="220" class="sans navy h2">model.dip</text>
+<text x="55" y="244" class="sans muted body">Human- and machine-readable scientific setup</text>
+<g class="mono code">
+<text x="58" y="286" fill="#71879b"># Load constants from another DIPL file</text>
+<text x="58" y="313" fill="#6d20bd">$source constants = "physical.dip"</text>
+<text x="58" y="354" fill="#71879b"># Atmospheric model configuration</text>
+<text x="58" y="381" fill="#b54a00">atmosphere</text>
+<text x="82" y="408" fill="#b54a00">n_layers int = 100</text>
+<text x="82" y="435" fill="#b54a00">temperature float = 288.15 K</text>
+<text x="82" y="462" fill="#b54a00">pressure float = 1013.25 hPa</text>
+<text x="82" y="489" fill="#b54a00">composition str = {constants?air}</text>
+<text x="58" y="530" fill="#71879b"># Derived parameters</text>
+<text x="58" y="557" fill="#b54a00">scale_height float = (8.314 * {temperature} /</text>
+<text x="82" y="584" fill="#b54a00">(0.02897 * 9.81)) m</text>
+<text x="58" y="611" fill="#b54a00">layer_thickness float = (1000 m / {n_layers})</text>
+<text x="58" y="638" fill="#b54a00">surface_pressure float = ({pressure} *</text>
+<text x="82" y="665" fill="#b54a00">exp(-1000 m / {scale_height}))</text>
+<text x="58" y="701" fill="#b54a00">output_path str = "results/"</text>
+<text x="58" y="724" fill="#b54a00">save_profile bool = true</text>
+</g></g>
+
+<!-- Arrow -->
+<path class="arrow" d="M520 435 H575 V415 L615 455 575 495 V475 H520Z"/>
+<text x="530" y="405" class="sans navy small">parse · validate</text>
+
+<!-- Core -->
+<g id="cpp-core" filter="url(#shadow)">
+<rect x="615" y="185" rx="14" width="355" height="545" class="darkpanel"/>
+<text x="650" y="235" class="sans white h2">C++ Core</text>
+<text x="650" y="260" class="sans" fill="#bfe9ff" font-size="15">Single implementation · canonical behavior</text>
+<g>
+<rect x="640" y="290" rx="9" width="305" height="66" class="card"/><text x="665" y="319" class="sans white h3">Parser</text><text x="665" y="342" class="sans" fill="#cce7f5" font-size="14">Read DIPL · resolve references</text>
+<rect x="640" y="370" rx="9" width="305" height="66" class="card"/><text x="665" y="399" class="sans white h3">Validation</text><text x="665" y="422" class="sans" fill="#cce7f5" font-size="14">Types · units · dimensions · semantics</text>
+<rect x="640" y="450" rx="9" width="305" height="66" class="card"/><text x="665" y="479" class="sans white h3">Environment</text><text x="665" y="502" class="sans" fill="#cce7f5" font-size="14">Canonical hierarchical parameter tree</text>
+<rect x="640" y="530" rx="9" width="305" height="66" class="card"/><text x="665" y="559" class="sans white h3">Expression engine</text><text x="665" y="582" class="sans" fill="#cce7f5" font-size="14">Evaluate expressions and functions</text>
+<rect x="640" y="610" rx="9" width="305" height="66" class="card"/><text x="665" y="639" class="sans white h3">API</text><text x="665" y="662" class="sans" fill="#cce7f5" font-size="14">Programmatic access to the Environment</text>
+</g>
+<text x="680" y="705" class="sans" fill="#bfe9ff" font-size="16">Robust · tested · high performance</text>
+</g>
+
+<!-- Arrow -->
+<path class="arrow" d="M980 435 H1025 V415 L1065 455 1025 495 V475 H980Z"/>
+<text x="985" y="395" class="sans navy small">same core</text>
+<text x="985" y="413" class="sans navy small">same behavior</text>
+
+<!-- Interfaces -->
+<g id="interfaces" filter="url(#shadow)">
+<rect x="1065" y="185" rx="14" width="505" height="545" class="darkpanel"/>
+<text x="1090" y="225" class="sans white h2">Use DIPL your way</text>
+<text x="1090" y="250" class="sans" fill="#cce7f5" font-size="16">Different interfaces. One validated Environment.</text>
+
+<g id="cli"><rect x="1090" y="275" rx="9" width="455" height="72" fill="#075d48" stroke="#42e5a7" stroke-width="1.5"/><text x="1120" y="307" class="sans white h3">CLI</text><text x="1120" y="331" class="sans white small">Scripts · applications · automation</text></g>
+<g id="python"><rect x="1090" y="360" rx="9" width="455" height="72" fill="#07538b" stroke="#2cc6ff" stroke-width="1.5"/><text x="1120" y="392" class="sans white h3">Python binding</text><text x="1120" y="416" class="sans white small">Direct access to the same C++ Environment</text></g>
+<g id="cabi"><rect x="1090" y="445" rx="9" width="455" height="72" fill="#553080" stroke="#ba72f4" stroke-width="1.5"/><text x="1120" y="477" class="sans white h3">C ABI</text><text x="1120" y="501" class="sans white small">C · Fortran · Rust · other native integrations</text></g>
+<g id="cmake"><rect x="1090" y="530" rx="9" width="455" height="72" fill="#8a4508" stroke="#ffa542" stroke-width="1.5"/><text x="1120" y="562" class="sans white h3">CMake integration</text><text x="1120" y="586" class="sans white small">Natural integration in C++ projects</text></g>
+<g id="rest"><rect x="1090" y="615" rx="9" width="455" height="72" fill="#7c1944" stroke="#ff639a" stroke-width="1.5"/><text x="1120" y="647" class="sans white h3">REST server <tspan font-size="15">(soon)</tspan></text><text x="1120" y="671" class="sans white small">Expose the Environment over HTTP</text></g>
+</g>
+
+<!-- Applications -->
+<!-- DIPH5 persistence: intentionally separate from access interfaces -->
+<g id="diph5-persistence" filter="url(#shadow)">
+  <path d="M795 730 V747" stroke="#13a8df" stroke-width="6"/>
+  <path d="M795 747 l-10 -12 h20 z" fill="#13a8df"/>
+  <path d="M815 747 V730" stroke="#13a8df" stroke-width="6"/>
+  <path d="M815 730 l-10 12 h20 z" fill="#13a8df"/>
+  <rect x="625" y="748" rx="11" width="360" height="72" fill="#eef7fd" stroke="#0877bd" stroke-width="2"/>
+  <ellipse cx="665" cy="769" rx="22" ry="8" fill="#0877bd"/>
+  <rect x="643" y="769" width="44" height="26" fill="#0877bd"/>
+  <ellipse cx="665" cy="795" rx="22" ry="8" fill="#07538b"/>
+  <text x="705" y="777" class="sans navy h3">DIPH5 · .diph5</text>
+  <text x="705" y="801" class="sans muted small">HDF5 persistence · store &amp; restore the Environment</text>
+</g>
+
+<text x="475" y="850" class="sans navy h3">The same validated parameter Environment throughout your scientific software</text>
+<rect x="30" y="865" rx="12" width="1540" height="75" fill="#f7fbfe" stroke="#b6cfdf"/>
+<g class="sans navy">
+<text x="70" y="897" class="h3">Simulation / solver</text>
+<text x="330" y="897" class="h3">Analysis</text>
+<text x="510" y="897" class="h3">Data &amp; storage</text>
+<text x="735" y="897" class="h3">Visualization</text>
+<text x="940" y="897" class="h3">Workflows</text>
+<text x="1130" y="897" class="h3">Your application</text>
+<text x="1370" y="897" class="h3">…</text>
+</g>
+<g class="sans muted small">
+<text x="70" y="922">one source</text><text x="330" y="922">same values</text><text x="510" y="922">reproducible</text>
+<text x="735" y="922">consistent</text><text x="940" y="922">portable</text><text x="1130" y="922">extensible</text>
+</g>
+
+<!-- Footer -->
+<rect x="0" y="970" width="1600" height="80" fill="#082b4b"/>
+<text x="45" y="1010" class="sans white h3">Single source of truth</text>
+<text x="360" y="1010" class="sans white h3">Consistent behavior</text>
+<text x="675" y="1010" class="sans white h3">Multi-interface ecosystem</text>
+<text x="1050" y="1010" class="sans white h3">Faster science</text>
+<text x="1330" y="1010" class="sans" fill="#7dd5ff" font-size="22" font-style="italic">Parameters drive progress.</text>
+</svg>
