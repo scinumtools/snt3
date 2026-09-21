@@ -26,6 +26,15 @@ unit systems, prefixes, uncertainties, arrays, and mathematical operations.
 describe complete scientific input parameters, including their types, units,
 defaults, constraints, options, provenance, expressions, and dependencies.
 
+DIPL definitions can be assembled from files, inline text, unit definitions,
+and named source registries, or collected in a reusable :doc:`DIPfile project
+<modules/dip/projects>`. Parsing produces an evaluated DIP environment: a
+typed hierarchy that retains values, units, constraints, and source
+provenance. Environments can be stored in the :doc:`DIPH5 HDF5 format
+<modules/dip/persistence>` for later reuse and inspection, including a source
+manifest with content hashes, or :doc:`exported as static parameters
+<modules/dip/generation>` for C++, C, Fortran, Rust, Julia, JSON, and YAML.
+
 The underlying framework is implemented primarily in modern C++ and is
 organized into modular components. :ref:`VAL <val-values>` provides the
 fundamental value system, :ref:`EXS <exs-expression-solver>` provides the
@@ -39,8 +48,8 @@ Python modules, providing a consistent conceptual API across languages.
 
 A key objective of SciNumTools is to make the same scientific definitions
 usable across different environments. PUEL and DIPL definitions can be
-consumed by C++ and Python applications and exposed through interfaces such
-as command-line tools and REST services. This makes it possible to define
+consumed by C++, Python, and C applications and exposed through command-line,
+CMake, and REST interfaces. This makes it possible to define
 scientific data once and reuse it throughout a workflow instead of
 reimplementing the same units, parameter definitions, expressions, and
 constraints for every application.
