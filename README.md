@@ -30,10 +30,10 @@ model: values, units, constraints, derived relationships, and provenance stay
 together in one portable definition rather than being distributed across
 configuration files and application code.
 
-![DIPL architecture: scientific parameters are parsed and validated by the C++ core, then made available through command-line, Python, C, CMake, and REST interfaces.](docs/img/snt-schema-readme.png)
-
 The [online documentation](https://vrtulka23.github.io/scinumtools3/) contains
 the concepts, language specifications, tutorials, examples, and API reference.
+
+![DIPL architecture: scientific parameters are parsed and validated by the C++ core, then made available through command-line, Python, C, CMake, and REST interfaces.](docs/img/snt-schema-readme.png)
 
 ## Why DIPL?
 
