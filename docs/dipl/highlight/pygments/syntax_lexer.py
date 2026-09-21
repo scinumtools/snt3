@@ -75,9 +75,9 @@ class SyntaxLexer(RegexLexer):
             # function
             (r"([ ]*\()([a-zA-Z0-9_-]+)(\))",
              bygroups(Token.DIP.Text, Token.DIP.Expression, Token.DIP.Text), 'unit'),
-            # unquoted parenthesized expressions
-            (r'([ ]*\()([^#\n()]*)(\))',
-             bygroups(Token.DIP.Text, Token.DIP.Expression, Token.DIP.Text), 'unit'),
+            # Unquoted parenthesized expressions. References are handled by
+            # the expression state so they retain the reference token colour.
+            (r'[ ]*\(', Token.DIP.Expression, 'expression'),
             # expressions
             (r"([ ]*\()(')",
              bygroups(Token.DIP.Text, Token.DIP.Expression),   'expr_single'),
@@ -168,6 +168,20 @@ class SyntaxLexer(RegexLexer):
             (r'""[^"]',                Token.DIP.Expression),
             (r'(""")(\))',
              bygroups(Token.DIP.Expression, Token.DIP.Text), "unit"),
+        ],
+        'expression': [
+            (r'\{',                    Token.DIP.Reference, 'reference_expr'),
+            (r'\(',                    Token.DIP.Expression, 'expression_nested'),
+            (r'\)',                    Token.DIP.Expression, 'unit'),
+            (r'[^{}()]+',               Token.DIP.Expression),
+            (r'.',                      Token.DIP.Expression),
+        ],
+        'expression_nested': [
+            (r'\{',                    Token.DIP.Reference, 'reference_expr'),
+            (r'\(',                    Token.DIP.Expression, '#push'),
+            (r'\)',                    Token.DIP.Expression, '#pop'),
+            (r'[^{}()]+',               Token.DIP.Expression),
+            (r'.',                      Token.DIP.Expression),
         ],
         'reference' : [
             (r"{",                     Token.DIP.Reference, "#push"),

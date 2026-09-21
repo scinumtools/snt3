@@ -24,6 +24,12 @@ logic for each application.
 Language features
 -----------------
 
+This overview introduces DIPL's main language features. The complete normative
+language specification is provided below.
+
+Structured, typed values
+^^^^^^^^^^^^^^^^^^^^^^^^
+
 DIPL is indentation-based: two spaces establish a child level, while a dot
 in a name gives the equivalent fully qualified path. Comments begin with
 ``#``. A value definition has a name, explicit type, value, and—when
@@ -52,6 +58,9 @@ element:
    note str = """A string may span
    multiple lines."""
 
+Typed tabular data
+^^^^^^^^^^^^^^^^^^
+
 The ``table`` type turns a compact, typed table block into child arrays. Its
 columns may carry units and a ``!delimiter`` property can select a CSV- or
 TSV-like separator:
@@ -65,6 +74,9 @@ TSV-like separator:
    0 293.15
    1 294.20
    """
+
+Groups, maps, and lists
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Groups organize named children. Keyed collections are maps and indexed
 collections are lists; collections may be nested:
@@ -81,6 +93,9 @@ collections are lists; collections may be nested:
    sensors[]
      name str = "outlet"
 
+References, slices, and templates
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 References use braces. A local reference begins with ``?`` and a named-source
 reference puts the source before it. Values may be sliced, complete subtrees
 can be imported with a trailing dot, and formatted strings interpolate a
@@ -92,6 +107,9 @@ reference with double braces:
    first_component float = {?velocity}[0]
    message str = f"Speed: {{?speed}}"
 
+Derived values and decisions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Numerical and logical expressions support arithmetic, comparisons, Boolean
 operators, parentheses, exponentiation, and built-in numerical functions.
 They establish dependencies which are resolved before values are validated:
@@ -101,6 +119,9 @@ They establish dependencies which are resolved before values are validated:
    area float = ({?width} * {?height})
    reynolds float = ({?density} * {?speed} * {?diameter} / {?viscosity})
    stable bool = (({?reynolds} < 2e3) || ({?reynolds} > 4e3))
+
+Validation, metadata, and provenance
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Properties immediately below a value add validation, display guidance,
 categorization, and scientific provenance. ``{.}`` is the normalized value of
@@ -121,6 +142,9 @@ definition may also be declared without a value and completed by a later
 compatible modification; compatible units are converted to the definition's
 unit.
 
+External sources and custom units
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Named sources make external DIPL documents or raw text available without
 copying them into the local file. Custom PUEL units can be declared alongside
 the parameters:
@@ -132,6 +156,9 @@ the parameters:
 
    proton_mass float = {constants?proton_mass}
    domain_length float = 4 [cell_length]
+
+Reusable schemas
+^^^^^^^^^^^^^^^^
 
 Schemas declare reusable, validated structures. They can be applied to groups,
 map items, lists, or complete collections:
@@ -145,6 +172,9 @@ map items, lists, or complete collections:
    materials[copper] : material
      density = 8960 kg/m3
      conductivity = 401 W/(m*K)
+
+Conditional definitions
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Conditional blocks select definitions from logical expressions. Only the first
 matching branch is evaluated:
@@ -162,20 +192,11 @@ values or node trees. Their names and semantics belong to that application;
 all built-in DIPL constructs above have the portable language semantics
 defined by the specification.
 
-* Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/specification.md>`_
-* Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/grammar.ebnf>`_
-
-Application
------------
-
-`Nuclide Atlas <https://github.com/vrtulka23/nuclide-atlas>`_ is a unit-aware
-nuclear-isotope database and decay-chain calculator built with SciNumTools3.
-It uses DIPL sources for validated nuclide records and scenarios, including
-units and provenance metadata, and its CMake build configuration is driven by
-DIPL through the SNT CMake integration.
-
 Specification
 -------------
+
+* Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/specification.md>`_
+* Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/grammar.ebnf>`_
 
 .. raw:: html
 
@@ -210,3 +231,14 @@ highlighting directly.
    :hidden:
 
    highlighting
+
+Application
+-----------
+
+`Nuclide Atlas <https://github.com/vrtulka23/nuclide-atlas>`_ is a unit-aware
+nuclear-isotope database and decay-chain calculator built with SciNumTools3.
+It uses DIPL sources for validated nuclide records and scenarios, including
+units and provenance metadata, and its CMake build configuration is driven by
+DIPL through the SNT CMake integration.
+
+   

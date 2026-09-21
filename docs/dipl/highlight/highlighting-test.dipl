@@ -14,6 +14,11 @@ formatted_slice str = f"Surname: {{?name}[9:]}"
 formatted_multiline str = f"""Length: {{?length}}
 Width: {{?width}}"""
 
+# The same reference must retain its reference colour in every context.
+reference_direct float = {?length}
+reference_expression float = ({?length} * 2)
+reference_template str = f"Length: {{?length}}"
+
 enabled bool = true
 disabled bool = false
 missing bool = none
