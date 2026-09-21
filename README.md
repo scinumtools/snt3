@@ -26,6 +26,18 @@ The project is built around two languages:
 The [online documentation](https://vrtulka23.github.io/scinumtools3/) contains
 the concepts, language specifications, tutorials, examples, and API reference.
 
+## Features
+
+- **Unit-aware quantities:** parse, calculate, and convert values with units,
+  uncertainties, arrays, prefixes, and unit systems.
+- **Declarative scientific inputs:** define typed, constrained DIPL parameter
+  hierarchies with expressions, dependencies, metadata, and source provenance.
+- **Reproducible parameter exchange:** persist evaluated environments in DIPH5
+  with source-content hashes, or generate native C++, C, Fortran, Rust, Julia,
+  JSON, and YAML representations.
+- **One definition, many entry points:** use the same semantics from C++17,
+  Python, C, command-line, CMake, and REST applications.
+
 ## Quick example
 
 Define parameters in a `parameters.dip` file:
