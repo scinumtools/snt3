@@ -1,0 +1,16 @@
+# Build trees contain host-specific CMake caches and binaries. Docker images
+# configure their own clean build directory.
+build/
+build-*/
+docs/build/
+
+# Local environments and generated Python artifacts are not source inputs.
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+wheelhouse/
+
+# Docker does not need repository history to compile the checked-out sources.
+.git/

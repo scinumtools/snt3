@@ -8,7 +8,7 @@ This directory contains Docker images for **SciNumTools3**.
 | --------- | -------------------------------------------------------------------------- |
 | `python/` | Ready-to-use Python environment with SciNumTools3 installed.               |
 | `dev/`    | Development environment for building, testing, and modifying SciNumTools3. |
-| `rest/`   | *(Planned)* REST API server exposing SciNumTools3 functionality.           |
+| `rest/`   | REST API server exposing SciNumTools3 functionality.                       |
 
 ---
 
@@ -101,6 +101,28 @@ Run the Python tests:
 ```bash
 pytest
 ```
+
+---
+
+## REST API Server Image
+
+Build:
+
+```bash
+docker build \
+    -f packaging/docker/rest/Dockerfile \
+    -t scinumtools3-rest .
+```
+
+Run as a network service:
+
+```bash
+docker run --rm -p 8080:8080 scinumtools3-rest
+```
+
+The server has no authentication. Production deployment needs an
+authentication-capable reverse proxy or equivalent network access control. For
+host-only development, publish ``127.0.0.1:8080:8080`` instead.
 
 ---
 

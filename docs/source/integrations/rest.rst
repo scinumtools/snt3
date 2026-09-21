@@ -18,9 +18,11 @@ Enable the server explicitly when configuring SNT:
 
 The server listens on ``127.0.0.1:8080`` by default. Pass ``--port PORT`` to
 choose another port, for example when the default is already occupied.
-``--help`` shows the available program options. It returns JSON and has no
-authentication or authorization layer. Run it only for trusted local users
-unless a reverse proxy or equivalent deployment boundary supplies those
+``--address ADDRESS`` changes the listening address; it is intended for
+container deployments, where ``0.0.0.0`` accepts connections from outside the
+container. ``--help`` shows the available program options. It returns JSON and
+has no authentication or authorization layer. Run it only for trusted local
+users unless a reverse proxy or equivalent deployment boundary supplies those
 controls.
 
 PUQ endpoints

@@ -4,6 +4,7 @@
 #include <charconv>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <string_view>
 
 namespace {
@@ -17,13 +18,14 @@ namespace {
     }
 
     void print_usage(const char* executable) {
-        std::cout << "Usage: " << executable << " [--port PORT]\n";
+        std::cout << "Usage: " << executable << " [--address ADDRESS] [--port PORT]\n";
     }
 
 } // namespace
 
 int main(const int argc, char* argv[]) {
     int port = SERVER_PORT;
+    std::string address(SERVER_ADDRESS);
     for (int argument = 1; argument < argc; ++argument) {
         const std::string_view option(argv[argument]);
         if (option == "--help" || option == "-h") {
@@ -44,10 +46,19 @@ int main(const int argc, char* argv[]) {
             }
             continue;
         }
+        if (option == "--address") {
+            if (++argument == argc || std::string_view(argv[argument]).empty()) {
+                std::cerr << "Missing value for --address.\n";
+                print_usage(argv[0]);
+                return 2;
+            }
+            address = argv[argument];
+            continue;
+        }
         std::cerr << "Unknown option: " << option << '\n';
         print_usage(argv[0]);
         return 2;
     }
 
-    return snt::server::run(SERVER_ADDRESS, port);
+    return snt::server::run(address, port);
 }
