@@ -30,6 +30,8 @@ model: values, units, constraints, derived relationships, and provenance stay
 together in one portable definition rather than being distributed across
 configuration files and application code.
 
+![DIPL architecture: scientific parameters are parsed and validated by the C++ core, then made available through command-line, Python, C, CMake, and REST interfaces.](docs/img/snt-schema-readme.png)
+
 The [online documentation](https://vrtulka23.github.io/scinumtools3/) contains
 the concepts, language specifications, tutorials, examples, and API reference.
 
@@ -44,6 +46,26 @@ the concepts, language specifications, tutorials, examples, and API reference.
   JSON, and YAML representations.
 - **One definition, many entry points:** use the same semantics from C++17,
   Python, C, command-line, CMake, and the optional local REST service.
+
+## Interfaces
+
+- **[C++ API](https://vrtulka23.github.io/scinumtools3/api/index.html):**
+  modular C++17 libraries and application-facing commands.
+- **[Python](https://vrtulka23.github.io/scinumtools3/integrations/python.html):**
+  PUQ, VAL, DIP, and API bindings, with native Python values and NumPy arrays.
+- **[C binding](https://vrtulka23.github.io/scinumtools3/integrations/c.html):**
+  experimental opaque-handle interfaces for PUQ and DIPL.
+- **[Command line](https://vrtulka23.github.io/scinumtools3/integrations/cli.html):**
+  PUQ evaluation and conversion, DIP parsing, DIPH5 persistence, and export.
+- **[CMake](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html):**
+  package integration and DIPL evaluation during project configuration.
+- **[REST API server](https://vrtulka23.github.io/scinumtools3/integrations/rest.html):**
+  optional local HTTP access to the command-oriented PUQ and DIP API.
+- **[Docker](https://vrtulka23.github.io/scinumtools3/integrations/docker.html):**
+  reproducible Python and development environments.
+
+See the [integration overview](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
+for the complete usage guides.
 
 ## Quick example
 
@@ -198,26 +220,6 @@ snt_dip_get(
     REQUIRED
 )
 ```
-
-## Interfaces
-
-- **[C++ API](https://vrtulka23.github.io/scinumtools3/api/index.html):**
-  modular C++17 libraries and application-facing commands.
-- **[Python](https://vrtulka23.github.io/scinumtools3/integrations/python.html):**
-  PUQ, VAL, DIP, and API bindings, with native Python values and NumPy arrays.
-- **[C binding](https://vrtulka23.github.io/scinumtools3/integrations/c.html):**
-  experimental opaque-handle interfaces for PUQ and DIPL.
-- **[Command line](https://vrtulka23.github.io/scinumtools3/integrations/cli.html):**
-  PUQ evaluation and conversion, DIP parsing, DIPH5 persistence, and export.
-- **[CMake](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html):**
-  package integration and DIPL evaluation during project configuration.
-- **[REST API server](https://vrtulka23.github.io/scinumtools3/integrations/rest.html):**
-  optional local HTTP access to the command-oriented PUQ and DIP API.
-- **[Docker](https://vrtulka23.github.io/scinumtools3/integrations/docker.html):**
-  reproducible Python and development environments.
-
-See the [integration overview](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
-for the complete usage guides.
 
 ## Used in applications
 
