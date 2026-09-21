@@ -9,8 +9,14 @@ if(NOT EXISTS "${CPPHTTPLIB_HEADER}")
   )
 endif()
 
-file(GLOB EXEC_FILES CONFIGURE_DEPENDS "./*.cpp" "./**/*.cpp")
-add_executable(${EXEC_NAME} ${EXEC_FILES} )
+add_executable(${EXEC_NAME}
+  dip.cpp
+  main.cpp
+  openapi.cpp
+  published.cpp
+  puq.cpp
+  server.cpp
+)
 
 target_include_directories(${EXEC_NAME}
   PRIVATE
@@ -20,6 +26,8 @@ target_include_directories(${EXEC_NAME}
 )
 
 target_link_libraries(${EXEC_NAME} PRIVATE snt-api)
+
+enable_coverage(${EXEC_NAME})
 
 set_target_properties(${EXEC_NAME} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
