@@ -3,12 +3,21 @@
 
 #include "httplib.h"
 
+#include <filesystem>
 #include <functional>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace snt::server {
+
+    enum class PublishedInputKind { Project, DIPH5 };
+
+    struct PublishedInput {
+        std::string name;
+        std::filesystem::path file;
+        PublishedInputKind kind;
+    };
 
     std::string required_param(const httplib::Request& request, const std::string& name);
     bool optional_flag(const httplib::Request& request, const std::string& name);
@@ -18,7 +27,9 @@ namespace snt::server {
 
     void register_puq_routes(httplib::Server& server);
     void register_dip_routes(httplib::Server& server);
-    int run(std::string_view address, int port);
+    void register_published_routes(httplib::Server& server, const std::vector<PublishedInput>& inputs);
+    void register_openapi_route(httplib::Server& server);
+    int run(std::string_view address, int port, const std::vector<PublishedInput>& inputs = {});
 
 } // namespace snt::server
 

@@ -56,3 +56,27 @@ must place it behind appropriate network access controls or an
 authentication-capable reverse proxy. To restrict it to the Docker host while
 developing, use ``-p 127.0.0.1:8080:8080`` instead. See :doc:`REST API server
 <rest>` for endpoints and request formats.
+
+Published parameter environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Mount a DIPL project directory read-only and publish the environment parsed
+from its ``DIPfile`` at startup:
+
+.. code-block:: console
+
+   docker run --rm -p 9000:8080 \
+       -v "$(pwd)/model:/data:ro" \
+       scinumtools3-rest \
+       --project model=/data/DIPfile
+
+The service is then available on port ``9000``. It never receives the project
+files over HTTP; it parses the mounted project once and exposes the immutable
+result under the name ``model``. A mounted DIPH5 environment works similarly:
+
+.. code-block:: console
+
+   docker run --rm -p 9000:8080 \
+       -v "$(pwd)/environment.diph5:/data/environment.diph5:ro" \
+       scinumtools3-rest \
+       --diph5 model=/data/environment.diph5

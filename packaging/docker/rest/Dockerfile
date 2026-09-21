@@ -30,4 +30,4 @@ RUN cmake -G Ninja -S . -B build \
 
 EXPOSE 8080
 
-CMD ["/opt/scinumtools3/build/bin/snt-server", "--address", "0.0.0.0", "--port", "8080"]
+ENTRYPOINT ["/opt/scinumtools3/build/bin/snt-server", "--address", "0.0.0.0"]

@@ -25,6 +25,13 @@ has no authentication or authorization layer. Run it only for trusted local
 users unless a reverse proxy or equivalent deployment boundary supplies those
 controls.
 
+OpenAPI document
+----------------
+
+The server exposes an OpenAPI 3.1 document at ``/openapi.json``. Load
+``http://127.0.0.1:8080/openapi.json`` in Swagger UI, Swagger Editor, or any
+other OpenAPI-compatible client to browse and invoke the API.
+
 PUQ endpoints
 -------------
 
@@ -112,6 +119,39 @@ by the project's ``sources[].filepath`` values. Absolute paths, ``.`` and
 names are rejected. The temporary bundle directory is removed after the
 request, whether parsing succeeds or fails. The endpoint therefore never
 resolves a path supplied by a caller outside its isolated request bundle.
+
+Published environments
+----------------------
+
+For deployed models, start the server with a named project or DIPH5 input:
+
+.. code-block:: console
+
+   snt-server --project model=/srv/model/DIPfile
+   snt-server --diph5 model=/srv/model/environment.diph5
+
+``--project NAME=PATH`` parses the ordinary DIPfile project once at startup;
+``--diph5 NAME=PATH`` loads a previously evaluated environment once. Either
+option may be repeated for multiple names. The inputs are then read-only and
+are never selected by HTTP-supplied file paths. Restart the server to load a
+changed mounted file.
+
+``GET /snt/dip/environments`` lists published names. Retrieve all or part of
+one environment with ``GET /snt/dip/environment`` using ``name`` and the same
+``request``, ``tags``, ``value``, and ``type`` query parameters used by the
+parse endpoint:
+
+.. code-block:: console
+
+   $ curl http://127.0.0.1:8080/snt/dip/environments
+   {"environments":["model"]}
+
+   $ curl --get http://127.0.0.1:8080/snt/dip/environment \
+       --data-urlencode 'name=model' \
+       --data-urlencode 'request=answer' \
+       --data-urlencode 'value=true' \
+       --data-urlencode 'type=integer'
+   {"result":"42\\n"}
 
 DIPH5 response
 --------------

@@ -124,6 +124,18 @@ The server has no authentication. Production deployment needs an
 authentication-capable reverse proxy or equivalent network access control. For
 host-only development, publish ``127.0.0.1:8080:8080`` instead.
 
+Publish a mounted DIPL project without uploading its inputs over HTTP:
+
+```bash
+docker run --rm -p 9000:8080 \
+    -v "$(pwd)/model:/data:ro" \
+    scinumtools3-rest \
+    --project model=/data/DIPfile
+```
+
+Use ``--diph5 model=/data/environment.diph5`` with a read-only mounted DIPH5
+file to publish an already evaluated environment.
+
 ---
 
 # Notes

@@ -94,21 +94,28 @@ namespace snt::server {
         handle_response(response, [&] { response.set_content(json_result(handler()), "application/json"); });
     }
 
-    int run(const std::string_view address, const int port) {
-        httplib::Server server;
-        server.Get("/", [](const httplib::Request&, httplib::Response& response) {
-            response.set_content(
-                R"({"service":"SNT REST API","endpoints":["/snt/puq/eval","/snt/puq/convert","/snt/puq/info","/snt/puq/list","/snt/dip/parse"]}
+    int run(const std::string_view address, const int port, const std::vector<PublishedInput>& inputs) {
+        try {
+            httplib::Server server;
+            server.Get("/", [](const httplib::Request&, httplib::Response& response) {
+                response.set_content(
+                    R"({"service":"SNT REST API","endpoints":["/snt/puq/eval","/snt/puq/convert","/snt/puq/info","/snt/puq/list","/snt/dip/parse","/snt/dip/environments","/snt/dip/environment"]}
 )",
-                "application/json"
-            );
-        });
-        register_puq_routes(server);
-        register_dip_routes(server);
+                    "application/json"
+                );
+            });
+            register_puq_routes(server);
+            register_dip_routes(server);
+            register_published_routes(server, inputs);
+            register_openapi_route(server);
 
-        std::cout << "Starting SNT REST API server on http://" << address << ':' << port << '\n';
-        if (!server.listen(std::string(address), port)) {
-            std::cerr << "Unable to start SNT REST API server on port " << port << ".\n";
+            std::cout << "Starting SNT REST API server on http://" << address << ':' << port << '\n';
+            if (!server.listen(std::string(address), port)) {
+                std::cerr << "Unable to start SNT REST API server on port " << port << ".\n";
+                return 1;
+            }
+        } catch (const std::exception& exception) {
+            std::cerr << "Unable to load published environment: " << exception.what() << '\n';
             return 1;
         }
         return 0;
