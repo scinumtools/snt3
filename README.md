@@ -35,6 +35,20 @@ configuration files and application code.
 The [online documentation](https://vrtulka23.github.io/scinumtools3/) contains
 the concepts, language specifications, tutorials, examples, and API reference.
 
+## Why DIPL?
+
+Scientific software often begins with a small configuration file, then grows
+into values spread across input files, unit conversions, validation code,
+derived constants, and undocumented assumptions. That makes a model harder to
+review, reproduce, and safely reuse in another tool or language.
+
+DIPL was created to make the parameter definition itself the authoritative
+model interface. It keeps physical units, types, constraints, hierarchical
+structure, references, expressions, metadata, and provenance together, then
+exposes one evaluated and validated environment to every part of an
+application. The result is less duplicated glue code and a clearer boundary
+between a scientific model's assumptions and its implementation.
+
 ## Features
 
 - **Unit-aware quantities:** parse, calculate, and convert values with units,

@@ -41,7 +41,9 @@ docs = [
     "sphinx",
     "sphinx-rtd-theme",
     "pypandoc-binary",
-    "breathe",
+    # cpp_topics uses Breathe's stable 4.x filtering API. Breathe 5 is
+    # currently pre-release and redesigns that internal extension API.
+    "breathe>=4.36,<5",
 ]
 dev = [
     "mypy",
