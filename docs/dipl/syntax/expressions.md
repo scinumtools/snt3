@@ -4,6 +4,11 @@ Node values can also be defined indirectly using expressions.
 Expression values consist of multiple values combined with mathematical expressions wrapped in additional parentheses, while they can span on multiple lines. 
 The code will be automatically wrapped into a single line based on the balance of the parentheses
 
+The outer parentheses identify the value as an expression. Expressions assigned
+to ``bool`` nodes, used by ``!condition``, or used by ``@if`` and ``@elif``
+must be logical expressions. Expressions assigned to integer or floating-point
+nodes must be numerical expressions.
+
 ``` DIPL
 result float = (
   12 + 3.43 - ( 6 * 7.89 ) / 1.2e3
@@ -28,7 +33,7 @@ Possible input values used by expressions are summarized in the following table:
 | ``<bool>`` | boolean    | ``true``/``false``            |
 | ``<num>``  | numerical  | ``24 cm``                     |
 | ``<ref>``  | reference  | ``{?energy}``                 |
-| ``<expr>`` | expression | ``12 cm == {?width} && true`` |
+| ``<expr>`` | expression | ``(12 cm == {?width} && true)`` |
 
 Operators summarized below are evaluated according to their priority from highest `1` to lowest `6`, and can be nested accordingly.
 

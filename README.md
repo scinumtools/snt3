@@ -16,12 +16,19 @@ engineering software.
 
 SciNumTools provides a common representation for physical quantities and
 validated scientific input parameters. Its C++17 libraries can be used from
-C++, Python, the command line, CMake, and REST applications.
+C++, Python, C, the command line, and CMake.
 
 The project is built around two languages:
 
-- **PUEL** describes values, units, uncertainties, arrays, and unit systems.
-- **DIPL** describes typed input parameters, constraints, and relationships.
+- **[PUEL](https://vrtulka23.github.io/scinumtools3/puel/index.html)**
+  describes values, units, uncertainties, arrays, and unit systems.
+- **[DIPL](https://vrtulka23.github.io/scinumtools3/dipl/index.html)**
+  describes typed input parameters, constraints, and relationships.
+
+DIPL can serve as the single source of validated truth for a scientific
+model: values, units, constraints, derived relationships, and provenance stay
+together in one portable definition rather than being distributed across
+configuration files and application code.
 
 The [online documentation](https://vrtulka23.github.io/scinumtools3/) contains
 the concepts, language specifications, tutorials, examples, and API reference.
@@ -30,13 +37,13 @@ the concepts, language specifications, tutorials, examples, and API reference.
 
 - **Unit-aware quantities:** parse, calculate, and convert values with units,
   uncertainties, arrays, prefixes, and unit systems.
-- **Declarative scientific inputs:** define typed, constrained DIPL parameter
+- **Single source of validated truth:** define typed, constrained DIPL
   hierarchies with expressions, dependencies, metadata, and source provenance.
 - **Reproducible parameter exchange:** persist evaluated environments in DIPH5
   with source-content hashes, or generate native C++, C, Fortran, Rust, Julia,
   JSON, and YAML representations.
 - **One definition, many entry points:** use the same semantics from C++17,
-  Python, C, command-line, CMake, and REST applications.
+  Python, C, command-line, and CMake applications.
 
 ## Quick example
 
@@ -194,18 +201,19 @@ snt_dip_get(
 
 ## Interfaces
 
-- **C++ API:** modular libraries under `include/snt/`, documented with Doxygen
-  and Breathe.
-- **Python:** PUQ, VAL, DIP, and API bindings. VAL values are represented by
-  native Python values and NumPy arrays. EXS is available internally to the
-  C++ implementation but has no standalone Python binding.
-- **CLI:** commands for PUQ conversion, DIP parsing, DIPH5 persistence, and
-  static parameter generation.
-- **C binding:** experimental and incomplete; use it only where its current
-  scope is sufficient.
+- **[C++ API](https://vrtulka23.github.io/scinumtools3/api/index.html):**
+  modular C++17 libraries and application-facing commands.
+- **[Python](https://vrtulka23.github.io/scinumtools3/integrations/python.html):**
+  PUQ, VAL, DIP, and API bindings, with native Python values and NumPy arrays.
+- **[C binding](https://vrtulka23.github.io/scinumtools3/integrations/c.html):**
+  experimental opaque-handle interfaces for PUQ and DIPL.
+- **[Command line](https://vrtulka23.github.io/scinumtools3/integrations/cli.html):**
+  PUQ evaluation and conversion, DIP parsing, DIPH5 persistence, and export.
+- **[CMake](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html):**
+  package integration and DIPL evaluation during project configuration.
 
-The [integration guides](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
-cover Python, C, CLI, CMake, and REST usage.
+See the [integration overview](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
+for the complete usage guides.
 
 ## Used in applications
 
