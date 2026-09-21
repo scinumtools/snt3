@@ -148,6 +148,33 @@ TEST_F(Cursor, ValuesFullPath) {
     }
 }
 
+TEST_F(Cursor, LowerPrecisionNumericValues) {
+    dip::DIP input;
+    input.add_string(
+        "signed int = 127\n"
+        "unsigned uint = 255\n"
+        "real float = 1.25\n"
+        "signed_values int[2] = [3, 4]\n"
+        "unsigned_values uint[2] = [5, 6]\n"
+        "real_values float[2] = [1.25, 2.5]\n"
+    );
+    const dip::Environment lower = input.parse();
+
+    EXPECT_EQ(lower["signed"].as<int8_t>(), 127);
+    EXPECT_EQ(lower["unsigned"].as<uint8_t>(), 255);
+    EXPECT_FLOAT_EQ(lower["real"].as<float>(), 1.25F);
+    EXPECT_EQ(lower["signed_values"].as<std::vector<int16_t>>(), (std::vector<int16_t>{3, 4}));
+    EXPECT_EQ((lower["unsigned_values"].as<std::array<uint32_t, 2>>()), (std::array<uint32_t, 2>{5, 6}));
+    EXPECT_EQ((lower["real_values"].as<std::array<float, 2>>()), (std::array<float, 2>{1.25F, 2.5F}));
+
+    // Cursor conversions are views; narrowing does not alter DIPL's internal storage.
+    EXPECT_EQ(lower["signed"].as<int64_t>(), 127);
+    EXPECT_DOUBLE_EQ(lower["real"].as<double>(), 1.25);
+
+    // Numeric categories remain distinct: integer values are not floating-point values.
+    EXPECT_THROW(lower["signed"].as<float>(), dip::SyntaxException);
+}
+
 TEST_F(Cursor, ValuesPartialPaths) {
 
     EXPECT_EQ(env.nodes.size(), 8);

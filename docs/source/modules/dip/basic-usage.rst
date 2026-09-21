@@ -66,6 +66,18 @@ environment was parsed directly or loaded from a DIPH5 version 2 file, the
 result also includes the matching source-manifest entry with its recorded path
 and SHA-256 content fingerprint.
 
+Numeric values are retained internally at their DIPL storage precision. The
+C++ cursor can return a lower native type when needed by an application:
+
+.. code-block:: cpp
+
+   int8_t layer_count = env["simulation.layers"].as<int8_t>();
+   std::vector<float> samples = env["simulation.samples"].as<std::vector<float>>();
+
+Lower signed, unsigned, and floating-point targets are converted with the
+ordinary C++ cast rules. This does not change the values retained by the
+environment.
+
 For custom behavior, DIP also supports registered value- and node-producing
 functions. Those functions are evaluated while parsing and are not part of a
 persisted DIPH5 environment; applications that load DIPH5 should treat the
