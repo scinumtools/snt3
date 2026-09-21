@@ -169,8 +169,8 @@ cmake --build build
 ctest --test-dir build
 ```
 
-For build options, installation, Docker images, and package-manager details,
-see the [installation guide](https://vrtulka23.github.io/scinumtools3/installation.html).
+For build options, installation, and package-manager details, see the
+[installation guide](https://vrtulka23.github.io/scinumtools3/installation.html).
 
 ## CMake
 
@@ -213,6 +213,8 @@ snt_dip_get(
   package integration and DIPL evaluation during project configuration.
 - **[REST API server](https://vrtulka23.github.io/scinumtools3/integrations/rest.html):**
   optional local HTTP access to the command-oriented PUQ and DIP API.
+- **[Docker](https://vrtulka23.github.io/scinumtools3/integrations/docker.html):**
+  reproducible Python and development environments.
 
 See the [integration overview](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
 for the complete usage guides.

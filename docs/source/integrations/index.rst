@@ -14,3 +14,4 @@ logic in each application.
    cli
    cmake
    rest
+   docker

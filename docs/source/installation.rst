@@ -164,33 +164,6 @@ This modular approach allows an application to link only the SciNumTools
 components it requires.
 
 
-Docker
-------
-
-Preconfigured Docker images are provided for both Python users and
-SciNumTools development.
-
-The Python image can be built with:
-
-.. code-block:: console
-
-   docker build \
-       -f packaging/docker/python/Dockerfile \
-       -t scinumtools3-python .
-
-For development, use:
-
-.. code-block:: console
-
-   docker build \
-       -f packaging/docker/dev/Dockerfile \
-       -t scinumtools3-dev .
-
-The Docker setup is particularly useful when a reproducible development
-environment is required or when installing all build dependencies locally
-would be inconvenient.
-
-
 Choosing an Installation Method
 -------------------------------
 
@@ -199,7 +172,8 @@ The recommended installation method depends on the intended use:
 * **Python application:** install ``scinumtools3`` from PyPI or Conda.
 * **C++ application:** use vcpkg, Conan, Homebrew, or a system installation.
 * **SciNumTools development:** build directly from source.
-* **Reproducible development environment:** use the provided Docker images.
+* **Reproducible development environment:** use the :doc:`Docker integration
+  <integrations/docker>`.
 
 After installation, continue with :doc:`quickstart` to start using
 SciNumTools.
