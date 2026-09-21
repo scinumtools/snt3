@@ -9,7 +9,7 @@ if(NOT EXISTS "${CPPHTTPLIB_HEADER}")
   )
 endif()
 
-file(GLOB EXEC_FILES "./*.cpp" "./**/*.cpp")
+file(GLOB EXEC_FILES CONFIGURE_DEPENDS "./*.cpp" "./**/*.cpp")
 add_executable(${EXEC_NAME} ${EXEC_FILES} )
 
 target_include_directories(${EXEC_NAME}
