@@ -184,6 +184,31 @@ namespace snt::dip {
         source_manifest_ = std::move(manifest);
     }
 
+    std::vector<TraceInfo> Environment::get_trace_manifest() const {
+        if (trace_manifest_loaded_)
+            return trace_manifest_;
+
+        std::vector<TraceInfo> manifest;
+        manifest.reserve(units.entries().size() + schemas.entries().size() + functions.entries().size());
+        for (const auto& entry : units.entries())
+            manifest.push_back({entry.second.id, entry.second.name, "unit"});
+        for (const auto& entry : schemas.entries())
+            manifest.push_back({entry.second.id, entry.second.name, "schema"});
+        for (const auto& function : functions.entries())
+            manifest.push_back(
+                {function.id, function.name, function.kind == FunctionKind::Value ? "function_value" : "function_nodes"}
+            );
+        std::sort(manifest.begin(), manifest.end(), [](const TraceInfo& lhs, const TraceInfo& rhs) {
+            return lhs.id < rhs.id;
+        });
+        return manifest;
+    }
+
+    void Environment::set_trace_manifest(std::vector<TraceInfo> manifest) {
+        trace_manifest_ = std::move(manifest);
+        trace_manifest_loaded_ = true;
+    }
+
     std::string Environment::request_code(const std::string& source_name) const {
         return sources.at(source_name).code;
     }

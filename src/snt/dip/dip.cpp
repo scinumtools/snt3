@@ -185,9 +185,7 @@ code list : snt_project_code
     }
 
     void DIP::add_unit(const std::string& uname, const std::string& uexpr) {
-        num_units++;
-        EnvUnit uenv = {uname, uexpr};
-        env.units.append(uname, uenv);
+        env.units.append(uname, uexpr, source.name);
     }
 
     void DIP::add_project(const std::filesystem::path& project_file) {
@@ -254,11 +252,11 @@ code list : snt_project_code
     }
 
     void DIP::add_function_value(const std::string& name, FunctionList::DataFunctionType func) {
-        env.functions.append_value(name, std::move(func));
+        env.functions.append_value(name, std::move(func), source.name);
     }
 
     void DIP::add_function_nodes(const std::string& name, FunctionList::NodesFunctionType func) {
-        env.functions.append_nodes(name, std::move(func));
+        env.functions.append_nodes(name, std::move(func), source.name);
     }
 
     std::string DIP::to_string() {
@@ -376,7 +374,7 @@ code list : snt_project_code
                     i++;
                 }
                 if (schema_nodes.size() > 0) {
-                    env.schemas.append(current_node->value_raw.at(0), schema_nodes);
+                    env.schemas.append(current_node->value_raw.at(0), schema_nodes, current_node->line.source.name);
                 } else {
                     throw dip::SyntaxException(
                         "Schema does not contain any value nodes",

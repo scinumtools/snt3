@@ -8,6 +8,22 @@ using namespace snt;
 
 class Functions : public FixtureFunctions {};
 
+TEST_F(Functions, TraceIdentifiers) {
+    dip::FunctionList functions;
+    functions.append_value("scalar_value", FixtureFunctions::get_scalar_boolean, "DIP0");
+    functions.append_nodes("scalar_nodes", FixtureFunctions::get_scalar_nodes, "DIP0");
+
+    const dip::EnvFunction& value = functions.get_value_info("scalar_value");
+    EXPECT_EQ(value.name, "scalar_value");
+    EXPECT_EQ(value.kind, dip::FunctionKind::Value);
+    EXPECT_EQ(value.id, "DIP0_FUNCTION0");
+
+    const dip::EnvFunction& nodes = functions.get_nodes_info("scalar_nodes");
+    EXPECT_EQ(nodes.name, "scalar_nodes");
+    EXPECT_EQ(nodes.kind, dip::FunctionKind::Nodes);
+    EXPECT_EQ(nodes.id, "DIP0_FUNCTION1");
+}
+
 TEST_F(Functions, BooleanValues) {
 
     // define scalar

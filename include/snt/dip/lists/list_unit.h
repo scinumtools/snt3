@@ -13,6 +13,7 @@ namespace snt::dip {
         std::string name;       ///< unit key
         std::string definition; ///< unit definition
         size_t stack;           ///< number of the current unit system stack
+        std::string id;         ///< Internal trace identifier, e.g. DIP0_UNIT0.
     };
 
     /**
@@ -21,6 +22,7 @@ namespace snt::dip {
     class UnitList {
       private:
         std::map<std::string, EnvUnit> units; ///< Map of custom units
+        std::map<std::string, size_t> id_counters;
 
       public:
         /**
@@ -33,16 +35,18 @@ namespace snt::dip {
          *
          * @param name Name of a custom unit
          * @param definition Expression that defines a new unit
+         * @param parent_id Internal identifier of the registering source.
          */
-        void append(const std::string& name, const std::string& definition);
+        void append(const std::string& name, const std::string& definition, const std::string& parent_id = {});
 
         /**
          * Append new custom unit from a name and a custom unit data
          *
          * @param name Name of a custom unit
          * @param data Custom unit data object
+         * @param parent_id Internal identifier of the registering source.
          */
-        void append(const std::string& name, EnvUnit data);
+        void append(const std::string& name, EnvUnit data, const std::string& parent_id = {});
 
         /**
          * Select custom unit data
@@ -59,6 +63,9 @@ namespace snt::dip {
          * @return Custom unit data
          */
         const EnvUnit& at(const std::string& name) const;
+
+        /** Return all registered custom units keyed by unit name. */
+        const std::map<std::string, EnvUnit>& entries() const;
     };
 
 } // namespace snt::dip

@@ -62,7 +62,7 @@ without parsing the original DIPL files.
 
 ``env["path.to.value"].get_provenance()`` returns the source name, line,
 captured source line, and citation metadata for a resolved value. When the
-environment was parsed directly or loaded from a DIPH5 version 2 file, the
+environment was parsed directly or loaded from a DIPH5 version 2 or later file, the
 result also includes the matching source-manifest entry with its recorded path
 and SHA-256 content fingerprint.
 

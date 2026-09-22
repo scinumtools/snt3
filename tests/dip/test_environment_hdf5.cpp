@@ -76,6 +76,36 @@ TEST(Environment, SourceManifestAndCursorProvenance) {
     std::filesystem::remove(file);
 }
 
+TEST(Environment, TraceManifestRoundTrip) {
+    dip::DIP parser;
+    parser.add_unit("trace_round_trip_unit", "m");
+    parser.add_function_value("trace_round_trip_function", [](const dip::Environment&) -> dip::ValueNodeData {
+        return {};
+    });
+    parser.add_string(
+        "$schema trace_round_trip_schema\n"
+        "  value int\n"
+        "record : trace_round_trip_schema\n"
+        "  value = 1\n"
+    );
+    const dip::Environment source = parser.parse();
+    const std::vector<dip::TraceInfo> expected = source.get_trace_manifest();
+    ASSERT_EQ(expected.size(), 3);
+
+    const auto file = environment_file("trace-manifest");
+    source.save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    const std::vector<dip::TraceInfo> actual = loaded.get_trace_manifest();
+    ASSERT_EQ(actual.size(), expected.size());
+    for (size_t index = 0; index < expected.size(); ++index) {
+        EXPECT_EQ(actual[index].id, expected[index].id);
+        EXPECT_EQ(actual[index].name, expected[index].name);
+        EXPECT_EQ(actual[index].kind, expected[index].kind);
+    }
+    std::filesystem::remove(file);
+}
+
 TEST(Environment, LoadSchemaVersion1WithoutSourceManifest) {
     const auto file = environment_file("load-version-1");
     dip::Environment source = parsed_environment();
@@ -151,7 +181,12 @@ TEST(Environment, SaveHdf5Content) {
         uint64_t version = 0;
         ASSERT_GE(H5Aread(version_attribute, H5T_NATIVE_UINT64, &version), 0);
         EXPECT_EQ(version, 2);
+        H5Handle minor_version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
+        uint64_t minor_version = 0;
+        ASSERT_GE(H5Aread(minor_version_attribute, H5T_NATIVE_UINT64, &minor_version), 0);
+        EXPECT_EQ(minor_version, 1);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
+        ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Trace", H5P_DEFAULT), 0);
         H5Handle source_manifest(H5Gopen2(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), H5Gclose);
         ASSERT_GE(source_manifest, 0);
         H5Handle source_entry(H5Gopen2(source_manifest, "0", H5P_DEFAULT), H5Gclose);

@@ -1,6 +1,6 @@
 % SciNumTools DIPH5
 % Environment HDF5 Format Specification
-% Version 2.0
+% Version 2.1
 
 # Scope
 
@@ -23,14 +23,15 @@ needed to interpret and trace those values. In particular, node settings,
 units, schemas, source information, and provenance are persisted as dataset
 attributes.
 
-Implementation-specific runtime registries are not serialized as independent
+Implementation-specific runtime registries are not serialized as executable
 objects. This includes global function definitions, branching state, and the
 complete unit and schema registries. DIPH5 version 2 additionally stores a
 source manifest containing source identities, paths, parent relationships, and
-content fingerprints. It does not embed complete source text or parsed source
-nodes. A loaded DIPH5 file must therefore be treated as an evaluated
-environment, not as a source from which the original DIPL program can be
-reconstructed exactly.
+content fingerprints. Version 2.1 also stores durable identifiers for registered
+units, schemas, and functions. It does not embed complete source text, parsed
+source nodes, or executable functions. A loaded DIPH5 file must therefore be
+treated as an evaluated environment, not as a source from which the original
+DIPL program can be reconstructed exactly.
 
 # File identification and versioning
 
@@ -40,11 +41,13 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `1` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2 readers support both version 1 files, which have no
-source manifest, and version 2 files. Future schema revisions MUST preserve
-the meaning of existing attributes or increment the schema version.
+schema version. Version 2.1 readers support version 1 files, version 2.0
+files (which omit the minor attribute), and version 2.1 files. Future schema
+revisions MUST preserve the meaning of existing attributes or increment the
+major or minor schema version.
 
 ## File naming
 
@@ -158,8 +161,24 @@ The manifest is an integrity and provenance aid, not a source archive. A
 consumer can hash an available source file and compare the result with the
 stored digest, but loading DIPH5 does not recreate executable source
 definitions or enable source-qualified lookups. `_DIPL_Sources` is reserved at
-the DIPH5 root; a DIPL environment with that top-level path cannot be saved as
-a version 2 file.
+the DIPH5 root; a DIPL environment with that top-level path cannot be saved.
+
+## Trace manifest
+
+Version 2.1 files contain a root `/_DIPL_Trace` group. Each child is a numbered
+trace-manifest entry. It records the stable internal identifier assigned during
+parsing for every registered unit, schema, and function:
+
+| Attribute | Type | Meaning |
+| --- | --- | --- |
+| `_DIPL_Trace_Id` | UTF-8 string | Internal trace identifier, for example `DIP0_UNIT0`. |
+| `_DIPL_Trace_Name` | UTF-8 string | Registered public name. |
+| `_DIPL_Trace_Kind` | UTF-8 string | `unit`, `schema`, `function_value`, or `function_nodes`. |
+
+The trace manifest preserves diagnostic and documentation identity only. It
+does not recreate a custom unit definition, schema nodes, or an executable
+function on load. `_DIPL_Trace` is reserved at the DIPH5 root; a DIPL
+environment with that top-level path cannot be saved.
 
 # Examples
 

@@ -12,6 +12,7 @@
 #include <snt/dip/lists/list_schema.h>
 #include <snt/dip/lists/list_source.h>
 #include <snt/dip/lists/list_unit.h>
+#include <vector>
 
 namespace snt::dip {
 
@@ -30,6 +31,13 @@ namespace snt::dip {
         size_t parent_line = 0;
         std::string hash_algorithm;
         std::string hash;
+    };
+
+    /** Durable identity information for one registered DIPL construct. */
+    struct TraceInfo {
+        std::string id;   ///< Internal trace identifier, e.g. DIP0_UNIT0.
+        std::string name; ///< Registered public name.
+        std::string kind; ///< "unit", "schema", "function_value", or "function_nodes".
     };
 
     /**
@@ -61,6 +69,8 @@ namespace snt::dip {
     class Environment {
       private:
         std::vector<SourceInfo> source_manifest_;
+        std::vector<TraceInfo> trace_manifest_;
+        bool trace_manifest_loaded_ = false;
 
       public:
         NodeList<ValueNode> nodes; ///< List of parsed nodes
@@ -111,6 +121,12 @@ namespace snt::dip {
          * This does not recreate executable source definitions or source code.
          */
         void set_source_manifest(std::vector<SourceInfo> manifest);
+
+        /** Return durable identities for registered units, schemas, and functions. */
+        std::vector<TraceInfo> get_trace_manifest() const;
+
+        /** Replace persisted trace-registry information during environment loading. */
+        void set_trace_manifest(std::vector<TraceInfo> manifest);
 
         /**
          * Get a source code

@@ -32,7 +32,6 @@ namespace snt::dip {
         size_t num_strings = 0; ///< counter of code inputs from a string
         size_t num_files = 0;   ///< counter of code inputs from a file
         size_t num_sources = 0; ///< number of explicitely added sources
-        size_t num_units = 0;   ///< number of explicitely added units
         size_t num_projects = 0; ///< number of project manifests added to this parser
 
         void add_string_input(

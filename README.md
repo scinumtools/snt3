@@ -16,7 +16,7 @@ engineering software.
 
 SciNumTools provides a common representation for physical quantities and
 validated scientific input parameters. Its C++17 libraries can be used from
-C++, Python, C, the command line, and CMake.
+C/C++, Python, the command line, and CMake.
 
 The project is built around two languages:
 
@@ -58,8 +58,8 @@ between a scientific model's assumptions and its implementation.
 - **Reproducible parameter exchange:** persist evaluated environments in DIPH5
   with source-content hashes, or generate native C++, C, Fortran, Rust, Julia,
   JSON, and YAML representations.
-- **One definition, many entry points:** use the same semantics from C++17,
-  Python, C, command-line, CMake, and the optional local REST service.
+- **One definition, many entry points:** use the same semantics from C/C++17,
+  Python, command-line, CMake, and the optional local REST service.
 
 ## Interfaces
 
@@ -111,7 +111,7 @@ same validated parameters can be passed between its components.
 
 An evaluated environment can be saved in the DIPH5 HDF5 format for later use
 or exchange. DIPH5 retains node provenance and a SHA-256 source manifest for
-later verification. Environments can also be generated as native C++, C,
+later verification. Environments can also be generated as native C/C++,
 Fortran, Rust, or Julia parameters and as JSON or YAML data files for
 applications that should not parse DIPL at run time.
 

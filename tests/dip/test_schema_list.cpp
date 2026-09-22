@@ -21,6 +21,7 @@ TEST(SchemaList, ValueNodes) {
 
     dip::EnvSchema schema = env.schemas.at("human");
     EXPECT_EQ(schema.nodes.size(), 4);
+    EXPECT_EQ(schema.id, schema.nodes.front()->line.source.name + "_SCHEMA0");
 }
 
 TEST(SchemaList, Properties) {

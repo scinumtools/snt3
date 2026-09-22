@@ -4,7 +4,7 @@ Environment Persistence
 DIP can persist an evaluated environment in the DIPH5 HDF5 format. This is
 useful when a DIPL input has already been parsed and evaluated and the
 resulting values need to be exchanged with another application, stored for a
-later calculation, or inspected by legacy scientific software using HDF5.
+later calculation, or inspected by scientific software using HDF5.
 
 The persisted object is an evaluated environment, not the original DIPL
 program or the complete parser runtime. The format stores values, hierarchy,
@@ -51,11 +51,13 @@ round trip:
   the writer constructs the hierarchy from the saved value paths.
 
 Source identifiers, line numbers, captured source lines, and citation metadata
-remain node-level provenance. DIPH5 version 2 also stores a source manifest
-with each source's name, recorded path, parent relationship, and SHA-256 hash
-of the exact parsed content. This permits later verification of an available
-source file. Loading does not embed or recreate complete source text, parsed
-source nodes, or source-qualified lookups.
+remain node-level provenance. DIPH5 version 2 stores a source manifest with
+each source's name, recorded path, parent relationship, and SHA-256 hash of
+the exact parsed content. Version 2.1 additionally preserves the trace IDs of
+registered units, schemas, and functions. This permits later verification and
+diagnostic correlation, but loading does not recreate complete source text,
+parsed source nodes, custom-unit definitions, schemas, executable functions,
+or source-qualified lookups.
 
 HDF5 mapping
 ------------

@@ -6,9 +6,18 @@
 
 namespace snt::dip {
 
+    namespace {
+
+        std::string next_unit_id(std::map<std::string, size_t>& counters, const std::string& parent_id) {
+            const std::string scope = parent_id.empty() ? "ENV" : parent_id;
+            return scope + "_UNIT" + std::to_string(counters[scope]++);
+        }
+
+    } // namespace
+
     UnitList::UnitList() = default;
 
-    void UnitList::append(const std::string& name, const std::string& definition) {
+    void UnitList::append(const std::string& name, const std::string& definition, const std::string& parent_id) {
         auto it = units.find(name);
         if (it != units.end())
             throw dip::EnvironmentException(
@@ -19,10 +28,10 @@ namespace snt::dip {
                 __LINE__
             );
         size_t stack = puq::UnitSystem::set_custom_unit(name, definition);
-        units.insert({name, {name, definition, stack}});
+        units.insert({name, {name, definition, stack, next_unit_id(id_counters, parent_id)}});
     }
 
-    void UnitList::append(const std::string& name, EnvUnit data) {
+    void UnitList::append(const std::string& name, EnvUnit data, const std::string& parent_id) {
         auto it = units.find(name);
         if (it != units.end())
             throw dip::EnvironmentException(
@@ -33,6 +42,8 @@ namespace snt::dip {
                 __LINE__
             );
         data.stack = puq::UnitSystem::set_custom_unit(name, data.definition);
+        if (data.id.empty())
+            data.id = next_unit_id(id_counters, parent_id);
         units.insert({name, data});
     }
 
@@ -60,6 +71,10 @@ namespace snt::dip {
                 __LINE__
             );
         return it->second;
+    }
+
+    const std::map<std::string, EnvUnit>& UnitList::entries() const {
+        return units;
     }
 
 } // namespace snt::dip

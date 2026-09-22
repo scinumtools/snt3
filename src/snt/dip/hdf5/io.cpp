@@ -753,11 +753,64 @@ namespace snt::dip::hdf5 {
             env.set_source_manifest(std::move(sources));
         }
 
+        void read_trace_manifest(Environment& env, hid_t file) {
+            const std::string manifest_path = "/" + std::string(GROUP_TRACE);
+            const htri_t exists = H5Lexists(file, manifest_path.c_str(), H5P_DEFAULT);
+            if (exists < 0)
+                throw Error("Unable to inspect the HDF5 trace manifest");
+            if (exists == 0)
+                throw dip::IOException(
+                    "Invalid HDF5 trace manifest",
+                    "A DIPH5 version 2.1 file does not contain its required trace manifest.",
+                    "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
+                    __FILE__,
+                    __LINE__
+                );
+
+            Id manifest(
+                H5Gopen2(file, manifest_path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the HDF5 trace manifest"
+            );
+            std::vector<TraceInfo> traces;
+            const hsize_t count = object_count(manifest);
+            traces.reserve(count);
+            for (hsize_t index = 0; index < count; ++index) {
+                const std::string entry_name = object_name(manifest, index);
+                if (H5Gget_objtype_by_idx(manifest, index) != H5G_GROUP)
+                    throw dip::IOException(
+                        "Invalid HDF5 trace manifest",
+                        "A trace-manifest entry is not an HDF5 group.",
+                        "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
+                        __FILE__,
+                        __LINE__
+                    );
+                Id entry(
+                    H5Gopen2(manifest, entry_name.c_str(), H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to open an HDF5 trace-manifest entry"
+                );
+                TraceInfo trace{
+                    read_string(entry, ATTR_TRACE_ID),
+                    read_string(entry, ATTR_TRACE_NAME),
+                    read_string(entry, ATTR_TRACE_KIND)
+                };
+                if (trace.id.empty() || trace.name.empty() || trace.kind.empty())
+                    throw dip::IOException(
+                        "Invalid HDF5 trace manifest",
+                        "A trace-manifest entry is missing its identifier, name, or kind.",
+                        "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
+                        __FILE__,
+                        __LINE__
+                    );
+                traces.push_back(std::move(trace));
+            }
+            env.set_trace_manifest(std::move(traces));
+        }
+
         void read_group(Environment& env, hid_t group, bool root = false) {
             const hsize_t count = object_count(group);
             for (hsize_t i = 0; i < count; ++i) {
                 const std::string name = object_name(group, i);
-                if (root && name == std::string(GROUP_SOURCES))
+                if (root && (name == std::string(GROUP_SOURCES) || name == std::string(GROUP_TRACE)))
                     continue;
                 const int type = H5Gget_objtype_by_idx(group, i);
                 if (type == H5G_GROUP) {
@@ -829,9 +882,34 @@ namespace snt::dip::hdf5 {
             }
         }
 
-        bool uses_source_manifest_path(const std::string& path) {
-            const std::string name(GROUP_SOURCES);
-            return path == name || path.rfind(name + ".", 0) == 0 || path.rfind(name + "[", 0) == 0;
+        void write_trace_manifest(hid_t file, const Environment& env) {
+            const std::string manifest_path = "/" + std::string(GROUP_TRACE);
+            Id manifest(
+                H5Gcreate2(file, manifest_path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                H5Gclose,
+                "Unable to create the HDF5 trace manifest"
+            );
+            const auto traces = env.get_trace_manifest();
+            for (size_t index = 0; index < traces.size(); ++index) {
+                const TraceInfo& trace = traces[index];
+                const std::string entry_name = std::to_string(index);
+                Id entry(
+                    H5Gcreate2(manifest, entry_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to create an HDF5 trace-manifest entry"
+                );
+                write_string(entry, ATTR_TRACE_ID, trace.id);
+                write_string(entry, ATTR_TRACE_NAME, trace.name);
+                write_string(entry, ATTR_TRACE_KIND, trace.kind);
+            }
+        }
+
+        bool uses_reserved_path(const std::string& path) {
+            for (const auto name : {std::string(GROUP_SOURCES), std::string(GROUP_TRACE)}) {
+                if (path == name || path.rfind(name + ".", 0) == 0 || path.rfind(name + "[", 0) == 0)
+                    return true;
+            }
+            return false;
         }
     } // namespace
 
@@ -844,17 +922,19 @@ namespace snt::dip::hdf5 {
         );
         write_string(output, ATTR_FORMAT, std::string(FORMAT));
         write_scalar<uint64_t>(output, ATTR_VERSION, H5T_NATIVE_UINT64, VERSION);
+        write_scalar<uint64_t>(output, ATTR_VERSION_MINOR, H5T_NATIVE_UINT64, VERSION_MINOR);
         for (const auto& node : env.nodes.get_nodes()) {
-            if (node && uses_source_manifest_path(node->path.name))
+            if (node && uses_reserved_path(node->path.name))
                 throw dip::IOException(
                     "Reserved DIPH5 path",
-                    "The DIPL path `" + node->path.name + "` conflicts with the reserved DIPH5 source manifest.",
-                    "Rename the top-level `_DIPL_Sources` group before saving this environment.",
+                    "The DIPL path `" + node->path.name + "` conflicts with a reserved DIPH5 manifest.",
+                    "Rename the top-level `_DIPL_Sources` or `_DIPL_Trace` group before saving this environment.",
                     __FILE__,
                     __LINE__
                 );
         }
         write_source_manifest(output, env);
+        write_trace_manifest(output, env);
         for (const auto& node : env.nodes.get_nodes())
             if (node)
                 write_node(output, env, *node);
@@ -881,8 +961,21 @@ namespace snt::dip::hdf5 {
                 __FILE__,
                 __LINE__
             );
+        const uint64_t minor_version = has_attribute(input, ATTR_VERSION_MINOR)
+                                           ? read_scalar<uint64_t>(input, ATTR_VERSION_MINOR, H5T_NATIVE_UINT64)
+                                           : 0;
+        if (version == VERSION && minor_version > VERSION_MINOR)
+            throw dip::IOException(
+                "Unsupported HDF5 environment version",
+                "The file schema minor version is newer than this SciNumTools3 version supports.",
+                "Use a compatible SciNumTools3 version.",
+                __FILE__,
+                __LINE__
+            );
         if (version >= 2)
             read_source_manifest(env, input);
+        if (version == VERSION && minor_version >= 1)
+            read_trace_manifest(env, input);
         read_group(env, input, true);
     }
 
