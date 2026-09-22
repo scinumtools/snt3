@@ -9,7 +9,7 @@ namespace snt::server {
   "openapi": "3.1.0",
   "info": {
     "title": "SciNumTools REST API",
-    "version": "0.8.1",
+    "version": ")json" CODE_VERSION R"json(",
     "description": "PUEL evaluation and DIPL environment access. Mounted DIPL projects and DIPH5 environments are read-only startup inputs."
   },
   "paths": {
