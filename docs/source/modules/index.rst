@@ -125,6 +125,8 @@ calculated*, and *what constraints it must satisfy*.
   parameter environments.
 * :doc:`Environment persistence <dip/persistence>` — saving and loading
   evaluated environments in DIPH5 format from C++.
+* :doc:`Traceability and source identities <dip/traceability>` — following
+  DIPL inputs and registered constructs through diagnostics and DIPH5.
 * :doc:`Static parameter generation <dip/generation>` — exporting evaluated
   environments as native source code or data files.
 
@@ -135,6 +137,7 @@ calculated*, and *what constraints it must satisfy*.
    dip/basic-usage
    dip/projects
    dip/persistence
+   dip/traceability
    dip/generation
 
 .. _mat-materials:

@@ -58,6 +58,31 @@ element:
    note str = """A string may span
    multiple lines."""
 
+Declarations, definitions, and modifications
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A declaration establishes a parameter's name, type, shape, and optional
+default unit without assigning a value. A definition additionally supplies
+the initial value. A later occurrence of the same path is a modification: it
+may omit the type but must remain compatible with the declared type, shape,
+and dimensions.
+
+.. code-block:: dipl
+
+   # Declaration, completed by a modification.
+   mass float kg
+   mass = 750 g
+
+   # Definition, followed by a compatible modification.
+   length float = 1 m
+   length = 25 cm
+
+For dimensional parameters, the unit on the declaration or definition is the
+parameter's default unit. Compatible modifications are normalized to that
+unit, including values injected from references. The evaluated values above
+are therefore ``mass = 0.75 kg`` and ``length = 0.25 m``. A dimensional
+incompatibility, such as assigning seconds to ``length``, is rejected.
+
 Typed tabular data
 ^^^^^^^^^^^^^^^^^^
 
@@ -166,8 +191,8 @@ map items, lists, or complete collections:
 .. code-block:: dipl
 
    $schema material
-     density float kg/m3;
-     conductivity float W/(m*K);
+     density float kg/m3
+     conductivity float W/(m*K)
 
    materials[copper] : material
      density = 8960
