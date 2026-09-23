@@ -26,6 +26,9 @@ Language features
 This overview introduces PUEL's principal language features. The complete
 normative specification is provided below.
 
+Trailing ``#`` annotations in the examples below explain each expression; they
+are documentation comments and are not part of PUEL syntax.
+
 Quantities with physical units
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -35,10 +38,10 @@ There is no whitespace within an expression.
 
 .. code-block:: text
 
-   m
-   9.81*m/s2
-   293.15*K
-   3.452(3)*kg*m/s2
+   m                   # one metre
+   9.81*m/s2           # acceleration
+   293.15*K            # absolute temperature
+   3.452(3)*kg*m/s2    # value with absolute uncertainty
 
 The parenthesized digits in ``3.452(3)`` represent an uncertainty in the last
 significant digits, so the uncertainty stays attached to the quantity through
@@ -55,10 +58,10 @@ square root of ``m`` and ``s-1:2`` is the inverse square root of ``s``.
 
 .. code-block:: text
 
-   kg*m2/(sr*s2)
-   m-1*s-2
-   m1:2
-   (m/s)2
+   kg*m2/(sr*s2)       # grouped denominator
+   m-1*s-2             # negative exponents
+   m1:2                # square-root length dimension
+   (m/s)2              # exponent applied to a group
 
 These forms retain their dimensional meaning, so equivalent expressions can
 be compared and converted even when written differently.
@@ -72,9 +75,9 @@ elementwise.
 
 .. code-block:: text
 
-   [2,3.4,5e6]*km/s
-   [2.00(20),3.00(30)]*m
-   [20,40.5]*2
+   [2,3.4,5e6]*km/s        # array with common units
+   [2.00(20),3.00(30)]*m   # per-element uncertainties
+   [20,40.5]*2             # elementwise scalar multiplication
 
 These compact numerical arrays belong to standalone PUEL expressions. DIPL
 uses its own typed array syntax and attaches one scalar PUEL unit expression
@@ -103,9 +106,9 @@ an offset, while logarithmic levels can include a reference quantity.
 
 .. code-block:: text
 
-   23*Cel       # 296.15*K
-   0*dBm        # 1*mW
-   0*dBW        # 1*W
+   23*Cel       # converts to 296.15*K
+   0*dBm        # referenced power level: 1*mW
+   0*dBW        # referenced power level: 1*W
 
 PUQ supports Celsius (``Cel``), Fahrenheit (``degF``), kelvin (``K``), and
 Rankine (``degR``), as well as logarithmic ratios and levels including
@@ -122,10 +125,10 @@ of an expression, separated by an underscore.
 
 .. code-block:: text
 
-   cm
-   MHz
-   US_lb*ft
-   SI_9.81*m/s2
+   cm              # centi- prefix on metre
+   MHz             # mega- prefix on hertz
+   US_lb*ft        # US customary mass-length expression
+   SI_9.81*m/s2    # explicitly SI acceleration
 
 The available unit systems, units, constants, and allowed prefixes are defined
 by the reference tables in the specification. A prefix is accepted only where
@@ -140,10 +143,10 @@ unambiguous inside a larger unit expression.
 
 .. code-block:: text
 
-   {#m_p}
-   {N_A}
-   <E>
-   |E|
+   {#m_p}          # fixed reference constant
+   {N_A}           # active-system constant
+   <E>             # physical quantity scale
+   |E|             # unit-system conversion factor
 
 Custom units
 ^^^^^^^^^^^^

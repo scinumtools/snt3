@@ -10,6 +10,9 @@ variables:
 
 input-files:
   - docs/puel/specification.md
+  - docs/puel/sections/validity.md
+  - docs/puel/sections/uncertainty.md
+  - docs/puel/sections/special-units.md
   - docs/puel/tables/prefixes.md
   - docs/puel/tables/systems.md
   - docs/puel/tables/common.md

@@ -23,6 +23,20 @@ The language is designed for the following use cases:
 
 This chapter defines the language syntax and conversion rules. The following chapters provide reference tables for [scaling prefixes](tables/prefixes.md), [unit systems](tables/systems.md), and [shared definitions](tables/common.md), followed by the derived units, constants, and quantity scales of each supported system.
 
+Focused normative sections define [validity and errors](sections/validity.md),
+[uncertainty propagation](sections/uncertainty.md), and [special-unit
+semantics and conformance options](sections/special-units.md).
+
+### Terminology
+
+A **unit expression** describes units or dimensions, such as `kg*m*s-2`. A
+**quantity expression** additionally supplies a value, such as `12*kg*m*s-2`.
+Both are standalone, whitespace-free PUEL expressions. A **calculator
+expression**, such as `12*kg + 3*g`, is a PUQ operation over complete PUEL
+quantities and is not part of the standalone PUEL grammar. Host APIs may also
+construct quantities from numerical arrays or values without first parsing a
+PUEL literal.
+
 ---
 
 ## Design Principles
@@ -31,17 +45,31 @@ PUEL is designed to be:
 
 - **Concise** — compact textual representation of units  
 - **Composable** — units can be combined using algebraic operations  
-- **Deterministic** — expressions resolve to a canonical dimensional form  
+- **Deterministic** — expressions resolve to an unambiguous dimensional meaning
 - **Extensible** — supports custom units and prefixes  
 - **Solver-backed** — evaluation delegated to EXS  
 
 ### Relationship to Existing Unit Standards
 
-PUEL is designed as a machine-readable language for representing physical quantities and unit expressions, rather than as a replacement for established unit coding systems. 
-In particular, PUEL is intended to be interoperable with standards and vocabularies such as the International System of Units (SI), the Unified Code for Units of Measure (UCUM), UDUNITS, QUDT, and the OM ontology. 
-PUEL extends the scope of conventional unit notations by providing a unified syntax for numerical values, units, uncertainties, physical constants, symbolic quantities, and algebraic expressions. 
-Where applicable, PUEL unit expressions SHOULD be convertible to and from established unit representations, while the semantic interpretation of a PUEL expression remains independent of any particular serialization format. 
-This design allows PUEL to serve as a compact interchange notation for scientific quantities while remaining compatible with existing unit standards and ontologies.
+PUEL is a machine-readable language for representing physical quantities and
+unit expressions, rather than a replacement for established unit coding
+systems. Its vocabulary and dimensional model are designed to be understandable
+alongside SI, UCUM, UDUNITS, QUDT, and the OM ontology. PUEL additionally
+expresses numerical values, uncertainties, physical constants, symbolic
+quantities, and algebraic unit factors.
+
+SciNumTools3 does not currently claim complete bidirectional conversion to
+those external serializations. A PUEL expression remains semantically
+independent of any particular external notation or ontology.
+
+### Portable PUEL profile
+
+For exchange between implementations, producers SHOULD use the portable
+profile: ASCII syntax, SI linear units, no custom symbols, no system-specific
+constants or quantity scales, and no temperature or logarithmic units. Use
+compact array literals without spaces, such as `[2,3,4]*m`, when arrays are
+needed. Producers using an extended feature SHOULD record the required unit
+system and feature family with the exchanged data.
 
 ---
 
@@ -143,7 +171,7 @@ The following rules apply in unit expressions:
 
 | Rule                                                                                                                                                                                                                         | Examples                                                                                                                           |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Expressions MUST NOT contain whitespace except for spaces after array separators.                                                                                                                                           | `kg*m/s2`                                                                                                                          |
+| Expressions MUST NOT contain whitespace. PUQ MAY accept one space after an array comma as an input convenience, but portable and canonical array literals omit it.                                                             | `kg*m/s2`; `[2,3,4]*m`                                                                                                             |
 | Unit identifiers MAY be combined using multiplication (`*`), division (`/`), and grouping parentheses (`(`, `)`).                                                                                                            | `kg*m`; `m/s`; `kg*m2/(sr*s2)`                                                                                                     |
 | Exponents are written directly after the corresponding unit identifier and do not use exponentiation operators such as `^` or `**`.                                                                                          | `m2`                                                                                                                               |
 | Fractional exponents are written using the `numerator:denominator` notation.                                                                                                                                                 | `kg3:2`                                                                                                                            |
@@ -167,11 +195,11 @@ Expressions containing only numerical factors are supported. For example, `3*(2.
 
 ### Numerical arrays
 
-A numerical array is written as a comma-separated list of values in square brackets. All elements share the units specified outside the brackets. Elements MAY include scientific notation or parenthesized uncertainties. Spaces MAY follow commas.
+A numerical array is written as a comma-separated list of values in square brackets. All elements share the units specified outside the brackets. Elements MAY include scientific notation or parenthesized uncertainties. The portable form contains no spaces; PUQ also accepts one optional space after a comma for input compatibility.
 
 ```PUEL
 [2,3.4,5e6]*km/s
-[2.00(20), 3.00(30)]*m
+[2.00(20),3.00(30)]*m
 ```
 
 Multiplication and division by a scalar apply to each element. Multiplication and division between arrays of the same shape are elementwise operations. For example, `[20,40.5]*2` evaluates to `[40,81]`, and `[20,40.5]*[2,3]` evaluates to `[40,121.5]`. Unit factors are combined using the ordinary expression rules.
@@ -188,15 +216,29 @@ In addition to ASCII notation, PUQ can produce Unicode and HTML representations 
 
 Unicode input conveniences are optional; ASCII notation remains the portable form. A system identifier MUST retain its leading position and underscore separator even when Unicode notation is used, as in the displayed form of `US_23*ft2`. HTML output is a display format, not an expression input format.
 
-### Canonical Representation and Serialization
+### Normalization and Serialization
 
-Implementations SHOULD internally normalize unit expressions to a canonical form in which all unit factors appear in the numerator and division is represented using negative exponents. For example, the expression `kg*m2/(sr*s2)` is canonically represented as `kg*m2*sr-1*s-2`.
+Implementations MUST resolve a valid expression to its numerical scale,
+dimensions, and applicable special-unit semantics. Division may be normalized
+to negative exponents; for example, `kg*m2/(sr*s2)` and
+`kg*m2*sr-1*s-2` have the same dimensional meaning.
 
-The canonical form provides a unique and deterministic textual representation of a unit expression. Because the original placement of division operators and grouping parentheses cannot, in general, be reconstructed from a normalized expression, implementations SHOULD use the canonical form when serializing unit expressions.
+PUEL does not yet prescribe one unique textual serialization for every
+semantically equivalent expression. Implementations may retain factor order or
+choose their own normalized display form. They MUST NOT imply that formatting
+alone preserves the original placement of division operators or grouping
+parentheses.
 
-If a unit expression contains a numerical factor, serialized expressions MUST place the numerical factor at the beginning of the expression.
+For portable serialization, producers SHOULD use ASCII notation, place a
+numerical factor first, join factors with `*`, use negative exponents rather
+than `/`, and omit whitespace from array literals. Implementations that offer
+a stronger canonical serialization MUST document their factor ordering,
+numeric precision, uncertainty formatting, prefix rebasing, and treatment of
+temperature and logarithmic units.
 
-When representing base dimensions, only dimensions with non-zero exponents SHOULD be included. The order of the base dimensions MUST be preserved as specified in Section 3.1..
+When representing base dimensions, only dimensions with non-zero exponents
+SHOULD be included. Their order MUST follow the base-unit list in
+[Base units](#base-units): `m`, `g`, `s`, `K`, `A`, `cd`, `mol`, and `rad`.
 
 ## Calculator expressions
 
@@ -216,7 +258,9 @@ operand remains a valid PUEL expression:
 The calculator supports grouping, unary `+` and `-`, and binary `+`, `-`,
 `*`, and `/`, in the usual precedence order. Calculator syntax is a PUQ host
 operation rather than an additional form accepted by the standalone PUEL unit
-solver.
+solver. Likewise, the C++ `puq::math` functions such as `sqrt`, `pow`, `log`,
+and trigonometric functions operate on parsed quantities but do not add
+function-call syntax to PUEL.
 
 ## Conversions
 
