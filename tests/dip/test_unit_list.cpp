@@ -67,6 +67,51 @@ TEST(UnitList, AddUnitFromCode) {
     EXPECT_EQ(vnode->units->measurement.baseunits.dimensions().to_string(), "1e3*g*s-3*rad-2");
 }
 
+TEST(UnitList, ValueInjection) {
+    dip::DIP d;
+    d.add_string("mass int = 2 kg");
+    d.add_string("$unit injected_mass = {?mass}");
+    d.add_string("sample float = 3 injected_mass");
+    dip::Environment env = d.parse();
+
+    const dip::EnvUnit& unit = env.units.at("injected_mass");
+    EXPECT_EQ(unit.definition, "2*kg");
+
+    dip::ValueNode::PointerType sample = env.get_node("sample");
+    ASSERT_TRUE(sample->units);
+    EXPECT_EQ(sample->units->to_string(), "injected_mass");
+}
+
+TEST(UnitList, ValueInjectionRequiresScalarNumber) {
+    dip::DIP d;
+    d.add_string("mass str = \"kg\"");
+    d.add_string("$unit injected_mass = {?mass}");
+
+    try {
+        d.parse();
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Invalid unit reference value");
+    } catch (...) {
+        FAIL() << "Expected dip::SyntaxException";
+    }
+}
+
+TEST(UnitList, BracketedUnitIdentifierError) {
+    dip::DIP d;
+    d.add_string("$unit injected_mass = 2*kg");
+    d.add_string("sample float = 3 [injected_mass]");
+
+    try {
+        d.parse();
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Bracketed unit identifier");
+    } catch (...) {
+        FAIL() << "Expected dip::SyntaxException";
+    }
+}
+
 TEST(UnitList, UniqeNames) {
 
     {

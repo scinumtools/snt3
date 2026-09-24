@@ -206,7 +206,7 @@ Importing sources/units enables users to dynamically modify numerical code units
 $source init = "initial/settings.dip"
 $source {init?.}           # all sources of 'init' are imported
 $unit {units?.}            # all units are imported from an imported source 'units'
-weight float = 23 [mass]   # using imported unit
+weight float = 23 mass     # using imported unit
 ```
 
 ## Injections
@@ -308,4 +308,3 @@ $unit mass = {?mass}
 ```
 
 In both cases, the path in the injection refers to the **value of a node**. Injection paths therefore differ from node imports: injections always request a node value and cannot request a node set.
-

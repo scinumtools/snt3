@@ -822,6 +822,16 @@ namespace snt::dip {
         std::smatch matchResult;
         if (std::regex_search(target, matchResult, pattern)) {
             units_raw = matchResult[1].str();
+            if (units_raw.find_first_of("[]") != std::string::npos) {
+                throw dip::SyntaxException(
+                    "Bracketed unit identifier",
+                    "Square brackets are not valid in a DIPL unit expression: `" + units_raw + "`.",
+                    "Use bare unit identifiers, for example `custom_unit`, instead of `[custom_unit]`.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
+            }
             // Now strip delimiter + match
             if (delimiter != '\0') {
                 strip(std::string(1, delimiter));

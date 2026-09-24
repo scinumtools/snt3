@@ -33,16 +33,16 @@ weight = 90000 g
 ## Custom Units
 
 Similarly as in case of references, it is also possible to define new units directly in the DIPL code. This can be achieved by a special node directive ``$unit``.
-Names of the custom units are automatically wrapped into square brackets.
+Custom units are referenced by their bare identifier, just like standard PUEL units. Square brackets are not valid in unit expressions.
 If the name of a custom unit is already used, the code will raise an error.
 
 ``` DIPL
-$unit mass = 30 AU
-$unit length = 10 pc
-$unit time = 1 Gy
+$unit mass = 30*kg
+$unit length = 10*m
+$unit time = 1*s
 
-velocity float = 2 [length]/[time]
-density float = 34 [mass]/[length]3
+velocity float = 2 length/time
+density float = 34 mass/length3
 ```
 
 Each DIPL implementation MUST support the definition and integration of custom units directly through the code interface.
