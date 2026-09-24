@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
 
 using namespace snt;
 
@@ -114,4 +115,41 @@ TEST(SourceList, AddSourceFromCode) {
     EXPECT_EQ(vnode->path.name, "bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "false");
+}
+
+TEST(SourceList, ValueInjection) {
+    const std::filesystem::path source_filename = std::filesystem::temp_directory_path() / "injected_source.dip";
+    {
+        std::ofstream source_file(source_filename);
+        ASSERT_TRUE(source_file.is_open()) << "Failed to create temp file.";
+        source_file << "answer int = 42\n";
+    }
+
+    dip::DIP d;
+    d.add_string("source_path str = \"" + source_filename.string() + "\"");
+    d.add_string("$source injected = {?source_path}");
+    dip::Environment env = d.parse();
+
+    std::filesystem::remove(source_filename);
+
+    const dip::EnvSource& source = env.sources.at("injected");
+    EXPECT_EQ(source.path, source_filename);
+    ASSERT_EQ(source.nodes.size(), 1);
+    EXPECT_EQ(source.nodes.at(0)->path.name, "answer");
+    EXPECT_EQ(source.nodes.at(0)->value->to_string(), "42");
+}
+
+TEST(SourceList, ValueInjectionRequiresScalarString) {
+    dip::DIP d;
+    d.add_string("source_path int = 42");
+    d.add_string("$source injected = {?source_path}");
+
+    try {
+        d.parse();
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& e) {
+        EXPECT_EQ(e.info().message, "Invalid source reference value");
+    } catch (...) {
+        FAIL() << "Expected dip::SyntaxException";
+    }
 }
