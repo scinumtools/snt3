@@ -232,6 +232,26 @@ TEST(SchemaList, MultipleSchemas) {
     EXPECT_EQ(vnode->path.name, "john.will");
 }
 
+TEST(SchemaList, NestedSchemaModification) {
+    dip::DIP d;
+    d.add_string(
+        "$schema child\n"
+        "  x float = 1\n"
+        "$schema parent\n"
+        "  child : child\n"
+        "root : parent\n"
+        "  child\n"
+        "    x = 2\n"
+    );
+    dip::Environment env = d.parse();
+
+    ASSERT_EQ(env.nodes.size(), 1);
+    dip::ValueNode::PointerType node = env.nodes.at(0);
+    EXPECT_EQ(node->path.name, "root.child.x");
+    EXPECT_EQ(node->value->to_string(), "2");
+    EXPECT_EQ(node->value->get_dtype(), core::DataType::Float64);
+}
+
 TEST(SchemaList, FromCollection) {
     { // maps
         dip::DIP d;

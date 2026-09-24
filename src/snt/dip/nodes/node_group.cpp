@@ -85,4 +85,12 @@ namespace snt::dip {
         }
     }
 
+    BaseNode::PointerType GroupNode::clone(const Path& pth, std::optional<size_t> indent) const {
+        std::shared_ptr<GroupNode> copy = std::make_shared<GroupNode>(*this);
+        copy->path = pth;
+        if (indent)
+            copy->indent = indent.value();
+        return copy;
+    }
+
 } // namespace snt::dip
