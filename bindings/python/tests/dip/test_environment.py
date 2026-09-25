@@ -68,6 +68,42 @@ def test_source_manifest_and_provenance(tmp_path):
     assert loaded["value"].provenance.source.hash == provenance.source.hash
 
 
+def test_extended_metadata():
+    parser = DIP()
+    parser.add_string(
+        "gravity.force_accuracy.opening_angle float = 0.7\n"
+        "  ?descr \"Barnes-Hut opening angle\"\n"
+        "  ?native \"ErrTolTheta\"\n"
+        "  ?requires [\"build.gravity.self_gravity\", \"build.gravity.tree\"]\n"
+        "  ?conflicts \"build.gravity.direct\"\n"
+        "  ?implies \"build.gravity.tree\"\n"
+        "  ?see [\"gravity.force_accuracy\", \"gravity.softening\"]\n"
+        "  ?example [\"0.5\", \"0.7\"]\n"
+        "  ?rationale \"Balances accuracy and cost\"\n"
+        "  ?recommended_range \"0.3 to 1.0\"\n"
+        "  ?performance_impact \"Smaller values cost more\"\n"
+        "  ?scientific_impact \"Smaller values improve accuracy\"\n"
+        "  ?category \"Gravity\"\n"
+        "  ?visibility \"advanced\"\n"
+    )
+    environment = parser.parse()
+    metadata = environment["gravity.force_accuracy.opening_angle"].metadata
+
+    assert metadata.description == "Barnes-Hut opening angle"
+    assert metadata.native == ["ErrTolTheta"]
+    assert metadata.requires == ["build.gravity.self_gravity", "build.gravity.tree"]
+    assert metadata.conflicts == ["build.gravity.direct"]
+    assert metadata.implies == ["build.gravity.tree"]
+    assert metadata.see == ["gravity.force_accuracy", "gravity.softening"]
+    assert metadata.example == ["0.5", "0.7"]
+    assert metadata.rationale == "Balances accuracy and cost"
+    assert metadata.recommended_range == "0.3 to 1.0"
+    assert metadata.performance_impact == "Smaller values cost more"
+    assert metadata.scientific_impact == "Smaller values improve accuracy"
+    assert metadata.category == "Gravity"
+    assert metadata.visibility == "advanced"
+
+
 def test_generate(env, tmp_path):
     assert env.size == 7
 

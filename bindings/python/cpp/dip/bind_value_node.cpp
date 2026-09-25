@@ -41,6 +41,21 @@ namespace snt::bind::python {
         metadata.def_readonly("created", &dip::ValueMetadata::created);
         metadata.def_readonly("modified", &dip::ValueMetadata::modified);
         metadata.def_readonly("license", &dip::ValueMetadata::license);
+        metadata.def_readonly("rationale", &dip::ValueMetadata::rationale);
+        metadata.def_readonly("native", &dip::ValueMetadata::native);
+        metadata.def_readonly("requires", &dip::ValueMetadata::requires);
+        metadata.def_readonly("conflicts", &dip::ValueMetadata::conflicts);
+        metadata.def_readonly("implies", &dip::ValueMetadata::implies);
+        metadata.def_readonly("see", &dip::ValueMetadata::see);
+        metadata.def_readonly("example", &dip::ValueMetadata::example);
+        metadata.def_readonly("recommended_range", &dip::ValueMetadata::recommended_range);
+        metadata.def_readonly("performance_impact", &dip::ValueMetadata::performance_impact);
+        metadata.def_readonly("scientific_impact", &dip::ValueMetadata::scientific_impact);
+        metadata.def_readonly("deprecated", &dip::ValueMetadata::deprecated);
+        metadata.def_readonly("replacement", &dip::ValueMetadata::replacement);
+        metadata.def_readonly("since", &dip::ValueMetadata::since);
+        metadata.def_readonly("category", &dip::ValueMetadata::category);
+        metadata.def_readonly("visibility", &dip::ValueMetadata::visibility);
 
         auto vdata = py::class_<dip::ValueNodeData>(
             m, "ValueNodeData", "Evaluated value data returned by DIPL functions and nodes."

@@ -126,6 +126,12 @@ namespace snt::bind::python {
             "provenance", &dip::Cursor::get_provenance, "Source and citation provenance for the value at this path."
         );
 
+        val.def_property_readonly(
+            "metadata",
+            [](const dip::Cursor& self) { return self.get_provenance().metadata; },
+            "Documentation and provenance metadata for the value at this path."
+        );
+
         val.def_property_readonly("kind", &dip::Cursor::get_kind, "Kind of DIPL path represented by this cursor.");
 
         val.def(
