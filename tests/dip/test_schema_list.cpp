@@ -396,3 +396,13 @@ TEST(SchemaList, TableDeclarations) {
         }
     }
 }
+
+TEST(SchemaList, RejectValueWithAppliedSchema) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema settings\n"
+        "  child int = 1\n"
+        "value int = 1 : settings\n"
+    );
+    EXPECT_THROW(parser.parse(), dip::SyntaxException);
+}

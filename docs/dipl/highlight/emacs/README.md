@@ -13,3 +13,4 @@ file to a directory on Emacs’ `load-path`, then enable it for `.dip` and
 
 The mode highlights DIPL types, `$source`/`$unit`/`$schema` declarations,
 properties, `@if`/`@elif`/`@else`/`@end` branching, booleans, and numbers.
+Numbers within `#` line comments retain the comment face.

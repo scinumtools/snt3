@@ -103,6 +103,9 @@ grandfather str = "John"   # parent of Peter and Cintia
 ```
 
 Both parent and children nodes can be either definitions, modifications or declarations.
+Value nodes may have child nodes, but they cannot apply schemas themselves.
+Schema application is reserved for groups and collection items; a schema may, in
+turn, define value nodes and child containers.
 Nodes in the above example are equivalent to the fully-qualified **path notation** given below.
 
 ``` DIPL

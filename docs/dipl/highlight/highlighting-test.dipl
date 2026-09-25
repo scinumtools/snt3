@@ -1,5 +1,10 @@
 # DIPL highlighting fixture: covers the syntax categories used by the lexer.
 
+# Numeric-looking commented configuration must remain entirely a comment.
+#       size = 10000 arepo_length
+#     files = 4
+#   courant_factor = 0.25
+
 # Declarations: external sources, custom units, and schemas.
 $source imported = "data/other.dip"
 $unit local_length = 2.5 m

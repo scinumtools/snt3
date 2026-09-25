@@ -465,6 +465,15 @@ code list : snt_project_code
         for (size_t i = 0; i < target.nodes.size(); i++) {
             ValueNode::PointerType vnode = target.nodes.at(i);
             if (vnode) {
+                if (!vnode->schemas.empty())
+                    throw dip::SyntaxException(
+                        "Invalid value-node schema",
+                        "The value node `" + vnode->path.name + "` has applied schemas.",
+                        "Apply schemas to a group, map item, or list item rather than to a value node.",
+                        __FILE__,
+                        __LINE__,
+                        vnode->line
+                    );
                 vnode->validate_definition();
                 vnode->validate_options();
                 vnode->validate_condition(target);

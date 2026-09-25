@@ -73,12 +73,28 @@
   '((t :foreground "#d47b7b"))
   "Face for highlighting numbers")
 
-;; Highlight numbers and scientific notation in all programming modes
+(defconst dip-number-regexp
+  "-?\\b[0-9]+\\b\\(?:\\.[0-9]*\\(?:[eE][-+]?[0-9]+\\)?\\)?\\b\\.?"
+  "Regular expression matching a DIPL numeric literal.")
+
+(defun dip-match-number (limit)
+  "Match a DIPL number before LIMIT, excluding line comments.
+Font-lock runs this matcher separately from the comment rule, so simply
+ordering the rules cannot prevent number faces inside `#` comments."
+  (catch 'match
+    (while (re-search-forward dip-number-regexp limit t)
+      (unless (save-excursion
+                (let ((number-start (match-beginning 0)))
+                  (beginning-of-line)
+                  (search-forward "#" number-start t)))
+        (throw 'match t)))
+    nil))
+
 (defun highlight-dip-mode-numbers ()
-  "Highlight numbers and scientific notation in all programming modes."
+  "Highlight DIPL numeric literals outside comments."
   (font-lock-add-keywords
    nil
-   '(("-?\\b[0-9]+\\b\\(?:\\.[0-9]*\\(?:[eE][-+]?[0-9]+\\)?\\)?\\b\\.?" . 'my-number-face))))
+   '((dip-match-number . 'my-number-face))))
 
 ;; Add the function to dip modes hooks
 (add-hook 'dip-mode-hook 'highlight-dip-mode-numbers)

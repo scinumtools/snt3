@@ -268,6 +268,8 @@ is represented as:
 
 `_DIPL_Value` is format-owned and is not a DIPL child node. A direct DIPL child
 with that name beneath a value group is invalid and writers MUST reject it.
+The payload is a value node and therefore MUST NOT carry applied schemas;
+schemas are represented only by their expanded group or collection-item structure.
 
 ## Custom-unit manifest
 

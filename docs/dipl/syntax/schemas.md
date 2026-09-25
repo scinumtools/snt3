@@ -27,6 +27,7 @@ $schema vehicle
 ```
 
 A schema is instantiated by appending one or more schema names after a colon (`:`) to a group, map item, or list item declaration. 
+Schemas cannot be applied to a value node, including a value node that has child nodes.
 Multiple schema names are separated by commas.
 For example, the following creates two `car` instances, each of which also conforms to the `vehicle` schema:
 

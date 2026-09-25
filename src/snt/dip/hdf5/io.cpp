@@ -526,6 +526,14 @@ namespace snt::dip::hdf5 {
         }
 
         void write_node(hid_t file, const Environment& env, const ValueNode& node) {
+            if (!node.schemas.empty())
+                throw dip::IOException(
+                    "Invalid value-node schema",
+                    "The value node `" + node.path.name + "` has applied schemas.",
+                    "Apply schemas to a group, map item, or list item rather than to a value node.",
+                    __FILE__,
+                    __LINE__
+                );
             const std::string path = dataset_path(file, env, node.path.name);
             if (!has_descendant(env, node.path.name)) {
                 write_value_dataset(file, path, node);
@@ -697,6 +705,14 @@ namespace snt::dip::hdf5 {
                 node->options.push_back({option_value(value_dtype, option_values[i]), option_values[i], units_value});
             }
             node->schemas = read_strings(dataset, ATTR_SCHEMAS);
+            if (!node->schemas.empty())
+                throw dip::IOException(
+                    "Invalid value-node schema",
+                    "The persisted value node `" + path + "` has applied schemas.",
+                    "Use a DIPH5 file where schemas are applied only to groups or collection items.",
+                    __FILE__,
+                    __LINE__
+                );
             node->value_origin =
                 static_cast<ValueOrigin>(read_scalar<uint64_t>(dataset, ATTR_VALUE_ORIGIN, H5T_NATIVE_UINT64));
             node->line.source.name = read_string(dataset, ATTR_SOURCE);
