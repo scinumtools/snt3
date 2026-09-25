@@ -20,7 +20,7 @@ class SyntaxLexer(RegexLexer):
             (r'[ ]*\@(if|elif|else|end)', Token.DIP.Keyword, 'node_value'),
             (r'[ ]*!(options|format|condition|constant|tags|delimiter)',
              Token.DIP.Keyword, 'node_value'),
-            (r'[ ]*\?(descr|authors|title|journal|year|volume|issue|pages|doi|url|version|created|modified|license)',
+            (r'[ ]*\?(descr|authors|title|journal|year|volume|issue|pages|doi|url|version|created|modified|license|rationale|native|requires|conflicts|implies|see|example|recommended_range|performance_impact|scientific_impact|deprecated|replacement|since|category|visibility)',
              Token.DIP.Metadata, 'node_value'),
             (r'^([ ]*)(=)',
              bygroups(Token.DIP.Text, Token.DIP.Keyword), 'node_value'),

@@ -73,6 +73,21 @@ namespace snt::dip {
     constexpr std::string_view KEYWORD_CREATED = "?created";
     constexpr std::string_view KEYWORD_MODIFIED = "?modified";
     constexpr std::string_view KEYWORD_LICENSE = "?license";
+    constexpr std::string_view KEYWORD_RATIONALE = "?rationale";
+    constexpr std::string_view KEYWORD_NATIVE = "?native";
+    constexpr std::string_view KEYWORD_REQUIRES = "?requires";
+    constexpr std::string_view KEYWORD_CONFLICTS = "?conflicts";
+    constexpr std::string_view KEYWORD_IMPLIES = "?implies";
+    constexpr std::string_view KEYWORD_SEE = "?see";
+    constexpr std::string_view KEYWORD_EXAMPLE = "?example";
+    constexpr std::string_view KEYWORD_RECOMMENDED_RANGE = "?recommended_range";
+    constexpr std::string_view KEYWORD_PERFORMANCE_IMPACT = "?performance_impact";
+    constexpr std::string_view KEYWORD_SCIENTIFIC_IMPACT = "?scientific_impact";
+    constexpr std::string_view KEYWORD_DEPRECATED = "?deprecated";
+    constexpr std::string_view KEYWORD_REPLACEMENT = "?replacement";
+    constexpr std::string_view KEYWORD_SINCE = "?since";
+    constexpr std::string_view KEYWORD_CATEGORY = "?category";
+    constexpr std::string_view KEYWORD_VISIBILITY = "?visibility";
 
     constexpr std::string_view KEYWORD_IF = "if";
     constexpr std::string_view KEYWORD_ELIF = "elif";
@@ -171,6 +186,21 @@ namespace snt::dip {
         Created,
         Modified,
         License,
+        Rationale,
+        Native,
+        Requires,
+        Conflicts,
+        Implies,
+        See,
+        Example,
+        RecommendedRange,
+        PerformanceImpact,
+        ScientificImpact,
+        Deprecated,
+        Replacement,
+        Since,
+        Category,
+        Visibility,
 
         Delimiter // specific properties
     };

@@ -143,10 +143,13 @@ metadata-property
 metadata-key
   = "?descr" | "?authors" | "?title" | "?journal" | "?year"
   | "?volume" | "?issue" | "?pages" | "?doi" | "?url" | "?version"
-  | "?created" | "?modified" | "?license" ;
+  | "?created" | "?modified" | "?license" | "?rationale" | "?native"
+  | "?requires" | "?conflicts" | "?implies" | "?see" | "?example"
+  | "?recommended_range" | "?performance_impact" | "?scientific_impact"
+  | "?deprecated" | "?replacement" | "?since" | "?category" | "?visibility" ;
 
 metadata-value
-  = string | integer | float | boolean | "none" ;
+  = string | integer | float | boolean | "none" | array ;
 
 (* -------------------------------------------------------------------------- *)
 (* Conditions                                                                 *)

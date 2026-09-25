@@ -155,6 +155,21 @@ namespace snt::dip {
             {KEYWORD_CREATED, PropertyType::Created},
             {KEYWORD_MODIFIED, PropertyType::Modified},
             {KEYWORD_LICENSE, PropertyType::License},
+            {KEYWORD_RATIONALE, PropertyType::Rationale},
+            {KEYWORD_NATIVE, PropertyType::Native},
+            {KEYWORD_REQUIRES, PropertyType::Requires},
+            {KEYWORD_CONFLICTS, PropertyType::Conflicts},
+            {KEYWORD_IMPLIES, PropertyType::Implies},
+            {KEYWORD_SEE, PropertyType::See},
+            {KEYWORD_EXAMPLE, PropertyType::Example},
+            {KEYWORD_RECOMMENDED_RANGE, PropertyType::RecommendedRange},
+            {KEYWORD_PERFORMANCE_IMPACT, PropertyType::PerformanceImpact},
+            {KEYWORD_SCIENTIFIC_IMPACT, PropertyType::ScientificImpact},
+            {KEYWORD_DEPRECATED, PropertyType::Deprecated},
+            {KEYWORD_REPLACEMENT, PropertyType::Replacement},
+            {KEYWORD_SINCE, PropertyType::Since},
+            {KEYWORD_CATEGORY, PropertyType::Category},
+            {KEYWORD_VISIBILITY, PropertyType::Visibility},
         };
         for (const auto& kw : keywords) {
             if (code.compare(0, kw.text.size(), kw.text) != 0)

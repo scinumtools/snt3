@@ -21,7 +21,7 @@
     "comment": { "match": "#.*$", "name": "comment.line.number-sign.dipl" },
     "declaration": { "match": "\\$(?:source|unit|schema)\\b", "name": "keyword.control.dipl" },
     "directive": { "match": "!(?:options|format|condition|constant|tags|delimiter)\\b", "name": "keyword.other.dipl" },
-    "metadata": { "match": "\\?(?:descr|authors|title|journal|year|volume|issue|pages|doi|url|version|created|modified|license)\\b", "name": "storage.modifier.dipl" },
+    "metadata": { "match": "\\?(?:descr|authors|title|journal|year|volume|issue|pages|doi|url|version|created|modified|license|rationale|native|requires|conflicts|implies|see|example|recommended_range|performance_impact|scientific_impact|deprecated|replacement|since|category|visibility)\\b", "name": "storage.modifier.dipl" },
     "branch": { "match": "@(?:if|elif|else|end)\\b", "name": "keyword.control.dipl" },
     "type": { "match": "\\b(?:bool|char|byte|str|table|map|list|u?int(?:8|16|32|64)?|float(?:16|32|64|128)?)\\b", "name": "storage.type.dipl" },
     "boolean": { "match": "\\b(?:true|false|none)\\b", "name": "constant.language.dipl" },

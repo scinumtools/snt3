@@ -378,6 +378,51 @@ namespace snt::dip {
         case PropertyType::License:
             metadata.license += values.at(0);
             return true;
+        case PropertyType::Rationale:
+            metadata.rationale += values.at(0);
+            return true;
+        case PropertyType::Native:
+            metadata.native.insert(metadata.native.end(), values.begin(), values.end());
+            return true;
+        case PropertyType::Requires:
+            metadata.requires.insert(metadata.requires.end(), values.begin(), values.end());
+            return true;
+        case PropertyType::Conflicts:
+            metadata.conflicts.insert(metadata.conflicts.end(), values.begin(), values.end());
+            return true;
+        case PropertyType::Implies:
+            metadata.implies.insert(metadata.implies.end(), values.begin(), values.end());
+            return true;
+        case PropertyType::See:
+            metadata.see.insert(metadata.see.end(), values.begin(), values.end());
+            return true;
+        case PropertyType::Example:
+            metadata.example.insert(metadata.example.end(), values.begin(), values.end());
+            return true;
+        case PropertyType::RecommendedRange:
+            metadata.recommended_range += values.at(0);
+            return true;
+        case PropertyType::PerformanceImpact:
+            metadata.performance_impact += values.at(0);
+            return true;
+        case PropertyType::ScientificImpact:
+            metadata.scientific_impact += values.at(0);
+            return true;
+        case PropertyType::Deprecated:
+            metadata.deprecated += values.at(0);
+            return true;
+        case PropertyType::Replacement:
+            metadata.replacement += values.at(0);
+            return true;
+        case PropertyType::Since:
+            metadata.since += values.at(0);
+            return true;
+        case PropertyType::Category:
+            metadata.category += values.at(0);
+            return true;
+        case PropertyType::Visibility:
+            metadata.visibility += values.at(0);
+            return true;
         default:
             return false;
         }

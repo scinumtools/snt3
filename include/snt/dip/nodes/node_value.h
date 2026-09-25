@@ -5,6 +5,7 @@
 
 #include <deque>
 #include <optional>
+#include <vector>
 #include <snt/dip/exceptions.h>
 #include <snt/puq/quantity.h>
 
@@ -33,6 +34,21 @@ namespace snt::dip {
         std::string created;     ///< Date of creation
         std::string modified;    ///< Date of modification
         std::string license;     ///< License of the value
+        std::string rationale;   ///< Why the selected value is appropriate
+        std::vector<std::string> native;   ///< Native target name(s)
+        std::vector<std::string> requires; ///< Required paths or capabilities
+        std::vector<std::string> conflicts; ///< Incompatible paths or capabilities
+        std::vector<std::string> implies;  ///< Implied paths or capabilities
+        std::vector<std::string> see;      ///< Related paths
+        std::vector<std::string> example;  ///< Recommended example values
+        std::string recommended_range;     ///< Advisory, non-enforcing range
+        std::string performance_impact;    ///< Computational-cost implication
+        std::string scientific_impact;     ///< Modelling implication
+        std::string deprecated;            ///< Deprecation notice
+        std::string replacement;           ///< Replacement path
+        std::string since;                 ///< Introducing schema/software version
+        std::string category;              ///< Documentation grouping
+        std::string visibility;            ///< Documentation/UI visibility
     };
 
     /**

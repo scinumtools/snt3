@@ -144,8 +144,12 @@ When present, node settings are stored as attributes on the value dataset:
 Source and provenance information uses `_DIPL_Source`, `_DIPL_Source_Line`,
 `_DIPL_Source_Code`, and the metadata attributes `description`, `authors`,
 `title`, `journal`, `year`, `volume`, `issue`, `pages`, `doi`, `url`,
-`version`, `created`, `modified`, and `license`. Physical units are stored in
-the `units` attribute using their canonical PUEL representation.
+`version`, `created`, `modified`, `license`, `rationale`, `recommended_range`,
+`performance_impact`, `scientific_impact`, `deprecated`, `replacement`,
+`since`, `category`, and `visibility`. The plural metadata attributes `native`,
+`requires`, `conflicts`, `implies`, `see`, and `example` are UTF-8 string-array
+attributes. Physical units are stored in the `units` attribute using their
+canonical PUEL representation.
 
 ## Source manifest
 

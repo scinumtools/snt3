@@ -471,7 +471,26 @@ namespace snt::dip::hdf5 {
             SNT_WRITE_METADATA(created);
             SNT_WRITE_METADATA(modified);
             SNT_WRITE_METADATA(license);
+            SNT_WRITE_METADATA(rationale);
+            SNT_WRITE_METADATA(recommended_range);
+            SNT_WRITE_METADATA(performance_impact);
+            SNT_WRITE_METADATA(scientific_impact);
+            SNT_WRITE_METADATA(deprecated);
+            SNT_WRITE_METADATA(replacement);
+            SNT_WRITE_METADATA(since);
+            SNT_WRITE_METADATA(category);
+            SNT_WRITE_METADATA(visibility);
 #undef SNT_WRITE_METADATA
+#define SNT_WRITE_METADATA_LIST(NAME)                                                                                  \
+    if (!metadata.NAME.empty())                                                                                        \
+    write_strings(object, #NAME, metadata.NAME)
+            SNT_WRITE_METADATA_LIST(native);
+            SNT_WRITE_METADATA_LIST(requires);
+            SNT_WRITE_METADATA_LIST(conflicts);
+            SNT_WRITE_METADATA_LIST(implies);
+            SNT_WRITE_METADATA_LIST(see);
+            SNT_WRITE_METADATA_LIST(example);
+#undef SNT_WRITE_METADATA_LIST
         }
 
         void write_value_dataset(hid_t file, const std::string& path, const ValueNode& node) {
@@ -675,7 +694,24 @@ namespace snt::dip::hdf5 {
             SNT_READ_METADATA(created);
             SNT_READ_METADATA(modified);
             SNT_READ_METADATA(license);
+            SNT_READ_METADATA(rationale);
+            SNT_READ_METADATA(recommended_range);
+            SNT_READ_METADATA(performance_impact);
+            SNT_READ_METADATA(scientific_impact);
+            SNT_READ_METADATA(deprecated);
+            SNT_READ_METADATA(replacement);
+            SNT_READ_METADATA(since);
+            SNT_READ_METADATA(category);
+            SNT_READ_METADATA(visibility);
 #undef SNT_READ_METADATA
+#define SNT_READ_METADATA_LIST(NAME) metadata.NAME = read_strings(object, #NAME)
+            SNT_READ_METADATA_LIST(native);
+            SNT_READ_METADATA_LIST(requires);
+            SNT_READ_METADATA_LIST(conflicts);
+            SNT_READ_METADATA_LIST(implies);
+            SNT_READ_METADATA_LIST(see);
+            SNT_READ_METADATA_LIST(example);
+#undef SNT_READ_METADATA_LIST
         }
 
         void read_dataset(Environment& env, hid_t dataset) {

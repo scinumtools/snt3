@@ -38,7 +38,7 @@
         <!-- Metadata -->
         <RegExpr
             attribute="Metadata"
-            String="\?(descr|authors|title|journal|year|volume|issue|pages|doi|url|version|created|modified|license)"
+            String="\?(descr|authors|title|journal|year|volume|issue|pages|doi|url|version|created|modified|license|rationale|native|requires|conflicts|implies|see|example|recommended_range|performance_impact|scientific_impact|deprecated|replacement|since|category|visibility)"
             context="#stay"/>
 
         <!-- Numbers -->

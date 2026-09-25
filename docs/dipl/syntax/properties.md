@@ -170,6 +170,25 @@ The following metadata properties are currently defined:
 | `?created`  | Creation date of the referenced resource or metadata.          |
 | `?modified` | Last modification date of the referenced resource or metadata. |
 | `?license`  | License governing the referenced resource or dataset.          |
+| `?rationale` | Why the selected or default value is appropriate. |
+| `?native` | Native target name(s), such as an application configuration key. |
+| `?requires` | FQP or capability required for this node to apply. |
+| `?conflicts` | FQP or capability that cannot coexist with this node or value. |
+| `?implies` | Setting or capability normally enabled or required by this choice. |
+| `?see` | Related FQP cross-reference(s). |
+| `?example` | Recommended, optionally unit-aware example value(s). |
+| `?recommended_range` | Advisory range; unlike `!condition`, this does not enforce validity. |
+| `?performance_impact` | Computational-cost or memory implication. |
+| `?scientific_impact` | Modelling or physical consequence. |
+| `?deprecated` | Deprecation notice or version. |
+| `?replacement` | FQP that supersedes a deprecated node. |
+| `?since` | Software or schema version that introduced the node. |
+| `?category` | Documentation grouping independent of hierarchy. |
+| `?visibility` | Documentation or UI level, such as `basic`, `advanced`, or `expert`. |
+
+`?native`, `?requires`, `?conflicts`, `?implies`, `?see`, and `?example`
+accept either one scalar value or an array of strings. All other metadata
+properties accept one scalar value.
 
 **Example**
 
@@ -190,4 +209,3 @@ thermal_conductivity float = 401 W/(m*K)
   ?modified "2024-04-02"
   ?license "CC BY 4.0"
 ```
-

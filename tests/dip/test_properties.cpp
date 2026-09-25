@@ -564,3 +564,50 @@ TEST(Properties, Metadata) {
         FAIL() << "Expected dip::SyntaxException";
     }
 }
+
+TEST(Properties, ExtendedMetadata) {
+
+    dip::DIP d;
+    d.add_string(
+        "gravity.theta float = 0.7\n"
+        "  ?rationale \"Balances force accuracy and tree-walk cost\"\n"
+        "  ?native [\"ErrTolTheta\", \"TreeOpeningAngle\"]\n"
+        "  ?requires [\"build.gravity.self_gravity\", \"build.gravity.tree\"]\n"
+        "  ?conflicts \"build.gravity.direct\"\n"
+        "  ?implies \"build.gravity.tree\"\n"
+        "  ?see [\"gravity.force_accuracy\", \"gravity.softening\"]\n"
+        "  ?example [\"0.5\", \"0.7\"]\n"
+        "  ?recommended_range \"0.3 to 1.0\"\n"
+        "  ?performance_impact \"Smaller values increase tree-walk cost\"\n"
+        "  ?scientific_impact \"Smaller values improve force accuracy\"\n"
+        "  ?deprecated \"Never\"\n"
+        "  ?replacement \"gravity.opening_angle\"\n"
+        "  ?since \"3.0\"\n"
+        "  ?category \"Gravity\"\n"
+        "  ?visibility \"advanced\"\n"
+    );
+    const dip::Environment env = d.parse();
+    const auto node = env.get_node("gravity.theta");
+    ASSERT_TRUE(node);
+    const auto& metadata = node->metadata;
+    EXPECT_EQ(metadata.rationale, "Balances force accuracy and tree-walk cost");
+    EXPECT_EQ(metadata.native, (std::vector<std::string>{"ErrTolTheta", "TreeOpeningAngle"}));
+    EXPECT_EQ(metadata.requires, (std::vector<std::string>{"build.gravity.self_gravity", "build.gravity.tree"}));
+    EXPECT_EQ(metadata.conflicts, (std::vector<std::string>{"build.gravity.direct"}));
+    EXPECT_EQ(metadata.implies, (std::vector<std::string>{"build.gravity.tree"}));
+    EXPECT_EQ(metadata.see, (std::vector<std::string>{"gravity.force_accuracy", "gravity.softening"}));
+    EXPECT_EQ(metadata.example, (std::vector<std::string>{"0.5", "0.7"}));
+    EXPECT_EQ(metadata.recommended_range, "0.3 to 1.0");
+    EXPECT_EQ(metadata.performance_impact, "Smaller values increase tree-walk cost");
+    EXPECT_EQ(metadata.scientific_impact, "Smaller values improve force accuracy");
+    EXPECT_EQ(metadata.deprecated, "Never");
+    EXPECT_EQ(metadata.replacement, "gravity.opening_angle");
+    EXPECT_EQ(metadata.since, "3.0");
+    EXPECT_EQ(metadata.category, "Gravity");
+    EXPECT_EQ(metadata.visibility, "advanced");
+
+    const dip::Provenance provenance = env["gravity.theta"].get_provenance();
+    EXPECT_EQ(provenance.metadata.native, metadata.native);
+    EXPECT_EQ(provenance.metadata.requires, metadata.requires);
+    EXPECT_EQ(provenance.metadata.visibility, "advanced");
+}

@@ -69,6 +69,21 @@ calculated float = ({?length} * 2) cm
   ?created "2026-09-21"
   ?modified "2026-09-21"
   ?license "CC BY 4.0"
+  ?rationale "Balances accuracy and cost"
+  ?native ["ErrTolTheta", "TreeOpeningAngle"]
+  ?requires ["build.gravity.self_gravity", "build.gravity.tree"]
+  ?conflicts "build.gravity.direct"
+  ?implies "build.gravity.tree"
+  ?see ["gravity.force_accuracy", "gravity.softening"]
+  ?example ["0.5", "0.7"]
+  ?recommended_range "0.3 to 1.0"
+  ?performance_impact "Smaller values cost more"
+  ?scientific_impact "Smaller values improve accuracy"
+  ?deprecated "Never"
+  ?replacement "gravity.opening_angle"
+  ?since "3.0"
+  ?category "Gravity"
+  ?visibility "advanced"
 
 # Conditional branches.
 @if ({?enabled})
