@@ -92,7 +92,17 @@ namespace snt::dip {
          * @param vdt Stored value data type.
          */
         ValueNode(const Parser& parser, const NodeDtype dt, const core::DataType vdt = core::DataType::None)
-            : BaseNode(parser, dt), constant(false), value_dtype(vdt) {};
+            : BaseNode(parser, dt), constant(false), value_dtype(vdt) {
+            if (path.kind == Path::Kind::Map || path.kind == Path::Kind::List)
+                throw dip::SyntaxException(
+                    "Invalid value-node path",
+                    "A map or list item cannot itself be a value node: `" + path.name + "`.",
+                    "Declare the collection item as a group and place value nodes beneath it.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
+        };
         /** Construct a value node by copying another node's value.
          * @param other Source node.
          * @param dt DIP node data type.

@@ -273,7 +273,10 @@ namespace snt::dip::hdf5 {
                 H5Gclose,
                 "Unable to open or create an HDF5 group"
             );
-            write_string(group, ATTR_KIND, kind);
+            // A value group is also an intermediate group for its descendants.
+            // Do not let a later child write turn it back into a plain group.
+            if (!(exists > 0 && kind == "group" && read_string(group, ATTR_KIND) == KIND_VALUE_GROUP))
+                write_string(group, ATTR_KIND, kind);
             return group;
         }
 
@@ -470,8 +473,7 @@ namespace snt::dip::hdf5 {
 #undef SNT_WRITE_METADATA
         }
 
-        void write_node(hid_t file, const Environment& env, const ValueNode& node) {
-            const std::string path = dataset_path(file, env, node.path.name);
+        void write_value_dataset(hid_t file, const std::string& path, const ValueNode& node) {
             write_value(file, path, node);
             Id dataset(H5Dopen2(file, path.c_str(), H5P_DEFAULT), H5Dclose, "Unable to open an HDF5 dataset");
             write_string(dataset, ATTR_KIND, "value");
@@ -507,6 +509,30 @@ namespace snt::dip::hdf5 {
             if (!node.line.code.empty())
                 write_string(dataset, ATTR_SOURCE_CODE, node.line.code);
             write_metadata(dataset, node.metadata);
+        }
+
+        bool has_descendant(const Environment& env, const std::string& path) {
+            const std::string dot_prefix = path + ".";
+            const std::string collection_prefix = path + "[";
+            for (const auto& candidate : env.nodes.get_nodes()) {
+                if (!candidate)
+                    continue;
+                const std::string& candidate_path = candidate->path.name;
+                if (candidate_path.rfind(dot_prefix, 0) == 0 || candidate_path.rfind(collection_prefix, 0) == 0)
+                    return true;
+            }
+            return false;
+        }
+
+        void write_node(hid_t file, const Environment& env, const ValueNode& node) {
+            const std::string path = dataset_path(file, env, node.path.name);
+            if (!has_descendant(env, node.path.name)) {
+                write_value_dataset(file, path, node);
+                return;
+            }
+            Id group = ensure_group(file, path, std::string(KIND_VALUE_GROUP));
+            write_string(group, ATTR_PATH, node.path.name);
+            write_value_dataset(group, std::string(VALUE_PAYLOAD), node);
         }
 
         std::vector<hsize_t> dimensions(hid_t dataset) {
@@ -806,17 +832,46 @@ namespace snt::dip::hdf5 {
             env.set_trace_manifest(std::move(traces));
         }
 
-        void read_group(Environment& env, hid_t group, bool root = false) {
+        void read_group(Environment& env, hid_t group, bool root = false, bool skip_value_payload = false) {
             const hsize_t count = object_count(group);
             for (hsize_t i = 0; i < count; ++i) {
                 const std::string name = object_name(group, i);
                 if (root && (name == std::string(GROUP_SOURCES) || name == std::string(GROUP_TRACE)))
+                    continue;
+                if (skip_value_payload && name == VALUE_PAYLOAD)
                     continue;
                 const int type = H5Gget_objtype_by_idx(group, i);
                 if (type == H5G_GROUP) {
                     Id child(H5Gopen2(group, name.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open an HDF5 group");
                     const std::string kind = read_string(child, ATTR_KIND);
                     const std::string path = read_string(child, ATTR_PATH);
+                    if (kind == KIND_VALUE_GROUP) {
+                        const htri_t payload_exists = H5Lexists(child, std::string(VALUE_PAYLOAD).c_str(), H5P_DEFAULT);
+                        if (payload_exists <= 0)
+                            throw dip::IOException(
+                                "Invalid DIPH5 value group",
+                                "The value group at `" + path + "` does not contain its `_DIPL_Value` payload.",
+                                "Use a complete DIPH5 2.2 file written by a compatible SciNumTools3 version.",
+                                __FILE__,
+                                __LINE__
+                            );
+                        Id payload(
+                            H5Dopen2(child, std::string(VALUE_PAYLOAD).c_str(), H5P_DEFAULT),
+                            H5Dclose,
+                            "Unable to open a DIPH5 value-group payload"
+                        );
+                        if (read_string(payload, ATTR_KIND) != "value" || read_string(payload, ATTR_PATH) != path)
+                            throw dip::IOException(
+                                "Invalid DIPH5 value group",
+                                "The value-group payload does not describe its parent DIPL value path.",
+                                "Use a complete DIPH5 2.2 file written by a compatible SciNumTools3 version.",
+                                __FILE__,
+                                __LINE__
+                            );
+                        read_dataset(env, payload);
+                        read_group(env, child, false, true);
+                        continue;
+                    }
                     if (!path.empty() &&
                         (kind == "group" || kind == "item" || kind == "map_item" || kind == "list_item") &&
                         !env.hierarchy.has_collection(path))
@@ -911,6 +966,14 @@ namespace snt::dip::hdf5 {
             }
             return false;
         }
+
+        bool uses_value_payload_child(const Environment& env, const std::string& path) {
+            const std::string payload_path = path + "." + std::string(VALUE_PAYLOAD);
+            for (const auto& candidate : env.nodes.get_nodes())
+                if (candidate && candidate->path.name == payload_path)
+                    return true;
+            return false;
+        }
     } // namespace
 
     void save(const Environment& env, const std::filesystem::path& file) {
@@ -929,6 +992,17 @@ namespace snt::dip::hdf5 {
                     "Reserved DIPH5 path",
                     "The DIPL path `" + node->path.name + "` conflicts with a reserved DIPH5 manifest.",
                     "Rename the top-level `_DIPL_Sources` or `_DIPL_Trace` group before saving this environment.",
+                    __FILE__,
+                    __LINE__
+                );
+        }
+        for (const auto& node : env.nodes.get_nodes()) {
+            if (node && has_descendant(env, node->path.name) && uses_value_payload_child(env, node->path.name))
+                throw dip::IOException(
+                    "Reserved DIPH5 child path",
+                    "The DIPL path `" + node->path.name + "." + std::string(VALUE_PAYLOAD) +
+                        "` conflicts with the DIPH5 value-group payload.",
+                    "Rename the direct child before saving this environment.",
                     __FILE__,
                     __LINE__
                 );

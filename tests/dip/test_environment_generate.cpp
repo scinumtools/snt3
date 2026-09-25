@@ -112,6 +112,33 @@ TEST(Environment, GenerateMultiDimensionalArray) {
     std::filesystem::remove(cpp_file);
 }
 
+TEST(Environment, GenerateValueNodeWithChildren) {
+    dip::DIP parser;
+    parser.add_string(
+        "feature bool = true\n"
+        "  setting int = 2\n"
+    );
+    const dip::Environment env = parser.parse();
+    const auto json_file = environment_file("value-node-children.json");
+    const auto yaml_file = environment_file("value-node-children.yaml");
+    env.generate(dip::ExportFormat::JSON, json_file);
+    env.generate(dip::ExportFormat::YAML, yaml_file);
+
+    std::ifstream json(json_file);
+    std::stringstream json_text;
+    json_text << json.rdbuf();
+    EXPECT_NE(json_text.str().find("\"feature\": {"), std::string::npos);
+    EXPECT_NE(json_text.str().find("\"$value\": true"), std::string::npos);
+    EXPECT_NE(json_text.str().find("\"setting\": 2"), std::string::npos);
+
+    std::ifstream yaml(yaml_file);
+    std::stringstream yaml_text;
+    yaml_text << yaml.rdbuf();
+    EXPECT_NE(yaml_text.str().find("feature:\n  $value: true\n  setting: 2"), std::string::npos);
+    std::filesystem::remove(json_file);
+    std::filesystem::remove(yaml_file);
+}
+
 TEST(Environment, GenerateThreeDimensionalArray) {
     dip::DIP parser;
     parser.add_string("volume int[2,2,3] = [[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]]");

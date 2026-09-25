@@ -7,10 +7,9 @@
 namespace snt::dip::hdf5::schema {
 
     inline constexpr std::string_view FORMAT = "SciNumTools3 Environment";
-    // DIPH5 2.1 adds durable trace-registry records while retaining the v2
-    // node and source-manifest layout.
+    // DIPH5 2.2 adds value groups, allowing a value node to have children.
     inline constexpr uint64_t VERSION = 2;
-    inline constexpr uint64_t VERSION_MINOR = 1;
+    inline constexpr uint64_t VERSION_MINOR = 2;
     inline constexpr uint64_t FIRST_SUPPORTED_VERSION = 1;
 
     inline constexpr std::string_view ATTR_FORMAT = "_DIPL_Format";
@@ -45,6 +44,8 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_TRACE_ID = "_DIPL_Trace_Id";
     inline constexpr std::string_view ATTR_TRACE_NAME = "_DIPL_Trace_Name";
     inline constexpr std::string_view ATTR_TRACE_KIND = "_DIPL_Trace_Kind";
+    inline constexpr std::string_view KIND_VALUE_GROUP = "value_group";
+    inline constexpr std::string_view VALUE_PAYLOAD = "_DIPL_Value";
 
 } // namespace snt::dip::hdf5::schema
 

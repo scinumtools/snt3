@@ -184,6 +184,8 @@ When resolving a fully-qualified path, all parent collections shall already exis
 Since the container type of each parent node is therefore known, selectors of the form `[value]` can be unambiguously interpreted either as map keys or list indices.
 
 Only the final path segment may create a new node or collection item.
+Collection items are container nodes: they cannot declare a DIPL value directly.
+Place typed value nodes beneath the item group instead.
 
 ```DIPL
 basket                      # group

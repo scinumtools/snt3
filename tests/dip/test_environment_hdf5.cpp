@@ -184,7 +184,7 @@ TEST(Environment, SaveHdf5Content) {
         H5Handle minor_version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
         uint64_t minor_version = 0;
         ASSERT_GE(H5Aread(minor_version_attribute, H5T_NATIVE_UINT64, &minor_version), 0);
-        EXPECT_EQ(minor_version, 1);
+        EXPECT_EQ(minor_version, 2);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Trace", H5P_DEFAULT), 0);
         H5Handle source_manifest(H5Gopen2(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), H5Gclose);
@@ -233,5 +233,56 @@ TEST(Environment, SaveHdf5Content) {
         EXPECT_GT(H5Aexists(title, "_DIPL_Tags"), 0);
         EXPECT_GT(H5Aexists(title, "_DIPL_Options"), 0);
     }
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, ValueNodeWithChildrenHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string(
+        "feature bool = true\n"
+        "  setting int = 2\n"
+        "  cutoff float = 5 m\n"
+    );
+    const dip::Environment source = parser.parse();
+    const auto file = environment_file("value-node-children");
+    source.save(file);
+
+    {
+        H5Handle hdf5_file(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
+        ASSERT_GE(hdf5_file, 0);
+        H5Handle feature(H5Gopen2(hdf5_file, "/feature", H5P_DEFAULT), H5Gclose);
+        ASSERT_GE(feature, 0);
+        EXPECT_GT(H5Aexists(feature, "_DIPL_Kind"), 0);
+        H5Handle payload(H5Dopen2(feature, "_DIPL_Value", H5P_DEFAULT), H5Dclose);
+        ASSERT_GE(payload, 0);
+        EXPECT_GT(H5Aexists(payload, "_DIPL_Value_Type"), 0);
+        EXPECT_GT(H5Lexists(feature, "setting", H5P_DEFAULT), 0);
+    }
+
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_TRUE(loaded["feature"].as<bool>());
+    EXPECT_EQ(loaded["feature.setting"].as<int64_t>(), 2);
+    EXPECT_DOUBLE_EQ(loaded["feature.cutoff"].as<double>(), 5.0);
+    EXPECT_EQ(loaded.get_node("feature.cutoff")->units->to_string(), "m");
+
+    const auto resaved = environment_file("value-node-children-resaved");
+    loaded.save(resaved);
+    dip::Environment round_tripped;
+    round_tripped.load(resaved);
+    EXPECT_TRUE(round_tripped["feature"].as<bool>());
+    EXPECT_EQ(round_tripped["feature.setting"].as<int64_t>(), 2);
+    std::filesystem::remove(file);
+    std::filesystem::remove(resaved);
+}
+
+TEST(Environment, RejectsReservedValueGroupPayloadChild) {
+    dip::DIP parser;
+    parser.add_string(
+        "feature bool = true\n"
+        "  _DIPL_Value int = 2\n"
+    );
+    const auto file = environment_file("reserved-value-payload");
+    EXPECT_THROW(parser.parse().save(file), dip::IOException);
     std::filesystem::remove(file);
 }

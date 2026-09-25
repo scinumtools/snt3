@@ -78,6 +78,16 @@ TEST(Collections, ListItems) {
     }
 }
 
+TEST(Collections, RejectValueCollectionItems) {
+    dip::DIP map;
+    map.add_string("items[key] int = 1");
+    EXPECT_THROW(map.parse(), dip::SyntaxException);
+
+    dip::DIP list;
+    list.add_string("items[] bool = true");
+    EXPECT_THROW(list.parse(), dip::SyntaxException);
+}
+
 TEST(Collections, Declarations) {
 
     // declare only

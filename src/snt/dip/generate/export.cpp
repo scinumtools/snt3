@@ -20,6 +20,10 @@ namespace snt::dip::generate {
             return node.has_value && node.children.empty();
         }
 
+        bool has_embedded_value(const Node& node) {
+            return node.has_value && !node.children.empty();
+        }
+
         void write_json(std::ostream& output, const Node& node, size_t depth) {
             if (node.kind == NodeKind::List) {
                 output << '[';
@@ -40,14 +44,17 @@ namespace snt::dip::generate {
             }
 
             output << '{';
+            const size_t value_offset = has_embedded_value(node) ? 1 : 0;
+            if (has_embedded_value(node))
+                output << '\n' << indent(depth + 1) << "\"$value\": " << node.literal;
             for (size_t index = 0; index < node.children.size(); ++index) {
-                if (index)
+                if (index + value_offset)
                     output << ',';
                 const Node& child = *node.children[index];
                 output << '\n' << indent(depth + 1) << '"' << child.name << "\": ";
                 write_json(output, child, depth + 1);
             }
-            if (!node.children.empty())
+            if (has_embedded_value(node) || !node.children.empty())
                 output << '\n' << indent(depth);
             output << '}';
         }
@@ -70,6 +77,8 @@ namespace snt::dip::generate {
                 }
                 return;
             }
+            if (has_embedded_value(node))
+                output << indent(depth) << "$value: " << node.literal << '\n';
             for (const auto& child : node.children) {
                 output << indent(depth) << child->name << ':';
                 if (is_scalar(*child)) {

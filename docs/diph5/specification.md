@@ -1,6 +1,6 @@
 % SciNumTools DIPH5
 % Environment HDF5 Format Specification
-% Version 2.1
+% Version 2.2
 
 # Scope
 
@@ -29,7 +29,8 @@ complete unit and schema registries. DIPH5 version 2 additionally stores a
 source manifest containing source identities, paths, parent relationships, and
 content fingerprints. Version 2.1 also stores durable identifiers for registered
 units, schemas, and functions. It does not embed complete source text, parsed
-source nodes, or executable functions. A loaded DIPH5 file must therefore be
+source nodes, or executable functions. Version 2.2 adds `value_group` objects
+for value nodes that have child nodes. A loaded DIPH5 file must therefore be
 treated as an evaluated environment, not as a source from which the original
 DIPL program can be reconstructed exactly.
 
@@ -41,11 +42,12 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
-| `_DIPL_Schema_Version_Minor` | unsigned integer | `1` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `2` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2.1 readers support version 1 files, version 2.0
-files (which omit the minor attribute), and version 2.1 files. Future schema
+schema version. Version 2.2 readers support version 1 files, version 2.0
+files (which omit the minor attribute), version 2.1 files, and version 2.2
+files. Future schema
 revisions MUST preserve the meaning of existing attributes or increment the
 major or minor schema version.
 
@@ -59,9 +61,9 @@ attributes, regardless of its filename.
 # Paths and objects
 
 Each component of a fully qualified DIPL path is represented by an HDF5 path
-component. A value node is an HDF5 dataset at its resolved path. Intermediate
-groups represent DIPL hierarchy and carry `_DIPL_Kind=group` and
-`_DIPL_Path` attributes.
+component. A value node without child nodes is an HDF5 dataset at its resolved
+path. Intermediate groups represent DIPL hierarchy and carry `_DIPL_Kind=group`
+and `_DIPL_Path` attributes.
 
 The `_DIPL_Path` attribute stores the corresponding fully qualified DIPL path
 and is the authoritative mapping back to DIPL semantics.
@@ -79,6 +81,7 @@ identified by `_DIPL_Kind`:
 | `list_item` | item of an ordered collection | `_DIPL_Index` |
 
 Collection item groups may contain nested groups and value datasets.
+They are containers and cannot themselves represent DIPL value nodes.
 
 The complete object-kind table is:
 
@@ -89,6 +92,7 @@ The complete object-kind table is:
 | keyed item | `map_item` | item path | `_DIPL_Key` |
 | ordered collection | `list` | collection path | — |
 | ordered item | `list_item` | item path | `_DIPL_Index` |
+| value with children | `value_group` | value path | `_DIPL_Value` dataset |
 | value dataset | `value` | value path | `_DIPL_Node_Type`, `_DIPL_Value_Type` |
 
 An implementation MUST use the kind attribute to distinguish a collection
@@ -233,6 +237,36 @@ is represented as:
 ```
 
 The velocity dataset has rank one and dimension `3`.
+
+## Value groups
+
+When a DIPL value node has descendants, its resolved HDF5 path is a group rather
+than a dataset. The group has `_DIPL_Kind=value_group` and `_DIPL_Path` set to
+the value node's fully qualified path. Its own value is stored in a reserved
+child dataset named `_DIPL_Value`; that dataset uses the normal `value` dataset
+attributes, including the real DIPL path rather than a synthetic sentinel path.
+All other children of the group are regular DIPL descendants.
+
+```DIPL
+feature bool = true
+  setting int = 2
+```
+
+is represented as:
+
+```text
+/feature                            group   (_DIPL_Kind=value_group,
+                                             _DIPL_Path=feature)
+/feature/_DIPL_Value                dataset (_DIPL_Kind=value,
+                                             _DIPL_Path=feature,
+                                             _DIPL_Value_Type=bool)
+/feature/setting                    dataset (_DIPL_Kind=value,
+                                             _DIPL_Path=feature.setting,
+                                             _DIPL_Value_Type=int32)
+```
+
+`_DIPL_Value` is format-owned and is not a DIPL child node. A direct DIPL child
+with that name beneath a value group is invalid and writers MUST reject it.
 
 ## Ordered collections
 

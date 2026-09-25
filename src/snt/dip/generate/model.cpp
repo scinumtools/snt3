@@ -36,7 +36,10 @@ namespace snt::dip::generate {
 
         Node* child(Node& parent, NodeKind kind, const std::string& name, const std::string& path) {
             const auto found = std::find_if(parent.children.begin(), parent.children.end(), [&](const auto& node) {
-                return node->kind == kind && node->name == name;
+                const bool value_group_pair =
+                    (node->kind == NodeKind::Value && kind == NodeKind::Group) ||
+                    (node->kind == NodeKind::Group && kind == NodeKind::Value);
+                return node->name == name && (node->kind == kind || value_group_pair);
             });
             if (found != parent.children.end())
                 return found->get();
