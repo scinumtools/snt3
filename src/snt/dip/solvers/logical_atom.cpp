@@ -6,12 +6,36 @@
 #include <snt/dip/solvers/logical_atom.h>
 
 namespace snt::dip {
+    namespace {
+        [[noreturn]] void throw_dimension_mismatch(
+            const char* operation, const ValueNodeData& left, const ValueNodeData& right
+        ) {
+            if (left.units) {
+                throw dip::UnitException(
+                    "Dimension mismatch",
+                    "The `" + std::string(operation) + "` operator cannot compare a quantity with dimensions `" +
+                        left.units->to_string() + "` with a nondimensional quantity.",
+                    "Give both operands compatible units.",
+                    __FILE__,
+                    __LINE__
+                );
+            }
+            throw dip::UnitException(
+                "Dimension mismatch",
+                "The `" + std::string(operation) +
+                    "` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
+                    right.units->to_string() + "`.",
+                "Give both operands compatible units.",
+                __FILE__,
+                __LINE__
+            );
+        }
+    } // namespace
 
     LogicalAtom& LogicalAtom::operator=(const LogicalAtom& a) {
         if (this != &a) {
-            value.value = a.value.value->clone();
-            if (value.units)
-                value.units = a.value.units;
+            value.value = a.value.value ? a.value.value->clone() : nullptr;
+            value.units = a.value.units;
         }
         return *this;
     }
@@ -80,24 +104,8 @@ namespace snt::dip {
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_equal(new_value.get());
-        } else if (value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `==` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
-                    other->value.units->to_string() + "`.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
-        } else if (other->value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `==` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
-                    "` with a nondimensional quantity.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
+        } else if (value.units || other->value.units) {
+            throw_dimension_mismatch("==", value, other->value);
         } else {
             value.value = value.value->compare_equal(other->value.value.get());
         }
@@ -118,24 +126,8 @@ namespace snt::dip {
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_not_equal(new_value.get());
-        } else if (value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `!=` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
-                    other->value.units->to_string() + "`.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
-        } else if (other->value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `!=` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
-                    "` with a nondimensional quantity.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
+        } else if (value.units || other->value.units) {
+            throw_dimension_mismatch("!=", value, other->value);
         } else {
             value.value = value.value->compare_not_equal(other->value.value.get());
         }
@@ -156,24 +148,8 @@ namespace snt::dip {
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_less_equal(new_value.get());
-        } else if (value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `<=` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
-                    other->value.units->to_string() + "`.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
-        } else if (other->value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `<=` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
-                    "` with a nondimensional quantity.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
+        } else if (value.units || other->value.units) {
+            throw_dimension_mismatch("<=", value, other->value);
         } else {
             value.value = value.value->compare_less_equal(other->value.value.get());
         }
@@ -194,24 +170,8 @@ namespace snt::dip {
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_greater_equal(new_value.get());
-        } else if (value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `>=` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
-                    other->value.units->to_string() + "`.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
-        } else if (other->value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `>=` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
-                    "` with a nondimensional quantity.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
+        } else if (value.units || other->value.units) {
+            throw_dimension_mismatch(">=", value, other->value);
         } else {
             value.value = value.value->compare_greater_equal(other->value.value.get());
         }
@@ -232,24 +192,8 @@ namespace snt::dip {
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_less(new_value.get());
-        } else if (value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `<` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
-                    other->value.units->to_string() + "`.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
-        } else if (other->value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `<` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
-                    "` with a nondimensional quantity.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
+        } else if (value.units || other->value.units) {
+            throw_dimension_mismatch("<", value, other->value);
         } else {
             value.value = value.value->compare_less(other->value.value.get());
         }
@@ -270,24 +214,8 @@ namespace snt::dip {
             quantity = quantity.convert(*value.units);
             val::BaseValue::PointerType new_value = std::move(quantity.measurement.result.estimate);
             value.value = value.value->compare_greater(new_value.get());
-        } else if (value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `>` operator cannot compare a nondimensional quantity with a quantity having dimensions `" +
-                    other->value.units->to_string() + "`.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
-        } else if (other->value.units) {
-            throw dip::UnitException(
-                "Dimension mismatch",
-                "The `>` operator cannot compare a quantity with dimensions `" + value.units->to_string() +
-                    "` with a nondimensional quantity.",
-                "Check whether the input units are correct.",
-                __FILE__,
-                __LINE__
-            );
+        } else if (value.units || other->value.units) {
+            throw_dimension_mismatch(">", value, other->value);
         } else {
             value.value = value.value->compare_greater(other->value.value.get());
         }

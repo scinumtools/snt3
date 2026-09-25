@@ -71,6 +71,22 @@ TEST(SolverLogical, FloatComparison) {
     EXPECT_EQ(data.value->to_string(), "false");
 }
 
+TEST(SolverLogical, DimensionalComparison) {
+    dip::Environment env;
+    dip::LogicalSolver solver(env);
+    EXPECT_EQ(solver.eval("1 s > 0 s").value->to_string(), "true");
+    EXPECT_EQ(solver.eval("1 m > 50 cm").value->to_string(), "true");
+}
+
+TEST(SolverLogical, RejectsDimensionMismatchForEveryComparison) {
+    dip::Environment env;
+    dip::LogicalSolver solver(env);
+    for (const char* operation : {"==", "!=", "<=", ">=", "<", ">"}) {
+        EXPECT_THROW(solver.eval(std::string("1 s ") + operation + " 0"), dip::UnitException);
+        EXPECT_THROW(solver.eval(std::string("1 ") + operation + " 0 s"), dip::UnitException);
+    }
+}
+
 TEST(SolverLogical, StringComparison) {
 
     dip::Environment env;

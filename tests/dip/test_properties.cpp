@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <limits>
+#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 
@@ -245,6 +246,26 @@ TEST(Properties, Condition) {
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
     }
+}
+
+TEST(Properties, DimensionalCondition) {
+    dip::DIP schema;
+    schema.add_string(
+        "$schema limited\n"
+        "  limit float s\n"
+        "    !condition ({.} > 0 s)\n"
+        "configuration : limited\n"
+        "  limit = 1 s\n"
+    );
+    const dip::Environment env = schema.parse();
+    EXPECT_DOUBLE_EQ(env["configuration.limit"].as<double>(), 1.0);
+
+    dip::DIP mismatch;
+    mismatch.add_string(
+        "duration float = 1 s\n"
+        "  !condition ({.} > 0)\n"
+    );
+    EXPECT_THROW(mismatch.parse(), dip::UnitException);
 }
 
 TEST(Properties, OptionsBolean) {

@@ -9,9 +9,8 @@ namespace snt::dip {
 
     NumericalAtom& NumericalAtom::operator=(const NumericalAtom& a) {
         if (this != &a) {
-            value.value = a.value.value->clone();
-            if (value.units)
-                value.units = a.value.units;
+            value.value = a.value.value ? a.value.value->clone() : nullptr;
+            value.units = a.value.units;
         }
         return *this;
     }
