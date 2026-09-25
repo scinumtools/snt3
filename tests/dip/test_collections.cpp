@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 
 using namespace snt;
@@ -86,6 +87,51 @@ TEST(Collections, RejectValueCollectionItems) {
     dip::DIP list;
     list.add_string("items[] bool = true");
     EXPECT_THROW(list.parse(), dip::SyntaxException);
+}
+
+TEST(Collections, IndexedListItemModification) {
+    dip::DIP parser;
+    parser.add_string(
+        "softenings list\n"
+        "softenings[]\n"
+        "  length float = 1 cm\n"
+        "softenings[]\n"
+        "  length float = 2 cm\n"
+        "softenings[1]\n"
+        "  length = 3 cm\n"
+        "table[2026]\n"
+        "  value int = 1\n"
+    );
+    const dip::Environment env = parser.parse();
+    EXPECT_DOUBLE_EQ(env["softenings[1].length"].as<double>(), 3.0);
+    EXPECT_EQ(env.hierarchy.get_collection("table").kind, dip::Path::Kind::Map);
+    EXPECT_EQ(env["table[2026].value"].as<int64_t>(), 1);
+
+    dip::DIP out_of_range;
+    out_of_range.add_string(
+        "softenings[]\n"
+        "  length float = 1 cm\n"
+        "softenings[2]\n"
+        "  length = 3 cm\n"
+    );
+    EXPECT_THROW(out_of_range.parse(), dip::EnvironmentException);
+}
+
+TEST(Collections, IndexedListItemSchemaModification) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema softening\n"
+        "  length float = 0 cm\n"
+        "softenings list : softening\n"
+        "softenings[]\n"
+        "  length = 1 cm\n"
+        "softenings[]\n"
+        "  length = 2 cm\n"
+        "softenings[1]\n"
+        "  length = 3 cm\n"
+    );
+    const dip::Environment env = parser.parse();
+    EXPECT_DOUBLE_EQ(env["softenings[1].length"].as<double>(), 3.0);
 }
 
 TEST(Collections, Declarations) {

@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_hierarchy.h>
@@ -5,6 +7,25 @@
 #include <utility>
 
 namespace snt::dip {
+    namespace {
+        bool is_index_selector(const std::string& item) {
+            return !item.empty() &&
+                   std::all_of(item.begin(), item.end(), [](unsigned char character) { return std::isdigit(character); });
+        }
+
+        void validate_list_index(const Collection& collection, const std::string& path, const std::string& item, const Line& line) {
+            const auto index = std::stoull(item);
+            if (index >= collection.items.size())
+                throw dip::EnvironmentException(
+                    "Unknown collection item",
+                    "The list index `" + item + "` is outside collection `" + path + "`.",
+                    "Use an existing list index or append a new item with `[]`.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
+        }
+    } // namespace
 
     void HierarchyList::record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded) {
         if (node->path.name == "")
@@ -56,7 +77,9 @@ namespace snt::dip {
                         __LINE__,
                         node->line
                     );
-                else if (
+                else if (itc->second.kind == Path::Kind::List && is_index_selector(cnode.item)) {
+                    validate_list_index(itc->second, name_full, cnode.item, node->line);
+                } else if (
                     std::find(itc->second.items.begin(), itc->second.items.end(), cnode.item) == itc->second.items.end()
                 )
                     throw dip::EnvironmentException(
@@ -94,7 +117,10 @@ namespace snt::dip {
             // append FQ item selector and register new collections
             auto it = collections.find(name_full);
             if (cnode.kind == Path::Kind::Map) {
-                if (it == collections.end()) { // create new collection
+                if (it != collections.end() && it->second.kind == Path::Kind::List && is_index_selector(cnode.item)) {
+                    validate_list_index(it->second, name_full, cnode.item, node->line);
+                    name_full += "[" + cnode.item + "]";
+                } else if (it == collections.end()) { // create new collection
                     collections[name_full] = Collection{name_full, {cnode.item}, Path::Kind::Map, {}};
                 } else if (it->second.kind != Path::Kind::Map) {
                     throw dip::EnvironmentException(
@@ -119,8 +145,10 @@ namespace snt::dip {
                         node->line
                     );
                 }
-                name_full += "[" + cnode.item + "]";
-                collections[name_full] = Collection{name_full, {}, Path::Kind::Item, {}};
+                if (name_full.back() != ']') {
+                    name_full += "[" + cnode.item + "]";
+                    collections[name_full] = Collection{name_full, {}, Path::Kind::Item, {}};
+                }
             } else if (cnode.kind == Path::Kind::List) {
                 std::string key;
                 if (it == collections.end()) { // create new collection

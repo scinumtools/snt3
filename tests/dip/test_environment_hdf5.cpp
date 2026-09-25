@@ -317,3 +317,23 @@ TEST(Environment, CustomUnitsHdf5RoundTrip) {
     std::filesystem::remove(file);
     std::filesystem::remove(resaved);
 }
+
+TEST(Environment, IndexedListItemModificationHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string(
+        "softenings[]\n"
+        "  length float = 1 cm\n"
+        "softenings[]\n"
+        "  length float = 2 cm\n"
+        "softenings[1]\n"
+        "  length = 3 cm\n"
+    );
+    const dip::Environment source = parser.parse();
+    const auto file = environment_file("indexed-list-modification");
+    source.save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_DOUBLE_EQ(loaded["softenings[1].length"].as<double>(), 3.0);
+    EXPECT_EQ(loaded.hierarchy.get_collection("softenings").items, (std::vector<std::string>{"0", "1"}));
+    std::filesystem::remove(file);
+}
