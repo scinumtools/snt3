@@ -184,7 +184,7 @@ TEST(Environment, SaveHdf5Content) {
         H5Handle minor_version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
         uint64_t minor_version = 0;
         ASSERT_GE(H5Aread(minor_version_attribute, H5T_NATIVE_UINT64, &minor_version), 0);
-        EXPECT_EQ(minor_version, 2);
+        EXPECT_EQ(minor_version, 3);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Trace", H5P_DEFAULT), 0);
         H5Handle source_manifest(H5Gopen2(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), H5Gclose);
@@ -285,4 +285,35 @@ TEST(Environment, RejectsReservedValueGroupPayloadChild) {
     const auto file = environment_file("reserved-value-payload");
     EXPECT_THROW(parser.parse().save(file), dip::IOException);
     std::filesystem::remove(file);
+}
+
+TEST(Environment, CustomUnitsHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string(
+        "$unit arepo_length = 2*m\n"
+        "$unit arepo_span = 3*arepo_length\n"
+        "box_size float = 7500 arepo_span\n"
+    );
+    const dip::Environment source = parser.parse();
+    const auto file = environment_file("custom-units");
+    source.save(file);
+
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_DOUBLE_EQ(loaded["box_size"].as<double>(), 7500.0);
+    EXPECT_EQ(loaded.get_node("box_size")->units->to_string(), "arepo_span");
+    const dip::EnvUnit& length = loaded.units.at("arepo_length");
+    const dip::EnvUnit& span = loaded.units.at("arepo_span");
+    EXPECT_EQ(length.definition, "2*m");
+    EXPECT_EQ(span.definition, "3*arepo_length");
+    EXPECT_LT(length.registration_order, span.registration_order);
+
+    const auto resaved = environment_file("custom-units-resaved");
+    loaded.save(resaved);
+    dip::Environment round_tripped;
+    round_tripped.load(resaved);
+    EXPECT_EQ(round_tripped.units.at("arepo_span").id, span.id);
+    EXPECT_EQ(round_tripped.units.at("arepo_span").definition, span.definition);
+    std::filesystem::remove(file);
+    std::filesystem::remove(resaved);
 }

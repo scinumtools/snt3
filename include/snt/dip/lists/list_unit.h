@@ -2,6 +2,7 @@
 #define DIP_LIST_UNIT_H
 
 #include <map>
+#include <limits>
 #include <string>
 
 namespace snt::dip {
@@ -14,6 +15,7 @@ namespace snt::dip {
         std::string definition; ///< unit definition
         size_t stack;           ///< number of the current unit system stack
         std::string id;         ///< Internal trace identifier, e.g. DIP0_UNIT0.
+        size_t registration_order = std::numeric_limits<size_t>::max(); ///< Environment-local registration order.
     };
 
     /**
@@ -23,6 +25,7 @@ namespace snt::dip {
       private:
         std::map<std::string, EnvUnit> units; ///< Map of custom units
         std::map<std::string, size_t> id_counters;
+        size_t next_registration_order = 0;
 
       public:
         /**

@@ -1,6 +1,6 @@
 % SciNumTools DIPH5
 % Environment HDF5 Format Specification
-% Version 2.2
+% Version 2.3
 
 # Scope
 
@@ -29,8 +29,9 @@ complete unit and schema registries. DIPH5 version 2 additionally stores a
 source manifest containing source identities, paths, parent relationships, and
 content fingerprints. Version 2.1 also stores durable identifiers for registered
 units, schemas, and functions. It does not embed complete source text, parsed
-source nodes, or executable functions. Version 2.2 adds `value_group` objects
-for value nodes that have child nodes. A loaded DIPH5 file must therefore be
+source nodes, or executable functions. Version 2.2 adds `value_group` objects.
+Version 2.3 persists custom PUEL unit registrations required to interpret
+evaluated quantities. A loaded DIPH5 file must therefore be
 treated as an evaluated environment, not as a source from which the original
 DIPL program can be reconstructed exactly.
 
@@ -42,11 +43,11 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
-| `_DIPL_Schema_Version_Minor` | unsigned integer | `2` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `3` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2.2 readers support version 1 files, version 2.0
-files (which omit the minor attribute), version 2.1 files, and version 2.2
+schema version. Version 2.3 readers support version 1 files, version 2.0
+files (which omit the minor attribute), version 2.1 files, version 2.2 files, and version 2.3
 files. Future schema
 revisions MUST preserve the meaning of existing attributes or increment the
 major or minor schema version.
@@ -267,6 +268,14 @@ is represented as:
 
 `_DIPL_Value` is format-owned and is not a DIPL child node. A direct DIPL child
 with that name beneath a value group is invalid and writers MUST reject it.
+
+## Custom-unit manifest
+
+DIPH5 2.3 stores custom PUEL registrations in `/_DIPL_Units`. Each numbered
+entry carries `_DIPL_Unit_Name`, `_DIPL_Unit_Definition`, `_DIPL_Unit_Order`,
+and `_DIPL_Trace_Id`. Readers MUST register entries in ascending order before
+reading value datasets, so definitions may depend on earlier custom units.
+`_DIPL_Units` is format-owned and cannot be a top-level DIPL path.
 
 ## Ordered collections
 

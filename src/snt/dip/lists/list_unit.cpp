@@ -2,6 +2,8 @@
 #include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_unit.h>
 #include <snt/puq/systems/unit_system.h>
+#include <algorithm>
+#include <limits>
 #include <stdexcept>
 
 namespace snt::dip {
@@ -18,17 +20,7 @@ namespace snt::dip {
     UnitList::UnitList() = default;
 
     void UnitList::append(const std::string& name, const std::string& definition, const std::string& parent_id) {
-        auto it = units.find(name);
-        if (it != units.end())
-            throw dip::EnvironmentException(
-                "Duplicate custom unit",
-                "A custom unit named `" + name + "` already exists in the environment unit list.",
-                "Choose a different custom unit name.",
-                __FILE__,
-                __LINE__
-            );
-        size_t stack = puq::UnitSystem::set_custom_unit(name, definition);
-        units.insert({name, {name, definition, stack, next_unit_id(id_counters, parent_id)}});
+        append(name, EnvUnit{name, definition}, parent_id);
     }
 
     void UnitList::append(const std::string& name, EnvUnit data, const std::string& parent_id) {
@@ -41,9 +33,26 @@ namespace snt::dip {
                 __FILE__,
                 __LINE__
             );
-        data.stack = puq::UnitSystem::set_custom_unit(name, data.definition);
+        const auto active = puq::UnitSystem::current.custom->UnitList.find(name);
+        if (active != puq::UnitSystem::current.custom->UnitList.end()) {
+            if (active->second.definition != data.definition)
+                throw dip::EnvironmentException(
+                    "Conflicting custom unit",
+                    "The active PUEL unit `" + name + "` has a different definition.",
+                    "Load environments with distinct unit names or matching unit definitions.",
+                    __FILE__,
+                    __LINE__
+                );
+            data.stack = 0;
+        } else {
+            data.stack = puq::UnitSystem::set_custom_unit(name, data.definition);
+        }
         if (data.id.empty())
             data.id = next_unit_id(id_counters, parent_id);
+        if (data.registration_order == std::numeric_limits<size_t>::max())
+            data.registration_order = next_registration_order++;
+        else
+            next_registration_order = std::max(next_registration_order, data.registration_order + 1);
         units.insert({name, data});
     }
 

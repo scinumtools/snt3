@@ -135,7 +135,7 @@ namespace snt::puq {
         struct Measurement msr;
         std::smatch m;
         std::regex rx_unit(
-            "^(\\{?[a-zA-Z0_%#']+\\}?)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$"
+            "^(\\{?[a-zA-Z0_%#'_]+\\}?)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$"
         );
         std::regex rx_quantity(
             "^(\\<[a-zA-Z_]+\\>)([+-]?[0-9]*)(" + std::string(Symbols::fraction_separator) + "([0-9]+)|)$"

@@ -7,9 +7,9 @@
 namespace snt::dip::hdf5::schema {
 
     inline constexpr std::string_view FORMAT = "SciNumTools3 Environment";
-    // DIPH5 2.2 adds value groups, allowing a value node to have children.
+    // DIPH5 2.3 persists custom PUEL unit registrations.
     inline constexpr uint64_t VERSION = 2;
-    inline constexpr uint64_t VERSION_MINOR = 2;
+    inline constexpr uint64_t VERSION_MINOR = 3;
     inline constexpr uint64_t FIRST_SUPPORTED_VERSION = 1;
 
     inline constexpr std::string_view ATTR_FORMAT = "_DIPL_Format";
@@ -41,6 +41,10 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_SOURCE_HASH_ALGORITHM = "_DIPL_Source_Hash_Algorithm";
     inline constexpr std::string_view ATTR_SOURCE_HASH = "_DIPL_Source_Hash";
     inline constexpr std::string_view GROUP_TRACE = "_DIPL_Trace";
+    inline constexpr std::string_view GROUP_UNITS = "_DIPL_Units";
+    inline constexpr std::string_view ATTR_UNIT_NAME = "_DIPL_Unit_Name";
+    inline constexpr std::string_view ATTR_UNIT_DEFINITION = "_DIPL_Unit_Definition";
+    inline constexpr std::string_view ATTR_UNIT_ORDER = "_DIPL_Unit_Order";
     inline constexpr std::string_view ATTR_TRACE_ID = "_DIPL_Trace_Id";
     inline constexpr std::string_view ATTR_TRACE_NAME = "_DIPL_Trace_Name";
     inline constexpr std::string_view ATTR_TRACE_KIND = "_DIPL_Trace_Kind";

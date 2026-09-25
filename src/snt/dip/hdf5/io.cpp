@@ -7,6 +7,7 @@
 #include <hdf5.h>
 #include <numeric>
 #include <optional>
+#include <set>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/val/values.h>
@@ -832,11 +833,60 @@ namespace snt::dip::hdf5 {
             env.set_trace_manifest(std::move(traces));
         }
 
+        void read_unit_manifest(Environment& env, hid_t file) {
+            const std::string manifest_path = "/" + std::string(GROUP_UNITS);
+            const htri_t exists = H5Lexists(file, manifest_path.c_str(), H5P_DEFAULT);
+            if (exists < 0)
+                throw Error("Unable to inspect the HDF5 unit manifest");
+            if (exists == 0)
+                throw dip::IOException(
+                    "Invalid HDF5 unit manifest",
+                    "A DIPH5 version 2.3 file does not contain its required custom-unit manifest.",
+                    "Use a complete DIPH5 2.3 file written by a compatible SciNumTools3 version.",
+                    __FILE__,
+                    __LINE__
+                );
+            Id manifest(
+                H5Gopen2(file, manifest_path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the HDF5 unit manifest"
+            );
+            struct Record { std::string name; std::string definition; std::string id; uint64_t order; };
+            std::vector<Record> records;
+            std::set<std::string> names;
+            std::set<std::string> ids;
+            std::set<uint64_t> orders;
+            const hsize_t count = object_count(manifest);
+            records.reserve(count);
+            for (hsize_t index = 0; index < count; ++index) {
+                const std::string entry_name = object_name(manifest, index);
+                if (H5Gget_objtype_by_idx(manifest, index) != H5G_GROUP)
+                    throw dip::IOException("Invalid HDF5 unit manifest", "A unit-manifest entry is not an HDF5 group.", "Use a complete DIPH5 2.3 file.", __FILE__, __LINE__);
+                Id entry(H5Gopen2(manifest, entry_name.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open an HDF5 unit-manifest entry");
+                Record record{read_string(entry, ATTR_UNIT_NAME), read_string(entry, ATTR_UNIT_DEFINITION),
+                              read_string(entry, ATTR_TRACE_ID), read_scalar<uint64_t>(entry, ATTR_UNIT_ORDER, H5T_NATIVE_UINT64)};
+                if (record.name.empty() || record.definition.empty() || record.id.empty() || !names.insert(record.name).second ||
+                    !ids.insert(record.id).second || !orders.insert(record.order).second)
+                    throw dip::IOException("Invalid HDF5 unit manifest", "A unit-manifest entry has missing or duplicate identity data.", "Use a complete DIPH5 2.3 file.", __FILE__, __LINE__);
+                const auto traces = env.get_trace_manifest();
+                const auto trace = std::find_if(traces.begin(), traces.end(), [&](const TraceInfo& item) { return item.id == record.id; });
+                if (trace == traces.end() || trace->name != record.name || trace->kind != "unit")
+                    throw dip::IOException("Invalid HDF5 unit manifest", "A unit-manifest trace identifier does not match the trace manifest.", "Use a complete DIPH5 2.3 file.", __FILE__, __LINE__);
+                records.push_back(std::move(record));
+            }
+            std::sort(records.begin(), records.end(), [](const Record& left, const Record& right) { return left.order < right.order; });
+            for (const auto& record : records) {
+                try {
+                    env.units.append(record.name, EnvUnit{record.name, record.definition, 0, record.id, static_cast<size_t>(record.order)});
+                } catch (const std::exception& error) {
+                    throw dip::IOException("Invalid HDF5 unit manifest", "Unable to register custom unit `" + record.name + "`: " + error.what(), "Ensure unit definitions are valid and ordered by dependency.", __FILE__, __LINE__);
+                }
+            }
+        }
+
         void read_group(Environment& env, hid_t group, bool root = false, bool skip_value_payload = false) {
             const hsize_t count = object_count(group);
             for (hsize_t i = 0; i < count; ++i) {
                 const std::string name = object_name(group, i);
-                if (root && (name == std::string(GROUP_SOURCES) || name == std::string(GROUP_TRACE)))
+                if (root && (name == std::string(GROUP_SOURCES) || name == std::string(GROUP_TRACE) || name == std::string(GROUP_UNITS)))
                     continue;
                 if (skip_value_payload && name == VALUE_PAYLOAD)
                     continue;
@@ -959,8 +1009,26 @@ namespace snt::dip::hdf5 {
             }
         }
 
+        void write_unit_manifest(hid_t file, const Environment& env) {
+            const std::string manifest_path = "/" + std::string(GROUP_UNITS);
+            Id manifest(H5Gcreate2(file, manifest_path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose, "Unable to create the HDF5 unit manifest");
+            std::vector<const EnvUnit*> units;
+            units.reserve(env.units.entries().size());
+            for (const auto& entry : env.units.entries())
+                units.push_back(&entry.second);
+            std::sort(units.begin(), units.end(), [](const EnvUnit* left, const EnvUnit* right) { return left->registration_order < right->registration_order; });
+            for (size_t index = 0; index < units.size(); ++index) {
+                const EnvUnit& unit = *units[index];
+                Id entry(H5Gcreate2(manifest, std::to_string(index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose, "Unable to create an HDF5 unit-manifest entry");
+                write_string(entry, ATTR_UNIT_NAME, unit.name);
+                write_string(entry, ATTR_UNIT_DEFINITION, unit.definition);
+                write_scalar<uint64_t>(entry, ATTR_UNIT_ORDER, H5T_NATIVE_UINT64, unit.registration_order);
+                write_string(entry, ATTR_TRACE_ID, unit.id);
+            }
+        }
+
         bool uses_reserved_path(const std::string& path) {
-            for (const auto name : {std::string(GROUP_SOURCES), std::string(GROUP_TRACE)}) {
+            for (const auto name : {std::string(GROUP_SOURCES), std::string(GROUP_TRACE), std::string(GROUP_UNITS)}) {
                 if (path == name || path.rfind(name + ".", 0) == 0 || path.rfind(name + "[", 0) == 0)
                     return true;
             }
@@ -1009,6 +1077,7 @@ namespace snt::dip::hdf5 {
         }
         write_source_manifest(output, env);
         write_trace_manifest(output, env);
+        write_unit_manifest(output, env);
         for (const auto& node : env.nodes.get_nodes())
             if (node)
                 write_node(output, env, *node);
@@ -1050,6 +1119,8 @@ namespace snt::dip::hdf5 {
             read_source_manifest(env, input);
         if (version == VERSION && minor_version >= 1)
             read_trace_manifest(env, input);
+        if (version == VERSION && minor_version >= 3)
+            read_unit_manifest(env, input);
         read_group(env, input, true);
     }
 
