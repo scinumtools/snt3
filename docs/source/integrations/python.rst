@@ -38,7 +38,7 @@ parameters, and return a value in Python. For example, given a file named
    width float = 40 mm
    area float = ( {?length} * {?width} ) m2
 
-Parse and query it with ``DIP.add_file`` and the environment cursor:
+Parse it into an environment with ``DIP.add_file``:
 
 .. code-block:: python
 
@@ -48,22 +48,6 @@ Parse and query it with ``DIP.add_file`` and the environment cursor:
    dip = DIP()
    dip.add_file(Path("parameters.dip"))
    env = dip.parse()
-
-   area = env["area"]
-   print(area.value, area.units)  # 0.01 m2
-
-The cursor also provides values and units for unitless scalars. For example,
-a file containing ``count int = 42`` can be queried with
-``env["count"].value``. The cursor returned by ``env["area"]`` exposes both
-``value`` and ``units``; pass the value to ``Quantity`` when an explicit unit
-conversion is needed:
-
-.. code-block:: python
-
-   from scinumtools3.puq import Quantity
-
-   area_in_cm2 = Quantity(area.value, area.units).convert("cm2")
-   print(area_in_cm2)  # 100 cm2
 
 For a reusable DIPfile manifest, call ``add_project`` instead of adding each
 file, source, and unit individually:
@@ -75,6 +59,83 @@ file, source, and unit individually:
    env = dip.parse()
 
 See :doc:`DIPfile projects <../modules/dip/projects>` for the manifest format.
+
+Accessing nodes
+--------------
+
+There are two main ways to access nodes:
+
+* **Cursor:** use ``env["path"]`` to inspect a known path or traverse groups
+  and collections in the environment.
+* **Select:** use ``env.select(...)`` to discover value nodes by path and
+  tags and inspect independent snapshots of the results.
+
+Cursor: inspect a known path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+   area = env["area"]
+   print(area.value, area.units)  # 0.01 m2
+   print(area.metadata.description)
+
+A cursor accesses a path in the environment. Use ``cursor.elements()`` for
+list elements and ``cursor.items()`` for named items in a map. It also exposes
+``shape``, ``metadata``, ``provenance``, and ``to_numpy()``.
+
+The cursor also provides values and units for unitless scalars. For example,
+a file containing ``count int = 42`` can be queried with
+``env["count"].value``. The cursor returned by ``env["area"]`` exposes both
+``value`` and ``units``; pass the value to ``Quantity`` when an explicit unit
+conversion is needed:
+
+.. code-block:: python
+
+   from scinumtools3.puq import Quantity
+
+   area_in_cm2 = Quantity(area.value, area.units.to_string()).convert("cm2")
+   print(area_in_cm2)  # 100 cm2
+
+Select: discover and inspect nodes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Select returns value nodes whose values, units, tags, and metadata can be
+inspected directly:
+
+.. code-block:: python
+
+   dip = DIP()
+   dip.add_string('''physics
+     speed float = 2 m/s
+       !tags ["export", "runtime", "hydro"]
+       ?descr "Flow speed"
+   ''')
+   env = dip.parse()
+   for node in env.select(
+       "?physics.",
+       tags_all=["export", "runtime"],
+       tags_any=["hydro", "gravity"],
+       tags_none=["internal", "deprecated"],
+   ):
+       print(node.name, node.value, node.units, node.tags, node.metadata.description)
+
+``tags_all`` requires every listed tag, ``tags_any`` requires at least one,
+and ``tags_none`` excludes nodes with any listed tag. The filters combine
+with AND; omitted or empty filters impose no restriction. Tags match only
+explicit assignments, without parent-tag inheritance.
+
+``?`` selects all value nodes, ``?physics.`` selects a subtree including its
+value-bearing root and collection members, and ``?physics.speed`` selects
+an exact node. Results retain fully qualified paths in environment order,
+with each matching node returned once. No matches returns an empty list.
+
+Selected nodes are independent snapshots; selection does not modify the
+environment. Their ``tags`` and ``metadata`` properties are read-only.
+Changing a returned tags list affects only that list. Metadata remains valid
+while its Python wrapper is alive.
+
+Additional request helpers remain available in the
+:doc:`Python DIP API reference <../api/python_dip>`.
 
 Persisting DIP environments
 ----------------------------

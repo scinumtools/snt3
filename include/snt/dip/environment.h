@@ -18,6 +18,15 @@ namespace snt::dip {
 
     class Cursor; ///< Forward declaring
 
+    /** Explicit node tag filters, combined with AND; empty fields impose no restriction. */
+    struct TagFilter {
+        std::vector<std::string> all;
+        std::vector<std::string> any;
+        std::vector<std::string> none;
+
+        bool matches(const std::vector<std::string>& tags) const;
+    };
+
     /**
      * Durable identity information for one DIPL source.
      *
@@ -174,6 +183,14 @@ namespace snt::dip {
             const RequestType rtype = RequestType::Reference,
             const std::vector<std::string>& tags = {}
         ) const;
+
+        /**
+         * Select independent snapshots with original fully qualified paths in environment order.
+         * `?` selects all values, `?path` an exact value, and `?path.` a subtree,
+         * including its value-bearing root and collection members. Tags are not inherited.
+         * No matches returns an empty list. Source-qualified queries are also supported.
+         */
+        ValueNode::ListType select(const std::string& request = "?", const TagFilter& tags = {}) const;
 
         /**
          * Get a keyed collection of  nodes from a reference or a function based on a request expression

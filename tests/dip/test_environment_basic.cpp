@@ -126,3 +126,55 @@ TEST(Environment, GetNode) {
 }
 
 // TODO: tests more requests with RequestType::Function
+
+TEST(Environment, SelectTagFilter) {
+    EXPECT_TRUE((dip::TagFilter{}).matches({}));
+    EXPECT_TRUE((dip::TagFilter{{"export", "runtime"}, {"hydro", "gravity"}, {"internal"}})
+                    .matches({"export", "runtime", "hydro"}));
+    EXPECT_FALSE((dip::TagFilter{{"export", "runtime"}, {}, {}}).matches({"export"}));
+    EXPECT_FALSE((dip::TagFilter{{}, {"hydro"}, {}}).matches({}));
+    EXPECT_FALSE((dip::TagFilter{{}, {}, {"internal"}}).matches({"export", "internal"}));
+    EXPECT_TRUE((dip::TagFilter{{}, {}, {"internal"}}).matches({}));
+}
+
+TEST(Environment, SelectSnapshots) {
+    dip::DIP parser;
+    parser.add_string(
+        "physics int = 1\n"
+        "  !tags [\"export\"]\n"
+        "  speed int = 2 m/s\n"
+        "    !tags [\"export\", \"runtime\"]\n"
+        "    ?descr \"Flow speed\"\n"
+        "  samples[]\n"
+        "    value int = 3\n"
+        "physics_extra int = 4\n"
+    );
+    auto env = parser.parse();
+    const auto all = env.select();
+    ASSERT_EQ(all.size(), 4);
+    const auto subtree = env.select("?physics.");
+    ASSERT_EQ(subtree.size(), 3);
+    EXPECT_EQ(subtree[0]->path.name, "physics");
+    EXPECT_EQ(subtree[1]->path.name, "physics.speed");
+    EXPECT_EQ(subtree[2]->path.name, "physics.samples[0].value");
+    EXPECT_EQ(env.select("?physics.samples.").size(), 1);
+    EXPECT_TRUE(env.select("?missing").empty());
+    auto selected = env.select("?physics.", {{"export", "runtime"}, {}, {}});
+    ASSERT_EQ(selected.size(), 1);
+    auto snapshot = selected.front();
+    auto original = env.nodes.at(1);
+    EXPECT_NE(snapshot.get(), original.get());
+    EXPECT_NE(snapshot->value.get(), original->value.get());
+    EXPECT_EQ(snapshot->path.name, "physics.speed");
+    EXPECT_EQ(snapshot->metadata.description, "Flow speed");
+    // Mutations in either direction must not cross the snapshot boundary.
+    snapshot->tags.clear();
+    snapshot->metadata.description = "Snapshot only";
+    snapshot->set_value(all[0]->value->clone());
+    EXPECT_EQ(original->tags.size(), 2);
+    EXPECT_EQ(original->metadata.description, "Flow speed");
+    EXPECT_EQ(original->value->to_string(), "2");
+    original->metadata.description = "Environment only";
+    EXPECT_EQ(snapshot->metadata.description, "Snapshot only");
+    EXPECT_EQ(env.request_group("?physics.speed").front()->path.name, "speed");
+}

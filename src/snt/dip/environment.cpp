@@ -1,6 +1,7 @@
 #include "generate/export.h"
 
 #include <array>
+#include <algorithm>
 #include <cstdint>
 #include <iomanip>
 #include <snt/dip/cursor.h>
@@ -361,6 +362,31 @@ namespace snt::dip {
             }
         }
         return false; // No match found
+    }
+
+    bool TagFilter::matches(const std::vector<std::string>& tags) const {
+        return std::all_of(all.begin(), all.end(), [&tags](const std::string& tag) {
+                   return std::find(tags.begin(), tags.end(), tag) != tags.end();
+               }) &&
+               (any.empty() || hasIntersection(tags, any)) && !hasIntersection(tags, none);
+    }
+
+    ValueNode::ListType Environment::select(const std::string& request, const TagFilter& tags) const {
+        auto [source_name, node_path, is_root] = parse_request(request);
+        const NodeList<ValueNode>& node_pool = source_name.empty() ? nodes : sources.at(source_name).nodes;
+        ValueNode::ListType selected;
+        std::unordered_set<std::string> seen;
+        for (const auto& vnode : node_pool.get_nodes()) {
+            if (!vnode)
+                continue;
+            const auto& name = vnode->path.name;
+            const bool descendant = name.size() > node_path.size() && name.rfind(node_path, 0) == 0 &&
+                                    (name[node_path.size()] == SIGN_SEPARATOR || name[node_path.size()] == SIGN_ARRAY_OPEN);
+            const bool path_matches = name == node_path || (is_root && (node_path.empty() || descendant));
+            if (path_matches && tags.matches(vnode->tags) && seen.insert(name).second)
+                selected.push_back(std::dynamic_pointer_cast<ValueNode>(vnode->clone(vnode->path, std::nullopt)));
+        }
+        return selected;
     }
 
     ValueNode::ListType Environment::request_group(

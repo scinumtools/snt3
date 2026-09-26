@@ -80,7 +80,7 @@ simulation
   duration float = ( {?simulation.timestep} * {?simulation.steps} ) fs
 ```
 
-Parse it and access evaluated values through the environment cursor:
+Parse it into an environment:
 
 ```python
 from pathlib import Path
@@ -90,8 +90,6 @@ dip = DIP()
 dip.add_file(Path("parameters.dip"))
 env = dip.parse()
 
-duration = env["simulation.duration"]
-print(duration.value, duration.units)
 ```
 
 You can also add definitions directly:
@@ -103,6 +101,22 @@ dip.add_string("count int = 42")
 env = dip.parse()
 ```
 
+## Accessing nodes
+
+There are two main ways to access nodes in an environment:
+
+- **Cursor:** use `env["path"]` to inspect a known path or traverse groups and collections.
+- **Select:** use `env.select(...)` to discover value nodes by path and tags and inspect snapshots of the results.
+
+### Cursor: inspect a known path
+
+```python
+cursor = env["length"]
+print(cursor.value, cursor.units, cursor.metadata.description)
+```
+
+A cursor accesses a path in the environment. Use `cursor.elements()` to traverse
+list elements and `cursor.items()` to traverse named items in a map.
 Cursor values are ordinary Python values: `bool`, `int`, `float`, `str`, or nested
 lists. Use `cursor.to_numpy()` to obtain a NumPy array. A cursor also exposes its
 `units`, `shape`, and child traversal methods. To convert a unit-bearing DIPL result,
@@ -115,6 +129,41 @@ length = env["length"]
 length_cm = Quantity(length.value, length.units.to_string()).convert("cm")
 print(length_cm)  # 25*cm
 ```
+
+### Select: discover and inspect nodes
+
+Use `select()` to discover values and inspect their tags and metadata directly:
+
+```python
+dip = DIP()
+dip.add_string('''physics
+  speed float = 2 m/s
+    !tags ["export", "runtime", "hydro"]
+    ?descr "Flow speed"
+''')
+env = dip.parse()
+for node in env.select(
+    "?physics.",
+    tags_all=["export", "runtime"],
+    tags_any=["hydro", "gravity"],
+    tags_none=["internal", "deprecated"],
+):
+    print(node.name, node.value, node.tags, node.metadata.description)
+```
+
+The three filters combine with AND; omitted or empty filters impose no restriction.
+Only explicitly assigned tags match: children do not inherit their parent's tags.
+`?` selects the whole environment, `?physics.` selects a subtree including its
+value-bearing root and collection members, and `?physics.speed` selects an exact
+node. Results retain fully qualified paths in environment order, with each node
+returned once. No matches returns an empty list.
+
+Selected nodes are independent snapshots; selection does not modify the environment.
+Tags are returned as a separate Python list, and metadata remains valid while its
+Python wrapper is alive.
+
+Additional request helpers remain available in the
+[Python API reference](https://vrtulka23.github.io/scinumtools3/api/python_dip.html).
 
 ## Command-style API helpers
 

@@ -76,6 +76,22 @@ namespace snt::bind::python {
         );
 
         env.def(
+            "select",
+            [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& all,
+               const std::vector<std::string>& any, const std::vector<std::string>& none) {
+                return e.select(path, dip::TagFilter{all, any, none});
+            },
+            py::arg("path") = "?",
+            py::kw_only(),
+            py::arg("tags_all") = std::vector<std::string>{},
+            py::arg("tags_any") = std::vector<std::string>{},
+            py::arg("tags_none") = std::vector<std::string>{},
+            "Select node snapshots with full paths in environment order. Empty filters impose no restriction; "
+            "all filters are combined with AND. Subtrees include their value-bearing root and collection members. "
+            "Tags are not inherited. No matches returns an empty list."
+        );
+
+        env.def(
             "request_group",
             [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& tags) {
                 return e.request_group(path, dip::RequestType::Reference, tags);
