@@ -17,7 +17,7 @@ namespace snt::dip {
     class Environment;
 
     /**
-     * Set of node and value metadata
+     * Metadata attached to a value node or schema definition.
      */
     struct ValueMetadata {
         std::string description; ///< Value description
@@ -49,6 +49,9 @@ namespace snt::dip {
         std::string since;                 ///< Introducing schema/software version
         std::string category;              ///< Documentation grouping
         std::string visibility;            ///< Documentation/UI visibility
+
+        /** Assign a metadata property; return false for non-metadata properties. */
+        bool set_property(PropertyType property, const val::Array::StringType& values);
     };
 
     /**

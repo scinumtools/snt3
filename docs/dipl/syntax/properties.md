@@ -156,13 +156,16 @@ intensity float W/m2
 
 ## Metadata
 
-**Used by:** `int`, `float`, `str`, `bool`
+**Used by:** `int`, `float`, `str`, `bool`, and schema definitions
 
 Metadata provide additional information about a parameter without affecting its value or interpretation. They are intended for documentation, provenance, licensing, and versioning purposes, and may be used by documentation generators, scientific workflows, and other tooling.
 
 In particular, provenance metadata describe the origin of a parameter's value, such as the publication, dataset, or other source from which it was obtained. This allows scientific and engineering data to remain traceable and properly attributed.
 
 Unlike comments, metadata are part of the parsed document and are preserved during processing.
+On a `$schema` declaration, metadata describe the reusable definition and
+must appear before its first member. They stay on the schema definition rather
+than the group, collection, item, or value nodes that result from applying it.
 
 The following metadata properties are currently defined:
 

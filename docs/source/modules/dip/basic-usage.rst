@@ -153,6 +153,9 @@ Use ``add_schema_string(name, body)`` or ``add_schema_file(name, path)`` to
 register one reusable schema. Supply its body without a ``$schema`` wrapper,
 starting at indentation zero. Registration parses the schema immediately;
 values and references are evaluated when the schema is applied during ``parse()``.
+Place ``?`` metadata properties before the first body node to describe the
+schema definition. Its metadata are available through ``env.schemas.at(name)``
+and are not copied onto the applying group, collection, item, or values.
 Original source text, file paths, line numbers, and source identities are retained.
 
 .. code-block:: cpp

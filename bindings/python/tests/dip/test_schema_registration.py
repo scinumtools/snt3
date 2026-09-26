@@ -57,3 +57,15 @@ def test_registration_errors(tmp_path):
     parser.add_schema_string('settings', 'value int')
     with pytest.raises(RuntimeError):
         parser.add_schema_string('settings', 'value int')
+
+
+def test_schema_metadata_introspection():
+    parser = DIP()
+    parser.add_schema_string('settings', '?descr "Reusable settings"\nvalue int = 42')
+    parser.add_string('physics : settings')
+    env = parser.parse()
+
+    schema = env.schemas['settings']
+    assert env.select('?physics.value')[0].metadata.description == ''
+    del env
+    assert schema.metadata.description == 'Reusable settings'

@@ -88,7 +88,7 @@ TEST(Project, RejectsAmbiguousCodeEntry) {
 
 TEST(Project, RegistersSchemaFilesAndStrings) {
     ProjectDirectory project("dip-project-schemas");
-    project.write("settings.dipl", "value int = 42\n");
+    project.write("settings.dipl", "?descr \"File schema\"\nvalue int = 42\n");
     project.write(
         "DIPfile",
         "schemas[]\n"
@@ -96,7 +96,10 @@ TEST(Project, RegistersSchemaFilesAndStrings) {
         "  file = \"settings.dipl\"\n"
         "schemas[]\n"
         "  name = \"from_string\"\n"
-        "  string = \"value int = 43\"\n"
+        "  string = \"\"\"\n"
+        "?descr \"Inline schema\"\n"
+        "value int = 43\n"
+        "\"\"\"\n"
         "code[]\n"
         "  string = \"\"\"\n"
         "first : from_file\n"
@@ -111,6 +114,8 @@ TEST(Project, RegistersSchemaFilesAndStrings) {
     EXPECT_EQ(env["first.value"].as<int64_t>(), 42);
     EXPECT_EQ(env["second.value"].as<int64_t>(), 43);
     EXPECT_EQ(env.schemas.entries().size(), 2);
+    EXPECT_EQ(env.schemas.at("from_file").metadata.description, "File schema");
+    EXPECT_EQ(env.schemas.at("from_string").metadata.description, "Inline schema");
     const auto& file_source = env.sources.at(env.schemas.at("from_file").nodes.at(0)->line.source.name);
     const auto& string_source = env.sources.at(env.schemas.at("from_string").nodes.at(0)->line.source.name);
     EXPECT_EQ(file_source.path, (project.path() / "settings.dipl").string());

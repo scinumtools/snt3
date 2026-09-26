@@ -13,6 +13,24 @@ Schemas are declared using the `$schema` directive.
 The schema name defines a reusable type. 
 Nodes declared within the schema become members of that type and are inherited by all schema instances.
 
+Metadata properties may immediately follow the schema declaration, before its
+first member. They describe the reusable definition and stay in the schema
+registry: they are not copied to the group, collection, or item that applies
+the schema, nor to its value nodes. Metadata indented beneath a value member
+describes that member and is copied when the schema is applied:
+
+```DIPL
+$schema settings
+  ?descr "Reusable physics settings"
+  ?since "0.8.3"
+  speed float = 2 m/s
+    ?descr "Flow speed"
+```
+
+Schema-level metadata are available through the environment's schema registry.
+Only `?` metadata properties are accepted on a schema declaration; directives
+such as `!tags` remain value-node properties.
+
 For example, the following schemas define common structures that can be combined to describe a car:
 
 ```DIPL

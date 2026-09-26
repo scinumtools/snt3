@@ -27,4 +27,9 @@ namespace snt::dip {
         return {};
     }
 
+    bool SchemaNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
+        (void)units;
+        return metadata.set_property(property, values);
+    }
+
 } // namespace snt::dip

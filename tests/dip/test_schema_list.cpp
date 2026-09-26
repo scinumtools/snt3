@@ -1,5 +1,7 @@
 #include "pch_tests.h"
 
+#include <snt/dip/cursor.h>
+
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 
@@ -420,6 +422,40 @@ TEST(SchemaList, HostRegistration) {
     EXPECT_EQ(env.schemas.at("child").nodes.front()->line.source.line_number, 1);
     EXPECT_NE(env.schemas.at("child").id.find("_STRING0_SCHEMA0"), std::string::npos);
     EXPECT_THROW(parser.add_schema_string("child", "value int = 1"), dip::EnvironmentException);
+}
+
+TEST(SchemaList, DeclarationMetadataStaysOnSchema) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema settings\n"
+        "  ?descr \"Reusable physics settings\"\n"
+        "  ?since \"0.8.3\"\n"
+        "  speed float = 2 m/s\n"
+        "    ?descr \"Flow speed\"\n"
+        "physics : settings\n"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env.schemas.at("settings").metadata.description, "Reusable physics settings");
+    EXPECT_EQ(env.schemas.at("settings").metadata.since, "0.8.3");
+    EXPECT_EQ(env.get_node("physics.speed")->metadata.description, "Flow speed");
+    EXPECT_TRUE(env.get_node("physics.speed")->metadata.since.empty());
+}
+
+TEST(SchemaList, HostRegistrationMetadata) {
+    dip::DIP parser;
+    parser.add_schema_string("settings", "?descr \"Reusable settings\"\nvalue int = 42\n");
+    parser.add_string("physics : settings\n");
+    const auto env = parser.parse();
+    EXPECT_EQ(env.schemas.at("settings").metadata.description, "Reusable settings");
+    EXPECT_EQ(env["physics.value"].as<int64_t>(), 42);
+    EXPECT_TRUE(env.get_node("physics.value")->metadata.description.empty());
+}
+
+TEST(SchemaList, RejectNonMetadataOnSchema) {
+    dip::DIP parser;
+    parser.add_string("$schema settings\n  !tags [\"export\"]\n  value int = 42\n");
+    EXPECT_THROW(parser.parse(), dip::SyntaxException);
+    EXPECT_THROW(parser.add_schema_string("settings", "!tags [\"export\"]\nvalue int = 42"), dip::SyntaxException);
 }
 
 TEST(SchemaList, InvalidHostRegistration) {

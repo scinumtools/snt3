@@ -12,6 +12,7 @@ Project format
 Each project contains only ``units[]``, ``sources[]``, ``schemas[]``, and
 ``code[]`` items. A schema item has a ``name`` and exactly one of ``file`` or
 ``string``. Its file or string is a schema body without a ``$schema`` wrapper.
+Schema-level ``?`` metadata may appear before the first body node.
 Schemas are registered before ``code[]`` is parsed; ``code[]`` items retain
 their declared order. Each code item also has exactly one of ``file`` or
 ``string``.

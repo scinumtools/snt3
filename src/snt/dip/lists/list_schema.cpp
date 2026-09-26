@@ -16,7 +16,10 @@ namespace snt::dip {
 
     SchemaList::SchemaList() = default;
 
-    void SchemaList::append(const std::string& name, BaseNode::ListType& nodes, const std::string& parent_id) {
+    void SchemaList::append(
+        const std::string& name, BaseNode::ListType& nodes, const std::string& parent_id,
+        const ValueMetadata& metadata
+    ) {
         auto it = schemas.find(name);
         if (it != schemas.end())
             throw dip::EnvironmentException(
@@ -26,7 +29,7 @@ namespace snt::dip {
                 __FILE__,
                 __LINE__
             );
-        schemas.insert({name, {name, nodes, next_schema_id(id_counters, parent_id)}});
+        schemas.insert({name, {name, nodes, next_schema_id(id_counters, parent_id), metadata}});
     }
 
     void SchemaList::append(const std::string& name, EnvSchema src, const std::string& parent_id) {

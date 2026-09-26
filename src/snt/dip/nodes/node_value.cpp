@@ -10,6 +10,52 @@
 
 namespace snt::dip {
 
+    bool ValueMetadata::set_property(PropertyType property, const val::Array::StringType& values) {
+        switch (property) {
+#define SNT_METADATA_SCALAR(TYPE, FIELD)                                                                                \
+    case PropertyType::TYPE:                                                                                             \
+        FIELD += values.at(0);                                                                                           \
+        return true
+#define SNT_METADATA_LIST(TYPE, FIELD)                                                                                  \
+    case PropertyType::TYPE:                                                                                             \
+        FIELD.insert(FIELD.end(), values.begin(), values.end());                                                         \
+        return true
+            SNT_METADATA_SCALAR(Description, description);
+            SNT_METADATA_SCALAR(Authors, authors);
+            SNT_METADATA_SCALAR(Title, title);
+            SNT_METADATA_SCALAR(Journal, journal);
+            SNT_METADATA_SCALAR(Year, year);
+            SNT_METADATA_SCALAR(Volume, volume);
+            SNT_METADATA_SCALAR(Issue, issue);
+            SNT_METADATA_SCALAR(Pages, pages);
+            SNT_METADATA_SCALAR(DOI, doi);
+            SNT_METADATA_SCALAR(URL, url);
+            SNT_METADATA_SCALAR(Version, version);
+            SNT_METADATA_SCALAR(Created, created);
+            SNT_METADATA_SCALAR(Modified, modified);
+            SNT_METADATA_SCALAR(License, license);
+            SNT_METADATA_SCALAR(Rationale, rationale);
+            SNT_METADATA_LIST(Native, native);
+            SNT_METADATA_LIST(Requires, requires);
+            SNT_METADATA_LIST(Conflicts, conflicts);
+            SNT_METADATA_LIST(Implies, implies);
+            SNT_METADATA_LIST(See, see);
+            SNT_METADATA_LIST(Example, example);
+            SNT_METADATA_SCALAR(RecommendedRange, recommended_range);
+            SNT_METADATA_SCALAR(PerformanceImpact, performance_impact);
+            SNT_METADATA_SCALAR(ScientificImpact, scientific_impact);
+            SNT_METADATA_SCALAR(Deprecated, deprecated);
+            SNT_METADATA_SCALAR(Replacement, replacement);
+            SNT_METADATA_SCALAR(Since, since);
+            SNT_METADATA_SCALAR(Category, category);
+            SNT_METADATA_SCALAR(Visibility, visibility);
+#undef SNT_METADATA_SCALAR
+#undef SNT_METADATA_LIST
+        default:
+            return false;
+        }
+    }
+
     ValueNode::ValueNode(const ValueNode& other)
         : units(other.units), tags(other.tags), constant(other.constant), metadata(other.metadata),
           condition(other.condition), format(other.format), value_dtype(other.value_dtype), BaseNode(other) {
@@ -337,92 +383,35 @@ namespace snt::dip {
             return true;
             // metadata
         case PropertyType::Description:
-            metadata.description += values.at(0);
-            return true;
         case PropertyType::Authors:
-            metadata.authors += values.at(0);
-            return true;
         case PropertyType::Title:
-            metadata.title += values.at(0);
-            return true;
         case PropertyType::Journal:
-            metadata.journal += values.at(0);
-            return true;
         case PropertyType::Year:
-            metadata.year += values.at(0);
-            return true;
         case PropertyType::Volume:
-            metadata.volume += values.at(0);
-            return true;
         case PropertyType::Issue:
-            metadata.issue += values.at(0);
-            return true;
         case PropertyType::Pages:
-            metadata.pages += values.at(0);
-            return true;
         case PropertyType::DOI:
-            metadata.doi += values.at(0);
-            return true;
         case PropertyType::URL:
-            metadata.url += values.at(0);
-            return true;
         case PropertyType::Version:
-            metadata.version += values.at(0);
-            return true;
         case PropertyType::Created:
-            metadata.created += values.at(0);
-            return true;
         case PropertyType::Modified:
-            metadata.modified += values.at(0);
-            return true;
         case PropertyType::License:
-            metadata.license += values.at(0);
-            return true;
         case PropertyType::Rationale:
-            metadata.rationale += values.at(0);
-            return true;
         case PropertyType::Native:
-            metadata.native.insert(metadata.native.end(), values.begin(), values.end());
-            return true;
         case PropertyType::Requires:
-            metadata.requires.insert(metadata.requires.end(), values.begin(), values.end());
-            return true;
         case PropertyType::Conflicts:
-            metadata.conflicts.insert(metadata.conflicts.end(), values.begin(), values.end());
-            return true;
         case PropertyType::Implies:
-            metadata.implies.insert(metadata.implies.end(), values.begin(), values.end());
-            return true;
         case PropertyType::See:
-            metadata.see.insert(metadata.see.end(), values.begin(), values.end());
-            return true;
         case PropertyType::Example:
-            metadata.example.insert(metadata.example.end(), values.begin(), values.end());
-            return true;
         case PropertyType::RecommendedRange:
-            metadata.recommended_range += values.at(0);
-            return true;
         case PropertyType::PerformanceImpact:
-            metadata.performance_impact += values.at(0);
-            return true;
         case PropertyType::ScientificImpact:
-            metadata.scientific_impact += values.at(0);
-            return true;
         case PropertyType::Deprecated:
-            metadata.deprecated += values.at(0);
-            return true;
         case PropertyType::Replacement:
-            metadata.replacement += values.at(0);
-            return true;
         case PropertyType::Since:
-            metadata.since += values.at(0);
-            return true;
         case PropertyType::Category:
-            metadata.category += values.at(0);
-            return true;
         case PropertyType::Visibility:
-            metadata.visibility += values.at(0);
-            return true;
+            return metadata.set_property(property, values);
         default:
             return false;
         }

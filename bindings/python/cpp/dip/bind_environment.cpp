@@ -49,6 +49,15 @@ namespace snt::bind::python {
         );
         nl.def("size", &dip::NodeList<dip::ValueNode>::size, "Return the number of nodes.");
 
+        auto schema = py::class_<dip::EnvSchema>(m, "SchemaDefinition", "Registered DIPL schema definition.");
+        schema.def_readonly("name", &dip::EnvSchema::name);
+        schema.def_readonly("id", &dip::EnvSchema::id);
+        schema.def_property_readonly(
+            "metadata", [](const dip::EnvSchema& s) -> const dip::ValueMetadata& { return s.metadata; },
+            py::return_value_policy::reference_internal,
+            "Metadata attached to this schema definition."
+        );
+
         auto env = py::class_<dip::Environment>(
             m, "Environment", "Evaluation environment containing DIPL sources, units, functions, and nodes."
         );
@@ -63,6 +72,10 @@ namespace snt::bind::python {
             "source_manifest",
             &dip::Environment::get_source_manifest,
             "Source identities and SHA-256 fingerprints available for this environment."
+        );
+        env.def_property_readonly(
+            "schemas", [](const dip::Environment& e) { return e.schemas.entries(); },
+            "Registered schema definitions keyed by name. The returned mapping is a snapshot."
         );
 
         env.def("load", &dip::Environment::load, py::arg("file"), "Load an environment from an HDF5 file.");

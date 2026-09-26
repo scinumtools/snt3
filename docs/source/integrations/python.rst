@@ -277,5 +277,10 @@ Register a schema body directly, then apply it in ordinary DIPL code:
 
 Bodies start at indentation zero and omit the ``$schema`` wrapper. Registration
 preserves source information and leaves value evaluation to schema application.
+Put schema-level ``?`` metadata before the first body node, then inspect it with
+``env.schemas["settings"].metadata``. Schema metadata describe the definition
+and are not copied onto the applying group, collection, item, or value nodes.
+DIPH5 currently stores evaluated nodes rather than reusable schema definitions,
+so this registry is available on a parsed environment, not one loaded from DIPH5.
 The command API also supports ``argument_add("schema_string", [name, body])``
 and ``argument_add("schema_file", [name, path])``; file paths there are strings.

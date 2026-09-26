@@ -92,7 +92,11 @@ schema-declaration
   = "$schema" whitespace schema-name [ comment ] newline schema-block ;
 
 schema-block
-  = INDENT { blank-line | comment-line | schema-member } DEDENT ;
+  = INDENT { blank-line | comment-line | schema-metadata }
+    { blank-line | comment-line | schema-member } DEDENT ;
+
+schema-metadata
+  = metadata-property [ comment ] newline ;
 
 schema-member
   = value-declaration

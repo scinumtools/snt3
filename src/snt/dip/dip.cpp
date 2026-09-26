@@ -1,4 +1,5 @@
 #include "parsers.h"
+#include "nodes/node_schema.h"
 
 #include <fstream>
 #include <iostream>
@@ -381,6 +382,25 @@ code list : snt_project_code
             );
     }
 
+    inline void set_schema_property(
+        const BaseNode::PointerType& schema_node, const BaseNode::PointerType& current_node
+    ) {
+        auto property = std::dynamic_pointer_cast<PropertyNode>(current_node);
+        if (property->indent - schema_node->indent != INDENT_STEP)
+            throw dip::SyntaxException(
+                "Schema metadata has an invalid indent",
+                "A schema metadata property must be indented one level beneath its declaration.",
+                "Indent the property " + std::to_string(INDENT_STEP) + " spaces more than the schema declaration.",
+                __FILE__, __LINE__, property->line
+            );
+        if (!schema_node->set_property(property->ptype, property->value_raw, property->units_raw))
+            throw dip::SyntaxException(
+                "Invalid schema property", "Only metadata properties can describe a schema.",
+                "Use a ? metadata property before the first schema value node.",
+                __FILE__, __LINE__, property->line
+            );
+    }
+
     void DIP::add_schema_string(const std::string& name, const std::string& source_code) {
         add_schema_string_input(name, source_code, env.sources.at(source.name).path, {source.name, source.line_number});
     }
@@ -426,6 +446,7 @@ code list : snt_project_code
         auto body = parse_code_nodes(schema_lines);
         BaseNode::ListType schema_nodes;
         BaseNode::PointerType previous = nullptr;
+        ValueMetadata schema_metadata;
         for (const auto& node : body) {
             if (node->dtype == NodeDtype::Empty)
                 continue;
@@ -440,9 +461,19 @@ code list : snt_project_code
                     "Schema body has an invalid indent", "The first node must start at indentation zero.",
                     "Remove the extra indentation from the schema body.", __FILE__, __LINE__, node->line
                 );
-            if (node->dtype == NodeDtype::Property)
-                set_node_property(node, previous);
-            else {
+            if (node->dtype == NodeDtype::Property) {
+                if (!previous) {
+                    auto property = std::dynamic_pointer_cast<PropertyNode>(node);
+                    if (!schema_metadata.set_property(property->ptype, property->value_raw))
+                        throw dip::SyntaxException(
+                            "Invalid schema property", "Only metadata properties can describe a schema.",
+                            "Use a ? metadata property before the first schema value node.",
+                            __FILE__, __LINE__, node->line
+                        );
+                } else {
+                    set_node_property(node, previous);
+                }
+            } else {
                 schema_nodes.push_back(node);
                 previous = node;
             }
@@ -455,7 +486,7 @@ code list : snt_project_code
         // Schema nodes are stored one level beneath their application point.
         for (const auto& node : schema_nodes)
             node->indent += INDENT_STEP;
-        env.schemas.append(name, schema_nodes, source_name);
+        env.schemas.append(name, schema_nodes, source_name, schema_metadata);
         env.sources.append(source_name, source_file, source_code, parent);
     }
 
@@ -474,22 +505,32 @@ code list : snt_project_code
                 // create a schema and aggregate all child nodes
                 check_indent(previous_node, current_node);
                 BaseNode::ListType schema_nodes;
+                BaseNode::PointerType schema_previous = current_node;
                 while (i + 1 < queue.size()) {
                     BaseNode::PointerType schema_node = queue.at(i + 1);
-                    check_indent(previous_node, schema_node);
+                    check_indent(schema_previous, schema_node);
                     if (schema_node->indent <= current_node->indent)
                         break;
+                    if (schema_node->dtype == NodeDtype::Property && schema_previous == current_node) {
+                        set_schema_property(schema_previous, schema_node);
+                        ++i;
+                        continue;
+                    }
                     schema_node->indent -= current_node->indent; // strip schema indent from aggregated nodest
                     if (schema_node->dtype == NodeDtype::Property) {
-                        set_node_property(schema_node, previous_node);
+                        set_node_property(schema_node, schema_previous);
                     } else {
                         schema_nodes.push_back(schema_node);
-                        previous_node = schema_node;
+                        schema_previous = schema_node;
                     }
                     i++;
                 }
+                previous_node = schema_previous;
                 if (schema_nodes.size() > 0) {
-                    env.schemas.append(current_node->value_raw.at(0), schema_nodes, current_node->line.source.name);
+                    auto schema = std::dynamic_pointer_cast<SchemaNode>(current_node);
+                    env.schemas.append(
+                        current_node->value_raw.at(0), schema_nodes, current_node->line.source.name, schema->metadata
+                    );
                 } else {
                     throw dip::SyntaxException(
                         "Schema does not contain any value nodes",

@@ -24,7 +24,7 @@ namespace snt::bind::python {
     void init_value_node(py::module_& m) {
 
         auto metadata = py::class_<dip::ValueMetadata>(
-            m, "ValueMetadata", "Citation, licensing, and descriptive metadata attached to a DIPL value."
+            m, "ValueMetadata", "Citation, licensing, and descriptive metadata attached to a DIPL value or schema."
         );
         metadata.def(py::init<>(), "Create empty DIPL value metadata.");
         metadata.def_readonly("description", &dip::ValueMetadata::description);
