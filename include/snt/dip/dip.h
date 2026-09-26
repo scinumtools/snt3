@@ -36,7 +36,14 @@ namespace snt::dip {
 
         void add_schema_input(
             const std::string& name, const std::string& source_code,
-            const std::filesystem::path& source_file, const std::string& source_name
+            const std::filesystem::path& source_file, const std::string& source_name, const Source& parent
+        );
+        void add_schema_string_input(
+            const std::string& name, const std::string& source_code,
+            const std::filesystem::path& source_file, const Source& parent
+        );
+        void add_schema_file_input(
+            const std::string& name, const std::filesystem::path& source_file, const Source& parent
         );
         void add_string_input(
             const std::string& source_code,
@@ -101,8 +108,8 @@ namespace snt::dip {
          * Add a DIP project manifest.
          *
          * The manifest is ordinary DIPL containing ``units[]``, ``sources[]``,
-         * and ordered ``code[]`` records. Relative paths are resolved from the
-         * manifest's directory.
+         * ``schemas[]``, and ordered ``code[]`` records. Relative paths are
+         * resolved from the manifest's directory.
          *
          * @param project_file Path to the DIPfile manifest.
          */

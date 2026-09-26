@@ -86,6 +86,60 @@ TEST(Project, RejectsAmbiguousCodeEntry) {
     EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::SyntaxException);
 }
 
+TEST(Project, RegistersSchemaFilesAndStrings) {
+    ProjectDirectory project("dip-project-schemas");
+    project.write("settings.dipl", "value int = 42\n");
+    project.write(
+        "DIPfile",
+        "schemas[]\n"
+        "  name = \"from_file\"\n"
+        "  file = \"settings.dipl\"\n"
+        "schemas[]\n"
+        "  name = \"from_string\"\n"
+        "  string = \"value int = 43\"\n"
+        "code[]\n"
+        "  string = \"\"\"\n"
+        "first : from_file\n"
+        "second : from_string\n"
+        "\"\"\"\n"
+    );
+
+    dip::DIP parser;
+    parser.add_project(project.path() / "DIPfile");
+    const dip::Environment env = parser.parse();
+
+    EXPECT_EQ(env["first.value"].as<int64_t>(), 42);
+    EXPECT_EQ(env["second.value"].as<int64_t>(), 43);
+    EXPECT_EQ(env.schemas.entries().size(), 2);
+    const auto& file_source = env.sources.at(env.schemas.at("from_file").nodes.at(0)->line.source.name);
+    const auto& string_source = env.sources.at(env.schemas.at("from_string").nodes.at(0)->line.source.name);
+    EXPECT_EQ(file_source.path, (project.path() / "settings.dipl").string());
+    EXPECT_EQ(string_source.path, (project.path() / "DIPfile").string());
+    EXPECT_EQ(file_source.parent.name, string_source.parent.name);
+}
+
+TEST(Project, RejectsAmbiguousSchemaEntry) {
+    ProjectDirectory project("dip-project-ambiguous-schema");
+    project.write(
+        "DIPfile",
+        "schemas[]\n"
+        "  name = \"settings\"\n"
+        "  file = \"settings.dipl\"\n"
+        "  string = \"value int = 42\"\n"
+    );
+
+    dip::DIP parser;
+    EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::SyntaxException);
+}
+
+TEST(Project, RejectsSchemaEntryWithoutBody) {
+    ProjectDirectory project("dip-project-empty-schema-entry");
+    project.write("DIPfile", "schemas[]\n  name = \"settings\"\n");
+
+    dip::DIP parser;
+    EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::SyntaxException);
+}
+
 TEST(Project, RejectsOrdinaryParameterNodes) {
     ProjectDirectory project("dip-project-invalid-node");
     project.write("DIPfile", "answer int = 42\n");

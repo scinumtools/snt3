@@ -96,10 +96,14 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(result["result"], "42\n")
 
     def test_DIPProjectBundle(self):
-        project = """code[]
+        project = """schemas[]
+  name = \"settings\"
+  file = \"schemas/settings.dipl\"
+code[]
   file = \"parameters/base.dipl\"
 code[]
   string = \"\"\"
+physics : settings
 derived int = ({?answer} + 1)
 \"\"\"
 """
@@ -107,12 +111,14 @@ derived int = ({?answer} + 1)
             [
                 ("project", "DIPfile", project),
                 ("file", "parameters/base.dipl", "answer int = 41\n"),
+                ("file", "schemas/settings.dipl", "value int = 42\n"),
             ]
         )
         with self.request("/snt/dip/parse", body, content_type) as response:
             result = json.loads(response.read())
         self.assertIn("answer = 41", result["result"])
         self.assertIn("derived = 42", result["result"])
+        self.assertIn("physics.value = 42", result["result"])
 
     def test_DIPSchemaUploads(self):
         for filename in (None, "settings.dipl"):

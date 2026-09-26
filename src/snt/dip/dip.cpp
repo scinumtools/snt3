@@ -24,11 +24,16 @@ namespace snt::dip {
 $schema snt_project_source
   name str
   filepath str
+$schema snt_project_schema
+  name str
+  file str = none
+  string str = none
 $schema snt_project_code
   file str = none
   string str = none
 units list : snt_project_unit
 sources list : snt_project_source
+schemas list : snt_project_schema
 code list : snt_project_code
 )DIPL";
 
@@ -38,10 +43,11 @@ code list : snt_project_code
         }
 
         void validate_project_manifest(const Environment& manifest) {
-            const std::set<std::string> collections = {"units", "sources", "code"};
+            const std::set<std::string> collections = {"units", "sources", "schemas", "code"};
             const std::map<std::string, std::set<std::string>> fields = {
                 {"units", {"name", "unit"}},
                 {"sources", {"name", "filepath"}},
+                {"schemas", {"name", "file", "string"}},
                 {"code", {"file", "string"}},
             };
 
@@ -51,7 +57,7 @@ code list : snt_project_code
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest contains the unsupported top-level collection `" + top_level_name(path) + "`.",
-                        "Use only the units[], sources[], and code[] collections.",
+                        "Use only the units[], sources[], schemas[], and code[] collections.",
                         __FILE__,
                         __LINE__
                     );
@@ -72,7 +78,7 @@ code list : snt_project_code
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest node `" + path + "` is not part of the DIPfile schema.",
-                        "Use only the declared fields of units[], sources[], and code[] items.",
+                        "Use only the declared fields of units[], sources[], schemas[], and code[] items.",
                         __FILE__,
                         __LINE__,
                         node->line
@@ -223,6 +229,36 @@ code list : snt_project_code
                 );
             }
         }
+        if (project.hierarchy.has_collection("schemas")) {
+            const Collection& collection = project.hierarchy.get_collection("schemas");
+            for (const std::string& index : collection.items) {
+                const std::string item = "schemas[" + index + "]";
+                const std::string name = project[item + ".name"].as<std::string>();
+                const auto file = project.get_node(item + ".file");
+                const auto string = project.get_node(item + ".string");
+                const bool has_file = file->value != nullptr;
+                const bool has_string = string->value != nullptr;
+                if (has_file == has_string) {
+                    throw SyntaxException(
+                        "Invalid DIP project schema entry",
+                        "Each schemas[] item must define exactly one of `file` or `string`.",
+                        "Set one field and leave the other as none.",
+                        __FILE__,
+                        __LINE__,
+                        file->line
+                    );
+                }
+                const auto location_node = has_file ? file : string;
+                const Source parent = {project_source, location_node->line.source.line_number};
+                if (has_file) {
+                    add_schema_file_input(
+                        name, project_path(project_directory, project[item + ".file"].as<std::string>()), parent
+                    );
+                } else {
+                    add_schema_string_input(name, project[item + ".string"].as<std::string>(), absolute_project, parent);
+                }
+            }
+        }
         if (project.hierarchy.has_collection("code")) {
             const Collection& collection = project.hierarchy.get_collection("code");
             for (const std::string& index : collection.items) {
@@ -346,11 +382,24 @@ code list : snt_project_code
     }
 
     void DIP::add_schema_string(const std::string& name, const std::string& source_code) {
+        add_schema_string_input(name, source_code, env.sources.at(source.name).path, {source.name, source.line_number});
+    }
+
+    void DIP::add_schema_string_input(
+        const std::string& name, const std::string& source_code,
+        const std::filesystem::path& source_file, const Source& parent
+    ) {
         const std::string source_name = source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings++);
-        add_schema_input(name, source_code, env.sources.at(source.name).path, source_name);
+        add_schema_input(name, source_code, source_file, source_name, parent);
     }
 
     void DIP::add_schema_file(const std::string& name, const std::filesystem::path& source_file) {
+        add_schema_file_input(name, source_file, {source.name, source.line_number});
+    }
+
+    void DIP::add_schema_file_input(
+        const std::string& name, const std::filesystem::path& source_file, const Source& parent
+    ) {
         std::ifstream file(source_file);
         if (!file)
             throw dip::IOException(
@@ -360,12 +409,12 @@ code list : snt_project_code
         std::ostringstream code;
         code << file.rdbuf();
         const std::string source_name = source.name + "_" + std::string(FILE_SOURCE) + std::to_string(num_files++);
-        add_schema_input(name, code.str(), source_file, source_name);
+        add_schema_input(name, code.str(), source_file, source_name, parent);
     }
 
     void DIP::add_schema_input(
         const std::string& name, const std::string& source_code,
-        const std::filesystem::path& source_file, const std::string& source_name
+        const std::filesystem::path& source_file, const std::string& source_name, const Source& parent
     ) {
         if (!std::regex_match(name, std::regex(std::string(PATTERN_KEYWORD) + "+")))
             throw dip::SyntaxException(
@@ -407,7 +456,7 @@ code list : snt_project_code
         for (const auto& node : schema_nodes)
             node->indent += INDENT_STEP;
         env.schemas.append(name, schema_nodes, source_name);
-        env.sources.append(source_name, source_file, source_code, {source.name, source.line_number});
+        env.sources.append(source_name, source_file, source_code, parent);
     }
 
     Environment DIP::parse() {
