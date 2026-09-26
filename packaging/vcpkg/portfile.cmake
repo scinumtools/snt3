@@ -19,18 +19,25 @@ vcpkg_cmake_configure(
         -DENABLE_MAT=OFF
         -DENABLE_API=ON
 
+        -DENABLE_EXEC_APPS=ON
+        -DENABLE_EXEC_APPS_SNT=ON
+        -DENABLE_SNT_SERVER=ON
+        -DENABLE_SNT_VIEW=OFF
+        -DSNT_HTTPLIB_INCLUDE_DIR=${CURRENT_INSTALLED_DIR}/include
+        -DCMAKE_INSTALL_BINDIR=tools/${PORT}
         -DENABLE_EXEC_APPS_DMAP=OFF
         -DENABLE_EXEC_EXAMPLES=OFF
         -DENABLE_EXEC_BENCHMARKS=OFF
+    OPTIONS_DEBUG
+        -DENABLE_EXEC_APPS=OFF
+        -DENABLE_EXEC_APPS_SNT=OFF
+        -DENABLE_SNT_SERVER=OFF
 )
 
 vcpkg_cmake_install()
 
-# Copy executables to tools
-vcpkg_copy_tools(
-    TOOL_NAMES snt
-    AUTO_CLEAN
-)
+# Install directly to tools so exported executable paths stay valid.
+vcpkg_copy_tool_dependencies("${CURRENT_PACKAGES_DIR}/tools/${PORT}")
 
 vcpkg_cmake_config_fixup(
     PACKAGE_NAME snt

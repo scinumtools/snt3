@@ -44,6 +44,8 @@ class SciNumToolsConan(ConanFile):
     default_options = {
         "shared": False,
         "fPIC": True,
+        "hdf5/*:enable_cxx": False,
+        "hdf5/*:hl": False,
     }
 
     #
@@ -89,6 +91,9 @@ class SciNumToolsConan(ConanFile):
     #
     # Remove fPIC on Windows
     #
+    def requirements(self):
+        self.requires("hdf5/[>=1.14.3 <2]", transitive_headers=True, transitive_libs=True)
+
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
@@ -108,8 +113,8 @@ class SciNumToolsConan(ConanFile):
         tc.variables["RUN_UNIT_TESTS"] = False
         tc.variables["ENABLE_EXEC_APPS"] = False
         tc.variables["ENABLE_EXEC_APPS_SNT"] = False
-        tc.variables["ENABLE_EXEC_APPS_SERVER"] = False
-        tc.variables["ENABLE_EXEC_APPS_GUI"] = False
+        tc.variables["ENABLE_SNT_SERVER"] = False
+        tc.variables["ENABLE_SNT_VIEW"] = False
         tc.variables["ENABLE_MAT"] = False
         tc.variables["ENABLE_EXEC_APPS_DMAP"] = False
         tc.variables["ENABLE_EXEC_EXAMPLES"] = False
@@ -158,7 +163,7 @@ class SciNumToolsConan(ConanFile):
             "exs": ("snt-exs", []),
             "val": ("snt-val", ["core"]),
             "puq": ("snt-puq", ["core", "exs", "val"]),
-            "dip": ("snt-dip", ["puq"]),
+            "dip": ("snt-dip", ["puq", "hdf5::hdf5_c"]),
             "api": ("snt-api", ["puq", "dip"]),
         }
 

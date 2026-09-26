@@ -26,12 +26,32 @@ Options:
 Modules:
   dip     Dimensional Input Parameters
   puq     Physical Units & Quantities
+  server  REST API server (optional build feature)
+  view    Parameter viewer (reserved for future implementation)
 
 Run 'snt <module> --help' for module-specific commands.
 )";
 }
 
 int main(int argc, char* argv[]) {
+
+    // Server arguments have their own parser; pass through without reinterpreting them.
+    if (argc > 1 && std::string(argv[1]) == "server") {
+#ifdef ENABLE_SNT_SERVER
+        return module_server(argc - 1, argv + 1);
+#else
+        std::cerr << "Server support is not included in this build. Configure with ENABLE_SNT_SERVER=ON.\n";
+        return 1;
+#endif
+    }
+    if (argc > 1 && std::string(argv[1]) == "view") {
+#ifdef ENABLE_SNT_VIEW
+        return module_view(argc - 1, argv + 1);
+#else
+        std::cerr << "Viewer support is not included in this build. The parameter viewer is a future feature.\n";
+        return 1;
+#endif
+    }
 
     ArgParser argpar(argc, argv);
 
@@ -50,6 +70,8 @@ int main(int argc, char* argv[]) {
                 module_puq(argpar);
             } else if (mod == "dip") {
                 module_dip(argpar);
+            } else {
+                throw std::runtime_error("Unknown module: " + mod + ". Use snt --help.");
             }
         }
     } catch (std::exception& e) {

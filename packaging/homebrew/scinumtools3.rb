@@ -8,6 +8,8 @@ class Scinumtools3 < Formula
 
   depends_on "cmake" => :build
   depends_on "ninja" => :build
+  depends_on "cpp-httplib" => :build
+  depends_on "hdf5"
 
   def install
     args = std_cmake_args + %w[
@@ -23,10 +25,16 @@ class Scinumtools3 < Formula
       -DENABLE_MAT=OFF
       -DENABLE_API=ON
 
+      -DENABLE_EXEC_APPS=ON
+      -DENABLE_EXEC_APPS_SNT=ON
+      -DENABLE_SNT_SERVER=ON
+      -DENABLE_SNT_VIEW=OFF
       -DENABLE_EXEC_APPS_DMAP=OFF
       -DENABLE_EXEC_EXAMPLES=OFF
       -DENABLE_EXEC_BENCHMARKS=OFF
     ]
+
+    args << "-DSNT_HTTPLIB_INCLUDE_DIR=#{Formula["cpp-httplib"].opt_include}"
 
     system "cmake", "-S", ".", "-B", "build", *args
     system "cmake", "--build", "build"
@@ -36,5 +44,6 @@ class Scinumtools3 < Formula
   test do
     output = shell_output("#{bin}/snt -v")
     assert_match version.to_s, output
+    assert_match "Usage: snt server", shell_output("#{bin}/snt server --help")
   end
 end

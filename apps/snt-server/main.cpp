@@ -19,7 +19,8 @@ namespace {
     }
 
     void print_usage(const char* executable) {
-        std::cout << "Usage: " << executable
+        (void)executable;
+        std::cout << "Usage: snt server"
                   << " [--address ADDRESS] [--port PORT] [--project NAME=PATH] [--diph5 NAME=PATH]\n";
     }
 
@@ -39,7 +40,7 @@ namespace {
 
 } // namespace
 
-int main(const int argc, char* argv[]) {
+int module_server(const int argc, char* argv[]) {
     int port = SERVER_PORT;
     std::string address(SERVER_ADDRESS);
     std::vector<snt::server::PublishedInput> published_inputs;

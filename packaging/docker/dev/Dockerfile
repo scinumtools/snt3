@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     ninja-build \
     git \
     pkg-config \
+    libhdf5-dev \
     gdb \
     lldb \
     clang \

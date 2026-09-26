@@ -36,4 +36,22 @@ if(ENABLE_UNIT_TESTS)
   )
 endif()
 
+if(ENABLE_SNT_SERVER)
+  target_compile_definitions(snt PRIVATE ENABLE_SNT_SERVER)
+  add_subdirectory(../snt-server ${CMAKE_CURRENT_BINARY_DIR}/server)
+endif()
+if(ENABLE_SNT_VIEW)
+  target_compile_definitions(snt PRIVATE ENABLE_SNT_VIEW)
+  add_subdirectory(../snt-view ${CMAKE_CURRENT_BINARY_DIR}/view)
+endif()
+
+if(ENABLE_UNIT_TESTS)
+  add_test(NAME cli.commands
+    COMMAND ${CMAKE_COMMAND}
+      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+      "-DSERVER_ENABLED=${ENABLE_SNT_SERVER}"
+      "-DVIEW_ENABLED=${ENABLE_SNT_VIEW}"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/commands.cmake")
+endif()
+
 enable_coverage(${EXEC_NAME})

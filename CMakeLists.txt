@@ -7,7 +7,7 @@ file(READ "settings.env" ENV_CONTENTS)
 string(REGEX MATCH "CODE_VERSION=([^\n\r]*)" _ ${ENV_CONTENTS})
 string(REGEX REPLACE ".*CODE_VERSION=([^\n\r]*).*" "\\1" CODE_VERSION "${_}")
 
-project(scinumtools3 VERSION "${CODE_VERSION}" LANGUAGES CXX)
+project(scinumtools3 VERSION "${CODE_VERSION}" LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,7 +22,7 @@ endif()
 
 set(MODULE_NAME snt)
 #set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install")
-set(CMAKE_INSTALL_BINDIR bin)
+set(CMAKE_INSTALL_BINDIR bin CACHE STRING "Executable installation directory")
 set(CMAKE_INSTALL_LIBDIR lib)
 set(CMAKE_INSTALL_INCLUDEDIR include)
 
@@ -130,10 +130,15 @@ option(ENABLE_EXEC_APPS_SNT "Enable main SciNumTools CLI executable" "${ENABLE_E
 message(STATUS "ENABLE_EXEC_APPS_SNT         ${ENABLE_EXEC_APPS_SNT}")
 option(ENABLE_EXEC_APPS_DMAP "Enable build of dimension map executable" "${ENABLE_EXEC_APPS}")
 message(STATUS "ENABLE_EXEC_APPS_DMAP        ${ENABLE_EXEC_APPS_DMAP}")
-option(ENABLE_EXEC_APPS_SERVER "Enable SNT REST-API server app" "${ENABLE_EXEC_APPS}")
-message(STATUS "ENABLE_EXEC_APPS_SERVER      ${ENABLE_EXEC_APPS_SERVER}")
-option(ENABLE_EXEC_APPS_GUI "Enable SNT graphical user interface" OFF)
-message(STATUS "ENABLE_EXEC_APPS_GUI         ${ENABLE_EXEC_APPS_GUI}")
+# Server and viewer are optional modules of the main executable.
+option(ENABLE_SNT_SERVER "Enable snt server command support" "${ENABLE_EXEC_APPS_SNT}")
+message(STATUS "ENABLE_SNT_SERVER           ${ENABLE_SNT_SERVER}")
+option(ENABLE_SNT_VIEW "Enable snt view command support" OFF)
+message(STATUS "ENABLE_SNT_VIEW             ${ENABLE_SNT_VIEW}")
+if((ENABLE_SNT_SERVER OR ENABLE_SNT_VIEW) AND
+   NOT (ENABLE_EXEC_APPS AND ENABLE_EXEC_APPS_SNT AND ENABLE_PUQ AND ENABLE_DIP AND ENABLE_API))
+    message(FATAL_ERROR "snt server/view require ENABLE_EXEC_APPS, ENABLE_EXEC_APPS_SNT, ENABLE_PUQ, ENABLE_DIP, and ENABLE_API.")
+endif()
 option(ENABLE_EXEC_EXAMPLES "Enable build of example executables" ON)
 message(STATUS "ENABLE_EXEC_EXAMPLES         ${ENABLE_EXEC_EXAMPLES}")
 option(ENABLE_EXEC_BENCHMARKS "Build benchmarks" OFF)

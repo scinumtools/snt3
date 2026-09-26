@@ -98,8 +98,9 @@ prefix as ``-DHDF5_ROOT=/path/to/hdf5`` when running CMake. The commands below
 also require the Ninja build tool.
 
 Clone the repository with its ``cpp-httplib`` submodule and configure the
-build. The submodule provides the optional REST server; omit it only when
-configuring with ``-DENABLE_EXEC_APPS_SERVER=OFF``.
+build. The submodule provides the optional REST server. Alternatively, install
+cpp-httplib 0.46.0 or newer and set ``SNT_HTTPLIB_INCLUDE_DIR`` to its header
+directory. Builds with ``-DENABLE_SNT_SERVER=OFF`` do not need cpp-httplib.
 
 .. code-block:: console
 

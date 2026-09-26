@@ -1,7 +1,7 @@
 REST API server
 ===============
 
-The optional ``snt-server`` executable exposes the command-oriented C++ API
+The optional ``snt server`` command exposes the command-oriented C++ API
 over HTTP. It uses the same ``snt::api`` commands as the command-line tool;
 PUEL evaluation and DIPL parsing therefore retain the same semantics.
 
@@ -12,9 +12,9 @@ Enable the server explicitly when configuring SNT:
 
 .. code-block:: bash
 
-   cmake -G Ninja -B build -DENABLE_EXEC_APPS_SERVER=ON
-   cmake --build build --target snt-server
-   ./build/bin/snt-server --port 8081
+   cmake -G Ninja -B build -DENABLE_SNT_SERVER=ON
+   cmake --build build --target snt
+   ./build/bin/snt server --port 8081
 
 The server listens on ``127.0.0.1:8080`` by default. Pass ``--port PORT`` to
 choose another port, for example when the default is already occupied.
@@ -127,8 +127,8 @@ For deployed models, start the server with a named project or DIPH5 input:
 
 .. code-block:: console
 
-   snt-server --project model=/srv/model/DIPfile
-   snt-server --diph5 model=/srv/model/environment.diph5
+   snt server --project model=/srv/model/DIPfile
+   snt server --diph5 model=/srv/model/environment.diph5
 
 ``--project NAME=PATH`` parses the ordinary DIPfile project once at startup;
 ``--diph5 NAME=PATH`` loads a previously evaluated environment once. Either

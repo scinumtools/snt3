@@ -1,5 +1,5 @@
 {% set name = "scinumtools3" %}
-{% set version = "0.8.0" %}
+{% set version = "0.8.3" %}
 
 package:
   name: {{ name }}
@@ -7,26 +7,29 @@ package:
 
 source:
   url: https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: cfb91ae6c62a35969d656f908795ded3ad49f855353ea4e829dedbdedaea308c
+  sha256: 65b86ef6a9eda90e8a7aa1429c7ca63a34d67aba3d039e635c4162e376c1436c
 
 build:
   number: 0
   script: 
-    - export CMAKE_BUILD_PARALLEL_LEVEL=1
-    - {{ PYTHON }} -m pip install . --no-deps -vv
+    - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
   build:
+    - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ stdlib("c") }}
     - cmake >=3.24
     - ninja
 
   host:
+    - hdf5
     - python
     - pip
     - scikit-build-core
     - pybind11
+    - setuptools
+    - wheel
     - numpy
 
   run:

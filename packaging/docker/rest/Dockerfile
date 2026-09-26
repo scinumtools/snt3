@@ -23,11 +23,12 @@ RUN cmake -G Ninja -S . -B build \
     -DENABLE_BINDING_C=OFF \
     -DENABLE_CABI_GTEST=OFF \
     -DENABLE_EXEC_EXAMPLES=OFF \
-    -DENABLE_EXEC_APPS_SNT=OFF \
+    -DENABLE_EXEC_APPS_SNT=ON \
     -DENABLE_EXEC_APPS_DMAP=OFF \
-    -DENABLE_EXEC_APPS_SERVER=ON \
-    && cmake --build build --target snt-server
+    -DENABLE_SNT_SERVER=ON \
+    -DENABLE_SNT_VIEW=OFF \
+    && cmake --build build --target snt
 
 EXPOSE 8080
 
-ENTRYPOINT ["/opt/scinumtools3/build/bin/snt-server", "--address", "0.0.0.0"]
+ENTRYPOINT ["/opt/scinumtools3/build/bin/snt", "server", "--address", "0.0.0.0"]

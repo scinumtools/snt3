@@ -143,3 +143,26 @@ without a ``$schema`` wrapper:
 
 As with other individual inputs, these cannot be combined with ``--project``
 or ``--load``.
+
+Server and viewer commands
+--------------------------
+
+The main executable also hosts the REST server:
+
+.. code-block:: sh
+
+   snt server --help
+   snt server --port 8081
+   snt server --project model=/srv/model/DIPfile
+
+Build server support with ``ENABLE_SNT_SERVER=ON``. It requires the cpp-httplib
+submodule; CLI-only builds can set it to ``OFF``. See :doc:`rest` for routes and
+options. The former standalone ``snt-server`` executable is no longer built or
+installed; replace its invocation with ``snt server``.
+
+``snt view`` reserves the entry point for a future parameter viewer. With
+``ENABLE_SNT_VIEW=ON``, ``snt view --help`` describes the placeholder and invoking
+it reports that the viewer is not implemented. No GUI dependencies are required
+yet. The former ``snt-gui`` placeholder executable has been removed.
+
+Both features belong to the ``snt`` target and require ``ENABLE_EXEC_APPS_SNT``.

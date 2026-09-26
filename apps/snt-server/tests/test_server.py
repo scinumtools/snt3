@@ -1,4 +1,4 @@
-"""Black-box CTest coverage for the snt-server HTTP interface."""
+"""Black-box CTest coverage for the snt server HTTP interface."""
 
 import http.client
 import json
@@ -42,7 +42,7 @@ class ServerTests(unittest.TestCase):
     def setUpClass(cls):
         cls.port = unused_port()
         cls.process = subprocess.Popen(
-            [SERVER_EXECUTABLE, "--port", str(cls.port)],
+            [SERVER_EXECUTABLE, "server", "--port", str(cls.port)],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
         )
@@ -50,14 +50,14 @@ class ServerTests(unittest.TestCase):
         while time.monotonic() < deadline:
             if cls.process.poll() is not None:
                 message = cls.process.stderr.read().decode(errors="replace")
-                raise RuntimeError(f"snt-server exited during startup: {message}")
+                raise RuntimeError(f"snt server exited during startup: {message}")
             try:
                 with urllib.request.urlopen(f"http://127.0.0.1:{cls.port}/", timeout=0.2) as response:
                     if response.status == http.client.OK:
                         return
             except OSError:
                 time.sleep(0.05)
-        raise RuntimeError("snt-server did not accept requests within 10 seconds")
+        raise RuntimeError("snt server did not accept requests within 10 seconds")
 
     @classmethod
     def tearDownClass(cls):

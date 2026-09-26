@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     ninja-build \
     git \
     pkg-config \
+    libhdf5-dev \
     python3 \
     python3-dev \
     python3-pip \

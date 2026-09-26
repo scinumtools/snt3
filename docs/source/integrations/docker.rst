@@ -35,7 +35,7 @@ installing the complete native toolchain locally would be inconvenient.
 REST API server
 ---------------
 
-Build the image containing only the ``snt-server`` application and its native
+Build the image containing ``snt`` with server support and its native
 runtime dependencies:
 
 .. code-block:: console
