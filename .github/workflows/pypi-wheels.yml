@@ -145,6 +145,7 @@ jobs:
             -DENABLE_EXEC_APPS_SNT=OFF
             -DENABLE_SNT_SERVER=OFF
             -DENABLE_SNT_VIEW=OFF
+            -DENABLE_SNT_DMAP=OFF
             -DENABLE_EXEC_EXAMPLES=OFF
             -DENABLE_EXEC_BENCHMARKS=OFF
 

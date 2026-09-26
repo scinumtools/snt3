@@ -27,8 +27,8 @@ def archive_version(data):
             main = archive.extractfile(f"{prefix}/apps/snt/main.cpp").read().decode()
         except KeyError as error:
             raise ValueError("Archive is missing unified CLI sources") from error
-        if "ENABLE_SNT_SERVER" not in cmake or "module_server" not in main:
-            raise ValueError("Archive predates the unified CLI; publish a release containing snt server first")
+        if "ENABLE_SNT_SERVER" not in cmake or "ENABLE_SNT_DMAP" not in cmake or "module_server" not in main or "module_dmap" not in main:
+            raise ValueError("Archive predates the unified CLI; publish a release containing snt server and snt dmap first")
     match = re.search(r"^CODE_VERSION=([0-9]+\.[0-9]+\.[0-9]+)$", content, re.M)
     if not match:
         raise ValueError("Release archive has no supported CODE_VERSION")

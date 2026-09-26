@@ -3,8 +3,9 @@
 The Homebrew and vcpkg recipes build the libraries and unified `snt` executable,
 including `snt server`. They declare HDF5 and cpp-httplib dependencies explicitly;
 GitHub source archives do not contain Git submodule contents. Server builds accept
-`SNT_HTTPLIB_INCLUDE_DIR` and require cpp-httplib 0.46.0 or newer. The viewer remains
-disabled until implemented.
+`SNT_HTTPLIB_INCLUDE_DIR` and require cpp-httplib 0.46.0 or newer. Homebrew and vcpkg include `snt dmap`; Conan, Conda, and PyPI package
+libraries or Python bindings without application commands. The viewer
+remains disabled until implemented.
 
 Conan packages the C++ libraries and propagates the HDF5 C-library dependency to
 consumers. Conda and PyPI package the Python bindings with application features
@@ -25,7 +26,7 @@ python3 packaging/update_release.py 0.8.4
 python3 packaging/update_release.py 0.8.4 --check
 ```
 
-The command downloads the GitHub tag archive, checks its `CODE_VERSION` and unified CLI support, and
+The command downloads the GitHub tag archive, checks its `CODE_VERSION` and unified `snt server` / `snt dmap` support, and
 computes SHA-256 and SHA-512 digests for Homebrew, vcpkg, and Conda. It updates the
 vcpkg manifest version as well. It does not publish packages or modify the project
 version. `--archive /path/to/downloaded.tar.gz` supports an already downloaded copy

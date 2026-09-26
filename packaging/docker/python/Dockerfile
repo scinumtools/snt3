@@ -57,7 +57,7 @@ RUN python3 -m pip install --break-system-packages . \
     --config-settings=cmake.define.ENABLE_EXEC_APPS=OFF \
     --config-settings=cmake.define.ENABLE_EXEC_EXAMPLES=OFF \
     --config-settings=cmake.define.RUN_UNIT_TESTS=OFF \
-    --config-settings=cmake.define.ENABLE_EXEC_APPS_DMAP=OFF \
+    --config-settings=cmake.define.ENABLE_SNT_DMAP=OFF \
     --config-settings=cmake.define.ENABLE_EXEC_BENCHMARKS=OFF
 
 # -----------------------------------------------------------------------------

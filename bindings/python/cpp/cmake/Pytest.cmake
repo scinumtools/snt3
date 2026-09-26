@@ -9,7 +9,7 @@ function(pytest_discover_tests target)
 
     add_test(
         NAME pytest_${target}
-        COMMAND ${PYTEST_EXECUTABLE}
+        COMMAND ${PYTEST_EXECUTABLE} -m pytest
                 ${PYTEST_TEST_PATHS}
         WORKING_DIRECTORY ${PYTEST_WORKING_DIRECTORY}
     )

@@ -24,7 +24,7 @@ RUN cmake -G Ninja -S . -B build \
     -DENABLE_CABI_GTEST=OFF \
     -DENABLE_EXEC_EXAMPLES=OFF \
     -DENABLE_EXEC_APPS_SNT=ON \
-    -DENABLE_EXEC_APPS_DMAP=OFF \
+    -DENABLE_SNT_DMAP=OFF \
     -DENABLE_SNT_SERVER=ON \
     -DENABLE_SNT_VIEW=OFF \
     && cmake --build build --target snt

@@ -29,7 +29,7 @@ class Scinumtools3 < Formula
       -DENABLE_EXEC_APPS_SNT=ON
       -DENABLE_SNT_SERVER=ON
       -DENABLE_SNT_VIEW=OFF
-      -DENABLE_EXEC_APPS_DMAP=OFF
+      -DENABLE_SNT_DMAP=ON
       -DENABLE_EXEC_EXAMPLES=OFF
       -DENABLE_EXEC_BENCHMARKS=OFF
     ]
@@ -45,5 +45,6 @@ class Scinumtools3 < Formula
     output = shell_output("#{bin}/snt -v")
     assert_match version.to_s, output
     assert_match "Usage: snt server", shell_output("#{bin}/snt server --help")
+    assert_match "Usage: snt dmap", shell_output("#{bin}/snt dmap --help")
   end
 end

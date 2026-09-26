@@ -116,7 +116,7 @@ class SciNumToolsConan(ConanFile):
         tc.variables["ENABLE_SNT_SERVER"] = False
         tc.variables["ENABLE_SNT_VIEW"] = False
         tc.variables["ENABLE_MAT"] = False
-        tc.variables["ENABLE_EXEC_APPS_DMAP"] = False
+        tc.variables["ENABLE_SNT_DMAP"] = False
         tc.variables["ENABLE_EXEC_EXAMPLES"] = False
         tc.variables["ENABLE_EXEC_BENCHMARKS"] = False
 

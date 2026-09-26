@@ -17,8 +17,8 @@ def make_archive(version, unified=True):
         member = tarfile.TarInfo(f"scinumtools3-{version}/settings.env")
         member.size = len(content)
         archive.addfile(member, io.BytesIO(content))
-        for name, text in [("CMakeLists.txt", "ENABLE_SNT_SERVER" if unified else "old flags"),
-                           ("apps/snt/main.cpp", "module_server" if unified else "old CLI")]:
+        for name, text in [("CMakeLists.txt", "ENABLE_SNT_SERVER ENABLE_SNT_DMAP" if unified else "old flags"),
+                           ("apps/snt/main.cpp", "module_server module_dmap" if unified else "old CLI")]:
             member = tarfile.TarInfo(f"scinumtools3-{version}/{name}")
             member.size = len(text.encode())
             archive.addfile(member, io.BytesIO(text.encode()))

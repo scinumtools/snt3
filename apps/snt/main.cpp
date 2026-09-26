@@ -26,6 +26,7 @@ Options:
 Modules:
   dip     Dimensional Input Parameters
   puq     Physical Units & Quantities
+  dmap    Regenerate PUQ dimension-map headers (developer tool; optional)
   server  REST API server (optional build feature)
   view    Parameter viewer (reserved for future implementation)
 
@@ -41,6 +42,14 @@ int main(int argc, char* argv[]) {
         return module_server(argc - 1, argv + 1);
 #else
         std::cerr << "Server support is not included in this build. Configure with ENABLE_SNT_SERVER=ON.\n";
+        return 1;
+#endif
+    }
+    if (argc > 1 && std::string(argv[1]) == "dmap") {
+#ifdef ENABLE_SNT_DMAP
+        return module_dmap(argc - 1, argv + 1);
+#else
+        std::cerr << "Dimension map support is not included in this build. Configure with ENABLE_SNT_DMAP=ON.\n";
         return 1;
 #endif
     }

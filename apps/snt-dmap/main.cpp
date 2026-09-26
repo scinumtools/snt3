@@ -205,7 +205,7 @@ void create_map(const std::string& file_header) {
     fs.open(file_header, std::ios::out | std::ios::trunc);
     fs << "/*" << '\n';
     fs << " * Do not modify this file!" << '\n';
-    fs << " * This file can be updated using 'dmap' executable." << '\n';
+    fs << " * This file can be updated using 'snt dmap'." << '\n';
     fs << " * " << '\n';
     fs << " * Unit system:  " << puq::UnitSystem::current.data->SystemName << " ("
        << puq::UnitSystem::current.data->SystemAbbrev << ")" << '\n';
@@ -249,9 +249,18 @@ class InputParser {
     std::vector<std::string> tokens;
 };
 
-int main(int argc, char* argv[]) {
+int module_dmap(int argc, char* argv[]) {
 
     InputParser input(argc, argv);
+
+    if (input.cmdOptionExists("--help") || input.cmdOptionExists("-h")) {
+        std::cout << "Usage: snt dmap [-e]\nGenerate PUQ dimension-map headers in "
+                     "src/snt/puq/systems/dmaps/.\n"
+                     "Developer tool: run from the project root. Existing headers are overwritten.\n"
+                     "Review the generated changes before committing them.\n"
+                     "  -e  Overwrite headers with empty placeholder maps.\n";
+        return 0;
+    }
 
     std::cout << "Generating dimension maps:" << '\n';
     for (auto sys : puq::SystemMap) {
@@ -268,4 +277,5 @@ int main(int argc, char* argv[]) {
             std::cout << "Generating dmap file: " << file_header << '\n';
         }
     }
+    return 0;
 }

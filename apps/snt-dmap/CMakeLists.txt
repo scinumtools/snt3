@@ -1,18 +1,7 @@
-# create executable
-file(GLOB EXEC_FILES "./*.cpp" "./**/*.cpp")
-set(EXEC_NAME snt-dmap)
+# Add dimension-map generation to the main executable.
+target_sources(snt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
-add_executable(${EXEC_NAME} ${EXEC_FILES} )
-
-target_include_directories(${EXEC_NAME}
+target_include_directories(snt
   PRIVATE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
-
-target_link_libraries(${EXEC_NAME} PRIVATE snt-puq)
-
-set_target_properties(${EXEC_NAME} PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
-
-enable_coverage(${EXEC_NAME})

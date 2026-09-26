@@ -5,6 +5,7 @@ class ArgParser;
 
 int module_server(int argc, char* argv[]);
 int module_view(int argc, char* argv[]);
+int module_dmap(int argc, char* argv[]);
 
 void module_dip(ArgParser& argpar);
 void module_puq(ArgParser& argpar);

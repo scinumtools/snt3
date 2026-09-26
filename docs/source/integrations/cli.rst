@@ -144,25 +144,33 @@ without a ``$schema`` wrapper:
 As with other individual inputs, these cannot be combined with ``--project``
 or ``--load``.
 
-Server and viewer commands
---------------------------
+Server, dmap, and viewer commands
+---------------------------------
 
-The main executable also hosts the REST server:
+The main executable also hosts the REST server and dimension-map generator:
 
 .. code-block:: sh
 
    snt server --help
    snt server --port 8081
    snt server --project model=/srv/model/DIPfile
+   snt dmap --help
 
-Build server support with ``ENABLE_SNT_SERVER=ON``. It requires the cpp-httplib
-submodule; CLI-only builds can set it to ``OFF``. See :doc:`rest` for routes and
-options. The former standalone ``snt-server`` executable is no longer built or
-installed; replace its invocation with ``snt server``.
+Build server support with ``ENABLE_SNT_SERVER=ON`` and dimension-map
+generation with ``ENABLE_SNT_DMAP=ON``. Server support requires cpp-httplib;
+builds without it can set ``ENABLE_SNT_SERVER=OFF``. See :doc:`rest` for routes
+and options. The former standalone ``snt-server`` and ``snt-dmap`` executables
+are no longer built or installed; use ``snt server`` and ``snt dmap``.
+
+``snt dmap`` is a developer tool for precomputing PUQ unit dimensions. Run it
+from the source repository root only when updating unit definitions: it
+overwrites ``src/snt/puq/systems/dmaps/dmap_*.h``. Review the generated diff
+before committing. Its ``-e`` option replaces those headers with empty
+placeholders.
 
 ``snt view`` reserves the entry point for a future parameter viewer. With
 ``ENABLE_SNT_VIEW=ON``, ``snt view --help`` describes the placeholder and invoking
 it reports that the viewer is not implemented. No GUI dependencies are required
 yet. The former ``snt-gui`` placeholder executable has been removed.
 
-Both features belong to the ``snt`` target and require ``ENABLE_EXEC_APPS_SNT``.
+All three features belong to the ``snt`` target and require ``ENABLE_EXEC_APPS_SNT``.

@@ -40,16 +40,28 @@ if(ENABLE_SNT_SERVER)
   target_compile_definitions(snt PRIVATE ENABLE_SNT_SERVER)
   add_subdirectory(../snt-server ${CMAKE_CURRENT_BINARY_DIR}/server)
 endif()
+if(ENABLE_SNT_DMAP)
+  target_compile_definitions(snt PRIVATE ENABLE_SNT_DMAP)
+  add_subdirectory(../snt-dmap ${CMAKE_CURRENT_BINARY_DIR}/dmap)
+endif()
 if(ENABLE_SNT_VIEW)
   target_compile_definitions(snt PRIVATE ENABLE_SNT_VIEW)
   add_subdirectory(../snt-view ${CMAKE_CURRENT_BINARY_DIR}/view)
 endif()
 
 if(ENABLE_UNIT_TESTS)
+  if(ENABLE_SNT_DMAP)
+    add_test(NAME cli.dmap
+      COMMAND ${CMAKE_COMMAND}
+        "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+        "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dmap"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dmap.cmake")
+  endif()
   add_test(NAME cli.commands
     COMMAND ${CMAKE_COMMAND}
       "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
       "-DSERVER_ENABLED=${ENABLE_SNT_SERVER}"
+      "-DDMAP_ENABLED=${ENABLE_SNT_DMAP}"
       "-DVIEW_ENABLED=${ENABLE_SNT_VIEW}"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/commands.cmake")
 endif()
