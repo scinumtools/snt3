@@ -167,6 +167,25 @@ definition may also be declared without a value and completed by a later
 compatible modification; compatible units are converted to the definition's
 unit.
 
+.. _dipl-tag-design:
+
+Tags for discovery and selection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use tags to classify nodes for discovery and selection, such as identifying
+settings used by an exporter, diagnostic tool, or user interface. Keep tags as
+simple labels; they should not encode instructions, expressions, dependencies,
+or formatting rules.
+
+Structured behavior belongs in typed DIPL nodes and reusable schemas. For
+example, an optional child schema can define export units or applicability.
+Descriptive information belongs in metadata. Consuming applications select
+nodes by their tags, inspect their typed settings and metadata, and implement
+the relevant behavior.
+
+This separation keeps configuration explicit, supports validation and reuse,
+and avoids creating an application-specific language inside tag strings.
+
 External sources and custom units
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

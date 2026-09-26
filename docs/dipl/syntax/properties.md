@@ -114,6 +114,18 @@ In practice, it is recommended to use string values for tags to ensure consisten
 Once assigned, tags enable nodes to be queried and filtered after parsing through the use of tag selectors.
 Every DIPL implementation SHOULD provide support for selecting parsed nodes based on their associated tags.
 
+Tags should classify nodes for discovery and selection, such as identifying settings
+used by an exporter, diagnostic tool, or user interface. Keep tags as simple labels;
+they should not encode instructions, expressions, dependencies, or formatting rules.
+
+Structured behavior belongs in typed DIPL nodes and reusable schemas—for example,
+an optional child schema defining export units or applicability. Descriptive
+information belongs in metadata. Consuming applications select nodes by their tags,
+inspect their typed settings and metadata, and implement the relevant behavior.
+
+This separation keeps configuration explicit, supports validation and reuse, and
+avoids creating an application-specific language inside tag strings.
+
 ``` DIPL
 resolution int = 32
   !tags ["box", "grid"]

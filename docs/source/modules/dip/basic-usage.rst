@@ -119,6 +119,9 @@ excludes nodes with any listed tag. The three filters combine with AND; empty
 fields impose no restriction. Tags match explicit assignments without
 parent-tag inheritance.
 
+Keep tags as classification labels. Put structured settings in typed nodes and
+schemas, and descriptive information in metadata; see :ref:`dipl-tag-design`.
+
 ``?`` selects all value nodes, ``?physics.`` selects a subtree including its
 value-bearing root and collection members, and ``?physics.speed`` selects an
 exact node. Source-qualified queries such as ``shared?scale`` are also supported.
