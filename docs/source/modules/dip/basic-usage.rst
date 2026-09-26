@@ -64,7 +64,7 @@ Use ``env.load("parameters.diph5")`` to restore a previously persisted evaluated
 environment without parsing the original DIPL files.
 
 Cursor: inspect a known path
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Access a path using ``env["path.to.value"]``. The
 resulting cursor exposes the evaluated value and its units; groups, maps, and
@@ -89,7 +89,7 @@ ordinary C++ cast rules. This does not change the values retained by the
 environment.
 
 Select: discover and inspect nodes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Use ``select()`` to find value nodes and inspect their tags and metadata directly:
 

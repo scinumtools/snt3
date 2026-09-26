@@ -61,7 +61,7 @@ file, source, and unit individually:
 See :doc:`DIPfile projects <../modules/dip/projects>` for the manifest format.
 
 Accessing nodes
---------------
+---------------
 
 There are two main ways to access nodes:
 
@@ -71,7 +71,7 @@ There are two main ways to access nodes:
   tags and inspect independent snapshots of the results.
 
 Cursor: inspect a known path
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -97,7 +97,7 @@ conversion is needed:
    print(area_in_cm2)  # 100 cm2
 
 Select: discover and inspect nodes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Select returns value nodes whose values, units, tags, and metadata can be
 inspected directly:
