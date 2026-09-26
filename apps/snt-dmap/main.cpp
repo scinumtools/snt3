@@ -254,11 +254,29 @@ int module_dmap(int argc, char* argv[]) {
     InputParser input(argc, argv);
 
     if (input.cmdOptionExists("--help") || input.cmdOptionExists("-h")) {
-        std::cout << "Usage: snt dmap [-e]\nGenerate PUQ dimension-map headers in "
-                     "src/snt/puq/systems/dmaps/.\n"
-                     "Developer tool: run from the project root. Existing headers are overwritten.\n"
-                     "Review the generated changes before committing them.\n"
-                     "  -e  Overwrite headers with empty placeholder maps.\n";
+        std::cout << R"(
+Scientific Numerical Tools v3 (SNT)
+Module: PUQ dimension-map generator
+
+Usage:
+  snt dmap [options]
+
+Description:
+  Precompute PUQ unit dimensions and regenerate the dimension-map headers in
+  src/snt/puq/systems/dmaps/. This is a developer tool: run it from the project
+  root. Existing headers are overwritten; review the diff before committing.
+
+Options:
+  -h, --help
+      Show help.
+  -e
+      Overwrite headers with empty placeholder maps instead of calculated maps.
+      Intended for build and test workflows.
+
+Examples:
+  snt dmap
+  snt dmap -e
+)";
         return 0;
     }
 

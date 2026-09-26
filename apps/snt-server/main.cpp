@@ -18,10 +18,37 @@ namespace {
         return port;
     }
 
-    void print_usage(const char* executable) {
-        (void)executable;
-        std::cout << "Usage: snt server"
-                  << " [--address ADDRESS] [--port PORT] [--project NAME=PATH] [--diph5 NAME=PATH]\n";
+    void print_usage() {
+        std::cout << R"(
+Scientific Numerical Tools v3 (SNT)
+Module: REST API server
+
+Usage:
+  snt server [options]
+
+Description:
+  Serve the SNT API over HTTP. By default, listen on 127.0.0.1:8080.
+  Published DIP environments are loaded once at startup and served read-only.
+  Use external access controls when binding to a public address.
+
+Options:
+  -h, --help
+      Show help.
+  --address <address>
+      Listening address (default: 127.0.0.1).
+  --port <port>
+      Listening port from 1 to 65535 (default: 8080).
+  --project <name=path>
+      Publish a DIPfile project under the given name. May be repeated.
+  --diph5 <name=path>
+      Publish a saved DIPH5 environment. May be repeated.
+
+Examples:
+  snt server --port 8081
+  snt server --project model=/srv/model/DIPfile
+  snt server --project model=/srv/model/DIPfile \
+      --diph5 baseline=/srv/model/baseline.diph5
+)";
     }
 
     snt::server::PublishedInput parse_published_input(
@@ -48,13 +75,13 @@ int module_server(const int argc, char* argv[]) {
     for (int argument = 1; argument < argc; ++argument) {
         const std::string_view option(argv[argument]);
         if (option == "--help" || option == "-h") {
-            print_usage(argv[0]);
+            print_usage();
             return 0;
         }
         if (option == "--port") {
             if (++argument == argc) {
                 std::cerr << "Missing value for --port.\n";
-                print_usage(argv[0]);
+                print_usage();
                 return 2;
             }
             try {
@@ -68,7 +95,7 @@ int module_server(const int argc, char* argv[]) {
         if (option == "--address") {
             if (++argument == argc || std::string_view(argv[argument]).empty()) {
                 std::cerr << "Missing value for --address.\n";
-                print_usage(argv[0]);
+                print_usage();
                 return 2;
             }
             address = argv[argument];
@@ -77,7 +104,7 @@ int module_server(const int argc, char* argv[]) {
         if (option == "--project" || option == "--diph5") {
             if (++argument == argc) {
                 std::cerr << "Missing value for " << option << ".\n";
-                print_usage(argv[0]);
+                print_usage();
                 return 2;
             }
             try {
@@ -94,7 +121,7 @@ int module_server(const int argc, char* argv[]) {
             continue;
         }
         std::cerr << "Unknown option: " << option << '\n';
-        print_usage(argv[0]);
+        print_usage();
         return 2;
     }
 
