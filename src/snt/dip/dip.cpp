@@ -486,7 +486,7 @@ code list : snt_project_code
         // Schema nodes are stored one level beneath their application point.
         for (const auto& node : schema_nodes)
             node->indent += INDENT_STEP;
-        env.schemas.append(name, schema_nodes, source_name, schema_metadata);
+        env.schemas.append(name, schema_nodes, source_name, schema_metadata, schema_nodes.front()->line.source.line_number);
         env.sources.append(source_name, source_file, source_code, parent);
     }
 
@@ -529,7 +529,8 @@ code list : snt_project_code
                 if (schema_nodes.size() > 0) {
                     auto schema = std::dynamic_pointer_cast<SchemaNode>(current_node);
                     env.schemas.append(
-                        current_node->value_raw.at(0), schema_nodes, current_node->line.source.name, schema->metadata
+                        current_node->value_raw.at(0), schema_nodes, current_node->line.source.name, schema->metadata,
+                        current_node->line.source.line_number
                     );
                 } else {
                     throw dip::SyntaxException(
@@ -569,6 +570,8 @@ code list : snt_project_code
             }
             // Create hierarchical names
             target.hierarchy.record(node, nodes_nohierarchy);
+            if (node->dtype == NodeDtype::Group && !node->schemas.empty())
+                target.hierarchy.set_schemas(node->path.name, node->schemas);
             // Add nodes to the node list
             if (std::find(nodes_notypes.begin(), nodes_notypes.end(), node->dtype) != nodes_notypes.end()) {
                 continue;

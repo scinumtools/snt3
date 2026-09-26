@@ -251,6 +251,11 @@ namespace snt::dip {
         collections[path] = Collection{path, std::move(items), kind, std::move(schemas)};
     }
 
+    void HierarchyList::set_schemas(const std::string& path, std::vector<std::string> schemas) {
+        get_collection(path);
+        collections.at(path).schemas = std::move(schemas);
+    }
+
     const bool HierarchyList::has_collection(const std::string& path) const {
         return collections.find(path) != collections.end();
     }

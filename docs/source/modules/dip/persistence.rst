@@ -54,10 +54,15 @@ Source identifiers, line numbers, captured source lines, and citation metadata
 remain node-level provenance. DIPH5 version 2 stores a source manifest with
 each source's name, recorded path, parent relationship, and SHA-256 hash of
 the exact parsed content. Version 2.1 additionally preserves the trace IDs of
-registered units, schemas, and functions. This permits later verification and
-diagnostic correlation, but loading does not recreate complete source text,
-parsed source nodes, custom-unit definitions, schemas, executable functions,
-or source-qualified lookups.
+registered units, schemas, and functions. Version 2.4 adds schema-level
+descriptions, citations, and source locations to those trace entries. In C++,
+``get_schema_manifest()`` returns these descriptive records and
+``get_applied_schemas(path)`` finds schemas applied along a value path.
+``get_contributing_schema(path)`` identifies the schema that supplied a value
+node, when known. Loading
+does not recreate complete source text, parsed source nodes, schema definitions,
+executable functions, or source-qualified lookups; a loaded schema cannot be
+instantiated from the snapshot.
 
 HDF5 mapping
 ------------

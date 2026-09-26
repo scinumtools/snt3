@@ -73,6 +73,7 @@ namespace snt::dip {
                         EnvSchema schema = env.schemas.at(schema_name);
                         for (const auto& node : schema.nodes) { // ... and unwrap the schema nodes
                             BaseNode::PointerType node_new = node->clone(node->path, node->indent + indent);
+                            node_new->schema_id = schema.id;
                             // if schema contains table nodes, we defer it
                             if (node_new->dtype == NodeDtype::Table)
                                 node_new = std::make_shared<DeferredNode>(node_new);

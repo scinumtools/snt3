@@ -1,6 +1,6 @@
 % SciNumTools DIPH5
 % Environment HDF5 Format Specification
-% Version 2.3
+% Version 2.4
 
 # Scope
 
@@ -31,7 +31,8 @@ content fingerprints. Version 2.1 also stores durable identifiers for registered
 units, schemas, and functions. It does not embed complete source text, parsed
 source nodes, or executable functions. Version 2.2 adds `value_group` objects.
 Version 2.3 persists custom PUEL unit registrations required to interpret
-evaluated quantities. A loaded DIPH5 file must therefore be
+evaluated quantities. Version 2.4 adds descriptive schema metadata and source
+locations to schema trace entries. A loaded DIPH5 file must therefore be
 treated as an evaluated environment, not as a source from which the original
 DIPL program can be reconstructed exactly.
 
@@ -43,12 +44,11 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
-| `_DIPL_Schema_Version_Minor` | unsigned integer | `3` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `4` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2.3 readers support version 1 files, version 2.0
-files (which omit the minor attribute), version 2.1 files, version 2.2 files, and version 2.3
-files. Future schema
+schema version. Version 2.4 readers support version 1 files and versions 2.0
+through 2.4. Future schema
 revisions MUST preserve the meaning of existing attributes or increment the
 major or minor schema version.
 
@@ -188,6 +188,17 @@ The trace manifest preserves diagnostic and documentation identity only. It
 does not recreate a custom unit definition, schema nodes, or an executable
 function on load. `_DIPL_Trace` is reserved at the DIPH5 root; a DIPL
 environment with that top-level path cannot be saved.
+
+In version 2.4, schema trace entries additionally carry
+`_DIPL_Schema_Source` (the source-manifest name),
+`_DIPL_Schema_Source_Line` (unsigned declaration or first-body line), and
+the same optional metadata attributes used by value nodes, including
+`description`, `authors`, and `doi`. These fields describe the schema and
+its origin; they do not provide a reusable definition. Earlier files retain
+schema IDs and names but have no schema-level metadata or source location.
+Schema-derived value datasets also carry `_DIPL_Node_Schema_Id`, which refers
+to the schema trace ID that supplied the node. Group and collection schema
+associations remain in `_DIPL_Schemas` attributes on their HDF5 groups.
 
 # Examples
 

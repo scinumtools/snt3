@@ -26,6 +26,16 @@ namespace snt::bind::python {
         source_info.def_readonly("hash_algorithm", &dip::SourceInfo::hash_algorithm);
         source_info.def_readonly("hash", &dip::SourceInfo::hash);
 
+        auto schema_info = py::class_<dip::SchemaInfo>(
+            m, "SchemaInfo", "Read-only schema description and source provenance; not an executable definition."
+        );
+        schema_info.def_readonly("id", &dip::SchemaInfo::id);
+        schema_info.def_readonly("name", &dip::SchemaInfo::name);
+        schema_info.def_readonly("source_name", &dip::SchemaInfo::source_name);
+        schema_info.def_readonly("source_line", &dip::SchemaInfo::source_line);
+        schema_info.def_readonly("metadata", &dip::SchemaInfo::metadata);
+        schema_info.def_readonly("source", &dip::SchemaInfo::source);
+
         auto export_format =
             py::enum_<dip::ExportFormat>(m, "ExportFormat", "Export format for generated parameter lists.");
         export_format.value("CPP", dip::ExportFormat::CPP);
@@ -78,17 +88,31 @@ namespace snt::bind::python {
         env.def_property_readonly(
             "schemas", [](const dip::Environment& e) { return e.schemas.entries(); },
             "Registered schema definitions keyed by name. The mapping is a snapshot and remains valid "
-            "independently of this environment. DIPH5 loading does not restore reusable schemas."
+            "independently of this environment. DIPH5 loading does not restore reusable schemas; use schema_manifest."
+        );
+        env.def_property_readonly(
+            "schema_manifest", &dip::Environment::get_schema_manifest,
+            "Schema identities, descriptions, citations, and source provenance; no reusable definitions."
+        );
+        env.def(
+            "applied_schemas", &dip::Environment::get_applied_schemas, py::arg("path"),
+            "Return descriptive records for schemas applied along a value or collection path.\n\n"
+            "Args:\n    path: Fully qualified value or collection path."
+        );
+        env.def(
+            "contributing_schema", &dip::Environment::get_contributing_schema, py::arg("path"),
+            "Return the schema that supplied a value node, or None when it was not schema-derived.\n\n"
+            "Args:\n    path: Fully qualified value path."
         );
 
         env.def(
             "load", &dip::Environment::load, py::arg("file"),
-            "Load evaluated nodes from DIPH5. Schema definitions and their metadata are not reconstructed.\n\n"
+            "Load evaluated nodes from DIPH5. Schema descriptions and provenance are available in schema_manifest; reusable definitions are not reconstructed.\n\n"
             "Args:\n    file: Path to the DIPH5 file."
         );
         env.def(
             "save", &dip::Environment::save, py::arg("file"),
-            "Save evaluated nodes to DIPH5. Schema identities are recorded, but definitions and their metadata are not.\n\n"
+            "Save evaluated nodes to DIPH5 with descriptive schema metadata and provenance, but not reusable definitions.\n\n"
             "Args:\n    file: Output DIPH5 path; an existing file is overwritten."
         );
         env.def(

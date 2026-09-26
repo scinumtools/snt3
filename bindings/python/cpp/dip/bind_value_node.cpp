@@ -165,6 +165,11 @@ namespace snt::bind::python {
         );
 
         val.def_property_readonly(
+            "schema_id", [](const dip::ValueNode& vnode) { return vnode.schema_id; },
+            "Trace ID of the schema that supplied this node, or an empty string."
+        );
+
+        val.def_property_readonly(
             "metadata",
             [](const dip::ValueNode& vnode) -> const dip::ValueMetadata& { return vnode.metadata; },
             py::return_value_policy::reference_internal,

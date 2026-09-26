@@ -69,3 +69,27 @@ def test_schema_metadata_introspection():
     assert env.select('?physics.value')[0].metadata.description == ''
     del env
     assert schema.metadata.description == 'Reusable settings'
+
+
+def test_schema_metadata_diph5_provenance(tmp_path):
+    parser = DIP()
+    parser.add_schema_string('settings', '?descr "Reusable settings"\n?doi "10.1234/settings"\nvalue int = 42')
+    parser.add_string('physics : settings')
+    parsed = parser.parse()
+    path = tmp_path / 'settings.diph5'
+    parsed.save(path)
+
+    from scinumtools3.dip import Environment
+    loaded = Environment()
+    loaded.load(path)
+    assert loaded.schemas == {}
+    assert loaded['physics.value'].value == 42
+    assert len(loaded.schema_manifest) == 1
+    schema = loaded.applied_schemas('physics.value')[0]
+    assert schema.name == 'settings'
+    assert schema.metadata.description == 'Reusable settings'
+    assert schema.metadata.doi == '10.1234/settings'
+    assert schema.source_name
+    assert schema.source.hash == parsed.schema_manifest[0].source.hash
+    assert loaded.contributing_schema('physics.value').id == schema.id
+    assert loaded.select('?physics.value')[0].schema_id == schema.id

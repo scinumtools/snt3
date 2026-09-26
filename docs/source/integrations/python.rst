@@ -280,7 +280,14 @@ preserves source information and leaves value evaluation to schema application.
 Put schema-level ``?`` metadata before the first body node, then inspect it with
 ``env.schemas["settings"].metadata``. Schema metadata describe the definition
 and are not copied onto the applying group, collection, item, or value nodes.
-DIPH5 currently stores evaluated nodes rather than reusable schema definitions,
-so this registry is available on a parsed environment, not one loaded from DIPH5.
+DIPH5 stores evaluated nodes and descriptive schema provenance rather than
+reusable schema definitions. After loading a snapshot, inspect
+``env.schema_manifest`` for schema descriptions and citations, or use
+``env.applied_schemas("physics.speed")`` to find schemas applied along a value's
+path. ``env.contributing_schema("physics.speed")`` identifies the schema that
+supplied that value node, if any; selected value nodes also expose its
+``schema_id``. Each record includes ``metadata``, ``source_name``, ``source_line``, and
+an optional ``source`` identity with its path and hash. ``env.schemas`` remains
+empty after loading; the snapshot cannot instantiate schemas.
 The command API also supports ``argument_add("schema_string", [name, body])``
 and ``argument_add("schema_file", [name, path])``; file paths there are strings.

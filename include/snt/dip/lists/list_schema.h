@@ -15,6 +15,8 @@ namespace snt::dip {
         BaseNode::ListType nodes; // aggregated nodes
         std::string id;           // internal trace identifier, e.g. DIP0_SCHEMA0
         ValueMetadata metadata;   ///< Metadata on the definition, not inherited by instances.
+        std::string source_name;  ///< Source containing the declaration or schema body.
+        size_t source_line = 0;   ///< Declaration line, or first body line for host schemas.
     };
 
     class SchemaList {
@@ -32,7 +34,7 @@ namespace snt::dip {
          */
         void append(
             const std::string& name, BaseNode::ListType& nodes, const std::string& parent_id = {},
-            const ValueMetadata& metadata = {}
+            const ValueMetadata& metadata = {}, size_t source_line = 0
         );
         /** Append a schema record, assigning an identifier when it has none. */
         void append(const std::string& name, EnvSchema src, const std::string& parent_id = {});

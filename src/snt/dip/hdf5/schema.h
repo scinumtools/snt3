@@ -7,9 +7,9 @@
 namespace snt::dip::hdf5::schema {
 
     inline constexpr std::string_view FORMAT = "SciNumTools3 Environment";
-    // DIPH5 2.3 persists custom PUEL unit registrations.
+    // DIPH5 2.4 persists descriptive schema provenance in the trace manifest.
     inline constexpr uint64_t VERSION = 2;
-    inline constexpr uint64_t VERSION_MINOR = 3;
+    inline constexpr uint64_t VERSION_MINOR = 4;
     inline constexpr uint64_t FIRST_SUPPORTED_VERSION = 1;
 
     inline constexpr std::string_view ATTR_FORMAT = "_DIPL_Format";
@@ -30,6 +30,7 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_OPTIONS = "_DIPL_Options";
     inline constexpr std::string_view ATTR_OPTION_UNITS = "_DIPL_Option_Units";
     inline constexpr std::string_view ATTR_SCHEMAS = "_DIPL_Schemas";
+    inline constexpr std::string_view ATTR_NODE_SCHEMA_ID = "_DIPL_Node_Schema_Id";
     inline constexpr std::string_view ATTR_SOURCE = "_DIPL_Source";
     inline constexpr std::string_view ATTR_SOURCE_LINE = "_DIPL_Source_Line";
     inline constexpr std::string_view ATTR_SOURCE_CODE = "_DIPL_Source_Code";
@@ -48,6 +49,8 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_TRACE_ID = "_DIPL_Trace_Id";
     inline constexpr std::string_view ATTR_TRACE_NAME = "_DIPL_Trace_Name";
     inline constexpr std::string_view ATTR_TRACE_KIND = "_DIPL_Trace_Kind";
+    inline constexpr std::string_view ATTR_SCHEMA_SOURCE = "_DIPL_Schema_Source";
+    inline constexpr std::string_view ATTR_SCHEMA_SOURCE_LINE = "_DIPL_Schema_Source_Line";
     inline constexpr std::string_view KIND_VALUE_GROUP = "value_group";
     inline constexpr std::string_view VALUE_PAYLOAD = "_DIPL_Value";
 

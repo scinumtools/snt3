@@ -210,6 +210,67 @@ namespace snt::dip {
         trace_manifest_loaded_ = true;
     }
 
+    std::vector<SchemaInfo> Environment::get_schema_manifest() const {
+        std::vector<SchemaInfo> manifest;
+        if (schema_manifest_loaded_) {
+            manifest = schema_manifest_;
+        } else {
+            manifest.reserve(schemas.entries().size());
+            for (const auto& [name, schema] : schemas.entries())
+                manifest.push_back({schema.id, name, schema.source_name, schema.source_line, schema.metadata, {}});
+            std::sort(manifest.begin(), manifest.end(), [](const SchemaInfo& lhs, const SchemaInfo& rhs) {
+                return lhs.id < rhs.id;
+            });
+        }
+        for (auto& schema : manifest)
+            schema.source = get_source_info(schema.source_name);
+        return manifest;
+    }
+
+    void Environment::set_schema_manifest(std::vector<SchemaInfo> manifest) {
+        schema_manifest_ = std::move(manifest);
+        schema_manifest_loaded_ = true;
+    }
+
+    std::vector<SchemaInfo> Environment::get_applied_schemas(const std::string& path) const {
+        const auto manifest = get_schema_manifest();
+        std::vector<SchemaInfo> result;
+        auto add_at = [&](const std::string& prefix, bool item_follows) {
+            if (!hierarchy.has_collection(prefix))
+                return;
+            const auto& collection = hierarchy.get_collection(prefix);
+            if ((collection.kind == Path::Kind::List || collection.kind == Path::Kind::Map) && !item_follows)
+                return;
+            for (const auto& name : collection.schemas) {
+                const auto schema = std::find_if(manifest.begin(), manifest.end(), [&](const SchemaInfo& entry) {
+                    return entry.name == name;
+                });
+                if (schema != manifest.end() && std::none_of(result.begin(), result.end(), [&](const SchemaInfo& entry) {
+                        return entry.id == schema->id;
+                    }))
+                    result.push_back(*schema);
+            }
+        };
+        for (size_t index = 0; index < path.size(); ++index)
+            if (path[index] == '.' || path[index] == '[')
+                add_at(path.substr(0, index), path[index] == '[');
+        add_at(path, false);
+        return result;
+    }
+
+    std::optional<SchemaInfo> Environment::get_contributing_schema(const std::string& path) const {
+        const auto node = get_node(path);
+        if (node->schema_id.empty())
+            return std::nullopt;
+        const auto manifest = get_schema_manifest();
+        const auto schema = std::find_if(manifest.begin(), manifest.end(), [&](const SchemaInfo& entry) {
+            return entry.id == node->schema_id;
+        });
+        if (schema == manifest.end())
+            return std::nullopt;
+        return *schema;
+    }
+
     std::string Environment::request_code(const std::string& source_name) const {
         return sources.at(source_name).code;
     }

@@ -89,6 +89,9 @@ namespace snt::dip {
             const std::string& path, Path::Kind kind, std::vector<std::string> schemas, std::vector<std::string> items
         );
 
+        /** Record schemas applied to an existing group or collection item. */
+        void set_schemas(const std::string& path, std::vector<std::string> schemas);
+
         /**
          * Test if collection whith the given path exists
          *

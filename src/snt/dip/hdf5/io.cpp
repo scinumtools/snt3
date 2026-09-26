@@ -302,11 +302,15 @@ namespace snt::dip::hdf5 {
                     const Collection& collection = env.hierarchy.get_collection(dipl_path);
                     Id container = ensure_group(file, hdf5_path, path_kind_name(collection.kind));
                     write_string(container, ATTR_PATH, dipl_path);
+                    if (!has_attribute(container, ATTR_SCHEMAS))
+                        write_strings(container, ATTR_SCHEMAS, collection.schemas);
                     hdf5_path += '/' + item;
                     dipl_path += '[' + item + ']';
                     Id item_group =
                         ensure_group(file, hdf5_path, collection.kind == Path::Kind::List ? "list_item" : "map_item");
                     write_string(item_group, ATTR_PATH, dipl_path);
+                    if (env.hierarchy.has_collection(dipl_path) && !has_attribute(item_group, ATTR_SCHEMAS))
+                        write_strings(item_group, ATTR_SCHEMAS, env.hierarchy.get_collection(dipl_path).schemas);
                     if (collection.kind == Path::Kind::List)
                         write_scalar<uint64_t>(item_group, ATTR_INDEX, H5T_NATIVE_UINT64, std::stoull(item));
                     else
@@ -321,6 +325,8 @@ namespace snt::dip::hdf5 {
                     if (!collection_item) {
                         Id group = ensure_group(file, hdf5_path, "group");
                         write_string(group, ATTR_PATH, dipl_path);
+                        if (env.hierarchy.has_collection(dipl_path) && !has_attribute(group, ATTR_SCHEMAS))
+                            write_strings(group, ATTR_SCHEMAS, env.hierarchy.get_collection(dipl_path).schemas);
                     }
                     ++pos;
                 }
@@ -521,6 +527,8 @@ namespace snt::dip::hdf5 {
             write_strings(dataset, ATTR_OPTIONS, option_values);
             write_strings(dataset, ATTR_OPTION_UNITS, option_units);
             write_strings(dataset, ATTR_SCHEMAS, node.schemas);
+            if (!node.schema_id.empty())
+                write_string(dataset, ATTR_NODE_SCHEMA_ID, node.schema_id);
             if (node.units)
                 write_string(dataset, "units", node.units->to_string());
             if (!node.line.source.name.empty())
@@ -741,6 +749,7 @@ namespace snt::dip::hdf5 {
                 node->options.push_back({option_value(value_dtype, option_values[i]), option_values[i], units_value});
             }
             node->schemas = read_strings(dataset, ATTR_SCHEMAS);
+            node->schema_id = read_string(dataset, ATTR_NODE_SCHEMA_ID);
             if (!node->schemas.empty())
                 throw dip::IOException(
                     "Invalid value-node schema",
@@ -832,7 +841,7 @@ namespace snt::dip::hdf5 {
             env.set_source_manifest(std::move(sources));
         }
 
-        void read_trace_manifest(Environment& env, hid_t file) {
+        void read_trace_manifest(Environment& env, hid_t file, uint64_t minor_version) {
             const std::string manifest_path = "/" + std::string(GROUP_TRACE);
             const htri_t exists = H5Lexists(file, manifest_path.c_str(), H5P_DEFAULT);
             if (exists < 0)
@@ -850,6 +859,7 @@ namespace snt::dip::hdf5 {
                 H5Gopen2(file, manifest_path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the HDF5 trace manifest"
             );
             std::vector<TraceInfo> traces;
+            std::vector<SchemaInfo> schema_infos;
             const hsize_t count = object_count(manifest);
             traces.reserve(count);
             for (hsize_t index = 0; index < count; ++index) {
@@ -880,9 +890,21 @@ namespace snt::dip::hdf5 {
                         __FILE__,
                         __LINE__
                     );
+                if (trace.kind == "schema") {
+                    SchemaInfo info;
+                    info.id = trace.id;
+                    info.name = trace.name;
+                    if (minor_version >= 4) {
+                        info.source_name = read_string(entry, ATTR_SCHEMA_SOURCE);
+                        info.source_line = read_scalar<uint64_t>(entry, ATTR_SCHEMA_SOURCE_LINE, H5T_NATIVE_UINT64);
+                        read_metadata(entry, info.metadata);
+                    }
+                    schema_infos.push_back(std::move(info));
+                }
                 traces.push_back(std::move(trace));
             }
             env.set_trace_manifest(std::move(traces));
+            env.set_schema_manifest(std::move(schema_infos));
         }
 
         void read_unit_manifest(Environment& env, hid_t file) {
@@ -977,7 +999,10 @@ namespace snt::dip::hdf5 {
                     if (!path.empty() &&
                         (kind == "group" || kind == "item" || kind == "map_item" || kind == "list_item") &&
                         !env.hierarchy.has_collection(path))
-                        env.hierarchy.set_collection(path, kind == "group" ? Path::Kind::Group : Path::Kind::Item, {});
+                        env.hierarchy.set_collection(
+                            path, kind == "group" ? Path::Kind::Group : Path::Kind::Item,
+                            read_strings(child, ATTR_SCHEMAS)
+                        );
                     if (!path.empty() && (kind == "map" || kind == "list") && !env.hierarchy.has_collection(path)) {
                         std::vector<std::string> items;
                         const hsize_t child_count = object_count(child);
@@ -1003,7 +1028,8 @@ namespace snt::dip::hdf5 {
                                 return std::stoull(a) < std::stoull(b);
                             });
                         env.hierarchy.set_collection(
-                            path, kind == "map" ? Path::Kind::Map : Path::Kind::List, {}, items
+                            path, kind == "map" ? Path::Kind::Map : Path::Kind::List,
+                            read_strings(child, ATTR_SCHEMAS), items
                         );
                     }
                     read_group(env, child);
@@ -1047,6 +1073,7 @@ namespace snt::dip::hdf5 {
                 "Unable to create the HDF5 trace manifest"
             );
             const auto traces = env.get_trace_manifest();
+            const auto schema_infos = env.get_schema_manifest();
             for (size_t index = 0; index < traces.size(); ++index) {
                 const TraceInfo& trace = traces[index];
                 const std::string entry_name = std::to_string(index);
@@ -1058,6 +1085,16 @@ namespace snt::dip::hdf5 {
                 write_string(entry, ATTR_TRACE_ID, trace.id);
                 write_string(entry, ATTR_TRACE_NAME, trace.name);
                 write_string(entry, ATTR_TRACE_KIND, trace.kind);
+                if (trace.kind == "schema") {
+                    const auto info = std::find_if(schema_infos.begin(), schema_infos.end(), [&](const SchemaInfo& candidate) {
+                        return candidate.id == trace.id;
+                    });
+                    if (info != schema_infos.end()) {
+                        write_string(entry, ATTR_SCHEMA_SOURCE, info->source_name);
+                        write_scalar<uint64_t>(entry, ATTR_SCHEMA_SOURCE_LINE, H5T_NATIVE_UINT64, info->source_line);
+                        write_metadata(entry, info->metadata);
+                    }
+                }
             }
         }
 
@@ -1170,7 +1207,7 @@ namespace snt::dip::hdf5 {
         if (version >= 2)
             read_source_manifest(env, input);
         if (version == VERSION && minor_version >= 1)
-            read_trace_manifest(env, input);
+            read_trace_manifest(env, input, minor_version);
         if (version == VERSION && minor_version >= 3)
             read_unit_manifest(env, input);
         read_group(env, input, true);

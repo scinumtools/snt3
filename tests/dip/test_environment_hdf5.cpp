@@ -149,6 +149,80 @@ TEST(Environment, TraceManifestRoundTrip) {
     std::filesystem::remove(file);
 }
 
+TEST(Environment, SchemaProvenanceHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_schema_string(
+        "settings", "?descr \"Reusable settings\"\n?doi \"10.1234/settings\"\nvalue int = 42\n"
+    );
+    parser.add_string("physics : settings\nitems list : settings\nitems[]\n");
+    const dip::Environment source = parser.parse();
+    const auto before = source.get_schema_manifest();
+    ASSERT_EQ(before.size(), 1);
+    ASSERT_TRUE(before.front().source.has_value());
+    ASSERT_EQ(source.get_applied_schemas("physics.value").size(), 1);
+    ASSERT_EQ(source.get_applied_schemas("items[0].value").size(), 1);
+    ASSERT_TRUE(source.get_contributing_schema("physics.value").has_value());
+
+    const auto file = environment_file("schema-provenance");
+    source.save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_TRUE(loaded.schemas.entries().empty());
+    const auto after = loaded.get_schema_manifest();
+    ASSERT_EQ(after.size(), 1);
+    EXPECT_EQ(after.front().id, before.front().id);
+    EXPECT_EQ(after.front().name, "settings");
+    EXPECT_EQ(after.front().metadata.description, "Reusable settings");
+    EXPECT_EQ(after.front().metadata.doi, "10.1234/settings");
+    EXPECT_EQ(after.front().source_name, before.front().source_name);
+    EXPECT_EQ(after.front().source_line, before.front().source_line);
+    ASSERT_TRUE(after.front().source.has_value());
+    EXPECT_EQ(after.front().source->hash, before.front().source->hash);
+    ASSERT_EQ(loaded.get_applied_schemas("physics.value").size(), 1);
+    EXPECT_EQ(loaded.get_applied_schemas("physics.value").front().metadata.description, "Reusable settings");
+    ASSERT_EQ(loaded.get_applied_schemas("items[0].value").size(), 1);
+    ASSERT_TRUE(loaded.get_contributing_schema("physics.value").has_value());
+    EXPECT_EQ(loaded.get_contributing_schema("physics.value")->id, before.front().id);
+    EXPECT_TRUE(loaded.get_applied_schemas("items").empty());
+    EXPECT_EQ(loaded["physics.value"].as<int64_t>(), 42);
+
+    const auto copy = environment_file("schema-provenance-copy");
+    loaded.save(copy);
+    dip::Environment reloaded;
+    reloaded.load(copy);
+    ASSERT_EQ(reloaded.get_schema_manifest().size(), 1);
+    EXPECT_EQ(reloaded.get_schema_manifest().front().metadata.doi, "10.1234/settings");
+    std::filesystem::remove(copy);
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, InlineSchemaMetadataAndOverrideHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema inline_settings\n"
+        "  ?descr \"Inline description\"\n"
+        "  ?doi \"10.1234/inline\"\n"
+        "  value int = 1\n"
+        "record : inline_settings\n"
+        "  value = 2\n"
+        "plain int = 3\n"
+    );
+    const auto file = environment_file("inline-schema-provenance");
+    parser.parse().save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_TRUE(loaded.schemas.entries().empty());
+    ASSERT_EQ(loaded.get_schema_manifest().size(), 1);
+    EXPECT_EQ(loaded.get_schema_manifest().front().metadata.description, "Inline description");
+    EXPECT_EQ(loaded.get_schema_manifest().front().metadata.doi, "10.1234/inline");
+    EXPECT_EQ(loaded.get_schema_manifest().front().source_line, 1);
+    ASSERT_TRUE(loaded.get_contributing_schema("record.value").has_value());
+    EXPECT_EQ(loaded.get_contributing_schema("record.value")->name, "inline_settings");
+    EXPECT_FALSE(loaded.get_contributing_schema("plain").has_value());
+    EXPECT_EQ(loaded["record.value"].as<int64_t>(), 2);
+    std::filesystem::remove(file);
+}
+
 TEST(Environment, LoadSchemaVersion1WithoutSourceManifest) {
     const auto file = environment_file("load-version-1");
     dip::Environment source = parsed_environment();
@@ -227,7 +301,7 @@ TEST(Environment, SaveHdf5Content) {
         H5Handle minor_version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
         uint64_t minor_version = 0;
         ASSERT_GE(H5Aread(minor_version_attribute, H5T_NATIVE_UINT64, &minor_version), 0);
-        EXPECT_EQ(minor_version, 3);
+    EXPECT_EQ(minor_version, 4);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Trace", H5P_DEFAULT), 0);
         H5Handle source_manifest(H5Gopen2(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), H5Gclose);

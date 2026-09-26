@@ -50,6 +50,16 @@ namespace snt::dip {
         std::string kind; ///< "unit", "schema", "function_value", or "function_nodes".
     };
 
+    /** Descriptive schema provenance; contains no reusable schema nodes. */
+    struct SchemaInfo {
+        std::string id;
+        std::string name;
+        std::string source_name;
+        size_t source_line = 0;
+        ValueMetadata metadata;
+        std::optional<SourceInfo> source; ///< Source identity and fingerprint when available.
+    };
+
     /**
      * Type of an environment request
      */
@@ -80,6 +90,8 @@ namespace snt::dip {
       private:
         std::vector<SourceInfo> source_manifest_;
         std::vector<TraceInfo> trace_manifest_;
+        std::vector<SchemaInfo> schema_manifest_;
+        bool schema_manifest_loaded_ = false;
         bool trace_manifest_loaded_ = false;
 
       public:
@@ -88,7 +100,7 @@ namespace snt::dip {
         BranchingList branching;   ///< List of code branching (case, else)
         SourceList sources;        ///< List of code sources
         UnitList units;            ///< List of custom units
-        SchemaList schemas;        ///< Registered definitions and metadata; not restored from DIPH5.
+        SchemaList schemas;        ///< Reusable definitions; not restored from DIPH5.
         FunctionList functions;    ///< List of functions
 
         /**
@@ -98,14 +110,14 @@ namespace snt::dip {
 
         /**
          * Load evaluated DIP nodes from a DIPH5 file. Reusable schema definitions
-         * and their metadata are not reconstructed.
+         * are not reconstructed; descriptive schema provenance is restored.
          * @param file File name of the environment file
          */
         void load(const std::filesystem::path& file);
 
         /**
          * Save evaluated DIP nodes to a DIPH5 file. The schema trace manifest is
-         * saved, but reusable schema definitions and their metadata are not.
+         * saved with schema descriptions and source provenance, but reusable definitions are not.
          * @param file File name of the environment file
          */
         void save(const std::filesystem::path& file) const;
@@ -139,6 +151,18 @@ namespace snt::dip {
 
         /** Replace persisted trace-registry information during environment loading. */
         void set_trace_manifest(std::vector<TraceInfo> manifest);
+
+        /** Return schema descriptions and source provenance without executable definitions. */
+        std::vector<SchemaInfo> get_schema_manifest() const;
+
+        /** Replace persisted schema provenance during DIPH5 loading. */
+        void set_schema_manifest(std::vector<SchemaInfo> manifest);
+
+        /** Return schemas applied along a value or collection path, in path order. */
+        std::vector<SchemaInfo> get_applied_schemas(const std::string& path) const;
+
+        /** Return the schema that supplied a value node, if known. */
+        std::optional<SchemaInfo> get_contributing_schema(const std::string& path) const;
 
         /**
          * Get a source code

@@ -100,6 +100,7 @@ namespace snt::dip {
         path = other->path;
         indent = other->indent;
         line = other->line;
+        schema_id = other->schema_id;
     }
 
     ValueNode::ValueNode(const ValueNode::PointerType other, const NodeDtype dt)
@@ -108,6 +109,7 @@ namespace snt::dip {
         path = other->path;
         indent = other->indent;
         line = other->line;
+        schema_id = other->schema_id;
     }
 
     val::BaseValue::PointerType ValueNode::parse_function(
