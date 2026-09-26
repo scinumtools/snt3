@@ -135,6 +135,9 @@ TEST(Environment, GenerateValueNodeWithChildren) {
     std::stringstream yaml_text;
     yaml_text << yaml.rdbuf();
     EXPECT_NE(yaml_text.str().find("feature:\n  $value: true\n  setting: 2"), std::string::npos);
+    // Release file handles before deleting the files (required on Windows).
+    json.close();
+    yaml.close();
     std::filesystem::remove(json_file);
     std::filesystem::remove(yaml_file);
 }
