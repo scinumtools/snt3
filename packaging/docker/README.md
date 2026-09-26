@@ -147,4 +147,3 @@ file to publish an already evaluated environment.
 The REST image builds the `snt` target with `ENABLE_SNT_SERVER=ON` and
 `ENABLE_SNT_VIEW=OFF`. Its entry point is `snt server --address 0.0.0.0`;
 container arguments remain server options such as `--port` or `--project`.
-There is no separate `snt-server` executable.
