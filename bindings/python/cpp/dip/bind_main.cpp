@@ -41,6 +41,10 @@ namespace snt::bind::python {
         auto dip = py::class_<dip::DIP>(m, "DIP", "Parser and evaluator for DIPL source definitions.");
         dip.def(py::init<>(), "Create an empty DIPL parser.");
         dip.def("add_string", &dip::DIP::add_string, py::arg("source_code"), "Add DIPL source text to the parser.");
+        dip.def("add_schema_string", &dip::DIP::add_schema_string,
+                py::arg("name"), py::arg("source_code"), "Register a named schema body from DIPL text.");
+        dip.def("add_schema_file", &dip::DIP::add_schema_file,
+                py::arg("name"), py::arg("source_file"), "Register a named schema body from a file.");
         dip.def(
             "add_file",
             &dip::DIP::add_file,

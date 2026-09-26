@@ -104,3 +104,25 @@ accept null pointers.
 Output buffers belong to the caller. Their capacity must include space for
 the terminating null character; insufficient capacity is reported as an
 error.
+
+Registering schemas
+-------------------
+
+Use ``snt_dip_parser_add_schema_string`` or ``snt_dip_parser_add_schema_file``
+with an explicit schema name and a body without a ``$schema`` wrapper:
+
+.. code-block:: c
+
+   snt_dip* parser = NULL;
+   snt_dip_error error = {0};
+   if (snt_dip_parser_create(&parser, &error) == 0) {
+       if (snt_dip_parser_add_schema_string(parser, "settings", "value int = 42", &error) == 0 &&
+           snt_dip_parser_add_string(parser, "physics : settings", &error) == 0) {
+           int status = snt_dip_parser_parse(parser, &error);
+           /* Handle status and inspect physics.value. */
+       }
+       snt_dip_parser_free(parser);
+   }
+
+The file variant takes ``(parser, name, path, error)``. Both functions use the
+same return codes and error structure as the other parser functions.

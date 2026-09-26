@@ -126,3 +126,34 @@ TEST_F(Environment, Generate) {
     generated.close();
     std::filesystem::remove(file);
 }
+
+TEST(DIP, RegisterSchema) {
+    snt_dip* parser = nullptr;
+    snt_dip_error error{};
+    ASSERT_EQ(snt_dip_parser_create(&parser, &error), 0);
+    EXPECT_NE(snt_dip_parser_add_schema_string(parser, nullptr, "value int = 1", &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_schema_string(parser, "settings", "value int = 42", &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_string(parser, "simulation : settings", &error), 0);
+    ASSERT_EQ(snt_dip_parser_parse(parser, &error), 0);
+    std::array<char, 64> output{};
+    EXPECT_EQ(snt_dip_parser_get(parser, "simulation.value", output.data(), output.size(), &error), 0);
+    EXPECT_EQ(std::string(output.data()), "42");
+    snt_dip_parser_free(parser);
+}
+
+TEST(DIP, RegisterSchemaFile) {
+    const auto file = std::filesystem::temp_directory_path() / "snt-c-schema-registration.dipl";
+    { std::ofstream stream(file); stream << "value int = 7\n"; }
+    snt_dip* parser = nullptr;
+    snt_dip_error error{};
+    ASSERT_EQ(snt_dip_parser_create(&parser, &error), 0);
+    EXPECT_NE(snt_dip_parser_add_schema_file(parser, "settings", nullptr, &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_schema_file(parser, "settings", file.string().c_str(), &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_string(parser, "physics : settings", &error), 0);
+    ASSERT_EQ(snt_dip_parser_parse(parser, &error), 0);
+    std::array<char, 64> output{};
+    EXPECT_EQ(snt_dip_parser_get(parser, "physics.value", output.data(), output.size(), &error), 0);
+    EXPECT_EQ(std::string(output.data()), "7");
+    snt_dip_parser_free(parser);
+    std::filesystem::remove(file);
+}

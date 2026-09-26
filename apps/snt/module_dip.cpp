@@ -29,7 +29,8 @@ Options:
   -v, --version
       Show version information.
   -i,--input <type> [<name>] <value>
-      Add a new source type (file/string/unit/source). Unit and source input require name and value.
+      Add input (file/string/unit/source/schema_string/schema_file).
+      Unit, source, and schema inputs require name and value.
   --project <file>
       Load a DIPfile project manifest instead of --input.
   --load <file>

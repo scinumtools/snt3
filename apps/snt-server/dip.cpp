@@ -1,3 +1,4 @@
+#include <map>
 #include "server.h"
 
 #include "snt/api/dip_parse.h"
@@ -101,7 +102,33 @@ namespace snt::server {
 
         void add_dip_input(const httplib::Request& request, api::DIPParse& command, ProjectBundle& bundle) {
             if (!request.form.fields.empty() || !request.form.files.empty()) {
-                command.argument_add("project", {add_project_bundle(request, bundle).string()});
+                if (request.form.files.count("project") || request.form.fields.count("project")) {
+                    command.argument_add("project", {add_project_bundle(request, bundle).string()});
+                    return;
+                }
+                std::map<std::string, std::string> schemas;
+                std::string code;
+                size_t code_count = 0;
+                auto add_part = [&](const std::string& name, const std::string& content) {
+                    if (name == "code") {
+                        code = content;
+                        ++code_count;
+                    } else if (name.rfind("schema:", 0) == 0 && name.size() > 7) {
+                        if (!schemas.emplace(name.substr(7), content).second)
+                            throw std::invalid_argument("Duplicate schema part: " + name);
+                    } else {
+                        throw std::invalid_argument("Schema uploads accept code and schema:<name> parts only.");
+                    }
+                };
+                for (const auto& [name, part] : request.form.fields)
+                    add_part(name, part.content);
+                for (const auto& [name, part] : request.form.files)
+                    add_part(name, part.content);
+                if (code_count != 1)
+                    throw std::invalid_argument("Schema uploads require exactly one code part.");
+                for (const auto& [name, content] : schemas)
+                    command.argument_add("schema_string", {name, content});
+                command.argument_add("string", {code});
                 return;
             }
             if (request.body.empty())

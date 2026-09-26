@@ -34,6 +34,10 @@ namespace snt::dip {
         size_t num_sources = 0; ///< number of explicitely added sources
         size_t num_projects = 0; ///< number of project manifests added to this parser
 
+        void add_schema_input(
+            const std::string& name, const std::string& source_code,
+            const std::filesystem::path& source_file, const std::string& source_name
+        );
         void add_string_input(
             const std::string& source_code,
             const std::filesystem::path& source_file,
@@ -65,6 +69,11 @@ namespace snt::dip {
          * @param source_code Text with a DIPL code
          */
         void add_string(const std::string& source_code);
+
+        /** Register a named schema body without a $schema wrapper. */
+        void add_schema_string(const std::string& name, const std::string& source_code);
+        /** Register a named schema body read from a file. */
+        void add_schema_file(const std::string& name, const std::filesystem::path& source_file);
 
         /**
          * Add DIPL code from a file

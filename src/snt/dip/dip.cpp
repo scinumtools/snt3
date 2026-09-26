@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <regex>
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
@@ -316,7 +317,7 @@ code list : snt_project_code
             throw dip::SyntaxException(
                 "Cannot set a property on a non-value node",
                 "Only value nodes (" + ss.str() + ") can have properties, but the node type is `" +
-                    NodeDtypeNames.at(previous_node->dtype) + "`.",
+                    (previous_node ? NodeDtypeNames.at(previous_node->dtype) : "none") + "`.",
                 "Remove the property or move it behind a value node.",
                 __FILE__,
                 __LINE__,
@@ -342,6 +343,71 @@ code list : snt_project_code
                 __LINE__,
                 pnode->line
             );
+    }
+
+    void DIP::add_schema_string(const std::string& name, const std::string& source_code) {
+        const std::string source_name = source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings++);
+        add_schema_input(name, source_code, env.sources.at(source.name).path, source_name);
+    }
+
+    void DIP::add_schema_file(const std::string& name, const std::filesystem::path& source_file) {
+        std::ifstream file(source_file);
+        if (!file)
+            throw dip::IOException(
+                "File not found", "The file `" + source_file.string() + "` could not be opened.",
+                "Check whether the file exists and whether you have sufficient permissions.", __FILE__, __LINE__
+            );
+        std::ostringstream code;
+        code << file.rdbuf();
+        const std::string source_name = source.name + "_" + std::string(FILE_SOURCE) + std::to_string(num_files++);
+        add_schema_input(name, code.str(), source_file, source_name);
+    }
+
+    void DIP::add_schema_input(
+        const std::string& name, const std::string& source_code,
+        const std::filesystem::path& source_file, const std::string& source_name
+    ) {
+        if (!std::regex_match(name, std::regex(std::string(PATTERN_KEYWORD) + "+")))
+            throw dip::SyntaxException(
+                "Invalid schema name", "The schema name `" + name + "` is not a DIPL keyword.",
+                "Use a nonempty name containing only letters, digits, underscores, and hyphens.", __FILE__, __LINE__
+            );
+        std::queue<Line> schema_lines;
+        parse_lines(schema_lines, source_code, source_name);
+        auto body = parse_code_nodes(schema_lines);
+        BaseNode::ListType schema_nodes;
+        BaseNode::PointerType previous = nullptr;
+        for (const auto& node : body) {
+            if (node->dtype == NodeDtype::Empty)
+                continue;
+            if (node->dtype == NodeDtype::Schema)
+                throw dip::SyntaxException(
+                    "Unexpected schema declaration", "A schema body cannot contain a $schema declaration.",
+                    "Pass the body without its $schema wrapper.", __FILE__, __LINE__, node->line
+                );
+            check_indent(previous, node);
+            if (!previous && node->indent != 0)
+                throw dip::SyntaxException(
+                    "Schema body has an invalid indent", "The first node must start at indentation zero.",
+                    "Remove the extra indentation from the schema body.", __FILE__, __LINE__, node->line
+                );
+            if (node->dtype == NodeDtype::Property)
+                set_node_property(node, previous);
+            else {
+                schema_nodes.push_back(node);
+                previous = node;
+            }
+        }
+        if (schema_nodes.empty())
+            throw dip::SyntaxException(
+                "Schema does not contain any value nodes", "The schema is empty and does not contain any value nodes.",
+                "Declare or define value nodes in the schema.", __FILE__, __LINE__
+            );
+        // Schema nodes are stored one level beneath their application point.
+        for (const auto& node : schema_nodes)
+            node->indent += INDENT_STEP;
+        env.schemas.append(name, schema_nodes, source_name);
+        env.sources.append(source_name, source_file, source_code, {source.name, source.line_number});
     }
 
     Environment DIP::parse() {

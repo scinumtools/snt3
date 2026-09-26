@@ -114,6 +114,28 @@ derived int = ({?answer} + 1)
         self.assertIn("answer = 41", result["result"])
         self.assertIn("derived = 42", result["result"])
 
+    def test_DIPSchemaUploads(self):
+        for filename in (None, "settings.dipl"):
+            body, content_type = multipart([
+                ("schema:settings", filename, "value int = 42\n"),
+                ("code", None, "physics : settings\n"),
+            ])
+            with self.request("/snt/dip/parse?request=physics.value&value=true&type=integer",
+                              body, content_type) as response:
+                self.assertEqual(json.loads(response.read())["result"], "42\n")
+            with self.request("/snt/dip/parse?output=diph5", body, content_type) as response:
+                self.assertTrue(response.read().startswith(b"\x89HDF\r\n\x1a\n"))
+        for parts in [
+            [("schema:settings", None, "v int = 1")],
+            [("code", None, ""), ("code", None, "")],
+            [("code", None, ""), ("schema:", None, "v int")],
+            [("code", None, ""), ("schema:a", None, "v int"), ("schema:a", "a.dipl", "v int")],
+            [("project", "DIPfile", ""), ("schema:a", None, "v int")],
+        ]:
+            body, content_type = multipart(parts)
+            with self.assertRaises(urllib.error.HTTPError):
+                self.request("/snt/dip/parse", body, content_type)
+
     def test_DIPH5(self):
         with self.request("/snt/dip/parse?output=diph5", b"answer int = 42\n") as response:
             content = response.read()

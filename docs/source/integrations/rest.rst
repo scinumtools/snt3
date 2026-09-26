@@ -183,3 +183,22 @@ JSON ``error`` string. For example:
 .. code-block:: json
 
    {"error":"Missing required query parameter: expression"}
+
+Uploading named schemas
+-----------------------
+
+``POST /snt/dip/parse`` accepts a multipart request with exactly one ``code``
+part and named ``schema:<name>`` parts. Each schema part contains a schema body
+without a ``$schema`` wrapper. Both inline fields and uploaded files are accepted;
+the part name supplies the schema name, independently of the filename.
+
+.. code-block:: sh
+
+   curl http://127.0.0.1:8080/snt/dip/parse \
+       --form 'schema:settings=@settings.dipl' \
+       --form-string 'code=physics : settings'
+
+Schemas are registered before the code is parsed. Duplicate or empty schema
+names, multiple code parts, and mixing these parts with a project bundle are
+rejected. Existing query options and ``output=diph5`` also work with this input.
+Raw DIPL request bodies and project bundles remain supported.

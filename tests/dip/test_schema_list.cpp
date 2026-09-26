@@ -406,3 +406,30 @@ TEST(SchemaList, RejectValueWithAppliedSchema) {
     );
     EXPECT_THROW(parser.parse(), dip::SyntaxException);
 }
+
+TEST(SchemaList, HostRegistration) {
+    dip::DIP parser;
+    parser.add_schema_string("child", "value int = 2\n  !tags [\"export\"]\n  ?descr \"Child value\"\n");
+    parser.add_schema_string("parent", "child : child\n");
+    parser.add_string("settings : parent\n  child.value = 3\n");
+    auto env = parser.parse();
+    auto node = env.get_node("settings.child.value");
+    EXPECT_EQ(node->value->to_string(), "3");
+    EXPECT_EQ(node->metadata.description, "Child value");
+    EXPECT_EQ(node->tags, std::vector<std::string>{"export"});
+    EXPECT_EQ(env.schemas.at("child").nodes.front()->line.source.line_number, 1);
+    EXPECT_NE(env.schemas.at("child").id.find("_STRING0_SCHEMA0"), std::string::npos);
+    EXPECT_THROW(parser.add_schema_string("child", "value int = 1"), dip::EnvironmentException);
+}
+
+TEST(SchemaList, InvalidHostRegistration) {
+    dip::DIP parser;
+    EXPECT_THROW(parser.add_schema_string("bad name", "value int = 1"), dip::SyntaxException);
+    EXPECT_THROW(parser.add_schema_string("empty", "# comment\n"), dip::SyntaxException);
+    EXPECT_THROW(parser.add_schema_string("wrapper", "$schema inner\n  value int = 1"), dip::SyntaxException);
+    EXPECT_THROW(parser.add_schema_string("indent", "  value int = 1"), dip::SyntaxException);
+    EXPECT_THROW(parser.add_schema_string("property", "!tags [\"a\"]"), dip::SyntaxException);
+    parser.add_schema_string("same", "value int = 1");
+    parser.add_string("$schema same\n  value int = 2");
+    EXPECT_THROW(parser.parse(), dip::EnvironmentException);
+}

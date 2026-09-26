@@ -42,7 +42,7 @@ namespace snt::api {
         /**
          * Add code
          *
-         * @param add_type Type of the code input
+         * @param add_type project/file/string (one value), source/unit/schema_string/schema_file (name and value)
          * @param add_values Code input values
          **/
         void argument_add(const std::string& add_type, const std::vector<std::string>& add_values);

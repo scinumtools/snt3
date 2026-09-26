@@ -145,3 +145,24 @@ in the :doc:`C++ DIP API <../../api/cpp_dip>` documentation.
 
 For Python, C, command-line, and CMake usage, see
 :doc:`Interfaces and integrations <../../integrations/index>`.
+
+Registering schemas from host code
+----------------------------------
+
+Use ``add_schema_string(name, body)`` or ``add_schema_file(name, path)`` to
+register one reusable schema. Supply its body without a ``$schema`` wrapper,
+starting at indentation zero. Registration parses the schema immediately;
+values and references are evaluated when the schema is applied during ``parse()``.
+Original source text, file paths, line numbers, and source identities are retained.
+
+.. code-block:: cpp
+
+   snt::dip::DIP dip;
+   dip.add_schema_string("settings", "speed float = 2 m/s\n");
+   // Alternatively: dip.add_schema_file("settings", "settings.dipl");
+   dip.add_string("physics : settings");
+   auto env = dip.parse();
+
+Schema names follow DIPL keyword rules and must be unique. Empty bodies and
+bodies containing a surrounding ``$schema`` declaration are rejected. Ordinary
+``add_string()`` and ``add_file()`` still accept complete DIPL documents.

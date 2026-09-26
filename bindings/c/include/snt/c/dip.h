@@ -30,6 +30,10 @@ typedef enum {
 
 /** Create a DIPL parser. */
 int snt_dip_parser_create(snt_dip** result, snt_dip_error* error);
+/** Register a named schema body from a string. */
+int snt_dip_parser_add_schema_string(snt_dip* dip, const char* name, const char* source, snt_dip_error* error);
+/** Register a named schema body from a file. */
+int snt_dip_parser_add_schema_file(snt_dip* dip, const char* name, const char* path, snt_dip_error* error);
 /** Add DIPL source text to a parser. */
 int snt_dip_parser_add_string(snt_dip* dip, const char* source, snt_dip_error* error);
 /** Add a DIPL source file to a parser. */

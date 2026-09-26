@@ -180,3 +180,27 @@ extern "C" int snt_dip_environment_generate(
 extern "C" void snt_dip_parser_free(snt_dip* dip) {
     delete dip;
 }
+
+extern "C" int snt_dip_parser_add_schema_string(snt_dip* dip, const char* name, const char* source, snt_dip_error* error) {
+    try {
+        if (!dip || !name || !source)
+            throw std::invalid_argument("DIP, schema name, and schema input are required");
+        dip->parser.add_schema_string(name, source);
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
+extern "C" int snt_dip_parser_add_schema_file(snt_dip* dip, const char* name, const char* path, snt_dip_error* error) {
+    try {
+        if (!dip || !name || !path)
+            throw std::invalid_argument("DIP, schema name, and schema input are required");
+        dip->parser.add_schema_file(name, path);
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}

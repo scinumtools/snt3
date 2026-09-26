@@ -127,3 +127,19 @@ In this mode, invalid requests write an error to standard error and return
 a nonzero exit status. Arrays, values with units, and undefined values are
 rejected. For reading such scalar settings during CMake configuration, see
 :doc:`cmake`.
+
+Registering schemas
+-------------------
+
+Schema inputs take a name and either body text or a file containing the body,
+without a ``$schema`` wrapper:
+
+.. code-block:: sh
+
+   snt dip parse -i schema_string settings 'value int = 42' \
+       -i string 'physics : settings' -r physics.value --value
+   snt dip parse -i schema_file settings settings.dipl \
+       -i string 'physics : settings' --print
+
+As with other individual inputs, these cannot be combined with ``--project``
+or ``--load``.

@@ -23,7 +23,7 @@ namespace snt::api {
                 throw api::ArgumentException(
                     "Conflicting DIP inputs",
                     "A DIP project cannot be combined with other DIPL inputs.",
-                    "Use either one project input or individual file, string, source, and unit inputs.",
+                    "Use either one project input or individual file, string, source, unit, and schema inputs.",
                     __FILE__,
                     __LINE__
                 );
@@ -34,7 +34,7 @@ namespace snt::api {
             throw api::ArgumentException(
                 "Conflicting DIP inputs",
                 "A DIP project is already configured.",
-                "Use either one project input or individual file, string, source, and unit inputs.",
+                "Use either one project input or individual file, string, source, unit, and schema inputs.",
                 __FILE__,
                 __LINE__
             );
@@ -42,6 +42,10 @@ namespace snt::api {
             dip.add_file(add_values[0]);
         } else if (add_type == "string" && add_values.size() == 1) {
             dip.add_string(add_values[0]);
+        } else if (add_type == "schema_string" && add_values.size() == 2) {
+            dip.add_schema_string(add_values[0], add_values[1]);
+        } else if (add_type == "schema_file" && add_values.size() == 2) {
+            dip.add_schema_file(add_values[0], add_values[1]);
         } else if (add_type == "source" && add_values.size() == 2) {
             dip.add_source(add_values[0], add_values[1]);
         } else if (add_type == "unit" && add_values.size() == 2) {
@@ -50,7 +54,7 @@ namespace snt::api {
             throw api::ArgumentException(
                 "Invalid add argument",
                 "The input type `" + add_type + "` was not recognized or has an invalid number of values.",
-                "Use `project`, `file`, or `string` with one value, or `source` or `unit` with two values.",
+                "Use `project`, `file`, or `string` with one value, or `source`, `unit`, `schema_string`, or `schema_file` with two values.",
                 __FILE__,
                 __LINE__
             );

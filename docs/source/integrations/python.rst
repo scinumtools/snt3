@@ -261,3 +261,21 @@ subprocess.
 
 For installation options and the complete Python API, see the
 `Python binding README <https://github.com/vrtulka23/scinumtools3/tree/main/bindings/python>`_.
+
+Registering schemas
+-------------------
+
+Register a schema body directly, then apply it in ordinary DIPL code:
+
+.. code-block:: python
+
+   dip = DIP()
+   dip.add_schema_string("settings", "speed float = 2 m/s\n")
+   # Alternatively: dip.add_schema_file("settings", Path("settings.dipl"))
+   dip.add_string("physics : settings")
+   env = dip.parse()
+
+Bodies start at indentation zero and omit the ``$schema`` wrapper. Registration
+preserves source information and leaves value evaluation to schema application.
+The command API also supports ``argument_add("schema_string", [name, body])``
+and ``argument_add("schema_file", [name, path])``; file paths there are strings.
