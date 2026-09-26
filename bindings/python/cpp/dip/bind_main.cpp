@@ -40,34 +40,70 @@ namespace snt::bind::python {
 
         auto dip = py::class_<dip::DIP>(m, "DIP", "Parser and evaluator for DIPL source definitions.");
         dip.def(py::init<>(), "Create an empty DIPL parser.");
-        dip.def("add_string", &dip::DIP::add_string, py::arg("source_code"), "Add DIPL source text to the parser.");
-        dip.def("add_schema_string", &dip::DIP::add_schema_string,
-                py::arg("name"), py::arg("source_code"), "Register a named schema body from DIPL text.");
-        dip.def("add_schema_file", &dip::DIP::add_schema_file,
-                py::arg("name"), py::arg("source_file"), "Register a named schema body from a file.");
+        dip.def(
+            "add_string", &dip::DIP::add_string, py::arg("source_code"),
+            "Add DIPL source text to the parser.\n\nArgs:\n    source_code: Complete DIPL text to parse."
+        );
+        dip.def(
+            "add_schema_string", &dip::DIP::add_schema_string,
+            py::arg("name"), py::arg("source_code"),
+            R"doc(Register a named schema body without a $schema wrapper.
+Leading ? metadata describe the schema definition; metadata on a member
+follow that member into instances.
+
+Args:
+    name: Unique schema name.
+    source_code: Schema body starting at indentation zero.
+)doc"
+        );
+        dip.def(
+            "add_schema_file", &dip::DIP::add_schema_file,
+            py::arg("name"), py::arg("source_file"),
+            R"doc(Register a named schema body from a file, with the same rules as add_schema_string().
+
+Args:
+    name: Unique schema name.
+    source_file: Path to a file containing the unwrapped schema body.
+)doc"
+        );
         dip.def(
             "add_file",
             &dip::DIP::add_file,
             py::arg("source_file"),
             py::arg("source_name") = "",
             py::arg("absolute") = true,
-            "Add a DIPL source file to the parser."
+            R"doc(Add a DIPL source file to the parser.
+
+Args:
+    source_file: Path to the DIPL file.
+    source_name: Optional registered source name; generated when empty.
+    absolute: Accepted for compatibility; currently has no effect.
+)doc"
         );
         dip.def(
             "add_source",
             &dip::DIP::add_source,
             py::arg("source_name"),
             py::arg("source_file"),
-            "Register a named DIPL source file."
+            "Register a named DIPL source file.\n\nArgs:\n    source_name: Name used in references.\n"
+            "    source_file: Path to the source file."
         );
         dip.def(
-            "add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"), "Register a custom unit definition."
+            "add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"),
+            "Register a custom unit definition.\n\nArgs:\n    name: Unit name.\n"
+            "    unit: PUEL expression defining the unit."
         );
         dip.def(
             "add_project",
             &dip::DIP::add_project,
             py::arg("project_file"),
-            "Add a DIPfile project manifest and its declared DIPL inputs."
+            R"doc(Add a DIPfile with units[], sources[], schemas[], and ordered code[] entries.
+Schema entries have a name and exactly one file or string body; relative
+paths resolve from the DIPfile directory.
+
+Args:
+    project_file: Path to the DIPfile manifest.
+)doc"
         );
 
         dip.def(
@@ -78,7 +114,10 @@ namespace snt::bind::python {
                     return func(env).cast<dip::ValueNodeData>();
                 });
             },
-            "Register a Python callback that returns value data for a DIPL function."
+            py::arg("name"), py::arg("callback"),
+            "Register a Python callback that returns value data for a DIPL function.\n\n"
+            "Args:\n    name: Function name used in DIPL.\n"
+            "    callback: Callable receiving an Environment and returning ValueNodeData."
         );
 
         dip.def(
@@ -89,10 +128,13 @@ namespace snt::bind::python {
                     return func(env).cast<dip::ValueNode::ListType>();
                 });
             },
-            "Register a Python callback that returns nodes for a DIPL function."
+            py::arg("name"), py::arg("callback"),
+            "Register a Python callback that returns nodes for a DIPL function.\n\n"
+            "Args:\n    name: Function name used in DIPL.\n"
+            "    callback: Callable receiving an Environment and returning value nodes."
         );
 
-        dip.def("parse", &dip::DIP::parse, "Parse and evaluate all added DIPL input.");
+        dip.def("parse", &dip::DIP::parse, "Parse and evaluate all added DIPL inputs, including registered schemas.");
         // dip.def("parse_docs", &dip::DIP::parse_docs);
 
         dip.def("enter", &dip_enter);

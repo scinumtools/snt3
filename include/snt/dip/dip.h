@@ -77,9 +77,14 @@ namespace snt::dip {
          */
         void add_string(const std::string& source_code);
 
-        /** Register a named schema body without a $schema wrapper. */
+        /**
+         * Register a named schema body without a $schema wrapper.
+         * Leading ? metadata properties describe the schema definition; properties
+         * beneath a value node describe that value in every instance.
+         * The schema is available in the Environment::schemas registry after parse().
+         */
         void add_schema_string(const std::string& name, const std::string& source_code);
-        /** Register a named schema body read from a file. */
+        /** Register a named schema body from a file, with the same rules as add_schema_string(). */
         void add_schema_file(const std::string& name, const std::filesystem::path& source_file);
 
         /**
@@ -107,9 +112,11 @@ namespace snt::dip {
         /**
          * Add a DIP project manifest.
          *
-         * The manifest is ordinary DIPL containing ``units[]``, ``sources[]``,
-         * ``schemas[]``, and ordered ``code[]`` records. Relative paths are
-         * resolved from the manifest's directory.
+         * The manifest is ordinary DIPL containing units[], sources[], schemas[],
+         * and ordered code[] records. Each schemas[] item has a name and exactly
+         * one file or string body, without a $schema wrapper. Schemas are
+         * registered before code[] is parsed. Relative paths are resolved from
+         * the manifest's directory.
          *
          * @param project_file Path to the DIPfile manifest.
          */
@@ -130,7 +137,7 @@ namespace snt::dip {
         void add_function_nodes(const std::string& name, FunctionList::NodesFunctionType func);
 
         /**
-         * Parse DIPL code lines
+         * Parse DIPL code lines and return an environment with registered schemas.
          */
         Environment parse();
 

@@ -49,17 +49,19 @@ namespace snt::bind::python {
         );
         nl.def("size", &dip::NodeList<dip::ValueNode>::size, "Return the number of nodes.");
 
-        auto schema = py::class_<dip::EnvSchema>(m, "SchemaDefinition", "Registered DIPL schema definition.");
+        auto schema = py::class_<dip::EnvSchema>(
+            m, "SchemaDefinition", "Registered DIPL schema definition; its metadata are not copied to instances."
+        );
         schema.def_readonly("name", &dip::EnvSchema::name);
         schema.def_readonly("id", &dip::EnvSchema::id);
         schema.def_property_readonly(
             "metadata", [](const dip::EnvSchema& s) -> const dip::ValueMetadata& { return s.metadata; },
             py::return_value_policy::reference_internal,
-            "Metadata attached to this schema definition."
+            "Metadata describing this reusable definition, not its applying group, collection, item, or values."
         );
 
         auto env = py::class_<dip::Environment>(
-            m, "Environment", "Evaluation environment containing DIPL sources, units, functions, and nodes."
+            m, "Environment", "Evaluation environment containing DIPL sources, units, schemas, functions, and nodes."
         );
         env.def(py::init<>(), "Create an empty evaluation environment.");
         env.def_property_readonly(
@@ -75,17 +77,27 @@ namespace snt::bind::python {
         );
         env.def_property_readonly(
             "schemas", [](const dip::Environment& e) { return e.schemas.entries(); },
-            "Registered schema definitions keyed by name. The returned mapping is a snapshot."
+            "Registered schema definitions keyed by name. The mapping is a snapshot and remains valid "
+            "independently of this environment. DIPH5 loading does not restore reusable schemas."
         );
 
-        env.def("load", &dip::Environment::load, py::arg("file"), "Load an environment from an HDF5 file.");
-        env.def("save", &dip::Environment::save, py::arg("file"), "Save the environment to an HDF5 file.");
+        env.def(
+            "load", &dip::Environment::load, py::arg("file"),
+            "Load evaluated nodes from DIPH5. Schema definitions and their metadata are not reconstructed.\n\n"
+            "Args:\n    file: Path to the DIPH5 file."
+        );
+        env.def(
+            "save", &dip::Environment::save, py::arg("file"),
+            "Save evaluated nodes to DIPH5. Schema identities are recorded, but definitions and their metadata are not.\n\n"
+            "Args:\n    file: Output DIPH5 path; an existing file is overwritten."
+        );
         env.def(
             "generate",
             &dip::Environment::generate,
             py::arg("format"),
             py::arg("file"),
-            "Generate a static parameter list."
+            "Generate a static parameter list.\n\nArgs:\n    format: ExportFormat member selecting the output format.\n"
+            "    file: Output path; an existing file is overwritten."
         );
 
         env.def(
@@ -99,9 +111,18 @@ namespace snt::bind::python {
             py::arg("tags_all") = std::vector<std::string>{},
             py::arg("tags_any") = std::vector<std::string>{},
             py::arg("tags_none") = std::vector<std::string>{},
-            "Select node snapshots with full paths in environment order. Empty filters impose no restriction; "
-            "all filters are combined with AND. Subtrees include their value-bearing root and collection members. "
-            "Tags are not inherited. No matches returns an empty list."
+            R"doc(Select independent node snapshots with full paths, in environment order.
+Subtrees include value-bearing roots and collection members; each node
+appears once. Tags are explicit and not inherited. Filters combine with AND;
+empty filters impose no restriction. Selection does not modify the environment.
+No matches returns an empty list.
+
+Args:
+    path: Query path; ? selects all, ?path. a subtree, and ?path an exact node.
+    tags_all: Require every listed tag.
+    tags_any: Require at least one listed tag.
+    tags_none: Exclude nodes with any listed tag.
+)doc"
         );
 
         env.def(
@@ -111,7 +132,14 @@ namespace snt::bind::python {
             },
             py::arg("path"),
             py::arg("tags") = std::vector<std::string>{},
-            "Return a group cursor at a DIPL path."
+            R"doc(Return node snapshots with paths relative to the requested root.
+A nonempty tags list matches any listed tag; an empty list imposes no
+restriction. Raise an error if no nodes match.
+
+Args:
+    path: Reference query path.
+    tags: Tags of which at least one must occur on each returned node.
+)doc"
         );
 
         env.def(
@@ -128,10 +156,19 @@ namespace snt::bind::python {
             py::arg("path"),
             py::arg("to_units") = "",
             py::arg("as_numpy") = false,
-            "Return the value at a path, optionally converted to a NumPy array."
+            R"doc(Return the value at a path, optionally converted to a NumPy array.
+
+Args:
+    path: Reference query path.
+    to_units: Requested output units; empty keeps the original units.
+    as_numpy: Return a NumPy array when true.
+)doc"
         );
 
-        env.def("__getitem__", &dip::Environment::operator[], py::arg("path"), "Return a Cursor for a DIPL path.");
+        env.def(
+            "__getitem__", &dip::Environment::operator[], py::arg("path"),
+            "Return a Cursor for a known DIPL path.\n\nArgs:\n    path: Path to inspect."
+        );
 
         // env.def("request_code", &dip::Environment::request_code, py::arg("source_name"));
 

@@ -9,12 +9,12 @@
 
 namespace snt::dip {
 
-    /** Schema source and nodes registered in a DIPL environment. */
+    /** Reusable schema definition registered in a parsed DIPL environment. */
     struct EnvSchema {
         std::string name;         // schema key
         BaseNode::ListType nodes; // aggregated nodes
         std::string id;           // internal trace identifier, e.g. DIP0_SCHEMA0
-        ValueMetadata metadata;   // metadata attached to the schema definition
+        ValueMetadata metadata;   ///< Metadata on the definition, not inherited by instances.
     };
 
     class SchemaList {
@@ -24,10 +24,11 @@ namespace snt::dip {
 
       public:
         SchemaList();
-        /** Append an item to the collection.
+        /** Append a schema definition to the registry.
          * @param name Name used to identify the item.
          * @param nodes Nodes defining the schema.
          * @param parent_id Internal identifier of the registering source.
+         * @param metadata Metadata attached to the schema definition.
          */
         void append(
             const std::string& name, BaseNode::ListType& nodes, const std::string& parent_id = {},
@@ -38,7 +39,7 @@ namespace snt::dip {
         EnvSchema& at(const std::string& name);
         const EnvSchema& at(const std::string& name) const;
 
-        /** Return all registered schemas keyed by schema name. */
+        /** Return all registered schema definitions and metadata keyed by name. */
         const std::map<std::string, EnvSchema>& entries() const;
     };
 

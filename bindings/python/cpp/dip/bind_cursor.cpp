@@ -59,28 +59,29 @@ namespace snt::bind::python {
             py::init<const dip::Environment*, std::string_view>(),
             py::arg("env"),
             py::arg("path") = "",
-            "Create a cursor at a DIPL path."
+            "Create a cursor at a DIPL path. The environment must outlive the cursor.\n\n"
+            "Args:\n    env: Environment to inspect.\n    path: Known DIPL path; empty selects the root."
         );
 
         val.def(
             "__getitem__",
             py::overload_cast<std::string_view>(&dip::Cursor::operator[], py::const_),
             py::arg("name"),
-            "Select a child by name."
+            "Select a child by name.\n\nArgs:\n    name: Child or mapping key."
         );
 
         val.def(
             "__getitem__",
             py::overload_cast<std::size_t>(&dip::Cursor::operator[], py::const_),
             py::arg("index"),
-            "Select a child by index."
+            "Select a child by index.\n\nArgs:\n    index: Zero-based sequence index."
         );
 
         val.def(
             "__contains__",
             [](const dip::Cursor& self, const std::string& item) { return self.has_item(item); },
             py::arg("item"),
-            "Return whether a named child exists."
+            "Return whether a named child exists.\n\nArgs:\n    item: Child name to check."
         );
 
         val.def("elements", &dip::Cursor::elements, "Return child elements.");
@@ -97,7 +98,10 @@ namespace snt::bind::python {
             "Return child names and values as pairs."
         );
 
-        val.def("has_item", &dip::Cursor::has_item, py::arg("name"), "Return whether a named child exists.");
+        val.def(
+            "has_item", &dip::Cursor::has_item, py::arg("name"),
+            "Return whether a named child exists.\n\nArgs:\n    name: Child name to check."
+        );
 
         val.def_property_readonly("path", &dip::Cursor::get_path, "Path of this cursor in the DIPL environment.");
 

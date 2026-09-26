@@ -18,12 +18,13 @@ namespace snt::dip {
 
     class Cursor; ///< Forward declaring
 
-    /** Explicit node tag filters, combined with AND; empty fields impose no restriction. */
+    /** Match explicitly assigned node tags; fields combine with AND. */
     struct TagFilter {
-        std::vector<std::string> all;
-        std::vector<std::string> any;
-        std::vector<std::string> none;
+        std::vector<std::string> all;  ///< Require every listed tag.
+        std::vector<std::string> any;  ///< Require at least one listed tag.
+        std::vector<std::string> none; ///< Reject nodes with any listed tag.
 
+        /** Empty filter fields impose no restriction. */
         bool matches(const std::vector<std::string>& tags) const;
     };
 
@@ -87,7 +88,7 @@ namespace snt::dip {
         BranchingList branching;   ///< List of code branching (case, else)
         SourceList sources;        ///< List of code sources
         UnitList units;            ///< List of custom units
-        SchemaList schemas;        ///< List of schemas
+        SchemaList schemas;        ///< Registered definitions and metadata; not restored from DIPH5.
         FunctionList functions;    ///< List of functions
 
         /**
@@ -96,13 +97,15 @@ namespace snt::dip {
         Environment();
 
         /**
-         * Load DIP environment from a HDF5 file
+         * Load evaluated DIP nodes from a DIPH5 file. Reusable schema definitions
+         * and their metadata are not reconstructed.
          * @param file File name of the environment file
          */
         void load(const std::filesystem::path& file);
 
         /**
-         * Save DIP environment into a HDF5 file
+         * Save evaluated DIP nodes to a DIPH5 file. The schema trace manifest is
+         * saved, but reusable schema definitions and their metadata are not.
          * @param file File name of the environment file
          */
         void save(const std::filesystem::path& file) const;
@@ -171,11 +174,13 @@ namespace snt::dip {
         ) const;
 
         /**
-         * Get group of nodes from a reference or a function based on a request expression
+         * Request nodes from a reference or function. Reference results are snapshots
+         * with paths relative to the requested root. Tag filtering uses any-match
+         * semantics; an empty tag list imposes no restriction. Empty results throw.
          *
          * @param request Request expression
          * @param rtype Request type: reference, or function
-         * @param tags List of tags that filter selected set
+         * @param tags Tags of which at least one must occur on each returned node
          * @return Group of selected nodes
          */
         ValueNode::ListType request_group(
@@ -187,8 +192,10 @@ namespace snt::dip {
         /**
          * Select independent snapshots with original fully qualified paths in environment order.
          * `?` selects all values, `?path` an exact value, and `?path.` a subtree,
-         * including its value-bearing root and collection members. Tags are not inherited.
-         * No matches returns an empty list. Source-qualified queries are also supported.
+         * including its value-bearing root and collection members. Each path is
+         * returned once. Filters combine with AND and match explicit, non-inherited
+         * tags. Selection does not modify the environment. No matches returns an
+         * empty list. Source-qualified queries are also supported.
          */
         ValueNode::ListType select(const std::string& request = "?", const TagFilter& tags = {}) const;
 
@@ -229,7 +236,8 @@ namespace snt::dip {
         val::BaseValue::PointerType get_value(size_t index) const;
 
         /**
-         * Get pointer to a node with a specific name
+         * Get an environment-owned pointer to a node with a specific name.
+         * The pointer refers to the stored node, unlike the snapshots from select().
          *
          * @param path Path name of a searched node
          * @return Pointer to a selected node

@@ -26,7 +26,7 @@ namespace snt::bind::python {
         auto metadata = py::class_<dip::ValueMetadata>(
             m, "ValueMetadata", "Citation, licensing, and descriptive metadata attached to a DIPL value or schema."
         );
-        metadata.def(py::init<>(), "Create empty DIPL value metadata.");
+        metadata.def(py::init<>(), "Create empty DIPL value or schema metadata.");
         metadata.def_readonly("description", &dip::ValueMetadata::description);
         metadata.def_readonly("authors", &dip::ValueMetadata::authors);
         metadata.def_readonly("title", &dip::ValueMetadata::title);
@@ -127,7 +127,9 @@ namespace snt::bind::python {
             py::arg("path"),
             py::arg("value"),
             py::arg("units") = py::none(),
-            "Create a DIPL value node."
+            "Create a DIPL value node.\n\nArgs:\n    path: Fully qualified node path.\n"
+            "    value: Python bool, int, float, str, or list value.\n"
+            "    units: Optional unit expression for a numeric value."
         );
 
         val.def(
@@ -159,14 +161,14 @@ namespace snt::bind::python {
         val.def_property_readonly(
             "tags",
             [](const dip::ValueNode& vnode) { return vnode.tags; },
-            "Copy of the tags attached to the node as a Python list."
+            "Copy of the node's explicitly assigned tags. Editing this Python list does not change the environment."
         );
 
         val.def_property_readonly(
             "metadata",
             [](const dip::ValueNode& vnode) -> const dip::ValueMetadata& { return vnode.metadata; },
             py::return_value_policy::reference_internal,
-            "Documentation and provenance metadata attached to the node."
+            "Documentation and provenance metadata attached to this value node."
         );
 
         val.def_property_readonly(

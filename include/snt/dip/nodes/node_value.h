@@ -20,7 +20,7 @@ namespace snt::dip {
      * Metadata attached to a value node or schema definition.
      */
     struct ValueMetadata {
-        std::string description; ///< Value description
+        std::string description; ///< Value or schema description
         std::string authors;     ///< Publication authors
         std::string title;       ///< Publication title
         std::string journal;     ///< Publication journal
@@ -33,7 +33,7 @@ namespace snt::dip {
         std::string version;     ///< Publication version
         std::string created;     ///< Date of creation
         std::string modified;    ///< Date of modification
-        std::string license;     ///< License of the value
+        std::string license;     ///< License of the value or schema
         std::string rationale;   ///< Why the selected value is appropriate
         std::vector<std::string> native;   ///< Native target name(s)
         std::vector<std::string> requires; ///< Required paths or capabilities
@@ -50,7 +50,7 @@ namespace snt::dip {
         std::string category;              ///< Documentation grouping
         std::string visibility;            ///< Documentation/UI visibility
 
-        /** Assign a metadata property; return false for non-metadata properties. */
+        /** Assign a ? metadata property; return false for directives and other properties. */
         bool set_property(PropertyType property, const val::Array::StringType& values);
     };
 
@@ -86,14 +86,14 @@ namespace snt::dip {
         std::optional<puq::Quantity> units;
 
         // directives
-        val::Array::StringType tags;
+        val::Array::StringType tags; ///< Explicit node labels used for discovery and selection.
         bool constant;
         std::string condition;
         std::vector<OptionStruct> options;
         std::string format;
 
         // metadata
-        ValueMetadata metadata;
+        ValueMetadata metadata; ///< Metadata on this value node, including schema member metadata.
 
         /** Construct an empty value node. */
         ValueNode() : constant(false), value_dtype(core::DataType::None) {};

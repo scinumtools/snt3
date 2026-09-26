@@ -111,6 +111,7 @@ namespace snt::dip {
         std::optional<SourceInfo> source;
     };
 
+    /** Access a known environment path; the cursor must not outlive its environment. */
     class Cursor {
       protected:
         const Environment* env_;
@@ -161,7 +162,8 @@ namespace snt::dip {
         std::optional<puq::Quantity> get_units() const;
 
         /**
-         * Get a value node at the current cursor path
+         * Get the environment-owned value node at the current cursor path.
+         * Unlike Environment::select(), this is not an independent snapshot.
          *
          * @return A value node pointer
          */
