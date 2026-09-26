@@ -1,9 +1,73 @@
+import gc
+import weakref
+
 import pytest
 import numpy as np
 
 from scinumtools3.core import DataType
 from scinumtools3.puq import Quantity
 from scinumtools3.dip import DIP, Environment, ValueNode, Cursor, PybindException
+
+def test_tags_and_metadata_defaults():
+    # Newly created nodes have empty tags and metadata.
+    node = ValueNode("foo", 3)
+    assert node.tags == []
+    assert node.metadata.description == ""
+
+
+def test_query_tags_and_metadata():
+    dip = DIP()
+    dip.add_string(
+        'foo int = 3\n'
+        '  !tags ["export", "science"]\n'
+        '  ?descr "Exported parameter"\n'
+        '  ?native ["Foo", "FOO"]\n'
+        'bar int = 4\n'
+    )
+    env = dip.parse()
+    # Query results expose tags and metadata directly on each node.
+    nodes = env.request_group("?", ["export"])
+    assert len(nodes) == 1
+    node = nodes[0]
+    assert node.name == "foo"
+    assert node.tags == ["export", "science"]
+    assert isinstance(node.tags, list)
+    assert isinstance(node.metadata, type(env["foo"].metadata))
+    assert node.metadata.description == "Exported parameter"
+    assert node.metadata.native == ["Foo", "FOO"]
+
+    # Editing the returned list changes only the local copy.
+    tags = node.tags
+    tags.clear()
+    tags.append("local")
+    assert tags == ["local"]
+    assert node.tags == ["export", "science"]
+    # Environment queries still use the original tags.
+    assert len(env.request_group("?", ["export"])) == 1
+    with pytest.raises(RuntimeError, match="Node request returns empty node group"):
+        env.request_group("?", ["local"])
+
+    # Properties and metadata fields cannot be reassigned.
+    with pytest.raises(AttributeError):
+        node.tags = []
+    with pytest.raises(AttributeError):
+        node.metadata = node.metadata
+    with pytest.raises(AttributeError):
+        node.metadata.description = "Changed"
+
+    # Holding metadata keeps its node alive after other owners are deleted.
+    metadata = node.metadata
+    node_ref = weakref.ref(node)
+    del node, nodes, env, dip
+    gc.collect()
+    assert node_ref() is not None
+    assert metadata.description == "Exported parameter"
+    assert metadata.native == ["Foo", "FOO"]
+    # Releasing metadata also releases the node.
+    del metadata
+    gc.collect()
+    assert node_ref() is None
+
 
 def test_value_bool():
 

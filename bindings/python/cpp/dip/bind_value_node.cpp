@@ -157,6 +157,19 @@ namespace snt::bind::python {
         );
 
         val.def_property_readonly(
+            "tags",
+            [](const dip::ValueNode& vnode) { return vnode.tags; },
+            "Copy of the tags attached to the node as a Python list."
+        );
+
+        val.def_property_readonly(
+            "metadata",
+            [](const dip::ValueNode& vnode) -> const dip::ValueMetadata& { return vnode.metadata; },
+            py::return_value_policy::reference_internal,
+            "Documentation and provenance metadata attached to the node."
+        );
+
+        val.def_property_readonly(
             "shape", [](const dip::ValueNode& vnode) { return vnode.value->get_shape(); }, "Shape of the stored value."
         );
 
