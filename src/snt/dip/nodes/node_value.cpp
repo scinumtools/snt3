@@ -228,6 +228,9 @@ namespace snt::dip {
 
     void ValueNode::set_value(val::BaseValue::PointerType value_input) {
         value = nullptr;
+        // Keep declarations unassigned until instance modifications or final validation.
+        if (value_input == nullptr && value_origin == ValueOrigin::Empty && value_raw.empty())
+            return;
         if (value_input == nullptr && !value_raw.empty() && !value_raw.at(0).empty()) {
             // Triple-quoted values are initially parsed as a single string. When
             // an array dimension is declared, parse an array literal contained
@@ -365,6 +368,10 @@ namespace snt::dip {
 
     void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
         validate_modification(node);
+        // Nested schema expansion can repeat a declaration before its value is assigned.
+        if (node->dtype != NodeDtype::Modification && node->value_origin == ValueOrigin::Empty &&
+            node->value_raw.empty())
+            return;
         // parse value from raw data
         std::optional<std::string_view> units;
         if (dtype == NodeDtype::Integer || dtype == NodeDtype::Float)

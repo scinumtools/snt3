@@ -308,3 +308,68 @@ def test_nested_and_flat_overrides_conflict_across_origins():
     parser.add_string('group.value int = 1\n$override\n  group.value = 3')
     with pytest.raises(RuntimeError, match='Duplicate override'):
         parser.parse()
+
+
+def test_nested_schema_field_initialized_without_override():
+    # Nested schema expansion must retain x until the concrete instance assigns it.
+    parser = DIP()
+    parser.add_string('$schema a\n  x str\n$schema b\n  sub : a\ny : b\n  sub\n    x = "yes"\nanswer str = {?y.sub.x}')
+    env = parser.parse()
+    assert env['y.sub.x'].value == 'yes'
+    assert env['answer'].value == 'yes'
+    assert env.select('?y.sub.x')[0].override is False
+
+
+def test_nested_schema_field_override_precedes_dependent():
+    # Nested block syntax targets the instantiated field while retaining its schema settings.
+    parser = DIP()
+    parser.add_string(
+        '$schema a\n'
+        '  x str\n'
+        '    !options ["yes", "replacement"]\n'
+        '    !tags ["export"]\n'
+        '    ?descr "Nested setting"\n'
+        '$schema b\n'
+        '  sub : a\n'
+        'y : b\n'
+        '  sub\n'
+        '    x = "yes"\n'
+        'answer str = {?y.sub.x}\n'
+        '$override\n'
+        '  y\n'
+        '    sub\n'
+        '      x = "replacement"'
+    )
+    env = parser.parse()
+    node = env.select('?y.sub.x')[0]
+    assert node.value == 'replacement'
+    assert node.tags == ['export']
+    assert node.metadata.description == 'Nested setting'
+    assert node.override is True
+    assert env['answer'].value == 'replacement'
+    provenance = env['y.sub.x'].provenance
+    assert provenance.override_code == '      x = "replacement"'
+    assert provenance.override_source is not None
+    assert env.contributing_schema('y.sub.x') is not None
+
+
+def test_nested_schema_field_still_requires_a_value():
+    parser = DIP()
+    parser.add_string('$schema a\n  x str\n$schema b\n  sub : a\ny : b')
+    with pytest.raises(RuntimeError, match='Undefined value'):
+        parser.parse()
+
+
+def test_nested_schema_override_initializes_field_without_instance_assignment():
+    # The override can provide the first value for a nested schema member.
+    parser = DIP()
+    parser.add_string(
+        '$schema a\n  x str\n'
+        '$schema b\n  sub : a\n'
+        'y : b\n'
+        'answer str = {?y.sub.x}\n'
+        '$override\n  y\n    sub\n      x = "replacement"'
+    )
+    env = parser.parse()
+    assert env['y.sub.x'].value == 'replacement'
+    assert env['answer'].value == 'replacement'

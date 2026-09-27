@@ -469,3 +469,47 @@ TEST(SchemaList, InvalidHostRegistration) {
     parser.add_string("$schema same\n  value int = 2");
     EXPECT_THROW(parser.parse(), dip::EnvironmentException);
 }
+
+TEST(SchemaList, NestedUnassignedMemberInitializedByInstance) {
+    // A schema declaration stays unassigned until the instance supplies its value.
+    dip::DIP parser;
+    parser.add_string(
+        "$schema a\n"
+        "  x str\n"
+        "$schema b\n"
+        "  sub : a\n"
+        "y : b\n"
+        "  sub\n"
+        "    x = \"yes\"\n"
+        "answer str = {?y.sub.x}\n"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env["y.sub.x"].as<std::string>(), "yes");
+    EXPECT_EQ(env["answer"].as<std::string>(), "yes");
+    EXPECT_FALSE(env.get_node("y.sub.x")->override);
+}
+
+TEST(SchemaList, NestedUnassignedMemberOverriddenBeforeDependency) {
+    // Nested override paths resolve against the concrete schema instance.
+    dip::DIP parser;
+    parser.add_string(
+        "$schema a\n"
+        "  x str\n"
+        "    ?descr \"Nested setting\"\n"
+        "$schema b\n"
+        "  sub : a\n"
+        "y : b\n"
+        "  sub\n"
+        "    x = \"yes\"\n"
+        "answer str = {?y.sub.x}\n"
+        "$override\n"
+        "  y\n"
+        "    sub\n"
+        "      x = \"replacement\"\n"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env["y.sub.x"].as<std::string>(), "replacement");
+    EXPECT_EQ(env["answer"].as<std::string>(), "replacement");
+    EXPECT_TRUE(env.get_node("y.sub.x")->override);
+    EXPECT_EQ(env["y.sub.x"].get_provenance().override_code, "      x = \"replacement\"");
+}
