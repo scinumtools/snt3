@@ -513,3 +513,110 @@ TEST(SchemaList, NestedUnassignedMemberOverriddenBeforeDependency) {
     EXPECT_TRUE(env.get_node("y.sub.x")->override);
     EXPECT_EQ(env["y.sub.x"].get_provenance().override_code, "      x = \"replacement\"");
 }
+
+TEST(SchemaList, NestedValueChildSchemaApplication) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema policy\n"
+        "  enabled bool = true\n"
+        "$schema inner\n"
+        "  x float\n"
+        "    export : policy\n"
+        "$schema outer\n"
+        "  sub : inner\n"
+        "y : outer\n"
+        "  sub\n"
+        "    x = 1\n"
+    );
+
+    const auto env = parser.parse();
+    EXPECT_EQ(env["y.sub.x"].as<double>(), 1);
+    EXPECT_TRUE(env["y.sub.x.export.enabled"].as<bool>());
+}
+
+TEST(SchemaList, NestedValueChildSchemaIndependentInstances) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema policy\n"
+        "  enabled bool = true\n"
+        "$schema inner\n"
+        "  x float\n"
+        "    export : policy\n"
+        "$schema outer\n"
+        "  sub : inner\n"
+        "first : outer\n"
+        "  sub\n"
+        "    x = 1\n"
+        "second : outer\n"
+        "  sub\n"
+        "    x = 2\n"
+    );
+
+    const auto env = parser.parse();
+    EXPECT_EQ(env["first.sub.x"].as<double>(), 1);
+    EXPECT_EQ(env["second.sub.x"].as<double>(), 2);
+    EXPECT_TRUE(env["first.sub.x.export.enabled"].as<bool>());
+    EXPECT_TRUE(env["second.sub.x.export.enabled"].as<bool>());
+}
+
+TEST(SchemaList, NestedValueChildSchemaWithHostOverride) {
+    dip::DIP parser;
+    parser.add_override_string("y.sub.x = 4");
+    parser.add_string(
+        "$schema policy\n"
+        "  enabled bool = true\n"
+        "$schema inner\n"
+        "  x float\n"
+        "    export : policy\n"
+        "$schema outer\n"
+        "  sub : inner\n"
+        "y : outer\n"
+        "  sub\n"
+        "    x = 1\n"
+        "twice float = ({?y.sub.x} * 2)\n"
+    );
+
+    const auto env = parser.parse();
+    EXPECT_EQ(env["y.sub.x"].as<double>(), 4);
+    EXPECT_EQ(env["twice"].as<double>(), 8);
+    EXPECT_TRUE(env["y.sub.x.export.enabled"].as<bool>());
+    EXPECT_TRUE(env.get_node("y.sub.x")->override);
+    EXPECT_FALSE(env.get_node("y.sub.x.export.enabled")->override);
+}
+
+TEST(SchemaList, SeparateGroupSchemaDeclarationsApplyOnce) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema first\n"
+        "  one int = 1\n"
+        "$schema second\n"
+        "  two int = 2\n"
+        "settings : first\n"
+        "settings : second\n"
+    );
+
+    const auto env = parser.parse();
+    EXPECT_EQ(env["settings.one"].as<int64_t>(), 1);
+    EXPECT_EQ(env["settings.two"].as<int64_t>(), 2);
+}
+
+TEST(SchemaList, RepeatedGroupSchemaDeclarationStillFails) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema first\n"
+        "  one int = 1\n"
+        "$schema second\n"
+        "  two int = 2\n"
+        "settings : first\n"
+        "settings : second\n"
+        "settings : first\n"
+    );
+    try {
+        parser.parse();
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& error) {
+        EXPECT_EQ(error.info().message, "Duplicated schema");
+    } catch (...) {
+        FAIL() << "Expected dip::SyntaxException";
+    }
+}
