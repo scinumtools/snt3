@@ -1,12 +1,9 @@
-#include "compiler.h"
-#include "model.h"
-#include "writer.h"
 #include "../snt/argparser.h"
 #include "../snt/main.h"
 
 #include <snt/api/dip_parse.h>
+#include <snt/docs/report.h>
 #include <cstddef>
-#include <fstream>
 #include <iostream>
 #include <stdexcept>
 
@@ -58,11 +55,6 @@ Examples:
 )";
 }
 
-std::string read_file(const std::string& path) {
-    std::ifstream stream(path, std::ios::binary);
-    if (!stream) throw std::runtime_error("Cannot read introduction file: " + path);
-    return std::string((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-}
 } // namespace
 
 void module_docs(ArgParser& argpar) {
@@ -135,9 +127,11 @@ void module_docs(ArgParser& argpar) {
     if (has_compiler && format != "pdf")
         throw std::runtime_error("--tex-compiler requires --format pdf.");
 
-    const auto document = snt::docs::build_document(command.evaluate(), input_label,
-                                                    has_intro ? read_file(intro) : "", has_load);
-    const auto tex = snt::docs::render_tex(document);
-    if (format == "tex") snt::docs::write_file(output, tex);
-    else snt::docs::compile_pdf(tex, output, compiler);
+    snt::docs::ReportOptions options;
+    options.input_label = input_label;
+    if (has_intro) options.introduction_file = intro;
+    options.tex_compiler = compiler;
+    snt::docs::generate(command.evaluate(), format == "tex" ? snt::docs::ReportFormat::Tex
+                                                        : snt::docs::ReportFormat::Pdf,
+                        output, options);
 }

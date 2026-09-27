@@ -28,6 +28,12 @@ typedef enum {
     SNT_DIP_EXPORT_YAML,
 } snt_dip_export_format;
 
+/** Output format for a generated DIP report. */
+typedef enum {
+    SNT_DIP_REPORT_TEX,
+    SNT_DIP_REPORT_PDF,
+} snt_dip_report_format;
+
 /** Create a DIPL parser. */
 int snt_dip_parser_create(snt_dip** result, snt_dip_error* error);
 /** Register a named schema body from a string. */
@@ -57,6 +63,14 @@ int snt_dip_environment_save(snt_dip* dip, const char* path, snt_dip_error* erro
 /** Generate a static parameter list from the environment. */
 int snt_dip_environment_generate(
     snt_dip* dip, snt_dip_export_format format, const char* path, snt_dip_error* error
+);
+/** Generate a TeX or PDF report from a parsed or loaded environment.
+ * input_label, intro_file, and tex_compiler may be null. The default compiler is pdflatex.
+ */
+int snt_dip_environment_generate_docs(
+    snt_dip* dip, snt_dip_report_format format, const char* path,
+    const char* input_label, const char* intro_file, const char* tex_compiler,
+    snt_dip_error* error
 );
 /** Release a DIPL parser. Accepts null. */
 void snt_dip_parser_free(snt_dip* dip);

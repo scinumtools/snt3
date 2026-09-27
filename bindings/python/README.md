@@ -15,6 +15,10 @@ The package includes:
 - `scinumtools3.api` for formatted, command-style evaluation
 - NumPy interoperability for array values
 
+Evaluated DIP environments can also generate TeX or PDF documentation with
+`Environment.generate_docs(ReportFormat.TEX, "report.tex")` or
+`ReportFormat.PDF`. See the [documentation guide](https://vrtulka23.github.io/scinumtools3/modules/dip/documentation.html).
+
 ## Installation
 
 SciNumTools3 requires Python 3.9 or later and depends on NumPy.

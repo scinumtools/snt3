@@ -9,6 +9,7 @@ namespace snt::dip {
         try {
             Environment loaded;
             hdf5::load(loaded, file);
+            loaded.snapshot_loaded_ = true;
             *this = std::move(loaded);
         } catch (const hdf5::Error& error) {
             throw dip::IOException(

@@ -5,6 +5,7 @@
 #include <string>
 
 #include <snt/dip/dip.h>
+#include <snt/docs/report.h>
 
 struct snt_dip {
     snt::dip::DIP parser;
@@ -53,6 +54,14 @@ snt::dip::ExportFormat export_format(snt_dip_export_format format) {
         return snt::dip::ExportFormat::YAML;
     default:
         throw std::invalid_argument("invalid DIP output format");
+    }
+}
+
+snt::docs::ReportFormat report_format(snt_dip_report_format format) {
+    switch (format) {
+    case SNT_DIP_REPORT_TEX: return snt::docs::ReportFormat::Tex;
+    case SNT_DIP_REPORT_PDF: return snt::docs::ReportFormat::Pdf;
+    default: throw std::invalid_argument("invalid DIP report format");
     }
 }
 } // namespace
@@ -208,6 +217,26 @@ extern "C" int snt_dip_environment_generate(
         if (!dip || !path)
             throw std::invalid_argument("DIP and filename are required");
         dip->env.generate(export_format(format), path);
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
+extern "C" int snt_dip_environment_generate_docs(
+    snt_dip* dip, snt_dip_report_format format, const char* path,
+    const char* input_label, const char* intro_file, const char* tex_compiler,
+    snt_dip_error* error
+) {
+    try {
+        if (!dip || !dip->parsed || !path || !*path)
+            throw std::invalid_argument("parsed DIP and output path are required");
+        snt::docs::ReportOptions options;
+        if (input_label) options.input_label = input_label;
+        if (intro_file) options.introduction_file = intro_file;
+        if (tex_compiler) options.tex_compiler = tex_compiler;
+        snt::docs::generate(dip->env, report_format(format), path, options);
         ok(error);
         return 0;
     } catch (const std::exception& exception) {

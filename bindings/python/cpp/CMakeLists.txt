@@ -115,6 +115,7 @@ endif()
 # extension so ELF linkers retain the dependency and auditwheel can bundle it.
 if (ENABLE_DIP_PYBIND)
     target_link_libraries(${MODULE_NAME} PRIVATE HDF5::HDF5)
+    target_link_libraries(${MODULE_NAME} PRIVATE snt-docs)
 
     # FindHDF5 may discover HDF5 through a compiler wrapper on manylinux.  In
     # that case the imported target can have no concrete link items, while

@@ -28,9 +28,11 @@ std::string escape_tex(const std::string& value) {
     return out;
 }
 
-void row(std::ostringstream& out, const std::string& label, const std::string& value) {
+void row(std::ostringstream& out, const std::string& label, const std::string& value,
+         const char* color = "sntLabel") {
     if (!value.empty())
-        out << "\\textbf{" << escape_tex(label) << "} & " << escape_tex(value) << " \\\\\n";
+        out << "\\textcolor{" << color << "}{\\textbf{" << escape_tex(label) << "}} & "
+            << escape_tex(value) << " \\\\\n";
 }
 
 std::string location(const Origin& origin) {
@@ -41,15 +43,15 @@ std::string location(const Origin& origin) {
 }
 
 void publication_rows(std::ostringstream& out, const Publication& publication) {
-    row(out, "Authors", publication.authors);
-    row(out, "Publication", publication.title);
-    row(out, "Journal", publication.journal);
-    row(out, "Year", publication.year);
-    row(out, "Volume", publication.volume);
-    row(out, "Issue", publication.issue);
-    row(out, "Pages", publication.pages);
-    row(out, "DOI", publication.doi);
-    row(out, "URL", publication.url);
+    row(out, "Authors", publication.authors, "sntMeta");
+    row(out, "Publication", publication.title, "sntMeta");
+    row(out, "Journal", publication.journal, "sntMeta");
+    row(out, "Year", publication.year, "sntMeta");
+    row(out, "Volume", publication.volume, "sntMeta");
+    row(out, "Issue", publication.issue, "sntMeta");
+    row(out, "Pages", publication.pages, "sntMeta");
+    row(out, "DOI", publication.doi, "sntMeta");
+    row(out, "URL", publication.url, "sntMeta");
 }
 
 std::string joined(const std::vector<std::string>& items) {
@@ -64,7 +66,7 @@ std::string joined(const std::vector<std::string>& items) {
 
 std::string render_tex(const Document& document) {
     std::ostringstream body;
-    body << "\\begin{longtable}{@{}p{0.20\\linewidth}p{0.74\\linewidth}@{}}\n";
+    body << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
     row(body, "Input", document.input_label);
     body << "\\end{longtable}\n";
     if (document.loaded_snapshot)
@@ -77,19 +79,19 @@ std::string render_tex(const Document& document) {
     if (document.parameters.empty())
         body << "No evaluated parameters.\n";
     for (const auto& item : document.parameters) {
-        body << "\\subsection*{\\texttt{" << escape_tex(item.path) << "}}\n"
-             << "\\begin{longtable}{@{}p{0.20\\linewidth}p{0.74\\linewidth}@{}}\n";
-        row(body, "Value", item.value);
-        row(body, "Units", item.units);
-        row(body, "Description", item.description);
-        row(body, "Applied schemas", joined(item.applied_schemas));
-        row(body, "Contributing schema", item.contributing_schema);
-        row(body, "Overridden", item.overridden ? "yes" : "no");
-        row(body, "Declared at", location(item.declaration));
-        row(body, "Declaration", item.declaration.code);
+        body << "\\sntnode{" << escape_tex(item.path) << "}\n"
+             << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
+        row(body, "Value", item.value, "sntBlue");
+        row(body, "Units", item.units, "sntBlue");
+        row(body, "Description", item.description, "sntMeta");
+        row(body, "Applied schemas", joined(item.applied_schemas), "sntMeta");
+        row(body, "Contributing schema", item.contributing_schema, "sntMeta");
+        row(body, "Overridden", item.overridden ? "yes" : "no", item.overridden ? "sntOverride" : "sntSource");
+        row(body, "Declared at", location(item.declaration), "sntSource");
+        row(body, "Declaration", item.declaration.code, "sntSource");
         if (item.overridden) {
-            row(body, "Override at", location(item.replacement));
-            row(body, "Override", item.replacement.code);
+            row(body, "Override at", location(item.replacement), "sntOverride");
+            row(body, "Override", item.replacement.code, "sntOverride");
         }
         publication_rows(body, item.publication);
         body << "\\end{longtable}\n";
@@ -99,8 +101,8 @@ std::string render_tex(const Document& document) {
     if (document.structure.empty())
         body << "No hierarchy paths are available.\n";
     for (const auto& item : document.structure) {
-        body << "\\subsection*{\\texttt{" << escape_tex(item.path) << "}}\n"
-             << "\\begin{longtable}{@{}p{0.20\\linewidth}p{0.74\\linewidth}@{}}\n";
+        body << "\\sntentry{" << escape_tex(item.path) << "}\n"
+             << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
         row(body, "Kind", item.kind);
         row(body, "Schemas", joined(item.schemas));
         body << "\\end{longtable}\n";
@@ -109,8 +111,8 @@ std::string render_tex(const Document& document) {
     if (!document.schemas.empty()) {
         body << "\\section*{Schemas}\n";
         for (const auto& schema : document.schemas) {
-            body << "\\subsection*{\\texttt{" << escape_tex(schema.name) << "}}\n"
-                 << "\\begin{longtable}{@{}p{0.20\\linewidth}p{0.74\\linewidth}@{}}\n";
+            body << "\\sntentry{" << escape_tex(schema.name) << "}\n"
+                 << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
             row(body, "Description", schema.description);
             row(body, "Declared at", location(schema.origin));
             publication_rows(body, schema.publication);
@@ -122,14 +124,14 @@ std::string render_tex(const Document& document) {
     if (document.sources.empty())
         body << "No source manifest is available.\n";
     for (const auto& source : document.sources) {
-        body << "\\subsection*{\\texttt{" << escape_tex(source.name) << "}}\n"
-             << "\\begin{longtable}{@{}p{0.20\\linewidth}p{0.74\\linewidth}@{}}\n";
-        row(body, "Path", source.path);
-        row(body, "Parent", source.parent);
+        body << "\\sntentry{" << escape_tex(source.name) << "}\n"
+             << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
+        row(body, "Path", source.path, "sntSource");
+        row(body, "Parent", source.parent, "sntSource");
         if (source.parent_line)
-            row(body, "Parent line", std::to_string(source.parent_line));
+            row(body, "Parent line", std::to_string(source.parent_line), "sntSource");
         if (!source.hash.empty())
-            row(body, "Content hash", source.hash_algorithm + ": " + source.hash);
+            row(body, "Content hash", source.hash_algorithm + ": " + source.hash, "sntSource");
         body << "\\end{longtable}\n";
     }
 
@@ -137,8 +139,8 @@ std::string render_tex(const Document& document) {
     if (document.units.empty())
         body << "No custom units are registered.\n";
     for (const auto& unit : document.units) {
-        body << "\\subsection*{\\texttt{" << escape_tex(unit.name) << "}}\n"
-             << "\\begin{longtable}{@{}p{0.20\\linewidth}p{0.74\\linewidth}@{}}\n";
+        body << "\\sntentry{" << escape_tex(unit.name) << "}\n"
+             << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
         row(body, "Definition", unit.definition);
         body << "\\end{longtable}\n";
     }
@@ -146,8 +148,8 @@ std::string render_tex(const Document& document) {
     if (!document.functions.empty()) {
         body << "\\section*{Registered functions}\n";
         for (const auto& function : document.functions) {
-            body << "\\subsection*{\\texttt{" << escape_tex(function.name) << "}}\n"
-                 << "\\begin{longtable}{@{}p{0.20\\linewidth}p{0.74\\linewidth}@{}}\n";
+            body << "\\sntentry{" << escape_tex(function.name) << "}\n"
+                 << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
             row(body, "Kind", function.kind);
             body << "\\end{longtable}\n";
         }

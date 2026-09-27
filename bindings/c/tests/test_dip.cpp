@@ -163,6 +163,21 @@ TEST_F(Environment, Generate) {
     std::filesystem::remove(file);
 }
 
+TEST_F(Environment, GenerateDocs) {
+    const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-report.tex";
+    ASSERT_EQ(snt_dip_environment_generate_docs(
+        dip, SNT_DIP_REPORT_TEX, file.string().c_str(), "C binding demo", nullptr, nullptr, &error), 0);
+    std::ifstream generated(file);
+    std::stringstream contents;
+    contents << generated.rdbuf();
+    EXPECT_NE(contents.str().find("simulation.steps"), std::string::npos);
+    EXPECT_NE(contents.str().find("C binding demo"), std::string::npos);
+    EXPECT_NE(contents.str().find("sntNodeFill"), std::string::npos);
+    EXPECT_NE(snt_dip_environment_generate_docs(
+        dip, static_cast<snt_dip_report_format>(99), file.string().c_str(), nullptr, nullptr, nullptr, &error), 0);
+    std::filesystem::remove(file);
+}
+
 TEST(DIP, RegisterSchema) {
     snt_dip* parser = nullptr;
     snt_dip_error error{};

@@ -94,6 +94,7 @@ namespace snt::dip {
         std::vector<SchemaInfo> schema_manifest_;
         bool schema_manifest_loaded_ = false;
         bool trace_manifest_loaded_ = false;
+        bool snapshot_loaded_ = false;
 
       public:
         NodeList<ValueNode> nodes; ///< List of parsed nodes
@@ -109,6 +110,9 @@ namespace snt::dip {
          * Constructor of the Environment class
          */
         Environment();
+
+        /** Whether this environment was loaded from a DIPH5 snapshot. */
+        bool is_loaded_snapshot() const { return snapshot_loaded_; }
 
         /**
          * Load evaluated DIP nodes from a DIPH5 file. Reusable schema definitions

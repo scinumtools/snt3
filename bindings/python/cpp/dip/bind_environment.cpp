@@ -10,6 +10,7 @@
 #include <snt/dip/environment.h>
 #include <snt/dip/lists/list_node.h>
 #include <snt/dip/nodes/node_value.h>
+#include <snt/docs/report.h>
 
 namespace py = pybind11;
 
@@ -48,6 +49,10 @@ namespace snt::bind::python {
         export_format.value("TOML", dip::ExportFormat::TOML);
         export_format.value("YAML", dip::ExportFormat::YAML);
         export_format.export_values();
+
+        auto report_format = py::enum_<docs::ReportFormat>(m, "ReportFormat", "Output format for a DIP report.");
+        report_format.value("TEX", docs::ReportFormat::Tex);
+        report_format.value("PDF", docs::ReportFormat::Pdf);
 
         auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList", "Sequence of evaluated DIPL value nodes.");
         nl.def(py::init<>(), "Create an empty node list.");
@@ -122,6 +127,22 @@ namespace snt::bind::python {
             py::arg("file"),
             "Generate a static parameter list.\n\nArgs:\n    format: ExportFormat member selecting the output format.\n"
             "    file: Output path; an existing file is overwritten."
+        );
+        env.def(
+            "generate_docs",
+            [](const dip::Environment& e, docs::ReportFormat format, const std::filesystem::path& file,
+               const std::string& input_label, const std::filesystem::path& intro_file,
+               const std::string& tex_compiler) {
+                docs::ReportOptions options;
+                options.input_label = input_label;
+                options.introduction_file = intro_file;
+                options.tex_compiler = tex_compiler;
+                docs::generate(e, format, file, options);
+            },
+            py::arg("format"), py::arg("file"), py::kw_only(),
+            py::arg("input_label") = "", py::arg("intro_file") = std::filesystem::path{},
+            py::arg("tex_compiler") = "pdflatex",
+            "Write a TeX or PDF report from this evaluated environment. PDF requires a local TeX compiler."
         );
 
         env.def(

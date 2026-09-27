@@ -11,6 +11,8 @@ target_include_directories(${EXEC_NAME}
 )
 
 target_link_libraries(${EXEC_NAME} PRIVATE snt-api)
+target_sources(${EXEC_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/apps/snt-docs/module.cpp")
+target_link_libraries(${EXEC_NAME} PRIVATE snt-docs)
 
 set_target_properties(${EXEC_NAME} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
@@ -27,6 +29,11 @@ install(EXPORT SNTExecutables
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/snt)
 
 if(ENABLE_UNIT_TESTS)
+  add_test(NAME cli.docs
+    COMMAND ${CMAKE_COMMAND}
+      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/docs"
+      -P "${PROJECT_SOURCE_DIR}/apps/snt-docs/tests/docs.cmake")
   add_test(
     NAME cli.dip.persistence
     COMMAND ${CMAKE_COMMAND}
@@ -49,7 +56,6 @@ if(ENABLE_SNT_VIEW)
   add_subdirectory(../snt-view ${CMAKE_CURRENT_BINARY_DIR}/view)
 endif()
 
-add_subdirectory(../snt-docs ${CMAKE_CURRENT_BINARY_DIR}/docs)
 
 if(ENABLE_UNIT_TESTS)
   if(ENABLE_SNT_DMAP)

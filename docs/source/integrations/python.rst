@@ -219,6 +219,31 @@ tags only restrict textual output. See :doc:`Static parameter generation
 <../modules/dip/generation>` for native representations and format-specific
 behavior.
 
+Generating TeX and PDF reports
+------------------------------
+
+Call ``Environment.generate_docs()`` after parsing a project or loading a
+DIPH5 snapshot. ``ReportFormat`` selects TeX or PDF:
+
+.. code-block:: python
+
+   from scinumtools3.dip import DIP, ReportFormat
+
+   parser = DIP()
+   parser.add_project("DIPfile")
+   env = parser.parse()
+   env.generate_docs(ReportFormat.TEX, "report.tex",
+                     input_label="DIPfile", intro_file="introduction.tex")
+   env.generate_docs(ReportFormat.PDF, "report.pdf",
+                     input_label="DIPfile", intro_file="introduction.tex")
+
+``intro_file`` is an optional trusted LaTeX fragment without a preamble.
+PDF output needs a local TeX compiler; pass ``tex_compiler="lualatex"`` or
+another compatible executable when required. The same method works on an
+``Environment`` restored with ``load()`` and reports only provenance retained
+in DIPH5. See :doc:`Generating DIP documentation
+<../modules/dip/documentation>` for report contents and limits.
+
 Source provenance
 -----------------
 

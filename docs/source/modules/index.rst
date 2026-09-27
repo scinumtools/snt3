@@ -1,5 +1,5 @@
-SNT Modules
-===========
+C++ Modules Overview
+====================
 
 SciNumTools v3 is organized as a modular C++ framework in which the individual
 components build upon each other to provide a common infrastructure for
@@ -129,6 +129,8 @@ calculated*, and *what constraints it must satisfy*.
   DIPL inputs and registered constructs through diagnostics and DIPH5.
 * :doc:`Static parameter generation <dip/generation>` — exporting evaluated
   environments as native source code or data files.
+* :doc:`Generating DIP documentation <dip/documentation>` — TeX and PDF
+  reports of evaluated environments.
 
 .. toctree::
    :maxdepth: 1
@@ -139,6 +141,7 @@ calculated*, and *what constraints it must satisfy*.
    dip/persistence
    dip/traceability
    dip/generation
+   dip/documentation
 
 .. _mat-materials:
 

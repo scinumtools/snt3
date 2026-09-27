@@ -1,0 +1,33 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage[margin=25mm]{geometry}
+\definecolor{sntBlue}{HTML}{204B70}
+\definecolor{sntNodeFill}{HTML}{EDF3F7}
+\definecolor{sntLabel}{HTML}{34495A}
+\definecolor{sntMeta}{HTML}{246B62}
+\definecolor{sntSource}{HTML}{646B73}
+\definecolor{sntOverride}{HTML}{A34C16}
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{0pt}
+\setlength{\LTpre}{0pt}
+\setlength{\LTpost}{0pt}
+\renewcommand{\arraystretch}{0.9}
+\newcommand{\sntnode}[1]{%
+  \par\vspace{0.45em}\noindent
+  \colorbox{sntNodeFill}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+    \textcolor{sntBlue}{\textbf{\texttt{#1}}}}}%
+  \par\nobreak\vspace{0.08em}%
+}
+\newcommand{\sntentry}[1]{%
+  \par\vspace{0.3em}\noindent
+  \textcolor{sntBlue}{\textbf{\texttt{#1}}}%
+  \par\nobreak\vspace{0.05em}%
+}
+\begin{document}
+{\Large\bfseries\textcolor{sntBlue}{DIP parameter report}\par}
+\vspace{0.25em}\hrule\vspace{0.5em}
+%%SNT_DOCS_BODY%%
+\end{document}
