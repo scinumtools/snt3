@@ -84,6 +84,10 @@ namespace snt::api {
         /// type is empty, bool, integer, float, or string.
         void argument_value(const std::string& type = "");
 
+        /// Evaluate configured DIPL inputs or load a DIPH5 snapshot.
+        /// Shared by command-line consumers that need the full environment.
+        dip::Environment evaluate();
+
         /**
          * Executed parsing command
          *

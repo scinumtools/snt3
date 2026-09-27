@@ -25,6 +25,7 @@ Options:
 
 Modules:
   dip     Dimensional Input Parameters
+  docs    Generate a TeX or PDF report from DIP parameters
   puq     Physical Units & Quantities
   dmap    Regenerate PUQ dimension-map headers (developer tool; optional)
   server  REST API server (optional build feature)
@@ -79,6 +80,8 @@ int main(int argc, char* argv[]) {
                 module_puq(argpar);
             } else if (mod == "dip") {
                 module_dip(argpar);
+            } else if (mod == "docs") {
+                module_docs(argpar);
             } else {
                 throw std::runtime_error("Unknown module: " + mod + ". Use snt --help.");
             }

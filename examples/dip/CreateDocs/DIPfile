@@ -1,0 +1,13 @@
+units[]
+  name = "lab_length"
+  unit = "2*m"
+
+schemas[]
+  name = "sensor"
+  file = "sensor.dipl"
+
+overrides[]
+  file = "overrides.dip"
+
+code[]
+  file = "parameters.dip"

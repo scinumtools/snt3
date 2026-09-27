@@ -1,0 +1,10 @@
+?descr "Reusable temperature sensor settings"
+?authors "A. Example and B. Researcher"
+?title "A mock sensor calibration study"
+?year "2026"
+?doi "10.1234/example.sensor"
+
+model str = "T100"
+  ?descr "Sensor model identifier"
+accuracy float = 0.2 K
+  ?descr "Stated temperature accuracy"

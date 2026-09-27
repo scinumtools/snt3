@@ -1,0 +1,6 @@
+#ifndef SNT_DOCS_TEMPLATE_H
+#define SNT_DOCS_TEMPLATE_H
+namespace snt::docs {
+inline constexpr const char* latex_template = R"SNTDOCSTEMPLATE(@SNT_DOCS_TEMPLATE@)SNTDOCSTEMPLATE";
+}
+#endif

@@ -147,13 +147,17 @@ namespace snt::api {
         value_type = type;
     }
 
-    std::string DIPParse::execute() {
-        // Parse DIPL or restore an already evaluated environment.
+    dip::Environment DIPParse::evaluate() {
         dip::Environment env;
         if (load_file.empty())
             env = dip.parse();
         else
             env.load(load_file);
+        return env;
+    }
+
+    std::string DIPParse::execute() {
+        dip::Environment env = evaluate();
 
         // request nodes
         dip::ValueNode::ListType vnodes;

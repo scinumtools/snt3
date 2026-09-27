@@ -1,0 +1,10 @@
+experiment
+  title str = "Heat & Flow_demo"
+    ?descr "A small mock experiment for the documentation report."
+  duration float = 12 h
+    ?descr "Length of one run"
+  track_length float = 5 lab_length
+    ?descr "Length expressed in the custom project unit"
+  flow_speed float = 2 m/s
+    ?descr "Nominal inlet speed, replaced for this run"
+  sensor : sensor

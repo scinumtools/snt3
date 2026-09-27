@@ -49,6 +49,8 @@ if(ENABLE_SNT_VIEW)
   add_subdirectory(../snt-view ${CMAKE_CURRENT_BINARY_DIR}/view)
 endif()
 
+add_subdirectory(../snt-docs ${CMAKE_CURRENT_BINARY_DIR}/docs)
+
 if(ENABLE_UNIT_TESTS)
   if(ENABLE_SNT_DMAP)
     add_test(NAME cli.dmap
