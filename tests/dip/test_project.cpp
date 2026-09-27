@@ -73,6 +73,82 @@ TEST(Project, ParsesUnitsSourcesFilesAndStrings) {
     EXPECT_NE(provenance.source->parent_name.find("_project"), std::string::npos);
 }
 
+TEST(Project, LoadsOverrideFilesBeforeEvaluatingCode) {
+    ProjectDirectory project("dip-project-overrides");
+    std::filesystem::create_directories(project.path() / "tuning");
+    project.write("tuning/values.dip", "settings.radius = 20 cm\n");
+    project.write(
+        "parameters.dip",
+        "settings\n"
+        "  radius float = 10 cm\n"
+        "settings.radius = 30 cm\n"
+        "diameter float = ({?settings.radius} * 2) cm\n"
+    );
+    project.write(
+        "DIPfile",
+        "code[]\n"
+        "  file = \"parameters.dip\"\n"
+        "overrides[]\n"
+        "  file = \"tuning/values.dip\"\n"
+    );
+
+    dip::DIP parser;
+    parser.add_project(project.path() / "DIPfile");
+    const dip::Environment env = parser.parse();
+
+    EXPECT_EQ(env["settings.radius"].as<double>(), 20);
+    EXPECT_EQ(env["diameter"].as<double>(), 40);
+    EXPECT_TRUE(env.get_node("settings.radius")->override);
+    const auto provenance = env["settings.radius"].get_provenance();
+    ASSERT_TRUE(provenance.override_source.has_value());
+    ASSERT_TRUE(provenance.source.has_value());
+    EXPECT_EQ(provenance.override_source->path, (project.path() / "tuning/values.dip").string());
+    EXPECT_EQ(provenance.override_source->parent_name, provenance.source->parent_name);
+    EXPECT_GT(provenance.override_source->parent_line, 0);
+}
+
+TEST(Project, RejectsDuplicateOverrideTargets) {
+    ProjectDirectory project("dip-project-duplicate-overrides");
+    project.write("first.dip", "answer = 10\n");
+    project.write("second.dip", "answer = 20\n");
+    project.write(
+        "DIPfile",
+        "overrides[]\n"
+        "  file = \"first.dip\"\n"
+        "overrides[]\n"
+        "  file = \"second.dip\"\n"
+        "code[]\n"
+        "  string = \"answer int = 1\"\n"
+    );
+
+    dip::DIP parser;
+    EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::SyntaxException);
+}
+
+TEST(Project, RejectsMissingOverrideFile) {
+    ProjectDirectory project("dip-project-missing-override");
+    project.write("DIPfile", "overrides[]\n  file = \"missing.dip\"\n");
+
+    dip::DIP parser;
+    EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::IOException);
+}
+
+TEST(Project, RejectsUnknownOverrideField) {
+    ProjectDirectory project("dip-project-invalid-override-field");
+    project.write("DIPfile", "overrides[]\n  file = \"values.dip\"\n  string = \"answer = 2\"\n");
+
+    dip::DIP parser;
+    EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::ParserException);
+}
+
+TEST(Project, RequiresOverrideFileField) {
+    ProjectDirectory project("dip-project-no-override-file-field");
+    project.write("DIPfile", "overrides[]\n");
+
+    dip::DIP parser;
+    EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::Exception);
+}
+
 TEST(Project, RejectsAmbiguousCodeEntry) {
     ProjectDirectory project("dip-project-ambiguous");
     project.write(

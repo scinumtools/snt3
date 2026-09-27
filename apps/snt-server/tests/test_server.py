@@ -120,6 +120,19 @@ derived int = ({?answer} + 1)
         self.assertIn("derived = 42", result["result"])
         self.assertIn("physics.value = 42", result["result"])
 
+        # A project may name an uploaded override file alongside its code files.
+        project_with_override = project + 'overrides[]\n  file = "overrides.dip"\n'
+        body, content_type = multipart([
+            ("project", "DIPfile", project_with_override),
+            ("file", "parameters/base.dipl", "answer int = 41\n"),
+            ("file", "schemas/settings.dipl", "value int = 42\n"),
+            ("file", "overrides.dip", "answer = 99\n"),
+        ])
+        with self.request("/snt/dip/parse", body, content_type) as response:
+            result = json.loads(response.read())
+        self.assertIn("answer = 99", result["result"])
+        self.assertIn("derived = 100", result["result"])
+
         # Inline and uploaded override bodies must both tune the model before evaluation.
         for filename in (None, "overrides.dip"):
             body, content_type = multipart([

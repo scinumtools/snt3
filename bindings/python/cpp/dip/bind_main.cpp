@@ -107,9 +107,10 @@ Args:
             "add_project",
             &dip::DIP::add_project,
             py::arg("project_file"),
-            R"doc(Add a DIPfile with units[], sources[], schemas[], and ordered code[] entries.
-Schema entries have a name and exactly one file or string body; relative
-paths resolve from the DIPfile directory.
+            R"doc(Add a DIPfile with units[], sources[], schemas[], overrides[], and ordered code[] entries.
+Schema entries have a name and exactly one file or string body. Override
+entries have a file containing value modifications without a $override wrapper.
+Relative paths resolve from the DIPfile directory.
 
 Args:
     project_file: Path to the DIPfile manifest.

@@ -129,6 +129,21 @@ def test_add_project(tmp_path):
     c.argument_value("integer")
     assert c.execute() == "42\n"
 
+
+def test_project_override_file(tmp_path):
+    (tmp_path / "parameters.dip").write_text("answer int = 1\n")
+    (tmp_path / "overrides.dip").write_text("answer = 42\n")
+    (tmp_path / "DIPfile").write_text(
+        'code[]\n  file = "parameters.dip"\n'
+        'overrides[]\n  file = "overrides.dip"\n'
+    )
+
+    command = DIPParse()
+    command.argument_add("project", [str(tmp_path / "DIPfile")])
+    command.argument_request("answer")
+    command.argument_value("integer")
+    assert command.execute() == "42\n"
+
 def test_request():
 
     c = DIPParse()

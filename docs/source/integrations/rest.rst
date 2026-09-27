@@ -101,8 +101,9 @@ project <../modules/dip/projects>` and its referenced files as multipart form
 uploads. The ``project`` part is the DIPfile; every ``file`` part is written
 under a request-scoped temporary directory using its supplied relative
 filename. The server then invokes the ordinary ``add_project`` API. Thus the
-manifest retains its native ``units[]``, ``sources[]``, ``schemas[]``, and ordered ``code[]``
-semantics; no second REST-specific project format exists.
+manifest retains its native ``units[]``, ``sources[]``, ``schemas[]``,
+``overrides[]``, and ordered ``code[]`` semantics; no second REST-specific
+project format exists.
 
 For example, if ``DIPfile`` refers to ``parameters/base.dip``:
 
@@ -113,8 +114,9 @@ For example, if ``DIPfile`` refers to ``parameters/base.dip``:
        --form 'file=@parameters/base.dip;filename=parameters/base.dip'
    {"result":"answer = 42\n..."}
 
-Upload source and schema files in exactly the same way, using the relative paths
-declared by the project's ``sources[].filepath`` and ``schemas[].file`` values.
+Upload source, schema, and override files in exactly the same way, using the
+relative paths declared by the project's ``sources[].filepath``,
+``schemas[].file``, and ``overrides[].file`` values.
 Absolute paths, ``.`` and
 ``..`` path components, duplicate paths, extra form fields, and unknown part
 names are rejected. The temporary bundle directory is removed after the

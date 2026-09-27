@@ -32,10 +32,13 @@ $schema snt_project_schema
 $schema snt_project_code
   file str = none
   string str = none
+$schema snt_project_override
+  file str
 units list : snt_project_unit
 sources list : snt_project_source
 schemas list : snt_project_schema
 code list : snt_project_code
+overrides list : snt_project_override
 )DIPL";
 
         std::string top_level_name(const std::string& path) {
@@ -44,12 +47,13 @@ code list : snt_project_code
         }
 
         void validate_project_manifest(const Environment& manifest) {
-            const std::set<std::string> collections = {"units", "sources", "schemas", "code"};
+            const std::set<std::string> collections = {"units", "sources", "schemas", "code", "overrides"};
             const std::map<std::string, std::set<std::string>> fields = {
                 {"units", {"name", "unit"}},
                 {"sources", {"name", "filepath"}},
                 {"schemas", {"name", "file", "string"}},
                 {"code", {"file", "string"}},
+                {"overrides", {"file"}},
             };
 
             for (const auto& [path, collection] : manifest.hierarchy.get_collections()) {
@@ -58,7 +62,7 @@ code list : snt_project_code
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest contains the unsupported top-level collection `" + top_level_name(path) + "`.",
-                        "Use only the units[], sources[], schemas[], and code[] collections.",
+                        "Use only the units[], sources[], schemas[], code[], and overrides[] collections.",
                         __FILE__,
                         __LINE__
                     );
@@ -79,7 +83,7 @@ code list : snt_project_code
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest node `" + path + "` is not part of the DIPfile schema.",
-                        "Use only the declared fields of units[], sources[], schemas[], and code[] items.",
+                        "Use only the declared fields of units[], sources[], schemas[], code[], and overrides[] items.",
                         __FILE__,
                         __LINE__,
                         node->line
@@ -212,22 +216,28 @@ code list : snt_project_code
     }
 
     void DIP::add_override_string(const std::string& source_code) {
-        add_override_input(source_code, env.sources.at(source.name).path);
+        add_override_input(source_code, env.sources.at(source.name).path, {source.name, source.line_number});
     }
 
-    void DIP::add_override_input(const std::string& source_code, const std::filesystem::path& source_file) {
+    void DIP::add_override_input(
+        const std::string& source_code, const std::filesystem::path& source_file, const Source& parent
+    ) {
         const std::string source_name = source.name + "_OVERRIDE" + std::to_string(num_overrides);
         std::queue<Line> override_lines;
         parse_lines(override_lines, source_code, source_name);
         const auto nodes = parse_code_nodes(override_lines);
         auto overrides = env.overrides;
         overrides.append(nodes, 0);
-        env.sources.append(source_name, source_file, source_code, {source.name, source.line_number});
+        env.sources.append(source_name, source_file, source_code, parent);
         env.overrides = std::move(overrides);
         ++num_overrides;
     }
 
     void DIP::add_override_file(const std::filesystem::path& source_file) {
+        add_override_file_input(source_file, {source.name, source.line_number});
+    }
+
+    void DIP::add_override_file_input(const std::filesystem::path& source_file, const Source& parent) {
         std::ifstream file(source_file);
         if (!file)
             throw dip::IOException(
@@ -236,7 +246,7 @@ code list : snt_project_code
             );
         std::ostringstream code;
         code << file.rdbuf();
-        add_override_input(code.str(), source_file);
+        add_override_input(code.str(), source_file, parent);
     }
 
     void DIP::add_project(const std::filesystem::path& project_file) {
@@ -301,6 +311,17 @@ code list : snt_project_code
                 } else {
                     add_schema_string_input(name, project[item + ".string"].as<std::string>(), absolute_project, parent);
                 }
+            }
+        }
+        if (project.hierarchy.has_collection("overrides")) {
+            const Collection& collection = project.hierarchy.get_collection("overrides");
+            for (const std::string& index : collection.items) {
+                const std::string item = "overrides[" + index + "]";
+                const auto node = project.get_node(item + ".file");
+                add_override_file_input(
+                    project_path(project_directory, project[item + ".file"].as<std::string>()),
+                    {project_source, node->line.source.line_number}
+                );
             }
         }
         if (project.hierarchy.has_collection("code")) {

@@ -1,21 +1,24 @@
 DIPfile projects
 ================
 
-A ``DIPfile`` gathers the units, named sources, reusable schemas, DIPL files,
-and inline DIPL definitions used by one parameter environment. It is itself
-ordinary DIPL: the project loader supplies the schemas for its four lists and
-parses the file with the standard DIP parser.
+A ``DIPfile`` gathers the units, named sources, reusable schemas, override
+files, DIPL files, and inline DIPL definitions used by one parameter
+environment. It is itself ordinary DIPL: the project loader supplies the
+schemas for its five lists and parses the file with the standard DIP parser.
 
 Project format
 --------------
 
-Each project contains only ``units[]``, ``sources[]``, ``schemas[]``, and
-``code[]`` items. A schema item has a ``name`` and exactly one of ``file`` or
-``string``. Its file or string is a schema body without a ``$schema`` wrapper.
+Each project contains only ``units[]``, ``sources[]``, ``schemas[]``,
+``overrides[]``, and ``code[]`` items. A schema item has a ``name`` and exactly
+one of ``file`` or ``string``. Its file or string is a schema body without a
+``$schema`` wrapper.
 Schema-level ``?`` metadata may appear before the first body node.
-Schemas are registered before ``code[]`` is parsed; ``code[]`` items retain
-their declared order. Each code item also has exactly one of ``file`` or
-``string``.
+Each override item has a required ``file`` field. Its file contains value
+modifications without a ``$override`` wrapper. Schemas and overrides are
+registered before model evaluation, regardless of where their entries appear
+in the manifest; ``code[]`` items retain their declared order. Each code item
+has exactly one of ``file`` or ``string``.
 
 .. code-block:: dipl
 
@@ -35,6 +38,9 @@ their declared order. Each code item also has exactly one of ``file`` or
      name = "options"
      string = "enabled bool = true"
 
+   overrides[]
+     file = "parameters/overrides.dip"
+
    code[]
      file = "parameters/base.dip"
 
@@ -49,12 +55,21 @@ Paths in ``filepath`` and ``file`` are interpreted relative to the directory
 containing the DIPfile. The contents of a ``string`` block are passed to DIP
 unchanged, so a root DIPL node inside the block must begin at column zero.
 The ``schemas[]`` entries match host-code ``add_schema_file()`` and
-``add_schema_string()``; ``code[]`` may still contain ordinary ``$schema``
-declarations.
+``add_schema_string()``; ``overrides[]`` matches ``add_override_file()``.
+Override targets must exist in the evaluated model and may be specified only
+once across all override sources. ``code[]`` may still contain ordinary
+``$schema`` declarations.
+
+For example, ``parameters/overrides.dip`` can contain:
+
+.. code-block:: dipl
+
+   output
+     enabled = false
 
 The project manifest is an input description rather than part of the final
-parameter environment. It cannot be combined with individual ``--input``
-arguments or a DIPH5 ``--load`` command.
+parameter environment. The command-line ``--project`` option cannot be
+combined with individual ``--input`` arguments or a DIPH5 ``--load`` command.
 
 Using projects
 --------------

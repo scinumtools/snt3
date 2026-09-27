@@ -86,4 +86,24 @@ def test_add_project(tmp_path):
 
     assert env["answer"].value == 42
     assert env["next"].value == 43
+
+
+def test_add_project_override_file(tmp_path):
+    # The DIPfile registers the override even when its entry follows code[].
+    (tmp_path / "parameters.dip").write_text(
+        "answer int = 1\nnext int = ({?answer} + 1)\n"
+    )
+    (tmp_path / "overrides.dip").write_text("answer = 42\n")
+    (tmp_path / "DIPfile").write_text(
+        'code[]\n  file = "parameters.dip"\n'
+        'overrides[]\n  file = "overrides.dip"\n'
+    )
+
+    dip = DIP()
+    dip.add_project(str(tmp_path / "DIPfile"))
+    env = dip.parse()
+
+    assert env["answer"].value == 42
+    assert env["next"].value == 43
+    assert env["answer"].provenance.override_source.path == str(tmp_path / "overrides.dip")
     
