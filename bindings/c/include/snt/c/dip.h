@@ -34,7 +34,7 @@ int snt_dip_parser_create(snt_dip** result, snt_dip_error* error);
 int snt_dip_parser_add_schema_string(snt_dip* dip, const char* name, const char* source, snt_dip_error* error);
 /** Register a named schema body from a file. */
 int snt_dip_parser_add_schema_file(snt_dip* dip, const char* name, const char* path, snt_dip_error* error);
-/** Collect an unwrapped override body containing only path = value modifications. */
+/** Collect an unwrapped override body of value modifications and optional nested path prefixes. */
 int snt_dip_parser_add_override_string(snt_dip* dip, const char* source, snt_dip_error* error);
 /** Register an unwrapped override body from a file, retaining its source path. */
 int snt_dip_parser_add_override_file(snt_dip* dip, const char* path, snt_dip_error* error);

@@ -24,6 +24,40 @@
 
 namespace snt::dip {
 
+    void check_indent(const BaseNode::PointerType& previous_node, const BaseNode::PointerType& current_node) {
+        // We make sure that the indent spacing is always set by INDENT_STEP
+        if ((current_node->indent % INDENT_STEP) != 0) {
+            std::stringstream suggested;
+            suggested << (current_node->indent - (current_node->indent % INDENT_STEP)) << ", ";
+            suggested << (current_node->indent - (current_node->indent % INDENT_STEP) + INDENT_STEP) << ", ...";
+            throw dip::SyntaxException(
+                "Invalid indent length",
+                "The indentation length is " + std::to_string(current_node->indent) + ", which is not a multiple of " +
+                    std::to_string(INDENT_STEP) + ".",
+                "Use an indentation length of " + suggested.str(),
+                __FILE__,
+                __LINE__,
+                current_node->line
+            );
+        }
+        if (previous_node != nullptr) {
+            if ((current_node->indent > previous_node->indent) &&
+                (current_node->indent - previous_node->indent) != INDENT_STEP) {
+                throw dip::SyntaxException(
+                    "Child node has an invalid indent",
+                    "The child node is indented " + std::to_string(current_node->indent) +
+                        " spaces, but it should be " + std::to_string(previous_node->indent + INDENT_STEP) + " spaces.",
+                    "Indent the child node " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
+                    __FILE__,
+                    __LINE__,
+                    current_node->line
+                );
+            }
+        }
+    }
+
+
+
     inline EnvSource parse_file_source(
         const std::string& source_name, const std::string& source_file, const Source& parent
     ) {

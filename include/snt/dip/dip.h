@@ -91,7 +91,7 @@ namespace snt::dip {
         void add_schema_file(const std::string& name, const std::filesystem::path& source_file);
 
         /** Atomically register value-only modifications from an unwrapped $override body.
-         * Targets are fully qualified paths in the evaluated model, including active conditional nodes. */
+         * Dotted paths and nested prefixes resolve to existing targets, including active conditional nodes. */
         void add_override_string(const std::string& source_code);
         /** Register an unwrapped override body from a file, retaining its source path. */
         void add_override_file(const std::filesystem::path& source_file);

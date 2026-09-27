@@ -10,7 +10,7 @@
 (* ========================================================================== *)
 
 document
-  = { blank-line | comment-line | statement } ;
+  = { blank-line | comment-line | statement | override-region } ;
 
 statement
   = source-declaration
@@ -106,6 +106,35 @@ schema-member
 schema-use
   = whitespace ":" whitespace schema-name
     { optional-whitespace "," optional-whitespace schema-name } ;
+
+(* -------------------------------------------------------------------------- *)
+(* Overrides: permitted only in document, never in a nested statement block.   *)
+(* -------------------------------------------------------------------------- *)
+
+override-region
+  = "$override" [ comment ] newline override-block ;
+
+override-block
+  = INDENT { blank-line | comment-line } override-entry
+    { blank-line | comment-line | override-entry } DEDENT ;
+
+override-entry
+  = override-modification | override-prefix ;
+
+(* Prefixes compose paths; they do not declare groups or collection items. *)
+override-prefix
+  = override-path [ comment ] newline override-block ;
+
+(* A value-bearing parent may also have modifications to existing children. *)
+override-modification
+  = override-path whitespace "=" whitespace value
+    [ whitespace PUEL-unit-expression ] [ comment ] newline [ override-block ] ;
+
+override-path
+  = override-path-segment { "." override-path-segment } ;
+
+override-path-segment
+  = name [ "[" collection-key "]" ] ;
 
 (* -------------------------------------------------------------------------- *)
 (* Properties and metadata                                                    *)
@@ -473,5 +502,12 @@ non-negative-integer
 (*   single value is required.                                                *)
 (* - Map and list selectors cannot be mixed at the same collection path.      *)
 (* - Schemas must be declared before use; source and unit names are unique.   *)
+(* - Expanded override paths are unique across all override inputs,  *)
+(*   and must resolve to normally instantiated value nodes. Empty selectors, *)
+(*   remote target domains, and partial array targets are not permitted.     *)
+(* - Overrides are collected before evaluation and applied at the target's   *)
+(*   declaration; replacement dependencies must already be available there.  *)
+(* - Overrides preserve declaration constraints, may replace !constant       *)
+(*   values, and take precedence over subsequent ordinary modifications.    *)
 (* - Functions are host-defined extensions; their availability and semantics  *)
 (*   are implementation-specific.                                            *)

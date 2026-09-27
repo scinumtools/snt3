@@ -319,7 +319,9 @@ evaluated at the target declaration, so its dependencies must already be
 available then. See :ref:`dip-overrides` for examples, evaluation order, and
 unit conversion rules.
 
-Override bodies contain only ``path = value`` modifications. Each path may
+Override bodies contain ``path = value`` modifications and optional nested
+path prefixes, such as ``"simulation\n  steps = 1024"``. Indentation starts
+at zero in string and file bodies. Each expanded path may
 appear once and must have a normal declaration. Overrides also replace
 ``!constant`` values during initial evaluation. Later ordinary modifications
 are ignored; dependent expressions and conditions see the replacement value.

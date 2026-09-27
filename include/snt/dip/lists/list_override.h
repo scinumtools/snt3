@@ -20,6 +20,8 @@ namespace snt::dip {
       public:
         /** Register one modification; a repeated target is an error. */
         void append(const BaseNode::PointerType& node);
+        /** Atomically collect a body, expanding indentation into fully qualified target paths. */
+        void append(const BaseNode::ListType& nodes, size_t indent);
         /** Find a modification by fully qualified target path, or return nullptr. */
         BaseNode::PointerType find(const std::string& path) const;
         /** Mark a target consumed after successful application. */

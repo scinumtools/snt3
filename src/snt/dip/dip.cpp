@@ -220,20 +220,8 @@ code list : snt_project_code
         std::queue<Line> override_lines;
         parse_lines(override_lines, source_code, source_name);
         const auto nodes = parse_code_nodes(override_lines);
-        if (nodes.empty())
-            throw dip::SyntaxException(
-                "Empty override", "The override body has no modifications.",
-                "Provide one or more complete value modifications.", __FILE__, __LINE__
-            );
         auto overrides = env.overrides;
-        for (const auto& node : nodes) {
-            if (node->dtype != NodeDtype::Modification || node->indent != 0)
-                throw dip::SyntaxException(
-                    "Invalid override entry", "An override body may contain only unindented value modifications.",
-                    "Use `path = value` without a node type or nested block.", __FILE__, __LINE__, node->line
-                );
-            overrides.append(node);
-        }
+        overrides.append(nodes, 0);
         env.sources.append(source_name, source_file, source_code, {source.name, source.line_number});
         env.overrides = std::move(overrides);
         ++num_overrides;
@@ -360,38 +348,6 @@ code list : snt_project_code
     static constexpr std::array<NodeDtype, 5> preceeding_nodes = {
         NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table
     };
-
-    inline void check_indent(const BaseNode::PointerType& previous_node, const BaseNode::PointerType& current_node) {
-        // We make sure that the indent spacing is always set by INDENT_STEP
-        if ((current_node->indent % INDENT_STEP) != 0) {
-            std::stringstream suggested;
-            suggested << (current_node->indent - (current_node->indent % INDENT_STEP)) << ", ";
-            suggested << (current_node->indent - (current_node->indent % INDENT_STEP) + INDENT_STEP) << ", ...";
-            throw dip::SyntaxException(
-                "Invalid indent length",
-                "The indentation length is " + std::to_string(current_node->indent) + ", which is not a multiple of " +
-                    std::to_string(INDENT_STEP) + ".",
-                "Use an indentation length of " + suggested.str(),
-                __FILE__,
-                __LINE__,
-                current_node->line
-            );
-        }
-        if (previous_node != nullptr) {
-            if ((current_node->indent > previous_node->indent) &&
-                (current_node->indent - previous_node->indent) != INDENT_STEP) {
-                throw dip::SyntaxException(
-                    "Child node has an invalid indent",
-                    "The child node is indented " + std::to_string(current_node->indent) +
-                        " spaces, but it should be " + std::to_string(previous_node->indent + INDENT_STEP) + " spaces.",
-                    "Indent the child node " + std::to_string(INDENT_STEP) + " spaces more than the preceding node.",
-                    __FILE__,
-                    __LINE__,
-                    current_node->line
-                );
-            }
-        }
-    }
 
     inline void set_node_property(const BaseNode::PointerType& current_node, const BaseNode::PointerType& previous_node) {
         // assign properties to the previous value node
@@ -614,23 +570,11 @@ code list : snt_project_code
                         "Invalid override region", "An $override directive must be at the top level.",
                         "Move the directive to indentation zero.", __FILE__, __LINE__, current_node->line
                     );
-                size_t count = 0;
-                while (i + 1 < queue.size() && queue.at(i + 1)->indent > current_node->indent) {
-                    const auto entry = queue.at(++i);
-                    if (entry->dtype != NodeDtype::Modification || entry->indent != INDENT_STEP)
-                        throw dip::SyntaxException(
-                            "Invalid override entry", "An $override region may contain only value modifications.",
-                            "Use `path = value` indented one level beneath $override.",
-                            __FILE__, __LINE__, entry->line
-                        );
-                    env.overrides.append(entry);
-                    ++count;
-                }
-                if (count == 0)
-                    throw dip::SyntaxException(
-                        "Empty override", "The $override region has no modifications.",
-                        "Add at least one value modification.", __FILE__, __LINE__, current_node->line
-                    );
+                BaseNode::ListType body;
+                while (i + 1 < queue.size() &&
+                       (queue.at(i + 1)->dtype == NodeDtype::Empty || queue.at(i + 1)->indent > current_node->indent))
+                    body.push_back(queue.at(++i));
+                env.overrides.append(body, INDENT_STEP);
                 previous_node = nullptr;
             } else {
                 // push rest of the nodes to the filtered node queue

@@ -177,7 +177,8 @@ Overriding initial values
 
 Use ``$override`` to replace values without changing a node's type, units,
 properties, or hierarchy. The region contains only value modifications, with
-fully qualified paths. Declare regions at the top level, outside schemas and
+dotted paths or nested indentation. Bare paths inside a region are prefixes,
+not group declarations. Declare regions at the top level, outside schemas and
 nested blocks. Their order among top-level inputs does not matter:
 
 .. code-block:: dipl
@@ -188,6 +189,19 @@ nested blocks. Their order among top-level inputs does not matter:
    simulation
      resolution int = 512
      cells int = ({?simulation.resolution} * 2)
+
+For example, the same target can be written with a nested prefix:
+
+.. code-block:: dipl
+
+   $override
+     simulation
+       resolution = 1024
+
+Use either form for a given target: duplicate detection uses the expanded
+path. Prefixes may name existing collection items, and value-bearing parents
+may have nested modifications to their existing children. Types, properties,
+schema applications, and collection appends are not allowed in override bodies.
 
 Replacement values may be literals, references, expressions, or calls to
 registered DIPL value functions. For example:

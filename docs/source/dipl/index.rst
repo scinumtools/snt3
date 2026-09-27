@@ -217,6 +217,27 @@ map items, lists, or complete collections:
      density = 8960
      conductivity = 401
 
+Value overrides
+^^^^^^^^^^^^^^^
+
+Top-level ``$override`` regions tune values in an existing model. They are
+collected before evaluation and preserve declaration types, units, properties,
+and constraints. Dotted paths and nested path prefixes are both supported:
+
+.. code-block:: dipl
+
+   $override
+     simulation.steps = 1024
+
+   simulation
+     steps int = 100
+
+Dependencies and existing conditional definitions use the replacement values.
+Duplicate targets and targets that are not instantiated are errors. See the
+`Overrides specification
+<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/syntax/overrides.md>`_
+for syntax, evaluation order, units, and host registration rules.
+
 Conditional definitions
 ^^^^^^^^^^^^^^^^^^^^^^^
 

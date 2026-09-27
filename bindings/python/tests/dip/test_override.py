@@ -222,3 +222,89 @@ def test_schema_override_constraint_error_retains_schema_declaration():
     assert 'Declaration: ' in diagnostic
     assert 'value int = 1' in diagnostic
     assert 'at:' in diagnostic and 'physics.value = 3' in diagnostic
+
+
+@pytest.mark.parametrize('origin', ['inline', 'string', 'file'])
+def test_nested_override_paths(tmp_path, origin):
+    # Prefixes expand through the normal hierarchy rules without creating model nodes.
+    parser = DIP()
+    parser.add_string('simulation\n  steps int = 100\n  box_size float = 1 m\n  nested\n    enabled bool = false\nitems[a]\n  mass float = 1 kg\nparent int = 1\n  child int = 2')
+    body = ('simulation\n  steps = 1024\n  box_size = 200 cm\n  nested\n    enabled = true\n'
+            'items[a]\n  mass = 3 kg\nparent = 4\n  child = 5')
+    if origin == 'inline':
+        parser.add_string('$override\n' + '\n'.join('  ' + line for line in body.splitlines()))
+    elif origin == 'string':
+        parser.add_override_string(body)
+    else:
+        file = tmp_path / 'nested.dip'
+        file.write_text(body)
+        parser.add_override_file(file)
+    env = parser.parse()
+    assert [(node.name, node.value) for node in env.select('?')] == [
+        ('simulation.steps', 1024), ('simulation.box_size', 2),
+        ('simulation.nested.enabled', True), ('items[a].mass', 3),
+        ('parent', 4), ('parent.child', 5),
+    ]
+    assert all(node.override for node in env.select('?'))
+    assert env['simulation.steps'].provenance.override_code.strip() == 'steps = 1024'
+
+
+@pytest.mark.parametrize('body', [
+    'simulation\n  steps = 2\nsimulation.steps = 3',
+    'simulation.steps = 3\nsimulation\n  steps = 2',
+    'simulation\n  steps = 2\nsimulation\n  steps = 3',
+])
+def test_nested_override_duplicates_are_atomic(body):
+    # Different spellings of the same full path are duplicates, not precedence rules.
+    parser = DIP()
+    with pytest.raises(RuntimeError, match='Duplicate override'):
+        parser.add_override_string(body)
+    parser.add_override_string('simulation.steps = 4')
+    parser.add_string('simulation.steps int = 1')
+    env = parser.parse()
+    assert env['simulation.steps'].value == 4
+
+
+@pytest.mark.parametrize('body', [
+    'simulation\n  steps int = 2',
+    'simulation : settings\n  steps = 2',
+    'simulation map\n  steps = 2',
+    'simulation\n  !tags ["export"]\n  steps = 2',
+    'simulation\n  ?descr "Description"\n  steps = 2',
+    'items[]\n  mass = 2',
+    'simulation',
+    'simulation\n    steps = 2',
+    '  simulation.steps = 2',
+])
+def test_nested_override_rejects_structural_entries(body):
+    # Indentation is shorthand for paths, never permission to declare or append nodes.
+    parser = DIP()
+    with pytest.raises(RuntimeError):
+        parser.add_override_string(body)
+
+
+def test_nested_override_missing_target_is_not_created():
+    parser = DIP()
+    parser.add_string('simulation.steps int = 1')
+    parser.add_override_string('simulation\n  missing = 2')
+    with pytest.raises(RuntimeError, match='Unresolved override'):
+        parser.parse()
+
+
+def test_nested_prefixes_compose_dotted_paths_and_list_indices():
+    # Nested and dotted paths compose identically, including concrete list item selectors.
+    parser = DIP()
+    parser.add_string('root\n  items[]\n    nested.value int = 1\n  items[]\n    nested.value int = 2')
+    parser.add_string('$override\n  root\n    # Select a concrete item, without appending one.\n    items[1]\n\n      nested.value = 8')
+    env = parser.parse()
+    assert [(n.name, n.value) for n in env.select('?')] == [
+        ('root.items[0].nested.value', 1), ('root.items[1].nested.value', 8),
+    ]
+
+
+def test_nested_and_flat_overrides_conflict_across_origins():
+    parser = DIP()
+    parser.add_override_string('group\n  value = 2')
+    parser.add_string('group.value int = 1\n$override\n  group.value = 3')
+    with pytest.raises(RuntimeError, match='Duplicate override'):
+        parser.parse()

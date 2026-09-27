@@ -325,3 +325,16 @@ TEST(Override, ConstraintDiagnosticLocation) {
         EXPECT_EQ(exception.info().details.find("Declaration: "), std::string::npos);
     }
 }
+
+TEST(Override, NestedPathsUseExistingHierarchy) {
+    // Prefixes share normal path composition; only their value entries become overrides.
+    dip::DIP parser;
+    parser.add_string("group\n  nested.value int = 1\nitems[a]\n  value int = 2");
+    parser.add_override_string("group\n  nested\n    value = 3\nitems[a]\n  value = 4");
+    const auto env = parser.parse();
+    EXPECT_EQ(env.nodes.size(), 2);
+    EXPECT_EQ(env["group.nested.value"].as<int64_t>(), 3);
+    EXPECT_EQ(env["items[a].value"].as<int64_t>(), 4);
+    EXPECT_TRUE(env.overrides.unresolved().empty());
+    EXPECT_EQ(env["group.nested.value"].get_provenance().override_code, "    value = 3");
+}

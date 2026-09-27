@@ -60,6 +60,7 @@ At a conceptual level:
 * **Units** provide dimensional information and ensure physical consistency during evaluation.
 * **Properties** attach metadata and declarative constraints to the configuration.
 * **Schemas** define expected structures and provide a basis for validating complete configurations.
+* **Overrides** replace values in an existing parameter model while preserving its declarations and constraints.
 
 This design allows DIPL to represent not only data, but also the semantic relationships and domain-specific rules governing that data. 
 The resulting document can be interpreted both as **data** and as an **executable configuration model**: values can be evaluated, dependencies resolved, and semantic constraints validated by the DIPL interpreter.
@@ -110,6 +111,7 @@ The following topics are covered:
 * [Properties](syntax/properties.md) — metadata and properties associated with nodes.
 * [Conditions](syntax/conditions.md) — conditional definitions and constraints.
 * [Schemas](syntax/schemas.md) — schemas for defining and validating structured data.
+* [Overrides](syntax/overrides.md) — value replacements applied before normal evaluation.
 
 ## File Format
 
@@ -125,6 +127,8 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
 1. **Parsing**  
    The input MUST be parsed into a structured representation of nodes.
    This includes processing indentation, node types, and structural relationships.
+   All top-level override regions MUST be collected at this stage, before
+   normal node evaluation. Duplicate override targets MUST result in an error.
 2. **Dependency Resolution**  
    All references MUST be resolved into a directed acyclic graph (DAG) of node dependencies.
    - Unresolved sources or node references MUST result in an error.
@@ -137,6 +141,11 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
    - scalar values
    - arrays and structured values
    - expressions involving references
+   For an overridden node, only its replacement value MUST be evaluated, at
+   the target declaration. Its dependencies MUST already be available then.
+   The original value MUST NOT be evaluated. Subsequent dependents and
+   conditional definitions MUST use the replacement value. These rules are
+   defined in the [Overrides](syntax/overrides.md) chapter.
    If evaluation fails (e.g. invalid operations or unresolved values), evaluation MUST fail.
 5. **Unit Normalization**  
    All evaluated values MUST be converted to the canonical unit representation defined in the Units specification.
@@ -188,6 +197,7 @@ The following conditions MUST result in evaluation failure:
 - type mismatch
 - unit incompatibility
 - expression evaluation failure
+- duplicate, invalid, or unresolved override target
 
 Errors MUST be deterministic and MUST NOT be ignored.
 
@@ -229,6 +239,7 @@ Independent implementations of the DIPL language (e.g., in Rust or Julia) are en
 | **Definition**     | Statement creating a node and assigning its value                          |
 | **Declaration**    | Statement creating a typed node without a value                            |
 | **Modification**   | Statement assigning a value to an existing node                            |
+| **Override**       | Collected value replacement evaluated at an existing node's declaration    |
 | **Source**         | Named external DIPL/text domain                                            |
 | **Reference**      | Expression identifying existing nodes or external content                  |
 | **Import**         | An operation that inserts referenced nodes into the current node hierarchy |

@@ -27,6 +27,12 @@ namespace snt::dip {
         }
     } // namespace
 
+    void HierarchyList::record_parent(const BaseNode::PointerType& node) {
+        while (!parents.empty() && node->indent <= parents.back().indent)
+            parents.pop_back();
+        parents.push_back({node->indent, node->path.name, node->path.collections});
+    }
+
     void HierarchyList::record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded) {
         if (node->path.name == "")
             return;
@@ -35,9 +41,7 @@ namespace snt::dip {
                 return;
 
         // closed children nodes and register new parent
-        while (parents.size() > 0 && node->indent <= parents.back().indent)
-            parents.pop_back();
-        parents.push_back({node->indent, node->path.name, node->path.collections});
+        record_parent(node);
 
         // aggregate all path collections
         std::vector<Path::CollectionAccess> collections_full;

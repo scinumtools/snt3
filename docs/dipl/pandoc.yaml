@@ -20,6 +20,7 @@ input-files:
   - docs/dipl/syntax/properties.md
   - docs/dipl/syntax/conditions.md
   - docs/dipl/syntax/schemas.md
+  - docs/dipl/syntax/overrides.md
   - docs/dipl/appendix/highlighting.md
 
 syntax-definitions:

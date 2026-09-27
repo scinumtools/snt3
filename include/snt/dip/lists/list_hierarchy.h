@@ -42,6 +42,9 @@ namespace snt::dip {
          */
         void record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded);
 
+        /** Update indentation context without creating nodes or collection items. */
+        void record_parent(const BaseNode::PointerType& node);
+
         /**
          * Get path of the current hierarchy level
          *

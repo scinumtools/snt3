@@ -1,7 +1,53 @@
+#include "../parsers.h"
+
 #include <snt/dip/exceptions.h>
+#include <snt/dip/lists/list_hierarchy.h>
 #include <snt/dip/lists/list_override.h>
 
 namespace snt::dip {
+
+    void OverrideList::append(const BaseNode::ListType& nodes, size_t indent) {
+        BaseNode::ListType body;
+        for (const auto& node : nodes)
+            if (node->dtype != NodeDtype::Empty)
+                body.push_back(node);
+        if (body.empty())
+            throw dip::SyntaxException(
+                "Empty override", "The override body has no modifications.",
+                "Provide one or more value modifications.", __FILE__, __LINE__
+            );
+        OverrideList collected = *this;
+        HierarchyList hierarchy;
+        for (size_t i = 0; i < body.size(); ++i) {
+            const auto& node = body.at(i);
+            const bool prefix = node->dtype == NodeDtype::Group && node->dtype_raw[1].empty() &&
+                                node->schemas.empty() && node->value_raw.empty();
+            if ((!prefix && node->dtype != NodeDtype::Modification) || node->path.name.empty() ||
+                node->path.name.find("[]") != std::string::npos)
+                throw dip::SyntaxException(
+                    "Invalid override entry", "Override bodies accept only value modifications and path prefixes.",
+                    "Use existing paths without types, properties, schema applications, or collection appends.",
+                    __FILE__, __LINE__, node->line
+                );
+            check_indent(i == 0 ? nullptr : body.at(i - 1), node);
+            if (node->indent < indent || (i == 0 && node->indent != indent))
+                throw dip::SyntaxException(
+                    "Invalid override indentation", "Override children must be indented exactly one level.",
+                    "Start at the body indentation and use two spaces per nested level.",
+                    __FILE__, __LINE__, node->line
+                );
+            if (prefix && (i + 1 == body.size() || body.at(i + 1)->indent <= node->indent))
+                throw dip::SyntaxException(
+                    "Empty override prefix", "The path prefix `" + node->path.name + "` has no modifications.",
+                    "Add nested value modifications or remove the prefix.", __FILE__, __LINE__, node->line
+                );
+            auto resolved = node->clone(hierarchy.get_current_path(node->indent, node->path.name));
+            if (!prefix)
+                collected.append(resolved);
+            hierarchy.record_parent(node);
+        }
+        *this = std::move(collected);
+    }
 
     void OverrideList::append(const BaseNode::PointerType& node) {
         if (!node || node->dtype != NodeDtype::Modification || node->path.name.empty())

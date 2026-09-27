@@ -6,6 +6,7 @@
 
 namespace snt::dip {
 
+    void check_indent(const BaseNode::PointerType& previous_node, const BaseNode::PointerType& current_node);
     EnvSource parse_source(const std::string& source_name, const std::string& source_file, const Source& parent);
     std::queue<Line> parse_lines(
         std::queue<Line>& lines, const std::string& source_code, const std::string& source_name
