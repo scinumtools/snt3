@@ -169,3 +169,70 @@ Original source text, file paths, line numbers, and source identities are retain
 Schema names follow DIPL keyword rules and must be unique. Empty bodies and
 bodies containing a surrounding ``$schema`` declaration are rejected. Ordinary
 ``add_string()`` and ``add_file()`` still accept complete DIPL documents.
+
+.. _dip-overrides:
+
+Overriding initial values
+-------------------------
+
+Use ``$override`` to replace values without changing a node's type, units,
+properties, or hierarchy. The region contains only value modifications, with
+fully qualified paths. Declare regions at the top level, outside schemas and
+nested blocks. Their order among top-level inputs does not matter:
+
+.. code-block:: dipl
+
+   $override
+     simulation.resolution = 1024
+
+   simulation
+     resolution int = 512
+     cells int = ({?simulation.resolution} * 2)
+
+Replacement values may be literals, references, expressions, or calls to
+registered DIPL value functions. For example:
+
+.. code-block:: dipl
+
+   base float = 10 cm
+   radius float = 1 cm
+   diameter float = ({?radius} * 2) cm
+
+   $override
+     radius = ({?base} * 2) cm
+
+This evaluates ``radius`` to ``20 cm`` and ``diameter`` to ``40 cm``.
+Alternatively, the replacement could be ``radius = {?base} cm`` or
+``radius = compute_radius() cm``, provided the host has registered the
+``compute_radius`` value function. These are alternatives for the same target,
+not entries to combine in one input.
+
+An override is evaluated when its target declaration is processed. Values
+referenced by its expression, reference, or function must already be available
+at that point. Moving the ``$override`` region does not change this requirement
+or enable forward references. The original value expression or function is
+not evaluated; subsequent dependents see the replacement value.
+
+The replacement must satisfy the target's type, declared dimensions, and
+constraints. Explicit compatible units are converted to the target's declared
+units; without explicit units, the replacement uses the target's units.
+These rules also apply to bodies supplied through ``add_override_string`` and
+``add_override_file``.
+
+When an overridden value violates an options, condition, or format constraint,
+the diagnostic points to the override and includes the original declaration
+as context. File paths are included when available.
+
+Dependencies and conditions see the overridden value. Existing conditional
+definitions may therefore instantiate different nodes: overrides preserve the
+declared model, while its evaluated graph follows its existing conditions. An
+override targeting a node that remains inactive is an error.
+
+An override may replace a ``!constant``
+value; subsequent ordinary modifications to that node are ignored. Duplicate
+or unmatched override paths are errors. Host code can call
+``add_override_string(body)`` or ``add_override_file(path)``. Both accept an
+unwrapped DIPL override body; files retain their source path in provenance. Selected nodes
+expose the ``override`` flag, and cursor provenance retains both the original
+declaration and the override source. DIPH5 persists the evaluated value and
+this provenance.

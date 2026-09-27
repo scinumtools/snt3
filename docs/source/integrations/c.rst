@@ -126,3 +126,15 @@ with an explicit schema name and a body without a ``$schema`` wrapper:
 
 The file variant takes ``(parser, name, path, error)``. Both functions use the
 same return codes and error structure as the other parser functions.
+
+Overrides
+---------
+
+``snt_dip_parser_add_override_string(parser, body, error)`` accepts unwrapped
+``path = value`` modifications before parsing. Use
+``snt_dip_parser_add_override_file(parser, path, error)`` to read the body from
+a file. Registration is atomic and file provenance retains the source path.
+
+After parsing or loading DIPH5, call
+``snt_dip_parser_is_overridden(parser, path, &result, error)`` to inspect the
+override flag. ``result`` is 1 for an overridden value and 0 otherwise.

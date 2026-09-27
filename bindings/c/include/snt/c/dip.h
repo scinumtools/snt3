@@ -34,6 +34,10 @@ int snt_dip_parser_create(snt_dip** result, snt_dip_error* error);
 int snt_dip_parser_add_schema_string(snt_dip* dip, const char* name, const char* source, snt_dip_error* error);
 /** Register a named schema body from a file. */
 int snt_dip_parser_add_schema_file(snt_dip* dip, const char* name, const char* path, snt_dip_error* error);
+/** Collect an unwrapped override body containing only path = value modifications. */
+int snt_dip_parser_add_override_string(snt_dip* dip, const char* source, snt_dip_error* error);
+/** Register an unwrapped override body from a file, retaining its source path. */
+int snt_dip_parser_add_override_file(snt_dip* dip, const char* path, snt_dip_error* error);
 /** Add DIPL source text to a parser. */
 int snt_dip_parser_add_string(snt_dip* dip, const char* source, snt_dip_error* error);
 /** Add a DIPL source file to a parser. */
@@ -44,6 +48,8 @@ int snt_dip_parser_add_project(snt_dip* dip, const char* path, snt_dip_error* er
 int snt_dip_parser_parse(snt_dip* dip, snt_dip_error* error);
 /** Format a parsed DIPL value into a caller-provided buffer. */
 int snt_dip_parser_get(const snt_dip* dip, const char* path, char* buffer, size_t capacity, snt_dip_error* error);
+/** Set result to 1 when the parsed or loaded value was explicitly overridden, otherwise 0. */
+int snt_dip_parser_is_overridden(const snt_dip* dip, const char* path, int* result, snt_dip_error* error);
 /** Load the environment from an HDF5 file. */
 int snt_dip_environment_load(snt_dip* dip, const char* path, snt_dip_error* error);
 /** Save the environment to an HDF5 file. */

@@ -93,6 +93,44 @@ extern "C" int snt_dip_parser_add_file(snt_dip* dip, const char* path, snt_dip_e
     }
 }
 
+extern "C" int snt_dip_parser_add_override_string(snt_dip* dip, const char* source, snt_dip_error* error) {
+    try {
+        if (!dip || !source)
+            throw std::invalid_argument("DIP and override text are required");
+        dip->parser.add_override_string(source);
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
+extern "C" int snt_dip_parser_add_override_file(snt_dip* dip, const char* path, snt_dip_error* error) {
+    try {
+        if (!dip || !path)
+            throw std::invalid_argument("DIP and override file path are required");
+        dip->parser.add_override_file(path);
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
+extern "C" int snt_dip_parser_is_overridden(
+    const snt_dip* dip, const char* path, int* result, snt_dip_error* error
+) {
+    try {
+        if (!dip || !dip->parsed || !path || !result)
+            throw std::invalid_argument("parsed DIP, path, and output are required");
+        *result = dip->env.get_node(path)->override ? 1 : 0;
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
 extern "C" int snt_dip_parser_add_project(snt_dip* dip, const char* path, snt_dip_error* error) {
     try {
         if (!dip || !path)

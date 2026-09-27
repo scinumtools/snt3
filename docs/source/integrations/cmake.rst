@@ -81,3 +81,20 @@ For lower-level use, invoke the installed executable directly. The
        OUTPUT_STRIP_TRAILING_WHITESPACE
        COMMAND_ERROR_IS_FATAL ANY
    )
+
+Overriding values
+-----------------
+
+``snt_dip_get`` accepts ``OVERRIDE_STRING`` with an unwrapped DIPL override body:
+
+.. code-block:: cmake
+
+   snt_dip_get(FILE config.dip PATH build.python TYPE BOOL OUTPUT enabled
+               OVERRIDE_STRING "build.python = true")
+
+Multiple modifications may be separated by newlines. Overrides are applied
+before evaluation and follow the same validation and duplicate rules as DIPL.
+
+Use ``OVERRIDE_FILE overrides.dip`` to load an unwrapped body from a file.
+The path is relative to ``CMAKE_CURRENT_SOURCE_DIR`` and is tracked as a
+configure dependency. Both override arguments may be used for distinct targets.

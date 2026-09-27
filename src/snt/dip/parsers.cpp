@@ -5,6 +5,7 @@
 #include "nodes/node_group.h"
 #include "nodes/node_import.h"
 #include "nodes/node_modification.h"
+#include "nodes/node_override.h"
 #include "nodes/node_property.h"
 #include "nodes/node_schema.h"
 #include "nodes/node_source.h"
@@ -229,6 +230,8 @@ namespace snt::dip {
                 node = SourceNode::is_node(parser);
             if (node == nullptr)
                 node = SchemaNode::is_node(parser);
+            if (node == nullptr)
+                node = OverrideNode::is_node(parser);
             if (node == nullptr)
                 node = CaseNode::is_node(parser);
             if (node == nullptr)

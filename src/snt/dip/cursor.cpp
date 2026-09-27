@@ -112,13 +112,19 @@ namespace snt::dip {
 
     Provenance Cursor::get_provenance() const {
         const dip::ValueNode::PointerType node = get_node();
-        return {
+        Provenance provenance{
             node->line.source.name,
             node->line.source.line_number,
             node->line.code,
             node->metadata,
             env_->get_source_info(node->line.source.name),
         };
+        if (node->override) {
+            provenance.override_source = env_->get_source_info(node->override_line.source.name);
+            provenance.override_line = node->override_line.source.line_number;
+            provenance.override_code = node->override_line.code;
+        }
+        return provenance;
     }
 
     val::Array::ShapeType Cursor::get_shape() const {

@@ -7,9 +7,9 @@
 namespace snt::dip::hdf5::schema {
 
     inline constexpr std::string_view FORMAT = "SciNumTools3 Environment";
-    // DIPH5 2.4 persists descriptive schema provenance in the trace manifest.
+    // DIPH5 2.5 persists effective override state and its source.
     inline constexpr uint64_t VERSION = 2;
-    inline constexpr uint64_t VERSION_MINOR = 4;
+    inline constexpr uint64_t VERSION_MINOR = 5;
     inline constexpr uint64_t FIRST_SUPPORTED_VERSION = 1;
 
     inline constexpr std::string_view ATTR_FORMAT = "_DIPL_Format";
@@ -31,6 +31,10 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_OPTION_UNITS = "_DIPL_Option_Units";
     inline constexpr std::string_view ATTR_SCHEMAS = "_DIPL_Schemas";
     inline constexpr std::string_view ATTR_NODE_SCHEMA_ID = "_DIPL_Node_Schema_Id";
+    inline constexpr std::string_view ATTR_OVERRIDE = "_DIPL_Override";
+    inline constexpr std::string_view ATTR_OVERRIDE_SOURCE = "_DIPL_Override_Source";
+    inline constexpr std::string_view ATTR_OVERRIDE_LINE = "_DIPL_Override_Line";
+    inline constexpr std::string_view ATTR_OVERRIDE_CODE = "_DIPL_Override_Code";
     inline constexpr std::string_view ATTR_SOURCE = "_DIPL_Source";
     inline constexpr std::string_view ATTR_SOURCE_LINE = "_DIPL_Source_Line";
     inline constexpr std::string_view ATTR_SOURCE_CODE = "_DIPL_Source_Code";

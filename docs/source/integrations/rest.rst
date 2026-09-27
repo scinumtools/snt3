@@ -203,3 +203,21 @@ Schemas are registered before the code is parsed. Duplicate or empty schema
 names, multiple code parts, and mixing these parts with a project bundle are
 rejected. Existing query options and ``output=diph5`` also work with this input.
 Raw DIPL request bodies and project bundles remain supported.
+
+Override uploads
+----------------
+
+Multipart DIPL requests accept ``override`` fields or file parts alongside the
+required ``code`` part and optional ``schema:<name>`` parts. Each override part
+contains an unwrapped body of ``path = value`` modifications. Repeated parts
+are allowed, but repeated target paths are errors.
+
+.. code-block:: shell
+
+   curl --form 'code=@parameters.dip' \
+       --form-string 'override=simulation.steps = 1024' \
+       'http://localhost:8080/snt/dip/parse'
+
+Project bundles also accept ``override`` fields or files alongside their
+``project`` and ``file`` parts. The uploaded model files need no edits. Plain
+DIPL request bodies accept top-level ``$override`` regions.

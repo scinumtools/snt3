@@ -24,6 +24,7 @@ namespace snt::dip {
         bool kwd_unit();
         bool kwd_source();
         bool kwd_schema();
+        bool kwd_override();
         bool kwd_property(PropertyType& ptype);
         bool part_trim();
         bool part_indent();

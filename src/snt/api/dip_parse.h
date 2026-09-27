@@ -30,6 +30,7 @@ namespace snt::api {
         std::string save_file;         ///< Optional DIPH5 output path
         std::optional<dip::ExportFormat> generate_format; ///< Optional static export format
         std::string generate_file;     ///< Optional static export output path
+        bool has_model_input = false;  ///< Whether a model input, excluding overrides, has been added
         bool has_input = false;        ///< Whether DIPL inputs have been added
         bool has_project = false;      ///< Whether a DIPfile project has been added
 
@@ -42,7 +43,7 @@ namespace snt::api {
         /**
          * Add code
          *
-         * @param add_type project/file/string (one value), source/unit/schema_string/schema_file (name and value)
+         * @param add_type project/file/string/override_string/override_file (one value), source/unit/schema_string/schema_file (name and value)
          * @param add_values Code input values
          **/
         void argument_add(const std::string& add_type, const std::vector<std::string>& add_values);

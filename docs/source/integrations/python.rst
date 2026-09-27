@@ -236,6 +236,10 @@ content fingerprints:
    if provenance.source is not None:
        print(provenance.source.path, provenance.source.hash)
 
+When a value was overridden, ``provenance.override_source``,
+``provenance.override_line``, and ``provenance.override_code`` identify the
+effective value's origin; the original declaration fields remain available.
+
 Python values and NumPy
 -----------------------
 
@@ -291,3 +295,36 @@ an optional ``source`` identity with its path and hash. ``env.schemas`` remains
 empty after loading; the snapshot cannot instantiate schemas.
 The command API also supports ``argument_add("schema_string", [name, body])``
 and ``argument_add("schema_file", [name, path])``; file paths there are strings.
+
+Overriding initial values
+-------------------------
+
+Use a ``$override`` region in DIPL, or register an unwrapped override body
+before ``parse()``:
+
+.. code-block:: python
+
+   dip = DIP()
+   dip.add_override_string("simulation.steps = 1024")
+   # Alternatively, read an unwrapped body from a file:
+   # dip.add_override_file("overrides.dip")
+   dip.add_string("simulation\n  steps int = 100")
+   env = dip.parse()
+   print(env["simulation.steps"].value)  # 1024
+
+Override bodies also accept DIPL references, expressions, and calls to
+registered value functions, for example
+``dip.add_override_string("radius = ({?base} * 2) cm")``. The replacement is
+evaluated at the target declaration, so its dependencies must already be
+available then. See :ref:`dip-overrides` for examples, evaluation order, and
+unit conversion rules.
+
+Override bodies contain only ``path = value`` modifications. Each path may
+appear once and must have a normal declaration. Overrides also replace
+``!constant`` values during initial evaluation. Later ordinary modifications
+are ignored; dependent expressions and conditions see the replacement value.
+Existing conditions may activate or deactivate nodes. A target that is not
+instantiated is an unresolved override error. Registration can accompany
+``add_project("DIPfile")``; a rejected override body registers no entries. Inspect
+``node.override`` on a selected node and ``cursor.provenance.override_source``
+for its origin. DIPH5 preserves both the effective value and override provenance.

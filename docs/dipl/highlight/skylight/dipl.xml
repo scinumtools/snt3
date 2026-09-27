@@ -10,7 +10,7 @@
         <!-- Constants / language directives -->
         <RegExpr
             attribute="Constant"
-            String="\$(schema|source|unit)"
+            String="\$(schema|source|unit|override)\b"
             context="#stay"/>
         <RegExpr
             attribute="Constant"

@@ -54,6 +54,9 @@ file(WRITE "${project_dir}/parameters.dip" "answer int = 42\n")
 file(WRITE "${project_dir}/DIPfile" "code[]\n  file = \"parameters.dip\"\n")
 run_cli(success "42\n" --project "${project_dir}/DIPfile" --request answer --value --type integer)
 run_cli(failure "" --project "${project_dir}/DIPfile" --input string "other int = 1")
+# Project tuning must work regardless of whether the override or project is specified first.
+run_cli(success "99\n" --project "${project_dir}/DIPfile" --input override_string "answer = 99" --request answer --value --type integer)
+run_cli(success "99\n" --input override_string "answer = 99" --project "${project_dir}/DIPfile" --request answer --value --type integer)
 
 file(WRITE "${TEST_DIR}/schema.dipl" "value int = 42\n")
 run_cli(success "42\n" -i schema_file settings "${TEST_DIR}/schema.dipl"
@@ -61,3 +64,7 @@ run_cli(success "42\n" -i schema_file settings "${TEST_DIR}/schema.dipl"
 run_cli(success "42\n" -i schema_string settings "value int = 42"
   -i string "physics : settings" -r physics.value --value)
 run_cli(failure "" -i schema_string settings)
+
+# An override file supplies an unwrapped body alongside the existing project.
+file(WRITE "${project_dir}/overrides.dip" "answer = 99\n")
+run_cli(success "99\n" --input override_file "${project_dir}/overrides.dip" --project "${project_dir}/DIPfile" --request answer --value --type integer)

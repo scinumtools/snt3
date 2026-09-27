@@ -33,6 +33,9 @@ namespace snt::dip {
         size_t num_files = 0;   ///< counter of code inputs from a file
         size_t num_sources = 0; ///< number of explicitely added sources
         size_t num_projects = 0; ///< number of project manifests added to this parser
+        size_t num_overrides = 0; ///< number of host-provided override sources
+
+        void add_override_input(const std::string& source_code, const std::filesystem::path& source_file);
 
         void add_schema_input(
             const std::string& name, const std::string& source_code,
@@ -86,6 +89,12 @@ namespace snt::dip {
         void add_schema_string(const std::string& name, const std::string& source_code);
         /** Register a named schema body from a file, with the same rules as add_schema_string(). */
         void add_schema_file(const std::string& name, const std::filesystem::path& source_file);
+
+        /** Atomically register value-only modifications from an unwrapped $override body.
+         * Targets are fully qualified paths in the evaluated model, including active conditional nodes. */
+        void add_override_string(const std::string& source_code);
+        /** Register an unwrapped override body from a file, retaining its source path. */
+        void add_override_file(const std::filesystem::path& source_file);
 
         /**
          * Add DIPL code from a file

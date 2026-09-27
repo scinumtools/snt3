@@ -99,6 +99,11 @@ vehicle
   wheels int = 4
   mass float = 1200 kg
 
+# Override bodies contain value modifications without type declarations.
+$override # Tune the existing vehicle settings.
+  vehicle.wheels = 6
+  vehicle.mass = 1.5e3 kg
+
 # Indexed collection items.
 units[]
   name str = "length"

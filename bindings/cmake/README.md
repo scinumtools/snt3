@@ -30,6 +30,7 @@ build
 ```cmake
 snt_dip_get(FILE <file> PATH <node> OUTPUT <variable>
             [TYPE BOOL|INTEGER|FLOAT|STRING]
+            [OVERRIDE_STRING "path = value"] [OVERRIDE_FILE overrides.dip]
             [DEPENDS <file>...])
 ```
 
@@ -52,6 +53,11 @@ snt_dip_get(FILE <file> PATH <node> OUTPUT <variable>
   discovered automatically. Values are evaluated again at each configuration.
 - Invalid syntax, missing nodes, type mismatches, and CLI failures are fatal.
   A query has a 30-second timeout. Empty strings and `false` are valid results.
+
+`OVERRIDE_STRING` supplies an unwrapped DIPL override body before evaluation.
+It may contain multiple newline-separated modifications. For example,
+`OVERRIDE_STRING "build.python = true"` replaces the declared value, including
+a constant. Duplicate or unresolved override targets fail configuration.
 
 Use normal variables for switches controlled by DIPL. If a switch should instead
 be user-overridable through `-D`, explicitly use the DIPL result as the default
@@ -86,3 +92,6 @@ short form `-i file config.dip`.
 
 A [standalone example](../examples/dip/CMakeIntegration) demonstrates creating or removing a
 build target based on a DIPL boolean.
+
+`OVERRIDE_FILE` reads an unwrapped override body from a file, resolved relative
+to `CMAKE_CURRENT_SOURCE_DIR`, and tracks it as a configure dependency.

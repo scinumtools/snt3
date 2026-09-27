@@ -6,6 +6,8 @@ class SyntaxLexer(RegexLexer):
     aliases = ['dipl']
     tokens = {
         'root': [
+            (r'([ ]*)(\$override)(?=[ ]*(?:#|$))',
+             bygroups(Token.DIP.Text, Token.DIP.Keyword)),
             (r'([ ]*)(#[^\n]*|)(\n)', 
              bygroups(Token.DIP.Text, Token.DIP.Comment, Token.DIP.Text)),
             (r'([ ]*)(\$(?:source|unit|schema))(\s+)(\{)',

@@ -42,6 +42,9 @@ namespace snt::bind::python {
         provenance.def_readonly("source_code", &dip::Provenance::source_code);
         provenance.def_readonly("metadata", &dip::Provenance::metadata);
         provenance.def_readonly("source", &dip::Provenance::source);
+        provenance.def_readonly("override_source", &dip::Provenance::override_source);
+        provenance.def_readonly("override_line", &dip::Provenance::override_line);
+        provenance.def_readonly("override_code", &dip::Provenance::override_code);
 
         auto k = py::enum_<dip::Path::Kind>(m, "PathKind", "Kind of path within a DIPL node hierarchy.");
         k.value("None", dip::Path::Kind::None);

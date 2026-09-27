@@ -529,6 +529,14 @@ namespace snt::dip::hdf5 {
             write_strings(dataset, ATTR_SCHEMAS, node.schemas);
             if (!node.schema_id.empty())
                 write_string(dataset, ATTR_NODE_SCHEMA_ID, node.schema_id);
+            write_scalar<uint8_t>(dataset, ATTR_OVERRIDE, H5T_NATIVE_UINT8, node.override);
+            if (node.override) {
+                write_string(dataset, ATTR_OVERRIDE_SOURCE, node.override_line.source.name);
+                write_scalar<uint64_t>(
+                    dataset, ATTR_OVERRIDE_LINE, H5T_NATIVE_UINT64, node.override_line.source.line_number
+                );
+                write_string(dataset, ATTR_OVERRIDE_CODE, node.override_line.code);
+            }
             if (node.units)
                 write_string(dataset, "units", node.units->to_string());
             if (!node.line.source.name.empty())
@@ -750,6 +758,13 @@ namespace snt::dip::hdf5 {
             }
             node->schemas = read_strings(dataset, ATTR_SCHEMAS);
             node->schema_id = read_string(dataset, ATTR_NODE_SCHEMA_ID);
+            node->override = read_scalar<uint8_t>(dataset, ATTR_OVERRIDE, H5T_NATIVE_UINT8) != 0;
+            if (node->override) {
+                node->override_line.source.name = read_string(dataset, ATTR_OVERRIDE_SOURCE);
+                node->override_line.source.line_number =
+                    read_scalar<uint64_t>(dataset, ATTR_OVERRIDE_LINE, H5T_NATIVE_UINT64);
+                node->override_line.code = read_string(dataset, ATTR_OVERRIDE_CODE);
+            }
             if (!node->schemas.empty())
                 throw dip::IOException(
                     "Invalid value-node schema",

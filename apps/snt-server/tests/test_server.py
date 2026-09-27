@@ -120,7 +120,37 @@ derived int = ({?answer} + 1)
         self.assertIn("derived = 42", result["result"])
         self.assertIn("physics.value = 42", result["result"])
 
+        # Inline and uploaded override bodies must both tune the model before evaluation.
+        for filename in (None, "overrides.dip"):
+            body, content_type = multipart([
+                ("project", "DIPfile", project),
+                ("file", "parameters/base.dipl", "answer int = 41\n"),
+                ("file", "schemas/settings.dipl", "value int = 42\n"),
+                ("override", filename, "answer = 99"),
+            ])
+            with self.request("/snt/dip/parse", body, content_type) as response:
+                result = json.loads(response.read())
+            self.assertIn("answer = 99", result["result"])
+            self.assertIn("derived = 100", result["result"])
+
     def test_DIPSchemaUploads(self):
+        # Inline and uploaded override bodies must both tune the model before evaluation.
+        for filename in (None, "overrides.dip"):
+            body, content_type = multipart([
+                ("schema:settings", None, "value int = 1\n  !constant\n"),
+                ("code", None, "physics : settings\n"),
+                ("override", filename, "physics.value = 42\n"),
+            ])
+            with self.request("/snt/dip/parse?request=physics.value&value=true&type=integer",
+                              body, content_type) as response:
+                self.assertEqual(json.loads(response.read())["result"], "42\n")
+        body, content_type = multipart([
+            ("code", None, "value int = 1\n"),
+            ("override", None, "value = 2"),
+            ("override", "duplicate.dip", "value = 2"),
+        ])
+        with self.assertRaises(urllib.error.HTTPError):
+            self.request("/snt/dip/parse", body, content_type)
         for filename in (None, "settings.dipl"):
             body, content_type = multipart([
                 ("schema:settings", filename, "value int = 42\n"),

@@ -223,6 +223,25 @@ TEST(Environment, InlineSchemaMetadataAndOverrideHdf5RoundTrip) {
     std::filesystem::remove(file);
 }
 
+TEST(Environment, OverrideProvenanceHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string("$override\n  radius = 20 cm\nradius float = 10 cm\n");
+    const auto source = parser.parse();
+    const auto file = environment_file("override-provenance");
+    source.save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_TRUE(loaded.get_node("radius")->override);
+    EXPECT_EQ(loaded["radius"].as<double>(), 20);
+    const auto provenance = loaded["radius"].get_provenance();
+    EXPECT_EQ(provenance.source_line, 3);
+    EXPECT_EQ(provenance.override_line, 2);
+    EXPECT_EQ(provenance.override_code, "  radius = 20 cm");
+    ASSERT_TRUE(provenance.override_source.has_value());
+    EXPECT_EQ(provenance.override_source->name, provenance.source_name);
+    std::filesystem::remove(file);
+}
+
 TEST(Environment, LoadSchemaVersion1WithoutSourceManifest) {
     const auto file = environment_file("load-version-1");
     dip::Environment source = parsed_environment();
@@ -301,7 +320,7 @@ TEST(Environment, SaveHdf5Content) {
         H5Handle minor_version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
         uint64_t minor_version = 0;
         ASSERT_GE(H5Aread(minor_version_attribute, H5T_NATIVE_UINT64, &minor_version), 0);
-    EXPECT_EQ(minor_version, 4);
+    EXPECT_EQ(minor_version, 5);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Trace", H5P_DEFAULT), 0);
         H5Handle source_manifest(H5Gopen2(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), H5Gclose);

@@ -20,11 +20,12 @@ namespace snt::bind::python {
             py::arg("add_value"),
             R"doc(Add a DIPfile project, file, inline code, named source, custom unit, or named schema.
 schema_string and schema_file take a name and unwrapped body or file path.
+override_string takes an unwrapped body; override_file takes its file path. Both may accompany a project.
 A DIPfile may include schemas[] entries.
 
 Args:
-    add_type: project, file, string, source, unit, schema_string, or schema_file.
-    add_value: One value for project/file/string; [name, value] for the others.
+    add_type: project, file, string, override_string, override_file, source, unit, schema_string, or schema_file.
+    add_value: One value for project/file/string/override_string/override_file; [name, value] for the others.
 )doc"
         );
 

@@ -23,7 +23,7 @@
             ;; define several category of keywords
             (x-keywords '("true" "false" "none"))
             (x-types '("float" "int" "bool" "str" "table" "float32" "float64" "float128" "int16" "int32" "int64" "uint16" "uint32" "uint64"))
-            (x-constants '("$source" "$unit" "$schema"))
+            (x-constants '("$source" "$unit" "$schema" "$override"))
             (x-events '("!options" "!constant" "!format" "!condition" "!tags" "!delimiter"))
             (x-metadata '("?descr" "?authors" "?title" "?journal" "?year" "?volume" "?issue" "?pages" "?doi" "?url" "?version" "?created" "?modified" "?license" "?rationale" "?native" "?requires" "?conflicts" "?implies" "?see" "?example" "?recommended_range" "?performance_impact" "?scientific_impact" "?deprecated" "?replacement" "?since" "?category" "?visibility"))
             (x-functions '("@if" "@elif" "@else" "@end"))

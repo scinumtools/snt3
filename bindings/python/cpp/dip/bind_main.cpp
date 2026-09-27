@@ -67,6 +67,16 @@ Args:
 )doc"
         );
         dip.def(
+            "add_override_string", &dip::DIP::add_override_string, py::arg("source_code"),
+            "Collect unwrapped value modifications before evaluating nodes.\n\n"
+            "Args:\n    source_code: DIPL text containing only `path = value` entries."
+        );
+        dip.def(
+            "add_override_file", &dip::DIP::add_override_file, py::arg("source_file"),
+            "Register an unwrapped override body from a file before evaluating nodes.\n\n"
+            "Args:\n    source_file: Path to a file containing only `path = value` entries."
+        );
+        dip.def(
             "add_file",
             &dip::DIP::add_file,
             py::arg("source_file"),

@@ -93,6 +93,21 @@ code list : snt_project_code
             return path.is_absolute() ? path : base / path;
         }
 
+        std::string resolved_override_path(const Environment& env, std::string path) {
+            size_t position = 0;
+            while ((position = path.find("[]", position)) != std::string::npos) {
+                const std::string collection_path = path.substr(0, position);
+                if (!env.hierarchy.has_collection(collection_path))
+                    break;
+                const auto& collection = env.hierarchy.get_collection(collection_path);
+                if (collection.items.empty())
+                    break;
+                path.replace(position, 2, "[" + collection.items.back() + "]");
+                position += collection.items.back().size() + 2;
+            }
+            return path;
+        }
+
     } // namespace
 
     int DIP::num_instances = 0;
@@ -194,6 +209,46 @@ code list : snt_project_code
 
     void DIP::add_unit(const std::string& uname, const std::string& uexpr) {
         env.units.append(uname, uexpr, source.name);
+    }
+
+    void DIP::add_override_string(const std::string& source_code) {
+        add_override_input(source_code, env.sources.at(source.name).path);
+    }
+
+    void DIP::add_override_input(const std::string& source_code, const std::filesystem::path& source_file) {
+        const std::string source_name = source.name + "_OVERRIDE" + std::to_string(num_overrides);
+        std::queue<Line> override_lines;
+        parse_lines(override_lines, source_code, source_name);
+        const auto nodes = parse_code_nodes(override_lines);
+        if (nodes.empty())
+            throw dip::SyntaxException(
+                "Empty override", "The override body has no modifications.",
+                "Provide one or more complete value modifications.", __FILE__, __LINE__
+            );
+        auto overrides = env.overrides;
+        for (const auto& node : nodes) {
+            if (node->dtype != NodeDtype::Modification || node->indent != 0)
+                throw dip::SyntaxException(
+                    "Invalid override entry", "An override body may contain only unindented value modifications.",
+                    "Use `path = value` without a node type or nested block.", __FILE__, __LINE__, node->line
+                );
+            overrides.append(node);
+        }
+        env.sources.append(source_name, source_file, source_code, {source.name, source.line_number});
+        env.overrides = std::move(overrides);
+        ++num_overrides;
+    }
+
+    void DIP::add_override_file(const std::filesystem::path& source_file) {
+        std::ifstream file(source_file);
+        if (!file)
+            throw dip::IOException(
+                "File not found", "The file `" + source_file.string() + "` could not be opened.",
+                "Check whether the file exists and whether you have sufficient permissions.", __FILE__, __LINE__
+            );
+        std::ostringstream code;
+        code << file.rdbuf();
+        add_override_input(code.str(), source_file);
     }
 
     void DIP::add_project(const std::filesystem::path& project_file) {
@@ -455,6 +510,11 @@ code list : snt_project_code
                     "Unexpected schema declaration", "A schema body cannot contain a $schema declaration.",
                     "Pass the body without its $schema wrapper.", __FILE__, __LINE__, node->line
                 );
+            if (node->dtype == NodeDtype::Override)
+                throw dip::SyntaxException(
+                    "Invalid override region", "An $override directive cannot be declared inside a schema.",
+                    "Use a top-level region with fully qualified target paths.", __FILE__, __LINE__, node->line
+                );
             check_indent(previous, node);
             if (!previous && node->indent != 0)
                 throw dip::SyntaxException(
@@ -511,6 +571,12 @@ code list : snt_project_code
                     check_indent(schema_previous, schema_node);
                     if (schema_node->indent <= current_node->indent)
                         break;
+                    if (schema_node->dtype == NodeDtype::Override)
+                        throw dip::SyntaxException(
+                            "Invalid override region", "An $override directive cannot be declared inside a schema.",
+                            "Use a top-level region with fully qualified target paths.",
+                            __FILE__, __LINE__, schema_node->line
+                        );
                     if (schema_node->dtype == NodeDtype::Property && schema_previous == current_node) {
                         set_schema_property(schema_previous, schema_node);
                         ++i;
@@ -542,6 +608,30 @@ code list : snt_project_code
                         current_node->line
                     );
                 }
+            } else if (current_node->dtype == NodeDtype::Override) {
+                if (current_node->indent != 0)
+                    throw dip::SyntaxException(
+                        "Invalid override region", "An $override directive must be at the top level.",
+                        "Move the directive to indentation zero.", __FILE__, __LINE__, current_node->line
+                    );
+                size_t count = 0;
+                while (i + 1 < queue.size() && queue.at(i + 1)->indent > current_node->indent) {
+                    const auto entry = queue.at(++i);
+                    if (entry->dtype != NodeDtype::Modification || entry->indent != INDENT_STEP)
+                        throw dip::SyntaxException(
+                            "Invalid override entry", "An $override region may contain only value modifications.",
+                            "Use `path = value` indented one level beneath $override.",
+                            __FILE__, __LINE__, entry->line
+                        );
+                    env.overrides.append(entry);
+                    ++count;
+                }
+                if (count == 0)
+                    throw dip::SyntaxException(
+                        "Empty override", "The $override region has no modifications.",
+                        "Add at least one value modification.", __FILE__, __LINE__, current_node->line
+                    );
+                previous_node = nullptr;
             } else {
                 // push rest of the nodes to the filtered node queue
                 if (previous_node)
@@ -557,9 +647,38 @@ code list : snt_project_code
         Environment target = env;
         while (queue.size() > 0) {
             BaseNode::PointerType node = queue.pop_front();
+            BaseNode::PointerType replacement;
+            ValueNode::PointerType declared;
+            bool suppress_value = false;
+            if (!target.branching.false_case() &&
+                (node->dtype == NodeDtype::Boolean || node->dtype == NodeDtype::Integer ||
+                 node->dtype == NodeDtype::Float || node->dtype == NodeDtype::String ||
+                 node->dtype == NodeDtype::Modification)) {
+                const std::string path = target.branching.clean_name(resolved_override_path(
+                    target, target.hierarchy.get_current_path(node->indent, node->path.name).name
+                ));
+                bool already_defined = false;
+                for (const auto& existing : target.nodes.get_nodes())
+                    if (existing && existing->path.name == path) {
+                        already_defined = true;
+                        suppress_value = existing->override;
+                        break;
+                    }
+                if (!already_defined && node->dtype != NodeDtype::Modification) {
+                    replacement = target.overrides.find(path);
+                    if (replacement)
+                        declared = std::dynamic_pointer_cast<ValueNode>(node);
+                }
+            }
             // Perform specific node parsing outside of a condition block or inside of a valid condition block
             if (!target.branching.false_case() || node->dtype == NodeDtype::Case) {
-                BaseNode::ListType parsed = node->parse(target);
+                BaseNode::ListType parsed;
+                if (replacement && declared) {
+                    declared->apply_override(replacement, target);
+                    target.overrides.consume(replacement->path.name);
+                } else if (!suppress_value) {
+                    parsed = node->parse(target);
+                }
                 if (parsed.size() > 0) {
                     while (parsed.size() > 0) {
                         queue.push_front(parsed.back());
@@ -588,8 +707,12 @@ code list : snt_project_code
                 for (size_t i = 0; i < target.nodes.size(); i++) {
                     if (target.nodes.at(i)->path.name == node->path.name) {
                         ValueNode::PointerType mnode = target.nodes.at(i);
-                        mnode->validate_constant();
-                        mnode->modify_value(node, target);
+                        if (mnode->override) {
+                            mnode->validate_modification(node);
+                        } else {
+                            mnode->validate_constant();
+                            mnode->modify_value(node, target);
+                        }
                         new_node = false;
                     }
                 }
@@ -614,11 +737,20 @@ code list : snt_project_code
                             "Check why the node value was not set correctly.",
                             __FILE__,
                             __LINE__,
-                            vnode->line
+                            node->line
                         );
                     target.nodes.push_back(vnode);
                 }
             }
+        }
+        const auto unresolved = target.overrides.unresolved();
+        if (!unresolved.empty()) {
+            const auto entry = target.overrides.find(unresolved.front());
+            throw dip::EnvironmentException(
+                "Unresolved override", "The override target `" + unresolved.front() + "` was not defined.",
+                "Define the node outside $override or remove the override.",
+                __FILE__, __LINE__, entry->line
+            );
         }
         // Validate nodes
         for (size_t i = 0; i < target.nodes.size(); i++) {
@@ -633,10 +765,30 @@ code list : snt_project_code
                         __LINE__,
                         vnode->line
                     );
-                vnode->validate_definition();
-                vnode->validate_options();
-                vnode->validate_condition(target);
-                vnode->validate_format();
+                try {
+                    vnode->validate_definition();
+                    vnode->validate_options();
+                    vnode->validate_condition(target);
+                    vnode->validate_format();
+                } catch (const dip::SyntaxException& exception) {
+                    if (!vnode->override)
+                        throw;
+                    auto info = exception.info();
+                    info.details += "\nDeclaration: " + vnode->line.source.name + ":" +
+                                    std::to_string(vnode->line.source.line_number) + " | " + vnode->line.code;
+                    const auto& sources = target.sources.entries();
+                    const auto declaration_source = sources.find(vnode->line.source.name);
+                    if (declaration_source != sources.end() && !declaration_source->second.path.empty())
+                        info.details += "\nDeclaration file: " + declaration_source->second.path;
+                    const auto override_source = sources.find(vnode->override_line.source.name);
+                    if (override_source != sources.end() && !override_source->second.path.empty())
+                        info.details += "\nOverride file: " + override_source->second.path;
+                    info.location = core::SourceLocation{
+                        vnode->override_line.source.name, vnode->override_line.source.line_number,
+                        vnode->override_line.code
+                    };
+                    throw dip::SyntaxException(std::move(info));
+                }
             } else {
                 throw dip::ParserException(
                     "Node in a node list has undefined value",

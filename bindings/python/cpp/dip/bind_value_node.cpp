@@ -168,6 +168,10 @@ namespace snt::bind::python {
             "schema_id", [](const dip::ValueNode& vnode) { return vnode.schema_id; },
             "Trace ID of the schema that supplied this node, or an empty string."
         );
+        val.def_property_readonly(
+            "override", [](const dip::ValueNode& vnode) { return vnode.override; },
+            "Whether an explicit $override supplied the effective value."
+        );
 
         val.def_property_readonly(
             "metadata",

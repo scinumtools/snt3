@@ -109,6 +109,9 @@ namespace snt::dip {
         std::string source_code;
         ValueMetadata metadata;
         std::optional<SourceInfo> source;
+        std::optional<SourceInfo> override_source; ///< Source of an applied override, if any.
+        size_t override_line = 0;
+        std::string override_code;
     };
 
     /** Access a known environment path; the cursor must not outlive its environment. */

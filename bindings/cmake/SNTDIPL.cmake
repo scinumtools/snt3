@@ -3,7 +3,7 @@ include_guard(GLOBAL)
 # Read one evaluated, unitless DIPL scalar into a normal caller-scope variable.
 # OUT is retained as an alias for OUTPUT; REQUIRED is accepted for compatibility.
 function(snt_dip_get)
-    cmake_parse_arguments(PARSE_ARGV 0 ARG "REQUIRED" "FILE;PATH;OUTPUT;OUT;TYPE" "DEPENDS")
+    cmake_parse_arguments(PARSE_ARGV 0 ARG "REQUIRED" "FILE;PATH;OUTPUT;OUT;TYPE;OVERRIDE_STRING;OVERRIDE_FILE" "DEPENDS")
     if(ARG_UNPARSED_ARGUMENTS OR ARG_KEYWORDS_MISSING_VALUES)
         message(FATAL_ERROR "snt_dip_get(): unknown arguments or missing keyword values: ${ARG_UNPARSED_ARGUMENTS};${ARG_KEYWORDS_MISSING_VALUES}")
     endif()
@@ -45,11 +45,23 @@ function(snt_dip_get)
         endif()
         list(APPEND dependencies "${dependency}")
     endforeach()
+    if(DEFINED ARG_OVERRIDE_FILE)
+        get_filename_component(override_file "${ARG_OVERRIDE_FILE}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+        list(APPEND dependencies "${override_file}")
+    endif()
     if(NOT CMAKE_SCRIPT_MODE_FILE)
         set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${dependencies})
     endif()
+    set(override_args)
+    if(DEFINED ARG_OVERRIDE_STRING)
+        string(REPLACE ";" "\\;" override_body "${ARG_OVERRIDE_STRING}")
+        list(APPEND override_args --input override_string "${override_body}")
+    endif()
+    if(DEFINED ARG_OVERRIDE_FILE)
+        list(APPEND override_args --input override_file "${override_file}")
+    endif()
     execute_process(
-        COMMAND "${SNT_EXECUTABLE}" dip parse --input file "${input}" --request "${ARG_PATH}" --value ${type_args}
+        COMMAND "${SNT_EXECUTABLE}" dip parse --input file "${input}" ${override_args} --request "${ARG_PATH}" --value ${type_args}
         WORKING_DIRECTORY "${input_dir}"
         RESULT_VARIABLE result
         OUTPUT_VARIABLE value

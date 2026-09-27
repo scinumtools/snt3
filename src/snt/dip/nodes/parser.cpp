@@ -114,6 +114,18 @@ namespace snt::dip {
         return true;
     }
 
+    bool Parser::kwd_override() {
+        constexpr std::string_view keyword = KEYWORD_OVERRIDE;
+        if (code.compare(0, keyword.size(), keyword) != 0 ||
+            (code.size() > keyword.size() && code[keyword.size()] != ' ' && code[keyword.size()] != '#'))
+            return false;
+        std::size_t pos = keyword.size();
+        while (pos < code.size() && code[pos] == ' ')
+            ++pos;
+        strip(std::string(code.substr(0, pos)));
+        return true;
+    }
+
     bool Parser::kwd_schema() {
         constexpr std::string_view keyword = KEYWORD_SCHEMA;
         if (code.compare(0, keyword.size(), keyword) != 0)

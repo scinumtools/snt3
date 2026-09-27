@@ -28,6 +28,7 @@ namespace snt::dip {
         {NodeDtype::Group, "group"},
         {NodeDtype::Case, "case"},
         {NodeDtype::Schema, "schema"},
+        {NodeDtype::Override, "override"},
         {NodeDtype::Import, "import"},
         {NodeDtype::Boolean, "boolean"},
         {NodeDtype::Integer, "integer"},

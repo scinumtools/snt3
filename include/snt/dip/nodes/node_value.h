@@ -88,6 +88,8 @@ namespace snt::dip {
         // directives
         val::Array::StringType tags; ///< Explicit node labels used for discovery and selection.
         bool constant;
+        bool override = false; ///< Value was selected by an explicit $override.
+        Line override_line;    ///< Source of the effective override value.
         std::string condition;
         std::vector<OptionStruct> options;
         std::string format;
@@ -178,6 +180,10 @@ namespace snt::dip {
          * @param units_input Quantity metadata to assign; `std::nullopt` removes the units.
          */
         void set_units(const std::optional<puq::Quantity>& units_input = std::nullopt);
+        /** Evaluate an override against this declaration without evaluating its original value. */
+        void apply_override(const BaseNode::PointerType& node, Environment& env);
+        /** Check that a subsequent declaration preserves the node type. */
+        void validate_modification(const BaseNode::PointerType& node) const;
         virtual void modify_value(const BaseNode::PointerType& node, Environment& env);
         bool set_property(PropertyType property, val::Array::StringType& values, std::string& units) override;
         std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override {

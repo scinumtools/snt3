@@ -1,6 +1,6 @@
 % SciNumTools DIPH5
 % Environment HDF5 Format Specification
-% Version 2.4
+% Version 2.5
 
 # Scope
 
@@ -32,7 +32,8 @@ units, schemas, and functions. It does not embed complete source text, parsed
 source nodes, or executable functions. Version 2.2 adds `value_group` objects.
 Version 2.3 persists custom PUEL unit registrations required to interpret
 evaluated quantities. Version 2.4 adds descriptive schema metadata and source
-locations to schema trace entries. A loaded DIPH5 file must therefore be
+locations to schema trace entries. Version 2.5 records which evaluated values
+were overridden and where their replacement values originated. A loaded DIPH5 file must therefore be
 treated as an evaluated environment, not as a source from which the original
 DIPL program can be reconstructed exactly.
 
@@ -44,11 +45,11 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
-| `_DIPL_Schema_Version_Minor` | unsigned integer | `4` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `5` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2.4 readers support version 1 files and versions 2.0
-through 2.4. Future schema
+schema version. Version 2.5 readers support version 1 files and versions 2.0
+through 2.5. Future schema
 revisions MUST preserve the meaning of existing attributes or increment the
 major or minor schema version.
 
@@ -140,6 +141,11 @@ When present, node settings are stored as attributes on the value dataset:
 `_DIPL_Constant`, `_DIPL_Condition`, `_DIPL_Format_Spec`, `_DIPL_Tags`,
 `_DIPL_Options`, `_DIPL_Option_Units`, `_DIPL_Schemas`, and
 `_DIPL_Value_Origin`.
+
+Version 2.5 adds `_DIPL_Override` (unsigned 8-bit boolean) to each value
+dataset. If true, `_DIPL_Override_Source`, `_DIPL_Override_Line`, and
+`_DIPL_Override_Code` identify the modification that supplied the effective
+value. The ordinary source attributes continue to identify the declaration.
 
 Source and provenance information uses `_DIPL_Source`, `_DIPL_Source_Line`,
 `_DIPL_Source_Code`, and the metadata attributes `description`, `authors`,

@@ -29,10 +29,12 @@ Options:
   -v, --version
       Show version information.
   -i,--input <type> [<name>] <value>
-      Add input (file/string/unit/source/schema_string/schema_file).
+      Add input (file/string/override_string/override_file/unit/source/schema_string/schema_file).
+      override_string takes an unwrapped body of path = value modifications.
+      override_file reads such a body from a file.
       Unit, source, and schema inputs require name and value.
   --project <file>
-      Load a DIPfile project manifest instead of --input.
+      Load a DIPfile project; override_string/override_file inputs may tune its values.
   --load <file>
       Load an evaluated DIPH5 environment instead of --input.
   --save <file>
@@ -91,13 +93,11 @@ void module_dip(ArgParser& argpar) {
         const auto& key = argument.key;
         const auto& values = argument.values;
         if (key == "-i" || key == "--input") {
-            if (has_project)
-                throw std::runtime_error("--input cannot be combined with --project.");
             if (values.empty())
                 throw std::runtime_error(key + " requires an input type and value.");
             for (size_t i = 0; i < values.size();) {
                 const auto& kind = values[i];
-                size_t count = (kind == "file" || kind == "string") ? 1 : 2;
+                size_t count = (kind == "file" || kind == "string" || kind == "override_string" || kind == "override_file") ? 1 : 2;
                 if (i + count >= values.size())
                     throw std::runtime_error("Incomplete DIP input: " + kind);
                 cmd.argument_add(
@@ -113,8 +113,6 @@ void module_dip(ArgParser& argpar) {
         } else if (key == "--project") {
             if (values.size() != 1 || has_project)
                 throw std::runtime_error("Specify exactly one --project file.");
-            if (has_input || has_load)
-                throw std::runtime_error("--project cannot be combined with --input or --load.");
             cmd.argument_add("project", {values.front()});
             has_project = true;
         } else if (key == "--load") {

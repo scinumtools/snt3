@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <unordered_set>
+#include <vector>
 
 namespace snt::server {
 
@@ -83,18 +84,19 @@ namespace snt::server {
         };
 
         std::filesystem::path add_project_bundle(const httplib::Request& request, ProjectBundle& bundle) {
-            if (!request.form.fields.empty())
-                throw std::invalid_argument("A DIP project bundle accepts uploaded files only.");
+            for (const auto& [name, field] : request.form.fields)
+                if (name != "override")
+                    throw std::invalid_argument("Project bundle fields must contain override text.");
             if (request.form.get_file_count("project") != 1)
                 throw std::invalid_argument("A DIP project bundle requires exactly one uploaded project part.");
 
             const auto project = request.form.get_file("project");
             bundle.add_file("DIPfile", project.content);
             for (const auto& [name, file] : request.form.files) {
-                if (name == "project")
+                if (name == "project" || name == "override")
                     continue;
                 if (name != "file")
-                    throw std::invalid_argument("Bundle uploads use one project part and file parts only.");
+                    throw std::invalid_argument("Bundle uploads accept project, file, and override parts only.");
                 bundle.add_file(safe_bundle_path(file.filename), file.content);
             }
             return bundle.project_file();
@@ -104,20 +106,29 @@ namespace snt::server {
             if (!request.form.fields.empty() || !request.form.files.empty()) {
                 if (request.form.files.count("project") || request.form.fields.count("project")) {
                     command.argument_add("project", {add_project_bundle(request, bundle).string()});
+                    for (const auto& [name, part] : request.form.fields)
+                        if (name == "override")
+                            command.argument_add("override_string", {part.content});
+                    for (const auto& [name, part] : request.form.files)
+                        if (name == "override")
+                            command.argument_add("override_string", {part.content});
                     return;
                 }
                 std::map<std::string, std::string> schemas;
+                std::vector<std::string> overrides;
                 std::string code;
                 size_t code_count = 0;
                 auto add_part = [&](const std::string& name, const std::string& content) {
                     if (name == "code") {
                         code = content;
                         ++code_count;
+                    } else if (name == "override") {
+                        overrides.push_back(content);
                     } else if (name.rfind("schema:", 0) == 0 && name.size() > 7) {
                         if (!schemas.emplace(name.substr(7), content).second)
                             throw std::invalid_argument("Duplicate schema part: " + name);
                     } else {
-                        throw std::invalid_argument("Schema uploads accept code and schema:<name> parts only.");
+                        throw std::invalid_argument("DIPL uploads accept code, override, and schema:<name> parts only.");
                     }
                 };
                 for (const auto& [name, part] : request.form.fields)
@@ -128,6 +139,8 @@ namespace snt::server {
                     throw std::invalid_argument("Schema uploads require exactly one code part.");
                 for (const auto& [name, content] : schemas)
                     command.argument_add("schema_string", {name, content});
+                for (const auto& content : overrides)
+                    command.argument_add("override_string", {content});
                 command.argument_add("string", {code});
                 return;
             }

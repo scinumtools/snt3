@@ -57,7 +57,8 @@ namespace snt::dip {
     }
 
     ValueNode::ValueNode(const ValueNode& other)
-        : units(other.units), tags(other.tags), constant(other.constant), metadata(other.metadata),
+        : units(other.units), tags(other.tags), constant(other.constant), override(other.override),
+          override_line(other.override_line), metadata(other.metadata),
           condition(other.condition), format(other.format), value_dtype(other.value_dtype), BaseNode(other) {
         options.reserve(other.options.size());
         for (const auto& option : other.options) {
@@ -300,7 +301,7 @@ namespace snt::dip {
         }
     }
 
-    void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
+    void ValueNode::validate_modification(const BaseNode::PointerType& node) const {
         // check if modification and target node have the same node type
         if (node->dtype != NodeDtype::Modification && node->dtype != dtype)
             throw dip::SyntaxException(
@@ -312,6 +313,58 @@ namespace snt::dip {
                 __LINE__,
                 line
             );
+    }
+
+    void ValueNode::apply_override(const BaseNode::PointerType& node, Environment& env) {
+        if ((dtype == NodeDtype::Boolean || dtype == NodeDtype::String) && !units_raw.empty())
+            throw dip::UnitException(
+                "Invalid units", "The declared value type does not support units.",
+                "Remove units from the original declaration.", __FILE__, __LINE__, line
+            );
+        if (node->value_origin == ValueOrigin::None && !node->units_raw.empty())
+            throw dip::UnitException(
+                "Invalid null override units", "A null value cannot specify replacement units.",
+                "Use `path = none` without units.", __FILE__, __LINE__, node->line
+            );
+        set_units();
+        auto evaluated = std::dynamic_pointer_cast<ValueNode>(clone(path, indent));
+        evaluated->value_dtype = value_dtype;
+        evaluated->value.reset();
+        evaluated->units.reset();
+        evaluated->options.clear();
+        evaluated->line = node->line;
+        evaluated->value_origin = node->value_origin;
+        evaluated->value_raw = node->value_raw;
+        evaluated->value_shape = node->value_shape;
+        evaluated->value_slice = node->value_slice;
+        if (!node->units_raw.empty())
+            evaluated->units_raw = node->units_raw;
+        evaluated->parse(env);
+        if (evaluated->units) {
+            if (!units)
+                throw dip::UnitException(
+                    "Dimension mismatch", "An override cannot add units to a nondimensional node.",
+                    "Use units compatible with the target declaration.", __FILE__, __LINE__, node->line
+                );
+            if (evaluated->value) {
+                puq::Quantity quantity(std::move(evaluated->value), evaluated->units->to_string());
+                quantity = quantity.convert(*units);
+                evaluated->value = std::move(quantity.measurement.result.estimate);
+            }
+        }
+        if (evaluated->value && evaluated->value->get_dtype() != value_dtype)
+            evaluated->value = evaluated->value->cast_as(value_dtype);
+        value = std::move(evaluated->value);
+        value_origin = node->value_origin;
+        value_raw = node->value_raw;
+        value_shape = node->value_shape;
+        value_slice = node->value_slice;
+        override = true;
+        override_line = node->line;
+    }
+
+    void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
+        validate_modification(node);
         // parse value from raw data
         std::optional<std::string_view> units;
         if (dtype == NodeDtype::Integer || dtype == NodeDtype::Float)

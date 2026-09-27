@@ -65,8 +65,9 @@ place the declarations in a :doc:`DIPfile project <../modules/dip/projects>`:
 
    snt dip parse --project DIPfile --request simulation.steps --print
 
-``--project`` replaces ``--input`` for that command and resolves paths within
-the project relative to the DIPfile.
+``--project`` supplies the model and resolves paths relative to the DIPfile.
+It can be combined with ``--input override_string`` or ``--input override_file``
+to tune its values.
 
 Environment persistence
 -----------------------
@@ -173,3 +174,28 @@ it reports that the viewer is not implemented. No GUI dependencies are required
 yet.
 
 All three features belong to the ``snt`` target and require ``ENABLE_EXEC_APPS_SNT``.
+
+Override inputs
+---------------
+
+Pass an unwrapped override body using ``override_string``:
+
+.. code-block:: shell
+
+   snt dip parse -i file parameters.dip \
+       -i override_string 'simulation.steps = 1024' --print
+
+The command API exposes the same input as
+``argument_add("override_string", {body})`` (a one-element list in Python).
+Duplicate targets fail, including duplicates in ``$override`` regions in files.
+Project inputs accept override text alongside the manifest:
+
+.. code-block:: shell
+
+   snt dip parse --project DIPfile \
+       -i override_string 'simulation.steps = 1024' --print
+
+The project and override inputs may be supplied in either order.
+
+Use ``-i override_file overrides.dip`` to read an unwrapped override body from
+a file. The command API equivalent is ``argument_add("override_file", {path})``.

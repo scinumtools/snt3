@@ -9,6 +9,7 @@
 #include <snt/dip/lists/list_functions.h>
 #include <snt/dip/lists/list_hierarchy.h>
 #include <snt/dip/lists/list_node.h>
+#include <snt/dip/lists/list_override.h>
 #include <snt/dip/lists/list_schema.h>
 #include <snt/dip/lists/list_source.h>
 #include <snt/dip/lists/list_unit.h>
@@ -101,6 +102,7 @@ namespace snt::dip {
         SourceList sources;        ///< List of code sources
         UnitList units;            ///< List of custom units
         SchemaList schemas;        ///< Reusable definitions; not restored from DIPH5.
+        OverrideList overrides;    ///< Collected value modifications for initial evaluation.
         FunctionList functions;    ///< List of functions
 
         /**

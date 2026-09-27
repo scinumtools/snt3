@@ -58,6 +58,42 @@ TEST(DIP, ReportsErrors) {
     snt_dip_parser_free(nullptr);
 }
 
+TEST(DIP, Overrides) {
+    // The C ABI reports registration errors and exposes override state after parsing or loading.
+    snt_dip* parser = nullptr;
+    snt_dip_error error{};
+    ASSERT_EQ(snt_dip_parser_create(&parser, &error), 0);
+    int overridden = -1;
+    EXPECT_NE(snt_dip_parser_is_overridden(parser, "value", &overridden, &error), 0);
+    EXPECT_NE(snt_dip_parser_add_override_string(parser, nullptr, &error), 0);
+    EXPECT_NE(snt_dip_parser_add_override_file(parser, nullptr, &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_override_string(parser, "value = 20", &error), 0);
+    const auto input = std::filesystem::temp_directory_path() / "snt-c-override-input.dip";
+    { std::ofstream output(input); output << "other = 30"; }
+    ASSERT_EQ(snt_dip_parser_add_override_file(parser, input.string().c_str(), &error), 0);
+    std::filesystem::remove(input);
+    EXPECT_NE(snt_dip_parser_add_override_file(parser, input.string().c_str(), &error), 0);
+    EXPECT_NE(snt_dip_parser_add_override_string(parser, "value = 20", &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_string(parser, "value int = 1\n  !constant\nother int = 2\nplain int = 3", &error), 0);
+    ASSERT_EQ(snt_dip_parser_parse(parser, &error), 0);
+    std::array<char, 64> output{};
+    ASSERT_EQ(snt_dip_parser_get(parser, "other", output.data(), output.size(), &error), 0);
+    EXPECT_STREQ(output.data(), "30");
+    ASSERT_EQ(snt_dip_parser_is_overridden(parser, "value", &overridden, &error), 0);
+    EXPECT_EQ(overridden, 1);
+    ASSERT_EQ(snt_dip_parser_is_overridden(parser, "plain", &overridden, &error), 0);
+    EXPECT_EQ(overridden, 0);
+    EXPECT_NE(snt_dip_parser_is_overridden(parser, "missing", &overridden, &error), 0);
+    EXPECT_NE(snt_dip_parser_is_overridden(parser, "value", nullptr, &error), 0);
+    const auto file = std::filesystem::temp_directory_path() / "snt-c-overrides.diph5";
+    ASSERT_EQ(snt_dip_environment_save(parser, file.string().c_str(), &error), 0);
+    ASSERT_EQ(snt_dip_environment_load(parser, file.string().c_str(), &error), 0);
+    ASSERT_EQ(snt_dip_parser_is_overridden(parser, "value", &overridden, &error), 0);
+    EXPECT_EQ(overridden, 1);
+    snt_dip_parser_free(parser);
+    std::filesystem::remove(file);
+}
+
 TEST(DIP, ParseProject) {
     const auto directory = std::filesystem::temp_directory_path() / "scinumtools3-cabi-project";
     std::filesystem::remove_all(directory);

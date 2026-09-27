@@ -97,6 +97,7 @@ namespace snt::dip {
     constexpr std::string_view KEYWORD_SOURCE = "$source";
     constexpr std::string_view KEYWORD_UNIT = "$unit";
     constexpr std::string_view KEYWORD_SCHEMA = "$schema";
+    constexpr std::string_view KEYWORD_OVERRIDE = "$override";
 
     // Regex Patterns
     constexpr std::string_view PATTERN_KEYWORD = "[a-zA-Z0-9_-]";
@@ -152,6 +153,7 @@ namespace snt::dip {
         Group,
         Case,
         Schema,
+        Override,
         Import, // node structure
         Boolean,
         Integer,

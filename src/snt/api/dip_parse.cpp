@@ -19,22 +19,22 @@ namespace snt::api {
             );
         }
         if (add_type == "project" && add_values.size() == 1) {
-            if (has_input) {
+            if (has_model_input) {
                 throw api::ArgumentException(
                     "Conflicting DIP inputs",
-                    "A DIP project cannot be combined with other DIPL inputs.",
-                    "Use either one project input or individual file, string, source, unit, and schema inputs.",
+                    "A DIP project can only be combined with override inputs.",
+                    "Use one project or individual model inputs; override_string and override_file may accompany either.",
                     __FILE__,
                     __LINE__
                 );
             }
             dip.add_project(add_values[0]);
             has_project = true;
-        } else if (has_project) {
+        } else if (has_project && add_type != "override_string" && add_type != "override_file") {
             throw api::ArgumentException(
                 "Conflicting DIP inputs",
                 "A DIP project is already configured.",
-                "Use either one project input or individual file, string, source, unit, and schema inputs.",
+                "Use one project or individual model inputs; override_string and override_file may accompany either.",
                 __FILE__,
                 __LINE__
             );
@@ -42,6 +42,10 @@ namespace snt::api {
             dip.add_file(add_values[0]);
         } else if (add_type == "string" && add_values.size() == 1) {
             dip.add_string(add_values[0]);
+        } else if (add_type == "override_string" && add_values.size() == 1) {
+            dip.add_override_string(add_values[0]);
+        } else if (add_type == "override_file" && add_values.size() == 1) {
+            dip.add_override_file(add_values[0]);
         } else if (add_type == "schema_string" && add_values.size() == 2) {
             dip.add_schema_string(add_values[0], add_values[1]);
         } else if (add_type == "schema_file" && add_values.size() == 2) {
@@ -54,12 +58,14 @@ namespace snt::api {
             throw api::ArgumentException(
                 "Invalid add argument",
                 "The input type `" + add_type + "` was not recognized or has an invalid number of values.",
-                "Use `project`, `file`, or `string` with one value, or `source`, `unit`, `schema_string`, or `schema_file` with two values.",
+                "Use `project`, `file`, `string`, `override_string`, or `override_file` with one value, or `source`, `unit`, `schema_string`, or `schema_file` with two values.",
                 __FILE__,
                 __LINE__
             );
         }
         has_input = true;
+        if (add_type != "override_string" && add_type != "override_file")
+            has_model_input = true;
     }
 
     void DIPParse::argument_load(const std::string& file) {

@@ -158,3 +158,32 @@ def test_tags():
         "bar = 1.33e5 kg\n"
     )
     
+def test_override_input():
+    # The command API applies the same constant-replacement semantics as direct DIP access.
+    command = DIPParse()
+    command.argument_add('string', ['value int = 1\n  !constant'])
+    command.argument_add('override_string', ['value = 42'])
+    command.argument_request('value')
+    command.argument_value('integer')
+    assert command.execute() == '42\n'
+
+
+@pytest.mark.parametrize('override_first', [False, True])
+@pytest.mark.parametrize('kind', ['override_string', 'override_file'])
+def test_project_override_input(tmp_path, override_first, kind):
+    # File and string overrides can accompany a project in either registration order.
+    project = tmp_path / 'DIPfile'
+    project.write_text('code[]\n  string = "value int = 1"\n')
+    command = DIPParse()
+    file = tmp_path / 'overrides.dip'
+    file.write_text('value = 42')
+    inputs = [('project', [str(project)]), (kind, ['value = 42' if kind == 'override_string' else str(file)])]
+    if override_first:
+        inputs.reverse()
+    for kind, values in inputs:
+        command.argument_add(kind, values)
+    command.argument_request('value')
+    command.argument_value('integer')
+    assert command.execute() == '42\n'
+    with pytest.raises(RuntimeError, match='Conflicting DIP inputs'):
+        command.argument_add('string', ['extra int = 1'])

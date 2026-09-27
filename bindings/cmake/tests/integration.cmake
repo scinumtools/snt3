@@ -9,6 +9,21 @@ file(WRITE "${input}" [=[build
   length float = 2 m
 ]=])
 include("${SNT_HELPER}")
+# File and inline bodies must both tune values through the CMake helper.
+file(WRITE "${TEST_ROOT}/overrides.dip" "build.count = 31\n")
+snt_dip_get(FILE "${input}" PATH build.count OUTPUT file_count OVERRIDE_FILE "${TEST_ROOT}/overrides.dip")
+if(NOT file_count STREQUAL "31")
+    message(FATAL_ERROR "Override file query failed: ${file_count}")
+endif()
+snt_dip_get(FILE "${input}" PATH build.count OUTPUT override_count OVERRIDE_STRING "build.count = 23")
+if(NOT override_count STREQUAL "23")
+    message(FATAL_ERROR "Override query failed: ${override_count}")
+endif()
+# A semicolon inside a DIPL string must survive CMake argument expansion unchanged.
+snt_dip_get(FILE "${input}" PATH build.text OUTPUT override_text OVERRIDE_STRING [=[build.text = "x;y"]=])
+if(NOT override_text STREQUAL "x;y")
+    message(FATAL_ERROR "Override string was changed: ${override_text}")
+endif()
 snt_dip_get(FILE "${input}" PATH build.enabled TYPE BOOL OUTPUT enabled)
 if(enabled)
     message(FATAL_ERROR "DIPL false incorrectly enabled a CMake branch")
