@@ -1,6 +1,7 @@
 #include "parsers.h"
 #include "nodes/node_schema.h"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -226,6 +227,8 @@ overrides list : snt_project_override
         std::queue<Line> override_lines;
         parse_lines(override_lines, source_code, source_name);
         const auto nodes = parse_code_nodes(override_lines);
+        if (std::all_of(nodes.begin(), nodes.end(), [](const auto& node) { return node->dtype == NodeDtype::Empty; }))
+            return;
         auto overrides = env.overrides;
         overrides.append(nodes, 0);
         env.sources.append(source_name, source_file, source_code, parent);

@@ -179,6 +179,20 @@ def test_override_file_errors_and_provenance(tmp_path):
     assert str(loaded['value'].provenance.override_source.path) == str(file)
 
 
+def test_empty_override_inputs_are_noops(tmp_path):
+    file = tmp_path / 'overrides.dip'
+    file.write_text('')
+    parser = DIP()
+    parser.add_override_string('')
+    parser.add_override_string('# No changes\n')
+    parser.add_override_file(file)
+    parser.add_string('value int = 7')
+
+    env = parser.parse()
+    assert env['value'].value == 7
+    assert not env.select('?value')[0].override
+
+
 @pytest.mark.parametrize('declaration, replacement, message', [
     ('value int = 1\n  !options [1,2]', 'value = 3', 'Invalid option'),
     ('value int = 1\n  !condition ({.} > 0)', 'value = -1', 'Node does not satisfy its condition'),

@@ -125,6 +125,24 @@ TEST(Project, RejectsDuplicateOverrideTargets) {
     EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::SyntaxException);
 }
 
+TEST(Project, AllowsEmptyOverrideFile) {
+    ProjectDirectory project("dip-project-empty-overrides");
+    project.write("overrides.dip", "");
+    project.write(
+        "DIPfile",
+        "overrides[]\n"
+        "  file = \"overrides.dip\"\n"
+        "code[]\n"
+        "  string = \"answer int = 7\"\n"
+    );
+
+    dip::DIP parser;
+    parser.add_project(project.path() / "DIPfile");
+    const dip::Environment env = parser.parse();
+    EXPECT_EQ(env["answer"].as<int64_t>(), 7);
+    EXPECT_FALSE(env.get_node("answer")->override);
+}
+
 TEST(Project, RejectsMissingOverrideFile) {
     ProjectDirectory project("dip-project-missing-override");
     project.write("DIPfile", "overrides[]\n  file = \"missing.dip\"\n");

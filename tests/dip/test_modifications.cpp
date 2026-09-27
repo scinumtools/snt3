@@ -156,6 +156,23 @@ TEST(Override, MultipleRegionsAndHostRegistration) {
     EXPECT_TRUE(env.overrides.unresolved().empty());
 }
 
+TEST(Override, EmptyInputsDoNotChangeValues) {
+    // Empty and comment-only host inputs are valid no-ops, even before the model is declared.
+    dip::DIP parser;
+    parser.add_override_string("");
+    parser.add_override_string("  \n# No changes\n");
+    const auto file = std::filesystem::temp_directory_path() / "snt-empty-override.dip";
+    { std::ofstream output(file); }
+    parser.add_override_file(file);
+    std::filesystem::remove(file);
+    parser.add_string("value int = 7\n");
+
+    const auto env = parser.parse();
+    EXPECT_EQ(env["value"].as<int64_t>(), 7);
+    EXPECT_FALSE(env.get_node("value")->override);
+    EXPECT_TRUE(env.overrides.unresolved().empty());
+}
+
 TEST(Override, DuplicateAndMissingTargets) {
     // Targets are unique and must be instantiated, including when declarations are conditional.
     dip::DIP parser;

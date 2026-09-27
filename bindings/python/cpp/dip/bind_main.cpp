@@ -68,12 +68,12 @@ Args:
         );
         dip.def(
             "add_override_string", &dip::DIP::add_override_string, py::arg("source_code"),
-            "Collect unwrapped value modifications before evaluating nodes.\n\n"
+            "Collect unwrapped value modifications before evaluating nodes. Empty bodies make no changes.\n\n"
             "Args:\n    source_code: DIPL modifications with dotted paths or nested path prefixes."
         );
         dip.def(
             "add_override_file", &dip::DIP::add_override_file, py::arg("source_file"),
-            "Register an unwrapped override body from a file before evaluating nodes.\n\n"
+            "Register an unwrapped override body from a file before evaluating nodes. Empty files make no changes.\n\n"
             "Args:\n    source_file: Path to an unwrapped body of modifications and optional nested path prefixes."
         );
         dip.def(

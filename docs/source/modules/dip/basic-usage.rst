@@ -246,7 +246,8 @@ An override may replace a ``!constant``
 value; subsequent ordinary modifications to that node are ignored. Duplicate
 or unmatched override paths are errors. Host code can call
 ``add_override_string(body)`` or ``add_override_file(path)``. Both accept an
-unwrapped DIPL override body; files retain their source path in provenance. Selected nodes
+unwrapped DIPL override body; an empty or comment-only body makes no changes.
+Files retain their source path in provenance. Selected nodes
 expose the ``override`` flag, and cursor provenance retains both the original
 declaration and the override source. DIPH5 persists the evaluated value and
 this provenance.

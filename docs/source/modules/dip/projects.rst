@@ -58,7 +58,8 @@ The ``schemas[]`` entries match host-code ``add_schema_file()`` and
 ``add_schema_string()``; ``overrides[]`` matches ``add_override_file()``.
 Override targets must exist in the evaluated model and may be specified only
 once across all override sources. ``code[]`` may still contain ordinary
-``$schema`` declarations.
+``$schema`` declarations. An empty override file is accepted and leaves the
+model unchanged.
 
 For example, ``parameters/overrides.dip`` can contain:
 
