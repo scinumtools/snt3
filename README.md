@@ -81,7 +81,7 @@ between a scientific model's assumptions and its implementation.
 - **C++ API:**
   [modular C++17 libraries and application-facing commands](https://vrtulka23.github.io/scinumtools3/api/index.html).
 - **Python:**
-  [PUQ, VAL, DIP, and API bindings](https://vrtulka23.github.io/scinumtools3/integrations/python.html),
+  [PUQ, DIP, and API bindings](https://vrtulka23.github.io/scinumtools3/integrations/python.html),
   with native Python values and NumPy arrays.
 - **C binding:**
   [experimental opaque-handle interfaces](https://vrtulka23.github.io/scinumtools3/integrations/c.html)
@@ -92,7 +92,7 @@ between a scientific model's assumptions and its implementation.
   [package integration and DIPL evaluation](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html)
   during project configuration.
 - **REST API server:**
-  [optional local HTTP access](https://vrtulka23.github.io/scinumtools3/integrations/rest.html)
+  [local HTTP access](https://vrtulka23.github.io/scinumtools3/integrations/rest.html)
   to the command-oriented PUQ and DIP API.
 - **Docker:**
   [reproducible Python and development environments](https://vrtulka23.github.io/scinumtools3/integrations/docker.html).
