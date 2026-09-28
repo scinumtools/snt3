@@ -1,11 +1,20 @@
-C++ Modules Overview
-====================
+C++ Modules
+===========
 
-SciNumTools v3 is organized as a modular C++ framework in which the individual
-components build upon each other to provide a common infrastructure for
-scientific data. The architecture separates fundamental value and expression
-handling from higher-level concepts such as physical quantities, dimensional
-input parameters, and eventually materials.
+SciNumTools v3 is a layered C++ framework. ``CORE`` supplies shared
+infrastructure, ``VAL`` represents scalar and array values, and ``EXS``
+evaluates expressions. ``PUQ`` adds physical quantities and units. ``DIP``
+combines these capabilities to define and evaluate scientific input
+parameters, while ``API`` exposes them to applications and services. ``MAT``
+is planned as a future module for materials and chemical composition.
+
+The module structure appears in the C++ namespaces and, where exposed, the
+Python modules. The sections below describe each C++ module and link to its
+usage guides.
+
+.. image:: ../_static/module-dependencies.svg
+   :alt: Dependency flow from CORE through VAL and EXS to PUQ, then to DIP, MAT, and API.
+   :width: 100%
 
 CORE — Core Infrastructure
 --------------------------
@@ -26,12 +35,8 @@ a scientific-data equivalent of NumPy within the framework: it provides the
 basic mechanisms for representing, storing, manipulating, and operating on
 scalar and array-like values.
 
-VAL is used as a building block by higher-level modules, in particular DIP.
-Rather than implementing its own independent data representation, the
-dimensional input parameter system can use VAL to represent parameter values
-and perform operations on them. This establishes a common value model
-throughout SciNumTools and allows numerical data to be handled consistently
-across the different components and language interfaces.
+VAL supplies a common representation for numerical values across the
+higher-level modules, including DIP parameter values.
 
 .. _exs-expression-solver:
 
@@ -49,12 +54,28 @@ application. Operations may represent numerical, logical, mathematical,
 or domain-specific functionality, while EXS takes care of their
 interpretation and evaluation.
 
-The ``PUQ`` unit solver and calculator are built on EXS to provide
-unit-aware expressions and calculations. ``DIP`` similarly uses EXS for
-its numerical and logical solvers, including expressions used for
-parameter evaluation, conditions, and dependencies. EXS therefore forms
-a common expression-processing layer shared by several higher-level
-SciNumTools modules.
+PUQ and DIP build their specialized solvers on EXS. Its configurable parser
+and evaluation steps let those modules share expression infrastructure.
+
+* :doc:`Using the EXS solver <exs/basic-usage>` — evaluate an expression with
+  the built-in atom and operators.
+* :doc:`Operators and evaluation order <exs/operators-and-order>` — choose
+  operator symbols and specify the order in which operations run.
+* :doc:`Custom atoms and operations <exs/custom-operations>` — add a new
+  operator, its evaluation step, and application-specific atom behavior.
+* :doc:`Solver settings <exs/settings>` — pass application data to atom
+  parsing and operator evaluation.
+* :doc:`EXS examples <../examples/exs>` — runnable default, modified, and
+  custom solvers.
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   exs/basic-usage
+   exs/operators-and-order
+   exs/custom-operations
+   exs/settings
 
 .. _puq-physical-units-and-quantities:
 
@@ -129,8 +150,8 @@ calculated*, and *what constraints it must satisfy*.
   DIPL inputs and registered constructs through diagnostics and DIPH5.
 * :doc:`Static parameter generation <dip/generation>` — exporting evaluated
   environments as native source code or data files.
-* :doc:`Generating DIP reports <dip/report>` — TeX and PDF
-  reports of evaluated environments.
+* :doc:`C++ report generation <dip/report>` — TeX and PDF reports of
+  evaluated environments.
 
 .. toctree::
    :maxdepth: 1
@@ -179,30 +200,16 @@ used consistently across different applications and services, providing a
 common interface for defining, querying, evaluating, and exchanging
 scientific data.
 
-* :doc:`DIP C++ API <../api/dip>` — command-oriented DIPL parsing, DIPH5
-  loading and saving, and static parameter generation.
-* :doc:`PUQ C++ API <../api/puq>` — command-oriented evaluation, conversion,
-  inspection, and definition listing.
+The ``snt::api`` C++ module provides command objects for these workflows.
+They return formatted text suitable for interfaces such as the CLI. Code that
+needs typed results can use ``snt::puq`` or ``snt::dip`` directly.
 
-Module Architecture
--------------------
+* :doc:`PUQ commands <api/puq>` — evaluate, convert, and inspect PUEL quantities and list definitions.
+* :doc:`DIP commands <api/dip>` — parse DIPL, load and save DIPH5, and generate static parameters and reports.
 
-The modules form a layered system rather than a collection of unrelated
-libraries. VAL provides the fundamental value layer, while EXS provides
-expression evaluation and PUQ provides physical quantities and units. DIP
-combines these capabilities into a higher-level scientific parameter system,
-and future modules such as MAT can build on the same infrastructure for
-specialized scientific domains.
+.. toctree::
+   :maxdepth: 1
+   :hidden:
 
-The module structure is preserved across the different language interfaces.
-In C++, each module is represented by its corresponding namespace, while in
-Python the same structure is exposed as separate modules. This provides a
-consistent conceptual organization across languages and makes it possible
-to move between C++ and Python without having to learn a fundamentally
-different API structure.
-
-This architecture ensures that numerical values, expressions, units,
-parameters, and domain-specific data share the same underlying
-representation and computational infrastructure throughout SciNumTools.
-The result is a coherent framework in which functionality can be combined
-across modules while remaining clearly separated by responsibility.
+   api/puq
+   api/dip

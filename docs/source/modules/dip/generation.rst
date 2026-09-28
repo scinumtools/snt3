@@ -30,7 +30,7 @@ From C++:
 Generation is also available from the :doc:`Python binding
 <../../integrations/python>`, the :doc:`C binding <../../integrations/c>`,
 the :doc:`command-line interface <../../integrations/cli>`, and the
-:doc:`command-oriented C++ API <../../api/dip>`.
+:ref:`command-oriented C++ API guide <module-api-dip>`.
 
 Command line
 ------------

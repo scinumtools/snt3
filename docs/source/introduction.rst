@@ -34,8 +34,8 @@ provenance. Environments can be stored in the :doc:`DIPH5 HDF5 format
 <modules/dip/persistence>` for later reuse and inspection, including a source
 manifest with content hashes, or :doc:`exported as static parameters
 <modules/dip/generation>` for C++, C, Fortran, Rust, Julia, JSON, and YAML.
-An evaluated environment can also become a :doc:`TeX or PDF report
-<modules/dip/report>` showing effective values, units, overrides, schemas,
+An evaluated environment can also become a TeX or PDF report showing
+effective values, units, overrides, schemas,
 source provenance, and available publication references. The
 :ref:`CreateReport example <dip-create-report-example>` includes a generated
 PDF that can be viewed immediately.

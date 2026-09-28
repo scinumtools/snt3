@@ -79,5 +79,5 @@ The project-loading call and command syntax are documented with their
 respective interfaces: :doc:`C++ basic usage <basic-usage>`,
 :doc:`the command-line interface <../../integrations/cli>`,
 :doc:`the Python binding <../../integrations/python>`, :doc:`the C bindings
-<../../integrations/c>`, and the command-oriented :doc:`C++ API
-<../../api/dip>`.
+<../../integrations/c>`, and the command-oriented :ref:`C++ API
+<module-api-dip>`.

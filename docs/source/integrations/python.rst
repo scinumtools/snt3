@@ -8,8 +8,8 @@ Python and C++.
 
 After installation, import the module or one of its submodules:
 
-PUQ quantities
---------------
+Quantities and units
+--------------------
 
 PUQ represents numerical values together with their physical units and,
 when needed, uncertainties. Quantities can be added, multiplied, compared,
@@ -25,8 +25,8 @@ mixing of incompatible units.
    length = Quantity(2.5, "m")
    print(length.convert("cm"))
 
-DIP parameters
---------------
+DIPL parameters
+---------------
 
 The Python binding can load a DIPL definition from a file, evaluate its
 parameters, and return a value in Python. For example, given a file named
@@ -137,8 +137,73 @@ while its Python wrapper is alive.
 Additional request helpers remain available in the
 :doc:`Python DIP API reference <../api/python_dip>`.
 
-Persisting DIP environments
-----------------------------
+Registering schemas
+-------------------
+
+Register a schema body directly, then apply it in ordinary DIPL code:
+
+.. code-block:: python
+
+   dip = DIP()
+   dip.add_schema_string("settings", "speed float = 2 m/s\n")
+   # Alternatively: dip.add_schema_file("settings", Path("settings.dipl"))
+   dip.add_string("physics : settings")
+   env = dip.parse()
+
+Bodies start at indentation zero and omit the ``$schema`` wrapper. Registration
+preserves source information and leaves value evaluation to schema application.
+Put schema-level ``?`` metadata before the first body node, then inspect it with
+``env.schemas["settings"].metadata``. Schema metadata describe the definition
+and are not copied onto the applying group, collection, item, or value nodes.
+DIPH5 stores evaluated nodes and descriptive schema provenance rather than
+reusable schema definitions. After loading a snapshot, inspect
+``env.schema_manifest`` for schema descriptions and citations, or use
+``env.applied_schemas("physics.speed")`` to find schemas applied along a value's
+path. ``env.contributing_schema("physics.speed")`` identifies the schema that
+supplied that value node, if any; selected value nodes also expose its
+``schema_id``. Each record includes ``metadata``, ``source_name``, ``source_line``, and
+an optional ``source`` identity with its path and hash. ``env.schemas`` remains
+empty after loading; the snapshot cannot instantiate schemas.
+The command API also supports ``argument_add("schema_string", [name, body])``
+and ``argument_add("schema_file", [name, path])``; file paths there are strings.
+
+Overriding values
+-----------------
+
+Use a ``$override`` region in DIPL, or register an unwrapped override body
+before ``parse()``:
+
+.. code-block:: python
+
+   dip = DIP()
+   dip.add_override_string("simulation.steps = 1024")
+   # Alternatively, read an unwrapped body from a file:
+   # dip.add_override_file("overrides.dip")
+   dip.add_string("simulation\n  steps int = 100")
+   env = dip.parse()
+   print(env["simulation.steps"].value)  # 1024
+
+Override bodies also accept DIPL references, expressions, and calls to
+registered value functions, for example
+``dip.add_override_string("radius = ({?base} * 2) cm")``. The replacement is
+evaluated at the target declaration, so its dependencies must already be
+available then. See :ref:`dip-overrides` for examples, evaluation order, and
+unit conversion rules.
+
+Override bodies contain ``path = value`` modifications and optional nested
+path prefixes, such as ``"simulation\n  steps = 1024"``. Indentation starts
+at zero in string and file bodies. Each expanded path may
+appear once and must have a normal declaration. Overrides also replace
+``!constant`` values during initial evaluation. Later ordinary modifications
+are ignored; dependent expressions and conditions see the replacement value.
+Existing conditions may activate or deactivate nodes. A target that is not
+instantiated is an unresolved override error. Registration can accompany
+``add_project("DIPfile")``; a rejected override body registers no entries. Inspect
+``node.override`` on a selected node and ``cursor.provenance.override_source``
+for its origin. DIPH5 preserves both the effective value and override provenance.
+
+Environment persistence
+-----------------------
 
 Save evaluated parameters to a DIPH5 file and restore them through
 ``Environment``:
@@ -219,8 +284,8 @@ tags only restrict textual output. See :doc:`Static parameter generation
 <../modules/dip/generation>` for native representations and format-specific
 behavior.
 
-Generating TeX and PDF reports
-------------------------------
+Generating reports
+------------------
 
 Call ``Environment.generate_report()`` after parsing a project or loading a
 DIPH5 snapshot. ``ReportFormat`` selects TeX or PDF:
@@ -243,9 +308,12 @@ DIPH5 snapshot. ``ReportFormat`` selects TeX or PDF:
 PDF output needs a local TeX compiler; pass ``tex_compiler="lualatex"`` or
 another compatible executable when required. The same method works on an
 ``Environment`` restored with ``load()`` and reports only provenance retained
-in DIPH5. See :doc:`Generating DIP reports
-<../modules/dip/report>` for report contents and limits, and
-:doc:`the report integration <report>` for cover and contents options.
+in DIPH5. The default title is ``DIP parameter report``; an empty author
+appears as ``Not specified``, while date and version default to the local
+generation date and SNT build version. The PDF has a cover and linked contents
+page; TeX output needs no external tool. See the :ref:`CreateReport example
+<dip-create-report-example>` for a PDF and :doc:`Environment persistence
+<../modules/dip/persistence>` for DIPH5 limits.
 
 Source provenance
 -----------------
@@ -293,68 +361,3 @@ subprocess.
 
 For installation options and the complete Python API, see the
 `Python binding README <https://github.com/vrtulka23/scinumtools3/tree/main/bindings/python>`_.
-
-Registering schemas
--------------------
-
-Register a schema body directly, then apply it in ordinary DIPL code:
-
-.. code-block:: python
-
-   dip = DIP()
-   dip.add_schema_string("settings", "speed float = 2 m/s\n")
-   # Alternatively: dip.add_schema_file("settings", Path("settings.dipl"))
-   dip.add_string("physics : settings")
-   env = dip.parse()
-
-Bodies start at indentation zero and omit the ``$schema`` wrapper. Registration
-preserves source information and leaves value evaluation to schema application.
-Put schema-level ``?`` metadata before the first body node, then inspect it with
-``env.schemas["settings"].metadata``. Schema metadata describe the definition
-and are not copied onto the applying group, collection, item, or value nodes.
-DIPH5 stores evaluated nodes and descriptive schema provenance rather than
-reusable schema definitions. After loading a snapshot, inspect
-``env.schema_manifest`` for schema descriptions and citations, or use
-``env.applied_schemas("physics.speed")`` to find schemas applied along a value's
-path. ``env.contributing_schema("physics.speed")`` identifies the schema that
-supplied that value node, if any; selected value nodes also expose its
-``schema_id``. Each record includes ``metadata``, ``source_name``, ``source_line``, and
-an optional ``source`` identity with its path and hash. ``env.schemas`` remains
-empty after loading; the snapshot cannot instantiate schemas.
-The command API also supports ``argument_add("schema_string", [name, body])``
-and ``argument_add("schema_file", [name, path])``; file paths there are strings.
-
-Overriding initial values
--------------------------
-
-Use a ``$override`` region in DIPL, or register an unwrapped override body
-before ``parse()``:
-
-.. code-block:: python
-
-   dip = DIP()
-   dip.add_override_string("simulation.steps = 1024")
-   # Alternatively, read an unwrapped body from a file:
-   # dip.add_override_file("overrides.dip")
-   dip.add_string("simulation\n  steps int = 100")
-   env = dip.parse()
-   print(env["simulation.steps"].value)  # 1024
-
-Override bodies also accept DIPL references, expressions, and calls to
-registered value functions, for example
-``dip.add_override_string("radius = ({?base} * 2) cm")``. The replacement is
-evaluated at the target declaration, so its dependencies must already be
-available then. See :ref:`dip-overrides` for examples, evaluation order, and
-unit conversion rules.
-
-Override bodies contain ``path = value`` modifications and optional nested
-path prefixes, such as ``"simulation\n  steps = 1024"``. Indentation starts
-at zero in string and file bodies. Each expanded path may
-appear once and must have a normal declaration. Overrides also replace
-``!constant`` values during initial evaluation. Later ordinary modifications
-are ignored; dependent expressions and conditions see the replacement value.
-Existing conditions may activate or deactivate nodes. A target that is not
-instantiated is an unresolved override error. Registration can accompany
-``add_project("DIPfile")``; a rejected override body registers no entries. Inspect
-``node.override`` on a selected node and ``cursor.provenance.override_source``
-for its origin. DIPH5 preserves both the effective value and override provenance.

@@ -4,8 +4,8 @@ CMake integration
 SciNumTools installs a CMake package named ``snt``. It provides the C++
 libraries and the ``snt_dip_get`` helper from the CMake binding.
 
-Setup
------
+Getting started
+---------------
 
 Load the package with ``find_package`` before using its targets or helpers.
 
@@ -25,8 +25,8 @@ Load the package with ``find_package`` before using its targets or helpers.
        add_subdirectory(python)
    endif()
 
-Using DIPL values
------------------
+DIPL parameters
+---------------
 
 The requested node must be one defined scalar without units or an array.
 ``TYPE`` may be ``BOOL``, ``INTEGER``, ``FLOAT``, or ``STRING`` and checks the
@@ -40,6 +40,23 @@ to configure again. Use ``DEPENDS`` when the selected value also depends on
 other DIPL files, such as imported sources or a shared configuration file.
 Each file listed there is registered with CMake's configure dependency graph;
 when one changes, CMake reruns configuration and reevaluates the DIPL value.
+
+Overriding values
+-----------------
+
+``snt_dip_get`` accepts ``OVERRIDE_STRING`` with an unwrapped DIPL override body:
+
+.. code-block:: cmake
+
+   snt_dip_get(FILE config.dip PATH build.python TYPE BOOL OUTPUT enabled
+               OVERRIDE_STRING "build.python = true")
+
+Multiple modifications may be separated by newlines. Overrides are applied
+before evaluation and follow the same validation and duplicate rules as DIPL.
+
+Use ``OVERRIDE_FILE overrides.dip`` to load an unwrapped body from a file.
+The path is relative to ``CMAKE_CURRENT_SOURCE_DIR`` and is tracked as a
+configure dependency. Both override arguments may be used for distinct targets.
 
 Advanced usage
 --------------
@@ -81,20 +98,3 @@ For lower-level use, invoke the installed executable directly. The
        OUTPUT_STRIP_TRAILING_WHITESPACE
        COMMAND_ERROR_IS_FATAL ANY
    )
-
-Overriding values
------------------
-
-``snt_dip_get`` accepts ``OVERRIDE_STRING`` with an unwrapped DIPL override body:
-
-.. code-block:: cmake
-
-   snt_dip_get(FILE config.dip PATH build.python TYPE BOOL OUTPUT enabled
-               OVERRIDE_STRING "build.python = true")
-
-Multiple modifications may be separated by newlines. Overrides are applied
-before evaluation and follow the same validation and duplicate rules as DIPL.
-
-Use ``OVERRIDE_FILE overrides.dip`` to load an unwrapped body from a file.
-The path is relative to ``CMAKE_CURRENT_SOURCE_DIR`` and is tracked as a
-configure dependency. Both override arguments may be used for distinct targets.

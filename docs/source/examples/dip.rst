@@ -73,7 +73,7 @@ repository root, generate a TeX file without external tools:
        --output build/create-report.tex
 
 For a PDF, add ``--format pdf`` and choose a ``.pdf`` output path; this
-requires a local TeX compiler. See :doc:`../integrations/report` for the
+requires a local TeX compiler. See :doc:`../integrations/cli` for the
 complete PDF command and report options.
 
 Generated report

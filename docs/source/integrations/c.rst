@@ -11,8 +11,8 @@ The C binding exposes PUQ quantities through ``<snt/c/puq.h>`` and DIPL parsing
 through ``<snt/c/dip.h>``. It uses opaque handles: C applications hold pointers to SNT objects and
 operate on them through functions, while the implementation remains in C++.
 
-Building and linking
---------------------
+Getting started
+---------------
 
 Build and install SciNumTools with ``ENABLE_BINDING_C=ON`` (the default)
 and the PUQ and DIP modules enabled. See :doc:`../installation` for the
@@ -31,8 +31,8 @@ source build instructions. In a consuming CMake project, link to ``snt-c``:
 The C++ linker supplies the runtime needed by the underlying C++ libraries;
 the application source can remain C.
 
-Quantities and unit conversion
-------------------------------
+Quantities and units
+--------------------
 
 Use ``snt_puq_quantity_eval`` to evaluate a PUEL expression,
 ``snt_puq_quantity_convert`` to create a quantity in the requested units, and
@@ -58,8 +58,42 @@ To load a DIPfile manifest, replace the individual input calls with
 ``snt_dip_parser_add_project(dip, "DIPfile", &error)`` before parsing. See
 :doc:`DIPfile projects <../modules/dip/projects>` for the format.
 
-Persisting DIP environments
-----------------------------
+Registering schemas
+-------------------
+
+Use ``snt_dip_parser_add_schema_string`` or ``snt_dip_parser_add_schema_file``
+with an explicit schema name and a body without a ``$schema`` wrapper:
+
+.. code-block:: c
+
+   snt_dip* parser = NULL;
+   snt_dip_error error = {0};
+   if (snt_dip_parser_create(&parser, &error) == 0) {
+       if (snt_dip_parser_add_schema_string(parser, "settings", "value int = 42", &error) == 0 &&
+           snt_dip_parser_add_string(parser, "physics : settings", &error) == 0) {
+           int status = snt_dip_parser_parse(parser, &error);
+           /* Handle status and inspect physics.value. */
+       }
+       snt_dip_parser_free(parser);
+   }
+
+The file variant takes ``(parser, name, path, error)``. Both functions use the
+same return codes and error structure as the other parser functions.
+
+Overriding values
+-----------------
+
+``snt_dip_parser_add_override_string(parser, body, error)`` accepts unwrapped
+``path = value`` modifications before parsing. Use
+``snt_dip_parser_add_override_file(parser, path, error)`` to read the body from
+a file. Registration is atomic and file provenance retains the source path.
+
+After parsing or loading DIPH5, call
+``snt_dip_parser_is_overridden(parser, path, &result, error)`` to inspect the
+override flag. ``result`` is 1 for an overridden value and 0 otherwise.
+
+Environment persistence
+-----------------------
 
 Use ``snt_dip_environment_save`` and ``snt_dip_environment_load`` with a DIP
 handle, a ``const char*`` filename, and an ``snt_dip_error`` object. They
@@ -88,8 +122,8 @@ The supported C ABI formats are ``SNT_DIP_EXPORT_CPP``,
 ``SNT_DIP_EXPORT_YAML``. See :doc:`Static parameter generation
 <../modules/dip/generation>` for the generated representations.
 
-Generating TeX and PDF reports
-------------------------------
+Generating reports
+------------------
 
 After parsing or loading an environment, call
 ``snt_dip_environment_generate_report``. Use ``SNT_DIP_REPORT_TEX`` for TeX or
@@ -123,7 +157,10 @@ To set cover fields, use ``snt_dip_environment_generate_report_with_options``:
    snt_dip_environment_generate_report_with_options(
        dip, SNT_DIP_REPORT_PDF, "report.pdf", &options, &error);
 
-See :doc:`the report integration <report>` for cover defaults and contents links.
+The default title is ``DIP parameter report``; an empty author appears as
+``Not specified``. Date and version default to the local generation date and
+SNT build version. See the :ref:`CreateReport example
+<dip-create-report-example>` for the cover and linked contents page.
 
 Errors and ownership
 --------------------
@@ -141,37 +178,3 @@ accept null pointers.
 Output buffers belong to the caller. Their capacity must include space for
 the terminating null character; insufficient capacity is reported as an
 error.
-
-Registering schemas
--------------------
-
-Use ``snt_dip_parser_add_schema_string`` or ``snt_dip_parser_add_schema_file``
-with an explicit schema name and a body without a ``$schema`` wrapper:
-
-.. code-block:: c
-
-   snt_dip* parser = NULL;
-   snt_dip_error error = {0};
-   if (snt_dip_parser_create(&parser, &error) == 0) {
-       if (snt_dip_parser_add_schema_string(parser, "settings", "value int = 42", &error) == 0 &&
-           snt_dip_parser_add_string(parser, "physics : settings", &error) == 0) {
-           int status = snt_dip_parser_parse(parser, &error);
-           /* Handle status and inspect physics.value. */
-       }
-       snt_dip_parser_free(parser);
-   }
-
-The file variant takes ``(parser, name, path, error)``. Both functions use the
-same return codes and error structure as the other parser functions.
-
-Overrides
----------
-
-``snt_dip_parser_add_override_string(parser, body, error)`` accepts unwrapped
-``path = value`` modifications before parsing. Use
-``snt_dip_parser_add_override_file(parser, path, error)`` to read the body from
-a file. Registration is atomic and file provenance retains the source path.
-
-After parsing or loading DIPH5, call
-``snt_dip_parser_is_overridden(parser, path, &result, error)`` to inspect the
-override flag. ``result`` is 1 for an overridden value and 0 otherwise.

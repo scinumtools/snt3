@@ -39,4 +39,4 @@ quantity value:
 
 The :doc:`PUEL specification <../../puel/index>` defines the language in
 detail. For command-oriented C++ evaluation, formatting, and inspection, see
-the :doc:`PUQ C++ API <../../api/puq>`.
+the :ref:`PUQ command guide <module-api-puq>`.

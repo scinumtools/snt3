@@ -29,12 +29,9 @@ module.
 Each module overview links to topic pages that group related types and
 operations, such as quantities, unit systems, or DIPL nodes.
 
-The application-facing API overview is split by domain:
-
-* :doc:`PUQ API <puq>` — evaluation, conversion, inspection, and listing.
-* :doc:`DIP API <dip>` — DIPL parsing, DIPH5 loading and saving, and static
-  parameter generation.
-* :doc:`DIP report API <cpp_report>` — TeX and PDF reports.
+The generated application API declarations are grouped by domain. For
+examples and workflow guidance, see the :ref:`API module overview
+<api-application-interface>`.
 
 .. toctree::
    :maxdepth: 1
@@ -44,11 +41,8 @@ The application-facing API overview is split by domain:
    cpp_exs
    cpp_puq
    cpp_dip
-   cpp_report
    cpp_mat
    cpp_api
-   puq
-   dip
 
 Python API
 ----------

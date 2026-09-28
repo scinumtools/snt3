@@ -9,7 +9,7 @@ Package
 
 .. code-block:: cmake
 
-   find_package(scinumtools3 REQUIRED)
+   find_package(snt CONFIG REQUIRED)
 
 The package exports the ``snt::snt`` executable target and the
 ``SNT_EXECUTABLE`` path variable.

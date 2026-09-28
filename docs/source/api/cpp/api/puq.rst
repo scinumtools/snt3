@@ -1,8 +1,6 @@
 PUQ commands
 ============
 
-Evaluate and convert quantities, inspect expressions, and list definitions.
-
 .. doxygentopic:: snt::api
    :members:
    :undoc-members:

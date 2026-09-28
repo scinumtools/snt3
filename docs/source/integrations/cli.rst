@@ -21,6 +21,7 @@ Once the executable is on your ``PATH``, inspect the available commands:
    snt -h
    snt puq -h
    snt dip -h
+   snt report -h
 
 Quantities and units
 --------------------
@@ -44,8 +45,8 @@ quantity, supplied with ``-Q``:
 
    snt puq convert "12*statA" "A" -s ESU -S SI -Q "I"
 
-DIPL definitions
-----------------
+DIPL parameters
+---------------
 
 Use ``dip parse`` with ``--input file`` to load a file or ``--input string``
 to supply definitions directly. ``--print`` displays nodes with names and
@@ -68,6 +69,64 @@ place the declarations in a :doc:`DIPfile project <../modules/dip/projects>`:
 ``--project`` supplies the model and resolves paths relative to the DIPfile.
 It can be combined with ``--input override_string`` or ``--input override_file``
 to tune its values.
+
+Values for shell scripts
+------------------------
+
+The ``--value`` option prints exactly one defined, unitless scalar without
+its name or string quotes. It requires ``--request`` and cannot be combined
+with ``--print``. Optionally use ``--type`` to require ``bool``, ``integer``,
+``float``, or ``string`` without implicit conversion:
+
+.. code-block:: bash
+
+   answer=$(snt dip parse --input string "answer int = 42" \
+       --request answer --value --type integer)
+   printf '%s\n' "$answer"
+
+In this mode, invalid requests write an error to standard error and return
+a nonzero exit status. Arrays, values with units, and undefined values are
+rejected. For reading such scalar settings during CMake configuration, see
+:doc:`cmake`.
+
+Registering schemas
+-------------------
+
+Schema inputs take a name and either body text or a file containing the body,
+without a ``$schema`` wrapper:
+
+.. code-block:: sh
+
+   snt dip parse -i schema_string settings 'value int = 42' \
+       -i string 'physics : settings' -r physics.value --value
+   snt dip parse -i schema_file settings settings.dipl \
+       -i string 'physics : settings' --print
+
+As with other individual inputs, these cannot be combined with ``--project``
+or ``--load``.
+
+Overriding values
+-----------------
+
+Pass an unwrapped override body using ``override_string``:
+
+.. code-block:: shell
+
+   snt dip parse -i file parameters.dip \
+       -i override_string 'simulation.steps = 1024' --print
+
+Duplicate targets fail, including duplicates in ``$override`` regions in files.
+Project inputs accept override text alongside the manifest:
+
+.. code-block:: shell
+
+   snt dip parse --project DIPfile \
+       -i override_string 'simulation.steps = 1024' --print
+
+The project and override inputs may be supplied in either order.
+
+Use ``-i override_file overrides.dip`` to read an unwrapped override body from
+a file.
 
 Environment persistence
 -----------------------
@@ -110,8 +169,8 @@ tags only affect text printed by the command, not the generated environment.
 See :doc:`Static parameter generation <../modules/dip/generation>` for the
 native representations and format-specific behavior.
 
-Generating a parameter report
------------------------------
+Generating reports
+------------------
 
 ``snt report`` writes a LaTeX report of evaluated values and units, descriptions,
 parameter paths, source identities, custom unit definitions, schema information,
@@ -152,42 +211,22 @@ PDF. The TeX compiler is never installed by ``snt report``.
 For reports containing Unicode characters unsupported by ``pdflatex``, use
 ``--tex-compiler lualatex`` when that compiler is installed.
 Use ``--title``, ``--author``, ``--date``, and ``--report-version`` for the
-cover. See :doc:`TeX and PDF reports <report>` for the layout and a fuller example.
-
-Values for shell scripts
-------------------------
-
-The ``--value`` option prints exactly one defined, unitless scalar without
-its name or string quotes. It requires ``--request`` and cannot be combined
-with ``--print``. Optionally use ``--type`` to require ``bool``, ``integer``,
-``float``, or ``string`` without implicit conversion:
+cover. To regenerate the bundled :ref:`CreateReport example
+<dip-create-report-example>` PDF from the repository root:
 
 .. code-block:: bash
 
-   answer=$(snt dip parse --input string "answer int = 42" \
-       --request answer --value --type integer)
-   printf '%s\n' "$answer"
+   build/bin/snt report --project examples/dip/CreateReport/DIPfile \
+       --intro examples/dip/CreateReport/introduction.tex \
+       --title "Mock Heat Flow Study" --author "Example Research Team" \
+       --date "2026-09-28" --report-version "1.0 demo" \
+       --format pdf --output examples/dip/CreateReport/report.pdf
 
-In this mode, invalid requests write an error to standard error and return
-a nonzero exit status. Arrays, values with units, and undefined values are
-rejected. For reading such scalar settings during CMake configuration, see
-:doc:`cmake`.
-
-Registering schemas
--------------------
-
-Schema inputs take a name and either body text or a file containing the body,
-without a ``$schema`` wrapper:
-
-.. code-block:: sh
-
-   snt dip parse -i schema_string settings 'value int = 42' \
-       -i string 'physics : settings' -r physics.value --value
-   snt dip parse -i schema_file settings settings.dipl \
-       -i string 'physics : settings' --print
-
-As with other individual inputs, these cannot be combined with ``--project``
-or ``--load``.
+The default cover title is ``DIP parameter report``; an empty author appears
+as ``Not specified``. The date defaults to the local generation date and the
+version to the SNT build version. Set date and version explicitly for a
+reproducible cover. The :ref:`CreateReport example
+<dip-create-report-example>` shows the layout and provides a PDF to inspect.
 
 Server, dmap, and viewer commands
 ---------------------------------
@@ -218,28 +257,3 @@ it reports that the viewer is not implemented. No GUI dependencies are required
 yet.
 
 All three features belong to the ``snt`` target and require ``ENABLE_EXEC_APPS_SNT``.
-
-Override inputs
----------------
-
-Pass an unwrapped override body using ``override_string``:
-
-.. code-block:: shell
-
-   snt dip parse -i file parameters.dip \
-       -i override_string 'simulation.steps = 1024' --print
-
-The command API exposes the same input as
-``argument_add("override_string", {body})`` (a one-element list in Python).
-Duplicate targets fail, including duplicates in ``$override`` regions in files.
-Project inputs accept override text alongside the manifest:
-
-.. code-block:: shell
-
-   snt dip parse --project DIPfile \
-       -i override_string 'simulation.steps = 1024' --print
-
-The project and override inputs may be supplied in either order.
-
-Use ``-i override_file overrides.dip`` to read an unwrapped override body from
-a file. The command API equivalent is ``argument_add("override_file", {path})``.

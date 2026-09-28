@@ -17,7 +17,7 @@ The package includes:
 
 Evaluated DIP environments can also generate TeX or PDF documentation with
 `Environment.generate_report(ReportFormat.TEX, "report.tex")` or
-`ReportFormat.PDF`. See the [report guide](https://vrtulka23.github.io/scinumtools3/modules/dip/report.html).
+`ReportFormat.PDF`. See the [Python guide](https://vrtulka23.github.io/scinumtools3/integrations/python.html#generating-tex-and-pdf-reports).
 
 ## Installation
 

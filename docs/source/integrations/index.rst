@@ -1,4 +1,4 @@
-Interfaces and integrations
+Interfaces and Integrations
 ===========================
 
 SciNumTools exposes the same scientific data model through language bindings
@@ -12,7 +12,6 @@ logic in each application.
    python
    c
    cli
-   report
    cmake
    rest
    docker

@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1090 590" role="img" aria-labelledby="title description">
+  <title id="title">Default EXS evaluation order</title>
+  <desc id="description">Twelve passes read left to right, then top to bottom: functions, parentheses, unary signs, conditional, power, multiplication division modulo, addition subtraction, relational comparisons, equality comparisons, logical not, logical and, logical or.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L7 4 L1 7" fill="none" stroke="#64748b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <style>
+    .heading { font: 700 22px system-ui, sans-serif; fill: #14243b; }
+    .note { font: 14px system-ui, sans-serif; fill: #52637a; }
+    .number { font: 700 17px system-ui, sans-serif; fill: #14243b; }
+    .name { font: 700 17px system-ui, sans-serif; fill: #14243b; }
+    .kind { font: 12px system-ui, sans-serif; fill: #52637a; }
+    .symbols { font: 15px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #263c56; }
+    .group { fill: #e8f4f5; stroke: #9acdd1; }
+    .unary { fill: #fff3e3; stroke: #e4bf82; }
+    .ternary { fill: #f4eef9; stroke: #c9b4df; }
+    .binary { fill: #eaf0fb; stroke: #a9bde6; }
+    .box { stroke-width: 1.5; }
+    .edge { stroke: #64748b; stroke-width: 2; marker-end: url(#arrow); }
+  </style>
+
+  <text class="heading" x="30" y="35">Default EXS evaluation passes</text>
+  <text class="note" x="30" y="58">Read left to right, then top to bottom. Earlier passes run first.</text>
+
+  <path class="edge" d="M352 136 H369"/>
+  <path class="edge" d="M697 136 H714"/>
+  <path class="edge" d="M352 262 H369"/>
+  <path class="edge" d="M697 262 H714"/>
+  <path class="edge" d="M352 388 H369"/>
+  <path class="edge" d="M697 388 H714"/>
+  <path class="edge" d="M352 514 H369"/>
+  <path class="edge" d="M697 514 H714"/>
+
+  <g transform="translate(30 84)">
+    <rect class="box group" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">01</text><text class="name" x="56" y="30">Functions</text>
+    <text class="kind" x="225" y="30">GROUP</text>
+    <text class="symbols" x="17" y="62">exp log log10 logb powb</text>
+    <text class="symbols" x="17" y="84">sqrt cbrt sin cos tan</text>
+  </g>
+  <g transform="translate(375 84)">
+    <rect class="box group" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">02</text><text class="name" x="56" y="30">Parentheses</text>
+    <text class="kind" x="225" y="30">GROUP</text>
+    <text class="symbols" x="17" y="72">( expression )</text>
+  </g>
+  <g transform="translate(720 84)">
+    <rect class="box unary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">03</text><text class="name" x="56" y="30">Unary signs</text>
+    <text class="kind" x="225" y="30">UNARY</text>
+    <text class="symbols" x="17" y="72">+x   -x</text>
+  </g>
+
+  <g transform="translate(30 210)">
+    <rect class="box ternary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">04</text><text class="name" x="56" y="30">Conditional</text>
+    <text class="kind" x="225" y="30">TERNARY</text>
+    <text class="symbols" x="17" y="72">condition ? yes : no</text>
+  </g>
+  <g transform="translate(375 210)">
+    <rect class="box binary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">05</text><text class="name" x="56" y="30">Power</text>
+    <text class="kind" x="225" y="30">BINARY</text>
+    <text class="symbols" x="17" y="72">a ** b</text>
+  </g>
+  <g transform="translate(720 210)">
+    <rect class="box binary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">06</text><text class="name" x="56" y="30">Multiplicative</text>
+    <text class="kind" x="225" y="30">BINARY</text>
+    <text class="symbols" x="17" y="72">*   /   %</text>
+  </g>
+
+  <g transform="translate(30 336)">
+    <rect class="box binary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">07</text><text class="name" x="56" y="30">Additive</text>
+    <text class="kind" x="225" y="30">BINARY</text>
+    <text class="symbols" x="17" y="72">+   -</text>
+  </g>
+  <g transform="translate(375 336)">
+    <rect class="box binary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">08</text><text class="name" x="56" y="30">Relational</text>
+    <text class="kind" x="225" y="30">BINARY</text>
+    <text class="symbols" x="17" y="72">&lt;=   &gt;=   &lt;   &gt;</text>
+  </g>
+  <g transform="translate(720 336)">
+    <rect class="box binary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">09</text><text class="name" x="56" y="30">Equality</text>
+    <text class="kind" x="225" y="30">BINARY</text>
+    <text class="symbols" x="17" y="72">==   !=</text>
+  </g>
+
+  <g transform="translate(30 462)">
+    <rect class="box unary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">10</text><text class="name" x="56" y="30">Logical NOT</text>
+    <text class="kind" x="225" y="30">UNARY</text>
+    <text class="symbols" x="17" y="72">!x</text>
+  </g>
+  <g transform="translate(375 462)">
+    <rect class="box binary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">11</text><text class="name" x="56" y="30">Logical AND</text>
+    <text class="kind" x="225" y="30">BINARY</text>
+    <text class="symbols" x="17" y="72">a &amp;&amp; b</text>
+  </g>
+  <g transform="translate(720 462)">
+    <rect class="box binary" width="320" height="104" rx="12"/>
+    <text class="number" x="17" y="30">12</text><text class="name" x="56" y="30">Logical OR</text>
+    <text class="kind" x="225" y="30">BINARY</text>
+    <text class="symbols" x="17" y="72">a || b</text>
+  </g>
+</svg>

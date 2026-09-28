@@ -65,7 +65,7 @@ between a scientific model's assumptions and its implementation.
   with source-content hashes, or
   [generate native code and data files](https://vrtulka23.github.io/scinumtools3/modules/dip/generation.html)
   for C++, C, Fortran, Rust, Julia, JSON, and YAML.
-- **[Readable parameter reports](https://vrtulka23.github.io/scinumtools3/modules/dip/report.html):**
+- **[Readable parameter reports](https://vrtulka23.github.io/scinumtools3/examples/dip.html#dip-create-report-example):**
   generate TeX or PDF reports of effective DIP values, units, overrides,
   provenance, schemas, and publication references. See the
   [example report and PDF](https://vrtulka23.github.io/scinumtools3/examples/dip.html#dip-create-report-example).
@@ -129,7 +129,7 @@ applications that should not parse DIPL at run time.
 
 Use `snt report --project DIPfile --output report.tex` to turn an evaluated
 project into a readable TeX report. PDF output is also available when a TeX
-compiler is installed. See the [report guide](https://vrtulka23.github.io/scinumtools3/integrations/report.html)
+compiler is installed. See the [CLI guide](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#generating-reports)
 and the [CreateReport example](examples/dip/CreateReport/README.md), which
 includes a generated PDF.
 

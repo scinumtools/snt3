@@ -18,3 +18,4 @@ any-tag filtering, and its exception when no nodes match.
    cpp/dip/nodes
    cpp/dip/registries
    cpp/dip/solvers
+   cpp/dip/report

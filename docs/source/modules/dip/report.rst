@@ -1,63 +1,93 @@
-Generating DIP reports
-======================
+Report generation
+=================
 
-``snt report`` turns an evaluated DIP environment into a TeX report or a PDF.
-The report lists effective values and units, descriptions, parameter paths,
-schema information, override status, source identities, custom unit definitions,
-registered function names, and available publication metadata. Entries are
-sorted by path or name so repeated runs have a stable order. Generated text is
-escaped for LaTeX.
-It has a cover page, linked contents page, and no separate hierarchy section.
+``snt::dip::report::generate`` writes a TeX or PDF report from an evaluated
+``snt::dip::Environment``. The application-facing
+``snt::api::generate_dip_report`` calls the same generator. Both use the
+document model in the DIP library, so the two formats have the same content.
 
-Run the ``examples/dip/CreateReport`` demo from the repository root to try a
-DIPfile with two schemas, an override, and two custom units:
+Generating a report
+-------------------
 
-.. code-block:: bash
-
-   build/bin/snt report --project examples/dip/CreateReport/DIPfile \
-       --intro examples/dip/CreateReport/introduction.tex \
-       --output build/create-report.tex
-
-``--format tex`` is the default and needs no external program. To produce a
-PDF, add ``--format pdf`` and an output path ending in ``.pdf``. This invokes
-``pdflatex`` by default; ``--tex-compiler`` selects another compatible local
-TeX executable. If the compiler is missing or fails, the command reports an
-error and does not create a new PDF. The compiler runs twice to resolve
-contents links and page numbers.
-
-Use ``--title``, ``--author``, ``--date``, and ``--report-version`` to set the
-cover. The date defaults to the local generation date, and the version to
-the SNT build version. See :doc:`the report integration <../../integrations/report>`
-for details and a fuller example.
-
-The optional ``--intro`` file contains a trusted LaTeX fragment, without
-``\documentclass`` or a document preamble. It appears after the contents page
-in both TeX and PDF output. For Unicode text unsupported by ``pdflatex``, use
-``--tex-compiler lualatex`` when available.
-
-The same renderer is available to C++, Python, and C applications from an
-already evaluated :cpp:class:`snt::dip::Environment`:
+Parse a DIPfile project and pass the resulting environment to the API:
 
 .. code-block:: cpp
 
-   #include <snt/dip/dip.h>
    #include <snt/api/dip_report.h>
+   #include <snt/dip/dip.h>
 
    snt::dip::DIP parser;
    parser.add_project("DIPfile");
    auto env = parser.parse();
+
    snt::dip::report::ReportOptions options;
    options.input_label = "DIPfile";
    options.introduction_file = "introduction.tex";
-   snt::api::generate_dip_report(env, snt::dip::report::ReportFormat::Tex,
-                               "report.tex", options);
+   snt::api::generate_dip_report(
+       env, snt::dip::report::ReportFormat::Tex, "report.tex", options);
 
-See :doc:`the Python binding <../../integrations/python>` and
-:doc:`the C binding <../../integrations/c>` for their corresponding calls.
-The C++ declaration is in :doc:`the report API reference <../../api/cpp_report>`.
+TeX output needs no external program. ``introduction_file`` is an optional
+trusted LaTeX fragment without a document preamble. It appears after the
+contents page; ``\subsection`` headings in the fragment become contents
+links. Other text supplied by the environment and cover options is escaped
+for LaTeX.
 
-DIPH5 snapshots contain evaluated values and retained provenance. A report
-generated from a loaded snapshot cannot reconstruct original source text,
-executable function bodies, reusable schema definitions, or empty containers
-that were not saved. Built-in PUQ unit catalogues are not duplicated in the
-report; custom units registered in the environment are listed.
+PDF output uses the same TeX document and invokes a local TeX compiler twice
+to resolve contents links and page numbers:
+
+.. code-block:: cpp
+
+   options.title = "Mock Heat Flow Study";
+   options.author = "Example Research Team";
+   options.date = "2026-09-28";
+   options.version = "1.0 demo";
+   options.tex_compiler = "pdflatex";
+   snt::api::generate_dip_report(
+       env, snt::dip::report::ReportFormat::Pdf, "report.pdf", options);
+
+``tex_compiler`` defaults to ``pdflatex``. Choose another compatible local
+compiler, such as ``lualatex`` for Unicode text, when needed. An unavailable
+or failing compiler raises an error; the generator does not install one.
+
+Report options and content
+--------------------------
+
+``ReportOptions`` defaults to the title ``DIP parameter report``, an
+unspecified author, the local generation date, and the SNT build version.
+Set the date and version explicitly when a reproducible cover matters.
+``input_label`` identifies the environment on the cover. Set
+``source_root`` to a project directory to show source paths relative to it
+when possible.
+
+The report contains effective values and units, descriptions, parameter
+paths, schema information, override status, source provenance, custom units,
+registered function names, and available publication references. Entries are
+sorted by path or name. The PDF has a cover, linked contents page, and
+matching shaded headings for parameters, schemas, sources, and custom units.
+Parameter paths retain their group names; there is no separate hierarchy
+section. Built-in PUQ unit catalogues and executable function bodies are not
+included.
+
+The generator also accepts a loaded DIPH5 environment:
+
+.. code-block:: cpp
+
+   #include <snt/dip/environment.h>
+   #include <snt/dip/report/report.h>
+
+   snt::dip::Environment env;
+   env.load("run.diph5");
+   snt::dip::report::generate(
+       env, snt::dip::report::ReportFormat::Tex, "loaded-report.tex");
+
+This report contains only values and provenance retained in the snapshot.
+It cannot reconstruct unsaved source text, executable function bodies,
+reusable schema definitions, or empty containers without value descendants.
+
+See the :doc:`DIP report declarations <../../api/cpp/dip/report>` for the full
+options and the :ref:`API wrapper declaration <cpp-api-report-generation>`.
+The :ref:`CreateReport example <dip-create-report-example>` includes
+a generated PDF. For other interfaces, see the :doc:`CLI
+<../../integrations/cli>`, :doc:`Python <../../integrations/python>`,
+:doc:`C <../../integrations/c>`, and :doc:`REST
+<../../integrations/rest>` guides.

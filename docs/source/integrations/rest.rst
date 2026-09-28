@@ -5,8 +5,8 @@ The optional ``snt server`` command exposes the command-oriented C++ API
 over HTTP. It uses the same ``snt::api`` commands as the command-line tool;
 PUEL evaluation and DIPL parsing therefore retain the same semantics.
 
-Build and run
--------------
+Getting started
+---------------
 
 Enable the server explicitly when configuring SNT:
 
@@ -32,8 +32,8 @@ The server exposes an OpenAPI 3.1 document at ``/openapi.json``. Load
 ``http://127.0.0.1:8080/openapi.json`` in Swagger UI, Swagger Editor, or any
 other OpenAPI-compatible client to browse and invoke the API.
 
-PUQ endpoints
--------------
+Quantities and units
+--------------------
 
 All PUQ endpoints use ``GET`` and return ``{"result":"..."}`` on success.
 Optional query parameters are named after the corresponding API command
@@ -68,8 +68,8 @@ prefixes within a PUEL unit name. For example, use ``mi`` together with
 parameters. The list names are ``prefix``, ``base``, ``deriv``, ``log``,
 ``temp``, ``const``, ``quant``, and ``sys``.
 
-DIPL endpoint
--------------
+DIPL parameters
+---------------
 
 Send a DIPL document in the request body to ``POST /snt/dip/parse``. This can
 be inline text or a client-side file uploaded with ``curl --data-binary``; the
@@ -122,6 +122,43 @@ Absolute paths, ``.`` and
 names are rejected. The temporary bundle directory is removed after the
 request, whether parsing succeeds or fails. The endpoint therefore never
 resolves a path supplied by a caller outside its isolated request bundle.
+
+Registering schemas
+-------------------
+
+``POST /snt/dip/parse`` accepts a multipart request with exactly one ``code``
+part and named ``schema:<name>`` parts. Each schema part contains a schema body
+without a ``$schema`` wrapper. Both inline fields and uploaded files are accepted;
+the part name supplies the schema name, independently of the filename.
+
+.. code-block:: sh
+
+   curl http://127.0.0.1:8080/snt/dip/parse \
+       --form 'schema:settings=@settings.dipl' \
+       --form-string 'code=physics : settings'
+
+Schemas are registered before the code is parsed. Duplicate or empty schema
+names, multiple code parts, and mixing these parts with a project bundle are
+rejected. Existing query options and ``output=diph5`` also work with this input.
+Raw DIPL request bodies and project bundles remain supported.
+
+Overriding values
+-----------------
+
+Multipart DIPL requests accept ``override`` fields or file parts alongside the
+required ``code`` part and optional ``schema:<name>`` parts. Each override part
+contains an unwrapped body of ``path = value`` modifications. Repeated parts
+are allowed, but repeated target paths are errors.
+
+.. code-block:: shell
+
+   curl --form 'code=@parameters.dip' \
+       --form-string 'override=simulation.steps = 1024' \
+       'http://localhost:8080/snt/dip/parse'
+
+Project bundles also accept ``override`` fields or files alongside their
+``project`` and ``file`` parts. The uploaded model files need no edits. Plain
+DIPL request bodies accept top-level ``$override`` regions.
 
 Published environments
 ----------------------
@@ -177,11 +214,11 @@ output and therefore do not filter the DIPH5 result.
 The REST endpoint does not expose DIPH5 loading, direct server-side save
 paths, static parameter code generation, or direct server-side file paths.
 
-TeX and PDF reports
--------------------
+Generating reports
+------------------
 
 ``POST /snt/dip/report`` accepts the same DIPL body or multipart project bundle
-as ``/snt/dip/parse`` and returns a TeX attachment. Add ``format=pdf`` to
+as ``/snt/dip/parse`` and returns a TeX attachment by default. Add ``format=pdf`` to
 receive a PDF attachment; the server host needs ``pdflatex`` installed. Cover
 metadata may be supplied through ``title``, ``author``, ``date``, ``version``,
 and ``input_label`` query parameters. The report includes all evaluated
@@ -190,11 +227,18 @@ kept in a request-scoped temporary directory.
 
 .. code-block:: console
 
+   $ curl --request POST http://127.0.0.1:8080/snt/dip/report \
+       --data-binary @model.dipl --output report.tex
+
    $ curl --request POST \
        'http://127.0.0.1:8080/snt/dip/report?format=pdf&title=Example&author=Research%20Team' \
        --data-binary @model.dipl --output report.pdf
 
-See :doc:`the report integration <report>` for the report layout and cover defaults.
+The default title is ``DIP parameter report``; an empty author appears as
+``Not specified``. Date and version default to the local generation date and
+SNT build version. See the :ref:`CreateReport example
+<dip-create-report-example>` for the report layout. This endpoint accepts DIPL
+and project bundles rather than saved DIPH5 files.
 
 Errors
 ------
@@ -205,40 +249,3 @@ JSON ``error`` string. For example:
 .. code-block:: json
 
    {"error":"Missing required query parameter: expression"}
-
-Uploading named schemas
------------------------
-
-``POST /snt/dip/parse`` accepts a multipart request with exactly one ``code``
-part and named ``schema:<name>`` parts. Each schema part contains a schema body
-without a ``$schema`` wrapper. Both inline fields and uploaded files are accepted;
-the part name supplies the schema name, independently of the filename.
-
-.. code-block:: sh
-
-   curl http://127.0.0.1:8080/snt/dip/parse \
-       --form 'schema:settings=@settings.dipl' \
-       --form-string 'code=physics : settings'
-
-Schemas are registered before the code is parsed. Duplicate or empty schema
-names, multiple code parts, and mixing these parts with a project bundle are
-rejected. Existing query options and ``output=diph5`` also work with this input.
-Raw DIPL request bodies and project bundles remain supported.
-
-Override uploads
-----------------
-
-Multipart DIPL requests accept ``override`` fields or file parts alongside the
-required ``code`` part and optional ``schema:<name>`` parts. Each override part
-contains an unwrapped body of ``path = value`` modifications. Repeated parts
-are allowed, but repeated target paths are errors.
-
-.. code-block:: shell
-
-   curl --form 'code=@parameters.dip' \
-       --form-string 'override=simulation.steps = 1024' \
-       'http://localhost:8080/snt/dip/parse'
-
-Project bundles also accept ``override`` fields or files alongside their
-``project`` and ``file`` parts. The uploaded model files need no edits. Plain
-DIPL request bodies accept top-level ``$override`` regions.

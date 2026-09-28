@@ -1,10 +1,15 @@
-DIPL commands
-=============
-
-Parse DIPL sources or load evaluated DIPH5 environments, request formatted
-output, and save environments for application interfaces.
+DIP commands
+============
 
 .. doxygentopic:: snt::api
    :members:
    :undoc-members:
    :headers: src/snt/api/dip_parse.h
+
+.. _cpp-api-report-generation:
+
+Report generation
+-----------------
+
+.. doxygenfunction:: snt::api::generate_dip_report
+   :project: snt

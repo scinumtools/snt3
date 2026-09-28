@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 305" role="img" aria-labelledby="title description">
+  <title id="title">SciNumTools C++ module dependencies</title>
+  <desc id="description">CORE leads to VAL. VAL and EXS lead to PUQ. PUQ leads to DIP and MAT. DIP leads to API. Redundant direct dependencies are omitted.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L8 5 L1 9" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <style>
+    .title { font: 700 22px system-ui, sans-serif; fill: #14243b; }
+    .note { font: 13px system-ui, sans-serif; fill: #52637a; }
+    .name { font: 700 20px system-ui, sans-serif; fill: #14243b; }
+    .detail { font: 13px system-ui, sans-serif; fill: #40536b; }
+    .edge { fill: none; stroke: #64748b; stroke-width: 2.5; marker-end: url(#arrow); }
+  </style>
+
+  <text class="title" x="30" y="38">C++ module dependencies</text>
+  <text class="note" x="30" y="62">Arrows point to modules built on the preceding layer; redundant links are omitted.</text>
+
+  <path class="edge" d="M180 172 C208 172 211 140 239 140"/>
+  <path class="edge" d="M390 140 C426 140 439 172 474 172"/>
+  <path class="edge" d="M390 250 C431 250 440 190 474 190"/>
+  <path class="edge" d="M625 172 C662 172 669 140 704 140"/>
+  <path class="edge" d="M625 194 C661 194 670 250 704 250"/>
+  <path class="edge" d="M855 140 H969"/>
+
+  <rect x="30" y="146" width="150" height="70" rx="13" fill="#edf2f8" stroke="#b9c8d9" stroke-width="1.5"/>
+  <text class="name" x="48" y="175">CORE</text>
+  <text class="detail" x="48" y="197">Shared utilities</text>
+
+  <rect x="240" y="105" width="150" height="70" rx="13" fill="#e8f4f5" stroke="#9acdd1" stroke-width="1.5"/>
+  <text class="name" x="258" y="134">VAL</text>
+  <text class="detail" x="258" y="156">Values</text>
+
+  <rect x="240" y="215" width="150" height="70" rx="13" fill="#e8f4f5" stroke="#9acdd1" stroke-width="1.5"/>
+  <text class="name" x="258" y="244">EXS</text>
+  <text class="detail" x="258" y="266">Expressions</text>
+
+  <rect x="475" y="146" width="150" height="70" rx="13" fill="#e8eefb" stroke="#a9bce6" stroke-width="1.5"/>
+  <text class="name" x="493" y="175">PUQ</text>
+  <text class="detail" x="493" y="197">Units &amp; quantities</text>
+
+  <rect x="705" y="105" width="150" height="70" rx="13" fill="#e8f1fc" stroke="#a3c0e6" stroke-width="1.5"/>
+  <text class="name" x="723" y="134">DIP</text>
+  <text class="detail" x="723" y="156">Parameters &amp; reports</text>
+
+  <rect x="705" y="215" width="150" height="70" rx="13" fill="#f5f2f9" stroke="#c8b8d9" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text class="name" x="723" y="244">MAT</text>
+  <text class="detail" x="723" y="266">Materials (planned)</text>
+
+  <rect x="970" y="105" width="150" height="70" rx="13" fill="#eaf5ed" stroke="#a9cfb2" stroke-width="1.5"/>
+  <text class="name" x="988" y="134">API</text>
+  <text class="detail" x="988" y="156">Application access</text>
+</svg>
