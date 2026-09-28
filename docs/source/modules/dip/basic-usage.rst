@@ -175,79 +175,42 @@ bodies containing a surrounding ``$schema`` declaration are rejected. Ordinary
 Overriding initial values
 -------------------------
 
-Use ``$override`` to replace values without changing a node's type, units,
-properties, or hierarchy. The region contains only value modifications, with
-dotted paths or nested indentation. Bare paths inside a region are prefixes,
-not group declarations. Declare regions at the top level, outside schemas and
-nested blocks. Their order among top-level inputs does not matter:
+Register overrides on ``snt::dip::DIP`` before calling ``parse()``. Use
+``add_override_string(body)`` for an inline value-only body; omit the
+``$override`` wrapper. The parser applies the replacement while evaluating
+the target, so dependent values see it:
 
-.. code-block:: dipl
+.. code-block:: cpp
 
-   $override
-     simulation.resolution = 1024
+   snt::dip::DIP dip;
+   dip.add_string(
+       "simulation\n"
+       "  resolution int = 512\n"
+       "  cells int = ({?simulation.resolution} * 2)\n");
+   dip.add_override_string("simulation.resolution = 1024\n");
 
-   simulation
-     resolution int = 512
-     cells int = ({?simulation.resolution} * 2)
+   auto env = dip.parse();
+   int resolution = env["simulation.resolution"].as<int>(); // 1024
+   int cells = env["simulation.cells"].as<int>();           // 2048
+   bool overridden = env.get_node("simulation.resolution")->override;
 
-For example, the same target can be written with a nested prefix:
+For a separate tuning file, call ``add_override_file(path)`` instead. It
+reads an unwrapped override body and retains the file path in provenance:
 
-.. code-block:: dipl
+.. code-block:: cpp
 
-   $override
-     simulation
-       resolution = 1024
+   snt::dip::DIP dip;
+   dip.add_project("DIPfile");
+   dip.add_override_file("tuning.dip");
+   auto env = dip.parse();
+   auto provenance = env["simulation.resolution"].get_provenance();
+   // provenance.override_source identifies tuning.dip when this node is overridden.
 
-Use either form for a given target: duplicate detection uses the expanded
-path. Prefixes may name existing collection items, and value-bearing parents
-may have nested modifications to their existing children. Types, properties,
-schema applications, and collection appends are not allowed in override bodies.
-
-Replacement values may be literals, references, expressions, or calls to
-registered DIPL value functions. For example:
-
-.. code-block:: dipl
-
-   base float = 10 cm
-   radius float = 1 cm
-   diameter float = ({?radius} * 2) cm
-
-   $override
-     radius = ({?base} * 2) cm
-
-This evaluates ``radius`` to ``20 cm`` and ``diameter`` to ``40 cm``.
-Alternatively, the replacement could be ``radius = {?base} cm`` or
-``radius = compute_radius() cm``, provided the host has registered the
-``compute_radius`` value function. These are alternatives for the same target,
-not entries to combine in one input.
-
-An override is evaluated when its target declaration is processed. Values
-referenced by its expression, reference, or function must already be available
-at that point. Moving the ``$override`` region does not change this requirement
-or enable forward references. The original value expression or function is
-not evaluated; subsequent dependents see the replacement value.
-
-The replacement must satisfy the target's type, declared dimensions, and
-constraints. Explicit compatible units are converted to the target's declared
-units; without explicit units, the replacement uses the target's units.
-These rules also apply to bodies supplied through ``add_override_string`` and
-``add_override_file``.
-
-When an overridden value violates an options, condition, or format constraint,
-the diagnostic points to the override and includes the original declaration
-as context. File paths are included when available.
-
-Dependencies and conditions see the overridden value. Existing conditional
-definitions may therefore instantiate different nodes: overrides preserve the
-declared model, while its evaluated graph follows its existing conditions. An
-override targeting a node that remains inactive is an error.
-
-An override may replace a ``!constant``
-value; subsequent ordinary modifications to that node are ignored. Duplicate
-or unmatched override paths are errors. Host code can call
-``add_override_string(body)`` or ``add_override_file(path)``. Both accept an
-unwrapped DIPL override body; an empty or comment-only body makes no changes.
-Files retain their source path in provenance. Selected nodes
-expose the ``override`` flag, and cursor provenance retains both the original
-declaration and the override source. DIPH5 persists the evaluated value and
-this provenance.
+The replacement must satisfy the target's type, units, dimensions, and
+constraints. An unmatched or duplicate target is an error. Overrides may be
+registered before or after model inputs, but references inside a replacement
+must be available when the target is evaluated. The original declaration and
+override source remain available through ``get_provenance()`` and in saved
+DIPH5 environments. For override body syntax and evaluation rules, see the
+:doc:`DIPL language guide <../../dipl/index>` and the `overrides specification
+<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/syntax/overrides.md>`_.

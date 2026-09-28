@@ -1,5 +1,5 @@
-Command-line interface
-======================
+CLI Command-line interface
+==========================
 
 The ``snt`` executable evaluates PUEL expressions, converts quantities, and
 parses DIPL definitions from a terminal or shell script. It uses the same
