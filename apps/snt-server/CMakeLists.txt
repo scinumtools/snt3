@@ -1,6 +1,9 @@
 # Add the optional server module to the main executable.
+if(SNT_HTTPLIB_INCLUDE_DIR AND NOT EXISTS "${SNT_HTTPLIB_INCLUDE_DIR}/httplib.h")
+  unset(SNT_HTTPLIB_INCLUDE_DIR CACHE)
+endif()
 find_path(SNT_HTTPLIB_INCLUDE_DIR httplib.h
-  HINTS "${CMAKE_CURRENT_SOURCE_DIR}/external/cpp-httplib"
+  HINTS "${PROJECT_SOURCE_DIR}/external/cpp-httplib"
   DOC "Directory containing cpp-httplib's httplib.h")
 if(NOT SNT_HTTPLIB_INCLUDE_DIR)
   message(FATAL_ERROR

@@ -1,3 +1,6 @@
-[submodule "apps/snt-server/external/cpp-httplib"]
-	path = apps/snt-server/external/cpp-httplib
+[submodule "external/cpp-httplib"]
+	path = external/cpp-httplib
 	url = https://github.com/yhirose/cpp-httplib.git
+[submodule "external/briefpp"]
+	path = external/briefpp
+	url = https://github.com/vrtulka23/briefpp
