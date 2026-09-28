@@ -70,7 +70,8 @@ Generating reports
 ------------------
 
 ``snt::api::generate_dip_report`` takes an evaluated environment and writes
-a TeX or PDF report. Parse a DIPfile project, then choose the output format:
+a report in TeX, PDF, Markdown, reStructuredText, HTML, Typst, plain text,
+or Brief++ document JSON. Parse a DIPfile project, then choose the output format:
 
 .. code-block:: cpp
 
@@ -93,6 +94,10 @@ a TeX or PDF report. Parse a DIPfile project, then choose the output format:
    options.tex_compiler = "pdflatex";
    snt::api::generate_dip_report(
        env, snt::dip::report::ReportFormat::Pdf, "report.pdf", options);
+
+   options.introduction_file.clear(); // Raw LaTeX is only for TeX/PDF.
+   snt::api::generate_dip_report(
+       env, snt::dip::report::ReportFormat::Html, "report.html", options);
 
 TeX output needs no external tool. PDF output runs the configured local TeX
 compiler and reports an error if it is unavailable. The API also accepts an

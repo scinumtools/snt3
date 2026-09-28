@@ -1,8 +1,11 @@
 # build library
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/report/template.tex")
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/report/template.tex" SNT_REPORT_TEMPLATE)
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/report/template.h.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/report/template.h" @ONLY)
+find_path(SNT_BRIEFPP_INCLUDE_DIR briefpp/report.hpp
+  HINTS "${PROJECT_SOURCE_DIR}/external/briefpp/include"
+  DOC "Directory containing briefpp/report.hpp")
+if(NOT SNT_BRIEFPP_INCLUDE_DIR)
+  message(FATAL_ERROR
+    "DIP reports require Brief++. Initialize external/briefpp or set SNT_BRIEFPP_INCLUDE_DIR.")
+endif()
 file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
 set(EXEC_NAME snt-dip)
 
@@ -17,7 +20,7 @@ target_include_directories(${EXEC_NAME}
     $<INSTALL_INTERFACE:include>
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_BINARY_DIR}/report
+    ${SNT_BRIEFPP_INCLUDE_DIR}
 )
 
 set_target_properties(${EXEC_NAME} PROPERTIES

@@ -218,8 +218,10 @@ Generating reports
 ------------------
 
 ``POST /snt/dip/report`` accepts the same DIPL body or multipart project bundle
-as ``/snt/dip/parse`` and returns a TeX attachment by default. Add ``format=pdf`` to
-receive a PDF attachment; the server host needs ``pdflatex`` installed. Cover
+as ``/snt/dip/parse`` and returns a TeX attachment by default. ``format`` also
+accepts ``pdf``, ``md``, ``rst``, ``html``, ``typ``, ``txt``, and ``json``.
+Brief++ renders the text formats without external tools. PDF requires
+``pdflatex`` on the server host. JSON is a ``briefpp/1`` document tree. Cover
 metadata may be supplied through ``title``, ``author``, ``date``, ``version``,
 and ``input_label`` query parameters. The report includes all evaluated
 parameters, irrespective of parse result filters. Uploaded project files are
@@ -233,6 +235,9 @@ kept in a request-scoped temporary directory.
    $ curl --request POST \
        'http://127.0.0.1:8080/snt/dip/report?format=pdf&title=Example&author=Research%20Team' \
        --data-binary @model.dipl --output report.pdf
+
+   $ curl --request POST 'http://127.0.0.1:8080/snt/dip/report?format=html' \
+       --data-binary @model.dipl --output report.html
 
 The default title is ``DIP parameter report``; an empty author appears as
 ``Not specified``. Date and version default to the local generation date and

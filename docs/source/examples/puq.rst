@@ -1,8 +1,8 @@
 PUQ examples
 ============
 
-CBinding
---------
+C Binding
+---------
 
 The ``examples/puq/CBinding`` directory is a standalone C project using only
 the public ``snt/c/puq.h`` interface for PUQ operations. It evaluates a quantity,

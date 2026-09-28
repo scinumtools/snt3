@@ -138,6 +138,12 @@ After parsing or loading an environment, call
        fprintf(stderr, "%s\n", error.message);
    }
 
+Other format values are ``SNT_DIP_REPORT_MD``, ``SNT_DIP_REPORT_RST``,
+``SNT_DIP_REPORT_HTML``, ``SNT_DIP_REPORT_TYP``, ``SNT_DIP_REPORT_TXT``, and
+``SNT_DIP_REPORT_JSON``. They use Brief++ renderers without an external
+tool. JSON is a ``briefpp/1`` document tree. Pass a null introduction path
+for these formats; a LaTeX introduction is accepted only for TeX and PDF.
+
 The input label, introduction path, and compiler name may be null. A null
 compiler uses ``pdflatex`` for PDF output. The introduction file is a trusted
 LaTeX fragment without a preamble. PDF generation returns an error if the

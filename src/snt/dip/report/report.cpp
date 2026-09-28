@@ -2,7 +2,7 @@
 
 #include "compiler.h"
 #include "model.h"
-#include "writer.h"
+#include "renderer.h"
 
 #include <chrono>
 #include <ctime>
@@ -32,6 +32,8 @@ std::string current_date() {
 void generate(const dip::Environment& environment, ReportFormat format,
               const std::filesystem::path& output, const ReportOptions& options) {
     if (output.empty()) throw std::invalid_argument("A report output path is required.");
+    if (!options.introduction_file.empty() && format != ReportFormat::Tex && format != ReportFormat::Pdf)
+        throw std::invalid_argument("A LaTeX introduction is supported only for TeX and PDF reports.");
     std::string introduction;
     if (!options.introduction_file.empty()) {
         if (!std::filesystem::is_regular_file(options.introduction_file))
@@ -49,10 +51,16 @@ void generate(const dip::Environment& environment, ReportFormat format,
                                          options.version.empty() ? CODE_VERSION : options.version,
                                          options.source_root,
                                          environment.is_loaded_snapshot());
-    const auto tex = render_tex(document);
     switch (format) {
-    case ReportFormat::Tex: write_file(output, tex); break;
-    case ReportFormat::Pdf: compile_pdf(tex, output, options.tex_compiler); break;
+    case ReportFormat::Tex:
+    case ReportFormat::Markdown:
+    case ReportFormat::Rst:
+    case ReportFormat::Html:
+    case ReportFormat::Typst:
+    case ReportFormat::Text:
+    case ReportFormat::Json:
+        write_file(output, render_document(document, format)); break;
+    case ReportFormat::Pdf: compile_pdf(render_document(document, ReportFormat::Tex), output, options.tex_compiler); break;
     default: throw std::invalid_argument("Unknown report format.");
     }
 }

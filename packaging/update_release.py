@@ -36,7 +36,7 @@ def archive_version(data):
 
 
 def replace_once(pattern, replacement, text):
-    result, count = re.subn(pattern, lambda match: replacement, text, flags=re.M)
+    result, count = re.subn(pattern, lambda match: match.expand(replacement), text, flags=re.M)
     if count != 1:
         raise ValueError(f"Expected one recipe field matching {pattern!r}; found {count}")
     return result
@@ -56,8 +56,10 @@ def render_updates(root, version, data):
                         path.read_text())
     updates[path] = replace_once(r'^  sha256 "[a-f0-9]+"$', f'  sha256 "{sha256}"', text)
     path = root / "packaging/vcpkg/portfile.cmake"
-    text = replace_once(r'^    REF v\S+$', f'    REF v{version}', path.read_text())
-    updates[path] = replace_once(r'^    SHA512 [a-f0-9]+$', f'    SHA512 {sha512}', text)
+    text = replace_once(r'(^    REPO vrtulka23/scinumtools3\n)    REF v\S+$',
+                        r'\g<1>    REF v' + version, path.read_text())
+    updates[path] = replace_once(r'(^    REF v\S+\n)    SHA512 [a-f0-9]+$',
+                                 r'\g<1>    SHA512 ' + sha512, text)
     path = root / "packaging/vcpkg/vcpkg.json"
     manifest = json.loads(path.read_text())
     manifest["version"] = version
@@ -66,7 +68,8 @@ def render_updates(root, version, data):
     path = root / "packaging/conda-forge/meta.yaml"
     text = replace_once(r'^\{% set version = ".*" %\}$',
                         '{% set version = "' + version + '" %}', path.read_text())
-    text = replace_once(r'^  sha256: [a-f0-9]+$', f'  sha256: {sha256}', text)
+    text = replace_once(r'(^  - url: https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v\{\{ version \}\}\.tar\.gz\n)    sha256: [a-f0-9]+$',
+                        r'\g<1>    sha256: ' + sha256, text)
     updates[path] = replace_once(r'^  number: [0-9]+$', '  number: 0', text)
     return updates
 

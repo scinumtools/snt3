@@ -55,6 +55,26 @@ if(name_pos GREATER speed_pos)
   message(FATAL_ERROR "Parameter order is not stable and sorted")
 endif()
 
+foreach(format IN ITEMS md rst html typ txt json)
+  set(rendered "${TEST_DIR}/report.${format}")
+  run_report(success --project "${project_dir}/DIPfile"
+    -i override_string "physics.speed = 3 m/s"
+    --format "${format}" --output "${rendered}"
+    --date "2026-09-28" --report-version "draft_1")
+  file(READ "${rendered}" result)
+  foreach(expected IN ITEMS "physics.speed" "Override at" "Custom units" "Flow")
+    string(FIND "${result}" "${expected}" index)
+    if(index EQUAL -1)
+      message(FATAL_ERROR "${format} report is missing '${expected}'")
+    endif()
+  endforeach()
+endforeach()
+run_report(failure --project "${project_dir}/DIPfile" --intro "${project_dir}/intro.tex"
+  --format html --output "${TEST_DIR}/bad.html")
+if(NOT LAST_ERROR MATCHES "--intro requires")
+  message(FATAL_ERROR "HTML report did not reject the LaTeX introduction")
+endif()
+
 execute_process(COMMAND "${SNT_EXECUTABLE}" dip parse --project "${project_dir}/DIPfile"
   -i override_string "physics.speed = 3 m/s" --save "${snapshot}"
   RESULT_VARIABLE save_status ERROR_VARIABLE save_error)

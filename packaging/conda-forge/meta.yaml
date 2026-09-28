@@ -6,13 +6,17 @@ package:
   version: {{ version }}
 
 source:
-  url: https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 65b86ef6a9eda90e8a7aa1429c7ca63a34d67aba3d039e635c4162e376c1436c
+  - url: https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v{{ version }}.tar.gz
+    sha256: 65b86ef6a9eda90e8a7aa1429c7ca63a34d67aba3d039e635c4162e376c1436c
+    folder: scinumtools3
+  - url: https://github.com/vrtulka23/briefpp/archive/624aa478149a0fa0e7213bb7cfb6d19615d6e771.tar.gz
+    sha256: aaac2a8a25f8a7bc11546038594eb9fef43bf560c0c0532a886c432d5e14de31
+    folder: scinumtools3/external/briefpp
 
 build:
   number: 0
   script: 
-    - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
+    - {{ PYTHON }} -m pip install scinumtools3 --no-deps --no-build-isolation -vv
 
 requirements:
   build:

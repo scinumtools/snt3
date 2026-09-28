@@ -25,7 +25,7 @@ Options:
 
 Modules:
   dip     Dimensional Input Parameters
-  report  Generate a TeX or PDF report from DIP parameters
+  report  Generate a DIP report in TeX, PDF, and other formats
   puq     Physical Units & Quantities
   dmap    Regenerate PUQ dimension-map headers (developer tool; optional)
   server  REST API server (optional build feature)

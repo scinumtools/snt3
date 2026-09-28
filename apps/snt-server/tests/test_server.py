@@ -211,8 +211,14 @@ derived int = ({?answer} + 1)
         with self.request("/snt/dip/report", body, content_type) as response:
             self.assertIn(r"\sntnode{other}", response.read().decode())
 
+        with self.request("/snt/dip/report?format=md", b"answer int = 42\n") as response:
+            self.assertEqual(response.headers.get_content_type(), "text/markdown")
+            self.assertIn("answer", response.read().decode())
+        with self.request("/snt/dip/report?format=json", b"answer int = 42\n") as response:
+            self.assertEqual(response.headers.get_content_type(), "application/json")
+            self.assertEqual(json.loads(response.read())["schema"], "briefpp/1")
         with self.assertRaises(urllib.error.HTTPError):
-            self.request("/snt/dip/report?format=md", b"answer int = 42\n")
+            self.request("/snt/dip/report?format=bad", b"answer int = 42\n")
         if shutil.which("pdflatex"):
             with self.request("/snt/dip/report?format=pdf", b"answer int = 42\n") as response:
                 self.assertEqual(response.headers.get_content_type(), "application/pdf")

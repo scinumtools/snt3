@@ -288,7 +288,8 @@ Generating reports
 ------------------
 
 Call ``Environment.generate_report()`` after parsing a project or loading a
-DIPH5 snapshot. ``ReportFormat`` selects TeX or PDF:
+DIPH5 snapshot. ``ReportFormat`` selects TeX, PDF, Markdown, reStructuredText,
+HTML, Typst, plain text, or Brief++ document JSON:
 
 .. code-block:: python
 
@@ -300,11 +301,18 @@ DIPH5 snapshot. ``ReportFormat`` selects TeX or PDF:
    env.generate_report(ReportFormat.TEX, "report.tex",
                      input_label="DIPfile", intro_file="introduction.tex")
    env.generate_report(ReportFormat.PDF, "report.pdf",
-                     input_label="DIPfile", intro_file="introduction.tex",
-                     title="Mock Heat Flow Study", author="Example Research Team",
-                     date="2026-09-28", version="1.0 demo")
+       input_label="DIPfile", intro_file="introduction.tex",
+       title="Mock Heat Flow Study", author="Example Research Team",
+       date="2026-09-28", version="1.0 demo")
+   env.generate_report(ReportFormat.HTML, "report.html", input_label="DIPfile")
+   env.generate_report(ReportFormat.MARKDOWN, "report.md")
 
-``intro_file`` is an optional trusted LaTeX fragment without a preamble.
+The remaining values are ``RST``, ``TYPST``, ``TEXT``, and ``JSON``.
+Markdown uses MyST-style table directives; JSON contains a ``briefpp/1``
+document tree. These text formats need no external tools.
+
+``intro_file`` is an optional trusted LaTeX fragment without a preamble,
+accepted only for TeX and PDF.
 PDF output needs a local TeX compiler; pass ``tex_compiler="lualatex"`` or
 another compatible executable when required. The same method works on an
 ``Environment`` restored with ``load()`` and reports only provenance retained

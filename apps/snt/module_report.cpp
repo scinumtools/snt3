@@ -8,6 +8,19 @@
 #include <stdexcept>
 
 namespace {
+snt::dip::report::ReportFormat report_format(const std::string& name) {
+    using Format = snt::dip::report::ReportFormat;
+    if (name == "tex") return Format::Tex;
+    if (name == "pdf") return Format::Pdf;
+    if (name == "md") return Format::Markdown;
+    if (name == "rst") return Format::Rst;
+    if (name == "html") return Format::Html;
+    if (name == "typ") return Format::Typst;
+    if (name == "txt") return Format::Text;
+    if (name == "json") return Format::Json;
+    throw std::runtime_error("Unknown report format: " + name + ". Use tex, pdf, md, rst, html, typ, txt, or json.");
+}
+
 std::string help_report() {
     return R"(
 Scientific Numerical Tools v3 (SNT)
@@ -17,7 +30,7 @@ Usage:
   snt report [options] [arguments]
 
 Description:
-  Generate a TeX or PDF report from an evaluated DIP environment.
+  Generate a report from an evaluated DIP environment using Brief++.
   The report includes values, parameter paths, sources, custom units, schemas,
   overrides, and available publication metadata.
 
@@ -34,12 +47,12 @@ Options:
       Load a DIPfile project. Override inputs may tune its values.
   --load <file>
       Load an evaluated DIPH5 environment instead of DIPL inputs.
-  --format <tex|pdf>
+  --format <tex|pdf|md|rst|html|typ|txt|json>
       Select the report format (default: tex).
   --output <file>
       Write the report to this file.
   --intro <file.tex>
-      Insert trusted LaTeX after the contents page, in both TeX and PDF output.
+      Insert trusted LaTeX after the contents page, in TeX or PDF output.
       Supply a fragment without a document preamble.
   --title <text>
       Set the cover title (default: DIP parameter report).
@@ -56,6 +69,8 @@ Options:
 
 Examples:
   snt report --project DIPfile --output report.tex
+  snt report --project DIPfile --format html --output report.html
+  snt report --project DIPfile --format md --output report.md
   snt report --load run.diph5 --output report.tex
   snt report --project DIPfile --intro introduction.tex --format pdf --output report.pdf
   snt report --input file parameters.dip -i override_string "steps = 200" \
@@ -142,10 +157,11 @@ void module_report(ArgParser& argpar) {
     if (!has_input && !has_project && !has_load)
         throw std::runtime_error("Specify --input, --project, or --load.");
     if (output.empty()) throw std::runtime_error("Specify --output for the report.");
-    if (format != "tex" && format != "pdf")
-        throw std::runtime_error("Unknown report format: " + format + ". Use tex or pdf.");
+    const auto selected_format = report_format(format);
     if (has_compiler && format != "pdf")
         throw std::runtime_error("--tex-compiler requires --format pdf.");
+    if (has_intro && format != "tex" && format != "pdf")
+        throw std::runtime_error("--intro requires --format tex or pdf.");
 
     snt::dip::report::ReportOptions options;
     options.input_label = input_label;
@@ -156,7 +172,5 @@ void module_report(ArgParser& argpar) {
     options.date = date;
     options.version = report_version;
     options.source_root = source_root;
-    snt::api::generate_dip_report(command.evaluate(), format == "tex" ? snt::dip::report::ReportFormat::Tex
-                                                                : snt::dip::report::ReportFormat::Pdf,
-                                output, options);
+    snt::api::generate_dip_report(command.evaluate(), selected_format, output, options);
 }

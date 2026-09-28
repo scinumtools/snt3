@@ -61,6 +61,12 @@ snt::dip::report::ReportFormat report_format(snt_dip_report_format format) {
     switch (format) {
     case SNT_DIP_REPORT_TEX: return snt::dip::report::ReportFormat::Tex;
     case SNT_DIP_REPORT_PDF: return snt::dip::report::ReportFormat::Pdf;
+    case SNT_DIP_REPORT_MD: return snt::dip::report::ReportFormat::Markdown;
+    case SNT_DIP_REPORT_RST: return snt::dip::report::ReportFormat::Rst;
+    case SNT_DIP_REPORT_HTML: return snt::dip::report::ReportFormat::Html;
+    case SNT_DIP_REPORT_TYP: return snt::dip::report::ReportFormat::Typst;
+    case SNT_DIP_REPORT_TXT: return snt::dip::report::ReportFormat::Text;
+    case SNT_DIP_REPORT_JSON: return snt::dip::report::ReportFormat::Json;
     default: throw std::invalid_argument("invalid DIP report format");
     }
 }

@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 import pytest
 
@@ -28,6 +29,26 @@ def test_generate_report_from_parsed_and_loaded_environment(tmp_path: Path):
     assert "\\tableofcontents" in content
     assert "\\section{Parameters}" in content
     assert "\\section{Hierarchy}" not in content
+
+    formats = {
+        ReportFormat.MARKDOWN: ("md", "physics.speed"),
+        ReportFormat.RST: ("rst", "physics.speed"),
+        ReportFormat.HTML: ("html", "Flow &amp; speed"),
+        ReportFormat.TYPST: ("typ", "physics.speed"),
+        ReportFormat.TEXT: ("txt", "physics.speed"),
+        ReportFormat.JSON: ("json", '"schema":"briefpp/1"'),
+    }
+    for report_format, (extension, expected) in formats.items():
+        file = tmp_path / f"report.{extension}"
+        env.generate_report(report_format, file, title="Study & report", version="v1.0")
+        result = file.read_text()
+        assert expected in result
+        assert "Flow & speed" in result or "Flow &amp; speed" in result or "Flow \\& speed" in result
+        assert "Override at" in result
+    json_report = json.loads((tmp_path / "report.json").read_text())
+    assert json_report["metadata"]["title"] == "Study & report"
+    with pytest.raises((ValueError, RuntimeError), match="LaTeX introduction"):
+        env.generate_report(ReportFormat.HTML, tmp_path / "bad.html", intro_file=intro)
 
     snapshot = tmp_path / "run.diph5"
     env.save(snapshot)

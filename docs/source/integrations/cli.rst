@@ -172,7 +172,7 @@ native representations and format-specific behavior.
 Generating reports
 ------------------
 
-``snt report`` writes a LaTeX report of evaluated values and units, descriptions,
+``snt report`` writes a report of evaluated values and units, descriptions,
 parameter paths, source identities, custom unit definitions, schema information,
 override status, and available publication metadata. Function names are listed
 when registered; executable function bodies are not included. Built-in PUQ unit
@@ -185,6 +185,20 @@ default format is ``tex``; it requires no external tools:
    snt report --load run.diph5 --output report.tex
    snt report --input file parameters.dip --output report.tex
 
+Brief++ also renders the same report as Markdown (``md``), reStructuredText
+(``rst``), HTML (``html``), Typst (``typ``), plain text (``txt``), or a
+``briefpp/1`` document tree (``json``):
+
+.. code-block:: bash
+
+   snt report --project DIPfile --format html --output report.html
+   snt report --project DIPfile --format md --output report.md
+   snt report --load run.diph5 --format json --output report.json
+
+These formats need no external tools. Markdown tables use Brief++'s
+MyST-style directives. Report JSON describes the document; use
+``snt dip parse --generate json`` for static parameter export JSON.
+
 The command accepts the same ``--input`` kinds as ``snt dip parse``. A project
 may be combined with ``override_string`` or ``override_file`` inputs. A DIPH5
 ``--load`` cannot be combined with other inputs. For loaded snapshots, the
@@ -194,7 +208,7 @@ DIPH5 snapshot and therefore cannot appear in a report generated from it.
 
 Use ``--intro introduction.tex`` to insert trusted LaTeX after the report
 contents page. The file is read as a fragment, without a document preamble. Its text
-is included in both TeX and PDF reports.
+is included in both TeX and PDF reports. Other formats reject ``--intro``.
 
 ``--format pdf`` compiles the same generated TeX with ``pdflatex``. Select a
 compatible executable with ``--tex-compiler`` when needed:

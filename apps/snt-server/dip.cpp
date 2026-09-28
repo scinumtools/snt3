@@ -168,7 +168,28 @@ namespace snt::server {
             const auto format = request.has_param("format") ? request.get_param_value("format") : "tex";
             if (format == "tex") return dip::report::ReportFormat::Tex;
             if (format == "pdf") return dip::report::ReportFormat::Pdf;
-            throw std::invalid_argument("The format query parameter must be tex or pdf.");
+            if (format == "md") return dip::report::ReportFormat::Markdown;
+            if (format == "rst") return dip::report::ReportFormat::Rst;
+            if (format == "html") return dip::report::ReportFormat::Html;
+            if (format == "typ") return dip::report::ReportFormat::Typst;
+            if (format == "txt") return dip::report::ReportFormat::Text;
+            if (format == "json") return dip::report::ReportFormat::Json;
+            throw std::invalid_argument("The format query parameter must be tex, pdf, md, rst, html, typ, txt, or json.");
+        }
+
+        std::pair<const char*, const char*> report_response_type(dip::report::ReportFormat format) {
+            using Format = dip::report::ReportFormat;
+            switch (format) {
+            case Format::Tex: return {"report.tex", "application/x-tex"};
+            case Format::Pdf: return {"report.pdf", "application/pdf"};
+            case Format::Markdown: return {"report.md", "text/markdown"};
+            case Format::Rst: return {"report.rst", "text/x-rst"};
+            case Format::Html: return {"report.html", "text/html"};
+            case Format::Typst: return {"report.typ", "text/plain"};
+            case Format::Text: return {"report.txt", "text/plain"};
+            case Format::Json: return {"report.json", "application/json"};
+            }
+            throw std::invalid_argument("Unknown report format.");
         }
 
         dip::report::ReportOptions report_options(const httplib::Request& request) {
@@ -190,14 +211,13 @@ namespace snt::server {
                 ProjectBundle bundle;
                 api::DIPParse command;
                 add_dip_input(request, command, bundle);
-                const auto filename = format == dip::report::ReportFormat::Pdf ? "report.pdf" : "report.tex";
+                const auto [filename, content_type] = report_response_type(format);
                 const auto output = bundle.output_file(filename);
                 auto options = report_options(request);
                 options.source_root = bundle.project_file().parent_path();
                 api::generate_dip_report(command.evaluate(), format, output, options);
                 response.set_header("Content-Disposition", "attachment; filename=" + std::string(filename));
-                response.set_content(read_binary_file(output),
-                                     format == dip::report::ReportFormat::Pdf ? "application/pdf" : "application/x-tex");
+                response.set_content(read_binary_file(output), content_type);
             });
         });
         server.Post("/snt/dip/parse", [](const httplib::Request& request, httplib::Response& response) {

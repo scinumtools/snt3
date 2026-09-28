@@ -2,10 +2,10 @@ DIP examples
 ============
 
 The DIP examples cover a minimal DIPL definition, CMake configuration,
-report generation, and the C binding.
+and report generation.
 
-QuickExample
-------------
+Quick Example
+-------------
 
 The ``examples/dip/QuickExample`` directory contains a small DIPL definition
 with typed parameters, units, references, and validation properties. It is a
@@ -24,8 +24,8 @@ tree.
    area float = ({?length} * {?width})
      !condition ({.} > 0 m2)
 
-CMakeIntegration
-----------------
+CMake Integration
+-----------------
 
 The ``examples/dip/CMakeIntegration`` directory is a standalone CMake
 consumer. It reads boolean, integer, and string values from ``build.dip``
@@ -51,8 +51,8 @@ causes CMake to reconfigure and apply the new settings.
 
 .. _dip-create-report-example:
 
-CreateReport
-------------
+Create Report
+-------------
 
 The `CreateReport source directory <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/CreateReport>`_
 contains a DIPfile project with two schemas, two custom units, multiple
@@ -91,17 +91,3 @@ by the example. The `PDF can also be opened separately
        height="800px"
        style="border: none;">
    </iframe>
-
-C binding
----------
-
-The `DIP C binding example <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/CBinding>`_
-uses only ``snt/c/dip.h`` to add DIPL text, parse it, and retrieve the ``answer``
-node through an opaque C handle.
-
-.. code-block:: c
-
-   snt_dip_parser_create(&dip, &error);
-   snt_dip_parser_add_string(dip, "answer int = 42", &error);
-   snt_dip_parser_parse(dip, &error);
-   snt_dip_parser_get(dip, "answer", value, sizeof(value), &error);

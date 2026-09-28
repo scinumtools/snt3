@@ -97,10 +97,13 @@ If HDF5 is installed outside the standard search paths, pass its installation
 prefix as ``-DHDF5_ROOT=/path/to/hdf5`` when running CMake. The commands below
 also require the Ninja build tool.
 
-Clone the repository with its ``cpp-httplib`` submodule and configure the
-build. The submodule provides the optional REST server. Alternatively, install
-cpp-httplib 0.46.0 or newer and set ``SNT_HTTPLIB_INCLUDE_DIR`` to its header
-directory. Builds with ``-DENABLE_SNT_SERVER=OFF`` do not need cpp-httplib.
+Clone the repository with its submodules and configure the build. The
+``briefpp`` submodule provides the header-only renderer for DIP reports.
+Alternatively, set ``SNT_BRIEFPP_INCLUDE_DIR`` to a directory containing
+``briefpp/report.hpp``. The ``cpp-httplib`` submodule provides the optional REST
+server. Alternatively, install cpp-httplib 0.46.0 or newer and set
+``SNT_HTTPLIB_INCLUDE_DIR`` to its header directory. Builds with
+``-DENABLE_SNT_SERVER=OFF`` do not need cpp-httplib.
 
 .. code-block:: console
 

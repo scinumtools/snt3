@@ -4,8 +4,8 @@ EXS examples
 The ``examples/exs`` directory contains small, focused C++ projects showing
 how to extend and configure the EXS expression solver.
 
-DefaultSolver
--------------
+Default Solver
+--------------
 
 The `DefaultSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/DefaultSolver>`_ evaluates a basic expression:
 
@@ -18,8 +18,8 @@ the default arithmetic precedence.
    snt::exs::Solver<snt::exs::Atom> solver;
    auto result = solver.eval("23 * 34.5 + 4");
 
-ModifiedSolver
---------------
+Modified Solver
+---------------
 
 The `ModifiedSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/ModifiedSolver>`_ changes logical symbols and precedence:
 
@@ -32,8 +32,8 @@ rules.
 
    N false A false O true
 
-CustomSolver
-------------
+Custom Solver
+-------------
 
 The `CustomSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/CustomSolver>`_ adds a custom ``len(...)`` operator:
 
@@ -45,8 +45,8 @@ how domain-specific operations can be introduced without changing EXS.
 
    apple < len(hospital)
 
-ArraySolver
------------
+Array Solver
+------------
 
 The `ArraySolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/ArraySolver>`_ adds array syntax and element-wise operations:
 
@@ -58,8 +58,8 @@ subtraction through the normal EXS operation pipeline.
 
    [1, 2, 3] + [4, 5, 6]
 
-SettingsSolver
---------------
+Settings Solver
+---------------
 
 The `SettingsSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/SettingsSolver>`_ uses application settings in expressions:
 
@@ -71,8 +71,8 @@ evaluation can depend on host application state.
 
    2 + ? - {3}
 
-UniquePtrSolver
----------------
+Unique Pointer Solver
+---------------------
 
 The `UniquePtrSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/UniquePtrSolver>`_ evaluates a logical expression with an atom backed by ``std::unique_ptr``:
 

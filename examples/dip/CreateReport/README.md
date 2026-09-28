@@ -32,6 +32,18 @@ build/bin/snt report --project examples/dip/CreateReport/DIPfile \
   --format pdf --output examples/dip/CreateReport/report.pdf
 ```
 
+Brief++ can also render this project without a TeX compiler:
+
+```sh
+build/bin/snt report --project examples/dip/CreateReport/DIPfile \
+  --format html --output build/create-report.html
+build/bin/snt report --project examples/dip/CreateReport/DIPfile \
+  --format md --output build/create-report.md
+```
+
+Other formats are `rst`, `typ`, `txt`, and `json`. The introduction file is
+LaTeX and applies only to TeX and PDF reports.
+
 Use `--tex-compiler lualatex` if your own report text contains Unicode that
 `pdflatex` cannot typeset. TeX output itself needs no compiler. See
 `build/bin/snt report --help` for other input options, including `--load` for a

@@ -2,8 +2,11 @@
 
 The Homebrew and vcpkg recipes build the libraries and unified `snt` executable,
 including `snt server`. They declare HDF5 and cpp-httplib dependencies explicitly;
-GitHub source archives do not contain Git submodule contents. Server builds accept
-`SNT_HTTPLIB_INCLUDE_DIR` and require cpp-httplib 0.46.0 or newer. Homebrew and vcpkg include `snt dmap`; Conan, Conda, and PyPI package
+GitHub source archives do not contain Git submodule contents. The archive-based
+recipes fetch the pinned header-only Brief++ source separately for DIP reports.
+Local source builds can initialize `external/briefpp` or set
+`SNT_BRIEFPP_INCLUDE_DIR`. Server builds accept `SNT_HTTPLIB_INCLUDE_DIR` and
+require cpp-httplib 0.46.0 or newer. Homebrew and vcpkg include `snt dmap`; Conan, Conda, and PyPI package
 libraries or Python bindings without application commands. The viewer
 remains disabled until implemented.
 

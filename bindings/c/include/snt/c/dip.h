@@ -32,6 +32,12 @@ typedef enum {
 typedef enum {
     SNT_DIP_REPORT_TEX,
     SNT_DIP_REPORT_PDF,
+    SNT_DIP_REPORT_MD,
+    SNT_DIP_REPORT_RST,
+    SNT_DIP_REPORT_HTML,
+    SNT_DIP_REPORT_TYP,
+    SNT_DIP_REPORT_TXT,
+    SNT_DIP_REPORT_JSON,
 } snt_dip_report_format;
 
 /** Optional report settings. Null fields use the documented defaults. */
@@ -75,7 +81,7 @@ int snt_dip_environment_save(snt_dip* dip, const char* path, snt_dip_error* erro
 int snt_dip_environment_generate(
     snt_dip* dip, snt_dip_export_format format, const char* path, snt_dip_error* error
 );
-/** Generate a TeX or PDF report from a parsed or loaded environment.
+/** Generate a report from a parsed or loaded environment.
  * input_label, intro_file, and tex_compiler may be null. The default compiler is pdflatex.
  */
 int snt_dip_environment_generate_report(

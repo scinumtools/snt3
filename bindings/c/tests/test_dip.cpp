@@ -184,6 +184,16 @@ TEST_F(Environment, GenerateReport) {
     EXPECT_NE(covered_contents.str().find("C \\& report"), std::string::npos);
     EXPECT_NE(covered_contents.str().find("Example\\_Team"), std::string::npos);
     covered.close();
+    const auto html_file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-report.html";
+    ASSERT_EQ(snt_dip_environment_generate_report(
+        dip, SNT_DIP_REPORT_HTML, html_file.string().c_str(), nullptr, nullptr, nullptr, &error), 0);
+    std::ifstream html(html_file);
+    std::stringstream html_contents;
+    html_contents << html.rdbuf();
+    EXPECT_NE(html_contents.str().find("<html lang=\"en\">"), std::string::npos);
+    EXPECT_NE(html_contents.str().find("simulation.steps"), std::string::npos);
+    html.close();
+    std::filesystem::remove(html_file);
     EXPECT_NE(snt_dip_environment_generate_report(
         dip, static_cast<snt_dip_report_format>(99), file.string().c_str(), nullptr, nullptr, nullptr, &error), 0);
     std::filesystem::remove(file);

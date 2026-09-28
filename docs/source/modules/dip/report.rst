@@ -1,10 +1,14 @@
 Report generation
 =================
 
-``snt::dip::report::generate`` writes a TeX or PDF report from an evaluated
+``snt::dip::report::generate`` writes a report from an evaluated
 ``snt::dip::Environment``. The application-facing
 ``snt::api::generate_dip_report`` calls the same generator. Both use the
-document model in the DIP library, so the two formats have the same content.
+document model in the DIP library. The renderer is `Brief++
+<https://github.com/vrtulka23/briefpp>`_, a header-only library. Supported
+formats are TeX, PDF, Markdown, reStructuredText, HTML, Typst, plain text,
+and Brief++ document JSON. All contain the evaluated report data; TeX and
+PDF additionally use the styled cover and contents page.
 
 Generating a report
 -------------------
@@ -27,7 +31,7 @@ Parse a DIPfile project and pass the resulting environment to the API:
        env, snt::dip::report::ReportFormat::Tex, "report.tex", options);
 
 TeX output needs no external program. ``introduction_file`` is an optional
-trusted LaTeX fragment without a document preamble. It appears after the
+trusted LaTeX fragment for TeX and PDF only, without a document preamble. It appears after the
 contents page; ``\subsection`` headings in the fragment become contents
 links. Other text supplied by the environment and cover options is escaped
 for LaTeX.
@@ -48,6 +52,22 @@ to resolve contents links and page numbers:
 ``tex_compiler`` defaults to ``pdflatex``. Choose another compatible local
 compiler, such as ``lualatex`` for Unicode text, when needed. An unavailable
 or failing compiler raises an error; the generator does not install one.
+
+Other formats use Brief++ renderers directly and need no external program:
+
+.. code-block:: cpp
+
+   options.introduction_file.clear();
+   snt::api::generate_dip_report(
+       env, snt::dip::report::ReportFormat::Html, "report.html", options);
+   snt::api::generate_dip_report(
+       env, snt::dip::report::ReportFormat::Markdown, "report.md", options);
+
+The other format values are ``Rst``, ``Typst``, ``Text``, and ``Json``.
+Markdown uses Brief++'s MyST-style directives for tables. JSON is the
+``briefpp/1`` document tree, not DIP's static parameter export JSON.
+An introduction file is rejected for these formats because it contains raw
+LaTeX.
 
 Report options and content
 --------------------------

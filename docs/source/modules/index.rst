@@ -150,7 +150,7 @@ calculated*, and *what constraints it must satisfy*.
   DIPL inputs and registered constructs through diagnostics and DIPH5.
 * :doc:`Static parameter generation <dip/generation>` — exporting evaluated
   environments as native source code or data files.
-* :doc:`C++ report generation <dip/report>` — TeX and PDF reports of
+* :doc:`C++ report generation <dip/report>` — Brief++ reports of
   evaluated environments.
 
 .. toctree::

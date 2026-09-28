@@ -54,6 +54,12 @@ namespace snt::bind::python {
         auto report_format = py::enum_<dip::report::ReportFormat>(m, "ReportFormat", "Output format for a DIP report.");
         report_format.value("TEX", dip::report::ReportFormat::Tex);
         report_format.value("PDF", dip::report::ReportFormat::Pdf);
+        report_format.value("MARKDOWN", dip::report::ReportFormat::Markdown);
+        report_format.value("RST", dip::report::ReportFormat::Rst);
+        report_format.value("HTML", dip::report::ReportFormat::Html);
+        report_format.value("TYPST", dip::report::ReportFormat::Typst);
+        report_format.value("TEXT", dip::report::ReportFormat::Text);
+        report_format.value("JSON", dip::report::ReportFormat::Json);
 
         auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList", "Sequence of evaluated DIPL value nodes.");
         nl.def(py::init<>(), "Create an empty node list.");
@@ -150,7 +156,7 @@ namespace snt::bind::python {
             py::arg("tex_compiler") = "pdflatex",
             py::arg("title") = "DIP parameter report", py::arg("author") = "",
             py::arg("date") = "", py::arg("version") = "",
-            "Write a TeX or PDF report from this evaluated environment. PDF requires a local TeX compiler."
+            "Write a report from this evaluated environment. PDF requires a local TeX compiler."
         );
 
         env.def(
