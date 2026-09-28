@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace snt::docs {
+namespace snt::dip::report {
 namespace {
 std::string escape_tex(const std::string& value) {
     std::string out;
@@ -66,16 +66,27 @@ std::string joined(const std::vector<std::string>& items) {
 
 std::string render_tex(const Document& document) {
     std::ostringstream body;
-    body << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
-    row(body, "Input", document.input_label);
-    body << "\\end{longtable}\n";
+    body << "\\begin{titlepage}\n\\centering\n"
+         << "\\vspace*{0.18\\textheight}\n"
+         << "{\\Huge\\bfseries\\textcolor{sntBlue}{" << escape_tex(document.title) << "}\\par}\n"
+         << "\\vspace{0.8em}\\textcolor{sntBlue}{\\rule{0.72\\linewidth}{1pt}}\\par\n"
+         << "\\vspace{2em}\n"
+         << "\\begin{tabular}{@{}rl@{}}\n"
+         << "\\textcolor{sntLabel}{\\textbf{Author}} & "
+         << escape_tex(document.author.empty() ? "Not specified" : document.author) << " \\\\\n"
+         << "\\textcolor{sntLabel}{\\textbf{Date}} & " << escape_tex(document.date) << " \\\\\n"
+         << "\\textcolor{sntLabel}{\\textbf{Version}} & " << escape_tex(document.version) << " \\\\\n";
+    if (!document.input_label.empty())
+        body << "\\textcolor{sntLabel}{\\textbf{Input}} & " << escape_tex(document.input_label) << " \\\\\n";
+    body << "\\end{tabular}\n\\end{titlepage}\n"
+         << "\\tableofcontents\n\\clearpage\n";
     if (document.loaded_snapshot)
         body << "\\emph{This report shows only the nodes and provenance retained in the DIPH5 snapshot.}\n";
 
     if (!document.introduction_tex.empty())
-        body << "\\section*{Introduction}\n" << document.introduction_tex << "\n";
+        body << "\\section{Introduction}\n" << document.introduction_tex << "\n";
 
-    body << "\\section*{Parameters}\n";
+    body << "\\section{Parameters}\n";
     if (document.parameters.empty())
         body << "No evaluated parameters.\n";
     for (const auto& item : document.parameters) {
@@ -86,32 +97,21 @@ std::string render_tex(const Document& document) {
         row(body, "Description", item.description, "sntMeta");
         row(body, "Applied schemas", joined(item.applied_schemas), "sntMeta");
         row(body, "Contributing schema", item.contributing_schema, "sntMeta");
-        row(body, "Overridden", item.overridden ? "yes" : "no", item.overridden ? "sntOverride" : "sntSource");
+        row(body, "Overridden", item.overridden ? "yes" : "no", "sntSource");
         row(body, "Declared at", location(item.declaration), "sntSource");
         row(body, "Declaration", item.declaration.code, "sntSource");
         if (item.overridden) {
-            row(body, "Override at", location(item.replacement), "sntOverride");
-            row(body, "Override", item.replacement.code, "sntOverride");
+            row(body, "Override at", location(item.replacement), "sntSource");
+            row(body, "Override", item.replacement.code, "sntSource");
         }
         publication_rows(body, item.publication);
         body << "\\end{longtable}\n";
     }
 
-    body << "\\section*{Hierarchy}\n";
-    if (document.structure.empty())
-        body << "No hierarchy paths are available.\n";
-    for (const auto& item : document.structure) {
-        body << "\\sntentry{" << escape_tex(item.path) << "}\n"
-             << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
-        row(body, "Kind", item.kind);
-        row(body, "Schemas", joined(item.schemas));
-        body << "\\end{longtable}\n";
-    }
-
     if (!document.schemas.empty()) {
-        body << "\\section*{Schemas}\n";
+        body << "\\section{Schemas}\n";
         for (const auto& schema : document.schemas) {
-            body << "\\sntentry{" << escape_tex(schema.name) << "}\n"
+            body << "\\sntnode{" << escape_tex(schema.name) << "}\n"
                  << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
             row(body, "Description", schema.description);
             row(body, "Declared at", location(schema.origin));
@@ -120,11 +120,11 @@ std::string render_tex(const Document& document) {
         }
     }
 
-    body << "\\section*{Sources}\n";
+    body << "\\section{Sources}\n";
     if (document.sources.empty())
         body << "No source manifest is available.\n";
     for (const auto& source : document.sources) {
-        body << "\\sntentry{" << escape_tex(source.name) << "}\n"
+        body << "\\sntnode{" << escape_tex(source.name) << "}\n"
              << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
         row(body, "Path", source.path, "sntSource");
         row(body, "Parent", source.parent, "sntSource");
@@ -135,20 +135,20 @@ std::string render_tex(const Document& document) {
         body << "\\end{longtable}\n";
     }
 
-    body << "\\section*{Custom units}\n";
+    body << "\\section{Custom units}\n";
     if (document.units.empty())
         body << "No custom units are registered.\n";
     for (const auto& unit : document.units) {
-        body << "\\sntentry{" << escape_tex(unit.name) << "}\n"
+        body << "\\sntnode{" << escape_tex(unit.name) << "}\n"
              << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
         row(body, "Definition", unit.definition);
         body << "\\end{longtable}\n";
     }
 
     if (!document.functions.empty()) {
-        body << "\\section*{Registered functions}\n";
+        body << "\\section{Registered functions}\n";
         for (const auto& function : document.functions) {
-            body << "\\sntentry{" << escape_tex(function.name) << "}\n"
+            body << "\\sntnode{" << escape_tex(function.name) << "}\n"
                  << "\\begin{longtable}{@{}p{0.25\\linewidth}p{0.69\\linewidth}@{}}\n";
             row(body, "Kind", function.kind);
             body << "\\end{longtable}\n";
@@ -156,12 +156,12 @@ std::string render_tex(const Document& document) {
     }
 
     std::string output = latex_template;
-    const std::string marker = "%%SNT_DOCS_BODY%%";
+    const std::string marker = "%%SNT_REPORT_BODY%%";
     const auto position = output.find(marker);
     if (position == std::string::npos)
-        throw std::runtime_error("The snt docs LaTeX template is missing its body marker.");
+        throw std::runtime_error("The snt report LaTeX template is missing its body marker.");
     output.replace(position, marker.size(), body.str());
     return output;
 }
 
-} // namespace snt::docs
+} // namespace snt::dip::report

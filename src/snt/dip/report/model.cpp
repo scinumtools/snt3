@@ -2,29 +2,37 @@
 
 #include <algorithm>
 
-namespace snt::docs {
-
-bool Publication::empty() const {
-    return authors.empty() && title.empty() && journal.empty() && year.empty() && volume.empty() && issue.empty() &&
-           pages.empty() && doi.empty() && url.empty();
-}
+namespace snt::dip::report {
 
 namespace {
+std::string display_path(const std::string& path, const std::filesystem::path& source_root) {
+    if (path.empty() || source_root.empty()) return path;
+    const auto relative = std::filesystem::path(path).lexically_relative(
+        std::filesystem::absolute(source_root).lexically_normal());
+    if (relative.empty() || *relative.begin() == "..") return path;
+    return relative.generic_string();
+}
+
 Publication publication_of(const dip::ValueMetadata& meta) {
     return {meta.authors, meta.title, meta.journal, meta.year, meta.volume, meta.issue, meta.pages, meta.doi, meta.url};
 }
 
 Origin origin_of(const std::string& name, size_t line, const std::string& code,
-                 const std::optional<dip::SourceInfo>& source) {
-    return {name, source ? source->path : "", code, line};
+                 const std::optional<dip::SourceInfo>& source, const std::filesystem::path& source_root) {
+    return {name, source ? display_path(source->path, source_root) : "", code, line};
 }
 } // namespace
 
 Document build_document(const dip::Environment& env, std::string input_label, std::string introduction_tex,
-                        bool loaded_snapshot) {
+                        std::string title, std::string author, std::string date, std::string version,
+                        const std::filesystem::path& source_root, bool loaded_snapshot) {
     Document document;
     document.input_label = std::move(input_label);
     document.introduction_tex = std::move(introduction_tex);
+    document.title = std::move(title);
+    document.author = std::move(author);
+    document.date = std::move(date);
+    document.version = std::move(version);
     document.loaded_snapshot = loaded_snapshot;
 
     for (const auto& node : env.nodes.get_nodes()) {
@@ -36,10 +44,11 @@ Document build_document(const dip::Environment& env, std::string input_label, st
         item.publication = publication_of(node->metadata);
         item.overridden = node->override;
         item.declaration = origin_of(node->line.source.name, node->line.source.line_number, node->line.code,
-                                     env.get_source_info(node->line.source.name));
+                                     env.get_source_info(node->line.source.name), source_root);
         if (node->override)
             item.replacement = origin_of(node->override_line.source.name, node->override_line.source.line_number,
-                                         node->override_line.code, env.get_source_info(node->override_line.source.name));
+                                         node->override_line.code, env.get_source_info(node->override_line.source.name),
+                                         source_root);
         for (const auto& schema : env.get_applied_schemas(item.path))
             item.applied_schemas.push_back(schema.name);
         if (const auto schema = env.get_contributing_schema(item.path))
@@ -50,29 +59,11 @@ Document build_document(const dip::Environment& env, std::string input_label, st
         return a.path < b.path;
     });
 
-    for (const auto& [path, collection] : env.hierarchy.get_collections()) {
-        if (path.empty()) continue;
-        Structure item;
-        item.path = path;
-        switch (collection.kind) {
-        case dip::Path::Kind::Group: item.kind = "group"; break;
-        case dip::Path::Kind::Map: item.kind = "map"; break;
-        case dip::Path::Kind::List: item.kind = "list"; break;
-        case dip::Path::Kind::Item: item.kind = "item"; break;
-        default: continue;
-        }
-        item.schemas = collection.schemas;
-        document.structure.push_back(std::move(item));
-    }
-    std::sort(document.structure.begin(), document.structure.end(), [](const Structure& a, const Structure& b) {
-        return a.path < b.path;
-    });
-
     for (const auto& info : env.get_schema_manifest()) {
         Schema schema;
         schema.name = info.name;
         schema.description = info.metadata.description;
-        schema.origin = origin_of(info.source_name, info.source_line, "", info.source);
+        schema.origin = origin_of(info.source_name, info.source_line, "", info.source, source_root);
         schema.publication = publication_of(info.metadata);
         document.schemas.push_back(std::move(schema));
     }
@@ -81,7 +72,7 @@ Document build_document(const dip::Environment& env, std::string input_label, st
     });
 
     for (const auto& info : env.get_source_manifest())
-        document.sources.push_back({info.name, info.path, info.parent_name, info.hash_algorithm,
+        document.sources.push_back({info.name, display_path(info.path, source_root), info.parent_name, info.hash_algorithm,
                                     info.hash, info.parent_line});
     std::sort(document.sources.begin(), document.sources.end(), [](const Source& a, const Source& b) {
         return a.name < b.name;
@@ -101,4 +92,4 @@ Document build_document(const dip::Environment& env, std::string input_label, st
     return document;
 }
 
-} // namespace snt::docs
+} // namespace snt::dip::report

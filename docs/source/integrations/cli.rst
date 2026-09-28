@@ -113,8 +113,8 @@ native representations and format-specific behavior.
 Generating a parameter report
 -----------------------------
 
-``snt docs`` writes a LaTeX report of evaluated values and units, descriptions,
-hierarchy paths, source identities, custom unit definitions, schema information,
+``snt report`` writes a LaTeX report of evaluated values and units, descriptions,
+parameter paths, source identities, custom unit definitions, schema information,
 override status, and available publication metadata. Function names are listed
 when registered; executable function bodies are not included. Built-in PUQ unit
 catalogues are not duplicated in the report. Output paths are sorted for repeatable reports. The
@@ -122,9 +122,9 @@ default format is ``tex``; it requires no external tools:
 
 .. code-block:: bash
 
-   snt docs --project DIPfile --output report.tex
-   snt docs --load run.diph5 --output report.tex
-   snt docs --input file parameters.dip --output report.tex
+   snt report --project DIPfile --output report.tex
+   snt report --load run.diph5 --output report.tex
+   snt report --input file parameters.dip --output report.tex
 
 The command accepts the same ``--input`` kinds as ``snt dip parse``. A project
 may be combined with ``override_string`` or ``override_file`` inputs. A DIPH5
@@ -134,7 +134,7 @@ Empty groups and collections without value descendants are not present in a
 DIPH5 snapshot and therefore cannot appear in a report generated from it.
 
 Use ``--intro introduction.tex`` to insert trusted LaTeX after the report
-title. The file is read as a fragment, without a document preamble. Its text
+contents page. The file is read as a fragment, without a document preamble. Its text
 is included in both TeX and PDF reports.
 
 ``--format pdf`` compiles the same generated TeX with ``pdflatex``. Select a
@@ -142,15 +142,17 @@ compatible executable with ``--tex-compiler`` when needed:
 
 .. code-block:: bash
 
-   snt docs --project DIPfile --format pdf --output report.pdf
-   snt docs --load run.diph5 --format pdf --output report.pdf \
+   snt report --project DIPfile --format pdf --output report.pdf
+   snt report --load run.diph5 --format pdf --output report.pdf \
        --tex-compiler /path/to/pdflatex
 
 PDF output requires a locally installed TeX compiler. If it is unavailable or
 compilation fails, the command reports an error and does not create the output
-PDF. The TeX compiler is never installed by ``snt docs``.
+PDF. The TeX compiler is never installed by ``snt report``.
 For reports containing Unicode characters unsupported by ``pdflatex``, use
 ``--tex-compiler lualatex`` when that compiler is installed.
+Use ``--title``, ``--author``, ``--date``, and ``--report-version`` for the
+cover. See :doc:`TeX and PDF reports <report>` for the layout and a fuller example.
 
 Values for shell scripts
 ------------------------

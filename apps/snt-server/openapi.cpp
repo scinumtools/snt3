@@ -76,6 +76,29 @@ namespace snt::server {
         }
       }
     },
+    "/snt/dip/report": {
+      "post": {
+        "summary": "Generate a TeX or PDF report from client-supplied DIPL",
+        "description": "Accepts the same DIPL text or multipart project bundle as /snt/dip/parse. The complete evaluated environment is documented.",
+        "parameters": [
+          {"name": "format", "in": "query", "schema": {"type": "string", "enum": ["tex", "pdf"], "default": "tex"}},
+          {"name": "input_label", "in": "query", "schema": {"type": "string"}},
+          {"name": "title", "in": "query", "schema": {"type": "string"}},
+          {"name": "author", "in": "query", "schema": {"type": "string"}},
+          {"name": "date", "in": "query", "schema": {"type": "string"}},
+          {"name": "version", "in": "query", "schema": {"type": "string"}}
+        ],
+        "requestBody": {"required": true, "content": {
+          "text/plain": {"schema": {"type": "string"}},
+          "application/octet-stream": {"schema": {"type": "string", "format": "binary"}},
+          "multipart/form-data": {"schema": {"type": "object", "required": ["project"], "properties": {"project": {"type": "string", "format": "binary"}, "file": {"type": "array", "items": {"type": "string", "format": "binary"}}}}}
+        }},
+        "responses": {
+          "200": {"description": "Generated report attachment", "content": {"application/x-tex": {"schema": {"type": "string"}}, "application/pdf": {"schema": {"type": "string", "format": "binary"}}}},
+          "400": {"$ref": "#/components/responses/error"}
+        }
+      }
+    },
     "/snt/dip/environments": {
       "get": {
         "summary": "List startup-mounted environments",

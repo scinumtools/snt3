@@ -34,7 +34,7 @@ The application-facing API overview is split by domain:
 * :doc:`PUQ API <puq>` — evaluation, conversion, inspection, and listing.
 * :doc:`DIP API <dip>` — DIPL parsing, DIPH5 loading and saving, and static
   parameter generation.
-* :doc:`DIP documentation API <cpp_docs>` — TeX and PDF reports.
+* :doc:`DIP report API <cpp_report>` — TeX and PDF reports.
 
 .. toctree::
    :maxdepth: 1
@@ -44,7 +44,7 @@ The application-facing API overview is split by domain:
    cpp_exs
    cpp_puq
    cpp_dip
-   cpp_docs
+   cpp_report
    cpp_mat
    cpp_api
    puq

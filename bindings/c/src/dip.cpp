@@ -5,7 +5,7 @@
 #include <string>
 
 #include <snt/dip/dip.h>
-#include <snt/docs/report.h>
+#include <snt/dip/report/report.h>
 
 struct snt_dip {
     snt::dip::DIP parser;
@@ -57,10 +57,10 @@ snt::dip::ExportFormat export_format(snt_dip_export_format format) {
     }
 }
 
-snt::docs::ReportFormat report_format(snt_dip_report_format format) {
+snt::dip::report::ReportFormat report_format(snt_dip_report_format format) {
     switch (format) {
-    case SNT_DIP_REPORT_TEX: return snt::docs::ReportFormat::Tex;
-    case SNT_DIP_REPORT_PDF: return snt::docs::ReportFormat::Pdf;
+    case SNT_DIP_REPORT_TEX: return snt::dip::report::ReportFormat::Tex;
+    case SNT_DIP_REPORT_PDF: return snt::dip::report::ReportFormat::Pdf;
     default: throw std::invalid_argument("invalid DIP report format");
     }
 }
@@ -224,19 +224,33 @@ extern "C" int snt_dip_environment_generate(
     }
 }
 
-extern "C" int snt_dip_environment_generate_docs(
+extern "C" int snt_dip_environment_generate_report(
     snt_dip* dip, snt_dip_report_format format, const char* path,
     const char* input_label, const char* intro_file, const char* tex_compiler,
     snt_dip_error* error
 ) {
+    const snt_dip_report_options options{input_label, intro_file, tex_compiler, nullptr, nullptr, nullptr, nullptr};
+    return snt_dip_environment_generate_report_with_options(dip, format, path, &options, error);
+}
+
+extern "C" int snt_dip_environment_generate_report_with_options(
+    snt_dip* dip, snt_dip_report_format format, const char* path,
+    const snt_dip_report_options* cover, snt_dip_error* error
+) {
     try {
         if (!dip || !dip->parsed || !path || !*path)
             throw std::invalid_argument("parsed DIP and output path are required");
-        snt::docs::ReportOptions options;
-        if (input_label) options.input_label = input_label;
-        if (intro_file) options.introduction_file = intro_file;
-        if (tex_compiler) options.tex_compiler = tex_compiler;
-        snt::docs::generate(dip->env, report_format(format), path, options);
+        snt::dip::report::ReportOptions options;
+        if (cover) {
+            if (cover->input_label) options.input_label = cover->input_label;
+            if (cover->intro_file) options.introduction_file = cover->intro_file;
+            if (cover->tex_compiler) options.tex_compiler = cover->tex_compiler;
+            if (cover->title) options.title = cover->title;
+            if (cover->author) options.author = cover->author;
+            if (cover->date) options.date = cover->date;
+            if (cover->version) options.version = cover->version;
+        }
+        snt::dip::report::generate(dip->env, report_format(format), path, options);
         ok(error);
         return 0;
     } catch (const std::exception& exception) {

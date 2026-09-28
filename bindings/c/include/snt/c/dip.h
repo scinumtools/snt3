@@ -34,6 +34,17 @@ typedef enum {
     SNT_DIP_REPORT_PDF,
 } snt_dip_report_format;
 
+/** Optional report settings. Null fields use the documented defaults. */
+typedef struct {
+    const char* input_label;
+    const char* intro_file;
+    const char* tex_compiler;
+    const char* title;
+    const char* author;
+    const char* date;
+    const char* version;
+} snt_dip_report_options;
+
 /** Create a DIPL parser. */
 int snt_dip_parser_create(snt_dip** result, snt_dip_error* error);
 /** Register a named schema body from a string. */
@@ -67,10 +78,15 @@ int snt_dip_environment_generate(
 /** Generate a TeX or PDF report from a parsed or loaded environment.
  * input_label, intro_file, and tex_compiler may be null. The default compiler is pdflatex.
  */
-int snt_dip_environment_generate_docs(
+int snt_dip_environment_generate_report(
     snt_dip* dip, snt_dip_report_format format, const char* path,
     const char* input_label, const char* intro_file, const char* tex_compiler,
     snt_dip_error* error
+);
+/** Generate a report with optional cover metadata. options may be null. */
+int snt_dip_environment_generate_report_with_options(
+    snt_dip* dip, snt_dip_report_format format, const char* path,
+    const snt_dip_report_options* options, snt_dip_error* error
 );
 /** Release a DIPL parser. Accepts null. */
 void snt_dip_parser_free(snt_dip* dip);

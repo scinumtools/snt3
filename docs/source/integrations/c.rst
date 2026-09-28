@@ -92,13 +92,13 @@ Generating TeX and PDF reports
 ------------------------------
 
 After parsing or loading an environment, call
-``snt_dip_environment_generate_docs``. Use ``SNT_DIP_REPORT_TEX`` for TeX or
+``snt_dip_environment_generate_report``. Use ``SNT_DIP_REPORT_TEX`` for TeX or
 ``SNT_DIP_REPORT_PDF`` for PDF:
 
 .. code-block:: c
 
    snt_dip_error error = {0};
-   if (snt_dip_environment_generate_docs(
+   if (snt_dip_environment_generate_report(
            dip, SNT_DIP_REPORT_TEX, "report.tex", "DIPfile",
            "introduction.tex", NULL, &error) != 0) {
        fprintf(stderr, "%s\n", error.message);
@@ -108,8 +108,22 @@ The input label, introduction path, and compiler name may be null. A null
 compiler uses ``pdflatex`` for PDF output. The introduction file is a trusted
 LaTeX fragment without a preamble. PDF generation returns an error if the
 configured compiler is unavailable or fails. See :doc:`Generating DIP
-documentation <../modules/dip/documentation>` for report contents and DIPH5
+reports <../modules/dip/report>` for report contents and DIPH5
 limits.
+
+To set cover fields, use ``snt_dip_environment_generate_report_with_options``:
+
+.. code-block:: c
+
+   snt_dip_report_options options = {0};
+   options.title = "Mock Heat Flow Study";
+   options.author = "Example Research Team";
+   options.date = "2026-09-28";
+   options.version = "1.0 demo";
+   snt_dip_environment_generate_report_with_options(
+       dip, SNT_DIP_REPORT_PDF, "report.pdf", &options, &error);
+
+See :doc:`the report integration <report>` for cover defaults and contents links.
 
 Errors and ownership
 --------------------

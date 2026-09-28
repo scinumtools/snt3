@@ -2,6 +2,7 @@
 
 import http.client
 import json
+import shutil
 import socket
 import subprocess
 import sys
@@ -191,6 +192,31 @@ derived int = ({?answer} + 1)
             self.assertEqual(response.headers.get_content_type(), "application/x-hdf5")
             self.assertEqual(response.headers["Content-Disposition"], "attachment; filename=environment.diph5")
         self.assertTrue(content.startswith(b"\x89HDF\r\n\x1a\n"))
+
+    def test_DIPReport(self):
+        query = urllib.parse.urlencode({"title": "Study & report", "author": "Example_Team",
+                                        "date": "2026-09-28", "version": "v1.0"})
+        with self.request(f"/snt/dip/report?{query}", b"answer int = 42\n") as response:
+            self.assertEqual(response.headers.get_content_type(), "application/x-tex")
+            content = response.read().decode()
+        self.assertIn(r"Study \& report", content)
+        self.assertIn(r"Example\_Team", content)
+        self.assertIn(r"\tableofcontents", content)
+        self.assertIn(r"\sntnode{answer}", content)
+
+        body, content_type = multipart([
+            ("project", "DIPfile", 'code[]\n  file = "parameters.dip"\n'),
+            ("file", "parameters.dip", "other int = 7\n"),
+        ])
+        with self.request("/snt/dip/report", body, content_type) as response:
+            self.assertIn(r"\sntnode{other}", response.read().decode())
+
+        with self.assertRaises(urllib.error.HTTPError):
+            self.request("/snt/dip/report?format=md", b"answer int = 42\n")
+        if shutil.which("pdflatex"):
+            with self.request("/snt/dip/report?format=pdf", b"answer int = 42\n") as response:
+                self.assertEqual(response.headers.get_content_type(), "application/pdf")
+                self.assertTrue(response.read().startswith(b"%PDF"))
 
 
 if __name__ == "__main__":

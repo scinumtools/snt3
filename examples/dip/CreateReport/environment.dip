@@ -1,0 +1,7 @@
+lab
+  room_temperature float = 293 K
+    ?descr "Ambient laboratory temperature"
+  pressure float = 101325 Pa
+    ?descr "Ambient pressure during the demonstration"
+  operator str = "Example Research Team"
+    ?descr "Team responsible for this mock run"

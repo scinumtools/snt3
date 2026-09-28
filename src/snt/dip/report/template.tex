@@ -9,7 +9,8 @@
 \definecolor{sntLabel}{HTML}{34495A}
 \definecolor{sntMeta}{HTML}{246B62}
 \definecolor{sntSource}{HTML}{646B73}
-\definecolor{sntOverride}{HTML}{A34C16}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=sntBlue}
 \setlength{\parskip}{0pt}
 \setlength{\parindent}{0pt}
 \setlength{\LTpre}{0pt}
@@ -21,13 +22,6 @@
     \textcolor{sntBlue}{\textbf{\texttt{#1}}}}}%
   \par\nobreak\vspace{0.08em}%
 }
-\newcommand{\sntentry}[1]{%
-  \par\vspace{0.3em}\noindent
-  \textcolor{sntBlue}{\textbf{\texttt{#1}}}%
-  \par\nobreak\vspace{0.05em}%
-}
 \begin{document}
-{\Large\bfseries\textcolor{sntBlue}{DIP parameter report}\par}
-\vspace{0.25em}\hrule\vspace{0.5em}
-%%SNT_DOCS_BODY%%
+%%SNT_REPORT_BODY%%
 \end{document}

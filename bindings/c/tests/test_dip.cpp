@@ -163,9 +163,9 @@ TEST_F(Environment, Generate) {
     std::filesystem::remove(file);
 }
 
-TEST_F(Environment, GenerateDocs) {
+TEST_F(Environment, GenerateReport) {
     const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-report.tex";
-    ASSERT_EQ(snt_dip_environment_generate_docs(
+    ASSERT_EQ(snt_dip_environment_generate_report(
         dip, SNT_DIP_REPORT_TEX, file.string().c_str(), "C binding demo", nullptr, nullptr, &error), 0);
     std::ifstream generated(file);
     std::stringstream contents;
@@ -173,7 +173,16 @@ TEST_F(Environment, GenerateDocs) {
     EXPECT_NE(contents.str().find("simulation.steps"), std::string::npos);
     EXPECT_NE(contents.str().find("C binding demo"), std::string::npos);
     EXPECT_NE(contents.str().find("sntNodeFill"), std::string::npos);
-    EXPECT_NE(snt_dip_environment_generate_docs(
+    const snt_dip_report_options options{"C binding demo", nullptr, nullptr,
+        "C & report", "Example_Team", "2026-09-28", "v1.0"};
+    ASSERT_EQ(snt_dip_environment_generate_report_with_options(
+        dip, SNT_DIP_REPORT_TEX, file.string().c_str(), &options, &error), 0);
+    std::ifstream covered(file);
+    std::stringstream covered_contents;
+    covered_contents << covered.rdbuf();
+    EXPECT_NE(covered_contents.str().find("C \\& report"), std::string::npos);
+    EXPECT_NE(covered_contents.str().find("Example\\_Team"), std::string::npos);
+    EXPECT_NE(snt_dip_environment_generate_report(
         dip, static_cast<snt_dip_report_format>(99), file.string().c_str(), nullptr, nullptr, nullptr, &error), 0);
     std::filesystem::remove(file);
 }

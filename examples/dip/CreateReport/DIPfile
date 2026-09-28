@@ -1,13 +1,21 @@
 units[]
   name = "lab_length"
   unit = "2*m"
+units[]
+  name = "sample_period"
+  unit = "0.5*s"
 
 schemas[]
   name = "sensor"
   file = "sensor.dipl"
+schemas[]
+  name = "analysis"
+  file = "analysis.dipl"
 
 overrides[]
   file = "overrides.dip"
 
 code[]
   file = "parameters.dip"
+code[]
+  file = "environment.dip"

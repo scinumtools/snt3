@@ -1,4 +1,8 @@
 # build library
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/report/template.tex")
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/report/template.tex" SNT_REPORT_TEMPLATE)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/report/template.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/report/template.h" @ONLY)
 file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
 set(EXEC_NAME snt-dip)
 
@@ -13,6 +17,7 @@ target_include_directories(${EXEC_NAME}
     $<INSTALL_INTERFACE:include>
   PRIVATE
     ${PROJECT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_BINARY_DIR}/report
 )
 
 set_target_properties(${EXEC_NAME} PROPERTIES

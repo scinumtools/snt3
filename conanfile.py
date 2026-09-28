@@ -151,7 +151,6 @@ class SciNumToolsConan(ConanFile):
 
         self.cpp_info.libs = [
             "snt-api",
-            "snt-docs",
             "snt-dip",
             "snt-puq",
             "snt-val",
@@ -165,7 +164,6 @@ class SciNumToolsConan(ConanFile):
             "val": ("snt-val", ["core"]),
             "puq": ("snt-puq", ["core", "exs", "val"]),
             "dip": ("snt-dip", ["puq", "hdf5::hdf5_c"]),
-            "docs": ("snt-docs", ["dip"]),
             "api": ("snt-api", ["puq", "dip"]),
         }
 

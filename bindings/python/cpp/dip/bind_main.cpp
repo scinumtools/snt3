@@ -146,7 +146,6 @@ Args:
         );
 
         dip.def("parse", &dip::DIP::parse, "Parse and evaluate all added DIPL inputs, including registered schemas.");
-        // dip.def("parse_docs", &dip::DIP::parse_docs);
 
         dip.def("enter", &dip_enter);
         dip.def("exit", &dip_exit);

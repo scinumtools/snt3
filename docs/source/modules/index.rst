@@ -129,7 +129,7 @@ calculated*, and *what constraints it must satisfy*.
   DIPL inputs and registered constructs through diagnostics and DIPH5.
 * :doc:`Static parameter generation <dip/generation>` — exporting evaluated
   environments as native source code or data files.
-* :doc:`Generating DIP documentation <dip/documentation>` — TeX and PDF
+* :doc:`Generating DIP reports <dip/report>` — TeX and PDF
   reports of evaluated environments.
 
 .. toctree::
@@ -141,7 +141,7 @@ calculated*, and *what constraints it must satisfy*.
    dip/persistence
    dip/traceability
    dip/generation
-   dip/documentation
+   dip/report
 
 .. _mat-materials:
 

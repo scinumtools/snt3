@@ -1,0 +1,9 @@
+?descr "Reusable analysis and reporting choices"
+?authors "C. Analyst"
+?title "Illustrative data reduction method"
+?year "2026"
+
+method str = "mean"
+  ?descr "Method used to summarize the mock sensor readings"
+window int = 8
+  ?descr "Number of readings in a summary window"

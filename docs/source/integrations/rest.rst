@@ -175,7 +175,26 @@ the complete environment; request and tag filters apply only to textual
 output and therefore do not filter the DIPH5 result.
 
 The REST endpoint does not expose DIPH5 loading, direct server-side save
-paths, static generation, or direct server-side file paths.
+paths, static parameter code generation, or direct server-side file paths.
+
+TeX and PDF reports
+-------------------
+
+``POST /snt/dip/report`` accepts the same DIPL body or multipart project bundle
+as ``/snt/dip/parse`` and returns a TeX attachment. Add ``format=pdf`` to
+receive a PDF attachment; the server host needs ``pdflatex`` installed. Cover
+metadata may be supplied through ``title``, ``author``, ``date``, ``version``,
+and ``input_label`` query parameters. The report includes all evaluated
+parameters, irrespective of parse result filters. Uploaded project files are
+kept in a request-scoped temporary directory.
+
+.. code-block:: console
+
+   $ curl --request POST \
+       'http://127.0.0.1:8080/snt/dip/report?format=pdf&title=Example&author=Research%20Team' \
+       --data-binary @model.dipl --output report.pdf
+
+See :doc:`the report integration <report>` for the report layout and cover defaults.
 
 Errors
 ------

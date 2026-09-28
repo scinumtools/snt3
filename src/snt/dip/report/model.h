@@ -1,15 +1,14 @@
-#ifndef SNT_DOCS_MODEL_H
-#define SNT_DOCS_MODEL_H
+#ifndef SNT_REPORT_MODEL_H
+#define SNT_REPORT_MODEL_H
 
 #include <snt/dip/environment.h>
 #include <string>
 #include <vector>
 
-namespace snt::docs {
+namespace snt::dip::report {
 
 struct Publication {
     std::string authors, title, journal, year, volume, issue, pages, doi, url;
-    bool empty() const;
 };
 
 struct Origin {
@@ -32,11 +31,6 @@ struct Schema {
     Publication publication;
 };
 
-struct Structure {
-    std::string path, kind;
-    std::vector<std::string> schemas;
-};
-
 struct Source {
     std::string name, path, parent, hash_algorithm, hash;
     size_t parent_line = 0;
@@ -53,9 +47,9 @@ struct Function {
 struct Document {
     std::string input_label;
     std::string introduction_tex;
+    std::string title, author, date, version;
     bool loaded_snapshot = false;
     std::vector<Parameter> parameters;
-    std::vector<Structure> structure;
     std::vector<Schema> schemas;
     std::vector<Source> sources;
     std::vector<Unit> units;
@@ -63,8 +57,9 @@ struct Document {
 };
 
 Document build_document(const dip::Environment& env, std::string input_label, std::string introduction_tex,
-                        bool loaded_snapshot = false);
+                        std::string title, std::string author, std::string date, std::string version,
+                        const std::filesystem::path& source_root, bool loaded_snapshot = false);
 
-} // namespace snt::docs
+} // namespace snt::dip::report
 
 #endif

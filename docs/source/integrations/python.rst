@@ -222,7 +222,7 @@ behavior.
 Generating TeX and PDF reports
 ------------------------------
 
-Call ``Environment.generate_docs()`` after parsing a project or loading a
+Call ``Environment.generate_report()`` after parsing a project or loading a
 DIPH5 snapshot. ``ReportFormat`` selects TeX or PDF:
 
 .. code-block:: python
@@ -232,17 +232,20 @@ DIPH5 snapshot. ``ReportFormat`` selects TeX or PDF:
    parser = DIP()
    parser.add_project("DIPfile")
    env = parser.parse()
-   env.generate_docs(ReportFormat.TEX, "report.tex",
+   env.generate_report(ReportFormat.TEX, "report.tex",
                      input_label="DIPfile", intro_file="introduction.tex")
-   env.generate_docs(ReportFormat.PDF, "report.pdf",
-                     input_label="DIPfile", intro_file="introduction.tex")
+   env.generate_report(ReportFormat.PDF, "report.pdf",
+                     input_label="DIPfile", intro_file="introduction.tex",
+                     title="Mock Heat Flow Study", author="Example Research Team",
+                     date="2026-09-28", version="1.0 demo")
 
 ``intro_file`` is an optional trusted LaTeX fragment without a preamble.
 PDF output needs a local TeX compiler; pass ``tex_compiler="lualatex"`` or
 another compatible executable when required. The same method works on an
 ``Environment`` restored with ``load()`` and reports only provenance retained
-in DIPH5. See :doc:`Generating DIP documentation
-<../modules/dip/documentation>` for report contents and limits.
+in DIPH5. See :doc:`Generating DIP reports
+<../modules/dip/report>` for report contents and limits, and
+:doc:`the report integration <report>` for cover and contents options.
 
 Source provenance
 -----------------

@@ -15,7 +15,7 @@
 #include <unistd.h>
 #endif
 
-namespace snt::docs {
+namespace snt::dip::report {
 namespace {
 struct TemporaryDirectory {
     std::filesystem::path path;
@@ -24,7 +24,7 @@ struct TemporaryDirectory {
         const auto base = std::filesystem::temp_directory_path();
         const auto seed = std::chrono::steady_clock::now().time_since_epoch().count();
         for (int attempt = 0; attempt < 100; ++attempt) {
-            auto candidate = base / ("snt-docs-" + std::to_string(seed) + "-" + std::to_string(attempt));
+            auto candidate = base / ("snt-dip-report-" + std::to_string(seed) + "-" + std::to_string(attempt));
             if (std::filesystem::create_directory(candidate)) {
                 path = std::move(candidate);
                 return;
@@ -98,12 +98,14 @@ void compile_pdf(const std::string& contents, const std::filesystem::path& outpu
     const auto pdf = temporary.path / "report.pdf";
     const auto log = temporary.path / "compiler.log";
     write_file(tex, contents);
-    const int status = run_compiler(compiler, tex, temporary.path, log);
-    if (status == 127 || status == -1)
-        throw std::runtime_error("TeX compiler '" + compiler + "' is unavailable. Install it or set --tex-compiler.");
-    if (status != 0 || !std::filesystem::exists(pdf))
-        throw std::runtime_error("TeX compiler failed (exit " + std::to_string(status) + ").\n" + compiler_log(log));
+    for (int pass = 0; pass < 2; ++pass) {
+        const int status = run_compiler(compiler, tex, temporary.path, log);
+        if (status == 127 || status == -1)
+            throw std::runtime_error("TeX compiler '" + compiler + "' is unavailable. Install it or set --tex-compiler.");
+        if (status != 0 || !std::filesystem::exists(pdf))
+            throw std::runtime_error("TeX compiler failed (exit " + std::to_string(status) + ").\n" + compiler_log(log));
+    }
     std::filesystem::copy_file(pdf, output, std::filesystem::copy_options::overwrite_existing);
 }
 
-} // namespace snt::docs
+} // namespace snt::dip::report

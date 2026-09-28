@@ -2,6 +2,7 @@
 #include "server.h"
 
 #include "snt/api/dip_parse.h"
+#include <snt/api/dip_report.h>
 
 #include <algorithm>
 #include <filesystem>
@@ -159,13 +160,46 @@ namespace snt::server {
         std::string read_binary_file(const std::filesystem::path& path) {
             std::ifstream input(path, std::ios::binary);
             if (!input)
-                throw std::runtime_error("Unable to read generated DIPH5 output.");
+                throw std::runtime_error("Unable to read generated output.");
             return {std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
+        }
+
+        dip::report::ReportFormat report_format(const httplib::Request& request) {
+            const auto format = request.has_param("format") ? request.get_param_value("format") : "tex";
+            if (format == "tex") return dip::report::ReportFormat::Tex;
+            if (format == "pdf") return dip::report::ReportFormat::Pdf;
+            throw std::invalid_argument("The format query parameter must be tex or pdf.");
+        }
+
+        dip::report::ReportOptions report_options(const httplib::Request& request) {
+            dip::report::ReportOptions options;
+            options.input_label = request.has_param("input_label") ? request.get_param_value("input_label") : "DIPL request";
+            if (request.has_param("title")) options.title = request.get_param_value("title");
+            if (request.has_param("author")) options.author = request.get_param_value("author");
+            if (request.has_param("date")) options.date = request.get_param_value("date");
+            if (request.has_param("version")) options.version = request.get_param_value("version");
+            return options;
         }
 
     } // namespace
 
     void register_dip_routes(httplib::Server& server) {
+        server.Post("/snt/dip/report", [](const httplib::Request& request, httplib::Response& response) {
+            handle_response(response, [&] {
+                const auto format = report_format(request);
+                ProjectBundle bundle;
+                api::DIPParse command;
+                add_dip_input(request, command, bundle);
+                const auto filename = format == dip::report::ReportFormat::Pdf ? "report.pdf" : "report.tex";
+                const auto output = bundle.output_file(filename);
+                auto options = report_options(request);
+                options.source_root = bundle.project_file().parent_path();
+                api::generate_dip_report(command.evaluate(), format, output, options);
+                response.set_header("Content-Disposition", "attachment; filename=" + std::string(filename));
+                response.set_content(read_binary_file(output),
+                                     format == dip::report::ReportFormat::Pdf ? "application/pdf" : "application/x-tex");
+            });
+        });
         server.Post("/snt/dip/parse", [](const httplib::Request& request, httplib::Response& response) {
             if (request.has_param("output")) {
                 handle_response(response, [&] {

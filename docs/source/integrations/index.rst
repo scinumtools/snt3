@@ -12,6 +12,7 @@ logic in each application.
    python
    c
    cli
+   report
    cmake
    rest
    docker

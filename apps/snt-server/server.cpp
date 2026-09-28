@@ -99,7 +99,7 @@ namespace snt::server {
             httplib::Server server;
             server.Get("/", [](const httplib::Request&, httplib::Response& response) {
                 response.set_content(
-                    R"({"service":"SNT REST API","endpoints":["/snt/puq/eval","/snt/puq/convert","/snt/puq/info","/snt/puq/list","/snt/dip/parse","/snt/dip/environments","/snt/dip/environment"]}
+                    R"({"service":"SNT REST API","endpoints":["/snt/puq/eval","/snt/puq/convert","/snt/puq/info","/snt/puq/list","/snt/dip/parse","/snt/dip/report","/snt/dip/environments","/snt/dip/environment"]}
 )",
                     "application/json"
                 );

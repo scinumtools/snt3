@@ -1,0 +1,6 @@
+#ifndef SNT_REPORT_TEMPLATE_H
+#define SNT_REPORT_TEMPLATE_H
+namespace snt::dip::report {
+inline constexpr const char* latex_template = R"SNTREPORTTPL(@SNT_REPORT_TEMPLATE@)SNTREPORTTPL";
+}
+#endif
