@@ -1,8 +1,8 @@
 DIP examples
 ============
 
-The DIP examples cover both a minimal DIPL definition and integration of DIPL
-configuration with a CMake build.
+The DIP examples cover a minimal DIPL definition, CMake configuration,
+report generation, and the C binding.
 
 QuickExample
 ------------
@@ -48,6 +48,49 @@ causes CMake to reconfigure and apply the new settings.
        add_executable(dip-cmake-example main.cpp)
        set_property(TARGET dip-cmake-example PROPERTY CXX_STANDARD "${CXX_STANDARD}")
    endif()
+
+.. _dip-create-report-example:
+
+CreateReport
+------------
+
+The `CreateReport source directory <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/CreateReport>`_
+contains a DIPfile project with two schemas, two custom units, multiple
+source files, and an override. Its LaTeX introduction and cover fields show
+how to add context to the generated report. The
+:download:`example PDF <../../../examples/dip/CreateReport/report.pdf>` is
+included in the repository for immediate viewing.
+
+The report shows the effective ``experiment.flow_speed`` value of ``3 m/s``
+alongside its declaration and override locations. It also lists the custom
+units, schema information, and available publication references. From the
+repository root, generate a TeX file without external tools:
+
+.. code-block:: bash
+
+   build/bin/snt report --project examples/dip/CreateReport/DIPfile \
+       --intro examples/dip/CreateReport/introduction.tex \
+       --output build/create-report.tex
+
+For a PDF, add ``--format pdf`` and choose a ``.pdf`` output path; this
+requires a local TeX compiler. See :doc:`../integrations/report` for the
+complete PDF command and report options.
+
+Generated report
+^^^^^^^^^^^^^^^^
+
+The bundled PDF shows the cover, linked contents, and styled sections produced
+by the example. The `PDF can also be opened separately
+<../_static/create-report.pdf>`_.
+
+.. raw:: html
+
+   <iframe
+       src="../_static/create-report.pdf"
+       width="100%"
+       height="800px"
+       style="border: none;">
+   </iframe>
 
 C binding
 ---------

@@ -17,7 +17,7 @@ runs twice so contents links and page numbers are resolved.
 Try the example
 ---------------
 
-The :doc:`CreateReport example <../modules/dip/report>` contains two
+The :ref:`CreateReport example <dip-create-report-example>` contains two
 schemas, two custom units, multiple source files, an override, and publication
 metadata. The :download:`generated example PDF
 <../../../examples/dip/CreateReport/report.pdf>` is included for immediate
@@ -55,7 +55,7 @@ made with ``\subsection`` appear as links in the contents page.
 Other interfaces
 ----------------
 
-For C++, call ``snt::api::generate_dip_report(environment, format, output,
+For C++, call ``snt::api::generate_dip_report(env, format, output,
 options)`` from ``<snt/api/dip_report.h>``. The underlying renderer is also
 available as ``snt::dip::report::generate``. See :doc:`the C++ API <../api/cpp_report>`.
 Set ``options.source_root`` to shorten source paths when calling the library

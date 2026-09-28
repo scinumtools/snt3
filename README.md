@@ -3,6 +3,8 @@
 Unit-safe, strongly typed, validated input parameters for scientific and
 engineering software.
 
+Focus on your science. Leave the parameter plumbing to SciNumTools.
+
 [![Build](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml)
 [![codecov](https://codecov.io/github/vrtulka23/scinumtools3/graph/badge.svg?token=8A25K1T7XM)](https://codecov.io/github/vrtulka23/scinumtools3)
 [![Documentation](https://img.shields.io/badge/docs-online-blue)](https://vrtulka23.github.io/scinumtools3/)
@@ -51,15 +53,25 @@ between a scientific model's assumptions and its implementation.
 
 ## Features
 
-- **Unit-aware quantities:** parse, calculate, and convert values with units,
-  uncertainties, arrays, prefixes, and unit systems.
-- **Single source of validated truth:** define typed, constrained DIPL
-  hierarchies with expressions, dependencies, metadata, and source provenance.
-- **Reproducible parameter exchange:** persist evaluated environments in DIPH5
-  with source-content hashes, or generate native C++, C, Fortran, Rust, Julia,
-  JSON, and YAML representations.
-- **One definition, many entry points:** use the same semantics from C/C++17,
-  Python, command-line, CMake, and the optional local REST service.
+- **[Unit-aware quantities](https://vrtulka23.github.io/scinumtools3/modules/puq/quantities.html):**
+  parse, calculate, and convert values with units, uncertainties, arrays,
+  prefixes, and unit systems.
+- **[Single source of validated truth](https://vrtulka23.github.io/scinumtools3/modules/dip/basic-usage.html):**
+  define typed, constrained DIPL hierarchies with expressions, dependencies,
+  metadata, and
+  [source provenance](https://vrtulka23.github.io/scinumtools3/modules/dip/traceability.html).
+- **Reproducible parameter exchange:**
+  [persist evaluated environments in DIPH5](https://vrtulka23.github.io/scinumtools3/modules/dip/persistence.html)
+  with source-content hashes, or
+  [generate native code and data files](https://vrtulka23.github.io/scinumtools3/modules/dip/generation.html)
+  for C++, C, Fortran, Rust, Julia, JSON, and YAML.
+- **[Readable parameter reports](https://vrtulka23.github.io/scinumtools3/modules/dip/report.html):**
+  generate TeX or PDF reports of effective DIP values, units, overrides,
+  provenance, schemas, and publication references. See the
+  [example report and PDF](https://vrtulka23.github.io/scinumtools3/examples/dip.html#dip-create-report-example).
+- **[One definition, many entry points](https://vrtulka23.github.io/scinumtools3/integrations/index.html):**
+  use the same semantics from C/C++17, Python, command-line, CMake, and the
+  optional local REST service.
 
 ## Interfaces
 
@@ -70,7 +82,7 @@ between a scientific model's assumptions and its implementation.
 - **[C binding](https://vrtulka23.github.io/scinumtools3/integrations/c.html):**
   experimental opaque-handle interfaces for PUQ and DIPL.
 - **[Command line](https://vrtulka23.github.io/scinumtools3/integrations/cli.html):**
-  PUQ evaluation and conversion, DIP parsing, DIPH5 persistence, and export.
+  PUQ evaluation and conversion, DIP parsing, DIPH5 persistence, export, and reports.
 - **[CMake](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html):**
   package integration and DIPL evaluation during project configuration.
 - **[REST API server](https://vrtulka23.github.io/scinumtools3/integrations/rest.html):**
@@ -114,6 +126,12 @@ or exchange. DIPH5 retains node provenance and a SHA-256 source manifest for
 later verification. Environments can also be generated as native C/C++,
 Fortran, Rust, or Julia parameters and as JSON or YAML data files for
 applications that should not parse DIPL at run time.
+
+Use `snt report --project DIPfile --output report.tex` to turn an evaluated
+project into a readable TeX report. PDF output is also available when a TeX
+compiler is installed. See the [report guide](https://vrtulka23.github.io/scinumtools3/integrations/report.html)
+and the [CreateReport example](examples/dip/CreateReport/README.md), which
+includes a generated PDF.
 
 Use the PUQ and DIP APIs from C++:
 

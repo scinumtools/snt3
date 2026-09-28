@@ -45,11 +45,11 @@ already evaluated :cpp:class:`snt::dip::Environment`:
 
    snt::dip::DIP parser;
    parser.add_project("DIPfile");
-   auto environment = parser.parse();
+   auto env = parser.parse();
    snt::dip::report::ReportOptions options;
    options.input_label = "DIPfile";
    options.introduction_file = "introduction.tex";
-   snt::api::generate_dip_report(environment, snt::dip::report::ReportFormat::Tex,
+   snt::api::generate_dip_report(env, snt::dip::report::ReportFormat::Tex,
                                "report.tex", options);
 
 See :doc:`the Python binding <../../integrations/python>` and

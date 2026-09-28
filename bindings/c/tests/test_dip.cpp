@@ -173,6 +173,7 @@ TEST_F(Environment, GenerateReport) {
     EXPECT_NE(contents.str().find("simulation.steps"), std::string::npos);
     EXPECT_NE(contents.str().find("C binding demo"), std::string::npos);
     EXPECT_NE(contents.str().find("sntNodeFill"), std::string::npos);
+    generated.close();
     const snt_dip_report_options options{"C binding demo", nullptr, nullptr,
         "C & report", "Example_Team", "2026-09-28", "v1.0"};
     ASSERT_EQ(snt_dip_environment_generate_report_with_options(
@@ -182,6 +183,7 @@ TEST_F(Environment, GenerateReport) {
     covered_contents << covered.rdbuf();
     EXPECT_NE(covered_contents.str().find("C \\& report"), std::string::npos);
     EXPECT_NE(covered_contents.str().find("Example\\_Team"), std::string::npos);
+    covered.close();
     EXPECT_NE(snt_dip_environment_generate_report(
         dip, static_cast<snt_dip_report_format>(99), file.string().c_str(), nullptr, nullptr, nullptr, &error), 0);
     std::filesystem::remove(file);

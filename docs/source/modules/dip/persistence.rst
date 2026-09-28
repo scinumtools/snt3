@@ -25,9 +25,9 @@ The C++ API saves and loads through :cpp:class:`snt::dip::Environment`:
 
    snt::dip::DIP parser;
    parser.add_file("parameters.dipl");
-   snt::dip::Environment environment = parser.parse();
+   snt::dip::Environment env = parser.parse();
 
-   environment.save("parameters.diph5");
+   env.save("parameters.diph5");
 
    snt::dip::Environment restored;
    restored.load("parameters.diph5");
