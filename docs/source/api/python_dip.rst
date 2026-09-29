@@ -2,6 +2,8 @@ DIP Python API
 ==============
 
 DIPL parsing, evaluation environments, tree traversal, and parameter nodes.
+The inspection functions expose evaluated value snapshots, ordered table
+metadata, in-memory slices, artifact loading, and structured DIP diagnostics.
 
 For everyday node access, use Cursor for known paths and Select for discovery;
 see :doc:`the Python guide <../integrations/python>`. The request helpers below

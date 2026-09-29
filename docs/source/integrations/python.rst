@@ -344,6 +344,51 @@ When a value was overridden, ``provenance.override_source``,
 ``provenance.override_line``, and ``provenance.override_code`` identify the
 effective value's origin; the original declaration fields remain available.
 
+Inspecting values and tables
+----------------------------
+
+The read-only DIP inspection API gives a renderer stable paths, effective
+values, units, metadata, source locations, applied changes, and schema facts.
+``inspect_values(env)`` retains environment order. A value's ``changes`` list
+is also in evaluation order. ``inspect_capabilities(env, path)`` tells a client
+whether a path contains a value, children, an array, or a table. Flags for
+reference graphs and direct editing remain false.
+
+.. code-block:: python
+
+   from scinumtools3.dip import inspect_capabilities, inspect_table, inspect_value, read_value_slice
+
+   if inspect_capabilities(env, "measurements").has_tabular_data:
+       table = inspect_table(env, "measurements")
+       for column in table.columns:  # original DIPL header order
+           if table.rows:
+               values = read_value_slice(env, column.path, [(0, table.rows - 1)])
+               print(column.name, column.units, values)
+
+   speed = inspect_value(env, "physics.speed")
+   print(speed.value, speed.declaration_location, speed.override_location)
+
+``inspect_tables(env)`` lists every table. Column values live at their paths;
+the table inspection object contains column metadata and row count. Slice
+ranges are zero-based and inclusive, and read from an evaluated in-memory
+value. DIPH5 loading is still eager. ``open_artifact(path)`` loads a DIPfile,
+DIPL file, or DIPH5 snapshot, while ``reload_artifact(env, path)`` replaces an
+environment after a successful load.
+
+DIP exceptions provide a ``diagnostic`` attribute containing a structured
+category, message, details, suggestion, and available source locations:
+
+.. code-block:: python
+
+   from scinumtools3.dip import diagnostic_from_exception, reload_artifact
+
+   try:
+       reload_artifact(env, "DIPfile")
+   except RuntimeError as error:
+       diagnostic = diagnostic_from_exception(error)
+       if diagnostic is not None:
+           print(diagnostic.code, diagnostic.message, diagnostic.location)
+
 Python values and NumPy
 -----------------------
 

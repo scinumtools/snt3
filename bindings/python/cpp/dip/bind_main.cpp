@@ -16,6 +16,7 @@ namespace snt::bind::python {
     void init_environment(py::module_& m);
     void init_value_node(py::module_& m);
     void init_cursor(py::module_& m);
+    void init_inspection(py::module_& m);
     void init_exceptions(py::module_& m);
 
     // Adding Python context manager methods to DIP
@@ -36,6 +37,7 @@ namespace snt::bind::python {
         init_value_node(m);
         init_environment(m);
         init_cursor(m);
+        init_inspection(m);
         init_exceptions(m);
 
         auto dip = py::class_<dip::DIP>(m, "DIP", "Parser and evaluator for DIPL source definitions.");

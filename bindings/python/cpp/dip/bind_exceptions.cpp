@@ -8,6 +8,7 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
+#include <snt/dip/diagnostic.h>
 
 namespace py = pybind11;
 
@@ -32,6 +33,17 @@ namespace snt::bind::python {
                 instance.attr("message") = e.info().message;
                 instance.attr("details") = e.info().details;
                 instance.attr("suggestion") = e.info().suggestion;
+                instance.attr("diagnostic") = py::cast(dip::diagnostic_from_exception(e));
+                PyErr_SetObject(type.ptr(), instance.ptr());
+            } catch (const dip::Exception& e) {
+                py::object type = py::reinterpret_borrow<py::object>(PyExc_RuntimeError);
+                py::object instance = type(e.what());
+                instance.attr("diagnostic") = py::cast(dip::diagnostic_from_exception(e));
+                PyErr_SetObject(type.ptr(), instance.ptr());
+            } catch (const core::Exception& e) {
+                py::object type = py::reinterpret_borrow<py::object>(PyExc_RuntimeError);
+                py::object instance = type(e.what());
+                instance.attr("diagnostic") = py::cast(dip::diagnostic_from_exception(e));
                 PyErr_SetObject(type.ptr(), instance.ptr());
             }
         });
