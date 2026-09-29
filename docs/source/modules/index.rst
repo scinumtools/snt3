@@ -148,6 +148,8 @@ calculated*, and *what constraints it must satisfy*.
   evaluated environments in DIPH5 format from C++.
 * :doc:`Traceability and source identities <dip/traceability>` — following
   DIPL inputs and registered constructs through diagnostics and DIPH5.
+* :doc:`Inspecting and reloading environments <dip/inspection>` — reading
+  evaluated values and provenance through a small C++ API.
 * :doc:`Static parameter generation <dip/generation>` — exporting evaluated
   environments as native source code or data files.
 * :doc:`C++ report generation <dip/report>` — Brief++ reports of
@@ -161,6 +163,7 @@ calculated*, and *what constraints it must satisfy*.
    dip/projects
    dip/persistence
    dip/traceability
+   dip/inspection
    dip/generation
    dip/report
 
