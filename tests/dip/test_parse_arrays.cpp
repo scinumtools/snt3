@@ -42,6 +42,40 @@ TEST(ParseArrays, IntegerValue) {
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 }
 
+TEST(ParseArrays, IntegerElementsOutsideDeclaredRangeAreRejected) {
+    const std::vector<std::string> declarations = {
+        "value int8[2] = [-128, 128]", "value int16[2] = [-32769, 32767]",
+        "value uint8[2] = [0, 256]", "value uint8[2] = [0, -1]",
+        "value uint16[2] = [0, 65536]", "value uint16[2] = [0, -1]",
+        "value uint32[2] = [0, 4294967296]",
+        "value uint64[2] = [0, 18446744073709551616]"
+    };
+    for (const auto& declaration : declarations) {
+        SCOPED_TRACE(declaration);
+        dip::DIP parser;
+        parser.add_string(declaration + "\n");
+        EXPECT_THROW(parser.parse(), dip::SyntaxException);
+    }
+}
+
+TEST(ParseArrays, IntegerElementsAtDeclaredLimitsRemainExact) {
+    dip::DIP parser;
+    parser.add_string(
+        "signed8 int8[2] = [-128, 127]\n"
+        "unsigned8 uint8[2] = [0, 255]\n"
+        "signed16 int16[2] = [-32768, 32767]\n"
+        "unsigned16 uint16[2] = [0, 65535]\n"
+        "unsigned64 uint64[2] = [0, 18446744073709551615]\n"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env["signed8"].as<std::vector<int64_t>>(), (std::vector<int64_t>{-128, 127}));
+    EXPECT_EQ(env["unsigned8"].as<std::vector<uint64_t>>(), (std::vector<uint64_t>{0, 255}));
+    EXPECT_EQ(env["signed16"].as<std::vector<int64_t>>(), (std::vector<int64_t>{-32768, 32767}));
+    EXPECT_EQ(env["unsigned16"].as<std::vector<uint64_t>>(), (std::vector<uint64_t>{0, 65535}));
+    EXPECT_EQ(env["unsigned64"].as<std::vector<uint64_t>>(),
+              (std::vector<uint64_t>{0, std::numeric_limits<uint64_t>::max()}));
+}
+
 TEST(ParseArrays, FloatValue) {
 
     dip::DIP d;

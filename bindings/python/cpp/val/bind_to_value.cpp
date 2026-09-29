@@ -190,7 +190,7 @@ namespace snt::bind::python {
             } else if (val->get_size() == 0) { // return none value
                 return py::array_t<int64_t>(0);
             } else if (val->get_size() == 1) { // scalar array
-                auto result = py::array_t<int64_t>({});
+                auto result = py::array_t<int64_t>(shape);
                 *result.mutable_data() = val->get_value(0);
                 return result;
             } else { // return numpy array
@@ -215,7 +215,7 @@ namespace snt::bind::python {
             } else if (val->get_size() == 0) {
                 return py::array_t<uint64_t>(0);
             } else if (val->get_size() == 1) {
-                auto result = py::array_t<uint64_t>({});
+                auto result = py::array_t<uint64_t>(shape);
                 *result.mutable_data() = val->get_value(0);
                 return result;
             } else {
@@ -263,7 +263,9 @@ namespace snt::bind::python {
                 return np.attr("array")(py::list());
             } else if (val->get_size() == 1) { // scalar array
                 py::module_ np = py::module_::import("numpy");
-                return np.attr("array")(py::str(val->get_value(0)));
+                py::list items;
+                items.append(py::str(val->get_value(0)));
+                return np.attr("array")(items).attr("reshape")(shape);
             } else { // return numpy array
                 py::list list;
                 // NOTE: For string-array conversion I could not find an alternative

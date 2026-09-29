@@ -5,6 +5,93 @@
 #include <snt/dip/nodes/node_integer.h>
 #include <snt/dip/solvers/numerical_solver.h>
 
+#include <cmath>
+#include <limits>
+#include <type_traits>
+#include <snt/val/values_number.h>
+
+namespace {
+
+template <typename T>
+T checked_integer(const std::string& input, const snt::dip::Line& line) {
+    try {
+        size_t consumed = 0;
+        if constexpr (std::is_signed_v<T>) {
+            const auto value = std::stoll(input, &consumed);
+            if (consumed != input.size() || value < std::numeric_limits<T>::lowest() ||
+                value > std::numeric_limits<T>::max())
+                throw std::out_of_range("integer outside declared range");
+            return static_cast<T>(value);
+        } else {
+            const auto first = input.find_first_not_of(" \t");
+            if (first != std::string::npos && input[first] == '-')
+                throw std::out_of_range("negative unsigned integer");
+            const auto value = std::stoull(input, &consumed);
+            if (consumed != input.size() || value > std::numeric_limits<T>::max())
+                throw std::out_of_range("integer outside declared range");
+            return static_cast<T>(value);
+        }
+    } catch (const std::invalid_argument&) {
+        // Report malformed values through the same source-located DIP diagnostic.
+    } catch (const std::out_of_range&) {
+        // This also catches values outside the range of the parsing type.
+    }
+    throw snt::dip::SyntaxException(
+        "Invalid integer value",
+        "The value `" + input + "` is not a valid " +
+            (std::is_signed_v<T> ? "signed" : "unsigned") + " " +
+            std::to_string(sizeof(T) * 8) + "-bit integer.",
+        "Use an integer within the range of the declared data type.",
+        __FILE__, __LINE__, line
+    );
+}
+
+void validate_integer_range(const snt::val::BaseValue* value, snt::core::DataType dtype,
+                            const snt::dip::Line& line) {
+    if (!value) return;
+    unsigned bits = 0;
+    bool unsigned_target = false;
+    switch (dtype) {
+    case snt::core::DataType::Integer8: bits = 8; break;
+    case snt::core::DataType::Integer16: bits = 16; break;
+    case snt::core::DataType::Integer32: bits = 32; break;
+    case snt::core::DataType::Integer64: bits = 64; break;
+    case snt::core::DataType::Integer8_U: bits = 8; unsigned_target = true; break;
+    case snt::core::DataType::Integer16_U: bits = 16; unsigned_target = true; break;
+    case snt::core::DataType::Integer32_U: bits = 32; unsigned_target = true; break;
+    case snt::core::DataType::Integer64_U: bits = 64; unsigned_target = true; break;
+    default: return;
+    }
+    const auto signed_min = bits == 64 ? std::numeric_limits<int64_t>::lowest() : -(int64_t{1} << (bits - 1));
+    const auto signed_max = bits == 64 ? std::numeric_limits<int64_t>::max() : (int64_t{1} << (bits - 1)) - 1;
+    const auto unsigned_max = bits == 64 ? std::numeric_limits<uint64_t>::max() : (uint64_t{1} << bits) - 1;
+    bool in_range = true;
+    if (const auto* signed_values = dynamic_cast<const snt::val::ArrayValue<int64_t>*>(value)) {
+        for (const auto number : signed_values->get_values())
+            in_range &= unsigned_target ? number >= 0 && static_cast<uint64_t>(number) <= unsigned_max
+                                        : number >= signed_min && number <= signed_max;
+    } else if (const auto* unsigned_values = dynamic_cast<const snt::val::ArrayValue<uint64_t>*>(value)) {
+        for (const auto number : unsigned_values->get_values())
+            in_range &= unsigned_target ? number <= unsigned_max : number <= static_cast<uint64_t>(signed_max);
+    } else if (const auto* floating_values = dynamic_cast<const snt::val::ArrayValue<double>*>(value)) {
+        const auto upper_exclusive = std::ldexp(1.0L, unsigned_target ? bits : bits - 1);
+        const auto lower_inclusive = unsigned_target ? 0.0L : -upper_exclusive;
+        for (const auto number : floating_values->get_values())
+            in_range &= std::isfinite(number) && static_cast<long double>(number) >= lower_inclusive &&
+                        static_cast<long double>(number) < upper_exclusive;
+    }
+    if (!in_range)
+        throw snt::dip::SyntaxException(
+            "Integer value outside declared range",
+            "The evaluated value cannot be represented as a " +
+                std::string(unsigned_target ? "unsigned " : "signed ") + std::to_string(bits) + "-bit integer.",
+            "Use a value within the range of the declared data type.",
+            __FILE__, __LINE__, line
+        );
+}
+
+} // namespace
+
 namespace snt::dip {
 
     ValueNode::PointerType IntegerNode::is_node(Parser& parser) {
@@ -47,25 +134,30 @@ namespace snt::dip {
     };
 
     BaseNode::ListType IntegerNode::parse(Environment& env) {
+        auto assign_checked = [this](val::BaseValue::PointerType incoming) {
+            validate_integer_range(incoming.get(), value_dtype, line);
+            set_value(std::move(incoming));
+        };
         switch (value_origin) {
         case ValueOrigin::FunctionRes:
             break;
         case ValueOrigin::Function:
-            set_value(parse_function(env, value_raw.at(0), units_raw));
+            assign_checked(parse_function(env, value_raw.at(0), units_raw));
             break;
         case ValueOrigin::Reference:
         case ValueOrigin::ReferenceRel:
         case ValueOrigin::ReferenceRaw:
-            set_value(parse_reference(env, value_raw.at(0), units_raw, value_origin));
+            assign_checked(parse_reference(env, value_raw.at(0), units_raw, value_origin));
             break;
         case ValueOrigin::Expression: {
-            set_value(parse_expression(env, value_raw.at(0), units_raw, dtype));
+            assign_checked(parse_expression(env, value_raw.at(0), units_raw, dtype));
             break;
         }
         default:
             set_value();
             break;
         }
+        validate_integer_range(value.get(), value_dtype, line);
         if (!units) // units might be provided by the ValueOrigin::Function
             set_units();
         return {};
@@ -75,27 +167,21 @@ namespace snt::dip {
         // TODO: variable precision x should be implemented
         switch (value_dtype) {
         case core::DataType::Integer8_U:
-            return std::make_unique<val::ArrayValueUint8>(static_cast<uint8_t>(std::stoul(value_input)));
+            return std::make_unique<val::ArrayValueUint8>(checked_integer<uint8_t>(value_input, line));
         case core::DataType::Integer8:
-            return std::make_unique<val::ArrayValueInt8>(static_cast<int8_t>(std::stol(value_input)));
+            return std::make_unique<val::ArrayValueInt8>(checked_integer<int8_t>(value_input, line));
         case core::DataType::Integer16_U:
-            return std::make_unique<val::ArrayValueUint16>((unsigned short)std::stoi(value_input));
-            break;
+            return std::make_unique<val::ArrayValueUint16>(checked_integer<uint16_t>(value_input, line));
         case core::DataType::Integer16:
-            return std::make_unique<val::ArrayValueInt16>((short)std::stoi(value_input));
-            break;
+            return std::make_unique<val::ArrayValueInt16>(checked_integer<int16_t>(value_input, line));
         case core::DataType::Integer32_U:
-            return std::make_unique<val::ArrayValueUint32>(std::stoul(value_input));
-            break;
+            return std::make_unique<val::ArrayValueUint32>(checked_integer<uint32_t>(value_input, line));
         case core::DataType::Integer32:
-            return std::make_unique<val::ArrayValueInt32>(std::stoi(value_input));
-            break;
+            return std::make_unique<val::ArrayValueInt32>(checked_integer<int32_t>(value_input, line));
         case core::DataType::Integer64_U:
-            return std::make_unique<val::ArrayValueUint64>(std::stoull(value_input));
-            break;
+            return std::make_unique<val::ArrayValueUint64>(checked_integer<uint64_t>(value_input, line));
         case core::DataType::Integer64:
-            return std::make_unique<val::ArrayValueInt64>(std::stoll(value_input));
-            break;
+            return std::make_unique<val::ArrayValueInt64>(checked_integer<int64_t>(value_input, line));
         default: {
             const bool is_unsigned = dtype_raw[0] == "u";
             const std::string integer_type = is_unsigned ? "unsigned integer" : "signed integer";
@@ -123,7 +209,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back(static_cast<uint8_t>(std::stoul(s)));
+                    arr.push_back(checked_integer<uint8_t>(s, line));
             }
             return std::make_unique<val::ArrayValueUint8>(arr, shape);
         }
@@ -132,7 +218,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back(static_cast<int8_t>(std::stol(s)));
+                    arr.push_back(checked_integer<int8_t>(s, line));
             }
             return std::make_unique<val::ArrayValueInt8>(arr, shape);
         }
@@ -141,7 +227,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back((unsigned short)std::stoul(s));
+                    arr.push_back(checked_integer<uint16_t>(s, line));
             }
             return std::make_unique<val::ArrayValueUint16>(arr, shape);
         }
@@ -150,7 +236,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back((short)std::stoi(s));
+                    arr.push_back(checked_integer<int16_t>(s, line));
             }
             return std::make_unique<val::ArrayValueInt16>(arr, shape);
         }
@@ -159,7 +245,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back(std::stoul(s));
+                    arr.push_back(checked_integer<uint32_t>(s, line));
             }
             return std::make_unique<val::ArrayValueUint32>(arr, shape);
         }
@@ -168,7 +254,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back(std::stoi(s));
+                    arr.push_back(checked_integer<int32_t>(s, line));
             }
             return std::make_unique<val::ArrayValueInt32>(arr, shape);
         }
@@ -177,7 +263,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back(std::stoull(s));
+                    arr.push_back(checked_integer<uint64_t>(s, line));
             }
             return std::make_unique<val::ArrayValueUint64>(arr, shape);
         }
@@ -186,7 +272,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back(std::stoll(s));
+                    arr.push_back(checked_integer<int64_t>(s, line));
             }
             return std::make_unique<val::ArrayValueInt64>(arr, shape);
         }

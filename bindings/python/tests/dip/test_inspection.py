@@ -1,4 +1,7 @@
+import numpy as np
 import pytest
+
+from scinumtools3.core import DataType
 
 from scinumtools3.dip import (
     ArtifactKind,
@@ -95,3 +98,44 @@ def test_value_inspection_changes_capabilities_and_diagnostics(tmp_path):
     assert diagnostic.message
     assert diagnostic.location is not None
     assert diagnostic.location.line == 1
+
+
+def test_python_inspection_preserves_integer_precision_and_array_shape(tmp_path):
+    parser = DIP()
+    parser.add_string(
+        "large uint64 = 9007199254740993\n"
+        "maximum uint64 = 18446744073709551615\n"
+        "minimum int64 = -9223372036854775808\n"
+        "counts uint64[1] = [18446744073709551615]\n"
+        "offsets int64[1] = [-9223372036854775808]\n"
+        'labels str[1] = ["only"]\n'
+        "grid uint64[2,2] = [[0, 9007199254740993], [18446744073709551615, 7]]\n"
+    )
+    env = parser.parse()
+
+    def check_values(current):
+        assert inspect_value(current, "large").value == 2**53 + 1
+        assert inspect_value(current, "maximum").value == 2**64 - 1
+        assert inspect_value(current, "minimum").value == -(2**63)
+        for path, dtype, expected in (
+            ("counts", DataType.Integer64_U, 2**64 - 1),
+            ("offsets", DataType.Integer64, -(2**63)),
+            ("labels", DataType.String, "only"),
+        ):
+            inspected = inspect_value(current, path)
+            assert inspected.type == dtype
+            assert inspected.shape == [1]
+            values = inspected.to_numpy()
+            assert values.shape == (1,)
+            assert values[0] == expected
+        grid = inspect_value(current, "grid")
+        assert grid.shape == [2, 2]
+        assert grid.value == [[0, 2**53 + 1], [2**64 - 1, 7]]
+        np.testing.assert_array_equal(grid.to_numpy(), np.array(grid.value, dtype=np.uint64))
+
+    check_values(env)
+    snapshot = tmp_path / "numeric.diph5"
+    env.save(snapshot)
+    loaded = Environment()
+    loaded.load(snapshot)
+    check_values(loaded)

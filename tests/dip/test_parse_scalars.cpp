@@ -261,3 +261,45 @@ TEST(ParseScalars, DataTypeRanges) {
     EXPECT_DOUBLE_EQ(env["float64_min"].as<double>(), std::numeric_limits<double>::lowest());
     EXPECT_DOUBLE_EQ(env["float64_max"].as<double>(), std::numeric_limits<double>::max());
 }
+
+TEST(ParseScalars, IntegerValuesOutsideDeclaredRangeAreRejected) {
+    const std::vector<std::string> declarations = {
+        "value int8 = -129", "value int8 = 128",
+        "value uint8 = -1", "value uint8 = 256",
+        "value int16 = -32769", "value int16 = 32768",
+        "value uint16 = -1", "value uint16 = 65536",
+        "value int32 = 2147483648", "value uint32 = 4294967296",
+        "value int64 = 9223372036854775808", "value uint64 = 18446744073709551616"
+    };
+    for (const auto& declaration : declarations) {
+        SCOPED_TRACE(declaration);
+        dip::DIP parser;
+        parser.add_string(declaration + "\n");
+        EXPECT_THROW(parser.parse(), dip::SyntaxException);
+    }
+}
+
+TEST(ParseScalars, IntegerExpressionOutsideDeclaredRangeIsRejected) {
+    const std::vector<std::string> declarations = {
+        "value int8 = (127 + 1)",
+        "value uint8 = (255 + 1)",
+        "value uint8 = (-1)",
+        "value uint64 = (-1)"
+    };
+    for (const auto& declaration : declarations) {
+        SCOPED_TRACE(declaration);
+        dip::DIP parser;
+        parser.add_string(declaration + "\n");
+        EXPECT_THROW(parser.parse(), dip::SyntaxException);
+    }
+}
+
+TEST(ParseScalars, IntegerOverrideOutsideDeclaredRangeIsRejected) {
+    for (const std::string override_value : {"256", "(255 + 1)", "-1"}) {
+        SCOPED_TRACE(override_value);
+        dip::DIP parser;
+        parser.add_string("value uint8 = 1\n");
+        parser.add_override_string("value = " + override_value + "\n");
+        EXPECT_THROW(parser.parse(), dip::SyntaxException);
+    }
+}
