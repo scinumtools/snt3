@@ -628,6 +628,8 @@ namespace snt::dip::generate {
 
             std::string rust_value_type(const Node& node) const {
                 std::string result = rust_scalar_type(node.dtype);
+                if (!node.is_array)
+                    return result;
                 for (auto dimension = node.shape.rbegin(); dimension != node.shape.rend(); ++dimension)
                     result = "[" + result + "; " + std::to_string(*dimension) + "]";
                 return result;
@@ -1027,7 +1029,8 @@ namespace snt::dip::generate {
 
             void write_member(const Node& node, const std::string& name) {
                 if (is_scalar(node)) {
-                    output_ << "    " << fortran_scalar_type(node) << fortran_dimensions(node.shape) << " :: " << name
+                    output_ << "    " << fortran_scalar_type(node)
+                            << (node.is_array ? fortran_dimensions(node.shape) : "") << " :: " << name
                             << "\n";
                     return;
                 }

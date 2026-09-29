@@ -135,3 +135,40 @@ TEST(Casting, String) {
     bval = val->cast_as(core::DataType::Character);
     EXPECT_EQ(bval->to_string(), "B");
 }
+
+TEST(Casting, StringArrayPreservesNumericValuesAcrossSupportedTypes) {
+    const val::ArrayValueStr signed_values(std::vector<std::string>{"-12", "127"});
+    for (const auto type : {core::DataType::Integer8, core::DataType::Integer16,
+                            core::DataType::Integer32, core::DataType::Integer64}) {
+        const auto converted = signed_values.cast_as(type);
+        EXPECT_EQ(converted->get_dtype(), type);
+        EXPECT_EQ(converted->to_string(), "[-12, 127]");
+    }
+
+    const val::ArrayValueStr unsigned_values(std::vector<std::string>{"0", "255"});
+    for (const auto type : {core::DataType::Integer8_U, core::DataType::Integer16_U,
+                            core::DataType::Integer32_U, core::DataType::Integer64_U}) {
+        const auto converted = unsigned_values.cast_as(type);
+        EXPECT_EQ(converted->get_dtype(), type);
+        EXPECT_EQ(converted->to_string(), "[0, 255]");
+    }
+
+    const val::ArrayValueStr fractional_values(std::vector<std::string>{"-1.25", "2.5"});
+    for (const auto type : {core::DataType::Float32, core::DataType::Float64,
+                            core::DataType::Float128}) {
+        const auto converted = fractional_values.cast_as(type);
+        EXPECT_EQ(converted->get_dtype(), type);
+        EXPECT_EQ(converted->to_string(), "[-1.25, 2.5]");
+    }
+}
+
+TEST(Casting, StringArrayRejectsInvalidBooleanCharacterAndIntegerRange) {
+    EXPECT_THROW(val::ArrayValueStr(std::vector<std::string>{"true", "yes"})
+                     .cast_as(core::DataType::Boolean), val::TypeException);
+    EXPECT_THROW(val::ArrayValueStr(std::vector<std::string>{"a", "ab"})
+                     .cast_as(core::DataType::Character), val::TypeException);
+    EXPECT_THROW(val::ArrayValueStr(std::vector<std::string>{"2147483648"})
+                     .cast_as(core::DataType::Integer32), val::TypeException);
+    EXPECT_THROW(val::ArrayValueStr(std::vector<std::string>{"4294967296"})
+                     .cast_as(core::DataType::Integer32_U), val::TypeException);
+}

@@ -201,3 +201,76 @@ TEST(Environment, GenerateThreeDimensionalArray) {
     std::filesystem::remove(julia_file);
     std::filesystem::remove(fortran_file);
 }
+
+TEST(Environment, GeneratedFormatsPreserveTypedScientificInputs) {
+    dip::DIP parser;
+    parser.add_string(
+        "run\n"
+        "  enabled bool = true\n"
+        "  signed8 int8 = -12\n"
+        "  signed16 int16 = -1234\n"
+        "  signed32 int32 = -123456\n"
+        "  signed64 int64 = -9007199254740993\n"
+        "  unsigned8 uint8 = 250\n"
+        "  unsigned16 uint16 = 60000\n"
+        "  unsigned32 uint32 = 4000000000\n"
+        "  unsigned64 uint64 = 9007199254740993\n"
+        "  fraction32 float32 = 1.25\n"
+        "  fraction64 float64 = -2.5\n"
+        "  label str = \"Flow \\\"study\\\"\"\n"
+    );
+    const auto env = parser.parse();
+    const auto read = [&](dip::ExportFormat format, const std::string& suffix) {
+        const auto file = environment_file("typed-export." + suffix);
+        env.generate(format, file);
+        std::ifstream stream(file);
+        std::stringstream text;
+        text << stream.rdbuf();
+        stream.close();
+        std::filesystem::remove(file);
+        return text.str();
+    };
+
+    const auto cpp = read(dip::ExportFormat::CPP, "hpp");
+    EXPECT_NE(cpp.find("std::int8_t signed8"), std::string::npos);
+    EXPECT_NE(cpp.find("std::uint64_t unsigned64"), std::string::npos);
+    EXPECT_NE(cpp.find("float fraction32"), std::string::npos);
+    EXPECT_NE(cpp.find("9007199254740993"), std::string::npos);
+
+    const auto c = read(dip::ExportFormat::C, "h");
+    EXPECT_NE(c.find("int16_t signed16"), std::string::npos);
+    EXPECT_NE(c.find("uint32_t unsigned32"), std::string::npos);
+    EXPECT_NE(c.find("9007199254740993"), std::string::npos);
+
+    const auto rust = read(dip::ExportFormat::RUST, "rs");
+    EXPECT_NE(rust.find("pub signed64: i64"), std::string::npos);
+    EXPECT_NE(rust.find("pub unsigned64: u64"), std::string::npos);
+    EXPECT_NE(rust.find("9007199254740993"), std::string::npos);
+
+    const auto julia = read(dip::ExportFormat::JULIA, "jl");
+    EXPECT_NE(julia.find("Int8(-12)"), std::string::npos);
+    EXPECT_NE(julia.find("UInt64(9007199254740993)"), std::string::npos);
+
+    const auto fortran_file = environment_file("unsigned-fortran.f90");
+    EXPECT_THROW(env.generate(dip::ExportFormat::FORTRAN, fortran_file), dip::EnvironmentException);
+    std::filesystem::remove(fortran_file);
+
+    dip::DIP signed_parser;
+    signed_parser.add_string("signed8 int8 = -12\nsigned64 int64 = -9007199254740993\n"
+                             "fraction32 float32 = 1.25\n");
+    signed_parser.parse().generate(dip::ExportFormat::FORTRAN, fortran_file);
+    std::ifstream fortran_stream(fortran_file);
+    std::stringstream fortran_text;
+    fortran_text << fortran_stream.rdbuf();
+    fortran_stream.close();
+    std::filesystem::remove(fortran_file);
+    EXPECT_NE(fortran_text.str().find("integer(int8) :: signed8"), std::string::npos);
+    EXPECT_NE(fortran_text.str().find("real(real32) :: fraction32"), std::string::npos);
+
+    const auto json = read(dip::ExportFormat::JSON, "json");
+    EXPECT_NE(json.find("\"unsigned64\": 9007199254740993"), std::string::npos);
+    EXPECT_NE(json.find("\"label\": \"Flow \\\"study\\\"\""), std::string::npos);
+
+    const auto yaml = read(dip::ExportFormat::YAML, "yaml");
+    EXPECT_NE(yaml.find("unsigned64: 9007199254740993"), std::string::npos);
+}

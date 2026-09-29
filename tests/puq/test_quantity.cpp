@@ -118,6 +118,30 @@ TEST(Quantity, UnitConversion) {
     EXPECT_EQ(q.to_string(), "1.49598e8*km");
 }
 
+TEST(Quantity, CrossSystemEnergyArithmeticPreservesPhysicalValue) {
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
+
+    puq::Quantity joule(1, "J", puq::SystemType::SI);
+    puq::Quantity erg(1e7, "erg", puq::SystemType::ESU);
+    EXPECT_EQ((joule + erg).convert("J", puq::SystemType::SI).to_string(), "2*J");
+    EXPECT_EQ((joule - erg).convert("J", puq::SystemType::SI).to_string(), "0*J");
+
+    joule += erg;
+    EXPECT_EQ(joule.convert("J", puq::SystemType::SI).to_string(), "2*J");
+    joule -= erg;
+    EXPECT_EQ(joule.convert("J", puq::SystemType::SI).to_string(), "J");
+
+    EXPECT_THROW(joule * erg, puq::SystemException);
+    EXPECT_THROW(joule / erg, puq::SystemException);
+    EXPECT_THROW(static_cast<void>(joule == erg), puq::SystemException);
+    EXPECT_THROW(static_cast<void>(joule != erg), puq::SystemException);
+    EXPECT_THROW(joule *= erg, puq::SystemException);
+    EXPECT_THROW(joule /= erg, puq::SystemException);
+}
+
 TEST(Quantity, ArithmeticsAdd) {
 
     puq::Quantity q1, q2, q3;
