@@ -28,6 +28,8 @@ module.
 
 Each module overview links to topic pages that group related types and
 operations, such as quantities, unit systems, or DIPL nodes.
+The :doc:`C++ adapter reference <cpp/dip/adapter>` lists ``Adapter``,
+``AdapterContext``, and the three ``run_adapter*`` functions.
 
 The generated application API declarations are grouped by domain. For
 examples and workflow guidance, see the :ref:`API module overview
@@ -53,6 +55,8 @@ extension, including the ``core``, ``val``, ``puq``, ``dip``, and ``api``
 submodules when they are enabled in the build. EXS is used internally by
 PUQ and DIP and is not exposed as a standalone Python module; see
 :doc:`../integrations/python` for the rationale.
+The :ref:`Python adapter reference <python-dip-adapters>` lists the matching
+classes and runner functions.
 
 .. toctree::
    :maxdepth: 2
@@ -78,7 +82,8 @@ C API
 -----
 
 The C ABI reference documents the experimental opaque-handle interfaces for
-PUQ quantities and DIPL parsing.
+PUQ quantities and DIPL parsing. The adapter interface is provided through
+the C++ and Python APIs linked above; it has no C ABI entry points.
 
 .. toctree::
    :maxdepth: 1

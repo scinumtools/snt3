@@ -152,6 +152,8 @@ calculated*, and *what constraints it must satisfy*.
   evaluated values and provenance through a small C++ API.
 * :doc:`Static parameter generation <dip/generation>` — exporting evaluated
   environments as native source code or data files.
+* :doc:`Application adapters <dip/adapters>` — generating one or more
+  application-specific files from an evaluated environment.
 * :doc:`C++ report generation <dip/report>` — Brief++ reports of
   evaluated environments.
 
@@ -165,6 +167,7 @@ calculated*, and *what constraints it must satisfy*.
    dip/traceability
    dip/inspection
    dip/generation
+   dip/adapters
    dip/report
 
 .. _mat-materials:

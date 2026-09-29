@@ -60,6 +60,36 @@ file, source, and unit individually:
 
 See :doc:`DIPfile projects <../modules/dip/projects>` for the manifest format.
 
+Application adapters
+--------------------
+
+Subclass ``Adapter`` to turn an evaluated environment into one or more
+application-specific files. The Python callback receives the same registered
+output types as C++: text, binary bytes, and a streamed ``write(bytes)``
+function. ``run_adapter_project`` parses a DIPfile; ``run_adapter_snapshot``
+loads a DIPH5 snapshot; ``run_adapter`` accepts an existing environment.
+
+.. code-block:: python
+
+   from scinumtools3.dip import Adapter, run_adapter_project
+
+   class AnalysisAdapter(Adapter):
+       def plan(self, env, context):
+           steps = env["run.steps"].value
+           context.add_text("job.json", '{"steps": %d}\n' % steps)
+           context.add_binary("marker.bin", b"SNT3")
+
+           def write_steps(write):
+               for i in range(steps):
+                   write(f"{i}\n".encode())
+
+           context.add_stream("steps.csv", write_steps)
+
+   run_adapter_project("DIPfile", AnalysisAdapter(), "analysis-inputs")
+
+See :doc:`Application adapters <../modules/dip/adapters>` for path rules and
+the complete C++ and Python examples.
+
 Accessing nodes
 ---------------
 

@@ -4,6 +4,8 @@ DIP Python API
 DIPL parsing, evaluation environments, tree traversal, and parameter nodes.
 The inspection functions expose evaluated value snapshots, ordered table
 metadata, in-memory slices, artifact loading, and structured DIP diagnostics.
+The adapter classes and runners are documented in :doc:`the adapter guide
+<../modules/dip/adapters>`.
 
 For everyday node access, use Cursor for known paths and Select for discovery;
 see :doc:`the Python guide <../integrations/python>`. The request helpers below
@@ -30,3 +32,20 @@ when no nodes match.
 
 .. autoclass:: scinumtools3.dip.ValueNodeData
    :members:
+
+.. _python-dip-adapters:
+
+Application adapters
+--------------------
+
+.. autoclass:: scinumtools3.dip.Adapter
+   :members:
+
+.. autoclass:: scinumtools3.dip.AdapterContext
+   :members:
+
+.. autofunction:: scinumtools3.dip.run_adapter
+
+.. autofunction:: scinumtools3.dip.run_adapter_project
+
+.. autofunction:: scinumtools3.dip.run_adapter_snapshot

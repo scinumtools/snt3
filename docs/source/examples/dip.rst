@@ -2,7 +2,7 @@ DIP examples
 ============
 
 The DIP examples cover a minimal DIPL definition, CMake configuration,
-and report generation.
+application adapters, and report generation.
 
 Quick Example
 -------------
@@ -48,6 +48,29 @@ causes CMake to reconfigure and apply the new settings.
        add_executable(dip-cmake-example main.cpp)
        set_property(TARGET dip-cmake-example PROPERTY CXX_STANDARD "${CXX_STANDARD}")
    endif()
+
+Adapter Outputs
+---------------
+
+The `AdapterOutputs source directory
+<https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/AdapterOutputs>`_
+uses ``steps = 4`` and ``dt = 0.25 s`` to demonstrate two independent formats.
+The C++ adapter writes a solver namelist, binary marker, streamed time values,
+and a DIPH5 snapshot. The Python adapter writes JSON and CSV for an analysis
+program. Each adapter registers multiple files in one ``plan()`` call.
+
+After building ``ExampleDipAdapter`` and ``_snt``, run them from the repository
+root with fresh output directories:
+
+.. code-block:: console
+
+   build/bin/ExampleDipAdapter examples/dip/AdapterOutputs/DIPfile build/adapter-cpp
+   PYTHONPATH=build/python python examples/dip/AdapterOutputs/convert.py --output build/adapter-python
+
+The first command creates ``solver/control.nml``, ``solver/magic.bin``,
+``solver/times.dat``, and ``run.diph5``. The second creates
+``analysis/job.json`` and ``analysis/times.csv``. See :doc:`the adapter guide
+<../modules/dip/adapters>` for the API and path rules.
 
 .. _dip-create-report-example:
 
