@@ -1,6 +1,8 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
+#include <snt/dip/diagnostic.h>
+#include <snt/dip/exceptions.h>
 #include <snt/dip/inspection.h>
 #include <snt/val/values_array.h>
 
@@ -39,6 +41,60 @@ TEST(Inspection, EvaluatedValuesAndProvenance) {
     EXPECT_EQ(values[1].path, "count");
     EXPECT_EQ(values[1].value->get_dtype(), values[1].type);
     EXPECT_FALSE(values[1].override_location.has_value());
+}
+
+TEST(Inspection, CapabilityFlags) {
+    dip::DIP parser;
+    parser.add_string("physics\n  speed float = 2 m/s\nsamples int[3] = [1, 2, 3]\nsingle int[1] = [4]\n");
+    auto env = parser.parse();
+
+    const auto group = dip::inspect_capabilities(env, "physics");
+    EXPECT_TRUE(group.hasChildren);
+    EXPECT_FALSE(group.hasValue);
+    EXPECT_FALSE(group.hasTabularData);
+
+    const auto speed = dip::inspect_capabilities(env, "physics.speed");
+    EXPECT_TRUE(speed.hasValue);
+    EXPECT_TRUE(speed.hasSource);
+    EXPECT_TRUE(speed.hasProvenance);
+    EXPECT_FALSE(speed.hasChildren);
+    EXPECT_FALSE(speed.hasArrayData);
+    EXPECT_FALSE(speed.hasReferenceGraph);
+    EXPECT_FALSE(speed.sourceEditable);
+    EXPECT_FALSE(speed.directlyWritable);
+
+    EXPECT_TRUE(dip::inspect_capabilities(env, "samples").hasArrayData);
+    EXPECT_TRUE(dip::inspect_capabilities(env, "single").hasArrayData);
+    EXPECT_THROW(dip::inspect_capabilities(env, "missing"), std::out_of_range);
+
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto snapshot = std::filesystem::temp_directory_path() / ("snt-inspection-capabilities-" + suffix + ".diph5");
+    env.save(snapshot);
+    dip::reload_artifact(env, snapshot);
+    EXPECT_FALSE(dip::inspect_capabilities(env, "physics.speed").hasArrayData);
+    EXPECT_TRUE(dip::inspect_capabilities(env, "single").hasArrayData);
+    std::filesystem::remove(snapshot);
+}
+
+TEST(Inspection, SharedDiagnosticPreservesStructuredException) {
+    const dip::Line line{"value int = bad", {"parameters.dip", 12}};
+    const dip::SyntaxException error("Invalid value", "Expected integer", "Use an integer",
+                                     __FILE__, __LINE__, line);
+    const auto diagnostic = dip::diagnostic_from_exception(error);
+    EXPECT_EQ(diagnostic.severity, core::DiagnosticSeverity::Error);
+    EXPECT_EQ(diagnostic.code, "dip.syntax");
+    EXPECT_EQ(diagnostic.message, "Invalid value");
+    EXPECT_EQ(diagnostic.details, "Expected integer");
+    EXPECT_EQ(diagnostic.suggestion, "Use an integer");
+    ASSERT_TRUE(diagnostic.location.has_value());
+    EXPECT_EQ(diagnostic.location->source, "parameters.dip");
+    EXPECT_EQ(diagnostic.location->line, 12);
+    EXPECT_TRUE(diagnostic.origin.has_value());
+
+    const auto generic = dip::diagnostic_from_exception(std::invalid_argument("Invalid artifact"));
+    EXPECT_EQ(generic.code, "dip.error");
+    EXPECT_EQ(generic.message, "Invalid artifact");
+    EXPECT_FALSE(generic.location.has_value());
 }
 
 TEST(Inspection, ArtifactDetectionAndFreshReload) {
@@ -126,6 +182,7 @@ TEST(Inspection, ReadOnlyTableViewSurvivesSnapshot) {
     EXPECT_EQ(table.columns[0].name, "speed");
     EXPECT_EQ(table.columns[1].path, "measurements.count");
     EXPECT_TRUE(table.columns[0].units.has_value());
+    EXPECT_TRUE(dip::inspect_capabilities(env, "measurements").hasTabularData);
     EXPECT_EQ(dip::inspect_value(env, "measurements.count").table_path, "measurements");
     EXPECT_TRUE(dip::inspect_value(env, "measurements.extra").table_path.empty());
     EXPECT_EQ(dip::inspect_tables(env).size(), 1);

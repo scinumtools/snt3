@@ -64,3 +64,32 @@ version.
            auto first_row = snt::dip::read_value_slice(env, column.path, {{0, 0}});
        }
    }
+
+``inspect_capabilities`` reports which facts and operations are available at
+a value, group, collection, or table path. For example, ``hasTabularData`` is
+true at a table path and ``hasArrayData`` is true for array-valued nodes.
+``hasReferenceGraph``, ``sourceEditable``, and ``directlyWritable`` remain
+false until those operations are supported.
+
+.. code-block:: cpp
+
+   auto capabilities = snt::dip::inspect_capabilities(env, "measurements");
+   if (capabilities.hasTabularData) {
+       auto table = snt::dip::inspect_table(env, "measurements");
+   }
+
+Errors can be converted to the shared ``snt::core::Diagnostic`` type without
+parsing formatted exception text. It retains the exception category, message,
+details, suggestion, and available source locations. Current codes classify
+exception types, rather than individual error cases.
+
+.. code-block:: cpp
+
+   #include <snt/dip/diagnostic.h>
+
+   try {
+       snt::dip::reload_artifact(env, "DIPfile");
+   } catch (const std::exception& error) {
+       auto diagnostic = snt::dip::diagnostic_from_exception(error);
+       // Show diagnostic.message and diagnostic.location to the user.
+   }

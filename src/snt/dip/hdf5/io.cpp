@@ -761,6 +761,12 @@ namespace snt::dip::hdf5 {
                 node = std::make_shared<PersistedValueNode>(Path(path), std::move(value), dtype, units);
             else
                 node = std::make_shared<PersistedValueNode>(Path(path), value_dtype, dtype);
+            if (node->value && has_attribute(dataset, ATTR_ARRAY) &&
+                read_scalar<uint8_t>(dataset, ATTR_ARRAY, H5T_NATIVE_UINT8)) {
+                node->dimension.clear();
+                for (const auto extent : node->value->get_shape())
+                    node->dimension.push_back({extent, extent});
+            }
             node->constant = read_scalar<uint8_t>(dataset, ATTR_CONSTANT, H5T_NATIVE_UINT8) != 0;
             node->condition = read_string(dataset, ATTR_CONDITION);
             node->format = read_string(dataset, ATTR_FORMAT_SPEC);

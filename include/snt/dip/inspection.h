@@ -56,6 +56,24 @@ ValueInspection inspect_value(const Environment& env, std::string_view path);
 /** Values in environment order, each retaining its fully qualified path. */
 std::vector<ValueInspection> inspect_values(const Environment& env);
 
+/** Supported inspection operations and retained facts at a DIP path.
+ * hasReferenceGraph is false until dependency recording is implemented.
+ */
+struct InspectionCapabilities {
+    bool hasValue = false;
+    bool hasChildren = false;
+    bool hasSource = false;
+    bool hasProvenance = false;
+    bool hasTabularData = false;
+    bool hasArrayData = false;
+    bool hasReferenceGraph = false;
+    bool sourceEditable = false;
+    bool directlyWritable = false;
+};
+
+/** Works for evaluated value paths, groups, and collection paths. */
+InspectionCapabilities inspect_capabilities(const Environment& env, std::string_view path);
+
 /** Metadata for a table column; values remain in the environment. */
 struct TableColumnInspection {
     size_t index = 0;

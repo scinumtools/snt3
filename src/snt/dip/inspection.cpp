@@ -90,6 +90,41 @@ std::vector<ValueInspection> inspect_values(const Environment& env) {
     return result;
 }
 
+InspectionCapabilities inspect_capabilities(const Environment& env, std::string_view path) {
+    const std::string name(path);
+    InspectionCapabilities capabilities;
+    bool found = env.hierarchy.has_collection(name);
+    const std::string child_prefix = name + ".";
+    const std::string item_prefix = name + "[";
+    for (const auto& node : env.nodes.get_nodes()) {
+        if (!node) continue;
+        if (node->path.name == name) {
+            found = true;
+            capabilities.hasValue = bool(node->value);
+            capabilities.hasSource = !node->line.source.name.empty();
+            capabilities.hasProvenance = capabilities.hasSource || node->override ||
+                                         !node->modification_lines.empty();
+            capabilities.hasArrayData = node->value && !node->dimension.empty();
+        }
+        if (node->table_path == name) {
+            found = true;
+            capabilities.hasTabularData = true;
+        }
+        if (node->path.name.compare(0, child_prefix.size(), child_prefix) == 0 ||
+            node->path.name.compare(0, item_prefix.size(), item_prefix) == 0)
+            capabilities.hasChildren = true;
+    }
+    for (const auto& entry : env.hierarchy.get_collections()) {
+        const auto& collection_path = entry.first;
+        if (collection_path.compare(0, child_prefix.size(), child_prefix) == 0 ||
+            collection_path.compare(0, item_prefix.size(), item_prefix) == 0)
+            capabilities.hasChildren = true;
+    }
+    if (!found && !capabilities.hasChildren)
+        throw std::out_of_range("No evaluated DIP path found: " + name);
+    return capabilities;
+}
+
 TableInspection inspect_table(const Environment& env, std::string_view path) {
     TableInspection table;
     table.path = std::string(path);

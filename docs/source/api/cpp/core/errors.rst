@@ -6,4 +6,5 @@ Shared exception types and source-location information.
 .. doxygentopic:: snt::core
    :members:
    :undoc-members:
-   :headers: include/snt/core/exceptions.h
+   :headers: include/snt/core/diagnostic.h
+      include/snt/core/exceptions.h
