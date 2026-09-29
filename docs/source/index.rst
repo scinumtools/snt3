@@ -33,6 +33,7 @@ as well as JSON and YAML data files.
    introduction
    installation
    quickstart
+   initiative
 
 .. toctree::
    :maxdepth: 2

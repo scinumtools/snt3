@@ -51,6 +51,19 @@ exposes one evaluated and validated environment to every part of an
 application. The result is less duplicated glue code and a clearer boundary
 between a scientific model's assumptions and its implementation.
 
+## One parameter layer for many scientific codes
+
+<a href="https://vrtulka23.github.io/scinumtools3/initiative.html"><img align="left" src="docs/img/snt-initiative-readme.png" alt="A parameter model is validated and translated into a scientific code's native input file" width="180" height="180" hspace="16" style="margin-right:30px"></a>
+
+We are inviting maintainers of established, open-source scientific codes to
+try a shared, optional parameter layer. A project-specific adapter can turn a
+DIPL definition into its existing native input file, while SciNumTools handles
+units, constraints, dependencies, and parameter documentation. The first step
+keeps the solver and its native parser in place. [Read about the initiative
+and see the full flyer](https://vrtulka23.github.io/scinumtools3/initiative.html).
+
+<br clear="left">
+
 ## Features
 
 - **Unit-aware quantities:**
