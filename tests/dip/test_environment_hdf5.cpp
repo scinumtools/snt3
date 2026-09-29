@@ -6,6 +6,8 @@
 #include <limits>
 #include <hdf5.h>
 #include <snt/dip/cursor.h>
+#include <snt/dip/exceptions.h>
+#include <snt/dip/inspection.h>
 
 using namespace snt;
 
@@ -101,6 +103,47 @@ TEST(Environment, ExactNumericValuesSurviveHdf5RoundTrip) {
     EXPECT_EQ(loaded["matrix"].get_shape(), (val::Array::ShapeType{2, 2}));
     EXPECT_EQ(loaded["matrix"].as<std::vector<double>>(),
               (std::vector<double>{1.25, -2.5, 3.75, 4.5}));
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, RejectsCorruptModificationHistoryWithoutReplacingEnvironment) {
+    dip::DIP parser;
+    parser.add_string("answer int = 1\nanswer = 2\n");
+    const auto source = parser.parse();
+    auto env = source;
+    const auto file = environment_file("corrupt-modification-history");
+
+    auto corrupt_history = [&](bool remove_lines) {
+        source.save(file);
+        H5Handle h5file(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        ASSERT_GE(static_cast<hid_t>(h5file), 0);
+        H5Handle dataset(H5Dopen2(h5file, "/answer", H5P_DEFAULT), H5Dclose);
+        ASSERT_GE(static_cast<hid_t>(dataset), 0);
+        constexpr const char* lines_attribute = "_DIPL_Modification_Lines";
+        if (remove_lines) {
+            ASSERT_GE(H5Adelete(dataset, lines_attribute), 0);
+        } else {
+            H5Handle attribute(H5Aopen(dataset, lines_attribute, H5P_DEFAULT), H5Aclose);
+            ASSERT_GE(static_cast<hid_t>(attribute), 0);
+            H5Handle type(H5Aget_type(attribute), H5Tclose);
+            ASSERT_GE(static_cast<hid_t>(type), 0);
+            const char invalid_line[] = "x";
+            ASSERT_GE(H5Awrite(attribute, type, invalid_line), 0);
+        }
+    };
+
+    for (const bool remove_lines : {true, false}) {
+        SCOPED_TRACE(remove_lines ? "missing lines" : "invalid line number");
+        corrupt_history(remove_lines);
+        try {
+            dip::reload_artifact(env, file);
+            FAIL() << "Expected corrupted modification history to be rejected";
+        } catch (const dip::IOException& error) {
+            EXPECT_EQ(error.info().message, "Invalid value modification history");
+        }
+        EXPECT_EQ(env["answer"].as<int64_t>(), 2);
+        EXPECT_EQ(env.nodes.size(), 1);
+    }
     std::filesystem::remove(file);
 }
 
