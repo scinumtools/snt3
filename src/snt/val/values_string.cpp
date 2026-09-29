@@ -52,7 +52,7 @@ namespace snt::val {
         case core::DataType::Integer32: {
             std::vector<int64_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++) {
-                long n = std::stol(this->value[i]);
+                long long n = std::stoll(this->value[i]);
                 if (n < INT32_MIN || n > INT32_MAX)
                     throw val::TypeException(
                         "Integer range mismatch",
@@ -96,7 +96,7 @@ namespace snt::val {
         case core::DataType::Integer32_U: {
             std::vector<uint64_t> arr(this->value.size());
             for (size_t i = 0; i < this->value.size(); i++) {
-                unsigned long n = std::stoul(this->value[i]);
+                unsigned long long n = std::stoull(this->value[i]);
                 if (n > UINT32_MAX)
                     throw val::TypeException(
                         "Integer range mismatch",

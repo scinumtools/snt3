@@ -171,4 +171,8 @@ TEST(Casting, StringArrayRejectsInvalidBooleanCharacterAndIntegerRange) {
                      .cast_as(core::DataType::Integer32), val::TypeException);
     EXPECT_THROW(val::ArrayValueStr(std::vector<std::string>{"4294967296"})
                      .cast_as(core::DataType::Integer32_U), val::TypeException);
+    EXPECT_EQ(val::ArrayValueStr(std::vector<std::string>{"-2147483648", "2147483647"})
+                  .cast_as(core::DataType::Integer32)->to_string(), "[-2147483648, 2147483647]");
+    EXPECT_EQ(val::ArrayValueStr(std::vector<std::string>{"0", "4294967295"})
+                  .cast_as(core::DataType::Integer32_U)->to_string(), "[0, 4294967295]");
 }
