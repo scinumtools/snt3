@@ -265,7 +265,10 @@ namespace snt::bind::python {
                 py::module_ np = py::module_::import("numpy");
                 py::list items;
                 items.append(py::str(val->get_value(0)));
-                return np.attr("array")(items).attr("reshape")(shape);
+                py::tuple dimensions(shape.size());
+                for (size_t i = 0; i < shape.size(); ++i)
+                    dimensions[i] = py::cast(shape[i]);
+                return np.attr("array")(items).attr("reshape")(dimensions);
             } else { // return numpy array
                 py::list list;
                 // NOTE: For string-array conversion I could not find an alternative

@@ -127,6 +127,10 @@ def test_python_inspection_preserves_integer_precision_and_array_shape(tmp_path)
             assert inspected.shape == [1]
             values = inspected.to_numpy()
             assert values.shape == (1,)
+            if dtype == DataType.Integer64_U:
+                assert values.dtype == np.dtype("uint64")
+            elif dtype == DataType.Integer64:
+                assert values.dtype == np.dtype("int64")
             assert values[0] == expected
         grid = inspect_value(current, "grid")
         assert grid.shape == [2, 2]
