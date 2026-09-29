@@ -81,10 +81,16 @@ namespace snt::dip {
             }
         }
         // update node settings
+        size_t column_index = 0;
         for (const auto& node : nodes) {
             size_t size = node->value_raw.size();
             node->indent += indent;
             node->path.name = path.name + std::string(1, SIGN_SEPARATOR) + node->path.name;
+            if (auto column = std::dynamic_pointer_cast<ValueNode>(node)) {
+                column->table_path = full_name;
+                column->table_column_index = column_index;
+            }
+            ++column_index;
             node->path.collections.insert(
                 node->path.collections.begin(), path.collections.begin(), path.collections.end()
             );

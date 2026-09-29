@@ -90,6 +90,9 @@ namespace snt::dip {
         bool constant;
         bool override = false; ///< Value was selected by an explicit $override.
         Line override_line;    ///< Source of the effective override value.
+        std::vector<Line> modification_lines; ///< Applied value modifications in evaluation order.
+        std::string table_path; ///< Parent table when this value is a parsed table column.
+        size_t table_column_index = 0; ///< Position in the original table header.
         std::string condition;
         std::vector<OptionStruct> options;
         std::string format;

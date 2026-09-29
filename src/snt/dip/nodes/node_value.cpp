@@ -58,7 +58,8 @@ namespace snt::dip {
 
     ValueNode::ValueNode(const ValueNode& other)
         : units(other.units), tags(other.tags), constant(other.constant), override(other.override),
-          override_line(other.override_line), metadata(other.metadata),
+          override_line(other.override_line), modification_lines(other.modification_lines), table_path(other.table_path),
+          table_column_index(other.table_column_index), metadata(other.metadata),
           condition(other.condition), format(other.format), value_dtype(other.value_dtype), BaseNode(other) {
         options.reserve(other.options.size());
         for (const auto& option : other.options) {
@@ -413,6 +414,7 @@ namespace snt::dip {
         }
         value_raw = node->value_raw;
         set_value(std::move(value));
+        modification_lines.push_back(node->line);
     }
 
     bool ValueNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {

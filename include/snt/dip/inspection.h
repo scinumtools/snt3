@@ -27,6 +27,13 @@ Environment open_artifact(const std::filesystem::path& path);
 void reload_artifact(Environment& current, const std::filesystem::path& path);
 
 /** Owned, read-only facts about one evaluated value. */
+enum class ValueChangeKind { Declaration, Modification, Override };
+
+struct ValueChange {
+    ValueChangeKind kind;
+    core::SourceLocation location;
+};
+
 struct ValueInspection {
     std::string path;
     core::DataType type;
@@ -40,12 +47,34 @@ struct ValueInspection {
     std::optional<core::SourceLocation> override_location;
     std::vector<SchemaInfo> applied_schemas;
     std::optional<SchemaInfo> contributing_schema;
+    std::string table_path; ///< Empty unless the value is a table column.
+    std::vector<ValueChange> changes; ///< Applied changes in evaluation order.
 };
 
 ValueInspection inspect_value(const Environment& env, std::string_view path);
 
 /** Values in environment order, each retaining its fully qualified path. */
 std::vector<ValueInspection> inspect_values(const Environment& env);
+
+/** Metadata for a table column; values remain in the environment. */
+struct TableColumnInspection {
+    size_t index = 0;
+    std::string name;
+    std::string path;
+    core::DataType type;
+    std::optional<puq::Quantity> units;
+    ValueMetadata metadata;
+};
+
+/** A read-only view of an evaluated DIPL table. */
+struct TableInspection {
+    std::string path;
+    size_t rows = 0;
+    std::vector<TableColumnInspection> columns;
+};
+
+TableInspection inspect_table(const Environment& env, std::string_view path);
+std::vector<TableInspection> inspect_tables(const Environment& env);
 
 /** Read an in-memory value slice without first cloning the whole array.
  * Ranges are zero-based and inclusive. This does not perform lazy DIPH5 I/O.

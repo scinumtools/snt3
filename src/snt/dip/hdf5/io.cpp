@@ -529,6 +529,10 @@ namespace snt::dip::hdf5 {
             write_strings(dataset, ATTR_SCHEMAS, node.schemas);
             if (!node.schema_id.empty())
                 write_string(dataset, ATTR_NODE_SCHEMA_ID, node.schema_id);
+            if (!node.table_path.empty()) {
+                write_string(dataset, ATTR_TABLE_PATH, node.table_path);
+                write_scalar<uint64_t>(dataset, ATTR_TABLE_COLUMN_INDEX, H5T_NATIVE_UINT64, node.table_column_index);
+            }
             write_scalar<uint8_t>(dataset, ATTR_OVERRIDE, H5T_NATIVE_UINT8, node.override);
             if (node.override) {
                 write_string(dataset, ATTR_OVERRIDE_SOURCE, node.override_line.source.name);
@@ -536,6 +540,17 @@ namespace snt::dip::hdf5 {
                     dataset, ATTR_OVERRIDE_LINE, H5T_NATIVE_UINT64, node.override_line.source.line_number
                 );
                 write_string(dataset, ATTR_OVERRIDE_CODE, node.override_line.code);
+            }
+            if (!node.modification_lines.empty()) {
+                std::vector<std::string> sources, lines, codes;
+                for (const auto& modification : node.modification_lines) {
+                    sources.push_back(modification.source.name);
+                    lines.push_back(std::to_string(modification.source.line_number));
+                    codes.push_back(modification.code);
+                }
+                write_strings(dataset, ATTR_MODIFICATION_SOURCES, sources);
+                write_strings(dataset, ATTR_MODIFICATION_LINES, lines);
+                write_strings(dataset, ATTR_MODIFICATION_CODES, codes);
             }
             if (node.units)
                 write_string(dataset, "units", node.units->to_string());
@@ -758,12 +773,40 @@ namespace snt::dip::hdf5 {
             }
             node->schemas = read_strings(dataset, ATTR_SCHEMAS);
             node->schema_id = read_string(dataset, ATTR_NODE_SCHEMA_ID);
+            node->table_path = read_string(dataset, ATTR_TABLE_PATH);
+            if (!node->table_path.empty() && has_attribute(dataset, ATTR_TABLE_COLUMN_INDEX))
+                node->table_column_index = read_scalar<uint64_t>(dataset, ATTR_TABLE_COLUMN_INDEX, H5T_NATIVE_UINT64);
             node->override = read_scalar<uint8_t>(dataset, ATTR_OVERRIDE, H5T_NATIVE_UINT8) != 0;
             if (node->override) {
                 node->override_line.source.name = read_string(dataset, ATTR_OVERRIDE_SOURCE);
                 node->override_line.source.line_number =
                     read_scalar<uint64_t>(dataset, ATTR_OVERRIDE_LINE, H5T_NATIVE_UINT64);
                 node->override_line.code = read_string(dataset, ATTR_OVERRIDE_CODE);
+            }
+            const auto modification_sources = read_strings(dataset, ATTR_MODIFICATION_SOURCES);
+            const auto modification_lines = read_strings(dataset, ATTR_MODIFICATION_LINES);
+            const auto modification_codes = read_strings(dataset, ATTR_MODIFICATION_CODES);
+            if (modification_sources.size() != modification_lines.size() ||
+                modification_sources.size() != modification_codes.size())
+                throw dip::IOException(
+                    "Invalid value modification history",
+                    "The persisted modification attributes have different lengths for `" + path + "`.",
+                    "Use a DIPH5 file with matching modification sources, lines, and codes.",
+                    __FILE__, __LINE__
+                );
+            for (size_t i = 0; i < modification_sources.size(); ++i) {
+                try {
+                    node->modification_lines.push_back(
+                        {modification_codes[i], {modification_sources[i], std::stoull(modification_lines[i])}}
+                    );
+                } catch (const std::exception&) {
+                    throw dip::IOException(
+                        "Invalid value modification history",
+                        "A persisted modification line number is invalid for `" + path + "`.",
+                        "Use a DIPH5 file with valid modification line numbers.",
+                        __FILE__, __LINE__
+                    );
+                }
             }
             if (!node->schemas.empty())
                 throw dip::IOException(

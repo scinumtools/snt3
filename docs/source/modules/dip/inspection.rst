@@ -19,11 +19,12 @@ order with their full paths.
        auto replacement = *speed.override_location;
    }
 
-This is the current declaration and applied override, when present. It is
-not a history of every modification. The ``provenance`` member retains the
-existing source manifest details; ``contributing_schema`` identifies a schema
-that supplied the value when known. A loaded DIPH5 environment contains only
-provenance retained in the snapshot.
+The ``changes`` member lists the declaration, applied value modifications, and
+an effective override in evaluation order, with source locations. Changes
+ignored because of an override are not included. The ``provenance`` member
+retains the existing source manifest details; ``contributing_schema``
+identifies a schema that supplied the value when known. A loaded DIPH5
+environment contains only provenance retained in the snapshot.
 
 ``detect_artifact(path)`` classifies conventional names: ``DIPfile``,
 ``.dip`` or ``.dipl``, ``.dipt``, and ``.diph5``. It does not validate file
@@ -47,3 +48,19 @@ ranges and returns a typed VAL value containing the selected elements:
 
 This slices an already evaluated value. DIPH5 loading remains eager; this API
 does not provide disk-backed lazy reads.
+
+Tables are represented by evaluated column arrays. ``inspect_table`` exposes
+their shared row count and ordered column metadata, including types and units,
+without copying column values. Use ``read_value_slice`` with a column path to
+read a range. ``inspect_tables`` lists the tables in an environment. Table
+identity is retained when saving and loading DIPH5 files produced by this
+version.
+
+.. code-block:: cpp
+
+   auto table = snt::dip::inspect_table(env, "measurements");
+   if (table.rows > 0) {
+       for (const auto& column : table.columns) {
+           auto first_row = snt::dip::read_value_slice(env, column.path, {{0, 0}});
+       }
+   }

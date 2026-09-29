@@ -24,6 +24,9 @@ TEST(Inspection, EvaluatedValuesAndProvenance) {
     EXPECT_EQ(speed.metadata.description, "Flow speed");
     EXPECT_TRUE(speed.units.has_value());
     EXPECT_TRUE(speed.override_location.has_value());
+    ASSERT_EQ(speed.changes.size(), 2);
+    EXPECT_EQ(speed.changes[0].kind, dip::ValueChangeKind::Declaration);
+    EXPECT_EQ(speed.changes[1].kind, dip::ValueChangeKind::Override);
     EXPECT_EQ(speed.override_location->line, 1);
     EXPECT_FALSE(speed.declaration_location.source.empty());
     EXPECT_TRUE(speed.contributing_schema.has_value());
@@ -86,4 +89,56 @@ TEST(Inspection, BoundedInMemorySlice) {
     EXPECT_EQ(integers->get_values(), (std::vector<int64_t>{2, 3, 4}));
     EXPECT_THROW(dip::read_value_slice(env, "samples", {{4, 7}}), std::out_of_range);
     EXPECT_THROW(dip::read_value_slice(env, "samples", {}), std::invalid_argument);
+}
+
+TEST(Inspection, AppliedModificationHistorySurvivesSnapshot) {
+    dip::DIP parser;
+    parser.add_string("answer int = 1\nanswer = 2\nanswer = 3\n");
+    auto env = parser.parse();
+    auto value = dip::inspect_value(env, "answer");
+    ASSERT_EQ(value.changes.size(), 3);
+    EXPECT_EQ(value.changes[0].kind, dip::ValueChangeKind::Declaration);
+    EXPECT_EQ(value.changes[1].kind, dip::ValueChangeKind::Modification);
+    EXPECT_EQ(value.changes[1].location.line, 2);
+    EXPECT_EQ(value.changes[2].location.line, 3);
+    EXPECT_EQ(env["answer"].as<int>(), 3);
+
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto snapshot = std::filesystem::temp_directory_path() / ("snt-inspection-history-" + suffix + ".diph5");
+    env.save(snapshot);
+    dip::reload_artifact(env, snapshot);
+    value = dip::inspect_value(env, "answer");
+    ASSERT_EQ(value.changes.size(), 3);
+    EXPECT_EQ(value.changes[1].location.line, 2);
+    EXPECT_EQ(value.changes[2].location.line, 3);
+    std::filesystem::remove(snapshot);
+}
+
+TEST(Inspection, ReadOnlyTableViewSurvivesSnapshot) {
+    dip::DIP parser;
+    parser.add_string("measurements table = \"\"\"speed float m/s\ncount int\n---\n2 1\n3 2\n\"\"\"\n");
+    parser.add_string("measurements.extra int[2] = [8, 9]\n");
+    auto env = parser.parse();
+
+    const auto table = dip::inspect_table(env, "measurements");
+    EXPECT_EQ(table.rows, 2);
+    ASSERT_EQ(table.columns.size(), 2);
+    EXPECT_EQ(table.columns[0].name, "speed");
+    EXPECT_EQ(table.columns[1].path, "measurements.count");
+    EXPECT_TRUE(table.columns[0].units.has_value());
+    EXPECT_EQ(dip::inspect_value(env, "measurements.count").table_path, "measurements");
+    EXPECT_TRUE(dip::inspect_value(env, "measurements.extra").table_path.empty());
+    EXPECT_EQ(dip::inspect_tables(env).size(), 1);
+
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto snapshot = std::filesystem::temp_directory_path() / ("snt-inspection-table-" + suffix + ".diph5");
+    env.save(snapshot);
+    dip::reload_artifact(env, snapshot);
+    const auto restored = dip::inspect_table(env, "measurements");
+    EXPECT_EQ(restored.rows, 2);
+    ASSERT_EQ(restored.columns.size(), 2);
+    EXPECT_EQ(restored.columns[0].name, "speed");
+    EXPECT_EQ(restored.columns[1].name, "count");
+    EXPECT_THROW(dip::inspect_table(env, "measurements.extra"), std::out_of_range);
+    std::filesystem::remove(snapshot);
 }

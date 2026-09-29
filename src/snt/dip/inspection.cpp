@@ -3,7 +3,9 @@
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 
+#include <algorithm>
 #include <stdexcept>
+#include <set>
 #include <utility>
 
 namespace snt::dip {
@@ -66,9 +68,17 @@ ValueInspection inspect_value(const Environment& env, std::string_view path) {
     if (node->override)
         replacement = location(provenance.override_source, node->override_line.source.name,
                                provenance.override_line, provenance.override_code);
+    std::vector<ValueChange> changes{{ValueChangeKind::Declaration, declaration}};
+    for (const auto& line : node->modification_lines)
+        changes.push_back({ValueChangeKind::Modification,
+                           location(env.get_source_info(line.source.name), line.source.name,
+                                    line.source.line_number, line.code)});
+    if (replacement)
+        changes.push_back({ValueChangeKind::Override, *replacement});
     return {name, node->value->get_dtype(), node->value->get_shape(), node->value->clone(),
             node->units, node->metadata, node->tags, provenance, declaration, replacement,
-            env.get_applied_schemas(name), env.get_contributing_schema(name)};
+            env.get_applied_schemas(name), env.get_contributing_schema(name), node->table_path,
+            std::move(changes)};
 }
 
 std::vector<ValueInspection> inspect_values(const Environment& env) {
@@ -76,6 +86,40 @@ std::vector<ValueInspection> inspect_values(const Environment& env) {
     result.reserve(env.nodes.size());
     for (const auto& node : env.nodes.get_nodes()) {
         if (node && node->value) result.push_back(inspect_value(env, node->path.name));
+    }
+    return result;
+}
+
+TableInspection inspect_table(const Environment& env, std::string_view path) {
+    TableInspection table;
+    table.path = std::string(path);
+    const std::string prefix = table.path + ".";
+    for (const auto& node : env.nodes.get_nodes()) {
+        if (!node || node->table_path != table.path) continue;
+        if (!node->value)
+            throw std::invalid_argument("The table column has no evaluated value: " + node->path.name);
+        const auto shape = node->value->get_shape();
+        if (shape.size() != 1 || (!table.columns.empty() && shape[0] != table.rows))
+            throw std::invalid_argument("The table columns have inconsistent shapes: " + table.path);
+        if (node->path.name.compare(0, prefix.size(), prefix) != 0)
+            throw std::invalid_argument("The table column is outside its table: " + node->path.name);
+        table.rows = shape[0];
+        table.columns.push_back({node->table_column_index, node->path.name.substr(prefix.size()), node->path.name,
+                                 node->value->get_dtype(), node->units, node->metadata});
+    }
+    if (table.columns.empty())
+        throw std::out_of_range("No evaluated table found: " + table.path);
+    std::stable_sort(table.columns.begin(), table.columns.end(),
+                     [](const auto& a, const auto& b) { return a.index < b.index; });
+    return table;
+}
+
+std::vector<TableInspection> inspect_tables(const Environment& env) {
+    std::vector<TableInspection> result;
+    std::set<std::string> seen;
+    for (const auto& node : env.nodes.get_nodes()) {
+        if (node && !node->table_path.empty() && seen.insert(node->table_path).second)
+            result.push_back(inspect_table(env, node->table_path));
     }
     return result;
 }

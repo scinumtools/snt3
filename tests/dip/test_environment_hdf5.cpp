@@ -320,7 +320,7 @@ TEST(Environment, SaveHdf5Content) {
         H5Handle minor_version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
         uint64_t minor_version = 0;
         ASSERT_GE(H5Aread(minor_version_attribute, H5T_NATIVE_UINT64, &minor_version), 0);
-    EXPECT_EQ(minor_version, 5);
+        EXPECT_EQ(minor_version, 6);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Trace", H5P_DEFAULT), 0);
         H5Handle source_manifest(H5Gopen2(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), H5Gclose);

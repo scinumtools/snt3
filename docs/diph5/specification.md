@@ -1,6 +1,6 @@
 % SciNumTools DIPH5
 % Environment HDF5 Format Specification
-% Version 2.5
+% Version 2.6
 
 # Scope
 
@@ -33,7 +33,9 @@ source nodes, or executable functions. Version 2.2 adds `value_group` objects.
 Version 2.3 persists custom PUEL unit registrations required to interpret
 evaluated quantities. Version 2.4 adds descriptive schema metadata and source
 locations to schema trace entries. Version 2.5 records which evaluated values
-were overridden and where their replacement values originated. A loaded DIPH5 file must therefore be
+were overridden and where their replacement values originated. Version 2.6
+retains applied value modifications and the parent table and original column
+order for table columns. A loaded DIPH5 file must therefore be
 treated as an evaluated environment, not as a source from which the original
 DIPL program can be reconstructed exactly.
 
@@ -45,11 +47,11 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
-| `_DIPL_Schema_Version_Minor` | unsigned integer | `5` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `6` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2.5 readers support version 1 files and versions 2.0
-through 2.5. Future schema
+schema version. Version 2.6 readers support version 1 files and versions 2.0
+through 2.6. Future schema
 revisions MUST preserve the meaning of existing attributes or increment the
 major or minor schema version.
 
@@ -146,6 +148,18 @@ Version 2.5 adds `_DIPL_Override` (unsigned 8-bit boolean) to each value
 dataset. If true, `_DIPL_Override_Source`, `_DIPL_Override_Line`, and
 `_DIPL_Override_Code` identify the modification that supplied the effective
 value. The ordinary source attributes continue to identify the declaration.
+
+Version 2.6 adds `_DIPL_Modification_Sources`, `_DIPL_Modification_Lines`, and
+`_DIPL_Modification_Codes` as equal-length UTF-8 string arrays. They record
+applied value modifications in evaluation order; line numbers are decimal
+strings. Ignored changes are not included. The declaration and effective
+override remain in their existing attributes.
+
+Version 2.6 also adds `_DIPL_Table_Path` (UTF-8 string) and
+`_DIPL_Table_Column_Index` (unsigned integer) to datasets produced from a
+table declaration. The path identifies the parent DIPL table, and the index
+preserves its column order. Both attributes are absent on ordinary value
+datasets. Older files remain readable, but they do not retain table identity.
 
 Source and provenance information uses `_DIPL_Source`, `_DIPL_Source_Line`,
 `_DIPL_Source_Code`, and the metadata attributes `description`, `authors`,
