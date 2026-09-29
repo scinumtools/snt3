@@ -31,8 +31,8 @@ Usage:
 
 Description:
   Generate a report from an evaluated DIP environment using Brief++.
-  The report includes values, parameter paths, sources, custom units, schemas,
-  overrides, and available publication metadata.
+  The report includes values, types, table summaries, applied changes, sources,
+  custom units, schemas, overrides where present, and publication metadata.
 
 Options:
   -h, --help

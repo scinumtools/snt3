@@ -4,7 +4,7 @@ file(MAKE_DIRECTORY "${project_dir}")
 file(WRITE "${project_dir}/settings.dipl"
   "?descr \"Reusable settings\"\n?title \"Schema & paper\"\nspeed float = 2 m/s\n  ?descr \"Flow & speed_#%\"\n")
 file(WRITE "${project_dir}/parameters.dip"
-  "physics : settings\nname str = \"A&B_#%\"\n  ?title \"Value study\"\n  ?doi \"10.1/example_#\"\n")
+  "physics : settings\nname str = \"A&B_#%\"\n  ?title \"Value study\"\n  ?doi \"10.1/example_#\"\nduration float = 12 h\nduration = 14 h\nmeasurements table = \"\"\"temperature float K\ntime float s\n---\n295 0\n296 1\n\"\"\"\n")
 file(WRITE "${project_dir}/DIPfile"
   "units[]\n  name = \"custom_length\"\n  unit = \"2*m\"\nschemas[]\n  name = \"settings\"\n  file = \"settings.dipl\"\ncode[]\n  file = \"parameters.dip\"\n")
 file(WRITE "${project_dir}/intro.tex" "This model uses \\textbf{measured} values.\n")
@@ -36,7 +36,8 @@ if(NOT absolute_source_pos EQUAL -1)
 endif()
 foreach(expected IN ITEMS "\\begin{titlepage}" "\\tableofcontents" "\\usepackage{hyperref}"
     "\\section{Parameters}" "Demo \\& report" "Ada\\_Lovelace" "2026-09-28"
-    "draft\\_1" "Introduction" "measured" "physics.speed" "3" "m/s" "Overridden" "Override at"
+    "draft\\_1" "Introduction" "measured" "physics.speed" "3" "m/s" "Override at"
+    "Modified at" "Modification" "\\section{Tables}" "\\sntnode{measurements}" "Column 1"
     "Reusable settings" "Schema \\& paper" "Flow \\& speed\\_\\#\\%" "Value study"
     "10.1/example\\_\\#" "A\\&B\\_\\#\\%" "Sources"
     "Custom units" "\\sntnode{settings}" "\\sntnode{custom\\_length}"
@@ -46,6 +47,17 @@ foreach(expected IN ITEMS "\\begin{titlepage}" "\\tableofcontents" "\\usepackage
     message(FATAL_ERROR "TeX report is missing '${expected}'")
   endif()
 endforeach()
+string(REGEX MATCH "Content hash & SHA-256: ([0-9a-f]+)[.][.][.]" abbreviated_hash "${tex}")
+if(NOT abbreviated_hash)
+  message(FATAL_ERROR "TeX report is missing an abbreviated source hash")
+endif()
+string(LENGTH "${CMAKE_MATCH_1}" hash_length)
+if(NOT hash_length EQUAL 16)
+  message(FATAL_ERROR "Source hash prefix should contain 16 characters, got ${hash_length}")
+endif()
+if(tex MATCHES "Overridden")
+  message(FATAL_ERROR "Override location already conveys status; report should not repeat it")
+endif()
 if(tex MATCHES "\\\\section\\*\\{Hierarchy\\}")
   message(FATAL_ERROR "Report still contains a hierarchy section")
 endif()
@@ -62,12 +74,19 @@ foreach(format IN ITEMS md rst html typ txt json)
     --format "${format}" --output "${rendered}"
     --date "2026-09-28" --report-version "draft_1")
   file(READ "${rendered}" result)
-  foreach(expected IN ITEMS "physics.speed" "Override at" "Custom units" "Flow")
+  foreach(expected IN ITEMS "physics.speed" "Override at" "Modified at" "Tables" "Column 1" "Custom units" "Flow")
     string(FIND "${result}" "${expected}" index)
     if(index EQUAL -1)
       message(FATAL_ERROR "${format} report is missing '${expected}'")
     endif()
   endforeach()
+  if(format STREQUAL "json")
+    string(REGEX MATCH "SHA-256: ([0-9a-f]+)" json_hash "${result}")
+    string(LENGTH "${CMAKE_MATCH_1}" json_hash_length)
+    if(NOT json_hash_length EQUAL 64)
+      message(FATAL_ERROR "JSON report should retain the full SHA-256 digest")
+    endif()
+  endif()
 endforeach()
 run_report(failure --project "${project_dir}/DIPfile" --intro "${project_dir}/intro.tex"
   --format html --output "${TEST_DIR}/bad.html")
@@ -83,7 +102,7 @@ if(NOT save_status EQUAL 0)
 endif()
 run_report(success --load "${snapshot}" --output "${TEST_DIR}/loaded.tex")
 file(READ "${TEST_DIR}/loaded.tex" loaded)
-foreach(expected IN ITEMS "physics.speed" "Overridden" "Override at" "Reusable settings"
+foreach(expected IN ITEMS "physics.speed" "Override at" "Modified at" "Tables" "Column 1" "Reusable settings"
     "Schema \\& paper" "Sources" "Custom units" "custom\\_length")
   string(FIND "${loaded}" "${expected}" index)
   if(index EQUAL -1)
@@ -96,6 +115,9 @@ run_report(success --input string "count int = 7" --output "${TEST_DIR}/inline.t
 file(READ "${TEST_DIR}/inline.tex" inline)
 if(NOT inline MATCHES "count" OR NOT inline MATCHES "Value.*7")
   message(FATAL_ERROR "Inline DIPL input is missing from its report")
+endif()
+if(inline MATCHES "Overridden|Override at")
+  message(FATAL_ERROR "An unmodified parameter should not show override status")
 endif()
 
 if(UNIX)

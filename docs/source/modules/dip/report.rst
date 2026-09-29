@@ -79,11 +79,18 @@ Set the date and version explicitly when a reproducible cover matters.
 ``source_root`` to a project directory to show source paths relative to it
 when possible.
 
-The report contains effective values and units, descriptions, parameter
-paths, schema information, override status, source provenance, custom units,
-registered function names, and available publication references. Entries are
-sorted by path or name. The PDF has a cover, linked contents page, and
-matching shaded headings for parameters, schemas, sources, and custom units.
+The report contains effective values, types, array shapes and units,
+descriptions, parameter paths, schema information, source provenance, custom
+units, registered function names, and available publication references.
+Applied value modifications appear in order with their source locations.
+Override information appears only for overridden parameters. Evaluated tables
+have a summary of their row count and ordered column names, types, and units;
+their column values remain in the Parameters section. Entries are sorted by
+path or name. The PDF has a cover, linked contents page, and matching shaded
+headings for parameters, tables, schemas, sources, and custom units.
+Human-readable reports show a 16-character prefix of each source content hash
+for readability. The JSON report, environment, and DIPH5 snapshot retain full
+digests.
 Parameter paths retain their group names; there is no separate hierarchy
 section. Built-in PUQ unit catalogues and executable function bodies are not
 included.

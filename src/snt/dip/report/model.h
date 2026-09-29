@@ -17,12 +17,23 @@ struct Origin {
 };
 
 struct Parameter {
-    std::string path, value, units, description;
+    std::string path, value, units, type, shape, description;
     std::vector<std::string> applied_schemas;
     std::string contributing_schema;
     bool overridden = false;
     Origin declaration, replacement;
+    std::vector<Origin> modifications;
     Publication publication;
+};
+
+struct TableColumn {
+    std::string name, type, units;
+};
+
+struct Table {
+    std::string path;
+    size_t rows = 0;
+    std::vector<TableColumn> columns;
 };
 
 struct Schema {
@@ -50,6 +61,7 @@ struct Document {
     std::string title, author, date, version;
     bool loaded_snapshot = false;
     std::vector<Parameter> parameters;
+    std::vector<Table> tables;
     std::vector<Schema> schemas;
     std::vector<Source> sources;
     std::vector<Unit> units;

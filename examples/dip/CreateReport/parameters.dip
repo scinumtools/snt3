@@ -21,3 +21,10 @@ experiment
     ?descr "Initial outlet temperature"
   sensor : sensor
   analysis : analysis
+  readings table = """time float s
+temperature float K
+---
+0 295
+1 296
+2 297
+"""

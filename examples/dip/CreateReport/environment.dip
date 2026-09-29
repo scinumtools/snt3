@@ -5,3 +5,5 @@ lab
     ?descr "Ambient pressure during the demonstration"
   operator str = "Example Research Team"
     ?descr "Team responsible for this mock run"
+
+experiment.sample_count = 60

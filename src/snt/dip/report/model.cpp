@@ -1,6 +1,7 @@
 #include "model.h"
 
 #include <algorithm>
+#include <snt/dip/inspection.h>
 
 namespace snt::dip::report {
 
@@ -21,6 +22,21 @@ Origin origin_of(const std::string& name, size_t line, const std::string& code,
                  const std::optional<dip::SourceInfo>& source, const std::filesystem::path& source_root) {
     return {name, source ? display_path(source->path, source_root) : "", code, line};
 }
+
+std::string type_name(core::DataType type) {
+    const auto found = core::DataTypeNames.find(type);
+    return found == core::DataTypeNames.end() ? "unknown" : found->second;
+}
+
+std::string shape_of(const dip::ValueNode& node) {
+    if (node.dimension.empty() || !node.value) return "";
+    std::string result;
+    for (const auto extent : node.value->get_shape()) {
+        if (!result.empty()) result += " x ";
+        result += std::to_string(extent);
+    }
+    return result;
+}
 } // namespace
 
 Document build_document(const dip::Environment& env, std::string input_label, std::string introduction_tex,
@@ -40,6 +56,8 @@ Document build_document(const dip::Environment& env, std::string input_label, st
         item.path = node->path.name;
         item.value = node->value ? node->value->to_string() : "none";
         item.units = node->units ? node->units->to_string() : "";
+        item.type = type_name(node->value ? node->value->get_dtype() : node->value_dtype);
+        item.shape = shape_of(*node);
         item.description = node->metadata.description;
         item.publication = publication_of(node->metadata);
         item.overridden = node->override;
@@ -49,6 +67,9 @@ Document build_document(const dip::Environment& env, std::string input_label, st
             item.replacement = origin_of(node->override_line.source.name, node->override_line.source.line_number,
                                          node->override_line.code, env.get_source_info(node->override_line.source.name),
                                          source_root);
+        for (const auto& change : node->modification_lines)
+            item.modifications.push_back(origin_of(change.source.name, change.source.line_number, change.code,
+                                                   env.get_source_info(change.source.name), source_root));
         for (const auto& schema : env.get_applied_schemas(item.path))
             item.applied_schemas.push_back(schema.name);
         if (const auto schema = env.get_contributing_schema(item.path))
@@ -56,6 +77,19 @@ Document build_document(const dip::Environment& env, std::string input_label, st
         document.parameters.push_back(std::move(item));
     }
     std::sort(document.parameters.begin(), document.parameters.end(), [](const Parameter& a, const Parameter& b) {
+        return a.path < b.path;
+    });
+
+    for (const auto& inspected : dip::inspect_tables(env)) {
+        Table table;
+        table.path = inspected.path;
+        table.rows = inspected.rows;
+        for (const auto& column : inspected.columns)
+            table.columns.push_back({column.name, type_name(column.type),
+                                     column.units ? column.units->to_string() : ""});
+        document.tables.push_back(std::move(table));
+    }
+    std::sort(document.tables.begin(), document.tables.end(), [](const Table& a, const Table& b) {
         return a.path < b.path;
     });
 

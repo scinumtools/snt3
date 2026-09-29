@@ -43,6 +43,13 @@ std::string joined(const std::vector<std::string>& items) {
     return result;
 }
 
+std::string displayed_hash(const std::string& hash) {
+    constexpr std::size_t visible_characters = 16;
+    return hash.size() > visible_characters
+        ? hash.substr(0, visible_characters) + "..."
+        : hash;
+}
+
 Rows publication_rows(const Publication& publication) {
     Rows rows;
     add_row(rows, "Authors", publication.authors);
@@ -72,12 +79,13 @@ std::string preamble(const Document& document) {
 \setlength{\parindent}{0pt}
 \setlength{\LTpre}{0pt}
 \setlength{\LTpost}{0pt}
-\renewcommand{\arraystretch}{0.9}
+\setlength{\LTleft}{0pt}
+\renewcommand{\arraystretch}{0.82}
 \newcommand{\sntnode}[1]{%
-  \par\vspace{0.45em}\noindent
+  \par\vspace{0.35em}\noindent
   \colorbox{sntNodeFill}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
     \textcolor{sntBlue}{\textbf{\texttt{#1}}}}}%
-  \par\nobreak\vspace{0.08em}%
+  \par\nobreak\vspace{0.03em}%
 }
 \makeatletter
 \renewcommand{\maketitle}{%
@@ -123,13 +131,18 @@ std::string render_document(const Document& document, ReportFormat format) {
         auto& node = add_heading(parameters, item.path, latex);
         Rows primary, metadata, source;
         add_row(primary, "Value", item.value);
+        add_row(primary, "Type", item.type);
+        add_row(primary, "Shape", item.shape);
         add_row(primary, "Units", item.units);
         add_row(metadata, "Description", item.description);
         add_row(metadata, "Applied schemas", joined(item.applied_schemas));
         add_row(metadata, "Contributing schema", item.contributing_schema);
-        add_row(source, "Overridden", item.overridden ? "yes" : "no");
         add_row(source, "Declared at", location(item.declaration));
         add_row(source, "Declaration", item.declaration.code);
+        for (const auto& modification : item.modifications) {
+            add_row(source, "Modified at", location(modification));
+            add_row(source, "Modification", modification.code);
+        }
         if (item.overridden) {
             add_row(source, "Override at", location(item.replacement));
             add_row(source, "Override", item.replacement.code);
@@ -138,6 +151,26 @@ std::string render_document(const Document& document, ReportFormat format) {
         add_table(node, "snt-metadata", metadata);
         add_table(node, "snt-source", source);
         add_table(node, "snt-metadata", publication_rows(item.publication));
+    }
+
+    if (!document.tables.empty()) {
+        auto& tables = report.section("Tables");
+        tables.paragraph("Column values are listed under Parameters.");
+        for (const auto& table : document.tables) {
+            auto& node = add_heading(tables, table.path, latex);
+            Rows details, columns;
+            add_row(details, "Rows", std::to_string(table.rows));
+            add_row(details, "Columns", std::to_string(table.columns.size()));
+            for (size_t i = 0; i < table.columns.size(); ++i) {
+                const auto& column = table.columns[i];
+                std::string description = column.name + " (" + column.type;
+                if (!column.units.empty()) description += ", " + column.units;
+                description += ")";
+                columns.emplace_back("Column " + std::to_string(i + 1), std::move(description));
+            }
+            add_table(node, "snt-primary", details);
+            add_table(node, "snt-metadata", columns);
+        }
     }
 
     if (!document.schemas.empty()) {
@@ -160,7 +193,11 @@ std::string render_document(const Document& document, ReportFormat format) {
         add_row(details, "Path", source.path);
         add_row(details, "Parent", source.parent);
         if (source.parent_line) add_row(details, "Parent line", std::to_string(source.parent_line));
-        if (!source.hash.empty()) add_row(details, "Content hash", source.hash_algorithm + ": " + source.hash);
+        if (!source.hash.empty()) {
+            const auto& hash = source.hash;
+            add_row(details, "Content hash", source.hash_algorithm + ": " +
+                (format == ReportFormat::Json ? hash : displayed_hash(hash)));
+        }
         add_table(node, "snt-source", details);
     }
 
@@ -188,9 +225,9 @@ std::string render_document(const Document& document, ReportFormat format) {
     case ReportFormat::Pdf: {
         briefpp::LatexRenderer renderer;
         renderer.package("xcolor").package("array").preamble(preamble(document));
-        renderer.table_column_spec("snt-primary", "@{}>{\\color{sntBlue}\\bfseries}p{0.25\\linewidth}p{0.69\\linewidth}@{}")
-            .table_column_spec("snt-metadata", "@{}>{\\color{sntMeta}\\bfseries}p{0.25\\linewidth}p{0.69\\linewidth}@{}")
-            .table_column_spec("snt-source", "@{}>{\\color{sntSource}\\bfseries}p{0.25\\linewidth}p{0.69\\linewidth}@{}");
+        renderer.table_column_spec("snt-primary", "@{}>{\\color{sntBlue}\\bfseries}w{l}{0.28\\linewidth}@{\\hspace{0.8em}}>{\\raggedright\\arraybackslash}p{0.67\\linewidth}@{}")
+            .table_column_spec("snt-metadata", "@{}>{\\color{sntMeta}\\bfseries}w{l}{0.28\\linewidth}@{\\hspace{0.8em}}>{\\raggedright\\arraybackslash}p{0.67\\linewidth}@{}")
+            .table_column_spec("snt-source", "@{}>{\\color{sntSource}\\bfseries}w{l}{0.28\\linewidth}@{\\hspace{0.8em}}>{\\raggedright\\arraybackslash}p{0.67\\linewidth}@{}");
         return renderer.render(report);
     }
     case ReportFormat::Markdown: return briefpp::MarkdownRenderer{}.render(report);

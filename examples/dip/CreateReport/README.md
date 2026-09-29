@@ -4,14 +4,20 @@ Open the [generated PDF](report.pdf) to see the result immediately.
 
 This example demonstrates `snt report` with a DIPfile project. It includes two
 custom units, two reusable schemas with mock publication metadata, multiple
-source files, an overridden value, and a LaTeX introduction. The input files
+source files, an overridden value, an applied modification, a readings table,
+and a LaTeX introduction. The input files
 are resolved relative to `DIPfile`.
 
-In the report, `experiment.flow_speed` has the effective value `3 m/s`,
-`experiment.sensor` and `experiment.analysis` come from schemas, and
+The PDF contents page links to an **Override example** in the introduction.
+In the Parameters section, `experiment.flow_speed` has the effective value `3 m/s`
+and shows its `2 m/s` declaration and `overrides.dip:1` replacement source.
+Also in the report,
+`experiment.sample_count` is modified in `environment.dip`, the readings table
+shows its row count and column types, `experiment.sensor` and
+`experiment.analysis` come from schemas, and
 `lab_length` and `sample_period` appear under custom units. The PDF includes a
-cover, linked contents page, and matching blocks for parameters, schemas, and
-custom units.
+cover, linked contents page, and matching blocks for parameters, tables,
+schemas, and custom units.
 
 From the repository root, build `snt` and generate a TeX report:
 

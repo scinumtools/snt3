@@ -61,8 +61,10 @@ how to add context to the generated report. The
 :download:`example PDF <../../../examples/dip/CreateReport/report.pdf>` is
 included in the repository for immediate viewing.
 
-The report shows the effective ``experiment.flow_speed`` value of ``3 m/s``
-alongside its declaration and override locations. It also lists the custom
+The PDF contents page links to an ``Override example`` subsection. The
+Parameters section shows the effective ``experiment.flow_speed`` value of
+``3 m/s`` alongside its ``2 m/s`` declaration and ``overrides.dip:1`` source.
+It also lists the custom
 units, schema information, and available publication references. From the
 repository root, generate a TeX file without external tools:
 
