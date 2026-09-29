@@ -153,6 +153,36 @@ TEST(UnitSystem, ContextConversionESU) {
     }
 }
 
+TEST(UnitSystem, ContextConversionPreservesAbsoluteUncertainty) {
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
+
+    // 1 statA = 3.335641e-10 A. Both the estimate and its absolute
+    // uncertainty must scale by the same factor when changing systems.
+    const puq::Quantity original(20.0, 0.5, "statA", puq::SystemType::ESU);
+    const auto converted = original.convert("A", puq::SystemType::SI, "I");
+    const auto* estimate =
+        dynamic_cast<const val::ArrayValue<double>*>(converted.measurement.result.estimate.get());
+    const auto* uncertainty =
+        dynamic_cast<const val::ArrayValue<double>*>(converted.measurement.result.uncertainty.get());
+    ASSERT_NE(estimate, nullptr);
+    ASSERT_NE(uncertainty, nullptr);
+    EXPECT_NEAR(estimate->get_values().at(0), 20.0 * 3.335641e-10, 1e-14);
+    EXPECT_NEAR(uncertainty->get_values().at(0), 0.5 * 3.335641e-10, 1e-15);
+
+    const auto restored = converted.convert("statA", puq::SystemType::ESU, "I");
+    const auto* restored_estimate =
+        dynamic_cast<const val::ArrayValue<double>*>(restored.measurement.result.estimate.get());
+    const auto* restored_uncertainty =
+        dynamic_cast<const val::ArrayValue<double>*>(restored.measurement.result.uncertainty.get());
+    ASSERT_NE(restored_estimate, nullptr);
+    ASSERT_NE(restored_uncertainty, nullptr);
+    EXPECT_NEAR(restored_estimate->get_values().at(0), 20.0, 1e-4);
+    EXPECT_NEAR(restored_uncertainty->get_values().at(0), 0.5, 1e-5);
+}
+
 TEST(UnitSystem, ContextConversionSRU) {
     if constexpr (!puq::Config::use_system_nus) {
         GTEST_SKIP() << "CGS unit system is disabled";

@@ -1,10 +1,11 @@
+import os
 import sys
 from pathlib import Path
 import pytest
 
 repo = Path(__file__).resolve().parents[3]
 
-sys.path.insert(0, str(repo / "build/python"))
+sys.path.insert(0, os.environ.get("SNT_TEST_PYTHON_DIR", str(repo / "build/python")))
 
 print("\nFIRST 10 sys.path entries:")
 for p in sys.path[:10]:

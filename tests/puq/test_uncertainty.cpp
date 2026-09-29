@@ -1,6 +1,8 @@
 #include "pch_tests.h"
 
+#include <algorithm>
 #include <snt/puq/measurement.h>
+#include <snt/puq/quantity.h>
 
 using namespace snt;
 
@@ -195,4 +197,26 @@ TEST(Uncertainty, Arrays) {
         std::make_unique<val::ArrayValueFloat64>(arr1), std::make_unique<val::ArrayValueFloat64>(arr2)
     );
     EXPECT_EQ(msr1.to_string(), "[1.210(10)e1, 2.220(20)e1, 3.230(30)e1]");
+}
+
+TEST(Uncertainty, DensityConversionPreservesEndpointBound) {
+    const puq::Quantity mass(8.0, 0.2, "g");
+    const puq::Quantity volume(2.0, 0.05, "cm3");
+    const auto density = (mass / volume).convert("kg/m3");
+
+    const auto* estimate =
+        dynamic_cast<const val::ArrayValue<double>*>(density.measurement.result.estimate.get());
+    const auto* uncertainty =
+        dynamic_cast<const val::ArrayValue<double>*>(density.measurement.result.uncertainty.get());
+    ASSERT_NE(estimate, nullptr);
+    ASSERT_NE(uncertainty, nullptr);
+
+    // The division model bounds the result using both measurement endpoints.
+    const double center = 8.0 / 2.0;
+    const double upper_distance = 8.2 / 1.95 - center;
+    const double lower_distance = center - 7.8 / 2.05;
+    EXPECT_NEAR(estimate->get_values().at(0), center * 1000.0, 1e-9);
+    EXPECT_NEAR(uncertainty->get_values().at(0),
+                std::max(upper_distance, lower_distance) * 1000.0, 1e-9);
+    EXPECT_EQ(density.measurement.baseunits.to_string(), "kg*m-3");
 }

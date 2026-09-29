@@ -1,7 +1,9 @@
 #include "pch_tests.h"
 #include "test_environment_fixture.h"
 
+#include <chrono>
 #include <filesystem>
+#include <limits>
 #include <hdf5.h>
 #include <snt/dip/cursor.h>
 
@@ -45,6 +47,60 @@ TEST(Environment, Load) {
     ASSERT_EQ(env.get_node("title")->options.size(), 2);
     EXPECT_EQ(env.get_node("title")->options[1].value_raw, "Other");
     EXPECT_EQ(env.get_node("title")->metadata.description, "Environment round-trip fixture");
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, DerivedTableValuesSurviveHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string(
+        "measurements table = \"\"\"speed float m/s\ntime float s\n---\n1 1\n2 2\n3 3\n\"\"\"\n"
+        "distance float[3] = ({?measurements.speed} * {?measurements.time}) m\n"
+    );
+    const auto original = parser.parse();
+    const std::vector<double> expected{1.0, 4.0, 9.0};
+    EXPECT_EQ(original["distance"].as<std::vector<double>>(), expected);
+
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto file = std::filesystem::temp_directory_path() / ("snt-derived-table-" + suffix + ".diph5");
+    original.save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+
+    EXPECT_EQ(loaded["distance"].as<std::vector<double>>(), expected);
+    EXPECT_EQ(loaded["distance"].get_shape(), (val::Array::ShapeType{3}));
+    ASSERT_TRUE(loaded["distance"].get_units().has_value());
+    EXPECT_EQ(loaded["distance"].get_units()->to_string(), "m");
+    EXPECT_EQ(loaded["measurements.speed"].as<std::vector<double>>(),
+              (std::vector<double>{1.0, 2.0, 3.0}));
+    EXPECT_EQ(loaded["measurements.time"].as<std::vector<double>>(),
+              (std::vector<double>{1.0, 2.0, 3.0}));
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, ExactNumericValuesSurviveHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string(
+        "large_count uint64 = 9007199254740993\n"
+        "maximum_count uint64 = 18446744073709551615\n"
+        "minimum_offset int64 = -9223372036854775808\n"
+        "gain float32 = 1.23456789\n"
+        "matrix float64[2,2] = [[1.25, -2.5], [3.75, 4.5]]\n"
+    );
+    const auto original = parser.parse();
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto file = std::filesystem::temp_directory_path() / ("snt-numeric-fidelity-" + suffix + ".diph5");
+    original.save(file);
+
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_EQ(loaded["large_count"].as<uint64_t>(), uint64_t{9007199254740993ULL});
+    EXPECT_EQ(loaded["maximum_count"].as<uint64_t>(), std::numeric_limits<uint64_t>::max());
+    EXPECT_EQ(loaded["minimum_offset"].as<int64_t>(), std::numeric_limits<int64_t>::min());
+    EXPECT_EQ(loaded["gain"].get_node()->value->get_dtype(), core::DataType::Float32);
+    EXPECT_DOUBLE_EQ(loaded["gain"].as<double>(), static_cast<double>(static_cast<float>(1.23456789)));
+    EXPECT_EQ(loaded["matrix"].get_shape(), (val::Array::ShapeType{2, 2}));
+    EXPECT_EQ(loaded["matrix"].as<std::vector<double>>(),
+              (std::vector<double>{1.25, -2.5, 3.75, 4.5}));
     std::filesystem::remove(file);
 }
 

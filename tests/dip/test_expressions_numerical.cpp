@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 
 using namespace snt;
@@ -89,4 +90,23 @@ TEST(ExpressionsNumerical, DimToNonDim) {
     EXPECT_EQ(vnode->path.name, "baz");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->to_string(), "0.05475");
+}
+
+TEST(ExpressionsNumerical, ArrayReferencesWithMixedUnits) {
+    dip::DIP parser;
+    parser.add_string(
+        "distance float[3] = [2, 4, 6] m\n"
+        "duration float = 2 s\n"
+        "speed float[3] = ({?distance} / {?duration} + 50 cm/s) m/s\n"
+    );
+    const auto env = parser.parse();
+
+    // Independent calculation: distance / 2 s + 0.5 m/s.
+    const auto values = env["speed"].as<std::vector<double>>();
+    ASSERT_EQ(values.size(), 3);
+    EXPECT_DOUBLE_EQ(values[0], 1.5);
+    EXPECT_DOUBLE_EQ(values[1], 2.5);
+    EXPECT_DOUBLE_EQ(values[2], 3.5);
+    ASSERT_TRUE(env["speed"].get_units().has_value());
+    EXPECT_EQ(env["speed"].get_units()->to_string(), "m*s-1");
 }

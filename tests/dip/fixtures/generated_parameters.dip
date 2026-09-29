@@ -1,0 +1,11 @@
+experiment
+  title str = "Flow \"study\" \\ trial"
+  steps int = 4
+  gains float[3] = [1.25, 2.5, 3.75]
+  paths str[2] = ["alpha", "beta"]
+sensors[]
+  id int = 7
+  enabled bool = true
+sensors[]
+  id int = 9
+  enabled bool = false

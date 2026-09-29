@@ -27,6 +27,35 @@ install(EXPORT SNTExecutables
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/snt)
 
 if(ENABLE_UNIT_TESTS)
+  set(GENERATED_PARAMETERS_DIR "${CMAKE_CURRENT_BINARY_DIR}/tests/generated-parameters")
+  set(GENERATED_CPP_HEADER "${GENERATED_PARAMETERS_DIR}/parameters.hpp")
+  set(GENERATED_C_HEADER "${GENERATED_PARAMETERS_DIR}/parameters.h")
+  set(GENERATED_PARAMETERS_DIP "${PROJECT_SOURCE_DIR}/tests/dip/fixtures/generated_parameters.dip")
+  add_custom_command(
+    OUTPUT "${GENERATED_CPP_HEADER}" "${GENERATED_C_HEADER}"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${GENERATED_PARAMETERS_DIR}"
+    COMMAND $<TARGET_FILE:snt> dip parse -i file
+      "${GENERATED_PARAMETERS_DIP}"
+      --generate cpp "${GENERATED_CPP_HEADER}"
+    COMMAND $<TARGET_FILE:snt> dip parse -i file
+      "${GENERATED_PARAMETERS_DIP}"
+      --generate c "${GENERATED_C_HEADER}"
+    DEPENDS snt "${GENERATED_PARAMETERS_DIP}"
+    VERBATIM
+  )
+  add_custom_target(snt-generated-parameters
+    DEPENDS "${GENERATED_CPP_HEADER}" "${GENERATED_C_HEADER}")
+  add_executable(snt-generated-parameters-cpp
+    "${PROJECT_SOURCE_DIR}/tests/dip/fixtures/generated_parameters_cpp.cpp")
+  add_executable(snt-generated-parameters-c
+    "${PROJECT_SOURCE_DIR}/tests/dip/fixtures/generated_parameters_c.c")
+  target_include_directories(snt-generated-parameters-cpp PRIVATE "${GENERATED_PARAMETERS_DIR}")
+  target_include_directories(snt-generated-parameters-c PRIVATE "${GENERATED_PARAMETERS_DIR}")
+  add_dependencies(snt-generated-parameters-cpp snt-generated-parameters)
+  add_dependencies(snt-generated-parameters-c snt-generated-parameters)
+  add_test(NAME cli.generated.cpp-values COMMAND $<TARGET_FILE:snt-generated-parameters-cpp>)
+  add_test(NAME cli.generated.c-values COMMAND $<TARGET_FILE:snt-generated-parameters-c>)
+
   add_test(NAME cli.report
     COMMAND ${CMAKE_COMMAND}
       "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"

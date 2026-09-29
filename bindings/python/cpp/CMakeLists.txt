@@ -84,7 +84,7 @@ if(
         )
         set_tests_properties(${TEST_FULL_NAME} PROPERTIES 
             DEPENDS ${MODULE_NAME}
-            ENVIRONMENT "PROJECT_SOURCE_ROOT=${CMAKE_SOURCE_DIR}"
+            ENVIRONMENT "PROJECT_SOURCE_ROOT=${CMAKE_SOURCE_DIR};SNT_TEST_PYTHON_DIR=${CMAKE_BINARY_DIR}/python"
         )
     endforeach()
     endfunction()

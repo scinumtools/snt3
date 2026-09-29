@@ -10,7 +10,7 @@ TEST(ReferencesRaw, BooleanValues) {
 
     // create temporary file
     std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
-    std::filesystem::path source_filename = temp_dir / "example_raw_file.txt";
+    std::filesystem::path source_filename = temp_dir / "snt-raw-boolean.txt";
     std::string source_code = "  [[true,false], \n[false,true]]  ";
     std::string source_name = "foo_source";
     {
@@ -39,7 +39,7 @@ TEST(ReferencesRaw, IntegerValues) {
 
     // create temporary file
     std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
-    std::filesystem::path source_filename = temp_dir / "example_raw_file.txt";
+    std::filesystem::path source_filename = temp_dir / "snt-raw-integer.txt";
     std::string source_code = "  [[1,2], \n[3,4]]  ";
     std::string source_name = "foo_source";
     {
@@ -68,7 +68,7 @@ TEST(ReferencesRaw, FloatValues) {
 
     // create temporary file
     std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
-    std::filesystem::path source_filename = temp_dir / "example_raw_file.txt";
+    std::filesystem::path source_filename = temp_dir / "snt-raw-float.txt";
     std::string source_code = "  [[1,2.], \n[3.45,4.56e7]]  ";
     std::string source_name = "foo_source";
     {
@@ -97,7 +97,7 @@ TEST(ReferencesRaw, StringValues) {
 
     // create temporary file
     std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
-    std::filesystem::path source_filename = temp_dir / "example_raw_file.txt";
+    std::filesystem::path source_filename = temp_dir / "snt-raw-string.txt";
     std::string source_code = "  [[jerk,\"snap\"], \n[\"crackle\",\"pop\"]]  ";
     std::string source_name = "foo_source";
     {
@@ -126,7 +126,7 @@ TEST(ReferencesRaw, TableNodes) {
 
     // create temporary file
     std::filesystem::path temp_dir = std::filesystem::temp_directory_path();
-    std::filesystem::path source_filename = temp_dir / "example_raw_file.txt";
+    std::filesystem::path source_filename = temp_dir / "snt-raw-table.txt";
     std::ostringstream source_code;
     source_code << "bar int" << '\n';
     source_code << "baz bool" << '\n';
