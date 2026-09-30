@@ -148,3 +148,121 @@ TEST(Adapter, StreamFailureLeavesNoPublishedOutput) {
     EXPECT_TRUE(dip::run_adapter(env, adapter, work.path / "empty").empty());
     EXPECT_FALSE(fs::exists(work.path / "empty"));
 }
+
+TEST(Adapter, ReplaceRegisteredRegeneratesOnlyPlannedFilesAndSnapshot) {
+    Workspace work;
+    dip::DIP parser;
+    parser.add_string("run\n  steps int = 2\n");
+    const auto first = parser.parse();
+    ExampleAdapter adapter;
+    const auto output = work.path / "output";
+    const auto policy = dip::ExistingOutputPolicy::ReplaceRegistered;
+
+    ASSERT_EQ(dip::run_adapter(first, adapter, output, "run.diph5").size(), 4);
+    const auto old_snapshot = read(output / "run.diph5");
+    work.write("output/unrelated.txt", "keep me");
+    work.write("output/native/control.in", "old control");
+    EXPECT_THROW(dip::run_adapter(first, adapter, output, "run.diph5"), dip::EnvironmentException);
+
+    dip::DIP changed_parser;
+    changed_parser.add_string("run\n  steps int = 4\n");
+    const auto changed = changed_parser.parse();
+    const auto written = dip::run_adapter(changed, adapter, output, "run.diph5", policy);
+    ASSERT_EQ(written.size(), 4);
+    EXPECT_EQ(read(output / "native/control.in"), "STEPS=4\n");
+    EXPECT_EQ(read(output / "series/steps.dat"), "0\n1\n2\n3\n");
+    EXPECT_EQ(read(output / "unrelated.txt"), "keep me");
+    EXPECT_NE(read(output / "run.diph5"), old_snapshot);
+
+    EXPECT_EQ(dip::run_adapter(changed, adapter, output, "run.diph5", policy).size(), 4);
+    EXPECT_EQ(read(output / "unrelated.txt"), "keep me");
+}
+
+TEST(Adapter, ReplaceRegisteredRejectsDirectoryFileAndSymlinkConflicts) {
+    Workspace work;
+    dip::DIP parser;
+    parser.add_string("value int = 1\n");
+    const auto env = parser.parse();
+    CallbackAdapter adapter;
+    const auto output = work.path / "output";
+    fs::create_directories(output / "directory");
+    work.write("output/parent", "original parent");
+    const auto policy = dip::ExistingOutputPolicy::ReplaceRegistered;
+
+    adapter.callback = [](dip::AdapterContext& context) { context.add_text("directory", "new"); };
+    EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
+    EXPECT_TRUE(fs::is_directory(output / "directory"));
+
+    adapter.callback = [](dip::AdapterContext& context) { context.add_text("parent/child", "new"); };
+    EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
+    EXPECT_EQ(read(output / "parent"), "original parent");
+
+    std::error_code error;
+    fs::create_symlink(output / "parent", output / "link", error);
+    if (!error) {
+        adapter.callback = [](dip::AdapterContext& context) { context.add_text("link", "new"); };
+        EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
+        EXPECT_TRUE(fs::is_symlink(fs::symlink_status(output / "link")));
+        adapter.callback = [](dip::AdapterContext& context) { context.add_text("link/child", "new"); };
+        EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
+    }
+}
+
+TEST(Adapter, FailedStagedWritePreservesExistingFiles) {
+    Workspace work;
+    dip::DIP parser;
+    parser.add_string("value int = 1\n");
+    const auto env = parser.parse();
+    const auto output = work.path / "output";
+    fs::create_directories(output);
+    work.write("output/first.txt", "old first");
+    work.write("output/unrelated.txt", "unrelated");
+    CallbackAdapter adapter;
+    adapter.callback = [](dip::AdapterContext& context) {
+        context.add_text("first.txt", "new first");
+        context.add_stream("second.txt", [](std::ostream& out) {
+            out << "partial";
+            throw std::runtime_error("stream failed");
+        });
+    };
+    EXPECT_THROW(dip::run_adapter(env, adapter, output, dip::ExistingOutputPolicy::ReplaceRegistered),
+                 std::runtime_error);
+    EXPECT_EQ(read(output / "first.txt"), "old first");
+    EXPECT_EQ(read(output / "unrelated.txt"), "unrelated");
+    EXPECT_FALSE(fs::exists(output / "second.txt"));
+}
+
+TEST(Adapter, PublicationFailureRestoresFilesAlreadyReplaced) {
+    Workspace work;
+    dip::DIP parser;
+    parser.add_string("value int = 1\n");
+    const auto env = parser.parse();
+    const auto output = work.path / "output";
+    fs::create_directories(output);
+    work.write("output/first.txt", "old first");
+    work.write("output/second.txt", "old second");
+    work.write("output/unrelated.txt", "unrelated");
+    CallbackAdapter adapter;
+    adapter.callback = [&](dip::AdapterContext& context) {
+        context.add_text("first.txt", "new first");
+        context.add_text("second.txt", "new second");
+        context.add_stream("trigger.txt", [&](std::ostream& out) {
+            bool removed = false;
+            for (const auto& entry : fs::directory_iterator(output)) {
+                if (entry.path().filename().string().find(".snt-adapter-stage-") == 0) {
+                    removed = fs::remove(entry.path() / "new/second.txt");
+                    break;
+                }
+            }
+            if (!removed)
+                throw std::runtime_error("test could not remove staged output");
+            out << "ready";
+        });
+    };
+    EXPECT_THROW(dip::run_adapter(env, adapter, output, dip::ExistingOutputPolicy::ReplaceRegistered),
+                 fs::filesystem_error);
+    EXPECT_EQ(read(output / "first.txt"), "old first");
+    EXPECT_EQ(read(output / "second.txt"), "old second");
+    EXPECT_EQ(read(output / "unrelated.txt"), "unrelated");
+    EXPECT_FALSE(fs::exists(output / "trigger.txt"));
+}

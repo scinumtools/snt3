@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <exception>
 #include <fstream>
 #include <snt/dip/adapter.h>
 #include <snt/dip/dip.h>
@@ -53,10 +54,14 @@ namespace snt::dip {
             return status;
         }
 
-        void validate_destinations(const fs::path& root, const std::vector<fs::path>& paths) {
+        void validate_destinations(
+            const fs::path& root, const std::vector<fs::path>& paths, ExistingOutputPolicy policy
+        ) {
             if (root.empty())
                 invalid_output(root, "does not specify an output directory");
             const auto root_status = checked_status(root);
+            if (fs::is_symlink(root_status))
+                invalid_output(root, "is a symbolic link");
             if (fs::exists(root_status) && !fs::is_directory(root_status))
                 invalid_output(root, "is not a directory");
             for (size_t i = 0; i < paths.size(); ++i) {
@@ -73,8 +78,12 @@ namespace snt::dip {
                     if (fs::is_symlink(status))
                         invalid_output(paths[i], "passes through a symbolic link");
                     const bool last = std::next(part) == paths[i].end();
-                    if (last || !fs::is_directory(status))
-                        invalid_output(paths[i], "collides with an existing filesystem entry");
+                    if (last) {
+                        if (policy == ExistingOutputPolicy::Reject || !fs::is_regular_file(status))
+                            invalid_output(paths[i], "collides with an existing filesystem entry");
+                    } else if (!fs::is_directory(status)) {
+                        invalid_output(paths[i], "passes through a non-directory entry");
+                    }
                 }
             }
         }
@@ -142,7 +151,8 @@ namespace snt::dip {
     }
 
     std::vector<fs::path> run_adapter(
-        const Environment& env, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot
+        const Environment& env, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot,
+        ExistingOutputPolicy policy
     ) {
         AdapterContext context;
         adapter.plan(env, context);
@@ -153,7 +163,7 @@ namespace snt::dip {
             relative.push_back(validate_relative(output.path));
         if (!snapshot.empty())
             relative.push_back(validate_relative(snapshot));
-        validate_destinations(output_dir, relative);
+        validate_destinations(output_dir, relative, policy);
         if (relative.empty())
             return {};
 
@@ -163,7 +173,7 @@ namespace snt::dip {
         StageCleanup stage{create_stage(output_dir, relative)};
         for (size_t i = 0; i < context.outputs_.size(); ++i) {
             const auto& requested = context.outputs_[i];
-            const fs::path file = stage.path / relative[i];
+            const fs::path file = stage.path / "new" / relative[i];
             fs::create_directories(file.parent_path());
             std::ofstream stream(file, std::ios::binary | std::ios::trunc);
             if (!stream)
@@ -199,55 +209,107 @@ namespace snt::dip {
                 );
         }
         if (!snapshot.empty()) {
-            const fs::path file = stage.path / relative.back();
+            const fs::path file = stage.path / "new" / relative.back();
             fs::create_directories(file.parent_path());
             env.save(file);
         }
 
+        struct PublishedOutput {
+            fs::path destination;
+            fs::path backup;
+            bool backed_up = false;
+            bool published = false;
+        };
+        std::vector<PublishedOutput> journal;
+        journal.reserve(relative.size());
         std::vector<fs::path> written;
         std::vector<fs::path> created_dirs;
         try {
+            // A stream writer may have changed a destination while staging.
+            validate_destinations(output_dir, relative, policy);
             for (const auto& path : relative) {
                 const fs::path destination = output_dir / path;
                 fs::path dir = output_dir;
                 for (const auto& part : path.parent_path()) {
                     dir /= part;
-                    if (!fs::exists(dir)) {
+                    const auto status = checked_status(dir);
+                    if (!fs::exists(status)) {
                         fs::create_directory(dir);
                         created_dirs.push_back(dir);
+                    } else if (!fs::is_directory(status) || fs::is_symlink(status)) {
+                        invalid_output(path, "passes through a non-directory entry or symbolic link");
                     }
                 }
-                if (fs::exists(checked_status(destination)))
+                const auto status = checked_status(destination);
+                if (fs::is_symlink(status) || (fs::exists(status) && !fs::is_regular_file(status)))
+                    invalid_output(path, "collides with an existing filesystem entry");
+                if (fs::exists(status) && policy == ExistingOutputPolicy::Reject)
                     invalid_output(path, "appeared while the adapter was writing");
-                fs::rename(stage.path / path, destination);
+
+                journal.push_back({destination, stage.path / "old" / path});
+                auto& entry = journal.back();
+                if (fs::exists(status)) {
+                    fs::create_directories(entry.backup.parent_path());
+                    fs::rename(destination, entry.backup);
+                    entry.backed_up = true;
+                }
+                fs::rename(stage.path / "new" / path, destination);
+                entry.published = true;
                 written.push_back(destination);
             }
         } catch (...) {
-            std::error_code error;
-            for (auto it = written.rbegin(); it != written.rend(); ++it)
+            const auto original_error = std::current_exception();
+            std::error_code rollback_error;
+            for (auto it = journal.rbegin(); it != journal.rend(); ++it) {
+                std::error_code error;
+                if (it->published)
+                    fs::remove(it->destination, error);
+                if (!rollback_error && error)
+                    rollback_error = error;
+                if (it->backed_up) {
+                    error.clear();
+                    fs::rename(it->backup, it->destination, error);
+                    if (!rollback_error && error)
+                        rollback_error = error;
+                }
+            }
+            for (auto it = created_dirs.rbegin(); it != created_dirs.rend(); ++it) {
+                std::error_code error;
                 fs::remove(*it, error);
-            for (auto it = created_dirs.rbegin(); it != created_dirs.rend(); ++it)
-                fs::remove(*it, error);
-            throw;
+                if (!rollback_error && error)
+                    rollback_error = error;
+            }
+            if (rollback_error) {
+                // Keep any backup that could not be restored for manual recovery.
+                const fs::path recovery_dir = stage.path;
+                stage.path.clear();
+                throw fs::filesystem_error(
+                    "Cannot restore adapter outputs after publication failed; backups remain in the staging directory",
+                    recovery_dir, rollback_error
+                );
+            }
+            std::rethrow_exception(original_error);
         }
         root_cleanup.remove_if_empty = false;
         return written;
     }
 
     std::vector<fs::path> run_adapter_project(
-        const fs::path& project, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot
+        const fs::path& project, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot,
+        ExistingOutputPolicy policy
     ) {
         DIP parser;
         parser.add_project(project);
         const Environment env = parser.parse();
-        return run_adapter(env, adapter, output_dir, snapshot);
+        return run_adapter(env, adapter, output_dir, snapshot, policy);
     }
 
     std::vector<fs::path> run_adapter_snapshot(
-        const fs::path& input, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot
+        const fs::path& input, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot,
+        ExistingOutputPolicy policy
     ) {
         Environment env;
         env.load(input);
-        return run_adapter(env, adapter, output_dir, snapshot);
+        return run_adapter(env, adapter, output_dir, snapshot, policy);
     }
 } // namespace snt::dip

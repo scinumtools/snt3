@@ -26,6 +26,10 @@ namespace snt::bind::python {
     } // namespace
 
     void init_adapter(py::module_& m) {
+        py::enum_<dip::ExistingOutputPolicy>(m, "ExistingOutputPolicy")
+            .value("Reject", dip::ExistingOutputPolicy::Reject)
+            .value("ReplaceRegistered", dip::ExistingOutputPolicy::ReplaceRegistered);
+
         py::class_<dip::AdapterContext>(m, "AdapterContext", "Outputs planned for one adapter run.")
             .def(
                 "add_text",
@@ -87,14 +91,16 @@ namespace snt::bind::python {
             [](const dip::Environment& env,
                const dip::Adapter& adapter,
                const std::filesystem::path& output_dir,
-               const std::optional<std::filesystem::path>& snapshot) {
-                return dip::run_adapter(env, adapter, output_dir, snapshot.value_or(std::filesystem::path{}));
+               const std::optional<std::filesystem::path>& snapshot,
+               dip::ExistingOutputPolicy policy) {
+                return dip::run_adapter(env, adapter, output_dir, snapshot.value_or(std::filesystem::path{}), policy);
             },
             py::arg("env"),
             py::arg("adapter"),
             py::arg("output_dir"),
             py::arg("snapshot") = py::none(),
-            "Plan and write outputs from an existing Environment. Paths must be relative and absent. "
+            py::arg("existing_output_policy") = dip::ExistingOutputPolicy::Reject,
+            "Plan and write outputs from an existing Environment. Paths must be relative. "
             "Returns written paths in registration order, followed by an optional DIPH5 snapshot."
         );
         m.def(
@@ -102,15 +108,17 @@ namespace snt::bind::python {
             [](const std::filesystem::path& project,
                const dip::Adapter& adapter,
                const std::filesystem::path& output_dir,
-               const std::optional<std::filesystem::path>& snapshot) {
+               const std::optional<std::filesystem::path>& snapshot,
+               dip::ExistingOutputPolicy policy) {
                 return dip::run_adapter_project(
-                    project, adapter, output_dir, snapshot.value_or(std::filesystem::path{})
+                    project, adapter, output_dir, snapshot.value_or(std::filesystem::path{}), policy
                 );
             },
             py::arg("project"),
             py::arg("adapter"),
             py::arg("output_dir"),
             py::arg("snapshot") = py::none(),
+            py::arg("existing_output_policy") = dip::ExistingOutputPolicy::Reject,
             "Parse a DIPfile, then plan and write adapter outputs. Returns written paths."
         );
         m.def(
@@ -118,15 +126,17 @@ namespace snt::bind::python {
             [](const std::filesystem::path& input,
                const dip::Adapter& adapter,
                const std::filesystem::path& output_dir,
-               const std::optional<std::filesystem::path>& snapshot) {
+               const std::optional<std::filesystem::path>& snapshot,
+               dip::ExistingOutputPolicy policy) {
                 return dip::run_adapter_snapshot(
-                    input, adapter, output_dir, snapshot.value_or(std::filesystem::path{})
+                    input, adapter, output_dir, snapshot.value_or(std::filesystem::path{}), policy
                 );
             },
             py::arg("input"),
             py::arg("adapter"),
             py::arg("output_dir"),
             py::arg("snapshot") = py::none(),
+            py::arg("existing_output_policy") = dip::ExistingOutputPolicy::Reject,
             "Load a DIPH5 snapshot, then plan and write adapter outputs. Returns written paths."
         );
     }

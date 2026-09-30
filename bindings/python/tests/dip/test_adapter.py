@@ -2,7 +2,14 @@ from pathlib import Path
 
 import pytest
 
-from scinumtools3.dip import Adapter, DIP, run_adapter, run_adapter_project, run_adapter_snapshot
+from scinumtools3.dip import (
+    Adapter,
+    DIP,
+    ExistingOutputPolicy,
+    run_adapter,
+    run_adapter_project,
+    run_adapter_snapshot,
+)
 
 
 class ExampleAdapter(Adapter):
@@ -53,3 +60,91 @@ def test_path_conflict_prevents_python_stream_callback(tmp_path: Path):
         run_adapter(env, ConflictAdapter(), tmp_path / "invalid")
     assert called == []
     assert not (tmp_path / "invalid").exists()
+
+
+def test_replace_registered_regenerates_and_preserves_unrelated_files(tmp_path: Path):
+    (tmp_path / "parameters.dip").write_text("run\n  steps int = 2\n")
+    (tmp_path / "DIPfile").write_text('code[]\n  file = "parameters.dip"\n')
+    output = tmp_path / "output"
+    adapter = ExampleAdapter()
+    policy = ExistingOutputPolicy.ReplaceRegistered
+
+    run_adapter_project(tmp_path / "DIPfile", adapter, output, "run.diph5")
+    (output / "unrelated.txt").write_text("keep me")
+    (output / "control/settings.ini").write_text("old settings")
+    with pytest.raises(RuntimeError):
+        run_adapter_project(tmp_path / "DIPfile", adapter, output, "run.diph5")
+
+    (tmp_path / "parameters.dip").write_text("run\n  steps int = 4\n")
+    written = run_adapter_project(
+        tmp_path / "DIPfile", adapter, output, "run.diph5", existing_output_policy=policy
+    )
+    assert len(written) == 4
+    assert (output / "control/settings.ini").read_text() == "steps=4\n"
+    assert (output / "data/steps.csv").read_text() == "0\n1\n2\n3\n"
+    assert (output / "unrelated.txt").read_text() == "keep me"
+    assert len(run_adapter_snapshot(
+        output / "run.diph5", adapter, output, existing_output_policy=policy
+    )) == 3
+    assert (output / "unrelated.txt").read_text() == "keep me"
+
+
+def test_replace_registered_rejects_conflicts(tmp_path: Path):
+    parser = DIP()
+    parser.add_string("value int = 1\n")
+    env = parser.parse()
+    output = tmp_path / "output"
+    output.mkdir()
+    (output / "directory").mkdir()
+    (output / "parent").write_text("original")
+
+    class OneFile(Adapter):
+        def __init__(self, path):
+            super().__init__()
+            self.path = path
+
+        def plan(self, env, context):
+            context.add_text(self.path, "new")
+
+    for path in ("directory", "parent/child"):
+        with pytest.raises(RuntimeError):
+            run_adapter(env, OneFile(path), output,
+                        existing_output_policy=ExistingOutputPolicy.ReplaceRegistered)
+    assert (output / "parent").read_text() == "original"
+
+    link = output / "link"
+    try:
+        link.symlink_to(output / "parent")
+    except (OSError, NotImplementedError):
+        return
+    for path in ("link", "link/child"):
+        with pytest.raises(RuntimeError):
+            run_adapter(env, OneFile(path), output,
+                        existing_output_policy=ExistingOutputPolicy.ReplaceRegistered)
+    assert link.is_symlink()
+
+
+def test_failed_python_stream_preserves_registered_files(tmp_path: Path):
+    parser = DIP()
+    parser.add_string("value int = 1\n")
+    env = parser.parse()
+    output = tmp_path / "output"
+    output.mkdir()
+    (output / "first.txt").write_text("old first")
+    (output / "unrelated.txt").write_text("unrelated")
+
+    def fail(write):
+        write(b"partial")
+        raise ValueError("stream failed")
+
+    class FailingAdapter(Adapter):
+        def plan(self, env, context):
+            context.add_text("first.txt", "new first")
+            context.add_stream("second.txt", fail)
+
+    with pytest.raises(ValueError, match="stream failed"):
+        run_adapter(env, FailingAdapter(), output,
+                    existing_output_policy=ExistingOutputPolicy.ReplaceRegistered)
+    assert (output / "first.txt").read_text() == "old first"
+    assert (output / "unrelated.txt").read_text() == "unrelated"
+    assert not (output / "second.txt").exists()

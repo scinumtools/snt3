@@ -40,10 +40,27 @@ when requested.
 
 The runner validates every registered path before calling any stream writer.
 It rejects absolute paths, ``.`` and ``..`` components, duplicate paths,
-file/directory conflicts, symbolic links in destinations, and existing files.
-Output files are first written in a staging directory. A failing writer leaves
-no published files. Existing files are never overwritten. Use a fresh output
-directory for each run.
+file/directory conflicts, and symbolic links. By default, it also rejects
+existing files. Output files are first written in a staging directory, so a
+failing writer leaves the destination unchanged.
+
+To regenerate inputs in the same directory, opt in to replacing files
+registered for this run:
+
+.. code-block:: cpp
+
+   using snt::dip::ExistingOutputPolicy;
+
+   snt::dip::run_adapter_project("DIPfile", SolverAdapter{}, "solver-inputs",
+                                 "run.diph5", ExistingOutputPolicy::ReplaceRegistered);
+
+The optional snapshot follows the same policy. Unregistered files are
+preserved. The runner finishes writing all staged outputs before replacing
+existing regular files and restores prior files if publication fails.
+Python exposes ``ExistingOutputPolicy.ReplaceRegistered`` through the
+``existing_output_policy`` argument of all three runner functions. The
+default in both languages is ``Reject``. The adapter still decides which
+files to register and how to format them.
 
 Adapters can use ordinary environment access, selection, and table inspection
 inside ``plan()``. A DIPH5 run can use only the values and provenance retained

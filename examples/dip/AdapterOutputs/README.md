@@ -15,6 +15,8 @@ PYTHONPATH=build/python python examples/dip/AdapterOutputs/convert.py
 
 Pass a DIPfile path and output directory as positional arguments to the C++
 program. The Python script accepts `--project` and `--output`. Both runners
-refuse to overwrite existing files, so use a fresh output directory for another
-run. `run_adapter_snapshot()` can regenerate the same inputs from the C++
-example's `run.diph5` file.
+reject existing output files by default. Code that needs to regenerate inputs
+in the same directory can pass `ExistingOutputPolicy::ReplaceRegistered` in
+C++, or `existing_output_policy=ExistingOutputPolicy.ReplaceRegistered` in
+Python. Only files registered for that run are replaced. `run_adapter_snapshot()`
+can regenerate the same inputs from the C++ example's `run.diph5` file.

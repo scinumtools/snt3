@@ -10,6 +10,7 @@ ExportFormat = _dip.ExportFormat
 ReportFormat = _dip.ReportFormat
 Adapter = _dip.Adapter
 AdapterContext = _dip.AdapterContext
+ExistingOutputPolicy = _dip.ExistingOutputPolicy
 run_adapter = _dip.run_adapter
 run_adapter_project = _dip.run_adapter_project
 run_adapter_snapshot = _dip.run_adapter_snapshot
