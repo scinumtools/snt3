@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="610" viewBox="0 0 1200 610" role="img" aria-labelledby="title description">
+  <title id="title">A practical first integration</title>
+  <desc id="description">DIPL parameter model flows to SciNumTools validation, then to a project-specific adapter that writes the native input file, then to the existing solver.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L9 5 L1 9 Z" fill="#66839d"/>
+    </marker>
+  </defs>
+  <style>
+    .label { font: 700 17px system-ui, -apple-system, sans-serif; letter-spacing: 2px; fill: #4f667a; }
+    .title { font: 650 31px system-ui, -apple-system, sans-serif; fill: #162d42; }
+    .long { font-size: 28px; }
+    .number { font: 700 25px system-ui, -apple-system, sans-serif; fill: #fff; text-anchor: middle; dominant-baseline: central; }
+    .connector { fill: none; stroke: #66839d; stroke-width: 3; stroke-linecap: round; marker-end: url(#arrow); }
+  </style>
+
+  <rect width="1200" height="610" fill="#fff"/>
+
+  <path class="connector" d="M600 125 V165"/>
+  <path class="connector" d="M600 275 V315"/>
+  <path class="connector" d="M600 445 V475"/>
+
+  <g>
+    <rect x="100" y="25" width="1000" height="100" rx="20" fill="#f0f6fc" stroke="#b5cde3" stroke-width="2"/>
+    <rect x="100" y="25" width="11" height="100" rx="5" fill="#3f7cba"/>
+    <rect x="100" y="175" width="1000" height="100" rx="20" fill="#edf8f7" stroke="#a9d7d0" stroke-width="2"/>
+    <rect x="100" y="175" width="11" height="100" rx="5" fill="#278f86"/>
+    <rect x="100" y="325" width="1000" height="120" rx="20" fill="#f3f5fa" stroke="#bdcbe0" stroke-width="2"/>
+    <rect x="100" y="325" width="11" height="120" rx="5" fill="#617ea8"/>
+    <rect x="100" y="485" width="1000" height="100" rx="20" fill="#eff8f1" stroke="#add4b8" stroke-width="2"/>
+    <rect x="100" y="485" width="11" height="100" rx="5" fill="#3b9162"/>
+  </g>
+
+  <circle cx="169" cy="75" r="28" fill="#3f7cba"/>
+  <text class="number" x="169" y="75">1</text>
+  <text class="label" x="235" y="65">PARAMETER MODEL</text>
+  <text class="title" x="235" y="101">DIPL parameter model</text>
+
+  <circle cx="169" cy="225" r="28" fill="#278f86"/>
+  <text class="number" x="169" y="225">2</text>
+  <text class="label" x="235" y="215">VALIDATION</text>
+  <text class="title" x="235" y="251">SciNumTools resolves and validates parameters</text>
+
+  <circle cx="169" cy="385" r="28" fill="#617ea8"/>
+  <text class="number" x="169" y="385">3</text>
+  <text class="label" x="235" y="362">NATIVE INPUT</text>
+  <text class="title long" x="235" y="397">Project-specific adapter writes</text>
+  <text class="title long" x="235" y="431">the native input file</text>
+
+  <circle cx="169" cy="535" r="28" fill="#3b9162"/>
+  <text class="number" x="169" y="535">4</text>
+  <text class="label" x="235" y="525">EXECUTION</text>
+  <text class="title" x="235" y="561">Existing solver runs as before</text>
+</svg>

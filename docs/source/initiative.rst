@@ -18,18 +18,10 @@ A practical first integration
 
 The first integration is a compatibility layer around an existing program:
 
-.. code-block:: text
-
-   DIPL parameter model
-          |
-          v
-   SciNumTools resolves and validates parameters
-          |
-          v
-   Project-specific adapter writes the native input file
-          |
-          v
-   Existing solver runs as before
+.. image:: _static/initiative-integration-flow.png
+   :width: 100%
+   :align: center
+   :alt: DIPL parameter model flows to SciNumTools validation, a project-specific adapter that writes a native input file, and the existing solver.
 
 The code's numerical methods, solver, and native input format remain under
 the project's control. Existing native files can still be used. Direct DIPL

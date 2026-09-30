@@ -1,38 +1,42 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report a reproducible problem in SciNumTools3
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## What happened?
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+Describe the incorrect result or failure. Include the exact error message if there is one.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## How can we reproduce it?
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+Provide the smallest input and command or code that reproduces the problem. For PUQ or DIP, include the relevant PUEL or DIPL definitions; for a DIPfile project, include the relevant manifest entries. If the problem needs a DIPH5 file, attach a small example or explain how to generate one.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+```text
+# Input, command, or code
+```
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+## Expected and actual behavior
 
-**Additional context**
-Add any other context about the problem here.
+**Expected:**
+
+**Actual:**
+
+```text
+# Output or diagnostic, if applicable
+```
+
+## Where does it occur?
+
+- Module or language: CORE / VAL / EXS / PUQ / DIP / DIPL / PUEL / other
+- Interface: C++ / Python / C / CLI / CMake / REST / documentation / other
+- SciNumTools3 version or commit:
+- Installation: pip / conda / source build / other
+- OS and version:
+- If relevant: compiler, Python, CMake, and HDF5 versions; build options
+
+## Additional context
+
+Add any relevant files, logs, or screenshots. If the behavior changed between versions, identify the last version that worked.
