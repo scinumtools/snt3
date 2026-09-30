@@ -32,9 +32,6 @@ The C++ API saves and loads through :cpp:class:`snt::dip::Environment`:
    snt::dip::Environment restored;
    restored.load("parameters.diph5");
 
-For usage through language bindings, see
-:doc:`Interfaces and integrations <../../integrations/index>`.
-
 ``save()`` overwrites an existing destination file. ``load()`` replaces the
 current environment only after the file has been read successfully; a failed
 load leaves the existing environment unchanged.

@@ -14,7 +14,7 @@ Enable the server explicitly when configuring SNT:
 
    cmake -G Ninja -B build -DENABLE_SNT_SERVER=ON
    cmake --build build --target snt
-   ./build/bin/snt server --port 8081
+   ./build/bin/snt server
 
 The server listens on ``127.0.0.1:8080`` by default. Pass ``--port PORT`` to
 choose another port, for example when the default is already occupied.

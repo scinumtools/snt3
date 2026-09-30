@@ -8,6 +8,18 @@ moves to dimensional input parameters using DIPL.
 The examples below use the Python interface. The same concepts are available
 through the C++ API and other SciNumTools interfaces.
 
+Which part should I use?
+------------------------
+
+* :doc:`PUEL <puel/index>` is the language for unit-aware quantity expressions.
+* :doc:`PUQ <modules/puq/index>` provides typed quantities and unit conversion
+  in code.
+* :doc:`DIPL <dipl/index>` is the language for structured parameters,
+  constraints, and dependencies.
+* :doc:`DIP <modules/dip/index>` parses DIPL and lets code inspect evaluated
+  parameter values.
+* :doc:`API <modules/api/index>` provides command-style operations with
+  formatted output and reports.
 
 Working with Physical Quantities
 --------------------------------
@@ -97,4 +109,5 @@ sections introduce each part of SciNumTools in more detail:
   DIPL.
 * :doc:`modules/index` — understand the architecture and individual modules.
 * :doc:`examples/index` — explore more complete examples and use cases.
-* :doc:`api/index` — access the detailed C++ and Python API reference.
+* :doc:`api/index` — look up the C++, Python, C, and CMake interfaces in the
+  programming reference.

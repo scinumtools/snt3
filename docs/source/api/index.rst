@@ -1,38 +1,23 @@
-API Reference
-=============
+Programming Reference
+=====================
 
-The code API is documented through two language interfaces: C++ and Python.
-Both expose the same scientific concepts; the ``snt::api`` namespace is a
-regular C++ module within the C++ interface.
+This reference documents the C++, Python, C, and CMake interfaces. The
+``snt::api`` namespace is one of the C++ modules documented here.
 
 C++ API
 -------
 
-The module API provides the main public interfaces of each SciNumTools
+The C++ reference covers the public interfaces of each SciNumTools
 module. These interfaces are intended for users developing scientific
 applications and provide access to values, expressions, physical
 quantities, and dimensional input parameters.
 
 The ``API`` module supplies command-oriented application operations such as
-PUQ evaluation and DIPL parsing. It is documented as part of the C++ module
-API, rather than as a separate code API.
+PUQ evaluation and DIPL parsing. Its declarations appear alongside those of
+the other C++ modules.
 
-The reference below is generated from C++ declarations and comments using
-Doxygen and Breathe. It covers the namespaces in ``include/snt/`` and the
-``snt::api`` command headers in ``src/snt/api``, including public members,
-free functions, enums, and aliases. Private members, the ``dip::detail``
-template helpers, and the recursive ``core::_array_to_string`` helpers are
-omitted. The VAL page also omits the string-array template specialization
-to avoid duplicate documentation links. MAT is included as an experimental
-module.
-
-Each module overview links to topic pages that group related types and
-operations, such as quantities, unit systems, or DIPL nodes.
-The :doc:`C++ adapter reference <cpp/dip/adapter>` lists ``Adapter``,
-``AdapterContext``, and the three ``run_adapter*`` functions.
-
-The generated application API declarations are grouped by domain. For
-examples and workflow guidance, see the :ref:`API module overview
+Each module overview links to topic pages for related types and operations.
+For examples and workflow guidance, see the :ref:`API module overview
 <api-application-interface>`.
 
 .. toctree::
@@ -90,3 +75,18 @@ the C++ and Python APIs linked above; it has no C ABI entry points.
 
    c_puq
    c_dip
+
+Reference scope
+---------------
+
+The C++ reference is generated from declarations and comments using Doxygen
+and Breathe. It covers the namespaces in ``include/snt/`` and the
+``snt::api`` command headers in ``src/snt/api``, including public members,
+free functions, enums, and aliases. Private members, the ``dip::detail``
+template helpers, and the recursive ``core::_array_to_string`` helpers are
+omitted. The VAL page also omits the string-array template specialization
+to avoid duplicate documentation links. MAT is included as an experimental
+module.
+
+The :doc:`C++ adapter reference <cpp/dip/adapter>` lists ``Adapter``,
+``AdapterContext``, and the three ``run_adapter*`` functions.

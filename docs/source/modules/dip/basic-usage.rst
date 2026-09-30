@@ -143,9 +143,6 @@ persisted DIPH5 environment; applications that load DIPH5 should treat the
 file as evaluated data. The complete class and function reference is available
 in the :doc:`C++ DIP API <../../api/cpp_dip>` documentation.
 
-For Python, C, command-line, and CMake usage, see
-:doc:`Interfaces and integrations <../../integrations/index>`.
-
 Registering schemas from host code
 ----------------------------------
 

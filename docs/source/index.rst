@@ -32,6 +32,7 @@ as well as JSON and YAML data files.
    
    introduction
    installation
+   dependencies
    quickstart
    initiative
 
@@ -44,16 +45,38 @@ as well as JSON and YAML data files.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Guides
-   
+   :caption: Modules
+
    modules/index
-   integrations/index
+   modules/core/index
+   modules/val/index
+   modules/exs/index
+   modules/puq/index
+   modules/dip/index
+   modules/mat/index
+   modules/api/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Interfaces and Integrations
+
+   integrations/python
+   integrations/c
+   integrations/cli
+   integrations/cmake
+   integrations/rest
+   integrations/docker
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Resources
+
    examples/index
 
 .. toctree::
    :maxdepth: 2
    :caption: Reference
-   
+
    api/index
 
 Previous version
@@ -68,7 +91,3 @@ In short, `v2` established the scientific concepts and Python implementation; `v
 Documentation for the original Python implementation, `SciNumTools2`, is available here:
 
 * `SciNumTools2 Documentation <https://vrtulka23.github.io/scinumtools/>`_
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:

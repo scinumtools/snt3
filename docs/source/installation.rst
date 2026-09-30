@@ -90,6 +90,8 @@ Building from Source
 SciNumTools is built using CMake and requires a C++17-compatible compiler.
 Building from source provides full access to the C++ library, command-line
 applications, tests, and other components of the project.
+For a summary of required and included build dependencies, see
+:doc:`dependencies`.
 
 With DIP enabled (the default), install HDF5 development headers and the
 HDF5 C library before configuring. The HDF5 C++ library is not required.
