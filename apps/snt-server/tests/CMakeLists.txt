@@ -1,6 +1,6 @@
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-foreach(TEST_NAME PUQConvert DIPSingleValue DIPProjectBundle DIPSchemaUploads DIPH5 DIPReport)
+foreach(TEST_NAME PUQConvert DIPSingleValue DIPProjectBundle DIPSchemaUploads DIPH5 DIPCompare DIPReport)
   add_test(
     NAME server.${TEST_NAME}
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_server.py

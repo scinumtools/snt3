@@ -32,7 +32,7 @@ def multipart(parts):
             disposition += f'; filename="{filename}"'
         body.extend(f"{disposition}\r\n".encode())
         body.extend(b"Content-Type: application/octet-stream\r\n\r\n")
-        body.extend(content.encode())
+        body.extend(content if isinstance(content, bytes) else content.encode())
         body.extend(b"\r\n")
     body.extend(f"--{boundary}--\r\n".encode())
     return bytes(body), f"multipart/form-data; boundary={boundary}"
@@ -95,6 +95,23 @@ class ServerTests(unittest.TestCase):
         with self.request(f"/snt/dip/parse?{query}", b"answer int = 42\n") as response:
             result = json.loads(response.read())
         self.assertEqual(result["result"], "42\n")
+
+    def test_DIPCompare(self):
+        def snapshot(value):
+            with self.request("/snt/dip/parse?output=diph5", f"value int = {value}\n".encode()) as response:
+                return response.read()
+
+        before, after = snapshot(1), snapshot(2)
+        body, content_type = multipart([
+            ("before", "before.diph5", before),
+            ("after", "after.diph5", after),
+        ])
+        with self.request("/snt/dip/compare", body, content_type) as response:
+            result = json.loads(response.read())
+        self.assertEqual(result["changed"], 1)
+        self.assertEqual(result["differences"][0]["path"], "value")
+        with self.request("/snt/dip/compare?format=text", body, content_type) as response:
+            self.assertIn("1 changed", response.read().decode())
 
     def test_DIPProjectBundle(self):
         project = """schemas[]

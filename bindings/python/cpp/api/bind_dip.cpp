@@ -1,7 +1,9 @@
 #include "snt/api/dip_parse.h"
+#include "snt/api/dip_compare.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl/filesystem.h>
 
 namespace py = pybind11;
 
@@ -77,6 +79,13 @@ Args:
         );
 
         command.def("execute", &api::DIPParse::execute, "Execute the configured DIPL query.");
+
+        py::class_<api::DIPCompare>(m, "DIPCompare", "Compare DIPH5 files and render a text summary.")
+            .def(py::init<std::filesystem::path, std::filesystem::path>(), py::arg("before"), py::arg("after"))
+            .def("set_options", &api::DIPCompare::set_options, py::arg("options"))
+            .def("set_max_details", &api::DIPCompare::set_max_details, py::arg("count"))
+            .def("compare", &api::DIPCompare::compare)
+            .def("execute", &api::DIPCompare::execute);
     }
 
 } // namespace snt::bind::python

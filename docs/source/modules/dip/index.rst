@@ -28,6 +28,8 @@ calculated*, and *what constraints it must satisfy*.
   parameter environments.
 * :doc:`Environment persistence <persistence>` — saving and loading
   evaluated environments in DIPH5 format from C++.
+* :doc:`DIPH5 comparison <comparison>` — summarized differences between
+  evaluated snapshots.
 * :doc:`Traceability and source identities <traceability>` — following
   DIPL inputs and registered constructs through diagnostics and DIPH5.
 * :doc:`Inspecting and reloading environments <inspection>` — reading
@@ -46,9 +48,9 @@ calculated*, and *what constraints it must satisfy*.
    basic-usage
    projects
    persistence
+   comparison
    traceability
    inspection
    generation
    adapters
    report
-

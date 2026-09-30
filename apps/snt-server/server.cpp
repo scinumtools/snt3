@@ -11,7 +11,9 @@ namespace snt::server {
 
         std::mutex api_mutex;
 
-        std::string json_escape(const std::string_view value) {
+    } // namespace
+
+    std::string json_escape(const std::string_view value) {
             std::string escaped;
             escaped.reserve(value.size());
             for (const unsigned char ch : value) {
@@ -35,8 +37,9 @@ namespace snt::server {
                 }
             }
             return escaped;
-        }
+    }
 
+    namespace {
         std::string json_result(const std::string_view value) {
             return "{\"result\":\"" + json_escape(value) + "\"}\n";
         }
@@ -99,7 +102,7 @@ namespace snt::server {
             httplib::Server server;
             server.Get("/", [](const httplib::Request&, httplib::Response& response) {
                 response.set_content(
-                    R"({"service":"SNT REST API","endpoints":["/snt/puq/eval","/snt/puq/convert","/snt/puq/info","/snt/puq/list","/snt/dip/parse","/snt/dip/report","/snt/dip/environments","/snt/dip/environment"]}
+                    R"({"service":"SNT REST API","endpoints":["/snt/puq/eval","/snt/puq/convert","/snt/puq/info","/snt/puq/list","/snt/dip/parse","/snt/dip/compare","/snt/dip/report","/snt/dip/environments","/snt/dip/environment"]}
 )",
                     "application/json"
                 );

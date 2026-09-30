@@ -45,6 +45,25 @@ This complete example converts metres to centimetres:
 DIPL parameters
 ---------------
 
+The comparison ABI in ``<snt/c/dip.h>`` returns an owned handle with summary
+counts and indexed differences. String and index pointers from
+``snt_dip_comparison_get`` remain valid until the handle is freed. To render
+text, first call ``snt_dip_comparison_render_text`` with a null buffer and
+zero capacity to obtain the required size, including the terminating NUL.
+
+.. code-block:: c
+
+   snt_dip_comparison* result = NULL;
+   snt_dip_error error = {0};
+   if (snt_dip_compare_files("before.diph5", "after.diph5",
+           SNT_DIP_COMPARE_EFFECTIVE, 3, &result, &error) == 0) {
+       size_t added, removed, changed;
+       snt_dip_comparison_summary(result, &added, &removed, &changed, &error);
+       snt_dip_comparison_free(result);
+   }
+
+See :doc:`DIPH5 comparison <../modules/dip/comparison>` for scope semantics.
+
 Create a parser with ``snt_dip_parser_create``, add definitions with
 ``snt_dip_parser_add_string`` or ``snt_dip_parser_add_file``, and call
 ``snt_dip_parser_parse``. Then retrieve a value as text with

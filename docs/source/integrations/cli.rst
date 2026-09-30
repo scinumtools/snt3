@@ -48,6 +48,19 @@ quantity, supplied with ``-Q``:
 DIPL parameters
 ---------------
 
+Compare saved environments with ``snt dip compare``. It prints a summary and
+up to 50 differences by default. Exit status is 0 when equal in the selected
+scope, 1 when different, and 2 for invalid input or an error.
+
+.. code-block:: bash
+
+   snt dip compare before.diph5 after.diph5
+   snt dip compare before.diph5 after.diph5 --scope full --max-details 20
+
+``--max-array-examples N`` controls the number of flat array indices shown
+for each changed array. See :doc:`DIPH5 comparison <../modules/dip/comparison>`
+for scope semantics.
+
 Use ``dip parse`` with ``--input file`` to load a file or ``--input string``
 to supply definitions directly. ``--print`` displays nodes with names and
 units, and ``--request`` selects a node:

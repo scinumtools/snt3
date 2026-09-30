@@ -68,6 +68,13 @@ if(ENABLE_UNIT_TESTS)
       "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-persistence"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dip_persistence.cmake"
   )
+  add_test(
+    NAME cli.dip.comparison
+    COMMAND ${CMAKE_COMMAND}
+      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-comparison"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dip_comparison.cmake"
+  )
 endif()
 
 if(ENABLE_SNT_SERVER)

@@ -9,11 +9,59 @@ extern "C" {
 
 /** Opaque handle for a DIPL parser and environment. */
 typedef struct snt_dip snt_dip;
+/** Opaque, owned result of comparing two DIPH5 files. */
+typedef struct snt_dip_comparison snt_dip_comparison;
 /** Error code and diagnostic message returned by a DIP ABI function. */
 typedef struct {
     int code;
     const char* message;
 } snt_dip_error;
+
+typedef enum {
+    SNT_DIP_COMPARE_EFFECTIVE,
+    SNT_DIP_COMPARE_FULL,
+} snt_dip_compare_scope;
+
+typedef enum {
+    SNT_DIP_DIFFERENCE_ADDED,
+    SNT_DIP_DIFFERENCE_REMOVED,
+    SNT_DIP_DIFFERENCE_CHANGED,
+} snt_dip_difference_kind;
+
+/** String and index pointers remain valid until the comparison is freed. */
+typedef struct {
+    const char* path;
+    const char* category;
+    snt_dip_difference_kind kind;
+    const char* fields; ///< Comma-separated changed fields.
+    const char* before;
+    const char* after;
+    size_t changed_elements;
+    const size_t* example_indices;
+    size_t example_count;
+} snt_dip_difference;
+
+/** Load and compare two DIPH5 files. The caller owns *result. */
+int snt_dip_compare_files(
+    const char* before, const char* after, snt_dip_compare_scope scope,
+    size_t max_array_examples, snt_dip_comparison** result, snt_dip_error* error
+);
+/** Retrieve total added, removed, and changed entries. */
+int snt_dip_comparison_summary(
+    const snt_dip_comparison* result, size_t* added, size_t* removed, size_t* changed, snt_dip_error* error
+);
+/** Return the number of indexed differences; zero for a comparison with no differences. */
+size_t snt_dip_comparison_count(const snt_dip_comparison* result);
+/** Get one difference; string and index pointers are borrowed from result. */
+int snt_dip_comparison_get(
+    const snt_dip_comparison* result, size_t index, snt_dip_difference* difference, snt_dip_error* error
+);
+/** Render text; call with buffer=NULL and capacity=0 to query required bytes including NUL. */
+int snt_dip_comparison_render_text(
+    const snt_dip_comparison* result, size_t max_details, char* buffer, size_t capacity,
+    size_t* required, snt_dip_error* error
+);
+void snt_dip_comparison_free(snt_dip_comparison* result);
 
 /** Output format for generated parameter lists. */
 typedef enum {

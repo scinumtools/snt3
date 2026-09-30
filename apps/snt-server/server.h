@@ -22,6 +22,7 @@ namespace snt::server {
     std::string required_param(const httplib::Request& request, const std::string& name);
     bool optional_flag(const httplib::Request& request, const std::string& name);
     std::vector<std::string> split_tags(std::string_view value);
+    std::string json_escape(std::string_view value);
     void handle_response(httplib::Response& response, const std::function<void()>& handler);
     void handle_json(httplib::Response& response, const std::function<std::string()>& handler);
 

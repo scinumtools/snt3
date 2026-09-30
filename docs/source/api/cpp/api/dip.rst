@@ -5,6 +5,7 @@ DIP commands
    :members:
    :undoc-members:
    :headers: src/snt/api/dip_parse.h
+      include/snt/api/dip_compare.h
 
 .. _cpp-api-report-generation:
 

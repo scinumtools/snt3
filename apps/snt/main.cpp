@@ -62,6 +62,14 @@ int main(int argc, char* argv[]) {
         return 1;
 #endif
     }
+    if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "compare") {
+        try {
+            return module_dip_compare(argc - 2, argv + 2);
+        } catch (const std::exception& error) {
+            std::cerr << error.what() << '\n';
+            return 2;
+        }
+    }
 
     ArgParser argpar(argc, argv);
 

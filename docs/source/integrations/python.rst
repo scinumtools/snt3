@@ -28,6 +28,25 @@ mixing of incompatible units.
 DIPL parameters
 ---------------
 
+Compare saved snapshots with ``compare_diph5`` or loaded environments with
+``compare``. The default scope compares effective values; set ``Full`` to
+include persisted metadata and provenance.
+
+.. code-block:: python
+
+   from scinumtools3.dip import (
+       ComparisonOptions, ComparisonScope, compare_diph5, render_comparison
+   )
+
+   options = ComparisonOptions()
+   options.scope = ComparisonScope.Full
+   result = compare_diph5("before.diph5", "after.diph5", options)
+   print(render_comparison(result, max_details=20))
+   print(result.equal, result.added, result.removed, result.changed)
+
+The command layer also exposes ``scinumtools3.api.dip.DIPCompare``. See
+:doc:`DIPH5 comparison <../modules/dip/comparison>` for the compared fields.
+
 The Python binding can load a DIPL definition from a file, evaluate its
 parameters, and return a value in Python. For example, given a file named
 ``parameters.dip``:

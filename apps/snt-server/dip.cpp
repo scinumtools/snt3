@@ -2,13 +2,16 @@
 #include "server.h"
 
 #include "snt/api/dip_parse.h"
+#include <snt/api/dip_compare.h>
 #include <snt/api/dip_report.h>
 
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
+#include <limits>
 #include <random>
+#include <sstream>
 #include <stdexcept>
 #include <system_error>
 #include <unordered_set>
@@ -202,9 +205,78 @@ namespace snt::server {
             return options;
         }
 
+        std::size_t compare_count(const httplib::Request& request, const char* name, std::size_t fallback) {
+            if (!request.has_param(name)) return fallback;
+            const auto value = request.get_param_value(name);
+            if (value.empty() || value.find_first_not_of("0123456789") != std::string::npos)
+                throw std::invalid_argument(std::string(name) + " must be a nonnegative integer.");
+            const auto count = std::stoull(value);
+            if (count > std::numeric_limits<std::size_t>::max())
+                throw std::invalid_argument(std::string(name) + " is too large.");
+            return static_cast<std::size_t>(count);
+        }
+
+        std::string comparison_json(const dip::ComparisonResult& result, std::size_t max_details) {
+            std::ostringstream out;
+            out << "{\"scope\":\"" << (result.scope == dip::ComparisonScope::Full ? "full" : "effective")
+                << "\",\"equal\":" << (result.equal() ? "true" : "false")
+                << ",\"added\":" << result.added << ",\"removed\":" << result.removed
+                << ",\"changed\":" << result.changed << ",\"differences\":[";
+            const auto count = std::min(max_details, result.differences.size());
+            for (std::size_t i = 0; i < count; ++i) {
+                const auto& difference = result.differences[i];
+                if (i) out << ',';
+                out << "{\"path\":\"" << json_escape(difference.path)
+                    << "\",\"category\":\"" << json_escape(difference.category)
+                    << "\",\"kind\":\"" << (difference.kind == dip::DifferenceKind::Added ? "added" :
+                                              difference.kind == dip::DifferenceKind::Removed ? "removed" : "changed")
+                    << "\",\"fields\":[";
+                for (std::size_t j = 0; j < difference.fields.size(); ++j) {
+                    if (j) out << ',';
+                    out << '"' << json_escape(difference.fields[j]) << '"';
+                }
+                out << "],\"before\":\"" << json_escape(difference.before)
+                    << "\",\"after\":\"" << json_escape(difference.after)
+                    << "\",\"changed_elements\":" << difference.changed_elements
+                    << ",\"example_indices\":[";
+                for (std::size_t j = 0; j < difference.example_indices.size(); ++j) {
+                    if (j) out << ',';
+                    out << difference.example_indices[j];
+                }
+                out << "]}";
+            }
+            out << "],\"omitted\":" << result.differences.size() - count << "}\n";
+            return out.str();
+        }
+
     } // namespace
 
     void register_dip_routes(httplib::Server& server) {
+        server.Post("/snt/dip/compare", [](const httplib::Request& request, httplib::Response& response) {
+            handle_response(response, [&] {
+                if (!request.form.fields.empty() || request.form.get_file_count("before") != 1 ||
+                    request.form.get_file_count("after") != 1 || request.form.files.size() != 2)
+                    throw std::invalid_argument("Comparison requires exactly one before and one after DIPH5 upload.");
+                const auto format = request.has_param("format") ? request.get_param_value("format") : "json";
+                if (format != "json" && format != "text")
+                    throw std::invalid_argument("Comparison format must be json or text.");
+                dip::ComparisonOptions options;
+                const auto scope = request.has_param("scope") ? request.get_param_value("scope") : "effective";
+                if (scope == "full") options.scope = dip::ComparisonScope::Full;
+                else if (scope != "effective")
+                    throw std::invalid_argument("Comparison scope must be effective or full.");
+                options.max_array_examples = compare_count(request, "max_array_examples", 3);
+                const auto max_details = compare_count(request, "max_details", 50);
+                ProjectBundle bundle;
+                bundle.add_file("before.diph5", request.form.get_file("before").content);
+                bundle.add_file("after.diph5", request.form.get_file("after").content);
+                api::DIPCompare command(bundle.output_file("before.diph5"), bundle.output_file("after.diph5"));
+                command.set_options(options);
+                const auto result = command.compare();
+                if (format == "text") response.set_content(api::render_dip_comparison(result, max_details), "text/plain");
+                else response.set_content(comparison_json(result, max_details), "application/json");
+            });
+        });
         server.Post("/snt/dip/report", [](const httplib::Request& request, httplib::Response& response) {
             handle_response(response, [&] {
                 const auto format = report_format(request);

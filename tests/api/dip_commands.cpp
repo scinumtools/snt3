@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 #include "snt/api/dip_parse.h"
+#include "snt/api/dip_compare.h"
 #include "snt/api/exceptions.h"
 #include "snt/dip/cursor.h"
 
@@ -216,6 +217,20 @@ TEST_F(DIPPersistenceCommands, Save) {
     env.load(file);
     EXPECT_EQ(env["foo[bar].snap"].as<int64_t>(), 3);
     EXPECT_TRUE(env["foo[bar].jerk"].as<bool>());
+}
+
+TEST_F(DIPPersistenceCommands, Compare) {
+    prepare_file();
+    api::DIPCompare same(file, file);
+    EXPECT_TRUE(same.compare().equal());
+    EXPECT_NE(same.execute().find("0 added, 0 removed, 0 changed"), std::string::npos);
+    const auto other = file.parent_path() / (file.stem().string() + "-other.diph5");
+    dip::DIP parser;
+    parser.add_string("simulation.steps int = 101\nsimulation.enabled bool = true\n");
+    parser.parse().save(other);
+    api::DIPCompare changed(file, other);
+    EXPECT_EQ(changed.compare().changed, 1);
+    std::filesystem::remove(other);
 }
 
 TEST_F(DIPPersistenceCommands, Generate) {

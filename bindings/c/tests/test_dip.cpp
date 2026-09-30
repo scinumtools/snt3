@@ -148,6 +148,40 @@ TEST_F(Environment, Save) {
     std::filesystem::remove(file);
 }
 
+TEST(DIP, CompareFiles) {
+    const auto before_file = std::filesystem::temp_directory_path() / "snt-c-compare-before.diph5";
+    const auto after_file = std::filesystem::temp_directory_path() / "snt-c-compare-after.diph5";
+    snt_dip_error error{};
+    for (const auto& [file, code] : {std::pair{before_file, "value int = 1\n"},
+                                     std::pair{after_file, "value int = 2\n"}}) {
+        snt_dip* parser = nullptr;
+        ASSERT_EQ(snt_dip_parser_create(&parser, &error), 0);
+        ASSERT_EQ(snt_dip_parser_add_string(parser, code, &error), 0);
+        ASSERT_EQ(snt_dip_parser_parse(parser, &error), 0);
+        ASSERT_EQ(snt_dip_environment_save(parser, file.string().c_str(), &error), 0);
+        snt_dip_parser_free(parser);
+    }
+    snt_dip_comparison* result = nullptr;
+    ASSERT_EQ(snt_dip_compare_files(before_file.string().c_str(), after_file.string().c_str(),
+                                    SNT_DIP_COMPARE_EFFECTIVE, 3, &result, &error), 0) << error.message;
+    size_t added = 0, removed = 0, changed = 0;
+    ASSERT_EQ(snt_dip_comparison_summary(result, &added, &removed, &changed, &error), 0);
+    EXPECT_EQ(changed, 1);
+    ASSERT_EQ(snt_dip_comparison_count(result), 1);
+    snt_dip_difference difference{};
+    ASSERT_EQ(snt_dip_comparison_get(result, 0, &difference, &error), 0);
+    EXPECT_STREQ(difference.path, "value");
+    EXPECT_EQ(difference.kind, SNT_DIP_DIFFERENCE_CHANGED);
+    size_t required = 0;
+    ASSERT_EQ(snt_dip_comparison_render_text(result, 50, nullptr, 0, &required, &error), 0);
+    std::string text(required, '\0');
+    ASSERT_EQ(snt_dip_comparison_render_text(result, 50, text.data(), text.size(), &required, &error), 0);
+    EXPECT_NE(text.find("1 changed"), std::string::npos);
+    snt_dip_comparison_free(result);
+    std::filesystem::remove(before_file);
+    std::filesystem::remove(after_file);
+}
+
 TEST_F(Environment, Generate) {
     const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-parameters.json";
 

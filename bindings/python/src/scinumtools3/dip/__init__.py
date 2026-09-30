@@ -14,6 +14,14 @@ ExistingOutputPolicy = _dip.ExistingOutputPolicy
 run_adapter = _dip.run_adapter
 run_adapter_project = _dip.run_adapter_project
 run_adapter_snapshot = _dip.run_adapter_snapshot
+ComparisonScope = _dip.ComparisonScope
+DifferenceKind = _dip.DifferenceKind
+ComparisonOptions = _dip.ComparisonOptions
+Difference = _dip.Difference
+ComparisonResult = _dip.ComparisonResult
+compare = _dip.compare
+compare_diph5 = _dip.compare_diph5
+render_comparison = _dip.render_comparison
 
 PybindException = _dip.PybindException
 

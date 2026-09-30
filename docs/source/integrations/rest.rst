@@ -71,6 +71,20 @@ parameters. The list names are ``prefix``, ``base``, ``deriv``, ``log``,
 DIPL parameters
 ---------------
 
+Upload two DIPH5 files to ``POST /snt/dip/compare``. The default JSON response
+contains ``scope``, ``equal``, summary counts, a bounded ``differences`` array,
+and the number ``omitted``. Each difference contains path, category, kind,
+changed fields, before and after previews, changed element count, and sample
+flat indices. Use ``format=text`` for the same summary in plain text.
+
+.. code-block:: bash
+
+   curl -F 'before=@before.diph5' -F 'after=@after.diph5' \
+       'http://127.0.0.1:8080/snt/dip/compare?scope=full&format=text'
+
+The optional ``max_details`` and ``max_array_examples`` query parameters
+bound the output. See :doc:`DIPH5 comparison <../modules/dip/comparison>`.
+
 Send a DIPL document in the request body to ``POST /snt/dip/parse``. This can
 be inline text or a client-side file uploaded with ``curl --data-binary``; the
 server receives its contents and adds them as DIPL text. By default, the

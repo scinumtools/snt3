@@ -47,6 +47,25 @@ environment. Output validation must succeed before saving. See
 :doc:`DIP environment persistence <../dip/persistence>` for the format and its
 limitations.
 
+Comparing DIPH5 snapshots
+-------------------------
+
+``DIPCompare`` loads two snapshots and returns a structured result or bounded
+text summary:
+
+.. code-block:: cpp
+
+   #include <snt/api/dip_compare.h>
+
+   snt::api::DIPCompare command("before.diph5", "after.diph5");
+   auto result = command.compare();
+   std::string summary = command.execute();
+
+Set ``ComparisonOptions`` through ``set_options()`` to select full scope or
+change the array sample size. ``set_max_details()`` bounds ``execute()``
+output. See :doc:`DIPH5 comparison <../dip/comparison>` for the fields and
+equality semantics.
+
 Generating static parameters
 ----------------------------
 

@@ -76,6 +76,35 @@ namespace snt::server {
         }
       }
     },
+    "/snt/dip/compare": {
+      "post": {
+        "summary": "Compare two DIPH5 snapshots",
+        "description": "Compares evaluated values by default. Full scope also compares persisted metadata, provenance, settings, and manifests.",
+        "parameters": [
+          {"name": "scope", "in": "query", "schema": {"type": "string", "enum": ["effective", "full"], "default": "effective"}},
+          {"name": "format", "in": "query", "schema": {"type": "string", "enum": ["json", "text"], "default": "json"}},
+          {"name": "max_details", "in": "query", "schema": {"type": "integer", "minimum": 0, "default": 50}},
+          {"name": "max_array_examples", "in": "query", "schema": {"type": "integer", "minimum": 0, "default": 3}}
+        ],
+        "requestBody": {"required": true, "content": {
+          "multipart/form-data": {"schema": {"type": "object", "required": ["before", "after"], "properties": {
+            "before": {"type": "string", "format": "binary"},
+            "after": {"type": "string", "format": "binary"}
+          }}}
+        }},
+        "responses": {
+          "200": {"description": "Comparison summary", "content": {
+            "application/json": {"schema": {"type": "object", "required": ["scope", "equal", "added", "removed", "changed", "differences", "omitted"], "properties": {
+              "scope": {"type": "string"}, "equal": {"type": "boolean"},
+              "added": {"type": "integer"}, "removed": {"type": "integer"}, "changed": {"type": "integer"},
+              "differences": {"type": "array", "items": {"type": "object"}}, "omitted": {"type": "integer"}
+            }}},
+            "text/plain": {"schema": {"type": "string"}}
+          }},
+          "400": {"$ref": "#/components/responses/error"}
+        }
+      }
+    },
     "/snt/dip/report": {
       "post": {
         "summary": "Generate a report from client-supplied DIPL",

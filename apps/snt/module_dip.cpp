@@ -1,5 +1,6 @@
 #include "argparser.h"
 #include "main.h"
+#include "snt/api/dip_compare.h"
 #include "snt/api/dip_parse.h"
 
 #include <cstddef>
@@ -9,6 +10,7 @@
 #include <map>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
 
 using namespace snt;
 
@@ -19,6 +21,7 @@ Module: Dimensional Input Parameters (DIP)
 
 Usage:
   snt dip parse [options] [arguments]
+  snt dip compare <before.diph5> <after.diph5> [options]
 
 Description:
   Parse and query dimensional input parameter definitions.
@@ -61,6 +64,7 @@ Examples:
   snt dip parse -i file parameters.dip --save parameters.diph5
   snt dip parse --load parameters.diph5 --print
   snt dip parse -i file parameters.dip --generate cpp parameters.hpp
+  snt dip compare before.diph5 after.diph5 --scope full
 
   snt dip parse \
       -i file parameters.dip \
@@ -68,6 +72,47 @@ Examples:
       -r "family.father" \
       --print
 )";
+}
+
+int module_dip_compare(int argc, char* argv[]) {
+    if (argc == 2 && std::string(argv[1]) == "--help") {
+        std::cout << "Usage: snt dip compare <before.diph5> <after.diph5> "
+                     "[--scope effective|full] [--max-details N] [--max-array-examples N]\n";
+        return 0;
+    }
+    std::vector<std::string> paths;
+    dip::ComparisonOptions options;
+    std::size_t max_details = 50;
+    for (int index = 1; index < argc; ++index) {
+        const std::string argument = argv[index];
+        if (argument == "--scope" || argument == "--max-details" || argument == "--max-array-examples") {
+            if (++index >= argc)
+                throw std::invalid_argument(argument + " requires a value.");
+            const std::string value = argv[index];
+            if (argument == "--scope") {
+                if (value == "full") options.scope = dip::ComparisonScope::Full;
+                else if (value != "effective") throw std::invalid_argument("Scope must be effective or full.");
+            } else {
+                if (value.empty() || value.find_first_not_of("0123456789") != std::string::npos)
+                    throw std::invalid_argument(argument + " requires a nonnegative integer.");
+                const auto count = static_cast<std::size_t>(std::stoull(value));
+                if (argument == "--max-details") max_details = count;
+                else options.max_array_examples = count;
+            }
+        } else if (!argument.empty() && argument[0] == '-') {
+            throw std::invalid_argument("Unknown comparison option: " + argument);
+        } else {
+            paths.push_back(argument);
+        }
+    }
+    if (paths.size() != 2)
+        throw std::invalid_argument("Compare requires exactly two DIPH5 file paths.");
+    api::DIPCompare command(paths[0], paths[1]);
+    command.set_options(options);
+    command.set_max_details(max_details);
+    const auto result = command.compare();
+    std::cout << api::render_dip_comparison(result, max_details);
+    return result.equal() ? 0 : 1;
 }
 
 void module_dip(ArgParser& argpar) {
