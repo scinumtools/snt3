@@ -34,6 +34,7 @@ namespace snt::dip {
     /** Retains evaluation order and provides effective forward and reverse links. */
     class DependencyGraph {
       public:
+        bool recorded = false; ///< True when DIP captured this graph during parsing.
         std::vector<DependencyEvent> events;
 
         /** Latest event for this owner and kind. */

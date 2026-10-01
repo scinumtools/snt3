@@ -400,9 +400,38 @@ The read-only DIP inspection API gives a renderer stable paths, effective
 values, units, metadata, source locations, applied changes, and schema facts.
 ``inspect_values(env)`` retains environment order. A value's ``changes`` list
 is also in evaluation order. ``inspect_capabilities(env, path)`` tells a client
-whether a path contains a value, children, an array, or a table. Flags for
-direct editing remains false. ``inspect_dependency_graph(env)`` returns
-recorded node reads and numerical or logical operation trees when available.
+whether a path contains a value, children, an array, or a table. The direct
+editing flags remain false. Dependency recording is off by default. Parse with
+``DIP.parse(record_dependency_graph=True)`` or
+``open_artifact(path, record_dependency_graph=True)`` to capture a graph.
+Pass the option again to ``reload_artifact`` when refreshing parsed source.
+``inspect_dependency_graph(env)`` returns its node reads and numerical or
+logical operation trees. The graph's ``recorded`` flag distinguishes a captured
+graph from an ordinary parse.
+
+.. code-block:: python
+
+   from scinumtools3.dip import DIP, DependencyEventKind, inspect_dependency_graph
+
+   parser = DIP()
+   parser.add_string(
+       "distance float = 12 m\n"
+       "time float = 3 s\n"
+       "speed float = ({?distance} / {?time}) m/s\n"
+   )
+   env = parser.parse(record_dependency_graph=True)
+   graph = inspect_dependency_graph(env)
+   print([edge.target for edge in graph.dependencies("?speed")])
+   event = graph.latest("?speed", DependencyEventKind.Value)
+   if event is not None and event.composition is not None:
+       print(event.composition.root, len(event.composition.nodes))
+
+Node IDs use ``?path`` for the current environment and ``source?path`` for
+imports. ``dependencies`` reports the latest value evaluation; ``events`` also
+retains earlier evaluations and branch decisions. DIPH5 snapshots retain a
+recorded graph when saved, and loading uses that saved state regardless of the
+``record_dependency_graph`` option. See :doc:`the DIP inspection guide
+<../modules/dip/inspection>` for graph semantics and limitations.
 
 .. code-block:: python
 

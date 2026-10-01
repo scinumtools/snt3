@@ -10,6 +10,7 @@ Load DIPL definitions, evaluate environments, and retrieve values.
       include/snt/dip/dip.h
       include/snt/dip/environment.h
       include/snt/dip/diagnostic.h
+      include/snt/dip/dependency_graph.h
       include/snt/dip/inspection.h
       include/snt/dip/exceptions.h
       include/snt/dip/settings.h

@@ -20,11 +20,16 @@ ArtifactKind detect_artifact(const std::filesystem::path& path);
 
 /** Load a project, DIPL file, or DIPH5 snapshot into a new environment.
  * .dipt is table input within DIPL, not a standalone environment.
+ * Recording is opt-in for parsed sources; snapshots retain their saved graph state
+ * regardless of record_dependency_graph.
  */
-Environment open_artifact(const std::filesystem::path& path);
+Environment open_artifact(const std::filesystem::path& path, bool record_dependency_graph = false);
 
-/** Replace the current environment only after the new artifact loads successfully. */
-void reload_artifact(Environment& current, const std::filesystem::path& path);
+/** Replace the current environment only after the new artifact loads successfully.
+ * Pass record_dependency_graph again when refreshing parsed source with a graph.
+ */
+void reload_artifact(Environment& current, const std::filesystem::path& path,
+                     bool record_dependency_graph = false);
 
 /** Owned, read-only facts about one evaluated value. */
 enum class ValueChangeKind { Declaration, Modification, Override };

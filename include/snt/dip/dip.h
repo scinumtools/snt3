@@ -153,8 +153,9 @@ namespace snt::dip {
 
         /**
          * Parse DIPL code lines and return an environment with registered schemas.
+         * Recording dependencies is opt-in to avoid graph allocations during ordinary parsing.
          */
-        Environment parse();
+        Environment parse(bool record_dependency_graph = false);
 
         /**
          * Get a string representation of the current DIPL instance

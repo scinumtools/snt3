@@ -85,8 +85,9 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
         "chosen bool = ({?result} > 5 m && {?source} < 4 m)\n"
         "result = {?source} m\n"
     );
-    auto env = parser.parse();
+    auto env = parser.parse(true);
     const auto& graph = env.dependency_graph();
+    EXPECT_TRUE(graph.recorded);
     const auto* previous = graph.latest("?chosen", dip::DependencyEventKind::Value);
     ASSERT_NE(previous, nullptr);
     ASSERT_TRUE(previous->composition.has_value());
@@ -108,6 +109,7 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
     dip::Environment restored;
     restored.load(file);
     std::filesystem::remove(file);
+    EXPECT_TRUE(restored.dependency_graph().recorded);
     const auto* restored_event = restored.dependency_graph().latest("?chosen", dip::DependencyEventKind::Value);
     ASSERT_NE(restored_event, nullptr);
     ASSERT_TRUE(restored_event->composition.has_value());
@@ -116,6 +118,31 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
     ASSERT_TRUE(restored_event->location.has_value());
     EXPECT_EQ(restored_event->location->line, previous->location->line);
     EXPECT_EQ(restored.dependency_graph().dependencies("?result").front().target, "?source");
+}
+
+TEST(Inspection, DependencyRecordingIsOptIn) {
+    const std::string code = "base int = 4\nresult int = ({?base} + 2)\n";
+    dip::DIP fast_parser;
+    fast_parser.add_string(code);
+    auto fast = fast_parser.parse();
+    EXPECT_FALSE(fast.dependency_graph().recorded);
+    EXPECT_TRUE(fast.dependency_graph().events.empty());
+    EXPECT_FALSE(dip::inspect_capabilities(fast, "result").hasReferenceGraph);
+
+    dip::DIP graph_parser;
+    graph_parser.add_string(code);
+    auto recorded = graph_parser.parse(true);
+    EXPECT_TRUE(recorded.dependency_graph().recorded);
+    ASSERT_EQ(recorded.dependency_graph().dependencies("?result").size(), 1);
+    EXPECT_EQ(fast["result"].as<int>(), recorded["result"].as<int>());
+
+    const auto file = std::filesystem::temp_directory_path() / "snt-no-graph-roundtrip.diph5";
+    fast.save(file);
+    dip::Environment restored;
+    restored.load(file);
+    std::filesystem::remove(file);
+    EXPECT_FALSE(restored.dependency_graph().recorded);
+    EXPECT_TRUE(restored.dependency_graph().events.empty());
 }
 
 TEST(Inspection, DependencyGraphResolvesRelativeReadsAndConditions) {
@@ -128,7 +155,7 @@ TEST(Inspection, DependencyGraphResolvesRelativeReadsAndConditions) {
         "    result float = ({.crackle} + {...snap})\n"
         "      !condition ({.} > 0)\n"
     );
-    const auto env = parser.parse();
+    const auto env = parser.parse(true);
     const auto& graph = env.dependency_graph();
     const auto reads = graph.dependencies("?foo.bar.result");
     ASSERT_EQ(reads.size(), 2);
@@ -144,7 +171,7 @@ TEST(Inspection, DependencyGraphResolvesRelativeReadsAndConditions) {
 TEST(Inspection, DependencyGraphConnectsBranchDecisionsToValues) {
     dip::DIP parser;
     parser.add_string("enabled bool = true\n@if ({?enabled} == true)\n  answer int = 42\n@end\n");
-    const auto env = parser.parse();
+    const auto env = parser.parse(true);
     const auto& graph = env.dependency_graph();
     const auto* decision = graph.latest("#case:1", dip::DependencyEventKind::Decision);
     ASSERT_NE(decision, nullptr);
@@ -206,6 +233,8 @@ TEST(Inspection, ArtifactDetectionAndFreshReload) {
     { std::ofstream output(bad); output << "answer int = \"bad\"\n"; }
 
     auto env = dip::open_artifact(good);
+    EXPECT_FALSE(env.dependency_graph().recorded);
+    EXPECT_TRUE(dip::open_artifact(good, true).dependency_graph().recorded);
     EXPECT_EQ(env["answer"].as<int>(), 7);
     EXPECT_EQ(dip::inspect_value(env, "answer").declaration_location.source, good.string());
     EXPECT_THROW(dip::reload_artifact(env, bad), std::exception);

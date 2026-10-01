@@ -25,12 +25,19 @@ from scinumtools3.dip import (
 
 
 def test_dependency_graph_exposes_operation_tree_and_survives_snapshot(tmp_path):
+    fast_parser = DIP()
+    fast_parser.add_string("distance float = 12 m\ntime float = 3 s\nspeed float = ({?distance} / {?time}) m/s\n")
+    fast_env = fast_parser.parse()
+    assert not inspect_dependency_graph(fast_env).recorded
+    assert inspect_dependency_graph(fast_env).events == []
+
     parser = DIP()
     parser.add_string("distance float = 12 m\ntime float = 3 s\nspeed float = ({?distance} / {?time}) m/s\n")
-    env = parser.parse()
+    env = parser.parse(record_dependency_graph=True)
 
     def check(current):
         graph = inspect_dependency_graph(current)
+        assert graph.recorded
         event = graph.latest("?speed", DependencyEventKind.Value)
         assert event is not None
         assert {edge.target for edge in graph.dependencies("?speed")} == {"?distance", "?time"}

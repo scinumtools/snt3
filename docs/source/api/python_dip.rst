@@ -3,7 +3,9 @@ DIP Python API
 
 DIPL parsing, evaluation environments, tree traversal, and parameter nodes.
 The inspection functions expose evaluated value snapshots, ordered table
-metadata, in-memory slices, artifact loading, and structured DIP diagnostics.
+metadata, in-memory slices, artifact loading, optional dependency graphs, and
+structured DIP diagnostics. See :doc:`the DIP inspection guide
+<../modules/dip/inspection>` for graph recording and interpretation.
 The adapter classes and runners are documented in :doc:`the adapter guide
 <../modules/dip/adapters>`.
 

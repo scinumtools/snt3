@@ -17,7 +17,7 @@ TEST(ReferencesImports, ImportNode) {
     d.add_string("bar {?foo.snap}");
     d.add_string("baz");
     d.add_string("  {?foo.crackle}");
-    dip::Environment env = d.parse();
+    dip::Environment env = d.parse(true);
     EXPECT_EQ(env.nodes.size(), 4);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(2);
@@ -52,7 +52,7 @@ TEST(ReferencesImports, ImportNodeRemote) {
     dip::DIP d;
     d.add_string("$source " + source_name + " = \"" + source_filename.string() + "\"");
     d.add_string("pop {" + source_name + "?foo.bar}");
-    dip::Environment env = d.parse();
+    dip::Environment env = d.parse(true);
     EXPECT_EQ(env.nodes.size(), 1);
 
     // remove temporary file

@@ -531,7 +531,7 @@ overrides list : snt_project_override
         env.sources.append(source_name, source_file, source_code, parent);
     }
 
-    Environment DIP::parse() {
+    Environment DIP::parse(bool record_dependency_graph) {
         NodeList<BaseNode> queue = parse_code_nodes(lines);
         NodeList<BaseNode> queue_filtered;
 
@@ -614,6 +614,7 @@ overrides list : snt_project_override
 
         // parse other nodes
         Environment target = env;
+        target.set_dependency_recording(record_dependency_graph);
         while (queue.size() > 0) {
             BaseNode::PointerType node = queue.pop_front();
             BaseNode::PointerType replacement;
@@ -649,35 +650,46 @@ overrides list : snt_project_override
             if (!target.branching.false_case() || node->dtype == NodeDtype::Case) {
                 BaseNode::ListType parsed;
                 if (replacement && declared) {
-                    Environment::DependencyScope graph_scope(
-                        target, "?" + graph_path, DependencyEventKind::Value,
-                        core::SourceLocation{replacement->line.source.name, replacement->line.source.line_number,
-                                             replacement->line.code}
-                    );
+                    std::optional<Environment::DependencyScope> graph_scope;
+                    if (record_dependency_graph)
+                        graph_scope.emplace(
+                            target, "?" + graph_path, DependencyEventKind::Value,
+                            core::SourceLocation{replacement->line.source.name, replacement->line.source.line_number,
+                                                 replacement->line.code}
+                        );
                     declared->apply_override(replacement, target);
-                    graph_value_evaluated = true;
+                    graph_value_evaluated = record_dependency_graph;
                     target.overrides.consume(replacement->path.name);
                 } else if (!suppress_value) {
                     if (value_node && !already_defined &&
                         !(node->value_origin == ValueOrigin::Empty && node->value_raw.empty())) {
-                        Environment::DependencyScope graph_scope(
-                            target, "?" + graph_path, DependencyEventKind::Value,
-                            core::SourceLocation{node->line.source.name, node->line.source.line_number, node->line.code}
-                        );
-                        const auto imported = std::dynamic_pointer_cast<ValueNode>(node);
-                        if (imported && !imported->copied_from.empty())
-                            target.record_import_origin(imported->copied_from);
+                        std::optional<Environment::DependencyScope> graph_scope;
+                        if (record_dependency_graph) {
+                            graph_scope.emplace(
+                                target, "?" + graph_path, DependencyEventKind::Value,
+                                core::SourceLocation{node->line.source.name, node->line.source.line_number,
+                                                     node->line.code}
+                            );
+                            const auto imported = std::dynamic_pointer_cast<ValueNode>(node);
+                            if (imported && !imported->copied_from.empty())
+                                target.record_import_origin(imported->copied_from);
+                        }
                         parsed = node->parse(target);
-                        graph_value_evaluated = true;
+                        graph_value_evaluated = record_dependency_graph;
                     } else if (node->dtype == NodeDtype::Case) {
-                        Environment::DependencyScope graph_scope(
-                            target, "#case:pending", DependencyEventKind::Decision,
-                            core::SourceLocation{node->line.source.name, node->line.source.line_number, node->line.code}
-                        );
+                        std::optional<Environment::DependencyScope> graph_scope;
+                        if (record_dependency_graph)
+                            graph_scope.emplace(
+                                target, "#case:pending", DependencyEventKind::Decision,
+                                core::SourceLocation{node->line.source.name, node->line.source.line_number,
+                                                     node->line.code}
+                            );
                         parsed = node->parse(target);
-                        const auto case_node = std::dynamic_pointer_cast<CaseNode>(node);
-                        if (case_node)
-                            target.set_active_dependency_owner("#case:" + std::to_string(case_node->case_id));
+                        if (record_dependency_graph) {
+                            const auto case_node = std::dynamic_pointer_cast<CaseNode>(node);
+                            if (case_node)
+                                target.set_active_dependency_owner("#case:" + std::to_string(case_node->case_id));
+                        }
                     } else {
                         parsed = node->parse(target);
                     }
@@ -718,13 +730,15 @@ overrides list : snt_project_override
                                 node->value_raw.empty()) {
                                 mnode->modify_value(node, target);
                             } else {
-                                Environment::DependencyScope graph_scope(
-                                    target, "?" + node->path.name, DependencyEventKind::Value,
-                                    core::SourceLocation{node->line.source.name, node->line.source.line_number,
-                                                         node->line.code}
-                                );
+                                std::optional<Environment::DependencyScope> graph_scope;
+                                if (record_dependency_graph)
+                                    graph_scope.emplace(
+                                        target, "?" + node->path.name, DependencyEventKind::Value,
+                                        core::SourceLocation{node->line.source.name, node->line.source.line_number,
+                                                             node->line.code}
+                                    );
                                 mnode->modify_value(node, target);
-                                graph_value_evaluated = true;
+                                graph_value_evaluated = record_dependency_graph;
                             }
                         }
                         new_node = false;
@@ -755,7 +769,7 @@ overrides list : snt_project_override
                         );
                     target.nodes.push_back(vnode);
                 }
-                if (graph_value_evaluated)
+                if (record_dependency_graph && graph_value_evaluated)
                     target.set_value_controls("?" + node->path.name, target.branching.active_case_ids());
             }
         }
@@ -785,11 +799,13 @@ overrides list : snt_project_override
                     vnode->validate_definition();
                     vnode->validate_options();
                     if (!vnode->condition.empty()) {
-                        Environment::DependencyScope graph_scope(
-                            target, "?" + vnode->path.name, DependencyEventKind::Condition,
-                            core::SourceLocation{vnode->line.source.name, vnode->line.source.line_number,
-                                                 vnode->line.code}
-                        );
+                        std::optional<Environment::DependencyScope> graph_scope;
+                        if (record_dependency_graph)
+                            graph_scope.emplace(
+                                target, "?" + vnode->path.name, DependencyEventKind::Condition,
+                                core::SourceLocation{vnode->line.source.name, vnode->line.source.line_number,
+                                                     vnode->line.code}
+                            );
                         vnode->validate_condition(target);
                     }
                     vnode->validate_format();

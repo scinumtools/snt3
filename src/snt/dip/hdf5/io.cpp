@@ -1187,6 +1187,7 @@ namespace snt::dip::hdf5 {
             const std::string path = "/" + std::string(GROUP_DEPENDENCIES);
             Id root(H5Gcreate2(file, path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
                     "Unable to create the DIP dependency graph");
+            write_scalar<uint8_t>(root, "recorded", H5T_NATIVE_UINT8, graph.recorded ? 1 : 0);
             for (size_t index = 0; index < graph.events.size(); ++index) {
                 const auto& event = graph.events[index];
                 Id entry(H5Gcreate2(root, std::to_string(index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
@@ -1238,6 +1239,7 @@ namespace snt::dip::hdf5 {
                 throw Error("A DIPH5 2.7 file is missing its DIP dependency graph");
             Id root(H5Gopen2(file, path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the DIP dependency graph");
             DependencyGraph graph;
+            graph.recorded = read_scalar<uint8_t>(root, "recorded", H5T_NATIVE_UINT8, 1) != 0;
             const auto count = object_count(root);
             for (size_t index = 0; index < count; ++index) {
                 Id entry(H5Gopen2(root, std::to_string(index).c_str(), H5P_DEFAULT), H5Gclose,

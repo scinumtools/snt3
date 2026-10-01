@@ -82,7 +82,13 @@ recorded references or an expression tree. ``sourceEditable`` and
 Dependency and operation graph
 ------------------------------
 
-``env.dependency_graph()`` retains DIP evaluation events in order. A value
+Dependency recording is opt-in. Use ``parser.parse(true)`` or
+``open_artifact(path, true)`` when the graph is needed. Ordinary parsing skips
+graph allocation and keeps the EXS solver on its graph-free path. Pass ``true``
+again to ``reload_artifact(env, path, true)`` when refreshing a graph view.
+
+``env.dependency_graph()`` retains DIP evaluation events in order. Its
+``recorded`` flag distinguishes a captured graph from an ordinary parse. A value
 event records the nodes read while assigning a value; condition and branch
 decision events are separate. Node IDs use ``?path`` for the current
 environment and ``source?path`` for imported sources. ``dependencies`` returns
@@ -103,6 +109,7 @@ this graph.
 
 .. code-block:: cpp
 
+   auto env = snt::dip::open_artifact("DIPfile", true);
    const auto& graph = env.dependency_graph();
    for (const auto& read : graph.dependencies("?physics.speed")) {
        // read.target is the resolved DIP node ID.
@@ -113,11 +120,14 @@ this graph.
        const auto root = calculation->composition->root;
    }
 
-The graph is retained in DIPH5 2.7 snapshots. Older snapshots load normally,
-but have no recorded graph. A function callback contributes node links only
-for DIP values it actually requests through the environment. Conditional
-expression operands are evaluated according to the current EXS semantics;
-the links mean "read during evaluation," not "necessary for the final result."
+The graph is retained in DIPH5 2.7 snapshots when recording was enabled.
+Loading a snapshot uses its saved graph state, regardless of the recording
+option passed to ``open_artifact`` or ``reload_artifact``. Older snapshots load
+normally, but have no recorded graph. A function callback contributes node
+links only for DIP values it actually requests through the environment.
+Conditional expression operands are evaluated according to the current EXS
+semantics; the links mean "read during evaluation," not "necessary for the final
+result."
 
 Errors can be converted to the shared ``snt::core::Diagnostic`` type without
 parsing formatted exception text. It retains the exception category, message,

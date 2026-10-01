@@ -113,6 +113,7 @@ void init_inspection(py::module_& m) {
         .def_readonly("composition", &dip::DependencyEvent::composition)
         .def_readonly("reads", &dip::DependencyEvent::reads);
     py::class_<dip::DependencyGraph>(m, "DependencyGraph")
+        .def_readonly("recorded", &dip::DependencyGraph::recorded)
         .def_readonly("events", &dip::DependencyGraph::events)
         .def("latest", [](const dip::DependencyGraph& graph, const std::string& owner,
                            dip::DependencyEventKind kind) -> py::object {
@@ -138,9 +139,11 @@ void init_inspection(py::module_& m) {
     m.def("detect_artifact", &dip::detect_artifact, py::arg("path"),
           "Classify a DIP path by its filename without reading its contents.");
     m.def("open_artifact", &dip::open_artifact, py::arg("path"),
-          "Open a DIPfile, DIPL source, or DIPH5 snapshot into a new Environment.");
+          py::arg("record_dependency_graph") = false,
+          "Open a DIPfile, DIPL source, or DIPH5 snapshot. Graph recording is opt-in for source; snapshots use their saved graph.");
     m.def("reload_artifact", &dip::reload_artifact, py::arg("env"), py::arg("path"),
-          "Replace an Environment only after its artifact loads successfully.");
+          py::arg("record_dependency_graph") = false,
+          "Replace an Environment after successful load; request graph recording again for parsed source.");
     m.def("inspect_value", &dip::inspect_value, py::arg("env"), py::arg("path"),
           "Return an owned snapshot of an evaluated value and its provenance.");
     m.def("inspect_values", [](const dip::Environment& env) {

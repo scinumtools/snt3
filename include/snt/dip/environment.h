@@ -96,6 +96,7 @@ namespace snt::dip {
         bool schema_manifest_loaded_ = false;
         bool trace_manifest_loaded_ = false;
         bool snapshot_loaded_ = false;
+        bool dependency_recording_ = false;
         mutable DependencyGraph dependency_graph_;
         mutable std::optional<size_t> active_dependency_event_;
 
@@ -119,8 +120,19 @@ namespace snt::dip {
 
         /** Graph captured during DIP evaluation. Loaded snapshots may have no graph. */
         const DependencyGraph& dependency_graph() const { return dependency_graph_; }
+        /** Enable graph capture for this parse. */
+        void set_dependency_recording(bool enabled) {
+            dependency_recording_ = enabled;
+            dependency_graph_ = DependencyGraph{};
+            dependency_graph_.recorded = enabled;
+            active_dependency_event_.reset();
+        }
         /** Restore a graph from a versioned snapshot. */
-        void set_dependency_graph(DependencyGraph graph) { dependency_graph_ = std::move(graph); }
+        void set_dependency_graph(DependencyGraph graph) {
+            dependency_recording_ = false;
+            dependency_graph_ = std::move(graph);
+            active_dependency_event_.reset();
+        }
 
         /** Scope one parser evaluation. Restores the previous context on exit. */
         class DependencyScope {

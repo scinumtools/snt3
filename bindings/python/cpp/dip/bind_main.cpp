@@ -151,7 +151,8 @@ Args:
             "    callback: Callable receiving an Environment and returning value nodes."
         );
 
-        dip.def("parse", &dip::DIP::parse, "Parse and evaluate all added DIPL inputs, including registered schemas.");
+        dip.def("parse", &dip::DIP::parse, py::arg("record_dependency_graph") = false,
+                "Parse and evaluate DIPL inputs; retain a dependency graph when requested (default: False).");
 
         dip.def("enter", &dip_enter);
         dip.def("exit", &dip_exit);

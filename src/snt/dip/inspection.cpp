@@ -26,17 +26,17 @@ ArtifactKind detect_artifact(const std::filesystem::path& path) {
     return ArtifactKind::Unknown;
 }
 
-Environment open_artifact(const std::filesystem::path& path) {
+Environment open_artifact(const std::filesystem::path& path, bool record_dependency_graph) {
     switch (detect_artifact(path)) {
     case ArtifactKind::Project: {
         DIP parser;
         parser.add_project(path);
-        return parser.parse();
+        return parser.parse(record_dependency_graph);
     }
     case ArtifactKind::DIPL: {
         DIP parser;
         parser.add_file(path);
-        return parser.parse();
+        return parser.parse(record_dependency_graph);
     }
     case ArtifactKind::DIPH5: {
         Environment env;
@@ -51,8 +51,9 @@ Environment open_artifact(const std::filesystem::path& path) {
     throw std::invalid_argument("Unknown DIP artifact.");
 }
 
-void reload_artifact(Environment& current, const std::filesystem::path& path) {
-    Environment fresh = open_artifact(path);
+void reload_artifact(Environment& current, const std::filesystem::path& path,
+                     bool record_dependency_graph) {
+    Environment fresh = open_artifact(path, record_dependency_graph);
     current = std::move(fresh);
 }
 
