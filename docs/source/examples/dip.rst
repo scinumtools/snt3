@@ -118,10 +118,13 @@ how to add context to the generated report. The
 included in the repository for immediate viewing.
 
 The PDF contents page links to an ``Override example`` subsection. The
-Parameters section shows the effective ``experiment.flow_speed`` value of
+Parameter guide links effective values to their full entries. The Parameters
+section shows the effective ``experiment.flow_speed`` value of
 ``3 m/s`` alongside its ``2 m/s`` declaration and ``overrides.dip:1`` source.
-It also lists the custom
-units, schema information, and available publication references. From the
+The derived ``experiment.flow_distance`` entry shows the speed and duration
+values read during evaluation. The Schemas section lists the parameters each
+schema supplied. The report also lists custom units and available publication
+references. From the
 repository root, generate a TeX file without external tools:
 
 .. code-block:: bash

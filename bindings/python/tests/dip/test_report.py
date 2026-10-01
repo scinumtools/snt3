@@ -19,6 +19,8 @@ def test_generate_report_from_parsed_and_loaded_environment(tmp_path: Path):
                       title="Study & report", author="Example_Team", date="2026-09-28",
                       version="v1.0")
     content = tex.read_text()
+    assert "Parameter guide" in content
+    assert "Calculation relationships are unavailable" in content
     assert "physics.speed" in content
     assert "Python example" in content
     assert "Flow \\& speed" in content
@@ -62,3 +64,29 @@ def test_generate_report_from_parsed_and_loaded_environment(tmp_path: Path):
     with pytest.raises(RuntimeError, match="unavailable"):
         loaded.generate_report(ReportFormat.PDF, tmp_path / "missing.pdf",
                              tex_compiler=str(tmp_path / "no-compiler"))
+
+
+def test_report_schema_and_recorded_dependencies_survive_snapshot(tmp_path: Path):
+    parser = DIP()
+    parser.add_schema_string("settings", "speed int = 3")
+    parser.add_string("physics : settings\ndouble_speed int = ({?physics.speed} * 2)")
+    env = parser.parse(record_dependency_graph=True)
+
+    report = tmp_path / "recorded.txt"
+    env.generate_report(ReportFormat.TEXT, report)
+    content = report.read_text()
+    assert "double_speed | 6" in content
+    assert "Supplied by schema | settings" in content
+    assert "Supplied parameters | physics.speed" in content
+    assert "Reads during evaluation | ?physics.speed" in content
+    assert "Used by | double_speed" in content
+    assert "Calculation relationships are unavailable" not in content
+
+    snapshot = tmp_path / "recorded.diph5"
+    env.save(snapshot)
+    loaded = Environment()
+    loaded.load(snapshot)
+    saved_report = tmp_path / "saved.txt"
+    loaded.generate_report(ReportFormat.TEXT, saved_report)
+    assert "Reads during evaluation | ?physics.speed" in saved_report.read_text()
+    assert "Supplied parameters | physics.speed" in saved_report.read_text()

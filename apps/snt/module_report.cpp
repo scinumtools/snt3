@@ -30,9 +30,10 @@ Usage:
   snt report [options] [arguments]
 
 Description:
-  Generate a report from an evaluated DIP environment using Brief++.
-  The report includes values, types, table summaries, applied changes, sources,
-  custom units, schemas, overrides where present, and publication metadata.
+  Generate a parameter reference from an evaluated DIP environment using Brief++.
+  The report includes effective values, source history, schema contributions,
+  and calculation relationships when a dependency graph is available.
+  DIPL inputs record the graph for this report; DIPH5 uses its saved graph.
 
 Options:
   -h, --help
@@ -172,5 +173,5 @@ void module_report(ArgParser& argpar) {
     options.date = date;
     options.version = report_version;
     options.source_root = source_root;
-    snt::api::generate_dip_report(command.evaluate(), selected_format, output, options);
+    snt::api::generate_dip_report(command.evaluate(true), selected_format, output, options);
 }

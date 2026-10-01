@@ -22,7 +22,7 @@ Parse a DIPfile project and pass the resulting environment to the API:
 
    snt::dip::DIP parser;
    parser.add_project("DIPfile");
-   auto env = parser.parse();
+   auto env = parser.parse(true);
 
    snt::dip::report::ReportOptions options;
    options.input_label = "DIPfile";
@@ -82,6 +82,22 @@ when possible.
 The report contains effective values, types, array shapes and units,
 descriptions, parameter paths, schema information, source provenance, custom
 units, registered function names, and available publication references.
+The Parameter guide lists every effective value and links to its full reference
+entry in HTML and PDF. Each entry retains its value, type, units, description,
+schema provenance, declaration, modifications, and override history. The
+Schemas section lists the parameters each schema supplied, while individual
+entries distinguish a schema applied along a path from one that supplied the
+value node.
+
+If the environment has a recorded dependency graph, parameter entries also
+show their evaluated expression, direct reads, branch selection, validation
+condition, and readers where available. These are evaluation facts: a read
+does not always mean that input was necessary for the final result. Source
+qualifiers on imported reads remain visible. Pass ``true`` to ``parse()`` to
+record this information; ordinary parsing keeps graph recording disabled.
+Reports from DIPH5 use a saved graph if present. Without one, the guide says
+that calculation relationships are unavailable.
+
 Applied value modifications appear in order with their source locations.
 Override information appears only for overridden parameters. Evaluated tables
 have a summary of their row count and ordered column names, types, and units;

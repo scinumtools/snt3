@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <snt/dip/inspection.h>
+#include <unordered_map>
 
 namespace snt::dip::report {
 
@@ -50,6 +51,8 @@ Document build_document(const dip::Environment& env, std::string input_label, st
     document.date = std::move(date);
     document.version = std::move(version);
     document.loaded_snapshot = loaded_snapshot;
+    const auto& graph = env.dependency_graph();
+    document.graph_recorded = graph.recorded;
 
     for (const auto& node : env.nodes.get_nodes()) {
         Parameter item;
@@ -74,11 +77,36 @@ Document build_document(const dip::Environment& env, std::string input_label, st
             item.applied_schemas.push_back(schema.name);
         if (const auto schema = env.get_contributing_schema(item.path))
             item.contributing_schema = schema->name;
+        if (graph.recorded) {
+            const auto id = "?" + item.path;
+            if (const auto* value = graph.latest(id, DependencyEventKind::Value)) {
+                item.expression = value->expression;
+                for (const auto& read : value->reads)
+                    if (std::find(item.reads.begin(), item.reads.end(), read.target) == item.reads.end())
+                        item.reads.push_back(read.target);
+                for (const auto& decision_id : value->controlled_by) {
+                    const auto* decision = graph.latest(decision_id, DependencyEventKind::Decision);
+                    item.selected_by.push_back(decision && !decision->expression.empty()
+                        ? decision->expression : decision_id);
+                }
+            }
+            if (const auto* condition = graph.latest(id, DependencyEventKind::Condition))
+                item.condition = condition->expression;
+        }
         document.parameters.push_back(std::move(item));
     }
     std::sort(document.parameters.begin(), document.parameters.end(), [](const Parameter& a, const Parameter& b) {
         return a.path < b.path;
     });
+    if (graph.recorded) {
+        std::unordered_map<std::string, std::vector<std::string>> readers;
+        for (const auto& item : document.parameters)
+            for (const auto& target : item.reads)
+                readers[target].push_back(item.path);
+        for (auto& item : document.parameters)
+            if (const auto found = readers.find("?" + item.path); found != readers.end())
+                item.used_by = std::move(found->second);
+    }
 
     for (const auto& inspected : dip::inspect_tables(env)) {
         Table table;
@@ -100,6 +128,13 @@ Document build_document(const dip::Environment& env, std::string input_label, st
         schema.origin = origin_of(info.source_name, info.source_line, "", info.source, source_root);
         schema.publication = publication_of(info.metadata);
         document.schemas.push_back(std::move(schema));
+    }
+    for (const auto& item : document.parameters) {
+        if (item.contributing_schema.empty()) continue;
+        const auto schema = std::find_if(document.schemas.begin(), document.schemas.end(), [&](const Schema& entry) {
+            return entry.name == item.contributing_schema;
+        });
+        if (schema != document.schemas.end()) schema->supplied_parameters.push_back(item.path);
     }
     std::sort(document.schemas.begin(), document.schemas.end(), [](const Schema& a, const Schema& b) {
         return a.name < b.name;

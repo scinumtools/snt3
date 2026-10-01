@@ -287,7 +287,7 @@ namespace snt::server {
                 const auto output = bundle.output_file(filename);
                 auto options = report_options(request);
                 options.source_root = bundle.project_file().parent_path();
-                api::generate_dip_report(command.evaluate(), format, output, options);
+                api::generate_dip_report(command.evaluate(true), format, output, options);
                 response.set_header("Content-Disposition", "attachment; filename=" + std::string(filename));
                 response.set_content(read_binary_file(output), content_type);
             });

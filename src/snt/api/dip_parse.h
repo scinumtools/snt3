@@ -86,7 +86,7 @@ namespace snt::api {
 
         /// Evaluate configured DIPL inputs or load a DIPH5 snapshot.
         /// Shared by command-line consumers that need the full environment.
-        dip::Environment evaluate();
+        dip::Environment evaluate(bool record_dependency_graph = false);
 
         /**
          * Executed parsing command

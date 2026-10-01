@@ -15,6 +15,8 @@ experiment
     ?descr "Length expressed in the custom project unit"
   flow_speed float = 2 m/s
     ?descr "Nominal inlet speed, replaced for this run"
+  flow_distance float = ({?experiment.flow_speed} * {?experiment.duration}) km
+    ?descr "Distance implied by effective flow speed and run duration"
   inlet_temperature float = 295 K
     ?descr "Initial inlet temperature"
   outlet_temperature float = 301 K

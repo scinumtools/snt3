@@ -238,7 +238,8 @@ Brief++ renders the text formats without external tools. PDF requires
 ``pdflatex`` on the server host. JSON is a ``briefpp/1`` document tree. Cover
 metadata may be supplied through ``title``, ``author``, ``date``, ``version``,
 and ``input_label`` query parameters. The report includes all evaluated
-parameters, irrespective of parse result filters. Uploaded project files are
+parameters, a linked parameter guide in HTML and PDF, schema contributions,
+and recorded calculation relationships. Uploaded project files are
 kept in a request-scoped temporary directory.
 
 .. code-block:: console

@@ -216,6 +216,11 @@ The command accepts the same ``--input`` kinds as ``snt dip parse``. A project
 may be combined with ``override_string`` or ``override_file`` inputs. A DIPH5
 ``--load`` cannot be combined with other inputs. For loaded snapshots, the
 report contains only provenance retained in DIPH5.
+Reports from DIPL inputs record evaluation dependencies automatically. The
+Parameter guide links effective values to full reference entries, and the
+Schemas section lists the parameters each schema supplied. A loaded DIPH5
+report includes calculation relationships only if its snapshot contains a
+recorded graph; otherwise the report states that they are unavailable.
 Empty groups and collections without value descendants are not present in a
 DIPH5 snapshot and therefore cannot appear in a report generated from it.
 

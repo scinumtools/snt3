@@ -67,48 +67,56 @@ and see the full flyer](https://vrtulka23.github.io/scinumtools3/initiative.html
 ## Features
 
 - **Unit-aware quantities:**
-  [parse, calculate, and convert values](https://vrtulka23.github.io/scinumtools3/modules/puq/quantities.html)
-  with units, uncertainties, arrays, prefixes, and unit systems.
+  Parse and calculate with [physical quantities](https://vrtulka23.github.io/scinumtools3/modules/puq/quantities.html),
+  then [convert units](https://vrtulka23.github.io/scinumtools3/modules/puq/conversion.html).
+  Quantities support uncertainties, arrays, prefixes, and unit systems.
 - **Single source of validated truth:**
-  [define typed, constrained DIPL hierarchies](https://vrtulka23.github.io/scinumtools3/modules/dip/basic-usage.html)
-  with expressions, dependencies,
-  metadata, and
+  Define [typed DIPL hierarchies](https://vrtulka23.github.io/scinumtools3/modules/dip/basic-usage.html)
+  with constraints, expressions, dependencies, and metadata; inspect their
   [source provenance](https://vrtulka23.github.io/scinumtools3/modules/dip/traceability.html).
 - **Reproducible parameter exchange:**
-  [persist evaluated environments in DIPH5](https://vrtulka23.github.io/scinumtools3/modules/dip/persistence.html)
+  Save evaluated environments as [DIPH5 files](https://vrtulka23.github.io/scinumtools3/modules/dip/persistence.html)
   with source-content hashes, or
-  [generate native code and data files](https://vrtulka23.github.io/scinumtools3/modules/dip/generation.html)
+  [generate native files](https://vrtulka23.github.io/scinumtools3/modules/dip/generation.html)
   for C++, C, Fortran, Rust, Julia, JSON, and YAML.
 - **Readable parameter reports:**
-  generate Brief++ reports in TeX, PDF, Markdown, HTML, and other formats
+  Generate [Brief++ reports](https://vrtulka23.github.io/scinumtools3/modules/dip/report.html)
+  in TeX, PDF, Markdown, HTML, and other formats
   with effective DIP values, units, overrides,
   provenance, schemas, and publication references. See the
   [example report and PDF](https://vrtulka23.github.io/scinumtools3/examples/dip.html#dip-create-report-example).
 - **One definition, many entry points:**
-  [use the same semantics](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
-  from C/C++17, Python, command-line, CMake, and the
-  optional local REST service.
+  Use the same semantics from C/C++17, Python, command line, CMake, and the
+  optional local REST service; see the
+  [integration guides](https://vrtulka23.github.io/scinumtools3/integrations/index.html).
 
 ## Interfaces
 
 - **C++ API:**
-  [modular C++17 libraries and application-facing commands](https://vrtulka23.github.io/scinumtools3/api/index.html).
+  [C++17 library reference](https://vrtulka23.github.io/scinumtools3/api/index.html#c-api)
+  and [application commands](https://vrtulka23.github.io/scinumtools3/api/cpp_api.html).
 - **Python:**
-  [PUQ, DIP, and API bindings](https://vrtulka23.github.io/scinumtools3/integrations/python.html),
-  with native Python values and NumPy arrays.
+  [PUQ, DIP, and API bindings](https://vrtulka23.github.io/scinumtools3/integrations/python.html)
+  with [native Python values and NumPy arrays](https://vrtulka23.github.io/scinumtools3/integrations/python.html#python-values-and-numpy).
 - **C binding:**
-  [experimental opaque-handle interfaces](https://vrtulka23.github.io/scinumtools3/integrations/c.html)
-  for PUQ and DIPL.
+  Experimental opaque-handle interfaces for
+  [PUQ](https://vrtulka23.github.io/scinumtools3/integrations/c.html#quantities-and-units)
+  and [DIPL](https://vrtulka23.github.io/scinumtools3/integrations/c.html#dipl-parameters).
 - **Command line:**
-  [PUQ evaluation and conversion, DIP parsing, DIPH5 persistence, export, and reports](https://vrtulka23.github.io/scinumtools3/integrations/cli.html).
+  [PUQ evaluation and conversion](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#quantities-and-units),
+  [DIP parsing](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#dipl-parameters),
+  DIPH5 persistence, export, and
+  [reports](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#generating-reports).
 - **CMake:**
-  [package integration and DIPL evaluation](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html)
+  [Package integration](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html#getting-started)
+  and [DIPL evaluation](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html#dipl-parameters)
   during project configuration.
 - **REST API server:**
-  [local HTTP access](https://vrtulka23.github.io/scinumtools3/integrations/rest.html)
+  [Local HTTP access](https://vrtulka23.github.io/scinumtools3/integrations/rest.html)
   to the command-oriented PUQ and DIP API.
 - **Docker:**
-  [reproducible Python and development environments](https://vrtulka23.github.io/scinumtools3/integrations/docker.html).
+  Reproducible [Python environment](https://vrtulka23.github.io/scinumtools3/integrations/docker.html#python-environment)
+  and [development environment](https://vrtulka23.github.io/scinumtools3/integrations/docker.html#development-environment).
 
 See the [integration overview](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
 for the complete usage guides.

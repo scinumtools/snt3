@@ -24,6 +24,8 @@ struct Parameter {
     Origin declaration, replacement;
     std::vector<Origin> modifications;
     Publication publication;
+    std::vector<std::string> reads, used_by, selected_by;
+    std::string expression, condition;
 };
 
 struct TableColumn {
@@ -40,6 +42,7 @@ struct Schema {
     std::string name, description;
     Origin origin;
     Publication publication;
+    std::vector<std::string> supplied_parameters;
 };
 
 struct Source {
@@ -60,6 +63,7 @@ struct Document {
     std::string introduction_tex;
     std::string title, author, date, version;
     bool loaded_snapshot = false;
+    bool graph_recorded = false;
     std::vector<Parameter> parameters;
     std::vector<Table> tables;
     std::vector<Schema> schemas;

@@ -117,6 +117,8 @@ int snt_dip_parser_add_file(snt_dip* dip, const char* path, snt_dip_error* error
 int snt_dip_parser_add_project(snt_dip* dip, const char* path, snt_dip_error* error);
 /** Parse and evaluate all sources added to a parser. */
 int snt_dip_parser_parse(snt_dip* dip, snt_dip_error* error);
+/** Parse and optionally record evaluation dependencies (nonzero enables recording). */
+int snt_dip_parser_parse_with_graph(snt_dip* dip, int record_dependency_graph, snt_dip_error* error);
 /** Format a parsed DIPL value into a caller-provided buffer. */
 int snt_dip_parser_get(const snt_dip* dip, const char* path, char* buffer, size_t capacity, snt_dip_error* error);
 /** Set result to 1 when the parsed or loaded value was explicitly overridden, otherwise 0. */

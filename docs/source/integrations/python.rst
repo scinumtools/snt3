@@ -264,7 +264,7 @@ Save evaluated parameters to DIPH5 and restore them with ``Environment``:
 
    parser = DIP()
    parser.add_string("simulation.steps int = 100")
-   env = parser.parse()
+   env = parser.parse(record_dependency_graph=True)
    env.save("parameters.diph5")
 
    restored = Environment()
@@ -358,6 +358,12 @@ Brief++ document JSON:
 The remaining format values are ``RST``, ``TYPST``, ``TEXT``, and ``JSON``.
 Markdown uses MyST-style table directives, and JSON contains a ``briefpp/1``
 document tree. These text formats need no external tools.
+The report keeps a full entry for every parameter. Its Parameter guide links
+to entries in HTML and PDF; the Schemas section lists parameters supplied by
+each schema. Parsing with ``record_dependency_graph=True`` adds evaluated
+expressions, direct reads, branch selections, and readers to the relevant
+entries. A loaded DIPH5 environment uses its saved graph if present. Without
+a graph, the report states that calculation relationships are unavailable.
 
 Use ``intro_file`` to supply a trusted LaTeX fragment without a preamble for
 TeX or PDF output. PDF generation requires a local TeX compiler; set

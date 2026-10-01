@@ -148,6 +148,11 @@ After parsing or loading an environment, call
 ``snt_dip_environment_generate_report``. Use ``SNT_DIP_REPORT_TEX`` for TeX or
 ``SNT_DIP_REPORT_PDF`` for PDF:
 
+Use ``snt_dip_parser_parse_with_graph(parser, 1, &error)`` when the report
+should include calculation reads and branch decisions. The existing
+``snt_dip_parser_parse`` keeps graph recording disabled. Both paths produce
+the full parameter reference and schema contribution view.
+
 .. code-block:: c
 
    snt_dip_error error = {0};

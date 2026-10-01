@@ -147,10 +147,10 @@ namespace snt::api {
         value_type = type;
     }
 
-    dip::Environment DIPParse::evaluate() {
+    dip::Environment DIPParse::evaluate(bool record_dependency_graph) {
         dip::Environment env;
         if (load_file.empty())
-            env = dip.parse();
+            env = dip.parse(record_dependency_graph);
         else
             env.load(load_file);
         return env;

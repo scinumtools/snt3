@@ -159,10 +159,14 @@ extern "C" int snt_dip_parser_add_project(snt_dip* dip, const char* path, snt_di
 }
 
 extern "C" int snt_dip_parser_parse(snt_dip* dip, snt_dip_error* error) {
+    return snt_dip_parser_parse_with_graph(dip, 0, error);
+}
+
+extern "C" int snt_dip_parser_parse_with_graph(snt_dip* dip, int record_dependency_graph, snt_dip_error* error) {
     try {
         if (!dip)
             throw std::invalid_argument("DIP is required");
-        dip->env = dip->parser.parse();
+        dip->env = dip->parser.parse(record_dependency_graph != 0);
         dip->parsed = true;
         ok(error);
         return 0;

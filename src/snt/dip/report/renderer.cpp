@@ -20,12 +20,27 @@ void add_table(briefpp::Node& section, const char* role, const Rows& rows) {
     for (const auto& [label, value] : rows) table.row(label, value);
 }
 
-briefpp::Node& add_heading(briefpp::Node& section, const std::string& name, bool latex) {
+briefpp::Node& add_heading(briefpp::Node& section, const std::string& name, bool latex,
+                           const std::string& id = {}) {
     if (latex) {
+        if (!id.empty()) section.raw(briefpp::Backend::Latex, "\\hypertarget{" + id + "}{}");
         section.raw(briefpp::Backend::Latex, "\\sntnode{" + briefpp::detail::escape_latex(name) + "}");
         return section;
     }
-    return section.section(name);
+    return section.section(name).label(id);
+}
+
+std::string parameter_id(size_t index) { return "snt-parameter-" + std::to_string(index + 1); }
+
+std::string overview_value(const Parameter& parameter) {
+    if (!parameter.shape.empty())
+        return "Array (" + parameter.shape + ")" + (parameter.units.empty() ? "" : " " + parameter.units);
+    const auto value = parameter.value + (parameter.units.empty() ? "" : " " + parameter.units);
+    constexpr size_t limit = 72;
+    if (value.size() <= limit) return value;
+    size_t end = limit;
+    while (end > 0 && (static_cast<unsigned char>(value[end]) & 0xc0) == 0x80) --end;
+    return value.substr(0, end) + "...";
 }
 
 std::string location(const Origin& origin) {
@@ -125,18 +140,55 @@ std::string render_document(const Document& document, ReportFormat format) {
     if (latex && !document.introduction_tex.empty())
         report.section("Introduction").raw(briefpp::Backend::Latex, document.introduction_tex);
 
+    auto& guide = report.section("Parameter guide");
+    guide.paragraph("A quick index to the full reference entries. Scalars show effective values; arrays show shape and units.");
+    if (document.parameters.empty()) {
+        guide.paragraph("No evaluated parameters.");
+    } else if (latex) {
+        std::string table = "\\begin{longtable}{@{}p{0.48\\linewidth}p{0.47\\linewidth}@{}}\n"
+                            "\\textbf{Parameter} & \\textbf{Value / summary} \\\\\n";
+        for (size_t i = 0; i < document.parameters.size(); ++i) {
+            const auto& item = document.parameters[i];
+            table += "\\hyperlink{" + parameter_id(i) + "}{\\texttt{" +
+                briefpp::detail::escape_latex(item.path) + "}} & " +
+                briefpp::detail::escape_latex(overview_value(item)) + " \\\\\n";
+        }
+        guide.raw(briefpp::Backend::Latex, table + "\\end{longtable}\n");
+    } else {
+        auto& table = guide.table().columns("Parameter", "Value / summary");
+        for (size_t i = 0; i < document.parameters.size(); ++i) {
+            const auto& item = document.parameters[i];
+            if (format == ReportFormat::Text)
+                table.row(item.path, overview_value(item));
+            else {
+                table.cell().link(item.path, "#" + parameter_id(i));
+                table.cell().text(overview_value(item));
+            }
+        }
+    }
+    if (!document.graph_recorded)
+        guide.paragraph("Calculation relationships are unavailable because no dependency graph was recorded.");
+    else
+        guide.paragraph("Inputs below are values read during evaluation; a read does not always mean the value was necessary for the result.");
+
     auto& parameters = report.section("Parameters");
     if (document.parameters.empty()) parameters.paragraph("No evaluated parameters.");
-    for (const auto& item : document.parameters) {
-        auto& node = add_heading(parameters, item.path, latex);
-        Rows primary, metadata, source;
+    for (size_t i = 0; i < document.parameters.size(); ++i) {
+        const auto& item = document.parameters[i];
+        auto& node = add_heading(parameters, item.path, latex, parameter_id(i));
+        Rows primary, metadata, explanation, source;
         add_row(primary, "Value", item.value);
         add_row(primary, "Type", item.type);
         add_row(primary, "Shape", item.shape);
         add_row(primary, "Units", item.units);
         add_row(metadata, "Description", item.description);
         add_row(metadata, "Applied schemas", joined(item.applied_schemas));
-        add_row(metadata, "Contributing schema", item.contributing_schema);
+        add_row(metadata, "Supplied by schema", item.contributing_schema);
+        add_row(explanation, "Expression", item.expression);
+        add_row(explanation, "Reads during evaluation", joined(item.reads));
+        add_row(explanation, "Selected by", joined(item.selected_by));
+        add_row(explanation, "Validation condition", item.condition);
+        add_row(explanation, "Used by", joined(item.used_by));
         add_row(source, "Declared at", location(item.declaration));
         add_row(source, "Declaration", item.declaration.code);
         for (const auto& modification : item.modifications) {
@@ -149,6 +201,7 @@ std::string render_document(const Document& document, ReportFormat format) {
         }
         add_table(node, "snt-primary", primary);
         add_table(node, "snt-metadata", metadata);
+        add_table(node, "snt-metadata", explanation);
         add_table(node, "snt-source", source);
         add_table(node, "snt-metadata", publication_rows(item.publication));
     }
@@ -175,11 +228,13 @@ std::string render_document(const Document& document, ReportFormat format) {
 
     if (!document.schemas.empty()) {
         auto& schemas = report.section("Schemas");
+        schemas.paragraph("Each schema lists the evaluated parameters it supplied. A schema may also apply to a path without supplying every value on that path.");
         for (const auto& schema : document.schemas) {
             auto& node = add_heading(schemas, schema.name, latex);
             Rows details;
             add_row(details, "Description", schema.description);
             add_row(details, "Declared at", location(schema.origin));
+            add_row(details, "Supplied parameters", joined(schema.supplied_parameters));
             add_table(node, "snt-metadata", details);
             add_table(node, "snt-metadata", publication_rows(schema.publication));
         }

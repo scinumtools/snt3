@@ -233,6 +233,25 @@ TEST_F(Environment, GenerateReport) {
     std::filesystem::remove(file);
 }
 
+TEST(DIPReport, RecordedCalculation) {
+    snt_dip* parser = nullptr;
+    snt_dip_error error{};
+    ASSERT_EQ(snt_dip_parser_create(&parser, &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_string(parser, "base int = 3\ndouble int = ({?base} * 2)", &error), 0);
+    ASSERT_EQ(snt_dip_parser_parse_with_graph(parser, 1, &error), 0);
+    const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-graph-report.txt";
+    ASSERT_EQ(snt_dip_environment_generate_report(parser, SNT_DIP_REPORT_TXT,
+        file.string().c_str(), nullptr, nullptr, nullptr, &error), 0);
+    std::ifstream generated(file);
+    std::stringstream contents;
+    contents << generated.rdbuf();
+    EXPECT_NE(contents.str().find("Reads during evaluation | ?base"), std::string::npos);
+    EXPECT_NE(contents.str().find("Used by | double"), std::string::npos);
+    generated.close();
+    std::filesystem::remove(file);
+    snt_dip_parser_free(parser);
+}
+
 TEST(DIP, RegisterSchema) {
     snt_dip* parser = nullptr;
     snt_dip_error error{};

@@ -9,15 +9,20 @@ and a LaTeX introduction. The input files
 are resolved relative to `DIPfile`.
 
 The PDF contents page links to an **Override example** in the introduction.
+The Parameter guide links every effective value to its full reference entry.
 In the Parameters section, `experiment.flow_speed` has the effective value `3 m/s`
 and shows its `2 m/s` declaration and `overrides.dip:1` replacement source.
+`experiment.flow_distance` evaluates to `129.6 km` and names the speed and
+duration values read during its calculation. The speed and duration entries
+also show that they are used by `experiment.flow_distance`.
 Also in the report,
 `experiment.sample_count` is modified in `environment.dip`, the readings table
 shows its row count and column types, `experiment.sensor` and
 `experiment.analysis` come from schemas, and
 `lab_length` and `sample_period` appear under custom units. The PDF includes a
 cover, linked contents page, and matching blocks for parameters, tables,
-schemas, and custom units.
+schemas, and custom units. The Schemas section lists the evaluated parameters
+supplied by each schema.
 
 From the repository root, build `snt` and generate a TeX report:
 

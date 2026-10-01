@@ -4,7 +4,7 @@ file(MAKE_DIRECTORY "${project_dir}")
 file(WRITE "${project_dir}/settings.dipl"
   "?descr \"Reusable settings\"\n?title \"Schema & paper\"\nspeed float = 2 m/s\n  ?descr \"Flow & speed_#%\"\n")
 file(WRITE "${project_dir}/parameters.dip"
-  "physics : settings\nname str = \"A&B_#%\"\n  ?title \"Value study\"\n  ?doi \"10.1/example_#\"\nduration float = 12 h\nduration = 14 h\nmeasurements table = \"\"\"temperature float K\ntime float s\n---\n295 0\n296 1\n\"\"\"\n")
+  "physics : settings\ndouble_speed float = ({?physics.speed} * 2) m/s\nname str = \"A&B_#%\"\n  ?title \"Value study\"\n  ?doi \"10.1/example_#\"\nduration float = 12 h\nduration = 14 h\nmeasurements table = \"\"\"temperature float K\ntime float s\n---\n295 0\n296 1\n\"\"\"\n")
 file(WRITE "${project_dir}/DIPfile"
   "units[]\n  name = \"custom_length\"\n  unit = \"2*m\"\nschemas[]\n  name = \"settings\"\n  file = \"settings.dipl\"\ncode[]\n  file = \"parameters.dip\"\n")
 file(WRITE "${project_dir}/intro.tex" "This model uses \\textbf{measured} values.\n")
@@ -41,6 +41,8 @@ foreach(expected IN ITEMS "\\begin{titlepage}" "\\tableofcontents" "\\usepackage
     "Reusable settings" "Schema \\& paper" "Flow \\& speed\\_\\#\\%" "Value study"
     "10.1/example\\_\\#" "A\\&B\\_\\#\\%" "Sources"
     "Custom units" "\\sntnode{settings}" "\\sntnode{custom\\_length}"
+    "Parameter guide" "\\hyperlink{snt-parameter-" "double\\_speed" "Reads during evaluation"
+    "?physics.speed" "Used by" "Supplied parameters" "Supplied by schema"
     "\\sntnode{DIP0}" "2*m" "parameters.dip")
   string(FIND "${tex}" "${expected}" index)
   if(index EQUAL -1)
@@ -74,7 +76,8 @@ foreach(format IN ITEMS md rst html typ txt json)
     --format "${format}" --output "${rendered}"
     --date "2026-09-28" --report-version "draft_1")
   file(READ "${rendered}" result)
-  foreach(expected IN ITEMS "physics.speed" "Override at" "Modified at" "Tables" "Column 1" "Custom units" "Flow")
+  foreach(expected IN ITEMS "physics.speed" "Override at" "Modified at" "Tables" "Column 1" "Custom units" "Flow"
+      "Parameter guide" "double" "Reads during evaluation" "Supplied parameters")
     string(FIND "${result}" "${expected}" index)
     if(index EQUAL -1)
       message(FATAL_ERROR "${format} report is missing '${expected}'")
@@ -85,6 +88,12 @@ foreach(format IN ITEMS md rst html typ txt json)
     string(LENGTH "${CMAKE_MATCH_1}" json_hash_length)
     if(NOT json_hash_length EQUAL 64)
       message(FATAL_ERROR "JSON report should retain the full SHA-256 digest")
+    endif()
+  endif()
+  if(format STREQUAL "html")
+    if(NOT result MATCHES "href=\"#snt-parameter-[0-9]+\"" OR
+       NOT result MATCHES "id=\"snt-parameter-[0-9]+\"")
+      message(FATAL_ERROR "HTML parameter guide links do not target parameter entries")
     endif()
   endif()
 endforeach()
