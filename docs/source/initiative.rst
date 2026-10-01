@@ -63,7 +63,7 @@ If you maintain or use a suitable scientific code, contact
 The initiative flyer
 --------------------
 
-.. figure:: ../img/snt_initiative_flyer_logo.png
+.. figure:: _static/snt_initiative_flyer_logo.png
    :width: 440px
    :align: center
    :alt: Flyer for the One parameter layer, many scientific codes initiative
