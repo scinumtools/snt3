@@ -1,0 +1,22 @@
+experiment
+  distance float = 12 m
+    ?descr "Distance travelled during the run"
+  duration float = 3 s
+  speed float = ({?experiment.distance} / {?experiment.duration}) m/s
+    ?descr "Distance divided by duration"
+    !condition ({.} > 0 m/s)
+  enabled bool = ({?experiment.speed} > 3 m/s)
+
+@if ({?experiment.enabled} == true)
+  status str = "fast"
+@end
+
+samples int[5] = [10, 20, 30, 40, 50]
+
+measurements table = """time float s
+temperature float K
+---
+0 295
+1 296
+2 297
+"""

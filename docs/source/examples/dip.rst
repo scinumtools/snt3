@@ -2,7 +2,7 @@ DIP examples
 ============
 
 The DIP examples cover a minimal DIPL definition, CMake configuration,
-application adapters, and report generation.
+inspection and dependency graphs, application adapters, and report generation.
 
 Quick Example
 -------------
@@ -48,6 +48,39 @@ causes CMake to reconfigure and apply the new settings.
        add_executable(dip-cmake-example main.cpp)
        set_property(TARGET dip-cmake-example PROPERTY CXX_STANDARD "${CXX_STANDARD}")
    endif()
+
+Inspection and Dependency Graph
+-------------------------------
+
+The `InspectionGraph source directory
+<https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/InspectionGraph>`_
+contains a DIPfile with an override, a calculated speed, a condition, a branch,
+a table, and an array. Its C++ program enables optional graph recording and
+prints provenance, a bounded array slice, forward and reverse dependencies,
+and the nested expression tree.
+
+From the repository root, after building the example target:
+
+.. code-block:: console
+
+   cmake --build build --target ExampleDipInspectionGraph
+   build/bin/ExampleDipInspectionGraph
+
+The output connects the calculated value to its source nodes and shows the
+expression structure:
+
+.. code-block:: text
+
+   Speed reads:
+     ?experiment.distance -> ?experiment.distance
+     ?experiment.duration -> ?experiment.duration
+   Speed expression:
+   operator div
+     operand {?experiment.distance}
+     operand {?experiment.duration}
+
+See :doc:`the inspection guide <../modules/dip/inspection>` for the meaning of
+the graph's ``?path`` IDs and its recorded events.
 
 Adapter Outputs
 ---------------
