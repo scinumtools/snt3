@@ -29,7 +29,7 @@ Modules:
   puq     Physical Units & Quantities
   dmap    Regenerate PUQ dimension-map headers (developer tool; optional)
   server  REST API server (optional build feature)
-  view    Parameter viewer (reserved for future implementation)
+  view    Read-only parameter browser (optional build feature)
 
 Run 'snt <module> --help' for module-specific commands.
 )";
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 #ifdef ENABLE_SNT_VIEW
         return module_view(argc - 1, argv + 1);
 #else
-        std::cerr << "Viewer support is not included in this build. The parameter viewer is a future feature.\n";
+        std::cerr << "Viewer support is not included in this build. Configure with ENABLE_SNT_VIEW=ON.\n";
         return 1;
 #endif
     }

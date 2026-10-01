@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cctype>
 #include <regex>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_branching.h>
@@ -236,11 +238,28 @@ namespace snt::dip {
         }
     }
 
-    std::string BranchingList::clean_name(const std::string& name) {
+    std::string BranchingList::clean_name(const std::string& name) const {
         std::ostringstream oss;
         oss << "(" << SIGN_CONDITION << "C[0-9]+" << SIGN_SEPARATOR << ")";
         std::regex pattern(oss.str());
         return std::regex_replace(name, pattern, "");
+    }
+
+    bool BranchingList::is_internal_path(const std::string& path) const {
+        size_t start = 0;
+        while (start < path.size()) {
+            const size_t end = path.find(SIGN_SEPARATOR, start);
+            const std::string component = path.substr(start, end - start);
+            if (component.size() > 2 && component[0] == SIGN_CONDITION && component[1] == 'C' &&
+                std::all_of(component.begin() + 2, component.end(), [](unsigned char ch) {
+                    return std::isdigit(ch);
+                }))
+                return true;
+            if (end == std::string::npos)
+                break;
+            start = end + 1;
+        }
+        return false;
     }
 
     std::vector<size_t> BranchingList::active_case_ids() const {

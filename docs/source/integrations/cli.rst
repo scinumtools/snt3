@@ -283,9 +283,22 @@ overwrites ``src/snt/puq/systems/dmaps/dmap_*.h``. Review the generated diff
 before committing. Its ``-e`` option replaces those headers with empty
 placeholders.
 
-``snt view`` reserves the entry point for a future parameter viewer. With
-``ENABLE_SNT_VIEW=ON``, ``snt view --help`` describes the placeholder and invoking
-it reports that the viewer is not implemented. No GUI dependencies are required
-yet.
+Build the optional read-only viewer with ``ENABLE_SNT_VIEW=ON`` after initializing
+the ``external/imgui`` and ``external/glfw`` Git submodules. This option compiles
+Dear ImGui, GLFW, and OpenGL support into the main ``snt`` executable. When the
+option is off, those GUI libraries are not compiled or linked.
+
+.. code-block:: sh
+
+   git submodule update --init external/imgui external/glfw
+   cmake -S . -B build -DENABLE_SNT_VIEW=ON
+   cmake --build build --target snt
+   build/bin/snt view parameters.dip
+
+The initial viewer browses evaluated paths, values, units, provenance, schemas,
+and recorded dependencies. It accepts ``.dip``, ``.dipl``, ``DIPfile``, and
+``.diph5`` artifacts. Use **File → Reload** or **Ctrl+R** after an external edit;
+an invalid reload retains the last valid view and displays the error. Standalone
+``.dipt`` opening and scalable access to large numerical datasets are deferred.
 
 All three features belong to the ``snt`` target and require ``ENABLE_EXEC_APPS_SNT``.

@@ -703,9 +703,20 @@ overrides list : snt_project_override
                 }
             }
             // Create hierarchical names
-            target.hierarchy.record(node, nodes_nohierarchy);
-            if (node->dtype == NodeDtype::Group && !node->schemas.empty())
-                target.hierarchy.set_schemas(node->path.name, node->schemas);
+            // Keep case-qualified paths for branch bookkeeping, while active nodes
+            // register their collections under the final semantic paths.
+            const bool active_hierarchy = node->dtype != NodeDtype::Case && !target.branching.false_case();
+            if (active_hierarchy)
+                target.hierarchy.record(node, nodes_nohierarchy, [&](const std::string& path) {
+                    return target.branching.clean_name(path);
+                });
+            else
+                target.hierarchy.record(node, nodes_nohierarchy);
+            if (node->dtype == NodeDtype::Group && !node->schemas.empty()) {
+                const std::string path = active_hierarchy
+                    ? target.branching.clean_name(node->path.name) : node->path.name;
+                target.hierarchy.set_schemas(path, node->schemas);
+            }
             // Add nodes to the node list
             if (std::find(nodes_notypes.begin(), nodes_notypes.end(), node->dtype) != nodes_notypes.end()) {
                 continue;
@@ -772,6 +783,25 @@ overrides list : snt_project_override
                 if (record_dependency_graph && graph_value_evaluated)
                     target.set_value_controls("?" + node->path.name, target.branching.active_case_ids());
             }
+        }
+        // Case-qualified collection keys are needed while parsing descendants,
+        // but the returned environment exposes only evaluated semantic paths.
+        std::vector<std::string> internal_collections;
+        for (const auto& entry : target.hierarchy.get_collections()) {
+            const std::string& path = entry.first;
+            if (target.branching.is_internal_path(path))
+                internal_collections.push_back(path);
+        }
+        for (const auto& path : internal_collections)
+            target.hierarchy.erase_collection(path);
+        for (const auto& node : target.nodes.get_nodes()) {
+            if (node && !target.hierarchy.has_collection(node->path.name))
+                throw dip::ParserException(
+                    "Missing evaluated collection",
+                    "The evaluated node `" + node->path.name + "` has no hierarchy collection.",
+                    "Check the branch and collection declarations that produced this node.",
+                    __FILE__, __LINE__, node->line
+                );
         }
         const auto unresolved = target.overrides.unresolved();
         if (!unresolved.empty()) {

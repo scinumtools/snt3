@@ -2,6 +2,7 @@
 #define DIP_HIERARCHY_LIST_H
 
 #include <snt/dip/nodes/node_base.h>
+#include <functional>
 #include <unordered_map>
 
 namespace snt::dip {
@@ -40,7 +41,8 @@ namespace snt::dip {
          * @param node Node that should be registed
          * @param excluded List of node types that will be ignored in a node hierarchy
          */
-        void record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded);
+        void record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded,
+                    const std::function<std::string(const std::string&)>& collection_path = {});
 
         /** Update indentation context without creating nodes or collection items. */
         void record_parent(const BaseNode::PointerType& node);
@@ -91,6 +93,9 @@ namespace snt::dip {
         void set_collection(
             const std::string& path, Path::Kind kind, std::vector<std::string> schemas, std::vector<std::string> items
         );
+
+        /** Remove a collection entry after parse-time path bookkeeping is complete. */
+        void erase_collection(const std::string& path);
 
         /** Record schemas applied to an existing group or collection item. */
         void set_schemas(const std::string& path, std::vector<std::string> schemas);

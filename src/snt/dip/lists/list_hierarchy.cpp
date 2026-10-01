@@ -33,12 +33,18 @@ namespace snt::dip {
         parents.push_back({node->indent, node->path.name, node->path.collections});
     }
 
-    void HierarchyList::record(const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded) {
+    void HierarchyList::record(
+        const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded,
+        const std::function<std::string(const std::string&)>& collection_path
+    ) {
         if (node->path.name == "")
             return;
         for (auto dtype : excluded)
             if (node->dtype == dtype)
                 return;
+        const auto key_for = [&](const std::string& path) {
+            return collection_path ? collection_path(path) : path;
+        };
 
         // closed children nodes and register new parent
         record_parent(node);
@@ -70,7 +76,8 @@ namespace snt::dip {
                 name_full += SIGN_SEPARATOR;
             name_full += cnode.path;
             // append FQ item selector and test if parent collections and item key exist
-            auto itc = collections.find(name_full);
+            const std::string key = key_for(name_full);
+            auto itc = collections.find(key);
             if (cnode.kind == Path::Kind::Map) {
                 if (itc == collections.end())
                     throw dip::EnvironmentException(
@@ -82,7 +89,7 @@ namespace snt::dip {
                         node->line
                     );
                 else if (itc->second.kind == Path::Kind::List && is_index_selector(cnode.item)) {
-                    validate_list_index(itc->second, name_full, cnode.item, node->line);
+                    validate_list_index(itc->second, key, cnode.item, node->line);
                 } else if (
                     std::find(itc->second.items.begin(), itc->second.items.end(), cnode.item) == itc->second.items.end()
                 )
@@ -119,13 +126,14 @@ namespace snt::dip {
                 name_full += SIGN_SEPARATOR;
             name_full += cnode.path;
             // append FQ item selector and register new collections
-            auto it = collections.find(name_full);
+            const std::string key = key_for(name_full);
+            auto it = collections.find(key);
             if (cnode.kind == Path::Kind::Map) {
                 if (it != collections.end() && it->second.kind == Path::Kind::List && is_index_selector(cnode.item)) {
-                    validate_list_index(it->second, name_full, cnode.item, node->line);
+                    validate_list_index(it->second, key, cnode.item, node->line);
                     name_full += "[" + cnode.item + "]";
                 } else if (it == collections.end()) { // create new collection
-                    collections[name_full] = Collection{name_full, {cnode.item}, Path::Kind::Map, {}};
+                    collections[key] = Collection{key, {cnode.item}, Path::Kind::Map, {}};
                 } else if (it->second.kind != Path::Kind::Map) {
                     throw dip::EnvironmentException(
                         "Invalid collection type",
@@ -151,13 +159,14 @@ namespace snt::dip {
                 }
                 if (name_full.back() != ']') {
                     name_full += "[" + cnode.item + "]";
-                    collections[name_full] = Collection{name_full, {}, Path::Kind::Item, {}};
+                    const std::string item_key = key_for(name_full);
+                    collections[item_key] = Collection{item_key, {}, Path::Kind::Item, {}};
                 }
             } else if (cnode.kind == Path::Kind::List) {
-                std::string key;
+                std::string item_index;
                 if (it == collections.end()) { // create new collection
-                    key = "0";
-                    collections[name_full] = Collection{name_full, {key}, Path::Kind::List, {}};
+                    item_index = "0";
+                    collections[key] = Collection{key, {item_index}, Path::Kind::List, {}};
                 } else if (it->second.kind != Path::Kind::List) {
                     throw dip::EnvironmentException(
                         "Invalid collection type",
@@ -168,15 +177,16 @@ namespace snt::dip {
                         node->line
                     );
                 } else { // append new item with an increased index
-                    key = std::to_string(it->second.items.size());
-                    it->second.items.push_back(key);
+                    item_index = std::to_string(it->second.items.size());
+                    it->second.items.push_back(item_index);
                 }
-                name_full += "[" + key + "]";
-                collections[name_full] = Collection{name_full, {}, Path::Kind::Item, {}};
+                name_full += "[" + item_index + "]";
+                const std::string item_key = key_for(name_full);
+                collections[item_key] = Collection{item_key, {}, Path::Kind::Item, {}};
             } else if (cnode.kind == Path::Kind::Group) {
-                auto col = collections.find(name_full);
+                auto col = collections.find(key);
                 if (col == collections.end()) {
-                    collections[name_full] = Collection{name_full, {}, Path::Kind::Group, {}};
+                    collections[key] = Collection{key, {}, Path::Kind::Group, {}};
                 }
             }
         }
@@ -258,6 +268,10 @@ namespace snt::dip {
     void HierarchyList::set_schemas(const std::string& path, std::vector<std::string> schemas) {
         get_collection(path);
         collections.at(path).schemas = std::move(schemas);
+    }
+
+    void HierarchyList::erase_collection(const std::string& path) {
+        collections.erase(path);
     }
 
     const bool HierarchyList::has_collection(const std::string& path) const {

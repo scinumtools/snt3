@@ -46,7 +46,9 @@ namespace snt::dip {
         bool false_case();
         void solve_case(const BaseNode::PointerType& node);
         void prepare_node(const BaseNode::PointerType& node);
-        std::string clean_name(const std::string& node);
+        std::string clean_name(const std::string& node) const;
+        /** Whether a path contains a parser-owned case component. */
+        bool is_internal_path(const std::string& path) const;
         /** Current decision IDs, from outermost to innermost branch. */
         std::vector<size_t> active_case_ids() const;
     };

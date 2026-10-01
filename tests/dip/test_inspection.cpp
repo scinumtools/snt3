@@ -43,6 +43,108 @@ TEST(Inspection, EvaluatedValuesAndProvenance) {
     EXPECT_FALSE(values[1].override_location.has_value());
 }
 
+TEST(Inspection, BranchCollectionsUseSemanticPaths) {
+    dip::DIP parser;
+    parser.add_string(
+        "enabled bool = true\n"
+        "@if ({?enabled} == true)\n"
+        "  status str = \"fast\"\n"
+        "  group\n"
+        "    member int = 4\n"
+        "@end\n"
+        "@if false\n"
+        "  hidden int = 1\n"
+        "@end\n"
+    );
+    const auto env = parser.parse(true);
+    EXPECT_TRUE(env.hierarchy.has_collection("status"));
+    EXPECT_TRUE(env.hierarchy.has_collection("group"));
+    EXPECT_TRUE(env.hierarchy.has_collection("group.member"));
+    EXPECT_FALSE(env.hierarchy.has_collection("hidden"));
+    for (const auto& entry : env.hierarchy.get_collections())
+        EXPECT_FALSE(env.branching.is_internal_path(entry.first)) << entry.first;
+    for (const auto& node : env.nodes.get_nodes())
+        EXPECT_TRUE(env.hierarchy.has_collection(node->path.name)) << node->path.name;
+    EXPECT_EQ(env["status"].get_provenance().source_line, 3);
+    const auto status = dip::inspect_value(env, "status");
+    EXPECT_EQ(status.value->to_string(), "\"fast\"");
+    EXPECT_EQ(status.declaration_location.line, 3);
+}
+
+TEST(Inspection, BranchCollectionsRetainMembers) {
+    dip::DIP parser;
+    parser.add_string(
+        "@if true\n"
+        "  items[]\n"
+        "    value int = 1\n"
+        "  lookup[key]\n"
+        "    value int = 2\n"
+        "@end\n"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env.hierarchy.get_collection("items").items, std::vector<std::string>({"0"}));
+    EXPECT_TRUE(env.hierarchy.has_collection("items[0]"));
+    EXPECT_TRUE(env.hierarchy.has_collection("items[0].value"));
+    EXPECT_EQ(env.hierarchy.get_collection("lookup").items, std::vector<std::string>({"key"}));
+    EXPECT_TRUE(env.hierarchy.has_collection("lookup[key]"));
+    EXPECT_TRUE(env.hierarchy.has_collection("lookup[key].value"));
+}
+
+TEST(Inspection, BranchCollectionsCombineSelectedCases) {
+    dip::DIP parser;
+    parser.add_string(
+        "@if true\n"
+        "  items[]\n"
+        "    value int = 1\n"
+        "  lookup[first]\n"
+        "    value int = 2\n"
+        "@end\n"
+        "@if false\n"
+        "  items[]\n"
+        "    value int = 99\n"
+        "  lookup[skipped]\n"
+        "    value int = 99\n"
+        "@end\n"
+        "@if true\n"
+        "  items[]\n"
+        "    value int = 3\n"
+        "  lookup[second]\n"
+        "    value int = 4\n"
+        "  @if true\n"
+        "    nested int = 5\n"
+        "  @end\n"
+        "@end\n"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env.hierarchy.get_collection("items").items, std::vector<std::string>({"0", "1"}));
+    EXPECT_EQ(env.hierarchy.get_collection("lookup").items, std::vector<std::string>({"first", "second"}));
+    for (const auto& path : {"items[0].value", "items[1].value", "lookup[first].value",
+                             "lookup[second].value", "nested"}) {
+        EXPECT_TRUE(env.hierarchy.has_collection(path)) << path;
+        EXPECT_NO_THROW(env[path].get_provenance()) << path;
+    }
+    EXPECT_FALSE(env.hierarchy.has_collection("items[2]"));
+    EXPECT_FALSE(env.hierarchy.has_collection("lookup[skipped]"));
+    for (const auto& node : env.nodes.get_nodes())
+        EXPECT_TRUE(env.hierarchy.has_collection(node->path.name)) << node->path.name;
+    for (const auto& entry : env.hierarchy.get_collections())
+        EXPECT_FALSE(env.branching.is_internal_path(entry.first)) << entry.first;
+}
+
+TEST(Inspection, NestedBranchKeepsCollectionParent) {
+    dip::DIP parser;
+    parser.add_string(
+        "lookup[key]\n"
+        "  @if true\n"
+        "    value int = 7\n"
+        "  @end\n"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env.hierarchy.get_collection("lookup").items, std::vector<std::string>({"key"}));
+    EXPECT_TRUE(env.hierarchy.has_collection("lookup[key].value"));
+    EXPECT_NO_THROW(env["lookup[key].value"].get_provenance());
+}
+
 TEST(Inspection, CapabilityFlags) {
     dip::DIP parser;
     parser.add_string("physics\n  speed float = 2 m/s\nsamples int[3] = [1, 2, 3]\nsingle int[1] = [4]\n");
