@@ -12,6 +12,10 @@ namespace snt::exs {
         }
     };
 
+    void OperatorBase::parse_for_composition(Expression& expr) {
+        parse(expr);
+    }
+
     void OperatorBase::operate_unary(TokenListBase* tokens) {
         throw exs::MissingException("Unary operation is not implemented", __FILE__, __LINE__);
     };

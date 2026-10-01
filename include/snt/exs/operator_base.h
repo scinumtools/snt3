@@ -31,6 +31,10 @@ namespace snt::exs {
          * @param expr Expression being parsed.
          */
         virtual void parse(Expression& expr);
+        /** Parse for structural inspection. Stateful operators may override this
+         * to consume the same syntax without retaining evaluation-only state.
+         */
+        virtual void parse_for_composition(Expression& expr);
         /** Apply the unary operator to the token list.
          * @param tokens Token list being processed.
          */

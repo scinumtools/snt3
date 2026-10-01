@@ -8,6 +8,7 @@ Configure expression evaluation and operator precedence.
    :undoc-members:
    :headers: include/snt/exs/exceptions.h
       include/snt/exs/expression.h
+      include/snt/exs/composition.h
       include/snt/exs/settings.h
       include/snt/exs/solver.h
       include/snt/exs/step_list.h

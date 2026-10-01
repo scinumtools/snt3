@@ -3,7 +3,9 @@
 
 #include <memory>
 #include <snt/core/settings.h>
+#include <snt/exs/composition.h>
 #include <snt/exs/exceptions.h>
+#include <snt/exs/expression_scan.h>
 #include <snt/exs/operators/arithmetic.h>
 #include <snt/exs/operators/comparison.h>
 #include <snt/exs/operators/control.h>
@@ -15,6 +17,7 @@
 #include <snt/exs/token_list.h>
 #include <stdexcept>
 #include <unordered_map>
+#include <utility>
 
 namespace snt::exs {
 
@@ -82,51 +85,53 @@ namespace snt::exs {
          * Main solver routine
          *
          * @param expression Expression that should be solved
+         * @param composition Optional output for the expression's composition graph.
          * @return Final atom object with a solution
          */
-        ATOM eval(std::string expression) {
+        ATOM eval(std::string expression, CompositionGraph* composition = nullptr) {
+            if (!composition)
+                return eval_impl<false>(std::move(expression), nullptr, nullptr);
+            CompositionGraph graph;
+            ATOM value = eval_impl<true>(std::move(expression), &graph, &graph.root);
+            *composition = std::move(graph);
+            return value;
+        }
 
-            Expression expr(expression);
+      private:
+        template <bool RECORD> ATOM eval_impl(std::string expression, CompositionGraph* graph, std::size_t* root) {
+
             // CHECKPOINT( expr.to_string() );
-            TokenList tokens(&operators, &settings);
+            TokenList tokens(&operators, &settings, graph);
 
             // Tokenize expression
-            while (expr.right.length() > 0) {
-                bool is_operator = false;
-                for (auto o : operators.order) {
-                    OperatorBase* op = operators.select(o);
-                    // CHECKPOINT( op->symbol );
-                    if (op->check(expr)) {
-                        is_operator = true;
-                        std::string left = expr.pop_left();
-                        if (left.length() > 0) {
-                            ATOM atom = ATOM::from_string(left, &settings);
-                            tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
-                        }
-                        op->parse(expr);
-                        if (op->groups.size() > 0) {
-                            std::vector<std::string> groups = op->groups;
-                            // CHECKPOINT( groups.size() )
-                            for (const auto& e : groups) {
-                                ATOM atom = eval(e);
-                                tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
-                            }
-                        }
-                        tokens.append(OPERATOR_TOKEN, op->type);
-                        // CHECKPOINT( expr.to_string() );
+            detail::scan_expression(
+                expression,
+                operators,
+                [&](std::string left) {
+                    ATOM atom = ATOM::from_string(left, &settings);
+                    if constexpr (RECORD) {
+                        const auto node = graph->nodes.size();
+                        graph->nodes.push_back({CompositionKind::Operand, left});
+                        tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom), node);
+                    } else {
+                        tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
                     }
+                },
+                [&](const std::string& group) {
+                    std::size_t child_root = 0;
+                    ATOM atom = eval_impl<RECORD>(group, graph, &child_root);
+                    if constexpr (RECORD)
+                        tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom), child_root);
+                    else
+                        tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
+                },
+                [&](int type, std::size_t group_count) {
+                    if constexpr (RECORD)
+                        tokens.append(OPERATOR_TOKEN, type, group_count);
+                    else
+                        tokens.append(OPERATOR_TOKEN, type);
                 }
-                if (is_operator == false) {
-                    expr.shift();
-                    // CHECKPOINT( expr.to_string() );
-                }
-                // CHECKPOINT( tokens.to_string(true) );
-            }
-            std::string left = expr.pop_left();
-            if (left.length() > 0) {
-                ATOM atom = ATOM::from_string(left, &settings);
-                tokens.append(ATOM_TOKEN, std::make_unique<ATOM>(atom));
-            }
+            );
             // CHECKPOINT( expr.to_string() );
 
             for (const auto& s : steps.steps) {
@@ -148,6 +153,17 @@ namespace snt::exs {
             }
 
             Token token = tokens.get_right();
+            if constexpr (RECORD) {
+                if (!token.composition_node)
+                    throw exs::ParserException(
+                        "Missing expression composition",
+                        "The evaluated expression did not produce a composition node.",
+                        "Check the configured operators and reduction steps.",
+                        __FILE__,
+                        __LINE__
+                    );
+                *root = *token.composition_node;
+            }
             // std::cout << &token << " " << token.atom << " " << token.atom->value << std::endl;
             if (!token.atom)
                 throw exs::ParserException(
@@ -161,7 +177,6 @@ namespace snt::exs {
             return ATOM(*catom);
         };
 
-      private:
         /**
          * Initialisation of a default list of operator steps
          */

@@ -71,6 +71,26 @@ TEST(UnitSolver, SolveArrays) {
     EXPECT_EQ(atom.value.to_string(), "[40, 121.5]");
 }
 
+TEST(UnitSolver, OptionalCompositionPreservesCustomOperators) {
+    exs::CompositionGraph graph;
+    auto result = puq::UnitSolver::solver.eval("[20,40.5]*kg/(m*s)2", &graph);
+    EXPECT_EQ(result.value.to_string(), "[20, 40.5]*kg*m-2*s-2");
+    ASSERT_LT(graph.root, graph.nodes.size());
+    EXPECT_EQ(graph.nodes.at(graph.root).text, "div");
+
+    exs::CompositionGraph short_graph;
+    auto short_array = puq::UnitSolver::solver.eval("[2,3]", &short_graph);
+    EXPECT_EQ(short_array.value.to_string(), "[2, 3]");
+    EXPECT_EQ(short_graph.nodes.at(short_graph.root).children.size(), 2);
+
+    auto before_inspection = puq::UnitSolver::solver.eval("(kg*s)2/(m)3");
+    const auto structure =
+        exs::build_composition_graph("(kg*s)2/(m)3", puq::UnitSolver::solver.operators, puq::UnitSolver::solver.steps);
+    EXPECT_EQ(structure.nodes.at(structure.root).text, "div");
+    auto after_inspection = puq::UnitSolver::solver.eval("(kg*s)2/(m)3");
+    EXPECT_EQ(after_inspection.value.to_string(), before_inspection.value.to_string());
+}
+
 TEST(UnitSolver, SolveErrors) {
 
     puq::UnitSolver solver;

@@ -37,6 +37,13 @@ For a different operation shape, derive from ``OperatorBase`` and override
 ``operate_unary``, ``operate_binary``, or ``operate_ternary`` as appropriate.
 The chosen step category must match that override.
 
+If a custom ``parse`` method retains state for a later ``operate_*`` call,
+also override ``parse_for_composition``. It must consume the same expression
+syntax without leaving evaluation-only state behind. The default
+implementation calls ``parse`` directly. This hook is used by the standalone
+``build_composition_graph`` pass; ``eval(expression, &graph)`` uses the normal
+parse and operation methods.
+
 Register the new operator and place its group operation before the comparison
 step:
 

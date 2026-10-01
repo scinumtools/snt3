@@ -12,6 +12,7 @@ namespace snt::puq {
         OperatorParentheses() : OperatorGroup<1>("par", {"", "(", ")", ","}, exs::PARENTHESES_OPERATOR) {}
         bool check(exs::Expression& expr) override;
         void parse(exs::Expression& expr) override;
+        void parse_for_composition(exs::Expression& expr) override;
         void operate_group(exs::TokenListBase* tokens) override;
     };
 

@@ -35,6 +35,11 @@ namespace snt::puq {
         }
     };
 
+    void OperatorParentheses::parse_for_composition(exs::Expression& expr) {
+        parse(expr);
+        exponent.pop_back();
+    }
+
     void OperatorParentheses::operate_group(exs::TokenListBase* tokens) {
         if (exponent.size() == 0)
             throw puq::ParserException(
