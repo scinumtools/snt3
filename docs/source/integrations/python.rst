@@ -401,7 +401,8 @@ values, units, metadata, source locations, applied changes, and schema facts.
 ``inspect_values(env)`` retains environment order. A value's ``changes`` list
 is also in evaluation order. ``inspect_capabilities(env, path)`` tells a client
 whether a path contains a value, children, an array, or a table. Flags for
-reference graphs and direct editing remain false.
+direct editing remains false. ``inspect_dependency_graph(env)`` returns
+recorded node reads and numerical or logical operation trees when available.
 
 .. code-block:: python
 

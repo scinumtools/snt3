@@ -7,11 +7,13 @@ from scinumtools3.dip import (
     ArtifactKind,
     DIP,
     DiagnosticSeverity,
+    DependencyEventKind,
     Environment,
     ValueChangeKind,
     detect_artifact,
     diagnostic_from_exception,
     inspect_capabilities,
+    inspect_dependency_graph,
     inspect_table,
     inspect_tables,
     inspect_value,
@@ -20,6 +22,30 @@ from scinumtools3.dip import (
     read_value_slice,
     reload_artifact,
 )
+
+
+def test_dependency_graph_exposes_operation_tree_and_survives_snapshot(tmp_path):
+    parser = DIP()
+    parser.add_string("distance float = 12 m\ntime float = 3 s\nspeed float = ({?distance} / {?time}) m/s\n")
+    env = parser.parse()
+
+    def check(current):
+        graph = inspect_dependency_graph(current)
+        event = graph.latest("?speed", DependencyEventKind.Value)
+        assert event is not None
+        assert {edge.target for edge in graph.dependencies("?speed")} == {"?distance", "?time"}
+        assert all(edge.operand for edge in graph.dependencies("?speed"))
+        assert event.composition is not None
+        assert len(event.composition.nodes) >= 3
+        assert graph.referenced_by("?distance") == ["?speed"]
+        assert inspect_capabilities(current, "speed").has_reference_graph
+
+    check(env)
+    snapshot = tmp_path / "graph.diph5"
+    env.save(snapshot)
+    loaded = Environment()
+    loaded.load(snapshot)
+    check(loaded)
 
 
 def test_table_order_and_column_values_survive_diph5(tmp_path):

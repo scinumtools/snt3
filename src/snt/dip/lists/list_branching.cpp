@@ -243,4 +243,15 @@ namespace snt::dip {
         return std::regex_replace(name, pattern, "");
     }
 
+    std::vector<size_t> BranchingList::active_case_ids() const {
+        std::vector<size_t> result;
+        result.reserve(state.size());
+        for (const auto branch_id : state) {
+            const auto& branch = branches.at(branch_id);
+            if (!branch.cases.empty())
+                result.push_back(branch.cases.back());
+        }
+        return result;
+    }
+
 } // namespace snt::dip

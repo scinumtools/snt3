@@ -11,6 +11,7 @@
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_property.h>
+#include <snt/dip/nodes/node_case.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/settings.h>
 #include <sstream>
@@ -618,14 +619,20 @@ overrides list : snt_project_override
             BaseNode::PointerType replacement;
             ValueNode::PointerType declared;
             bool suppress_value = false;
+            bool already_defined = false;
+            bool graph_value_evaluated = false;
+            const bool value_node = node->dtype == NodeDtype::Boolean || node->dtype == NodeDtype::Integer ||
+                                    node->dtype == NodeDtype::Float || node->dtype == NodeDtype::String;
+            std::string graph_path;
+            if (!target.branching.false_case() && (value_node || node->dtype == NodeDtype::Modification))
+                graph_path = target.branching.clean_name(resolved_override_path(
+                    target, target.hierarchy.get_current_path(node->indent, node->path.name).name
+                ));
             if (!target.branching.false_case() &&
                 (node->dtype == NodeDtype::Boolean || node->dtype == NodeDtype::Integer ||
                  node->dtype == NodeDtype::Float || node->dtype == NodeDtype::String ||
                  node->dtype == NodeDtype::Modification)) {
-                const std::string path = target.branching.clean_name(resolved_override_path(
-                    target, target.hierarchy.get_current_path(node->indent, node->path.name).name
-                ));
-                bool already_defined = false;
+                const std::string& path = graph_path;
                 for (const auto& existing : target.nodes.get_nodes())
                     if (existing && existing->path.name == path) {
                         already_defined = true;
@@ -642,10 +649,38 @@ overrides list : snt_project_override
             if (!target.branching.false_case() || node->dtype == NodeDtype::Case) {
                 BaseNode::ListType parsed;
                 if (replacement && declared) {
+                    Environment::DependencyScope graph_scope(
+                        target, "?" + graph_path, DependencyEventKind::Value,
+                        core::SourceLocation{replacement->line.source.name, replacement->line.source.line_number,
+                                             replacement->line.code}
+                    );
                     declared->apply_override(replacement, target);
+                    graph_value_evaluated = true;
                     target.overrides.consume(replacement->path.name);
                 } else if (!suppress_value) {
-                    parsed = node->parse(target);
+                    if (value_node && !already_defined &&
+                        !(node->value_origin == ValueOrigin::Empty && node->value_raw.empty())) {
+                        Environment::DependencyScope graph_scope(
+                            target, "?" + graph_path, DependencyEventKind::Value,
+                            core::SourceLocation{node->line.source.name, node->line.source.line_number, node->line.code}
+                        );
+                        const auto imported = std::dynamic_pointer_cast<ValueNode>(node);
+                        if (imported && !imported->copied_from.empty())
+                            target.record_import_origin(imported->copied_from);
+                        parsed = node->parse(target);
+                        graph_value_evaluated = true;
+                    } else if (node->dtype == NodeDtype::Case) {
+                        Environment::DependencyScope graph_scope(
+                            target, "#case:pending", DependencyEventKind::Decision,
+                            core::SourceLocation{node->line.source.name, node->line.source.line_number, node->line.code}
+                        );
+                        parsed = node->parse(target);
+                        const auto case_node = std::dynamic_pointer_cast<CaseNode>(node);
+                        if (case_node)
+                            target.set_active_dependency_owner("#case:" + std::to_string(case_node->case_id));
+                    } else {
+                        parsed = node->parse(target);
+                    }
                 }
                 if (parsed.size() > 0) {
                     while (parsed.size() > 0) {
@@ -679,7 +714,18 @@ overrides list : snt_project_override
                             mnode->validate_modification(node);
                         } else {
                             mnode->validate_constant();
-                            mnode->modify_value(node, target);
+                            if (node->dtype != NodeDtype::Modification && node->value_origin == ValueOrigin::Empty &&
+                                node->value_raw.empty()) {
+                                mnode->modify_value(node, target);
+                            } else {
+                                Environment::DependencyScope graph_scope(
+                                    target, "?" + node->path.name, DependencyEventKind::Value,
+                                    core::SourceLocation{node->line.source.name, node->line.source.line_number,
+                                                         node->line.code}
+                                );
+                                mnode->modify_value(node, target);
+                                graph_value_evaluated = true;
+                            }
                         }
                         new_node = false;
                     }
@@ -709,6 +755,8 @@ overrides list : snt_project_override
                         );
                     target.nodes.push_back(vnode);
                 }
+                if (graph_value_evaluated)
+                    target.set_value_controls("?" + node->path.name, target.branching.active_case_ids());
             }
         }
         const auto unresolved = target.overrides.unresolved();
@@ -736,7 +784,14 @@ overrides list : snt_project_override
                 try {
                     vnode->validate_definition();
                     vnode->validate_options();
-                    vnode->validate_condition(target);
+                    if (!vnode->condition.empty()) {
+                        Environment::DependencyScope graph_scope(
+                            target, "?" + vnode->path.name, DependencyEventKind::Condition,
+                            core::SourceLocation{vnode->line.source.name, vnode->line.source.line_number,
+                                                 vnode->line.code}
+                        );
+                        vnode->validate_condition(target);
+                    }
                     vnode->validate_format();
                 } catch (const dip::SyntaxException& exception) {
                     if (!vnode->override)

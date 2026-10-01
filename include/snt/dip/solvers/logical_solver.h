@@ -10,6 +10,8 @@ namespace snt::dip {
      * Solves logical expressions of DIP nodes
      */
     class LogicalSolver {
+      private:
+        Environment* env_;
       public:
         static exs::Solver<LogicalAtom, LogicalSettings> solver; ///< Instance of an EXS expression solver
 

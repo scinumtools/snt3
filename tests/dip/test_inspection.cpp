@@ -76,6 +76,94 @@ TEST(Inspection, CapabilityFlags) {
     std::filesystem::remove(snapshot);
 }
 
+TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
+    dip::DIP parser;
+    parser.add_string(
+        "source float = 3 m\n"
+        "other float = 4 m\n"
+        "result float = ({?source} + {?other}) m\n"
+        "chosen bool = ({?result} > 5 m && {?source} < 4 m)\n"
+        "result = {?source} m\n"
+    );
+    auto env = parser.parse();
+    const auto& graph = env.dependency_graph();
+    const auto* previous = graph.latest("?chosen", dip::DependencyEventKind::Value);
+    ASSERT_NE(previous, nullptr);
+    ASSERT_TRUE(previous->composition.has_value());
+    EXPECT_GT(previous->composition->nodes.size(), 2);
+    EXPECT_EQ(previous->reads.front().target, "?result");
+    EXPECT_FALSE(previous->reads.front().operand.empty());
+
+    const auto* current = graph.latest("?result", dip::DependencyEventKind::Value);
+    ASSERT_NE(current, nullptr);
+    ASSERT_EQ(current->reads.size(), 1);
+    EXPECT_EQ(current->reads.front().target, "?source");
+    EXPECT_EQ(graph.referenced_by("?other").size(), 0);
+    EXPECT_EQ(graph.referenced_by("?source").size(), 2);
+    EXPECT_TRUE(dip::inspect_capabilities(env, "result").hasReferenceGraph);
+    ASSERT_TRUE(env.get_node("result")->units.has_value());
+
+    const auto file = std::filesystem::temp_directory_path() / "snt-dependency-graph-roundtrip.diph5";
+    env.save(file);
+    dip::Environment restored;
+    restored.load(file);
+    std::filesystem::remove(file);
+    const auto* restored_event = restored.dependency_graph().latest("?chosen", dip::DependencyEventKind::Value);
+    ASSERT_NE(restored_event, nullptr);
+    ASSERT_TRUE(restored_event->composition.has_value());
+    EXPECT_EQ(restored_event->composition->nodes.size(), previous->composition->nodes.size());
+    EXPECT_EQ(restored_event->reads.front().operand, previous->reads.front().operand);
+    ASSERT_TRUE(restored_event->location.has_value());
+    EXPECT_EQ(restored_event->location->line, previous->location->line);
+    EXPECT_EQ(restored.dependency_graph().dependencies("?result").front().target, "?source");
+}
+
+TEST(Inspection, DependencyGraphResolvesRelativeReadsAndConditions) {
+    dip::DIP parser;
+    parser.add_string(
+        "snap int = 30\n"
+        "foo\n"
+        "  bar\n"
+        "    crackle float = 2\n"
+        "    result float = ({.crackle} + {...snap})\n"
+        "      !condition ({.} > 0)\n"
+    );
+    const auto env = parser.parse();
+    const auto& graph = env.dependency_graph();
+    const auto reads = graph.dependencies("?foo.bar.result");
+    ASSERT_EQ(reads.size(), 2);
+    EXPECT_EQ(reads[0].target, "?foo.bar.crackle");
+    EXPECT_EQ(reads[1].target, "?snap");
+    const auto* condition = graph.latest("?foo.bar.result", dip::DependencyEventKind::Condition);
+    ASSERT_NE(condition, nullptr);
+    ASSERT_EQ(condition->reads.size(), 1);
+    EXPECT_EQ(condition->reads.front().target, "?foo.bar.result");
+    EXPECT_TRUE(condition->composition.has_value());
+}
+
+TEST(Inspection, DependencyGraphConnectsBranchDecisionsToValues) {
+    dip::DIP parser;
+    parser.add_string("enabled bool = true\n@if ({?enabled} == true)\n  answer int = 42\n@end\n");
+    const auto env = parser.parse();
+    const auto& graph = env.dependency_graph();
+    const auto* decision = graph.latest("#case:1", dip::DependencyEventKind::Decision);
+    ASSERT_NE(decision, nullptr);
+    ASSERT_EQ(decision->reads.size(), 1);
+    EXPECT_EQ(decision->reads.front().target, "?enabled");
+    EXPECT_TRUE(decision->composition.has_value());
+    const auto* answer = graph.latest("?answer", dip::DependencyEventKind::Value);
+    ASSERT_NE(answer, nullptr);
+    EXPECT_EQ(answer->controlled_by, std::vector<std::string>({"#case:1"}));
+    const auto file = std::filesystem::temp_directory_path() / "snt-branch-graph-roundtrip.diph5";
+    env.save(file);
+    dip::Environment restored;
+    restored.load(file);
+    std::filesystem::remove(file);
+    const auto* restored_answer = restored.dependency_graph().latest("?answer", dip::DependencyEventKind::Value);
+    ASSERT_NE(restored_answer, nullptr);
+    EXPECT_EQ(restored_answer->controlled_by, answer->controlled_by);
+}
+
 TEST(Inspection, SharedDiagnosticPreservesStructuredException) {
     const dip::Line line{"value int = bad", {"parameters.dip", 12}};
     const dip::SyntaxException error("Invalid value", "Expected integer", "Use an integer",

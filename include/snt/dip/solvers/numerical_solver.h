@@ -10,6 +10,8 @@ namespace snt::dip {
      * Solves numerical expressions of DIP nodes
      */
     class NumericalSolver {
+      private:
+        Environment* env_;
       public:
         static exs::Solver<NumericalAtom, NumericalSettings> solver; ///< Instance of an EXS expression solver
 

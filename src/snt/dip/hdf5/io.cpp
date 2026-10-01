@@ -1020,11 +1020,14 @@ namespace snt::dip::hdf5 {
             }
         }
 
-        void read_group(Environment& env, hid_t group, bool root = false, bool skip_value_payload = false) {
+        void read_group(Environment& env, hid_t group, bool root = false, bool skip_value_payload = false,
+                        bool skip_dependency_manifest = false) {
             const hsize_t count = object_count(group);
             for (hsize_t i = 0; i < count; ++i) {
                 const std::string name = object_name(group, i);
-                if (root && (name == std::string(GROUP_SOURCES) || name == std::string(GROUP_TRACE) || name == std::string(GROUP_UNITS)))
+                if (root && (name == std::string(GROUP_SOURCES) || name == std::string(GROUP_TRACE) ||
+                             name == std::string(GROUP_UNITS) ||
+                             (skip_dependency_manifest && name == std::string(GROUP_DEPENDENCIES))))
                     continue;
                 if (skip_value_payload && name == VALUE_PAYLOAD)
                     continue;
@@ -1180,8 +1183,124 @@ namespace snt::dip::hdf5 {
             }
         }
 
+        void write_dependency_graph(hid_t file, const DependencyGraph& graph) {
+            const std::string path = "/" + std::string(GROUP_DEPENDENCIES);
+            Id root(H5Gcreate2(file, path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
+                    "Unable to create the DIP dependency graph");
+            for (size_t index = 0; index < graph.events.size(); ++index) {
+                const auto& event = graph.events[index];
+                Id entry(H5Gcreate2(root, std::to_string(index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                         H5Gclose, "Unable to create a DIP dependency event");
+                write_string(entry, "owner", event.owner);
+                write_scalar<uint64_t>(entry, "kind", H5T_NATIVE_UINT64, static_cast<uint64_t>(event.kind));
+                if (event.location) {
+                    write_string(entry, "source", event.location->source);
+                    write_scalar<uint64_t>(entry, "line", H5T_NATIVE_UINT64, event.location->line);
+                    if (event.location->code)
+                        write_string(entry, "code", *event.location->code);
+                }
+                write_strings(entry, "controlled_by", event.controlled_by);
+                write_string(entry, "expression", event.expression);
+                std::vector<std::string> targets, requests, operands;
+                for (const auto& edge : event.reads) {
+                    targets.push_back(edge.target);
+                    requests.push_back(edge.request);
+                    operands.push_back(edge.operand);
+                }
+                write_strings(entry, "targets", targets);
+                write_strings(entry, "requests", requests);
+                write_strings(entry, "operands", operands);
+                if (!event.composition)
+                    continue;
+                write_scalar<uint64_t>(entry, "root", H5T_NATIVE_UINT64, event.composition->root);
+                Id composition(H5Gcreate2(entry, "composition", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                               H5Gclose, "Unable to create a DIP operation tree");
+                for (size_t node_index = 0; node_index < event.composition->nodes.size(); ++node_index) {
+                    const auto& node = event.composition->nodes[node_index];
+                    Id item(H5Gcreate2(composition, std::to_string(node_index).c_str(), H5P_DEFAULT,
+                                       H5P_DEFAULT, H5P_DEFAULT), H5Gclose, "Unable to create an operation node");
+                    write_scalar<uint64_t>(item, "kind", H5T_NATIVE_UINT64, static_cast<uint64_t>(node.kind));
+                    write_string(item, "text", node.text);
+                    write_scalar<int64_t>(item, "operator", H5T_NATIVE_INT64, node.operator_type);
+                    if (node.operation)
+                        write_scalar<int64_t>(item, "operation", H5T_NATIVE_INT64, static_cast<int64_t>(*node.operation));
+                    std::vector<std::string> children;
+                    for (auto child : node.children)
+                        children.push_back(std::to_string(child));
+                    write_strings(item, "children", children);
+                }
+            }
+        }
+
+        void read_dependency_graph(Environment& env, hid_t file) {
+            const std::string path = "/" + std::string(GROUP_DEPENDENCIES);
+            if (H5Lexists(file, path.c_str(), H5P_DEFAULT) <= 0)
+                throw Error("A DIPH5 2.7 file is missing its DIP dependency graph");
+            Id root(H5Gopen2(file, path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the DIP dependency graph");
+            DependencyGraph graph;
+            const auto count = object_count(root);
+            for (size_t index = 0; index < count; ++index) {
+                Id entry(H5Gopen2(root, std::to_string(index).c_str(), H5P_DEFAULT), H5Gclose,
+                         "Unable to open a DIP dependency event");
+                DependencyEvent event;
+                event.owner = read_string(entry, "owner");
+                const auto kind = read_scalar<uint64_t>(entry, "kind", H5T_NATIVE_UINT64);
+                if (event.owner.empty() || kind > static_cast<uint64_t>(DependencyEventKind::Decision))
+                    throw Error("Invalid DIP dependency event");
+                event.kind = static_cast<DependencyEventKind>(kind);
+                if (has_attribute(entry, "source"))
+                    event.location = core::SourceLocation{
+                        read_string(entry, "source"), read_scalar<uint64_t>(entry, "line", H5T_NATIVE_UINT64),
+                        has_attribute(entry, "code") ? std::optional<std::string>(read_string(entry, "code"))
+                                                     : std::nullopt
+                    };
+                event.controlled_by = read_strings(entry, "controlled_by");
+                event.expression = read_string(entry, "expression");
+                const auto targets = read_strings(entry, "targets");
+                const auto requests = read_strings(entry, "requests");
+                const auto operands = read_strings(entry, "operands");
+                if (targets.size() != requests.size() || targets.size() != operands.size())
+                    throw Error("Invalid DIP dependency edges");
+                for (size_t edge = 0; edge < targets.size(); ++edge)
+                    event.reads.push_back({targets[edge], requests[edge], operands[edge]});
+                if (H5Lexists(entry, "composition", H5P_DEFAULT) > 0) {
+                    Id composition(H5Gopen2(entry, "composition", H5P_DEFAULT), H5Gclose,
+                                   "Unable to open a DIP operation tree");
+                    event.composition.emplace();
+                    event.composition->root = read_scalar<uint64_t>(entry, "root", H5T_NATIVE_UINT64);
+                    const auto node_count = object_count(composition);
+                    for (size_t node_index = 0; node_index < node_count; ++node_index) {
+                        Id item(H5Gopen2(composition, std::to_string(node_index).c_str(), H5P_DEFAULT), H5Gclose,
+                                "Unable to open a DIP operation node");
+                        exs::CompositionNode node;
+                        const auto node_kind = read_scalar<uint64_t>(item, "kind", H5T_NATIVE_UINT64);
+                        if (node_kind > static_cast<uint64_t>(exs::CompositionKind::Group))
+                            throw Error("Invalid DIP operation node kind");
+                        node.kind = static_cast<exs::CompositionKind>(node_kind);
+                        node.text = read_string(item, "text");
+                        node.operator_type = read_scalar<int64_t>(item, "operator", H5T_NATIVE_INT64);
+                        if (has_attribute(item, "operation"))
+                            node.operation = static_cast<exs::OperationType>(
+                                read_scalar<int64_t>(item, "operation", H5T_NATIVE_INT64));
+                        for (const auto& child : read_strings(item, "children")) {
+                            size_t parsed = 0;
+                            const auto value = std::stoull(child, &parsed);
+                            if (parsed != child.size() || value >= node_count)
+                                throw Error("Invalid DIP operation child");
+                            node.children.push_back(value);
+                        }
+                        event.composition->nodes.push_back(std::move(node));
+                    }
+                    if (event.composition->nodes.empty() || event.composition->root >= node_count)
+                        throw Error("Invalid DIP operation root");
+                }
+                graph.events.push_back(std::move(event));
+            }
+            env.set_dependency_graph(std::move(graph));
+        }
+
         bool uses_reserved_path(const std::string& path) {
-            for (const auto name : {std::string(GROUP_SOURCES), std::string(GROUP_TRACE), std::string(GROUP_UNITS)}) {
+            for (const auto name : {std::string(GROUP_SOURCES), std::string(GROUP_TRACE), std::string(GROUP_UNITS), std::string(GROUP_DEPENDENCIES)}) {
                 if (path == name || path.rfind(name + ".", 0) == 0 || path.rfind(name + "[", 0) == 0)
                     return true;
             }
@@ -1231,6 +1350,7 @@ namespace snt::dip::hdf5 {
         write_source_manifest(output, env);
         write_trace_manifest(output, env);
         write_unit_manifest(output, env);
+        write_dependency_graph(output, env.dependency_graph());
         for (const auto& node : env.nodes.get_nodes())
             if (node)
                 write_node(output, env, *node);
@@ -1274,7 +1394,9 @@ namespace snt::dip::hdf5 {
             read_trace_manifest(env, input, minor_version);
         if (version == VERSION && minor_version >= 3)
             read_unit_manifest(env, input);
-        read_group(env, input, true);
+        if (version == VERSION && minor_version >= 7)
+            read_dependency_graph(env, input);
+        read_group(env, input, true, false, version == VERSION && minor_version >= 7);
     }
 
 } // namespace snt::dip::hdf5

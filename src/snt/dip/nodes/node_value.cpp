@@ -59,6 +59,7 @@ namespace snt::dip {
     ValueNode::ValueNode(const ValueNode& other)
         : units(other.units), tags(other.tags), constant(other.constant), override(other.override),
           override_line(other.override_line), modification_lines(other.modification_lines), table_path(other.table_path),
+          copied_from(other.copied_from),
           table_column_index(other.table_column_index), metadata(other.metadata),
           condition(other.condition), format(other.format), value_dtype(other.value_dtype), BaseNode(other) {
         options.reserve(other.options.size());

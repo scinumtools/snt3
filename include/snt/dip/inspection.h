@@ -56,9 +56,7 @@ ValueInspection inspect_value(const Environment& env, std::string_view path);
 /** Values in environment order, each retaining its fully qualified path. */
 std::vector<ValueInspection> inspect_values(const Environment& env);
 
-/** Supported inspection operations and retained facts at a DIP path.
- * hasReferenceGraph is false until dependency recording is implemented.
- */
+/** Supported inspection operations and retained facts at a DIP path. */
 struct InspectionCapabilities {
     bool hasValue = false;
     bool hasChildren = false;

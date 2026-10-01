@@ -24,6 +24,9 @@ TEST(ReferencesImports, ImportNode) {
     EXPECT_EQ(vnode->path.name, "bar.snap");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "\"snap\"");
+    const auto imported_reads = env.dependency_graph().dependencies("?bar.snap");
+    ASSERT_EQ(imported_reads.size(), 1);
+    EXPECT_EQ(imported_reads.front().target, "?foo.snap");
 
     vnode = env.nodes.at(3);
     EXPECT_EQ(vnode->path.name, "baz.crackle");
@@ -59,6 +62,9 @@ TEST(ReferencesImports, ImportNodeRemote) {
     EXPECT_EQ(vnode->path.name, "pop.bar");
     EXPECT_TRUE(vnode);
     EXPECT_EQ(vnode->value->to_string(), "3");
+    const auto imported_reads = env.dependency_graph().dependencies("?pop.bar");
+    ASSERT_EQ(imported_reads.size(), 1);
+    EXPECT_EQ(imported_reads.front().target, "foo_source?foo.bar");
 }
 
 TEST(ReferencesImports, ImportRoot) {

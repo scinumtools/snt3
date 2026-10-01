@@ -105,6 +105,11 @@ InspectionCapabilities inspect_capabilities(const Environment& env, std::string_
             capabilities.hasProvenance = capabilities.hasSource || node->override ||
                                          !node->modification_lines.empty();
             capabilities.hasArrayData = node->value && !node->dimension.empty();
+            const auto* value_event = env.dependency_graph().latest("?" + name, DependencyEventKind::Value);
+            const auto* condition_event = env.dependency_graph().latest("?" + name, DependencyEventKind::Condition);
+            capabilities.hasReferenceGraph =
+                (value_event && (!value_event->reads.empty() || value_event->composition.has_value())) ||
+                (condition_event && (!condition_event->reads.empty() || condition_event->composition.has_value()));
         }
         if (node->table_path == name) {
             found = true;

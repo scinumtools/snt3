@@ -156,6 +156,50 @@ namespace snt::dip {
 
     Environment::Environment() = default;
 
+    Environment::DependencyScope::DependencyScope(Environment& env, std::string owner, DependencyEventKind kind,
+                                                   std::optional<core::SourceLocation> location)
+        : env_(env), previous_(env.active_dependency_event_) {
+        env_.dependency_graph_.events.push_back({std::move(owner), kind, std::move(location)});
+        env_.active_dependency_event_ = env_.dependency_graph_.events.size() - 1;
+    }
+
+    Environment::DependencyScope::~DependencyScope() { env_.active_dependency_event_ = previous_; }
+
+    exs::CompositionGraph* Environment::active_composition(const std::string& expression) {
+        if (!active_dependency_event_)
+            return nullptr;
+        auto& event = dependency_graph_.events.at(*active_dependency_event_);
+        event.expression = expression;
+        event.composition.emplace();
+        return &*event.composition;
+    }
+
+    void Environment::set_active_dependency_owner(std::string owner) {
+        if (active_dependency_event_)
+            dependency_graph_.events.at(*active_dependency_event_).owner = std::move(owner);
+    }
+
+    void Environment::set_value_controls(const std::string& owner, const std::vector<size_t>& case_ids) {
+        for (auto it = dependency_graph_.events.rbegin(); it != dependency_graph_.events.rend(); ++it) {
+            if (it->owner != owner || it->kind != DependencyEventKind::Value)
+                continue;
+            it->controlled_by.clear();
+            for (const auto case_id : case_ids)
+                it->controlled_by.push_back("#case:" + std::to_string(case_id));
+            break;
+        }
+    }
+
+    void Environment::record_import_origin(const std::string& source_node_id) {
+        record_dependency(source_node_id, source_node_id);
+    }
+
+    void Environment::record_dependency(const std::string& target, const std::string& request,
+                                        std::string_view operand) const {
+        if (active_dependency_event_)
+            dependency_graph_.events.at(*active_dependency_event_).reads.push_back({target, request, std::string(operand)});
+    }
+
     void Environment::generate(ExportFormat format, const std::filesystem::path& file) const {
         generate::write(*this, format, file);
     }
@@ -275,7 +319,8 @@ namespace snt::dip {
         return sources.at(source_name).code;
     }
 
-    ValueNodeData Environment::request_node_data(const std::string& request, const RequestType rtype) const {
+    ValueNodeData Environment::request_node_data(const std::string& request, const RequestType rtype,
+                                                  std::string_view operand) const {
         ValueNodeData new_value;
 
         switch (rtype) {
@@ -290,6 +335,7 @@ namespace snt::dip {
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
                 if (vnode && vnode->path.name == node_path) {
+                    record_dependency(source_name + "?" + node_path, request, operand);
                     new_value.value = vnode->value->clone();
                     if (vnode->units)
                         new_value.units = vnode->units;
@@ -359,6 +405,7 @@ namespace snt::dip {
             for (size_t i = 0; i < node_pool.size(); i++) {
                 ValueNode::PointerType vnode = node_pool.at(i);
                 if (vnode && vnode->path.name == node_path) {
+                    record_dependency(source_name + "?" + node_path, request);
                     if (vnode->value != nullptr) {
                         new_value = vnode->value->clone();
                     } else {
@@ -480,10 +527,12 @@ namespace snt::dip {
                         // filter nodes based on tags
                         if (!tags.empty() && !hasIntersection(vnode->tags, tags))
                             continue;
+                        record_dependency(source_name + "?" + vnode->path.name, request);
                         // select node
                         std::string new_name = vnode->path.name.substr(node_path_child.size(), vnode->path.name.size());
                         ValueNode::PointerType new_vnode =
                             std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
+                        new_vnode->copied_from = source_name + "?" + vnode->path.name;
                         new_nodes.push_back(new_vnode);
                     }
                 }
@@ -495,10 +544,12 @@ namespace snt::dip {
                         // filter nodes based on tags
                         if (!tags.empty() && !hasIntersection(vnode->tags, tags))
                             continue;
+                        record_dependency(source_name + "?" + vnode->path.name, request);
                         // select node
                         std::string new_name = vnode->path.basename();
                         ValueNode::PointerType new_vnode =
                             std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
+                        new_vnode->copied_from = source_name + "?" + vnode->path.name;
                         new_nodes.push_back(new_vnode);
                         break;
                     }

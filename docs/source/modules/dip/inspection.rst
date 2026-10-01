@@ -68,8 +68,9 @@ version.
 ``inspect_capabilities`` reports which facts and operations are available at
 a value, group, collection, or table path. For example, ``hasTabularData`` is
 true at a table path and ``hasArrayData`` is true for array-valued nodes.
-``hasReferenceGraph``, ``sourceEditable``, and ``directlyWritable`` remain
-false until those operations are supported.
+``hasReferenceGraph`` is true when an evaluated value or its condition has
+recorded references or an expression tree. ``sourceEditable`` and
+``directlyWritable`` remain false.
 
 .. code-block:: cpp
 
@@ -77,6 +78,46 @@ false until those operations are supported.
    if (capabilities.hasTabularData) {
        auto table = snt::dip::inspect_table(env, "measurements");
    }
+
+Dependency and operation graph
+------------------------------
+
+``env.dependency_graph()`` retains DIP evaluation events in order. A value
+event records the nodes read while assigning a value; condition and branch
+decision events are separate. Node IDs use ``?path`` for the current
+environment and ``source?path`` for imported sources. ``dependencies`` returns
+reads from the latest value event, so a replaced expression does not appear as
+a current dependency. ``referenced_by`` provides the reverse lookup. Earlier
+events remain available in ``events`` with their source locations for provenance.
+Each read retains its resolved target, request, and EXS operand text when present.
+Branch decision events use ``#case:N`` IDs. A value event's ``controlled_by``
+list identifies the active decisions that selected it. Imported value nodes
+retain a read link to the original node, including its source qualifier.
+
+Numerical and logical expressions include the EXS composition tree produced
+by the same evaluation pass. Its operands, operators, and groups show how the
+calculation is assembled. String templates and direct references have node
+reads without an EXS operation tree. Units and quantities remain parameters
+on inspected values; their internal unit expressions are not expanded into
+this graph.
+
+.. code-block:: cpp
+
+   const auto& graph = env.dependency_graph();
+   for (const auto& read : graph.dependencies("?physics.speed")) {
+       // read.target is the resolved DIP node ID.
+   }
+   const auto* calculation = graph.latest("?physics.speed", snt::dip::DependencyEventKind::Value);
+   if (calculation && calculation->composition) {
+       const auto& operations = calculation->composition->nodes;
+       const auto root = calculation->composition->root;
+   }
+
+The graph is retained in DIPH5 2.7 snapshots. Older snapshots load normally,
+but have no recorded graph. A function callback contributes node links only
+for DIP values it actually requests through the environment. Conditional
+expression operands are evaluated according to the current EXS semantics;
+the links mean "read during evaluation," not "necessary for the final result."
 
 Errors can be converted to the shared ``snt::core::Diagnostic`` type without
 parsing formatted exception text. It retains the exception category, message,

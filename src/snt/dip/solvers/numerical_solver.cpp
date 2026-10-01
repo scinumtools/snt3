@@ -75,7 +75,7 @@ namespace snt::dip {
         return exs::Solver<NumericalAtom, NumericalSettings>(operators, steps);
     }();
 
-    NumericalSolver::NumericalSolver(Environment& env, Path current) {
+    NumericalSolver::NumericalSolver(Environment& env, Path current) : env_(&env) {
 
         NumericalSettings settings = {{}, &env, std::move(current)};
 
@@ -91,7 +91,7 @@ namespace snt::dip {
                 __FILE__,
                 __LINE__
             );
-        NumericalAtom ua = solver.eval(expression);
+        NumericalAtom ua = solver.eval(expression, env_->active_composition(expression));
 
         // convert units if necessary
         if (ua.value.units && !units.empty()) {

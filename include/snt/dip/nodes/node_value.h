@@ -92,6 +92,7 @@ namespace snt::dip {
         Line override_line;    ///< Source of the effective override value.
         std::vector<Line> modification_lines; ///< Applied value modifications in evaluation order.
         std::string table_path; ///< Parent table when this value is a parsed table column.
+        std::string copied_from; ///< Source-qualified DIP node ID when created by an import.
         size_t table_column_index = 0; ///< Position in the original table header.
         std::string condition;
         std::vector<OptionStruct> options;

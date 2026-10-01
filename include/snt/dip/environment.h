@@ -2,6 +2,7 @@
 #define DIP_ENVIRONMENT_H
 
 #include "nodes/node_value.h"
+#include <snt/dip/dependency_graph.h>
 
 #include <filesystem>
 #include <optional>
@@ -95,6 +96,11 @@ namespace snt::dip {
         bool schema_manifest_loaded_ = false;
         bool trace_manifest_loaded_ = false;
         bool snapshot_loaded_ = false;
+        mutable DependencyGraph dependency_graph_;
+        mutable std::optional<size_t> active_dependency_event_;
+
+        void record_dependency(const std::string& target, const std::string& request,
+                               std::string_view operand = {}) const;
 
       public:
         NodeList<ValueNode> nodes; ///< List of parsed nodes
@@ -110,6 +116,29 @@ namespace snt::dip {
          * Constructor of the Environment class
          */
         Environment();
+
+        /** Graph captured during DIP evaluation. Loaded snapshots may have no graph. */
+        const DependencyGraph& dependency_graph() const { return dependency_graph_; }
+        /** Restore a graph from a versioned snapshot. */
+        void set_dependency_graph(DependencyGraph graph) { dependency_graph_ = std::move(graph); }
+
+        /** Scope one parser evaluation. Restores the previous context on exit. */
+        class DependencyScope {
+            Environment& env_;
+            std::optional<size_t> previous_;
+          public:
+            DependencyScope(Environment& env, std::string owner, DependencyEventKind kind,
+                            std::optional<core::SourceLocation> location = std::nullopt);
+            ~DependencyScope();
+            DependencyScope(const DependencyScope&) = delete;
+            DependencyScope& operator=(const DependencyScope&) = delete;
+        };
+
+        /** Attach the operation tree produced by the numerical or logical solver. */
+        exs::CompositionGraph* active_composition(const std::string& expression);
+        void set_active_dependency_owner(std::string owner);
+        void set_value_controls(const std::string& owner, const std::vector<size_t>& case_ids);
+        void record_import_origin(const std::string& source_node_id);
 
         /** Whether this environment was loaded from a DIPH5 snapshot. */
         bool is_loaded_snapshot() const { return snapshot_loaded_; }
@@ -186,7 +215,8 @@ namespace snt::dip {
          * @return Selected value node data
          */
         ValueNodeData request_node_data(
-            const std::string& request, const RequestType rtype = RequestType::Reference
+            const std::string& request, const RequestType rtype = RequestType::Reference,
+            std::string_view operand = {}
         ) const;
 
         /**

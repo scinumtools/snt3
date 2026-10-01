@@ -7,9 +7,9 @@
 namespace snt::dip::hdf5::schema {
 
     inline constexpr std::string_view FORMAT = "SciNumTools3 Environment";
-    // DIPH5 2.6 also retains applied modifications and evaluated table identity.
+    // DIPH5 2.7 retains the evaluated DIP dependency graph.
     inline constexpr uint64_t VERSION = 2;
-    inline constexpr uint64_t VERSION_MINOR = 6;
+    inline constexpr uint64_t VERSION_MINOR = 7;
     inline constexpr uint64_t FIRST_SUPPORTED_VERSION = 1;
 
     inline constexpr std::string_view ATTR_FORMAT = "_DIPL_Format";
@@ -52,6 +52,7 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_SOURCE_HASH = "_DIPL_Source_Hash";
     inline constexpr std::string_view GROUP_TRACE = "_DIPL_Trace";
     inline constexpr std::string_view GROUP_UNITS = "_DIPL_Units";
+    inline constexpr std::string_view GROUP_DEPENDENCIES = "_DIPL_Dependencies";
     inline constexpr std::string_view ATTR_UNIT_NAME = "_DIPL_Unit_Name";
     inline constexpr std::string_view ATTR_UNIT_DEFINITION = "_DIPL_Unit_Definition";
     inline constexpr std::string_view ATTR_UNIT_ORDER = "_DIPL_Unit_Order";

@@ -47,6 +47,8 @@ namespace snt::dip {
         void solve_case(const BaseNode::PointerType& node);
         void prepare_node(const BaseNode::PointerType& node);
         std::string clean_name(const std::string& node);
+        /** Current decision IDs, from outermost to innermost branch. */
+        std::vector<size_t> active_case_ids() const;
     };
 
 } // namespace snt::dip

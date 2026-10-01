@@ -27,7 +27,7 @@ namespace snt::dip {
             if (!request.empty() && request[0] == SIGN_SEPARATOR)
                 request = std::string(1, SIGN_QUERY) + csettings->current.resolve(request).name;
             // request absolute path
-            return csettings->env->request_node_data(request, RequestType::Reference);
+            return csettings->env->request_node_data(request, RequestType::Reference, s);
         } else if (parser.part_literal()) {
             ValueNode::PointerType vnode = nullptr;
             if (vnode == nullptr)

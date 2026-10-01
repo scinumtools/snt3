@@ -42,7 +42,7 @@ namespace snt::dip {
         return exs::Solver<LogicalAtom, LogicalSettings>(operators, steps);
     }();
 
-    LogicalSolver::LogicalSolver(Environment& env, Path current) {
+    LogicalSolver::LogicalSolver(Environment& env, Path current) : env_(&env) {
 
         LogicalSettings settings = {{}, &env, std::move(current)};
 
@@ -58,7 +58,7 @@ namespace snt::dip {
                 __FILE__,
                 __LINE__
             );
-        LogicalAtom ua = solver.eval(expression);
+        LogicalAtom ua = solver.eval(expression, env_->active_composition(expression));
         return ValueNodeData({std::move(ua.value.value), std::move(ua.value.units)});
     }
 
