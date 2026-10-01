@@ -63,9 +63,26 @@ If you maintain or use a suitable scientific code, contact
 The initiative flyer
 --------------------
 
-.. figure:: ../img/snt_initiative_flyer.png
+.. figure:: ../img/snt_initiative_flyer_logo.png
    :width: 440px
    :align: center
    :alt: Flyer for the One parameter layer, many scientific codes initiative
 
    The full initiative flyer, shown at a smaller size. Select the image to open it at full resolution.
+
+A badge for participating projects
+----------------------------------
+
+Projects can place a compact badge alongside their Build, Documentation, and
+License badges. It links readers to this initiative; describe the project's
+actual SNTv3 integration in the surrounding README text.
+
+.. image:: https://img.shields.io/badge/DIPL-%7B%3FSNTv3%7D-2980b9
+   :alt: DIPL — {?SNTv3}
+   :target: https://vrtulka23.github.io/scinumtools3/initiative.html
+
+Copy this Markdown into your project's ``README.md``:
+
+.. code-block:: markdown
+
+   [![DIPL: {?SNTv3}](https://img.shields.io/badge/DIPL-%7B%3FSNTv3%7D-2980b9)](https://vrtulka23.github.io/scinumtools3/initiative.html)

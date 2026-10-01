@@ -5,6 +5,7 @@ CMakeCache.txt
 helpers/*
 docs/build/*
 docs/doxy/*
+docs/banners/*
 dist/*
 bindings/python/.pytest_cache/*
 **/__pycache__/*

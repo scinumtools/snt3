@@ -12,3 +12,11 @@
 .highlight .-DIP-Expression { color: #8d6e63; }
 .highlight .-DIP-Unit { color: #607d8b; }
 .highlight .-DIP-Comment { color: #fb8c00; font-style: italic; }
+
+/* Keep the transparent wordmark legible within the RTD sidebar header. */
+.wy-side-nav-search .logo {
+  width: 100%;
+  max-width: 238px;
+  height: auto;
+  margin: 0.45rem auto 0.2rem;
+}
