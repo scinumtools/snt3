@@ -47,6 +47,16 @@ namespace snt::dip {
         std::string hash;
     };
 
+    /** How source paths are written into a DIPH5 source manifest. */
+    enum class SourcePathPolicy {
+        Preserve,           ///< Write source paths as recorded during parsing or loading.
+        RelativeToSnapshot  ///< Write file paths relative to the output DIPH5 directory.
+    };
+
+    struct SnapshotSaveOptions {
+        SourcePathPolicy source_paths = SourcePathPolicy::Preserve;
+    };
+
     /** Durable identity information for one registered DIPL construct. */
     struct TraceInfo {
         std::string id;   ///< Internal trace identifier, e.g. DIP0_UNIT0.
@@ -110,6 +120,7 @@ namespace snt::dip {
         bool schema_manifest_loaded_ = false;
         bool trace_manifest_loaded_ = false;
         bool snapshot_loaded_ = false;
+        std::filesystem::path source_path_base_; ///< Directory of a loaded snapshot for relative source paths.
         bool dependency_recording_ = false;
         mutable DependencyGraph dependency_graph_;
         mutable std::optional<size_t> active_dependency_event_;
@@ -170,6 +181,9 @@ namespace snt::dip {
         /** Whether this environment was loaded from a DIPH5 snapshot. */
         bool is_loaded_snapshot() const { return snapshot_loaded_; }
 
+        /** Base directory for relative source paths in a loaded snapshot. */
+        const std::filesystem::path& source_path_base() const { return source_path_base_; }
+
         /** Registrations from parsed DIPfiles. Snapshot loading does not restore these entries. */
         const std::vector<ProjectEntry>& project_entries() const { return project_entries_; }
         void record_project_entry(ProjectEntry entry) {
@@ -199,6 +213,8 @@ namespace snt::dip {
          * @param file File name of the environment file
          */
         void save(const std::filesystem::path& file) const;
+        /** Save with an explicit policy for source paths in the DIPH5 manifest. */
+        void save(const std::filesystem::path& file, const SnapshotSaveOptions& options) const;
 
         /**
          * Generate static parameter lists from the environment nodes

@@ -1,0 +1,26 @@
+experiment
+  temperatures float[5] = [293.15, 294.2, 295.1, 296.4, 297.0] K
+    ?descr "A small array for checking shape and value presentation"
+  sample_ids int[5] = [10, 11, 12, 13, 14]
+  first_sample_id int = {?experiment.sample_ids}[0]
+  is_fast bool = ({?experiment.average_speed} > 0.3 m/s)
+  summary str = f"Run {{?experiment.run_id}} at {{?experiment.lab_name}}"
+
+  target_temperature float = 294 K
+  target_temperature = 295 K
+
+  readings table = """time float s
+temperature float K
+pressure float Pa
+---
+0 293.15 101325
+1 294.20 101320
+2 295.10 101310
+3 296.40 101300
+"""
+
+@if ({?experiment.is_fast} == true)
+  state str = "fast"
+@else
+  state str = "steady"
+@end

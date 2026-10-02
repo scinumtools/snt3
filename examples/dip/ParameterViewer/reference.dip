@@ -1,0 +1,3 @@
+# Loaded as a named source; these values do not appear as top-level paths.
+lab_name str = "North Lab"
+calibration_revision int = 3

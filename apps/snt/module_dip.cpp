@@ -43,6 +43,10 @@ Options:
   --save <file>
       Save the full environment as DIPH5, overwriting the file.
       Request and tag filters affect printed output only.
+  --record-graph
+      Record evaluation dependencies for inspection and include them in --save output.
+  --relative-source-paths
+      Store source paths relative to the --save DIPH5 file.
   --generate <cpp|c|fortran|rust|julia|json|yaml> <file>
       Generate static parameters in the selected format, overwriting the file.
       Request and tag filters affect printed output only.
@@ -130,6 +134,8 @@ void module_dip(ArgParser& argpar) {
     bool has_load = false;
     bool has_save = false;
     bool has_generate = false;
+    bool record_graph = false;
+    bool relative_source_paths = false;
     bool has_request = false;
     bool print = false;
     bool value = false;
@@ -170,6 +176,11 @@ void module_dip(ArgParser& argpar) {
                 throw std::runtime_error("Specify exactly one --save file.");
             cmd.argument_save(values.front());
             has_save = true;
+        } else if (key == "--record-graph" || key == "--relative-source-paths") {
+            if (!values.empty())
+                throw std::runtime_error(key + " does not take arguments.");
+            if (key == "--record-graph") record_graph = true;
+            else relative_source_paths = true;
         } else if (key == "--generate") {
             if (values.size() != 2 || has_generate)
                 throw std::runtime_error("Specify one export format and one output file with --generate.");
@@ -201,6 +212,10 @@ void module_dip(ArgParser& argpar) {
     }
     if (!has_input && !has_project && !has_load)
         throw std::runtime_error("Specify a DIP input with --input, --project, or --load.");
+    if (record_graph && has_load)
+        throw std::runtime_error("--record-graph requires DIPL input, not --load.");
+    if (relative_source_paths && !has_save)
+        throw std::runtime_error("--relative-source-paths requires --save.");
     if (print && value)
         throw std::runtime_error("Use either --print or --value.");
     if (!type.empty() && !value)
@@ -211,5 +226,7 @@ void module_dip(ArgParser& argpar) {
         cmd.argument_print();
     if (value)
         cmd.argument_value(type);
+    cmd.argument_record_dependency_graph(record_graph);
+    cmd.argument_relative_source_paths(relative_source_paths);
     std::cout << cmd.execute();
 }

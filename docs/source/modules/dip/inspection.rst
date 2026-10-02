@@ -26,6 +26,30 @@ retains the existing source manifest details; ``contributing_schema``
 identifies a schema that supplied the value when known. A loaded DIPH5
 environment contains only provenance retained in the snapshot.
 
+For source navigation in a live parse, ``inspect_source_locations`` provides
+one query for evaluated paths, paths within a named source, named sources,
+schemas, units, and DIPfile entries. Results are ordered by precedence: an
+effective override, recent modifications, then the declaration for a value.
+Explicit groups and collection items expose their declaration; an inferred
+parent without its own declaration has no invented source location.
+
+.. code-block:: cpp
+
+   using namespace snt::dip;
+   auto locations = inspect_source_locations(
+       env, {SourceEntityKind::Unit, "sample_tick", {}});
+   for (const auto& location : locations) {
+       // location.source.path and location.line identify a physical source.
+   }
+
+For embedded text, the result points to its physical registration and retains
+the original logical source and line in ``logical_source_name`` and
+``logical_line``. Distinct semantic locations remain distinct even when they
+point to the same physical line. ``source_text_available`` tells a caller
+whether the parsed text is retained. DIPH5 snapshots may still report retained
+provenance, but have no complete source text; a viewer can disable source
+opening without discarding that provenance.
+
 ``detect_artifact(path)`` classifies conventional names: ``DIPfile``,
 ``.dip`` or ``.dipl``, ``.dipt``, and ``.diph5``. It does not validate file
 contents. ``open_artifact(path)`` loads a project, DIPL file, or DIPH5 snapshot.

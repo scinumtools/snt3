@@ -68,8 +68,11 @@ For example, ``parameters/overrides.dip`` can contain:
    output
      enabled = false
 
-The project manifest is an input description rather than part of the final
-parameter environment. The command-line ``--project`` option cannot be
+The project manifest describes inputs rather than evaluated parameters. A live
+environment retains its registrations in ``env.project_entries()`` in DIPfile
+order. Each entry records its kind, name, declared value, resolved file path
+when applicable, and the DIPfile source and line. These entries are not stored
+in a DIPH5 snapshot. The command-line ``--project`` option cannot be
 combined with individual ``--input`` arguments or a DIPH5 ``--load`` command.
 
 Using projects

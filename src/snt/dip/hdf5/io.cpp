@@ -1107,7 +1107,9 @@ namespace snt::dip::hdf5 {
             }
         }
 
-        void write_source_manifest(hid_t file, const Environment& env) {
+        void write_source_manifest(hid_t file, const Environment& env,
+                                   const std::filesystem::path& output_path,
+                                   const SnapshotSaveOptions& options) {
             const std::string manifest_path = "/" + std::string(GROUP_SOURCES);
             Id manifest(
                 H5Gcreate2(file, manifest_path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
@@ -1124,7 +1126,21 @@ namespace snt::dip::hdf5 {
                     "Unable to create an HDF5 source-manifest entry"
                 );
                 write_string(entry, ATTR_SOURCE_NAME, source.name);
-                write_string(entry, ATTR_SOURCE_PATH, source.path);
+                std::string stored_path = source.path;
+                if (!stored_path.empty() && options.source_paths == SourcePathPolicy::RelativeToSnapshot) {
+                    std::filesystem::path source_path(stored_path);
+                    if (source_path.is_relative()) {
+                        const auto base = env.source_path_base().empty()
+                            ? std::filesystem::current_path() : env.source_path_base();
+                        source_path = base / source_path;
+                    }
+                    const auto output_dir = std::filesystem::absolute(output_path).parent_path();
+                    const auto relative = source_path.lexically_normal().lexically_relative(output_dir);
+                    if (relative.empty())
+                        throw Error("Unable to make source path relative to the DIPH5 file: " + source.path);
+                    stored_path = relative.generic_string();
+                }
+                write_string(entry, ATTR_SOURCE_PATH, stored_path);
                 write_string(entry, ATTR_SOURCE_PARENT, source.parent_name);
                 write_scalar<uint64_t>(entry, ATTR_SOURCE_PARENT_LINE, H5T_NATIVE_UINT64, source.parent_line);
                 write_string(entry, ATTR_SOURCE_HASH_ALGORITHM, source.hash_algorithm);
@@ -1318,7 +1334,8 @@ namespace snt::dip::hdf5 {
         }
     } // namespace
 
-    void save(const Environment& env, const std::filesystem::path& file) {
+    void save(const Environment& env, const std::filesystem::path& file,
+              const SnapshotSaveOptions& options) {
         H5Eset_auto2(H5E_DEFAULT, nullptr, nullptr);
         Id output(
             H5Fcreate(file.string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT),
@@ -1349,7 +1366,7 @@ namespace snt::dip::hdf5 {
                     __LINE__
                 );
         }
-        write_source_manifest(output, env);
+        write_source_manifest(output, env, file, options);
         write_trace_manifest(output, env);
         write_unit_manifest(output, env);
         write_dependency_graph(output, env.dependency_graph());

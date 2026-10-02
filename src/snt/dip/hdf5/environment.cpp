@@ -10,6 +10,7 @@ namespace snt::dip {
             Environment loaded;
             hdf5::load(loaded, file);
             loaded.snapshot_loaded_ = true;
+            loaded.source_path_base_ = std::filesystem::absolute(file).parent_path();
             *this = std::move(loaded);
         } catch (const hdf5::Error& error) {
             throw dip::IOException(
@@ -23,8 +24,12 @@ namespace snt::dip {
     }
 
     void Environment::save(const std::filesystem::path& file) const {
+        save(file, SnapshotSaveOptions{});
+    }
+
+    void Environment::save(const std::filesystem::path& file, const SnapshotSaveOptions& options) const {
         try {
-            hdf5::save(*this, file);
+            hdf5::save(*this, file, options);
         } catch (const hdf5::Error& error) {
             throw dip::IOException(
                 "Unable to save HDF5 environment",

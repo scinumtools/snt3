@@ -1,0 +1,4 @@
+# A second named source with its own map hierarchy.
+devices[thermometer]
+  family str = "Thermal"
+  series int = 200

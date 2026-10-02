@@ -82,6 +82,57 @@ expression structure:
 See :doc:`the inspection guide <../modules/dip/inspection>` for the meaning of
 the graph's ``?path`` IDs and its recorded events.
 
+Parameter Viewer
+----------------
+
+The `ParameterViewer source directory
+<https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/ParameterViewer>`_
+contains a self-contained DIPfile project designed for browsing. It combines
+groups, a value with a child, map and list collections, a schema, a named
+source, a custom unit, an override, typed arrays and a table, validation,
+metadata, expressions, a formatted string, a modification, and a conditional
+branch. The project uses synthetic
+values and needs no external data files.
+
+Build the optional viewer, then open the project from the repository root:
+
+.. code-block:: console
+
+   cmake -S . -B build -DENABLE_SNT_VIEW=ON
+   cmake --build build --target parameter-viewer-snapshot
+   build/bin/snt view examples/dip/ParameterViewer/DIPfile
+
+The example also includes ``parameters.diph5``, an evaluated snapshot of
+the same project. Open it with ``snt view`` to compare live-project and snapshot
+browsing. A normal CMake build regenerates the snapshot when the DIPfile or any
+of its input files changes; use the ``parameter-viewer-snapshot`` target to
+regenerate it by itself.
+The generated snapshot records evaluation dependencies and stores source
+paths relative to its own directory, so the example can be moved as a unit.
+
+Inspect the ``DIPfile`` branch to see the project's registered inputs and
+their manifest lines. The structured manifest branch is available when
+opening the live DIPfile; the snapshot contains evaluated results.
+
+In the browser, compare ``experiment.geometry`` (group),
+``experiment.materials`` (map), ``experiment.probes`` (list),
+``experiment.duration`` (value), and ``experiment.repeats`` (value with a
+child). Select ``experiment.geometry.length`` to see its declaration and
+override. The ``Overrides`` branch lists this target separately and links back
+to its evaluated path. Then select ``experiment.average_speed`` to follow its dependencies.
+The effective values are ``3 m`` and ``0.375 m/s`` respectively. The
+``Schemas`` branch lists ``probe`` with its declaration and links to values it
+contributed; ``Units`` lists the ``sample_tick`` custom unit and its definition.
+``Sources`` branch contains the separate ``reference`` and ``catalog``
+sources. Select ``experiment.lab_name`` and follow its
+``reference?lab_name`` dependency to inspect the source value and declaration.
+Select ``experiment.instrument_family`` to navigate into the catalog's map.
+Source browsing requires a live
+project parse; source nodes are not yet stored in ``.diph5`` snapshots. The
+`example README
+<https://github.com/vrtulka23/scinumtools3/blob/main/examples/dip/ParameterViewer/README.md>`_
+provides a longer guided tour and a command-line parse check.
+
 Adapter Outputs
 ---------------
 

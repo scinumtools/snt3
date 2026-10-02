@@ -39,11 +39,15 @@ target_include_directories(snt-view-imgui PUBLIC
   "${PROJECT_SOURCE_DIR}/external/imgui/backends")
 target_link_libraries(snt-view-imgui PUBLIC glfw ${SNT_VIEW_OPENGL_TARGET})
 
+add_subdirectory("${PROJECT_SOURCE_DIR}/docs/dipl/highlight/cpp"
+                 "${CMAKE_CURRENT_BINARY_DIR}/dipl-highlighter")
+
 target_sources(snt PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/application.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/source_view.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/viewer_model.cpp")
-target_link_libraries(snt PRIVATE snt-view-imgui)
+target_link_libraries(snt PRIVATE snt-view-imgui snt-dipl-highlighter)
 
 if(APPLE)
   # The snt CLI is not an .app bundle, so embed the macOS Retina capability.
@@ -54,8 +58,10 @@ endif()
 if(ENABLE_UNIT_TESTS)
   add_executable(snt-view-model-test
     "${CMAKE_CURRENT_SOURCE_DIR}/viewer_model.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/source_view.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/model.cpp")
   target_include_directories(snt-view-model-test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-  target_link_libraries(snt-view-model-test PRIVATE snt-dip)
+  target_compile_definitions(snt-view-model-test PRIVATE PROJECT_SOURCE_ROOT_DIR="${PROJECT_SOURCE_DIR}/")
+  target_link_libraries(snt-view-model-test PRIVATE snt-dip snt-dipl-highlighter)
   add_test(NAME view.model COMMAND snt-view-model-test)
 endif()

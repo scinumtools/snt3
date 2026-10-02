@@ -283,7 +283,10 @@ are used for ``dipl`` code blocks in this Sphinx documentation. An
 `Emacs mode <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/emacs>`_,
 `Skylight/Kate definition <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/skylight>`_,
 and `TextMate package <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/textmate>`_
-are provided for editing DIPL files. The shared
+are provided for editing DIPL files. A reusable
+`C++ highlighter <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/cpp>`_
+provides DIPL token spans and the same palette to native applications, including
+the SNT3 viewer. The shared
 `highlighting test fixture <https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/highlight/highlighting-test.dipl>`_
 covers the language constructs supported by these highlighters.
 

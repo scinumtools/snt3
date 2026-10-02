@@ -154,11 +154,18 @@ reevaluating their DIPL sources:
    snt dip parse --load parameters.diph5 --print
    snt dip parse --load parameters.diph5 --request simulation.steps --value --type integer
    snt dip parse --load parameters.diph5 --save copy.diph5
+   snt dip parse --project DIPfile --record-graph --relative-source-paths \
+       --save project.diph5
 
 ``--load`` cannot be combined with any ``--input``. ``--save`` overwrites an
 existing file and does not require ``--print`` or ``--value``. It saves the
 entire environment even when ``--request`` or ``--tags`` restricts printed
 output. If output validation fails, the destination is not written.
+``--record-graph`` records evaluation dependencies while parsing DIPL input;
+the graph is stored by ``--save``. It cannot be used with ``--load``.
+``--relative-source-paths`` stores source-manifest paths relative to the saved
+DIPH5 file and requires ``--save``. This is useful when a project and its
+snapshot are distributed together.
 File errors are reported on standard error with a nonzero exit status.
 See :doc:`DIP environment persistence <../modules/dip/persistence>` for
 the format and its limitations.
@@ -293,7 +300,7 @@ option is off, those GUI libraries are not compiled or linked.
    git submodule update --init external/imgui external/glfw
    cmake -S . -B build -DENABLE_SNT_VIEW=ON
    cmake --build build --target snt
-   build/bin/snt view parameters.dip
+   build/bin/snt view examples/dip/ParameterViewer/DIPfile
 
 On Debian or Ubuntu, install these native packages to build both the X11 and
 Wayland backends. If the X11 development library is unavailable, the viewer
@@ -304,10 +311,28 @@ its Wayland backend is enabled::
      libxinerama-dev libxcursor-dev libxi-dev libwayland-dev libwayland-bin \
      libxkbcommon-dev wayland-protocols pkg-config
 
-The initial viewer browses evaluated paths, values, units, provenance, schemas,
-and recorded dependencies. It accepts ``.dip``, ``.dipl``, ``DIPfile``, and
+The initial viewer browses evaluated paths, values, provenance, and recorded
+dependencies. ``Schemas`` lists registered schemas with their declarations and
+links to contributed values; ``Units`` lists custom units with their definitions.
+Overridden values appear in a separate ``Overrides`` branch. Live DIPL projects
+also expose named sources in a separate browser branch, with navigation from
+``source?path`` dependencies.
+The top path bar preserves the argument passed to ``snt view``; file locations
+in the inspector are relative to the opened artifact's directory.
+For live ``.dip``, ``.dipl``, and ``DIPfile`` inputs, **Open source** in the
+inspector opens the selected declaration in a read-only, DIPL-highlighted
+source tab. An overridden parameter offers both its effective override and
+original declaration. Custom units and schemas also link to their definitions.
+For code embedded as a string in ``DIPfile``, the action points to the string's
+registration line; its internal line numbers do not refer to physical file lines.
+Source opening is disabled for ``.diph5`` snapshots, which do not retain the
+complete source text.
+It accepts ``.dip``, ``.dipl``, ``DIPfile``, and
 ``.diph5`` artifacts. Use **File → Reload** or **Ctrl+R** after an external edit;
 an invalid reload retains the last valid view and displays the error. Standalone
-``.dipt`` opening and scalable access to large numerical datasets are deferred.
+``.dipt`` opening, source-node browsing from ``.diph5`` snapshots, and scalable
+access to large numerical datasets are deferred.
+See :doc:`the ParameterViewer example <../examples/dip>` for a guided project
+that exercises the browser's node types.
 
 All three features belong to the ``snt`` target and require ``ENABLE_EXEC_APPS_SNT``.

@@ -6,6 +6,7 @@
 
 namespace snt::dip {
     class Environment;
+    struct SnapshotSaveOptions;
 }
 
 namespace snt::dip::hdf5 {
@@ -15,7 +16,7 @@ namespace snt::dip::hdf5 {
     };
 
     void load(Environment& env, const std::filesystem::path& file);
-    void save(const Environment& env, const std::filesystem::path& file);
+    void save(const Environment& env, const std::filesystem::path& file, const SnapshotSaveOptions& options);
 
 } // namespace snt::dip::hdf5
 

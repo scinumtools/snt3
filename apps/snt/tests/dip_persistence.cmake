@@ -53,6 +53,11 @@ file(MAKE_DIRECTORY "${project_dir}")
 file(WRITE "${project_dir}/parameters.dip" "answer int = 42\n")
 file(WRITE "${project_dir}/DIPfile" "code[]\n  file = \"parameters.dip\"\n")
 run_cli(success "42\n" --project "${project_dir}/DIPfile" --request answer --value --type integer)
+run_cli(success "" --project "${project_dir}/DIPfile" --record-graph
+  --relative-source-paths --save "${project_dir}/project.diph5")
+run_cli(success "42\n" --load "${project_dir}/project.diph5" --request answer --value --type integer)
+run_cli(failure "" --load "${project_dir}/project.diph5" --record-graph)
+run_cli(failure "" --project "${project_dir}/DIPfile" --relative-source-paths)
 run_cli(failure "" --project "${project_dir}/DIPfile" --input string "other int = 1")
 # Project tuning must work regardless of whether the override or project is specified first.
 run_cli(success "99\n" --project "${project_dir}/DIPfile" --input override_string "answer = 99" --request answer --value --type integer)

@@ -1,0 +1,9 @@
+?descr "Reusable settings for one measurement probe"
+
+model str = "T-100"
+  ?descr "Instrument model"
+accuracy float = 0.2 K
+  !condition ({.} > 0 K)
+  ?descr "Manufacturer's temperature accuracy"
+enabled bool = true
+  ?descr "Whether this probe is used"

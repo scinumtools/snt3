@@ -33,6 +33,8 @@ namespace snt::api {
         bool has_model_input = false;  ///< Whether a model input, excluding overrides, has been added
         bool has_input = false;        ///< Whether DIPL inputs have been added
         bool has_project = false;      ///< Whether a DIPfile project has been added
+        bool record_dependency_graph_ = false;
+        bool relative_source_paths_ = false;
 
       public:
         /**
@@ -56,6 +58,12 @@ namespace snt::api {
         /// Request/tag filters affect text output only. The file path must be nonempty.
         /// Saving occurs after successful output validation.
         void argument_save(const std::string& file);
+
+        /// Record the DIP dependency graph during parsing and include it in saved snapshots.
+        void argument_record_dependency_graph(bool enabled = true);
+
+        /// Store source paths relative to the output DIPH5 file when saving.
+        void argument_relative_source_paths(bool enabled = true);
 
         /// Generate static parameters during execute().
         /// format is one of cpp, c, fortran, rust, julia, json, or yaml.

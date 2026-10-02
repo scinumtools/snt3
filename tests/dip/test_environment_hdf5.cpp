@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <filesystem>
+#include <fstream>
 #include <limits>
 #include <hdf5.h>
 #include <snt/dip/cursor.h>
@@ -216,6 +217,56 @@ TEST(Environment, SourceManifestAndCursorProvenance) {
     EXPECT_EQ(loaded_provenance.source->hash, parsed_provenance.source->hash);
     EXPECT_EQ(loaded.get_source_manifest().size(), source.get_source_manifest().size());
     std::filesystem::remove(file);
+}
+
+TEST(Environment, RelativeSourcePathsFollowSnapshotLocation) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto root = std::filesystem::temp_directory_path() / ("snt-relative-sources-" + suffix);
+    const auto source_dir = root / "sources";
+    const auto snapshot_dir = root / "snapshots";
+    const auto copy_dir = root / "copies";
+    std::filesystem::create_directories(source_dir);
+    std::filesystem::create_directories(snapshot_dir);
+    std::filesystem::create_directories(copy_dir);
+    const auto source_file = source_dir / "values.dip";
+    {
+        std::ofstream stream(source_file);
+        stream << "value int = 1\n";
+    }
+    dip::DIP parser;
+    parser.add_file(source_file.string());
+    const auto parsed = parser.parse(true);
+    ASSERT_TRUE(parsed.dependency_graph().recorded);
+
+    dip::SnapshotSaveOptions options;
+    options.source_paths = dip::SourcePathPolicy::RelativeToSnapshot;
+    const auto snapshot = snapshot_dir / "values.diph5";
+    parsed.save(snapshot, options);
+    dip::Environment loaded;
+    loaded.load(snapshot);
+    ASSERT_TRUE(loaded.dependency_graph().recorded);
+    const auto manifest = loaded.get_source_manifest();
+    const auto source_it = std::find_if(manifest.begin(), manifest.end(), [&](const dip::SourceInfo& info) {
+        return std::filesystem::path(info.path).filename() == source_file.filename();
+    });
+    ASSERT_NE(source_it, manifest.end());
+    const auto& source = *source_it;
+    EXPECT_FALSE(std::filesystem::path(source.path).is_absolute());
+    EXPECT_EQ((snapshot_dir / source.path).lexically_normal(), source_file);
+
+    const auto copy = copy_dir / "values.diph5";
+    loaded.save(copy, options);
+    dip::Environment reloaded;
+    reloaded.load(copy);
+    const auto copied_manifest = reloaded.get_source_manifest();
+    const auto copied_it = std::find_if(copied_manifest.begin(), copied_manifest.end(),
+        [&](const dip::SourceInfo& info) {
+            return std::filesystem::path(info.path).filename() == source_file.filename();
+        });
+    ASSERT_NE(copied_it, copied_manifest.end());
+    const auto& copied_source = *copied_it;
+    EXPECT_EQ((copy_dir / copied_source.path).lexically_normal(), source_file);
+    std::filesystem::remove_all(root);
 }
 
 TEST(Environment, TraceManifestRoundTrip) {

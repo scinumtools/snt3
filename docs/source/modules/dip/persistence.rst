@@ -50,8 +50,13 @@ round trip:
 Source identifiers, line numbers, captured source lines, and citation metadata
 remain node-level provenance. DIPH5 version 2 stores a source manifest with
 each source's name, recorded path, parent relationship, and SHA-256 hash of
-the exact parsed content. Version 2.1 additionally preserves the trace IDs of
-registered units, schemas, and functions. Version 2.4 adds schema-level
+the exact parsed content. Source paths can be saved relative to the DIPH5
+directory with ``SnapshotSaveOptions`` and
+``SourcePathPolicy::RelativeToSnapshot``. Relative paths in a loaded snapshot
+are interpreted from that snapshot's directory when it is saved again with
+the same policy. The default preserves the original path strings.
+Version 2.1 additionally preserves the trace IDs of registered units, schemas,
+and functions. Version 2.4 adds schema-level
 descriptions, citations, and source locations to those trace entries. In C++,
 ``get_schema_manifest()`` returns these descriptive records and
 ``get_applied_schemas(path)`` finds schemas applied along a value path.

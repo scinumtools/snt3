@@ -1,0 +1,53 @@
+# A deliberately varied, small project for browsing the evaluated tree.
+experiment
+  title str = "Thermal flow demonstration"
+    ?descr "A synthetic run used to explore the SNT3 parameter viewer"
+  run_id str = "PV-2026-001"
+    !format "PV-[0-9]{4}-[0-9]{3}"
+    !tags ["identity", "export"]
+  enabled bool = true
+  mode str = "survey"
+    !options ["survey", "precision"]
+
+  # This value also owns a child, exercising the combined tree icon.
+  repeats int = 4
+    warmup int = 1
+
+  geometry
+    length float = 2 m
+      !condition ({.} > 0 m)
+      ?descr "Channel length; replaced by the run override"
+    width float = 40 cm
+    depth float = 10 cm
+    area float = ({?experiment.geometry.width} * {?experiment.geometry.depth}) m2
+      ?descr "Cross-sectional area calculated from two inputs"
+
+  duration float = 8 s
+  average_speed float = ({?experiment.geometry.length} / {?experiment.duration}) m/s
+    !condition ({.} > 0 m/s)
+    ?descr "Uses the effective, overridden length"
+  lab_name str = {reference?lab_name}
+    ?descr "Copied from the named reference source"
+  calibration_revision int = {reference?calibration_revision}
+  instrument_family str = {catalog?devices[thermometer].family}
+  room_temperature float = 293.15 K
+  pressure float = 101325 Pa
+  sample_interval float = 2 sample_tick
+    ?descr "Two ticks of the project-defined time unit"
+  optional_note str = none
+
+  instrument : probe
+    model = "T-200"
+
+  materials[steel]
+    density float = 7850 kg/m3
+    thermal_conductivity float = 45 W/(m*K)
+  materials[aluminium]
+    density float = 2700 kg/m3
+    thermal_conductivity float = 205 W/(m*K)
+
+  probes[] : probe
+    model = "Inlet-T"
+  probes[] : probe
+    model = "Outlet-T"
+    accuracy = 0.1 K

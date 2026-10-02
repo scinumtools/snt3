@@ -123,7 +123,8 @@ namespace snt::bind::python {
             "Args:\n    file: Path to the DIPH5 file."
         );
         env.def(
-            "save", &dip::Environment::save, py::arg("file"),
+            "save", py::overload_cast<const std::filesystem::path&>(&dip::Environment::save, py::const_),
+            py::arg("file"),
             "Save evaluated nodes to DIPH5 with descriptive schema metadata and provenance, but not reusable definitions.\n\n"
             "Args:\n    file: Output DIPH5 path; an existing file is overwritten."
         );

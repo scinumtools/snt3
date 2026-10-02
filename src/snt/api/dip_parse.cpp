@@ -95,6 +95,14 @@ namespace snt::api {
         save_file = file;
     }
 
+    void DIPParse::argument_record_dependency_graph(bool enabled) {
+        record_dependency_graph_ = enabled;
+    }
+
+    void DIPParse::argument_relative_source_paths(bool enabled) {
+        relative_source_paths_ = enabled;
+    }
+
     void DIPParse::argument_generate(const std::string& format, const std::string& file) {
         if (file.empty()) {
             throw api::ArgumentException(
@@ -157,7 +165,19 @@ namespace snt::api {
     }
 
     std::string DIPParse::execute() {
-        dip::Environment env = evaluate();
+        if (record_dependency_graph_ && !load_file.empty()) {
+            throw api::ArgumentException(
+                "Invalid graph recording option", "Graph recording requires DIPL input.",
+                "Remove --load or disable graph recording.", __FILE__, __LINE__
+            );
+        }
+        if (relative_source_paths_ && save_file.empty()) {
+            throw api::ArgumentException(
+                "Invalid source path option", "Relative source paths require a DIPH5 output.",
+                "Configure a save file or disable relative source paths.", __FILE__, __LINE__
+            );
+        }
+        dip::Environment env = evaluate(record_dependency_graph_);
 
         // request nodes
         dip::ValueNode::ListType vnodes;
@@ -214,8 +234,12 @@ namespace snt::api {
                 ss << node->path.name << " = " << node->to_string() << '\n';
             }
         }
-        if (!save_file.empty())
-            env.save(save_file);
+        if (!save_file.empty()) {
+            dip::SnapshotSaveOptions options;
+            if (relative_source_paths_)
+                options.source_paths = dip::SourcePathPolicy::RelativeToSnapshot;
+            env.save(save_file, options);
+        }
         if (generate_format)
             env.generate(*generate_format, generate_file);
         return ss.str();

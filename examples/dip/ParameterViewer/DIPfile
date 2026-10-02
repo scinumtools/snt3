@@ -1,0 +1,22 @@
+units[]
+  name = "sample_tick"
+  unit = "0.25*s"
+
+sources[]
+  name = "reference"
+  filepath = "reference.dip"
+sources[]
+  name = "catalog"
+  filepath = "catalog.dip"
+
+schemas[]
+  name = "probe"
+  file = "probe.dip"
+
+overrides[]
+  file = "overrides.dip"
+
+code[]
+  file = "parameters.dip"
+code[]
+  file = "observations.dip"

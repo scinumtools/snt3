@@ -180,7 +180,7 @@ HDF5 object names. Each entry has the following attributes:
 | Attribute | Type | Meaning |
 | --- | --- | --- |
 | `_DIPL_Source_Name` | UTF-8 string | Named DIPL source identifier. |
-| `_DIPL_Source_Path` | UTF-8 string | Path recorded when the source was parsed; it may be empty for inline input. |
+| `_DIPL_Source_Path` | UTF-8 string | Path recorded when the source was parsed, or a path relative to the DIPH5 file's directory when saved with the relative source path policy; it may be empty for inline input. |
 | `_DIPL_Source_Parent` | UTF-8 string | Parent source identifier, when one exists. |
 | `_DIPL_Source_Parent_Line` | unsigned integer | Parent source line associated with the registration. |
 | `_DIPL_Source_Hash_Algorithm` | UTF-8 string | Digest algorithm, currently `SHA-256`. |
