@@ -60,6 +60,7 @@ namespace snt::dip {
             );
         }
         EnvSource senv = parse_source(value_raw.at(0), source_file, line.source);
+        senv.named_source = true;
         env.sources.append(value_raw.at(0), senv);
         return {};
     }

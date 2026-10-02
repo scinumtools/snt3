@@ -23,8 +23,13 @@ TEST(ReferencesRaw, BooleanValues) {
     dip::DIP d;
     d.add_string("$source " + source_name + " = \"" + source_filename.string() + "\"");
     d.add_string("snap bool[2,2] = {" + source_name + "}");
-    dip::Environment env = d.parse();
+    dip::Environment env = d.parse(true);
     EXPECT_EQ(env.nodes.size(), 1);
+    EXPECT_TRUE(env.sources.at(source_name).named_source);
+    EXPECT_TRUE(env.sources.at(source_name).raw_text);
+    const auto reads = env.dependency_graph().dependencies("?snap");
+    ASSERT_EQ(reads.size(), 1);
+    EXPECT_EQ(reads.front().target, source_name + "?");
 
     // remove temporary file
     std::filesystem::remove(source_filename);

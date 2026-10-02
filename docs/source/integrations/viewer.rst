@@ -60,6 +60,10 @@ parameter to inspect its value, units, metadata, source locations, and
 dependencies. Follow a dependency to its input, then use the back and forward
 buttons to return to earlier selections. Values from named sources can be
 opened under the **Sources** branch through ``source?path`` references.
+Raw text sources appear there as source entries without parameter children.
+Select one and use **Open source** to read its original text in the Source tab;
+these files are shown without DIPL syntax coloring. A value that injects raw
+source content links back to that source when dependency recording is enabled.
 
 The top path bar shows the argument supplied to ``snt view``. Source file
 locations in the inspector are displayed relative to the opened artifact's

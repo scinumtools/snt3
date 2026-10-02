@@ -94,9 +94,9 @@ int main() {
                   std::vector<std::string>{"@dipfile", "@overrides", "@project", "@schemas", "@sources", "@units"},
               "Browser sections are not in the expected order");
         const auto& entries = project.environment().project_entries();
-        check(entries.size() == 7 && entries.front().kind == snt::dip::ProjectEntry::Kind::Unit &&
-              entries.front().line == 3 && entries.back().kind == snt::dip::ProjectEntry::Kind::Code &&
-              entries.back().line == 22, "DIPfile entries should retain source order and line numbers");
+        check(entries.size() == 8 && entries.front().kind == snt::dip::ProjectEntry::Kind::Unit &&
+              entries.front().line == 3 && entries.back().kind == snt::dip::ProjectEntry::Kind::Source &&
+              entries.back().line == 26, "DIPfile entries should retain source order and line numbers");
         const auto* source_entry = project.object("@dipfile?Sources?1");
         check(source_entry && source_entry->label == "reference" && source_entry->manifest_index &&
               std::filesystem::path(entries[*source_entry->manifest_index].resolved_path).filename() == "reference.dip",
@@ -231,6 +231,24 @@ int main() {
         check(catalog_reads.size() == 1 &&
               catalog_reads.front().target == "catalog?devices[thermometer].family" &&
               project.object(catalog_reads.front().target), "Second source dependency is not navigable");
+        const auto* raw_source = project.object("raw_samples?");
+        check(raw_source && raw_source->children.empty() &&
+              project.environment().sources.at("raw_samples").raw_text,
+              "Raw source is missing from the browser");
+        const auto raw_targets = project.source_targets(*raw_source);
+        check(raw_targets.size() == 1 && raw_targets.front().plain_text &&
+              raw_targets.front().file.filename() == "samples.txt",
+              "Raw source does not open as plain text");
+        snt::view::SourceView raw_view;
+        std::string raw_error;
+        check(raw_view.open(raw_targets.front().file, raw_targets.front().line, raw_error,
+                            raw_targets.front().plain_text) && raw_error.empty() &&
+              raw_view.lines().front().spans.size() == 1 &&
+              raw_view.lines().front().spans.front().kind == snt::view::SyntaxKind::Text,
+              "Raw source text should not receive DIPL syntax colors");
+        const auto raw_reads = project.environment().dependency_graph().dependencies("?experiment.sample_values");
+        check(raw_reads.size() == 1 && raw_reads.front().target == "raw_samples?" &&
+              project.object(raw_reads.front().target), "Raw source dependency is not navigable");
         check(project.select("reference?lab_name") && project.reload() &&
               project.selection() == "reference?lab_name" &&
               project.input_path() == relative_example.string(),

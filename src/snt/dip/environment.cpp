@@ -316,7 +316,9 @@ namespace snt::dip {
     }
 
     std::string Environment::request_code(const std::string& source_name) const {
-        return sources.at(source_name).code;
+        const auto& source = sources.at(source_name);
+        record_dependency(source_name + "?", source_name);
+        return source.code;
     }
 
     ValueNodeData Environment::request_node_data(const std::string& request, const RequestType rtype,

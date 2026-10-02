@@ -75,9 +75,15 @@ void draw_kind_icon(const ObjectInfo& object, ImVec2 pos, float size) {
         draw->PathLineTo(point(0.5f, 0.86f));
         draw->PathLineTo(point(0.39f, 0.62f));
         draw->PathLineTo(point(0.2f, 0.72f));
-        draw->PathStroke(color, ImDrawFlags_Closed, 1.2f);
+        draw->PathStroke(color, 1.2f, ImDrawFlags_Closed);
         draw->AddCircleFilled(point(0.31f, 0.46f), size * 0.085f, color, 6);
         draw->AddCircleFilled(point(0.69f, 0.46f), size * 0.085f, color, 6);
+    } else if (object.role == ObjectRole::Sources || object.role == ObjectRole::Source) {
+        draw->AddLine(point(0.29f, 0.24f), point(0.06f, 0.50f), color, 1.2f);
+        draw->AddLine(point(0.06f, 0.50f), point(0.29f, 0.76f), color, 1.2f);
+        draw->AddLine(point(0.59f, 0.15f), point(0.40f, 0.85f), color, 1.2f);
+        draw->AddLine(point(0.71f, 0.24f), point(0.94f, 0.50f), color, 1.2f);
+        draw->AddLine(point(0.94f, 0.50f), point(0.71f, 0.76f), color, 1.2f);
     } else if (object.role == ObjectRole::Units || object.role == ObjectRole::Unit) {
         draw->AddRect(point(0.08f, 0.28f), point(0.92f, 0.76f), color);
         for (int tick = 0; tick < 4; ++tick) {
@@ -281,6 +287,15 @@ void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
             model.environment().units.at(object->node_path).definition);
         return;
     }
+    if (object->role == ObjectRole::Source) {
+        const auto& named = model.environment().sources.at(object->source_name);
+        cache.fields.emplace_back("Kind", named.raw_text ? "Raw source" : "Named DIPL source");
+        if (named.raw_text)
+            cache.fields.emplace_back("Size", std::to_string(named.code.size()) + " bytes");
+        if (model.environment().dependency_graph().recorded)
+            cache.readers = model.environment().dependency_graph().referenced_by(object->path);
+        return;
+    }
     if (!object->has_value) {
         cache.fields.emplace_back("Kind", object->path.empty() ? "Artifact" : object_kind_name(*object));
         return;
@@ -427,7 +442,7 @@ void draw_inspector(ViewerModel& model, InspectorCache& cache, SourceView& sourc
                                       available ? "" : " (unavailable)");
                 }
                 if (clicked) {
-                    if (source.open(target.file, target.line, source_error)) {
+                    if (source.open(target.file, target.line, source_error, target.plain_text)) {
                         const auto parsed = model.environment().sources.entries().find(target.source_name);
                         if (parsed != model.environment().sources.entries().end() &&
                             parsed->second.code != source.text())

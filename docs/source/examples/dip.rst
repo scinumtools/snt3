@@ -90,8 +90,8 @@ Parameter Viewer
 The `ParameterViewer source directory
 <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/ParameterViewer>`_
 contains a self-contained DIPfile project designed for browsing. It combines
-groups, a value with a child, map and list collections, a schema, two named
-source, a custom unit, an override, typed arrays and a table, validation,
+groups, a value with a child, map and list collections, a schema, two DIPL
+sources and one raw text source, a custom unit, an override, typed arrays and a table, validation,
 metadata, expressions, a formatted string, a modification, and a conditional
 branch. The project uses synthetic
 values and needs no external data files.
@@ -131,6 +131,8 @@ contributed; ``Units`` lists the ``sample_tick`` custom unit and its definition.
 sources. Select ``experiment.lab_name`` and follow its
 ``reference?lab_name`` dependency to inspect the source value and declaration.
 Select ``experiment.instrument_family`` to navigate into the catalog's map.
+The ``raw_samples`` source opens as plain text and supplies
+``experiment.sample_values`` through raw source injection.
 Source browsing requires a live
 project parse; source nodes are not yet stored in ``.diph5`` snapshots. The
 `example README

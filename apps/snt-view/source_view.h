@@ -13,10 +13,11 @@ namespace snt::view {
 using SyntaxKind = dipl::highlight::SyntaxKind;
 using HighlightedLine = dipl::highlight::HighlightedLine;
 
-/** A read-only file buffer with DIPL token categories for the viewer. */
+/** A read-only file buffer with DIPL highlighting or plain text. */
 class SourceView {
 public:
-    bool open(const std::filesystem::path& file, std::size_t line, std::string& error);
+    bool open(const std::filesystem::path& file, std::size_t line, std::string& error,
+              bool plain_text = false);
     const std::filesystem::path& file() const { return file_; }
     std::size_t target_line() const { return target_line_; }
     const std::string& text() const { return text_; }

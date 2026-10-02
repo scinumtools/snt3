@@ -95,7 +95,9 @@ namespace snt::dip {
                 );
             std::ostringstream source_code;
             source_code << file.rdbuf();
-            return EnvSource({source_name, source_file, source_code.str(), parent});
+            EnvSource source{source_name, source_file, source_code.str(), parent};
+            source.raw_text = true;
+            return source;
         }
     }
 

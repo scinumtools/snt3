@@ -39,12 +39,13 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
 
 | File | Purpose |
 | --- | --- |
-| `DIPfile` | Registers the custom unit, two named sources, schema, override, and two code files. |
+| `DIPfile` | Registers the custom unit, two DIPL sources, one raw text source, schema, override, and two code files. |
 | `parameters.diph5` | Evaluated snapshot generated from `DIPfile`. |
 | `parameters.dip` | Groups, scalar types, a value with a child, units, expressions, metadata, validation, map and list collections, and schema use. |
 | `observations.dip` | Arrays, an array slice, a typed table, a formatted string, a compatible modification, a Boolean decision, and a conditional branch. |
 | `reference.dip` | Values read through the named `reference` source. |
 | `catalog.dip` | A second named source containing a map of devices. |
+| `samples.txt` | Raw array data injected through the `raw_samples` source. |
 | `probe.dip` | Reusable probe schema. |
 | `overrides.dip` | Replaces the declared channel length for this run. |
 
@@ -80,6 +81,8 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
 8. Select `experiment.temperatures` and `experiment.readings.temperature` to
    inspect an array and a table column. The current viewer summarizes arrays
    rather than displaying every element.
+   Select **Sources → raw_samples** and use **Open source** to view the raw
+   text without DIPL coloring. `experiment.sample_values` reads that source.
 9. Select `experiment.summary` to see string interpolation and
    `experiment.target_temperature` to see a compatible modification from
    `294 K` to `295 K`.
@@ -91,5 +94,6 @@ viewer keeps the last valid state if the edited project does not parse.
 Source-node browsing currently requires a live DIPL or DIPfile parse; a
 `.diph5` snapshot retains source identity but not source node values.
 Source viewing is also disabled for `.diph5` snapshots because they do not
-contain the complete source text. The Source tab uses DIPL syntax colors and
+contain the complete source text. The Source tab uses DIPL syntax colors for
+DIPL files and plain text for raw sources, and
 offers a **Copy source** button; it does not edit files.

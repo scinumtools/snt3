@@ -51,3 +51,5 @@ experiment
   probes[] : probe
     model = "Outlet-T"
     accuracy = 0.1 K
+
+  sample_values int[3] = {raw_samples}

@@ -261,11 +261,14 @@ std::vector<SourceTarget> ViewerModel::source_targets(const ObjectInfo& object) 
     }
 
     std::vector<SourceTarget> targets;
+    const bool plain_text = object.role == ObjectRole::Source &&
+        environment_.sources.at(object.source_name).raw_text;
     for (const auto& location : dip::inspect_source_locations(environment_, entity)) {
         if (!location.source_text_available || location.source.path.empty()) continue;
         std::filesystem::path file(location.source.path);
-        if (file.is_relative()) file = artifact_.parent_path() / file;
-        if (file.filename() != "DIPfile" && file.extension() != ".dip" && file.extension() != ".dipl")
+        if (file.is_relative()) file = std::filesystem::absolute(file);
+        if (!plain_text && file.filename() != "DIPfile" &&
+            file.extension() != ".dip" && file.extension() != ".dipl")
             continue;
         const auto duplicate = std::find_if(targets.begin(), targets.end(), [&](const auto& target) {
             return target.file == file && target.line == location.line;
@@ -282,7 +285,7 @@ std::vector<SourceTarget> ViewerModel::source_targets(const ObjectInfo& object) 
         case dip::SourceLocationRole::Definition: label = "Definition"; break;
         case dip::SourceLocationRole::Registration: label = "Registration"; break;
         }
-        targets.push_back({std::move(label), std::move(file), location.line, location.source.name});
+        targets.push_back({std::move(label), std::move(file), location.line, location.source.name, plain_text});
     }
     return targets;
 }

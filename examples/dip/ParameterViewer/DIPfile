@@ -20,3 +20,7 @@ code[]
   file = "parameters.dip"
 code[]
   file = "observations.dip"
+
+sources[]
+  name = "raw_samples"
+  filepath = "samples.txt"

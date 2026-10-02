@@ -312,21 +312,24 @@ TEST(Project, ParameterViewerExampleStaysBrowsable) {
     const auto value = locations(dip::SourceEntityKind::Path, "experiment.geometry.length");
     ASSERT_EQ(value.size(), 2);
     EXPECT_EQ(value.front().role, dip::SourceLocationRole::Override);
-    EXPECT_EQ(value.front().source.path, (project.parent_path() / "overrides.dip").string());
+    EXPECT_EQ(std::filesystem::path(value.front().source.path).generic_string(),
+              (project.parent_path() / "overrides.dip").generic_string());
     EXPECT_EQ(value.back().role, dip::SourceLocationRole::Declaration);
-    EXPECT_EQ(value.back().source.path, (project.parent_path() / "parameters.dip").string());
+    EXPECT_EQ(std::filesystem::path(value.back().source.path).generic_string(),
+              (project.parent_path() / "parameters.dip").generic_string());
 
     const auto group = locations(dip::SourceEntityKind::Path, "experiment.geometry");
     ASSERT_EQ(group.size(), 1);
     EXPECT_EQ(group.front().role, dip::SourceLocationRole::Declaration);
     const auto source_group = locations(dip::SourceEntityKind::Path, "devices[thermometer]", "catalog");
     ASSERT_EQ(source_group.size(), 1);
-    EXPECT_EQ(source_group.front().source.path, (project.parent_path() / "catalog.dip").string());
+    EXPECT_EQ(std::filesystem::path(source_group.front().source.path).generic_string(),
+              (project.parent_path() / "catalog.dip").generic_string());
 
     const auto unit = locations(dip::SourceEntityKind::Unit, "sample_tick");
     ASSERT_EQ(unit.size(), 1);
     EXPECT_EQ(unit.front().line, 3);
-    EXPECT_EQ(unit.front().source.path, project.string());
+    EXPECT_EQ(std::filesystem::path(unit.front().source.path).generic_string(), project.generic_string());
     const auto schema = locations(dip::SourceEntityKind::Schema, "probe");
     ASSERT_EQ(schema.size(), 2);
     EXPECT_EQ(schema.front().role, dip::SourceLocationRole::Definition);
@@ -334,7 +337,8 @@ TEST(Project, ParameterViewerExampleStaysBrowsable) {
     EXPECT_EQ(schema.back().line, 14);
     const auto source = locations(dip::SourceEntityKind::NamedSource, "reference");
     ASSERT_EQ(source.size(), 1);
-    EXPECT_EQ(source.front().source.path, (project.parent_path() / "reference.dip").string());
+    EXPECT_EQ(std::filesystem::path(source.front().source.path).generic_string(),
+              (project.parent_path() / "reference.dip").generic_string());
     const auto registration = locations(dip::SourceEntityKind::ProjectEntry, {}, {}, 1);
     ASSERT_EQ(registration.size(), 1);
     EXPECT_EQ(registration.front().line, 7);

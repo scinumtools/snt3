@@ -35,6 +35,7 @@ struct SourceTarget {
     std::filesystem::path file;
     std::size_t line = 0;
     std::string source_name;
+    bool plain_text = false;
 };
 
 class ViewerModel {

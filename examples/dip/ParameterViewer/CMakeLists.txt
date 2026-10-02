@@ -6,6 +6,7 @@ set(parameter_viewer_inputs
     parameters.dip
     probe.dip
     reference.dip
+    samples.txt
 )
 
 list(TRANSFORM parameter_viewer_inputs PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")

@@ -11,7 +11,8 @@
 
 namespace snt::dip {
 
-    /** An evaluated read of a DIP value. IDs use ?path or source?path. */
+    /** An evaluated read of a DIP value or raw source. IDs use ?path,
+     * source?path, or source? for an entire raw source. */
     struct DependencyEdge {
         std::string target;
         std::string request;
