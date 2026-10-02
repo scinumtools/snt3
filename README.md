@@ -108,6 +108,10 @@ and see the full flyer](https://vrtulka23.github.io/scinumtools3/initiative.html
   [DIP parsing](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#dipl-parameters),
   DIPH5 persistence, export, and
   [reports](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#generating-reports).
+- **Parameter Viewer:**
+  Browse evaluated DIPL projects and DIPH5 snapshots, inspect dependencies and
+  provenance, and open source locations in the optional
+  [graphical viewer](https://vrtulka23.github.io/scinumtools3/integrations/viewer.html).
 - **CMake:**
   [Package integration](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html#getting-started)
   and [DIPL evaluation](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html#dipl-parameters)
