@@ -15,7 +15,7 @@ Focus on your science. Leave the parameter plumbing to SciNumTools.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg?logo=c%2B%2B&logoColor=white)
 ![Compilers](https://img.shields.io/badge/Compilers-GCC%2011%2B%20%7C%20Clang%2015%2B%20%7C%20MSVC%202022-blue)
-[![{?SNT3}: DIPL](https://img.shields.io/badge/DIPL-%7B%3FSNTv3%7D-2980b9)](https://vrtulka23.github.io/scinumtools3/initiative.html)
+[![SNT3: DIPL](https://img.shields.io/badge/SNT3-DIPL-2980b9)](https://vrtulka23.github.io/scinumtools3/initiative.html)
 
 SciNumTools provides a common representation for physical quantities and
 validated scientific input parameters. Its C++17 libraries can be used from
