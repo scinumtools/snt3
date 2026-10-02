@@ -13,6 +13,7 @@ bindings/python/.pytest_cache/*
 **/.DS_STORE
 benchmarks/**/results/*
 coverage/*
+.build_request
 
 # Prerequisites
 *.d
