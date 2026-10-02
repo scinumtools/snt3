@@ -177,7 +177,7 @@ void ViewerModel::rebuild_objects() {
     }
     auto& root_sections = objects_.at("").children;
     root_sections.clear();
-    for (const char* section : {"@overrides", "@dipfile", "@project", "@schemas", "@sources", "@units"})
+    for (const char* section : {"@dipfile", "@overrides", "@project", "@schemas", "@sources", "@units"})
         if (objects_.find(section) != objects_.end()) root_sections.emplace_back(section);
     if (objects_.find(selection_) == objects_.end()) {
         while (!selection_.empty() && objects_.find(selection_) == objects_.end())

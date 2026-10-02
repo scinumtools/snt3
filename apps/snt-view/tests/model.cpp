@@ -91,7 +91,7 @@ int main() {
         const auto relative_example = std::filesystem::relative(example);
         snt::view::ViewerModel project(relative_example);
         check(project.object("")->children ==
-                  std::vector<std::string>{"@overrides", "@dipfile", "@project", "@schemas", "@sources", "@units"},
+                  std::vector<std::string>{"@dipfile", "@overrides", "@project", "@schemas", "@sources", "@units"},
               "Browser sections are not in the expected order");
         const auto& entries = project.environment().project_entries();
         check(entries.size() == 7 && entries.front().kind == snt::dip::ProjectEntry::Kind::Unit &&

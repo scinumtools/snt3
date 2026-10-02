@@ -32,7 +32,7 @@ Building from source
   ``libxkbcommon``, and ``wayland-scanner`` (provided by ``libwayland-bin``
   on Debian and Ubuntu). By default, the X11 backend is built when its
   development library is found; otherwise the build continues with Wayland. See
-  :doc:`integrations/cli` for the Debian and Ubuntu package command.
+  :doc:`integrations/viewer` for the Debian and Ubuntu package command.
 
 Included with the source checkout
 ---------------------------------

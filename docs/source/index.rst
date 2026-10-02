@@ -63,6 +63,7 @@ as well as JSON and YAML data files.
    integrations/python
    integrations/c
    integrations/cli
+   integrations/viewer
    integrations/cmake
    integrations/rest
    integrations/docker

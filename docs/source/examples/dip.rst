@@ -82,19 +82,23 @@ expression structure:
 See :doc:`the inspection guide <../modules/dip/inspection>` for the meaning of
 the graph's ``?path`` IDs and its recorded events.
 
+.. _dip-parameter-viewer-example:
+
 Parameter Viewer
 ----------------
 
 The `ParameterViewer source directory
 <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/ParameterViewer>`_
 contains a self-contained DIPfile project designed for browsing. It combines
-groups, a value with a child, map and list collections, a schema, a named
+groups, a value with a child, map and list collections, a schema, two named
 source, a custom unit, an override, typed arrays and a table, validation,
 metadata, expressions, a formatted string, a modification, and a conditional
 branch. The project uses synthetic
 values and needs no external data files.
 
-Build the optional viewer, then open the project from the repository root:
+Build the optional viewer, then open the project from the repository root.
+See :doc:`the viewer guide <../integrations/viewer>` for build dependencies and
+browser behavior:
 
 .. code-block:: console
 
