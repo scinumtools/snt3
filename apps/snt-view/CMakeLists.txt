@@ -8,6 +8,14 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/glfw/CMakeLists.txt" OR
   message(FATAL_ERROR "snt view requires the imgui and glfw submodules. Run git submodule update --init external/imgui external/glfw.")
 endif()
 
+if(UNIX AND NOT APPLE AND (NOT DEFINED CACHE{GLFW_BUILD_X11} OR GLFW_BUILD_X11))
+  find_package(X11 QUIET)
+  if(NOT X11_FOUND)
+    set(GLFW_BUILD_X11 OFF CACHE BOOL "Build GLFW with X11 support" FORCE)
+    message(STATUS "X11 development library unavailable; building GLFW without X11 support")
+  endif()
+endif()
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/glfw" "${CMAKE_CURRENT_BINARY_DIR}/glfw")
 find_package(OpenGL REQUIRED)
 

@@ -295,9 +295,10 @@ option is off, those GUI libraries are not compiled or linked.
    cmake --build build --target snt
    build/bin/snt view parameters.dip
 
-On Debian or Ubuntu, install the native OpenGL, X11, and Wayland development
-packages before configuring the viewer. GLFW also needs ``wayland-scanner``
-from ``libwayland-bin`` when its Wayland backend is enabled::
+On Debian or Ubuntu, install these native packages to build both the X11 and
+Wayland backends. If the X11 development library is unavailable, the viewer
+build skips X11. GLFW needs ``wayland-scanner`` from ``libwayland-bin`` when
+its Wayland backend is enabled::
 
    sudo apt-get install libgl1-mesa-dev libx11-dev libxext-dev libxrandr-dev \
      libxinerama-dev libxcursor-dev libxi-dev libwayland-dev libwayland-bin \
