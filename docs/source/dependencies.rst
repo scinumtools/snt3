@@ -26,8 +26,9 @@ Building from source
   GoogleTest or downloads it; the Python tests also need pytest 8.2.1 or
   newer. Set ``-DENABLE_UNIT_TESTS=OFF`` if tests are not needed.
 * **Viewer (optional):** ``-DENABLE_SNT_VIEW=ON`` needs OpenGL development
-  files and the GLFW and Dear ImGui submodules. On Linux, GLFW builds its
-  Wayland backend by default, which needs Wayland development files,
+  files and the GLFW and Dear ImGui submodules. Linux also needs
+  ``pkg-config`` to locate OpenGL. GLFW builds its Wayland backend by
+  default, which needs Wayland development files,
   ``libxkbcommon``, and ``wayland-scanner`` (provided by ``libwayland-bin``
   on Debian and Ubuntu). By default, the X11 backend is built when its
   development library is found; otherwise the build continues with Wayland. See

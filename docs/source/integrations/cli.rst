@@ -300,7 +300,7 @@ Wayland backends. If the X11 development library is unavailable, the viewer
 build skips X11. GLFW needs ``wayland-scanner`` from ``libwayland-bin`` when
 its Wayland backend is enabled::
 
-   sudo apt-get install libgl1-mesa-dev libx11-dev libxext-dev libxrandr-dev \
+   sudo apt-get install libgl-dev libglvnd-dev libx11-dev libxext-dev libxrandr-dev \
      libxinerama-dev libxcursor-dev libxi-dev libwayland-dev libwayland-bin \
      libxkbcommon-dev wayland-protocols pkg-config
 

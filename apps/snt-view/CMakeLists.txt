@@ -17,7 +17,14 @@ if(UNIX AND NOT APPLE AND (NOT DEFINED CACHE{GLFW_BUILD_X11} OR GLFW_BUILD_X11))
 endif()
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/external/glfw" "${CMAKE_CURRENT_BINARY_DIR}/glfw")
-find_package(OpenGL REQUIRED)
+if(UNIX AND NOT APPLE)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(SNT_VIEW_GL REQUIRED IMPORTED_TARGET gl)
+  set(SNT_VIEW_OPENGL_TARGET PkgConfig::SNT_VIEW_GL)
+else()
+  find_package(OpenGL REQUIRED)
+  set(SNT_VIEW_OPENGL_TARGET OpenGL::GL)
+endif()
 
 add_library(snt-view-imgui STATIC
   "${PROJECT_SOURCE_DIR}/external/imgui/imgui.cpp"
@@ -30,7 +37,7 @@ add_library(snt-view-imgui STATIC
 target_include_directories(snt-view-imgui PUBLIC
   "${PROJECT_SOURCE_DIR}/external/imgui"
   "${PROJECT_SOURCE_DIR}/external/imgui/backends")
-target_link_libraries(snt-view-imgui PUBLIC glfw OpenGL::GL)
+target_link_libraries(snt-view-imgui PUBLIC glfw ${SNT_VIEW_OPENGL_TARGET})
 
 target_sources(snt PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
