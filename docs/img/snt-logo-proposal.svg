@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="670" height="176" viewBox="0 0 670 176" role="img" aria-labelledby="title desc">
+  <title id="title">SNT3 proposal</title>
+  <desc id="desc">Clean parameter-reference wordmark reading {?SNT3}, with cyan braces, an amber question mark and version numeral, and dark navy lettering outlined in white.</desc>
+  <g font-family="Verdana, Arial, sans-serif" font-size="132" font-weight="700"
+     stroke="#ffffff" stroke-width="7" stroke-linejoin="round" paint-order="stroke fill">
+    <text x="12" y="139" fill="#087fa5">{</text>
+    <text x="93" y="139" fill="#c65d12">?</text>
+    <text x="185" y="139" fill="#183247" letter-spacing="-7">SNT</text>
+    <text x="489" y="139" fill="#c65d12">3</text>
+    <text x="580" y="139" fill="#087fa5">}</text>
+  </g>
+</svg>
