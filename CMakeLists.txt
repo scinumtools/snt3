@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
 cmake_policy(SET CMP0074 NEW)
+if(POLICY CMP0135)
+    cmake_policy(SET CMP0135 NEW)
+endif()
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 # set environmental variables
