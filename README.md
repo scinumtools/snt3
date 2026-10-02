@@ -1,4 +1,4 @@
-# Scientific Numerical Tools v3 `{?SNTv3}`
+# Scientific Numerical Tools v3 `{?SNT3}`
 
 Unit-safe, strongly typed, validated input parameters for scientific and
 engineering software.
