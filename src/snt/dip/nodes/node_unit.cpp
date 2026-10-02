@@ -63,6 +63,8 @@ namespace snt::dip {
             );
         }
         EnvUnit senv = {value_raw.at(0), definition};
+        senv.source_name = line.source.name;
+        senv.source_line = line.source.line_number;
         env.units.append(value_raw.at(0), senv, line.source.name);
         return {};
     }

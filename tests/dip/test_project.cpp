@@ -5,7 +5,9 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
+#include <snt/dip/inspection.h>
 #include <string>
+#include <utility>
 
 using namespace snt;
 
@@ -71,6 +73,21 @@ TEST(Project, ParsesUnitsSourcesFilesAndStrings) {
     ASSERT_TRUE(provenance.source.has_value());
     EXPECT_EQ(provenance.source->path, (project.path() / "DIPfile").string());
     EXPECT_NE(provenance.source->parent_name.find("_project"), std::string::npos);
+}
+
+TEST(Project, UnitDeclarationHasInspectableSource) {
+    ProjectDirectory project("dip-unit-source-inspection");
+    project.write("units.dip", "$unit local_length = 2*m\nlength float = 3 local_length\n");
+    dip::DIP parser;
+    parser.add_file(project.path() / "units.dip");
+    const auto env = parser.parse();
+
+    const auto locations = dip::inspect_source_locations(
+        env, {dip::SourceEntityKind::Unit, "local_length", {}});
+    ASSERT_EQ(locations.size(), 1);
+    EXPECT_EQ(locations.front().role, dip::SourceLocationRole::Definition);
+    EXPECT_EQ(locations.front().source.path, (project.path() / "units.dip").string());
+    EXPECT_EQ(locations.front().line, 1);
 }
 
 TEST(Project, LoadsOverrideFilesBeforeEvaluatingCode) {
@@ -215,6 +232,21 @@ TEST(Project, RegistersSchemaFilesAndStrings) {
     EXPECT_EQ(file_source.path, (project.path() / "settings.dipl").string());
     EXPECT_EQ(string_source.path, (project.path() / "DIPfile").string());
     EXPECT_EQ(file_source.parent.name, string_source.parent.name);
+    EXPECT_FALSE(file_source.embedded);
+    EXPECT_TRUE(string_source.embedded);
+    EXPECT_EQ(env.schemas.at("from_file").registration_line, 3);
+    EXPECT_EQ(env.schemas.at("from_string").registration_line, 6);
+    EXPECT_EQ(env.schemas.at("from_file").registration_source_name, file_source.parent.name);
+    EXPECT_EQ(env.schemas.at("from_string").registration_source_name, string_source.parent.name);
+    const auto inline_locations = dip::inspect_source_locations(
+        env, {dip::SourceEntityKind::Schema, "from_string", {}});
+    ASSERT_EQ(inline_locations.size(), 2);
+    EXPECT_EQ(inline_locations[0].role, dip::SourceLocationRole::Definition);
+    EXPECT_EQ(inline_locations[1].role, dip::SourceLocationRole::Registration);
+    EXPECT_EQ(inline_locations[0].line, 6);
+    EXPECT_EQ(inline_locations[1].line, 6);
+    EXPECT_EQ(inline_locations[0].logical_source_name, string_source.name);
+    EXPECT_TRUE(inline_locations[0].embedded_registration);
 }
 
 TEST(Project, RejectsAmbiguousSchemaEntry) {
@@ -245,4 +277,65 @@ TEST(Project, RejectsOrdinaryParameterNodes) {
 
     dip::DIP parser;
     EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::SyntaxException);
+}
+
+TEST(Project, ParameterViewerExampleStaysBrowsable) {
+    const auto project = std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) /
+                         "examples/dip/ParameterViewer/DIPfile";
+    dip::DIP parser;
+    parser.add_project(project);
+    const dip::Environment env = parser.parse(true);
+
+    EXPECT_DOUBLE_EQ(env["experiment.geometry.length"].as<double>(), 3.0);
+    EXPECT_DOUBLE_EQ(env["experiment.average_speed"].as<double>(), 0.375);
+    EXPECT_EQ(env["experiment.repeats.warmup"].as<int64_t>(), 1);
+    EXPECT_EQ(env["experiment.first_sample_id"].as<int64_t>(), 10);
+    EXPECT_EQ(env["experiment.calibration_revision"].as<int64_t>(), 3);
+    EXPECT_EQ(env["experiment.summary"].as<std::string>(), "Run PV-2026-001 at North Lab");
+    EXPECT_DOUBLE_EQ(env["experiment.target_temperature"].as<double>(), 295.0);
+    EXPECT_EQ(env["state"].as<std::string>(), "fast");
+    EXPECT_EQ(env.hierarchy.get_collection("experiment.materials").kind, dip::Path::Kind::Map);
+    EXPECT_EQ(env.hierarchy.get_collection("experiment.probes").kind, dip::Path::Kind::List);
+    EXPECT_TRUE(env.sources.at("reference").named_source);
+    EXPECT_TRUE(env.sources.at("catalog").named_source);
+    EXPECT_EQ(env.sources.at("catalog").hierarchy.get_collection("devices").kind, dip::Path::Kind::Map);
+    EXPECT_EQ(env["experiment.instrument_family"].as<std::string>(), "Thermal");
+    EXPECT_TRUE(env.get_node("experiment.geometry.length")->override);
+    EXPECT_FALSE(env.get_applied_schemas("experiment.probes[1].accuracy").empty());
+    EXPECT_EQ(env.get_node("experiment.readings.temperature")->value->get_shape().at(0), 4);
+    EXPECT_TRUE(env.dependency_graph().recorded);
+
+    const auto locations = [&](dip::SourceEntityKind kind, std::string name,
+                               std::string source = {}, std::size_t index = 0) {
+        return dip::inspect_source_locations(env, {kind, std::move(name), std::move(source), index});
+    };
+    const auto value = locations(dip::SourceEntityKind::Path, "experiment.geometry.length");
+    ASSERT_EQ(value.size(), 2);
+    EXPECT_EQ(value.front().role, dip::SourceLocationRole::Override);
+    EXPECT_EQ(value.front().source.path, (project.parent_path() / "overrides.dip").string());
+    EXPECT_EQ(value.back().role, dip::SourceLocationRole::Declaration);
+    EXPECT_EQ(value.back().source.path, (project.parent_path() / "parameters.dip").string());
+
+    const auto group = locations(dip::SourceEntityKind::Path, "experiment.geometry");
+    ASSERT_EQ(group.size(), 1);
+    EXPECT_EQ(group.front().role, dip::SourceLocationRole::Declaration);
+    const auto source_group = locations(dip::SourceEntityKind::Path, "devices[thermometer]", "catalog");
+    ASSERT_EQ(source_group.size(), 1);
+    EXPECT_EQ(source_group.front().source.path, (project.parent_path() / "catalog.dip").string());
+
+    const auto unit = locations(dip::SourceEntityKind::Unit, "sample_tick");
+    ASSERT_EQ(unit.size(), 1);
+    EXPECT_EQ(unit.front().line, 3);
+    EXPECT_EQ(unit.front().source.path, project.string());
+    const auto schema = locations(dip::SourceEntityKind::Schema, "probe");
+    ASSERT_EQ(schema.size(), 2);
+    EXPECT_EQ(schema.front().role, dip::SourceLocationRole::Definition);
+    EXPECT_EQ(schema.back().role, dip::SourceLocationRole::Registration);
+    EXPECT_EQ(schema.back().line, 14);
+    const auto source = locations(dip::SourceEntityKind::NamedSource, "reference");
+    ASSERT_EQ(source.size(), 1);
+    EXPECT_EQ(source.front().source.path, (project.parent_path() / "reference.dip").string());
+    const auto registration = locations(dip::SourceEntityKind::ProjectEntry, {}, {}, 1);
+    ASSERT_EQ(registration.size(), 1);
+    EXPECT_EQ(registration.front().line, 7);
 }

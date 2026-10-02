@@ -64,7 +64,10 @@ namespace snt::dip {
         DIP d(parent);
         d.add_file(source_file, source_name);
         Environment senv = d.parse();
-        return EnvSource({source_name, source_file, senv.sources.at(source_name).code, parent, senv.nodes});
+        EnvSource source{source_name, source_file, senv.sources.at(source_name).code, parent, senv.nodes};
+        source.hierarchy = std::move(senv.hierarchy);
+        source.declarations = senv.declarations();
+        return source;
     }
 
     EnvSource parse_source(const std::string& source_name, const std::string& source_file, const Source& parent) {

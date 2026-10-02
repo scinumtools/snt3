@@ -31,6 +31,43 @@ Environment open_artifact(const std::filesystem::path& path, bool record_depende
 void reload_artifact(Environment& current, const std::filesystem::path& path,
                      bool record_dependency_graph = false);
 
+/** A live DIP entity whose source can be inspected. For Path, source_name
+ * selects a named source; an empty source_name selects the evaluated project.
+ * ProjectEntry uses index instead of name.
+ */
+enum class SourceEntityKind { Path, NamedSource, Schema, Unit, ProjectEntry };
+
+struct SourceEntity {
+    SourceEntityKind kind;
+    std::string name;
+    std::string source_name;
+    std::size_t index = 0;
+};
+
+enum class SourceLocationRole { Source, Declaration, Modification, Override, Definition, Registration };
+
+/** A semantic source location. When embedded text has a host registration,
+ * source and line identify that physical location while logical_source_name
+ * and logical_line retain the original declaration. All lines are one-based.
+ */
+struct InspectedSourceLocation {
+    SourceLocationRole role;
+    SourceInfo source;
+    std::size_t line = 0;
+    std::string logical_source_name;
+    std::size_t logical_line = 0;
+    std::size_t modification_index = 0;
+    bool embedded_registration = false;
+    bool source_text_available = false; ///< Parsed text is retained in this environment.
+};
+
+/** Return semantic source locations in precedence order. Source text may be
+ * unavailable, especially after DIPH5 loading. Callers decide whether and how
+ * to open physical paths and whether equivalent targets should be collapsed.
+ */
+std::vector<InspectedSourceLocation> inspect_source_locations(
+    const Environment& env, const SourceEntity& entity);
+
 /** Owned, read-only facts about one evaluated value. */
 enum class ValueChangeKind { Declaration, Modification, Override };
 

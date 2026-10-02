@@ -377,6 +377,12 @@ TEST(Inspection, AppliedModificationHistorySurvivesSnapshot) {
     EXPECT_EQ(value.changes[1].location.line, 2);
     EXPECT_EQ(value.changes[2].location.line, 3);
     EXPECT_EQ(env["answer"].as<int>(), 3);
+    const dip::SourceEntity answer{dip::SourceEntityKind::Path, "answer", {}};
+    auto locations = dip::inspect_source_locations(env, answer);
+    ASSERT_EQ(locations.size(), 3);
+    EXPECT_EQ(locations[0].role, dip::SourceLocationRole::Modification);
+    EXPECT_EQ(locations[0].modification_index, 2);
+    EXPECT_TRUE(locations[0].source_text_available);
 
     const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
     const auto snapshot = std::filesystem::temp_directory_path() / ("snt-inspection-history-" + suffix + ".diph5");
@@ -386,6 +392,10 @@ TEST(Inspection, AppliedModificationHistorySurvivesSnapshot) {
     ASSERT_EQ(value.changes.size(), 3);
     EXPECT_EQ(value.changes[1].location.line, 2);
     EXPECT_EQ(value.changes[2].location.line, 3);
+    locations = dip::inspect_source_locations(env, answer);
+    ASSERT_EQ(locations.size(), 3);
+    EXPECT_EQ(locations[0].logical_line, 3);
+    EXPECT_FALSE(locations[0].source_text_available);
     std::filesystem::remove(snapshot);
 }
 

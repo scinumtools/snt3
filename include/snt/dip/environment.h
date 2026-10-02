@@ -3,7 +3,9 @@
 
 #include "nodes/node_value.h"
 #include <snt/dip/dependency_graph.h>
+#include <snt/dip/declarations.h>
 
+#include <algorithm>
 #include <filesystem>
 #include <optional>
 #include <snt/dip/lists/list_branching.h>
@@ -62,6 +64,17 @@ namespace snt::dip {
         std::optional<SourceInfo> source; ///< Source identity and fingerprint when available.
     };
 
+    /** One DIPfile registration, retained in manifest order for live inspection. */
+    struct ProjectEntry {
+        enum class Kind { Unit, Source, Schema, Code, Override };
+        Kind kind;
+        std::string name;          ///< Public name, when the entry has one.
+        std::string value;         ///< Declared unit, path, or inline text.
+        std::string resolved_path; ///< Absolute file path for file entries; empty for inline entries.
+        std::string source_name;   ///< DIPfile source identity.
+        size_t line = 0;           ///< One-based DIPfile assignment line.
+    };
+
     /**
      * Type of an environment request
      */
@@ -93,12 +106,14 @@ namespace snt::dip {
         std::vector<SourceInfo> source_manifest_;
         std::vector<TraceInfo> trace_manifest_;
         std::vector<SchemaInfo> schema_manifest_;
+        std::vector<ProjectEntry> project_entries_;
         bool schema_manifest_loaded_ = false;
         bool trace_manifest_loaded_ = false;
         bool snapshot_loaded_ = false;
         bool dependency_recording_ = false;
         mutable DependencyGraph dependency_graph_;
         mutable std::optional<size_t> active_dependency_event_;
+        ExplicitDeclarations declarations_; ///< Live explicit path locations; absent from snapshots.
 
         void record_dependency(const std::string& target, const std::string& request,
                                std::string_view operand = {}) const;
@@ -154,6 +169,22 @@ namespace snt::dip {
 
         /** Whether this environment was loaded from a DIPH5 snapshot. */
         bool is_loaded_snapshot() const { return snapshot_loaded_; }
+
+        /** Registrations from parsed DIPfiles. Snapshot loading does not restore these entries. */
+        const std::vector<ProjectEntry>& project_entries() const { return project_entries_; }
+        void record_project_entry(ProjectEntry entry) {
+            const auto after = std::find_if(project_entries_.begin(), project_entries_.end(),
+                [&](const ProjectEntry& current) {
+                    return current.source_name == entry.source_name && current.line > entry.line;
+                });
+            project_entries_.insert(after, std::move(entry));
+        }
+
+        /** Explicit declarations in the evaluated scope. */
+        const ExplicitDeclarations& declarations() const { return declarations_; }
+        void record_declaration(const std::string& path, const Line& line) {
+            declarations_.record(path, line);
+        }
 
         /**
          * Load evaluated DIP nodes from a DIPH5 file. Reusable schema definitions

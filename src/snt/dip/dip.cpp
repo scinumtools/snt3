@@ -99,6 +99,12 @@ overrides list : snt_project_override
             return path.is_absolute() ? path : base / path;
         }
 
+        const Line& project_field_line(const ValueNode::PointerType& node) {
+            // Manifest fields are members of the built-in project schema. Their
+            // declaration line is in the preamble; the assignment is in DIPfile.
+            return node->modification_lines.empty() ? node->line : node->modification_lines.back();
+        }
+
         std::string resolved_override_path(const Environment& env, std::string path) {
             size_t position = 0;
             while ((position = path.find("[]", position)) != std::string::npos) {
@@ -167,6 +173,7 @@ overrides list : snt_project_override
             num_strings++;
         }
         env.sources.append(source_name, source_file, source_code, parent);
+        env.sources.at(source_name).embedded = true;
         parse_lines(lines, source_code, source_name);
     }
 
@@ -210,6 +217,7 @@ overrides list : snt_project_override
         Source sparent = {source_name, parent.line_number};
         EnvSource senv = parse_source(sname, spath, sparent);
         senv.parent = parent;
+        senv.named_source = true;
         env.sources.append(sname, senv);
     }
 
@@ -271,7 +279,13 @@ overrides list : snt_project_override
             const Collection& collection = project.hierarchy.get_collection("units");
             for (const std::string& index : collection.items) {
                 const std::string item = "units[" + index + "]";
-                add_unit(project[item + ".name"].as<std::string>(), project[item + ".unit"].as<std::string>());
+                const std::string name = project[item + ".name"].as<std::string>();
+                add_unit(name, project[item + ".unit"].as<std::string>());
+                auto& unit = env.units.at(name);
+                unit.source_name = project_source;
+                unit.source_line = project_field_line(project.get_node(item + ".unit")).source.line_number;
+                env.record_project_entry({ProjectEntry::Kind::Unit, name,
+                    project[item + ".unit"].as<std::string>(), {}, project_source, unit.source_line});
             }
         }
         if (project.hierarchy.has_collection("sources")) {
@@ -283,8 +297,12 @@ overrides list : snt_project_override
                 add_source_input(
                     project[item + ".name"].as<std::string>(),
                     filepath.string(),
-                    {project_source, node->line.source.line_number}
+                    {project_source, project_field_line(node).source.line_number}
                 );
+                env.record_project_entry({ProjectEntry::Kind::Source,
+                    project[item + ".name"].as<std::string>(),
+                    project[item + ".filepath"].as<std::string>(), filepath.string(),
+                    project_source, project_field_line(node).source.line_number});
             }
         }
         if (project.hierarchy.has_collection("schemas")) {
@@ -303,11 +321,11 @@ overrides list : snt_project_override
                         "Set one field and leave the other as none.",
                         __FILE__,
                         __LINE__,
-                        file->line
+                        project_field_line(file)
                     );
                 }
                 const auto location_node = has_file ? file : string;
-                const Source parent = {project_source, location_node->line.source.line_number};
+                const Source parent = {project_source, project_field_line(location_node).source.line_number};
                 if (has_file) {
                     add_schema_file_input(
                         name, project_path(project_directory, project[item + ".file"].as<std::string>()), parent
@@ -315,6 +333,11 @@ overrides list : snt_project_override
                 } else {
                     add_schema_string_input(name, project[item + ".string"].as<std::string>(), absolute_project, parent);
                 }
+                env.record_project_entry({ProjectEntry::Kind::Schema, name,
+                    has_file ? project[item + ".file"].as<std::string>()
+                             : project[item + ".string"].as<std::string>(),
+                    has_file ? project_path(project_directory, project[item + ".file"].as<std::string>()).string()
+                             : std::string{}, project_source, parent.line_number});
             }
         }
         if (project.hierarchy.has_collection("overrides")) {
@@ -324,8 +347,12 @@ overrides list : snt_project_override
                 const auto node = project.get_node(item + ".file");
                 add_override_file_input(
                     project_path(project_directory, project[item + ".file"].as<std::string>()),
-                    {project_source, node->line.source.line_number}
+                    {project_source, project_field_line(node).source.line_number}
                 );
+                env.record_project_entry({ProjectEntry::Kind::Override, {},
+                    project[item + ".file"].as<std::string>(),
+                    project_path(project_directory, project[item + ".file"].as<std::string>()).string(),
+                    project_source, project_field_line(node).source.line_number});
             }
         }
         if (project.hierarchy.has_collection("code")) {
@@ -343,16 +370,21 @@ overrides list : snt_project_override
                         "Set one field and leave the other as none.",
                         __FILE__,
                         __LINE__,
-                        file->line
+                        project_field_line(file)
                     );
                 }
                 const auto location_node = has_file ? file : string;
-                const Source parent = {project_source, location_node->line.source.line_number};
+                const Source parent = {project_source, project_field_line(location_node).source.line_number};
                 if (has_file) {
                     add_file_input(project_path(project_directory, project[item + ".file"].as<std::string>()), {}, true, parent);
                 } else {
                     add_string_input(project[item + ".string"].as<std::string>(), absolute_project, parent);
                 }
+                env.record_project_entry({ProjectEntry::Kind::Code, {},
+                    has_file ? project[item + ".file"].as<std::string>()
+                             : project[item + ".string"].as<std::string>(),
+                    has_file ? project_path(project_directory, project[item + ".file"].as<std::string>()).string()
+                             : std::string{}, project_source, parent.line_number});
             }
         }
     }
@@ -447,6 +479,10 @@ overrides list : snt_project_override
     ) {
         const std::string source_name = source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings++);
         add_schema_input(name, source_code, source_file, source_name, parent);
+        env.sources.at(source_name).embedded = true;
+        auto& schema = env.schemas.at(name);
+        schema.registration_source_name = parent.name;
+        schema.registration_line = parent.line_number;
     }
 
     void DIP::add_schema_file(const std::string& name, const std::filesystem::path& source_file) {
@@ -466,6 +502,9 @@ overrides list : snt_project_override
         code << file.rdbuf();
         const std::string source_name = source.name + "_" + std::string(FILE_SOURCE) + std::to_string(num_files++);
         add_schema_input(name, code.str(), source_file, source_name, parent);
+        auto& schema = env.schemas.at(name);
+        schema.registration_source_name = parent.name;
+        schema.registration_line = parent.line_number;
     }
 
     void DIP::add_schema_input(
@@ -712,6 +751,8 @@ overrides list : snt_project_override
                 });
             else
                 target.hierarchy.record(node, nodes_nohierarchy);
+            if (active_hierarchy && node->dtype == NodeDtype::Group)
+                target.record_declaration(target.branching.clean_name(node->path.name), node->line);
             if (node->dtype == NodeDtype::Group && !node->schemas.empty()) {
                 const std::string path = active_hierarchy
                     ? target.branching.clean_name(node->path.name) : node->path.name;

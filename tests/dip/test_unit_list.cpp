@@ -35,6 +35,8 @@ TEST(UnitList, Keyword) {
     const std::string unit_source = uenv.id.substr(0, trace_suffix);
     EXPECT_EQ(env.sources.at(unit_source).code, "$unit " + unit_name + " = " + unit_definition);
     EXPECT_EQ(uenv.id, unit_source + "_UNIT0");
+    EXPECT_EQ(uenv.source_name, unit_source);
+    EXPECT_EQ(uenv.source_line, 1);
     // W/(m2*sr*m) = J/(m3*rad2*s) = kg/(m*rad2*s3) = 1e3*m-1*g*s-3*rad-2
     EXPECT_EQ(vnode->units->measurement.baseunits.dimensions().to_string(), "1e3*m-1*g*s-3*rad-2");
 
@@ -63,6 +65,8 @@ TEST(UnitList, AddUnitFromCode) {
     EXPECT_TRUE(vnode->units);
     EXPECT_EQ(vnode->units->to_string(), unit_name);
     EXPECT_NE(uenv.id.find("_UNIT0"), std::string::npos);
+    EXPECT_TRUE(uenv.source_name.empty());
+    EXPECT_EQ(uenv.source_line, 0);
     // W/(m2*sr) = J/(m2*rad2*s) = kg/(rad2*s3) = 1e3*g*s-3*rad-2
     EXPECT_EQ(vnode->units->measurement.baseunits.dimensions().to_string(), "1e3*g*s-3*rad-2");
 }

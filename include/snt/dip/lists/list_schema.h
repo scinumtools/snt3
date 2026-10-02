@@ -17,6 +17,8 @@ namespace snt::dip {
         ValueMetadata metadata;   ///< Metadata on the definition, not inherited by instances.
         std::string source_name;  ///< Source containing the declaration or schema body.
         size_t source_line = 0;   ///< Declaration line, or first body line for host schemas.
+        std::string registration_source_name; ///< Source that registered a host schema, when available.
+        size_t registration_line = 0; ///< One-based host declaration line.
     };
 
     class SchemaList {

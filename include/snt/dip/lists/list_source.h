@@ -3,6 +3,8 @@
 
 #include <filesystem>
 #include <map>
+#include <snt/dip/declarations.h>
+#include <snt/dip/lists/list_hierarchy.h>
 #include <snt/dip/lists/list_node.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/settings.h>
@@ -19,6 +21,10 @@ namespace snt::dip {
         std::string code;          // source code
         Source parent;             // parent source
         NodeList<ValueNode> nodes; // parsed nodes
+        bool named_source = false; // registered for source?path references
+        HierarchyList hierarchy;      // source-local hierarchy
+        ExplicitDeclarations declarations; // explicit source-local paths
+        bool embedded = false; // code came from a string rather than the file at path
                                    // std::shared_ptr<SourceList> sources;
     };
 

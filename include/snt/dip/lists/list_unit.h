@@ -16,6 +16,8 @@ namespace snt::dip {
         size_t stack;           ///< number of the current unit system stack
         std::string id;         ///< Internal trace identifier, e.g. DIP0_UNIT0.
         size_t registration_order = std::numeric_limits<size_t>::max(); ///< Environment-local registration order.
+        std::string source_name; ///< Parsed source containing the declaration, when available.
+        size_t source_line = 0; ///< One-based declaration line in that source.
     };
 
     /**

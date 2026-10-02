@@ -57,6 +57,103 @@ void reload_artifact(Environment& current, const std::filesystem::path& path,
     current = std::move(fresh);
 }
 
+std::vector<InspectedSourceLocation> inspect_source_locations(
+    const Environment& env, const SourceEntity& entity) {
+    std::vector<InspectedSourceLocation> locations;
+    const auto add = [&](SourceLocationRole role, const std::string& logical_name,
+                         std::size_t logical_line, std::size_t modification_index = 0) {
+        if (logical_name.empty() || logical_line == 0) return;
+        const auto parsed = env.sources.entries().find(logical_name);
+        const bool retained_text = parsed != env.sources.entries().end();
+        std::string physical_name = logical_name;
+        std::size_t physical_line = logical_line;
+        const bool embedded = retained_text && parsed->second.embedded;
+        if (embedded) {
+            physical_name = parsed->second.parent.name;
+            physical_line = parsed->second.parent.line_number;
+            if (physical_name.empty() || physical_line == 0) {
+                physical_name = logical_name;
+                physical_line = logical_line;
+            }
+        }
+        const auto info = env.get_source_info(physical_name);
+        const SourceInfo source = info.value_or(SourceInfo{physical_name, {}, {}, 0, {}, {}});
+        locations.push_back({role, source, physical_line, logical_name, logical_line,
+                             modification_index, embedded, retained_text});
+    };
+
+    switch (entity.kind) {
+    case SourceEntityKind::NamedSource: {
+        add(SourceLocationRole::Source, entity.name, 1);
+        break;
+    }
+    case SourceEntityKind::Schema: {
+        const auto schema = env.schemas.entries().find(entity.name);
+        if (schema != env.schemas.entries().end()) {
+            add(SourceLocationRole::Definition, schema->second.source_name,
+                schema->second.source_line);
+            add(SourceLocationRole::Registration, schema->second.registration_source_name,
+                schema->second.registration_line);
+        } else {
+            const auto manifest = env.get_schema_manifest();
+            const auto found = std::find_if(manifest.begin(), manifest.end(), [&](const auto& item) {
+                return item.name == entity.name;
+            });
+            if (found != manifest.end())
+                add(SourceLocationRole::Definition, found->source_name, found->source_line);
+        }
+        break;
+    }
+    case SourceEntityKind::Unit: {
+        const auto unit = env.units.entries().find(entity.name);
+        if (unit != env.units.entries().end())
+            add(SourceLocationRole::Definition, unit->second.source_name, unit->second.source_line);
+        break;
+    }
+    case SourceEntityKind::ProjectEntry: {
+        if (entity.index < env.project_entries().size()) {
+            const auto& entry = env.project_entries()[entity.index];
+            add(SourceLocationRole::Registration, entry.source_name, entry.line);
+        }
+        break;
+    }
+    case SourceEntityKind::Path: {
+        const auto source = env.sources.entries().find(entity.source_name);
+        if (!entity.source_name.empty() && source == env.sources.entries().end()) break;
+        const auto& nodes = entity.source_name.empty()
+            ? env.nodes.get_nodes() : source->second.nodes.get_nodes();
+        const auto found = std::find_if(nodes.begin(), nodes.end(), [&](const auto& node) {
+            return node && node->path.name == entity.name;
+        });
+        if (found != nodes.end()) {
+            const auto& node = *found;
+            if (node->override)
+                add(SourceLocationRole::Override, node->override_line.source.name,
+                    node->override_line.source.line_number);
+            for (std::size_t index = node->modification_lines.size(); index > 0; --index) {
+                const auto& change = node->modification_lines[index - 1];
+                add(SourceLocationRole::Modification, change.source.name,
+                    change.source.line_number, index);
+            }
+            add(SourceLocationRole::Declaration, node->line.source.name,
+                node->line.source.line_number);
+        } else if (entity.source_name.empty()) {
+            const auto declaration = env.declarations().find(entity.name);
+            if (declaration)
+                add(SourceLocationRole::Declaration, declaration->source.name,
+                    declaration->source.line_number);
+        } else {
+            const auto declaration = source->second.declarations.find(entity.name);
+            if (declaration)
+                add(SourceLocationRole::Declaration, declaration->source.name,
+                    declaration->source.line_number);
+        }
+        break;
+    }
+    }
+    return locations;
+}
+
 ValueInspection inspect_value(const Environment& env, std::string_view path) {
     const std::string name(path);
     const auto node = env.get_node(name);
