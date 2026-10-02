@@ -85,4 +85,4 @@ Copy this Markdown into your project's ``README.md``:
 
 .. code-block:: markdown
 
-   [![DIPL: {?SNTv3}](https://img.shields.io/badge/DIPL-%7B%3FSNTv3%7D-2980b9)](https://vrtulka23.github.io/scinumtools3/initiative.html)
+   [![{?SNT3}: DIPL](https://img.shields.io/badge/DIPL-%7B%3FSNTv3%7D-2980b9)](https://vrtulka23.github.io/scinumtools3/initiative.html)
