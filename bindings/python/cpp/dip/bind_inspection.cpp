@@ -3,7 +3,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl/filesystem.h>
-#include <snt/dip/inspection.h>
+#include <snt/dip/inspect/inspection.h>
 #include <snt/core/diagnostic.h>
 
 #include <utility>
@@ -138,10 +138,15 @@ void init_inspection(py::module_& m) {
 
     m.def("detect_artifact", &dip::detect_artifact, py::arg("path"),
           "Classify a DIP path by its filename without reading its contents.");
-    m.def("open_artifact", &dip::open_artifact, py::arg("path"),
+    m.def("open_artifact", [](const std::filesystem::path& path, bool record_dependency_graph) {
+          return dip::open_artifact(path, record_dependency_graph);
+    }, py::arg("path"),
           py::arg("record_dependency_graph") = false,
           "Open a DIPfile, DIPL source, or DIPH5 snapshot. Graph recording is opt-in for source; snapshots use their saved graph.");
-    m.def("reload_artifact", &dip::reload_artifact, py::arg("env"), py::arg("path"),
+    m.def("reload_artifact", [](dip::Environment& env, const std::filesystem::path& path,
+                                bool record_dependency_graph) {
+          dip::reload_artifact(env, path, record_dependency_graph);
+    }, py::arg("env"), py::arg("path"),
           py::arg("record_dependency_graph") = false,
           "Replace an Environment after successful load; request graph recording again for parsed source.");
     m.def("inspect_value", &dip::inspect_value, py::arg("env"), py::arg("path"),

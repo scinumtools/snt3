@@ -8,7 +8,7 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
-#include <snt/dip/diagnostic.h>
+#include <snt/dip/inspect/diagnostic.h>
 
 namespace py = pybind11;
 
