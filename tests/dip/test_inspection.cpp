@@ -13,6 +13,42 @@
 
 using namespace snt;
 
+TEST(Inspection, RetainedBlockInputsFollowEffectiveValues) {
+    dip::DIP parser;
+    parser.add_string("array int[2] = \"\"\"[1,2]\"\"\"\n"
+                      "changed int[2] = \"\"\"[3,4]\"\"\"\n"
+                      "changed = [5,6]\n"
+                      "ordinary int[2] = [7,8]\n");
+    parser.add_override_string("array = \"\"\"[9,10]\"\"\"");
+    const auto env = parser.parse(false, true);
+    const auto& blocks = dip::inspect_block_inputs(env);
+    ASSERT_EQ(blocks.size(), 1);
+    const auto* array = dip::inspect_block_input(env, "array");
+    ASSERT_NE(array, nullptr);
+    EXPECT_EQ(array->kind, dip::BlockInput::Kind::Array);
+    EXPECT_EQ(array->code, "[9,10]");
+    EXPECT_EQ(array->source_line, 1);
+    EXPECT_EQ(dip::inspect_block_input(env, "changed"), nullptr);
+    EXPECT_EQ(dip::inspect_block_input(env, "ordinary"), nullptr);
+}
+
+TEST(Inspection, ReloadRetainsBlockInputsWhenRequested) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto file = std::filesystem::temp_directory_path() / ("snt-inspection-block-" + suffix + ".dip");
+    {
+        std::ofstream stream(file);
+        stream << "array int[2] = \"\"\"[1,2]\"\"\"\n";
+    }
+    auto env = dip::open_artifact(file, false, true);
+    ASSERT_NE(dip::inspect_block_input(env, "array"), nullptr);
+    dip::reload_artifact(env, file, false, true);
+    ASSERT_NE(dip::inspect_block_input(env, "array"), nullptr);
+    EXPECT_EQ(dip::inspect_block_input(env, "array")->code, "[1,2]");
+    dip::reload_artifact(env, file);
+    EXPECT_TRUE(dip::inspect_block_inputs(env).empty());
+    std::filesystem::remove(file);
+}
+
 TEST(Inspection, EvaluatedValuesAndProvenance) {
     dip::DIP parser;
     parser.add_schema_string("settings", "speed float = 2 m/s\n  ?descr \"Flow speed\"\n");

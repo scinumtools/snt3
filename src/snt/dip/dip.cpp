@@ -570,7 +570,7 @@ overrides list : snt_project_override
         env.sources.append(source_name, source_file, source_code, parent);
     }
 
-    Environment DIP::parse(bool record_dependency_graph) {
+    Environment DIP::parse(bool record_dependency_graph, bool retain_block_inputs) {
         NodeList<BaseNode> queue = parse_code_nodes(lines);
         NodeList<BaseNode> queue_filtered;
 
@@ -654,6 +654,7 @@ overrides list : snt_project_override
         // parse other nodes
         Environment target = env;
         target.set_dependency_recording(record_dependency_graph);
+        target.set_block_input_recording(retain_block_inputs);
         while (queue.size() > 0) {
             BaseNode::PointerType node = queue.pop_front();
             BaseNode::PointerType replacement;
@@ -697,6 +698,7 @@ overrides list : snt_project_override
                                                  replacement->line.code}
                         );
                     declared->apply_override(replacement, target);
+                    target.record_block_input(*declared, *replacement, graph_path);
                     graph_value_evaluated = record_dependency_graph;
                     target.overrides.consume(replacement->path.name);
                 } else if (!suppress_value) {
@@ -740,6 +742,8 @@ overrides list : snt_project_override
                     }
                     continue;
                 }
+                if (value_node && !replacement && !suppress_value && !already_defined)
+                    target.record_block_input(*node, *node, graph_path);
             }
             // Create hierarchical names
             // Keep case-qualified paths for branch bookkeeping, while active nodes

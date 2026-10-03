@@ -153,9 +153,9 @@ namespace snt::dip {
 
         /**
          * Parse DIPL code lines and return an environment with registered schemas.
-         * Recording dependencies is opt-in to avoid graph allocations during ordinary parsing.
+         * Dependency recording and retention of parsed string blocks are opt-in.
          */
-        Environment parse(bool record_dependency_graph = false);
+        Environment parse(bool record_dependency_graph = false, bool retain_block_inputs = false);
 
         /**
          * Get a string representation of the current DIPL instance

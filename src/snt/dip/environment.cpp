@@ -156,6 +156,23 @@ namespace snt::dip {
 
     Environment::Environment() = default;
 
+    void Environment::record_block_input(const BaseNode& declared, const BaseNode& input,
+                                         const std::string& path) {
+        const bool table = declared.dtype == NodeDtype::Table;
+        if (table && input.value_origin == ValueOrigin::ReferenceRaw && !input.value_raw.empty())
+            sources.at(input.value_raw.front()).table_text = true;
+        if (!block_input_recording_ || input.value_origin != ValueOrigin::String ||
+            input.value_raw.empty()) return;
+        const bool array = (declared.dtype == NodeDtype::Boolean ||
+                            declared.dtype == NodeDtype::Integer ||
+                            declared.dtype == NodeDtype::Float) &&
+                           !declared.dimension.empty() && input.value_shape.empty();
+        if (!table && !array) return;
+        block_inputs_.insert_or_assign(path, BlockInput{
+            table ? BlockInput::Kind::Table : BlockInput::Kind::Array, path,
+            input.value_raw.front(), input.line.source.name, input.line.source.line_number});
+    }
+
     Environment::DependencyScope::DependencyScope(Environment& env, std::string owner, DependencyEventKind kind,
                                                    std::optional<core::SourceLocation> location)
         : env_(env), previous_(env.active_dependency_event_) {

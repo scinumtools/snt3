@@ -6,6 +6,7 @@
 #include <snt/dip/environment.h>
 
 #include <filesystem>
+#include <map>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -21,15 +22,23 @@ ArtifactKind detect_artifact(const std::filesystem::path& path);
 /** Load a project, DIPL file, or DIPH5 snapshot into a new environment.
  * .dipt is table input within DIPL, not a standalone environment.
  * Recording is opt-in for parsed sources; snapshots retain their saved graph state
- * regardless of record_dependency_graph.
+ * regardless of record_dependency_graph. Parsed string blocks are retained only
+ * when retain_block_inputs is true for a live parse.
  */
-Environment open_artifact(const std::filesystem::path& path, bool record_dependency_graph = false);
+Environment open_artifact(const std::filesystem::path& path, bool record_dependency_graph = false,
+                          bool retain_block_inputs = false);
 
 /** Replace the current environment only after the new artifact loads successfully.
- * Pass record_dependency_graph again when refreshing parsed source with a graph.
+ * Pass recording options again when refreshing a parsed source.
  */
 void reload_artifact(Environment& current, const std::filesystem::path& path,
-                     bool record_dependency_graph = false);
+                     bool record_dependency_graph = false, bool retain_block_inputs = false);
+
+/** Original string blocks retained by an opt-in live parse. Empty for snapshots. */
+const std::map<std::string, BlockInput>& inspect_block_inputs(const Environment& env);
+
+/** Return a retained block by evaluated path, or nullptr when unavailable. */
+const BlockInput* inspect_block_input(const Environment& env, std::string_view path);
 
 /** A live DIP entity whose source can be inspected. For Path, source_name
  * selects a named source; an empty source_name selects the evaluated project.

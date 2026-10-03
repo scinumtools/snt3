@@ -151,6 +151,8 @@ TEST(ReferencesRaw, TableNodes) {
     d.add_string("snap table = {" + source_name + "}");
     dip::Environment env = d.parse();
     EXPECT_EQ(env.nodes.size(), 2);
+    EXPECT_TRUE(env.sources.at(source_name).table_text);
+    EXPECT_TRUE(env.block_inputs().empty());
 
     // remove temporary file
     std::filesystem::remove(source_filename);

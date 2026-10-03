@@ -2,11 +2,13 @@
 #define DIP_ENVIRONMENT_H
 
 #include "nodes/node_value.h"
+#include <snt/dip/block_input.h>
 #include <snt/dip/dependency_graph.h>
 #include <snt/dip/declarations.h>
 
 #include <algorithm>
 #include <filesystem>
+#include <map>
 #include <optional>
 #include <snt/dip/lists/list_branching.h>
 #include <snt/dip/lists/list_functions.h>
@@ -117,11 +119,13 @@ namespace snt::dip {
         std::vector<TraceInfo> trace_manifest_;
         std::vector<SchemaInfo> schema_manifest_;
         std::vector<ProjectEntry> project_entries_;
+        std::map<std::string, BlockInput> block_inputs_;
         bool schema_manifest_loaded_ = false;
         bool trace_manifest_loaded_ = false;
         bool snapshot_loaded_ = false;
         std::filesystem::path source_path_base_; ///< Directory of a loaded snapshot for relative source paths.
         bool dependency_recording_ = false;
+        bool block_input_recording_ = false;
         mutable DependencyGraph dependency_graph_;
         mutable std::optional<size_t> active_dependency_event_;
         ExplicitDeclarations declarations_; ///< Live explicit path locations; absent from snapshots.
@@ -193,6 +197,15 @@ namespace snt::dip {
                 });
             project_entries_.insert(after, std::move(entry));
         }
+
+        /** String blocks from a live parse. Snapshots retain values, not source text. */
+        const std::map<std::string, BlockInput>& block_inputs() const { return block_inputs_; }
+        bool block_input_recording() const { return block_input_recording_; }
+        void set_block_input_recording(bool enabled) { block_input_recording_ = enabled; }
+        /** Capture the effective source literal after successful evaluation. */
+        void record_block_input(const BaseNode& declared, const BaseNode& input,
+                                const std::string& path);
+        void erase_block_input(const std::string& path) { block_inputs_.erase(path); }
 
         /** Explicit declarations in the evaluated scope. */
         const ExplicitDeclarations& declarations() const { return declarations_; }

@@ -6,6 +6,13 @@
 
 using namespace snt;
 
+TEST(ParseTables, SourceTextRecordingIsOptIn) {
+    dip::DIP d;
+    d.add_string("measurements table = \"\"\"time float s\n---\n0\n\"\"\"");
+    const auto env = d.parse();
+    EXPECT_TRUE(env.block_inputs().empty());
+}
+
 TEST(ParseTables, BasicTable) {
 
     dip::DIP d;
@@ -18,8 +25,12 @@ TEST(ParseTables, BasicTable) {
     d.add_string("3 false \\\"c\\\"");
     d.add_string("4 true  \\\"d\\\"");
     d.add_string("\"\"\"");
-    dip::Environment env = d.parse();
+    dip::Environment env = d.parse(false, true);
     EXPECT_EQ(env.nodes.size(), 3);
+    ASSERT_EQ(env.block_inputs().size(), 1);
+    EXPECT_EQ(env.block_inputs().at("foo").kind, dip::BlockInput::Kind::Table);
+    EXPECT_EQ(env.block_inputs().at("foo").path, "foo");
+    EXPECT_NE(env.block_inputs().at("foo").code.find("bar int\nbaz bool\ndig str\n---"), std::string::npos);
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_EQ(vnode->path.name, "foo.bar");

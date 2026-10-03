@@ -415,6 +415,7 @@ namespace snt::dip {
         }
         value_raw = node->value_raw;
         set_value(std::move(value));
+        if (env.block_input_recording()) env.erase_block_input(path.name);
         modification_lines.push_back(node->line);
     }
 

@@ -26,17 +26,18 @@ ArtifactKind detect_artifact(const std::filesystem::path& path) {
     return ArtifactKind::Unknown;
 }
 
-Environment open_artifact(const std::filesystem::path& path, bool record_dependency_graph) {
+Environment open_artifact(const std::filesystem::path& path, bool record_dependency_graph,
+                          bool retain_block_inputs) {
     switch (detect_artifact(path)) {
     case ArtifactKind::Project: {
         DIP parser;
         parser.add_project(path);
-        return parser.parse(record_dependency_graph);
+        return parser.parse(record_dependency_graph, retain_block_inputs);
     }
     case ArtifactKind::DIPL: {
         DIP parser;
         parser.add_file(path);
-        return parser.parse(record_dependency_graph);
+        return parser.parse(record_dependency_graph, retain_block_inputs);
     }
     case ArtifactKind::DIPH5: {
         Environment env;
@@ -52,9 +53,19 @@ Environment open_artifact(const std::filesystem::path& path, bool record_depende
 }
 
 void reload_artifact(Environment& current, const std::filesystem::path& path,
-                     bool record_dependency_graph) {
-    Environment fresh = open_artifact(path, record_dependency_graph);
+                     bool record_dependency_graph, bool retain_block_inputs) {
+    Environment fresh = open_artifact(path, record_dependency_graph, retain_block_inputs);
     current = std::move(fresh);
+}
+
+const std::map<std::string, BlockInput>& inspect_block_inputs(const Environment& env) {
+    return env.block_inputs();
+}
+
+const BlockInput* inspect_block_input(const Environment& env, std::string_view path) {
+    const auto& blocks = env.block_inputs();
+    const auto found = blocks.find(std::string(path));
+    return found == blocks.end() ? nullptr : &found->second;
 }
 
 std::vector<InspectedSourceLocation> inspect_source_locations(

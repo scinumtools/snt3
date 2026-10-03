@@ -6,6 +6,22 @@
 
 using namespace snt;
 
+TEST(ParseArrays, StringBlockIsRetainedOnlyForInspection) {
+    dip::DIP parser;
+    parser.add_string("block int[2,2] = \"\"\"[[1,2],[3,4]]\"\"\"");
+    parser.add_string("regular int[2] = [5,6]");
+    parser.add_string("note str = \"\"\"not an array\"\"\"");
+    const auto env = parser.parse(false, true);
+    ASSERT_EQ(env.block_inputs().size(), 1);
+    EXPECT_EQ(env.block_inputs().at("block").kind, dip::BlockInput::Kind::Array);
+    EXPECT_EQ(env.block_inputs().at("block").code, "[[1,2],[3,4]]");
+    EXPECT_EQ(env.get_node("block")->value->to_string(), "[[1, 2], [3, 4]]");
+
+    dip::DIP ordinary;
+    ordinary.add_string("block int[2] = \"\"\"[1,2]\"\"\"");
+    EXPECT_TRUE(ordinary.parse().block_inputs().empty());
+}
+
 TEST(ParseArrays, BooleanValue) {
 
     dip::DIP d;
