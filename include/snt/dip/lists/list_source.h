@@ -3,7 +3,7 @@
 
 #include <filesystem>
 #include <map>
-#include <snt/dip/declarations.h>
+#include <snt/dip/inspect/declarations.h>
 #include <snt/dip/lists/list_hierarchy.h>
 #include <snt/dip/lists/list_node.h>
 #include <snt/dip/nodes/node_value.h>

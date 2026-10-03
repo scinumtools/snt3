@@ -8,7 +8,7 @@
 #include <hdf5.h>
 #include <snt/dip/cursor.h>
 #include <snt/dip/exceptions.h>
-#include <snt/dip/inspection.h>
+#include <snt/dip/inspect/inspection.h>
 
 using namespace snt;
 

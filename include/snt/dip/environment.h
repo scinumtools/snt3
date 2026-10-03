@@ -2,9 +2,9 @@
 #define DIP_ENVIRONMENT_H
 
 #include "nodes/node_value.h"
-#include <snt/dip/block_input.h>
-#include <snt/dip/dependency_graph.h>
-#include <snt/dip/declarations.h>
+#include <snt/dip/inspect/block_input.h>
+#include <snt/dip/inspect/dependency_graph.h>
+#include <snt/dip/inspect/declarations.h>
 
 #include <algorithm>
 #include <filesystem>

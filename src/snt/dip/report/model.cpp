@@ -1,7 +1,7 @@
 #include "model.h"
 
 #include <algorithm>
-#include <snt/dip/inspection.h>
+#include <snt/dip/inspect/inspection.h>
 #include <unordered_map>
 
 namespace snt::dip::report {

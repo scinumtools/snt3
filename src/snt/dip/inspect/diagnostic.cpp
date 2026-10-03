@@ -1,4 +1,4 @@
-#include <snt/dip/diagnostic.h>
+#include <snt/dip/inspect/diagnostic.h>
 
 #include <snt/dip/exceptions.h>
 

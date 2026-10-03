@@ -1,9 +1,9 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
-#include <snt/dip/diagnostic.h>
+#include <snt/dip/inspect/diagnostic.h>
 #include <snt/dip/exceptions.h>
-#include <snt/dip/inspection.h>
+#include <snt/dip/inspect/inspection.h>
 #include <snt/val/values_array.h>
 
 #include <chrono>
