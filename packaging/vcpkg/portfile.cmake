@@ -1,8 +1,8 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO vrtulka23/scinumtools3
-    REF v0.8.0
-    SHA512 185745f10fd603671c054d41e0351f4d8b16994955dfbe5fb35f4b25c34820fbacbf0e430d74701c5bf99f94eae1b7aedbff3e2fba3b1082bc9c8f83718fa396
+    REF v0.9.0
+    SHA512 90a8f9764e4f06ef51399c41b3c2ac0ed062dad19e2bb996f4b9af06a3f5b097a6fdde7985a6deaf757ad907fc847024ef5281721fd02e53ca0d9f11b39d539d
 )
 
 vcpkg_from_github(

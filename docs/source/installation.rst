@@ -72,6 +72,17 @@ source repository:
 
    conan create .
 
+The Conan package installs the C++ libraries and the ``snt`` executable with
+``server`` and ``view`` commands. The server and viewer are enabled
+by default. The viewer requires the platform's OpenGL and window-system
+development libraries; Conan options ``with_server=False`` and
+``with_viewer=False`` can disable either feature when creating the package.
+To put ``snt`` on ``PATH`` in a consuming project, add
+``scinumtools3/0.9.0`` under ``[tool_requires]`` in its ``conanfile.txt`` and
+generate ``VirtualBuildEnv``. A regular library requirement still provides
+the executable in the package's ``bin`` directory, but does not add that
+directory to the runtime environment.
+
 
 macOS / Homebrew
 ~~~~~~~~~~~~~~~~

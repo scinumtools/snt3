@@ -6,13 +6,22 @@ GitHub source archives do not contain Git submodule contents. The archive-based
 recipes fetch the pinned header-only Brief++ source separately for DIP reports.
 Local source builds can initialize `external/briefpp` or set
 `SNT_BRIEFPP_INCLUDE_DIR`. Server builds accept `SNT_HTTPLIB_INCLUDE_DIR` and
-require cpp-httplib 0.46.0 or newer. Homebrew and vcpkg include `snt dmap`; Conan, Conda, and PyPI package
-libraries or Python bindings without application commands. The viewer
-remains disabled until implemented.
+require cpp-httplib 0.46.0 or newer. Homebrew, vcpkg, and Conan include the
+unified `snt` executable. The Conan package enables `snt server` and `snt view`;
+its developer-only `snt dmap` command is disabled. Conda and PyPI package Python
+bindings without application commands. The Homebrew and vcpkg recipes disable
+the optional viewer.
 
-Conan packages the C++ libraries and propagates the HDF5 C-library dependency to
-consumers. Conda and PyPI package the Python bindings with application features
-disabled. Conda obtains HDF5 from its host environment and uses its runtime pinning.
+Conan packages the C++ libraries and executable, and propagates the HDF5
+C-library dependency to consumers. Create it from a checkout with the
+`external/briefpp`, `external/cpp-httplib`, `external/glfw`, and `external/imgui`
+submodules initialized. Building the viewer also requires the platform's OpenGL
+and window-system development libraries. The `with_server` and `with_viewer`
+Conan options default to `True`; disable either when its dependencies are not
+available. Consumers that need `snt` on `PATH` can declare the package as a
+`tool_requires` dependency and generate `VirtualBuildEnv`. Conda and PyPI
+package the Python bindings with application features disabled. Conda obtains
+HDF5 from its host environment and uses its runtime pinning.
 The development and Python Docker images install HDF5 development files; the REST
 image builds and starts `snt server`.
 
@@ -25,8 +34,8 @@ old checksum, or use a locally generated archive's checksum for a GitHub URL.
 After publishing the intended Git tag, update all archive-based recipes together:
 
 ```sh
-python3 packaging/update_release.py 0.8.4
-python3 packaging/update_release.py 0.8.4 --check
+python3 packaging/update_release.py 0.9.0
+python3 packaging/update_release.py 0.9.0 --check
 ```
 
 The command downloads the GitHub tag archive, checks its `CODE_VERSION` and unified `snt server` / `snt dmap` support, and
@@ -35,13 +44,9 @@ vcpkg manifest version as well. It does not publish packages or modify the proje
 version. `--archive /path/to/downloaded.tar.gz` supports an already downloaded copy
 of the same GitHub archive. Download and validation failures leave recipes unchanged.
 
-Homebrew and vcpkg currently retain their 0.8.0 source pins pending this release step;
-the published 0.8.3 archive also predates the unified CLI. The dependency and
-command changes in these recipes target the next release (for example, 0.8.4). Full package
-builds should be performed after refreshing those pins, rather than treating the
-old archive as containing the current implementation. Conda, which packages only
-the Python bindings, is updated to the published 0.8.3 archive and its verified
-checksum; it does not depend on the executable unification.
+Homebrew, vcpkg, and Conda are pinned to the published 0.9.0 archive with
+verified checksums. Conan reads its version from `settings.env`; PyPI reads
+its version from `pyproject.toml`.
 
 ## Local checks
 

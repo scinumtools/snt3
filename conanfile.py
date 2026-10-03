@@ -39,11 +39,15 @@ class SciNumToolsConan(ConanFile):
     options = {
         "shared": [True, False],
         "fPIC": [True, False],
+        "with_server": [True, False],
+        "with_viewer": [True, False],
     }
 
     default_options = {
         "shared": False,
         "fPIC": True,
+        "with_server": True,
+        "with_viewer": True,
         "hdf5/*:enable_cxx": False,
         "hdf5/*:hl": False,
     }
@@ -60,9 +64,14 @@ class SciNumToolsConan(ConanFile):
         "examples/*",
         "tests/*",
         "apps/*",
+        "docs/dipl/highlight/cpp/*",
         "external/briefpp/include/briefpp/*",
         "external/briefpp/include/briefpp/renderers/*",
         "external/briefpp/LICENSE",
+        "external/cpp-httplib/httplib.h",
+        "external/cpp-httplib/LICENSE",
+        "external/glfw/*",
+        "external/imgui/*",
         "pyproject.toml",
         "LICENSE",
         "README.md",
@@ -108,16 +117,16 @@ class SciNumToolsConan(ConanFile):
         tc = CMakeToolchain(self)
 
         #
-        # Build only the C++ library
+        # Build the libraries and the unified CLI, including its server and viewer.
         #
         tc.variables["ENABLE_BINDING_PYTHON"] = False
         tc.variables["ENABLE_BINDING_C"] = False
         tc.variables["ENABLE_UNIT_TESTS"] = False
         tc.variables["RUN_UNIT_TESTS"] = False
-        tc.variables["ENABLE_EXEC_APPS"] = False
-        tc.variables["ENABLE_EXEC_APPS_SNT"] = False
-        tc.variables["ENABLE_SNT_SERVER"] = False
-        tc.variables["ENABLE_SNT_VIEW"] = False
+        tc.variables["ENABLE_EXEC_APPS"] = True
+        tc.variables["ENABLE_EXEC_APPS_SNT"] = True
+        tc.variables["ENABLE_SNT_SERVER"] = bool(self.options.with_server)
+        tc.variables["ENABLE_SNT_VIEW"] = bool(self.options.with_viewer)
         tc.variables["ENABLE_MAT"] = False
         tc.variables["ENABLE_SNT_DMAP"] = False
         tc.variables["ENABLE_EXEC_EXAMPLES"] = False
@@ -143,7 +152,17 @@ class SciNumToolsConan(ConanFile):
         cmake = CMake(self)
         cmake.install()
 
-        copy(self, "LICENSE", src=self.recipe_folder, dst="licenses")
+        copy(self, "LICENSE", src=self.source_folder,
+             dst=Path(self.package_folder) / "licenses")
+        for component, license_file in (
+            ("briefpp", "LICENSE"),
+            ("cpp-httplib", "LICENSE"),
+            ("glfw", "LICENSE.md"),
+            ("imgui", "LICENSE.txt"),
+        ):
+            copy(self, license_file,
+                 src=Path(self.source_folder) / "external" / component,
+                 dst=Path(self.package_folder) / "licenses" / component)
 
     #
     # Information for consumers

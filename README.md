@@ -242,10 +242,12 @@ brew tap vrtulka23/tap
 brew install scinumtools3
 ```
 
-For Conan, clone the repository and run `conan create .` from its root.
-
-The Conan package builds the C++ libraries. Applications and language bindings
-are configured separately.
+For Conan, clone the repository with its submodules and run `conan create .`
+from its root. The package includes the C++ libraries and the `snt` command
+with server and viewer support. The `with_server` and `with_viewer` options
+default to enabled; the viewer needs system OpenGL and windowing dependencies.
+Use it as a Conan `tool_requires` dependency with `VirtualBuildEnv` to put
+`snt` on `PATH`. Language bindings are configured separately.
 
 ### From source
 
