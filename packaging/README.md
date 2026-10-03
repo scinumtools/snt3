@@ -7,10 +7,12 @@ recipes fetch the pinned header-only Brief++ source separately for DIP reports.
 Local source builds can initialize `external/briefpp` or set
 `SNT_BRIEFPP_INCLUDE_DIR`. Server builds accept `SNT_HTTPLIB_INCLUDE_DIR` and
 require cpp-httplib 0.46.0 or newer. Homebrew, vcpkg, and Conan include the
-unified `snt` executable. The Conan package enables `snt server` and `snt view`;
-its developer-only `snt dmap` command is disabled. Conda and PyPI package Python
-bindings without application commands. The Homebrew and vcpkg recipes disable
-the optional viewer.
+unified `snt` executable. The vcpkg and Conan packages enable `snt view`;
+Homebrew disables it. Conan's developer-only `snt dmap` command is disabled.
+Conda and PyPI package Python bindings without application commands. The vcpkg
+recipe fetches pinned Dear ImGui and GLFW sources because GitHub archives omit
+submodules. On Linux it builds GLFW's X11 backend and requires the system's
+OpenGL and X11 development libraries.
 
 Conan packages the C++ libraries and executable, and propagates the HDF5
 C-library dependency to consumers. Create it from a checkout with the

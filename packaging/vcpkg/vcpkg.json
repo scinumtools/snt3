@@ -20,6 +20,10 @@
     {
       "name": "cpp-httplib",
       "default-features": false
+    },
+    {
+      "name": "libx11",
+      "platform": "linux"
     }
   ]
 }

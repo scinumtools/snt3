@@ -12,6 +12,24 @@ vcpkg_from_github(
     SHA512 1697cef47f04dd2105f0026ff36ee200ea86e450e38f58403d11f5eb213e82bba2b5b16d1d887599b518f0e1906a1cc56aebc6f76bb5cc7e150603b6a55476a1
 )
 
+vcpkg_from_github(
+    OUT_SOURCE_PATH IMGUI_SOURCE_PATH
+    REPO ocornut/imgui
+    REF f1cc2ae15e53a861a874c3034aae6798fde194ab
+    SHA512 ca47e0f8a80c0518a42e78d95f87611695e3b888640cf51ce686350c93f65840f2da15c6f412264e1fe62c12aa0cbefbf554bd8fc89cdaeff50c42431fe347fb
+)
+
+vcpkg_from_github(
+    OUT_SOURCE_PATH GLFW_SOURCE_PATH
+    REPO glfw/glfw
+    REF d9d6f0f1f967807ffade6598ea9a631ebaf37a56
+    SHA512 e41bbc7bdd727c2e36653f4b529879ab7dc48364ba8ac73173ae471274d223ea74e8699cdd2cadad61ae856cd734b0448c1dfb2628449d58bee11c754e740212
+)
+
+# GitHub archives omit submodules; the viewer expects these source paths.
+file(COPY "${IMGUI_SOURCE_PATH}/" DESTINATION "${SOURCE_PATH}/external/imgui")
+file(COPY "${GLFW_SOURCE_PATH}/" DESTINATION "${SOURCE_PATH}/external/glfw")
+
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
@@ -29,7 +47,10 @@ vcpkg_cmake_configure(
         -DENABLE_EXEC_APPS=ON
         -DENABLE_EXEC_APPS_SNT=ON
         -DENABLE_SNT_SERVER=ON
-        -DENABLE_SNT_VIEW=OFF
+        -DENABLE_SNT_VIEW=ON
+        # Keep the bundled GLFW inside snt and use the X11 backend on Linux.
+        -DGLFW_LIBRARY_TYPE=STATIC
+        -DGLFW_BUILD_WAYLAND=OFF
         -DSNT_HTTPLIB_INCLUDE_DIR=${CURRENT_INSTALLED_DIR}/include
         -DSNT_BRIEFPP_INCLUDE_DIR=${BRIEFPP_SOURCE_PATH}/include
         -DCMAKE_INSTALL_BINDIR=tools/${PORT}
@@ -40,6 +61,8 @@ vcpkg_cmake_configure(
         -DENABLE_EXEC_APPS=OFF
         -DENABLE_EXEC_APPS_SNT=OFF
         -DENABLE_SNT_SERVER=OFF
+        -DENABLE_SNT_VIEW=OFF
+        -DENABLE_SNT_DMAP=OFF
 )
 
 vcpkg_cmake_install()
