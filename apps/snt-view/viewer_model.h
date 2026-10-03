@@ -1,7 +1,8 @@
 #ifndef SNT_VIEW_VIEWER_MODEL_H
 #define SNT_VIEW_VIEWER_MODEL_H
 
-#include <snt/dip/inspection.h>
+#include <snt/dip/inspect/inspection.h>
+#include "source_format.h"
 
 #include <filesystem>
 #include <map>
@@ -14,7 +15,8 @@ namespace snt::view {
 
 enum class ObjectRole {
     Artifact, Project, DIPfile, ManifestCategory, ManifestEntry,
-    Sources, Source, Overrides, Override, Schemas, Schema, Units, Unit, Path
+    LocalSources, CodeSource, BlockSources, BlockSource, Sources, RawSources, Source,
+    Overrides, Override, Schemas, Schema, Units, Unit, Path
 };
 
 struct ObjectInfo {
@@ -35,7 +37,8 @@ struct SourceTarget {
     std::filesystem::path file;
     std::size_t line = 0;
     std::string source_name;
-    bool plain_text = false;
+    SourceFormat format = SourceFormat::DIPL;
+    std::optional<std::string> block_path;
 };
 
 class ViewerModel {

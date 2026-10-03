@@ -1,5 +1,5 @@
-#include <snt/dip/diagnostic.h>
-#include <snt/dip/inspection.h>
+#include <snt/dip/inspect/diagnostic.h>
+#include <snt/dip/inspect/inspection.h>
 #include <snt/val/value_base.h>
 
 #include <exception>

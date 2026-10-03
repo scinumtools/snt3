@@ -24,3 +24,6 @@ code[]
 sources[]
   name = "raw_samples"
   filepath = "samples.txt"
+sources[]
+  name = "table_samples"
+  filepath = "table_samples.dipt"

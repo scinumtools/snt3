@@ -21,13 +21,16 @@ std::string path_label(const std::string& path, const std::string& parent) {
 }
 
 std::string parent_id(const std::string& id) {
-    if (id == "@project" || id == "@dipfile" || id == "@sources" || id == "@overrides" ||
+    if (id == "@project" || id == "@dipfile" || id == "@local" || id == "@blocks" ||
+        id == "@sources" || id == "@raw_sources" || id == "@overrides" ||
         id == "@schemas" || id == "@units") return "";
     if (id.compare(0, 9, "@dipfile?") == 0) {
         const auto next = id.find('?', 9);
         return next == std::string::npos ? "@dipfile" : id.substr(0, next);
     }
     if (id.compare(0, 10, "@override?") == 0) return "@overrides";
+    if (id.compare(0, 6, "@code?") == 0) return "@local";
+    if (id.compare(0, 7, "@block?") == 0) return "@blocks";
     if (id.compare(0, 8, "@schema?") == 0) return "@schemas";
     if (id.compare(0, 6, "@unit?") == 0) return "@units";
     const auto question = id.find('?');
@@ -43,7 +46,7 @@ std::string parent_id(const std::string& id) {
 
 ViewerModel::ViewerModel(std::filesystem::path artifact)
     : input_path_(artifact.string()), artifact_(std::filesystem::absolute(std::move(artifact))) {
-    environment_ = dip::open_artifact(artifact_, true);
+    environment_ = dip::open_artifact(artifact_, true, true);
     rebuild_objects();
     history_.push_back(selection_);
 }
@@ -60,7 +63,7 @@ void ViewerModel::rebuild_objects() {
     objects_.clear();
     objects_.emplace("", ObjectInfo{"", artifact_.filename().string(), "", {}, false,
                                      dip::Path::Kind::None, ObjectRole::Artifact});
-    objects_.emplace("@project", ObjectInfo{"@project", "Evaluated project", "", {}, false,
+    objects_.emplace("@project", ObjectInfo{"@project", "Resolved nodes", "", {}, false,
                                               dip::Path::Kind::None, ObjectRole::Project});
     objects_.at("").children.push_back("@project");
     if (dip::detect_artifact(artifact_) == dip::ArtifactKind::Project) {
@@ -120,15 +123,17 @@ void ViewerModel::rebuild_objects() {
     if (dip::detect_artifact(artifact_) != dip::ArtifactKind::DIPH5) {
         for (const auto& [name, source] : environment_.sources.entries()) {
             if (!source.named_source) continue;
-            if (objects_.find("@sources") == objects_.end()) {
-                objects_.emplace("@sources", ObjectInfo{"@sources", "Sources", "", {}, false,
-                                                         dip::Path::Kind::None, ObjectRole::Sources});
-                objects_.at("").children.push_back("@sources");
+            const std::string category = source.raw_text ? "@raw_sources" : "@sources";
+            if (objects_.find(category) == objects_.end()) {
+                objects_.emplace(category, ObjectInfo{category,
+                    source.raw_text ? "Raw named sources" : "Named sources", "", {}, false,
+                    dip::Path::Kind::None, source.raw_text ? ObjectRole::RawSources : ObjectRole::Sources});
+                objects_.at("").children.push_back(category);
             }
             const std::string root = name + "?";
-            objects_.emplace(root, ObjectInfo{root, name, "@sources", {}, false,
+            objects_.emplace(root, ObjectInfo{root, name, category, {}, false,
                                                dip::Path::Kind::None, ObjectRole::Source, name});
-            objects_.at("@sources").children.push_back(root);
+            objects_.at(category).children.push_back(root);
             for (const auto& node : source.nodes.get_nodes()) {
                 if (!node || node->path.name.empty()) continue;
                 ensure_object(node->path.name, name);
@@ -140,10 +145,39 @@ void ViewerModel::rebuild_objects() {
             }
         }
     }
+    for (std::size_t index = 0; index < environment_.project_entries().size(); ++index) {
+        const auto& entry = environment_.project_entries()[index];
+        if (entry.kind != dip::ProjectEntry::Kind::Code) continue;
+        if (objects_.find("@local") == objects_.end()) {
+            objects_.emplace("@local", ObjectInfo{"@local", "Local sources", "", {}, false,
+                                                   dip::Path::Kind::None, ObjectRole::LocalSources});
+            objects_.at("").children.push_back("@local");
+        }
+        const std::string id = "@code?" + std::to_string(index);
+        const std::string label = entry.resolved_path.empty()
+            ? "Inline code (DIPfile:" + std::to_string(entry.line) + ")"
+            : display_file_path(entry.resolved_path);
+        ObjectInfo item{id, label, "@local", {}, false, dip::Path::Kind::None,
+                        ObjectRole::CodeSource};
+        item.manifest_index = index;
+        objects_.emplace(id, std::move(item));
+        objects_.at("@local").children.push_back(id);
+    }
+    if (!dip::inspect_block_inputs(environment_).empty()) {
+        objects_.emplace("@blocks", ObjectInfo{"@blocks", "Block value sources", "", {}, false,
+                                                dip::Path::Kind::None, ObjectRole::BlockSources});
+    }
+    for (const auto& [path, input] : dip::inspect_block_inputs(environment_)) {
+        const std::string id = "@block?" + path;
+        const std::string label = path + (input.kind == dip::BlockInput::Kind::Table ? " (table)" : " (array)");
+        objects_.emplace(id, ObjectInfo{id, label, "@blocks", {}, false,
+                                        dip::Path::Kind::None, ObjectRole::BlockSource, "", path});
+        objects_.at("@blocks").children.push_back(id);
+    }
     for (const auto& node : environment_.nodes.get_nodes()) {
         if (!node || !node->override || !node->value) continue;
         if (objects_.find("@overrides") == objects_.end()) {
-            objects_.emplace("@overrides", ObjectInfo{"@overrides", "Overrides", "", {}, false,
+            objects_.emplace("@overrides", ObjectInfo{"@overrides", "Overridden nodes", "", {}, false,
                                                        dip::Path::Kind::None, ObjectRole::Overrides});
             objects_.at("").children.push_back("@overrides");
         }
@@ -177,7 +211,8 @@ void ViewerModel::rebuild_objects() {
     }
     auto& root_sections = objects_.at("").children;
     root_sections.clear();
-    for (const char* section : {"@dipfile", "@overrides", "@project", "@schemas", "@sources", "@units"})
+    for (const char* section : {"@dipfile", "@overrides", "@project", "@schemas", "@units",
+                                "@local", "@blocks", "@sources", "@raw_sources"})
         if (objects_.find(section) != objects_.end()) root_sections.emplace_back(section);
     if (objects_.find(selection_) == objects_.end()) {
         while (!selection_.empty() && objects_.find(selection_) == objects_.end())
@@ -187,7 +222,7 @@ void ViewerModel::rebuild_objects() {
 
 bool ViewerModel::reload() {
     try {
-        auto fresh = dip::open_artifact(artifact_, true);
+        auto fresh = dip::open_artifact(artifact_, true, true);
         environment_ = std::move(fresh);
         rebuild_objects();
         ++revision_;
@@ -244,6 +279,25 @@ std::vector<SourceTarget> ViewerModel::source_targets(const ObjectInfo& object) 
     if (object.role == ObjectRole::Artifact || object.role == ObjectRole::Project ||
         object.role == ObjectRole::DIPfile)
         return {{"Source", artifact_, 1, {}}};
+    if (object.role == ObjectRole::CodeSource && object.manifest_index) {
+        const auto& entry = environment_.project_entries().at(*object.manifest_index);
+        return {{"Source", entry.resolved_path.empty() ? artifact_ : std::filesystem::path(entry.resolved_path),
+                 entry.resolved_path.empty() ? entry.line : 1, {}}};
+    }
+    if (object.role == ObjectRole::BlockSource) {
+        const auto& input = dip::inspect_block_inputs(environment_).at(object.node_path);
+        const auto& source = environment_.sources.at(input.source_name);
+        std::filesystem::path file = source.path;
+        std::size_t line = input.source_line;
+        if (source.embedded) {
+            file = environment_.sources.at(source.parent.name).path;
+            line = source.parent.line_number;
+        }
+        if (file.is_relative()) file = std::filesystem::absolute(file);
+        const auto format = input.kind == dip::BlockInput::Kind::Table
+            ? SourceFormat::Table : SourceFormat::Plain;
+        return {{"Block value", std::move(file), line, {}, format, input.path}};
+    }
 
     dip::SourceEntity entity{dip::SourceEntityKind::Path, object.node_path, object.source_name};
     if (object.role == ObjectRole::ManifestEntry && object.manifest_index) {
@@ -261,13 +315,17 @@ std::vector<SourceTarget> ViewerModel::source_targets(const ObjectInfo& object) 
     }
 
     std::vector<SourceTarget> targets;
-    const bool plain_text = object.role == ObjectRole::Source &&
-        environment_.sources.at(object.source_name).raw_text;
+    SourceFormat format = SourceFormat::DIPL;
+    if (object.role == ObjectRole::Source) {
+        const auto& source = environment_.sources.at(object.source_name);
+        if (source.table_text) format = SourceFormat::Table;
+        else if (source.raw_text) format = SourceFormat::Plain;
+    }
     for (const auto& location : dip::inspect_source_locations(environment_, entity)) {
         if (!location.source_text_available || location.source.path.empty()) continue;
         std::filesystem::path file(location.source.path);
         if (file.is_relative()) file = std::filesystem::absolute(file);
-        if (!plain_text && file.filename() != "DIPfile" &&
+        if (format == SourceFormat::DIPL && file.filename() != "DIPfile" &&
             file.extension() != ".dip" && file.extension() != ".dipl")
             continue;
         const auto duplicate = std::find_if(targets.begin(), targets.end(), [&](const auto& target) {
@@ -285,7 +343,7 @@ std::vector<SourceTarget> ViewerModel::source_targets(const ObjectInfo& object) 
         case dip::SourceLocationRole::Definition: label = "Definition"; break;
         case dip::SourceLocationRole::Registration: label = "Registration"; break;
         }
-        targets.push_back({std::move(label), std::move(file), location.line, location.source.name, plain_text});
+        targets.push_back({std::move(label), std::move(file), location.line, location.source.name, format});
     }
     return targets;
 }

@@ -45,6 +45,8 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/docs/dipl/highlight/cpp"
 target_sources(snt PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/application.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/browser_view.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/inspector_view.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/source_view.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/viewer_model.cpp")
 target_link_libraries(snt PRIVATE snt-view-imgui snt-dipl-highlighter)

@@ -1,0 +1,6 @@
+time float s
+temperature float K
+---
+0 293.15
+1 294.20
+2 295.10
