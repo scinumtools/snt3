@@ -3,6 +3,7 @@
 #include <chrono>
 #include <exception>
 #include <fstream>
+#include <set>
 #include <snt/dip/adapter.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
@@ -13,6 +14,9 @@ namespace snt::dip {
     namespace fs = std::filesystem;
 
     namespace {
+        constexpr const char* manifest_name = ".snt-adapter-manifest";
+        constexpr const char* manifest_header = "SNT-ADAPTER-MANIFEST-1\n";
+
         [[noreturn]] void invalid_output(const fs::path& path, const std::string& reason) {
             throw EnvironmentException(
                 "Invalid adapter output",
@@ -26,6 +30,9 @@ namespace snt::dip {
         fs::path validate_relative(const fs::path& path) {
             if (path.empty() || path.is_absolute() || path.has_root_name() || path.has_root_directory())
                 invalid_output(path, "must be a nonempty relative path");
+            const auto& native = path.native();
+            if (std::find(native.begin(), native.end(), fs::path::value_type{}) != native.end())
+                invalid_output(path, "contains a null character");
             for (const auto& part : path) {
                 if (part.empty() || part == "." || part == "..")
                     invalid_output(path, "contains an empty, current-directory, or parent-directory component");
@@ -52,6 +59,93 @@ namespace snt::dip {
             if (error && error != std::errc::no_such_file_or_directory)
                 throw fs::filesystem_error("Cannot inspect adapter output", path, error);
             return status;
+        }
+
+        void validate_path_components(const fs::path& root, const fs::path& path) {
+            fs::path current = root;
+            for (auto part = path.begin(); part != path.end(); ++part) {
+                current /= *part;
+                const auto status = checked_status(current);
+                if (!fs::exists(status))
+                    continue;
+                if (fs::is_symlink(status))
+                    invalid_output(path, "passes through a symbolic link");
+                const bool last = std::next(part) == path.end();
+                if (last ? !fs::is_regular_file(status) : !fs::is_directory(status))
+                    invalid_output(path, "collides with a non-file entry or passes through a non-directory entry");
+            }
+        }
+
+        [[noreturn]] void invalid_manifest(const fs::path& path) {
+            throw EnvironmentException(
+                "Invalid adapter manifest",
+                "The manifest `" + path.string() + "` is malformed or contains unsafe paths.",
+                "Remove or repair the manifest before synchronizing outputs.",
+                __FILE__,
+                __LINE__
+            );
+        }
+
+        std::vector<fs::path> read_manifest(const fs::path& root) {
+            const fs::path file = root / manifest_name;
+            const auto status = checked_status(file);
+            if (!fs::exists(status))
+                return {};
+            if (!fs::is_regular_file(status) || fs::is_symlink(status))
+                invalid_manifest(file);
+            std::ifstream in(file, std::ios::binary);
+            std::string header;
+            if (!std::getline(in, header) || header + "\n" != manifest_header)
+                invalid_manifest(file);
+            std::vector<fs::path> paths;
+            std::set<fs::path> unique;
+            std::string size_line;
+            while (std::getline(in, size_line)) {
+                if (size_line.empty() || size_line.size() > 7 ||
+                    !std::all_of(size_line.begin(), size_line.end(), [](unsigned char ch) { return ch >= '0' && ch <= '9'; }))
+                    invalid_manifest(file);
+                const auto length = static_cast<size_t>(std::stoul(size_line));
+                if (length == 0 || length > 1000000 || paths.size() >= 100000)
+                    invalid_manifest(file);
+                std::string bytes(length, '\0');
+                if (!in.read(bytes.data(), static_cast<std::streamsize>(length)) || in.get() != '\n')
+                    invalid_manifest(file);
+                fs::path path;
+                try {
+                    path = validate_relative(fs::u8path(bytes));
+                } catch (const EnvironmentException&) {
+                    invalid_manifest(file);
+                }
+                if (*path.begin() == manifest_name || !unique.insert(path).second)
+                    invalid_manifest(file);
+                for (const auto& existing : paths)
+                    if (is_prefix(path, existing) || is_prefix(existing, path))
+                        invalid_manifest(file);
+                paths.push_back(std::move(path));
+            }
+            if (!in.eof())
+                invalid_manifest(file);
+            return paths;
+        }
+
+        void write_manifest(const fs::path& file, const std::vector<fs::path>& paths) {
+            std::ofstream out(file, std::ios::binary | std::ios::trunc);
+            out << manifest_header;
+            for (const auto& path : paths) {
+                const std::string bytes = path.generic_u8string();
+                out << bytes.size() << '\n';
+                out.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+                out.put('\n');
+            }
+            out.close();
+            if (!out)
+                throw IOException(
+                    "Unable to write adapter manifest",
+                    "Writing `" + file.string() + "` failed.",
+                    "Check the available disk space.",
+                    __FILE__,
+                    __LINE__
+                );
         }
 
         void validate_destinations(
@@ -86,6 +180,69 @@ namespace snt::dip {
                     }
                 }
             }
+        }
+
+        void validate_sync_destinations(
+            const fs::path& root, const std::vector<fs::path>& paths, const std::vector<fs::path>& previous
+        ) {
+            if (root.empty())
+                invalid_output(root, "does not specify an output directory");
+            const auto root_status = checked_status(root);
+            if (fs::is_symlink(root_status) || (fs::exists(root_status) && !fs::is_directory(root_status)))
+                invalid_output(root, "is not a directory or is a symbolic link");
+            const std::set<fs::path> current(paths.begin(), paths.end());
+            const std::set<fs::path> stale = [&] {
+                std::set<fs::path> result;
+                for (const auto& path : previous)
+                    if (!current.count(path))
+                        result.insert(path);
+                return result;
+            }();
+            for (const auto& path : previous) {
+                if (*path.begin() == manifest_name)
+                    invalid_manifest(root / manifest_name);
+                validate_path_components(root, path);
+            }
+            for (size_t i = 0; i < paths.size(); ++i) {
+                const auto& path = paths[i];
+                if (*path.begin() == manifest_name)
+                    invalid_output(path, "uses the reserved adapter manifest path");
+                for (size_t j = 0; j < i; ++j)
+                    if (is_prefix(path, paths[j]) || is_prefix(paths[j], path))
+                        invalid_output(path, "conflicts with `" + paths[j].string() + "`");
+                fs::path current_path = root;
+                fs::path relative_path;
+                for (auto part = path.begin(); part != path.end(); ++part) {
+                    current_path /= *part;
+                    relative_path /= *part;
+                    const auto status = checked_status(current_path);
+                    if (!fs::exists(status))
+                        break;
+                    if (fs::is_symlink(status))
+                        invalid_output(path, "passes through a symbolic link");
+                    const bool last = std::next(part) == path.end();
+                    if (!last) {
+                        if (fs::is_regular_file(status) && stale.count(relative_path))
+                            break;
+                        if (!fs::is_directory(status))
+                            invalid_output(path, "passes through a non-directory entry");
+                    } else if (fs::is_directory(status)) {
+                        for (const auto& entry : fs::recursive_directory_iterator(current_path)) {
+                            const auto entry_status = checked_status(entry.path());
+                            if (fs::is_directory(entry_status))
+                                continue;
+                            const auto entry_relative = entry.path().lexically_relative(root);
+                            if (!fs::is_regular_file(entry_status) || !stale.count(entry_relative))
+                                invalid_output(path, "would replace a directory containing unregistered entries");
+                        }
+                    } else if (!fs::is_regular_file(status)) {
+                        invalid_output(path, "collides with a non-file entry");
+                    }
+                }
+            }
+            const auto manifest_status = checked_status(root / manifest_name);
+            if (fs::exists(manifest_status) && (!fs::is_regular_file(manifest_status) || fs::is_symlink(manifest_status)))
+                invalid_manifest(root / manifest_name);
         }
 
         struct StageCleanup {
@@ -163,8 +320,20 @@ namespace snt::dip {
             relative.push_back(validate_relative(output.path));
         if (!snapshot.empty())
             relative.push_back(validate_relative(snapshot));
-        validate_destinations(output_dir, relative, policy);
-        if (relative.empty())
+        const bool sync = policy == ExistingOutputPolicy::SyncRegistered;
+        std::vector<fs::path> previous;
+        if (sync) {
+            if (output_dir.empty())
+                invalid_output(output_dir, "does not specify an output directory");
+            const auto status = checked_status(output_dir);
+            if (fs::is_symlink(status) || (fs::exists(status) && !fs::is_directory(status)))
+                invalid_output(output_dir, "is not a directory or is a symbolic link");
+            previous = read_manifest(output_dir);
+            validate_sync_destinations(output_dir, relative, previous);
+        } else {
+            validate_destinations(output_dir, relative, policy);
+        }
+        if (relative.empty() && !sync)
             return {};
 
         const bool root_existed = fs::exists(output_dir);
@@ -213,6 +382,10 @@ namespace snt::dip {
             fs::create_directories(file.parent_path());
             env.save(file);
         }
+        if (sync) {
+            fs::create_directories(stage.path / "new");
+            write_manifest(stage.path / "new" / manifest_name, relative);
+        }
 
         struct PublishedOutput {
             fs::path destination;
@@ -221,12 +394,50 @@ namespace snt::dip {
             bool published = false;
         };
         std::vector<PublishedOutput> journal;
-        journal.reserve(relative.size());
+        journal.reserve(relative.size() + previous.size() + (sync ? 1 : 0));
         std::vector<fs::path> written;
         std::vector<fs::path> created_dirs;
+        std::vector<fs::path> removed_dirs;
         try {
             // A stream writer may have changed a destination while staging.
-            validate_destinations(output_dir, relative, policy);
+            if (sync) {
+                if (read_manifest(output_dir) != previous)
+                    invalid_manifest(output_dir / manifest_name);
+                validate_sync_destinations(output_dir, relative, previous);
+                const std::set<fs::path> current(relative.begin(), relative.end());
+                for (const auto& path : previous) {
+                    if (current.count(path))
+                        continue;
+                    const fs::path destination = output_dir / path;
+                    if (!fs::exists(checked_status(destination)))
+                        continue;
+                    journal.push_back({destination, stage.path / "old" / path});
+                    auto& entry = journal.back();
+                    fs::create_directories(entry.backup.parent_path());
+                    fs::rename(destination, entry.backup);
+                    entry.backed_up = true;
+                }
+                for (const auto& path : relative) {
+                    const fs::path destination = output_dir / path;
+                    if (!fs::is_directory(checked_status(destination)))
+                        continue;
+                    std::vector<fs::path> directories{destination};
+                    for (const auto& entry : fs::recursive_directory_iterator(destination)) {
+                        if (!fs::is_directory(checked_status(entry.path())))
+                            invalid_output(path, "would replace a directory containing unregistered entries");
+                        directories.push_back(entry.path());
+                    }
+                    std::sort(directories.begin(), directories.end(), [](const auto& a, const auto& b) {
+                        return std::distance(a.begin(), a.end()) > std::distance(b.begin(), b.end());
+                    });
+                    for (const auto& dir : directories) {
+                        fs::remove(dir);
+                        removed_dirs.push_back(dir);
+                    }
+                }
+            } else {
+                validate_destinations(output_dir, relative, policy);
+            }
             for (const auto& path : relative) {
                 const fs::path destination = output_dir / path;
                 fs::path dir = output_dir;
@@ -245,6 +456,7 @@ namespace snt::dip {
                     invalid_output(path, "collides with an existing filesystem entry");
                 if (fs::exists(status) && policy == ExistingOutputPolicy::Reject)
                     invalid_output(path, "appeared while the adapter was writing");
+                validate_path_components(stage.path / "new", path);
 
                 journal.push_back({destination, stage.path / "old" / path});
                 auto& entry = journal.back();
@@ -257,6 +469,17 @@ namespace snt::dip {
                 entry.published = true;
                 written.push_back(destination);
             }
+            if (sync) {
+                const fs::path destination = output_dir / manifest_name;
+                journal.push_back({destination, stage.path / "old" / manifest_name});
+                auto& entry = journal.back();
+                if (fs::exists(checked_status(destination))) {
+                    fs::rename(destination, entry.backup);
+                    entry.backed_up = true;
+                }
+                fs::rename(stage.path / "new" / manifest_name, destination);
+                entry.published = true;
+            }
         } catch (...) {
             const auto original_error = std::current_exception();
             std::error_code rollback_error;
@@ -266,18 +489,26 @@ namespace snt::dip {
                     fs::remove(it->destination, error);
                 if (!rollback_error && error)
                     rollback_error = error;
-                if (it->backed_up) {
-                    error.clear();
-                    fs::rename(it->backup, it->destination, error);
-                    if (!rollback_error && error)
-                        rollback_error = error;
-                }
             }
             for (auto it = created_dirs.rbegin(); it != created_dirs.rend(); ++it) {
                 std::error_code error;
                 fs::remove(*it, error);
                 if (!rollback_error && error)
                     rollback_error = error;
+            }
+            for (auto it = removed_dirs.rbegin(); it != removed_dirs.rend(); ++it) {
+                std::error_code error;
+                fs::create_directory(*it, error);
+                if (!rollback_error && error)
+                    rollback_error = error;
+            }
+            for (auto it = journal.rbegin(); it != journal.rend(); ++it) {
+                std::error_code error;
+                if (it->backed_up) {
+                    fs::rename(it->backup, it->destination, error);
+                    if (!rollback_error && error)
+                        rollback_error = error;
+                }
             }
             if (rollback_error) {
                 // Keep any backup that could not be restored for manual recovery.

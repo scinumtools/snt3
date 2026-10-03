@@ -14,7 +14,8 @@ namespace snt::dip {
     /** How a runner handles files already present at registered output paths. */
     enum class ExistingOutputPolicy {
         Reject,            ///< Reject every existing destination (default).
-        ReplaceRegistered  ///< Replace regular files registered for this run only.
+        ReplaceRegistered, ///< Replace regular files registered for this run only.
+        SyncRegistered     ///< Also remove files recorded by the previous sync run but not planned now.
     };
 
     /** Collects files requested by one adapter run. Paths are relative to the output directory. */
@@ -58,8 +59,10 @@ namespace snt::dip {
      * Plan, validate, and write adapter outputs below output_dir. Existing
      * destinations are rejected by default. ReplaceRegistered replaces only
      * registered regular files after all outputs are staged, and restores them
-     * if publication fails. snapshot is an optional relative DIPH5 path below
-     * the same directory. Returns written paths in registration order.
+     * if publication fails. SyncRegistered records the current paths and removes
+     * previously recorded files that are no longer planned. snapshot is an
+     * optional relative DIPH5 path below the same directory. Returns written
+     * paths in registration order.
      */
     std::vector<std::filesystem::path> run_adapter(
         const Environment& env,

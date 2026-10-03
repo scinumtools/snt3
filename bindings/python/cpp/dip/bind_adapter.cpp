@@ -28,7 +28,8 @@ namespace snt::bind::python {
     void init_adapter(py::module_& m) {
         py::enum_<dip::ExistingOutputPolicy>(m, "ExistingOutputPolicy")
             .value("Reject", dip::ExistingOutputPolicy::Reject)
-            .value("ReplaceRegistered", dip::ExistingOutputPolicy::ReplaceRegistered);
+            .value("ReplaceRegistered", dip::ExistingOutputPolicy::ReplaceRegistered)
+            .value("SyncRegistered", dip::ExistingOutputPolicy::SyncRegistered);
 
         py::class_<dip::AdapterContext>(m, "AdapterContext", "Outputs planned for one adapter run.")
             .def(

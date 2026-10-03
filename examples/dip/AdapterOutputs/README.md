@@ -20,3 +20,7 @@ in the same directory can pass `ExistingOutputPolicy::ReplaceRegistered` in
 C++, or `existing_output_policy=ExistingOutputPolicy.ReplaceRegistered` in
 Python. Only files registered for that run are replaced. `run_adapter_snapshot()`
 can regenerate the same inputs from the C++ example's `run.diph5` file.
+Use `ExistingOutputPolicy::SyncRegistered` (or
+`ExistingOutputPolicy.SyncRegistered` in Python) to also remove files recorded
+by a previous sync run when they are no longer registered. The runner stores
+that list in `.snt-adapter-manifest` and preserves unregistered files.

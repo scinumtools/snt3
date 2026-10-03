@@ -266,3 +266,125 @@ TEST(Adapter, PublicationFailureRestoresFilesAlreadyReplaced) {
     EXPECT_EQ(read(output / "unrelated.txt"), "unrelated");
     EXPECT_FALSE(fs::exists(output / "trigger.txt"));
 }
+
+TEST(Adapter, SyncRegisteredRemovesStaleOutputsAndSnapshotOnly) {
+    Workspace work;
+    dip::DIP parser;
+    parser.add_string("value int = 1\n");
+    const auto env = parser.parse();
+    const auto output = work.path / "output";
+    CallbackAdapter adapter;
+    adapter.callback = [](dip::AdapterContext& context) {
+        context.add_text("nested/keep.txt", "first");
+        context.add_text("nested/stale.txt", "stale");
+    };
+    const auto policy = dip::ExistingOutputPolicy::SyncRegistered;
+    ASSERT_EQ(dip::run_adapter(env, adapter, output, "run.diph5", policy).size(), 3);
+    const auto original_manifest = read(output / ".snt-adapter-manifest");
+    work.write("output/nested/unregistered.txt", "keep me");
+    work.write("output/other.txt", "also keep me");
+
+    adapter.callback = [](dip::AdapterContext& context) { context.add_text("nested/keep.txt", "second"); };
+    const auto written = dip::run_adapter(env, adapter, output, policy);
+    ASSERT_EQ(written.size(), 1);
+    EXPECT_EQ(read(written.front()), "second");
+    EXPECT_FALSE(fs::exists(output / "nested/stale.txt"));
+    EXPECT_FALSE(fs::exists(output / "run.diph5"));
+    EXPECT_EQ(read(output / "nested/unregistered.txt"), "keep me");
+    EXPECT_EQ(read(output / "other.txt"), "also keep me");
+    EXPECT_NE(read(output / ".snt-adapter-manifest"), original_manifest);
+
+    adapter.callback = [](dip::AdapterContext&) {};
+    EXPECT_TRUE(dip::run_adapter(env, adapter, output, policy).empty());
+    EXPECT_FALSE(fs::exists(output / "nested/keep.txt"));
+    EXPECT_EQ(read(output / "nested/unregistered.txt"), "keep me");
+}
+
+TEST(Adapter, SyncRegisteredHandlesFileDirectoryTransitionsWithoutRemovingUnregisteredFiles) {
+    Workspace work;
+    dip::DIP parser;
+    parser.add_string("value int = 1\n");
+    const auto env = parser.parse();
+    const auto output = work.path / "output";
+    CallbackAdapter adapter;
+    const auto policy = dip::ExistingOutputPolicy::SyncRegistered;
+    adapter.callback = [](dip::AdapterContext& context) {
+        context.add_text("branch", "old file");
+        context.add_text("tree/leaf.txt", "old leaf");
+    };
+    dip::run_adapter(env, adapter, output, policy);
+    adapter.callback = [](dip::AdapterContext& context) {
+        context.add_text("branch/leaf.txt", "new leaf");
+        context.add_text("tree", "new file");
+    };
+    dip::run_adapter(env, adapter, output, policy);
+    EXPECT_EQ(read(output / "branch/leaf.txt"), "new leaf");
+    EXPECT_EQ(read(output / "tree"), "new file");
+
+    work.write("output/branch/unregistered.txt", "user file");
+    adapter.callback = [](dip::AdapterContext& context) { context.add_text("branch", "replacement"); };
+    EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
+    EXPECT_EQ(read(output / "branch/leaf.txt"), "new leaf");
+    EXPECT_EQ(read(output / "branch/unregistered.txt"), "user file");
+}
+
+TEST(Adapter, SyncRegisteredValidatesManifestBeforeWritingAndRestoresItOnPublicationFailure) {
+    Workspace work;
+    dip::DIP parser;
+    parser.add_string("value int = 1\n");
+    const auto env = parser.parse();
+    const auto output = work.path / "output";
+    CallbackAdapter adapter;
+    const auto policy = dip::ExistingOutputPolicy::SyncRegistered;
+    adapter.callback = [](dip::AdapterContext& context) {
+        context.add_text("first.txt", "old first");
+        context.add_text("stale.txt", "old stale");
+        context.add_text("parent", "old parent");
+    };
+    dip::run_adapter(env, adapter, output, policy);
+    const auto manifest = read(output / ".snt-adapter-manifest");
+    work.write("output/unregistered.txt", "keep me");
+    int streamed = 0;
+    work.write("output/.snt-adapter-manifest", "SNT-ADAPTER-MANIFEST-1\n9\n../escape\n");
+    adapter.callback = [&](dip::AdapterContext& context) {
+        context.add_stream("new.txt", [&](std::ostream&) { ++streamed; });
+    };
+    EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
+    EXPECT_EQ(streamed, 0);
+    work.write("output/.snt-adapter-manifest", manifest);
+    std::error_code link_error;
+    fs::remove(output / "stale.txt");
+    fs::create_symlink(output / "unregistered.txt", output / "stale.txt", link_error);
+    if (!link_error) {
+        EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
+        EXPECT_EQ(read(output / "unregistered.txt"), "keep me");
+        fs::remove(output / "stale.txt");
+    }
+    work.write("output/stale.txt", "old stale");
+
+    adapter.callback = [&](dip::AdapterContext& context) {
+        context.add_text("first.txt", "new first");
+        context.add_text("parent/child.txt", "new child");
+        context.add_text("second.txt", "new second");
+        context.add_stream("trigger.txt", [&](std::ostream& out) {
+            bool removed = false;
+            for (const auto& entry : fs::directory_iterator(output)) {
+                if (entry.path().filename().string().find(".snt-adapter-stage-") == 0) {
+                    removed = fs::remove(entry.path() / "new/second.txt");
+                    break;
+                }
+            }
+            if (!removed)
+                throw std::runtime_error("test could not remove staged output");
+            out << "ready";
+        });
+    };
+    EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), fs::filesystem_error);
+    EXPECT_EQ(read(output / "first.txt"), "old first");
+    EXPECT_EQ(read(output / "stale.txt"), "old stale");
+    EXPECT_EQ(read(output / "parent"), "old parent");
+    EXPECT_FALSE(fs::exists(output / "second.txt"));
+    EXPECT_FALSE(fs::exists(output / "trigger.txt"));
+    EXPECT_EQ(read(output / "unregistered.txt"), "keep me");
+    EXPECT_EQ(read(output / ".snt-adapter-manifest"), manifest);
+}

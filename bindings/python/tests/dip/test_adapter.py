@@ -148,3 +148,31 @@ def test_failed_python_stream_preserves_registered_files(tmp_path: Path):
     assert (output / "first.txt").read_text() == "old first"
     assert (output / "unrelated.txt").read_text() == "unrelated"
     assert not (output / "second.txt").exists()
+
+
+def test_sync_registered_prunes_previous_outputs_and_keeps_default_reject(tmp_path: Path):
+    parser = DIP()
+    parser.add_string("value int = 1\n")
+    env = parser.parse()
+    output = tmp_path / "output"
+
+    class Files(Adapter):
+        def __init__(self, names):
+            super().__init__()
+            self.names = names
+
+        def plan(self, env, context):
+            for name in self.names:
+                context.add_text(name, name)
+
+    policy = ExistingOutputPolicy.SyncRegistered
+    assert len(run_adapter(env, Files(["keep.txt", "stale.txt"]), output,
+                           existing_output_policy=policy)) == 2
+    (output / "unregistered.txt").write_text("keep me")
+    with pytest.raises(RuntimeError):
+        run_adapter(env, Files(["keep.txt"]), output)
+    assert len(run_adapter(env, Files(["keep.txt"]), output,
+                           existing_output_policy=policy)) == 1
+    assert not (output / "stale.txt").exists()
+    assert (output / "unregistered.txt").read_text() == "keep me"
+    assert (output / ".snt-adapter-manifest").is_file()
