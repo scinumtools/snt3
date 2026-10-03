@@ -1,15 +1,15 @@
 Inspecting and reloading environments
 =====================================
 
-The read-only ``<snt/dip/inspection.h>`` API collects facts already retained
-by an evaluated environment. ``inspect_value`` returns an owned typed value,
-shape, units, metadata, tags, declaration and override locations, and schema
-information. ``inspect_values`` returns all evaluated values in environment
-order with their full paths.
+The inspection functions in ``<snt/dip/inspect/inspection.h>`` collect facts
+already retained by an evaluated environment. ``inspect_value`` returns an
+owned typed value, shape, units, metadata, tags, declaration and override
+locations, and schema information. ``inspect_values`` returns all evaluated
+values in environment order with their full paths.
 
 .. code-block:: cpp
 
-   #include <snt/dip/inspection.h>
+   #include <snt/dip/inspect/inspection.h>
 
    auto env = snt::dip::open_artifact("DIPfile");
    auto speed = snt::dip::inspect_value(env, "physics.speed");
@@ -49,6 +49,16 @@ point to the same physical line. ``source_text_available`` tells a caller
 whether the parsed text is retained. DIPH5 snapshots may still report retained
 provenance, but have no complete source text; a viewer can disable source
 opening without discarding that provenance.
+
+Original string literals parsed into array or table values can also be retained
+for inspection. This is opt-in for live parses: use ``parser.parse(false, true)``
+or ``open_artifact(path, false, true)``. ``inspect_block_inputs`` lists the
+retained blocks by evaluated path, and ``inspect_block_input`` looks up one
+block. Each record identifies its array or table kind, original text, logical
+source, and line. Pass the same option to
+``reload_artifact(env, path, false, true)`` to retain blocks after a reload.
+Ordinary parsing does not retain these copies, and DIPH5 snapshots store the
+evaluated values without the original block text.
 
 ``detect_artifact(path)`` classifies conventional names: ``DIPfile``,
 ``.dip`` or ``.dipl``, ``.dipt``, and ``.diph5``. It does not validate file
@@ -160,7 +170,7 @@ exception types, rather than individual error cases.
 
 .. code-block:: cpp
 
-   #include <snt/dip/diagnostic.h>
+   #include <snt/dip/inspect/diagnostic.h>
 
    try {
        snt::dip::reload_artifact(env, "DIPfile");

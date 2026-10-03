@@ -6,14 +6,23 @@ It uses the evaluated DIP environment to show values, provenance, and recorded
 dependencies. The viewer is part of the main ``snt`` executable; it does not
 need a separate application binary.
 
-.. figure:: ../_static/snt-viewer.png
-   :alt: Parameter Viewer with the DIPfile tree and an inspected speed value
-   :width: 460px
-   :align: center
-   :target: ../_static/snt-viewer.png
+.. container:: viewer-figures
 
-   The Parameter Viewer inspecting a live DIPfile project. Select the image
-   to open it at full size.
+   .. figure:: ../_static/snt-view-inspect.png
+      :alt: Parameter Viewer showing the Overridden nodes branch with experiment.geometry.length selected, its value of 3 m, and links to its declaration and override.
+      :width: 100%
+      :target: ../_static/snt-view-inspect.png
+
+      Inspecting an overridden value and its source locations.
+
+   .. figure:: ../_static/snt-view-source.png
+      :alt: Parameter Viewer Source tab showing syntax-highlighted parameters.dip with the length declaration selected at line 17.
+      :width: 100%
+      :target: ../_static/snt-view-source.png
+
+      Viewing the read-only DIPL source at the selected declaration.
+
+Select either image to open it at full size.
 
 Build and open
 --------------
@@ -50,20 +59,30 @@ enabled.
 Browse a project
 ----------------
 
-The browser separates overrides, the evaluated project, schemas, named
-sources, and custom units. A live ``DIPfile`` also has a top branch, above
-Overrides, grouping its registered inputs by type with their order preserved
+The browser separates **Overridden nodes**, **Resolved nodes**, schemas, custom
+units, **Local sources**, **Block value sources**, **Named sources**, and
+**Raw named sources**. A live ``DIPfile`` also has a top
+branch, grouping its registered inputs by type with their order preserved
 within each group. Use
 **Search paths** to filter the tree,
 or the adjacent controls to expand and collapse its branches. Select a
 parameter to inspect its value, units, metadata, source locations, and
 dependencies. Follow a dependency to its input, then use the back and forward
-buttons to return to earlier selections. Values from named sources can be
-opened under the **Sources** branch through ``source?path`` references.
-Raw text sources appear there as source entries without parameter children.
-Select one and use **Open source** to read its original text in the Source tab;
-these files are shown without DIPL syntax coloring. A value that injects raw
-source content links back to that source when dependency recording is enabled.
+buttons to return to earlier selections. **Local sources** lists the DIPfile's
+``code[]`` inputs, which define local ``?path`` values. File inputs open their
+original DIPL text; inline inputs open at their DIPfile declaration. Their
+evaluated parameters appear under **Resolved nodes**.
+
+**Block value sources** contains string literals parsed into non-string array
+or table values. Array blocks are shown as plain text. Table blocks highlight
+DIPL column declarations before ``---`` and show data rows as plain text.
+The viewer enables this opt-in retention for live parses.
+
+**Named sources** lists parsed DIPL ``sources[]`` inputs, whose values are
+addressed as ``source?path``. **Raw named sources** lists unparsed text inputs
+registered by ``sources[]``. A value that injects raw source content links
+back to its entry when dependency recording is enabled. Raw table files use
+the same header and data presentation as table block values.
 
 The top path bar shows the argument supplied to ``snt view``. Source file
 locations in the inspector are displayed relative to the opened artifact's

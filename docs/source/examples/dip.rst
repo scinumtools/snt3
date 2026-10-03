@@ -91,10 +91,10 @@ The `ParameterViewer source directory
 <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/ParameterViewer>`_
 contains a self-contained DIPfile project designed for browsing. It combines
 groups, a value with a child, map and list collections, a schema, two DIPL
-sources and one raw text source, a custom unit, an override, typed arrays and a table, validation,
-metadata, expressions, a formatted string, a modification, and a conditional
-branch. The project uses synthetic
-values and needs no external data files.
+sources and two raw sources, a custom unit, an override, typed arrays and two
+tables, validation, metadata, expressions, a formatted string, a modification,
+and a conditional branch. The project uses synthetic values and needs no data
+files outside the example directory.
 
 Build the optional viewer, then open the project from the repository root.
 See :doc:`the viewer guide <../integrations/viewer>` for build dependencies and
@@ -122,17 +122,23 @@ In the browser, compare ``experiment.geometry`` (group),
 ``experiment.materials`` (map), ``experiment.probes`` (list),
 ``experiment.duration`` (value), and ``experiment.repeats`` (value with a
 child). Select ``experiment.geometry.length`` to see its declaration and
-override. The ``Overrides`` branch lists this target separately and links back
-to its evaluated path. Then select ``experiment.average_speed`` to follow its dependencies.
+override. The ``Overridden nodes`` branch lists this target separately and links
+back to its evaluated path. Then select ``experiment.average_speed`` to follow
+its dependencies.
 The effective values are ``3 m`` and ``0.375 m/s`` respectively. The
 ``Schemas`` branch lists ``probe`` with its declaration and links to values it
 contributed; ``Units`` lists the ``sample_tick`` custom unit and its definition.
-``Sources`` branch contains the separate ``reference`` and ``catalog``
+``Named sources`` contains the separate ``reference`` and ``catalog``
 sources. Select ``experiment.lab_name`` and follow its
 ``reference?lab_name`` dependency to inspect the source value and declaration.
 Select ``experiment.instrument_family`` to navigate into the catalog's map.
 The ``raw_samples`` source opens as plain text and supplies
 ``experiment.sample_values`` through raw source injection.
+The inline ``experiment.readings`` table and ``experiment.sample_grid`` array
+are browsable under ``Block value sources``. Raw file inputs have their own
+``Raw named sources`` branch.
+The ``table_samples`` source supplies ``experiment.reference_readings`` and
+shows its column header with DIPL highlighting above the raw data rows.
 Source browsing requires a live
 project parse; source nodes are not yet stored in ``.diph5`` snapshots. The
 `example README
