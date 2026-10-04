@@ -125,6 +125,11 @@ set_module_options(API ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
 if(ENABLE_DIP)
     find_package(HDF5 REQUIRED COMPONENTS C)
 endif()
+option(ENABLE_SNT_REPORT "Enable DIP report generation" "${ENABLE_DIP}")
+message(STATUS "ENABLE_SNT_REPORT            ${ENABLE_SNT_REPORT}")
+if(ENABLE_SNT_REPORT AND NOT ENABLE_DIP)
+    message(FATAL_ERROR "snt report requires ENABLE_DIP.")
+endif()
 
 # enable building of executables
 option(ENABLE_EXEC_APPS "Enable build of SNT application" ON)

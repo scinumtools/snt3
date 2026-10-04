@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <hdf5.h>
-#include <numeric>
+#include <limits>
 #include <optional>
 #include <set>
 #include <snt/dip/environment.h>
@@ -57,6 +57,18 @@ namespace snt::dip::hdf5 {
         void check(herr_t status, const char* operation) {
             if (status < 0)
                 throw Error(operation);
+        }
+
+        size_t checked_size(uint64_t value, const char* field) {
+            if (value > static_cast<uint64_t>(std::numeric_limits<size_t>::max()))
+                throw Error(std::string("DIPH5 ") + field + " exceeds SIZE_MAX");
+            return static_cast<size_t>(value);
+        }
+
+        size_t checked_product(size_t count, size_t width, const char* field) {
+            if (width != 0 && count > std::numeric_limits<size_t>::max() / width)
+                throw Error(std::string("DIPH5 ") + field + " exceeds SIZE_MAX");
+            return count * width;
         }
 
         class PersistedValueNode final : public ValueNode {
@@ -138,7 +150,7 @@ namespace snt::dip::hdf5 {
             );
             Id type(H5Aget_type(attribute), H5Tclose, "Unable to inspect an HDF5 string attribute");
             const size_t width = H5Tget_size(type);
-            if (width == 0)
+            if (width == 0 || width == std::numeric_limits<size_t>::max())
                 throw Error("Invalid HDF5 string attribute");
             std::vector<char> buffer(width + 1, '\0');
             check(H5Aread(attribute, type, buffer.data()), "Unable to read an HDF5 string attribute");
@@ -202,11 +214,14 @@ namespace snt::dip::hdf5 {
             check(H5Sget_simple_extent_dims(space, &count, nullptr), "Unable to inspect an HDF5 attribute shape");
             Id type(H5Aget_type(attribute), H5Tclose, "Unable to inspect an HDF5 string attribute");
             const size_t width = H5Tget_size(type);
-            std::vector<char> buffer(static_cast<size_t>(count) * width, '\0');
+            if (width == 0)
+                throw Error("Invalid HDF5 string-array attribute");
+            const size_t item_count = checked_size(count, "string-array count");
+            std::vector<char> buffer(checked_product(item_count, width, "string-array size"), '\0');
             check(H5Aread(attribute, type, buffer.data()), "Unable to read an HDF5 string-array attribute");
             std::vector<std::string> values;
-            values.reserve(count);
-            for (size_t i = 0; i < count; ++i)
+            values.reserve(item_count);
+            for (size_t i = 0; i < item_count; ++i)
                 values.emplace_back(buffer.data() + i * width);
             return values;
         }
@@ -606,15 +621,18 @@ namespace snt::dip::hdf5 {
             return dims;
         }
 
-        size_t element_count(const std::vector<hsize_t>& dims) {
-            return dims.empty() ? 1 : std::accumulate(dims.begin(), dims.end(), size_t{1}, std::multiplies<>());
+        size_t element_count(const val::Array::ShapeType& dims) {
+            size_t count = 1;
+            for (const size_t extent : dims)
+                count = checked_product(count, extent, "dataset element count");
+            return count;
         }
 
         template <typename Disk, typename Stored>
         val::BaseValue::PointerType read_numeric(
             hid_t dataset, hid_t type, core::DataType dtype, const val::Array::ShapeType& shape
         ) {
-            std::vector<Disk> disk(element_count(std::vector<hsize_t>(shape.begin(), shape.end())));
+            std::vector<Disk> disk(element_count(shape));
             check(H5Dread(dataset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, disk.data()), "Unable to read an HDF5 dataset");
             std::vector<Stored> stored(disk.begin(), disk.end());
             return std::make_unique<val::ArrayValue<Stored>>(stored, shape, dtype);
@@ -629,7 +647,8 @@ namespace snt::dip::hdf5 {
             if (disk_dims.empty())
                 shape = {1};
             else
-                shape.assign(disk_dims.begin(), disk_dims.end());
+                for (const hsize_t extent : disk_dims)
+                    shape.push_back(checked_size(extent, "dataset dimension"));
             switch (dtype) {
             case core::DataType::Boolean:
                 return read_numeric<uint8_t, uint8_t>(dataset, H5T_NATIVE_UINT8, dtype, shape);
@@ -660,8 +679,10 @@ namespace snt::dip::hdf5 {
             case core::DataType::String: {
                 Id type(H5Dget_type(dataset), H5Tclose, "Unable to inspect an HDF5 string dataset");
                 const size_t width = H5Tget_size(type);
-                const size_t count = element_count(std::vector<hsize_t>(shape.begin(), shape.end()));
-                std::vector<char> buffer(count * width, '\0');
+                if (width == 0)
+                    throw Error("Invalid HDF5 string dataset");
+                const size_t count = element_count(shape);
+                std::vector<char> buffer(checked_product(count, width, "string dataset size"), '\0');
                 check(
                     H5Dread(dataset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, buffer.data()),
                     "Unable to read an HDF5 string dataset"
@@ -781,12 +802,15 @@ namespace snt::dip::hdf5 {
             node->schema_id = read_string(dataset, ATTR_NODE_SCHEMA_ID);
             node->table_path = read_string(dataset, ATTR_TABLE_PATH);
             if (!node->table_path.empty() && has_attribute(dataset, ATTR_TABLE_COLUMN_INDEX))
-                node->table_column_index = read_scalar<uint64_t>(dataset, ATTR_TABLE_COLUMN_INDEX, H5T_NATIVE_UINT64);
+                node->table_column_index = checked_size(
+                    read_scalar<uint64_t>(dataset, ATTR_TABLE_COLUMN_INDEX, H5T_NATIVE_UINT64), "table column index"
+                );
             node->override = read_scalar<uint8_t>(dataset, ATTR_OVERRIDE, H5T_NATIVE_UINT8) != 0;
             if (node->override) {
                 node->override_line.source.name = read_string(dataset, ATTR_OVERRIDE_SOURCE);
-                node->override_line.source.line_number =
-                    read_scalar<uint64_t>(dataset, ATTR_OVERRIDE_LINE, H5T_NATIVE_UINT64);
+                node->override_line.source.line_number = checked_size(
+                    read_scalar<uint64_t>(dataset, ATTR_OVERRIDE_LINE, H5T_NATIVE_UINT64), "override line number"
+                );
                 node->override_line.code = read_string(dataset, ATTR_OVERRIDE_CODE);
             }
             const auto modification_sources = read_strings(dataset, ATTR_MODIFICATION_SOURCES);
@@ -802,8 +826,9 @@ namespace snt::dip::hdf5 {
                 );
             for (size_t i = 0; i < modification_sources.size(); ++i) {
                 try {
+                    const size_t line_number = checked_size(std::stoull(modification_lines[i]), "modification line number");
                     node->modification_lines.push_back(
-                        {modification_codes[i], {modification_sources[i], std::stoull(modification_lines[i])}}
+                        {modification_codes[i], {modification_sources[i], line_number}}
                     );
                 } catch (const std::exception&) {
                     throw dip::IOException(
@@ -825,7 +850,9 @@ namespace snt::dip::hdf5 {
             node->value_origin =
                 static_cast<ValueOrigin>(read_scalar<uint64_t>(dataset, ATTR_VALUE_ORIGIN, H5T_NATIVE_UINT64));
             node->line.source.name = read_string(dataset, ATTR_SOURCE);
-            node->line.source.line_number = read_scalar<uint64_t>(dataset, ATTR_SOURCE_LINE, H5T_NATIVE_UINT64);
+            node->line.source.line_number = checked_size(
+                read_scalar<uint64_t>(dataset, ATTR_SOURCE_LINE, H5T_NATIVE_UINT64), "source line number"
+            );
             node->line.code = read_string(dataset, ATTR_SOURCE_CODE);
             read_metadata(dataset, node->metadata);
             env.nodes.push_back(node);
@@ -843,7 +870,10 @@ namespace snt::dip::hdf5 {
             const ssize_t size = H5Gget_objname_by_idx(group, index, nullptr, 0);
             if (size < 0)
                 throw Error("Unable to inspect an HDF5 object name");
-            std::vector<char> name(static_cast<size_t>(size) + 1, '\0');
+            const size_t width = checked_size(static_cast<uint64_t>(size), "object name length");
+            if (width == std::numeric_limits<size_t>::max())
+                throw Error("DIPH5 object name length exceeds SIZE_MAX");
+            std::vector<char> name(width + 1, '\0');
             if (H5Gget_objname_by_idx(group, index, name.data(), name.size()) < 0)
                 throw Error("Unable to read an HDF5 object name");
             return name.data();
@@ -868,7 +898,7 @@ namespace snt::dip::hdf5 {
             );
             std::vector<SourceInfo> sources;
             const hsize_t count = object_count(manifest);
-            sources.reserve(count);
+            sources.reserve(checked_size(count, "source-manifest count"));
             for (hsize_t index = 0; index < count; ++index) {
                 const std::string entry_name = object_name(manifest, index);
                 if (H5Gget_objtype_by_idx(manifest, index) != H5G_GROUP)
@@ -888,7 +918,10 @@ namespace snt::dip::hdf5 {
                     read_string(entry, ATTR_SOURCE_NAME),
                     read_string(entry, ATTR_SOURCE_PATH),
                     read_string(entry, ATTR_SOURCE_PARENT),
-                    static_cast<size_t>(read_scalar<uint64_t>(entry, ATTR_SOURCE_PARENT_LINE, H5T_NATIVE_UINT64)),
+                    checked_size(
+                        read_scalar<uint64_t>(entry, ATTR_SOURCE_PARENT_LINE, H5T_NATIVE_UINT64),
+                        "source parent line number"
+                    ),
                     read_string(entry, ATTR_SOURCE_HASH_ALGORITHM),
                     read_string(entry, ATTR_SOURCE_HASH),
                 };
@@ -925,7 +958,7 @@ namespace snt::dip::hdf5 {
             std::vector<TraceInfo> traces;
             std::vector<SchemaInfo> schema_infos;
             const hsize_t count = object_count(manifest);
-            traces.reserve(count);
+            traces.reserve(checked_size(count, "trace-manifest count"));
             for (hsize_t index = 0; index < count; ++index) {
                 const std::string entry_name = object_name(manifest, index);
                 if (H5Gget_objtype_by_idx(manifest, index) != H5G_GROUP)
@@ -960,7 +993,10 @@ namespace snt::dip::hdf5 {
                     info.name = trace.name;
                     if (minor_version >= 4) {
                         info.source_name = read_string(entry, ATTR_SCHEMA_SOURCE);
-                        info.source_line = read_scalar<uint64_t>(entry, ATTR_SCHEMA_SOURCE_LINE, H5T_NATIVE_UINT64);
+                        info.source_line = checked_size(
+                            read_scalar<uint64_t>(entry, ATTR_SCHEMA_SOURCE_LINE, H5T_NATIVE_UINT64),
+                            "schema source line number"
+                        );
                         read_metadata(entry, info.metadata);
                     }
                     schema_infos.push_back(std::move(info));
@@ -993,7 +1029,7 @@ namespace snt::dip::hdf5 {
             std::set<std::string> ids;
             std::set<uint64_t> orders;
             const hsize_t count = object_count(manifest);
-            records.reserve(count);
+            records.reserve(checked_size(count, "unit-manifest count"));
             for (hsize_t index = 0; index < count; ++index) {
                 const std::string entry_name = object_name(manifest, index);
                 if (H5Gget_objtype_by_idx(manifest, index) != H5G_GROUP)
@@ -1013,7 +1049,10 @@ namespace snt::dip::hdf5 {
             std::sort(records.begin(), records.end(), [](const Record& left, const Record& right) { return left.order < right.order; });
             for (const auto& record : records) {
                 try {
-                    env.units.append(record.name, EnvUnit{record.name, record.definition, 0, record.id, static_cast<size_t>(record.order)});
+                    env.units.append(record.name, EnvUnit{
+                        record.name, record.definition, 0, record.id,
+                        checked_size(record.order, "unit registration order")
+                    });
                 } catch (const std::exception& error) {
                     throw dip::IOException("Invalid HDF5 unit manifest", "Unable to register custom unit `" + record.name + "`: " + error.what(), "Ensure unit definitions are valid and ordered by dependency.", __FILE__, __LINE__);
                 }
@@ -1256,7 +1295,7 @@ namespace snt::dip::hdf5 {
             Id root(H5Gopen2(file, path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the DIP dependency graph");
             DependencyGraph graph;
             graph.recorded = read_scalar<uint8_t>(root, "recorded", H5T_NATIVE_UINT8, 1) != 0;
-            const auto count = object_count(root);
+            const size_t count = checked_size(object_count(root), "dependency event count");
             for (size_t index = 0; index < count; ++index) {
                 Id entry(H5Gopen2(root, std::to_string(index).c_str(), H5P_DEFAULT), H5Gclose,
                          "Unable to open a DIP dependency event");
@@ -1268,7 +1307,9 @@ namespace snt::dip::hdf5 {
                 event.kind = static_cast<DependencyEventKind>(kind);
                 if (has_attribute(entry, "source"))
                     event.location = core::SourceLocation{
-                        read_string(entry, "source"), read_scalar<uint64_t>(entry, "line", H5T_NATIVE_UINT64),
+                        read_string(entry, "source"),
+                        checked_size(read_scalar<uint64_t>(entry, "line", H5T_NATIVE_UINT64),
+                                     "dependency event line number"),
                         has_attribute(entry, "code") ? std::optional<std::string>(read_string(entry, "code"))
                                                      : std::nullopt
                     };
@@ -1285,8 +1326,10 @@ namespace snt::dip::hdf5 {
                     Id composition(H5Gopen2(entry, "composition", H5P_DEFAULT), H5Gclose,
                                    "Unable to open a DIP operation tree");
                     event.composition.emplace();
-                    event.composition->root = read_scalar<uint64_t>(entry, "root", H5T_NATIVE_UINT64);
-                    const auto node_count = object_count(composition);
+                    event.composition->root = checked_size(
+                        read_scalar<uint64_t>(entry, "root", H5T_NATIVE_UINT64), "operation root index"
+                    );
+                    const size_t node_count = checked_size(object_count(composition), "operation node count");
                     for (size_t node_index = 0; node_index < node_count; ++node_index) {
                         Id item(H5Gopen2(composition, std::to_string(node_index).c_str(), H5P_DEFAULT), H5Gclose,
                                 "Unable to open a DIP operation node");
@@ -1305,7 +1348,7 @@ namespace snt::dip::hdf5 {
                             const auto value = std::stoull(child, &parsed);
                             if (parsed != child.size() || value >= node_count)
                                 throw Error("Invalid DIP operation child");
-                            node.children.push_back(value);
+                            node.children.push_back(checked_size(value, "operation child index"));
                         }
                         event.composition->nodes.push_back(std::move(node));
                     }

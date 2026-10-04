@@ -3,7 +3,10 @@
 The Homebrew and vcpkg recipes build the libraries and unified `snt` executable,
 including `snt server`. They declare HDF5 and cpp-httplib dependencies explicitly;
 GitHub source archives do not contain Git submodule contents. The archive-based
-recipes fetch the pinned header-only Brief++ source separately for DIP reports.
+recipes can fetch the pinned header-only Brief++ source separately for DIP reports.
+The vcpkg port enables reports with the `reports` feature
+(`scinumtools3[reports]`); its default build omits Brief++ and report generation.
+Source builds use `ENABLE_SNT_REPORT`, which defaults to on when DIP is enabled.
 Local source builds can initialize `external/briefpp` or set
 `SNT_BRIEFPP_INCLUDE_DIR`. Server builds accept `SNT_HTTPLIB_INCLUDE_DIR` and
 require cpp-httplib 0.46.0 or newer. Homebrew, vcpkg, and Conan include the

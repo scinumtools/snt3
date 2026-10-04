@@ -51,6 +51,7 @@ namespace snt::bind::python {
         export_format.value("YAML", dip::ExportFormat::YAML);
         export_format.export_values();
 
+#ifdef SNT_ENABLE_REPORT
         auto report_format = py::enum_<dip::report::ReportFormat>(m, "ReportFormat", "Output format for a DIP report.");
         report_format.value("TEX", dip::report::ReportFormat::Tex);
         report_format.value("PDF", dip::report::ReportFormat::Pdf);
@@ -60,6 +61,7 @@ namespace snt::bind::python {
         report_format.value("TYPST", dip::report::ReportFormat::Typst);
         report_format.value("TEXT", dip::report::ReportFormat::Text);
         report_format.value("JSON", dip::report::ReportFormat::Json);
+#endif
 
         auto nl = py::class_<dip::NodeList<dip::ValueNode>>(m, "NodeList", "Sequence of evaluated DIPL value nodes.");
         nl.def(py::init<>(), "Create an empty node list.");
@@ -136,6 +138,7 @@ namespace snt::bind::python {
             "Generate a static parameter list.\n\nArgs:\n    format: ExportFormat member selecting the output format.\n"
             "    file: Output path; an existing file is overwritten."
         );
+#ifdef SNT_ENABLE_REPORT
         env.def(
             "generate_report",
             [](const dip::Environment& e, dip::report::ReportFormat format, const std::filesystem::path& file,
@@ -159,6 +162,7 @@ namespace snt::bind::python {
             py::arg("date") = "", py::arg("version") = "",
             "Write a report from this evaluated environment. PDF requires a local TeX compiler."
         );
+#endif
 
         env.def(
             "select",

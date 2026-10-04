@@ -25,5 +25,10 @@
       "name": "libx11",
       "platform": "linux"
     }
-  ]
+  ],
+  "features": {
+    "reports": {
+      "description": "Build DIP report support with Brief++"
+    }
+  }
 }

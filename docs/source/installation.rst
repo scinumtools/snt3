@@ -55,6 +55,9 @@ SciNumTools is available as a vcpkg package:
 
    ./vcpkg install scinumtools3
 
+The local vcpkg port builds report support with the ``reports`` feature:
+``./vcpkg install 'scinumtools3[reports]'``. The feature fetches Brief++.
+
 On Windows, use ``bootstrap-vcpkg.bat`` instead of
 ``bootstrap-vcpkg.sh``.
 
@@ -117,6 +120,8 @@ Alternatively, set ``SNT_BRIEFPP_INCLUDE_DIR`` to a directory containing
 server. Alternatively, install cpp-httplib 0.46.0 or newer and set
 ``SNT_HTTPLIB_INCLUDE_DIR`` to its header directory. Builds with
 ``-DENABLE_SNT_SERVER=OFF`` do not need cpp-httplib.
+Builds with ``-DENABLE_SNT_REPORT=OFF`` omit report generation and do not need
+Brief++. The report option defaults to on when DIP is enabled.
 
 .. code-block:: console
 

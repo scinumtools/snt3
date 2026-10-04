@@ -1,0 +1,183 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2e2d7eb4..5f38abc8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -125,6 +125,11 @@ set_module_options(API ON "${ENABLE_BINDING_PYTHON}" "${ENABLE_UNIT_TESTS}")
+ if(ENABLE_DIP)
+     find_package(HDF5 REQUIRED COMPONENTS C)
+ endif()
++option(ENABLE_SNT_REPORT "Enable DIP report generation" "${ENABLE_DIP}")
++message(STATUS "ENABLE_SNT_REPORT            ${ENABLE_SNT_REPORT}")
++if(ENABLE_SNT_REPORT AND NOT ENABLE_DIP)
++    message(FATAL_ERROR "snt report requires ENABLE_DIP.")
++endif()
+ 
+ # enable building of executables
+ option(ENABLE_EXEC_APPS "Enable build of SNT application" ON)
+diff --git a/apps/snt-server/dip.cpp b/apps/snt-server/dip.cpp
+index 125f6adb..3b84216c 100644
+--- a/apps/snt-server/dip.cpp
++++ b/apps/snt-server/dip.cpp
+@@ -167,6 +167,7 @@ namespace snt::server {
+             return {std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
+         }
+ 
++#ifdef SNT_ENABLE_REPORT
+         dip::report::ReportFormat report_format(const httplib::Request& request) {
+             const auto format = request.has_param("format") ? request.get_param_value("format") : "tex";
+             if (format == "tex") return dip::report::ReportFormat::Tex;
+@@ -204,6 +205,7 @@ namespace snt::server {
+             if (request.has_param("version")) options.version = request.get_param_value("version");
+             return options;
+         }
++#endif
+ 
+         std::size_t compare_count(const httplib::Request& request, const char* name, std::size_t fallback) {
+             if (!request.has_param(name)) return fallback;
+@@ -277,6 +279,7 @@ namespace snt::server {
+                 else response.set_content(comparison_json(result, max_details), "application/json");
+             });
+         });
++#ifdef SNT_ENABLE_REPORT
+         server.Post("/snt/dip/report", [](const httplib::Request& request, httplib::Response& response) {
+             handle_response(response, [&] {
+                 const auto format = report_format(request);
+@@ -292,6 +295,7 @@ namespace snt::server {
+                 response.set_content(read_binary_file(output), content_type);
+             });
+         });
++#endif
+         server.Post("/snt/dip/parse", [](const httplib::Request& request, httplib::Response& response) {
+             if (request.has_param("output")) {
+                 handle_response(response, [&] {
+diff --git a/apps/snt/CMakeLists.txt b/apps/snt/CMakeLists.txt
+index 35e47a4b..5feb37de 100644
+--- a/apps/snt/CMakeLists.txt
++++ b/apps/snt/CMakeLists.txt
+@@ -2,6 +2,9 @@
+ set(EXEC_NAME snt)
+ 
+ file(GLOB EXEC_FILES "./*.cpp" "./**/*.cpp")
++if(NOT ENABLE_SNT_REPORT)
++  list(FILTER EXEC_FILES EXCLUDE REGEX "/module_report\\.cpp$")
++endif()
+ add_executable(${EXEC_NAME} ${EXEC_FILES} )
+ 
+ target_include_directories(${EXEC_NAME}
+@@ -56,11 +59,13 @@ if(ENABLE_UNIT_TESTS)
+   add_test(NAME cli.generated.cpp-values COMMAND $<TARGET_FILE:snt-generated-parameters-cpp>)
+   add_test(NAME cli.generated.c-values COMMAND $<TARGET_FILE:snt-generated-parameters-c>)
+ 
+-  add_test(NAME cli.report
+-    COMMAND ${CMAKE_COMMAND}
+-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+-      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/report"
+-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/report.cmake")
++  if(ENABLE_SNT_REPORT)
++    add_test(NAME cli.report
++      COMMAND ${CMAKE_COMMAND}
++        "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
++        "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/report"
++        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/report.cmake")
++  endif()
+   add_test(
+     NAME cli.dip.persistence
+     COMMAND ${CMAKE_COMMAND}
+@@ -105,6 +110,7 @@ if(ENABLE_UNIT_TESTS)
+       "-DSERVER_ENABLED=${ENABLE_SNT_SERVER}"
+       "-DDMAP_ENABLED=${ENABLE_SNT_DMAP}"
+       "-DVIEW_ENABLED=${ENABLE_SNT_VIEW}"
++      "-DREPORT_ENABLED=${ENABLE_SNT_REPORT}"
+       -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/commands.cmake")
+ endif()
+ 
+diff --git a/apps/snt/main.cpp b/apps/snt/main.cpp
+index 63d2f4f8..72961ed0 100644
+--- a/apps/snt/main.cpp
++++ b/apps/snt/main.cpp
+@@ -25,7 +25,7 @@ Options:
+ 
+ Modules:
+   dip     Dimensional Input Parameters
+-  report  Generate a DIP report in TeX, PDF, and other formats
++  report  Generate a DIP report (optional build feature)
+   puq     Physical Units & Quantities
+   dmap    Regenerate PUQ dimension-map headers (developer tool; optional)
+   server  REST API server (optional build feature)
+@@ -89,7 +89,11 @@ int main(int argc, char* argv[]) {
+             } else if (mod == "dip") {
+                 module_dip(argpar);
+             } else if (mod == "report") {
++#ifdef SNT_ENABLE_REPORT
+                 module_report(argpar);
++#else
++                throw std::runtime_error("Report support is not included in this build. Configure with ENABLE_SNT_REPORT=ON.");
++#endif
+             } else {
+                 throw std::runtime_error("Unknown module: " + mod + ". Use snt --help.");
+             }
+diff --git a/src/snt/dip/CMakeLists.txt b/src/snt/dip/CMakeLists.txt
+index 15d94144..cc3cbd91 100644
+--- a/src/snt/dip/CMakeLists.txt
++++ b/src/snt/dip/CMakeLists.txt
+@@ -1,18 +1,28 @@
+ # build library
+-find_path(SNT_BRIEFPP_INCLUDE_DIR briefpp/report.hpp
+-  HINTS "${PROJECT_SOURCE_DIR}/external/briefpp/include"
+-  DOC "Directory containing briefpp/report.hpp")
+-if(NOT SNT_BRIEFPP_INCLUDE_DIR)
+-  message(FATAL_ERROR
+-    "DIP reports require Brief++. Initialize external/briefpp or set SNT_BRIEFPP_INCLUDE_DIR.")
++if(ENABLE_SNT_REPORT)
++  find_path(SNT_BRIEFPP_INCLUDE_DIR briefpp/report.hpp
++    HINTS "${PROJECT_SOURCE_DIR}/external/briefpp/include"
++    DOC "Directory containing briefpp/report.hpp")
++  if(NOT SNT_BRIEFPP_INCLUDE_DIR)
++    message(FATAL_ERROR
++      "DIP reports require Brief++. Initialize external/briefpp or set SNT_BRIEFPP_INCLUDE_DIR.")
++  endif()
+ endif()
+ file(GLOB SOURCE_FILES "./*.cpp" "./**/*.cpp")
++if(ENABLE_SNT_REPORT)
++  list(FILTER SOURCE_FILES EXCLUDE REGEX "/report/disabled\\.cpp$")
++else()
++  list(FILTER SOURCE_FILES EXCLUDE REGEX "/report/(compiler|model|renderer|report)\\.cpp$")
++endif()
+ set(EXEC_NAME snt-dip)
+ 
+ add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
+ # snt-dip is static.  HDF5 must therefore propagate to every final binary
+ # that consumes it, including the Python extension built for wheels.
+ target_link_libraries(${EXEC_NAME} PUBLIC snt-puq HDF5::HDF5)
++if(ENABLE_SNT_REPORT)
++  target_compile_definitions(${EXEC_NAME} PUBLIC SNT_ENABLE_REPORT)
++endif()
+ 
+ target_include_directories(${EXEC_NAME}
+   PUBLIC	
+@@ -20,7 +30,7 @@ target_include_directories(${EXEC_NAME}
+     $<INSTALL_INTERFACE:include>
+   PRIVATE
+     ${PROJECT_SOURCE_DIR}/src
+-    ${SNT_BRIEFPP_INCLUDE_DIR}
++    $<$<BOOL:${ENABLE_SNT_REPORT}>:${SNT_BRIEFPP_INCLUDE_DIR}>
+ )
+ 
+ set_target_properties(${EXEC_NAME} PROPERTIES
+diff --git a/src/snt/dip/report/disabled.cpp b/src/snt/dip/report/disabled.cpp
+new file mode 100644
+index 00000000..95874542
+--- /dev/null
++++ b/src/snt/dip/report/disabled.cpp
+@@ -0,0 +1,11 @@
++#include <snt/dip/report/report.h>
++
++#include <stdexcept>
++
++namespace snt::dip::report {
++
++void generate(const dip::Environment&, ReportFormat, const std::filesystem::path&, const ReportOptions&) {
++    throw std::runtime_error("Report support is not included in this build. Configure with ENABLE_SNT_REPORT=ON.");
++}
++
++} // namespace snt::dip::report

@@ -148,6 +148,68 @@ TEST(Environment, RejectsCorruptModificationHistoryWithoutReplacingEnvironment) 
     std::filesystem::remove(file);
 }
 
+TEST(Environment, ChecksModificationLineNumberAgainstSizeT) {
+    dip::DIP parser;
+    parser.add_string("answer int = 1\nanswer = 2\n");
+    const auto file = environment_file("large-modification-line");
+    parser.parse().save(file);
+    constexpr uint64_t large_line = uint64_t{1} << 32;
+    {
+        H5Handle h5file(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        ASSERT_GE(static_cast<hid_t>(h5file), 0);
+        H5Handle dataset(H5Dopen2(h5file, "/answer", H5P_DEFAULT), H5Dclose);
+        ASSERT_GE(static_cast<hid_t>(dataset), 0);
+        constexpr const char* name = "_DIPL_Modification_Lines";
+        ASSERT_GE(H5Adelete(dataset, name), 0);
+        const hsize_t count = 1;
+        H5Handle space(H5Screate_simple(1, &count, nullptr), H5Sclose);
+        H5Handle type(H5Tcopy(H5T_C_S1), H5Tclose);
+        ASSERT_GE(H5Tset_size(type, 11), 0);
+        H5Handle attribute(H5Acreate2(dataset, name, type, space, H5P_DEFAULT, H5P_DEFAULT), H5Aclose);
+        ASSERT_GE(static_cast<hid_t>(attribute), 0);
+        const char text[11] = "4294967296";
+        ASSERT_GE(H5Awrite(attribute, type, text), 0);
+    }
+
+    dip::Environment loaded;
+    if (large_line > std::numeric_limits<size_t>::max()) {
+        EXPECT_THROW(loaded.load(file), dip::IOException);
+    } else {
+        loaded.load(file);
+        ASSERT_EQ(loaded.get_node("answer")->modification_lines.size(), 1);
+        EXPECT_EQ(loaded.get_node("answer")->modification_lines.front().source.line_number, large_line);
+    }
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, ChecksDependencyEventLineNumberAgainstSizeT) {
+    dip::DIP parser;
+    parser.add_string("answer int = 1\n");
+    const auto file = environment_file("large-dependency-line");
+    parser.parse(true).save(file);
+    constexpr uint64_t large_line = uint64_t{1} << 32;
+    {
+        H5Handle h5file(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        ASSERT_GE(static_cast<hid_t>(h5file), 0);
+        H5Handle event(H5Gopen2(h5file, "/_DIPL_Dependencies/0", H5P_DEFAULT), H5Gclose);
+        ASSERT_GE(static_cast<hid_t>(event), 0);
+        H5Handle attribute(H5Aopen(event, "line", H5P_DEFAULT), H5Aclose);
+        ASSERT_GE(static_cast<hid_t>(attribute), 0);
+        ASSERT_GE(H5Awrite(attribute, H5T_NATIVE_UINT64, &large_line), 0);
+    }
+
+    dip::Environment loaded;
+    if (large_line > std::numeric_limits<size_t>::max()) {
+        EXPECT_THROW(loaded.load(file), dip::IOException);
+    } else {
+        loaded.load(file);
+        ASSERT_FALSE(loaded.dependency_graph().events.empty());
+        ASSERT_TRUE(loaded.dependency_graph().events.front().location.has_value());
+        EXPECT_EQ(loaded.dependency_graph().events.front().location->line, large_line);
+    }
+    std::filesystem::remove(file);
+}
+
 TEST(Environment, ExtendedMetadataHdf5RoundTrip) {
     dip::DIP parser;
     parser.add_string(

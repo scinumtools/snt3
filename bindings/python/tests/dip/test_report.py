@@ -5,6 +5,8 @@ import pytest
 
 from scinumtools3.dip import DIP, Environment, ReportFormat
 
+pytestmark = pytest.mark.skipif(ReportFormat is None, reason="DIP reports are disabled")
+
 
 def test_generate_report_from_parsed_and_loaded_environment(tmp_path: Path):
     parser = DIP()

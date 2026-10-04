@@ -2,6 +2,9 @@
 set(EXEC_NAME snt)
 
 file(GLOB EXEC_FILES "./*.cpp" "./**/*.cpp")
+if(NOT ENABLE_SNT_REPORT)
+  list(FILTER EXEC_FILES EXCLUDE REGEX "/module_report\\.cpp$")
+endif()
 add_executable(${EXEC_NAME} ${EXEC_FILES} )
 
 target_include_directories(${EXEC_NAME}
@@ -56,11 +59,13 @@ if(ENABLE_UNIT_TESTS)
   add_test(NAME cli.generated.cpp-values COMMAND $<TARGET_FILE:snt-generated-parameters-cpp>)
   add_test(NAME cli.generated.c-values COMMAND $<TARGET_FILE:snt-generated-parameters-c>)
 
-  add_test(NAME cli.report
-    COMMAND ${CMAKE_COMMAND}
-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/report"
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/report.cmake")
+  if(ENABLE_SNT_REPORT)
+    add_test(NAME cli.report
+      COMMAND ${CMAKE_COMMAND}
+        "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+        "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/report"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/report.cmake")
+  endif()
   add_test(
     NAME cli.dip.persistence
     COMMAND ${CMAKE_COMMAND}
@@ -105,6 +110,7 @@ if(ENABLE_UNIT_TESTS)
       "-DSERVER_ENABLED=${ENABLE_SNT_SERVER}"
       "-DDMAP_ENABLED=${ENABLE_SNT_DMAP}"
       "-DVIEW_ENABLED=${ENABLE_SNT_VIEW}"
+      "-DREPORT_ENABLED=${ENABLE_SNT_REPORT}"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/commands.cmake")
 endif()
 

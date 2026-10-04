@@ -3,14 +3,26 @@ vcpkg_from_github(
     REPO vrtulka23/scinumtools3
     REF v0.9.0
     SHA512 90a8f9764e4f06ef51399c41b3c2ac0ed062dad19e2bb996f4b9af06a3f5b097a6fdde7985a6deaf757ad907fc847024ef5281721fd02e53ca0d9f11b39d539d
+    # Remove these patches when REF points to a release containing both changes.
+    PATCHES
+        fix-diph5-size-t.patch
+        optional-report.patch
 )
 
-vcpkg_from_github(
-    OUT_SOURCE_PATH BRIEFPP_SOURCE_PATH
-    REPO vrtulka23/briefpp
-    REF 624aa478149a0fa0e7213bb7cfb6d19615d6e771
-    SHA512 1697cef47f04dd2105f0026ff36ee200ea86e450e38f58403d11f5eb213e82bba2b5b16d1d887599b518f0e1906a1cc56aebc6f76bb5cc7e150603b6a55476a1
-)
+if("reports" IN_LIST FEATURES)
+    vcpkg_from_github(
+        OUT_SOURCE_PATH BRIEFPP_SOURCE_PATH
+        REPO vrtulka23/briefpp
+        REF 624aa478149a0fa0e7213bb7cfb6d19615d6e771
+        SHA512 1697cef47f04dd2105f0026ff36ee200ea86e450e38f58403d11f5eb213e82bba2b5b16d1d887599b518f0e1906a1cc56aebc6f76bb5cc7e150603b6a55476a1
+    )
+    set(REPORT_OPTIONS
+        -DENABLE_SNT_REPORT=ON
+        -DSNT_BRIEFPP_INCLUDE_DIR=${BRIEFPP_SOURCE_PATH}/include
+    )
+else()
+    set(REPORT_OPTIONS -DENABLE_SNT_REPORT=OFF)
+endif()
 
 vcpkg_from_github(
     OUT_SOURCE_PATH IMGUI_SOURCE_PATH
@@ -48,11 +60,11 @@ vcpkg_cmake_configure(
         -DENABLE_EXEC_APPS_SNT=ON
         -DENABLE_SNT_SERVER=ON
         -DENABLE_SNT_VIEW=ON
+        ${REPORT_OPTIONS}
         # Keep the bundled GLFW inside snt and use the X11 backend on Linux.
         -DGLFW_LIBRARY_TYPE=STATIC
         -DGLFW_BUILD_WAYLAND=OFF
         -DSNT_HTTPLIB_INCLUDE_DIR=${CURRENT_INSTALLED_DIR}/include
-        -DSNT_BRIEFPP_INCLUDE_DIR=${BRIEFPP_SOURCE_PATH}/include
         -DCMAKE_INSTALL_BINDIR=tools/${PORT}
         -DENABLE_SNT_DMAP=ON
         -DENABLE_EXEC_EXAMPLES=OFF

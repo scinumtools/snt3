@@ -197,6 +197,7 @@ TEST_F(Environment, Generate) {
     std::filesystem::remove(file);
 }
 
+#ifdef SNT_ENABLE_REPORT
 TEST_F(Environment, GenerateReport) {
     const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-report.tex";
     ASSERT_EQ(snt_dip_environment_generate_report(
@@ -251,6 +252,15 @@ TEST(DIPReport, RecordedCalculation) {
     std::filesystem::remove(file);
     snt_dip_parser_free(parser);
 }
+#else
+TEST_F(Environment, ReportDisabled) {
+    const auto file = std::filesystem::temp_directory_path() / "scinumtools3-cabi-disabled-report.tex";
+    EXPECT_NE(snt_dip_environment_generate_report(
+        dip, SNT_DIP_REPORT_TEX, file.string().c_str(), nullptr, nullptr, nullptr, &error), 0);
+    ASSERT_NE(error.message, nullptr);
+    EXPECT_NE(std::string(error.message).find("ENABLE_SNT_REPORT=ON"), std::string::npos);
+}
+#endif
 
 TEST(DIP, RegisterSchema) {
     snt_dip* parser = nullptr;

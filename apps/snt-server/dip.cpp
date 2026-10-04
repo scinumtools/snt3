@@ -167,6 +167,7 @@ namespace snt::server {
             return {std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
         }
 
+#ifdef SNT_ENABLE_REPORT
         dip::report::ReportFormat report_format(const httplib::Request& request) {
             const auto format = request.has_param("format") ? request.get_param_value("format") : "tex";
             if (format == "tex") return dip::report::ReportFormat::Tex;
@@ -204,6 +205,7 @@ namespace snt::server {
             if (request.has_param("version")) options.version = request.get_param_value("version");
             return options;
         }
+#endif
 
         std::size_t compare_count(const httplib::Request& request, const char* name, std::size_t fallback) {
             if (!request.has_param(name)) return fallback;
@@ -277,6 +279,7 @@ namespace snt::server {
                 else response.set_content(comparison_json(result, max_details), "application/json");
             });
         });
+#ifdef SNT_ENABLE_REPORT
         server.Post("/snt/dip/report", [](const httplib::Request& request, httplib::Response& response) {
             handle_response(response, [&] {
                 const auto format = report_format(request);
@@ -292,6 +295,7 @@ namespace snt::server {
                 response.set_content(read_binary_file(output), content_type);
             });
         });
+#endif
         server.Post("/snt/dip/parse", [](const httplib::Request& request, httplib::Response& response) {
             if (request.has_param("output")) {
                 handle_response(response, [&] {

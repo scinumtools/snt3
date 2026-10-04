@@ -18,6 +18,10 @@ Building from source
   using the ``cmake -G Ninja`` commands in the installation guide.
 * **DIP:** HDF5 development headers and the HDF5 C library are required when
   DIP is enabled, which is the default. The HDF5 C++ library is not required.
+* **DIP reports:** Brief++ headers are required when
+  ``ENABLE_SNT_REPORT=ON`` (the default when DIP is enabled). Set
+  ``-DENABLE_SNT_REPORT=OFF`` to omit report generation and its Brief++
+  dependency.
 * **Python bindings:** the default build enables them and needs a Python 3
   interpreter and development files. CMake uses an installed pybind11 or
   downloads it when needed. Set ``-DENABLE_BINDING_PYTHON=OFF`` for a build
@@ -39,8 +43,8 @@ Included with the source checkout
 
 Clone with ``--recurse-submodules`` to include Brief++ for DIP reports,
 cpp-httplib for ``snt server``, and GLFW and Dear ImGui for ``snt view``.
-Brief++ is needed when DIP is enabled; the other submodules are needed only
-when their corresponding optional commands are enabled. An ordinary clone
+Brief++ is needed when DIP reports are enabled; the other submodules are needed
+only when their corresponding optional commands are enabled. An ordinary clone
 can fetch them later with ``git submodule update --init --recursive``. The
 installation guide also describes how to use separately installed copies
 of Brief++ and cpp-httplib.

@@ -25,7 +25,7 @@ Options:
 
 Modules:
   dip     Dimensional Input Parameters
-  report  Generate a DIP report in TeX, PDF, and other formats
+  report  Generate a DIP report (optional build feature)
   puq     Physical Units & Quantities
   dmap    Regenerate PUQ dimension-map headers (developer tool; optional)
   server  REST API server (optional build feature)
@@ -89,7 +89,11 @@ int main(int argc, char* argv[]) {
             } else if (mod == "dip") {
                 module_dip(argpar);
             } else if (mod == "report") {
+#ifdef SNT_ENABLE_REPORT
                 module_report(argpar);
+#else
+                throw std::runtime_error("Report support is not included in this build. Configure with ENABLE_SNT_REPORT=ON.");
+#endif
             } else {
                 throw std::runtime_error("Unknown module: " + mod + ". Use snt --help.");
             }

@@ -1,6 +1,12 @@
 Report generation
 =================
 
+Configure with ``-DENABLE_SNT_REPORT=ON`` to build report generation (the
+default when DIP is enabled). ``-DENABLE_SNT_REPORT=OFF`` removes the Brief++
+dependency. In a report-disabled build, the C++ and C report entry points
+return an error, while the CLI command, Python binding, and REST route are
+unavailable.
+
 ``snt::dip::report::generate`` writes a report from an evaluated
 ``snt::dip::Environment``. The application-facing
 ``snt::api::generate_dip_report`` calls the same generator. Both use the
