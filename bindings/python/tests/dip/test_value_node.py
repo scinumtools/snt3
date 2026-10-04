@@ -108,10 +108,16 @@ def test_value_integer():
     # numpy value
     node = ValueNode("foo.bar", np.array([[1, 2, 3], [4, 5, 6]]))
     val = node.to_numpy()
-    assert val.dtype  == np.int_
+    assert val.dtype == np.int64
     np.testing.assert_array_equal(val, np.array([[1, 2, 3], [4, 5, 6]]))
     assert node.shape == [2,3]
     assert node.dtype == DataType.Integer64
+
+    # Explicit narrow integer arrays must be converted without losing values.
+    node = ValueNode("foo.bar", np.array([[-1, 2], [3, 4]], dtype=np.int32))
+    val = node.to_numpy()
+    assert val.dtype == np.int64
+    np.testing.assert_array_equal(val, [[-1, 2], [3, 4]])
     
     # with units
     node = ValueNode("foo.bar", 3, "cm")

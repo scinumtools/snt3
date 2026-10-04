@@ -78,12 +78,12 @@ def test_value_integer():
 
     val = env.request_value("?snap", as_numpy=True)
     assert isinstance(val, np.ndarray)
-    assert val.dtype == np.int_
+    assert val.dtype == np.int64
     np.testing.assert_array_equal(val, np.array(3))
 
     val = env.request_value("?pop", as_numpy=True)
     assert isinstance(val, np.ndarray)
-    assert val.dtype == np.int_
+    assert val.dtype == np.int64
     assert val.shape == (2,3)
     np.testing.assert_array_equal(val, np.array([[1,2,3],[4,5,6]]))
     

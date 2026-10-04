@@ -52,6 +52,17 @@ exposes one evaluated and validated environment to every part of an
 application. The result is less duplicated glue code and a clearer boundary
 between a scientific model's assumptions and its implementation.
 
+## AI-assisted scientific setup
+
+AI assistants, including large language models (LLMs), can draft scientific
+setups, but those drafts need explicit checks. DIPL gives them a readable,
+structured description of run settings and references to initial-condition
+files. SciNumTools checks declared types, units, constraints, and dependencies;
+a code-specific adapter can check further requirements and write the code's
+native input files. This makes an AI-assisted setup easier to inspect and test
+before a run. Scientific review is still needed to judge whether the choices
+are physically appropriate.
+
 ## One parameter layer for many scientific codes
 
 <a href="https://vrtulka23.github.io/scinumtools3/initiative.html"><img align="left" src="docs/img/snt-initiative-readme.png" alt="A parameter model is validated and translated into a scientific code's native input file" width="180" height="180" hspace="16" style="margin-right:30px"></a>
@@ -62,6 +73,8 @@ DIPL definition into its existing native input file, while SciNumTools handles
 units, constraints, dependencies, and parameter documentation. The first step
 keeps the solver and its native parser in place. [Read about the initiative
 and see the full flyer](https://vrtulka23.github.io/scinumtools3/initiative.html).
+The long-term aim is direct integration where a project judges the model and
+tooling stable and trustworthy.
 
 <br clear="left">
 

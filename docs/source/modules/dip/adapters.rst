@@ -8,6 +8,12 @@ files. The adapter decides which values to use, how to validate them, and the
 names and formats of the resulting files. A single adapter can register zero,
 one, or many files.
 
+For AI-assisted setup of an established simulation code, DIPL can describe run
+settings and references to initial-condition inputs. An adapter can check
+code-specific requirements and generate the program's normal parameter file.
+These checks catch interface errors; they do not establish that the setup is
+physically appropriate.
+
 Derive from ``snt::dip::Adapter`` and register text, binary, or streamed
 content in ``plan()``. All paths are relative to the output directory.
 

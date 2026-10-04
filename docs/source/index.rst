@@ -26,6 +26,12 @@ DIP environments can be persisted in the DIPH5 HDF5 format for exchange and
 later reuse, or exported as native C++, C, Fortran, Rust, or Julia parameters,
 as well as JSON and YAML data files.
 
+For AI-assisted scientific setup, DIPL provides explicit rules against which
+proposed settings can be checked. A project-specific adapter can validate
+additional requirements, including references to initial-condition files,
+before producing the code's native input. See :doc:`initiative` for this
+approach and its path toward deeper integration.
+
 .. toctree::
    :maxdepth: 2
    :caption: Getting Started

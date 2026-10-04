@@ -176,9 +176,10 @@ namespace snt::bind::python {
             val::Array::ShapeType shape(info.shape.begin(), info.shape.end());
             return std::make_unique<val::ArrayValue<uint8_t>>(data, shape, core::DataType::Boolean);
 
-        } else if (array.dtype().is(py::dtype::of<int64_t>())) {
+        } else if (array.dtype().kind() == 'i' && info.itemsize <= sizeof(int64_t)) {
 
-            // integers
+            // NumPy's default integer width depends on the platform. Normalize
+            // signed integer arrays to the Integer64 value type.
             py::array_t<int64_t, py::array::c_style | py::array::forcecast> int_array(array);
             py::buffer_info int_info = int_array.request();
             const int64_t* ptr = static_cast<const int64_t*>(int_info.ptr);
@@ -210,7 +211,7 @@ namespace snt::bind::python {
             throw dip::PybindException(
                 "Unsupported NumPy data type",
                 "The NumPy array has an unsupported data format: `" + info.format + "`.",
-                "Provide a NumPy array with dtype `bool`, `int64`, or `float64`.",
+                "Provide a NumPy array with dtype `bool`, a signed integer type up to 64 bits, `float64`, or a string type.",
                 __FILE__,
                 __LINE__
             );

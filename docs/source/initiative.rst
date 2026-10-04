@@ -25,8 +25,28 @@ The first integration is a compatibility layer around an existing program:
 
 The code's numerical methods, solver, and native input format remain under
 the project's control. Existing native files can still be used. Direct DIPL
-integration can be considered later if a project wants it; the wrapper is a
-starting point rather than a limit on future integration.
+integration is the longer-term aim where the parameter model and tooling have
+earned enough stability and trust. The external adapter is a practical first
+step. An independent proof of concept can test whether DIPL faithfully
+represents an established code's interface without implying upstream
+participation or endorsement.
+
+AI-assisted setup with explicit checks
+--------------------------------------
+
+A DIPL definition is plain text with explicit types, units, constraints, and
+relationships. Researchers and AI assistants, including those based on large
+language models, can inspect and edit the same setup description. This could
+help automate the preparation of run settings and parameters that describe or
+refer to initial-condition inputs. A project-specific adapter can check
+additional requirements of the target code, including relationships between
+settings and referenced input files, before generating its native parameter
+file.
+
+These tools can propose setups, but plausible text alone is not evidence that
+a simulation is configured correctly. Explicit validation
+can catch missing or inconsistent inputs before a run; scientific judgment is
+still needed to assess whether the chosen setup is physically appropriate.
 
 What a shared parameter model can offer
 ---------------------------------------
@@ -56,9 +76,8 @@ subscription or hidden cost. Participating projects retain their own
 governance and would be asked to provide an appropriate reference to the
 collaboration in their documentation, website, or a paper.
 
-If you maintain or use a suitable scientific code, contact
-`vrtulka23@pm.me <mailto:vrtulka23@pm.me>`_ or visit the
-`SciNumTools3 repository <https://github.com/vrtulka23/scinumtools3>`_.
+If you maintain or use a suitable scientific code, start a discussion in the
+project's issue tracker.
 
 The initiative flyer
 --------------------
