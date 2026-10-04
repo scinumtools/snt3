@@ -39,28 +39,41 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          architecture: x86
+
+      - name: Install x86 Python dependencies
+        run: python -m pip install numpy pytest pytest-cmake pytest-benchmark pybind11
+
       - name: Install x86 dependencies
         run: vcpkg install hdf5:x86-windows gtest:x86-windows
 
-      - name: Configure x86 DIP tests
+      - name: Configure x86 source build
         run: >-
           cmake -S . -B build-x86 -G "Visual Studio 17 2022" -A Win32
           -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
           -DVCPKG_TARGET_TRIPLET=x86-windows
           -DHDF5_ROOT=C:/vcpkg/installed/x86-windows
           -DENABLE_UNIT_TESTS=ON
-          -DENABLE_DIP=ON
-          -DENABLE_BINDING_PYTHON=OFF
-          -DENABLE_BINDING_C=OFF
-          -DENABLE_EXEC_APPS=OFF
-          -DENABLE_EXEC_EXAMPLES=OFF
-          -DENABLE_MAT=OFF
+          -DENABLE_BINDING_PYTHON=ON
+          -DENABLE_BINDING_C=ON
+          -DENABLE_EXEC_APPS=ON
+          -DENABLE_EXEC_EXAMPLES=ON
+          -DENABLE_MAT=ON
+          -DENABLE_SNT_REPORT=ON
+          -DENABLE_SNT_SERVER=ON
+          -DENABLE_SNT_VIEW=ON
 
-      - name: Build x86 DIP tests
-        run: cmake --build build-x86 --config Release --target gtest-dip --parallel 4
+      - name: Build x86 source
+        run: cmake --build build-x86 --config Release --parallel 4
 
       - name: Test x86 DIPH5 conversions
         run: ctest --test-dir build-x86 -C Release -R "Environment.Checks.*SizeT" --output-on-failure
+
+      - name: Test x86 source
+        run: ctest --test-dir build-x86 -C Release --output-on-failure
 
       - name: Install x86 vcpkg port
         run: vcpkg install scinumtools3:x86-windows --overlay-ports=packaging/vcpkg

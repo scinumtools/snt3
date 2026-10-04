@@ -1,18 +1,23 @@
 # build test
 file(GLOB TEST_FILES "*.cpp")
+if(NOT ENABLE_EXEC_EXAMPLES)
+    list(REMOVE_ITEM TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test_examples.cpp")
+endif()
 set(EXEC_NAME gtest-exs)
 
 add_executable(${EXEC_NAME} ${TEST_FILES})
 
 # Here we have to define correct build paths for the examples
 # Using Make/Ninja uses 'bin' directory, but Visual Studio uses 'bin/Release', 'bin/Debug', ...
-target_compile_definitions(${EXEC_NAME} PRIVATE
-    EXAMPLE_SOLVER_UNIQUE_PTR="$<TARGET_FILE:ExampleSolverUniquePtr>"
-    EXAMPLE_SOLVER_CUSTOM="$<TARGET_FILE:ExampleSolverCustom>"
-    EXAMPLE_SOLVER_DEFAULT="$<TARGET_FILE:ExampleSolverDefault>"
-    EXAMPLE_SOLVER_ARRAY="$<TARGET_FILE:ExampleSolverArray>"
-    EXAMPLE_SOLVER_SETTINGS="$<TARGET_FILE:ExampleSolverSettings>"
-)
+if(ENABLE_EXEC_EXAMPLES)
+    target_compile_definitions(${EXEC_NAME} PRIVATE
+        EXAMPLE_SOLVER_UNIQUE_PTR="$<TARGET_FILE:ExampleSolverUniquePtr>"
+        EXAMPLE_SOLVER_CUSTOM="$<TARGET_FILE:ExampleSolverCustom>"
+        EXAMPLE_SOLVER_DEFAULT="$<TARGET_FILE:ExampleSolverDefault>"
+        EXAMPLE_SOLVER_ARRAY="$<TARGET_FILE:ExampleSolverArray>"
+        EXAMPLE_SOLVER_SETTINGS="$<TARGET_FILE:ExampleSolverSettings>"
+    )
+endif()
 
 target_include_directories(${EXEC_NAME}
   PRIVATE
