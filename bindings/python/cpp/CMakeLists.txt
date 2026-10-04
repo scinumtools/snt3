@@ -59,6 +59,17 @@ add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
         "${CMAKE_BINARY_DIR}/python/scinumtools3/"
 )
 
+# vcpkg places DLL dependencies beside the module in the configuration
+# directory (for example, Release). Copy them with the .pyd used by pytest.
+if(WIN32 AND CMAKE_CONFIGURATION_TYPES)
+    add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "$<TARGET_FILE_DIR:${MODULE_NAME}>"
+            "${CMAKE_BINARY_DIR}/python/scinumtools3"
+        VERBATIM
+    )
+endif()
+
 # this needs to be here, so that ctest notice it!
 if(
     ENABLE_CORE_PYTEST OR

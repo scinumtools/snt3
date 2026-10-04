@@ -72,6 +72,12 @@ jobs:
       - name: Test x86 DIPH5 conversions
         run: ctest --test-dir build-x86 -C Release -R "Environment.Checks.*SizeT" --output-on-failure
 
+      - name: Verify x86 Python extension imports
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = Join-Path $env:GITHUB_WORKSPACE 'build-x86/python'
+          python -c "import scinumtools3; print(scinumtools3.__file__)"
+
       - name: Test x86 source
         run: ctest --test-dir build-x86 -C Release --output-on-failure
 
