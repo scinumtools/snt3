@@ -76,10 +76,16 @@ source repository:
    conan create .
 
 The Conan package installs the C++ libraries and the ``snt`` executable with
-``server`` and ``view`` commands. The server and viewer are enabled
-by default. The viewer requires the platform's OpenGL and window-system
-development libraries; Conan options ``with_server=False`` and
-``with_viewer=False`` can disable either feature when creating the package.
+server, viewer, and report support enabled by default. The viewer requires the
+platform's OpenGL and window-system development libraries. Conan options
+``with_server=False``, ``with_viewer=False``, and ``with_reports=False`` disable
+the corresponding feature and its bundled dependency. For example, create a
+package without the three features using:
+
+.. code-block:: console
+
+   conan create . -o 'scinumtools3/*:with_server=False' -o 'scinumtools3/*:with_viewer=False' -o 'scinumtools3/*:with_reports=False'
+
 To put ``snt`` on ``PATH`` in a consuming project, add
 ``scinumtools3/0.9.0`` under ``[tool_requires]`` in its ``conanfile.txt`` and
 generate ``VirtualBuildEnv``. A regular library requirement still provides

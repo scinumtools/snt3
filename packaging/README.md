@@ -20,10 +20,11 @@ OpenGL and X11 development libraries.
 Conan packages the C++ libraries and executable, and propagates the HDF5
 C-library dependency to consumers. Create it from a checkout with the
 `external/briefpp`, `external/cpp-httplib`, `external/glfw`, and `external/imgui`
-submodules initialized. Building the viewer also requires the platform's OpenGL
-and window-system development libraries. The `with_server` and `with_viewer`
-Conan options default to `True`; disable either when its dependencies are not
-available. Consumers that need `snt` on `PATH` can declare the package as a
+submodules initialized for the corresponding enabled features. Building the viewer
+also requires the platform's OpenGL and window-system development libraries.
+The `with_server`, `with_viewer`, and `with_reports` Conan options default to
+`True`; disabling one omits its bundled dependency from the build and package.
+Consumers that need `snt` on `PATH` can declare the package as a
 `tool_requires` dependency and generate `VirtualBuildEnv`. Conda and PyPI
 package the Python bindings with application features disabled. Conda obtains
 HDF5 from its host environment and uses its runtime pinning.

@@ -41,6 +41,7 @@ class SciNumToolsConan(ConanFile):
         "fPIC": [True, False],
         "with_server": [True, False],
         "with_viewer": [True, False],
+        "with_reports": [True, False],
     }
 
     default_options = {
@@ -48,6 +49,7 @@ class SciNumToolsConan(ConanFile):
         "fPIC": True,
         "with_server": True,
         "with_viewer": True,
+        "with_reports": True,
         "hdf5/*:enable_cxx": False,
         "hdf5/*:hl": False,
     }
@@ -117,7 +119,7 @@ class SciNumToolsConan(ConanFile):
         tc = CMakeToolchain(self)
 
         #
-        # Build the libraries and the unified CLI, including its server and viewer.
+        # Build the libraries and the unified CLI with the selected features.
         #
         tc.variables["ENABLE_BINDING_PYTHON"] = False
         tc.variables["ENABLE_BINDING_C"] = False
@@ -127,6 +129,7 @@ class SciNumToolsConan(ConanFile):
         tc.variables["ENABLE_EXEC_APPS_SNT"] = True
         tc.variables["ENABLE_SNT_SERVER"] = bool(self.options.with_server)
         tc.variables["ENABLE_SNT_VIEW"] = bool(self.options.with_viewer)
+        tc.variables["ENABLE_SNT_REPORT"] = bool(self.options.with_reports)
         tc.variables["ENABLE_MAT"] = False
         tc.variables["ENABLE_SNT_DMAP"] = False
         tc.variables["ENABLE_EXEC_EXAMPLES"] = False
@@ -154,15 +157,16 @@ class SciNumToolsConan(ConanFile):
 
         copy(self, "LICENSE", src=self.source_folder,
              dst=Path(self.package_folder) / "licenses")
-        for component, license_file in (
-            ("briefpp", "LICENSE"),
-            ("cpp-httplib", "LICENSE"),
-            ("glfw", "LICENSE.md"),
-            ("imgui", "LICENSE.txt"),
+        for enabled, component, license_file in (
+            (bool(self.options.with_reports), "briefpp", "LICENSE"),
+            (bool(self.options.with_server), "cpp-httplib", "LICENSE"),
+            (bool(self.options.with_viewer), "glfw", "LICENSE.md"),
+            (bool(self.options.with_viewer), "imgui", "LICENSE.txt"),
         ):
-            copy(self, license_file,
-                 src=Path(self.source_folder) / "external" / component,
-                 dst=Path(self.package_folder) / "licenses" / component)
+            if enabled:
+                copy(self, license_file,
+                     src=Path(self.source_folder) / "external" / component,
+                     dst=Path(self.package_folder) / "licenses" / component)
 
     #
     # Information for consumers
@@ -194,3 +198,5 @@ class SciNumToolsConan(ConanFile):
             component.libs = [library]
             component.requires = requirements
             component.set_property("cmake_target_name", f"snt::{name}")
+            if name == "dip" and bool(self.options.with_reports):
+                component.defines = ["SNT_ENABLE_REPORT"]
