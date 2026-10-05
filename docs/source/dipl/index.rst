@@ -235,7 +235,7 @@ and constraints. Dotted paths and nested path prefixes are both supported:
 Dependencies and existing conditional definitions use the replacement values.
 Duplicate targets and targets that are not instantiated are errors. See the
 `Overrides specification
-<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/syntax/overrides.md>`_
+<https://github.com/scinumtools/snt3/blob/main/docs/dipl/syntax/overrides.md>`_
 for syntax, evaluation order, units, and host registration rules.
 
 Conditional definitions
@@ -260,8 +260,8 @@ defined by the specification.
 Specification
 -------------
 
-* Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/specification.md>`_
-* Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/grammar.ebnf>`_
+* Specification: `<https://github.com/scinumtools/snt3/blob/main/docs/dipl/specification.md>`_
+* Grammar: `<https://github.com/scinumtools/snt3/blob/main/docs/dipl/grammar.ebnf>`_
 
 .. raw:: html
 
@@ -278,22 +278,22 @@ Syntax highlighting
 
 The repository includes syntax definitions for the main editors and
 documentation tools. The `Pygments lexer and style
-<https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/pygments>`_
+<https://github.com/scinumtools/snt3/tree/main/docs/dipl/highlight/pygments>`_
 are used for ``dipl`` code blocks in this Sphinx documentation. An
-`Emacs mode <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/emacs>`_,
-`Skylight/Kate definition <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/skylight>`_,
-and `TextMate package <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/textmate>`_
+`Emacs mode <https://github.com/scinumtools/snt3/tree/main/docs/dipl/highlight/emacs>`_,
+`Skylight/Kate definition <https://github.com/scinumtools/snt3/tree/main/docs/dipl/highlight/skylight>`_,
+and `TextMate package <https://github.com/scinumtools/snt3/tree/main/docs/dipl/highlight/textmate>`_
 are provided for editing DIPL files. A reusable
-`C++ highlighter <https://github.com/vrtulka23/scinumtools3/tree/main/docs/dipl/highlight/cpp>`_
+`C++ highlighter <https://github.com/scinumtools/snt3/tree/main/docs/dipl/highlight/cpp>`_
 provides DIPL token spans and the same palette to native applications, including
 the SNT3 viewer. The shared
-`highlighting test fixture <https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/highlight/highlighting-test.dipl>`_
+`highlighting test fixture <https://github.com/scinumtools/snt3/blob/main/docs/dipl/highlight/highlighting-test.dipl>`_
 covers the language constructs supported by these highlighters.
 
 See the :doc:`rendered Pygments fixture <highlighting>` to verify the Sphinx
 highlighting directly.
 
-* Syntax highlighters: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/highlight>`_
+* Syntax highlighters: `<https://github.com/scinumtools/snt3/blob/main/docs/dipl/highlight>`_
 
 .. toctree::
    :hidden:

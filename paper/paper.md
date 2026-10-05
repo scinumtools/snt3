@@ -100,9 +100,9 @@ consistency.
 
 # Availability
 
-Source code: https://github.com/vrtulka23/scinumtools3
+Source code: https://github.com/scinumtools/snt3
 
-Documentation: https://vrtulka23.github.io/scinumtools3/
+Documentation: https://scinumtools.github.io/snt3/
 
 Acknowledgements
 

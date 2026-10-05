@@ -1,7 +1,7 @@
 # Units
 
 Units in DIPL follow a dedicated domain specific language PUEL designed for this purpose and defined in a separate [specification](../../puel/specification.md).
-Consequently, every DIPL implementation MUST either provide a fully compliant units parser or utilize the reference units parser available in the [SciNumTools v3](https://github.com/vrtulka23/scinumtools3) repository.
+Consequently, every DIPL implementation MUST either provide a fully compliant units parser or utilize the reference units parser available in the [SciNumTools v3](https://github.com/scinumtools/snt3) repository.
 
 All values MUST be converted to a canonical unit representation before comparison or condition evaluation.
 

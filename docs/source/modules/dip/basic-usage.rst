@@ -210,4 +210,4 @@ must be available when the target is evaluated. The original declaration and
 override source remain available through ``get_provenance()`` and in saved
 DIPH5 environments. For override body syntax and evaluation rules, see the
 :doc:`DIPL language guide <../../dipl/index>` and the `overrides specification
-<https://github.com/vrtulka23/scinumtools3/blob/main/docs/dipl/syntax/overrides.md>`_.
+<https://github.com/scinumtools/snt3/blob/main/docs/dipl/syntax/overrides.md>`_.

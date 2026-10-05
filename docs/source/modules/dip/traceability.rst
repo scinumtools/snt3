@@ -59,5 +59,5 @@ records in ``/_DIPL_Trace``. The latter preserves trace IDs, names, and kinds;
 it does not recreate custom-unit definitions, schema nodes, or executable host
 functions when an environment is loaded. See :doc:`Environment persistence
 <persistence>` and the `full DIPH5 specification
-<https://github.com/vrtulka23/scinumtools3/blob/main/docs/diph5/specification.md>`_
+<https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md>`_
 for the complete on-disk contract.

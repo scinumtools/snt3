@@ -6,8 +6,8 @@ package:
   version: {{ version }}
 
 source:
-  - url: https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v{{ version }}.tar.gz
-    sha256: dd8e47093f844da6f3c5f2aea4afc786ab581040d311972e27755b9879edfce5
+  - url: https://github.com/scinumtools/snt3/archive/refs/tags/v{{ version }}.tar.gz
+    sha256: 487b014d38988c0fd835263db206aa990bb564066c12c05e8df035107346e5b2
     folder: scinumtools3
   - url: https://github.com/vrtulka23/briefpp/archive/624aa478149a0fa0e7213bb7cfb6d19615d6e771.tar.gz
     sha256: aaac2a8a25f8a7bc11546038594eb9fef43bf560c0c0532a886c432d5e14de31
@@ -48,7 +48,7 @@ test:
     - python -c "import scinumtools3"
 
 about:
-  home: https://github.com/vrtulka23/scinumtools3
+  home: https://github.com/scinumtools/snt3
   summary: Python bindings for the SciNumTools3 C++ numerical library.
   license: MIT
   license_file: LICENSE

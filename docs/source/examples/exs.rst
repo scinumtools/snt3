@@ -7,7 +7,7 @@ how to extend and configure the EXS expression solver.
 Default Solver
 --------------
 
-The `DefaultSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/DefaultSolver>`_ evaluates a basic expression:
+The `DefaultSolver source <https://github.com/scinumtools/snt3/tree/main/examples/exs/DefaultSolver>`_ evaluates a basic expression:
 
 It uses the standard ``Atom``, operator registry, and evaluation steps. This
 is the smallest starting point for embedding EXS in a C++ program and shows
@@ -21,7 +21,7 @@ the default arithmetic precedence.
 Modified Solver
 ---------------
 
-The `ModifiedSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/ModifiedSolver>`_ changes logical symbols and precedence:
+The `ModifiedSolver source <https://github.com/scinumtools/snt3/tree/main/examples/exs/ModifiedSolver>`_ changes logical symbols and precedence:
 
 The example registers ``N``, ``A``, and ``O`` for negation, conjunction, and
 disjunction, then supplies an explicit step order. It demonstrates that
@@ -35,7 +35,7 @@ rules.
 Custom Solver
 -------------
 
-The `CustomSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/CustomSolver>`_ adds a custom ``len(...)`` operator:
+The `CustomSolver source <https://github.com/scinumtools/snt3/tree/main/examples/exs/CustomSolver>`_ adds a custom ``len(...)`` operator:
 
 Its atom stores either strings, booleans, or lengths. A custom group operator
 converts the argument to a length before the comparison operator runs, showing
@@ -48,7 +48,7 @@ how domain-specific operations can be introduced without changing EXS.
 Array Solver
 ------------
 
-The `ArraySolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/ArraySolver>`_ adds array syntax and element-wise operations:
+The `ArraySolver source <https://github.com/scinumtools/snt3/tree/main/examples/exs/ArraySolver>`_ adds array syntax and element-wise operations:
 
 The custom atom stores ``std::vector<double>`` values, while a group operator
 parses brackets and commas. The example then implements vector addition and
@@ -61,7 +61,7 @@ subtraction through the normal EXS operation pipeline.
 Settings Solver
 ---------------
 
-The `SettingsSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/SettingsSolver>`_ uses application settings in expressions:
+The `SettingsSolver source <https://github.com/scinumtools/snt3/tree/main/examples/exs/SettingsSolver>`_ uses application settings in expressions:
 
 An application-defined settings object is passed to the solver. Custom
 operators use it to substitute ``?`` and select an indexed option, showing how
@@ -74,7 +74,7 @@ evaluation can depend on host application state.
 Unique Pointer Solver
 ---------------------
 
-The `UniquePtrSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/UniquePtrSolver>`_ evaluates a logical expression with an atom backed by ``std::unique_ptr``:
+The `UniquePtrSolver source <https://github.com/scinumtools/snt3/tree/main/examples/exs/UniquePtrSolver>`_ evaluates a logical expression with an atom backed by ``std::unique_ptr``:
 
 The custom atom implements deep-copy construction and assignment in addition
 to move operations. This demonstrates that EXS atoms can own non-copyable

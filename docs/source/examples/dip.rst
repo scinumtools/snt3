@@ -12,7 +12,7 @@ with typed parameters, units, references, and validation properties. It is a
 smoke test: the C++ and Python quick-example tests load the README example and
 verify that it parses and evaluates successfully.
 
-See the `QuickExample source directory <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/QuickExample>`_.
+See the `QuickExample source directory <https://github.com/scinumtools/snt3/tree/main/examples/dip/QuickExample>`_.
 The test does not exercise a separate application workflow; it checks that
 this compact definition remains valid and produces an evaluable parameter
 tree.
@@ -33,7 +33,7 @@ with ``snt_dip_get`` and uses them to configure a C++ target and its standard.
 
 See the :doc:`../integrations/cmake` guide for the commands and configuration
 details. The complete source is available in the
-`CMakeIntegration directory <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/CMakeIntegration>`_.
+`CMakeIntegration directory <https://github.com/scinumtools/snt3/tree/main/examples/dip/CMakeIntegration>`_.
 
 The example shows configure-time evaluation with ``snt_dip_get``. A boolean
 controls whether the executable target is created, an integer selects its C++
@@ -53,7 +53,7 @@ Inspection and Dependency Graph
 -------------------------------
 
 The `InspectionGraph source directory
-<https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/InspectionGraph>`_
+<https://github.com/scinumtools/snt3/tree/main/examples/dip/InspectionGraph>`_
 contains a DIPfile with an override, a calculated speed, a condition, a branch,
 a table, and an array. Its C++ program enables optional graph recording and
 prints provenance, a bounded array slice, forward and reverse dependencies,
@@ -88,7 +88,7 @@ Parameter Viewer
 ----------------
 
 The `ParameterViewer source directory
-<https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/ParameterViewer>`_
+<https://github.com/scinumtools/snt3/tree/main/examples/dip/ParameterViewer>`_
 contains a self-contained DIPfile project designed for browsing. It combines
 groups, a value with a child, map and list collections, a schema, two DIPL
 sources and two raw sources, a custom unit, an override, typed arrays and two
@@ -142,14 +142,14 @@ shows its column header with DIPL highlighting above the raw data rows.
 Source browsing requires a live
 project parse; source nodes are not yet stored in ``.diph5`` snapshots. The
 `example README
-<https://github.com/vrtulka23/scinumtools3/blob/main/examples/dip/ParameterViewer/README.md>`_
+<https://github.com/scinumtools/snt3/blob/main/examples/dip/ParameterViewer/README.md>`_
 provides a longer guided tour and a command-line parse check.
 
 Adapter Outputs
 ---------------
 
 The `AdapterOutputs source directory
-<https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/AdapterOutputs>`_
+<https://github.com/scinumtools/snt3/tree/main/examples/dip/AdapterOutputs>`_
 uses ``steps = 4`` and ``dt = 0.25 s`` to demonstrate two independent formats.
 The C++ adapter writes a solver namelist, binary marker, streamed time values,
 and a DIPH5 snapshot. The Python adapter writes JSON and CSV for an analysis
@@ -173,7 +173,7 @@ The first command creates ``solver/control.nml``, ``solver/magic.bin``,
 Create Report
 -------------
 
-The `CreateReport source directory <https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/CreateReport>`_
+The `CreateReport source directory <https://github.com/scinumtools/snt3/tree/main/examples/dip/CreateReport>`_
 contains a DIPfile project with two schemas, two custom units, multiple
 source files, and an override. Its LaTeX introduction and cover fields show
 how to add context to the generated report. The

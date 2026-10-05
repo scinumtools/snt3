@@ -8,7 +8,7 @@ All derived unit definitions for the supported unit systems are implemented as s
 src/snt/puq/systems/system_*.cpp
 ```
 
-Since all units are defined as [PUEL](https://github.com/vrtulka23/scinumtools3/blob/main/docs/puel/specification.md) expressions, performing dimensional analysis at runtime would introduce unnecessary overhead.
+Since all units are defined as [PUEL](https://github.com/scinumtools/snt3/blob/main/docs/puel/specification.md) expressions, performing dimensional analysis at runtime would introduce unnecessary overhead.
 To avoid this, the unit definitions are precompiled into their base dimensional representations.
 
 This tool reads the unit definitions, computes their dimensionality, and generates helper header files used during compilation.

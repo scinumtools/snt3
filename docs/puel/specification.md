@@ -13,7 +13,7 @@ titlepage: true
 
 PUEL (Physical Units Expression Language) is a domain-specific language for representing and manipulating physical units and dimensional expressions.
 
-It defines the syntax and structure of unit expressions used in scientific computations within the [SciNumTools3](https://github.com/vrtulka23/scinumtools3) framework. Evaluation, normalization, dimensional analysis, and unit conversion are performed by the underlying EXS and PUQ modules.
+It defines the syntax and structure of unit expressions used in scientific computations within the [SciNumTools3](https://github.com/scinumtools/snt3) framework. Evaluation, normalization, dimensional analysis, and unit conversion are performed by the underlying EXS and PUQ modules.
 
 The language is designed for the following use cases:
 

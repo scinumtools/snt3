@@ -52,11 +52,11 @@ def render_updates(root, version, data):
     updates = {}
     path = root / "packaging/homebrew/scinumtools3.rb"
     text = replace_once(r'^  url ".*"$',
-                        f'  url "https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v{version}.tar.gz"',
+                        f'  url "https://github.com/scinumtools/snt3/archive/refs/tags/v{version}.tar.gz"',
                         path.read_text())
     updates[path] = replace_once(r'^  sha256 "[a-f0-9]+"$', f'  sha256 "{sha256}"', text)
     path = root / "packaging/vcpkg/portfile.cmake"
-    text = replace_once(r'(^    REPO vrtulka23/scinumtools3\n)    REF v\S+$',
+    text = replace_once(r'(^    REPO scinumtools/snt3\n)    REF v\S+$',
                         r'\g<1>    REF v' + version, path.read_text())
     updates[path] = replace_once(r'(^    REF v\S+\n)    SHA512 [a-f0-9]+$',
                                  r'\g<1>    SHA512 ' + sha512, text)
@@ -68,7 +68,7 @@ def render_updates(root, version, data):
     path = root / "packaging/conda-forge/meta.yaml"
     text = replace_once(r'^\{% set version = ".*" %\}$',
                         '{% set version = "' + version + '" %}', path.read_text())
-    text = replace_once(r'(^  - url: https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v\{\{ version \}\}\.tar\.gz\n)    sha256: [a-f0-9]+$',
+    text = replace_once(r'(^  - url: https://github.com/scinumtools/snt3/archive/refs/tags/v\{\{ version \}\}\.tar\.gz\n)    sha256: [a-f0-9]+$',
                         r'\g<1>    sha256: ' + sha256, text)
     updates[path] = replace_once(r'^  number: [0-9]+$', '  number: 0', text)
     return updates
@@ -85,7 +85,7 @@ def main():
     if args.archive:
         data = args.archive.read_bytes()
     else:
-        url = f"https://github.com/vrtulka23/scinumtools3/archive/refs/tags/v{args.version}.tar.gz"
+        url = f"https://github.com/scinumtools/snt3/archive/refs/tags/v{args.version}.tar.gz"
         with urllib.request.urlopen(url, timeout=60) as response:
             data = response.read()
     updates = render_updates(ROOT, args.version, data)

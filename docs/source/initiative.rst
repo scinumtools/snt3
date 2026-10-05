@@ -98,11 +98,11 @@ actual SNTv3 integration in the surrounding README text.
 
 .. image:: https://img.shields.io/badge/DIPL-%7B%3FSNTv3%7D-2980b9
    :alt: DIPL — {?SNTv3}
-   :target: https://vrtulka23.github.io/scinumtools3/initiative.html
+   :target: https://scinumtools.github.io/snt3/initiative.html
 
 Copy this Markdown into your project's ``README.md``:
 
 .. code-block:: markdown
 
-   [![SNT3: DIPL](https://img.shields.io/badge/SNT3-DIPL-2980b9)](https://vrtulka23.github.io/scinumtools3/initiative.html)
+   [![SNT3: DIPL](https://img.shields.io/badge/SNT3-DIPL-2980b9)](https://scinumtools.github.io/snt3/initiative.html)
              

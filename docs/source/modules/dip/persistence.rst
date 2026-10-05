@@ -88,7 +88,7 @@ from HDF5 names alone. Value datasets use native HDF5 numeric datatypes,
 simple dataspaces for arrays, and null dataspaces for null values. Node
 settings and provenance are stored as dataset attributes.
 
-* `Source specification <https://github.com/vrtulka23/scinumtools3/blob/main/docs/diph5/specification.md>`_
+* `Source specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md>`_
 
 Full DIPH5 specification
 ------------------------

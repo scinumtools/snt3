@@ -14,7 +14,7 @@ structured scientific input parameters. Together, they provide a compact
 and machine-readable way to describe not only values, but also their units,
 types, constraints, relationships, and dependencies.
 
-`SciNumTools v3 <https://github.com/vrtulka23/scinumtools3>`_ is built
+`SciNumTools v3 <https://github.com/scinumtools/snt3>`_ is built
 around a modular C++ core with Python bindings and
 interfaces for command-line tools, CMake, and REST services. The same
 scientific definitions can therefore be used across different languages,

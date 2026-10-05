@@ -70,8 +70,8 @@ source repository:
 
 .. code-block:: console
 
-   git clone --recurse-submodules https://github.com/vrtulka23/scinumtools3.git
-   cd scinumtools3
+   git clone --recurse-submodules https://github.com/scinumtools/snt3.git
+   cd snt3
 
    conan create .
 
@@ -131,8 +131,8 @@ Brief++. The report option defaults to on when DIP is enabled.
 
 .. code-block:: console
 
-   git clone --recurse-submodules https://github.com/vrtulka23/scinumtools3.git
-   cd scinumtools3
+   git clone --recurse-submodules https://github.com/scinumtools/snt3.git
+   cd snt3
 
    cmake -G Ninja -B build
    cmake --build build

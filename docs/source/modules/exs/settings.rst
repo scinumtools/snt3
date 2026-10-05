@@ -63,4 +63,4 @@ The ``Solver<CustomAtom, Settings>`` template argument ensures that these
 callbacks receive the intended settings type. Use ``solver.set_settings(new_settings)``
 to replace the stored settings before a later evaluation. For the complete
 operator registry, evaluation steps, and atom implementation, see the
-`SettingsSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/SettingsSolver>`_.
+`SettingsSolver source <https://github.com/scinumtools/snt3/tree/main/examples/exs/SettingsSolver>`_.

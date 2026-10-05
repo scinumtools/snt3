@@ -218,9 +218,9 @@ The reference implementation includes:
 - Python bindings for integration and scripting use cases
 
 **Project:**        SciNumTools v3  
-**Repository:**     <https://github.com/vrtulka23/scinumtools3>  
-**Documentation:**  <https://vrtulka23.github.io/scinumtools3/>  
-**Issues:**         <https://github.com/vrtulka23/scinumtools3/issues>  
+**Repository:**     <https://github.com/scinumtools/snt3>  
+**Documentation:**  <https://scinumtools.github.io/snt3/>  
+**Issues:**         <https://github.com/scinumtools/snt3/issues>  
 
 Independent implementations of the DIPL language (e.g., in Rust or Julia) are encouraged and welcome, and can be added to this list on request.
 

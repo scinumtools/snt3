@@ -5,10 +5,10 @@ engineering software.
 
 Focus on your science. Leave the parameter plumbing to SciNumTools.
 
-[![Build](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml)
-[![codecov](https://codecov.io/github/vrtulka23/scinumtools3/graph/badge.svg?token=8A25K1T7XM)](https://codecov.io/github/vrtulka23/scinumtools3)
-[![Documentation](https://img.shields.io/badge/docs-online-blue)](https://vrtulka23.github.io/scinumtools3/)
-[![GitHub release](https://img.shields.io/github/v/release/vrtulka23/scinumtools3?include_prereleases)](https://github.com/vrtulka23/scinumtools3/releases)
+[![Build](https://github.com/scinumtools/snt3/actions/workflows/c-cpp-build.yml/badge.svg)](https://github.com/scinumtools/snt3/actions/workflows/c-cpp-build.yml)
+[![codecov](https://codecov.io/github/scinumtools/snt3/graph/badge.svg?token=8A25K1T7XM)](https://codecov.io/github/scinumtools/snt3)
+[![Documentation](https://img.shields.io/badge/docs-online-blue)](https://scinumtools.github.io/snt3/)
+[![GitHub release](https://img.shields.io/github/v/release/scinumtools/snt3?include_prereleases)](https://github.com/scinumtools/snt3/releases)
 [![PyPI version](https://badge.fury.io/py/scinumtools3.svg)](https://pypi.org/project/scinumtools3/)
 [![Conda Version](https://anaconda.org/conda-forge/scinumtools3/badges/version.svg)](https://anaconda.org/conda-forge/scinumtools3)
 [![vcpkg](https://img.shields.io/vcpkg/v/scinumtools3?label=vcpkg)](https://vcpkg.io/en/package/scinumtools3.html)
@@ -16,7 +16,7 @@ Focus on your science. Leave the parameter plumbing to SciNumTools.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg?logo=c%2B%2B&logoColor=white)
 ![Compilers](https://img.shields.io/badge/Compilers-GCC%2011%2B%20%7C%20Clang%2015%2B%20%7C%20MSVC%202022-blue)
-[![SNT3: DIPL](https://img.shields.io/badge/SNT3-DIPL-2980b9)](https://vrtulka23.github.io/scinumtools3/initiative.html)
+[![SNT3: DIPL](https://img.shields.io/badge/SNT3-DIPL-2980b9)](https://scinumtools.github.io/snt3/initiative.html)
 
 SciNumTools provides a common representation for physical quantities and
 validated scientific input parameters. Its C++17 libraries can be used from
@@ -25,16 +25,16 @@ C/C++, Python, the command line, and CMake.
 The project is built around two languages:
 
 - **PUEL** describes values, units, uncertainties, arrays, and unit systems.
-  See the [PUEL language specification](https://vrtulka23.github.io/scinumtools3/puel/index.html).
+  See the [PUEL language specification](https://scinumtools.github.io/snt3/puel/index.html).
 - **DIPL** describes typed input parameters, constraints, and relationships.
-  See the [DIPL language specification](https://vrtulka23.github.io/scinumtools3/dipl/index.html).
+  See the [DIPL language specification](https://scinumtools.github.io/snt3/dipl/index.html).
 
 DIPL can serve as the single source of validated truth for a scientific
 model: values, units, constraints, derived relationships, and provenance stay
 together in one portable definition rather than being distributed across
 configuration files and application code.
 
-The [online documentation](https://vrtulka23.github.io/scinumtools3/) contains
+The [online documentation](https://scinumtools.github.io/snt3/) contains
 the concepts, language specifications, tutorials, examples, and API reference.
 
 ![DIPL architecture: scientific parameters are parsed and validated by the C++ core, then made available through command-line, Python, C, CMake, and REST interfaces.](docs/img/snt-schema-readme.png)
@@ -66,14 +66,14 @@ are physically appropriate.
 
 ## One parameter layer for many scientific codes
 
-<a href="https://vrtulka23.github.io/scinumtools3/initiative.html"><img align="left" src="docs/img/snt-initiative-readme.png" alt="A parameter model is validated and translated into a scientific code's native input file" width="180" height="180" hspace="16" style="margin-right:30px"></a>
+<a href="https://scinumtools.github.io/snt3/initiative.html"><img align="left" src="docs/img/snt-initiative-readme.png" alt="A parameter model is validated and translated into a scientific code's native input file" width="180" height="180" hspace="16" style="margin-right:30px"></a>
 
 We are inviting maintainers of established, open-source scientific codes to
 try a shared, optional parameter layer. A project-specific adapter can turn a
 DIPL definition into its existing native input file, while SciNumTools handles
 units, constraints, dependencies, and parameter documentation. The first step
 keeps the solver and its native parser in place. [Read about the initiative
-and see the full flyer](https://vrtulka23.github.io/scinumtools3/initiative.html).
+and see the full flyer](https://scinumtools.github.io/snt3/initiative.html).
 The long-term aim is direct integration where a project judges the model and
 tooling stable and trustworthy.
 
@@ -82,62 +82,62 @@ tooling stable and trustworthy.
 ## Features
 
 - **Unit-aware quantities:**
-  Parse and calculate with [physical quantities](https://vrtulka23.github.io/scinumtools3/modules/puq/quantities.html),
-  then [convert units](https://vrtulka23.github.io/scinumtools3/modules/puq/conversion.html).
+  Parse and calculate with [physical quantities](https://scinumtools.github.io/snt3/modules/puq/quantities.html),
+  then [convert units](https://scinumtools.github.io/snt3/modules/puq/conversion.html).
   Quantities support uncertainties, arrays, prefixes, and unit systems.
 - **Single source of validated truth:**
-  Define [typed DIPL hierarchies](https://vrtulka23.github.io/scinumtools3/modules/dip/basic-usage.html)
+  Define [typed DIPL hierarchies](https://scinumtools.github.io/snt3/modules/dip/basic-usage.html)
   with constraints, expressions, dependencies, and metadata; inspect their
-  [source provenance](https://vrtulka23.github.io/scinumtools3/modules/dip/traceability.html).
+  [source provenance](https://scinumtools.github.io/snt3/modules/dip/traceability.html).
 - **Reproducible parameter exchange:**
-  Save evaluated environments as [DIPH5 files](https://vrtulka23.github.io/scinumtools3/modules/dip/persistence.html)
+  Save evaluated environments as [DIPH5 files](https://scinumtools.github.io/snt3/modules/dip/persistence.html)
   with source-content hashes, or
-  [generate native files](https://vrtulka23.github.io/scinumtools3/modules/dip/generation.html)
+  [generate native files](https://scinumtools.github.io/snt3/modules/dip/generation.html)
   for C++, C, Fortran, Rust, Julia, JSON, and YAML.
 - **Readable parameter reports:**
-  Generate [Brief++ reports](https://vrtulka23.github.io/scinumtools3/modules/dip/report.html)
+  Generate [Brief++ reports](https://scinumtools.github.io/snt3/modules/dip/report.html)
   in TeX, PDF, Markdown, HTML, and other formats
   with effective DIP values, units, overrides,
   provenance, schemas, and publication references. See the
-  [example report and PDF](https://vrtulka23.github.io/scinumtools3/examples/dip.html#dip-create-report-example).
+  [example report and PDF](https://scinumtools.github.io/snt3/examples/dip.html#dip-create-report-example).
 - **One definition, many entry points:**
   Use the same semantics from C/C++17, Python, command line, CMake, and the
   optional local REST service; see the
-  [integration guides](https://vrtulka23.github.io/scinumtools3/integrations/index.html).
+  [integration guides](https://scinumtools.github.io/snt3/integrations/index.html).
 
 ## Interfaces
 
 - **C++ API:**
-  [C++17 library reference](https://vrtulka23.github.io/scinumtools3/api/index.html#c-api)
-  and [application commands](https://vrtulka23.github.io/scinumtools3/api/cpp_api.html).
+  [C++17 library reference](https://scinumtools.github.io/snt3/api/index.html#c-api)
+  and [application commands](https://scinumtools.github.io/snt3/api/cpp_api.html).
 - **Python:**
-  [PUQ, DIP, and API bindings](https://vrtulka23.github.io/scinumtools3/integrations/python.html)
-  with [native Python values and NumPy arrays](https://vrtulka23.github.io/scinumtools3/integrations/python.html#python-values-and-numpy).
+  [PUQ, DIP, and API bindings](https://scinumtools.github.io/snt3/integrations/python.html)
+  with [native Python values and NumPy arrays](https://scinumtools.github.io/snt3/integrations/python.html#python-values-and-numpy).
 - **C binding:**
   Experimental opaque-handle interfaces for
-  [PUQ](https://vrtulka23.github.io/scinumtools3/integrations/c.html#quantities-and-units)
-  and [DIPL](https://vrtulka23.github.io/scinumtools3/integrations/c.html#dipl-parameters).
+  [PUQ](https://scinumtools.github.io/snt3/integrations/c.html#quantities-and-units)
+  and [DIPL](https://scinumtools.github.io/snt3/integrations/c.html#dipl-parameters).
 - **Command line:**
-  [PUQ evaluation and conversion](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#quantities-and-units),
-  [DIP parsing](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#dipl-parameters),
+  [PUQ evaluation and conversion](https://scinumtools.github.io/snt3/integrations/cli.html#quantities-and-units),
+  [DIP parsing](https://scinumtools.github.io/snt3/integrations/cli.html#dipl-parameters),
   DIPH5 persistence, export, and
-  [reports](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#generating-reports).
+  [reports](https://scinumtools.github.io/snt3/integrations/cli.html#generating-reports).
 - **Parameter Viewer:**
   Browse evaluated DIPL projects and DIPH5 snapshots, inspect dependencies and
   provenance, and open source locations in the optional
-  [graphical viewer](https://vrtulka23.github.io/scinumtools3/integrations/viewer.html).
+  [graphical viewer](https://scinumtools.github.io/snt3/integrations/viewer.html).
 - **CMake:**
-  [Package integration](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html#getting-started)
-  and [DIPL evaluation](https://vrtulka23.github.io/scinumtools3/integrations/cmake.html#dipl-parameters)
+  [Package integration](https://scinumtools.github.io/snt3/integrations/cmake.html#getting-started)
+  and [DIPL evaluation](https://scinumtools.github.io/snt3/integrations/cmake.html#dipl-parameters)
   during project configuration.
 - **REST API server:**
-  [Local HTTP access](https://vrtulka23.github.io/scinumtools3/integrations/rest.html)
+  [Local HTTP access](https://scinumtools.github.io/snt3/integrations/rest.html)
   to the command-oriented PUQ and DIP API.
 - **Docker:**
-  Reproducible [Python environment](https://vrtulka23.github.io/scinumtools3/integrations/docker.html#python-environment)
-  and [development environment](https://vrtulka23.github.io/scinumtools3/integrations/docker.html#development-environment).
+  Reproducible [Python environment](https://scinumtools.github.io/snt3/integrations/docker.html#python-environment)
+  and [development environment](https://scinumtools.github.io/snt3/integrations/docker.html#development-environment).
 
-See the [integration overview](https://vrtulka23.github.io/scinumtools3/integrations/index.html)
+See the [integration overview](https://scinumtools.github.io/snt3/integrations/index.html)
 for the complete usage guides.
 
 ## Quick example
@@ -177,7 +177,7 @@ applications that should not parse DIPL at run time.
 Use `snt report --project DIPfile --output report.tex` to turn an evaluated
 project into a readable report. Brief++ renders TeX, Markdown, reStructuredText,
 HTML, Typst, plain text, and document JSON without external tools. PDF output
-is also available when a TeX compiler is installed. See the [CLI guide](https://vrtulka23.github.io/scinumtools3/integrations/cli.html#generating-reports)
+is also available when a TeX compiler is installed. See the [CLI guide](https://scinumtools.github.io/snt3/integrations/cli.html#generating-reports)
 and the [CreateReport example](examples/dip/CreateReport/README.md), which
 includes a generated PDF.
 
@@ -228,8 +228,8 @@ $ snt dip parse -a file parameters.dip -r simulation.fluid.density --print
 density = 998.2 kg*m-3
 ```
 
-See the [quickstart](https://vrtulka23.github.io/scinumtools3/quickstart.html)
-and [examples](https://vrtulka23.github.io/scinumtools3/examples/index.html)
+See the [quickstart](https://scinumtools.github.io/snt3/quickstart.html)
+and [examples](https://scinumtools.github.io/snt3/examples/index.html)
 for complete examples.
 
 ## Installation
@@ -268,15 +268,15 @@ Use it as a Conan `tool_requires` dependency with `VirtualBuildEnv` to put
 ### From source
 
 ```console
-git clone --recurse-submodules https://github.com/vrtulka23/scinumtools3.git
-cd scinumtools3
+git clone --recurse-submodules https://github.com/scinumtools/snt3.git
+cd snt3
 cmake -G Ninja -B build
 cmake --build build
 ctest --test-dir build
 ```
 
 For build options, installation, and package-manager details, see the
-[installation guide](https://vrtulka23.github.io/scinumtools3/installation.html).
+[installation guide](https://scinumtools.github.io/snt3/installation.html).
 
 ## CMake
 
@@ -322,7 +322,7 @@ SciNumTools v3 is the compiled successor to the original
 on units and validated scientific parameters.
 
 Contributions and issue reports are welcome through
-[GitHub](https://github.com/vrtulka23/scinumtools3). See
+[GitHub](https://github.com/scinumtools/snt3). See
 [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow.
 
 ## License

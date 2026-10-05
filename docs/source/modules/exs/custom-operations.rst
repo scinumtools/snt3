@@ -62,7 +62,7 @@ step:
    auto result = solver.eval("apple < len(hospital)");
 
 The complete atom and operator implementations are in the
-`CustomSolver source <https://github.com/vrtulka23/scinumtools3/tree/main/examples/exs/CustomSolver>`_.
+`CustomSolver source <https://github.com/scinumtools/snt3/tree/main/examples/exs/CustomSolver>`_.
 The :doc:`EXS examples <../../examples/exs>` also show arrays
 (``ArraySolver``) and atoms that own ``std::unique_ptr`` values
 (``UniquePtrSolver``). See :doc:`Solver settings <settings>` for passing

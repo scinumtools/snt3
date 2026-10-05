@@ -6,7 +6,7 @@
 ;; Version: 1.0.0
 ;; Created: 14. Sept. 2026
 ;; Keywords: languages, DIP
-;; Homepage: https://github.com/vrtulka23/scinumtools3
+;; Homepage: https://github.com/scinumtools/snt3
 
 ;; This file is not part of GNU Emacs.
 

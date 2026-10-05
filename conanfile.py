@@ -18,7 +18,7 @@ class SciNumToolsConan(ConanFile):
     name = "scinumtools3"
 
     license = "MIT"
-    url = "https://github.com/vrtulka23/scinumtools3"
+    url = "https://github.com/scinumtools/snt3"
     homepage = url
     description = "Scientific Numerical Tools v3 (SNT)"
     topics = (

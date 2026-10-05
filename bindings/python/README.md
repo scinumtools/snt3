@@ -2,7 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/scinumtools3.svg)](https://pypi.org/project/scinumtools3/)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/vrtulka23/scinumtools3/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/scinumtools/snt3/blob/main/LICENSE)
 
 SciNumTools3 provides unit-aware quantities and validated scientific configuration
 for Python. Use it to convert physical units, perform dimension-aware calculations,
@@ -18,7 +18,7 @@ The package includes:
 Evaluated DIP environments can generate reports in TeX, PDF, Markdown,
 reStructuredText, HTML, Typst, plain text, or Brief++ document JSON with
 `Environment.generate_report(ReportFormat.HTML, "report.html")` (or another
-`ReportFormat`). See the [Python guide](https://vrtulka23.github.io/scinumtools3/integrations/python.html#generating-reports).
+`ReportFormat`). See the [Python guide](https://scinumtools.github.io/snt3/integrations/python.html#generating-reports).
 
 ## Installation
 
@@ -168,7 +168,7 @@ Tags are returned as a separate Python list, and metadata remains valid while it
 Python wrapper is alive.
 
 Additional request helpers remain available in the
-[Python API reference](https://vrtulka23.github.io/scinumtools3/api/python_dip.html).
+[Python API reference](https://scinumtools.github.io/snt3/api/python_dip.html).
 
 ## Command-style API helpers
 
@@ -187,13 +187,13 @@ you want formatted command-style output without starting a subprocess.
 
 ## Documentation
 
-- [Python usage guide](https://vrtulka23.github.io/scinumtools3/integrations/python.html)
-- [Python API reference](https://vrtulka23.github.io/scinumtools3/api/python_api.html)
-- [PUEL specification](https://vrtulka23.github.io/scinumtools3/puel/index.html)
-- [DIPL specification](https://vrtulka23.github.io/scinumtools3/dipl/index.html)
-- [GitHub repository](https://github.com/vrtulka23/scinumtools3)
-- [Issue tracker](https://github.com/vrtulka23/scinumtools3/issues)
+- [Python usage guide](https://scinumtools.github.io/snt3/integrations/python.html)
+- [Python API reference](https://scinumtools.github.io/snt3/api/python_api.html)
+- [PUEL specification](https://scinumtools.github.io/snt3/puel/index.html)
+- [DIPL specification](https://scinumtools.github.io/snt3/dipl/index.html)
+- [GitHub repository](https://github.com/scinumtools/snt3)
+- [Issue tracker](https://github.com/scinumtools/snt3/issues)
 
 ## License
 
-SciNumTools3 is distributed under the [MIT License](https://github.com/vrtulka23/scinumtools3/blob/main/LICENSE).
+SciNumTools3 is distributed under the [MIT License](https://github.com/scinumtools/snt3/blob/main/LICENSE).

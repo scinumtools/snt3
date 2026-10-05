@@ -510,4 +510,4 @@ program needs typed results or direct access to module objects without
 starting a subprocess.
 
 For installation options and the complete Python API, see the
-`Python binding README <https://github.com/vrtulka23/scinumtools3/tree/main/bindings/python>`_.
+`Python binding README <https://github.com/scinumtools/snt3/tree/main/bindings/python>`_.

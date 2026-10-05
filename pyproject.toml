@@ -52,9 +52,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/vrtulka23/scinumtools3"
-Repository = "https://github.com/vrtulka23/scinumtools3"
-Issues = "https://github.com/vrtulka23/scinumtools3/issues"
+Homepage = "https://github.com/scinumtools/snt3"
+Repository = "https://github.com/scinumtools/snt3"
+Issues = "https://github.com/scinumtools/snt3/issues"
 
 # ------------------------
 # scikit-build-core config

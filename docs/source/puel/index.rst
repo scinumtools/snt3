@@ -160,8 +160,8 @@ registration; DIPL provides its ``$unit`` declaration for configuration files.
 Specification
 -------------
 
-* Specification: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/puel/specification.md>`_
-* Grammar: `<https://github.com/vrtulka23/scinumtools3/blob/main/docs/puel/grammar.ebnf>`_
+* Specification: `<https://github.com/scinumtools/snt3/blob/main/docs/puel/specification.md>`_
+* Grammar: `<https://github.com/scinumtools/snt3/blob/main/docs/puel/grammar.ebnf>`_
 
 .. raw:: html
 

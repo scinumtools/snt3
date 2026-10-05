@@ -1,7 +1,7 @@
 # SciNumTools v3 Documentation
 
 In this directory you can find the complete API reference and user guides for the ``SciNumTools3`` project.
-The online documentation for the C++ reference implementation, including Python bindings and the CLI, is available [here](https://vrtulka23.github.io/scinumtools3/).
+The online documentation for the C++ reference implementation, including Python bindings and the CLI, is available [here](https://scinumtools.github.io/snt3/).
 
 It also provides detailed specifications for the DIPL and PUEL domain-specific languages:
 

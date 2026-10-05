@@ -9,7 +9,7 @@ the public ``snt/c/puq.h`` interface for PUQ operations. It evaluates a quantity
 converts it to centimetres, formats the result into a caller-provided buffer,
 and releases the opaque handles through the C ABI.
 
-See the `CBinding source directory <https://github.com/vrtulka23/scinumtools3/tree/main/examples/puq/CBinding>`_.
+See the `CBinding source directory <https://github.com/scinumtools/snt3/tree/main/examples/puq/CBinding>`_.
 
 .. code-block:: c
 

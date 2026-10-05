@@ -83,7 +83,7 @@ inside ``plan()``. A DIPH5 run can use only the values and provenance retained
 in that snapshot. Application-specific validation belongs in the adapter.
 
 See the runnable `AdapterOutputs example
-<https://github.com/vrtulka23/scinumtools3/tree/main/examples/dip/AdapterOutputs>`_
+<https://github.com/scinumtools/snt3/tree/main/examples/dip/AdapterOutputs>`_
 for a C++ adapter producing a namelist, binary marker, and streamed data, and
 a Python adapter producing JSON and CSV. The :doc:`Python integration guide
 <../../integrations/python>` shows the subclassing pattern.

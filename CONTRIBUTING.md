@@ -7,12 +7,12 @@ Thank you for considering contributing to **scinumtools3**! We welcome all contr
 ## How to Contribute
 
 1. **Fork the repository** from GitHub:  
-   [https://github.com/vrtulka23/scinumtools3](https://github.com/vrtulka23/scinumtools3)
+   [https://github.com/scinumtools/snt3](https://github.com/scinumtools/snt3)
 
 2. **Clone your fork locally**:
    ```bash
-   git clone https://github.com/vrtulka23/scinumtools3.git
-   cd scinumtools3
+   git clone https://github.com/scinumtools/snt3.git
+   cd snt3
    ```
 
 3. **Create a new branch** for your work:
@@ -73,7 +73,7 @@ Thank you for considering contributing to **scinumtools3**! We welcome all contr
 If you find a bug or have a feature request:
 
 1. Check the issue tracker to see if it is already reported:
-   [https://github.com/vrtulka23/scinumtools3/issues](https://github.com/vrtulka23/scinumtools3/issues)
+   [https://github.com/scinumtools/snt3/issues](https://github.com/scinumtools/snt3/issues)
 
 2. If not, open a new issue and include:
 
