@@ -100,7 +100,7 @@ On macOS, SciNumTools can be installed using the project Homebrew tap:
 
 .. code-block:: console
 
-   brew tap vrtulka23/tap
+   brew tap scinumtools/tap
    brew install scinumtools3
 
 
