@@ -61,7 +61,7 @@ reimplementing the same units, parameter definitions, expressions, and
 constraints for every application.
 
 SciNumTools v3 is a substantial architectural development of the original
-`SciNumTools v2 <https://github.com/vrtulka23/scinumtools>`_ project. While v2
+`SciNumTools v2 <https://github.com/scinumtools/snt2>`_ project. While v2
 established the core scientific concepts in a Python-based framework, v3
 moves the fundamental functionality into a compiled, language-independent
 C++ core while retaining high-level access through Python and other

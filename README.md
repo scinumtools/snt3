@@ -318,7 +318,7 @@ The repository contains the C++ sources, Python bindings, command-line
 applications, tests, examples, packaging recipes, and documentation.
 
 SciNumTools v3 is the compiled successor to the original
-[SciNumTools v2](https://github.com/vrtulka23/scinumtools), with the same focus
+[SciNumTools v2](https://github.com/scinumtools/snt2), with the same focus
 on units and validated scientific parameters.
 
 Contributions and issue reports are welcome through

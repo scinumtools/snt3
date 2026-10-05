@@ -89,7 +89,7 @@ approach and its path toward deeper integration.
 Previous version
 ----------------
 
-Compared with `SciNumTools v2 <https://github.com/vrtulka23/scinumtools>`_, which was a Python-native framework integrating expression evaluation, physical units, material properties, and validated dimensional input parameters, SciNumTools v3 represents a substantial architectural evolution. The core functionality is being rebuilt in modern C++ as a compiled, modular foundation, removing the dependency on Python for the fundamental parameter and unit-processing pipeline. This makes the framework suitable not only for Python workflows but also for performance-critical applications, HPC environments, and direct integration with C++ and other languages.
+Compared with `SciNumTools v2 <https://github.com/scinumtools/snt2>`_, which was a Python-native framework integrating expression evaluation, physical units, material properties, and validated dimensional input parameters, SciNumTools v3 represents a substantial architectural evolution. The core functionality is being rebuilt in modern C++ as a compiled, modular foundation, removing the dependency on Python for the fundamental parameter and unit-processing pipeline. This makes the framework suitable not only for Python workflows but also for performance-critical applications, HPC environments, and direct integration with C++ and other languages.
 
 The `v3` development also moves beyond simply porting the `v2` functionality. The concepts are being reorganized around a more explicit language and data model, with `PUEL` (Physical Units Expression Language) providing the foundation for unit-aware expressions and `DIPL` (Dimensional Input Parameter Language) providing structured, validated scientific parameters. The project now includes a C++ core, command-line tooling, Python interfaces, CMake integration, documentation, examples, and testing infrastructure, establishing a foundation on which the higher-level functionality of `v2` can be rebuilt in a more general and extensible form.
 
@@ -97,4 +97,4 @@ In short, `v2` established the scientific concepts and Python implementation; `v
 
 Documentation for the original Python implementation, `SciNumTools2`, is available here:
 
-* `SciNumTools2 Documentation <https://vrtulka23.github.io/scinumtools/>`_
+* `SciNumTools2 Documentation <https://scinumtools.github.io/snt2/>`_
