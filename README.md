@@ -6,16 +6,16 @@ engineering software.
 Focus on your science. Leave the parameter plumbing to SciNumTools.
 
 [![Build](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml/badge.svg)](https://github.com/vrtulka23/scinumtools3/actions/workflows/c-cpp-build.yml)
-[![codecov](https://codecov.io/github/vrtulka23/scinumtools3/graph/badge.svg?token=8A25K1T7XM)](https://codecov.io/github/vrtulka23/scinumtools3)
-[![Documentation](https://img.shields.io/badge/docs-online-blue)](https://vrtulka23.github.io/scinumtools3/)
+[![Codecov](https://img.shields.io/codecov/c/github/vrtulka23/scinumtools3?color=7B61A8)](https://codecov.io/github/vrtulka23/scinumtools3)
 [![GitHub release](https://img.shields.io/github/v/release/vrtulka23/scinumtools3?include_prereleases)](https://github.com/vrtulka23/scinumtools3/releases)
-[![PyPI version](https://badge.fury.io/py/scinumtools3.svg)](https://pypi.org/project/scinumtools3/)
-[![Conda Version](https://anaconda.org/conda-forge/scinumtools3/badges/version.svg)](https://anaconda.org/conda-forge/scinumtools3)
+[![PyPI version](https://img.shields.io/pypi/v/scinumtools3.svg)](https://pypi.org/project/scinumtools3/)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/scinumtools3?label=conda&color=orange)](https://anaconda.org/conda-forge/scinumtools3)
 [![vcpkg](https://img.shields.io/vcpkg/v/scinumtools3?label=vcpkg)](https://vcpkg.io/en/package/scinumtools3.html)
 [![Homebrew version](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Fvrtulka23%2Fhomebrew-tap%2Fmain%2FFormula%2Fscinumtools3.rb&search=refs%2Ftags%2F%28v%5B%5E%2F%22%20%5D%2B%29%5C.tar%5C.gz&replace=%241&label=homebrew&color=orange)](https://github.com/vrtulka23/homebrew-tap/blob/main/Formula/scinumtools3.rb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg?logo=c%2B%2B&logoColor=white)
 ![Compilers](https://img.shields.io/badge/Compilers-GCC%2011%2B%20%7C%20Clang%2015%2B%20%7C%20MSVC%202022-blue)
+[![Documentation](https://img.shields.io/badge/docs-online-blue)](https://vrtulka23.github.io/scinumtools3/)
 [![SNT3: DIPL](https://img.shields.io/badge/SNT3-DIPL-2980b9)](https://vrtulka23.github.io/scinumtools3/initiative.html)
 
 SciNumTools provides a common representation for physical quantities and
