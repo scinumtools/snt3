@@ -13,8 +13,8 @@ Focus on your science. Leave the parameter plumbing to SciNumTools.
 [![vcpkg](https://img.shields.io/vcpkg/v/scinumtools3?label=vcpkg)](https://vcpkg.io/en/package/scinumtools3.html)
 [![Homebrew version](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Fscinumtools%2Fhomebrew-tap%2Fmain%2FFormula%2Fscinumtools3.rb&search=refs%2Ftags%2F%28v%5B%5E%2F%22%20%5D%2B%29%5C.tar%5C.gz&replace=%241&label=homebrew&color=orange)](https://github.com/scinumtools/homebrew-tap/blob/main/Formula/scinumtools3.rb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg?logo=c%2B%2B&logoColor=white)
-![Compilers](https://img.shields.io/badge/Compilers-GCC%2011%2B%20%7C%20Clang%2015%2B%20%7C%20MSVC%202022-blue)
+![C++17](https://img.shields.io/badge/C%2B%2B-17-00897B.svg?logo=c%2B%2B&logoColor=white)
+![Compilers](https://img.shields.io/badge/Compilers-GCC%2011%2B%20%7C%20Clang%2015%2B%20%7C%20MSVC%202022-00897B)
 [![Documentation](https://img.shields.io/badge/docs-online-blue)](https://scinumtools.github.io/snt3/)
 [![SNT3: DIPL](https://img.shields.io/badge/SNT3-DIPL-2980b9)](https://scinumtools.github.io/snt3/initiative.html)
 
