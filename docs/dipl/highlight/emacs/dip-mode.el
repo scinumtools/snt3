@@ -22,7 +22,7 @@
       (let* (
             ;; define several category of keywords
             (x-keywords '("true" "false" "none"))
-            (x-types '("float" "int" "bool" "str" "table" "float32" "float64" "float128" "int16" "int32" "int64" "uint16" "uint32" "uint64"))
+            (x-types '("float" "int" "bool" "str" "table" "map" "list" "float32" "float64" "float128" "int16" "int32" "int64" "uint16" "uint32" "uint64"))
             (x-constants '("$source" "$unit" "$schema" "$override"))
             (x-events '("!options" "!constant" "!format" "!condition" "!tags" "!delimiter"))
             (x-metadata '("?descr" "?authors" "?title" "?journal" "?year" "?volume" "?issue" "?pages" "?doi" "?url" "?version" "?created" "?modified" "?license" "?rationale" "?native" "?requires" "?conflicts" "?implies" "?see" "?example" "?recommended_range" "?performance_impact" "?scientific_impact" "?deprecated" "?replacement" "?since" "?category" "?visibility"))
@@ -37,6 +37,11 @@
             (x-functions-regexp (regexp-opt x-functions 'signs)))
 
         `(
+          ("#[^\n]*" . 'font-lock-comment-face)
+          (dip-match-collection-selector
+           (0 'default t)
+           (1 'dip-collection-bracket-face t)
+           (3 'dip-collection-bracket-face t))
           (,x-types-regexp . 'font-lock-type-face)
           (,x-constants-regexp . 'font-lock-constant-face)
           (,x-events-regexp . 'dip-directive-face)
@@ -48,7 +53,7 @@
            (0 'dip-reference-face prepend)
            (1 'dip-slice-face prepend))
           ("{[^{}\n]*}\\(?:\\[[^]\n]*\\)?" (0 'dip-reference-face prepend))
-          ("#[^\n]*" . 'font-lock-comment-face)
+          (dip-match-number . 'my-number-face)
           ;; note: order above matters, because once colored, that part won't change.
           ;; in general, put longer words first
           )))
@@ -69,6 +74,10 @@
   '((t :foreground "#c18a5d"))
   "Subtle face for DIPL reference slice indices.")
 
+(defface dip-collection-bracket-face
+  '((t :foreground "#888888"))
+  "Gray face for brackets around DIPL collection item keys.")
+
 (defface my-number-face
   '((t :foreground "#d47b7b"))
   "Face for highlighting numbers")
@@ -77,10 +86,27 @@
   "-?\\b[0-9]+\\b\\(?:\\.[0-9]*\\(?:[eE][-+]?[0-9]+\\)?\\)?\\b\\.?"
   "Regular expression matching a DIPL numeric literal.")
 
+(defconst dip-collection-path-regexp
+  "^[ \t]*[[:alnum:]_-]+\\(?:\\[[[:alnum:]_-]*\\]\\)?\\(?:\\.[[:alnum:]_-]+\\(?:\\[[[:alnum:]_-]*\\]\\)?\\)*"
+  "Regular expression matching the node path at the start of a DIPL line.")
+
+(defun dip-match-collection-selector (limit)
+  "Match a collection item selector before LIMIT in a node path.
+Selectors in array values, dimensions, references, and comments are excluded."
+  (catch 'match
+    (while (re-search-forward "\\(\\[\\)\\([[:alnum:]_-]*\\)\\(\\]\\)" limit t)
+      (let ((selector-start (match-beginning 0)))
+        (when (save-excursion
+                (beginning-of-line)
+                (save-match-data
+                  (and (looking-at dip-collection-path-regexp)
+                       (< selector-start (match-end 0)))))
+          (throw 'match t))))
+    nil))
+
 (defun dip-match-number (limit)
   "Match a DIPL number before LIMIT, excluding line comments.
-Font-lock runs this matcher separately from the comment rule, so simply
-ordering the rules cannot prevent number faces inside `#` comments."
+Skip numbers after `#` so comment text keeps the comment face."
   (catch 'match
     (while (re-search-forward dip-number-regexp limit t)
       (unless (save-excursion
@@ -89,15 +115,6 @@ ordering the rules cannot prevent number faces inside `#` comments."
                   (search-forward "#" number-start t)))
         (throw 'match t)))
     nil))
-
-(defun highlight-dip-mode-numbers ()
-  "Highlight DIPL numeric literals outside comments."
-  (font-lock-add-keywords
-   nil
-   '((dip-match-number . 'my-number-face))))
-
-;; Add the function to dip modes hooks
-(add-hook 'dip-mode-hook 'highlight-dip-mode-numbers)
 
 (defvar dip-mode-syntax-table
   (let ((st (make-syntax-table)))

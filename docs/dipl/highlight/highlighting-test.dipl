@@ -105,10 +105,12 @@ $override # Tune the existing vehicle settings.
     wheels = 6
     mass = 1.5e3 kg
 
-# Indexed collection items.
+# Collection declarations and items.
+units list
 units[]
   name str = "length"
   unit str = "23*au"
+sources map
 sources[constants]
   filepath str = "data/constants.dip"
 
