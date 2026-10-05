@@ -221,6 +221,20 @@ namespace snt::dip {
         return Path(new_path.str());
     }
 
+    std::string HierarchyList::resolve_list_selectors(std::string path) const {
+        size_t position = 0;
+        while ((position = path.find("[]", position)) != std::string::npos) {
+            const std::string collection_path = path.substr(0, position);
+            const auto collection = collections.find(collection_path);
+            if (collection == collections.end() || collection->second.items.empty())
+                break;
+            const std::string& index = collection->second.items.back();
+            path.replace(position, 2, "[" + index + "]");
+            position += index.size() + 2;
+        }
+        return path;
+    }
+
     const std::unordered_map<std::string, Collection>& HierarchyList::get_collections() const {
         return collections;
     }

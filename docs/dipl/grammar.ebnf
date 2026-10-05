@@ -119,11 +119,18 @@ override-block
     { blank-line | comment-line | override-entry } DEDENT ;
 
 override-entry
-  = override-modification | override-prefix ;
+  = override-modification | override-prefix | override-item ;
 
-(* Prefixes compose paths; they do not declare groups or collection items. *)
+(* A terminal selector may create a schema-backed item. *)
+override-item
+  = node-path-with-selector [ comment ] newline [ override-block ] ;
+
+(* Other prefixes compose paths without declaring groups or items. *)
 override-prefix
-  = override-path [ comment ] newline override-block ;
+  = override-group-path [ comment ] newline override-block ;
+
+override-group-path
+  = name { [ "[" collection-key "]" ] "." name } ;
 
 (* A value-bearing parent may also have modifications to existing children. *)
 override-modification
@@ -503,8 +510,8 @@ non-negative-integer
 (* - Map and list selectors cannot be mixed at the same collection path.      *)
 (* - Schemas must be declared before use; source and unit names are unique.   *)
 (* - Expanded override paths are unique across all override inputs,  *)
-(*   and must resolve to normally instantiated value nodes. Empty selectors, *)
-(*   remote target domains, and partial array targets are not permitted.     *)
+(*   and must resolve to value nodes instantiated normally or by an override *)
+(*   item group. Remote target domains and partial arrays are not permitted. *)
 (* - Overrides are collected before evaluation and applied at the target's   *)
 (*   declaration; replacement dependencies must already be available there.  *)
 (* - Overrides preserve declaration constraints, may replace !constant       *)

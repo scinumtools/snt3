@@ -233,7 +233,9 @@ and constraints. Dotted paths and nested path prefixes are both supported:
      steps int = 100
 
 Dependencies and existing conditional definitions use the replacement values.
-Duplicate targets and targets that are not instantiated are errors. See the
+Duplicate targets and targets that are not instantiated are errors. Item groups
+such as ``items[key]`` and ``items[]`` create items in schema-backed maps and
+lists. See the
 `Overrides specification
 <https://github.com/scinumtools/snt3/blob/main/docs/dipl/syntax/overrides.md>`_
 for syntax, evaluation order, units, and host registration rules.

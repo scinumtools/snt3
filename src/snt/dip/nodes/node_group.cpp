@@ -20,18 +20,21 @@ namespace snt::dip {
         // TODO: implement injection of a source file
         // TODO: implement injection a text file
         if (dtype_raw[1] == KEYWORD_MAP) {
-            std::string full_path = env.hierarchy.get_current_path(indent, path.name).name;
+            std::string full_path =
+                env.hierarchy.resolve_list_selectors(env.hierarchy.get_current_path(indent, path.name).name);
             env.hierarchy.set_collection(full_path, Path::Kind::Map, value_raw);
             return {};
         } else if (dtype_raw[1] == KEYWORD_LIST) {
-            std::string full_path = env.hierarchy.get_current_path(indent, path.name).name;
+            std::string full_path =
+                env.hierarchy.resolve_list_selectors(env.hierarchy.get_current_path(indent, path.name).name);
             env.hierarchy.set_collection(full_path, Path::Kind::List, value_raw);
             return {};
         } else {
             BaseNode::ListType nodes;
             if (schemas.empty()) { // since we output the same node, we have to avoid infinite loops
                 // Add schemas from collection definitions
-                std::string full_path = env.hierarchy.get_current_path(indent, path.name, false).name;
+                std::string full_path =
+                    env.hierarchy.resolve_list_selectors(env.hierarchy.get_current_path(indent, path.name, false).name);
                 std::vector<std::string> previous_schemas;
                 if (env.hierarchy.has_collection(full_path)) {
                     const Collection& col = env.hierarchy.get_collection(full_path);

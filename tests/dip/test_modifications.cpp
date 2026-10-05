@@ -355,3 +355,133 @@ TEST(Override, NestedPathsUseExistingHierarchy) {
     EXPECT_TRUE(env.overrides.unresolved().empty());
     EXPECT_EQ(env["group.nested.value"].get_provenance().override_code, "    value = 3");
 }
+
+TEST(Override, AddsSchemaBackedMapAndListItems) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema item\n"
+        "  value int = 1\n"
+        "maps map : item\n"
+        "maps[old]\n"
+        "  value = 3\n"
+        "list list : item\n"
+        "list[]\n"
+        "  value = 4\n"
+    );
+    parser.add_override_string(
+        "maps[new]\n"
+        "  value = 7\n"
+        "list[0]\n"
+        "  value = 5\n"
+        "list[]\n"
+        "  value = 8\n"
+        "list[]"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env["maps[old].value"].as<int64_t>(), 3);
+    EXPECT_EQ(env["maps[new].value"].as<int64_t>(), 7);
+    EXPECT_EQ(env["list[0].value"].as<int64_t>(), 5);
+    EXPECT_EQ(env["list[1].value"].as<int64_t>(), 8);
+    EXPECT_EQ(env["list[2].value"].as<int64_t>(), 1);
+    EXPECT_TRUE(env.get_node("list[1].value")->override);
+}
+
+TEST(Override, AddsNestedSchemaBackedItems) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema child\n"
+        "  value int = 1\n"
+        "$schema parent\n"
+        "  children list : child\n"
+        "parents list : parent\n"
+    );
+    parser.add_override_string(
+        "parents[]\n"
+        "  children[]\n"
+        "    value = 9"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env["parents[0].children[0].value"].as<int64_t>(), 9);
+}
+
+TEST(Override, OverridesExistingNestedItemInNewListItem) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema child\n"
+        "  value int = 1\n"
+        "$schema parent\n"
+        "  children map : child\n"
+        "  children[old]\n"
+        "parents list : parent\n"
+    );
+    parser.add_override_string("parents[]\n  children[old]\n    value = 9");
+    const auto env = parser.parse();
+    EXPECT_EQ(env["parents[0].children[old].value"].as<int64_t>(), 9);
+}
+
+TEST(Override, NestedMapKeysFollowEachAppendedListItem) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema child\n"
+        "  value int = 1\n"
+        "$schema parent\n"
+        "  children map : child\n"
+        "parents list : parent\n"
+    );
+    parser.add_override_string(
+        "parents[]\n"
+        "  children[key]\n"
+        "    value = 2\n"
+        "parents[]\n"
+        "  children[key]\n"
+        "    value = 3"
+    );
+    const auto env = parser.parse();
+    EXPECT_EQ(env["parents[0].children[key].value"].as<int64_t>(), 2);
+    EXPECT_EQ(env["parents[1].children[key].value"].as<int64_t>(), 3);
+}
+
+TEST(Override, InlineAdditionAndNoImplicitCreation) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema item\n"
+        "  value int = 1\n"
+        "$override\n"
+        "  items[new]\n"
+        "    value = 6\n"
+        "items map : item\n"
+    );
+    EXPECT_EQ(parser.parse()["items[new].value"].as<int64_t>(), 6);
+
+    dip::DIP implicit;
+    implicit.add_string(
+        "$schema item\n"
+        "  value int = 1\n"
+        "$override\n"
+        "  items[new].value = 6\n"
+        "items map : item\n"
+    );
+    EXPECT_THROW(implicit.parse(), dip::EnvironmentException);
+
+    dip::DIP prefixed;
+    prefixed.add_string("$schema item\n  value int = 1\nroot.items map : item\n");
+    prefixed.add_override_string("root\n  items[new]\n    value = 11");
+    EXPECT_EQ(prefixed.parse()["root.items[new].value"].as<int64_t>(), 11);
+}
+
+TEST(Override, RejectsInvalidItemCreation) {
+    dip::DIP untyped;
+    untyped.add_string("items list\n");
+    untyped.add_override_string("items[]");
+    EXPECT_THROW(untyped.parse(), dip::EnvironmentException);
+
+    dip::DIP missing_index;
+    missing_index.add_string("$schema item\n  value int = 1\nitems list : item\n");
+    missing_index.add_override_string("items[2]\n  value = 7");
+    EXPECT_THROW(missing_index.parse(), dip::EnvironmentException);
+
+    dip::DIP missing;
+    missing.add_string("$schema item\n  value int = 1\n");
+    missing.add_override_string("unknown[key]");
+    EXPECT_THROW(missing.parse(), dip::EnvironmentException);
+}

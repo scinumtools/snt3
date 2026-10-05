@@ -1,5 +1,5 @@
-#include "parsers.h"
 #include "nodes/node_schema.h"
+#include "parsers.h"
 
 #include <algorithm>
 #include <fstream>
@@ -103,21 +103,6 @@ overrides list : snt_project_override
             // Manifest fields are members of the built-in project schema. Their
             // declaration line is in the preamble; the assignment is in DIPfile.
             return node->modification_lines.empty() ? node->line : node->modification_lines.back();
-        }
-
-        std::string resolved_override_path(const Environment& env, std::string path) {
-            size_t position = 0;
-            while ((position = path.find("[]", position)) != std::string::npos) {
-                const std::string collection_path = path.substr(0, position);
-                if (!env.hierarchy.has_collection(collection_path))
-                    break;
-                const auto& collection = env.hierarchy.get_collection(collection_path);
-                if (collection.items.empty())
-                    break;
-                path.replace(position, 2, "[" + collection.items.back() + "]");
-                position += collection.items.back().size() + 2;
-            }
-            return path;
         }
 
     } // namespace
@@ -655,7 +640,14 @@ overrides list : snt_project_override
         Environment target = env;
         target.set_dependency_recording(record_dependency_graph);
         target.set_block_input_recording(retain_block_inputs);
-        while (queue.size() > 0) {
+        size_t next_item_group = 0;
+        while (queue.size() > 0 || next_item_group < target.overrides.item_group_count()) {
+            if (queue.size() == 0) {
+                auto group = target.overrides.materialize_item_group(next_item_group++, target.hierarchy);
+                if (!group)
+                    continue;
+                queue.push_back(group);
+            }
             BaseNode::PointerType node = queue.pop_front();
             BaseNode::PointerType replacement;
             ValueNode::PointerType declared;
@@ -666,8 +658,8 @@ overrides list : snt_project_override
                                     node->dtype == NodeDtype::Float || node->dtype == NodeDtype::String;
             std::string graph_path;
             if (!target.branching.false_case() && (value_node || node->dtype == NodeDtype::Modification))
-                graph_path = target.branching.clean_name(resolved_override_path(
-                    target, target.hierarchy.get_current_path(node->indent, node->path.name).name
+                graph_path = target.branching.clean_name(target.hierarchy.resolve_list_selectors(
+                    target.hierarchy.get_current_path(node->indent, node->path.name).name
                 ));
             if (!target.branching.false_case() &&
                 (node->dtype == NodeDtype::Boolean || node->dtype == NodeDtype::Integer ||

@@ -36,8 +36,8 @@ Options:
       Show version information.
   -i,--input <type> [<name>] <value>
       Add input (file/string/override_string/override_file/unit/source/schema_string/schema_file).
-      override_string takes an unwrapped body of path = value modifications.
-      override_file reads such a body from a file.
+      override_string takes an unwrapped body of path = value modifications
+      and collection item groups. override_file reads such a body from a file.
       Unit, source, and schema inputs require name and value.
   --project <file>
       Load a DIPfile project; override_string/override_file inputs may tune its values.

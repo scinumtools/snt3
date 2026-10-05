@@ -64,8 +64,8 @@ native input files. This makes an AI-assisted setup easier to inspect and test
 before a run. Scientific review is still needed to judge whether the choices
 are physically appropriate.
 
-The current tools let an assistant or script [list and describe evaluated
-parameters, then preview proposed overrides as JSON](https://scinumtools.github.io/snt3/integrations/cli.html#cli-semantic-interface).
+The current tools let an assistant or script [list and describe](https://scinumtools.github.io/snt3/integrations/cli.html#cli-semantic-interface)  evaluated
+parameters, then preview proposed overrides as JSON.
 The same operations are available through the [C++ inspection API](https://scinumtools.github.io/snt3/modules/dip/inspection.html#cpp-semantic-interface)
 and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.html#python-semantic-interface).
 

@@ -65,6 +65,9 @@ namespace snt::dip {
          */
         const Path get_current_path(size_t indent = 0, const std::string& path = "", bool show_item = true) const;
 
+        /** Replace implicit list selectors with the current item indices. */
+        std::string resolve_list_selectors(std::string path) const;
+
         /**
          * Gets a reference on a ll collections
          *
