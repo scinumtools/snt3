@@ -132,6 +132,8 @@ namespace snt::dip {
 
         void record_dependency(const std::string& target, const std::string& request,
                                std::string_view operand = {}) const;
+        std::vector<ValueNode::PointerType> selected_nodes(const std::string& request,
+                                                            const TagFilter& tags) const;
 
       public:
         NodeList<ValueNode> nodes; ///< List of parsed nodes
@@ -330,6 +332,10 @@ namespace snt::dip {
          * empty list. Source-qualified queries are also supported.
          */
         ValueNode::ListType select(const std::string& request = "?", const TagFilter& tags = {}) const;
+
+        /** Select path names without cloning values or arrays. */
+        std::vector<std::string> select_paths(const std::string& request = "?",
+                                              const TagFilter& tags = {}) const;
 
         /**
          * Get a keyed collection of  nodes from a reference or a function based on a request expression

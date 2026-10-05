@@ -22,6 +22,9 @@ Module: Dimensional Input Parameters (DIP)
 Usage:
   snt dip parse [options] [arguments]
   snt dip compare <before.diph5> <after.diph5> [options]
+  snt dip describe --project DIPfile --path PATH [--format json]
+  snt dip list --project DIPfile [--query QUERY] [--limit N] [--format json]
+  snt dip preview --project DIPfile --override-file FILE [--format json]
 
 Description:
   Parse and query dimensional input parameter definitions.
@@ -69,6 +72,9 @@ Examples:
   snt dip parse --load parameters.diph5 --print
   snt dip parse -i file parameters.dip --generate cpp parameters.hpp
   snt dip compare before.diph5 after.diph5 --scope full
+  snt dip describe --project DIPfile --path simulation.cooling --format json
+  snt dip list --project DIPfile --query '?simulation.' --limit 50 --format json
+  snt dip preview --project DIPfile --override-file candidate.dip --format json
 
   snt dip parse \
       -i file parameters.dip \

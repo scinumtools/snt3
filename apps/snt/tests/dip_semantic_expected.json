@@ -1,0 +1,122 @@
+{
+  "describe": {
+    "schema_version": "1",
+    "path": "experiment.steps",
+    "kind": "value",
+    "declared_type": "int32",
+    "stored_type": "int32",
+    "shape": [],
+    "elements": 1,
+    "value": {"available": true, "encoding": "dipl", "text": "4"},
+    "units": null,
+    "metadata": {
+      "description": "", "authors": "", "title": "", "journal": "", "year": "",
+      "volume": "", "issue": "", "pages": "", "doi": "", "url": "", "version": "",
+      "created": "", "modified": "", "license": "", "rationale": "",
+      "recommended_range": "", "performance_impact": "", "scientific_impact": "",
+      "deprecated": "", "replacement": "", "since": "", "category": "", "visibility": "",
+      "native": [], "requires": [], "conflicts": [], "implies": [], "see": [], "example": []
+    },
+    "tags": [],
+    "overridden": false,
+    "default": {"available": false, "reason": "not_separately_evaluated"},
+    "rules": {"options": [], "condition": null},
+    "dependencies": {"available": false, "reason": "not_recorded"},
+    "source_text": {"available": true},
+    "provenance": {"declaration": {"source": "@INPUT@", "line": 3}, "override": null}
+  },
+  "list_item": {
+    "schema_version": "1",
+    "path": "experiment.title",
+    "kind": "value",
+    "declared_type": "str",
+    "stored_type": "str",
+    "shape": [],
+    "elements": 1,
+    "value": {"available": false, "reason": "omitted_by_limit"},
+    "units": null,
+    "metadata": {
+      "description": "", "authors": "", "title": "", "journal": "", "year": "",
+      "volume": "", "issue": "", "pages": "", "doi": "", "url": "", "version": "",
+      "created": "", "modified": "", "license": "", "rationale": "",
+      "recommended_range": "", "performance_impact": "", "scientific_impact": "",
+      "deprecated": "", "replacement": "", "since": "", "category": "", "visibility": "",
+      "native": [], "requires": [], "conflicts": [], "implies": [], "see": [], "example": []
+    },
+    "tags": [],
+    "overridden": false,
+    "default": {"available": false, "reason": "not_separately_evaluated"},
+    "rules": {"options": [], "condition": null},
+    "dependencies": {"available": false, "reason": "not_recorded"},
+    "source_text": {"available": true},
+    "provenance": {"declaration": {"source": "@INPUT@", "line": 2}, "override": null}
+  },
+  "valid_preview": {
+    "schema_version": "1",
+    "baseline_valid": true,
+    "candidate_valid": true,
+    "baseline_diagnostics": [],
+    "candidate_diagnostics": [],
+    "accepted_override_targets": ["experiment.steps"],
+    "diff": {
+      "available": true,
+      "added": 0,
+      "removed": 0,
+      "changed": 1,
+      "total": 1,
+      "truncated": false,
+      "differences": [
+        {"path": "experiment.steps", "category": "value", "kind": "changed",
+         "fields": ["value"], "before": "4", "after": "200", "changed_elements": 1}
+      ]
+    }
+  },
+  "graph_describe": {
+    "schema_version": "1",
+    "path": "simulation.speed",
+    "kind": "value",
+    "declared_type": "float64",
+    "stored_type": "float64",
+    "shape": [],
+    "elements": 1,
+    "value": {"available": true, "encoding": "dipl", "text": "3"},
+    "units": "m*s-1",
+    "metadata": {
+      "description": "Average speed calculated from distance and duration",
+      "authors": "Example Simulation Team", "title": "Synthetic motion model",
+      "journal": "", "year": "", "volume": "", "issue": "", "pages": "", "doi": "", "url": "",
+      "version": "1", "created": "", "modified": "", "license": "CC0-1.0",
+      "rationale": "Shows a derived parameter with provenance and dependencies",
+      "recommended_range": "1 to 5 m/s", "performance_impact": "Negligible for this example",
+      "scientific_impact": "Changes the model's reported average speed",
+      "deprecated": "", "replacement": "", "since": "", "category": "Motion", "visibility": "public",
+      "native": ["mean_speed"], "requires": ["simulation.distance", "simulation.duration"],
+      "conflicts": [], "implies": [], "see": ["simulation.distance", "simulation.duration"],
+      "example": ["2 m/s", "3 m/s"]
+    },
+    "tags": ["physics", "derived"],
+    "overridden": false,
+    "default": {"available": false, "reason": "not_separately_evaluated"},
+    "rules": {"options": [], "condition": "{.} > 0 m/s"},
+    "dependencies": {"available": true, "reads": [
+      {"target": "?simulation.distance", "request": "?simulation.distance"},
+      {"target": "?simulation.duration", "request": "?simulation.duration"}
+    ]},
+    "source_text": {"available": true},
+    "provenance": {"declaration": {"source": "@GRAPH_INPUT@", "line": 7}, "override": null}
+  },
+  "invalid_preview": {
+    "schema_version": "1",
+    "baseline_valid": true,
+    "candidate_valid": false,
+    "baseline_diagnostics": [],
+    "candidate_diagnostics": [
+      {"code": "dip.environment", "message": "Unresolved override",
+       "details": "The override target `missing` was not defined.",
+       "suggestion": "Define the node outside $override or remove the override.",
+       "node_path": null, "location": {"source": "DIP1_OVERRIDE0", "line": 1}}
+    ],
+    "accepted_override_targets": [],
+    "diff": {"available": false, "reason": "evaluation_failed"}
+  }
+}

@@ -498,10 +498,11 @@ namespace snt::dip {
                (any.empty() || hasIntersection(tags, any)) && !hasIntersection(tags, none);
     }
 
-    ValueNode::ListType Environment::select(const std::string& request, const TagFilter& tags) const {
+    std::vector<ValueNode::PointerType> Environment::selected_nodes(
+        const std::string& request, const TagFilter& tags) const {
         auto [source_name, node_path, is_root] = parse_request(request);
         const NodeList<ValueNode>& node_pool = source_name.empty() ? nodes : sources.at(source_name).nodes;
-        ValueNode::ListType selected;
+        std::vector<ValueNode::PointerType> selected;
         std::unordered_set<std::string> seen;
         for (const auto& vnode : node_pool.get_nodes()) {
             if (!vnode)
@@ -511,9 +512,23 @@ namespace snt::dip {
                                     (name[node_path.size()] == SIGN_SEPARATOR || name[node_path.size()] == SIGN_ARRAY_OPEN);
             const bool path_matches = name == node_path || (is_root && (node_path.empty() || descendant));
             if (path_matches && tags.matches(vnode->tags) && seen.insert(name).second)
-                selected.push_back(std::dynamic_pointer_cast<ValueNode>(vnode->clone(vnode->path, std::nullopt)));
+                selected.push_back(vnode);
         }
         return selected;
+    }
+
+    ValueNode::ListType Environment::select(const std::string& request, const TagFilter& tags) const {
+        ValueNode::ListType selected;
+        for (const auto& node : selected_nodes(request, tags))
+            selected.push_back(std::dynamic_pointer_cast<ValueNode>(node->clone(node->path, std::nullopt)));
+        return selected;
+    }
+
+    std::vector<std::string> Environment::select_paths(const std::string& request,
+                                                       const TagFilter& tags) const {
+        std::vector<std::string> paths;
+        for (const auto& node : selected_nodes(request, tags)) paths.push_back(node->path.name);
+        return paths;
     }
 
     ValueNode::ListType Environment::request_group(

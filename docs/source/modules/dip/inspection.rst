@@ -113,6 +113,56 @@ recorded references or an expression tree. ``sourceEditable`` and
        auto table = snt::dip::inspect_table(env, "measurements");
    }
 
+.. _cpp-semantic-interface:
+
+Semantic descriptions and candidate previews
+--------------------------------------------
+
+``describe`` assembles a bounded description of one evaluated path. It uses
+the same value and source facts as ``inspect_value``, but omits large value
+content and can also describe groups, collections, and tables. Scalar and
+small array values are DIPL text; ``value_unavailable_reason`` explains when
+content is omitted. ``list_descriptions`` applies the same description to
+values selected by a ``?`` path query and explicit tag filters. Its result
+includes the total match count; value content is omitted by default.
+
+.. code-block:: cpp
+
+   #include <snt/dip/inspect/semantic.h>
+
+   auto env = snt::dip::open_artifact("DIPfile", true);
+   auto one = snt::dip::describe(env, "simulation.steps");
+   auto matches = snt::dip::list_descriptions(env, "?simulation.", {}, 50);
+   // one.value_text is optional; matches.total counts all matching values.
+
+Descriptions distinguish enforced options and conditions from advisory
+metadata. They report whether source text and a dependency graph are
+available. The ``default`` is not separately evaluated; clients should use
+``preview`` when they need a baseline comparison.
+
+``preview`` parses a project or DIPL file twice, applying ordered override
+entries only to the candidate. It returns validation diagnostics for either
+parse, accepted override targets, and a semantic comparison when both parses
+succeed. It does not write project or generated output files. A DIPH5 snapshot
+can be described, but cannot be a preview input.
+
+.. code-block:: cpp
+
+   #include <snt/dip/preview.h>
+
+   std::vector<snt::dip::PreviewOverride> overrides{
+       {snt::dip::PreviewOverride::Kind::Text, "simulation.steps = 200"}
+   };
+   auto result = snt::dip::preview("DIPfile", overrides);
+   if (result.candidate_valid) {
+       auto changed = result.comparison.changed;
+   } else {
+       auto diagnostics = result.candidate_diagnostics;
+   }
+
+Preview reevaluates inputs for the baseline and candidate. Reproducible
+results require stable source files and pure host callbacks.
+
 Dependency and operation graph
 ------------------------------
 

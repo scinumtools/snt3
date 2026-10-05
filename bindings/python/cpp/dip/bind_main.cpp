@@ -20,6 +20,7 @@ namespace snt::bind::python {
     void init_exceptions(py::module_& m);
     void init_adapter(py::module_& m);
     void init_comparison(py::module_& m);
+    void init_semantic(py::module_& m);
 
     // Adding Python context manager methods to DIP
     dip::DIP& dip_enter(dip::DIP& self) {
@@ -43,6 +44,7 @@ namespace snt::bind::python {
         init_exceptions(m);
         init_adapter(m);
         init_comparison(m);
+        init_semantic(m);
 
         auto dip = py::class_<dip::DIP>(m, "DIP", "Parser and evaluator for DIPL source definitions.");
         dip.def(py::init<>(), "Create an empty DIPL parser.");

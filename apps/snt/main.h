@@ -9,6 +9,7 @@ int module_dmap(int argc, char* argv[]);
 
 void module_dip(ArgParser& argpar);
 int module_dip_compare(int argc, char* argv[]);
+int module_dip_semantic(int argc, char* argv[]);
 void module_report(ArgParser& argpar);
 void module_puq(ArgParser& argpar);
 

@@ -1,0 +1,24 @@
+# Synthetic model for trying `snt dip describe` with populated metadata.
+simulation
+  distance float = 24 m
+    ?descr "Distance travelled during one run"
+  duration float = 8 s
+    ?descr "Duration of the run"
+  speed float = ({?simulation.distance} / {?simulation.duration}) m/s
+    !tags ["physics", "derived"]
+    !condition ({.} > 0 m/s)
+    ?descr "Average speed calculated from distance and duration"
+    ?authors "Example Simulation Team"
+    ?title "Synthetic motion model"
+    ?version "1"
+    ?license "CC0-1.0"
+    ?rationale "Shows a derived parameter with provenance and dependencies"
+    ?native "mean_speed"
+    ?requires ["simulation.distance", "simulation.duration"]
+    ?see ["simulation.distance", "simulation.duration"]
+    ?example ["2 m/s", "3 m/s"]
+    ?recommended_range "1 to 5 m/s"
+    ?performance_impact "Negligible for this example"
+    ?scientific_impact "Changes the model's reported average speed"
+    ?category "Motion"
+    ?visibility "public"

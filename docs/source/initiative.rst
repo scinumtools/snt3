@@ -43,6 +43,12 @@ additional requirements of the target code, including relationships between
 settings and referenced input files, before generating its native parameter
 file.
 
+The current :ref:`CLI semantic commands <cli-semantic-interface>` let a tool
+list values, describe their available metadata and provenance, and preview an
+override with validation diagnostics and an effective diff. The same core
+operations are available from :ref:`C++ <cpp-semantic-interface>` and
+:ref:`Python <python-semantic-interface>`.
+
 These tools can propose setups, but plausible text alone is not evidence that
 a simulation is configured correctly. Explicit validation
 can catch missing or inconsistent inputs before a run; scientific judgment is

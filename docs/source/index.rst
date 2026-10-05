@@ -30,7 +30,9 @@ For AI-assisted scientific setup, DIPL provides explicit rules against which
 proposed settings can be checked. A project-specific adapter can validate
 additional requirements, including references to initial-condition files,
 before producing the code's native input. See :doc:`initiative` for this
-approach and its path toward deeper integration.
+approach and its path toward deeper integration. Today, scripts and agents
+can :ref:`discover and describe evaluated parameters and preview candidate
+overrides <cli-semantic-interface>` through versioned CLI JSON.
 
 .. toctree::
    :maxdepth: 2

@@ -190,6 +190,19 @@ Args:
         );
 
         env.def(
+            "select_paths",
+            [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& all,
+               const std::vector<std::string>& any, const std::vector<std::string>& none) {
+                return e.select_paths(path, dip::TagFilter{all, any, none});
+            },
+            py::arg("path") = "?", py::kw_only(),
+            py::arg("tags_all") = std::vector<std::string>{},
+            py::arg("tags_any") = std::vector<std::string>{},
+            py::arg("tags_none") = std::vector<std::string>{},
+            "Select paths without copying their values or arrays."
+        );
+
+        env.def(
             "request_group",
             [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& tags) {
                 return e.request_group(path, dip::RequestType::Reference, tags);

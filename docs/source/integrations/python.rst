@@ -432,6 +432,34 @@ column metadata and row count; column values remain available at their own
 paths. Slice ranges are zero-based and inclusive, and read from an evaluated
 in-memory value. DIPH5 loading is still eager.
 
+.. _python-semantic-interface:
+
+``describe(env, path)`` assembles a bounded semantic description with a stable
+path, type, tags, metadata, available value text, provenance, and dependency
+availability. ``list_descriptions(env, query, limit=...)`` returns a bounded
+selection with the total match count. It accepts ``tags_all``, ``tags_any``,
+and ``tags_none`` like ``env.select``. Its default omits value content.
+``preview(path, overrides)`` evaluates separate baseline and candidate
+environments and returns diagnostics and an effective comparison:
+
+.. code-block:: python
+
+   from scinumtools3.dip import (
+       PreviewOverride, PreviewOverrideKind, describe, list_descriptions,
+       open_artifact, preview,
+   )
+
+   env = open_artifact("DIPfile")
+   print(describe(env, "simulation.steps").value_text)
+   print(list_descriptions(env, "?simulation.", limit=20).total)
+   result = preview("DIPfile", [
+       PreviewOverride(PreviewOverrideKind.Text, "simulation.steps = 200")
+   ])
+   if result.candidate_valid:
+       print(result.comparison.differences)
+   else:
+       print(result.candidate_diagnostics)
+
 Dependency graphs
 ~~~~~~~~~~~~~~~~~
 

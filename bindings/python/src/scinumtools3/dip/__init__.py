@@ -54,6 +54,14 @@ inspect_dependency_graph = _dip.inspect_dependency_graph
 inspect_table = _dip.inspect_table
 inspect_tables = _dip.inspect_tables
 read_value_slice = _dip.read_value_slice
+SemanticDescription = _dip.SemanticDescription
+SemanticList = _dip.SemanticList
+PreviewOverrideKind = _dip.PreviewOverrideKind
+PreviewOverride = _dip.PreviewOverride
+PreviewResult = _dip.PreviewResult
+describe = _dip.describe
+list_descriptions = _dip.list_descriptions
+preview = _dip.preview
 
 
 def diagnostic_from_exception(error):

@@ -6,6 +6,7 @@
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/inspect/inspection.h>
+#include <snt/dip/inspect/semantic.h>
 #include <string>
 #include <utility>
 
@@ -247,6 +248,16 @@ TEST(Project, RegistersSchemaFilesAndStrings) {
     EXPECT_EQ(inline_locations[1].line, 6);
     EXPECT_EQ(inline_locations[0].logical_source_name, string_source.name);
     EXPECT_TRUE(inline_locations[0].embedded_registration);
+    const auto value_locations = dip::inspect_source_locations(
+        env, {dip::SourceEntityKind::Path, "second.value", {}});
+    const auto inspected_value = dip::inspect_value(env, "second.value");
+    const auto described_value = dip::describe(env, "second.value");
+    ASSERT_FALSE(value_locations.empty());
+    ASSERT_TRUE(described_value.declaration);
+    EXPECT_EQ(inspected_value.declaration_location.source, described_value.declaration->source);
+    EXPECT_EQ(inspected_value.declaration_location.line, described_value.declaration->line);
+    EXPECT_EQ(described_value.declaration->line, value_locations.back().line);
+    EXPECT_EQ(described_value.declaration->source, (project.path() / "DIPfile").string());
 }
 
 TEST(Project, RejectsAmbiguousSchemaEntry) {

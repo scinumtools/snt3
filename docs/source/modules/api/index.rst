@@ -21,7 +21,7 @@ They return formatted text suitable for interfaces such as the CLI. Code that
 needs typed results can use ``snt::puq`` or ``snt::dip`` directly.
 
 * :doc:`PUQ commands <puq>` — evaluate, convert, and inspect PUEL quantities and list definitions.
-* :doc:`DIP commands <dip>` — parse DIPL, load and save DIPH5, and generate static parameters and reports.
+* :doc:`DIP commands <dip>` — parse DIPL, describe values, preview overrides, load and save DIPH5, and generate outputs.
 
 .. toctree::
    :maxdepth: 1

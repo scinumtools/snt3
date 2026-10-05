@@ -66,6 +66,32 @@ change the array sample size. ``set_max_details()`` bounds ``execute()``
 output. See :doc:`DIPH5 comparison <../dip/comparison>` for the fields and
 equality semantics.
 
+Semantic JSON for applications
+------------------------------
+
+``DIPSemantic`` exposes descriptions, discovery, and candidate previews as
+versioned JSON. ``describe_json`` and ``list_json`` accept a DIPfile, DIPL
+file, or DIPH5 snapshot. ``preview_json`` accepts a DIPfile or DIPL file and
+returns validation diagnostics plus a bounded diff. An invalid candidate is
+represented in JSON with ``candidate_valid: false``.
+Set the trailing ``record_dependency_graph`` argument of ``describe_json`` or
+``list_json`` to ``true`` to include recorded reads from a parsed input.
+Snapshots use their saved graph.
+
+.. code-block:: cpp
+
+   #include <snt/api/dip_semantic.h>
+
+   snt::api::DIPSemantic model("DIPfile");
+   auto description = model.describe_json("simulation.steps");
+   auto selected = model.list_json("?simulation.");
+   auto candidate = model.preview_json({
+       {snt::dip::PreviewOverride::Kind::Text, "simulation.steps = 200"}
+   });
+
+For typed C++ results, use :doc:`the DIP inspection and preview functions
+<../dip/inspection>` directly.
+
 Generating static parameters
 ----------------------------
 

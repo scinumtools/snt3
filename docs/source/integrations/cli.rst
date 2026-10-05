@@ -141,6 +141,56 @@ The project and override inputs may be supplied in either order.
 Use ``-i override_file overrides.dip`` to read an unwrapped override body from
 a file.
 
+.. _cli-semantic-interface:
+
+Describing and previewing parameters
+------------------------------------
+
+The read-only semantic commands return versioned JSON. ``describe`` reports
+one evaluated path, while ``list`` selects values by path and explicit tags:
+
+.. code-block:: shell
+
+   snt dip describe --project DIPfile --path simulation.steps --format json
+   snt dip list --project DIPfile --query '?simulation.' --limit 50 --format json
+   snt dip list --project DIPfile --tag-all runtime --format json
+
+Use ``--input`` for a DIPL file or a DIPH5 snapshot. Values in the JSON
+response have a DIPL text encoding. Values exceeding ``--max-value-elements``
+or the 4096-byte text cap are omitted, and tables have no single value.
+``list`` omits value content by default and
+reports whether its result was truncated. Missing defaults and dependency
+graphs are marked unavailable instead of being inferred. Add
+``--record-graph`` to ``describe`` or ``list`` to capture dependencies while
+parsing a DIPfile or DIPL input. A DIPH5 snapshot uses its saved graph state.
+For a populated example, run this from the repository root:
+
+.. code-block:: shell
+
+   snt dip describe --input examples/dip/SemanticDescription/parameters.dip \
+       --path simulation.speed --record-graph --format json
+
+It reports the evaluated speed, units, descriptive metadata, tags, enforced
+condition, source location, and reads of ``simulation.distance`` and
+``simulation.duration``. Metadata fields absent from the DIPL input remain
+empty; the tool does not invent publication details or a default value.
+
+``preview`` evaluates the original model and a separate candidate with
+ordered overrides. It reports validation diagnostics and an effective-value
+diff without writing project files or generated outputs:
+
+.. code-block:: shell
+
+   snt dip preview --project DIPfile --override-file candidate.dip --format json
+   snt dip preview --input parameters.dip --override 'simulation.steps = 200' \
+       --max-details 20 --format json
+
+An invalid candidate is a JSON result with ``candidate_valid: false`` and
+``diff.available: false``. The command exits successfully when it can return
+that result; command-line usage errors return a nonzero status. Preview
+accepts DIPfile, ``.dip``, and ``.dipl`` inputs, while description and listing
+also accept DIPH5 snapshots.
+
 Environment persistence
 -----------------------
 

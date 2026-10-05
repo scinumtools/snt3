@@ -64,6 +64,11 @@ native input files. This makes an AI-assisted setup easier to inspect and test
 before a run. Scientific review is still needed to judge whether the choices
 are physically appropriate.
 
+The current tools let an assistant or script [list and describe evaluated
+parameters, then preview proposed overrides as JSON](https://scinumtools.github.io/snt3/integrations/cli.html#cli-semantic-interface).
+The same operations are available through the [C++ inspection API](https://scinumtools.github.io/snt3/modules/dip/inspection.html#cpp-semantic-interface)
+and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.html#python-semantic-interface).
+
 ## One parameter layer for many scientific codes
 
 <a href="https://scinumtools.github.io/snt3/initiative.html"><img align="left" src="docs/img/snt-initiative-readme.png" alt="A parameter model is validated and translated into a scientific code's native input file" width="180" height="180" hspace="16" style="margin-right:30px"></a>

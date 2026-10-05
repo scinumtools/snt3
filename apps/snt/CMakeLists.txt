@@ -80,6 +80,13 @@ if(ENABLE_UNIT_TESTS)
       "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-comparison"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dip_comparison.cmake"
   )
+  add_test(
+    NAME cli.dip.semantic
+    COMMAND ${CMAKE_COMMAND}
+      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+      "-DSOURCE_DIR=${PROJECT_SOURCE_DIR}"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dip_semantic.cmake"
+  )
 endif()
 
 if(ENABLE_SNT_SERVER)

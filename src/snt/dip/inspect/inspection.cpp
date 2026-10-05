@@ -1,5 +1,8 @@
 #include <snt/dip/inspect/inspection.h>
 
+#include "artifact_input.h"
+#include "value_facts.h"
+
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 
@@ -10,10 +13,38 @@
 
 namespace snt::dip {
 namespace {
-core::SourceLocation location(const std::optional<SourceInfo>& info, const std::string& name,
-                              size_t line, const std::string& code) {
-    const std::string source = info && !info->path.empty() ? info->path : name;
-    return {source, line, code};
+std::optional<InspectedSourceLocation> resolve_source_location(
+    const Environment& env, SourceLocationRole role, const std::string& logical_name,
+    std::size_t logical_line, std::size_t modification_index = 0) {
+    if (logical_name.empty() || logical_line == 0) return std::nullopt;
+    const auto parsed = env.sources.entries().find(logical_name);
+    const bool retained_text = parsed != env.sources.entries().end();
+    std::string physical_name = logical_name;
+    std::size_t physical_line = logical_line;
+    const bool embedded = retained_text && parsed->second.embedded;
+    if (embedded) {
+        physical_name = parsed->second.parent.name;
+        physical_line = parsed->second.parent.line_number;
+        if (physical_name.empty() || physical_line == 0) {
+            physical_name = logical_name;
+            physical_line = logical_line;
+        }
+    }
+    const auto info = env.get_source_info(physical_name);
+    const SourceInfo source = info.value_or(SourceInfo{physical_name, {}, {}, 0, {}, {}});
+    return InspectedSourceLocation{role, source, physical_line, logical_name, logical_line,
+                                   modification_index, embedded, retained_text};
+}
+
+core::SourceLocation project_source_location(const std::optional<InspectedSourceLocation>& resolved,
+                                             const std::string& fallback_name, std::size_t fallback_line,
+                                             const std::string& code,
+                                             const std::optional<SourceInfo>& fallback_info = std::nullopt) {
+    if (!resolved) return {fallback_info && !fallback_info->path.empty() ? fallback_info->path : fallback_name,
+                           fallback_line, code};
+    const auto& source = resolved->source;
+    return {source.path.empty() ? source.name : source.path, resolved->line,
+            resolved->embedded_registration ? std::nullopt : std::optional<std::string>(code)};
 }
 } // namespace
 
@@ -29,14 +60,10 @@ ArtifactKind detect_artifact(const std::filesystem::path& path) {
 Environment open_artifact(const std::filesystem::path& path, bool record_dependency_graph,
                           bool retain_block_inputs) {
     switch (detect_artifact(path)) {
-    case ArtifactKind::Project: {
-        DIP parser;
-        parser.add_project(path);
-        return parser.parse(record_dependency_graph, retain_block_inputs);
-    }
+    case ArtifactKind::Project:
     case ArtifactKind::DIPL: {
         DIP parser;
-        parser.add_file(path);
+        detail::register_parse_input(parser, path);
         return parser.parse(record_dependency_graph, retain_block_inputs);
     }
     case ArtifactKind::DIPH5: {
@@ -46,6 +73,20 @@ Environment open_artifact(const std::filesystem::path& path, bool record_depende
     }
     case ArtifactKind::TableText:
         throw std::invalid_argument("A .dipt file requires a DIPL table declaration; it cannot be loaded alone.");
+    case ArtifactKind::Unknown:
+        throw std::invalid_argument("Unknown DIP artifact: " + path.string());
+    }
+    throw std::invalid_argument("Unknown DIP artifact.");
+}
+
+void detail::register_parse_input(DIP& parser, const std::filesystem::path& path) {
+    switch (detect_artifact(path)) {
+    case ArtifactKind::Project: parser.add_project(path); return;
+    case ArtifactKind::DIPL: parser.add_file(path); return;
+    case ArtifactKind::TableText:
+        throw std::invalid_argument("A .dipt file requires a DIPL table declaration; it cannot be loaded alone.");
+    case ArtifactKind::DIPH5:
+        throw std::invalid_argument("A .diph5 snapshot cannot be registered as parser input.");
     case ArtifactKind::Unknown:
         throw std::invalid_argument("Unknown DIP artifact: " + path.string());
     }
@@ -73,24 +114,8 @@ std::vector<InspectedSourceLocation> inspect_source_locations(
     std::vector<InspectedSourceLocation> locations;
     const auto add = [&](SourceLocationRole role, const std::string& logical_name,
                          std::size_t logical_line, std::size_t modification_index = 0) {
-        if (logical_name.empty() || logical_line == 0) return;
-        const auto parsed = env.sources.entries().find(logical_name);
-        const bool retained_text = parsed != env.sources.entries().end();
-        std::string physical_name = logical_name;
-        std::size_t physical_line = logical_line;
-        const bool embedded = retained_text && parsed->second.embedded;
-        if (embedded) {
-            physical_name = parsed->second.parent.name;
-            physical_line = parsed->second.parent.line_number;
-            if (physical_name.empty() || physical_line == 0) {
-                physical_name = logical_name;
-                physical_line = logical_line;
-            }
-        }
-        const auto info = env.get_source_info(physical_name);
-        const SourceInfo source = info.value_or(SourceInfo{physical_name, {}, {}, 0, {}, {}});
-        locations.push_back({role, source, physical_line, logical_name, logical_line,
-                             modification_index, embedded, retained_text});
+        if (auto resolved = resolve_source_location(env, role, logical_name, logical_line, modification_index))
+            locations.push_back(std::move(*resolved));
     };
 
     switch (entity.kind) {
@@ -165,29 +190,55 @@ std::vector<InspectedSourceLocation> inspect_source_locations(
     return locations;
 }
 
-ValueInspection inspect_value(const Environment& env, std::string_view path) {
+detail::ValueFacts detail::inspect_value_facts(const Environment& env, std::string_view path,
+                                               bool include_description_details) {
     const std::string name(path);
     const auto node = env.get_node(name);
     if (!node->value)
         throw std::invalid_argument("The DIP node has no evaluated value: " + name);
     const auto provenance = env[name].get_provenance();
-    const auto declaration = location(provenance.source, provenance.source_name,
-                                      provenance.source_line, provenance.source_code);
+    const auto declaration_source = resolve_source_location(
+        env, SourceLocationRole::Declaration, provenance.source_name, provenance.source_line);
+    const auto declaration = project_source_location(
+        declaration_source, provenance.source_name, provenance.source_line, provenance.source_code,
+        provenance.source);
     std::optional<core::SourceLocation> replacement;
-    if (node->override)
-        replacement = location(provenance.override_source, node->override_line.source.name,
-                               provenance.override_line, provenance.override_code);
+    if (node->override) {
+        const auto source = resolve_source_location(env, SourceLocationRole::Override,
+            node->override_line.source.name, provenance.override_line);
+        replacement = project_source_location(source, node->override_line.source.name,
+                                              provenance.override_line, provenance.override_code,
+                                              provenance.override_source);
+    }
     std::vector<ValueChange> changes{{ValueChangeKind::Declaration, declaration}};
     for (const auto& line : node->modification_lines)
         changes.push_back({ValueChangeKind::Modification,
-                           location(env.get_source_info(line.source.name), line.source.name,
-                                    line.source.line_number, line.code)});
+                           project_source_location(resolve_source_location(env, SourceLocationRole::Modification,
+                               line.source.name, line.source.line_number), line.source.name,
+                               line.source.line_number, line.code)});
     if (replacement)
         changes.push_back({ValueChangeKind::Override, *replacement});
-    return {name, node->value->get_dtype(), node->value->get_shape(), node->value->clone(),
-            node->units, node->metadata, node->tags, provenance, declaration, replacement,
-            env.get_applied_schemas(name), env.get_contributing_schema(name), node->table_path,
-            std::move(changes)};
+    std::vector<std::string> options;
+    if (include_description_details) {
+        options.reserve(node->options.size());
+        for (const auto& option : node->options)
+            options.push_back(option.value_raw + (option.units_raw.empty() ? "" : " " + option.units_raw));
+    }
+    return {name, node->value_dtype, node->value->get_dtype(), node->value->get_shape(),
+            node->value->get_size(), node->dimension.empty(), node->value.get(),
+            node->units, node->metadata, node->tags,
+            node->override, provenance, declaration, replacement, std::move(changes),
+            declaration_source && declaration_source->source_text_available, node->table_path,
+            node->condition, std::move(options)};
+}
+
+ValueInspection inspect_value(const Environment& env, std::string_view path) {
+    const auto facts = detail::inspect_value_facts(env, path);
+    return {facts.path, facts.stored_type, facts.shape, facts.value->clone(),
+            facts.units, facts.metadata, facts.tags, facts.provenance,
+            facts.declaration_location, facts.override_location,
+            env.get_applied_schemas(facts.path), env.get_contributing_schema(facts.path),
+            facts.table_path, facts.changes};
 }
 
 std::vector<ValueInspection> inspect_values(const Environment& env) {

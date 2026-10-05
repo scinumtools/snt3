@@ -70,6 +70,16 @@ int main(int argc, char* argv[]) {
             return 2;
         }
     }
+    if (argc > 2 && std::string(argv[1]) == "dip" &&
+        (std::string(argv[2]) == "describe" || std::string(argv[2]) == "list" ||
+         std::string(argv[2]) == "preview")) {
+        try {
+            return module_dip_semantic(argc - 2, argv + 2);
+        } catch (const std::exception& error) {
+            std::cerr << error.what() << '\n';
+            return 2;
+        }
+    }
 
     ArgParser argpar(argc, argv);
 
