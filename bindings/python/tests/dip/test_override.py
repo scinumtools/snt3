@@ -285,16 +285,24 @@ def test_nested_override_duplicates_are_atomic(body):
     'simulation map\n  steps = 2',
     'simulation\n  !tags ["export"]\n  steps = 2',
     'simulation\n  ?descr "Description"\n  steps = 2',
-    'items[]\n  mass = 2',
     'simulation',
     'simulation\n    steps = 2',
     '  simulation.steps = 2',
 ])
 def test_nested_override_rejects_structural_entries(body):
-    # Indentation is shorthand for paths, never permission to declare or append nodes.
+    # Typed declarations, properties, and malformed path prefixes are not overrides.
     parser = DIP()
     with pytest.raises(RuntimeError):
         parser.add_override_string(body)
+
+
+def test_nested_override_appends_schema_backed_item():
+    parser = DIP()
+    parser.add_schema_string('item', 'mass int = 1')
+    parser.add_string('items list : item')
+    parser.add_override_string('items[]\n  mass = 2')
+    env = parser.parse()
+    assert env['items[0].mass'].value == 2
 
 
 def test_nested_override_missing_target_is_not_created():

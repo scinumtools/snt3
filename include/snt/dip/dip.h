@@ -93,8 +93,8 @@ namespace snt::dip {
         /** Register a named schema body from a file, with the same rules as add_schema_string(). */
         void add_schema_file(const std::string& name, const std::filesystem::path& source_file);
 
-        /** Atomically register value-only modifications from an unwrapped $override body.
-         * Dotted paths and nested prefixes resolve to existing targets, including active conditional nodes.
+        /** Atomically register an unwrapped $override body.
+         * Value paths resolve to existing targets; terminal collection item groups may create schema-backed items.
          * An empty or comment-only body makes no changes. */
         void add_override_string(const std::string& source_code);
         /** Register an unwrapped override body from a file, retaining its source path.
