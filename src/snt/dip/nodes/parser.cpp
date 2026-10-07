@@ -266,7 +266,7 @@ namespace snt::dip {
         constexpr std::string_view types[] = {
             KEYWORD_BOOLEAN, KEYWORD_INTEGER, KEYWORD_FLOAT, KEYWORD_STRING, KEYWORD_TABLE, KEYWORD_MAP, KEYWORD_LIST
         };
-        constexpr std::string_view precisions[] = {"128", "64", "32", "16", "8", "x"};
+        constexpr std::string_view precisions[] = {"128", "64", "32", "16", "8"};
         const auto fail = [&] {
             if (required)
                 throw dip::SyntaxException(
@@ -308,6 +308,15 @@ namespace snt::dip {
                 return fail();
             // match precision
             precision = match(precisions);
+            if ((type == KEYWORD_INTEGER || type == KEYWORD_FLOAT) && n < code.size() && code[n] == 'x')
+                throw dip::SyntaxException(
+                    "Unsupported type precision",
+                    "Variable precision `x` is not supported for numeric DIPL nodes.",
+                    "Use an explicit supported type such as `int32`, `uint64`, or `float64`.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
         }
         // commit type
         dtype_raw = {sign, type, precision};

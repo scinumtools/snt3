@@ -70,7 +70,6 @@ namespace snt::dip {
     }
 
     val::BaseValue::PointerType FloatNode::cast_scalar_value(const std::string& value_input) const {
-        // TODO: variable precision x should be implemented
         switch (value_dtype) {
         case core::DataType::Float32:
             return std::make_unique<val::ArrayValueFloat32>(std::stof(value_input));
@@ -95,7 +94,6 @@ namespace snt::dip {
     val::BaseValue::PointerType FloatNode::cast_array_value(
         const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
     ) const {
-        // TODO: variable precision x should be implemented
         switch (value_dtype) {
         case core::DataType::Float32: {
             std::vector<float> arr;

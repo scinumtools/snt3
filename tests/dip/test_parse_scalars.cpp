@@ -50,6 +50,22 @@ TEST(ParseScalars, IntegerValue) {
     EXPECT_EQ(vnode->value->to_string(), "23456789");
 }
 
+TEST(ParseScalars, VariablePrecisionIsRejectedAtParsing) {
+    for (const std::string& declaration : {
+             "value intx = 1", "value uintx = 1", "value floatx = 1.5", "value floatx[2] = [1,2]"
+         }) {
+        SCOPED_TRACE(declaration);
+        dip::DIP parser;
+        try {
+            parser.add_string(declaration);
+            parser.parse();
+            FAIL() << "Expected an unsupported precision diagnostic";
+        } catch (const dip::SyntaxException& error) {
+            EXPECT_EQ(error.info().message, "Unsupported type precision");
+        }
+    }
+}
+
 TEST(ParseScalars, FloatValue) {
 
     dip::DIP d;

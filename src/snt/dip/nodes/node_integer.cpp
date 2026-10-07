@@ -164,7 +164,6 @@ namespace snt::dip {
     }
 
     val::BaseValue::PointerType IntegerNode::cast_scalar_value(const std::string& value_input) const {
-        // TODO: variable precision x should be implemented
         switch (value_dtype) {
         case core::DataType::Integer8_U:
             return std::make_unique<val::ArrayValueUint8>(checked_integer<uint8_t>(value_input, line));
@@ -202,7 +201,6 @@ namespace snt::dip {
     val::BaseValue::PointerType IntegerNode::cast_array_value(
         const val::Array::StringType& value_inputs, const val::Array::ShapeType& shape
     ) const {
-        // TODO: variable precision x should be implemented
         switch (value_dtype) {
         case core::DataType::Integer8_U: {
             std::vector<uint8_t> arr;
