@@ -5,6 +5,7 @@
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
 #include <snt/puq/result.h>
+#include <snt/puq/systems/unit_system.h>
 #include <snt/puq/to_string.h>
 
 using namespace snt;
@@ -292,8 +293,8 @@ TEST(Math, Sinus) {
             FAIL() << "Expected puq::UnitException";
         } catch (const puq::UnitException& e) {
             EXPECT_EQ(e.info().message, "Dimension mismatch");
-            EXPECT_EQ(e.info().details, "The sine function accepts only dimensionless quantities.");
-            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity as the argument of the sine function.");
+            EXPECT_EQ(e.info().details, "The sine function accepts only dimensionless quantities or angles.");
+            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity or an angle as the argument of the sine function.");
         } catch (...) {
             FAIL() << "Expected puq::SyntaxException";
         }
@@ -326,10 +327,10 @@ TEST(Math, Cosinus) {
         try {
             puq::math::cos(msr2);
             FAIL() << "Expected puq::UnitException";
-        } catch (const puq::UnitException& e) { // TOTO: should accept also radians
+        } catch (const puq::UnitException& e) {
             EXPECT_EQ(e.info().message, "Dimension mismatch");
-            EXPECT_EQ(e.info().details, "The cosine function accepts only dimensionless quantities.");
-            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity as the argument of the cosine function.");
+            EXPECT_EQ(e.info().details, "The cosine function accepts only dimensionless quantities or angles.");
+            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity or an angle as the argument of the cosine function.");
         } catch (...) {
             FAIL() << "Expected puq::SyntaxException";
         }
@@ -364,8 +365,8 @@ TEST(Math, Tangens) {
             FAIL() << "Expected puq::UnitException";
         } catch (const puq::UnitException& e) {
             EXPECT_EQ(e.info().message, "Dimension mismatch");
-            EXPECT_EQ(e.info().details, "The tangent function accepts only dimensionless quantities.");
-            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity as the argument of the tangent function.");
+            EXPECT_EQ(e.info().details, "The tangent function accepts only dimensionless quantities or angles.");
+            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity or an angle as the argument of the tangent function.");
         } catch (...) {
             FAIL() << "Expected puq::SyntaxException";
         }
@@ -376,6 +377,75 @@ TEST(Math, Tangens) {
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::tan(quant1);
         EXPECT_EQ(quant0.to_string(), "-1.012(81)"); // est -1.0124663625978223 unc 0.08100351713835607
+    }
+}
+
+TEST(Math, TrigonometricAngles) {
+    const double radians_per_degree = std::acos(-1.0) / 180.0;
+
+    EXPECT_THROW(puq::math::sin(puq::Measurement(1.0, "sr")), puq::UnitException);
+
+    const auto sine = puq::math::sin(puq::Measurement(30.0, 3.0, "deg"));
+    EXPECT_TRUE(sine.baseunits.size() == 0);
+    ASSERT_TRUE(sine.result.uncertainty);
+    EXPECT_NEAR(val::ArrayValueFloat64(sine.result.estimate.get()).get_value(0), 0.5, 1e-9);
+    EXPECT_NEAR(val::ArrayValueFloat64(sine.result.uncertainty.get()).get_value(0),
+                std::cos(30 * radians_per_degree) * 3 * radians_per_degree, 1e-9);
+
+    const auto cosine = puq::math::cos(puq::Measurement(60.0, 3.0, "deg"));
+    EXPECT_TRUE(cosine.baseunits.size() == 0);
+    ASSERT_TRUE(cosine.result.uncertainty);
+    EXPECT_NEAR(val::ArrayValueFloat64(cosine.result.estimate.get()).get_value(0), 0.5, 1e-9);
+    EXPECT_NEAR(val::ArrayValueFloat64(cosine.result.uncertainty.get()).get_value(0),
+                std::sin(60 * radians_per_degree) * 3 * radians_per_degree, 1e-9);
+
+    const auto tangent = puq::math::tan(puq::Measurement(45.0, 1.0, "deg"));
+    EXPECT_TRUE(tangent.baseunits.size() == 0);
+    ASSERT_TRUE(tangent.result.uncertainty);
+    EXPECT_NEAR(val::ArrayValueFloat64(tangent.result.estimate.get()).get_value(0), 1.0, 1e-9);
+    EXPECT_NEAR(val::ArrayValueFloat64(tangent.result.uncertainty.get()).get_value(0),
+                2 * radians_per_degree, 1e-9);
+
+    const auto radians = puq::math::sin(puq::Measurement(std::acos(-1.0) / 6.0, 0.1, "rad"));
+    EXPECT_TRUE(radians.baseunits.size() == 0);
+    EXPECT_NEAR(val::ArrayValueFloat64(radians.result.estimate.get()).get_value(0), 0.5, 1e-12);
+    ASSERT_TRUE(radians.result.uncertainty);
+    EXPECT_NEAR(val::ArrayValueFloat64(radians.result.uncertainty.get()).get_value(0),
+                std::cos(std::acos(-1.0) / 6.0) * 0.1, 1e-12);
+
+    if constexpr (puq::Config::use_system_cgs) {
+        puq::UnitSystem active_system(puq::SystemType::ESU);
+        const auto si_angle = puq::math::sin(puq::Quantity(30.0, 3.0, "deg", puq::SystemType::SI));
+        EXPECT_EQ(si_angle.stype, puq::SystemType::SI);
+        EXPECT_TRUE(si_angle.measurement.baseunits.size() == 0);
+        EXPECT_NEAR(val::ArrayValueFloat64(si_angle.measurement.result.estimate.get()).get_value(0), 0.5, 1e-9);
+
+        const auto esu_angle = puq::math::sin(
+            puq::Quantity(std::acos(-1.0) / 6.0, 0.1, "rad", puq::SystemType::ESU)
+        );
+        EXPECT_EQ(esu_angle.stype, puq::SystemType::ESU);
+        EXPECT_TRUE(esu_angle.measurement.baseunits.size() == 0);
+        EXPECT_NEAR(val::ArrayValueFloat64(esu_angle.measurement.result.estimate.get()).get_value(0), 0.5, 1e-12);
+    }
+}
+
+TEST(Math, TrigonometricAngleArrays) {
+    const val::Array::ShapeType shape = {2, 2};
+    puq::Result input(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{0.0, 30.0, 60.0, 90.0}, shape),
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{1.0, 1.0, 1.0, 1.0}, shape)
+    );
+    const auto output = puq::math::sin(puq::Measurement(input, "deg"));
+    EXPECT_TRUE(output.baseunits.size() == 0);
+    EXPECT_EQ(output.shape(), shape);
+    ASSERT_TRUE(output.result.uncertainty);
+    EXPECT_EQ(output.result.uncertainty->get_shape(), shape);
+    const val::ArrayValueFloat64 estimates(output.result.estimate.get());
+    const val::ArrayValueFloat64 uncertainties(output.result.uncertainty.get());
+    for (size_t i = 0; i < 4; ++i) {
+        const double angle = i * 30.0 * std::acos(-1.0) / 180.0;
+        EXPECT_NEAR(estimates.get_value(i), std::sin(angle), 1e-9);
+        EXPECT_NEAR(uncertainties.get_value(i), std::abs(std::cos(angle)) * std::acos(-1.0) / 180.0, 1e-9);
     }
 }
 

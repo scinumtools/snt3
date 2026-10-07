@@ -1,9 +1,10 @@
-#include <snt/puq/exceptions.h>
-#include <snt/puq/exponent.h>
+#include "trigonometric_input.h"
+
 #include <snt/puq/math/cos.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
 #include <snt/puq/result.h>
+#include <snt/puq/systems/unit_system.h>
 
 namespace snt::puq::math {
 
@@ -19,18 +20,11 @@ namespace snt::puq::math {
     }
 
     puq::Measurement cos(const puq::Measurement& msr) {
-        if (msr.baseunits.has_dimensions()) // TODO: allow for radians
-            throw puq::UnitException(
-                "Dimension mismatch",
-                "The cosine function accepts only dimensionless quantities.",
-                "Provide a dimensionless quantity as the argument of the cosine function.",
-                __FILE__,
-                __LINE__
-            );
-        return puq::Measurement(cos(msr.result), msr.baseunits);
+        return puq::Measurement(cos(trigonometric_input(msr, "cosine")));
     }
 
     puq::Quantity cos(const puq::Quantity& quant) {
+        puq::UnitSystem system(quant.stype);
         return puq::Quantity(cos(quant.measurement), quant.stype);
     }
 
