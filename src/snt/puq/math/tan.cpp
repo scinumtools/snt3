@@ -13,13 +13,11 @@ namespace snt::puq::math {
             // Treating limits where cos(x)->0, or 1/cos2(x)->inf
             val::BaseValue::PointerType cosx = m.estimate->math_cos();
             val::ArrayValueFloat64 eps(1e-12); // defining a small threshold
-            if (cosx->math_abs()->compare_less(&eps)->any_of()) {
-                // TODO: set inf values only to those array values which are truly less than eps
-                return puq::Result(m.estimate->math_tan(), m.uncertainty->math_inf());
-            } else {
-                val::BaseValue::PointerType invcos2 = m.estimate->math_cos()->math_pow(2)->math_inv();
-                return puq::Result(m.estimate->math_tan(), m.uncertainty->math_mul(invcos2.get()));
-            }
+            auto near_limit = cosx->math_abs()->compare_less(&eps);
+            auto invcos2 = cosx->math_pow(2)->math_inv();
+            auto propagated = m.uncertainty->math_mul(invcos2.get());
+            auto uncertainty = m.uncertainty->math_inf()->where(near_limit.get(), propagated.get());
+            return puq::Result(m.estimate->math_tan(), std::move(uncertainty));
         } else {
             return puq::Result(m.estimate->math_tan());
         }

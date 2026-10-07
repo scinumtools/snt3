@@ -329,7 +329,6 @@ TEST(Math, Tangens) {
         } catch (...) {
             FAIL() << "Expected puq::SyntaxException";
         }
-        // TODO: Implement test with limiting values
     }
     {
         // Quantity    TODO: implement tests with different systems
@@ -338,6 +337,27 @@ TEST(Math, Tangens) {
         quant0 = puq::math::tan(quant1);
         EXPECT_EQ(quant0.to_string(), "-1.012(81)"); // est -1.0124663625978223 unc 0.08100351713835607
     }
+}
+
+TEST(Math, TangensMixedArrayLimit) {
+    const double half_pi = std::acos(-1.0) / 2.0;
+    const val::Array::ShapeType shape = {2, 2};
+    puq::Result input(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{0.0, half_pi, half_pi / 2.0, 0.0}, shape),
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{0.1, 0.1, 0.1, 0.1}, shape)
+    );
+
+    puq::Result output = puq::math::tan(input);
+    ASSERT_TRUE(output.uncertainty);
+    EXPECT_EQ(output.uncertainty->get_shape(), shape);
+    const auto* values = dynamic_cast<const val::ArrayValue<double>*>(output.uncertainty.get());
+    ASSERT_NE(values, nullptr);
+    const auto uncertainty = values->get_values();
+    ASSERT_EQ(uncertainty.size(), 4);
+    EXPECT_NEAR(uncertainty[0], 0.1, 1e-12);
+    EXPECT_TRUE(std::isinf(uncertainty[1]));
+    EXPECT_NEAR(uncertainty[2], 0.2, 1e-12);
+    EXPECT_NEAR(uncertainty[3], 0.1, 1e-12);
 }
 
 TEST(Math, AbsoluteValue) {

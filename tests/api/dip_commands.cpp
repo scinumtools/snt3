@@ -12,8 +12,6 @@
 
 using namespace snt;
 
-// TODO: test each argument
-
 class DIPCommands : public ::testing::Test {
   protected:
     api::DIPParse cmd;
@@ -28,6 +26,28 @@ class DIPCommands : public ::testing::Test {
         );
     }
 };
+
+TEST(DIPParse, RejectsInvalidAddArguments) {
+    for (const char* kind : {"project", "file", "string", "override_string", "override_file"}) {
+        SCOPED_TRACE(kind);
+        api::DIPParse command;
+        EXPECT_THROW(command.argument_add(kind, {}), api::ArgumentException);
+        EXPECT_THROW(command.argument_add(kind, {"first", "second"}), api::ArgumentException);
+    }
+    for (const char* kind : {"source", "unit", "schema_string", "schema_file"}) {
+        SCOPED_TRACE(kind);
+        api::DIPParse command;
+        EXPECT_THROW(command.argument_add(kind, {"only-one"}), api::ArgumentException);
+        EXPECT_THROW(command.argument_add(kind, {"first", "second", "third"}), api::ArgumentException);
+    }
+    api::DIPParse command;
+    EXPECT_THROW(command.argument_add("unknown", {"value"}), api::ArgumentException);
+}
+
+TEST(DIPParse, RejectsInvalidScalarTypeArgument) {
+    api::DIPParse command;
+    EXPECT_THROW(command.argument_value("number"), api::ArgumentException);
+}
 
 TEST_F(DIPCommands, AddFile) {
 
