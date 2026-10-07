@@ -551,30 +551,30 @@ TEST(Properties, Metadata) {
     EXPECT_EQ(vnode->metadata.modified, "2024-04-02");
     EXPECT_EQ(vnode->metadata.license, "CC BY 4.0");
 
-    // Throw an error if trying to assign description to unsuported node
-    // TODO: The test below works only because the group node is the first node in the list.
-    //       If there are value nodes before the group node, the description will be assigned
-    //       to the first previous value node. This is because description nodes
-    //       currently don't see the group nodes in a node list.
-    //       This needs to be fixed!
-    d = dip::DIP();
-    d.add_string("foo");
-    d.add_string("  ?descr \"This is a group node\"");
-    d.add_string("bar int = 3");
-    try {
-        d.parse();
-        FAIL() << "Expected dip::SyntaxException";
-    } catch (const dip::SyntaxException& e) {
-        EXPECT_EQ(e.info().message, "Cannot set a property on a non-value node");
-        EXPECT_EQ(
-            e.info().details,
-            "Only value nodes (boolean, integer, float, string and table) can have properties, but the node type "
-            "is "
-            "`group`."
-        );
-        EXPECT_EQ(e.info().suggestion, "Remove the property or move it behind a value node.");
-    } catch (...) {
-        FAIL() << "Expected dip::SyntaxException";
+    // A group property must be rejected even when a value node precedes the group.
+    for (bool preceding_value : {false, true}) {
+        SCOPED_TRACE(preceding_value);
+        d = dip::DIP();
+        if (preceding_value)
+            d.add_string("prior int = 1");
+        d.add_string("foo");
+        d.add_string("  ?descr \"This is a group node\"");
+        d.add_string("bar int = 3");
+        try {
+            d.parse();
+            FAIL() << "Expected dip::SyntaxException";
+        } catch (const dip::SyntaxException& e) {
+            EXPECT_EQ(e.info().message, "Cannot set a property on a non-value node");
+            EXPECT_EQ(
+                e.info().details,
+                "Only value nodes (boolean, integer, float, string and table) can have properties, but the node type "
+                "is "
+                "`group`."
+            );
+            EXPECT_EQ(e.info().suggestion, "Remove the property or move it behind a value node.");
+        } catch (...) {
+            FAIL() << "Expected dip::SyntaxException";
+        }
     }
 
     // Throw an error if indent is not higher
