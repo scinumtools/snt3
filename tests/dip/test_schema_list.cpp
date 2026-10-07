@@ -83,8 +83,6 @@ TEST(SchemaList, Collections) {
 
 TEST(SchemaList, Assignment) {
 
-    // TODO: needs to be debugged
-
     dip::DIP d;
     d.add_string(
         "$schema car\n"

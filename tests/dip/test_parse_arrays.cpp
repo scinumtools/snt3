@@ -157,16 +157,16 @@ TEST(ParseArrays, WhiteSpace) {
 
     dip::DIP d;
     d.add_string("foo bool[2,2] = [[true,  true], [true, false]]");
-    // d.add_string("bar int[2,2] = \"[[1, 2], [3, 4]]\"");   // TODO implement parsing from a text block
+    d.add_string("bar int[2,2] = \"[[1, 2], [3, 4]]\"");
     dip::Environment env = d.parse();
 
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_EQ(vnode->value->to_string(), "[[true, true], [true, false]]");
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Boolean);
 
-    // vnode = env.nodes.at(1);  // TODO
-    // EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3, 4]]");
-    // EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer);
+    vnode = env.nodes.at(1);
+    EXPECT_EQ(vnode->value->to_string(), "[[1, 2], [3, 4]]");
+    EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Integer32);
 }
 
 TEST(ParseArrays, MultiLineWithComments) {

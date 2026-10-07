@@ -53,7 +53,6 @@ def test_init_numpy():
     assert q.to_string() == "[2, 3, 4]*km"
 
     # multidimensional arrays
-    # TODO: preserve shape!
     q = Quantity(np.array([[2,3,4],[5,6,7]]), "km")       
     assert q.to_string() == "[[2, 3, 4], [5, 6, 7]]*km"
     assert q.size() == 6

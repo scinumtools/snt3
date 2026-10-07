@@ -267,13 +267,6 @@ namespace snt::puq {
         return os;
     }
 
-    // void Measurement::pow(const ExponentVariant& exp) {
-    //   result.pow(exp);
-    //   // TODO: should be pow() instead of *=
-    //   // result = std::pow(result, (double)e);
-    //   baseunits *= exp;
-    // }
-
     Measurement Measurement::convert(const std::string& str) const {
         Measurement msr = Measurement(str);
         return convert(msr);
