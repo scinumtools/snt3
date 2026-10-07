@@ -13,6 +13,20 @@
 
 namespace snt::dip {
 namespace {
+ValueNode::PointerType inspection_node(const Environment& env, std::string_view path) {
+    const std::string name(path);
+    const auto separator = name.find('?');
+    if (separator == std::string::npos || separator == 0)
+        return env.get_node(separator == 0 ? name.substr(1) : name);
+    const auto source = env.sources.entries().find(name.substr(0, separator));
+    if (source == env.sources.entries().end())
+        throw std::out_of_range("No named DIP source found: " + name);
+    const std::string local_path = name.substr(separator + 1);
+    for (const auto& node : source->second.nodes.get_nodes())
+        if (node && node->path.name == local_path) return node;
+    throw std::out_of_range("No DIP value found in named source: " + name);
+}
+
 std::optional<InspectedSourceLocation> resolve_source_location(
     const Environment& env, SourceLocationRole role, const std::string& logical_name,
     std::size_t logical_line, std::size_t modification_index = 0) {
@@ -173,6 +187,11 @@ std::vector<InspectedSourceLocation> inspect_source_locations(
             }
             add(SourceLocationRole::Declaration, node->line.source.name,
                 node->line.source.line_number);
+            if (!node->table_path.empty()) {
+                if (const auto table = env.declarations().find(node->table_path))
+                    add(SourceLocationRole::Declaration, table->source.name,
+                        table->source.line_number);
+            }
         } else if (entity.source_name.empty()) {
             const auto declaration = env.declarations().find(entity.name);
             if (declaration)
@@ -241,6 +260,14 @@ ValueInspection inspect_value(const Environment& env, std::string_view path) {
             facts.table_path, facts.changes};
 }
 
+ValueSummary inspect_value_summary(const Environment& env, std::string_view path) {
+    const auto node = inspection_node(env, path);
+    if (!node->value)
+        throw std::invalid_argument("The DIP node has no evaluated value: " + std::string(path));
+    return {std::string(path), node->value->get_dtype(), node->value->get_shape(), node->value->get_size(),
+            node->units, node->metadata, node->table_path};
+}
+
 std::vector<ValueInspection> inspect_values(const Environment& env) {
     std::vector<ValueInspection> result;
     result.reserve(env.nodes.size());
@@ -253,6 +280,38 @@ std::vector<ValueInspection> inspect_values(const Environment& env) {
 InspectionCapabilities inspect_capabilities(const Environment& env, std::string_view path) {
     const std::string name(path);
     InspectionCapabilities capabilities;
+    const auto separator = name.find('?');
+    if (separator != std::string::npos && separator > 0) {
+        const auto source = env.sources.entries().find(name.substr(0, separator));
+        if (source == env.sources.entries().end())
+            throw std::out_of_range("No named DIP source found: " + name);
+        const std::string local_path = name.substr(separator + 1);
+        bool found = local_path.empty();
+        for (const auto& node : source->second.nodes.get_nodes()) {
+            if (!node) continue;
+            if (node->path.name == local_path) {
+                found = true;
+                capabilities.hasValue = bool(node->value);
+                capabilities.hasSource = !node->line.source.name.empty();
+                capabilities.hasProvenance = capabilities.hasSource || node->override ||
+                                             !node->modification_lines.empty();
+                capabilities.hasArrayData = node->value && !node->dimension.empty();
+            }
+            if (node->path.name.compare(0, local_path.size() + 1, local_path + ".") == 0 ||
+                node->path.name.compare(0, local_path.size() + 1, local_path + "[") == 0)
+                capabilities.hasChildren = true;
+        }
+        if (!found && !capabilities.hasChildren)
+            throw std::out_of_range("No evaluated DIP path found: " + name);
+        const auto& graph = env.dependency_graph();
+        const auto* value_event = graph.latest(name, DependencyEventKind::Value);
+        const auto* condition_event = graph.latest(name, DependencyEventKind::Condition);
+        capabilities.hasReferenceGraph =
+            (value_event && (!value_event->reads.empty() || value_event->composition.has_value())) ||
+            (condition_event && (!condition_event->reads.empty() || condition_event->composition.has_value())) ||
+            !graph.referenced_by(name).empty();
+        return capabilities;
+    }
     bool found = env.hierarchy.has_collection(name);
     const std::string child_prefix = name + ".";
     const std::string item_prefix = name + "[";
@@ -269,7 +328,8 @@ InspectionCapabilities inspect_capabilities(const Environment& env, std::string_
             const auto* condition_event = env.dependency_graph().latest("?" + name, DependencyEventKind::Condition);
             capabilities.hasReferenceGraph =
                 (value_event && (!value_event->reads.empty() || value_event->composition.has_value())) ||
-                (condition_event && (!condition_event->reads.empty() || condition_event->composition.has_value()));
+                (condition_event && (!condition_event->reads.empty() || condition_event->composition.has_value())) ||
+                !env.dependency_graph().referenced_by("?" + name).empty();
         }
         if (node->table_path == name) {
             found = true;
@@ -327,7 +387,7 @@ std::vector<TableInspection> inspect_tables(const Environment& env) {
 val::BaseValue::PointerType read_value_slice(
     const Environment& env, std::string_view path, const val::Array::RangeType& ranges) {
     const std::string name(path);
-    const auto node = env.get_node(name);
+    const auto node = inspection_node(env, name);
     if (!node->value)
         throw std::invalid_argument("The DIP node has no evaluated value: " + name);
     const auto shape = node->value->get_shape();

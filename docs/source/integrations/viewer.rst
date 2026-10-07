@@ -65,9 +65,17 @@ units, **Local sources**, **Block value sources**, **Named sources**, and
 branch, grouping its registered inputs by type with their order preserved
 within each group. Use
 **Search paths** to filter the tree,
-or the adjacent controls to expand and collapse its branches. Select a
+or the adjacent controls to expand and collapse its branches. Double-click a
+tree node to expand or collapse it, or single-click to select it. Select a
 parameter to inspect its value, units, metadata, source locations, and
-dependencies. Follow a dependency to its input, then use the back and forward
+dependencies. Arrays and tables expose a **Data** tab with bounded pages;
+arrays of higher rank allow choosing two displayed axes and fixed indices for
+the others. Data columns initially fit the visible values up to a readable
+maximum width. Drag a header divider to resize a column, scroll horizontally
+to see more columns, or hover over a clipped cell to read its full value.
+Values with recorded dependencies or readers expose a **Graph**
+tab with a local, navigable graph and retained expression composition when
+available. Follow a dependency to its input, then use the back and forward
 buttons to return to earlier selections. **Local sources** lists the DIPfile's
 ``code[]`` inputs, which define local ``?path`` values. File inputs open their
 original DIPL text; inline inputs open at their DIPfile declaration. Their
@@ -77,6 +85,9 @@ evaluated parameters appear under **Resolved nodes**.
 or table values. Array blocks are shown as plain text. Table blocks highlight
 DIPL column declarations before ``---`` and show data rows as plain text.
 The viewer enables this opt-in retention for live parses.
+Evaluated table nodes and their columns link back to the DIPL table declaration
+through **Open source**. For inline table text, **Block value sources** also
+opens the parsed header and rows directly.
 
 **Named sources** lists parsed DIPL ``sources[]`` inputs, whose values are
 addressed as ``source?path``. **Raw named sources** lists unparsed text inputs
@@ -103,7 +114,8 @@ its internal line numbers do not refer to physical file lines.
 
 Use **File → Reload** or **Ctrl+R** after editing an input file externally.
 If the updated input fails to parse, the viewer keeps the last valid state
-and displays the error.
+and displays the error. Selecting a different browser object closes the
+previous object's Source tab and refreshes the contextual tabs.
 
 Snapshot limits
 ---------------

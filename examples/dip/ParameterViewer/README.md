@@ -42,7 +42,7 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
 | `DIPfile` | Registers the custom unit, two DIPL sources, a raw array source, a raw table source, schema, override, and two code files. |
 | `parameters.diph5` | Evaluated snapshot generated from `DIPfile`. |
 | `parameters.dip` | Groups, scalar types, a value with a child, units, expressions, metadata, validation, map and list collections, and schema use. |
-| `observations.dip` | Arrays, an array slice, inline and referenced tables, a formatted string, a compatible modification, a Boolean decision, and a conditional branch. |
+| `observations.dip` | One-, two-, and three-dimensional arrays, a paged series, an array slice, inline and referenced tables, a formatted string, a compatible modification, a Boolean decision, and a conditional branch. |
 | `reference.dip` | Values read through the named `reference` source. |
 | `catalog.dip` | A second named source containing a map of devices. |
 | `samples.txt` | Raw array data injected through the `raw_samples` source. |
@@ -67,7 +67,10 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
    override** or **Open declaration** to view the corresponding source line in
    the read-only **Source** tab.
 5. Select `experiment.average_speed`. It evaluates to `0.375 m/s` and depends
-   on the effective length and duration. The inspector links to those inputs.
+   on the effective length and duration. Open **Graph** to follow its incoming
+   dependencies and the value that reads it. Select `experiment.duration` to
+   see a value with only incoming references; its Graph tab is still available.
+   The expression's composition appears below the local graph when recorded.
 6. Open **Schemas → probe** to see where the schema was registered and follow
    its contributed values in **Resolved nodes**. Select
    `experiment.instrument.model` and the two probe items; the second probe
@@ -75,19 +78,29 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
    and jump to its declaration in `DIPfile`.
 7. Select `experiment.lab_name`, then click `reference?lab_name` under
    **Depends on**. The browser opens **Named sources → reference → lab_name**, where
-   the source's own value and declaration are shown. Then select
+   the source's own value and declaration are shown. Its **Graph** tab shows
+   the evaluated value that reads it. Select `reference?calibration_curve` to
+   inspect array data retained in a named source. Then select
    `experiment.instrument_family` and follow its dependency into the separate
    **catalog** source and its `devices` map. Select
    `experiment.sample_interval` to see a value using that custom unit.
-8. Select `experiment.temperatures` and `experiment.readings.temperature` to
-   inspect an array and a table column. The current viewer summarizes arrays
-   rather than displaying every element.
+8. Select `experiment.temperatures` and open **Data** for a one-dimensional
+   array. Select `experiment.sample_grid` for a matrix, then
+   `experiment.response_cube` to choose the displayed axes and fixed index of
+   a three-dimensional array. Use `experiment.sample_series` to try the next
+   page of a longer array. Select `experiment.readings` (marked as a table in
+   the tree) to browse its rows in original column order, then click a column
+   heading to select that value. Open **Source** from the table or a column to
+   jump to the DIPL declaration. Select `experiment.extended_readings` for a
+   48-row, eight-column table that fills the Data panel; use the next row page
+   and horizontal scrolling to inspect the rest.
    Select **Raw named sources → raw_samples** and use **Open source** to view the raw
    text without DIPL coloring. `experiment.sample_values` reads that source.
    **Local sources → parameters.dip** and **Local sources → observations.dip** open the
    project code files with DIPL highlighting.
-   **Block value sources → experiment.readings (table)** shows the inline table with
-   its DIPL header highlighted and data rows in plain text. **Block value sources →
+   **Block value sources → experiment.readings (table)** also offers the evaluated
+   **Data** tab; **Source** shows the inline table with its DIPL header highlighted
+   and data rows in plain text. **Block value sources →
    experiment.sample_grid (array)** shows an array parsed from a string literal.
    **Raw named sources → table_samples** opens `table_samples.dipt` with the same presentation;
    `experiment.reference_readings` reads it.
@@ -99,6 +112,8 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
 
 Edit a value in a `.dip` file, then use **File → Reload** or **Ctrl+R**. The
 viewer keeps the last valid state if the edited project does not parse.
+Selecting another tree node closes the previous node's Source tab and shows
+only the Data and Graph tabs that apply to the new selection.
 Source-node browsing currently requires a live DIPL or DIPfile parse; a
 `.diph5` snapshot retains source identity but not source node values.
 Source viewing is also disabled for `.diph5` snapshots because they do not

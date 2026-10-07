@@ -106,6 +106,7 @@ void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
         const auto& input = dip::inspect_block_inputs(model.environment()).at(object->node_path);
         cache.fields.emplace_back("Kind", input.kind == dip::BlockInput::Kind::Table
             ? "Table block value" : "Array block value");
+        cache.fields.emplace_back("Data", "Open the Data tab to browse evaluated values");
         if (!cache.source_targets.empty()) {
             const auto& target = cache.source_targets.front();
             cache.fields.emplace_back("Declared", model.display_file_path(target.file.string()) + ":" +
@@ -115,6 +116,12 @@ void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
     }
     if (!object->has_value) {
         cache.fields.emplace_back("Kind", object->path.empty() ? "Artifact" : object_kind_name(*object));
+        if (object->has_table) {
+            const auto table = dip::inspect_table(model.environment(), object->node_path);
+            cache.fields.emplace_back("Rows", std::to_string(table.rows));
+            cache.fields.emplace_back("Columns", std::to_string(table.columns.size()));
+            cache.fields.emplace_back("Data", "Open the Data tab to browse table values");
+        }
         return;
     }
     cache.fields.emplace_back("Kind", object_kind_name(*object));
@@ -126,8 +133,10 @@ void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
         if (type != snt::core::DataTypeNames.end()) cache.fields.emplace_back("Type", type->second);
         if (shape.empty() || node->value->get_size() == 1)
             cache.fields.emplace_back("Value", node->value->to_string());
-        else
-            cache.fields.emplace_back("Value", "Array (select a slice in a later numerical view)");
+        else {
+            cache.fields.emplace_back("Value", "Array (open Data to inspect bounded slices)");
+            cache.fields.emplace_back("Elements", std::to_string(node->value->get_size()));
+        }
         if (!shape.empty()) {
             std::string dimensions;
             for (const auto dimension : shape) {

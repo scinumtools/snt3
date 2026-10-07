@@ -30,6 +30,7 @@ struct ObjectInfo {
     std::string source_name;
     std::string node_path;
     std::optional<std::size_t> manifest_index;
+    bool has_table = false;
 };
 
 struct SourceTarget {

@@ -26,6 +26,7 @@ const char* object_kind_name(const ObjectInfo& object) {
     if (object.role == ObjectRole::Schema) return "Schema";
     if (object.role == ObjectRole::Units) return "Custom units";
     if (object.role == ObjectRole::Unit) return "Custom unit";
+    if (object.has_table) return "Table";
     if (object.has_value && !object.children.empty()) return "Value and children";
     if (object.has_value) return "Value";
     if (object.hierarchy_kind == dip::Path::Kind::Map) return "Map collection";
@@ -88,6 +89,11 @@ void draw_kind_icon(const ObjectInfo& object, ImVec2 pos, float size) {
             const float x = 0.24f + tick * 0.17f;
             draw->AddLine(point(x, 0.28f), point(x, tick % 2 ? 0.48f : 0.57f), color);
         }
+    } else if (object.has_table) {
+        draw->AddRect(point(0.08f, 0.12f), point(0.92f, 0.88f), color, 1.2f);
+        draw->AddLine(point(0.08f, 0.36f), point(0.92f, 0.36f), color, 1.2f);
+        draw->AddLine(point(0.08f, 0.62f), point(0.92f, 0.62f), color, 1.2f);
+        draw->AddLine(point(0.49f, 0.12f), point(0.49f, 0.88f), color, 1.2f);
     } else if (object.has_value && object.children.empty()) {
         draw->AddQuadFilled(point(0.5f, 0.06f), point(0.94f, 0.5f),
                             point(0.5f, 0.94f), point(0.06f, 0.5f), color);
@@ -169,7 +175,9 @@ void draw_tree(ViewerModel& model, const ObjectInfo& object, const std::string& 
     for (const auto& path : object.children) {
         const auto* item = model.object(path);
         if (!item || !matches(model, *item, query)) continue;
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow |
+                                   ImGuiTreeNodeFlags_OpenOnDoubleClick |
+                                   ImGuiTreeNodeFlags_SpanAvailWidth;
         if (item->children.empty()) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
         if (model.selection() == path) flags |= ImGuiTreeNodeFlags_Selected;
         if (!query.empty()) flags |= ImGuiTreeNodeFlags_DefaultOpen;

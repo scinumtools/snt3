@@ -46,6 +46,9 @@ target_sources(snt PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/application.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/browser_view.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/data_page.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/data_view.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/graph_view.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/inspector_view.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/source_view.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/viewer_model.cpp")
@@ -59,6 +62,7 @@ endif()
 
 if(ENABLE_UNIT_TESTS)
   add_executable(snt-view-model-test
+    "${CMAKE_CURRENT_SOURCE_DIR}/data_page.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/viewer_model.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/source_view.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/model.cpp")

@@ -80,6 +80,11 @@ ranges and returns a typed VAL value containing the selected elements:
 
    auto values = snt::dip::read_value_slice(env, "samples", {{10, 19}});
 
+``inspect_value_summary`` reports type, shape, element count, units, and
+metadata without cloning the value. Use it to decide which bounded slice to
+read. Both functions accept resolved paths and named-source paths such as
+``reference?calibration_curve``.
+
 This slices an already evaluated value. DIPH5 loading remains eager; this API
 does not provide disk-backed lazy reads.
 
@@ -103,7 +108,8 @@ version.
 a value, group, collection, or table path. For example, ``hasTabularData`` is
 true at a table path and ``hasArrayData`` is true for array-valued nodes.
 ``hasReferenceGraph`` is true when an evaluated value or its condition has
-recorded references or an expression tree. ``sourceEditable`` and
+recorded references or an expression tree, or when another value references
+it. Named-source paths can also be queried. ``sourceEditable`` and
 ``directlyWritable`` remain false.
 
 .. code-block:: cpp

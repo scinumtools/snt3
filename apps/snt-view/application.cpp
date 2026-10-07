@@ -1,6 +1,8 @@
 #include "application.h"
 
 #include "browser_view.h"
+#include "data_view.h"
+#include "graph_view.h"
 #include "inspector_view.h"
 #include "source_view.h"
 #include "viewer_model.h"
@@ -27,6 +29,8 @@ namespace snt::view {
         void draw_view(
             ViewerModel& model,
             InspectorCache& inspector_cache,
+            DataViewState& data_state,
+            GraphViewState& graph_state,
             SourceView& source,
             bool& select_source_tab,
             bool& scroll_to_target,
@@ -94,8 +98,37 @@ namespace snt::view {
                 ImGui::TableSetColumnIndex(1);
                 ImGui::BeginChild("Inspector", ImVec2(0.0f, 0.0f));
                 static std::string displayed_selection;
-                const bool selection_changed = displayed_selection != model.selection();
+                static std::size_t displayed_revision = model.revision();
+                static bool has_data = false;
+                static bool has_graph = false;
+                const bool selection_changed = displayed_selection != model.selection() ||
+                                               displayed_revision != model.revision();
+                if (selection_changed) {
+                    source = SourceView{};
+                    source_error.clear();
+                    select_source_tab = false;
+                    scroll_to_target = false;
+                    data_state = {};
+                    graph_state = {};
+                    has_data = false;
+                    has_graph = false;
+                    if (const auto* selected = model.object(model.selection()); selected &&
+                        (selected->role == ObjectRole::Path || selected->role == ObjectRole::Override ||
+                         selected->role == ObjectRole::BlockSource || selected->role == ObjectRole::Source) &&
+                        (!selected->node_path.empty() || selected->role == ObjectRole::Source)) {
+                        try {
+                            const std::string inspect_path = selected->source_name.empty()
+                                ? selected->node_path : selected->path;
+                            const auto capabilities = dip::inspect_capabilities(model.environment(), inspect_path);
+                            has_data = capabilities.hasArrayData || capabilities.hasTabularData;
+                            has_graph = capabilities.hasReferenceGraph;
+                        } catch (const std::out_of_range&) {
+                            // Browser-only structural entries do not have inspection capabilities.
+                        }
+                    }
+                }
                 displayed_selection = model.selection();
+                displayed_revision = model.revision();
                 if (ImGui::BeginTabBar("Inspector tabs")) {
                     if (ImGui::BeginTabItem(
                             "Inspector", nullptr, selection_changed ? ImGuiTabItemFlags_SetSelected : 0
@@ -108,6 +141,14 @@ namespace snt::view {
                     if (!source.file().empty() &&
                         ImGui::BeginTabItem("Source", nullptr, select_source_tab ? ImGuiTabItemFlags_SetSelected : 0)) {
                         draw_source_view(model, source, scroll_to_target, source_error);
+                        ImGui::EndTabItem();
+                    }
+                    if (has_data && ImGui::BeginTabItem("Data")) {
+                        draw_data_view(model, data_state);
+                        ImGui::EndTabItem();
+                    }
+                    if (has_graph && ImGui::BeginTabItem("Graph")) {
+                        draw_graph_view(model, graph_state);
                         ImGui::EndTabItem();
                     }
                     select_source_tab = false;
@@ -164,6 +205,8 @@ namespace snt::view {
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init(glsl_version);
         InspectorCache inspector_cache;
+        DataViewState data_state;
+        GraphViewState graph_state;
         SourceView source;
         bool select_source_tab = false;
         bool scroll_to_target = false;
@@ -174,7 +217,8 @@ namespace snt::view {
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-            draw_view(model, inspector_cache, source, select_source_tab, scroll_to_target, source_error);
+            draw_view(model, inspector_cache, data_state, graph_state, source,
+                      select_source_tab, scroll_to_target, source_error);
             ImGui::Render();
             int width = 0, height = 0;
             glfwGetFramebufferSize(window, &width, &height);

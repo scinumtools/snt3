@@ -68,6 +68,7 @@ namespace snt::dip {
             );
         }
         const std::string full_name = env.hierarchy.get_current_path(indent, path.name).name;
+        env.record_declaration(full_name, line);
         env.record_block_input(*this, *this, full_name);
         // we have to check if a deferred table node is already in the node list
         for (size_t i = 0; i < env.nodes.size(); i++) {

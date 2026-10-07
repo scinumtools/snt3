@@ -115,6 +115,10 @@ void ViewerModel::rebuild_objects() {
         if (full.empty()) continue;
         ensure_object(full, "");
         objects_.at(full).has_value = node->value != nullptr;
+        if (!node->table_path.empty()) {
+            ensure_object(node->table_path, "");
+            objects_.at(node->table_path).has_table = true;
+        }
     }
     for (const auto& [path, collection] : environment_.hierarchy.get_collections()) {
         ensure_object(path, "");

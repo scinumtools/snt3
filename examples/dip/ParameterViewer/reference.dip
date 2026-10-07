@@ -1,3 +1,5 @@
 # Loaded as a named source; these values do not appear as top-level paths.
 lab_name str = "North Lab"
 calibration_revision int = 3
+calibration_curve float[4] = [0.98, 1.0, 1.02, 1.04]
+  ?descr "Example array retained in a named source for the Data view"

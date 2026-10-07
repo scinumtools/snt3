@@ -240,6 +240,7 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
     EXPECT_EQ(graph.referenced_by("?other").size(), 0);
     EXPECT_EQ(graph.referenced_by("?source").size(), 2);
     EXPECT_TRUE(dip::inspect_capabilities(env, "result").hasReferenceGraph);
+    EXPECT_TRUE(dip::inspect_capabilities(env, "source").hasReferenceGraph);
     ASSERT_TRUE(env.get_node("result")->units.has_value());
 
     const auto file = std::filesystem::temp_directory_path() / "snt-dependency-graph-roundtrip.diph5";
@@ -394,6 +395,9 @@ TEST(Inspection, BoundedInMemorySlice) {
     dip::DIP parser;
     parser.add_string("samples int[5] = [1, 2, 3, 4, 5]\n");
     const auto env = parser.parse();
+    const auto summary = dip::inspect_value_summary(env, "samples");
+    EXPECT_EQ(summary.shape, (val::Array::ShapeType{5}));
+    EXPECT_EQ(summary.elements, 5);
     auto slice = dip::read_value_slice(env, "samples", {{1, 3}});
     const auto* integers = dynamic_cast<const val::ArrayValue<int64_t>*>(slice.get());
     ASSERT_NE(integers, nullptr);
@@ -451,6 +455,18 @@ TEST(Inspection, ReadOnlyTableViewSurvivesSnapshot) {
     EXPECT_EQ(dip::inspect_value(env, "measurements.count").table_path, "measurements");
     EXPECT_TRUE(dip::inspect_value(env, "measurements.extra").table_path.empty());
     EXPECT_EQ(dip::inspect_tables(env).size(), 1);
+    const auto table_sources = dip::inspect_source_locations(
+        env, {dip::SourceEntityKind::Path, "measurements", {}});
+    const auto column_sources = dip::inspect_source_locations(
+        env, {dip::SourceEntityKind::Path, "measurements.count", {}});
+    const auto has_table_declaration = [](const auto& locations) {
+        return std::any_of(locations.begin(), locations.end(), [](const auto& location) {
+            return location.role == dip::SourceLocationRole::Declaration &&
+                   location.logical_line == 1 && location.source_text_available;
+        });
+    };
+    EXPECT_TRUE(has_table_declaration(table_sources));
+    EXPECT_TRUE(has_table_declaration(column_sources));
 
     const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
     const auto snapshot = std::filesystem::temp_directory_path() / ("snt-inspection-table-" + suffix + ".diph5");
