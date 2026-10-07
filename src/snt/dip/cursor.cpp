@@ -5,9 +5,23 @@
 
 namespace snt::dip {
 
+    namespace {
+        bool has_group_descendants(const HierarchyList& hierarchy, const std::string& path) {
+            const std::string prefix = path + ".";
+            for (const auto& [candidate, collection] : hierarchy.get_collections()) {
+                (void)collection;
+                if (candidate.size() > prefix.size() && candidate.compare(0, prefix.size(), prefix) == 0)
+                    return true;
+            }
+            return false;
+        }
+    } // namespace
+
     Cursor::Cursor(const Environment* env, std::string_view path) : env_(env), path_(path) {
         if (path_.empty()) {
             kind = Path::Kind::Empty;
+        } else if (!env_->hierarchy.has_collection(path_) && has_group_descendants(env_->hierarchy, path_)) {
+            kind = Path::Kind::Group;
         } else {
             const Collection& col = env_->hierarchy.get_collection(path_);
             switch (col.kind) {
@@ -32,7 +46,31 @@ namespace snt::dip {
         }
     }
 
-    // TODO: implement return of children Cursors for group collection
+    std::unordered_map<std::string, Cursor> Cursor::children() const {
+        if (kind != Path::Kind::Empty && kind != Path::Kind::Group && kind != Path::Kind::Item)
+            throw dip::EnvironmentException(
+                "Wrong collection kind",
+                "The path `" + path_ + "` must correspond to a group or collection item, but it refers to a " +
+                    Path::KindNames.at(kind) + " collection.",
+                "Use children() on a group or item; use elements() for a list or items() for a map.",
+                __FILE__,
+                __LINE__
+            );
+
+        std::unordered_map<std::string, Cursor> children;
+        const std::string prefix = path_.empty() ? "" : path_ + ".";
+        for (const auto& [candidate, collection] : env_->hierarchy.get_collections()) {
+            (void)collection;
+            if (candidate.size() <= prefix.size() || candidate.compare(0, prefix.size(), prefix) != 0)
+                continue;
+            const std::string remainder = candidate.substr(prefix.size());
+            const std::size_t end = remainder.find_first_of(".[");
+            const std::string name = remainder.substr(0, end);
+            if (!name.empty() && children.find(name) == children.end())
+                children.emplace(name, Cursor(env_, prefix + name));
+        }
+        return children;
+    }
 
     std::vector<Cursor> Cursor::elements() const {
         std::vector<Cursor> list;

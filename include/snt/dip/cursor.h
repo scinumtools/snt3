@@ -124,9 +124,9 @@ namespace snt::dip {
       public:
         explicit Cursor(const Environment* env, std::string_view path = "");
 
-        /** Return cursors for named children when group traversal is implemented.
-         * @return A map keyed by child name.
-         * @note Group-child traversal is currently not implemented.
+        /** Return direct named children of the root, a group, or a collection item.
+         * Dotted paths without an explicit group node are traversable as implied groups.
+         * @return A map keyed by direct child name; throws for list and map cursors.
          */
         std::unordered_map<std::string, Cursor> children() const;
 

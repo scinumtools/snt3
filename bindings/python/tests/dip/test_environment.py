@@ -33,6 +33,8 @@ def test_load(env, tmp_path):
     assert loaded["title"].value == "Python environment"
     assert loaded["simulation.steps"].value == 100
     assert loaded["simulation.timestep"].value == 0.5
+    assert set(loaded[""].children()) == {"title", "simulation", "boundary", "samples"}
+    assert loaded["simulation"].children()["steps"].value == 100
     assert len(loaded["boundary"].items()) == 1
     assert len(loaded["samples"].elements()) == 2
 

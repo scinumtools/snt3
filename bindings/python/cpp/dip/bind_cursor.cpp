@@ -87,6 +87,8 @@ namespace snt::bind::python {
             "Return whether a named child exists.\n\nArgs:\n    item: Child name to check."
         );
 
+        val.def("children", &dip::Cursor::children, "Return direct named children as a dictionary of cursors.");
+
         val.def("elements", &dip::Cursor::elements, "Return child elements.");
 
         val.def(

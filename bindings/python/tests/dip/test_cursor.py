@@ -4,6 +4,33 @@ import numpy as np
 from scinumtools3.puq import Quantity
 from scinumtools3.dip import DIP, Environment, ValueNode, Cursor, PathKind
 
+
+def test_cursor_children():
+    dip = DIP()
+    dip.add_string(
+        'settings\n'
+        '  count int = 2\n'
+        '  nested.value int = 3\n'
+        'model.inner.value int = 4\n'
+        'materials[copper]\n'
+        '  density int = 5\n'
+        'samples[]\n'
+        '  mass int = 6\n'
+    )
+    env = dip.parse()
+
+    root = env[''].children()
+    assert set(root) == {'settings', 'model', 'materials', 'samples'}
+    assert root['settings'].children()['count'].value == 2
+    assert root['settings']['nested']['value'].value == 3
+    assert root['model']['inner']['value'].value == 4
+    assert dict(root['materials'].items())['copper'].children()['density'].value == 5
+    assert root['samples'].elements()[0]['mass'].value == 6
+    assert root['settings'].children()['count'].children() == {}
+    with pytest.raises(RuntimeError, match='Wrong collection kind'):
+        root['materials'].children()
+
+
 def test_cursor_print():
     
     # prepare node collections

@@ -116,6 +116,47 @@ TEST_F(Cursor, TraverseCollections) {
     }
 }
 
+TEST(Cursor, TraverseChildrenGroups) {
+    dip::DIP parser;
+    parser.add_string(
+        "settings\n"
+        "  count int = 2\n"
+        "  nested.value int = 3\n"
+        "model.inner.value int = 4\n"
+        "materials[copper]\n"
+        "  density int = 5\n"
+        "samples[]\n"
+        "  mass int = 6\n"
+    );
+    const dip::Environment env = parser.parse();
+
+    const auto root = env[""].children();
+    EXPECT_EQ(root.size(), 4);
+    for (const auto& [name, child] : root)
+        EXPECT_EQ(child.get_path(), name);
+    EXPECT_EQ(env["model"].get_kind(), dip::Path::Kind::Group);
+    EXPECT_EQ(env["materials"].get_kind(), dip::Path::Kind::Map);
+    EXPECT_EQ(env["samples"].get_kind(), dip::Path::Kind::List);
+
+    const auto settings = env["settings"].children();
+    EXPECT_EQ(settings.size(), 2);
+    EXPECT_EQ(settings.count("count"), 1);
+    EXPECT_EQ(settings.count("nested"), 1);
+    EXPECT_EQ(env["settings"]["count"].as<int64_t>(), 2);
+    EXPECT_EQ(env["settings"]["nested"]["value"].as<int64_t>(), 3);
+    EXPECT_EQ(env["model"]["inner"]["value"].as<int64_t>(), 4);
+
+    const auto copper = env["materials"]["copper"].children();
+    EXPECT_EQ(copper.size(), 1);
+    EXPECT_EQ(copper.count("density"), 1);
+    EXPECT_EQ(env["materials"]["copper"]["density"].as<int64_t>(), 5);
+    EXPECT_EQ(env["samples"][0]["mass"].as<int64_t>(), 6);
+
+    EXPECT_TRUE(env["settings"]["count"].children().empty());
+    EXPECT_THROW(env["materials"].children(), dip::EnvironmentException);
+    EXPECT_THROW(env["samples"].children(), dip::EnvironmentException);
+}
+
 TEST_F(Cursor, ValuesFullPath) {
 
     EXPECT_EQ(env.nodes.size(), 8);
