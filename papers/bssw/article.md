@@ -77,8 +77,10 @@ integration with Pint and override handling.
 ## DIPL: An Evaluated Parameter Contract
 
 The second path uses the Dimensional Input Parameter Language (DIPL), part of
-SciNumTools3. In its input file, a reusable schema gives both material cases
-the same typed diffusivity parameter, units, condition, and description:
+SciNumTools3. Its C++ core evaluates the parameter model, which the example
+accesses through Python bindings; the heat solver remains in Python. In the
+DIPL input file, a reusable schema gives both material cases the same typed
+diffusivity parameter, units, condition, and description:
 
 ```dipl
 $schema thermal_material
