@@ -3,6 +3,7 @@
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
 #include <snt/puq/result.h>
+#include <snt/puq/systems/unit_system.h>
 
 namespace snt::puq::math {
 
@@ -50,7 +51,11 @@ namespace snt::puq::math {
     }
 
     puq::Quantity max(const puq::Quantity& quant1, const puq::Quantity& quant2) {
-        return puq::Quantity(max(quant1.measurement, quant2.measurement), quant1.stype);
+        puq::UnitSystem system(quant1.stype);
+        const puq::Measurement other = quant1.stype == quant2.stype
+                                            ? quant2.measurement
+                                            : quant2.convert(quant1.measurement.baseunits, quant1.stype).measurement;
+        return puq::Quantity(max(quant1.measurement, other), quant1.stype);
     }
 
 } // namespace snt::puq::math

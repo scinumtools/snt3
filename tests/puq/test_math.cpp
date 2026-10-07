@@ -138,7 +138,7 @@ TEST(Math, Exponent) {
         }
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::exp(quant1);
@@ -176,7 +176,7 @@ TEST(Math, LogarithmNatural) {
         }
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::log(quant1);
@@ -214,7 +214,7 @@ TEST(Math, LogarithmDecadic) {
         }
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::log10(quant1);
@@ -239,7 +239,7 @@ TEST(Math, CubicRoot) {
         EXPECT_EQ(msr0.to_string(), "1.3295(75)*km"); // est 1.3295028952345866 unc 0.0075432788015916685
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::cbrt(quant1);
@@ -264,7 +264,7 @@ TEST(Math, SquareRoot) {
         EXPECT_EQ(msr0.to_string(), "2.088(38)*m"); // est 2.08806130178211 unc 0.03831305122048434
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::sqrt(quant1);
@@ -300,7 +300,7 @@ TEST(Math, Sinus) {
         }
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::sin(quant1);
@@ -336,7 +336,7 @@ TEST(Math, Cosinus) {
         }
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::cos(quant1);
@@ -372,7 +372,7 @@ TEST(Math, Tangens) {
         }
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::tan(quant1);
@@ -541,7 +541,7 @@ TEST(Math, Maximum) {
         EXPECT_EQ(msr0.to_string(), "2.350(40)*km");
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04, "km");
         puq::Quantity quant2(3.45, 0.3, "m");
@@ -569,7 +569,7 @@ TEST(Math, Minimum) {
         EXPECT_EQ(msr0.to_string(), "3.45(30)e-3*km");
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04, "km");
         puq::Quantity quant2(3.45, 0.3, "m");
@@ -595,7 +595,7 @@ TEST(Math, Floor) {
         EXPECT_EQ(msr0.to_string(), "4*m2");
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::floor(quant1);
@@ -620,7 +620,7 @@ TEST(Math, Ceil) {
         EXPECT_EQ(msr0.to_string(), "5*m2");
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::ceil(quant1);
@@ -651,10 +651,130 @@ TEST(Math, Round) {
         EXPECT_EQ(msr0.to_string(), "4.00(50)*m2");
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.35, 0.04);
         quant0 = puq::math::round(quant1);
         EXPECT_EQ(quant0.to_string(), "2");
     }
+}
+
+TEST(Math, QuantityUnaryAcrossSystems) {
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
+
+    const auto check = [](const char* name, auto operation, double input, double expected, const char* unit = "") {
+        for (const auto system : {puq::SystemType::SI, puq::SystemType::ESU}) {
+            const auto active = system == puq::SystemType::SI ? puq::SystemType::ESU : puq::SystemType::SI;
+            puq::UnitSystem scope(active);
+            SCOPED_TRACE(name);
+            SCOPED_TRACE(static_cast<int>(system));
+
+            const puq::Quantity quantity = unit[0] ? puq::Quantity(input, 0.01, unit, system)
+                                                   : puq::Quantity(input, 0.01, system);
+            const auto output = operation(quantity);
+            EXPECT_EQ(output.stype, system);
+            EXPECT_EQ(puq::UnitSystem::current.type, active);
+            EXPECT_EQ(output.measurement.baseunits.size(), 0);
+            EXPECT_NEAR(val::ArrayValueFloat64(output.measurement.result.estimate.get()).get_value(0), expected,
+                        1e-12);
+        }
+    };
+
+    check("exp", [](const auto& q) { return puq::math::exp(q); }, 1.0, std::exp(1.0));
+    check("log", [](const auto& q) { return puq::math::log(q); }, 2.0, std::log(2.0));
+    check("log10", [](const auto& q) { return puq::math::log10(q); }, 2.0, std::log10(2.0));
+    check("cbrt", [](const auto& q) { return puq::math::cbrt(q); }, 8.0, 2.0);
+    check("sqrt", [](const auto& q) { return puq::math::sqrt(q); }, 4.0, 2.0);
+    check("sin", [](const auto& q) { return puq::math::sin(q); }, 0.3, std::sin(0.3), "rad");
+    check("cos", [](const auto& q) { return puq::math::cos(q); }, 0.3, std::cos(0.3), "rad");
+    check("tan", [](const auto& q) { return puq::math::tan(q); }, 0.3, std::tan(0.3), "rad");
+    check("floor", [](const auto& q) { return puq::math::floor(q); }, 2.35, 2.0);
+    check("ceil", [](const auto& q) { return puq::math::ceil(q); }, 2.35, 3.0);
+    check("round", [](const auto& q) { return puq::math::round(q); }, 2.35, 2.0);
+
+    for (const auto system : {puq::SystemType::SI, puq::SystemType::ESU}) {
+        const auto active = system == puq::SystemType::SI ? puq::SystemType::ESU : puq::SystemType::SI;
+        const std::string unit = system == puq::SystemType::SI ? "J" : "erg";
+        puq::UnitSystem scope(active);
+        SCOPED_TRACE(static_cast<int>(system));
+
+        const auto square_root = puq::math::sqrt(puq::Quantity(4.0, 0.1, unit + "2", system));
+        const auto cubic_root = puq::math::cbrt(puq::Quantity(8.0, 0.1, unit + "3", system));
+        for (const auto& root : {square_root, cubic_root}) {
+            EXPECT_EQ(root.stype, system);
+            EXPECT_EQ(root.measurement.baseunits.to_string(), unit);
+            EXPECT_NEAR(val::ArrayValueFloat64(root.measurement.result.estimate.get()).get_value(0), 2.0, 1e-12);
+        }
+        EXPECT_EQ(puq::UnitSystem::current.type, active);
+    }
+}
+
+TEST(Math, QuantityMinMaxAcrossSystems) {
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
+
+    for (const auto system : {puq::SystemType::SI, puq::SystemType::ESU}) {
+        const auto active = system == puq::SystemType::SI ? puq::SystemType::ESU : puq::SystemType::SI;
+        const std::string unit = system == puq::SystemType::SI ? "J" : "erg";
+        const std::string other_unit = system == puq::SystemType::SI ? "mJ" : "g*cm2/s2";
+        const double scale = system == puq::SystemType::SI ? 1.0 : 1e7;
+        const double other_unit_scale = system == puq::SystemType::SI ? 1e-3 : 1.0;
+        puq::UnitSystem scope(active);
+        SCOPED_TRACE(static_cast<int>(system));
+
+        const puq::Quantity left(2.0 * scale, 0.1 * scale, unit, system);
+        const puq::Quantity right(3.0 * scale / other_unit_scale, 0.2 * scale / other_unit_scale,
+                                  other_unit, system);
+        const auto minimum = puq::math::min(left, right);
+        const auto maximum = puq::math::max(left, right);
+        EXPECT_EQ(minimum.stype, system);
+        EXPECT_EQ(maximum.stype, system);
+        EXPECT_EQ(minimum.measurement.baseunits.to_string(), unit);
+        EXPECT_EQ(maximum.measurement.baseunits.to_string(), unit);
+        EXPECT_NEAR(val::ArrayValueFloat64(minimum.measurement.result.estimate.get()).get_value(0), 2.0 * scale,
+                    1e-12 * scale);
+        EXPECT_NEAR(val::ArrayValueFloat64(maximum.measurement.result.estimate.get()).get_value(0), 3.0 * scale,
+                    1e-12 * scale);
+        ASSERT_TRUE(minimum.measurement.result.uncertainty);
+        ASSERT_TRUE(maximum.measurement.result.uncertainty);
+        EXPECT_NEAR(val::ArrayValueFloat64(minimum.measurement.result.uncertainty.get()).get_value(0), 0.1 * scale,
+                    1e-12 * scale);
+        EXPECT_NEAR(val::ArrayValueFloat64(maximum.measurement.result.uncertainty.get()).get_value(0), 0.2 * scale,
+                    1e-12 * scale);
+        EXPECT_EQ(puq::UnitSystem::current.type, active);
+    }
+
+    const puq::Quantity si(2.0, 0.1, "J", puq::SystemType::SI);
+    const puq::Quantity esu(3e7, 2e6, "erg", puq::SystemType::ESU);
+    puq::UnitSystem active_system(puq::SystemType::ESU);
+    const auto minimum_si = puq::math::min(si, esu);
+    const auto maximum_si = puq::math::max(si, esu);
+    const auto minimum_esu = puq::math::min(esu, si);
+    const auto maximum_esu = puq::math::max(esu, si);
+    EXPECT_EQ(minimum_si.stype, puq::SystemType::SI);
+    EXPECT_EQ(maximum_si.stype, puq::SystemType::SI);
+    EXPECT_EQ(minimum_esu.stype, puq::SystemType::ESU);
+    EXPECT_EQ(maximum_esu.stype, puq::SystemType::ESU);
+    EXPECT_EQ(minimum_si.measurement.baseunits.to_string(), "J");
+    EXPECT_EQ(maximum_si.measurement.baseunits.to_string(), "J");
+    EXPECT_EQ(minimum_esu.measurement.baseunits.to_string(), "erg");
+    EXPECT_EQ(maximum_esu.measurement.baseunits.to_string(), "erg");
+    EXPECT_NEAR(val::ArrayValueFloat64(minimum_si.measurement.result.estimate.get()).get_value(0), 2.0, 1e-12);
+    EXPECT_NEAR(val::ArrayValueFloat64(maximum_si.measurement.result.estimate.get()).get_value(0), 3.0, 1e-12);
+    EXPECT_NEAR(val::ArrayValueFloat64(minimum_esu.measurement.result.estimate.get()).get_value(0), 2e7, 1e-5);
+    EXPECT_NEAR(val::ArrayValueFloat64(maximum_esu.measurement.result.estimate.get()).get_value(0), 3e7, 1e-5);
+    ASSERT_TRUE(minimum_si.measurement.result.uncertainty);
+    ASSERT_TRUE(maximum_si.measurement.result.uncertainty);
+    ASSERT_TRUE(minimum_esu.measurement.result.uncertainty);
+    ASSERT_TRUE(maximum_esu.measurement.result.uncertainty);
+    EXPECT_NEAR(val::ArrayValueFloat64(minimum_si.measurement.result.uncertainty.get()).get_value(0), 0.1, 1e-12);
+    EXPECT_NEAR(val::ArrayValueFloat64(maximum_si.measurement.result.uncertainty.get()).get_value(0), 0.2, 1e-12);
+    EXPECT_NEAR(val::ArrayValueFloat64(minimum_esu.measurement.result.uncertainty.get()).get_value(0), 1e6, 1e-5);
+    EXPECT_NEAR(val::ArrayValueFloat64(maximum_esu.measurement.result.uncertainty.get()).get_value(0), 2e6, 1e-5);
+    EXPECT_EQ(puq::UnitSystem::current.type, puq::SystemType::ESU);
 }
