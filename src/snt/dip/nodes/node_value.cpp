@@ -1,3 +1,4 @@
+#include <snt/dip/nodes/node_integer.h>
 #include <optional>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
@@ -248,6 +249,8 @@ namespace snt::dip {
         } else if (value_input == nullptr && value_origin == ValueOrigin::Array) {
             value = cast_value();
         } else if (value_input != nullptr) {
+            if (dtype == NodeDtype::Integer)
+                IntegerNode::validate_value(value_input.get(), value_dtype, line);
             if (value_input->get_dtype() == value_dtype)
                 value = std::move(value_input);
             else
@@ -357,6 +360,8 @@ namespace snt::dip {
                 evaluated->value = std::move(quantity.measurement.result.estimate);
             }
         }
+        if (dtype == NodeDtype::Integer)
+            IntegerNode::validate_value(evaluated->value.get(), value_dtype, node->line);
         if (evaluated->value && evaluated->value->get_dtype() != value_dtype)
             evaluated->value = evaluated->value->cast_as(value_dtype);
         value = std::move(evaluated->value);

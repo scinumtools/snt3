@@ -38,6 +38,8 @@ signed Integer type (`int`, or equivalently `int32`) has a signed 32-bit semanti
 range, allowing both positive and negative values within a fixed range. The
 unsigned Integer type (`uint`, or equivalently `uint32`) has an unsigned 32-bit
 semantic range and therefore represents only non-negative values.
+Assignments with units must remain whole numbers within that range after
+[conversion to the node's units](units.md#integer-values-after-unit-conversion).
 
 In the reference implementation, Integer values are internally represented
 using signed or unsigned 64-bit integers (`int64_t` or `uint64_t`), respectively.

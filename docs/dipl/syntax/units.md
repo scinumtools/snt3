@@ -29,6 +29,27 @@ weight = 90000 g
 # weight = 90 kg
 ```
 
+### Integer values after unit conversion
+
+For an integer node, DIPL converts an explicitly unit-bearing assignment to
+the node's declared units **before** converting it to the declared integer
+type. The converted value MUST be finite, a whole number, and within the
+declared integer type's signed or unsigned range. DIPL MUST reject a
+fractional result; it MUST NOT round or truncate it to an integer. This rule
+applies to definitions, modifications, and overrides, including values
+obtained from expressions, references, and functions. For arrays, it applies
+to every element.
+
+```DIPL
+distance int = 2 m
+distance = 200 cm       # valid: 2 m
+distance = 150 cm       # invalid: 1.5 m is not an integer
+```
+
+Use a `float` node when fractional values in the declared units are valid.
+An assignment without explicit units is already expressed in the node's
+declared units and must satisfy the same integer rule.
+
 
 ## Custom Units
 

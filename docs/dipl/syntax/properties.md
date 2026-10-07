@@ -23,6 +23,9 @@ If the node has an other value than one of the options, DIPL will throw an error
 
 Node definition and individual options can have different units, but they must have the same dimensionality. 
 The final value of such modified node will be, however, converted into units specified in the definition.
+Options with explicit units are converted to the node's declared units before
+the effective value is compared with them. For an integer node, the effective
+value must also satisfy the [integer conversion rule](units.md#integer-values-after-unit-conversion).
 
 ``` DIPL
 animal str = "dog"

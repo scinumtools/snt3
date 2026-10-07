@@ -46,8 +46,11 @@ T checked_integer(const std::string& input, const snt::dip::Line& line) {
     );
 }
 
-void validate_integer_range(const snt::val::BaseValue* value, snt::core::DataType dtype,
-                            const snt::dip::Line& line) {
+} // namespace
+
+namespace snt::dip {
+
+void IntegerNode::validate_value(const val::BaseValue* value, core::DataType dtype, const Line& line) {
     if (!value) return;
     unsigned bits = 0;
     bool unsigned_target = false;
@@ -66,6 +69,7 @@ void validate_integer_range(const snt::val::BaseValue* value, snt::core::DataTyp
     const auto signed_max = bits == 64 ? std::numeric_limits<int64_t>::max() : (int64_t{1} << (bits - 1)) - 1;
     const auto unsigned_max = bits == 64 ? std::numeric_limits<uint64_t>::max() : (uint64_t{1} << bits) - 1;
     bool in_range = true;
+    bool integral = true;
     if (const auto* signed_values = dynamic_cast<const snt::val::ArrayValue<int64_t>*>(value)) {
         for (const auto number : signed_values->get_values())
             in_range &= unsigned_target ? number >= 0 && static_cast<uint64_t>(number) <= unsigned_max
@@ -76,9 +80,18 @@ void validate_integer_range(const snt::val::BaseValue* value, snt::core::DataTyp
     } else if (const auto* floating_values = dynamic_cast<const snt::val::ArrayValue<double>*>(value)) {
         const auto upper_exclusive = std::ldexp(1.0L, unsigned_target ? bits : bits - 1);
         const auto lower_inclusive = unsigned_target ? 0.0L : -upper_exclusive;
-        for (const auto number : floating_values->get_values())
+        for (const auto number : floating_values->get_values()) {
             in_range &= std::isfinite(number) && static_cast<long double>(number) >= lower_inclusive &&
                         static_cast<long double>(number) < upper_exclusive;
+            integral &= std::isfinite(number) && std::trunc(number) == number;
+        }
+    } else if (const auto* floating_values = dynamic_cast<const snt::val::ArrayValue<long double>*>(value)) {
+        const auto upper_exclusive = std::ldexp(1.0L, unsigned_target ? bits : bits - 1);
+        const auto lower_inclusive = unsigned_target ? 0.0L : -upper_exclusive;
+        for (const auto number : floating_values->get_values()) {
+            in_range &= std::isfinite(number) && number >= lower_inclusive && number < upper_exclusive;
+            integral &= std::isfinite(number) && std::trunc(number) == number;
+        }
     }
     if (!in_range)
         throw snt::dip::SyntaxException(
@@ -88,11 +101,14 @@ void validate_integer_range(const snt::val::BaseValue* value, snt::core::DataTyp
             "Use a value within the range of the declared data type.",
             __FILE__, __LINE__, line
         );
+    if (!integral)
+        throw SyntaxException(
+            "Invalid integer value",
+            "The evaluated value is fractional and cannot be represented as an integer.",
+            "Use a whole number after unit conversion, or declare a floating-point node.",
+            __FILE__, __LINE__, line
+        );
 }
-
-} // namespace
-
-namespace snt::dip {
 
     ValueNode::PointerType IntegerNode::is_node(Parser& parser) {
         if (parser.dtype_raw[1] == "int") {
@@ -134,30 +150,26 @@ namespace snt::dip {
     };
 
     BaseNode::ListType IntegerNode::parse(Environment& env) {
-        auto assign_checked = [this](val::BaseValue::PointerType incoming) {
-            validate_integer_range(incoming.get(), value_dtype, line);
-            set_value(std::move(incoming));
-        };
         switch (value_origin) {
         case ValueOrigin::FunctionRes:
             break;
         case ValueOrigin::Function:
-            assign_checked(parse_function(env, value_raw.at(0), units_raw));
+            set_value(parse_function(env, value_raw.at(0), units_raw));
             break;
         case ValueOrigin::Reference:
         case ValueOrigin::ReferenceRel:
         case ValueOrigin::ReferenceRaw:
-            assign_checked(parse_reference(env, value_raw.at(0), units_raw, value_origin));
+            set_value(parse_reference(env, value_raw.at(0), units_raw, value_origin));
             break;
         case ValueOrigin::Expression: {
-            assign_checked(parse_expression(env, value_raw.at(0), units_raw, dtype));
+            set_value(parse_expression(env, value_raw.at(0), units_raw, dtype));
             break;
         }
         default:
             set_value();
             break;
         }
-        validate_integer_range(value.get(), value_dtype, line);
+        validate_value(value.get(), value_dtype, line);
         if (!units) // units might be provided by the ValueOrigin::Function
             set_units();
         return {};

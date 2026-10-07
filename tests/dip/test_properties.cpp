@@ -310,8 +310,6 @@ TEST(Properties, OptionsInteger) {
     EXPECT_EQ(vnode->options[1].value->to_string(), "32");
     EXPECT_EQ(vnode->options[2].value->to_string(), "64");
 
-    // TODO: implement unit conversion of units
-
     // validate if node value is in options
     d = dip::DIP();
     d.add_string("foo int = 1");
@@ -352,8 +350,6 @@ TEST(Properties, OptionsFloat) {
     EXPECT_EQ(vnode->options[1].value->to_string(), "2.34");
     EXPECT_EQ(vnode->options[2].value->to_string(), "5.6e7");
 
-    // TODO: implement unit conversion of units
-
     // validate if node value is in options
     d = dip::DIP();
     d.add_string("foo float = 2");
@@ -367,6 +363,38 @@ TEST(Properties, OptionsFloat) {
         EXPECT_EQ(e.info().suggestion, "Use one of the values defined by the node's `options` property.");
     } catch (...) {
         FAIL() << "Expected dip::SyntaxException";
+    }
+}
+
+TEST(Properties, OptionsConvertUnitsBeforeValidation) {
+    for (const std::string& type : {"int", "float"}) {
+        SCOPED_TRACE(type);
+        dip::DIP accepted;
+        accepted.add_string("distance " + type + " = 2 m\n  !options [100,200] cm");
+        const dip::Environment env = accepted.parse();
+        const auto node = env.get_node("distance");
+        ASSERT_EQ(node->options.size(), 2);
+        EXPECT_EQ(node->options[0].value->to_string(), "1");
+        EXPECT_EQ(node->options[1].value->to_string(), "2");
+        EXPECT_EQ(node->value->to_string(), "2");
+
+        dip::DIP rejected;
+        rejected.add_string("distance " + type + " = 2 m\n  !options [100,200] cm\ndistance = 3 m");
+        try {
+            rejected.parse();
+            FAIL() << "Expected an option validation error";
+        } catch (const dip::SyntaxException& error) {
+            EXPECT_EQ(error.info().message, "Invalid option");
+        }
+    }
+
+    dip::DIP fractional;
+    fractional.add_string("distance int = 2 m\n  !options [100,200] cm\ndistance = 150 cm");
+    try {
+        fractional.parse();
+        FAIL() << "Expected fractional integer conversion to be rejected";
+    } catch (const dip::SyntaxException& error) {
+        EXPECT_EQ(error.info().message, "Invalid integer value");
     }
 }
 

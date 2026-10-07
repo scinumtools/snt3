@@ -16,6 +16,8 @@ namespace snt::dip {
 
       public:
         static constexpr size_t max_int_size = sizeof(long long) * CHAR_BIT;
+        /** Validate that a value can be represented by the declared integer type. */
+        static void validate_value(const val::BaseValue* value, core::DataType dtype, const Line& line);
         /** Return an integer node when the parser is positioned at an integer literal.
          * @param parser Parser state to inspect.
          */

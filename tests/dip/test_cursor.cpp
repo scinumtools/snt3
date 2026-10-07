@@ -116,7 +116,7 @@ TEST_F(Cursor, TraverseCollections) {
     }
 }
 
-TEST(Cursor, TraverseChildrenGroups) {
+TEST_F(Cursor, TraverseChildrenGroups) {
     dip::DIP parser;
     parser.add_string(
         "settings\n"
