@@ -1,0 +1,38 @@
+rod
+  length float = 10 cm
+    !condition ({.} > 0 cm)
+  initial_temperature float = 280 K
+    !condition ({.} > 0 K)
+  boundary_temperature float = 320 K
+    !condition ({.} > 0 K)
+
+$schema thermal_material
+  diffusivity float = 1 mm2/s
+    !condition ({.} > 0 mm2/s)
+    ?title "Thermal diffusivity"
+    ?descr "Illustrative baseline, not measured material data"
+
+materials map : thermal_material
+materials[baseline]
+materials[trial]
+
+run
+  id str = "heat_rod_01"
+    !format "[a-z][a-z0-9_]*"
+  cells uint32 = 10
+    !condition ({.} >= 2)
+  steps uint32 = 12
+    !condition ({.} > 0)
+  safety float = 0.4
+    !condition ({.} > 0 && {.} <= 0.5)
+  dx float = ({?rod.length} / {?run.cells}) m
+  baseline_alpha float = ({?materials[baseline].diffusivity}) m2/s
+  alpha float = ({?materials[trial].diffusivity}) m2/s
+  dt float = ({?run.safety} * {?run.dx} * {?run.dx} / {?run.alpha}) s
+  baseline_fourier float = ({?run.baseline_alpha} * {?run.dt} / {?run.dx} / {?run.dx})
+    !condition ({.} > 0 && {.} <= 0.5)
+  trial_fourier float = ({?run.alpha} * {?run.dt} / {?run.dx} / {?run.dx})
+    !condition ({.} > 0 && {.} <= 0.5)
+
+$override
+  materials[trial].diffusivity = 0.02 cm2/s

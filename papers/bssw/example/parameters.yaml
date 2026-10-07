@@ -1,0 +1,25 @@
+rod:
+  length: {value: 10, unit: cm}
+  initial_temperature: {value: 280, unit: K}
+  boundary_temperature: {value: 320, unit: K}
+
+materials:
+  baseline: &thermal_material
+    diffusivity:
+      value: 1
+      unit: mm**2/s
+      provenance:
+        title: Thermal diffusivity
+        description: Illustrative baseline, not measured material data
+  trial:
+    <<: *thermal_material
+
+run:
+  id: heat_rod_01
+  cells: 10
+  steps: 12
+  safety: 0.4
+
+# The trial doubles the baseline diffusivity.
+overrides:
+  materials.trial.diffusivity: {value: 0.02, unit: cm**2/s}
