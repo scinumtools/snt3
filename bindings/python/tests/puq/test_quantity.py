@@ -224,10 +224,15 @@ def test_result_numpy():
     q = Quantity("[2.23(12),3.5,4.48(94),5.293]*km")
     assert np.all(q.to_numpy() == np.array([2.23, 3.5, 4.48, 5.293]))
 
-    ## TODO: debug
-    ## convert to multidimensional array
-    #q = Quantity("[[1,2,3],[4,5,6]]*km")
-    #assert np.all(q.to_numpy() == np.array([[1,2,3],[4,5,6]]))
+    # Multidimensional values are supported through NumPy input.
+    expected = np.array([[1, 2, 3], [4, 5, 6]])
+    q = Quantity(expected, "km")
+    np.testing.assert_array_equal(q.to_numpy(), expected)
+    assert q.to_numpy().shape == (2, 3)
+
+    # PUEL string literals are intentionally limited to one dimension.
+    with pytest.raises(RuntimeError, match="Multidimensional array literals are unsupported"):
+        Quantity("[[1,2,3],[4,5,6]]*km")
 
 def test_output_units():
 

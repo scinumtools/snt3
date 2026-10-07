@@ -4,6 +4,20 @@
 
 namespace snt::puq {
 
+    void OperatorArray::parse(exs::Expression& expr) {
+        exs::OperatorGroup<>::parse(expr);
+        for (const auto& group : groups) {
+            if (group.find(symbols.open) != std::string::npos)
+                throw puq::ParserException(
+                    "Multidimensional array literals are unsupported",
+                    "The PUEL expression `" + expr.expr + "` contains an array inside another array.",
+                    "Use a one-dimensional PUEL array or supply a multidimensional NumPy or VAL/C++ array.",
+                    __FILE__,
+                    __LINE__
+                );
+        }
+    }
+
     // TODO: this needs probably templates because of the ArrayValue
     void OperatorArray::operate_group(exs::TokenListBase* tokens) {
         exs::Token group;

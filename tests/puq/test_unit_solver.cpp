@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <snt/puq/exceptions.h>
 #include <snt/puq/solver/unit_atom.h>
 #include <snt/puq/solver/unit_solver.h>
 
@@ -69,6 +70,27 @@ TEST(UnitSolver, SolveArrays) {
 
     atom = solver.eval("[20, 40.5]*[2,3]"); // multiplication of vectors
     EXPECT_EQ(atom.value.to_string(), "[40, 121.5]");
+}
+
+TEST(UnitSolver, RejectNestedArrays) {
+    puq::UnitSolver solver;
+    try {
+        solver.eval("[[1,2,3],[4,5,6]]*km");
+        FAIL() << "Expected puq::ParserException";
+    } catch (const puq::ParserException& error) {
+        EXPECT_EQ(error.info().message, "Multidimensional array literals are unsupported");
+    }
+}
+
+TEST(UnitSolver, UnclosedArrayNamesClosingBracket) {
+    puq::UnitSolver solver;
+    try {
+        solver.eval("[1,2");
+        FAIL() << "Expected exs::ParserException";
+    } catch (const exs::ParserException& error) {
+        EXPECT_EQ(error.info().message, "Unclosed group");
+        EXPECT_NE(error.info().suggestion.find("`]`"), std::string::npos);
+    }
 }
 
 TEST(UnitSolver, OptionalCompositionPreservesCustomOperators) {

@@ -38,9 +38,10 @@ namespace snt::exs {
             while (depth > 0) {
                 if (expr.right.length() == 0) {
                     throw exs::ParserException(
-                        "Unclosed parentheses",
-                        "The expression is missing a closing parenthesis: `" + expr.expr + "`.",
-                        "Add a closing `)` parenthesis to complete the expression.",
+                        "Unclosed group",
+                        "The group opened by `" + symbols.open + "` is missing its closing `" + symbols.close +
+                            "` in the expression `" + expr.expr + "`.",
+                        "Add the closing `" + symbols.close + "` to complete the group.",
                         __FILE__,
                         __LINE__
                     );
