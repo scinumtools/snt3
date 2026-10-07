@@ -98,20 +98,14 @@ namespace snt::puq {
         if (numerical != d.numerical)
             return false;
         for (int i = 0; i < Config::num_basedim; i++) {
-            if (physical[i] != d.physical[i])
+            if (!equal_exp(physical[i], d.physical[i]))
                 return false;
         }
         return true;
     }
 
     bool Dimensions::operator!=(const Dimensions& d) const {
-        if (numerical != d.numerical)
-            return true;
-        for (int i = 0; i < Config::num_basedim; i++) {
-            if (physical[i] != d.physical[i])
-                return true;
-        }
-        return false;
+        return !(*this == d);
     }
 
 } // namespace snt::puq

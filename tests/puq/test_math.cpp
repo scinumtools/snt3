@@ -56,7 +56,7 @@ TEST(Math, Power) {
         }
     }
     {
-        // Quantity   TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(2.34e4, 56, "m2");
         puq::Quantity quant2(2.1, 0.1);
@@ -65,6 +65,46 @@ TEST(Math, Power) {
         quant0 = puq::math::pow(quant1, quant2);
         EXPECT_EQ(quant0.to_string(), "1.5(15)e9*m2"); // est 1497453345.9230108 unc 1506531188.1869695
     }
+}
+
+TEST(Math, PowerAcrossSystems) {
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
+
+    const puq::Quantity si(2.0, 0.1, "J", puq::SystemType::SI);
+    const puq::Quantity esu(2e7, 1e6, "erg", puq::SystemType::ESU);
+    const auto si_squared = puq::math::pow(si, 2);
+    const auto esu_squared = puq::math::pow(esu, 2);
+    EXPECT_EQ(si_squared.stype, puq::SystemType::SI);
+    EXPECT_EQ(esu_squared.stype, puq::SystemType::ESU);
+    EXPECT_EQ(si_squared.measurement.baseunits.to_string(), "J2");
+    EXPECT_EQ(esu_squared.measurement.baseunits.to_string(), "erg2");
+    ASSERT_TRUE(si_squared.measurement.result.uncertainty);
+    ASSERT_TRUE(esu_squared.measurement.result.uncertainty);
+    EXPECT_NEAR(val::ArrayValueFloat64(si_squared.measurement.result.estimate.get()).get_value(0), 4.0, 1e-12);
+    EXPECT_NEAR(val::ArrayValueFloat64(si_squared.measurement.result.uncertainty.get()).get_value(0), 0.4, 1e-12);
+    EXPECT_NEAR(val::ArrayValueFloat64(esu_squared.measurement.result.estimate.get()).get_value(0), 4e14, 1e2);
+    EXPECT_NEAR(val::ArrayValueFloat64(esu_squared.measurement.result.uncertainty.get()).get_value(0), 4e13, 1e1);
+
+    for (const auto& squared : {si_squared, esu_squared}) {
+        const auto in_joules_squared = squared.convert("J2", puq::SystemType::SI);
+        EXPECT_NEAR(val::ArrayValueFloat64(in_joules_squared.measurement.result.estimate.get()).get_value(0), 4.0,
+                    1e-12);
+        ASSERT_TRUE(in_joules_squared.measurement.result.uncertainty);
+        EXPECT_NEAR(val::ArrayValueFloat64(in_joules_squared.measurement.result.uncertainty.get()).get_value(0), 0.4,
+                    1e-12);
+    }
+
+    const auto converted_then_squared = puq::math::pow(esu.convert("J", puq::SystemType::SI), 2);
+    EXPECT_EQ(converted_then_squared.stype, puq::SystemType::SI);
+    EXPECT_EQ(converted_then_squared.measurement.baseunits.to_string(), "J2");
+    EXPECT_NEAR(val::ArrayValueFloat64(converted_then_squared.measurement.result.estimate.get()).get_value(0), 4.0,
+                1e-12);
+    ASSERT_TRUE(converted_then_squared.measurement.result.uncertainty);
+    EXPECT_NEAR(val::ArrayValueFloat64(converted_then_squared.measurement.result.uncertainty.get()).get_value(0), 0.4,
+                1e-12);
 }
 
 TEST(Math, Exponent) {
@@ -377,11 +417,32 @@ TEST(Math, AbsoluteValue) {
         EXPECT_EQ(msr0.to_string(), "4.36(16)*m2");
     }
     {
-        // Quantity    TODO: implement tests with different systems
+        // Quantity
         puq::Quantity quant0;
         puq::Quantity quant1(-4.36, 0.16, "m");
         quant0 = puq::math::abs(quant1);
         EXPECT_EQ(quant0.to_string(), "4.36(16)*m");
+    }
+}
+
+TEST(Math, AbsoluteValueAcrossSystems) {
+    if constexpr (!puq::Config::use_system_cgs) {
+        GTEST_SKIP() << "CGS unit system is disabled";
+        return;
+    }
+
+    const puq::Quantity si(-2.0, 0.1, "J", puq::SystemType::SI);
+    const puq::Quantity esu(-2e7, 1e6, "erg", puq::SystemType::ESU);
+    const auto si_absolute = puq::math::abs(si);
+    const auto esu_absolute = puq::math::abs(esu);
+    EXPECT_EQ(si_absolute.stype, puq::SystemType::SI);
+    EXPECT_EQ(esu_absolute.stype, puq::SystemType::ESU);
+
+    for (const auto& absolute : {si_absolute, esu_absolute}) {
+        const auto in_joules = absolute.convert("J", puq::SystemType::SI);
+        EXPECT_NEAR(val::ArrayValueFloat64(in_joules.measurement.result.estimate.get()).get_value(0), 2.0, 1e-12);
+        ASSERT_TRUE(in_joules.measurement.result.uncertainty);
+        EXPECT_NEAR(val::ArrayValueFloat64(in_joules.measurement.result.uncertainty.get()).get_value(0), 0.1, 1e-12);
     }
 }
 

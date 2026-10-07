@@ -144,6 +144,11 @@ namespace snt::puq {
 
     using ExponentVariant = std::variant<int, Exponent>;
 
+    /** Compare exponent values regardless of their storage type. */
+    inline bool equal_exp(const ExponentVariant& x, const ExponentVariant& y) {
+        return std::visit([](const auto& a, const auto& b) { return Exponent(a) == Exponent(b); }, x, y);
+    }
+
     inline ExponentVariant add_exp(const ExponentVariant& x, const ExponentVariant& y) {
         return std::visit(
             [](auto const& a, auto const& b) -> ExponentVariant {

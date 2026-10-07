@@ -63,6 +63,15 @@ TEST(Exponent, ArithmeticsComparison) {
     EXPECT_EQ(a != a, false);
 }
 
+TEST(Exponent, ValueComparison) {
+    EXPECT_TRUE(puq::Exponent(4, 2) == puq::Exponent(2));
+    EXPECT_TRUE(puq::Exponent(-2, -1) == 2);
+    EXPECT_FALSE(puq::Exponent(3, 2) == 2);
+    EXPECT_TRUE(puq::equal_exp(2, puq::Exponent(4, 2)));
+    EXPECT_TRUE(puq::equal_exp(puq::Exponent(1, 2), puq::Exponent(2, 4)));
+    EXPECT_FALSE(puq::equal_exp(2, puq::Exponent(3, 2)));
+}
+
 TEST(Exponent, ArithmeticsIntegers) {
 
     puq::Exponent a(2);

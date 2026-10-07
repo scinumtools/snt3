@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <numeric>
 #include <snt/puq/exponent.h>
 #include <sstream>
@@ -49,19 +50,20 @@ namespace snt::puq {
     }
 
     bool Exponent::operator==(const Exponent& e) const {
-        return to_float() == e.to_float();
+        return static_cast<std::int64_t>(numerator) * e.denominator ==
+               static_cast<std::int64_t>(e.numerator) * denominator;
     }
 
     bool Exponent::operator!=(const Exponent& e) const {
-        return to_float() != e.to_float();
+        return !(*this == e);
     }
 
     bool Exponent::operator==(const int& e) const {
-        return to_float() == e;
+        return *this == Exponent(e);
     }
 
     bool Exponent::operator!=(const int& e) const {
-        return to_float() != e;
+        return !(*this == e);
     }
 
     bool Exponent::operator==(const double e) const {
