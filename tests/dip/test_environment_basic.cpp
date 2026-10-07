@@ -3,6 +3,8 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
+#include <snt/dip/nodes/node_integer.h>
+#include <snt/val/values.h>
 
 using namespace snt;
 
@@ -125,7 +127,48 @@ TEST(Environment, GetNode) {
     EXPECT_EQ(node->units->to_string(), "cm");
 }
 
-// TODO: tests more requests with RequestType::Function
+TEST(Environment, RequestFunctionValue) {
+    dip::DIP d;
+    d.add_function_value("distance", [](const dip::Environment&) {
+        return dip::ValueNodeData{std::make_unique<val::ArrayValueFloat64>(2.0), puq::Quantity("m")};
+    });
+    d.add_string("anchor bool = true");
+    dip::Environment env = d.parse();
+
+    dip::ValueNodeData data = env.request_node_data("distance", dip::RequestType::Function);
+    ASSERT_TRUE(data.value);
+    ASSERT_TRUE(data.units);
+    EXPECT_EQ(data.value->to_string(), "2");
+    EXPECT_EQ(data.units->to_string(), "m");
+
+    auto value = env.request_value("distance", dip::RequestType::Function);
+    ASSERT_TRUE(value);
+    EXPECT_EQ(value->to_string(), "2");
+    value = env.request_value("distance", dip::RequestType::Function, "cm");
+    ASSERT_TRUE(value);
+    EXPECT_EQ(value->to_string(), "200");
+}
+
+TEST(Environment, RequestFunctionGroup) {
+    dip::DIP d;
+    d.add_function_nodes("generated", [](const dip::Environment&) {
+        dip::ValueNode::ListType nodes;
+        nodes.push_back(std::make_shared<dip::IntegerNode>(
+            dip::Path("count"), std::make_unique<val::ArrayValueInt32>(3)
+        ));
+        return nodes;
+    });
+    d.add_string("anchor bool = true");
+    dip::Environment env = d.parse();
+
+    auto nodes = env.request_group("generated", dip::RequestType::Function);
+    ASSERT_EQ(nodes.size(), 1);
+    EXPECT_EQ(nodes[0]->path.name, "count");
+    ASSERT_TRUE(nodes[0]->value);
+    EXPECT_EQ(nodes[0]->value->to_string(), "3");
+    EXPECT_EQ(nodes[0]->value_origin, dip::ValueOrigin::FunctionRes);
+    EXPECT_EQ(nodes[0]->line.source.name, "generated()");
+}
 
 TEST(Environment, SelectTagFilter) {
     EXPECT_TRUE((dip::TagFilter{}).matches({}));
