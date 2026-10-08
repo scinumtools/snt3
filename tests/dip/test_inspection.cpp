@@ -241,6 +241,20 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
     EXPECT_EQ(graph.referenced_by("?source").size(), 2);
     EXPECT_TRUE(dip::inspect_capabilities(env, "result").hasReferenceGraph);
     EXPECT_TRUE(dip::inspect_capabilities(env, "source").hasReferenceGraph);
+    const auto neighborhood = dip::inspect_dependency_neighborhood(env, "result");
+    EXPECT_TRUE(neighborhood.recorded);
+    EXPECT_EQ(neighborhood.id, "?result");
+    ASSERT_EQ(neighborhood.dependencies.size(), 1);
+    EXPECT_EQ(neighborhood.dependencies.front().id, "?source");
+    ASSERT_TRUE(neighborhood.value_event.has_value());
+    EXPECT_EQ(neighborhood.value_event->owner, "?result");
+    ASSERT_EQ(neighborhood.readers.size(), 1);
+    EXPECT_EQ(neighborhood.readers.front().id, "?chosen");
+    EXPECT_FALSE(neighborhood.readers.front().request.empty());
+    const auto reverse_only = dip::inspect_dependency_neighborhood(env, "?source");
+    EXPECT_TRUE(reverse_only.dependencies.empty());
+    ASSERT_EQ(reverse_only.readers.size(), 2);
+    EXPECT_EQ(reverse_only.readers.front().id, "?result");
     ASSERT_TRUE(env.get_node("result")->units.has_value());
 
     const auto file = std::filesystem::temp_directory_path() / "snt-dependency-graph-roundtrip.diph5";
@@ -257,6 +271,7 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
     ASSERT_TRUE(restored_event->location.has_value());
     EXPECT_EQ(restored_event->location->line, previous->location->line);
     EXPECT_EQ(restored.dependency_graph().dependencies("?result").front().target, "?source");
+    EXPECT_EQ(dip::inspect_dependency_neighborhood(restored, "result").dependencies.front().id, "?source");
 }
 
 TEST(Inspection, DependencyRecordingIsOptIn) {
@@ -267,6 +282,10 @@ TEST(Inspection, DependencyRecordingIsOptIn) {
     EXPECT_FALSE(fast.dependency_graph().recorded);
     EXPECT_TRUE(fast.dependency_graph().events.empty());
     EXPECT_FALSE(dip::inspect_capabilities(fast, "result").hasReferenceGraph);
+    const auto unavailable = dip::inspect_dependency_neighborhood(fast, "result");
+    EXPECT_FALSE(unavailable.recorded);
+    EXPECT_TRUE(unavailable.dependencies.empty());
+    EXPECT_TRUE(unavailable.readers.empty());
 
     dip::DIP graph_parser;
     graph_parser.add_string(code);
@@ -282,6 +301,25 @@ TEST(Inspection, DependencyRecordingIsOptIn) {
     std::filesystem::remove(file);
     EXPECT_FALSE(restored.dependency_graph().recorded);
     EXPECT_TRUE(restored.dependency_graph().events.empty());
+}
+
+TEST(Inspection, DependencyNeighborhoodAcceptsQualifiedSourceIds) {
+    dip::Environment env;
+    dip::DependencyGraph graph;
+    graph.recorded = true;
+    dip::DependencyEvent event;
+    event.owner = "?result";
+    event.reads.push_back({"reference?sample", "reference?sample", "{reference?sample}"});
+    graph.events.push_back(std::move(event));
+    env.set_dependency_graph(std::move(graph));
+
+    const auto neighborhood = dip::inspect_dependency_neighborhood(env, "reference?sample");
+    EXPECT_EQ(neighborhood.id, "reference?sample");
+    EXPECT_TRUE(neighborhood.dependencies.empty());
+    ASSERT_EQ(neighborhood.readers.size(), 1);
+    EXPECT_EQ(neighborhood.readers.front().id, "?result");
+    EXPECT_EQ(neighborhood.readers.front().request, "reference?sample");
+    EXPECT_EQ(neighborhood.readers.front().operand, "{reference?sample}");
 }
 
 TEST(Inspection, DependencyGraphResolvesRelativeReadsAndConditions) {
@@ -305,6 +343,15 @@ TEST(Inspection, DependencyGraphResolvesRelativeReadsAndConditions) {
     ASSERT_EQ(condition->reads.size(), 1);
     EXPECT_EQ(condition->reads.front().target, "?foo.bar.result");
     EXPECT_TRUE(condition->composition.has_value());
+    const auto neighborhood = dip::inspect_dependency_neighborhood(env, "foo.bar.result");
+    ASSERT_EQ(neighborhood.dependencies.size(), 3);
+    EXPECT_EQ(neighborhood.dependencies[0].id, "?foo.bar.crackle");
+    EXPECT_EQ(neighborhood.dependencies[1].id, "?snap");
+    EXPECT_EQ(neighborhood.dependencies[2].id, "?foo.bar.result");
+    ASSERT_TRUE(neighborhood.value_event.has_value());
+    ASSERT_TRUE(neighborhood.condition_event.has_value());
+    EXPECT_TRUE(neighborhood.value_event->composition.has_value());
+    EXPECT_TRUE(neighborhood.condition_event->composition.has_value());
 }
 
 TEST(Inspection, DependencyGraphConnectsBranchDecisionsToValues) {

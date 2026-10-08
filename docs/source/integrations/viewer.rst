@@ -70,7 +70,8 @@ tree node to expand or collapse it, or single-click to select it. Select a
 parameter to inspect its value, units, metadata, source locations, and
 dependencies. Arrays and tables expose a **Data** tab with bounded pages;
 arrays of higher rank allow choosing two displayed axes and fixed indices for
-the others. Data columns initially fit the visible values up to a readable
+the others. Use the ``<`` and ``>`` buttons beside a fixed index to step through
+that dimension. Data columns initially fit the visible values up to a readable
 maximum width. Drag a header divider to resize a column, scroll horizontally
 to see more columns, or hover over a clipped cell to read its full value.
 Values with recorded dependencies or readers expose a **Graph**

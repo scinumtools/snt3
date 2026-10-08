@@ -76,6 +76,35 @@ float data_table_height(std::size_t rows) {
     return std::min(content_height, std::max(row_height, ImGui::GetContentRegionAvail().y));
 }
 
+void fixed_index_control(std::size_t axis, std::size_t extent, std::size_t& index, bool& dirty) {
+    ImGui::PushID(static_cast<int>(axis));
+    const std::string label = "Dimension " + std::to_string(axis) + " index";
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted(label.c_str());
+    ImGui::SameLine();
+    ImGui::BeginDisabled(index == 0);
+    if (ImGui::SmallButton("<")) {
+        --index;
+        dirty = true;
+    }
+    ImGui::EndDisabled();
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(90.0f);
+    std::size_t entered = index;
+    if (ImGui::InputScalar("##index", ImGuiDataType_U64, &entered)) {
+        index = std::min(entered, extent - 1);
+        dirty = true;
+    }
+    ImGui::SameLine();
+    ImGui::BeginDisabled(index >= extent - 1);
+    if (ImGui::SmallButton(">")) {
+        ++index;
+        dirty = true;
+    }
+    ImGui::EndDisabled();
+    ImGui::PopID();
+}
+
 void draw_array(ViewerModel& model, DataViewState& state) {
     const auto& summary = *state.summary;
     const auto& shape = summary.shape;
@@ -118,12 +147,7 @@ void draw_array(ViewerModel& model, DataViewState& state) {
     }
     for (std::size_t axis = 0; axis < shape.size(); ++axis) {
         if (axis == state.row_axis || (matrix && axis == state.column_axis)) continue;
-        const std::string label = "Dimension " + std::to_string(axis) + " index";
-        std::size_t index = state.fixed_indices[axis];
-        if (ImGui::InputScalar(label.c_str(), ImGuiDataType_U64, &index)) {
-            state.fixed_indices[axis] = std::min(index, shape[axis] - 1);
-            state.dirty = true;
-        }
+        fixed_index_control(axis, shape[axis], state.fixed_indices[axis], state.dirty);
     }
     page_buttons(matrix ? "row indices" : "indices", state.row_start, shape[state.row_axis],
                  array_rows, false, state.dirty);
@@ -141,10 +165,11 @@ void draw_array(ViewerModel& model, DataViewState& state) {
     ImGui::PushID(state.path.c_str());
     const auto page_id = std::to_string(state.column_start);
     ImGui::PushID(page_id.c_str());
-    if (ImGui::BeginTable("Array data", static_cast<int>(visible_columns + 1),
+    if (ImGui::BeginChild("Array data viewport", ImVec2(0, data_table_height(state.cells.size())),
+                          ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar) &&
+        ImGui::BeginTable("Array data", static_cast<int>(visible_columns + 1),
                           ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable |
-                              ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY,
-                          ImVec2(0, data_table_height(state.cells.size())))) {
+                              ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
         ImGui::TableSetupColumn(matrix ? "Row" : "Index", ImGuiTableColumnFlags_WidthFixed, min_column_width);
         for (std::size_t column = 0; column < visible_columns; ++column) {
             const std::string heading = matrix ? std::to_string(state.column_start + column) : "Value";
@@ -163,6 +188,7 @@ void draw_array(ViewerModel& model, DataViewState& state) {
         }
         ImGui::EndTable();
     }
+    ImGui::EndChild();
     ImGui::PopID();
     ImGui::PopID();
 }
@@ -186,10 +212,11 @@ void draw_table(ViewerModel& model, DataViewState& state) {
     ImGui::PushID(state.path.c_str());
     const auto page_id = std::to_string(state.column_start);
     ImGui::PushID(page_id.c_str());
-    if (ImGui::BeginTable("Table data", static_cast<int>(visible_columns + 1),
+    if (ImGui::BeginChild("Table data viewport", ImVec2(0, data_table_height(state.cells.size())),
+                          ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar) &&
+        ImGui::BeginTable("Table data", static_cast<int>(visible_columns + 1),
                           ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable |
-                              ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY,
-                          ImVec2(0, data_table_height(state.cells.size())))) {
+                              ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
         ImGui::TableSetupColumn("#", ImGuiTableColumnFlags_WidthFixed, min_column_width);
         for (std::size_t column = 0; column < visible_columns; ++column) {
             const auto& info = table.columns[state.column_start + column];
@@ -226,6 +253,7 @@ void draw_table(ViewerModel& model, DataViewState& state) {
         }
         ImGui::EndTable();
     }
+    ImGui::EndChild();
     ImGui::PopID();
     ImGui::PopID();
 }

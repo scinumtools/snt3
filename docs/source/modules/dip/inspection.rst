@@ -190,6 +190,14 @@ Branch decision events use ``#case:N`` IDs. A value event's ``controlled_by``
 list identifies the active decisions that selected it. Imported value nodes
 retain a read link to the original node, including its source qualifier.
 
+``inspect_dependency_neighborhood`` returns a one-hop local view of those
+retained facts for one path: distinct value and condition dependencies, values
+whose latest evaluation reads it, edge request and operand text, and the
+separate latest value and condition events with their expression trees. It accepts
+resolved paths, ``?path`` IDs, and ``source?path`` IDs. ``recorded`` is false
+when graph capture was unavailable; no relationships are inferred in that
+case. The function returns data only, leaving graph layout to clients.
+
 Numerical and logical expressions include the EXS composition tree produced
 by the same evaluation pass. Its operands, operators, and groups show how the
 calculation is assembled. String templates and direct references have node
@@ -200,6 +208,10 @@ this graph.
 .. code-block:: cpp
 
    auto env = snt::dip::open_artifact("DIPfile", true);
+   auto neighborhood = snt::dip::inspect_dependency_neighborhood(env, "physics.speed");
+   for (const auto& dependency : neighborhood.dependencies) {
+       // dependency.id is the resolved DIP node or source ID.
+   }
    const auto& graph = env.dependency_graph();
    for (const auto& read : graph.dependencies("?physics.speed")) {
        // read.target is the resolved DIP node ID.

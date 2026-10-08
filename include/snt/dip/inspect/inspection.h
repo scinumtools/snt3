@@ -137,6 +137,34 @@ struct InspectionCapabilities {
 /** Works for evaluated value paths, groups, collection paths, and named source IDs. */
 InspectionCapabilities inspect_capabilities(const Environment& env, std::string_view path);
 
+/** One distinct value or source adjacent to a selected dependency-graph ID.
+ * request and operand describe the first effective read connecting the pair.
+ */
+struct DependencyNeighbor {
+    std::string id;
+    std::string request;
+    std::string operand;
+};
+
+/** Local effective dependency graph for a value or source ID. Dependencies
+ * combine value and condition reads in that order, once per target. Readers
+ * are values whose latest evaluation reads the selected ID. The latest value
+ * and condition events remain separate so clients can inspect both expressions.
+ */
+struct DependencyNeighborhood {
+    std::string id;
+    bool recorded = false;
+    std::vector<DependencyNeighbor> dependencies;
+    std::vector<DependencyNeighbor> readers;
+    std::optional<DependencyEvent> value_event;
+    std::optional<DependencyEvent> condition_event;
+};
+
+/** Accept an evaluated path, ?path, source?path, or source? ID. Returns an
+ * empty neighborhood with recorded=false when graph capture is unavailable.
+ */
+DependencyNeighborhood inspect_dependency_neighborhood(const Environment& env, std::string_view path);
+
 /** Metadata for a table column; values remain in the environment. */
 struct TableColumnInspection {
     size_t index = 0;

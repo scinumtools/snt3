@@ -1,12 +1,9 @@
 #include "graph_view.h"
 
-#include <snt/dip/inspect/dependency_graph.h>
-
 #include <imgui.h>
 
 #include <algorithm>
 #include <string>
-#include <unordered_set>
 
 namespace snt::view {
 namespace {
@@ -80,6 +77,18 @@ void draw_composition_node(const exs::CompositionGraph& graph, std::size_t index
     ImGui::PopID();
 }
 
+void draw_expression(const dip::DependencyEvent& event, const char* heading) {
+    if (event.expression.empty() && !event.composition) return;
+    ImGui::PushID(heading);
+    ImGui::SeparatorText(heading);
+    if (!event.expression.empty()) ImGui::TextWrapped("%s", event.expression.c_str());
+    if (event.composition && event.composition->root < event.composition->nodes.size()) {
+        ImGui::SeparatorText("Composition");
+        draw_composition_node(*event.composition, event.composition->root, 0);
+    }
+    ImGui::PopID();
+}
+
 } // namespace
 
 void GraphViewState::reset(const ViewerModel& model) {
@@ -88,75 +97,46 @@ void GraphViewState::reset(const ViewerModel& model) {
     revision = model.revision();
     const auto* object = model.object(path);
     if (!object) return;
-    const auto& graph = model.environment().dependency_graph();
-    recorded = graph.recorded;
-    if (!recorded) return;
     const std::string id = object->source_name.empty() ? "?" + object->node_path : object->path;
-    const auto* value_event = graph.latest(id, dip::DependencyEventKind::Value);
-    const auto* condition_event = graph.latest(id, dip::DependencyEventKind::Condition);
-    const auto* event = value_event && (!value_event->reads.empty() || value_event->composition)
-        ? value_event : condition_event;
-    if (event) {
-        expression = event->expression;
-        composition = event->composition;
-    }
-    std::unordered_set<std::string> seen;
-    if (value_event)
-        for (const auto& edge : value_event->reads)
-            if (seen.insert(edge.target).second)
-                dependencies.push_back({edge.target, edge.request, edge.operand});
-    if (condition_event)
-        for (const auto& edge : condition_event->reads)
-            if (seen.insert(edge.target).second)
-                dependencies.push_back({edge.target, edge.request, edge.operand});
-    for (const auto& reader : graph.referenced_by(id)) {
-        GraphNeighbor neighbor{reader, {}, {}};
-        for (const auto& edge : graph.dependencies(reader)) {
-            if (edge.target == id) {
-                neighbor.request = edge.request;
-                neighbor.operand = edge.operand;
-                break;
-            }
-        }
-        readers.push_back(std::move(neighbor));
-    }
+    neighborhood = dip::inspect_dependency_neighborhood(model.environment(), id);
 }
 
 void draw_graph_view(ViewerModel& model, GraphViewState& state) {
     if (state.path != model.selection() || state.revision != model.revision()) state.reset(model);
-    if (!state.recorded) {
+    const auto& neighborhood = state.neighborhood;
+    if (!neighborhood.recorded) {
         ImGui::TextDisabled("Dependency recording is unavailable for this artifact.");
         return;
     }
     const auto* object = model.object(state.path);
     if (!object) return;
-    const std::string center_id = object->source_name.empty() ? "?" + object->node_path : object->path;
+    const std::string& center_id = neighborhood.id;
     ImGui::TextDisabled("Dependencies -> selected value -> referenced by");
-    if (state.dependencies.size() > visible_neighbors) {
+    if (neighborhood.dependencies.size() > visible_neighbors) {
         ImGui::BeginDisabled(state.dependency_start == 0);
         if (ImGui::SmallButton("Previous dependencies"))
             state.dependency_start = state.dependency_start > visible_neighbors
                 ? state.dependency_start - visible_neighbors : 0;
         ImGui::EndDisabled();
         ImGui::SameLine();
-        ImGui::BeginDisabled(state.dependency_start + visible_neighbors >= state.dependencies.size());
+        ImGui::BeginDisabled(state.dependency_start + visible_neighbors >= neighborhood.dependencies.size());
         if (ImGui::SmallButton("Next dependencies"))
             state.dependency_start += visible_neighbors;
         ImGui::EndDisabled();
     }
-    if (state.readers.size() > visible_neighbors) {
+    if (neighborhood.readers.size() > visible_neighbors) {
         ImGui::BeginDisabled(state.reader_start == 0);
         if (ImGui::SmallButton("Previous readers"))
             state.reader_start = state.reader_start > visible_neighbors
                 ? state.reader_start - visible_neighbors : 0;
         ImGui::EndDisabled();
         ImGui::SameLine();
-        ImGui::BeginDisabled(state.reader_start + visible_neighbors >= state.readers.size());
+        ImGui::BeginDisabled(state.reader_start + visible_neighbors >= neighborhood.readers.size());
         if (ImGui::SmallButton("Next readers")) state.reader_start += visible_neighbors;
         ImGui::EndDisabled();
     }
-    const auto left_count = std::min(state.dependencies.size() - state.dependency_start, visible_neighbors);
-    const auto right_count = std::min(state.readers.size() - state.reader_start, visible_neighbors);
+    const auto left_count = std::min(neighborhood.dependencies.size() - state.dependency_start, visible_neighbors);
+    const auto right_count = std::min(neighborhood.readers.size() - state.reader_start, visible_neighbors);
     const float height = std::max(150.0f, 24.0f + row_step * static_cast<float>(
         std::max(left_count, right_count)));
     const float width = 3 * node_width + 2 * column_gap + 24;
@@ -179,7 +159,7 @@ void draw_graph_view(ViewerModel& model, GraphViewState& state) {
     ImGui::PushID("dependencies");
     for (std::size_t i = 0; i < left_count; ++i) {
         ImGui::PushID(static_cast<int>(state.dependency_start + i));
-        const auto& neighbor = state.dependencies[state.dependency_start + i];
+        const auto& neighbor = neighborhood.dependencies[state.dependency_start + i];
         draw_node(model, neighbor.id, neighbor.request, neighbor.operand,
                   ImVec2(origin.x + 12, node_y(i, left_count)), false);
         ImGui::PopID();
@@ -188,7 +168,7 @@ void draw_graph_view(ViewerModel& model, GraphViewState& state) {
     ImGui::PushID("readers");
     for (std::size_t i = 0; i < right_count; ++i) {
         ImGui::PushID(static_cast<int>(state.reader_start + i));
-        const auto& neighbor = state.readers[state.reader_start + i];
+        const auto& neighbor = neighborhood.readers[state.reader_start + i];
         draw_node(model, neighbor.id, neighbor.request, neighbor.operand,
                   ImVec2(right_x, node_y(i, right_count)), false);
         ImGui::PopID();
@@ -200,19 +180,13 @@ void draw_graph_view(ViewerModel& model, GraphViewState& state) {
     ImGui::SetCursorScreenPos(origin);
     ImGui::Dummy(ImVec2(width, height));
     ImGui::EndChild();
-    if (state.dependencies.size() > left_count || state.readers.size() > right_count)
+    if (neighborhood.dependencies.size() > left_count || neighborhood.readers.size() > right_count)
         ImGui::TextDisabled("Dependencies %zu to %zu of %zu; readers %zu to %zu of %zu.",
                             state.dependency_start + (left_count ? 1 : 0), state.dependency_start + left_count,
-                            state.dependencies.size(), state.reader_start + (right_count ? 1 : 0),
-                            state.reader_start + right_count, state.readers.size());
-    if (!state.expression.empty() || state.composition) {
-        ImGui::SeparatorText("Expression");
-        if (!state.expression.empty()) ImGui::TextWrapped("%s", state.expression.c_str());
-        if (state.composition && state.composition->root < state.composition->nodes.size()) {
-            ImGui::SeparatorText("Composition");
-            draw_composition_node(*state.composition, state.composition->root, 0);
-        }
-    }
+                            neighborhood.dependencies.size(), state.reader_start + (right_count ? 1 : 0),
+                            state.reader_start + right_count, neighborhood.readers.size());
+    if (neighborhood.value_event) draw_expression(*neighborhood.value_event, "Value expression");
+    if (neighborhood.condition_event) draw_expression(*neighborhood.condition_event, "Condition expression");
 }
 
 } // namespace snt::view

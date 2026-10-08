@@ -3,31 +3,17 @@
 
 #include "viewer_model.h"
 
-#include <snt/exs/composition.h>
-
 #include <cstddef>
-#include <optional>
 #include <string>
-#include <vector>
 
 namespace snt::view {
-
-struct GraphNeighbor {
-    std::string id;
-    std::string request;
-    std::string operand;
-};
 
 struct GraphViewState {
     std::string path;
     std::size_t revision = 0;
-    bool recorded = false;
-    std::vector<GraphNeighbor> dependencies;
-    std::vector<GraphNeighbor> readers;
+    dip::DependencyNeighborhood neighborhood;
     std::size_t dependency_start = 0;
     std::size_t reader_start = 0;
-    std::string expression;
-    std::optional<exs::CompositionGraph> composition;
 
     void reset(const ViewerModel& model);
 };

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <set>
+#include <unordered_set>
 #include <utility>
 
 namespace snt::dip {
@@ -348,6 +349,44 @@ InspectionCapabilities inspect_capabilities(const Environment& env, std::string_
     if (!found && !capabilities.hasChildren)
         throw std::out_of_range("No evaluated DIP path found: " + name);
     return capabilities;
+}
+
+DependencyNeighborhood inspect_dependency_neighborhood(const Environment& env, std::string_view path) {
+    if (path.empty()) throw std::invalid_argument("A dependency neighborhood requires a path");
+    DependencyNeighborhood result;
+    result.id = path.front() == '?' || path.find('?') != std::string_view::npos
+        ? std::string(path) : "?" + std::string(path);
+    const auto& graph = env.dependency_graph();
+    result.recorded = graph.recorded;
+    if (!result.recorded) return result;
+
+    const auto* value_event = graph.latest(result.id, DependencyEventKind::Value);
+    const auto* condition_event = graph.latest(result.id, DependencyEventKind::Condition);
+    if (value_event) result.value_event = *value_event;
+    if (condition_event) result.condition_event = *condition_event;
+
+    std::unordered_set<std::string> seen;
+    const auto add_dependencies = [&](const DependencyEvent* event) {
+        if (!event) return;
+        for (const auto& edge : event->reads)
+            if (seen.insert(edge.target).second)
+                result.dependencies.push_back({edge.target, edge.request, edge.operand});
+    };
+    add_dependencies(value_event);
+    add_dependencies(condition_event);
+
+    for (const auto& reader : graph.referenced_by(result.id)) {
+        DependencyNeighbor neighbor{reader, {}, {}};
+        for (const auto& edge : graph.dependencies(reader)) {
+            if (edge.target == result.id) {
+                neighbor.request = edge.request;
+                neighbor.operand = edge.operand;
+                break;
+            }
+        }
+        result.readers.push_back(std::move(neighbor));
+    }
+    return result;
 }
 
 TableInspection inspect_table(const Environment& env, std::string_view path) {
