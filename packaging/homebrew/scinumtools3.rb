@@ -10,6 +10,7 @@ class Scinumtools3 < Formula
   depends_on "ninja" => :build
   depends_on "cpp-httplib" => :build
   depends_on "hdf5"
+  depends_on "curl"
 
   resource "briefpp" do
     url "https://github.com/vrtulka23/briefpp/archive/624aa478149a0fa0e7213bb7cfb6d19615d6e771.tar.gz"

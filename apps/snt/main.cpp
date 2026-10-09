@@ -30,6 +30,7 @@ Modules:
   dmap    Regenerate PUQ dimension-map headers (developer tool; optional)
   server  REST API server (optional build feature)
   view    Read-only parameter browser (optional build feature)
+  hub     Install and prepare pinned code examples
 
 Run 'snt <module> --help' for module-specific commands.
 )";
@@ -61,6 +62,9 @@ int main(int argc, char* argv[]) {
         std::cerr << "Viewer support is not included in this build. Configure with ENABLE_SNT_VIEW=ON.\n";
         return 1;
 #endif
+    }
+    if (argc > 1 && std::string(argv[1]) == "hub") {
+        return module_hub(argc, argv);
     }
     if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "compare") {
         try {

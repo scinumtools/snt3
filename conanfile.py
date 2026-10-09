@@ -72,6 +72,8 @@ class SciNumToolsConan(ConanFile):
         "external/briefpp/LICENSE",
         "external/cpp-httplib/httplib.h",
         "external/cpp-httplib/LICENSE",
+        "external/nlohmann/json.hpp",
+        "external/nlohmann/LICENSE.MIT",
         "external/glfw/*",
         "external/imgui/*",
         "pyproject.toml",
@@ -107,6 +109,7 @@ class SciNumToolsConan(ConanFile):
     #
     def requirements(self):
         self.requires("hdf5/[>=1.14.3 <2]", transitive_headers=True, transitive_libs=True)
+        self.requires("libcurl/[>=8 <9]")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -162,6 +165,7 @@ class SciNumToolsConan(ConanFile):
             (bool(self.options.with_server), "cpp-httplib", "LICENSE"),
             (bool(self.options.with_viewer), "glfw", "LICENSE.md"),
             (bool(self.options.with_viewer), "imgui", "LICENSE.txt"),
+            (True, "nlohmann", "LICENSE.MIT"),
         ):
             if enabled:
                 copy(self, license_file,

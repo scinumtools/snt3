@@ -22,6 +22,7 @@ Once the executable is on your ``PATH``, inspect the available commands:
    snt puq -h
    snt dip -h
    snt report -h
+   snt hub -h
 
 Quantities and units
 --------------------
@@ -328,6 +329,58 @@ as ``Not specified``. The date defaults to the local generation date and the
 version to the SNT build version. Set date and version explicitly for a
 reproducible cover. The :ref:`CreateReport example
 <dip-create-report-example>` shows the layout and provides a PDF to inspect.
+
+Pinned code examples with SNT Hub
+---------------------------------
+
+``snt hub`` installs a project adapter and its exact original-code revision
+from the published `SNT Hub catalogue <https://scinumtools.github.io/snt-hub/#registry>`_.
+Git and Python 3 (with ``venv`` and ``pip``) are required. Installation also
+needs network access to the catalogue, Git repositories, and Python packages.
+The adapter is code from the selected Hub revision and runs locally; inspect
+its origin and revisions with ``snt hub info`` before using it with your data.
+
+.. code-block:: bash
+
+   snt hub list
+   snt hub examples arepo
+   snt hub install arepo
+   snt hub info arepo
+   snt hub setup arepo mhd_shock_tube --output ./runs/mhd_shock_tube
+
+``install`` records the Hub and original-code Git revisions in an installation
+lock. A repeated install of the same revision reuses it; switching to a newly
+published revision requires ``--update``. ``--revision`` accepts the full SHA
+currently advertised by the catalogue. ``--prefix DIR`` selects a data
+directory for installation and subsequent commands, which is useful on HPC
+systems. Otherwise SNT uses the platform's application-data directory.
+
+``examples`` labels recipes by capability. A ``complete`` setup includes its
+reviewed initial-condition file as well as native parameter files and an
+``environment.diph5`` snapshot. For a ``native-inputs-only`` recipe, request
+``--inputs-only`` explicitly; that output lacks the initial-condition file.
+Setup refuses an existing destination and publishes a new directory only
+after the adapter succeeds. It does not build or run the scientific code.
+
+For a per-run change, pass a file of bare DIPL override assignments:
+
+.. code-block:: text
+
+   resources.wall_clock.limit = 1800 s
+   hydrodynamics.courant_factor = 0.25
+
+.. code-block:: bash
+
+   snt hub setup arepo mhd_shock_tube --override-file tuning.dip \
+       --output ./runs/tuned_shock_tube
+
+The adapter evaluates the override with DIPL, copies an accepted file to
+``input-overrides.dip``, and records its SHA-256 in ``setup-lock.json``. A
+complete example with a fixed initial-condition creator accepts only override
+targets approved by its recipe. The MHD shock tube currently approves the
+two assignments above. Other targets fail without publishing the requested
+directory; ``--inputs-only`` permits broader parameter changes because it
+does not create ICs. The file contains no ``$override`` wrapper.
 
 Server, dmap, and viewer commands
 ---------------------------------

@@ -68,7 +68,7 @@ wheel.expand-macos-universal-tags = true
 
 # Where the python package lives
 wheel.packages = ["bindings/python/src/scinumtools3"]
-sdist.include = ["external/briefpp/include/**", "external/briefpp/LICENSE"]
+sdist.include = ["external/briefpp/include/**", "external/briefpp/LICENSE", "external/nlohmann/**"]
 
 # This tells scikit-build where CMakeLists.txt is
 cmake.source-dir = "./"

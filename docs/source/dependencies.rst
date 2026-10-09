@@ -22,6 +22,11 @@ Building from source
   ``ENABLE_SNT_REPORT=ON`` (the default when DIP is enabled). Set
   ``-DENABLE_SNT_REPORT=OFF`` to omit report generation and its Brief++
   dependency.
+* **SNT Hub command:** building the ``snt`` executable requires libcurl
+  development headers and library for HTTPS catalogue access. The JSON header
+  is included in the source checkout. ``snt hub install`` additionally uses
+  Git and Python 3 with ``venv`` and ``pip`` at runtime to install a pinned
+  project adapter.
 * **Python bindings:** the default build enables them and needs a Python 3
   interpreter and development files. CMake uses an installed pybind11 or
   downloads it when needed. Set ``-DENABLE_BINDING_PYTHON=OFF`` for a build

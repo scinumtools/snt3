@@ -48,7 +48,7 @@ jobs:
         run: python -m pip install numpy pytest pytest-cmake pytest-benchmark pybind11
 
       - name: Install x86 dependencies
-        run: vcpkg install hdf5:x86-windows gtest:x86-windows
+        run: vcpkg install hdf5:x86-windows gtest:x86-windows curl:x86-windows
 
       - name: Configure x86 source build
         run: >-
@@ -114,7 +114,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            libgtest-dev libhdf5-dev pybind11-dev \
+            libgtest-dev libhdf5-dev libcurl4-openssl-dev pybind11-dev \
             libgl-dev libglvnd-dev libx11-dev libxext-dev libxrandr-dev \
             libxinerama-dev libxcursor-dev libxi-dev \
             libwayland-dev libwayland-bin libxkbcommon-dev wayland-protocols pkg-config
@@ -133,7 +133,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          vcpkg install hdf5:x64-windows
+          vcpkg install hdf5:x64-windows curl:x64-windows
           echo "CMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_ENV"
           echo "VCPKG_TARGET_TRIPLET=x64-windows" >> "$GITHUB_ENV"
           echo "HDF5_ROOT=C:/vcpkg/installed/x64-windows" >> "$GITHUB_ENV"

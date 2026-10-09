@@ -21,6 +21,7 @@
       "name": "cpp-httplib",
       "default-features": false
     },
+    "curl",
     {
       "name": "libx11",
       "platform": "linux"

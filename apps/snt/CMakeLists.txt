@@ -6,6 +6,7 @@ if(NOT ENABLE_SNT_REPORT)
   list(FILTER EXEC_FILES EXCLUDE REGEX "/module_report\\.cpp$")
 endif()
 add_executable(${EXEC_NAME} ${EXEC_FILES} )
+add_subdirectory(../snt-hub ${CMAKE_CURRENT_BINARY_DIR}/hub)
 
 target_include_directories(${EXEC_NAME}
   PRIVATE
