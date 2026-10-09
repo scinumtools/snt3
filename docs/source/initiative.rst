@@ -31,8 +31,14 @@ step. An independent proof of concept can test whether DIPL faithfully
 represents an established code's interface without implying upstream
 participation or endorsement.
 
-AI-assisted setup with explicit checks
---------------------------------------
+What a shared parameter model can offer
+---------------------------------------
+
+A DIPL model can keep effective values, units, types, constraints,
+dependencies, descriptions, and source information together. SciNumTools can
+validate and evaluate that model before it reaches the solver, and generate
+parameter reports that make a run easier to review. A visual parameter
+browser, with a path toward GUI editing, is part of the broader initiative.
 
 A DIPL definition is plain text with explicit types, units, constraints, and
 relationships. Researchers and AI assistants, including those based on large
@@ -56,15 +62,6 @@ a simulation is configured correctly. Explicit validation
 can catch missing or inconsistent inputs before a run; scientific judgment is
 still needed to assess whether the chosen setup is physically appropriate.
 
-What a shared parameter model can offer
----------------------------------------
-
-A DIPL model can keep effective values, units, types, constraints,
-dependencies, descriptions, and source information together. SciNumTools can
-validate and evaluate that model before it reaches the solver, and generate
-parameter reports that make a run easier to review. A visual parameter
-browser, with a path toward GUI editing, is part of the broader initiative.
-
 The intent is reusable tooling around each code's scientific interface,
 without asking code maintainers to give up ownership of their numerics or
 project governance.
@@ -85,7 +82,8 @@ governance and would be asked to provide an appropriate reference to the
 collaboration in their documentation, website, or a paper.
 
 If you maintain or use a suitable scientific code, start a discussion in the
-project's issue tracker.
+project's issue tracker. Explore other SciNumTools projects and integrations
+in the `SNT Hub <https://scinumtools.github.io/snt-hub/>`_.
 
 The initiative flyer
 --------------------
@@ -93,9 +91,11 @@ The initiative flyer
 .. figure:: _static/snt_initiative_flyer_logo.png
    :width: 440px
    :align: center
-   :alt: Flyer for the One parameter layer, many scientific codes initiative
+   :alt: Flyer for the One parameter layer, many scientific codes initiative, showing github.com/scinumtools/snt3 and the SNT Hub address
 
-   The full initiative flyer, shown at a smaller size. Select the image to open it at full resolution.
+   The full initiative flyer, shown at a smaller size. Select the image to
+   open it at full resolution. Its QR code opens the SNT3 repository; the
+   SNT Hub address is printed alongside it.
 
 A badge for participating projects
 ----------------------------------
@@ -104,8 +104,8 @@ Projects can place a compact badge alongside their Build, Documentation, and
 License badges. It links readers to this initiative; describe the project's
 actual SNTv3 integration in the surrounding README text.
 
-.. image:: https://img.shields.io/badge/DIPL-%7B%3FSNTv3%7D-2980b9
-   :alt: DIPL — {?SNTv3}
+.. image:: https://img.shields.io/badge/SNT3-DIPL-2980b9
+   :alt: SNT3: DIPL
    :target: https://scinumtools.github.io/snt3/initiative.html
 
 Copy this Markdown into your project's ``README.md``:

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="2174" height="2894" viewBox="0 0 2174 2894">
+  <title>One parameter layer, many scientific codes</title>
+  <!-- Keep the original flyer artwork and update its project links and QR code. -->
+  <image x="0" y="0" width="2174" height="2894"
+         xlink:href="snt_initiative_flyer_logo.png"/>
+  <rect x="990" y="2746" width="700" height="109" rx="10"
+        fill="#061d38"/>
+  <text x="1008" y="2791" fill="#f3f8ff"
+        style="font: 700 28px Arial, Helvetica, sans-serif; letter-spacing: 0.2px">GitHub: <tspan fill="#3ce0e6">github.com/scinumtools/snt3</tspan></text>
+  <text x="1008" y="2833" fill="#f3f8ff"
+        style="font: 700 28px Arial, Helvetica, sans-serif; letter-spacing: 0.2px">SNT Hub: <tspan fill="#3ce0e6">scinumtools.github.io/snt-hub/</tspan></text>
+  <rect x="1842" y="2554" width="230" height="230" rx="8" fill="#ffffff"/>
+  <image x="1850" y="2562" width="214" height="214"
+         xlink:href="initiative-repo-qr.svg"/>
+</svg>
