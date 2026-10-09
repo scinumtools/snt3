@@ -51,7 +51,8 @@ Document build_document(const dip::Environment& env, std::string input_label, st
     document.date = std::move(date);
     document.version = std::move(version);
     document.loaded_snapshot = loaded_snapshot;
-    const auto& graph = dip::Inspector{env}.graph();
+    const dip::Inspector inspector{env};
+    const auto& graph = inspector.graph();
     document.graph_recorded = graph.recorded;
 
     for (const auto& node : env.nodes.get_nodes()) {
@@ -61,7 +62,13 @@ Document build_document(const dip::Environment& env, std::string input_label, st
         item.units = node->units ? node->units->to_string() : "";
         item.type = type_name(node->value ? node->value->get_dtype() : node->value_dtype);
         item.shape = shape_of(*node);
-        item.description = node->metadata.description;
+        item.metadata = node->metadata;
+        if (node->value) {
+            const auto description = inspector.describe(item.path, 0);
+            item.tags = description.tags;
+            item.options = description.enforced_options;
+            item.condition = description.enforced_condition;
+        }
         item.publication = publication_of(node->metadata);
         item.overridden = node->override;
         item.declaration = origin_of(node->line.source.name, node->line.source.line_number, node->line.code,
@@ -90,8 +97,6 @@ Document build_document(const dip::Environment& env, std::string input_label, st
                         ? decision->expression : decision_id);
                 }
             }
-            if (const auto* condition = graph.latest(id, DependencyEventKind::Condition))
-                item.condition = condition->expression;
         }
         document.parameters.push_back(std::move(item));
     }
@@ -108,7 +113,7 @@ Document build_document(const dip::Environment& env, std::string input_label, st
                 item.used_by = std::move(found->second);
     }
 
-    for (const auto& inspected : dip::Inspector{env}.tables()) {
+    for (const auto& inspected : inspector.tables()) {
         Table table;
         table.path = inspected.path;
         table.rows = inspected.rows;

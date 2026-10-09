@@ -17,7 +17,9 @@ struct Origin {
 };
 
 struct Parameter {
-    std::string path, value, units, type, shape, description;
+    std::string path, value, units, type, shape;
+    dip::ValueMetadata metadata;
+    std::vector<std::string> tags, options;
     std::vector<std::string> applied_schemas;
     std::string contributing_schema;
     bool overridden = false;

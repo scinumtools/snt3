@@ -11,7 +11,12 @@ pytestmark = pytest.mark.skipif(ReportFormat is None, reason="DIP reports are di
 def test_generate_report_from_parsed_and_loaded_environment(tmp_path: Path):
     parser = DIP()
     parser.add_override_string("physics.speed = 3 m/s")
-    parser.add_string('physics\n  speed float = 2 m/s\n    ?descr "Flow & speed"')
+    parser.add_string('physics\n  speed float = 2 m/s\n'
+                      '    ?descr "Flow & speed"\n'
+                      '    !options [2, 3] m/s\n'
+                      '    !condition ({.} > 0 m/s)\n'
+                      '    ?rationale "Measured at startup"\n'
+                      '    ?recommended_range "2 to 3 m/s"')
     env = parser.parse()
 
     intro = tmp_path / "intro.tex"
@@ -28,6 +33,13 @@ def test_generate_report_from_parsed_and_loaded_environment(tmp_path: Path):
     assert "Flow \\& speed" in content
     assert "An \\textbf{example}" in content
     assert "Override at" in content
+    assert "Applied overrides" in content
+    assert "Allowed options" in content
+    assert "Validation condition" in content
+    assert "Recommended range" in content
+    assert "Author guidance" in content
+    assert "Measured at startup" in content
+    assert "2 to 3 m/s" in content
     assert "Study \\& report" in content
     assert "Example\\_Team" in content
     assert "\\tableofcontents" in content
@@ -62,6 +74,9 @@ def test_generate_report_from_parsed_and_loaded_environment(tmp_path: Path):
     loaded.generate_report(ReportFormat.TEX, loaded_tex)
     assert "DIPH5 snapshot" in loaded_tex.read_text()
     assert "Override at" in loaded_tex.read_text()
+    assert "Allowed options" in loaded_tex.read_text()
+    assert "Validation condition" in loaded_tex.read_text()
+    assert "Recommended range" in loaded_tex.read_text()
 
     with pytest.raises(RuntimeError, match="unavailable"):
         loaded.generate_report(ReportFormat.PDF, tmp_path / "missing.pdf",

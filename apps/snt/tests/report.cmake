@@ -2,7 +2,7 @@ file(MAKE_DIRECTORY "${TEST_DIR}")
 set(project_dir "${TEST_DIR}/project")
 file(MAKE_DIRECTORY "${project_dir}")
 file(WRITE "${project_dir}/settings.dipl"
-  "?descr \"Reusable settings\"\n?title \"Schema & paper\"\nspeed float = 2 m/s\n  ?descr \"Flow & speed_#%\"\n")
+  "?descr \"Reusable settings\"\n?title \"Schema & paper\"\nspeed float = 2 m/s\n  ?descr \"Flow & speed_#%\"\n  !options [2, 3] m/s\n  !condition ({.} > 0 m/s)\n  ?rationale \"Measured at startup\"\n  ?recommended_range \"2 to 3 m/s\"\n  ?scientific_impact \"Controls transport speed\"\n")
 file(WRITE "${project_dir}/parameters.dip"
   "physics : settings\ndouble_speed float = ({?physics.speed} * 2) m/s\nname str = \"A&B_#%\"\n  ?title \"Value study\"\n  ?doi \"10.1/example_#\"\nduration float = 12 h\nduration = 14 h\nmeasurements table = \"\"\"temperature float K\ntime float s\n---\n295 0\n296 1\n\"\"\"\n")
 file(WRITE "${project_dir}/DIPfile"
@@ -43,6 +43,9 @@ foreach(expected IN ITEMS "\\begin{titlepage}" "\\tableofcontents" "\\usepackage
     "Custom units" "\\sntnode{settings}" "\\sntnode{custom\\_length}"
     "Parameter guide" "\\hyperlink{snt-parameter-" "double\\_speed" "Reads during evaluation"
     "?physics.speed" "Used by" "Supplied parameters" "Supplied by schema"
+    "Applied overrides" "Allowed options" "Validation condition"
+    "Author guidance" "Measured at startup" "Recommended range"
+    "Controls transport speed"
     "\\sntnode{DIP0}" "2*m" "parameters.dip")
   string(FIND "${tex}" "${expected}" index)
   if(index EQUAL -1)
@@ -77,7 +80,9 @@ foreach(format IN ITEMS md rst html typ txt json)
     --date "2026-09-28" --report-version "draft_1")
   file(READ "${rendered}" result)
   foreach(expected IN ITEMS "physics.speed" "Override at" "Modified at" "Tables" "Column 1" "Custom units" "Flow"
-      "Parameter guide" "double" "Reads during evaluation" "Supplied parameters")
+      "Parameter guide" "double" "Reads during evaluation" "Supplied parameters"
+      "Applied overrides" "Allowed options" "Validation condition"
+      "Measured at startup" "Recommended range" "Controls transport speed")
     string(FIND "${result}" "${expected}" index)
     if(index EQUAL -1)
       message(FATAL_ERROR "${format} report is missing '${expected}'")
@@ -112,7 +117,8 @@ endif()
 run_report(success --load "${snapshot}" --output "${TEST_DIR}/loaded.tex")
 file(READ "${TEST_DIR}/loaded.tex" loaded)
 foreach(expected IN ITEMS "physics.speed" "Override at" "Modified at" "Tables" "Column 1" "Reusable settings"
-    "Schema \\& paper" "Sources" "Custom units" "custom\\_length")
+    "Schema \\& paper" "Sources" "Custom units" "custom\\_length"
+    "Applied overrides" "Allowed options" "Validation condition" "Recommended range")
   string(FIND "${loaded}" "${expected}" index)
   if(index EQUAL -1)
     message(FATAL_ERROR "DIPH5 report is missing '${expected}'")

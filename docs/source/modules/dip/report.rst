@@ -90,14 +90,24 @@ descriptions, parameter paths, schema information, source provenance, custom
 units, registered function names, and available publication references.
 The Parameter guide lists every effective value and links to its full reference
 entry in HTML and PDF. Each entry retains its value, type, units, description,
-schema provenance, declaration, modifications, and override history. The
+schema provenance, declaration, modifications, and override history. When
+present, an Applied overrides index lists the effective value and source of
+each explicit override so changes can be reviewed before reading individual
+entries. The
 Schemas section lists the parameters each schema supplied, while individual
 entries distinguish a schema applied along a path from one that supplied the
 value node.
 
+Parameter entries show declared ``!options`` and ``!condition`` rules, plus
+tags, when present. These rules remain visible without a recorded dependency
+graph. Author guidance such as rationale, recommended range, scientific and
+performance impact, dependencies, conflicts, and deprecation is shown in a
+separate advisory block. A recommended range or ``?requires`` entry describes
+intent; it does not add a runtime validation rule.
+
 If the environment has a recorded dependency graph, parameter entries also
-show their evaluated expression, direct reads, branch selection, validation
-condition, and readers where available. These are evaluation facts: a read
+show their evaluated expression, direct reads, branch selection, and readers
+where available. These are evaluation facts: a read
 does not always mean that input was necessary for the final result. Source
 qualifiers on imported reads remain visible. Pass ``true`` to ``parse()`` to
 record this information; ordinary parsing keeps graph recording disabled.
