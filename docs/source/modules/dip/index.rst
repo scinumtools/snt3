@@ -32,6 +32,8 @@ calculated*, and *what constraints it must satisfy*.
   DIPL inputs and registered constructs through diagnostics and DIPH5.
 * :doc:`Inspecting and reloading environments <inspection>` — reading
   evaluated values and provenance through a small C++ API.
+* :doc:`Inspect, propose, preview, review <../../agent-workflow>` — the
+  user-facing cycle for checked parameter proposals.
 * :doc:`Static parameter generation <generation>` — exporting evaluated
   environments as native source code or data files.
 * :doc:`Application adapters <adapters>` — generating one or more

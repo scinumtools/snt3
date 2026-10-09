@@ -134,6 +134,12 @@ effective value and the input that produced it: two input
 files can express the same quantity differently, and a deliberate override
 can change all quantities derived from that input.
 
+This small example can be checked by hand. In a larger model, one override may
+alter many derived values, activate conditional settings, or cross a stability
+limit. SNT's preview reports the resulting diff and diagnostics without
+changing the input file. The companion script keeps its trial override in the
+file for its paired comparison.
+
 ## Information Beyond the Effective Value
 
 Scientific inputs need context as well as valid numbers. The example marks

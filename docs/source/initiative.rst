@@ -48,6 +48,8 @@ list values, describe their available metadata and provenance, and preview an
 override with validation diagnostics and an effective diff. The same core
 operations are available from :ref:`C++ <cpp-semantic-interface>` and
 :ref:`Python <python-semantic-interface>`.
+See :doc:`the inspection and preview workflow <agent-workflow>` for a
+step-by-step example and the present boundary between preview and export.
 
 These tools can propose setups, but plausible text alone is not evidence that
 a simulation is configured correctly. Explicit validation

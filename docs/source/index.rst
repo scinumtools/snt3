@@ -32,7 +32,9 @@ additional requirements, including references to initial-condition files,
 before producing the code's native input. See :doc:`initiative` for this
 approach and its path toward deeper integration. Today, scripts and agents
 can :ref:`discover and describe evaluated parameters and preview candidate
-overrides <cli-semantic-interface>` through versioned CLI JSON.
+overrides <cli-semantic-interface>` through versioned CLI JSON. The
+:doc:`inspection and preview workflow <agent-workflow>` shows the full
+review cycle and its current export boundary.
 
 .. toctree::
    :maxdepth: 2
@@ -43,6 +45,7 @@ overrides <cli-semantic-interface>` through versioned CLI JSON.
    dependencies
    quickstart
    initiative
+   agent-workflow
 
 .. toctree::
    :maxdepth: 2

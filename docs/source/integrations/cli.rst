@@ -146,6 +146,9 @@ a file.
 Describing and previewing parameters
 ------------------------------------
 
+For the full review cycle, see :doc:`Inspect, propose, preview, review
+<../agent-workflow>`.
+
 The read-only semantic commands return versioned JSON. ``describe`` reports
 one evaluated path, while ``list`` selects values by path and explicit tags:
 
