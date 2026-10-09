@@ -21,8 +21,8 @@ int module_dip_semantic(int argc, char* argv[]) {
     if (argc == 2 && std::string(argv[1]) == "--help") {
         std::cout << "Usage: snt dip " << command
                   << " --project DIPfile [--path PATH | --query QUERY] [options]\n"
-                     "  --input FILE             DIPfile, .dip, or .dipl; describe/list also accept .diph5\n"
-                     "  --path PATH              Required for describe\n"
+                     "  --input FILE             DIPfile, .dip, or .dipl; describe/list/override-contract also accept .diph5\n"
+                     "  --path PATH              Required for describe and override-contract\n"
                      "  --query QUERY            List selection (default ?)\n"
                      "  --tag-all/any/none TAG   Repeatable list filters\n"
                      "  --limit N                Maximum list items (default 100)\n"
@@ -70,16 +70,19 @@ int module_dip_semantic(int argc, char* argv[]) {
         } else throw std::invalid_argument("Unknown option: " + option);
     }
     if (input.empty()) throw std::invalid_argument("Specify --project or --input.");
-    if (command == "describe" && path.empty()) throw std::invalid_argument("Describe requires --path.");
+    if ((command == "describe" || command == "override-contract") && path.empty())
+        throw std::invalid_argument(command + " requires --path.");
     if (command != "preview" && !overrides.empty())
         throw std::invalid_argument("Overrides require preview.");
-    if (has_path && command != "describe") throw std::invalid_argument("--path requires describe.");
+    if (has_path && command != "describe" && command != "override-contract")
+        throw std::invalid_argument("--path requires describe or override-contract.");
     if (has_list_options && command != "list") throw std::invalid_argument("List filters require list.");
     if (has_max_details && command != "preview") throw std::invalid_argument("--max-details requires preview.");
-    if (has_value_limit && command == "preview")
+    if (has_value_limit && command != "describe" && command != "list")
         throw std::invalid_argument("--max-value-elements requires describe or list.");
     const snt::api::DIPSemantic semantic(input, record_graph);
     if (command == "describe") std::cout << semantic.describe_json(path, max_value_elements) << '\n';
+    else if (command == "override-contract") std::cout << semantic.override_contract_json(path) << '\n';
     else if (command == "list") std::cout << semantic.list_json(query, tags, limit, max_value_elements) << '\n';
     else std::cout << semantic.preview_json(overrides, max_details) << '\n';
     return 0;

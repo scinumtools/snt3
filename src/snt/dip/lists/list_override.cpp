@@ -8,6 +8,42 @@
 
 namespace snt::dip {
 
+    OverrideItemTarget classify_override_item(const HierarchyList& hierarchy, const std::string& requested) {
+        OverrideItemTarget result;
+        const size_t selector = requested.rfind('[');
+        if (requested.empty() || requested.back() != ']' || selector == std::string::npos)
+            return result;
+        if (requested.find("[]") != std::string::npos && selector != requested.find("[]")) {
+            result.status = OverrideItemTarget::Status::UnresolvedParent;
+            return result;
+        }
+        const std::string collection_path = requested.substr(0, selector);
+        const std::string key = requested.substr(selector + 1, requested.size() - selector - 2);
+        if (!hierarchy.has_collection(collection_path)) {
+            result.status = OverrideItemTarget::Status::UnknownCollection;
+            return result;
+        }
+        const Collection& collection = hierarchy.get_collection(collection_path);
+        result.schemas = collection.schemas;
+        const bool existing_map = collection.kind == Path::Kind::Map &&
+            std::find(collection.items.begin(), collection.items.end(), key) != collection.items.end();
+        const bool existing_list = collection.kind == Path::Kind::List && !key.empty() &&
+            std::find(collection.items.begin(), collection.items.end(), key) != collection.items.end();
+        if ((collection.kind == Path::Kind::List && !key.empty() && !existing_list) ||
+            (collection.kind == Path::Kind::Map && key.empty()) ||
+            (collection.kind != Path::Kind::List && collection.kind != Path::Kind::Map))
+            return result;
+        if (!existing_map && !existing_list && collection.schemas.empty()) {
+            result.status = OverrideItemTarget::Status::SchemaRequired;
+            return result;
+        }
+        result.status = existing_map || existing_list ? OverrideItemTarget::Status::Existing
+                                                      : OverrideItemTarget::Status::Creatable;
+        result.resolved_path = collection.kind == Path::Kind::List && !existing_list
+            ? collection_path + "[" + std::to_string(collection.items.size()) + "]" : requested;
+        return result;
+    }
+
     void OverrideList::append(const BaseNode::ListType& nodes, size_t indent) {
         BaseNode::ListType body;
         for (const auto& node : nodes)
@@ -171,43 +207,31 @@ namespace snt::dip {
 
     BaseNode::PointerType OverrideList::materialize_item_group(size_t index, const HierarchyList& hierarchy) {
         const std::string requested = addition_path(index);
-        const size_t selector = requested.rfind('[');
-        const std::string collection_path = requested.substr(0, selector);
-        const std::string key = requested.substr(selector + 1, requested.size() - selector - 2);
+        const auto target = classify_override_item(hierarchy, requested);
         const Line& line = addition_line(index);
-        if (requested.find("[]") != std::string::npos && selector != requested.find("[]"))
+        if (target.status == OverrideItemTarget::Status::UnresolvedParent)
             throw dip::SyntaxException(
                 "Unresolved collection selector", "An enclosing list item has not been created.",
                 "Nest collection items under the list item they extend.", __FILE__, __LINE__, line
             );
-        if (!hierarchy.has_collection(collection_path))
+        if (target.status == OverrideItemTarget::Status::UnknownCollection)
             throw dip::EnvironmentException(
-                "Unknown collection", "The collection `" + collection_path + "` was not found.",
+                "Unknown collection", "The collection `" + requested.substr(0, requested.rfind('[')) + "` was not found.",
                 "Declare the collection outside $override before adding an item.", __FILE__, __LINE__, line
             );
-        const Collection& collection = hierarchy.get_collection(collection_path);
-        const bool existing_map = collection.kind == Path::Kind::Map &&
-            std::find(collection.items.begin(), collection.items.end(), key) != collection.items.end();
-        const bool existing_list = collection.kind == Path::Kind::List && !key.empty() &&
-            std::find(collection.items.begin(), collection.items.end(), key) != collection.items.end();
-        if ((collection.kind == Path::Kind::List && !key.empty() && !existing_list) ||
-            (collection.kind == Path::Kind::Map && key.empty()) ||
-            (collection.kind != Path::Kind::List && collection.kind != Path::Kind::Map))
+        if (target.status == OverrideItemTarget::Status::InvalidSelector)
             throw dip::EnvironmentException(
                 "Invalid collection item", "The selector does not match an existing item or collection kind.",
                 "Use [key] for maps, [] to append to lists, or an existing list index.", __FILE__, __LINE__, line
             );
-        if (!existing_map && !existing_list && collection.schemas.empty())
+        if (target.status == OverrideItemTarget::Status::SchemaRequired)
             throw dip::EnvironmentException(
                 "Invalid collection item", "New override items require a schema-backed collection.",
                 "Declare an item schema on the map or list.", __FILE__, __LINE__, line
             );
-        const std::string path = collection_path + "[" +
-            (collection.kind == Path::Kind::List ? std::to_string(collection.items.size()) : key) + "]";
-        const std::string resolved_path = existing_list ? requested : path;
-        activate_addition(index, resolved_path);
+        activate_addition(index, target.resolved_path);
         activate_concrete_descendants(index);
-        if (existing_map || existing_list) {
+        if (target.status == OverrideItemTarget::Status::Existing) {
             if (!additions_.at(index).has_children)
                 throw dip::SyntaxException(
                     "Empty override prefix", "The existing item `" + requested + "` has no override entries.",

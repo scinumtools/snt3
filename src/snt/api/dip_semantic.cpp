@@ -169,6 +169,47 @@ std::string DIPSemantic::describe_json(const std::string& path, std::size_t max_
     return out.str();
 }
 
+std::string DIPSemantic::override_contract_json(const std::string& path) const {
+    const auto contract = inspector().override_contract(path);
+    const char* kind = "unavailable";
+    switch (contract.kind) {
+    case dip::OverrideTargetKind::ExistingValue: kind = "existing_value"; break;
+    case dip::OverrideTargetKind::ExistingItem: kind = "existing_item"; break;
+    case dip::OverrideTargetKind::NewItem: kind = "new_item"; break;
+    case dip::OverrideTargetKind::Unavailable: break;
+    }
+    std::ostringstream out;
+    out << "{\"schema_version\":\"1\",\"path\":" << quote(contract.path)
+        << ",\"kind\":" << quote(kind) << ",\"reason\":";
+    if (contract.reason.empty()) out << "null"; else out << quote(contract.reason);
+    out << ",\"resolved_path\":";
+    if (contract.resolved_path.empty()) out << "null"; else out << quote(contract.resolved_path);
+    out << ",\"declared_type\":";
+    if (contract.declared_type == core::DataType::None) out << "null";
+    else out << quote(core::DataTypeNames.at(contract.declared_type));
+    out << ",\"current_shape\":";
+    if (contract.current_shape) {
+        out << '[';
+        for (std::size_t i = 0; i < contract.current_shape->size(); ++i) {
+            if (i) out << ',';
+            out << contract.current_shape->at(i);
+        }
+        out << ']';
+    } else out << "null";
+    out << ",\"units\":";
+    if (contract.units) out << quote(*contract.units); else out << "null";
+    out << ",\"rules\":{\"options\":";
+    strings(out, contract.enforced_options);
+    out << ",\"condition\":";
+    if (contract.enforced_condition.empty()) out << "null";
+    else out << quote(contract.enforced_condition);
+    out << "},\"item_schemas\":";
+    strings(out, contract.item_schemas);
+    out << ",\"snapshot_input\":" << (contract.snapshot_input ? "true" : "false")
+        << ",\"requires_preview\":true}";
+    return out.str();
+}
+
 std::string DIPSemantic::list_json(const std::string& query, const dip::TagFilter& tags,
                                    std::size_t limit, std::size_t max_value_elements) const {
     const auto result = inspector().list_descriptions(query, tags, limit, max_value_elements);

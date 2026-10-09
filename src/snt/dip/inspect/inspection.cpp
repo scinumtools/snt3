@@ -3,6 +3,7 @@
 #include "value_facts.h"
 
 #include <snt/dip/exceptions.h>
+#include <snt/dip/lists/list_override.h>
 
 #include <algorithm>
 #include <stdexcept>
@@ -315,6 +316,63 @@ InspectionCapabilities Inspector::capabilities(std::string_view path) const {
     if (!found && !capabilities.hasChildren)
         throw std::out_of_range("No evaluated DIP path found: " + name);
     return capabilities;
+}
+
+OverrideContract Inspector::override_contract(std::string_view path) const {
+    const auto& env = *env_;
+    OverrideContract result;
+    result.path = std::string(path);
+    result.snapshot_input = env.is_loaded_snapshot();
+    if (result.path.empty() || result.path.find('?') != std::string::npos || result.path.back() == '.') {
+        result.reason = "invalid_path";
+        return result;
+    }
+    try {
+        Path parsed(result.path);
+        if (parsed.kind == Path::Kind::Root || parsed.kind == Path::Kind::None) {
+            result.reason = "invalid_path";
+            return result;
+        }
+    } catch (const dip::Exception&) {
+        result.reason = "invalid_path";
+        return result;
+    }
+
+    for (const auto& node : env.nodes.get_nodes()) {
+        if (!node || node->path.name != result.path) continue;
+        const auto facts = detail::inspect_value_facts(env, result.path, true);
+        result.kind = OverrideTargetKind::ExistingValue;
+        result.resolved_path = result.path;
+        result.declared_type = facts.declared_type;
+        result.current_shape = facts.shape;
+        if (facts.units) result.units = facts.units->to_string();
+        result.enforced_condition = facts.enforced_condition;
+        result.enforced_options = facts.enforced_options;
+        return result;
+    }
+
+    if (result.path.back() != ']') {
+        result.reason = "unknown_value";
+        return result;
+    }
+    const auto item = classify_override_item(env.hierarchy, result.path);
+    result.resolved_path = item.resolved_path;
+    result.item_schemas = item.schemas;
+    switch (item.status) {
+    case OverrideItemTarget::Status::Existing:
+        result.kind = OverrideTargetKind::ExistingItem; break;
+    case OverrideItemTarget::Status::Creatable:
+        result.kind = OverrideTargetKind::NewItem; break;
+    case OverrideItemTarget::Status::UnknownCollection:
+        result.reason = "unknown_collection"; break;
+    case OverrideItemTarget::Status::InvalidSelector:
+        result.reason = "invalid_selector"; break;
+    case OverrideItemTarget::Status::SchemaRequired:
+        result.reason = "schema_required"; break;
+    case OverrideItemTarget::Status::UnresolvedParent:
+        result.reason = "unresolved_parent_item"; break;
+    }
+    return result;
 }
 
 DependencyNeighborhood Inspector::dependency_neighborhood(std::string_view path) const {

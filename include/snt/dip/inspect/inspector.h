@@ -40,6 +40,8 @@ class Inspector {
     std::vector<TableInspection> tables() const;
     /** Available facts and operations for a value, group, collection, table, or named-source path. */
     InspectionCapabilities capabilities(std::string_view path) const;
+    /** Static override target and known constraints; preview decides candidate validity. */
+    OverrideContract override_contract(std::string_view path) const;
     /** Semantic source locations in precedence order; retained source text may be unavailable. */
     std::vector<InspectedSourceLocation> source_locations(const SourceEntity& entity) const;
     /** Original array/table string blocks retained by an opt-in live parse; empty for snapshots. */

@@ -23,6 +23,7 @@ Usage:
   snt dip parse [options] [arguments]
   snt dip compare <before.diph5> <after.diph5> [options]
   snt dip describe --project DIPfile --path PATH [--format json]
+  snt dip override-contract --project DIPfile --path PATH [--format json]
   snt dip list --project DIPfile [--query QUERY] [--limit N] [--format json]
   snt dip preview --project DIPfile --override-file FILE [--format json]
 

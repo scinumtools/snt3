@@ -9,6 +9,23 @@ namespace py = pybind11;
 
 namespace snt::bind::python {
 void init_semantic(py::module_& m) {
+    py::enum_<dip::OverrideTargetKind>(m, "OverrideTargetKind")
+        .value("Unavailable", dip::OverrideTargetKind::Unavailable)
+        .value("ExistingValue", dip::OverrideTargetKind::ExistingValue)
+        .value("ExistingItem", dip::OverrideTargetKind::ExistingItem)
+        .value("NewItem", dip::OverrideTargetKind::NewItem);
+    py::class_<dip::OverrideContract>(m, "OverrideContract")
+        .def_readonly("path", &dip::OverrideContract::path)
+        .def_readonly("kind", &dip::OverrideContract::kind)
+        .def_readonly("reason", &dip::OverrideContract::reason)
+        .def_readonly("resolved_path", &dip::OverrideContract::resolved_path)
+        .def_readonly("declared_type", &dip::OverrideContract::declared_type)
+        .def_readonly("current_shape", &dip::OverrideContract::current_shape)
+        .def_readonly("units", &dip::OverrideContract::units)
+        .def_readonly("enforced_options", &dip::OverrideContract::enforced_options)
+        .def_readonly("enforced_condition", &dip::OverrideContract::enforced_condition)
+        .def_readonly("item_schemas", &dip::OverrideContract::item_schemas)
+        .def_readonly("snapshot_input", &dip::OverrideContract::snapshot_input);
     py::class_<dip::SemanticDescription>(m, "SemanticDescription")
         .def_readonly("path", &dip::SemanticDescription::path)
         .def_readonly("kind", &dip::SemanticDescription::kind)
@@ -55,6 +72,9 @@ void init_semantic(py::module_& m) {
         return dip::Inspector{env}.describe(path, max_value_elements);
     }, py::arg("env"), py::arg("path"),
           py::arg("max_value_elements") = 16);
+    m.def("override_contract", [](const dip::Environment& env, std::string_view path) {
+        return dip::Inspector{env}.override_contract(path);
+    }, py::arg("env"), py::arg("path"));
     m.def("list_descriptions", [](const dip::Environment& env, const std::string& query,
                                    const std::vector<std::string>& all,
                                    const std::vector<std::string>& any,

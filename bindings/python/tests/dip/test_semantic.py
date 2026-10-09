@@ -5,6 +5,8 @@ from scinumtools3.dip import (
     inspect_value,
     list_descriptions,
     open_artifact,
+    override_contract,
+    OverrideTargetKind,
     preview,
 )
 
@@ -25,6 +27,11 @@ def test_describe_list_and_preview_share_evaluated_paths(tmp_path):
     assert speed.value_text == "2"
     assert speed.units is not None
     assert speed.source_text_available
+    contract = override_contract(env, "physics.speed")
+    assert contract.kind == OverrideTargetKind.ExistingValue
+    assert contract.resolved_path == "physics.speed"
+    assert contract.units is not None
+    assert override_contract(env, "missing").reason == "unknown_value"
 
     selected = list_descriptions(env, "?physics.", tags_all=["runtime"], limit=1)
     assert selected.total == 1
@@ -50,3 +57,4 @@ def test_describe_list_and_preview_share_evaluated_paths(tmp_path):
     assert not saved.source_text_available
     assert saved.declaration.source == inspected_saved.declaration_location.source
     assert saved.declaration.line == inspected_saved.declaration_location.line
+    assert override_contract(open_artifact(snapshot), "physics.speed").snapshot_input

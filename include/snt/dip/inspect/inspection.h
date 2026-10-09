@@ -93,6 +93,25 @@ struct InspectionCapabilities {
     bool directlyWritable = false;
 };
 
+/** What an override may target in this evaluated model. This is a static
+ * guide, not validation of a proposed value or a substitute for preview.
+ */
+enum class OverrideTargetKind { Unavailable, ExistingValue, ExistingItem, NewItem };
+
+struct OverrideContract {
+    std::string path;
+    OverrideTargetKind kind = OverrideTargetKind::Unavailable;
+    std::string reason; ///< Stable reason when unavailable.
+    std::string resolved_path; ///< New list items receive the next index at this moment.
+    core::DataType declared_type = core::DataType::None;
+    std::optional<val::Array::ShapeType> current_shape; ///< Evaluated shape, not declared bounds.
+    std::optional<std::string> units;
+    std::vector<std::string> enforced_options;
+    std::string enforced_condition;
+    std::vector<std::string> item_schemas;
+    bool snapshot_input = false; ///< A snapshot has no parser input to preview directly.
+};
+
 /** One distinct value or source adjacent to a selected dependency-graph ID.
  * request and operand describe the first effective read connecting the pair.
  */

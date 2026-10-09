@@ -33,6 +33,41 @@ TEST(DIPSemantic, RichDescriptionWithRecordedReads) {
     EXPECT_EQ(value.dependencies[1].target, "?simulation.duration");
 }
 
+TEST(DIPSemantic, OverrideContractUsesCollectionRules) {
+    snt::dip::DIP parser;
+    parser.add_string(
+        "$schema item\n"
+        "  mass int = 1\n"
+        "    !options [1, 2]\n"
+        "items list : item\n"
+        "items[]\n"
+        "materials map : item\n"
+        "plain map\n"
+        "scalar float = 2 m\n");
+    const auto env = parser.parse();
+    const snt::dip::Inspector view{env};
+
+    const auto value = view.override_contract("items[0].mass");
+    EXPECT_EQ(value.kind, snt::dip::OverrideTargetKind::ExistingValue);
+    EXPECT_EQ(value.declared_type, snt::core::DataType::Integer64);
+    EXPECT_EQ(value.enforced_options.size(), 2);
+    EXPECT_EQ(value.resolved_path, "items[0].mass");
+
+    const auto existing = view.override_contract("items[0]");
+    EXPECT_EQ(existing.kind, snt::dip::OverrideTargetKind::ExistingItem);
+    EXPECT_EQ(existing.item_schemas, (std::vector<std::string>{"item"}));
+    const auto added = view.override_contract("items[]");
+    EXPECT_EQ(added.kind, snt::dip::OverrideTargetKind::NewItem);
+    EXPECT_EQ(added.resolved_path, "items[1]");
+    EXPECT_EQ(added.item_schemas, (std::vector<std::string>{"item"}));
+    EXPECT_EQ(view.override_contract("materials[copper]").kind, snt::dip::OverrideTargetKind::NewItem);
+    EXPECT_EQ(view.override_contract("plain[copper]").reason, "schema_required");
+    EXPECT_EQ(view.override_contract("items[2]").reason, "invalid_selector");
+    EXPECT_EQ(view.override_contract("items[2].mass").reason, "unknown_value");
+    EXPECT_EQ(view.override_contract("missing[key]").reason, "unknown_collection");
+    EXPECT_EQ(view.override_contract("scalar?").reason, "invalid_path");
+}
+
 TEST(DIPSemantic, DescribeAndListBoundValues) {
     snt::dip::DIP parser;
     parser.add_file(fixture);

@@ -154,6 +154,7 @@ one evaluated path, while ``list`` selects values by path and explicit tags:
    snt dip describe --project DIPfile --path simulation.steps --format json
    snt dip list --project DIPfile --query '?simulation.' --limit 50 --format json
    snt dip list --project DIPfile --tag-all runtime --format json
+   snt dip override-contract --project DIPfile --path simulation.steps --format json
 
 Use ``--input`` for a DIPL file or a DIPH5 snapshot. Values in the JSON
 response have a DIPL text encoding. Values exceeding ``--max-value-elements``
@@ -163,6 +164,14 @@ reports whether its result was truncated. Missing defaults and dependency
 graphs are marked unavailable instead of being inferred. Add
 ``--record-graph`` to ``describe`` or ``list`` to capture dependencies while
 parsing a DIPfile or DIPL input. A DIPH5 snapshot uses its saved graph state.
+
+``override-contract`` classifies an override target as ``existing_value``,
+``existing_item``, ``new_item``, or ``unavailable``. It reports applicable
+constraints and a reason for unavailable targets. A new collection item needs
+a schema on its collection; append a list item with ``items[]`` or create a
+map item with ``items[key]``. This is a static guide: use ``preview`` to check
+the proposed value and dependent calculations.
+
 For a populated example, run this from the repository root:
 
 .. code-block:: shell

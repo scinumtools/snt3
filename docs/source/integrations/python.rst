@@ -440,17 +440,21 @@ availability. ``list_descriptions(env, query, limit=...)`` returns a bounded
 selection with the total match count. It accepts ``tags_all``, ``tags_any``,
 and ``tags_none`` like ``env.select``. Its default omits value content.
 ``preview(path, overrides)`` evaluates separate baseline and candidate
-environments and returns diagnostics and an effective comparison:
+environments and returns diagnostics and an effective comparison.
+``override_contract(env, path)`` classifies a possible override target and
+reports its current type and enforced rules. Preview the actual candidate to
+validate it:
 
 .. code-block:: python
 
    from scinumtools3.dip import (
        PreviewOverride, PreviewOverrideKind, describe, list_descriptions,
-       open_artifact, preview,
+       open_artifact, override_contract, preview,
    )
 
    env = open_artifact("DIPfile")
    print(describe(env, "simulation.steps").value_text)
+   print(override_contract(env, "simulation.steps").kind)
    print(list_descriptions(env, "?simulation.", limit=20).total)
    result = preview("DIPfile", [
        PreviewOverride(PreviewOverrideKind.Text, "simulation.steps = 200")

@@ -11,6 +11,18 @@ namespace snt::dip {
 
     class HierarchyList;
 
+    /** Static classification of a terminal collection-item override path.
+     * It does not evaluate the item or its child values.
+     */
+    struct OverrideItemTarget {
+        enum class Status { Existing, Creatable, UnknownCollection, InvalidSelector, SchemaRequired, UnresolvedParent };
+        Status status = Status::InvalidSelector;
+        std::string resolved_path;
+        std::vector<std::string> schemas;
+    };
+
+    OverrideItemTarget classify_override_item(const HierarchyList& hierarchy, const std::string& requested);
+
     /** Collected, exact-path value modifications applied before node evaluation. */
     class OverrideList {
       private:

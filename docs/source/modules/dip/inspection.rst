@@ -96,6 +96,9 @@ Explain a value
      - Produces a bounded description of a value, group, collection, or
        table. Use in search results or agent tools. :cpp:func:`view.list_descriptions <snt::dip::snt::dip::Inspector::list_descriptions>`
        describes a limited set of query matches.
+   * - :cpp:func:`view.override_contract("physics.speed") <snt::dip::snt::dip::Inspector::override_contract>`
+     - Classifies a proposed override path and reports its type, current shape,
+       units, and enforced rules. Use it to prepare an override before preview.
    * - :cpp:func:`view.source_locations(source) <snt::dip::snt::dip::Inspector::source_locations>`
      - Finds declarations, modifications, and overrides for a
        ``SourceEntity``. Use for source navigation; entities can also be
@@ -333,6 +336,31 @@ Descriptions separate enforced options and conditions from advisory metadata.
 They report source-text and dependency-graph availability. List results omit
 value content by default. A ``default`` is not separately evaluated; use a
 preview for a baseline comparison.
+
+Check an override target
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+:cpp:func:`Inspector::override_contract <snt::dip::snt::dip::Inspector::override_contract>`
+checks an exact path against the evaluated model before you construct an
+override. It identifies an existing value, an existing collection item, or a
+schema backed item that can be created:
+
+.. code-block:: cpp
+
+   auto value = view.override_contract("simulation.steps");
+   auto item = view.override_contract("materials[copper]");
+   if (item.kind == snt::dip::OverrideTargetKind::NewItem) {
+       // An item group can be written at item.path; preview checks its children.
+   }
+
+For a value, ``declared_type``, ``current_shape``, ``units``,
+``enforced_options``, and ``enforced_condition`` describe known constraints.
+For a collection item, ``item_schemas`` and ``resolved_path`` describe the
+item at this evaluation: ``items[]`` resolves to the next list index. A
+missing schema or mismatched selector yields ``Unavailable`` and a stable
+``reason``. New child values cannot be targeted directly; create their item
+group first. Contracts are static and may become stale if the input changes.
+Use preview to validate proposed values, item children, and dependencies.
 
 Preview an override
 ~~~~~~~~~~~~~~~~~~~

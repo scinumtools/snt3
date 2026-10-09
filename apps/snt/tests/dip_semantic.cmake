@@ -20,6 +20,15 @@ string(JSON expected GET "${expected_contract}" describe)
 check_json_output("describe" "${output}" "${expected}")
 
 execute_process(
+  COMMAND "${SNT_EXECUTABLE}" dip override-contract --input "${INPUT}" --path experiment.steps --format json
+  RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error)
+if(NOT status EQUAL 0)
+  message(FATAL_ERROR "contract failed: ${error}")
+endif()
+string(JSON expected GET "${expected_contract}" contract)
+check_json_output("contract" "${output}" "${expected}")
+
+execute_process(
   COMMAND "${SNT_EXECUTABLE}" dip describe --input "${GRAPH_INPUT}" --path simulation.speed --record-graph --format json
   RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error)
 if(NOT status EQUAL 0)

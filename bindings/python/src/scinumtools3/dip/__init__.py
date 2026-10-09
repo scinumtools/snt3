@@ -55,11 +55,14 @@ inspect_table = _dip.inspect_table
 inspect_tables = _dip.inspect_tables
 read_value_slice = _dip.read_value_slice
 SemanticDescription = _dip.SemanticDescription
+OverrideTargetKind = _dip.OverrideTargetKind
+OverrideContract = _dip.OverrideContract
 SemanticList = _dip.SemanticList
 PreviewOverrideKind = _dip.PreviewOverrideKind
 PreviewOverride = _dip.PreviewOverride
 PreviewResult = _dip.PreviewResult
 describe = _dip.describe
+override_contract = _dip.override_contract
 list_descriptions = _dip.list_descriptions
 preview = _dip.preview
 

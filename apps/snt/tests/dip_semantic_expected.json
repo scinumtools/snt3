@@ -1,4 +1,18 @@
 {
+  "contract": {
+    "schema_version": "1",
+    "path": "experiment.steps",
+    "kind": "existing_value",
+    "reason": null,
+    "resolved_path": "experiment.steps",
+    "declared_type": "int32",
+    "current_shape": [1],
+    "units": null,
+    "rules": {"options": [], "condition": null},
+    "item_schemas": [],
+    "snapshot_input": false,
+    "requires_preview": true
+  },
   "describe": {
     "schema_version": "1",
     "path": "experiment.steps",
