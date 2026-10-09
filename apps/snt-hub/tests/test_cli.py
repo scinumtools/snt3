@@ -102,6 +102,11 @@ class HubCLITest(unittest.TestCase):
         result = self.call("list", "--prefix", str(self.root), env=env)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("40-character", result.stderr)
+        data["hub_revision"] = "b" * 40
+        catalogue.write_text(json.dumps(data))
+        result = self.call("list", "--prefix", str(self.root), env=env)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("toy\tToy\t" + "a" * 40, result.stdout)
 
     def test_setup_forwards_override_as_one_absolute_argument(self):
         self.fixture()

@@ -561,7 +561,8 @@ int command(int argc, char* argv[]) {
     if (args.show_help) { help(args.action); return 0; }
     const auto root = data_root(args.prefix);
     if (args.action == "list") {
-        for (const auto& project : catalog(root).at("projects"))
+        const auto data = catalog(root);
+        for (const auto& project : data.at("projects"))
             std::cout << text(project, "id") << '\t' << text(project, "name") << '\t'
                       << text(project, "source_revision") << '\n';
     } else if (args.action == "install") {
