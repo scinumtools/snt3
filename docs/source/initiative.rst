@@ -66,6 +66,24 @@ The intent is reusable tooling around each code's scientific interface,
 without asking code maintainers to give up ownership of their numerics or
 project governance.
 
+Try a participating project
+---------------------------
+
+With SNT installed, choose a project and example from the Hub catalogue,
+then generate its inputs:
+
+.. code-block:: bash
+
+   snt hub list
+   snt hub examples PROJECT
+   snt hub install PROJECT
+   snt hub setup PROJECT EXAMPLE --output ./example-inputs
+
+Replace ``PROJECT`` and ``EXAMPLE`` with names shown by the first two
+commands. The new directory contains the generated files and a setup lock;
+available files depend on the example. SNT does not build or run the code. See the
+:ref:`SNT Hub CLI guide <cli-hub>` for prerequisites and overrides.
+
 How to participate
 ------------------
 

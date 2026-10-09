@@ -84,6 +84,19 @@ tooling stable and trustworthy.
 Explore related projects and integrations in the
 [SNT Hub registry](https://scinumtools.github.io/snt-hub/#registry).
 
+With SNT installed, choose a project and example, then generate its inputs:
+
+```bash
+snt hub list
+snt hub examples PROJECT
+snt hub install PROJECT
+snt hub setup PROJECT EXAMPLE --output ./example-inputs
+```
+
+Replace `PROJECT` and `EXAMPLE` with names listed by the first two commands.
+Generated files are placed in `./example-inputs`;
+see the [SNT Hub CLI guide](https://scinumtools.github.io/snt3/integrations/cli.html#pinned-code-examples-with-snt-hub) for prerequisites and overrides.
+
 <br clear="left">
 
 ## Features

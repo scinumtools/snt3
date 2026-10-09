@@ -330,6 +330,8 @@ version to the SNT build version. Set date and version explicitly for a
 reproducible cover. The :ref:`CreateReport example
 <dip-create-report-example>` shows the layout and provides a PDF to inspect.
 
+.. _cli-hub:
+
 Pinned code examples with SNT Hub
 ---------------------------------
 

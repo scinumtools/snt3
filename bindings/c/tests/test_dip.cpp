@@ -207,7 +207,7 @@ TEST_F(Environment, GenerateReport) {
     contents << generated.rdbuf();
     EXPECT_NE(contents.str().find("simulation.steps"), std::string::npos);
     EXPECT_NE(contents.str().find("C binding demo"), std::string::npos);
-    EXPECT_NE(contents.str().find("sntNodeFill"), std::string::npos);
+    EXPECT_NE(contents.str().find("\\sntnode{simulation.steps}"), std::string::npos);
     generated.close();
     const snt_dip_report_options options{"C binding demo", nullptr, nullptr,
         "C & report", "Example_Team", "2026-09-28", "v1.0"};
