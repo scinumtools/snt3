@@ -134,11 +134,15 @@ effective value and the input that produced it: two input
 files can express the same quantity differently, and a deliberate override
 can change all quantities derived from that input.
 
-This small example can be checked by hand. In a larger model, one override may
-alter many derived values, activate conditional settings, or cross a stability
-limit. SNT's preview reports the resulting diff and diagnostics without
-changing the input file. The companion script keeps its trial override in the
-file for its paired comparison.
+Here the initial temperature is one value in kelvin with a positive-value
+condition, easy to check by hand. In a larger code, choosing initial
+conditions or an initial-condition file may require knowing valid units,
+ranges, and compatibility with other settings. Putting those rules in the
+parameter model gives an AI agent inspectable guidance; with the YAML path
+here, it would also need to recover rules from the runner. SNT can preview a
+candidate and report rule violations and changed effective values without
+editing the input file. That guidance covers only relationships the model
+declares; a researcher still judges physical suitability.
 
 ## Information Beyond the Effective Value
 

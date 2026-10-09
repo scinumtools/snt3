@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" role="img" aria-labelledby="title desc">
+  <title id="title">DIPL inspection and preview workflow</title>
+  <desc id="desc">A parameter model is inspected, an override is proposed and previewed, and a person reviews the validation and diff. Review can lead to another proposal. Applying and exporting an approved input is a separate current step.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M1 1 L7 4.5 L1 8" fill="none" stroke="#4b6583" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      .heading{font:700 26px system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#182b42}
+      .label{font:700 17px system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#182b42}
+      .body{font:14px system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#41546a}
+      .small{font:600 12px system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#46627b}
+      .number{font:700 12px system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#fff}
+      .line{fill:none;stroke:#4b6583;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="470" rx="22" fill="#f5f8fc"/>
+  <text x="32" y="47" class="heading">From parameter model to reviewed proposal</text>
+  <text x="33" y="69" class="body">The same DIPL checks serve researchers, applications, and AI assistants.</text>
+
+  <g>
+    <rect x="30" y="102" width="204" height="149" rx="15" fill="#fff" stroke="#d2dfea" stroke-width="2"/>
+    <rect x="46" y="118" width="25" height="25" rx="7" fill="#365d85"/>
+    <text x="58.5" y="135.5" text-anchor="middle" class="number">1</text>
+    <text x="81" y="137" class="label">Model</text>
+    <text x="47" y="174" class="body">DIPL values, units,</text>
+    <text x="47" y="195" class="body">expressions, and rules</text>
+    <rect x="47" y="215" width="106" height="23" rx="11.5" fill="#e8f0f7"/>
+    <text x="100" y="231" text-anchor="middle" class="small">source inputs</text>
+  </g>
+  <g>
+    <rect x="264" y="102" width="204" height="149" rx="15" fill="#fff" stroke="#d2dfea" stroke-width="2"/>
+    <rect x="280" y="118" width="25" height="25" rx="7" fill="#365d85"/>
+    <text x="292.5" y="135.5" text-anchor="middle" class="number">2</text>
+    <text x="315" y="137" class="label">Inspect</text>
+    <text x="281" y="174" class="body">Find paths and read</text>
+    <text x="281" y="195" class="body">values and constraints</text>
+    <rect x="281" y="215" width="147" height="23" rx="11.5" fill="#e8f0f7"/>
+    <text x="354.5" y="231" text-anchor="middle" class="small">list · describe · contract</text>
+  </g>
+  <g>
+    <rect x="498" y="102" width="204" height="149" rx="15" fill="#fff" stroke="#d2dfea" stroke-width="2"/>
+    <rect x="514" y="118" width="25" height="25" rx="7" fill="#365d85"/>
+    <text x="526.5" y="135.5" text-anchor="middle" class="number">3</text>
+    <text x="549" y="137" class="label">Propose</text>
+    <text x="515" y="174" class="body">Prepare a small,</text>
+    <text x="515" y="195" class="body">explicit DIPL override</text>
+    <rect x="515" y="215" width="117" height="23" rx="11.5" fill="#e8f0f7"/>
+    <text x="573.5" y="231" text-anchor="middle" class="small">text or file</text>
+  </g>
+  <g>
+    <rect x="732" y="102" width="204" height="149" rx="15" fill="#f5fcfa" stroke="#78b8a8" stroke-width="2"/>
+    <rect x="748" y="118" width="25" height="25" rx="7" fill="#177d70"/>
+    <text x="760.5" y="135.5" text-anchor="middle" class="number">4</text>
+    <text x="783" y="137" class="label">Preview</text>
+    <text x="749" y="174" class="body">Evaluate and validate</text>
+    <text x="749" y="195" class="body">a separate candidate</text>
+    <rect x="749" y="215" width="111" height="23" rx="11.5" fill="#d9f1e9"/>
+    <text x="804.5" y="231" text-anchor="middle" class="small">no SNT output</text>
+  </g>
+  <g>
+    <rect x="966" y="102" width="204" height="149" rx="15" fill="#fff" stroke="#d2dfea" stroke-width="2"/>
+    <rect x="982" y="118" width="25" height="25" rx="7" fill="#365d85"/>
+    <text x="994.5" y="135.5" text-anchor="middle" class="number">5</text>
+    <text x="1017" y="137" class="label">Review</text>
+    <text x="983" y="174" class="body">Read diagnostics and</text>
+    <text x="983" y="195" class="body">the effective-value diff</text>
+    <rect x="983" y="215" width="122" height="23" rx="11.5" fill="#e8f0f7"/>
+    <text x="1044" y="231" text-anchor="middle" class="small">human decision</text>
+  </g>
+
+  <path d="M239 176 H258" class="line"/>
+  <path d="M473 176 H492" class="line"/>
+  <path d="M707 176 H726" class="line"/>
+  <path d="M941 176 H960" class="line"/>
+
+  <path d="M1020 256 V284 H600 V256" class="line"/>
+  <rect x="720" y="271" width="177" height="27" rx="13.5" fill="#f5f8fc"/>
+  <text x="808.5" y="289" text-anchor="middle" class="small">revise and preview again</text>
+
+  <rect x="30" y="333" width="864" height="100" rx="15" fill="#e9f0f8"/>
+  <text x="48" y="362" class="label">Validation has a defined scope</text>
+  <text x="48" y="389" class="body">SNT checks rules expressed by the model and reports effects on evaluated values.</text>
+  <text x="48" y="411" class="body">Scientific suitability and approval belong to the researcher or application.</text>
+
+  <path d="M1068 256 V324" class="line"/>
+  <rect x="966" y="333" width="204" height="100" rx="15" fill="#fffaf1" stroke="#c49a54" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="983" y="362" class="label">Apply &amp; export</text>
+  <text x="983" y="389" class="body">Separate workflow today;</text>
+  <text x="983" y="411" class="body">re-evaluate final inputs</text>
+</svg>
