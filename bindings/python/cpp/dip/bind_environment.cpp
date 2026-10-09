@@ -7,6 +7,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl/filesystem.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/lists/list_node.h>
@@ -168,7 +169,7 @@ namespace snt::bind::python {
             "select",
             [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& all,
                const std::vector<std::string>& any, const std::vector<std::string>& none) {
-                return e.select(path, dip::TagFilter{all, any, none});
+                return dip::Inspector{e}.select(path, dip::TagFilter{all, any, none});
             },
             py::arg("path") = "?",
             py::kw_only(),
@@ -193,7 +194,7 @@ Args:
             "select_paths",
             [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& all,
                const std::vector<std::string>& any, const std::vector<std::string>& none) {
-                return e.select_paths(path, dip::TagFilter{all, any, none});
+                return dip::Inspector{e}.select_paths(path, dip::TagFilter{all, any, none});
             },
             py::arg("path") = "?", py::kw_only(),
             py::arg("tags_all") = std::vector<std::string>{},

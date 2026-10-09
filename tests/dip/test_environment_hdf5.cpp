@@ -6,9 +6,10 @@
 #include <fstream>
 #include <limits>
 #include <hdf5.h>
+#include <snt/dip/artifact.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/cursor.h>
 #include <snt/dip/exceptions.h>
-#include <snt/dip/inspect/inspection.h>
 
 using namespace snt;
 
@@ -203,9 +204,10 @@ TEST(Environment, ChecksDependencyEventLineNumberAgainstSizeT) {
         EXPECT_THROW(loaded.load(file), dip::IOException);
     } else {
         loaded.load(file);
-        ASSERT_FALSE(loaded.dependency_graph().events.empty());
-        ASSERT_TRUE(loaded.dependency_graph().events.front().location.has_value());
-        EXPECT_EQ(loaded.dependency_graph().events.front().location->line, large_line);
+        const dip::Inspector view{loaded};
+        ASSERT_FALSE(view.graph().events.empty());
+        ASSERT_TRUE(view.graph().events.front().location.has_value());
+        EXPECT_EQ(view.graph().events.front().location->line, large_line);
     }
     std::filesystem::remove(file);
 }
@@ -298,7 +300,7 @@ TEST(Environment, RelativeSourcePathsFollowSnapshotLocation) {
     dip::DIP parser;
     parser.add_file(source_file.string());
     const auto parsed = parser.parse(true);
-    ASSERT_TRUE(parsed.dependency_graph().recorded);
+    ASSERT_TRUE(dip::Inspector{parsed}.graph().recorded);
 
     dip::SnapshotSaveOptions options;
     options.source_paths = dip::SourcePathPolicy::RelativeToSnapshot;
@@ -306,7 +308,7 @@ TEST(Environment, RelativeSourcePathsFollowSnapshotLocation) {
     parsed.save(snapshot, options);
     dip::Environment loaded;
     loaded.load(snapshot);
-    ASSERT_TRUE(loaded.dependency_graph().recorded);
+    ASSERT_TRUE(dip::Inspector{loaded}.graph().recorded);
     const auto manifest = loaded.get_source_manifest();
     const auto source_it = std::find_if(manifest.begin(), manifest.end(), [&](const dip::SourceInfo& info) {
         return std::filesystem::path(info.path).filename() == source_file.filename();

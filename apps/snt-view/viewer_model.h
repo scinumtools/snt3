@@ -1,7 +1,7 @@
 #ifndef SNT_VIEW_VIEWER_MODEL_H
 #define SNT_VIEW_VIEWER_MODEL_H
 
-#include <snt/dip/inspect/inspection.h>
+#include <snt/dip/inspect/inspector.h>
 #include "source_format.h"
 
 #include <filesystem>

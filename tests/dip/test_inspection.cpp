@@ -1,9 +1,10 @@
 #include "pch_tests.h"
 
 #include <snt/dip/dip.h>
+#include <snt/dip/artifact.h>
 #include <snt/dip/inspect/diagnostic.h>
 #include <snt/dip/exceptions.h>
-#include <snt/dip/inspect/inspection.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/val/values_array.h>
 
 #include <chrono>
@@ -21,15 +22,16 @@ TEST(Inspection, RetainedBlockInputsFollowEffectiveValues) {
                       "ordinary int[2] = [7,8]\n");
     parser.add_override_string("array = \"\"\"[9,10]\"\"\"");
     const auto env = parser.parse(false, true);
-    const auto& blocks = dip::inspect_block_inputs(env);
+    const dip::Inspector view{env};
+    const auto& blocks = view.block_inputs();
     ASSERT_EQ(blocks.size(), 1);
-    const auto* array = dip::inspect_block_input(env, "array");
+    const auto* array = view.block_input("array");
     ASSERT_NE(array, nullptr);
     EXPECT_EQ(array->kind, dip::BlockInput::Kind::Array);
     EXPECT_EQ(array->code, "[9,10]");
     EXPECT_EQ(array->source_line, 1);
-    EXPECT_EQ(dip::inspect_block_input(env, "changed"), nullptr);
-    EXPECT_EQ(dip::inspect_block_input(env, "ordinary"), nullptr);
+    EXPECT_EQ(view.block_input("changed"), nullptr);
+    EXPECT_EQ(view.block_input("ordinary"), nullptr);
 }
 
 TEST(Inspection, ReloadRetainsBlockInputsWhenRequested) {
@@ -40,12 +42,13 @@ TEST(Inspection, ReloadRetainsBlockInputsWhenRequested) {
         stream << "array int[2] = \"\"\"[1,2]\"\"\"\n";
     }
     auto env = dip::open_artifact(file, false, true);
-    ASSERT_NE(dip::inspect_block_input(env, "array"), nullptr);
+    dip::Inspector view{env};
+    ASSERT_NE(view.block_input("array"), nullptr);
     dip::reload_artifact(env, file, false, true);
-    ASSERT_NE(dip::inspect_block_input(env, "array"), nullptr);
-    EXPECT_EQ(dip::inspect_block_input(env, "array")->code, "[1,2]");
+    ASSERT_NE(view.block_input("array"), nullptr);
+    EXPECT_EQ(view.block_input("array")->code, "[1,2]");
     dip::reload_artifact(env, file);
-    EXPECT_TRUE(dip::inspect_block_inputs(env).empty());
+    EXPECT_TRUE(view.block_inputs().empty());
     std::filesystem::remove(file);
 }
 
@@ -55,8 +58,9 @@ TEST(Inspection, EvaluatedValuesAndProvenance) {
     parser.add_string("physics : settings\ncount int = 4\n");
     parser.add_override_string("physics.speed = 3 m/s\n");
     const auto env = parser.parse();
+    const dip::Inspector view{env};
 
-    auto speed = dip::inspect_value(env, "physics.speed");
+    auto speed = view.value("physics.speed");
     ASSERT_NE(speed.value, nullptr);
     EXPECT_EQ(speed.path, "physics.speed");
     EXPECT_EQ(speed.metadata.description, "Flow speed");
@@ -71,7 +75,7 @@ TEST(Inspection, EvaluatedValuesAndProvenance) {
     EXPECT_EQ(speed.contributing_schema->name, "settings");
     EXPECT_EQ(env["physics.speed"].as<double>(), 3);
 
-    const auto values = dip::inspect_values(env);
+    const auto values = view.values();
     ASSERT_EQ(values.size(), 2);
     EXPECT_EQ(values[0].path, "physics.speed");
     EXPECT_EQ(values[1].path, "count");
@@ -102,7 +106,7 @@ TEST(Inspection, BranchCollectionsUseSemanticPaths) {
     for (const auto& node : env.nodes.get_nodes())
         EXPECT_TRUE(env.hierarchy.has_collection(node->path.name)) << node->path.name;
     EXPECT_EQ(env["status"].get_provenance().source_line, 3);
-    const auto status = dip::inspect_value(env, "status");
+    const auto status = dip::Inspector{env}.value("status");
     EXPECT_EQ(status.value->to_string(), "\"fast\"");
     EXPECT_EQ(status.declaration_location.line, 3);
 }
@@ -185,13 +189,14 @@ TEST(Inspection, CapabilityFlags) {
     dip::DIP parser;
     parser.add_string("physics\n  speed float = 2 m/s\nsamples int[3] = [1, 2, 3]\nsingle int[1] = [4]\n");
     auto env = parser.parse();
+    const dip::Inspector view{env};
 
-    const auto group = dip::inspect_capabilities(env, "physics");
+    const auto group = view.capabilities("physics");
     EXPECT_TRUE(group.hasChildren);
     EXPECT_FALSE(group.hasValue);
     EXPECT_FALSE(group.hasTabularData);
 
-    const auto speed = dip::inspect_capabilities(env, "physics.speed");
+    const auto speed = view.capabilities("physics.speed");
     EXPECT_TRUE(speed.hasValue);
     EXPECT_TRUE(speed.hasSource);
     EXPECT_TRUE(speed.hasProvenance);
@@ -201,16 +206,16 @@ TEST(Inspection, CapabilityFlags) {
     EXPECT_FALSE(speed.sourceEditable);
     EXPECT_FALSE(speed.directlyWritable);
 
-    EXPECT_TRUE(dip::inspect_capabilities(env, "samples").hasArrayData);
-    EXPECT_TRUE(dip::inspect_capabilities(env, "single").hasArrayData);
-    EXPECT_THROW(dip::inspect_capabilities(env, "missing"), std::out_of_range);
+    EXPECT_TRUE(view.capabilities("samples").hasArrayData);
+    EXPECT_TRUE(view.capabilities("single").hasArrayData);
+    EXPECT_THROW(view.capabilities("missing"), std::out_of_range);
 
     const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
     const auto snapshot = std::filesystem::temp_directory_path() / ("snt-inspection-capabilities-" + suffix + ".diph5");
     env.save(snapshot);
     dip::reload_artifact(env, snapshot);
-    EXPECT_FALSE(dip::inspect_capabilities(env, "physics.speed").hasArrayData);
-    EXPECT_TRUE(dip::inspect_capabilities(env, "single").hasArrayData);
+    EXPECT_FALSE(view.capabilities("physics.speed").hasArrayData);
+    EXPECT_TRUE(view.capabilities("single").hasArrayData);
     std::filesystem::remove(snapshot);
 }
 
@@ -224,7 +229,8 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
         "result = {?source} m\n"
     );
     auto env = parser.parse(true);
-    const auto& graph = env.dependency_graph();
+    const dip::Inspector view{env};
+    const auto& graph = view.graph();
     EXPECT_TRUE(graph.recorded);
     const auto* previous = graph.latest("?chosen", dip::DependencyEventKind::Value);
     ASSERT_NE(previous, nullptr);
@@ -239,9 +245,9 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
     EXPECT_EQ(current->reads.front().target, "?source");
     EXPECT_EQ(graph.referenced_by("?other").size(), 0);
     EXPECT_EQ(graph.referenced_by("?source").size(), 2);
-    EXPECT_TRUE(dip::inspect_capabilities(env, "result").hasReferenceGraph);
-    EXPECT_TRUE(dip::inspect_capabilities(env, "source").hasReferenceGraph);
-    const auto neighborhood = dip::inspect_dependency_neighborhood(env, "result");
+    EXPECT_TRUE(view.capabilities("result").hasReferenceGraph);
+    EXPECT_TRUE(view.capabilities("source").hasReferenceGraph);
+    const auto neighborhood = view.dependency_neighborhood("result");
     EXPECT_TRUE(neighborhood.recorded);
     EXPECT_EQ(neighborhood.id, "?result");
     ASSERT_EQ(neighborhood.dependencies.size(), 1);
@@ -251,7 +257,7 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
     ASSERT_EQ(neighborhood.readers.size(), 1);
     EXPECT_EQ(neighborhood.readers.front().id, "?chosen");
     EXPECT_FALSE(neighborhood.readers.front().request.empty());
-    const auto reverse_only = dip::inspect_dependency_neighborhood(env, "?source");
+    const auto reverse_only = view.dependency_neighborhood("?source");
     EXPECT_TRUE(reverse_only.dependencies.empty());
     ASSERT_EQ(reverse_only.readers.size(), 2);
     EXPECT_EQ(reverse_only.readers.front().id, "?result");
@@ -261,17 +267,18 @@ TEST(Inspection, DependencyGraphTracksExpressionsAndEffectiveUpdates) {
     env.save(file);
     dip::Environment restored;
     restored.load(file);
+    const dip::Inspector restored_view{restored};
     std::filesystem::remove(file);
-    EXPECT_TRUE(restored.dependency_graph().recorded);
-    const auto* restored_event = restored.dependency_graph().latest("?chosen", dip::DependencyEventKind::Value);
+    EXPECT_TRUE(restored_view.graph().recorded);
+    const auto* restored_event = restored_view.graph().latest("?chosen", dip::DependencyEventKind::Value);
     ASSERT_NE(restored_event, nullptr);
     ASSERT_TRUE(restored_event->composition.has_value());
     EXPECT_EQ(restored_event->composition->nodes.size(), previous->composition->nodes.size());
     EXPECT_EQ(restored_event->reads.front().operand, previous->reads.front().operand);
     ASSERT_TRUE(restored_event->location.has_value());
     EXPECT_EQ(restored_event->location->line, previous->location->line);
-    EXPECT_EQ(restored.dependency_graph().dependencies("?result").front().target, "?source");
-    EXPECT_EQ(dip::inspect_dependency_neighborhood(restored, "result").dependencies.front().id, "?source");
+    EXPECT_EQ(restored_view.graph().dependencies("?result").front().target, "?source");
+    EXPECT_EQ(restored_view.dependency_neighborhood("result").dependencies.front().id, "?source");
 }
 
 TEST(Inspection, DependencyRecordingIsOptIn) {
@@ -279,10 +286,11 @@ TEST(Inspection, DependencyRecordingIsOptIn) {
     dip::DIP fast_parser;
     fast_parser.add_string(code);
     auto fast = fast_parser.parse();
-    EXPECT_FALSE(fast.dependency_graph().recorded);
-    EXPECT_TRUE(fast.dependency_graph().events.empty());
-    EXPECT_FALSE(dip::inspect_capabilities(fast, "result").hasReferenceGraph);
-    const auto unavailable = dip::inspect_dependency_neighborhood(fast, "result");
+    const dip::Inspector fast_view{fast};
+    EXPECT_FALSE(fast_view.graph().recorded);
+    EXPECT_TRUE(fast_view.graph().events.empty());
+    EXPECT_FALSE(fast_view.capabilities("result").hasReferenceGraph);
+    const auto unavailable = fast_view.dependency_neighborhood("result");
     EXPECT_FALSE(unavailable.recorded);
     EXPECT_TRUE(unavailable.dependencies.empty());
     EXPECT_TRUE(unavailable.readers.empty());
@@ -290,17 +298,19 @@ TEST(Inspection, DependencyRecordingIsOptIn) {
     dip::DIP graph_parser;
     graph_parser.add_string(code);
     auto recorded = graph_parser.parse(true);
-    EXPECT_TRUE(recorded.dependency_graph().recorded);
-    ASSERT_EQ(recorded.dependency_graph().dependencies("?result").size(), 1);
+    const dip::Inspector recorded_view{recorded};
+    EXPECT_TRUE(recorded_view.graph().recorded);
+    ASSERT_EQ(recorded_view.graph().dependencies("?result").size(), 1);
     EXPECT_EQ(fast["result"].as<int>(), recorded["result"].as<int>());
 
     const auto file = std::filesystem::temp_directory_path() / "snt-no-graph-roundtrip.diph5";
     fast.save(file);
     dip::Environment restored;
     restored.load(file);
+    const dip::Inspector restored_view{restored};
     std::filesystem::remove(file);
-    EXPECT_FALSE(restored.dependency_graph().recorded);
-    EXPECT_TRUE(restored.dependency_graph().events.empty());
+    EXPECT_FALSE(restored_view.graph().recorded);
+    EXPECT_TRUE(restored_view.graph().events.empty());
 }
 
 TEST(Inspection, DependencyNeighborhoodAcceptsQualifiedSourceIds) {
@@ -313,7 +323,7 @@ TEST(Inspection, DependencyNeighborhoodAcceptsQualifiedSourceIds) {
     graph.events.push_back(std::move(event));
     env.set_dependency_graph(std::move(graph));
 
-    const auto neighborhood = dip::inspect_dependency_neighborhood(env, "reference?sample");
+    const auto neighborhood = dip::Inspector{env}.dependency_neighborhood("reference?sample");
     EXPECT_EQ(neighborhood.id, "reference?sample");
     EXPECT_TRUE(neighborhood.dependencies.empty());
     ASSERT_EQ(neighborhood.readers.size(), 1);
@@ -333,7 +343,8 @@ TEST(Inspection, DependencyGraphResolvesRelativeReadsAndConditions) {
         "      !condition ({.} > 0)\n"
     );
     const auto env = parser.parse(true);
-    const auto& graph = env.dependency_graph();
+    const dip::Inspector view{env};
+    const auto& graph = view.graph();
     const auto reads = graph.dependencies("?foo.bar.result");
     ASSERT_EQ(reads.size(), 2);
     EXPECT_EQ(reads[0].target, "?foo.bar.crackle");
@@ -343,7 +354,7 @@ TEST(Inspection, DependencyGraphResolvesRelativeReadsAndConditions) {
     ASSERT_EQ(condition->reads.size(), 1);
     EXPECT_EQ(condition->reads.front().target, "?foo.bar.result");
     EXPECT_TRUE(condition->composition.has_value());
-    const auto neighborhood = dip::inspect_dependency_neighborhood(env, "foo.bar.result");
+    const auto neighborhood = view.dependency_neighborhood("foo.bar.result");
     ASSERT_EQ(neighborhood.dependencies.size(), 3);
     EXPECT_EQ(neighborhood.dependencies[0].id, "?foo.bar.crackle");
     EXPECT_EQ(neighborhood.dependencies[1].id, "?snap");
@@ -358,7 +369,7 @@ TEST(Inspection, DependencyGraphConnectsBranchDecisionsToValues) {
     dip::DIP parser;
     parser.add_string("enabled bool = true\n@if ({?enabled} == true)\n  answer int = 42\n@end\n");
     const auto env = parser.parse(true);
-    const auto& graph = env.dependency_graph();
+    const auto& graph = dip::Inspector{env}.graph();
     const auto* decision = graph.latest("#case:1", dip::DependencyEventKind::Decision);
     ASSERT_NE(decision, nullptr);
     ASSERT_EQ(decision->reads.size(), 1);
@@ -372,7 +383,7 @@ TEST(Inspection, DependencyGraphConnectsBranchDecisionsToValues) {
     dip::Environment restored;
     restored.load(file);
     std::filesystem::remove(file);
-    const auto* restored_answer = restored.dependency_graph().latest("?answer", dip::DependencyEventKind::Value);
+    const auto* restored_answer = dip::Inspector{restored}.graph().latest("?answer", dip::DependencyEventKind::Value);
     ASSERT_NE(restored_answer, nullptr);
     EXPECT_EQ(restored_answer->controlled_by, answer->controlled_by);
 }
@@ -419,17 +430,21 @@ TEST(Inspection, ArtifactDetectionAndFreshReload) {
     { std::ofstream output(bad); output << "answer int = \"bad\"\n"; }
 
     auto env = dip::open_artifact(good);
-    EXPECT_FALSE(env.dependency_graph().recorded);
-    EXPECT_TRUE(dip::open_artifact(good, true).dependency_graph().recorded);
+
+    const dip::Inspector view{env};
+    EXPECT_FALSE(view.graph().recorded);
+    const auto recorded_env = dip::open_artifact(good, true);
+    const dip::Inspector recorded_view{recorded_env};
+    EXPECT_TRUE(recorded_view.graph().recorded);
     EXPECT_EQ(env["answer"].as<int>(), 7);
-    EXPECT_EQ(dip::inspect_value(env, "answer").declaration_location.source, good.string());
+    EXPECT_EQ(view.value("answer").declaration_location.source, good.string());
     EXPECT_THROW(dip::reload_artifact(env, bad), std::exception);
     EXPECT_EQ(env["answer"].as<int>(), 7);
     env.save(snapshot);
     dip::reload_artifact(env, snapshot);
     EXPECT_TRUE(env.is_loaded_snapshot());
     EXPECT_EQ(env["answer"].as<int>(), 7);
-    auto snapshot_value = dip::inspect_value(env, "answer");
+    auto snapshot_value = view.value("answer");
     EXPECT_EQ(snapshot_value.declaration_location.source, good.string());
     EXPECT_EQ(snapshot_value.value->get_dtype(), snapshot_value.type);
 
@@ -442,22 +457,24 @@ TEST(Inspection, BoundedInMemorySlice) {
     dip::DIP parser;
     parser.add_string("samples int[5] = [1, 2, 3, 4, 5]\n");
     const auto env = parser.parse();
-    const auto summary = dip::inspect_value_summary(env, "samples");
+    const dip::Inspector view{env};
+    const auto summary = view.value_summary("samples");
     EXPECT_EQ(summary.shape, (val::Array::ShapeType{5}));
     EXPECT_EQ(summary.elements, 5);
-    auto slice = dip::read_value_slice(env, "samples", {{1, 3}});
+    auto slice = view.value_slice("samples", {{1, 3}});
     const auto* integers = dynamic_cast<const val::ArrayValue<int64_t>*>(slice.get());
     ASSERT_NE(integers, nullptr);
     EXPECT_EQ(integers->get_values(), (std::vector<int64_t>{2, 3, 4}));
-    EXPECT_THROW(dip::read_value_slice(env, "samples", {{4, 7}}), std::out_of_range);
-    EXPECT_THROW(dip::read_value_slice(env, "samples", {}), std::invalid_argument);
+    EXPECT_THROW(view.value_slice("samples", {{4, 7}}), std::out_of_range);
+    EXPECT_THROW(view.value_slice("samples", {}), std::invalid_argument);
 }
 
 TEST(Inspection, AppliedModificationHistorySurvivesSnapshot) {
     dip::DIP parser;
     parser.add_string("answer int = 1\nanswer = 2\nanswer = 3\n");
     auto env = parser.parse();
-    auto value = dip::inspect_value(env, "answer");
+    const dip::Inspector view{env};
+    auto value = view.value("answer");
     ASSERT_EQ(value.changes.size(), 3);
     EXPECT_EQ(value.changes[0].kind, dip::ValueChangeKind::Declaration);
     EXPECT_EQ(value.changes[1].kind, dip::ValueChangeKind::Modification);
@@ -465,7 +482,7 @@ TEST(Inspection, AppliedModificationHistorySurvivesSnapshot) {
     EXPECT_EQ(value.changes[2].location.line, 3);
     EXPECT_EQ(env["answer"].as<int>(), 3);
     const dip::SourceEntity answer{dip::SourceEntityKind::Path, "answer", {}};
-    auto locations = dip::inspect_source_locations(env, answer);
+    auto locations = view.source_locations(answer);
     ASSERT_EQ(locations.size(), 3);
     EXPECT_EQ(locations[0].role, dip::SourceLocationRole::Modification);
     EXPECT_EQ(locations[0].modification_index, 2);
@@ -475,11 +492,11 @@ TEST(Inspection, AppliedModificationHistorySurvivesSnapshot) {
     const auto snapshot = std::filesystem::temp_directory_path() / ("snt-inspection-history-" + suffix + ".diph5");
     env.save(snapshot);
     dip::reload_artifact(env, snapshot);
-    value = dip::inspect_value(env, "answer");
+    value = view.value("answer");
     ASSERT_EQ(value.changes.size(), 3);
     EXPECT_EQ(value.changes[1].location.line, 2);
     EXPECT_EQ(value.changes[2].location.line, 3);
-    locations = dip::inspect_source_locations(env, answer);
+    locations = view.source_locations(answer);
     ASSERT_EQ(locations.size(), 3);
     EXPECT_EQ(locations[0].logical_line, 3);
     EXPECT_FALSE(locations[0].source_text_available);
@@ -491,21 +508,20 @@ TEST(Inspection, ReadOnlyTableViewSurvivesSnapshot) {
     parser.add_string("measurements table = \"\"\"speed float m/s\ncount int\n---\n2 1\n3 2\n\"\"\"\n");
     parser.add_string("measurements.extra int[2] = [8, 9]\n");
     auto env = parser.parse();
+    const dip::Inspector view{env};
 
-    const auto table = dip::inspect_table(env, "measurements");
+    const auto table = view.table("measurements");
     EXPECT_EQ(table.rows, 2);
     ASSERT_EQ(table.columns.size(), 2);
     EXPECT_EQ(table.columns[0].name, "speed");
     EXPECT_EQ(table.columns[1].path, "measurements.count");
     EXPECT_TRUE(table.columns[0].units.has_value());
-    EXPECT_TRUE(dip::inspect_capabilities(env, "measurements").hasTabularData);
-    EXPECT_EQ(dip::inspect_value(env, "measurements.count").table_path, "measurements");
-    EXPECT_TRUE(dip::inspect_value(env, "measurements.extra").table_path.empty());
-    EXPECT_EQ(dip::inspect_tables(env).size(), 1);
-    const auto table_sources = dip::inspect_source_locations(
-        env, {dip::SourceEntityKind::Path, "measurements", {}});
-    const auto column_sources = dip::inspect_source_locations(
-        env, {dip::SourceEntityKind::Path, "measurements.count", {}});
+    EXPECT_TRUE(view.capabilities("measurements").hasTabularData);
+    EXPECT_EQ(view.value("measurements.count").table_path, "measurements");
+    EXPECT_TRUE(view.value("measurements.extra").table_path.empty());
+    EXPECT_EQ(view.tables().size(), 1);
+    const auto table_sources = view.source_locations({dip::SourceEntityKind::Path, "measurements", {}});
+    const auto column_sources = view.source_locations({dip::SourceEntityKind::Path, "measurements.count", {}});
     const auto has_table_declaration = [](const auto& locations) {
         return std::any_of(locations.begin(), locations.end(), [](const auto& location) {
             return location.role == dip::SourceLocationRole::Declaration &&
@@ -519,11 +535,11 @@ TEST(Inspection, ReadOnlyTableViewSurvivesSnapshot) {
     const auto snapshot = std::filesystem::temp_directory_path() / ("snt-inspection-table-" + suffix + ".diph5");
     env.save(snapshot);
     dip::reload_artifact(env, snapshot);
-    const auto restored = dip::inspect_table(env, "measurements");
+    const auto restored = view.table("measurements");
     EXPECT_EQ(restored.rows, 2);
     ASSERT_EQ(restored.columns.size(), 2);
     EXPECT_EQ(restored.columns[0].name, "speed");
     EXPECT_EQ(restored.columns[1].name, "count");
-    EXPECT_THROW(dip::inspect_table(env, "measurements.extra"), std::out_of_range);
+    EXPECT_THROW(view.table("measurements.extra"), std::out_of_range);
     std::filesystem::remove(snapshot);
 }

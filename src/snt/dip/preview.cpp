@@ -1,10 +1,10 @@
 #include <snt/dip/preview.h>
 
 #include <snt/dip/dip.h>
+#include <snt/dip/artifact.h>
 #include <snt/dip/inspect/diagnostic.h>
-#include <snt/dip/inspect/inspection.h>
 
-#include "inspect/artifact_input.h"
+#include "artifact_input.h"
 
 #include <stdexcept>
 #include <set>

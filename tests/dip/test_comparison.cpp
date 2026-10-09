@@ -32,6 +32,9 @@ TEST(Comparison, ValuesAndBoundedText) {
     const auto text = dip::render_comparison(result, 1);
     EXPECT_NE(text.find("1 added, 1 removed, 1 changed"), std::string::npos);
     EXPECT_NE(text.find("... 2 more differences"), std::string::npos);
+    const dip::Comparison comparison{before, after};
+    EXPECT_EQ(comparison.result().differences.size(), 3);
+    EXPECT_EQ(comparison.render(1), text);
 }
 
 TEST(Comparison, ScopeAndDiph5RoundTrip) {
@@ -56,6 +59,10 @@ TEST(Comparison, ScopeAndDiph5RoundTrip) {
     after.save(second);
     EXPECT_TRUE(dip::compare_diph5(first, second).equal());
     EXPECT_FALSE(dip::compare_diph5(first, second, options).equal());
+    const dip::Comparison comparison{first, second, options};
     std::filesystem::remove(first);
     std::filesystem::remove(second);
+    EXPECT_FALSE(comparison.equal());
+    EXPECT_EQ(comparison.result().scope, dip::ComparisonScope::Full);
+    EXPECT_NE(comparison.render().find("Full DIPH5 comparison"), std::string::npos);
 }

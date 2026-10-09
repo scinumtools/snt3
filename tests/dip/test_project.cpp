@@ -5,8 +5,7 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
-#include <snt/dip/inspect/inspection.h>
-#include <snt/dip/inspect/semantic.h>
+#include <snt/dip/inspect/inspector.h>
 #include <string>
 #include <utility>
 
@@ -83,8 +82,7 @@ TEST(Project, UnitDeclarationHasInspectableSource) {
     parser.add_file(project.path() / "units.dip");
     const auto env = parser.parse();
 
-    const auto locations = dip::inspect_source_locations(
-        env, {dip::SourceEntityKind::Unit, "local_length", {}});
+    const auto locations = dip::Inspector{env}.source_locations({dip::SourceEntityKind::Unit, "local_length", {}});
     ASSERT_EQ(locations.size(), 1);
     EXPECT_EQ(locations.front().role, dip::SourceLocationRole::Definition);
     EXPECT_EQ(locations.front().source.path, (project.path() / "units.dip").string());
@@ -222,6 +220,7 @@ TEST(Project, RegistersSchemaFilesAndStrings) {
     dip::DIP parser;
     parser.add_project(project.path() / "DIPfile");
     const dip::Environment env = parser.parse();
+    const dip::Inspector view{env};
 
     EXPECT_EQ(env["first.value"].as<int64_t>(), 42);
     EXPECT_EQ(env["second.value"].as<int64_t>(), 43);
@@ -239,8 +238,7 @@ TEST(Project, RegistersSchemaFilesAndStrings) {
     EXPECT_EQ(env.schemas.at("from_string").registration_line, 6);
     EXPECT_EQ(env.schemas.at("from_file").registration_source_name, file_source.parent.name);
     EXPECT_EQ(env.schemas.at("from_string").registration_source_name, string_source.parent.name);
-    const auto inline_locations = dip::inspect_source_locations(
-        env, {dip::SourceEntityKind::Schema, "from_string", {}});
+    const auto inline_locations = view.source_locations({dip::SourceEntityKind::Schema, "from_string", {}});
     ASSERT_EQ(inline_locations.size(), 2);
     EXPECT_EQ(inline_locations[0].role, dip::SourceLocationRole::Definition);
     EXPECT_EQ(inline_locations[1].role, dip::SourceLocationRole::Registration);
@@ -248,10 +246,9 @@ TEST(Project, RegistersSchemaFilesAndStrings) {
     EXPECT_EQ(inline_locations[1].line, 6);
     EXPECT_EQ(inline_locations[0].logical_source_name, string_source.name);
     EXPECT_TRUE(inline_locations[0].embedded_registration);
-    const auto value_locations = dip::inspect_source_locations(
-        env, {dip::SourceEntityKind::Path, "second.value", {}});
-    const auto inspected_value = dip::inspect_value(env, "second.value");
-    const auto described_value = dip::describe(env, "second.value");
+    const auto value_locations = view.source_locations({dip::SourceEntityKind::Path, "second.value", {}});
+    const auto inspected_value = view.value("second.value");
+    const auto described_value = view.describe("second.value");
     ASSERT_FALSE(value_locations.empty());
     ASSERT_TRUE(described_value.declaration);
     EXPECT_EQ(inspected_value.declaration_location.source, described_value.declaration->source);
@@ -296,6 +293,7 @@ TEST(Project, ParameterViewerExampleStaysBrowsable) {
     dip::DIP parser;
     parser.add_project(project);
     const dip::Environment env = parser.parse(true);
+    const dip::Inspector view{env};
 
     EXPECT_DOUBLE_EQ(env["experiment.geometry.length"].as<double>(), 3.0);
     EXPECT_DOUBLE_EQ(env["experiment.average_speed"].as<double>(), 0.375);
@@ -314,11 +312,11 @@ TEST(Project, ParameterViewerExampleStaysBrowsable) {
     EXPECT_TRUE(env.get_node("experiment.geometry.length")->override);
     EXPECT_FALSE(env.get_applied_schemas("experiment.probes[1].accuracy").empty());
     EXPECT_EQ(env.get_node("experiment.readings.temperature")->value->get_shape().at(0), 4);
-    EXPECT_TRUE(env.dependency_graph().recorded);
+    EXPECT_TRUE(view.graph().recorded);
 
     const auto locations = [&](dip::SourceEntityKind kind, std::string name,
                                std::string source = {}, std::size_t index = 0) {
-        return dip::inspect_source_locations(env, {kind, std::move(name), std::move(source), index});
+        return view.source_locations({kind, std::move(name), std::move(source), index});
     };
     const auto value = locations(dip::SourceEntityKind::Path, "experiment.geometry.length");
     ASSERT_EQ(value.size(), 2);

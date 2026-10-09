@@ -517,20 +517,6 @@ namespace snt::dip {
         return selected;
     }
 
-    ValueNode::ListType Environment::select(const std::string& request, const TagFilter& tags) const {
-        ValueNode::ListType selected;
-        for (const auto& node : selected_nodes(request, tags))
-            selected.push_back(std::dynamic_pointer_cast<ValueNode>(node->clone(node->path, std::nullopt)));
-        return selected;
-    }
-
-    std::vector<std::string> Environment::select_paths(const std::string& request,
-                                                       const TagFilter& tags) const {
-        std::vector<std::string> paths;
-        for (const auto& node : selected_nodes(request, tags)) paths.push_back(node->path.name);
-        return paths;
-    }
-
     ValueNode::ListType Environment::request_group(
         const std::string& request, const RequestType rtype, const std::vector<std::string>& tags
     ) const {

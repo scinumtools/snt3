@@ -46,7 +46,7 @@ DataCells read_array_page(const dip::Environment& environment, const std::string
             ranges.push_back({fixed_indices[axis], fixed_indices[axis]});
         }
     }
-    auto page = dip::read_value_slice(environment, path, ranges);
+    auto page = dip::Inspector{environment}.value_slice(path, ranges);
     DataCells cells(rows, std::vector<std::string>(columns));
     std::vector<std::size_t> retained_axes;
     for (std::size_t axis = 0; axis < shape.size(); ++axis)
@@ -76,7 +76,7 @@ DataCells read_table_page(const dip::Environment& environment, const dip::TableI
     DataCells cells(rows, std::vector<std::string>(columns));
     for (std::size_t column = 0; column < columns; ++column) {
         const auto& info = table.columns[column_start + column];
-        auto page = dip::read_value_slice(environment, info.path, {{row_start, row_start + rows - 1}});
+        auto page = dip::Inspector{environment}.value_slice(info.path, {{row_start, row_start + rows - 1}});
         for (std::size_t row = 0; row < rows; ++row)
             cells[row][column] = scalar_text(*page, {row});
     }

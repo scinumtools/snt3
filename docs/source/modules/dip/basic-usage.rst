@@ -54,7 +54,8 @@ instead of registering its units, sources, and code inputs individually:
 Environment
 -----------
 
-Use two main approaches to access nodes in an environment, in both C++ and Python:
+In C++, use a read-only ``Inspector`` for discovery and detailed inspection.
+The environment also provides a cursor for direct access to a known path:
 
 * **Cursor:** inspect a known path and traverse groups and collections.
 * **Select:** discover value nodes by path and tags, returning independent
@@ -91,9 +92,12 @@ environment.
 Select: discover and inspect nodes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use ``select()`` to find value nodes and inspect their tags and metadata directly:
+Use ``Inspector::select()`` to find value nodes and inspect their tags and
+metadata directly:
 
 .. code-block:: cpp
+
+   #include <snt/dip/inspect/inspector.h>
 
    snt::dip::DIP dip;
    dip.add_string(
@@ -107,7 +111,8 @@ Use ``select()`` to find value nodes and inspect their tags and metadata directl
    filter.all = {"export", "runtime"};
    filter.any = {"hydro", "gravity"};
    filter.none = {"internal", "deprecated"};
-   for (const auto& node : env.select("?physics.", filter)) {
+   snt::dip::Inspector view{env};
+   for (const auto& node : view.select("?physics.", filter)) {
        std::cout << node->path.name << ": " << node->to_string()
                  << " — " << node->metadata.description << '\n';
        for (const auto& tag : node->tags)

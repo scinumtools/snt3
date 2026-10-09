@@ -90,6 +90,51 @@ settings and provenance are stored as dataset attributes.
 
 * `Source specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md>`_
 
+.. _dip-diph5-comparison:
+
+Comparing DIPH5 snapshots
+-------------------------
+
+Construct a :cpp:class:`snt::dip::Comparison <snt::dip::snt::dip::Comparison>` with two DIPH5 snapshots. It
+loads and compares them once, then lets you inspect or render the result as
+often as needed. The result contains added, removed, and changed entries
+sorted by category and path. Each changed value lists the fields that differ. Arrays report the count
+of changed elements and a bounded sample of flat, zero-based indices. The
+plain-text renderer limits the number of entries while keeping the totals.
+
+.. code-block:: cpp
+
+   #include <snt/dip/comparison.h>
+
+   snt::dip::Comparison comparison{"before.diph5", "after.diph5"};
+   std::cout << comparison.render(50);
+
+The default ``Effective`` scope compares persisted value paths, declared and
+stored types, shapes, units, and element values. ``Full`` also compares tags,
+metadata, options, provenance, settings, and source, trace, and schema
+manifests. ``equal()`` means equal within the selected scope; it does not
+compare HDF5 bytes or layout. Numeric comparison is exact, with two NaNs
+treated as equal. Array examples are controlled by
+``ComparisonOptions::max_array_examples``.
+
+.. code-block:: cpp
+
+   snt::dip::ComparisonOptions options;
+   options.scope = snt::dip::ComparisonScope::Full;
+   options.max_array_examples = 5;
+   snt::dip::Comparison comparison{"before.diph5", "after.diph5", options};
+   if (!comparison.equal()) {
+       for (const auto& difference : comparison.result().differences) {
+           // Use the structured differences in your application.
+       }
+   }
+
+For applications using the command layer, :cpp:class:`snt::api::DIPCompare`
+provides the same comparison and text rendering. See also the
+:doc:`CLI <../../integrations/cli>`, :doc:`REST <../../integrations/rest>`,
+:doc:`Python <../../integrations/python>`, and :doc:`C <../../integrations/c>`
+interfaces.
+
 Full DIPH5 specification
 ------------------------
 

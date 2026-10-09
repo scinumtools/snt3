@@ -109,11 +109,11 @@ int main() {
         const auto example = std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "examples/dip/ParameterViewer/DIPfile";
         const auto relative_example = std::filesystem::relative(example);
         snt::view::ViewerModel project(relative_example);
-        const auto cube = snt::dip::inspect_value_summary(project.environment(), "experiment.response_cube");
+        const snt::dip::Inspector view{project.environment()};
+        const auto cube = view.value_summary("experiment.response_cube");
         check(cube.shape == (snt::val::Array::ShapeType{2, 2, 3}) && cube.elements == 12,
               "The example cube has the wrong inspection shape");
-        auto cube_page = snt::dip::read_value_slice(project.environment(), "experiment.response_cube",
-                                                    {{1, 1}, {0, 1}, {1, 2}});
+        auto cube_page = view.value_slice("experiment.response_cube", {{1, 1}, {0, 1}, {1, 2}});
         const auto* cube_values = dynamic_cast<const snt::val::ArrayValue<double>*>(cube_page.get());
         check(cube_values && cube_values->get_size() == 4 && cube_values->get_value(0) == 2.1 &&
                   cube_values->get_value(3) == 2.5,
@@ -131,15 +131,13 @@ int main() {
                   transposed_cells[0][0] == "1.4" && transposed_cells[0][1] == "2.4" &&
                   transposed_cells[1][0] == "1.5" && transposed_cells[1][1] == "2.5",
               "The cube page does not follow its selected row and column axes");
-        const auto series = snt::dip::inspect_value_summary(project.environment(), "experiment.sample_series");
+        const auto series = view.value_summary("experiment.sample_series");
         const auto series_cells = snt::view::read_array_page(project.environment(),
             "experiment.sample_series", series.shape, {0}, 0, 0, 24, 0, 24, 8);
         check(series_cells.size() == 12 && series_cells.front()[0] == "24" &&
                   series_cells.back()[0] == "35", "The series does not display its final page");
-        const auto named_curve = snt::dip::inspect_value_summary(project.environment(),
-                                                                 "reference?calibration_curve");
-        auto named_page = snt::dip::read_value_slice(project.environment(),
-                                                    "reference?calibration_curve", {{1, 2}});
+        const auto named_curve = view.value_summary("reference?calibration_curve");
+        auto named_page = view.value_slice("reference?calibration_curve", {{1, 2}});
         const auto* named_values = dynamic_cast<const snt::val::ArrayValue<double>*>(named_page.get());
         check(named_curve.shape == (snt::val::Array::ShapeType{4}) && named_values &&
                   named_values->get_value(0) == 1.0 && named_values->get_value(1) == 1.02,
@@ -148,7 +146,7 @@ int main() {
             "reference?calibration_curve", named_curve.shape, {0}, 0, 0, 1, 0, 2, 1);
         check(named_cells.size() == 2 && named_cells[0][0] == "1" && named_cells[1][0] == "1.02",
               "The named-source array page shows incorrect values");
-        const auto table = snt::dip::inspect_table(project.environment(), "experiment.readings");
+        const auto table = view.table("experiment.readings");
         check(project.object("experiment.readings") && project.object("experiment.readings")->has_table,
               "The browser does not identify the example table");
         for (const auto& path : {"experiment.readings", "experiment.readings.time",
@@ -165,17 +163,16 @@ int main() {
         check(table_cells.size() == 2 && table_cells[0].size() == 3 &&
                   table_cells[0][0] == "1" && table_cells[1][0] == "2",
               "The table page does not follow its row offset and column order");
-        const auto extended = snt::dip::inspect_table(project.environment(), "experiment.extended_readings");
+        const auto extended = view.table("experiment.extended_readings");
         check(extended.rows == 48 && extended.columns.size() == 8,
               "The example's large table has the wrong shape");
         const auto extended_page = snt::view::read_table_page(project.environment(), extended, 32, 0, 32, 8);
         check(extended_page.size() == 16 && extended_page.front()[0] == "32" &&
                   extended_page.back()[0] == "47" && extended_page.front().size() == 8,
               "The example's large table cannot be read on its second page");
-        check(snt::dip::inspect_capabilities(project.environment(), "experiment.duration").hasReferenceGraph &&
-                  snt::dip::inspect_capabilities(project.environment(), "reference?lab_name").hasReferenceGraph &&
-                  snt::dip::inspect_capabilities(project.environment(),
-                                                 "reference?calibration_curve").hasArrayData,
+        check(view.capabilities("experiment.duration").hasReferenceGraph &&
+                  view.capabilities("reference?lab_name").hasReferenceGraph &&
+                  view.capabilities("reference?calibration_curve").hasArrayData,
               "Graph or Data capability is missing from the example browser");
         check(project.object("@project")->label == "Resolved nodes" &&
               project.object("@overrides")->label == "Overridden nodes",
@@ -366,7 +363,7 @@ int main() {
             "Named source path has the wrong identity"
         );
         check(project.value_node(*source)->value->to_string() == "\"North Lab\"", "Named source value is unavailable");
-        const auto reads = project.environment().dependency_graph().dependencies("?experiment.lab_name");
+        const auto reads = view.graph().dependencies("?experiment.lab_name");
         check(
             reads.size() == 1 && reads.front().target == "reference?lab_name" && project.object(reads.front().target),
             "Named source dependency is not navigable"
@@ -378,7 +375,7 @@ int main() {
             "Second source map is not browsable"
         );
         const auto catalog_reads =
-            project.environment().dependency_graph().dependencies("?experiment.instrument_family");
+            view.graph().dependencies("?experiment.instrument_family");
         check(
             catalog_reads.size() == 1 && catalog_reads.front().target == "catalog?devices[thermometer].family" &&
                 project.object(catalog_reads.front().target),
@@ -405,7 +402,7 @@ int main() {
                 raw_view.lines().front().spans.front().kind == snt::view::SyntaxKind::Text,
             "Raw source text should not receive DIPL syntax colors"
         );
-        const auto raw_reads = project.environment().dependency_graph().dependencies("?experiment.sample_values");
+        const auto raw_reads = view.graph().dependencies("?experiment.sample_values");
         check(
             raw_reads.size() == 1 && raw_reads.front().target == "raw_samples?" &&
                 project.object(raw_reads.front().target),
@@ -464,8 +461,7 @@ int main() {
         );
         project.environment().save(snapshot_path);
         snt::view::ViewerModel snapshot(snapshot_path);
-        const auto snapshot_table = snt::dip::inspect_table(snapshot.environment(),
-                                                             "experiment.extended_readings");
+        const auto snapshot_table = snt::dip::Inspector{snapshot.environment()}.table("experiment.extended_readings");
         check(snapshot_table.rows == 48 && snapshot_table.columns.size() == 8,
               "The large example table was not retained in the snapshot");
         check(

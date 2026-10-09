@@ -67,4 +67,8 @@ namespace snt::dip {
             output << "... " << result.differences.size() - count << " more differences\n";
         return output.str();
     }
+
+    std::string Comparison::render(std::size_t max_details) const {
+        return render_comparison(result_, max_details);
+    }
 } // namespace snt::dip

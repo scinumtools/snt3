@@ -1,7 +1,7 @@
 #include "model.h"
 
 #include <algorithm>
-#include <snt/dip/inspect/inspection.h>
+#include <snt/dip/inspect/inspector.h>
 #include <unordered_map>
 
 namespace snt::dip::report {
@@ -51,7 +51,7 @@ Document build_document(const dip::Environment& env, std::string input_label, st
     document.date = std::move(date);
     document.version = std::move(version);
     document.loaded_snapshot = loaded_snapshot;
-    const auto& graph = env.dependency_graph();
+    const auto& graph = dip::Inspector{env}.graph();
     document.graph_recorded = graph.recorded;
 
     for (const auto& node : env.nodes.get_nodes()) {
@@ -108,7 +108,7 @@ Document build_document(const dip::Environment& env, std::string input_label, st
                 item.used_by = std::move(found->second);
     }
 
-    for (const auto& inspected : dip::inspect_tables(env)) {
+    for (const auto& inspected : dip::Inspector{env}.tables()) {
         Table table;
         table.path = inspected.path;
         table.rows = inspected.rows;

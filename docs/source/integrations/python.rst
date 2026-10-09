@@ -74,7 +74,7 @@ compares persisted metadata and provenance.
    print(result.equal, result.added, result.removed, result.changed)
 
 The command layer also provides ``scinumtools3.api.dip.DIPCompare``. See
-:doc:`DIPH5 comparison <../modules/dip/comparison>` for the compared fields.
+:ref:`DIPH5 comparison <dip-diph5-comparison>` for the compared fields.
 
 Application adapters
 --------------------

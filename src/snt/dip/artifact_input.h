@@ -1,5 +1,5 @@
-#ifndef SNT_DIP_INSPECT_ARTIFACT_INPUT_H
-#define SNT_DIP_INSPECT_ARTIFACT_INPUT_H
+#ifndef SNT_DIP_ARTIFACT_INPUT_H
+#define SNT_DIP_ARTIFACT_INPUT_H
 
 #include <snt/dip/dip.h>
 

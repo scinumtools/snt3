@@ -1,5 +1,7 @@
 #include "viewer_model.h"
 
+#include <snt/dip/artifact.h>
+
 #include <algorithm>
 #include <functional>
 #include <utility>
@@ -60,6 +62,7 @@ std::string ViewerModel::display_file_path(const std::string& path) const {
 }
 
 void ViewerModel::rebuild_objects() {
+    const dip::Inspector view{environment_};
     objects_.clear();
     objects_.emplace("", ObjectInfo{"", artifact_.filename().string(), "", {}, false,
                                      dip::Path::Kind::None, ObjectRole::Artifact});
@@ -167,11 +170,11 @@ void ViewerModel::rebuild_objects() {
         objects_.emplace(id, std::move(item));
         objects_.at("@local").children.push_back(id);
     }
-    if (!dip::inspect_block_inputs(environment_).empty()) {
+    if (!view.block_inputs().empty()) {
         objects_.emplace("@blocks", ObjectInfo{"@blocks", "Block value sources", "", {}, false,
                                                 dip::Path::Kind::None, ObjectRole::BlockSources});
     }
-    for (const auto& [path, input] : dip::inspect_block_inputs(environment_)) {
+    for (const auto& [path, input] : view.block_inputs()) {
         const std::string id = "@block?" + path;
         const std::string label = path + (input.kind == dip::BlockInput::Kind::Table ? " (table)" : " (array)");
         objects_.emplace(id, ObjectInfo{id, label, "@blocks", {}, false,
@@ -279,6 +282,7 @@ dip::ValueNode::PointerType ViewerModel::value_node(const ObjectInfo& object) co
 }
 
 std::vector<SourceTarget> ViewerModel::source_targets(const ObjectInfo& object) const {
+    const dip::Inspector view{environment_};
     if (dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPH5) return {};
     if (object.role == ObjectRole::Artifact || object.role == ObjectRole::Project ||
         object.role == ObjectRole::DIPfile)
@@ -289,7 +293,7 @@ std::vector<SourceTarget> ViewerModel::source_targets(const ObjectInfo& object) 
                  entry.resolved_path.empty() ? entry.line : 1, {}}};
     }
     if (object.role == ObjectRole::BlockSource) {
-        const auto& input = dip::inspect_block_inputs(environment_).at(object.node_path);
+        const auto& input = view.block_inputs().at(object.node_path);
         const auto& source = environment_.sources.at(input.source_name);
         std::filesystem::path file = source.path;
         std::size_t line = input.source_line;
@@ -325,7 +329,7 @@ std::vector<SourceTarget> ViewerModel::source_targets(const ObjectInfo& object) 
         if (source.table_text) format = SourceFormat::Table;
         else if (source.raw_text) format = SourceFormat::Plain;
     }
-    for (const auto& location : dip::inspect_source_locations(environment_, entity)) {
+    for (const auto& location : view.source_locations(entity)) {
         if (!location.source_text_available || location.source.path.empty()) continue;
         std::filesystem::path file(location.source.path);
         if (file.is_relative()) file = std::filesystem::absolute(file);

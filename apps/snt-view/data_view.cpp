@@ -268,11 +268,12 @@ void DataViewState::reset(const ViewerModel& model) {
     if (!object) return;
     value_path = object->source_name.empty() ? object->node_path : object->path;
     try {
-        const auto capabilities = dip::inspect_capabilities(model.environment(), value_path);
+        const dip::Inspector view{model.environment()};
+        const auto capabilities = view.capabilities(value_path);
         if (capabilities.hasTabularData) {
-            table = dip::inspect_table(model.environment(), object->node_path);
+            table = view.table(object->node_path);
         } else if (capabilities.hasArrayData) {
-            summary = dip::inspect_value_summary(model.environment(), value_path);
+            summary = view.value_summary(value_path);
             const auto& shape = summary->shape;
             fixed_indices.resize(shape.size(), 0);
             row_axis = shape.size() > 1 ? shape.size() - 2 : 0;

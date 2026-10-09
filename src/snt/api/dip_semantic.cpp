@@ -1,6 +1,7 @@
 #include <snt/api/dip_semantic.h>
 
-#include <snt/dip/inspect/inspection.h>
+#include <snt/dip/artifact.h>
+#include <snt/dip/inspect/inspector.h>
 
 #include <algorithm>
 #include <iomanip>
@@ -149,7 +150,7 @@ std::string DIPSemantic::describe_json(const std::string& path, std::size_t max_
                                        bool record_dependency_graph) const {
     const auto env = dip::open_artifact(input_, record_dependency_graph);
     std::ostringstream out;
-    description(out, dip::describe(env, path, max_value_elements));
+    description(out, dip::Inspector{env}.describe(path, max_value_elements));
     return out.str();
 }
 
@@ -157,7 +158,7 @@ std::string DIPSemantic::list_json(const std::string& query, const dip::TagFilte
                                    std::size_t limit, std::size_t max_value_elements,
                                    bool record_dependency_graph) const {
     const auto env = dip::open_artifact(input_, record_dependency_graph);
-    const auto result = dip::list_descriptions(env, query, tags, limit, max_value_elements);
+    const auto result = dip::Inspector{env}.list_descriptions(query, tags, limit, max_value_elements);
     std::ostringstream out;
     out << "{\"schema_version\":\"1\",\"total\":" << result.total
         << ",\"truncated\":" << (result.items.size() < result.total ? "true" : "false")

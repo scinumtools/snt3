@@ -2,6 +2,7 @@
 #include "browser_view.h"
 #include "source_view.h"
 
+#include <snt/dip/artifact.h>
 #include <snt/core/datatypes.h>
 #include <snt/dip/inspect/dependency_graph.h>
 
@@ -29,6 +30,7 @@ void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
     cache.valid = true;
     const auto* object = model.object(model.selection());
     if (!object) return;
+    const dip::Inspector view{model.environment()};
     cache.source_targets = model.source_targets(*object);
     cache.fields.emplace_back("Path", object->role == ObjectRole::Artifact ||
                                       object->role == ObjectRole::DIPfile ||
@@ -89,8 +91,8 @@ void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
             named.raw_text ? "Raw source" : "Named DIPL source");
         if (named.raw_text)
             cache.fields.emplace_back("Size", std::to_string(named.code.size()) + " bytes");
-        if (model.environment().dependency_graph().recorded)
-            cache.readers = model.environment().dependency_graph().referenced_by(object->path);
+        if (view.graph().recorded)
+            cache.readers = view.graph().referenced_by(object->path);
         return;
     }
     if (object->role == ObjectRole::CodeSource && object->manifest_index) {
@@ -103,7 +105,7 @@ void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
         return;
     }
     if (object->role == ObjectRole::BlockSource) {
-        const auto& input = dip::inspect_block_inputs(model.environment()).at(object->node_path);
+        const auto& input = view.block_inputs().at(object->node_path);
         cache.fields.emplace_back("Kind", input.kind == dip::BlockInput::Kind::Table
             ? "Table block value" : "Array block value");
         cache.fields.emplace_back("Data", "Open the Data tab to browse evaluated values");
@@ -117,7 +119,7 @@ void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
     if (!object->has_value) {
         cache.fields.emplace_back("Kind", object->path.empty() ? "Artifact" : object_kind_name(*object));
         if (object->has_table) {
-            const auto table = dip::inspect_table(model.environment(), object->node_path);
+            const auto table = view.table(object->node_path);
             cache.fields.emplace_back("Rows", std::to_string(table.rows));
             cache.fields.emplace_back("Columns", std::to_string(table.columns.size()));
             cache.fields.emplace_back("Data", "Open the Data tab to browse table values");
@@ -177,7 +179,7 @@ void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
             }
         }
 
-        const auto& graph = model.environment().dependency_graph();
+        const auto& graph = view.graph();
         if (graph.recorded) {
             const std::string graph_path = object->source_name.empty()
                 ? "?" + object->node_path : object->path;
@@ -244,6 +246,7 @@ void draw_source_view(const ViewerModel& model, const SourceView& source,
 
 void draw_inspector(ViewerModel& model, InspectorCache& cache, SourceView& source,
                     bool& select_source_tab, bool& scroll_to_target, std::string& source_error) {
+    const dip::Inspector view{model.environment()};
     if (!cache.valid || cache.path != model.selection() || cache.revision != model.revision())
         refresh_inspector(model, cache);
     if (const auto* object = model.object(model.selection())) {
@@ -273,7 +276,7 @@ void draw_inspector(ViewerModel& model, InspectorCache& cache, SourceView& sourc
                 if (clicked) {
                     const bool opened = target.block_path
                         ? source.open_text(target.file, target.line,
-                                           dip::inspect_block_inputs(model.environment()).at(*target.block_path).code,
+                                           view.block_inputs().at(*target.block_path).code,
                                            target.format, source_error)
                         : source.open(target.file, target.line, source_error, target.format);
                     if (opened) {

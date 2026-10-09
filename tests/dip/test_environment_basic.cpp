@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
@@ -193,16 +194,17 @@ TEST(Environment, SelectSnapshots) {
         "physics_extra int = 4\n"
     );
     auto env = parser.parse();
-    const auto all = env.select();
+    dip::Inspector view{env};
+    const auto all = view.select();
     ASSERT_EQ(all.size(), 4);
-    const auto subtree = env.select("?physics.");
+    const auto subtree = view.select("?physics.");
     ASSERT_EQ(subtree.size(), 3);
     EXPECT_EQ(subtree[0]->path.name, "physics");
     EXPECT_EQ(subtree[1]->path.name, "physics.speed");
     EXPECT_EQ(subtree[2]->path.name, "physics.samples[0].value");
-    EXPECT_EQ(env.select("?physics.samples.").size(), 1);
-    EXPECT_TRUE(env.select("?missing").empty());
-    auto selected = env.select("?physics.", {{"export", "runtime"}, {}, {}});
+    EXPECT_EQ(view.select("?physics.samples.").size(), 1);
+    EXPECT_TRUE(view.select("?missing").empty());
+    auto selected = view.select("?physics.", {{"export", "runtime"}, {}, {}});
     ASSERT_EQ(selected.size(), 1);
     auto snapshot = selected.front();
     auto original = env.nodes.at(1);

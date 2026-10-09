@@ -1,5 +1,6 @@
 #include <snt/dip/inspect/diagnostic.h>
-#include <snt/dip/inspect/inspection.h>
+#include <snt/dip/artifact.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/val/value_base.h>
 
 #include <exception>
@@ -45,8 +46,9 @@ int main() {
     try {
         const fs::path project = "examples/dip/InspectionGraph/DIPfile";
         auto env = snt::dip::open_artifact(project, true); // Graph recording is opt-in.
+        snt::dip::Inspector view{env};
 
-        const auto speed = snt::dip::inspect_value(env, "experiment.speed");
+        const auto speed = view.value("experiment.speed");
         std::cout << "Value: " << speed.path << " = " << speed.value->to_string();
         if (speed.units)
             std::cout << ' ' << speed.units->to_string();
@@ -56,7 +58,7 @@ int main() {
         print_location(std::cout, speed.declaration_location);
         std::cout << '\n';
 
-        const auto distance = snt::dip::inspect_value(env, "experiment.distance");
+        const auto distance = view.value("experiment.distance");
         std::cout << "\nDistance history:\n";
         for (const auto& change : distance.changes) {
             std::cout << "  " << change_name(change.kind) << " at ";
@@ -64,14 +66,14 @@ int main() {
             std::cout << '\n';
         }
 
-        const auto table = snt::dip::inspect_table(env, "measurements");
+        const auto table = view.table("measurements");
         std::cout << "\nTable: " << table.path << " (" << table.rows << " rows)\n";
         for (const auto& column : table.columns)
             std::cout << "  " << column.name << " -> " << column.path << '\n';
-        const auto slice = snt::dip::read_value_slice(env, "samples", {{1, 3}});
+        const auto slice = view.value_slice("samples", {{1, 3}});
         std::cout << "\nSamples [1..3]: " << slice->to_string() << '\n';
 
-        const auto& graph = env.dependency_graph();
+        const auto& graph = view.graph();
         std::cout << "\nGraph recorded: " << (graph.recorded ? "yes" : "no") << '\n';
         std::cout << "\nSpeed reads:\n";
         for (const auto& edge : graph.dependencies("?experiment.speed"))

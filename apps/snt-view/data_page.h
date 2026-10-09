@@ -1,7 +1,7 @@
 #ifndef SNT_VIEW_DATA_PAGE_H
 #define SNT_VIEW_DATA_PAGE_H
 
-#include <snt/dip/inspect/inspection.h>
+#include <snt/dip/inspect/inspector.h>
 
 #include <cstddef>
 #include <string>

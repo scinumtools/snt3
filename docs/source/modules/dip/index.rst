@@ -26,10 +26,8 @@ calculated*, and *what constraints it must satisfy*.
   and input sources.
 * :doc:`DIPfile projects <projects>` — reusable manifests for complete
   parameter environments.
-* :doc:`Environment persistence <persistence>` — saving and loading
-  evaluated environments in DIPH5 format from C++.
-* :doc:`DIPH5 comparison <comparison>` — summarized differences between
-  evaluated snapshots.
+* :doc:`Environment persistence <persistence>` — saving, loading, and
+  comparing evaluated environments in DIPH5 format.
 * :doc:`Traceability and source identities <traceability>` — following
   DIPL inputs and registered constructs through diagnostics and DIPH5.
 * :doc:`Inspecting and reloading environments <inspection>` — reading
@@ -48,7 +46,6 @@ calculated*, and *what constraints it must satisfy*.
    basic-usage
    projects
    persistence
-   comparison
    traceability
    inspection
    generation

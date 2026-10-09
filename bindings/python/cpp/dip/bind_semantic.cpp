@@ -2,7 +2,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl/filesystem.h>
 
-#include <snt/dip/inspect/semantic.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/preview.h>
 
 namespace py = pybind11;
@@ -51,14 +51,16 @@ void init_semantic(py::module_& m) {
         .def_readonly("accepted_override_targets", &dip::PreviewResult::accepted_override_targets)
         .def_readonly("comparison", &dip::PreviewResult::comparison);
 
-    m.def("describe", &dip::describe, py::arg("env"), py::arg("path"),
+    m.def("describe", [](const dip::Environment& env, std::string_view path, std::size_t max_value_elements) {
+        return dip::Inspector{env}.describe(path, max_value_elements);
+    }, py::arg("env"), py::arg("path"),
           py::arg("max_value_elements") = 16);
     m.def("list_descriptions", [](const dip::Environment& env, const std::string& query,
                                    const std::vector<std::string>& all,
                                    const std::vector<std::string>& any,
                                    const std::vector<std::string>& none,
                                    std::size_t limit, std::size_t max_value_elements) {
-        return dip::list_descriptions(env, query, dip::TagFilter{all, any, none}, limit,
+        return dip::Inspector{env}.list_descriptions(query, dip::TagFilter{all, any, none}, limit,
                                       max_value_elements);
     }, py::arg("env"), py::arg("query") = "?", py::kw_only(),
        py::arg("tags_all") = std::vector<std::string>{},

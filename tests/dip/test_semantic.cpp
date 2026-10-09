@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <snt/dip/dip.h>
-#include <snt/dip/inspect/semantic.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/preview.h>
 
 #include <filesystem>
@@ -17,7 +17,7 @@ TEST(DIPSemantic, RichDescriptionWithRecordedReads) {
     snt::dip::DIP parser;
     parser.add_file(rich_fixture);
     const auto env = parser.parse(true);
-    const auto value = snt::dip::describe(env, "simulation.speed");
+    const auto value = snt::dip::Inspector{env}.describe("simulation.speed");
     EXPECT_EQ(value.value_text, "3");
     EXPECT_EQ(value.units, "m*s-1");
     EXPECT_EQ(value.metadata.description, "Average speed calculated from distance and duration");
@@ -37,8 +37,9 @@ TEST(DIPSemantic, DescribeAndListBoundValues) {
     snt::dip::DIP parser;
     parser.add_file(fixture);
     const auto env = parser.parse();
+    const snt::dip::Inspector view{env};
 
-    const auto value = snt::dip::describe(env, "experiment.steps");
+    const auto value = view.describe("experiment.steps");
     EXPECT_EQ(value.path, "experiment.steps");
     EXPECT_EQ(value.kind, "value");
     EXPECT_EQ(value.declared_type, "int32");
@@ -59,20 +60,20 @@ TEST(DIPSemantic, DescribeAndListBoundValues) {
     ASSERT_TRUE(value.declaration);
     EXPECT_EQ(value.declaration->source, fixture.string());
     EXPECT_EQ(value.declaration->line, 3);
-    const auto inspected = snt::dip::inspect_value(env, "experiment.steps");
+    const auto inspected = view.value("experiment.steps");
     EXPECT_TRUE(value.shape.empty()); // Descriptions display scalars without the storage dimension.
     EXPECT_EQ(inspected.shape, (snt::val::Array::ShapeType{1}));
     EXPECT_EQ(value.tags, inspected.tags);
     EXPECT_EQ(value.metadata.description, inspected.metadata.description);
     EXPECT_EQ(value.declaration->source, inspected.declaration_location.source);
 
-    const auto large = snt::dip::describe(env, "experiment.gains", 2);
+    const auto large = view.describe("experiment.gains", 2);
     EXPECT_FALSE(large.value_text);
     EXPECT_EQ(large.value_unavailable_reason, "omitted_by_limit");
     EXPECT_EQ(large.elements, 3);
     EXPECT_EQ(large.shape, (snt::val::Array::ShapeType{3}));
 
-    const auto listed = snt::dip::list_descriptions(env, "?experiment.", {}, 2);
+    const auto listed = view.list_descriptions("?experiment.", {}, 2);
     EXPECT_EQ(listed.total, 4);
     ASSERT_EQ(listed.items.size(), 2);
     EXPECT_EQ(listed.items[0].path, "experiment.title");
@@ -80,13 +81,15 @@ TEST(DIPSemantic, DescribeAndListBoundValues) {
     EXPECT_EQ(listed.items[0].value_unavailable_reason, "omitted_by_limit");
     EXPECT_EQ(listed.items[1].path, "experiment.steps");
     EXPECT_EQ(listed.items[1].value_unavailable_reason, "omitted_by_limit");
-    EXPECT_EQ(env.select_paths("?experiment.").size(), listed.total);
-    EXPECT_EQ(snt::dip::describe(env, "experiment").kind, "group");
-    EXPECT_EQ(snt::dip::describe(env, "sensors").kind, "collection");
+    EXPECT_EQ(view.select_paths("?experiment.").size(), listed.total);
+    EXPECT_EQ(view.describe("experiment").kind, "group");
+    EXPECT_EQ(view.describe("sensors").kind, "collection");
 
     snt::dip::DIP long_text_parser;
     long_text_parser.add_string("label str = \"" + std::string(5000, 'a') + "\"");
-    const auto long_text = snt::dip::describe(long_text_parser.parse(), "label");
+    const auto long_text_env = long_text_parser.parse();
+    const snt::dip::Inspector long_text_view{long_text_env};
+    const auto long_text = long_text_view.describe("label");
     EXPECT_FALSE(long_text.value_text);
     EXPECT_EQ(long_text.value_unavailable_reason, "omitted_by_byte_limit");
 }
@@ -96,8 +99,9 @@ TEST(DIPSemantic, SharedFactsStayAlignedForOverrides) {
     parser.add_string("speed float = 2 m/s\n  !tags [\"runtime\"]\n  ?descr \"Flow speed\"\n");
     parser.add_override_string("speed = 3 m/s\n");
     const auto env = parser.parse();
-    const auto inspected = snt::dip::inspect_value(env, "speed");
-    const auto described = snt::dip::describe(env, "speed");
+    const snt::dip::Inspector view{env};
+    const auto inspected = view.value("speed");
+    const auto described = view.describe("speed");
     EXPECT_TRUE(described.shape.empty());
     EXPECT_EQ(inspected.shape, (snt::val::Array::ShapeType{1}));
     EXPECT_EQ(described.tags, inspected.tags);
@@ -165,5 +169,7 @@ TEST(DIPSemantic, PreviewValidAndInvalidOverride) {
 
     snt::dip::DIP parser;
     parser.add_file(fixture);
-    EXPECT_EQ(snt::dip::describe(parser.parse(), "experiment.steps").value_text, "4");
+    const auto env = parser.parse();
+    const snt::dip::Inspector view{env};
+    EXPECT_EQ(view.describe("experiment.steps").value_text, "4");
 }

@@ -63,7 +63,7 @@ text summary:
 
 Set ``ComparisonOptions`` through ``set_options()`` to select full scope or
 change the array sample size. ``set_max_details()`` bounds ``execute()``
-output. See :doc:`DIPH5 comparison <../dip/comparison>` for the fields and
+output. See :ref:`DIPH5 comparison <dip-diph5-comparison>` for the fields and
 equality semantics.
 
 Semantic JSON for applications

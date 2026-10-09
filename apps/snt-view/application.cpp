@@ -119,7 +119,7 @@ namespace snt::view {
                         try {
                             const std::string inspect_path = selected->source_name.empty()
                                 ? selected->node_path : selected->path;
-                            const auto capabilities = dip::inspect_capabilities(model.environment(), inspect_path);
+                            const auto capabilities = dip::Inspector{model.environment()}.capabilities(inspect_path);
                             has_data = capabilities.hasArrayData || capabilities.hasTabularData;
                             has_graph = capabilities.hasReferenceGraph;
                         } catch (const std::out_of_range&) {

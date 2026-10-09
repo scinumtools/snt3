@@ -51,6 +51,24 @@ namespace snt::dip {
 
     /** Render a bounded plain-text summary, shared by the language interfaces. */
     std::string render_comparison(const ComparisonResult& result, std::size_t max_details = 50);
+
+    /** An owned comparison that can be inspected and rendered repeatedly.
+     * File construction loads and compares both DIPH5 snapshots once.
+     */
+    class Comparison {
+      public:
+        Comparison(const Environment& before, const Environment& after, const ComparisonOptions& options = {});
+        Comparison(const std::filesystem::path& before, const std::filesystem::path& after,
+                   const ComparisonOptions& options = {});
+        explicit Comparison(ComparisonResult result);
+
+        const ComparisonResult& result() const { return result_; }
+        bool equal() const { return result_.equal(); }
+        std::string render(std::size_t max_details = 50) const;
+
+      private:
+        ComparisonResult result_;
+    };
 } // namespace snt::dip
 
 #endif // SNT_DIP_COMPARISON_H

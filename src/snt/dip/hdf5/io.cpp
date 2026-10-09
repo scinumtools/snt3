@@ -8,6 +8,7 @@
 #include <limits>
 #include <optional>
 #include <set>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/val/values.h>
@@ -1412,7 +1413,7 @@ namespace snt::dip::hdf5 {
         write_source_manifest(output, env, file, options);
         write_trace_manifest(output, env);
         write_unit_manifest(output, env);
-        write_dependency_graph(output, env.dependency_graph());
+        write_dependency_graph(output, Inspector{env}.graph());
         for (const auto& node : env.nodes.get_nodes())
             if (node)
                 write_node(output, env, *node);

@@ -39,14 +39,6 @@ struct SemanticList {
     std::size_t total = 0;
 };
 
-SemanticDescription describe(const Environment& env, std::string_view path,
-                             std::size_t max_value_elements = 16);
-
-/** Select evaluated values using Environment::select query and tag semantics. */
-SemanticList list_descriptions(const Environment& env, const std::string& query = "?",
-                               const TagFilter& tags = {}, std::size_t limit = 100,
-                               std::size_t max_value_elements = 0);
-
 } // namespace snt::dip
 
 #endif

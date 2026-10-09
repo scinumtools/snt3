@@ -58,7 +58,7 @@ scope, 1 when different, and 2 for invalid input or an error.
    snt dip compare before.diph5 after.diph5 --scope full --max-details 20
 
 ``--max-array-examples N`` controls the number of flat array indices shown
-for each changed array. See :doc:`DIPH5 comparison <../modules/dip/comparison>`
+for each changed array. See :ref:`DIPH5 comparison <dip-diph5-comparison>`
 for scope semantics.
 
 Use ``dip parse`` with ``--input file`` to load a file or ``--input string``

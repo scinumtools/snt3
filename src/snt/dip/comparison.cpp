@@ -10,6 +10,7 @@
 #include <snt/val/values_string.h>
 #include <stdexcept>
 #include <tuple>
+#include <utility>
 
 namespace snt::dip {
     namespace {
@@ -372,4 +373,13 @@ namespace snt::dip {
         new_env.load(after);
         return compare(old_env, new_env, options);
     }
+
+    Comparison::Comparison(const Environment& before, const Environment& after, const ComparisonOptions& options)
+        : result_(compare(before, after, options)) {}
+
+    Comparison::Comparison(const std::filesystem::path& before, const std::filesystem::path& after,
+                           const ComparisonOptions& options)
+        : result_(compare_diph5(before, after, options)) {}
+
+    Comparison::Comparison(ComparisonResult result) : result_(std::move(result)) {}
 } // namespace snt::dip

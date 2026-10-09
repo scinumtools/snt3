@@ -83,7 +83,7 @@ flat indices. Use ``format=text`` for the same summary in plain text.
        'http://127.0.0.1:8080/snt/dip/compare?scope=full&format=text'
 
 The optional ``max_details`` and ``max_array_examples`` query parameters
-bound the output. See :doc:`DIPH5 comparison <../modules/dip/comparison>`.
+bound the output. See :ref:`DIPH5 comparison <dip-diph5-comparison>`.
 
 Send a DIPL document in the request body to ``POST /snt/dip/parse``. This can
 be inline text or a client-side file uploaded with ``curl --data-binary``; the

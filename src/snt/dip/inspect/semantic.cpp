@@ -1,4 +1,4 @@
-#include <snt/dip/inspect/semantic.h>
+#include <snt/dip/inspect/inspector.h>
 
 #include "value_facts.h"
 
@@ -16,11 +16,12 @@ std::string type_name(core::DataType type) {
 }
 } // namespace
 
-SemanticDescription describe(const Environment& env, std::string_view path, std::size_t max_value_elements) {
+SemanticDescription Inspector::describe(std::string_view path, std::size_t max_value_elements) const {
+    const auto& env = *env_;
     SemanticDescription result;
     result.path = std::string(path);
-    const auto capabilities = inspect_capabilities(env, path);
-    result.dependencies_recorded = env.dependency_graph().recorded;
+    const auto capabilities = this->capabilities(path);
+    result.dependencies_recorded = this->graph().recorded;
     result.kind = capabilities.hasValue ? "value" : capabilities.hasTabularData ? "table" : "group";
     if (!capabilities.hasValue && !capabilities.hasTabularData &&
         env.hierarchy.has_collection(result.path)) {
@@ -56,21 +57,20 @@ SemanticDescription describe(const Environment& env, std::string_view path, std:
     result.enforced_condition = facts.enforced_condition;
     result.enforced_options = facts.enforced_options;
     if (result.dependencies_recorded)
-        result.dependencies = env.dependency_graph().dependencies("?" + result.path);
+        result.dependencies = this->graph().dependencies("?" + result.path);
     return result;
 }
 
-SemanticList list_descriptions(const Environment& env, const std::string& query,
-                               const TagFilter& tags, std::size_t limit,
-                               std::size_t max_value_elements) {
+SemanticList Inspector::list_descriptions(const std::string& query, const TagFilter& tags,
+                                          std::size_t limit, std::size_t max_value_elements) const {
     SemanticList result;
     if (query.empty() || query.front() != '?')
         throw std::invalid_argument("Description lists require an evaluated path query beginning with ?.");
-    const auto paths = env.select_paths(query, tags);
+    const auto paths = select_paths(query, tags);
     result.total = paths.size();
     for (const auto& path : paths) {
         if (result.items.size() >= limit) break;
-        result.items.push_back(describe(env, path, max_value_elements));
+        result.items.push_back(describe(path, max_value_elements));
     }
     return result;
 }

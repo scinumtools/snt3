@@ -3,7 +3,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl/filesystem.h>
-#include <snt/dip/inspect/inspection.h>
+#include <snt/dip/artifact.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/core/diagnostic.h>
 
 #include <utility>
@@ -149,27 +150,33 @@ void init_inspection(py::module_& m) {
     }, py::arg("env"), py::arg("path"),
           py::arg("record_dependency_graph") = false,
           "Replace an Environment after successful load; request graph recording again for parsed source.");
-    m.def("inspect_value", &dip::inspect_value, py::arg("env"), py::arg("path"),
+    m.def("inspect_value", [](const dip::Environment& env, std::string_view path) {
+        return dip::Inspector{env}.value(path);
+    }, py::arg("env"), py::arg("path"),
           "Return an owned snapshot of an evaluated value and its provenance.");
     m.def("inspect_values", [](const dip::Environment& env) {
         py::list result;
-        for (auto& value : dip::inspect_values(env)) result.append(py::cast(std::move(value)));
+        for (auto& value : dip::Inspector{env}.values()) result.append(py::cast(std::move(value)));
         return result;
     }, py::arg("env"), "Return value snapshots in environment order.");
-    m.def("inspect_capabilities", &dip::inspect_capabilities, py::arg("env"), py::arg("path"),
+    m.def("inspect_capabilities", [](const dip::Environment& env, std::string_view path) {
+        return dip::Inspector{env}.capabilities(path);
+    }, py::arg("env"), py::arg("path"),
           "Return supported inspection operations and retained facts at a path.");
-    m.def("inspect_dependency_graph", [](const dip::Environment& env) { return env.dependency_graph(); },
+    m.def("inspect_dependency_graph", [](const dip::Environment& env) { return dip::Inspector{env}.graph(); },
           py::arg("env"), "Return an owned graph of evaluated DIP reads and operation trees.");
-    m.def("inspect_table", &dip::inspect_table, py::arg("env"), py::arg("path"),
+    m.def("inspect_table", [](const dip::Environment& env, std::string_view path) {
+        return dip::Inspector{env}.table(path);
+    }, py::arg("env"), py::arg("path"),
           "Return table metadata with columns in DIPL header order.");
-    m.def("inspect_tables", &dip::inspect_tables, py::arg("env"),
+    m.def("inspect_tables", [](const dip::Environment& env) { return dip::Inspector{env}.tables(); }, py::arg("env"),
           "Return all evaluated tables in environment order.");
     m.def("read_value_slice", [](const dip::Environment& env, const std::string& path,
                                   const std::vector<std::pair<size_t, size_t>>& ranges, bool as_numpy) {
         val::Array::RangeType native_ranges;
         native_ranges.reserve(ranges.size());
         for (const auto& [first, last] : ranges) native_ranges.push_back({first, last});
-        auto value = dip::read_value_slice(env, path, native_ranges);
+        auto value = dip::Inspector{env}.value_slice(path, native_ranges);
         return as_numpy ? to_numpy_value(value) : to_python_value(value);
     }, py::arg("env"), py::arg("path"), py::arg("ranges"), py::kw_only(), py::arg("as_numpy") = false,
        "Read inclusive, zero-based ranges from an evaluated in-memory array.");

@@ -62,7 +62,7 @@ zero capacity to obtain the required size, including the terminating NUL.
        snt_dip_comparison_free(result);
    }
 
-See :doc:`DIPH5 comparison <../modules/dip/comparison>` for scope semantics.
+See :ref:`DIPH5 comparison <dip-diph5-comparison>` for scope semantics.
 
 Create a parser with ``snt_dip_parser_create``, add definitions with
 ``snt_dip_parser_add_string`` or ``snt_dip_parser_add_file``, and call

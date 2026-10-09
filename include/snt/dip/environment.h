@@ -110,10 +110,13 @@ namespace snt::dip {
         YAML,
     };
 
+    class Inspector;
+
     /**
      * Object of this class holds the whole DIP parsing environment
      */
     class Environment {
+        friend class Inspector;
       private:
         std::vector<SourceInfo> source_manifest_;
         std::vector<TraceInfo> trace_manifest_;
@@ -150,8 +153,6 @@ namespace snt::dip {
          */
         Environment();
 
-        /** Graph captured during DIP evaluation. Loaded snapshots may have no graph. */
-        const DependencyGraph& dependency_graph() const { return dependency_graph_; }
         /** Enable graph capture for this parse. */
         void set_dependency_recording(bool enabled) {
             dependency_recording_ = enabled;
@@ -322,20 +323,6 @@ namespace snt::dip {
             const RequestType rtype = RequestType::Reference,
             const std::vector<std::string>& tags = {}
         ) const;
-
-        /**
-         * Select independent snapshots with original fully qualified paths in environment order.
-         * `?` selects all values, `?path` an exact value, and `?path.` a subtree,
-         * including its value-bearing root and collection members. Each path is
-         * returned once. Filters combine with AND and match explicit, non-inherited
-         * tags. Selection does not modify the environment. No matches returns an
-         * empty list. Source-qualified queries are also supported.
-         */
-        ValueNode::ListType select(const std::string& request = "?", const TagFilter& tags = {}) const;
-
-        /** Select path names without cloning values or arrays. */
-        std::vector<std::string> select_paths(const std::string& request = "?",
-                                              const TagFilter& tags = {}) const;
 
         /**
          * Get a keyed collection of  nodes from a reference or a function based on a request expression

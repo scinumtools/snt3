@@ -98,7 +98,7 @@ void GraphViewState::reset(const ViewerModel& model) {
     const auto* object = model.object(path);
     if (!object) return;
     const std::string id = object->source_name.empty() ? "?" + object->node_path : object->path;
-    neighborhood = dip::inspect_dependency_neighborhood(model.environment(), id);
+    neighborhood = dip::Inspector{model.environment()}.dependency_neighborhood(id);
 }
 
 void draw_graph_view(ViewerModel& model, GraphViewState& state) {

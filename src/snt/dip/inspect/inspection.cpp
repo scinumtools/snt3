@@ -1,9 +1,7 @@
-#include <snt/dip/inspect/inspection.h>
+#include <snt/dip/inspect/inspector.h>
 
-#include "artifact_input.h"
 #include "value_facts.h"
 
-#include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 
 #include <algorithm>
@@ -63,69 +61,33 @@ core::SourceLocation project_source_location(const std::optional<InspectedSource
 }
 } // namespace
 
-ArtifactKind detect_artifact(const std::filesystem::path& path) {
-    if (path.filename() == "DIPfile") return ArtifactKind::Project;
-    const auto extension = path.extension().string();
-    if (extension == ".dip" || extension == ".dipl") return ArtifactKind::DIPL;
-    if (extension == ".dipt") return ArtifactKind::TableText;
-    if (extension == ".diph5") return ArtifactKind::DIPH5;
-    return ArtifactKind::Unknown;
+ValueNode::ListType Inspector::select(const std::string& query, const TagFilter& tags) const {
+    ValueNode::ListType selected;
+    for (const auto& node : env_->selected_nodes(query, tags))
+        selected.push_back(std::dynamic_pointer_cast<ValueNode>(node->clone(node->path, std::nullopt)));
+    return selected;
 }
 
-Environment open_artifact(const std::filesystem::path& path, bool record_dependency_graph,
-                          bool retain_block_inputs) {
-    switch (detect_artifact(path)) {
-    case ArtifactKind::Project:
-    case ArtifactKind::DIPL: {
-        DIP parser;
-        detail::register_parse_input(parser, path);
-        return parser.parse(record_dependency_graph, retain_block_inputs);
-    }
-    case ArtifactKind::DIPH5: {
-        Environment env;
-        env.load(path);
-        return env;
-    }
-    case ArtifactKind::TableText:
-        throw std::invalid_argument("A .dipt file requires a DIPL table declaration; it cannot be loaded alone.");
-    case ArtifactKind::Unknown:
-        throw std::invalid_argument("Unknown DIP artifact: " + path.string());
-    }
-    throw std::invalid_argument("Unknown DIP artifact.");
+std::vector<std::string> Inspector::select_paths(const std::string& query, const TagFilter& tags) const {
+    std::vector<std::string> paths;
+    for (const auto& node : env_->selected_nodes(query, tags)) paths.push_back(node->path.name);
+    return paths;
 }
 
-void detail::register_parse_input(DIP& parser, const std::filesystem::path& path) {
-    switch (detect_artifact(path)) {
-    case ArtifactKind::Project: parser.add_project(path); return;
-    case ArtifactKind::DIPL: parser.add_file(path); return;
-    case ArtifactKind::TableText:
-        throw std::invalid_argument("A .dipt file requires a DIPL table declaration; it cannot be loaded alone.");
-    case ArtifactKind::DIPH5:
-        throw std::invalid_argument("A .diph5 snapshot cannot be registered as parser input.");
-    case ArtifactKind::Unknown:
-        throw std::invalid_argument("Unknown DIP artifact: " + path.string());
-    }
-    throw std::invalid_argument("Unknown DIP artifact.");
-}
-
-void reload_artifact(Environment& current, const std::filesystem::path& path,
-                     bool record_dependency_graph, bool retain_block_inputs) {
-    Environment fresh = open_artifact(path, record_dependency_graph, retain_block_inputs);
-    current = std::move(fresh);
-}
-
-const std::map<std::string, BlockInput>& inspect_block_inputs(const Environment& env) {
+const std::map<std::string, BlockInput>& Inspector::block_inputs() const {
+    const auto& env = *env_;
     return env.block_inputs();
 }
 
-const BlockInput* inspect_block_input(const Environment& env, std::string_view path) {
+const BlockInput* Inspector::block_input(std::string_view path) const {
+    const auto& env = *env_;
     const auto& blocks = env.block_inputs();
     const auto found = blocks.find(std::string(path));
     return found == blocks.end() ? nullptr : &found->second;
 }
 
-std::vector<InspectedSourceLocation> inspect_source_locations(
-    const Environment& env, const SourceEntity& entity) {
+std::vector<InspectedSourceLocation> Inspector::source_locations(const SourceEntity& entity) const {
+    const auto& env = *env_;
     std::vector<InspectedSourceLocation> locations;
     const auto add = [&](SourceLocationRole role, const std::string& logical_name,
                          std::size_t logical_line, std::size_t modification_index = 0) {
@@ -252,7 +214,8 @@ detail::ValueFacts detail::inspect_value_facts(const Environment& env, std::stri
             node->condition, std::move(options)};
 }
 
-ValueInspection inspect_value(const Environment& env, std::string_view path) {
+ValueInspection Inspector::value(std::string_view path) const {
+    const auto& env = *env_;
     const auto facts = detail::inspect_value_facts(env, path);
     return {facts.path, facts.stored_type, facts.shape, facts.value->clone(),
             facts.units, facts.metadata, facts.tags, facts.provenance,
@@ -261,7 +224,8 @@ ValueInspection inspect_value(const Environment& env, std::string_view path) {
             facts.table_path, facts.changes};
 }
 
-ValueSummary inspect_value_summary(const Environment& env, std::string_view path) {
+ValueSummary Inspector::value_summary(std::string_view path) const {
+    const auto& env = *env_;
     const auto node = inspection_node(env, path);
     if (!node->value)
         throw std::invalid_argument("The DIP node has no evaluated value: " + std::string(path));
@@ -269,16 +233,18 @@ ValueSummary inspect_value_summary(const Environment& env, std::string_view path
             node->units, node->metadata, node->table_path};
 }
 
-std::vector<ValueInspection> inspect_values(const Environment& env) {
+std::vector<ValueInspection> Inspector::values() const {
+    const auto& env = *env_;
     std::vector<ValueInspection> result;
     result.reserve(env.nodes.size());
     for (const auto& node : env.nodes.get_nodes()) {
-        if (node && node->value) result.push_back(inspect_value(env, node->path.name));
+        if (node && node->value) result.push_back(value(node->path.name));
     }
     return result;
 }
 
-InspectionCapabilities inspect_capabilities(const Environment& env, std::string_view path) {
+InspectionCapabilities Inspector::capabilities(std::string_view path) const {
+    const auto& env = *env_;
     const std::string name(path);
     InspectionCapabilities capabilities;
     const auto separator = name.find('?');
@@ -304,7 +270,7 @@ InspectionCapabilities inspect_capabilities(const Environment& env, std::string_
         }
         if (!found && !capabilities.hasChildren)
             throw std::out_of_range("No evaluated DIP path found: " + name);
-        const auto& graph = env.dependency_graph();
+        const auto& graph = this->graph();
         const auto* value_event = graph.latest(name, DependencyEventKind::Value);
         const auto* condition_event = graph.latest(name, DependencyEventKind::Condition);
         capabilities.hasReferenceGraph =
@@ -325,12 +291,12 @@ InspectionCapabilities inspect_capabilities(const Environment& env, std::string_
             capabilities.hasProvenance = capabilities.hasSource || node->override ||
                                          !node->modification_lines.empty();
             capabilities.hasArrayData = node->value && !node->dimension.empty();
-            const auto* value_event = env.dependency_graph().latest("?" + name, DependencyEventKind::Value);
-            const auto* condition_event = env.dependency_graph().latest("?" + name, DependencyEventKind::Condition);
+            const auto* value_event = this->graph().latest("?" + name, DependencyEventKind::Value);
+            const auto* condition_event = this->graph().latest("?" + name, DependencyEventKind::Condition);
             capabilities.hasReferenceGraph =
                 (value_event && (!value_event->reads.empty() || value_event->composition.has_value())) ||
                 (condition_event && (!condition_event->reads.empty() || condition_event->composition.has_value())) ||
-                !env.dependency_graph().referenced_by("?" + name).empty();
+                !this->graph().referenced_by("?" + name).empty();
         }
         if (node->table_path == name) {
             found = true;
@@ -351,12 +317,13 @@ InspectionCapabilities inspect_capabilities(const Environment& env, std::string_
     return capabilities;
 }
 
-DependencyNeighborhood inspect_dependency_neighborhood(const Environment& env, std::string_view path) {
+DependencyNeighborhood Inspector::dependency_neighborhood(std::string_view path) const {
+    const auto& env = *env_;
     if (path.empty()) throw std::invalid_argument("A dependency neighborhood requires a path");
     DependencyNeighborhood result;
     result.id = path.front() == '?' || path.find('?') != std::string_view::npos
         ? std::string(path) : "?" + std::string(path);
-    const auto& graph = env.dependency_graph();
+    const auto& graph = this->graph();
     result.recorded = graph.recorded;
     if (!result.recorded) return result;
 
@@ -389,7 +356,8 @@ DependencyNeighborhood inspect_dependency_neighborhood(const Environment& env, s
     return result;
 }
 
-TableInspection inspect_table(const Environment& env, std::string_view path) {
+TableInspection Inspector::table(std::string_view path) const {
+    const auto& env = *env_;
     TableInspection table;
     table.path = std::string(path);
     const std::string prefix = table.path + ".";
@@ -413,18 +381,20 @@ TableInspection inspect_table(const Environment& env, std::string_view path) {
     return table;
 }
 
-std::vector<TableInspection> inspect_tables(const Environment& env) {
+std::vector<TableInspection> Inspector::tables() const {
+    const auto& env = *env_;
     std::vector<TableInspection> result;
     std::set<std::string> seen;
     for (const auto& node : env.nodes.get_nodes()) {
         if (node && !node->table_path.empty() && seen.insert(node->table_path).second)
-            result.push_back(inspect_table(env, node->table_path));
+            result.push_back(table(node->table_path));
     }
     return result;
 }
 
-val::BaseValue::PointerType read_value_slice(
-    const Environment& env, std::string_view path, const val::Array::RangeType& ranges) {
+val::BaseValue::PointerType Inspector::value_slice(
+    std::string_view path, const val::Array::RangeType& ranges) const {
+    const auto& env = *env_;
     const std::string name(path);
     const auto node = inspection_node(env, name);
     if (!node->value)

@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/dip.h>
 
 using namespace snt;
@@ -27,7 +28,7 @@ TEST(ReferencesRaw, BooleanValues) {
     EXPECT_EQ(env.nodes.size(), 1);
     EXPECT_TRUE(env.sources.at(source_name).named_source);
     EXPECT_TRUE(env.sources.at(source_name).raw_text);
-    const auto reads = env.dependency_graph().dependencies("?snap");
+    const auto reads = dip::Inspector{env}.graph().dependencies("?snap");
     ASSERT_EQ(reads.size(), 1);
     EXPECT_EQ(reads.front().target, source_name + "?");
 
