@@ -7,6 +7,8 @@ namespace snt::dip {
 
     class GroupNode : public BaseNode {
       public:
+        /** Schemas expanded by this declaration, recorded after its path resolves. */
+        std::vector<std::pair<std::string, bool>> new_schema_applications;
         static BaseNode::PointerType is_node(Parser& parser);
         GroupNode(Parser& parser) : BaseNode(parser, NodeDtype::Group) {};
         BaseNode::ListType parse(Environment& env) override;

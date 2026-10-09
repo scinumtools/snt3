@@ -99,6 +99,9 @@ Explain a value
    * - :cpp:func:`view.override_contract("physics.speed") <snt::dip::snt::dip::Inspector::override_contract>`
      - Classifies a proposed override path and reports its type, current shape,
        units, and enforced rules. Use it to prepare an override before preview.
+   * - :cpp:func:`view.schema_hierarchy() <snt::dip::snt::dip::Inspector::schema_hierarchy>`
+     - Lists reusable schema definitions, evaluated application sites, and the
+       schemas associated with each value. Use it to browse a model by schema.
    * - :cpp:func:`view.source_locations(source) <snt::dip::snt::dip::Inspector::source_locations>`
      - Finds declarations, modifications, and overrides for a
        ``SourceEntity``. Use for source navigation; entities can also be
@@ -109,6 +112,30 @@ Explain a value
    * - :cpp:func:`view.graph().dependencies("?physics.speed") <snt::dip::snt::dip::DependencyGraph::dependencies>`
      - Accesses recorded reads. The graph also exposes reverse references,
        evaluation history, and expression trees for calculation tracing.
+
+Browse reusable schemas
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A definition describes members that a schema can create. An application
+records where evaluation used the schema. A value association identifies the
+schema that supplied a particular evaluated value. These are separate facts:
+one definition may be applied at many paths, and an override does not change
+the definition.
+
+.. code-block:: cpp
+
+   auto hierarchy = view.schema_hierarchy();
+   for (const auto& definition : hierarchy.definitions)
+       std::cout << definition.id << ": " << definition.members.size() << " top-level members\n";
+   for (const auto& application : hierarchy.applications)
+       std::cout << application.path << ": " << application.schema_ids.front() << '\n';
+
+Members have nested ``members`` in declaration order. ``schema_refs`` names
+other definitions without copying their trees. Applications retain evaluation
+order and distinguish schemas inherited by collection items from explicit
+ones. Loaded DIPH5 snapshots have ``definitions_available == false`` and
+``applications_complete == false``: only retained effective associations can
+be reconstructed, without application origins or inheritance flags.
 
 Check a proposed change
 ~~~~~~~~~~~~~~~~~~~~~~~

@@ -76,6 +76,14 @@ namespace snt::dip {
         std::optional<SourceInfo> source; ///< Source identity and fingerprint when available.
     };
 
+    /** One schema relationship observed while evaluating a live input. */
+    struct SchemaApplicationEvent {
+        std::string path;
+        std::string schema_name;
+        bool inherited_from_collection = false;
+        core::SourceLocation origin;
+    };
+
     /** One DIPfile registration, retained in manifest order for live inspection. */
     struct ProjectEntry {
         enum class Kind { Unit, Source, Schema, Code, Override };
@@ -132,6 +140,7 @@ namespace snt::dip {
         mutable DependencyGraph dependency_graph_;
         mutable std::optional<size_t> active_dependency_event_;
         ExplicitDeclarations declarations_; ///< Live explicit path locations; absent from snapshots.
+        std::vector<SchemaApplicationEvent> schema_applications_;
 
         void record_dependency(const std::string& target, const std::string& request,
                                std::string_view operand = {}) const;
@@ -214,6 +223,13 @@ namespace snt::dip {
         const ExplicitDeclarations& declarations() const { return declarations_; }
         void record_declaration(const std::string& path, const Line& line) {
             declarations_.record(path, line);
+        }
+        /** Evaluation-order schema applications. Snapshots do not retain this history. */
+        const std::vector<SchemaApplicationEvent>& schema_applications() const { return schema_applications_; }
+        void record_schema_application(std::string path, std::string schema_name,
+                                       bool inherited, const Line& line) {
+            schema_applications_.push_back({std::move(path), std::move(schema_name), inherited,
+                {line.source.name, line.source.line_number, line.code}});
         }
 
         /**

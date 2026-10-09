@@ -5,6 +5,7 @@
 #include <snt/core/datatypes.h>
 #include <snt/core/string_format.h>
 
+#include <algorithm>
 #include <limits>
 #include <stdexcept>
 
@@ -71,6 +72,122 @@ SemanticList Inspector::list_descriptions(const std::string& query, const TagFil
     for (const auto& path : paths) {
         if (result.items.size() >= limit) break;
         result.items.push_back(describe(path, max_value_elements));
+    }
+    return result;
+}
+
+SchemaHierarchyInspection Inspector::schema_hierarchy() const {
+    const auto& env = *env_;
+    SchemaHierarchyInspection result;
+    result.definitions_available = !env.is_loaded_snapshot();
+    result.applications_complete = !env.is_loaded_snapshot();
+    for (const auto& source : env.get_source_manifest())
+        result.sources.emplace(source.name, source);
+
+    if (result.definitions_available) {
+        for (const auto& [name, schema] : env.schemas.entries()) {
+            SchemaDefinitionInspection definition;
+            definition.id = name;
+            definition.name = name;
+            definition.metadata = schema.metadata;
+            definition.origin = {schema.source_name, schema.source_line, {}};
+            struct Parent { size_t indent; std::string path; std::vector<size_t> indices; };
+            std::vector<Parent> parents;
+            for (const auto& node : schema.nodes) {
+                while (!parents.empty() && parents.back().indent >= node->indent)
+                    parents.pop_back();
+                SchemaMemberInspection member;
+                member.name = node->path.name;
+                member.relative_path = (parents.empty() ? "" : parents.back().path + ".") + member.name;
+                member.origin = {node->line.source.name, node->line.source.line_number, {}};
+                member.schema_refs = node->schemas;
+                if (node->dtype == NodeDtype::Group) {
+                    if (node->dtype_raw[1] == KEYWORD_MAP) member.kind = "map";
+                    else if (node->dtype_raw[1] == KEYWORD_LIST) member.kind = "list";
+                    else if (node->path.kind == Path::Kind::Map) member.kind = "map_item";
+                    else if (node->path.kind == Path::Kind::List) member.kind = "list_item";
+                    else member.kind = "group";
+                    if (member.schema_refs.empty()) member.schema_refs = node->value_raw;
+                } else if (node->dtype == NodeDtype::Table) member.kind = "table";
+                else member.kind = "value";
+                if (const auto value = std::dynamic_pointer_cast<ValueNode>(node)) {
+                    if (value->value_dtype != core::DataType::None)
+                        member.type = type_name(value->value_dtype);
+                    member.units = value->units_raw;
+                    member.dimensions = value->dimension;
+                    member.condition = value->condition;
+                    member.metadata = value->metadata;
+                    for (const auto& option : value->options)
+                        member.options.push_back(option.value_raw + (option.units_raw.empty() ? "" : " " + option.units_raw));
+                }
+                std::vector<SchemaMemberInspection>* children = &definition.members;
+                if (!parents.empty()) {
+                    for (const auto index : parents.back().indices)
+                        children = &children->at(index).members;
+                }
+                const size_t index = children->size();
+                children->push_back(std::move(member));
+                auto indices = parents.empty() ? std::vector<size_t>{} : parents.back().indices;
+                indices.push_back(index);
+                parents.push_back({node->indent, children->back().relative_path, std::move(indices)});
+            }
+            result.definitions.push_back(std::move(definition));
+        }
+    }
+
+    const auto kind_for = [&](const std::string& path) {
+        if (env.hierarchy.has_collection(path)) {
+            switch (env.hierarchy.get_collection(path).kind) {
+            case Path::Kind::Map: return std::string("map");
+            case Path::Kind::List: return std::string("list");
+            case Path::Kind::Item: {
+                const auto open = path.rfind('[');
+                const auto collection = open == std::string::npos ? "" : path.substr(0, open);
+                if (env.hierarchy.has_collection(collection))
+                    return env.hierarchy.get_collection(collection).kind == Path::Kind::List
+                        ? std::string("list_item") : std::string("map_item");
+                break;
+            }
+            default: break;
+            }
+        }
+        return std::string("group");
+    };
+    if (result.applications_complete) {
+        for (const auto& event : env.schema_applications()) {
+            if (!result.applications.empty()) {
+                auto& previous = result.applications.back();
+                if (previous.path == event.path &&
+                    previous.inherited_from_collection == event.inherited_from_collection &&
+                    previous.origin && previous.origin->source == event.origin.source &&
+                    previous.origin->line == event.origin.line) {
+                    previous.schema_ids.push_back(event.schema_name);
+                    continue;
+                }
+            }
+            result.applications.push_back({event.path, kind_for(event.path), {event.schema_name},
+                                           event.inherited_from_collection, event.origin});
+        }
+    } else {
+        // Old snapshots retain effective associations but no declaration order or origins.
+        std::vector<std::string> paths;
+        for (const auto& [path, collection] : env.hierarchy.get_collections())
+            if (!collection.schemas.empty()) paths.push_back(path);
+        std::sort(paths.begin(), paths.end());
+        for (const auto& path : paths) {
+            const auto& collection = env.hierarchy.get_collection(path);
+            result.applications.push_back({path, kind_for(path), collection.schemas, std::nullopt, std::nullopt});
+        }
+    }
+    for (const auto& node : env.nodes.get_nodes()) {
+        if (!node) continue;
+        SchemaValueAssociation value;
+        value.path = node->path.name;
+        for (const auto& schema : env.get_applied_schemas(value.path))
+            value.applied_schema_ids.push_back(schema.name);
+        if (const auto contributor = env.get_contributing_schema(value.path))
+            value.contributing_schema_id = contributor->name;
+        result.values.push_back(std::move(value));
     }
     return result;
 }

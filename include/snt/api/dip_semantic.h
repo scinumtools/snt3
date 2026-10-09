@@ -22,6 +22,7 @@ class DIPSemantic {
 
     std::string describe_json(const std::string& path, std::size_t max_value_elements = 16) const;
     std::string override_contract_json(const std::string& path) const;
+    std::string schemas_json() const;
     std::string list_json(const std::string& query = "?", const dip::TagFilter& tags = {},
                           std::size_t limit = 100, std::size_t max_value_elements = 0) const;
     std::string preview_json(const std::vector<dip::PreviewOverride>& overrides,

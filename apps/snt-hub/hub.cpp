@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -657,6 +658,18 @@ Json workspace_hub_record(const Workspace& current) {
     return read_json(current.root / "project.json").at("hub");
 }
 
+fs::path build_artifact(const fs::path& output, const std::string& declared, const char* label) {
+    if (declared.empty()) throw Error(std::string("Missing ") + label + " in build lock", 5);
+    const fs::path path(declared);
+    if (!path.is_absolute()) return inside(output, relative_path(declared, label));
+    const auto root = fs::weakly_canonical(output);
+    const auto resolved = fs::weakly_canonical(path);
+    const auto relative = resolved.lexically_relative(root);
+    if (relative.empty() || *relative.begin() == "..")
+        throw Error(std::string(label) + " escapes build output: " + declared, 5);
+    return resolved;
+}
+
 int workspace_build(const Workspace& current, const std::string& selected_setup,
                     const std::string& selected_profile) {
     const auto hub = workspace_hub_record(current);
@@ -694,19 +707,30 @@ int workspace_build(const Workspace& current, const std::string& selected_setup,
     }
     command.push_back("--output");
     command.push_back(staged.string());
-    const auto result = process(command, false);
+    const auto result = process(command);
     if (result.status == 127) throw Error("Adapter executable is unavailable", 4);
-    if (result.status != 0) return result.status;
+    if (result.status != 0) {
+        if (!result.output.empty())
+            std::cerr << result.output << (result.output.back() == '\n' ? "" : "\n");
+        const auto log_path = staged / "build.log";
+        if (fs::is_regular_file(log_path)) {
+            constexpr std::uintmax_t limit = 32 * 1024;
+            std::ifstream log(log_path, std::ios::binary);
+            const auto size = fs::file_size(log_path);
+            log.seekg(static_cast<std::streamoff>(size > limit ? size - limit : 0));
+            const std::string tail(std::istreambuf_iterator<char>{log}, std::istreambuf_iterator<char>{});
+            if (!tail.empty())
+                std::cerr << "Build log (last 32 KiB):\n" << tail << (tail.back() == '\n' ? "" : "\n");
+        }
+        return result.status;
+    }
     if (fs::is_symlink(staged / "build-lock.json"))
         throw Error("Adapter created a symlink for its build lock", 5);
     auto lock = read_json(staged / "build-lock.json");
     if (!lock.is_object() || number(lock, "schema_version") != 1)
         throw Error("Adapter produced an invalid build lock", 5);
-    text(lock, "compiler");
-    if (!lock.contains("build_options") || !lock.at("build_options").is_array())
-        throw Error("Adapter build lock needs a build_options array", 5);
-    const auto executable = inside(staged, relative_path(text(lock, "executable"), "built executable"));
-    const auto log = inside(staged, relative_path(text(lock, "build_log"), "build log"));
+    const auto executable = build_artifact(staged, text(lock, "executable"), "built executable");
+    const auto log = build_artifact(staged, text(lock, "build_log"), "build log");
     if (!fs::is_regular_file(executable) || !fs::is_regular_file(log))
         throw Error("Adapter did not produce its declared executable and build log", 5);
     lock["executable"] = executable.lexically_relative(fs::weakly_canonical(staged)).generic_string();
@@ -722,7 +746,9 @@ int workspace_build(const Workspace& current, const std::string& selected_setup,
     if (fs::symlink_status(destination).type() != fs::file_type::not_found)
         throw Error("Build output appeared during build: " + destination.string(), 5);
     fs::rename(staged, destination);
-    std::cout << "Built " << profile << " in " << destination << '\n';
+    std::cout << "Built " << profile << '\n'
+              << "  Output: " << destination.string() << '\n'
+              << "  Build lock: build-lock.json (in output directory)\n";
     return 0;
 }
 

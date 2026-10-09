@@ -4,6 +4,7 @@
 #include <snt/dip/inspect/inspector.h>
 #include <snt/dip/preview.h>
 
+#include <algorithm>
 #include <filesystem>
 
 namespace {
@@ -11,6 +12,63 @@ const std::filesystem::path fixture =
     std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "tests/dip/fixtures/generated_parameters.dip";
 const std::filesystem::path rich_fixture =
     std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "examples/dip/SemanticDescription/parameters.dip";
+const std::filesystem::path schema_fixture =
+    std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "tests/dip/fixtures/schema_hierarchy.dip";
+}
+
+TEST(DIPSemantic, SchemaHierarchySeparatesDefinitionsApplicationsAndValues) {
+    snt::dip::DIP parser;
+    parser.add_file(schema_fixture);
+    parser.add_override_string("people[alice].age = 33");
+    const auto env = parser.parse();
+    const auto result = snt::dip::Inspector{env}.schema_hierarchy();
+    EXPECT_TRUE(result.definitions_available);
+    EXPECT_TRUE(result.applications_complete);
+    ASSERT_EQ(result.definitions.size(), 4);
+    const auto& person = result.definitions[1];
+    EXPECT_EQ(person.id, "person");
+    ASSERT_EQ(person.members.size(), 3);
+    EXPECT_EQ(person.members[1].relative_path, "residence");
+    EXPECT_EQ(person.members[1].schema_refs, std::vector<std::string>{"address"});
+    EXPECT_TRUE(person.members[1].members.empty());
+    const auto& unused = result.definitions[3];
+    ASSERT_EQ(unused.members.size(), 3);
+    EXPECT_EQ(unused.members[0].members[0].relative_path, "tuning.step");
+    EXPECT_EQ(unused.members[2].kind, "list_item");
+    EXPECT_EQ(unused.members[2].members[0].relative_path, "choices[].code");
+    ASSERT_EQ(result.applications.size(), 6);
+    EXPECT_EQ(result.applications[0].path, "people");
+    EXPECT_EQ(result.applications[1].path, "people[alice]");
+    EXPECT_EQ(result.applications[1].inherited_from_collection, true);
+    EXPECT_EQ(result.applications[2].schema_ids, std::vector<std::string>{"role"});
+    EXPECT_EQ(result.applications[2].inherited_from_collection, false);
+    const auto value = std::find_if(result.values.begin(), result.values.end(), [](const auto& item) {
+        return item.path == "people[alice].age";
+    });
+    ASSERT_NE(value, result.values.end());
+    EXPECT_EQ(value->applied_schema_ids, (std::vector<std::string>{"person", "role"}));
+    EXPECT_EQ(value->contributing_schema_id, "person");
+    EXPECT_EQ(env["people[alice].age"].as<int>(), 33);
+}
+
+TEST(DIPSemantic, SchemaApplicationsResolveListIndices) {
+    snt::dip::DIP parser;
+    parser.add_string("$schema item\n  mass int = 1\nitems list : item\nitems[]\nitems[]\n");
+    const auto env = parser.parse();
+    const auto result = snt::dip::Inspector{env}.schema_hierarchy();
+    ASSERT_EQ(result.applications.size(), 3);
+    EXPECT_EQ(result.applications[1].path, "items[0]");
+    EXPECT_EQ(result.applications[2].path, "items[1]");
+}
+
+TEST(DIPSemantic, SchemaApplicationsPreserveCompositionOrder) {
+    snt::dip::DIP parser;
+    parser.add_string("$schema first\n  one int = 1\n$schema second\n  two int = 2\nsettings : first, second\n");
+    const auto env = parser.parse();
+    const auto result = snt::dip::Inspector{env}.schema_hierarchy();
+    ASSERT_EQ(result.applications.size(), 1);
+    EXPECT_EQ(result.applications[0].path, "settings");
+    EXPECT_EQ(result.applications[0].schema_ids, (std::vector<std::string>{"first", "second"}));
 }
 
 TEST(DIPSemantic, RichDescriptionWithRecordedReads) {

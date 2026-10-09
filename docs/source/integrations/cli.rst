@@ -159,6 +159,7 @@ one evaluated path, while ``list`` selects values by path and explicit tags:
    snt dip list --project DIPfile --query '?simulation.' --limit 50 --format json
    snt dip list --project DIPfile --tag-all runtime --format json
    snt dip override-contract --project DIPfile --path simulation.steps --format json
+   snt dip schemas --project DIPfile --format json
 
 Use ``--input`` for a DIPL file or a DIPH5 snapshot. Values in the JSON
 response have a DIPL text encoding. Values exceeding ``--max-value-elements``
@@ -168,6 +169,14 @@ reports whether its result was truncated. Missing defaults and dependency
 graphs are marked unavailable instead of being inferred. Add
 ``--record-graph`` to ``describe`` or ``list`` to capture dependencies while
 parsing a DIPfile or DIPL input. A DIPH5 snapshot uses its saved graph state.
+
+``schemas`` returns the ``snt-schema-hierarchy/1`` contract: reusable member
+trees, ordered application sites, and each evaluated value's applied and
+contributing schema IDs. Schema IDs are registered names within this project.
+It preserves collection item paths such as ``items[key]``. For a DIPH5 input,
+``definitions_available`` and ``applications_complete`` are false; retained
+schema associations are still listed, while unknown origins and inheritance
+flags are null. This command does not modify the model.
 
 ``override-contract`` classifies an override target as ``existing_value``,
 ``existing_item``, ``new_item``, or ``unavailable``. It reports applicable
@@ -390,9 +399,11 @@ independently; a usable existing executable can be passed to ``run``.
    snt hub run --executable /path/to/solver
 
 Build profiles belong to the project. A recipe that requires a prepared setup
-checks its ``setup-lock.json``. A successful build creates ``build/PROFILE``
+checks its ``setup-lock.json``. A project may build from an inputs-only setup
+when that setup contains the required build configuration; running still
+requires a complete setup. A successful build creates ``build/PROFILE``
 and a ``build-lock.json`` recording the source revision, optional setup lock
-digest, compiler details supplied by the adapter, and executable SHA-256.
+digest, build details supplied by the adapter, and executable SHA-256.
 ``run`` accepts only a complete setup. It checks a matching build lock or
 hashes the explicitly named executable, then records its exit status and
 executable identity in the run directory's ``run-lock.json``, including if

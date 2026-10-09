@@ -112,6 +112,55 @@ struct OverrideContract {
     bool snapshot_input = false; ///< A snapshot has no parser input to preview directly.
 };
 
+/** A declared schema member. Children preserve source declaration order. */
+struct SchemaMemberInspection {
+    std::string name;
+    std::string relative_path;
+    std::string kind;
+    std::string type;
+    std::string units;
+    val::Array::RangeType dimensions;
+    std::vector<std::string> schema_refs;
+    std::vector<std::string> options;
+    std::string condition;
+    ValueMetadata metadata;
+    core::SourceLocation origin;
+    std::vector<SchemaMemberInspection> members;
+};
+
+struct SchemaDefinitionInspection {
+    std::string id; ///< Registered, project-scoped schema name.
+    std::string name;
+    ValueMetadata metadata;
+    core::SourceLocation origin;
+    std::vector<SchemaMemberInspection> members;
+};
+
+struct SchemaApplicationInspection {
+    std::string path;
+    std::string kind;
+    std::vector<std::string> schema_ids;
+    std::optional<bool> inherited_from_collection; ///< Unknown for legacy snapshots.
+    std::optional<core::SourceLocation> origin;
+};
+
+struct SchemaValueAssociation {
+    std::string path;
+    std::vector<std::string> applied_schema_ids;
+    std::optional<std::string> contributing_schema_id;
+};
+
+/** Definitions and evaluated application sites. Snapshot applications are
+ * reconstructed from retained associations and are explicitly incomplete. */
+struct SchemaHierarchyInspection {
+    bool definitions_available = false;
+    bool applications_complete = false;
+    std::vector<SchemaDefinitionInspection> definitions;
+    std::vector<SchemaApplicationInspection> applications;
+    std::vector<SchemaValueAssociation> values;
+    std::map<std::string, SourceInfo> sources; ///< Resolve origin source IDs to physical source identities.
+};
+
 /** One distinct value or source adjacent to a selected dependency-graph ID.
  * request and operand describe the first effective read connecting the pair.
  */

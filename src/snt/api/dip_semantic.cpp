@@ -47,6 +47,23 @@ void location(std::ostream& out, const std::optional<core::SourceLocation>& valu
     out << '}';
 }
 
+void schema_location(std::ostream& out, const std::optional<core::SourceLocation>& value,
+                     const std::map<std::string, dip::SourceInfo>& sources,
+                     const std::filesystem::path& input) {
+    if (!value) { out << "null"; return; }
+    out << "{\"source\":" << quote(value->source) << ",\"line\":" << value->line;
+    const auto found = sources.find(value->source);
+    if (found != sources.end() && !found->second.path.empty()) {
+        const auto source_path = std::filesystem::path(found->second.path);
+        const auto base = std::filesystem::absolute(input).parent_path();
+        const auto relative = (source_path.is_absolute() ? source_path : std::filesystem::absolute(source_path))
+                                  .lexically_relative(base);
+        if (!relative.empty() && *relative.begin() != "..")
+            out << ",\"file\":" << quote(relative.generic_string());
+    }
+    out << '}';
+}
+
 void metadata(std::ostream& out, const dip::ValueMetadata& value) {
     out << "{\"description\":" << quote(value.description)
         << ",\"authors\":" << quote(value.authors)
@@ -144,6 +161,36 @@ void diagnostics(std::ostream& out, const std::vector<core::Diagnostic>& values)
     }
     out << ']';
 }
+
+void schema_member(std::ostream& out, const dip::SchemaMemberInspection& value,
+                   const std::map<std::string, dip::SourceInfo>& sources,
+                   const std::filesystem::path& input) {
+    out << "{\"name\":" << quote(value.name) << ",\"relative_path\":" << quote(value.relative_path)
+        << ",\"kind\":" << quote(value.kind) << ",\"type\":";
+    if (value.type.empty()) out << "null"; else out << quote(value.type);
+    out << ",\"units\":";
+    if (value.units.empty()) out << "null"; else out << quote(value.units);
+    out << ",\"dimensions\":[";
+    for (size_t i = 0; i < value.dimensions.size(); ++i) {
+        if (i) out << ',';
+        out << "{\"min\":" << value.dimensions[i].dmin << ",\"max\":";
+        if (value.dimensions[i].dmax == val::Array::max_range) out << "null";
+        else out << value.dimensions[i].dmax;
+        out << '}';
+    }
+    out << "],\"schema_refs\":"; strings(out, value.schema_refs);
+    out << ",\"options\":"; strings(out, value.options);
+    out << ",\"condition\":";
+    if (value.condition.empty()) out << "null"; else out << quote(value.condition);
+    out << ",\"metadata\":"; metadata(out, value.metadata);
+    out << ",\"origin\":"; schema_location(out, value.origin, sources, input);
+    out << ",\"members\":[";
+    for (size_t i = 0; i < value.members.size(); ++i) {
+        if (i) out << ',';
+        schema_member(out, value.members[i], sources, input);
+    }
+    out << "]}";
+}
 } // namespace
 
 const dip::Inspector& DIPSemantic::inspector() const {
@@ -207,6 +254,57 @@ std::string DIPSemantic::override_contract_json(const std::string& path) const {
     strings(out, contract.item_schemas);
     out << ",\"snapshot_input\":" << (contract.snapshot_input ? "true" : "false")
         << ",\"requires_preview\":true}";
+    return out.str();
+}
+
+std::string DIPSemantic::schemas_json() const {
+    const auto result = inspector().schema_hierarchy();
+    std::ostringstream out;
+    out << "{\"schema\":\"snt-schema-hierarchy/1\",\"definitions_available\":"
+        << (result.definitions_available ? "true" : "false")
+        << ",\"applications_complete\":" << (result.applications_complete ? "true" : "false")
+        << ",\"definitions\":[";
+    for (size_t i = 0; i < result.definitions.size(); ++i) {
+        if (i) out << ',';
+        const auto& definition = result.definitions[i];
+        out << "{\"id\":" << quote(definition.id) << ",\"name\":" << quote(definition.name)
+            << ",\"metadata\":";
+        metadata(out, definition.metadata);
+        out << ",\"origin\":"; schema_location(out, definition.origin, result.sources, input_);
+        out << ",\"members\":[";
+        for (size_t j = 0; j < definition.members.size(); ++j) {
+            if (j) out << ',';
+            schema_member(out, definition.members[j], result.sources, input_);
+        }
+        out << "]}";
+    }
+    out << "],\"applications\":[";
+    for (size_t i = 0; i < result.applications.size(); ++i) {
+        if (i) out << ',';
+        const auto& application = result.applications[i];
+        out << "{\"path\":" << quote(application.path) << ",\"kind\":" << quote(application.kind)
+            << ",\"schema_ids\":";
+        strings(out, application.schema_ids);
+        out << ",\"inherited_from_collection\":";
+        if (application.inherited_from_collection)
+            out << (*application.inherited_from_collection ? "true" : "false");
+        else out << "null";
+        out << ",\"origin\":";
+        schema_location(out, application.origin, result.sources, input_);
+        out << '}';
+    }
+    out << "],\"values\":[";
+    for (size_t i = 0; i < result.values.size(); ++i) {
+        if (i) out << ',';
+        const auto& value = result.values[i];
+        out << "{\"path\":" << quote(value.path) << ",\"applied_schema_ids\":";
+        strings(out, value.applied_schema_ids);
+        out << ",\"contributing_schema_id\":";
+        if (value.contributing_schema_id) out << quote(*value.contributing_schema_id);
+        else out << "null";
+        out << '}';
+    }
+    out << "]}";
     return out.str();
 }
 

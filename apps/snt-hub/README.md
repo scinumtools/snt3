@@ -20,8 +20,9 @@ and a selected adapter when `SNT_HUB_TEST_ROOT`, `SNT_HUB_TEST_PROJECT`, and
 Optional `build` and `run` dispatch is available only when the pinned project
 record and catalogue both declare matching version-1 capabilities. The
 project's adapter owns compiler and solver commands. A build adapter writes
-`build-lock.json` with relative `executable` and `build_log` paths, plus
-compiler and build-option details; SNT verifies those files and adds revision
-and SHA-256 provenance. A run adapter can add command and launcher details to
+`build-lock.json` with `executable` and `build_log` paths, and any build
+command details it can report. SNT confines those paths to the staged build,
+normalizes them to relative paths before publishing, and adds revision and
+SHA-256 provenance. A run adapter can add command and launcher details to
 `run-lock.json`; SNT adds executable identity and exit status even when the
 adapter fails. Projects must opt in with reviewed recipes.

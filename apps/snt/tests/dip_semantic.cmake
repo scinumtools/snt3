@@ -64,3 +64,56 @@ if(NOT status EQUAL 0)
 endif()
 string(JSON expected GET "${expected_contract}" invalid_preview)
 check_json_output("invalid preview" "${output}" "${expected}")
+
+set(SCHEMA_INPUT "${SOURCE_DIR}/tests/dip/fixtures/schema_hierarchy.dip")
+execute_process(
+  COMMAND "${SNT_EXECUTABLE}" dip schemas --input "${SCHEMA_INPUT}" --format json
+  RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error)
+if(NOT status EQUAL 0)
+  message(FATAL_ERROR "schema hierarchy failed: ${error}")
+endif()
+string(JSON version GET "${output}" schema)
+if(NOT version STREQUAL "snt-schema-hierarchy/1")
+  message(FATAL_ERROR "Unexpected schema hierarchy version: ${version}")
+endif()
+string(JSON available GET "${output}" definitions_available)
+string(JSON complete GET "${output}" applications_complete)
+string(JSON definition_count LENGTH "${output}" definitions)
+string(JSON application_count LENGTH "${output}" applications)
+string(JSON nested_ref GET "${output}" definitions 1 members 1 schema_refs 0)
+string(JSON source_file GET "${output}" definitions 0 origin file)
+string(JSON item_path GET "${output}" applications 1 path)
+string(JSON inherited GET "${output}" applications 1 inherited_from_collection)
+string(JSON explicit_schema GET "${output}" applications 2 schema_ids 0)
+string(JSON contributing GET "${output}" values 0 contributing_schema_id)
+if(NOT available OR NOT complete OR NOT definition_count EQUAL 4 OR
+   NOT application_count EQUAL 6 OR NOT nested_ref STREQUAL "address" OR
+   NOT source_file STREQUAL "schema_hierarchy.dip" OR
+   NOT item_path STREQUAL "people[alice]" OR NOT inherited OR
+   NOT explicit_schema STREQUAL "role" OR NOT contributing STREQUAL "person")
+  message(FATAL_ERROR "Schema hierarchy content is wrong: ${output}")
+endif()
+
+set(SCHEMA_SNAPSHOT "${CMAKE_CURRENT_BINARY_DIR}/schema-hierarchy-test.diph5")
+execute_process(
+  COMMAND "${SNT_EXECUTABLE}" dip parse -i file "${SCHEMA_INPUT}" --save "${SCHEMA_SNAPSHOT}"
+  RESULT_VARIABLE status OUTPUT_VARIABLE saved ERROR_VARIABLE error)
+if(NOT status EQUAL 0)
+  message(FATAL_ERROR "schema snapshot save failed: ${error}")
+endif()
+execute_process(
+  COMMAND "${SNT_EXECUTABLE}" dip schemas --input "${SCHEMA_SNAPSHOT}" --format json
+  RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error)
+file(REMOVE "${SCHEMA_SNAPSHOT}")
+if(NOT status EQUAL 0)
+  message(FATAL_ERROR "schema snapshot inspection failed: ${error}")
+endif()
+string(JSON available GET "${output}" definitions_available)
+string(JSON complete GET "${output}" applications_complete)
+string(JSON definition_count LENGTH "${output}" definitions)
+string(JSON inherited_type TYPE "${output}" applications 1 inherited_from_collection)
+string(JSON snapshot_schema GET "${output}" applications 1 schema_ids 0)
+if(available OR complete OR NOT definition_count EQUAL 0 OR
+   NOT inherited_type STREQUAL "NULL" OR NOT snapshot_schema STREQUAL "person")
+  message(FATAL_ERROR "Schema snapshot availability is wrong: ${output}")
+endif()

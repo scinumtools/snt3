@@ -58,12 +58,18 @@ SemanticDescription = _dip.SemanticDescription
 OverrideTargetKind = _dip.OverrideTargetKind
 OverrideContract = _dip.OverrideContract
 SemanticList = _dip.SemanticList
+SchemaMemberInspection = _dip.SchemaMemberInspection
+SchemaDefinitionInspection = _dip.SchemaDefinitionInspection
+SchemaApplicationInspection = _dip.SchemaApplicationInspection
+SchemaValueAssociation = _dip.SchemaValueAssociation
+SchemaHierarchyInspection = _dip.SchemaHierarchyInspection
 PreviewOverrideKind = _dip.PreviewOverrideKind
 PreviewOverride = _dip.PreviewOverride
 PreviewResult = _dip.PreviewResult
 describe = _dip.describe
 override_contract = _dip.override_contract
 list_descriptions = _dip.list_descriptions
+schema_hierarchy = _dip.schema_hierarchy
 preview = _dip.preview
 
 

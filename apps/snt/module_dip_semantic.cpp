@@ -21,7 +21,7 @@ int module_dip_semantic(int argc, char* argv[]) {
     if (argc == 2 && std::string(argv[1]) == "--help") {
         std::cout << "Usage: snt dip " << command
                   << " --project DIPfile [--path PATH | --query QUERY] [options]\n"
-                     "  --input FILE             DIPfile, .dip, or .dipl; describe/list/override-contract also accept .diph5\n"
+                     "  --input FILE             DIPfile, .dip, or .dipl; describe/list/schemas/override-contract also accept .diph5\n"
                      "  --path PATH              Required for describe and override-contract\n"
                      "  --query QUERY            List selection (default ?)\n"
                      "  --tag-all/any/none TAG   Repeatable list filters\n"
@@ -83,6 +83,7 @@ int module_dip_semantic(int argc, char* argv[]) {
     const snt::api::DIPSemantic semantic(input, record_graph);
     if (command == "describe") std::cout << semantic.describe_json(path, max_value_elements) << '\n';
     else if (command == "override-contract") std::cout << semantic.override_contract_json(path) << '\n';
+    else if (command == "schemas") std::cout << semantic.schemas_json() << '\n';
     else if (command == "list") std::cout << semantic.list_json(query, tags, limit, max_value_elements) << '\n';
     else std::cout << semantic.preview_json(overrides, max_details) << '\n';
     return 0;

@@ -32,16 +32,19 @@ namespace snt::dip {
         } else {
             BaseNode::ListType nodes;
             if (schemas.empty()) { // since we output the same node, we have to avoid infinite loops
+                new_schema_applications.clear();
                 // Add schemas from collection definitions
                 std::string full_path =
                     env.hierarchy.resolve_list_selectors(env.hierarchy.get_current_path(indent, path.name, false).name);
                 std::vector<std::string> previous_schemas;
+                std::vector<std::string> inherited_schemas;
                 if (env.hierarchy.has_collection(full_path)) {
                     const Collection& col = env.hierarchy.get_collection(full_path);
                     if (col.kind == Path::Kind::Group) {
                         // This concrete group already expanded these schemas; a later block only continues it.
                         previous_schemas = col.schemas;
                     } else {
+                        inherited_schemas = col.schemas;
                         for (const auto& schema : col.schemas) {
                             if (std::find(schemas.begin(), schemas.end(), schema) == schemas.end()) {
                                 schemas.push_back(schema);
@@ -87,6 +90,9 @@ namespace snt::dip {
                 // A later declaration of a group can add schemas, but must not reapply earlier ones.
                 const auto schemas_to_apply = schemas;
                 if (!schemas_to_apply.empty()) {
+                    for (const auto& schema_name : schemas_to_apply)
+                        new_schema_applications.emplace_back(schema_name,
+                            std::find(inherited_schemas.begin(), inherited_schemas.end(), schema_name) != inherited_schemas.end());
                     schemas.insert(schemas.begin(), previous_schemas.begin(), previous_schemas.end());
                     nodes.push_back(shared_from_this()); // Now we return the group node ... (hence the infinite loop)
                     for (const auto& schema_name : schemas_to_apply) {

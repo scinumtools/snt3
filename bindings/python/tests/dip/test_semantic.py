@@ -8,6 +8,7 @@ from scinumtools3.dip import (
     override_contract,
     OverrideTargetKind,
     preview,
+    schema_hierarchy,
 )
 
 
@@ -58,3 +59,28 @@ def test_describe_list_and_preview_share_evaluated_paths(tmp_path):
     assert saved.declaration.source == inspected_saved.declaration_location.source
     assert saved.declaration.line == inspected_saved.declaration_location.line
     assert override_contract(open_artifact(snapshot), "physics.speed").snapshot_input
+
+
+def test_schema_hierarchy_preserves_definitions_and_snapshot_limits(tmp_path):
+    source = tmp_path / "model.dip"
+    source.write_text(
+        '$schema item\n'
+        '  mass int = 1\n'
+        'items list : item\n'
+        'items[]\n'
+    )
+    env = open_artifact(source)
+    live = schema_hierarchy(env)
+    assert live.definitions_available and live.applications_complete
+    assert live.definitions[0].id == "item"
+    assert live.definitions[0].members[0].relative_path == "mass"
+    assert [application.path for application in live.applications] == ["items", "items[0]"]
+    assert live.applications[1].inherited_from_collection is True
+    assert live.values[0].contributing_schema_id == "item"
+
+    snapshot = tmp_path / "model.diph5"
+    env.save(snapshot)
+    saved = schema_hierarchy(open_artifact(snapshot))
+    assert not saved.definitions_available and not saved.applications_complete
+    assert saved.definitions == []
+    assert saved.applications[1].inherited_from_collection is None

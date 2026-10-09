@@ -191,15 +191,21 @@ class HubCLITest(unittest.TestCase):
             "a = sys.argv[1:]\n"
             "def value(key): return Path(a[a.index(key) + 1])\n"
             "if a[0] == 'build':\n"
-            "    if os.environ.get('SNT_HUB_TEST_BUILD_EXIT'): sys.exit(7)\n"
             "    out = value('--output')\n"
+            "    print('building in', out)\n"
+            "    if os.environ.get('SNT_HUB_TEST_BUILD_EXIT'):\n"
+            "        out.mkdir(parents=True)\n"
+            "        (out / 'build.log').write_text('compiler error\\n')\n"
+            "        print('build adapter failed', file=sys.stderr)\n"
+            "        sys.exit(7)\n"
             "    out.mkdir(parents=True)\n"
             "    (out / 'solver').write_text('#!/bin/sh\\nexit 0\\n' + '#' * 70055)\n"
             "    (out / 'solver').chmod(0o755)\n"
             "    (out / 'build.log').write_text('built\\n')\n"
             "    (out / 'build-lock.json').write_text(json.dumps({'schema_version': 1, "
-            "'executable': 'solver', 'build_log': 'build.log', 'compiler': 'test', "
-            "'build_options': []}))\n"
+            "'executable': os.environ.get('SNT_HUB_TEST_BAD_EXECUTABLE', str(out / 'solver')), "
+            "'build_log': str(out / 'build.log'), "
+            "'command': ['make']}))\n"
             "elif a[0] == 'run':\n"
             "    if not os.environ.get('SNT_HUB_TEST_SKIP_LOCK'):\n"
             "        (value('--setup-dir') / 'run-lock.json').write_text(json.dumps("
@@ -218,11 +224,21 @@ class HubCLITest(unittest.TestCase):
         failed_build = self.call("build", "--setup", "runs/complete", cwd=workspace,
                                  env=dict(env, SNT_HUB_TEST_BUILD_EXIT="1"))
         self.assertEqual(failed_build.returncode, 7)
+        self.assertIn("build adapter failed", failed_build.stderr)
+        self.assertIn("compiler error", failed_build.stderr)
+        self.assertFalse((workspace / "build/local").exists())
+        bad_path = self.call("build", "--setup", "runs/complete", cwd=workspace,
+                             env=dict(env, SNT_HUB_TEST_BAD_EXECUTABLE=str(self.root / "outside")))
+        self.assertIn("escapes build output", bad_path.stderr)
         self.assertFalse((workspace / "build/local").exists())
         built = self.call("build", "--setup", "runs/complete", cwd=workspace, env=env)
         self.assertEqual(built.returncode, 0, built.stderr)
+        self.assertIn("Built local\n  Output: " + str((workspace / "build/local").resolve()), built.stdout)
+        self.assertNotIn("building in", built.stdout)
         build_lock = json.loads((workspace / "build/local/build-lock.json").read_text())
         self.assertEqual(build_lock["source_revision"], source_sha)
+        self.assertEqual(build_lock["executable"], "solver")
+        self.assertEqual(build_lock["build_log"], "build.log")
         self.assertEqual(build_lock["executable_sha256"],
                          hashlib.sha256((workspace / "build/local/solver").read_bytes()).hexdigest())
         self.assertEqual(self.call("build", "--setup", "runs/complete", cwd=workspace,

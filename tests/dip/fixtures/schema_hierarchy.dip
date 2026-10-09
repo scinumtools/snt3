@@ -1,0 +1,22 @@
+$schema address
+  city str = "unknown"
+
+$schema person
+  name str = "unnamed"
+  residence : address
+  age int = 0
+
+$schema role
+  title str = "member"
+
+$schema unused
+  tuning
+    step int = 1
+  choices list
+  choices[]
+    code str = "default"
+
+people map : person
+people[alice] : role
+  name = "Alice"
+people[bob]

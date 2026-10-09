@@ -1,4 +1,5 @@
 #include "nodes/node_schema.h"
+#include "nodes/node_group.h"
 #include "parsers.h"
 
 #include <algorithm>
@@ -749,6 +750,17 @@ overrides list : snt_project_override
                 target.hierarchy.record(node, nodes_nohierarchy);
             if (active_hierarchy && node->dtype == NodeDtype::Group)
                 target.record_declaration(target.branching.clean_name(node->path.name), node->line);
+            if (active_hierarchy && node->dtype == NodeDtype::Group) {
+                const auto group = std::dynamic_pointer_cast<GroupNode>(node);
+                const std::string path = target.branching.clean_name(node->path.name);
+                if (node->dtype_raw[1] == KEYWORD_MAP || node->dtype_raw[1] == KEYWORD_LIST) {
+                    for (const auto& schema : node->value_raw)
+                        target.record_schema_application(path, schema, false, node->line);
+                } else if (group) {
+                    for (const auto& [schema, inherited] : group->new_schema_applications)
+                        target.record_schema_application(path, schema, inherited, node->line);
+                }
+            }
             if (node->dtype == NodeDtype::Group && !node->schemas.empty()) {
                 const std::string path = active_hierarchy
                     ? target.branching.clean_name(node->path.name) : node->path.name;
