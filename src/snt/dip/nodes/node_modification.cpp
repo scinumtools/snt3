@@ -4,6 +4,7 @@
 #include "node_table.h"
 
 #include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
 
 namespace snt::dip {
 
@@ -29,9 +30,18 @@ namespace snt::dip {
             auto dnode = std::dynamic_pointer_cast<DeferredNode>(node);
             if (dnode && dnode->path.name == full_name) {
                 // is it a table node?
-                if (dnode->node->dtype == NodeDtype::Table) {
+                if (dnode->node && dnode->node->dtype == NodeDtype::Table) {
                     // then add value to the table node and parse it
                     auto tnode = std::dynamic_pointer_cast<TableNode>(dnode->node);
+                    if (!tnode)
+                        throw dip::EnvironmentException(
+                            "Invalid deferred table",
+                            "The deferred node `" + full_name + "` is not a table declaration.",
+                            "Check the declaration that supplied this table.",
+                            __FILE__,
+                            __LINE__,
+                            line
+                        );
                     tnode->value_origin = value_origin;
                     tnode->value_raw = value_raw;
                     // return parsed nodes back to the node list

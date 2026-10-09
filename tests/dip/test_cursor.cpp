@@ -294,3 +294,10 @@ TEST_F(Cursor, GetValueNode) {
         EXPECT_EQ(units->to_string(), "cm");
     }
 }
+
+TEST(CursorNone, ReturnsNullValue) {
+    dip::DIP parser;
+    parser.add_string("optional int = none");
+    auto env = parser.parse();
+    EXPECT_EQ(env["optional"].get_value(), nullptr);
+}

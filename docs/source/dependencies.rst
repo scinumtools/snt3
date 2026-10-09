@@ -24,9 +24,10 @@ Building from source
   dependency.
 * **SNT Hub command:** building the ``snt`` executable requires libcurl
   development headers and library for HTTPS catalogue access. The JSON header
-  is included in the source checkout. ``snt hub install`` additionally uses
-  Git and Python 3 with ``venv`` and ``pip`` at runtime to install a pinned
-  project adapter.
+  is included in the source checkout. ``snt hub fetch`` uses Git to obtain a
+  pinned local source and adapter; ``snt hub setup`` and optional project
+  ``build`` or ``run`` commands use Python 3 with ``venv`` and ``pip`` to
+  provision the workspace-local adapter runtime.
 * **Python bindings:** the default build enables them and needs a Python 3
   interpreter and development files. CMake uses an installed pybind11 or
   downloads it when needed. Set ``-DENABLE_BINDING_PYTHON=OFF`` for a build

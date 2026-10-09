@@ -155,7 +155,8 @@ namespace snt::dip {
         const std::string& get_path() const;
 
         /** Return the value stored at this path.
-         * @return A newly allocated VAL value; throws when the path is absent or not a value node.
+         * @return A newly allocated VAL value, or nullptr for a DIPL `none` value.
+         * Throws when the path is absent or not a value node.
          */
         val::BaseValue::PointerType get_value() const;
 

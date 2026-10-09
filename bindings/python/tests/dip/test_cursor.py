@@ -5,6 +5,13 @@ from scinumtools3.puq import Quantity
 from scinumtools3.dip import DIP, Environment, ValueNode, Cursor, PathKind
 
 
+def test_cursor_none_value():
+    dip = DIP()
+    dip.add_string('optional int = none')
+    env = dip.parse()
+    assert env['optional'].value is None
+
+
 def test_cursor_children():
     dip = DIP()
     dip.add_string(

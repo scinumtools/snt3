@@ -641,9 +641,9 @@ TEST(Environment, RejectsReservedValueGroupPayloadChild) {
 TEST(Environment, CustomUnitsHdf5RoundTrip) {
     dip::DIP parser;
     parser.add_string(
-        "$unit arepo_length = 2*m\n"
-        "$unit arepo_span = 3*arepo_length\n"
-        "box_size float = 7500 arepo_span\n"
+        "$unit custom_length = 2*m\n"
+        "$unit custom_span = 3*custom_length\n"
+        "box_size float = 7500 custom_span\n"
     );
     const dip::Environment source = parser.parse();
     const auto file = environment_file("custom-units");
@@ -652,19 +652,19 @@ TEST(Environment, CustomUnitsHdf5RoundTrip) {
     dip::Environment loaded;
     loaded.load(file);
     EXPECT_DOUBLE_EQ(loaded["box_size"].as<double>(), 7500.0);
-    EXPECT_EQ(loaded.get_node("box_size")->units->to_string(), "arepo_span");
-    const dip::EnvUnit& length = loaded.units.at("arepo_length");
-    const dip::EnvUnit& span = loaded.units.at("arepo_span");
+    EXPECT_EQ(loaded.get_node("box_size")->units->to_string(), "custom_span");
+    const dip::EnvUnit& length = loaded.units.at("custom_length");
+    const dip::EnvUnit& span = loaded.units.at("custom_span");
     EXPECT_EQ(length.definition, "2*m");
-    EXPECT_EQ(span.definition, "3*arepo_length");
+    EXPECT_EQ(span.definition, "3*custom_length");
     EXPECT_LT(length.registration_order, span.registration_order);
 
     const auto resaved = environment_file("custom-units-resaved");
     loaded.save(resaved);
     dip::Environment round_tripped;
     round_tripped.load(resaved);
-    EXPECT_EQ(round_tripped.units.at("arepo_span").id, span.id);
-    EXPECT_EQ(round_tripped.units.at("arepo_span").definition, span.definition);
+    EXPECT_EQ(round_tripped.units.at("custom_span").id, span.id);
+    EXPECT_EQ(round_tripped.units.at("custom_span").definition, span.definition);
     std::filesystem::remove(file);
     std::filesystem::remove(resaved);
 }

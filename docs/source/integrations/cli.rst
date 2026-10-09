@@ -335,54 +335,90 @@ reproducible cover. The :ref:`CreateReport example
 Pinned code examples with SNT Hub
 ---------------------------------
 
-``snt hub`` installs a project adapter and its exact original-code revision
-from the published `SNT Hub catalogue <https://scinumtools.github.io/snt-hub/#registry>`_.
-Git and Python 3 (with ``venv`` and ``pip``) are required. Installation also
-needs network access to the catalogue, Git repositories, and Python packages.
-The adapter is code from the selected Hub revision and runs locally; inspect
-its origin and revisions with ``snt hub info`` before using it with your data.
+``snt hub fetch`` creates a local workspace from the published
+`SNT Hub catalogue <https://scinumtools.github.io/snt-hub/#registry>`_. It
+places the pinned original source in ``source/``, editable DIPL files in
+``dipl/``, and a revision lock in ``.snthub/``. Git and network access are
+required for fetch. Python 3 with ``venv`` and ``pip`` is needed only when
+setup first provisions the workspace's adapter runtime. Inspect the origin
+and revisions with ``snt hub info`` before using the adapter with your data.
 
 .. code-block:: bash
 
+   mkdir study && cd study
    snt hub list
-   snt hub examples arepo
-   snt hub install arepo
-   snt hub info arepo
-   snt hub setup arepo mhd_shock_tube --output ./runs/mhd_shock_tube
+   snt hub fetch PROJECT
+   snt hub examples
+   snt hub info
+   snt hub setup EXAMPLE
 
-``install`` records the Hub and original-code Git revisions in an installation
-lock. A repeated install of the same revision reuses it; switching to a newly
-published revision requires ``--update``. ``--revision`` accepts the full SHA
-currently advertised by the catalogue. ``--prefix DIR`` selects a data
-directory for installation and subsequent commands, which is useful on HPC
-systems. Otherwise SNT uses the platform's application-data directory.
+Replace ``PROJECT`` with an ID from ``list`` and ``EXAMPLE`` with a name from
+``examples``.
 
-``examples`` labels recipes by capability. A ``complete`` setup includes its
-reviewed initial-condition file as well as native parameter files and an
+``fetch`` uses the current directory, or ``--dir PATH``. It refuses existing
+workspace files and reuses a matching workspace without replacing edits.
+``--revision`` accepts the full Hub SHA currently advertised by the catalogue.
+``examples`` and ``info`` discover the workspace by searching upward for
+``.snthub/lock.json``; ``--workspace DIR`` selects one explicitly.
+``list`` reads the live catalogue without a cache.
+
+``examples`` labels recipes by capability. A ``complete`` setup includes the
+assets required by its recipe, native input files, and an
 ``environment.diph5`` snapshot. For a ``native-inputs-only`` recipe, request
-``--inputs-only`` explicitly; that output lacks the initial-condition file.
-Setup refuses an existing destination and publishes a new directory only
-after the adapter succeeds. It does not build or run the scientific code.
+``--inputs-only`` explicitly; that output still needs other inputs before it
+can run.
+Setup defaults to ``runs/EXAMPLE`` in the workspace. An explicit ``--output``
+must also remain inside the workspace. It refuses an existing destination
+and publishes a new directory only after the adapter succeeds. Setup does
+not build or run the scientific code.
+
+Optional build and run recipes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``snt hub build`` and ``snt hub run`` work only when the pinned project
+declares reviewed build or local run capabilities. The commands report an
+undeclared capability before creating an adapter runtime. A project can
+declare either capability
+independently; a usable existing executable can be passed to ``run``.
+
+.. code-block:: bash
+
+   snt hub build --setup runs/EXAMPLE --profile local
+   cd runs/EXAMPLE
+   snt hub run
+   # Or select an existing executable:
+   snt hub run --executable /path/to/solver
+
+Build profiles belong to the project. A recipe that requires a prepared setup
+checks its ``setup-lock.json``. A successful build creates ``build/PROFILE``
+and a ``build-lock.json`` recording the source revision, optional setup lock
+digest, compiler details supplied by the adapter, and executable SHA-256.
+``run`` accepts only a complete setup. It checks a matching build lock or
+hashes the explicitly named executable, then records its exit status and
+executable identity in the run directory's ``run-lock.json``, including if
+the solver fails. It refuses a second run in that directory until a rerun
+policy is defined. The project adapter chooses build and solver commands;
+SNT does not infer them from the project name.
 
 For a per-run change, pass a file of bare DIPL override assignments:
 
 .. code-block:: text
 
-   resources.wall_clock.limit = 1800 s
-   hydrodynamics.courant_factor = 0.25
+   simulation.steps = 100
+   solver.tolerance = 1e-6
 
 .. code-block:: bash
 
-   snt hub setup arepo mhd_shock_tube --override-file tuning.dip \
-       --output ./runs/tuned_shock_tube
+   snt hub setup EXAMPLE --override-file tuning.dip \
+       --output ./runs/tuned_example
 
 The adapter evaluates the override with DIPL, copies an accepted file to
 ``input-overrides.dip``, and records its SHA-256 in ``setup-lock.json``. A
-complete example with a fixed initial-condition creator accepts only override
-targets approved by its recipe. The MHD shock tube currently approves the
-two assignments above. Other targets fail without publishing the requested
-directory; ``--inputs-only`` permits broader parameter changes because it
-does not create ICs. The file contains no ``$override`` wrapper.
+complete example with a fixed data generator may accept only override targets
+approved by its recipe. Use paths declared by the selected DIPL model; the
+assignments above illustrate the syntax. Rejected targets fail without
+publishing the requested directory. The file contains no ``$override``
+wrapper.
 
 Server, dmap, and viewer commands
 ---------------------------------

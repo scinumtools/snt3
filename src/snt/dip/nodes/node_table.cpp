@@ -103,6 +103,13 @@ namespace snt::dip {
         return nodes;
     }
 
+    BaseNode::PointerType TableNode::clone(const Path& pth, std::optional<size_t> indent) const {
+        auto copy = std::make_shared<TableNode>(*this);
+        copy->path = pth;
+        if (indent) copy->indent = *indent;
+        return copy;
+    }
+
     bool TableNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
         const std::string& delimiter_raw = values.at(0);
         if (property == PropertyType::Delimiter && !delimiter_raw.empty()) {

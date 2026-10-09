@@ -137,7 +137,8 @@ namespace snt::dip {
     }
 
     val::BaseValue::PointerType Cursor::get_value() const {
-        return env_->get_node(path_)->value->clone();
+        const auto node = env_->get_node(path_);
+        return node->value ? node->value->clone() : nullptr;
     }
 
     std::optional<puq::Quantity> Cursor::get_units() const {

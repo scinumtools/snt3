@@ -69,19 +69,21 @@ project governance.
 Try a participating project
 ---------------------------
 
-With SNT installed, choose a project and example from the Hub catalogue,
-then generate its inputs:
+With SNT installed, create a workspace, choose a Hub project, and generate
+an example's inputs:
 
 .. code-block:: bash
 
+   mkdir study && cd study
    snt hub list
-   snt hub examples PROJECT
-   snt hub install PROJECT
-   snt hub setup PROJECT EXAMPLE --output ./example-inputs
+   snt hub fetch PROJECT
+   snt hub examples
+   snt hub setup EXAMPLE
 
-Replace ``PROJECT`` and ``EXAMPLE`` with names shown by the first two
-commands. The new directory contains the generated files and a setup lock;
-available files depend on the example. SNT does not build or run the code. See the
+Replace ``PROJECT`` and ``EXAMPLE`` with names shown by ``list`` and
+``examples``. ``runs/EXAMPLE`` contains generated files and a setup lock;
+available files depend on the example. Building and running require separate,
+reviewed project capabilities. See the
 :ref:`SNT Hub CLI guide <cli-hub>` for prerequisites and overrides.
 
 How to participate

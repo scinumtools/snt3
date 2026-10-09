@@ -1,7 +1,7 @@
 # DIPL highlighting fixture: covers the syntax categories used by the lexer.
 
 # Numeric-looking commented configuration must remain entirely a comment.
-#       size = 10000 arepo_length
+#       size = 10000 custom_length
 #     files = 4
 #   courant_factor = 0.25
 

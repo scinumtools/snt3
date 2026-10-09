@@ -346,6 +346,23 @@ TEST(SchemaList, DoubleUse) {
 }
 
 TEST(SchemaList, TableDeclarations) {
+    { // a schema table can be filled by a later untyped modification
+        dip::DIP d;
+        d.add_string(
+            "$schema settings\n"
+            "  data table\n"
+            "example : settings\n"
+            "  data = \"\"\"reading int\n"
+            "---\n"
+            "1\n"
+            "2\n"
+            "\"\"\""
+        );
+        dip::Environment env = d.parse();
+        ASSERT_EQ(env.nodes.size(), 1);
+        EXPECT_EQ(env.nodes.at(0)->path.name, "example.data.reading");
+        EXPECT_EQ(env["example.data.reading"].get_value()->to_string(), "[1, 2]");
+    }
     { // table is declared in the schema and defined later
         dip::DIP d;
         d.add_string(

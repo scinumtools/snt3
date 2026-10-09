@@ -21,6 +21,8 @@ TEST(ParseNone, Definition) {
     EXPECT_EQ(vnode->value_raw.size(), 0);
     EXPECT_EQ(vnode->value, nullptr);
     EXPECT_EQ(vnode->to_string(), "none");
+    EXPECT_EQ(env.get_value(0), nullptr);
+    EXPECT_EQ(env.request_node_data("?jerk").value, nullptr);
 
     vnode = env.nodes.at(1);
     EXPECT_EQ(vnode->value_raw.size(), 0);
