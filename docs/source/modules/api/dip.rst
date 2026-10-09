@@ -63,7 +63,8 @@ text summary:
 
 Set ``ComparisonOptions`` through ``set_options()`` to select full scope or
 change the array sample size. ``set_max_details()`` bounds ``execute()``
-output. See :ref:`DIPH5 comparison <dip-diph5-comparison>` for the fields and
+output. ``compare()`` and ``execute()`` reuse the same result until comparison
+options change. See :ref:`DIPH5 comparison <dip-diph5-comparison>` for the fields and
 equality semantics.
 
 Semantic JSON for applications
@@ -74,9 +75,10 @@ versioned JSON. ``describe_json`` and ``list_json`` accept a DIPfile, DIPL
 file, or DIPH5 snapshot. ``preview_json`` accepts a DIPfile or DIPL file and
 returns validation diagnostics plus a bounded diff. An invalid candidate is
 represented in JSON with ``candidate_valid: false``.
-Set the trailing ``record_dependency_graph`` argument of ``describe_json`` or
-``list_json`` to ``true`` to include recorded reads from a parsed input.
-Snapshots use their saved graph.
+Pass ``true`` as the second ``DIPSemantic`` constructor argument to record
+dependencies while parsing. Descriptions and lists reuse the same evaluated
+environment; call ``reload()`` after the input changes. Previews evaluate
+their baseline and candidate separately. Snapshots use their saved graph.
 
 .. code-block:: cpp
 

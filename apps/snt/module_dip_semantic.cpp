@@ -78,9 +78,9 @@ int module_dip_semantic(int argc, char* argv[]) {
     if (has_max_details && command != "preview") throw std::invalid_argument("--max-details requires preview.");
     if (has_value_limit && command == "preview")
         throw std::invalid_argument("--max-value-elements requires describe or list.");
-    const snt::api::DIPSemantic semantic(input);
-    if (command == "describe") std::cout << semantic.describe_json(path, max_value_elements, record_graph) << '\n';
-    else if (command == "list") std::cout << semantic.list_json(query, tags, limit, max_value_elements, record_graph) << '\n';
-    else std::cout << semantic.preview_json(overrides, record_graph, max_details) << '\n';
+    const snt::api::DIPSemantic semantic(input, record_graph);
+    if (command == "describe") std::cout << semantic.describe_json(path, max_value_elements) << '\n';
+    else if (command == "list") std::cout << semantic.list_json(query, tags, limit, max_value_elements) << '\n';
+    else std::cout << semantic.preview_json(overrides, max_details) << '\n';
     return 0;
 }

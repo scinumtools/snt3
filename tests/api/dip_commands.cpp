@@ -1,10 +1,12 @@
 #include "pch_tests.h"
 #include "snt/api/dip_parse.h"
 #include "snt/api/dip_compare.h"
+#include "snt/api/dip_semantic.h"
 #include "snt/api/exceptions.h"
 #include "snt/dip/cursor.h"
 
 #include <filesystem>
+#include <chrono>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -244,6 +246,10 @@ TEST_F(DIPPersistenceCommands, Compare) {
     api::DIPCompare same(file, file);
     EXPECT_TRUE(same.compare().equal());
     EXPECT_NE(same.execute().find("0 added, 0 removed, 0 changed"), std::string::npos);
+    dip::ComparisonOptions full;
+    full.scope = dip::ComparisonScope::Full;
+    same.set_options(full);
+    EXPECT_EQ(same.compare().scope, dip::ComparisonScope::Full);
     const auto other = file.parent_path() / (file.stem().string() + "-other.diph5");
     dip::DIP parser;
     parser.add_string("simulation.steps int = 101\nsimulation.enabled bool = true\n");
@@ -251,6 +257,29 @@ TEST_F(DIPPersistenceCommands, Compare) {
     api::DIPCompare changed(file, other);
     EXPECT_EQ(changed.compare().changed, 1);
     std::filesystem::remove(other);
+    EXPECT_NE(changed.execute().find("1 changed"), std::string::npos);
+}
+
+TEST(DIPSemanticCommand, ReusesEnvironmentUntilReload) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto file = std::filesystem::temp_directory_path() / ("snt-semantic-" + suffix + ".dipl");
+    {
+        std::ofstream output(file);
+        output << "value int = 1\n";
+    }
+    api::DIPSemantic semantic(file);
+    EXPECT_NE(semantic.describe_json("value").find("\"text\":\"1\""), std::string::npos);
+    EXPECT_NE(semantic.list_json().find("\"total\":1"), std::string::npos);
+    {
+        std::ofstream output(file);
+        output << "value int = 2\n";
+    }
+    EXPECT_NE(semantic.describe_json("value").find("\"text\":\"1\""), std::string::npos);
+    semantic.reload();
+    EXPECT_NE(semantic.describe_json("value").find("\"text\":\"2\""), std::string::npos);
+    std::filesystem::remove(file);
+    EXPECT_THROW(semantic.reload(), std::exception);
+    EXPECT_NE(semantic.describe_json("value").find("\"text\":\"2\""), std::string::npos);
 }
 
 TEST_F(DIPPersistenceCommands, Generate) {

@@ -146,19 +146,32 @@ void diagnostics(std::ostream& out, const std::vector<core::Diagnostic>& values)
 }
 } // namespace
 
-std::string DIPSemantic::describe_json(const std::string& path, std::size_t max_value_elements,
-                                       bool record_dependency_graph) const {
-    const auto env = dip::open_artifact(input_, record_dependency_graph);
+const dip::Inspector& DIPSemantic::inspector() const {
+    if (!inspector_) {
+        auto environment = std::make_unique<dip::Environment>(dip::open_artifact(input_, record_dependency_graph_));
+        auto inspector = std::make_unique<dip::Inspector>(*environment);
+        environment_ = std::move(environment);
+        inspector_ = std::move(inspector);
+    }
+    return *inspector_;
+}
+
+void DIPSemantic::reload() {
+    auto environment = std::make_unique<dip::Environment>(dip::open_artifact(input_, record_dependency_graph_));
+    auto inspector = std::make_unique<dip::Inspector>(*environment);
+    inspector_ = std::move(inspector);
+    environment_ = std::move(environment);
+}
+
+std::string DIPSemantic::describe_json(const std::string& path, std::size_t max_value_elements) const {
     std::ostringstream out;
-    description(out, dip::Inspector{env}.describe(path, max_value_elements));
+    description(out, inspector().describe(path, max_value_elements));
     return out.str();
 }
 
 std::string DIPSemantic::list_json(const std::string& query, const dip::TagFilter& tags,
-                                   std::size_t limit, std::size_t max_value_elements,
-                                   bool record_dependency_graph) const {
-    const auto env = dip::open_artifact(input_, record_dependency_graph);
-    const auto result = dip::Inspector{env}.list_descriptions(query, tags, limit, max_value_elements);
+                                   std::size_t limit, std::size_t max_value_elements) const {
+    const auto result = inspector().list_descriptions(query, tags, limit, max_value_elements);
     std::ostringstream out;
     out << "{\"schema_version\":\"1\",\"total\":" << result.total
         << ",\"truncated\":" << (result.items.size() < result.total ? "true" : "false")
@@ -172,8 +185,8 @@ std::string DIPSemantic::list_json(const std::string& query, const dip::TagFilte
 }
 
 std::string DIPSemantic::preview_json(const std::vector<dip::PreviewOverride>& overrides,
-                                      bool record_dependency_graph, std::size_t max_details) const {
-    const auto result = dip::preview(input_, overrides, record_dependency_graph);
+                                      std::size_t max_details) const {
+    const auto result = dip::preview(input_, overrides, record_dependency_graph_);
     std::ostringstream out;
     out << "{\"schema_version\":\"1\",\"baseline_valid\":"
         << (result.baseline_valid ? "true" : "false")
