@@ -81,6 +81,8 @@ keeps the solver and its native parser in place. [Read about the initiative
 and see the full flyer](https://scinumtools.github.io/snt3/initiative.html).
 The long-term aim is direct integration where a project judges the model and
 tooling stable and trustworthy.
+Explore related projects and integrations in the
+[SNT Hub registry](https://scinumtools.github.io/snt-hub/#registry).
 
 <br clear="left">
 

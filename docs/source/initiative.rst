@@ -83,7 +83,8 @@ collaboration in their documentation, website, or a paper.
 
 If you maintain or use a suitable scientific code, start a discussion in the
 project's issue tracker. Explore other SciNumTools projects and integrations
-in the `SNT Hub <https://scinumtools.github.io/snt-hub/>`_.
+in the `SNT Hub <https://scinumtools.github.io/snt-hub/>`_ and its
+`registry <https://scinumtools.github.io/snt-hub/#registry>`_.
 
 The initiative flyer
 --------------------
