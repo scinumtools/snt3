@@ -8,6 +8,20 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Emscripten renamed TOTAL_STACK to STACK_SIZE. Probe the linker setting so
+# distribution-packaged and current SDK toolchains both get the same stack.
+include(CheckLinkerFlag)
+check_linker_flag(CXX "-sSTACK_SIZE=4194304" SNT_WEB_HAS_STACK_SIZE)
+if(SNT_WEB_HAS_STACK_SIZE)
+  set(SNT_WEB_STACK_OPTION "-sSTACK_SIZE=4194304")
+else()
+  check_linker_flag(CXX "-sTOTAL_STACK=4194304" SNT_WEB_HAS_TOTAL_STACK)
+  if(NOT SNT_WEB_HAS_TOTAL_STACK)
+    message(FATAL_ERROR "Emscripten does not support a recognized stack-size setting")
+  endif()
+  set(SNT_WEB_STACK_OPTION "-sTOTAL_STACK=4194304")
+endif()
+
 # Compile the existing language implementation without native persistence,
 # reports, adapters, or application front ends. No browser parser is forked.
 set(SNT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../..")
@@ -32,7 +46,7 @@ target_link_options(dipl_web PRIVATE
   "-sENVIRONMENT=web,worker,node"
   "-sALLOW_MEMORY_GROWTH=1"
   "-sINITIAL_MEMORY=33554432"
-  "-sSTACK_SIZE=4194304"
+  "${SNT_WEB_STACK_OPTION}"
   "-sSTACK_OVERFLOW_CHECK=2")
 set_target_properties(dipl_web PROPERTIES
   SUFFIX ".mjs"
