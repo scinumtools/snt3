@@ -149,7 +149,11 @@ function compile_docs {
         echo "Emscripten requires Python 3.10 or newer on PATH." >&2
         return 1
     }
-    export EM_CACHE="$DIR_ROOT/build-web/cache"
+    # Homebrew's cache can be read-only for local builds. Ubuntu's packaged
+    # Emscripten uses a frozen, preinstalled cache that must not be replaced.
+    if [[ "$OS" == "Darwin" && -z "${EM_CACHE:-}" ]]; then
+        export EM_CACHE="$DIR_ROOT/build-web/cache"
+    fi
     emcmake cmake -S bindings/web -B build-web -G Ninja -DCMAKE_BUILD_TYPE=Release
     cmake --build build-web --parallel 4
     mkdir -p docs/source/_static/web/dist
