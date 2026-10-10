@@ -1,5 +1,6 @@
 # Custom
 build/*
+build-web/
 CMakeFiles/*
 CMakeCache.txt
 helpers/*
@@ -7,6 +8,7 @@ docs/build/*
 docs/doxy/*
 docs/banners/*
 dist/*
+bindings/web/dist/
 PROPOSALS/*
 bindings/python/.pytest_cache/*
 **/__pycache__/*

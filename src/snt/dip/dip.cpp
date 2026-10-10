@@ -143,6 +143,10 @@ overrides list : snt_project_override
         add_string_input(source_code, env.sources.at(source.name).path, {source.name, source.line_number});
     }
 
+    void DIP::add_string(const std::string& source_code, const std::string& source_name) {
+        add_string_input(source_code, env.sources.at(source.name).path, {source.name, source.line_number}, source_name);
+    }
+
     void DIP::add_file(const std::filesystem::path& source_file, std::string source_name, bool absolute) {
 
         add_file_input(source_file, std::move(source_name), absolute, {source.name, source.line_number});
@@ -215,10 +219,15 @@ overrides list : snt_project_override
         add_override_input(source_code, env.sources.at(source.name).path, {source.name, source.line_number});
     }
 
+    void DIP::add_override_string(const std::string& source_code, const std::string& source_name) {
+        add_override_input(source_code, env.sources.at(source.name).path, {source.name, source.line_number}, source_name);
+    }
+
     void DIP::add_override_input(
-        const std::string& source_code, const std::filesystem::path& source_file, const Source& parent
+        const std::string& source_code, const std::filesystem::path& source_file, const Source& parent,
+        std::string source_name
     ) {
-        const std::string source_name = source.name + "_OVERRIDE" + std::to_string(num_overrides);
+        if (source_name.empty()) source_name = source.name + "_OVERRIDE" + std::to_string(num_overrides);
         std::queue<Line> override_lines;
         parse_lines(override_lines, source_code, source_name);
         const auto nodes = parse_code_nodes(override_lines);
@@ -373,6 +382,13 @@ overrides list : snt_project_override
                              : std::string{}, project_source, parent.line_number});
             }
         }
+    }
+
+    void DIP::add_project(const ProjectInput& project) {
+        for (const auto& unit : project.units) add_unit(unit.name, unit.text);
+        for (const auto& schema : project.schemas) add_schema_string(schema.name, schema.text);
+        for (const auto& entry : project.overrides) add_override_string(entry.text, entry.name);
+        for (const auto& entry : project.code) add_string(entry.text, entry.name);
     }
 
     void DIP::add_function_value(const std::string& name, FunctionList::DataFunctionType func) {

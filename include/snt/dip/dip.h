@@ -10,6 +10,19 @@
 
 namespace snt::dip {
 
+    struct ProjectText {
+        std::string name;
+        std::string text;
+    };
+
+    /** Text-backed project registrations, processed in DIPfile phase order. */
+    struct ProjectInput {
+        std::vector<ProjectText> units;
+        std::vector<ProjectText> schemas;
+        std::vector<ProjectText> code;
+        std::vector<ProjectText> overrides;
+    };
+
     class DIP {
       private:
         static int num_instances; ///< counter of DIP class instances
@@ -36,7 +49,8 @@ namespace snt::dip {
         size_t num_overrides = 0; ///< number of host-provided override sources
 
         void add_override_input(
-            const std::string& source_code, const std::filesystem::path& source_file, const Source& parent
+            const std::string& source_code, const std::filesystem::path& source_file, const Source& parent,
+            std::string source_name = {}
         );
         void add_override_file_input(const std::filesystem::path& source_file, const Source& parent);
 
@@ -82,6 +96,8 @@ namespace snt::dip {
          * @param source_code Text with a DIPL code
          */
         void add_string(const std::string& source_code);
+        /** Add in-memory DIPL code with a stable source name for diagnostics. */
+        void add_string(const std::string& source_code, const std::string& source_name);
 
         /**
          * Register a named schema body without a $schema wrapper.
@@ -97,6 +113,8 @@ namespace snt::dip {
          * Value paths resolve to existing targets; terminal collection item groups may create schema-backed items.
          * An empty or comment-only body makes no changes. */
         void add_override_string(const std::string& source_code);
+        /** Add an override body with a stable source name for diagnostics. */
+        void add_override_string(const std::string& source_code, const std::string& source_name);
         /** Register an unwrapped override body from a file, retaining its source path.
          * An empty or comment-only file makes no changes. */
         void add_override_file(const std::filesystem::path& source_file);
@@ -136,6 +154,8 @@ namespace snt::dip {
          * @param project_file Path to the DIPfile manifest.
          */
         void add_project(const std::filesystem::path& project_file);
+        /** Register a project entirely from memory, without filesystem access. */
+        void add_project(const ProjectInput& project);
 
         /**
          * Add function that returns a value

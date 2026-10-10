@@ -3,6 +3,7 @@ file(GLOB TEST_FILES "*.cpp")
 set(EXEC_NAME gtest-dip)
 
 add_executable(${EXEC_NAME} ${TEST_FILES})
+target_sources(${EXEC_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/bindings/web/runtime.cpp")
 
 target_include_directories(${EXEC_NAME}
   PRIVATE

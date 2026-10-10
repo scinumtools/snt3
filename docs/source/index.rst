@@ -73,6 +73,7 @@ review cycle and its current export boundary.
 
    integrations/python
    integrations/c
+   integrations/web
    integrations/cli
    integrations/viewer
    integrations/cmake
