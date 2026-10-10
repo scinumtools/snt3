@@ -105,6 +105,7 @@ and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.htm
   Parse and calculate with [physical quantities](https://scinumtools.github.io/snt3/modules/puq/quantities.html),
   then [convert units](https://scinumtools.github.io/snt3/modules/puq/conversion.html).
   Quantities support uncertainties, arrays, prefixes, and unit systems.
+  Try the [live converter](https://scinumtools.github.io/snt3/modules/puq/conversion.html#try-a-conversion).
 - **Single source of validated truth:**
   Define [typed DIPL hierarchies](https://scinumtools.github.io/snt3/modules/dip/basic-usage.html)
   with constraints, expressions, dependencies, and metadata; inspect their
@@ -137,6 +138,9 @@ and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.htm
   Experimental opaque-handle interfaces for
   [PUQ](https://scinumtools.github.io/snt3/integrations/c.html#quantities-and-units)
   and [DIPL](https://scinumtools.github.io/snt3/integrations/c.html#dipl-parameters).
+- **WebAssembly and JavaScript:**
+  Experimental [web integration](https://scinumtools.github.io/snt3/integrations/web.html)
+  for browser-side DIPL inspection, validation, and override previews, plus PUQ conversion.
 - **Command line:**
   [PUQ evaluation and conversion](https://scinumtools.github.io/snt3/integrations/cli.html#quantities-and-units),
   [DIP parsing](https://scinumtools.github.io/snt3/integrations/cli.html#dipl-parameters),
