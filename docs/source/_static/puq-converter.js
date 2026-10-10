@@ -44,7 +44,9 @@ if (form) {
       );
     } catch (error) {
       result.classList.add('puq-converter-error');
-      result.textContent = error instanceof Error ? error.message : String(error);
+      result.textContent = error instanceof Error
+        ? [error.message, error.details, error.suggestion].filter(Boolean).join('\n')
+        : String(error);
     }
   });
 }

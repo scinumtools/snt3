@@ -2,6 +2,7 @@
 
 #include <emscripten/bind.h>
 #include <snt/api/puq_convert.h>
+#include <snt/core/exceptions.h>
 
 #include <algorithm>
 
@@ -92,8 +93,17 @@ val convert_puq(const std::string& expression, const std::string& output_units,
         if (!output_system.empty()) command.argument_output_system(output_system);
         if (!output_quantity.empty()) command.argument_output_quantity(output_quantity);
         result.set("value", command.execute());
+    } catch (const snt::core::Exception& error) {
+        const auto& info = error.info();
+        val diagnostic = val::object();
+        diagnostic.set("message", info.message);
+        diagnostic.set("details", info.details);
+        diagnostic.set("suggestion", info.suggestion);
+        result.set("error", diagnostic);
     } catch (const std::exception& error) {
-        result.set("error", error.what());
+        val diagnostic = val::object();
+        diagnostic.set("message", error.what());
+        result.set("error", diagnostic);
     }
     return result;
 }

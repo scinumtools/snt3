@@ -62,4 +62,14 @@ for (const expression of ["35**eV", "1*m/", "*m"]) {
   if (!syntaxRejected)
     throw new Error(`WASM PUQ accepted malformed expression: ${expression}`);
 }
+try {
+  puq.convert("35*eV", "Jddd");
+  throw new Error("WASM PUQ accepted an unknown target unit");
+} catch (error) {
+  if (error.message !== "Unknown unit base" ||
+      !error.details.includes("Jddd") || !error.suggestion ||
+      [error.message, error.details, error.suggestion].some((text) => text.includes("/home/runner/"))) {
+    throw error;
+  }
+}
 console.log("PUQ WebAssembly smoke test passed");
