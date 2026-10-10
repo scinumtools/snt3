@@ -46,6 +46,14 @@ Application adapters
 .. autoclass:: scinumtools3.dip.AdapterContext
    :members:
 
+.. autoclass:: scinumtools3.dip.OutputPlan
+   :members:
+
+.. autoclass:: scinumtools3.dip.OutputMapping
+   :members:
+
+.. autofunction:: scinumtools3.dip.resolve_output_plan
+
 .. autofunction:: scinumtools3.dip.run_adapter
 
 .. autofunction:: scinumtools3.dip.run_adapter_project

@@ -1061,13 +1061,14 @@ namespace snt::dip::hdf5 {
         }
 
         void read_group(Environment& env, hid_t group, bool root = false, bool skip_value_payload = false,
-                        bool skip_dependency_manifest = false) {
+                        bool skip_dependency_manifest = false, bool skip_output_manifest = false) {
             const hsize_t count = object_count(group);
             for (hsize_t i = 0; i < count; ++i) {
                 const std::string name = object_name(group, i);
                 if (root && (name == std::string(GROUP_SOURCES) || name == std::string(GROUP_TRACE) ||
                              name == std::string(GROUP_UNITS) ||
-                             (skip_dependency_manifest && name == std::string(GROUP_DEPENDENCIES))))
+                             (skip_dependency_manifest && name == std::string(GROUP_DEPENDENCIES)) ||
+                             (skip_output_manifest && name == std::string(GROUP_OUTPUTS))))
                     continue;
                 if (skip_value_payload && name == VALUE_PAYLOAD)
                     continue;
@@ -1361,8 +1362,81 @@ namespace snt::dip::hdf5 {
             env.set_dependency_graph(std::move(graph));
         }
 
+        void write_output_plan(hid_t file, const OutputPlan& plan) {
+            const std::string root = "/" + std::string(GROUP_OUTPUTS);
+            Id group(H5Gcreate2(file, root.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
+                     "Unable to create the DIPH5 output plan");
+            for (size_t index = 0; index < plan.mappings().size(); ++index) {
+                const auto& mapping = plan.mappings()[index];
+                const std::string path = root + "/" + std::to_string(index);
+                Id entry(H5Gcreate2(file, path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
+                         "Unable to create a DIPH5 output mapping");
+                write_string(entry, "id", mapping.id);
+                write_string(entry, "target", mapping.target);
+                write_string(entry, "key", mapping.key);
+                write_string(entry, "source_path", mapping.source_path);
+                write_string(entry, "rule", mapping.rule);
+                write_string(entry, "origin", mapping.origin);
+                write_string(entry, "value_path", mapping.value->path.name);
+                write_string(entry, ATTR_NODE_TYPE, node_type_name(mapping.value->dtype));
+                write_string(entry, ATTR_VALUE_TYPE, data_type_name(mapping.value->value_dtype));
+                write_strings(entry, "replacements", mapping.replacements);
+                write_strings(entry, "dependencies", mapping.dependencies);
+                write_scalar<uint8_t>(entry, "active", H5T_NATIVE_UINT8, mapping.active);
+                const std::string value_path = path + "/value";
+                write_value(file, value_path, *mapping.value);
+                if (mapping.value->units)
+                    write_string(entry, "units", mapping.value->units->to_string());
+            }
+        }
+
+        void read_output_plan(Environment& env, hid_t file) {
+            const std::string root = "/" + std::string(GROUP_OUTPUTS);
+            const htri_t exists = H5Lexists(file, root.c_str(), H5P_DEFAULT);
+            if (exists < 0)
+                throw Error("Unable to inspect the DIPH5 output plan");
+            if (exists == 0)
+                return;
+            Id group(H5Gopen2(file, root.c_str(), H5P_DEFAULT), H5Gclose,
+                     "Unable to open the DIPH5 output plan");
+            OutputPlan plan;
+            const hsize_t count = object_count(group);
+            for (hsize_t index = 0; index < count; ++index) {
+                const std::string name = std::to_string(index);
+                Id entry(H5Gopen2(group, name.c_str(), H5P_DEFAULT), H5Gclose,
+                         "Unable to open a DIPH5 output mapping");
+                OutputMapping mapping;
+                mapping.id = read_string(entry, "id");
+                mapping.target = read_string(entry, "target");
+                mapping.key = read_string(entry, "key");
+                mapping.source_path = read_string(entry, "source_path");
+                mapping.rule = read_string(entry, "rule");
+                mapping.origin = read_string(entry, "origin");
+                mapping.replacements = read_strings(entry, "replacements");
+                mapping.dependencies = read_strings(entry, "dependencies");
+                mapping.active = read_scalar<uint8_t>(entry, "active", H5T_NATIVE_UINT8) != 0;
+                Id dataset(H5Dopen2(entry, "value", H5P_DEFAULT), H5Dclose,
+                           "Unable to open a DIPH5 output value");
+                const auto dtype = data_type(read_string(entry, ATTR_VALUE_TYPE));
+                auto value = read_value(dataset, dtype);
+                if (!value)
+                    throw Error("A DIPH5 output mapping has no value");
+                std::optional<puq::Quantity> units;
+                if (has_attribute(entry, "units"))
+                    units.emplace(read_string(entry, "units"));
+                const std::string value_path = read_string(entry, "value_path");
+                mapping.value = std::make_shared<PersistedValueNode>(
+                    Path(value_path.empty() ? "output_value" : value_path), std::move(value),
+                    node_type(read_string(entry, ATTR_NODE_TYPE)), std::move(units));
+                plan.restore(std::move(mapping));
+            }
+            plan.validate();
+            env.set_output_plan(std::move(plan));
+        }
+
         bool uses_reserved_path(const std::string& path) {
-            for (const auto name : {std::string(GROUP_SOURCES), std::string(GROUP_TRACE), std::string(GROUP_UNITS), std::string(GROUP_DEPENDENCIES)}) {
+            for (const auto name : {std::string(GROUP_SOURCES), std::string(GROUP_TRACE), std::string(GROUP_UNITS),
+                                    std::string(GROUP_DEPENDENCIES), std::string(GROUP_OUTPUTS)}) {
                 if (path == name || path.rfind(name + ".", 0) == 0 || path.rfind(name + "[", 0) == 0)
                     return true;
             }
@@ -1414,6 +1488,8 @@ namespace snt::dip::hdf5 {
         write_trace_manifest(output, env);
         write_unit_manifest(output, env);
         write_dependency_graph(output, Inspector{env}.graph());
+        if (options.output_plan)
+            write_output_plan(output, *options.output_plan);
         for (const auto& node : env.nodes.get_nodes())
             if (node)
                 write_node(output, env, *node);
@@ -1459,7 +1535,10 @@ namespace snt::dip::hdf5 {
             read_unit_manifest(env, input);
         if (version == VERSION && minor_version >= 7)
             read_dependency_graph(env, input);
-        read_group(env, input, true, false, version == VERSION && minor_version >= 7);
+        read_group(env, input, true, false, version == VERSION && minor_version >= 7,
+                   version == VERSION && minor_version >= 8);
+        if (version == VERSION && minor_version >= 8)
+            read_output_plan(env, input);
     }
 
 } // namespace snt::dip::hdf5

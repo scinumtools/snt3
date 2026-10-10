@@ -307,12 +307,24 @@ namespace snt::dip {
         outputs_.push_back({std::move(path), Kind::Stream, {}, {}, std::move(writer)});
     }
 
+    OutputPlan resolve_output_plan(const Environment& env, const Adapter& adapter) {
+        if (env.is_loaded_snapshot() && env.output_plan()) {
+            env.output_plan()->validate();
+            return *env.output_plan();
+        }
+        OutputPlan plan;
+        adapter.describe_outputs(env, plan);
+        plan.validate();
+        return plan;
+    }
+
     std::vector<fs::path> run_adapter(
         const Environment& env, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot,
         ExistingOutputPolicy policy
     ) {
         AdapterContext context;
-        adapter.plan(env, context);
+        const OutputPlan plan = resolve_output_plan(env, adapter);
+        adapter.plan_resolved(env, plan, context);
 
         std::vector<fs::path> relative;
         relative.reserve(context.outputs_.size() + (snapshot.empty() ? 0 : 1));
@@ -380,7 +392,9 @@ namespace snt::dip {
         if (!snapshot.empty()) {
             const fs::path file = stage.path / "new" / relative.back();
             fs::create_directories(file.parent_path());
-            env.save(file);
+            SnapshotSaveOptions options;
+            options.output_plan = plan.mappings().empty() ? nullptr : &plan;
+            env.save(file, options);
         }
         if (sync) {
             fs::create_directories(stage.path / "new");

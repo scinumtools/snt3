@@ -2,11 +2,54 @@ Application adapters
 ====================
 
 An adapter turns an evaluated ``dip::Environment`` into input files for a
-specific downstream program. SNT loads the project or DIPH5 snapshot, calls
-``Adapter::plan()``, checks every output path and collision, and writes the
+specific downstream program. SNT loads the project or DIPH5 snapshot, resolves
+the adapter's output plan, checks every output path and collision, and writes the
 files. The adapter decides which values to use, how to validate them, and the
 names and formats of the resulting files. A single adapter can register zero,
 one, or many files.
+
+Adapter-owned output plans
+--------------------------
+
+An adapter may declare native mappings before writing files. Override
+``describe_outputs(env, outputs)`` to add mappings from real parameter paths
+with ``outputs.add_node(...)``, or from typed calculated values with
+``outputs.add_value(...)``. Each mapping has a stable ID, target, native key,
+active decision, and optional rule label, dependencies, and declaration origin.
+Use ``replace_node`` or ``replace_value`` when a profile intentionally changes
+a mapping with the same ID. Accidental duplicate IDs and duplicate active
+native keys within a target are rejected. Tags may help the adapter discover
+parameter groups; they do not define output policy.
+
+Override ``plan_resolved(env, outputs, context)`` to format the selected
+mappings and register native files. Existing adapters implementing only
+``plan(env, context)`` continue to work. For example:
+
+.. code-block:: python
+
+   from scinumtools3.dip import Adapter
+
+   class SolverAdapter(Adapter):
+       def describe_outputs(self, env, outputs):
+           outputs.add_node(env, "run.steps", "settings", "Steps", "run.steps",
+                            active=False, origin="base")
+           outputs.replace_node(env, "run.steps", "settings", "Steps", "run.steps",
+                                active=True, origin="profile")
+
+       def plan_resolved(self, env, outputs, context):
+           lines = [f"{item.key}={item.value}" for item in outputs.select("settings", True)]
+           context.add_text("control.in", "\n".join(lines) + "\n")
+
+The adapter evaluates its policy against the final environment and records
+the resulting typed values and decisions in the plan. A DIPH5 snapshot written
+by an adapter run stores that resolved plan. A later
+``run_adapter_snapshot()`` passes the saved plan to ``plan_resolved`` without
+rerunning ``describe_outputs``; this preserves profile choices even when the
+original profile files are unavailable. The plan is inspectable through
+``Environment.output_plan`` after loading the snapshot. Derived mappings
+remain outside the parameter tree and Parameter guide.
+Call ``resolve_output_plan(env, adapter)`` to inspect the same validated plan
+before writing any native files.
 
 For AI-assisted setup of an established simulation code, DIPL can describe run
 settings and references to initial-condition inputs. An adapter can check

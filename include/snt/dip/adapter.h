@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <functional>
 #include <ostream>
+#include <snt/dip/output_plan.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -51,9 +53,20 @@ namespace snt::dip {
     class Adapter {
       public:
         virtual ~Adapter() = default;
+        /** Declare typed native mappings after DIPL evaluation and value overrides. */
+        virtual void describe_outputs(const Environment&, OutputPlan&) const {}
         /** Select values, validate them for the target application, and register its files. */
-        virtual void plan(const Environment& env, AdapterContext& context) const = 0;
+        virtual void plan(const Environment&, AdapterContext&) const {
+            throw std::logic_error("Adapter must implement plan() or plan_resolved()");
+        }
+        /** Consume the resolved plan; the default preserves existing adapters. */
+        virtual void plan_resolved(const Environment& env, const OutputPlan&, AdapterContext& context) const {
+            plan(env, context);
+        }
     };
+
+    /** Resolve and validate an adapter's output plan without writing files. */
+    OutputPlan resolve_output_plan(const Environment& env, const Adapter& adapter);
 
     /**
      * Plan, validate, and write adapter outputs below output_dir. Existing

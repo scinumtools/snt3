@@ -5,6 +5,7 @@
 #include <snt/dip/inspect/block_input.h>
 #include <snt/dip/inspect/dependency_graph.h>
 #include <snt/dip/inspect/declarations.h>
+#include <snt/dip/output_plan.h>
 
 #include <algorithm>
 #include <filesystem>
@@ -57,6 +58,7 @@ namespace snt::dip {
 
     struct SnapshotSaveOptions {
         SourcePathPolicy source_paths = SourcePathPolicy::Preserve;
+        const OutputPlan* output_plan = nullptr; ///< Optional resolved adapter mappings.
     };
 
     /** Durable identity information for one registered DIPL construct. */
@@ -141,6 +143,7 @@ namespace snt::dip {
         mutable std::optional<size_t> active_dependency_event_;
         ExplicitDeclarations declarations_; ///< Live explicit path locations; absent from snapshots.
         std::vector<SchemaApplicationEvent> schema_applications_;
+        std::optional<OutputPlan> output_plan_; ///< Resolved adapter mappings loaded from DIPH5.
 
         void record_dependency(const std::string& target, const std::string& request,
                                std::string_view operand = {}) const;
@@ -196,6 +199,8 @@ namespace snt::dip {
 
         /** Whether this environment was loaded from a DIPH5 snapshot. */
         bool is_loaded_snapshot() const { return snapshot_loaded_; }
+        const std::optional<OutputPlan>& output_plan() const { return output_plan_; }
+        void set_output_plan(OutputPlan plan) { output_plan_ = std::move(plan); }
 
         /** Base directory for relative source paths in a loaded snapshot. */
         const std::filesystem::path& source_path_base() const { return source_path_base_; }

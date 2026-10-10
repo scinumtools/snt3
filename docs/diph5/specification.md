@@ -2,7 +2,7 @@
 title: "SciNumTools DIPH5"
 subtitle: "Environment HDF5 Format Specification"
 author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
-date: "Version 2.6"
+date: "Version 2.8"
 ---
 
 # Scope
@@ -42,6 +42,10 @@ order for table columns. A loaded DIPH5 file must therefore be
 treated as an evaluated environment, not as a source from which the original
 DIPL program can be reconstructed exactly.
 
+Version 2.7 retains the evaluated dependency graph. Version 2.8 may retain
+the resolved output plan of an application adapter. Output plans contain
+values and decisions, not executable adapter callbacks.
+
 # File identification and versioning
 
 The HDF5 root object MUST contain the following scalar attributes:
@@ -50,13 +54,26 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
-| `_DIPL_Schema_Version_Minor` | unsigned integer | `6` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `8` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2.6 readers support version 1 files and versions 2.0
-through 2.6. Future schema
+schema version. Version 2.8 readers support version 1 files and versions 2.0
+through 2.8. Future schema
 revisions MUST preserve the meaning of existing attributes or increment the
 major or minor schema version.
+
+## Resolved adapter output plan (2.8)
+
+An adapter-run snapshot MAY contain a root `_DIPL_Outputs` group. Each numbered
+child group, in declaration order, stores one resolved mapping. Its attributes
+are `id`, `target`, `key`, `source_path`, `rule`, `origin`, `replacements`,
+`dependencies`, `active`, `value_path`, `_DIPL_Node_Type`, and
+`_DIPL_Value_Type`; `units` is present for values with units. The `value`
+dataset uses the same typed HDF5 value encoding as parameter datasets. A
+missing `_DIPL_Outputs` group means the snapshot has no retained plan, so
+older adapters may derive their output policy from the loaded environment.
+These mappings are not DIPL parameter nodes and MUST NOT appear in normal
+environment selection.
 
 ## File naming
 

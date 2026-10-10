@@ -96,6 +96,10 @@ namespace snt::bind::python {
             "size", [](const dip::Environment& e) { return e.nodes.size(); }, "Number of top-level nodes."
         );
         env.def_property_readonly(
+            "output_plan", &dip::Environment::output_plan,
+            "Resolved adapter output plan loaded from DIPH5, or None."
+        );
+        env.def_property_readonly(
             "source_manifest",
             &dip::Environment::get_source_manifest,
             "Source identities and SHA-256 fingerprints available for this environment."

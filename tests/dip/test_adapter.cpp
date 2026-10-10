@@ -8,6 +8,8 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
+#include <snt/dip/nodes/node_boolean.h>
+#include <snt/val/values_number.h>
 #include <sstream>
 
 using namespace snt;
@@ -52,7 +54,69 @@ namespace {
         std::function<void(dip::AdapterContext&)> callback;
         void plan(const dip::Environment&, dip::AdapterContext& context) const override { callback(context); }
     };
+
+    struct MappedAdapter final : dip::Adapter {
+        mutable int declarations = 0;
+        void describe_outputs(const dip::Environment& env, dip::OutputPlan& outputs) const override {
+            ++declarations;
+            outputs.add_node(env, "run.steps", "settings", "Steps", "run.steps", false,
+                             "disabled by default", "base");
+            outputs.replace_node(env, "run.steps", "settings", "Steps", "run.steps", true,
+                                 "selected by profile", "profile");
+            outputs.add_value(
+                "run.enabled", "settings", "Enabled",
+                std::make_shared<dip::BooleanNode>(dip::Path("derived.enabled"),
+                    std::make_unique<val::ArrayValueBool>(env["run.steps"].as<int64_t>() > 0)),
+                true, "steps > 0", "adapter", {"run.steps"}
+            );
+        }
+        void plan_resolved(const dip::Environment&, const dip::OutputPlan& outputs,
+                           dip::AdapterContext& context) const override {
+            context.add_text("settings.txt", std::to_string(outputs.select("settings", true).size()));
+        }
+    };
 } // namespace
+
+TEST(Adapter, OutputPlanIsValidatedInspectableAndRetainedInSnapshot) {
+    Workspace work;
+    work.write("parameters.dip", "run\n  steps int = 3\n");
+    work.write("DIPfile", "code[]\n  file = \"parameters.dip\"\n");
+    MappedAdapter adapter;
+    dip::DIP preview_parser;
+    preview_parser.add_string("run\n  steps int = 3\n");
+    const auto preview = dip::resolve_output_plan(preview_parser.parse(), adapter);
+    ASSERT_EQ(preview.mappings().size(), 2);
+    EXPECT_EQ(preview.mappings()[0].origin, "profile");
+    dip::run_adapter_project(work.path / "DIPfile", adapter, work.path / "project", "run.diph5");
+    EXPECT_EQ(adapter.declarations, 2);
+    EXPECT_EQ(read(work.path / "project/settings.txt"), "2");
+
+    dip::Environment snapshot;
+    snapshot.load(work.path / "project/run.diph5");
+    EXPECT_EQ(dip::resolve_output_plan(snapshot, adapter).mappings().size(), 2);
+    EXPECT_EQ(adapter.declarations, 2);
+    ASSERT_TRUE(snapshot.output_plan().has_value());
+    const auto& mappings = snapshot.output_plan()->mappings();
+    ASSERT_EQ(mappings.size(), 2);
+    EXPECT_EQ(mappings[0].source_path, "run.steps");
+    EXPECT_EQ(mappings[0].replacements, std::vector<std::string>{"base"});
+    EXPECT_EQ(mappings[0].origin, "profile");
+    EXPECT_EQ(mappings[0].value->value->get_dtype(), snapshot.get_node("run.steps")->value->get_dtype());
+    EXPECT_EQ(mappings[1].dependencies, std::vector<std::string>{"run.steps"});
+    EXPECT_EQ(mappings[1].value->value->get_dtype(), core::DataType::Boolean);
+    EXPECT_FALSE(snapshot.nodes.get_nodes().empty());
+    EXPECT_EQ(snapshot.nodes.size(), 1);
+
+    MappedAdapter fresh_adapter;
+    dip::run_adapter_snapshot(work.path / "project/run.diph5", fresh_adapter, work.path / "loaded");
+    EXPECT_EQ(fresh_adapter.declarations, 0);
+    EXPECT_EQ(read(work.path / "loaded/settings.txt"), "2");
+
+    dip::OutputPlan invalid;
+    invalid.add_node(snapshot, "first", "settings", "same", "run.steps");
+    invalid.add_node(snapshot, "second", "settings", "same", "run.steps");
+    EXPECT_THROW(invalid.validate(), dip::EnvironmentException);
+}
 
 TEST(Adapter, ProjectAndSnapshotProduceEquivalentTextBinaryAndStreamedFiles) {
     Workspace work;

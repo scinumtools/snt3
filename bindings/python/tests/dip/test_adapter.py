@@ -6,6 +6,9 @@ from scinumtools3.dip import (
     Adapter,
     DIP,
     ExistingOutputPolicy,
+    Environment,
+    ValueNode,
+    resolve_output_plan,
     run_adapter,
     run_adapter_project,
     run_adapter_snapshot,
@@ -20,6 +23,52 @@ class ExampleAdapter(Adapter):
         context.add_stream("data/steps.csv", lambda write: [
             write(f"{index}\n".encode()) for index in range(steps)
         ])
+
+
+def test_adapter_output_plan_round_trips_with_profile_replacement(tmp_path: Path):
+    class MappingAdapter(Adapter):
+        def __init__(self):
+            super().__init__()
+            self.declarations = 0
+
+        def describe_outputs(self, env, outputs):
+            self.declarations += 1
+            outputs.add_node(env, "steps", "settings", "Steps", "run.steps",
+                             active=False, rule="default off", origin="base")
+            outputs.replace_node(env, "steps", "settings", "Steps", "run.steps",
+                                 active=True, rule="profile on", origin="profile")
+            outputs.add_value("enabled", "settings", "Enabled",
+                              ValueNode("derived.enabled", env["run.steps"].value > 0),
+                              rule="steps > 0", origin="adapter", dependencies=["run.steps"])
+
+        def plan_resolved(self, env, outputs, context):
+            context.add_text("settings.txt", ",".join(
+                f"{item.key}={item.value}" for item in outputs.select("settings", True)
+            ))
+
+    parser = DIP()
+    parser.add_string("run\n  steps int = 3\n")
+    env = parser.parse()
+    adapter = MappingAdapter()
+    preview = resolve_output_plan(env, adapter)
+    assert preview.mappings[0].origin == "profile"
+    run_adapter(env, adapter, tmp_path / "live", "run.diph5")
+    assert adapter.declarations == 2
+    assert (tmp_path / "live/settings.txt").read_text() == "Steps=3,Enabled=True"
+
+    snapshot = Environment()
+    snapshot.load(tmp_path / "live/run.diph5")
+    assert resolve_output_plan(snapshot, adapter).mappings[0].origin == "profile"
+    assert adapter.declarations == 2
+    assert snapshot.output_plan is not None
+    assert snapshot.output_plan.mappings[0].replacements == ["base"]
+    assert snapshot.output_plan.mappings[1].dependencies == ["run.steps"]
+    assert snapshot.size == 1
+
+    fresh_adapter = MappingAdapter()
+    run_adapter_snapshot(tmp_path / "live/run.diph5", fresh_adapter, tmp_path / "loaded")
+    assert fresh_adapter.declarations == 0
+    assert (tmp_path / "loaded/settings.txt").read_text() == "Steps=3,Enabled=True"
 
 
 def test_multiple_outputs_from_project_and_snapshot(tmp_path: Path):

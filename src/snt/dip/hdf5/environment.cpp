@@ -29,7 +29,10 @@ namespace snt::dip {
 
     void Environment::save(const std::filesystem::path& file, const SnapshotSaveOptions& options) const {
         try {
-            hdf5::save(*this, file, options);
+            auto effective = options;
+            if (!effective.output_plan && output_plan_)
+                effective.output_plan = &*output_plan_;
+            hdf5::save(*this, file, effective);
         } catch (const hdf5::Error& error) {
             throw dip::IOException(
                 "Unable to save HDF5 environment",
