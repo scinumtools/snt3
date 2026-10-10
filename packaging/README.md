@@ -33,6 +33,14 @@ image builds and starts `snt server`.
 
 ## Preparing a release
 
+Publishing a GitHub release builds CLI archives for Linux x86_64, macOS arm64,
+and Windows x86_64 and attaches them to that release. To rebuild the executables
+for an existing published release, open **Actions → Release SNT CLI → Run workflow**
+and enter its exact tag, such as `v0.9.3`. The workflow checks that the tag matches
+the source version and replaces the CLI archives attached to that release.
+The archives contain the executable and a short runtime note; `snt hub` additionally
+needs Git and Python 3 for project adapters.
+
 Archive-based recipes retain their last published version and checksums until a
 new release archive is available. Do not change the version while retaining an
 old checksum, or use a locally generated archive's checksum for a GitHub URL.
@@ -51,8 +59,7 @@ version. `--archive /path/to/downloaded.tar.gz` supports an already downloaded c
 of the same GitHub archive. Download and validation failures leave recipes unchanged.
 
 Homebrew, vcpkg, and Conda are pinned to the published 0.9.0 archive with
-verified checksums. Conan reads its version from `settings.env`; PyPI reads
-its version from `pyproject.toml`.
+verified checksums. Conan and PyPI both read their version from `settings.env`.
 
 ## Local checks
 

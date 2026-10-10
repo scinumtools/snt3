@@ -1,0 +1,212 @@
+name: Release SNT CLI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing published release tag, for example v0.9.3
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-cli-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.check.outputs.tag }}
+    steps:
+      - name: Check selected release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          test -n "$TAG"
+          draft=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
+          test "$draft" = false || { echo "Release $TAG is still a draft" >&2; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-22.04
+            target: linux-x86_64
+          - runner: macos-15-arm64
+            target: macos-arm64
+          - runner: windows-2022
+            target: windows-x86_64
+    runs-on: ${{ matrix.runner }}
+    env:
+      RELEASE_TAG: ${{ needs.release.outputs.tag }}
+      PACKAGE_NAME: snt-${{ needs.release.outputs.tag }}-${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+          submodules: recursive
+
+      - name: Check source version and architecture
+        shell: bash
+        run: |
+          version=$(sed -n 's/^CODE_VERSION=//p' settings.env)
+          test "$RELEASE_TAG" = "v$version" || {
+            echo "Release tag $RELEASE_TAG does not match settings.env ($version)" >&2
+            exit 1
+          }
+          case "${{ matrix.target }}:$(uname -m)" in
+            linux-x86_64:x86_64|macos-arm64:arm64|windows-x86_64:x86_64) ;;
+            *) echo "Runner architecture does not match the asset name" >&2; exit 1 ;;
+          esac
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libhdf5-dev libcurl4-openssl-dev libaec-dev zlib1g-dev
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install hdf5
+          echo "HDF5_ROOT=$(brew --prefix hdf5)" >> "$GITHUB_ENV"
+
+      - name: Set up MSVC
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install Windows dependencies
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          vcpkg install hdf5:x64-windows-static curl:x64-windows-static
+
+      - name: Configure CLI
+        shell: bash
+        run: |
+          extra=()
+          if [ "${{ runner.os }}" = Windows ]; then
+            extra+=(
+              -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+              -DVCPKG_TARGET_TRIPLET=x64-windows-static
+              -DHDF5_ROOT=C:/vcpkg/installed/x64-windows-static
+            )
+          fi
+          cmake -S . -B build-release -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DHDF5_USE_STATIC_LIBRARIES=ON \
+            -DENABLE_UNIT_TESTS=OFF \
+            -DENABLE_BINDING_PYTHON=OFF \
+            -DENABLE_BINDING_C=OFF \
+            -DENABLE_EXEC_EXAMPLES=OFF \
+            -DENABLE_EXEC_BENCHMARKS=OFF \
+            -DENABLE_MAT=OFF \
+            -DENABLE_SNT_VIEW=OFF \
+            -DENABLE_SNT_REPORT=ON \
+            -DENABLE_SNT_SERVER=ON \
+            -DENABLE_SNT_DMAP=ON \
+            "${extra[@]}"
+
+      - name: Build CLI
+        shell: bash
+        run: cmake --build build-release --config Release --target snt --parallel 4
+
+      - name: Verify CLI
+        shell: bash
+        run: |
+          executable=build-release/bin/snt
+          if [ "${{ runner.os }}" = Windows ]; then executable="$executable.exe"; fi
+          test -f "$executable"
+          test "$("$executable" --version)" = "${RELEASE_TAG#v}"
+          "$executable" puq convert '35*eV' J
+
+      - name: Package Linux and macOS CLI
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p "package/$PACKAGE_NAME" dist
+          cp build-release/bin/snt LICENSE "package/$PACKAGE_NAME/"
+          if [ "${{ runner.os }}" = macOS ]; then
+            executable="package/$PACKAGE_NAME/snt"
+            mkdir -p "package/$PACKAGE_NAME/lib"
+            files=("$executable")
+            for ((index=0; index<${#files[@]}; index++)); do
+              file="${files[index]}"
+              while IFS= read -r dependency; do
+                case "$dependency" in
+                  /opt/homebrew/*|/usr/local/*)
+                    name="${dependency##*/}"
+                    bundled="package/$PACKAGE_NAME/lib/$name"
+                    if [ ! -e "$bundled" ]; then
+                      cp "$dependency" "$bundled"
+                      chmod u+w "$bundled"
+                      install_name_tool -id "@executable_path/lib/$name" "$bundled"
+                      files+=("$bundled")
+                    fi
+                    install_name_tool -change "$dependency" "@executable_path/lib/$name" "$file"
+                    ;;
+                esac
+              done < <(otool -L "$file" | awk 'NR > 1 { print $1 }')
+              codesign --force --sign - "$file"
+            done
+            if otool -L "${files[@]}" | grep -E '/opt/homebrew/|/usr/local/'; then
+              echo 'Unbundled macOS dependency' >&2
+              exit 1
+            fi
+          fi
+          cat > "package/$PACKAGE_NAME/README.txt" <<'EOF'
+          Run ./snt --help for commands. The binary was built for the platform named
+          in this archive. The snt hub command also needs Git and Python 3 to fetch
+          and run a project's adapter. System libraries are required at runtime;
+          on Linux, install libcurl and libaec if they are absent.
+          EOF
+          tar -C package -czf "dist/$PACKAGE_NAME.tar.gz" "$PACKAGE_NAME"
+
+      - name: Package Windows CLI
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "package/$env:PACKAGE_NAME", dist | Out-Null
+          Copy-Item build-release/bin/snt.exe, LICENSE "package/$env:PACKAGE_NAME/"
+          @'
+          Run snt.exe --help for commands. The snt hub command also needs Git and
+          Python 3 to fetch and run a project's adapter.
+          '@ | Set-Content "package/$env:PACKAGE_NAME/README.txt"
+          Compress-Archive -Path "package/$env:PACKAGE_NAME" -DestinationPath "dist/$env:PACKAGE_NAME.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+          overwrite: true
+
+  publish:
+    needs: [release, build]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: cli-*
+          path: dist
+          merge-multiple: true
+
+      - name: Attach CLI archives to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          test "$(find dist -maxdepth 1 -type f | wc -l)" -eq 3
+          gh release upload "$RELEASE_TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"

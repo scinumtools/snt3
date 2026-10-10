@@ -6,7 +6,7 @@
 
 DIR_SOURCE=.
 
-echo "pyproject.toml                  " $(grep "^version =" $DIR_SOURCE/pyproject.toml)
+echo "pyproject.toml                   version from settings.env (dynamic metadata)"
 echo "settings.env                    " $(grep CODE_VERSION $DIR_SOURCE/settings.env)
 echo "packaging/conda-forge/meta.yaml " $(grep "version =" $DIR_SOURCE/packaging/conda-forge/meta.yaml)
 echo "packaging/vcpkg/portfile.cmake  " $(grep "REF " $DIR_SOURCE/packaging/vcpkg/portfile.cmake)
