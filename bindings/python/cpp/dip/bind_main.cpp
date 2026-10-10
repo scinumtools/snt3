@@ -49,7 +49,7 @@ namespace snt::bind::python {
         auto dip = py::class_<dip::DIP>(m, "DIP", "Parser and evaluator for DIPL source definitions.");
         dip.def(py::init<>(), "Create an empty DIPL parser.");
         dip.def(
-            "add_string", &dip::DIP::add_string, py::arg("source_code"),
+            "add_string", py::overload_cast<const std::string&>(&dip::DIP::add_string), py::arg("source_code"),
             "Add DIPL source text to the parser.\n\nArgs:\n    source_code: Complete DIPL text to parse."
         );
         dip.def(
@@ -75,7 +75,7 @@ Args:
 )doc"
         );
         dip.def(
-            "add_override_string", &dip::DIP::add_override_string, py::arg("source_code"),
+            "add_override_string", py::overload_cast<const std::string&>(&dip::DIP::add_override_string), py::arg("source_code"),
             "Collect unwrapped value modifications before evaluating nodes. Empty bodies make no changes.\n\n"
             "Args:\n    source_code: DIPL modifications with dotted paths or nested path prefixes."
         );
@@ -113,7 +113,7 @@ Args:
         );
         dip.def(
             "add_project",
-            &dip::DIP::add_project,
+            py::overload_cast<const std::filesystem::path&>(&dip::DIP::add_project),
             py::arg("project_file"),
             R"doc(Add a DIPfile with units[], sources[], schemas[], overrides[], and ordered code[] entries.
 Schema entries have a name and exactly one file or string body. Override
