@@ -143,6 +143,16 @@ namespace snt::exs {
                     if (oitype == UNARY_OPERATION) {
                         op->operate_unary(this, settings);
                     } else if (oitype == BINARY_OPERATION) {
+                        if (left.empty() || left.back().type != ATOM_TOKEN || right.empty() ||
+                            right.front().type != ATOM_TOKEN) {
+                            throw exs::ParserException(
+                                "Invalid expression syntax",
+                                "The operator `" + op->symbol + "` needs an operand on each side.",
+                                "Check for missing values or consecutive operators in the expression.",
+                                __FILE__,
+                                __LINE__
+                            );
+                        }
                         op->operate_binary(this, settings);
                     } else if (oitype == TERNARY_OPERATION) {
                         op->operate_ternary(this, settings);

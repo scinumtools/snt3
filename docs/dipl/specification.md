@@ -1,7 +1,7 @@
 ---
 title: "Dimensional Input Parameter Language"
 subtitle: "DIPL Specification for SciNumTools v3"
-author: "Ondrej Pego Jaura"
+author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
 version: "0.1.0"
 date: "September 2026"
 titlepage: true

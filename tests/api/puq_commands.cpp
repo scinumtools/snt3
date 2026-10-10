@@ -3,6 +3,7 @@
 #include "snt/api/puq_eval.h"
 #include "snt/api/puq_info.h"
 #include "snt/api/puq_list.h"
+#include "snt/exs/exceptions.h"
 
 #include <string>
 #include <vector>
@@ -83,6 +84,10 @@ TEST(PUQCommands, Convert) {
         std::string output = cmd.execute();
 
         EXPECT_EQ(output, "4.00277e-9*A");
+    }
+    for (const std::string& expression : {"35**eV", "1*m/", "*m"}) {
+        api::PUQConvert cmd(expression, "J");
+        EXPECT_THROW(cmd.execute(), exs::ParserException) << expression;
     }
 }
 

@@ -2,6 +2,7 @@ from: markdown
 pdf-engine: xelatex
 toc: true
 number-sections: true
+resource-path: [docs/dipl]
 
 variables:
   geometry:

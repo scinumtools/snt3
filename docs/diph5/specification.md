@@ -1,6 +1,9 @@
-% SciNumTools DIPH5
-% Environment HDF5 Format Specification
-% Version 2.6
+---
+title: "SciNumTools DIPH5"
+subtitle: "Environment HDF5 Format Specification"
+author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
+date: "Version 2.6"
+---
 
 # Scope
 

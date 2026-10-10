@@ -54,4 +54,12 @@ let incompatibleRejected = false;
 try { puq.convert("1*m", "s"); } catch { incompatibleRejected = true; }
 if (!incompatibleRejected)
   throw new Error("WASM PUQ accepted incompatible dimensions");
+for (const expression of ["35**eV", "1*m/", "*m"]) {
+  let syntaxRejected = false;
+  try { puq.convert(expression, "J"); } catch (error) {
+    syntaxRejected = String(error).includes("Invalid expression syntax");
+  }
+  if (!syntaxRejected)
+    throw new Error(`WASM PUQ accepted malformed expression: ${expression}`);
+}
 console.log("PUQ WebAssembly smoke test passed");

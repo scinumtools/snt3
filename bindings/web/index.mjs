@@ -44,7 +44,9 @@ export async function loadPUQ(options = {}) {
   return {
     systems() { return runtime.puqSystems(); },
     convert(expression, outputUnits, { inputSystem = "", outputSystem = "", outputQuantity = "" } = {}) {
-      return runtime.convertPUQ(expression, outputUnits, inputSystem, outputSystem, outputQuantity);
+      const result = runtime.convertPUQ(expression, outputUnits, inputSystem, outputSystem, outputQuantity);
+      if (result.error) throw new Error(result.error);
+      return result.value;
     },
   };
 }

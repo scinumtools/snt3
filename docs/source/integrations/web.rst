@@ -1,12 +1,12 @@
 WebAssembly and JavaScript
 ==========================
 
-The experimental web integration runs the existing C++ DIPL parser and
+The web integration runs the existing C++ DIPL parser and
 inspector, and the PUQ conversion command, in a browser through WebAssembly.
 Its JavaScript module provides string-based parsing, value descriptions,
 schema inspection, validation, override reevaluation, and unit conversion. It
-has no browser UI dependency. The interface is currently a local prototype
-and is not a published npm package.
+has no browser UI dependency. The JavaScript module is built from this
+repository and is not currently published as an npm package.
 
 Build it with Emscripten's ``emcmake`` and a C++17-capable toolchain:
 

@@ -139,7 +139,7 @@ and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.htm
   [PUQ](https://scinumtools.github.io/snt3/integrations/c.html#quantities-and-units)
   and [DIPL](https://scinumtools.github.io/snt3/integrations/c.html#dipl-parameters).
 - **WebAssembly and JavaScript:**
-  Experimental [web integration](https://scinumtools.github.io/snt3/integrations/web.html)
+  [Web integration](https://scinumtools.github.io/snt3/integrations/web.html)
   for browser-side DIPL inspection, validation, and override previews, plus PUQ conversion.
 - **Command line:**
   [PUQ evaluation and conversion](https://scinumtools.github.io/snt3/integrations/cli.html#quantities-and-units),

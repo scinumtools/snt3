@@ -82,14 +82,20 @@ val description(const snt::web::Model& model, const std::string& path, std::size
 
 val paths(const snt::web::Model& model) { return strings(model.paths()); }
 
-std::string convert_puq(const std::string& expression, const std::string& output_units,
-                        const std::string& input_system, const std::string& output_system,
-                        const std::string& output_quantity) {
-    snt::api::PUQConvert command(expression, output_units);
-    if (!input_system.empty()) command.argument_input_system(input_system);
-    if (!output_system.empty()) command.argument_output_system(output_system);
-    if (!output_quantity.empty()) command.argument_output_quantity(output_quantity);
-    return command.execute();
+val convert_puq(const std::string& expression, const std::string& output_units,
+                const std::string& input_system, const std::string& output_system,
+                const std::string& output_quantity) {
+    val result = val::object();
+    try {
+        snt::api::PUQConvert command(expression, output_units);
+        if (!input_system.empty()) command.argument_input_system(input_system);
+        if (!output_system.empty()) command.argument_output_system(output_system);
+        if (!output_quantity.empty()) command.argument_output_quantity(output_quantity);
+        result.set("value", command.execute());
+    } catch (const std::exception& error) {
+        result.set("error", error.what());
+    }
+    return result;
 }
 
 val puq_systems() {
