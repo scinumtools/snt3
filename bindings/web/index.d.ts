@@ -94,3 +94,12 @@ export function loadDIPL(options?: Record<string, unknown>): Promise<{
   validate(source: string, overrideBody?: string): Validation;
   validateProject(project: ProjectInput, overrideBody?: string): Validation;
 }>;
+export interface PUQConversionOptions {
+  inputSystem?: string;
+  outputSystem?: string;
+  outputQuantity?: string;
+}
+export function loadPUQ(options?: Record<string, unknown>): Promise<{
+  systems(): string[];
+  convert(expression: string, outputUnits: string, options?: PUQConversionOptions): string;
+}>;

@@ -1,4 +1,4 @@
-import { loadDIPL } from "../index.mjs";
+import { loadDIPL, loadPUQ } from "../index.mjs";
 
 const dipl = await loadDIPL();
 const source = [
@@ -42,3 +42,16 @@ projectModel.dispose();
 changed.dispose();
 model.dispose();
 console.log("DIPL WebAssembly smoke test passed");
+
+const puq = await loadPUQ();
+if (!puq.systems().includes("SI") || puq.convert("35*eV", "J") !== "5.60762e-18*J")
+  throw new Error("WASM PUQ conversion failed");
+if (puq.convert("12*statA", "A", {
+  inputSystem: "ESU", outputSystem: "SI", outputQuantity: "I",
+}) !== "4.00277e-9*A")
+  throw new Error("WASM contextual PUQ conversion failed");
+let incompatibleRejected = false;
+try { puq.convert("1*m", "s"); } catch { incompatibleRejected = true; }
+if (!incompatibleRejected)
+  throw new Error("WASM PUQ accepted incompatible dimensions");
+console.log("PUQ WebAssembly smoke test passed");

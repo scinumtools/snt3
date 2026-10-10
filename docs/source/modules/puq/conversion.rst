@@ -5,6 +5,35 @@ Conversion creates a new ``Quantity`` expressed in target units. The original
 quantity remains unchanged, which makes it safe to retain both a canonical
 calculation value and a display-specific representation.
 
+Try a conversion
+----------------
+
+Enter a PUQ quantity expression and target units. This tool runs the same C++
+conversion command as ``snt puq convert`` in your browser. The optional fields
+help with units that need an explicit system or physical-quantity context.
+
+.. raw:: html
+
+   <form id="puq-converter" class="puq-converter">
+     <div class="puq-converter-fields">
+       <label>Quantity expression<input name="expression" type="text" value="35*eV" required spellcheck="false" autocomplete="off"></label>
+       <label>Target units<input name="outputUnits" type="text" value="J" required spellcheck="false" autocomplete="off"></label>
+     </div>
+     <details>
+       <summary>Unit systems and quantity context</summary>
+       <div class="puq-converter-fields">
+         <label>Input system<input name="inputSystem" type="text" list="puq-system-names" placeholder="Default: SI" spellcheck="false" autocomplete="off"></label>
+         <label>Output system<input name="outputSystem" type="text" list="puq-system-names" placeholder="Default: input system" spellcheck="false" autocomplete="off"></label>
+         <label>Physical quantity<input name="outputQuantity" type="text" placeholder="Optional, for contextual conversions" spellcheck="false" autocomplete="off"></label>
+       </div>
+       <datalist id="puq-system-names"></datalist>
+     </details>
+     <button type="submit">Convert</button>
+     <output id="puq-converter-result" aria-live="polite">Enter a conversion and select Convert.</output>
+   </form>
+
+The conversion runs locally in the browser. No expression is sent to a server.
+
 Converting compatible quantities
 --------------------------------
 

@@ -37,3 +37,14 @@ export async function loadDIPL(options = {}) {
     },
   };
 }
+
+/** Load the PUQ converter backed by the same C++ implementation as the CLI. */
+export async function loadPUQ(options = {}) {
+  const runtime = await createDIPLRuntime(options);
+  return {
+    systems() { return runtime.puqSystems(); },
+    convert(expression, outputUnits, { inputSystem = "", outputSystem = "", outputQuantity = "" } = {}) {
+      return runtime.convertPUQ(expression, outputUnits, inputSystem, outputSystem, outputQuantity);
+    },
+  };
+}

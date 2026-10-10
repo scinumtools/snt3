@@ -1,11 +1,12 @@
 WebAssembly and JavaScript
 ==========================
 
-The experimental DIPL web integration runs the existing C++ parser and
-inspector in a browser through WebAssembly. Its JavaScript module provides
-string-based parsing, value descriptions, schema inspection, validation, and
-override reevaluation. It has no browser UI dependency. The interface is
-currently a local prototype and is not a published npm package.
+The experimental web integration runs the existing C++ DIPL parser and
+inspector, and the PUQ conversion command, in a browser through WebAssembly.
+Its JavaScript module provides string-based parsing, value descriptions,
+schema inspection, validation, override reevaluation, and unit conversion. It
+has no browser UI dependency. The interface is currently a local prototype
+and is not a published npm package.
 
 Build it with Emscripten's ``emcmake`` and a C++17-capable toolchain:
 
@@ -93,3 +94,25 @@ imports, DIPH5 persistence, reports, adapters, and DIPL source serialization
 are outside this prototype. For an editable configuration, retain the original
 project input and the accepted override body; the core does not currently
 provide a DIPL round-trip serializer.
+
+PUQ conversion
+--------------
+
+``loadPUQ`` exposes the existing C++ ``PUQConvert`` command to JavaScript.
+It accepts the same expression, target units, and optional unit-system and
+physical-quantity context as ``snt puq convert``:
+
+.. code-block:: javascript
+
+   import { loadPUQ } from "./bindings/web/index.mjs";
+
+   const puq = await loadPUQ();
+   console.log(puq.convert("35*eV", "J"));
+   console.log(puq.convert("12*statA", "A", {
+     inputSystem: "ESU", outputSystem: "SI", outputQuantity: "I",
+   }));
+   console.log(puq.systems());
+
+The :doc:`PUQ conversion page <../modules/puq/conversion>` includes a live
+browser converter using this interface. The documentation build compiles the
+WebAssembly module and copies it into Sphinx's static assets.

@@ -9,6 +9,7 @@ docs/doxy/*
 docs/banners/*
 dist/*
 bindings/web/dist/
+docs/source/_static/web/
 PROPOSALS/*
 bindings/python/.pytest_cache/*
 **/__pycache__/*

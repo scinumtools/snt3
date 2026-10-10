@@ -139,6 +139,23 @@ function run_code {
 }
 
 function compile_docs {
+    echo "Building WebAssembly documentation tools"
+    if ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))'; then
+        if [[ -x "$DIR_ROOT/.venv/bin/python3" ]]; then
+            export PATH="$DIR_ROOT/.venv/bin:$PATH"
+        fi
+    fi
+    python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' || {
+        echo "Emscripten requires Python 3.10 or newer on PATH." >&2
+        return 1
+    }
+    export EM_CACHE="$DIR_ROOT/build-web/cache"
+    emcmake cmake -S bindings/web -B build-web -G Ninja -DCMAKE_BUILD_TYPE=Release
+    cmake --build build-web --parallel 4
+    mkdir -p docs/source/_static/web/dist
+    cp bindings/web/index.mjs docs/source/_static/web/index.mjs
+    cp bindings/web/dist/dipl_web.mjs bindings/web/dist/dipl_web.wasm docs/source/_static/web/dist/
+
     dir_static=docs/source/_static
     file_dipl_spec=$dir_static/dipl-specification.pdf
     file_puel_spec=$dir_static/puel-specification.pdf
