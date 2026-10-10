@@ -2,13 +2,67 @@ Installation
 ============
 
 SciNumTools v3 can be installed in several ways, depending on how it is
-intended to be used. Python users can install the Python bindings directly
+intended to be used. Command-line users can download a precompiled ``snt``
+executable from GitHub Releases. Python users can install the Python bindings
 from PyPI or Conda, while C++ users can use vcpkg, Conan, Homebrew, or build
 the library directly from source.
 
 For most users, installing a pre-built package is recommended. Building
 from source is useful when developing SciNumTools itself, requiring specific
 build options, or integrating a development version of the library.
+
+
+Precompiled ``snt`` executable
+------------------------------
+
+Download the archive for your system from the `latest GitHub release
+<https://github.com/scinumtools/snt3/releases/latest>`_. The v0.9.3 archives
+are:
+
+* `Linux x86-64 <https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-linux-x86_64.tar.gz>`_
+* `macOS ARM64 <https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-macos-arm64.tar.gz>`_
+* `Windows x86-64 <https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-windows-x86_64.zip>`_
+
+On macOS, download and unpack the archive, then run the executable:
+
+.. code-block:: console
+
+   curl -fLO https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-macos-arm64.tar.gz
+   tar -xzf snt-v0.9.3-macos-arm64.tar.gz
+   ./snt-v0.9.3-macos-arm64/snt --version
+
+On Linux, use the corresponding archive:
+
+.. code-block:: console
+
+   curl -fLO https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-linux-x86_64.tar.gz
+   tar -xzf snt-v0.9.3-linux-x86_64.tar.gz
+   ./snt-v0.9.3-linux-x86_64/snt --version
+
+The Linux executable requires system runtime libraries, including libcurl and
+libaec. Keep the extracted directory together when moving it, because the
+macOS archive includes libraries beside ``snt``. To call ``snt`` by name in
+the current shell, add the extracted directory to ``PATH`` (use
+``linux-x86_64`` in this command on Linux):
+
+.. code-block:: console
+
+   export PATH="$PWD/snt-v0.9.3-macos-arm64:$PATH"
+
+For a permanent installation, move the entire extracted directory to a stable
+location and add its absolute path to your shell's ``PATH`` configuration.
+
+On Windows, extract the ZIP archive with File Explorer or PowerShell:
+
+.. code-block:: powershell
+
+   Invoke-WebRequest https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-windows-x86_64.zip -OutFile snt-v0.9.3-windows-x86_64.zip
+   Expand-Archive snt-v0.9.3-windows-x86_64.zip -DestinationPath .
+   .\snt-v0.9.3-windows-x86_64\snt.exe --version
+
+The archives contain the command-line application, not the C++ development
+libraries or Python bindings. The ``snt hub`` command additionally requires
+Git and Python 3 to fetch and run project adapters.
 
 
 Python
@@ -198,6 +252,8 @@ Choosing an Installation Method
 The recommended installation method depends on the intended use:
 
 * **Python application:** install ``scinumtools3`` from PyPI or Conda.
+* **Command-line application:** download the precompiled ``snt`` executable
+  from GitHub Releases.
 * **C++ application:** use vcpkg, Conan, Homebrew, or a system installation.
 * **SciNumTools development:** build directly from source.
 * **Reproducible development environment:** use the :doc:`Docker integration
