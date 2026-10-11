@@ -106,7 +106,8 @@ namespace snt::dip {
     BaseNode::PointerType TableNode::clone(const Path& pth, std::optional<size_t> indent) const {
         auto copy = std::make_shared<TableNode>(*this);
         copy->path = pth;
-        if (indent) copy->indent = *indent;
+        if (indent)
+            copy->indent = *indent;
         return copy;
     }
 

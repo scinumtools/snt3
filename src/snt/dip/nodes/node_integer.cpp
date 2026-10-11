@@ -1,114 +1,139 @@
 #include "../parsers.h"
 
+#include <cmath>
+#include <limits>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_integer.h>
 #include <snt/dip/solvers/numerical_solver.h>
-
-#include <cmath>
-#include <limits>
-#include <type_traits>
 #include <snt/val/values_number.h>
+#include <type_traits>
 
 namespace {
 
-template <typename T>
-T checked_integer(const std::string& input, const snt::dip::Line& line) {
-    try {
-        size_t consumed = 0;
-        if constexpr (std::is_signed_v<T>) {
-            const auto value = std::stoll(input, &consumed);
-            if (consumed != input.size() || value < std::numeric_limits<T>::lowest() ||
-                value > std::numeric_limits<T>::max())
-                throw std::out_of_range("integer outside declared range");
-            return static_cast<T>(value);
-        } else {
-            const auto first = input.find_first_not_of(" \t");
-            if (first != std::string::npos && input[first] == '-')
-                throw std::out_of_range("negative unsigned integer");
-            const auto value = std::stoull(input, &consumed);
-            if (consumed != input.size() || value > std::numeric_limits<T>::max())
-                throw std::out_of_range("integer outside declared range");
-            return static_cast<T>(value);
+    template <typename T> T checked_integer(const std::string& input, const snt::dip::Line& line) {
+        try {
+            size_t consumed = 0;
+            if constexpr (std::is_signed_v<T>) {
+                const auto value = std::stoll(input, &consumed);
+                if (consumed != input.size() || value < std::numeric_limits<T>::lowest() ||
+                    value > std::numeric_limits<T>::max())
+                    throw std::out_of_range("integer outside declared range");
+                return static_cast<T>(value);
+            } else {
+                const auto first = input.find_first_not_of(" \t");
+                if (first != std::string::npos && input[first] == '-')
+                    throw std::out_of_range("negative unsigned integer");
+                const auto value = std::stoull(input, &consumed);
+                if (consumed != input.size() || value > std::numeric_limits<T>::max())
+                    throw std::out_of_range("integer outside declared range");
+                return static_cast<T>(value);
+            }
+        } catch (const std::invalid_argument&) {
+            // Report malformed values through the same source-located DIP diagnostic.
+        } catch (const std::out_of_range&) {
+            // This also catches values outside the range of the parsing type.
         }
-    } catch (const std::invalid_argument&) {
-        // Report malformed values through the same source-located DIP diagnostic.
-    } catch (const std::out_of_range&) {
-        // This also catches values outside the range of the parsing type.
+        throw snt::dip::SyntaxException(
+            "Invalid integer value",
+            "The value `" + input + "` is not a valid " + (std::is_signed_v<T> ? "signed" : "unsigned") + " " +
+                std::to_string(sizeof(T) * 8) + "-bit integer.",
+            "Use an integer within the range of the declared data type.",
+            __FILE__,
+            __LINE__,
+            line
+        );
     }
-    throw snt::dip::SyntaxException(
-        "Invalid integer value",
-        "The value `" + input + "` is not a valid " +
-            (std::is_signed_v<T> ? "signed" : "unsigned") + " " +
-            std::to_string(sizeof(T) * 8) + "-bit integer.",
-        "Use an integer within the range of the declared data type.",
-        __FILE__, __LINE__, line
-    );
-}
 
 } // namespace
 
 namespace snt::dip {
 
-void IntegerNode::validate_value(const val::BaseValue* value, core::DataType dtype, const Line& line) {
-    if (!value) return;
-    unsigned bits = 0;
-    bool unsigned_target = false;
-    switch (dtype) {
-    case snt::core::DataType::Integer8: bits = 8; break;
-    case snt::core::DataType::Integer16: bits = 16; break;
-    case snt::core::DataType::Integer32: bits = 32; break;
-    case snt::core::DataType::Integer64: bits = 64; break;
-    case snt::core::DataType::Integer8_U: bits = 8; unsigned_target = true; break;
-    case snt::core::DataType::Integer16_U: bits = 16; unsigned_target = true; break;
-    case snt::core::DataType::Integer32_U: bits = 32; unsigned_target = true; break;
-    case snt::core::DataType::Integer64_U: bits = 64; unsigned_target = true; break;
-    default: return;
-    }
-    const auto signed_min = bits == 64 ? std::numeric_limits<int64_t>::lowest() : -(int64_t{1} << (bits - 1));
-    const auto signed_max = bits == 64 ? std::numeric_limits<int64_t>::max() : (int64_t{1} << (bits - 1)) - 1;
-    const auto unsigned_max = bits == 64 ? std::numeric_limits<uint64_t>::max() : (uint64_t{1} << bits) - 1;
-    bool in_range = true;
-    bool integral = true;
-    if (const auto* signed_values = dynamic_cast<const snt::val::ArrayValue<int64_t>*>(value)) {
-        for (const auto number : signed_values->get_values())
-            in_range &= unsigned_target ? number >= 0 && static_cast<uint64_t>(number) <= unsigned_max
-                                        : number >= signed_min && number <= signed_max;
-    } else if (const auto* unsigned_values = dynamic_cast<const snt::val::ArrayValue<uint64_t>*>(value)) {
-        for (const auto number : unsigned_values->get_values())
-            in_range &= unsigned_target ? number <= unsigned_max : number <= static_cast<uint64_t>(signed_max);
-    } else if (const auto* floating_values = dynamic_cast<const snt::val::ArrayValue<double>*>(value)) {
-        const auto upper_exclusive = std::ldexp(1.0L, unsigned_target ? bits : bits - 1);
-        const auto lower_inclusive = unsigned_target ? 0.0L : -upper_exclusive;
-        for (const auto number : floating_values->get_values()) {
-            in_range &= std::isfinite(number) && static_cast<long double>(number) >= lower_inclusive &&
-                        static_cast<long double>(number) < upper_exclusive;
-            integral &= std::isfinite(number) && std::trunc(number) == number;
+    void IntegerNode::validate_value(const val::BaseValue* value, core::DataType dtype, const Line& line) {
+        if (!value)
+            return;
+        unsigned bits = 0;
+        bool unsigned_target = false;
+        switch (dtype) {
+        case snt::core::DataType::Integer8:
+            bits = 8;
+            break;
+        case snt::core::DataType::Integer16:
+            bits = 16;
+            break;
+        case snt::core::DataType::Integer32:
+            bits = 32;
+            break;
+        case snt::core::DataType::Integer64:
+            bits = 64;
+            break;
+        case snt::core::DataType::Integer8_U:
+            bits = 8;
+            unsigned_target = true;
+            break;
+        case snt::core::DataType::Integer16_U:
+            bits = 16;
+            unsigned_target = true;
+            break;
+        case snt::core::DataType::Integer32_U:
+            bits = 32;
+            unsigned_target = true;
+            break;
+        case snt::core::DataType::Integer64_U:
+            bits = 64;
+            unsigned_target = true;
+            break;
+        default:
+            return;
         }
-    } else if (const auto* floating_values = dynamic_cast<const snt::val::ArrayValue<long double>*>(value)) {
-        const auto upper_exclusive = std::ldexp(1.0L, unsigned_target ? bits : bits - 1);
-        const auto lower_inclusive = unsigned_target ? 0.0L : -upper_exclusive;
-        for (const auto number : floating_values->get_values()) {
-            in_range &= std::isfinite(number) && number >= lower_inclusive && number < upper_exclusive;
-            integral &= std::isfinite(number) && std::trunc(number) == number;
+        const auto signed_min = bits == 64 ? std::numeric_limits<int64_t>::lowest() : -(int64_t{1} << (bits - 1));
+        const auto signed_max = bits == 64 ? std::numeric_limits<int64_t>::max() : (int64_t{1} << (bits - 1)) - 1;
+        const auto unsigned_max = bits == 64 ? std::numeric_limits<uint64_t>::max() : (uint64_t{1} << bits) - 1;
+        bool in_range = true;
+        bool integral = true;
+        if (const auto* signed_values = dynamic_cast<const snt::val::ArrayValue<int64_t>*>(value)) {
+            for (const auto number : signed_values->get_values())
+                in_range &= unsigned_target ? number >= 0 && static_cast<uint64_t>(number) <= unsigned_max
+                                            : number >= signed_min && number <= signed_max;
+        } else if (const auto* unsigned_values = dynamic_cast<const snt::val::ArrayValue<uint64_t>*>(value)) {
+            for (const auto number : unsigned_values->get_values())
+                in_range &= unsigned_target ? number <= unsigned_max : number <= static_cast<uint64_t>(signed_max);
+        } else if (const auto* floating_values = dynamic_cast<const snt::val::ArrayValue<double>*>(value)) {
+            const auto upper_exclusive = std::ldexp(1.0L, unsigned_target ? bits : bits - 1);
+            const auto lower_inclusive = unsigned_target ? 0.0L : -upper_exclusive;
+            for (const auto number : floating_values->get_values()) {
+                in_range &= std::isfinite(number) && static_cast<long double>(number) >= lower_inclusive &&
+                            static_cast<long double>(number) < upper_exclusive;
+                integral &= std::isfinite(number) && std::trunc(number) == number;
+            }
+        } else if (const auto* floating_values = dynamic_cast<const snt::val::ArrayValue<long double>*>(value)) {
+            const auto upper_exclusive = std::ldexp(1.0L, unsigned_target ? bits : bits - 1);
+            const auto lower_inclusive = unsigned_target ? 0.0L : -upper_exclusive;
+            for (const auto number : floating_values->get_values()) {
+                in_range &= std::isfinite(number) && number >= lower_inclusive && number < upper_exclusive;
+                integral &= std::isfinite(number) && std::trunc(number) == number;
+            }
         }
+        if (!in_range)
+            throw snt::dip::SyntaxException(
+                "Integer value outside declared range",
+                "The evaluated value cannot be represented as a " +
+                    std::string(unsigned_target ? "unsigned " : "signed ") + std::to_string(bits) + "-bit integer.",
+                "Use a value within the range of the declared data type.",
+                __FILE__,
+                __LINE__,
+                line
+            );
+        if (!integral)
+            throw SyntaxException(
+                "Invalid integer value",
+                "The evaluated value is fractional and cannot be represented as an integer.",
+                "Use a whole number after unit conversion, or declare a floating-point node.",
+                __FILE__,
+                __LINE__,
+                line
+            );
     }
-    if (!in_range)
-        throw snt::dip::SyntaxException(
-            "Integer value outside declared range",
-            "The evaluated value cannot be represented as a " +
-                std::string(unsigned_target ? "unsigned " : "signed ") + std::to_string(bits) + "-bit integer.",
-            "Use a value within the range of the declared data type.",
-            __FILE__, __LINE__, line
-        );
-    if (!integral)
-        throw SyntaxException(
-            "Invalid integer value",
-            "The evaluated value is fractional and cannot be represented as an integer.",
-            "Use a whole number after unit conversion, or declare a floating-point node.",
-            __FILE__, __LINE__, line
-        );
-}
 
     ValueNode::PointerType IntegerNode::is_node(Parser& parser) {
         if (parser.dtype_raw[1] == "int") {

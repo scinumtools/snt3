@@ -51,9 +51,8 @@ TEST(ParseScalars, IntegerValue) {
 }
 
 TEST(ParseScalars, VariablePrecisionIsRejectedAtParsing) {
-    for (const std::string& declaration : {
-             "value intx = 1", "value uintx = 1", "value floatx = 1.5", "value floatx[2] = [1,2]"
-         }) {
+    for (const std::string& declaration :
+         {"value intx = 1", "value uintx = 1", "value floatx = 1.5", "value floatx[2] = [1,2]"}) {
         SCOPED_TRACE(declaration);
         dip::DIP parser;
         try {
@@ -282,12 +281,18 @@ TEST(ParseScalars, DataTypeRanges) {
 
 TEST(ParseScalars, IntegerValuesOutsideDeclaredRangeAreRejected) {
     const std::vector<std::string> declarations = {
-        "value int8 = -129", "value int8 = 128",
-        "value uint8 = -1", "value uint8 = 256",
-        "value int16 = -32769", "value int16 = 32768",
-        "value uint16 = -1", "value uint16 = 65536",
-        "value int32 = 2147483648", "value uint32 = 4294967296",
-        "value int64 = 9223372036854775808", "value uint64 = 18446744073709551616"
+        "value int8 = -129",
+        "value int8 = 128",
+        "value uint8 = -1",
+        "value uint8 = 256",
+        "value int16 = -32769",
+        "value int16 = 32768",
+        "value uint16 = -1",
+        "value uint16 = 65536",
+        "value int32 = 2147483648",
+        "value uint32 = 4294967296",
+        "value int64 = 9223372036854775808",
+        "value uint64 = 18446744073709551616"
     };
     for (const auto& declaration : declarations) {
         SCOPED_TRACE(declaration);
@@ -299,10 +304,7 @@ TEST(ParseScalars, IntegerValuesOutsideDeclaredRangeAreRejected) {
 
 TEST(ParseScalars, IntegerExpressionOutsideDeclaredRangeIsRejected) {
     const std::vector<std::string> declarations = {
-        "value int8 = (127 + 1)",
-        "value uint8 = (255 + 1)",
-        "value uint8 = (-1)",
-        "value uint64 = (-1)"
+        "value int8 = (127 + 1)", "value uint8 = (255 + 1)", "value uint8 = (-1)", "value uint64 = (-1)"
     };
     for (const auto& declaration : declarations) {
         SCOPED_TRACE(declaration);
@@ -324,8 +326,10 @@ TEST(ParseScalars, IntegerOverrideOutsideDeclaredRangeIsRejected) {
 
 TEST(ParseScalars, FloatValuesOutsideDeclaredRangeAreRejected) {
     const std::vector<std::string> declarations = {
-        "value float32 = 3.5e38", "value float32 = -3.5e38",
-        "value float32 = 1e-50", "value float64 = 1e309",
+        "value float32 = 3.5e38",
+        "value float32 = -3.5e38",
+        "value float32 = 1e-50",
+        "value float64 = 1e309",
         "value float32 = (1e38 * 10)",
         "source float64 = 1e39\nvalue float32 = {?source}",
         "source float64 = 1e-50\nvalue float32 = {?source}"

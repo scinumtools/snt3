@@ -83,8 +83,8 @@ int main(int argc, char* argv[]) {
         }
     }
     if (argc > 2 && std::string(argv[1]) == "dip" &&
-        (std::string(argv[2]) == "describe" || std::string(argv[2]) == "override-contract" || std::string(argv[2]) == "schemas" || std::string(argv[2]) == "list" ||
-         std::string(argv[2]) == "preview")) {
+        (std::string(argv[2]) == "describe" || std::string(argv[2]) == "override-contract" ||
+         std::string(argv[2]) == "schemas" || std::string(argv[2]) == "list" || std::string(argv[2]) == "preview")) {
         try {
             return module_dip_semantic(argc - 2, argv + 2);
         } catch (const std::exception& error) {
@@ -114,7 +114,9 @@ int main(int argc, char* argv[]) {
 #ifdef SNT_ENABLE_REPORT
                 module_report(argpar);
 #else
-                throw std::runtime_error("Report support is not included in this build. Configure with ENABLE_SNT_REPORT=ON.");
+                throw std::runtime_error(
+                    "Report support is not included in this build. Configure with ENABLE_SNT_REPORT=ON."
+                );
 #endif
             } else {
                 throw std::runtime_error("Unknown module: " + mod + ". Use snt --help.");

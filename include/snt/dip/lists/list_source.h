@@ -16,18 +16,18 @@ namespace snt::dip {
 
     /** Named DIPL source text together with its parsed nodes. */
     struct EnvSource {
-        std::string name;          // source key
-        std::string path;          // source path
-        std::string code;          // source code
-        Source parent;             // parent source
-        NodeList<ValueNode> nodes; // parsed nodes
-        bool named_source = false; // registered for source?path references
-        bool raw_text = false;     // content is read verbatim, not parsed as DIPL
-        bool table_text = false;   // raw content was parsed as a table
-        HierarchyList hierarchy;      // source-local hierarchy
+        std::string name;                  // source key
+        std::string path;                  // source path
+        std::string code;                  // source code
+        Source parent;                     // parent source
+        NodeList<ValueNode> nodes;         // parsed nodes
+        bool named_source = false;         // registered for source?path references
+        bool raw_text = false;             // content is read verbatim, not parsed as DIPL
+        bool table_text = false;           // raw content was parsed as a table
+        HierarchyList hierarchy;           // source-local hierarchy
         ExplicitDeclarations declarations; // explicit source-local paths
-        bool embedded = false; // code came from a string rather than the file at path
-                                   // std::shared_ptr<SourceList> sources;
+        bool embedded = false;             // code came from a string rather than the file at path
+                                           // std::shared_ptr<SourceList> sources;
     };
 
     /** Collection of named DIPL sources. */

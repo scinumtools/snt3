@@ -4,8 +4,8 @@
 #include <iomanip>
 #include <snt/puq/util/display_length.h>
 #include <sstream>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace snt::puq {
 
@@ -40,15 +40,15 @@ namespace snt::puq {
                 if (setting.title.empty())
                     ss << std::string(setting.width + padding, ' ');
                 else
-                    ss << std::setfill(' ') << std::setw(setting.width) << std::left
-                       << std::string(setting.width, '-') << std::string(padding, ' ');
+                    ss << std::setfill(' ') << std::setw(setting.width) << std::left << std::string(setting.width, '-')
+                       << std::string(padding, ' ');
             }
             ss << '\n';
             for (const auto& row : data) {
                 for (size_t col = 0; col < row.size(); col++) {
                     size_t dwidth = row[col].size() - display_length(row[col]);
-                    ss << std::setfill(' ') << std::setw(static_cast<int>(settings[col].width + dwidth)) << std::left << row[col]
-                       << std::string(padding, ' ');
+                    ss << std::setfill(' ') << std::setw(static_cast<int>(settings[col].width + dwidth)) << std::left
+                       << row[col] << std::string(padding, ' ');
                 }
                 ss << '\n';
             }

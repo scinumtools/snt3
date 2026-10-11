@@ -1,12 +1,12 @@
 #include "pch_tests.h"
-#include "snt/api/dip_parse.h"
 #include "snt/api/dip_compare.h"
+#include "snt/api/dip_parse.h"
 #include "snt/api/dip_semantic.h"
 #include "snt/api/exceptions.h"
 #include "snt/dip/cursor.h"
 
-#include <filesystem>
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>

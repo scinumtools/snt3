@@ -1,10 +1,9 @@
 #include "model.h"
 
-#include <snt/dip/environment.h>
-
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <snt/dip/environment.h>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -36,9 +35,8 @@ namespace snt::dip::generate {
 
         Node* child(Node& parent, NodeKind kind, const std::string& name, const std::string& path) {
             const auto found = std::find_if(parent.children.begin(), parent.children.end(), [&](const auto& node) {
-                const bool value_group_pair =
-                    (node->kind == NodeKind::Value && kind == NodeKind::Group) ||
-                    (node->kind == NodeKind::Group && kind == NodeKind::Value);
+                const bool value_group_pair = (node->kind == NodeKind::Value && kind == NodeKind::Group) ||
+                                              (node->kind == NodeKind::Group && kind == NodeKind::Value);
                 return node->name == name && (node->kind == kind || value_group_pair);
             });
             if (found != parent.children.end())
@@ -79,7 +77,8 @@ namespace snt::dip::generate {
                 }
 
                 const Collection* collection = collection_at(collections, raw_path);
-                const NodeKind collection_kind = collection && collection->kind == Path::Kind::List ? NodeKind::List : NodeKind::Map;
+                const NodeKind collection_kind =
+                    collection && collection->kind == Path::Kind::List ? NodeKind::List : NodeKind::Map;
                 current = child(*current, collection_kind, segment.name, raw_path);
                 raw_path += '[' + segment.item + ']';
                 current = child(

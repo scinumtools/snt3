@@ -101,8 +101,8 @@ namespace snt::view {
                 static std::size_t displayed_revision = model.revision();
                 static bool has_data = false;
                 static bool has_graph = false;
-                const bool selection_changed = displayed_selection != model.selection() ||
-                                               displayed_revision != model.revision();
+                const bool selection_changed =
+                    displayed_selection != model.selection() || displayed_revision != model.revision();
                 if (selection_changed) {
                     source = SourceView{};
                     source_error.clear();
@@ -112,13 +112,14 @@ namespace snt::view {
                     graph_state = {};
                     has_data = false;
                     has_graph = false;
-                    if (const auto* selected = model.object(model.selection()); selected &&
+                    if (const auto* selected = model.object(model.selection());
+                        selected &&
                         (selected->role == ObjectRole::Path || selected->role == ObjectRole::Override ||
                          selected->role == ObjectRole::BlockSource || selected->role == ObjectRole::Source) &&
                         (!selected->node_path.empty() || selected->role == ObjectRole::Source)) {
                         try {
-                            const std::string inspect_path = selected->source_name.empty()
-                                ? selected->node_path : selected->path;
+                            const std::string inspect_path =
+                                selected->source_name.empty() ? selected->node_path : selected->path;
                             const auto capabilities = dip::Inspector{model.environment()}.capabilities(inspect_path);
                             has_data = capabilities.hasArrayData || capabilities.hasTabularData;
                             has_graph = capabilities.hasReferenceGraph;
@@ -217,8 +218,16 @@ namespace snt::view {
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-            draw_view(model, inspector_cache, data_state, graph_state, source,
-                      select_source_tab, scroll_to_target, source_error);
+            draw_view(
+                model,
+                inspector_cache,
+                data_state,
+                graph_state,
+                source,
+                select_source_tab,
+                scroll_to_target,
+                source_error
+            );
             ImGui::Render();
             int width = 0, height = 0;
             glfwGetFramebufferSize(window, &width, &height);

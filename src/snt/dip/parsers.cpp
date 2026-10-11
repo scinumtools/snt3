@@ -54,10 +54,10 @@ namespace snt::dip {
         }
     }
 
-
-
     inline EnvSource parse_file_source(
-        const std::string& source_name, const std::string& source_file, const Source& parent,
+        const std::string& source_name,
+        const std::string& source_file,
+        const Source& parent,
         const ProjectFileReader& reader
     ) {
         DIP d(parent);
@@ -70,8 +70,12 @@ namespace snt::dip {
         return source;
     }
 
-    EnvSource parse_source(const std::string& source_name, const std::string& source_file, const Source& parent,
-                           const ProjectFileReader& reader) {
+    EnvSource parse_source(
+        const std::string& source_name,
+        const std::string& source_file,
+        const Source& parent,
+        const ProjectFileReader& reader
+    ) {
         if (source_file.size() >= FILE_SUFFIX_DIP1.size() &&
             source_file.compare(
                 source_file.size() - FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1
@@ -100,7 +104,8 @@ namespace snt::dip {
         size_t line_number = 1;
         while (std::getline(ss, line)) {
             // Project files are read as bytes, so CRLF retains its carriage return.
-            if (!line.empty() && line.back() == '\r') line.pop_back();
+            if (!line.empty() && line.back() == '\r')
+                line.pop_back();
             // skip empty lines
             if (!line.empty() && !std::all_of(line.begin(), line.end(), isspace))
                 lines.push({line, {source_name, line_number}});

@@ -2,8 +2,8 @@
 #define SNT_VIEW_APPLICATION_H
 
 namespace snt::view {
-class ViewerModel;
-int run_application(ViewerModel& model);
-}
+    class ViewerModel;
+    int run_application(ViewerModel& model);
+} // namespace snt::view
 
 #endif

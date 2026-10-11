@@ -7,6 +7,6 @@
 namespace snt::dip::generate {
     /** Convert a DIPL name into a portable native-language identifier. */
     std::string identifier(const std::string& name, std::unordered_set<std::string>& used);
-}
+} // namespace snt::dip::generate
 
 #endif // SNT_DIP_GENERATE_NAMING_H

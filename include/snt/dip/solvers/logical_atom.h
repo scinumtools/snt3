@@ -8,7 +8,7 @@ namespace snt::dip {
 
     struct LogicalSettings : exs::BaseSettings {
         Environment* env = nullptr; ///< Environment for the references
-        Path current;     ///< Current path for in the hierarchy
+        Path current;               ///< Current path for in the hierarchy
     };
 
     class LogicalAtom : public exs::AtomBase<LogicalAtom, ValueNodeData> {

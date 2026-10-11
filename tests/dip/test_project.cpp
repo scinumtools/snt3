@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <snt/dip/cursor.h>
@@ -7,7 +8,6 @@
 #include <snt/dip/exceptions.h>
 #include <snt/dip/inspect/inspector.h>
 #include <snt/dip/project_bundle.h>
-#include <algorithm>
 #include <string>
 #include <utility>
 
@@ -15,45 +15,49 @@ using namespace snt;
 
 namespace {
 
-class ProjectDirectory {
-  public:
-    explicit ProjectDirectory(const std::string& name)
-        : path_(std::filesystem::temp_directory_path() / ("scinumtools3-" + name)) {
-        std::filesystem::remove_all(path_);
-        std::filesystem::create_directories(path_);
-    }
+    class ProjectDirectory {
+      public:
+        explicit ProjectDirectory(const std::string& name)
+            : path_(std::filesystem::temp_directory_path() / ("scinumtools3-" + name)) {
+            std::filesystem::remove_all(path_);
+            std::filesystem::create_directories(path_);
+        }
 
-    ~ProjectDirectory() { std::filesystem::remove_all(path_); }
+        ~ProjectDirectory() { std::filesystem::remove_all(path_); }
 
-    const std::filesystem::path& path() const { return path_; }
+        const std::filesystem::path& path() const { return path_; }
 
-    void write(const std::string& name, const std::string& contents) const {
-        std::ofstream file(path_ / name);
-        ASSERT_TRUE(file.is_open());
-        file << contents;
-    }
+        void write(const std::string& name, const std::string& contents) const {
+            std::ofstream file(path_ / name);
+            ASSERT_TRUE(file.is_open());
+            file << contents;
+        }
 
-  private:
-    std::filesystem::path path_;
-};
+      private:
+        std::filesystem::path path_;
+    };
 
 } // namespace
 
 TEST(Project, PackagesTypedTableAndMatchesNativeEvaluation) {
     ProjectDirectory project("source-backed-bundle");
-    project.write("DIPfile",
+    project.write(
+        "DIPfile",
         "units[]\n  name = \"tick\"\n  unit = \"s\"\n"
         "sources[]\n  name = \"measurements\"\n  filepath = \"measurements.dipt\"\n"
         "schemas[]\n  name = \"settings_schema\"\n  file = \"settings.dip\"\n"
         "overrides[]\n  file = \"preset.dip\"\n"
-        "code[]\n  file = \"model.dip\"\n");
+        "code[]\n  file = \"model.dip\"\n"
+    );
     project.write("settings.dip", "factor float = 2\nmode int = 1\n");
     project.write("preset.dip", "settings.mode = 2\n");
-    project.write("model.dip",
+    project.write(
+        "model.dip",
         "settings : settings_schema\n"
         "samples table = {measurements}\n"
         "interval float = 3 tick\n"
-        "scaled float = ({?settings.factor} * 3)\n");
+        "scaled float = ({?settings.factor} * 3)\n"
+    );
     project.write("measurements.dipt", "time float s\nmass float kg\n---\n0 1\n1 3\n");
 
     dip::DIP native;
@@ -90,23 +94,21 @@ TEST(Project, BundleRejectsMissingAndEscapingFiles) {
     dip::DIP parser;
     EXPECT_THROW(parser.add_project(bundle), dip::IOException);
     dip::DIP traversal;
-    const dip::ProjectBundle escaping_bundle{
-        "DIPfile", {{"DIPfile", "code[]\n  file = \"../outside.dip\"\n"}}};
-    EXPECT_THROW(traversal.add_project(escaping_bundle),
-                 dip::IOException);
+    const dip::ProjectBundle escaping_bundle{"DIPfile", {{"DIPfile", "code[]\n  file = \"../outside.dip\"\n"}}};
+    EXPECT_THROW(traversal.add_project(escaping_bundle), dip::IOException);
     dip::DIP invalid_text;
-    const dip::ProjectBundle invalid_bundle{
-        "DIPfile", {{"DIPfile", std::string(1, static_cast<char>(0xff))}}};
-    EXPECT_THROW(invalid_text.add_project(invalid_bundle),
-                 dip::IOException);
+    const dip::ProjectBundle invalid_bundle{"DIPfile", {{"DIPfile", std::string(1, static_cast<char>(0xff))}}};
+    EXPECT_THROW(invalid_text.add_project(invalid_bundle), dip::IOException);
 }
 
 TEST(Project, ParsesCRLFManifestAndCode) {
-    const dip::ProjectBundle bundle{"DIPfile", {
-        {"DIPfile", "units[]\r\n  name = \"tick\"\r\n  unit = \"s\"\r\n"
-                    "code[]\r\n  file = \"model.dip\"\r\n"},
-        {"model.dip", "value float = 2 tick\r\n"}
-    }};
+    const dip::ProjectBundle bundle{
+        "DIPfile",
+        {{"DIPfile",
+          "units[]\r\n  name = \"tick\"\r\n  unit = \"s\"\r\n"
+          "code[]\r\n  file = \"model.dip\"\r\n"},
+         {"model.dip", "value float = 2 tick\r\n"}}
+    };
     dip::DIP parser;
     parser.add_project(bundle);
     EXPECT_DOUBLE_EQ(parser.parse()["value"].as<double>(), 2.0);
@@ -115,14 +117,20 @@ TEST(Project, ParsesCRLFManifestAndCode) {
 #ifndef _WIN32
 TEST(Project, BundleKeepsLogicalSymlinkPath) {
     ProjectDirectory project("bundle-symlink");
-    project.write("DIPfile", "sources[]\n  name = \"data\"\n  filepath = \"alias.dipt\"\n"
-                             "code[]\n  string = \"samples table = {data}\"\n");
+    project.write(
+        "DIPfile",
+        "sources[]\n  name = \"data\"\n  filepath = \"alias.dipt\"\n"
+        "code[]\n  string = \"samples table = {data}\"\n"
+    );
     project.write("real.dipt", "mass float kg\n---\n3\n");
     std::filesystem::create_symlink("real.dipt", project.path() / "alias.dipt");
     const auto bundle = dip::package_project(project.path() / "DIPfile");
-    EXPECT_NE(std::find_if(bundle.files.begin(), bundle.files.end(), [](const auto& file) {
-        return file.path == "alias.dipt";
-    }), bundle.files.end());
+    EXPECT_NE(
+        std::find_if(
+            bundle.files.begin(), bundle.files.end(), [](const auto& file) { return file.path == "alias.dipt"; }
+        ),
+        bundle.files.end()
+    );
     dip::DIP parser;
     parser.add_project(bundle);
     EXPECT_EQ(parser.parse()["samples.mass"].as<std::vector<double>>(), (std::vector<double>{3.0}));
@@ -386,8 +394,7 @@ TEST(Project, RejectsOrdinaryParameterNodes) {
 }
 
 TEST(Project, ParameterViewerExampleStaysBrowsable) {
-    const auto project = std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) /
-                         "examples/dip/ParameterViewer/DIPfile";
+    const auto project = std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "examples/dip/ParameterViewer/DIPfile";
     dip::DIP parser;
     parser.add_project(project);
     const dip::Environment env = parser.parse(true);
@@ -412,26 +419,32 @@ TEST(Project, ParameterViewerExampleStaysBrowsable) {
     EXPECT_EQ(env.get_node("experiment.readings.temperature")->value->get_shape().at(0), 4);
     EXPECT_TRUE(view.graph().recorded);
 
-    const auto locations = [&](dip::SourceEntityKind kind, std::string name,
-                               std::string source = {}, std::size_t index = 0) {
-        return view.source_locations({kind, std::move(name), std::move(source), index});
-    };
+    const auto locations =
+        [&](dip::SourceEntityKind kind, std::string name, std::string source = {}, std::size_t index = 0) {
+            return view.source_locations({kind, std::move(name), std::move(source), index});
+        };
     const auto value = locations(dip::SourceEntityKind::Path, "experiment.geometry.length");
     ASSERT_EQ(value.size(), 2);
     EXPECT_EQ(value.front().role, dip::SourceLocationRole::Override);
-    EXPECT_EQ(std::filesystem::path(value.front().source.path).generic_string(),
-              (project.parent_path() / "overrides.dip").generic_string());
+    EXPECT_EQ(
+        std::filesystem::path(value.front().source.path).generic_string(),
+        (project.parent_path() / "overrides.dip").generic_string()
+    );
     EXPECT_EQ(value.back().role, dip::SourceLocationRole::Declaration);
-    EXPECT_EQ(std::filesystem::path(value.back().source.path).generic_string(),
-              (project.parent_path() / "parameters.dip").generic_string());
+    EXPECT_EQ(
+        std::filesystem::path(value.back().source.path).generic_string(),
+        (project.parent_path() / "parameters.dip").generic_string()
+    );
 
     const auto group = locations(dip::SourceEntityKind::Path, "experiment.geometry");
     ASSERT_EQ(group.size(), 1);
     EXPECT_EQ(group.front().role, dip::SourceLocationRole::Declaration);
     const auto source_group = locations(dip::SourceEntityKind::Path, "devices[thermometer]", "catalog");
     ASSERT_EQ(source_group.size(), 1);
-    EXPECT_EQ(std::filesystem::path(source_group.front().source.path).generic_string(),
-              (project.parent_path() / "catalog.dip").generic_string());
+    EXPECT_EQ(
+        std::filesystem::path(source_group.front().source.path).generic_string(),
+        (project.parent_path() / "catalog.dip").generic_string()
+    );
 
     const auto unit = locations(dip::SourceEntityKind::Unit, "sample_tick");
     ASSERT_EQ(unit.size(), 1);
@@ -444,8 +457,10 @@ TEST(Project, ParameterViewerExampleStaysBrowsable) {
     EXPECT_EQ(schema.back().line, 14);
     const auto source = locations(dip::SourceEntityKind::NamedSource, "reference");
     ASSERT_EQ(source.size(), 1);
-    EXPECT_EQ(std::filesystem::path(source.front().source.path).generic_string(),
-              (project.parent_path() / "reference.dip").generic_string());
+    EXPECT_EQ(
+        std::filesystem::path(source.front().source.path).generic_string(),
+        (project.parent_path() / "reference.dip").generic_string()
+    );
     const auto registration = locations(dip::SourceEntityKind::ProjectEntry, {}, {}, 1);
     ASSERT_EQ(registration.size(), 1);
     EXPECT_EQ(registration.front().line, 7);

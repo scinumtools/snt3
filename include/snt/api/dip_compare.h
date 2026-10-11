@@ -19,7 +19,10 @@ namespace snt::api {
         DIPCompare(std::filesystem::path before, std::filesystem::path after)
             : before_(std::move(before)), after_(std::move(after)) {}
 
-        void set_options(dip::ComparisonOptions options) { options_ = options; comparison_.reset(); }
+        void set_options(dip::ComparisonOptions options) {
+            options_ = options;
+            comparison_.reset();
+        }
         void set_max_details(std::size_t count) { max_details_ = count; }
         dip::ComparisonResult compare() const;
         std::string execute() const;

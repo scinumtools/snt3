@@ -102,10 +102,7 @@ TEST(Environment, GenerateMultiDimensionalArray) {
     std::ifstream cpp(cpp_file);
     std::stringstream text;
     text << cpp.rdbuf();
-    EXPECT_NE(
-        text.str().find("std::array<std::array<std::int32_t, 3>, 2> tensor"),
-        std::string::npos
-    );
+    EXPECT_NE(text.str().find("std::array<std::array<std::int32_t, 3>, 2> tensor"), std::string::npos);
     EXPECT_NE(text.str().find("{{{{1, 2, 3}}, {{4, 5, 6}}}}"), std::string::npos);
 
     cpp.close();
@@ -162,10 +159,11 @@ TEST(Environment, GenerateThreeDimensionalArray) {
     std::stringstream cpp_text;
     cpp_text << cpp.rdbuf();
     EXPECT_NE(
-        cpp_text.str().find("std::array<std::array<std::array<std::int32_t, 3>, 2>, 2> volume"),
-        std::string::npos
+        cpp_text.str().find("std::array<std::array<std::array<std::int32_t, 3>, 2>, 2> volume"), std::string::npos
     );
-    EXPECT_NE(cpp_text.str().find("{{{{{{1, 2, 3}}, {{4, 5, 6}}}}, {{{{7, 8, 9}}, {{10, 11, 12}}}}}}"), std::string::npos);
+    EXPECT_NE(
+        cpp_text.str().find("{{{{{{1, 2, 3}}, {{4, 5, 6}}}}, {{{{7, 8, 9}}, {{10, 11, 12}}}}}}"), std::string::npos
+    );
 
     std::ifstream c(c_file);
     std::stringstream c_text;
@@ -188,7 +186,10 @@ TEST(Environment, GenerateThreeDimensionalArray) {
     std::stringstream fortran_text;
     fortran_text << fortran.rdbuf();
     EXPECT_NE(fortran_text.str().find("dimension(2, 2, 3) :: volume"), std::string::npos);
-    EXPECT_NE(fortran_text.str().find("reshape([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], [2, 2, 3], order=[3, 2, 1])"), std::string::npos);
+    EXPECT_NE(
+        fortran_text.str().find("reshape([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], [2, 2, 3], order=[3, 2, 1])"),
+        std::string::npos
+    );
 
     cpp.close();
     c.close();
@@ -256,8 +257,10 @@ TEST(Environment, GeneratedFormatsPreserveTypedScientificInputs) {
     std::filesystem::remove(fortran_file);
 
     dip::DIP signed_parser;
-    signed_parser.add_string("signed8 int8 = -12\nsigned64 int64 = -9007199254740993\n"
-                             "fraction32 float32 = 1.25\n");
+    signed_parser.add_string(
+        "signed8 int8 = -12\nsigned64 int64 = -9007199254740993\n"
+        "fraction32 float32 = 1.25\n"
+    );
     signed_parser.parse().generate(dip::ExportFormat::FORTRAN, fortran_file);
     std::ifstream fortran_stream(fortran_file);
     std::stringstream fortran_text;

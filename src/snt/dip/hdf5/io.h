@@ -7,7 +7,7 @@
 namespace snt::dip {
     class Environment;
     struct SnapshotSaveOptions;
-}
+} // namespace snt::dip
 
 namespace snt::dip::hdf5 {
     class Error : public std::runtime_error {

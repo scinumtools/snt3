@@ -2,8 +2,8 @@
 
 #include <filesystem>
 #include <fstream>
-#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/dip.h>
+#include <snt/dip/inspect/inspector.h>
 
 using namespace snt;
 

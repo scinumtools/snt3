@@ -1,9 +1,9 @@
+#include <algorithm>
+#include <limits>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_unit.h>
 #include <snt/puq/systems/unit_system.h>
-#include <algorithm>
-#include <limits>
 #include <stdexcept>
 
 namespace snt::dip {

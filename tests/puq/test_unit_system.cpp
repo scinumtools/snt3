@@ -49,8 +49,8 @@ TEST(UnitSystem, RydbergInAtomicUnits) {
 
 TEST(UnitSystem, DimensionlessInformationUnits) {
     const auto& si_map = puq::SystemData::SI.DimensionMap;
-    for (const auto* symbol : {"bit", "byte", "kB", "MB", "GB", "TB", "PB", "EB",
-                               "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"}) {
+    for (const auto* symbol :
+         {"bit", "byte", "kB", "MB", "GB", "TB", "PB", "EB", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"}) {
         const auto& unit = si_map.at(symbol);
         EXPECT_EQ(unit.dimensions, si_map.at("%").dimensions) << symbol;
         EXPECT_DOUBLE_EQ(unit.uncertainty, 0.0) << symbol;
@@ -202,8 +202,7 @@ TEST(UnitSystem, ContextConversionPreservesAbsoluteUncertainty) {
     // uncertainty must scale by the same factor when changing systems.
     const puq::Quantity original(20.0, 0.5, "statA", puq::SystemType::ESU);
     const auto converted = original.convert("A", puq::SystemType::SI, "I");
-    const auto* estimate =
-        dynamic_cast<const val::ArrayValue<double>*>(converted.measurement.result.estimate.get());
+    const auto* estimate = dynamic_cast<const val::ArrayValue<double>*>(converted.measurement.result.estimate.get());
     const auto* uncertainty =
         dynamic_cast<const val::ArrayValue<double>*>(converted.measurement.result.uncertainty.get());
     ASSERT_NE(estimate, nullptr);

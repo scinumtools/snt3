@@ -7,9 +7,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl/filesystem.h>
-#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/cursor.h>
 #include <snt/dip/environment.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/lists/list_node.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/report/report.h>
@@ -80,7 +80,8 @@ namespace snt::bind::python {
         schema.def_readonly("name", &dip::EnvSchema::name);
         schema.def_readonly("id", &dip::EnvSchema::id);
         schema.def_property_readonly(
-            "metadata", [](const dip::EnvSchema& s) -> const dip::ValueMetadata& { return s.metadata; },
+            "metadata",
+            [](const dip::EnvSchema& s) -> const dip::ValueMetadata& { return s.metadata; },
             py::return_value_policy::reference_internal,
             "Metadata describing this reusable definition, not its applying group, collection, item, or values."
         );
@@ -96,8 +97,7 @@ namespace snt::bind::python {
             "size", [](const dip::Environment& e) { return e.nodes.size(); }, "Number of top-level nodes."
         );
         env.def_property_readonly(
-            "output_plan", &dip::Environment::output_plan,
-            "Resolved adapter output plan loaded from DIPH5, or None."
+            "output_plan", &dip::Environment::output_plan, "Resolved adapter output plan loaded from DIPH5, or None."
         );
         env.def_property_readonly(
             "source_manifest",
@@ -105,34 +105,45 @@ namespace snt::bind::python {
             "Source identities and SHA-256 fingerprints available for this environment."
         );
         env.def_property_readonly(
-            "schemas", [](const dip::Environment& e) { return e.schemas.entries(); },
+            "schemas",
+            [](const dip::Environment& e) { return e.schemas.entries(); },
             "Registered schema definitions keyed by name. The mapping is a snapshot and remains valid "
             "independently of this environment. DIPH5 loading does not restore reusable schemas; use schema_manifest."
         );
         env.def_property_readonly(
-            "schema_manifest", &dip::Environment::get_schema_manifest,
+            "schema_manifest",
+            &dip::Environment::get_schema_manifest,
             "Schema identities, descriptions, citations, and source provenance; no reusable definitions."
         );
         env.def(
-            "applied_schemas", &dip::Environment::get_applied_schemas, py::arg("path"),
+            "applied_schemas",
+            &dip::Environment::get_applied_schemas,
+            py::arg("path"),
             "Return descriptive records for schemas applied along a value or collection path.\n\n"
             "Args:\n    path: Fully qualified value or collection path."
         );
         env.def(
-            "contributing_schema", &dip::Environment::get_contributing_schema, py::arg("path"),
+            "contributing_schema",
+            &dip::Environment::get_contributing_schema,
+            py::arg("path"),
             "Return the schema that supplied a value node, or None when it was not schema-derived.\n\n"
             "Args:\n    path: Fully qualified value path."
         );
 
         env.def(
-            "load", &dip::Environment::load, py::arg("file"),
-            "Load evaluated nodes from DIPH5. Schema descriptions and provenance are available in schema_manifest; reusable definitions are not reconstructed.\n\n"
+            "load",
+            &dip::Environment::load,
+            py::arg("file"),
+            "Load evaluated nodes from DIPH5. Schema descriptions and provenance are available in schema_manifest; "
+            "reusable definitions are not reconstructed.\n\n"
             "Args:\n    file: Path to the DIPH5 file."
         );
         env.def(
-            "save", py::overload_cast<const std::filesystem::path&>(&dip::Environment::save, py::const_),
+            "save",
+            py::overload_cast<const std::filesystem::path&>(&dip::Environment::save, py::const_),
             py::arg("file"),
-            "Save evaluated nodes to DIPH5 with descriptive schema metadata and provenance, but not reusable definitions.\n\n"
+            "Save evaluated nodes to DIPH5 with descriptive schema metadata and provenance, but not reusable "
+            "definitions.\n\n"
             "Args:\n    file: Output DIPH5 path; an existing file is overwritten."
         );
         env.def(
@@ -146,13 +157,20 @@ namespace snt::bind::python {
 #ifdef SNT_ENABLE_REPORT
         env.def(
             "generate_report",
-            [](const dip::Environment& e, dip::report::ReportFormat format, const std::filesystem::path& file,
-               const std::string& input_label, const std::optional<std::filesystem::path>& intro_file,
-               const std::string& tex_compiler, const std::string& title,
-               const std::string& author, const std::string& date, const std::string& version) {
+            [](const dip::Environment& e,
+               dip::report::ReportFormat format,
+               const std::filesystem::path& file,
+               const std::string& input_label,
+               const std::optional<std::filesystem::path>& intro_file,
+               const std::string& tex_compiler,
+               const std::string& title,
+               const std::string& author,
+               const std::string& date,
+               const std::string& version) {
                 dip::report::ReportOptions options;
                 options.input_label = input_label;
-                if (intro_file) options.introduction_file = *intro_file;
+                if (intro_file)
+                    options.introduction_file = *intro_file;
                 options.tex_compiler = tex_compiler;
                 options.title = title;
                 options.author = author;
@@ -160,19 +178,27 @@ namespace snt::bind::python {
                 options.version = version;
                 dip::report::generate(e, format, file, options);
             },
-            py::arg("format"), py::arg("file"), py::kw_only(),
-            py::arg("input_label") = "", py::arg("intro_file") = py::none(),
+            py::arg("format"),
+            py::arg("file"),
+            py::kw_only(),
+            py::arg("input_label") = "",
+            py::arg("intro_file") = py::none(),
             py::arg("tex_compiler") = "pdflatex",
-            py::arg("title") = "DIP parameter report", py::arg("author") = "",
-            py::arg("date") = "", py::arg("version") = "",
+            py::arg("title") = "DIP parameter report",
+            py::arg("author") = "",
+            py::arg("date") = "",
+            py::arg("version") = "",
             "Write a report from this evaluated environment. PDF requires a local TeX compiler."
         );
 #endif
 
         env.def(
             "select",
-            [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& all,
-               const std::vector<std::string>& any, const std::vector<std::string>& none) {
+            [](const dip::Environment& e,
+               const std::string& path,
+               const std::vector<std::string>& all,
+               const std::vector<std::string>& any,
+               const std::vector<std::string>& none) {
                 return dip::Inspector{e}.select(path, dip::TagFilter{all, any, none});
             },
             py::arg("path") = "?",
@@ -196,11 +222,15 @@ Args:
 
         env.def(
             "select_paths",
-            [](const dip::Environment& e, const std::string& path, const std::vector<std::string>& all,
-               const std::vector<std::string>& any, const std::vector<std::string>& none) {
+            [](const dip::Environment& e,
+               const std::string& path,
+               const std::vector<std::string>& all,
+               const std::vector<std::string>& any,
+               const std::vector<std::string>& none) {
                 return dip::Inspector{e}.select_paths(path, dip::TagFilter{all, any, none});
             },
-            py::arg("path") = "?", py::kw_only(),
+            py::arg("path") = "?",
+            py::kw_only(),
             py::arg("tags_all") = std::vector<std::string>{},
             py::arg("tags_any") = std::vector<std::string>{},
             py::arg("tags_none") = std::vector<std::string>{},
@@ -248,7 +278,9 @@ Args:
         );
 
         env.def(
-            "__getitem__", &dip::Environment::operator[], py::arg("path"),
+            "__getitem__",
+            &dip::Environment::operator[],
+            py::arg("path"),
             "Return a Cursor for a known DIPL path.\n\nArgs:\n    path: Path to inspect."
         );
 

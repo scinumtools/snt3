@@ -1,20 +1,18 @@
+#include <algorithm>
+#include <filesystem>
 #include <gtest/gtest.h>
-
 #include <snt/dip/dip.h>
 #include <snt/dip/inspect/inspector.h>
 #include <snt/dip/preview.h>
 
-#include <algorithm>
-#include <filesystem>
-
 namespace {
-const std::filesystem::path fixture =
-    std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "tests/dip/fixtures/generated_parameters.dip";
-const std::filesystem::path rich_fixture =
-    std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "examples/dip/SemanticDescription/parameters.dip";
-const std::filesystem::path schema_fixture =
-    std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "tests/dip/fixtures/schema_hierarchy.dip";
-}
+    const std::filesystem::path fixture =
+        std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "tests/dip/fixtures/generated_parameters.dip";
+    const std::filesystem::path rich_fixture =
+        std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "examples/dip/SemanticDescription/parameters.dip";
+    const std::filesystem::path schema_fixture =
+        std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "tests/dip/fixtures/schema_hierarchy.dip";
+} // namespace
 
 TEST(DIPSemantic, SchemaHierarchySeparatesDefinitionsApplicationsAndValues) {
     snt::dip::DIP parser;
@@ -85,16 +83,16 @@ TEST(DIPSemantic, DescribesOptionalOptionLabels) {
 
 TEST(DIPSemantic, SchemaMembersExposeOptionLabels) {
     snt::dip::DIP parser;
-    parser.add_string("$schema preset\n  level int = 2\n    !options [1, 2]\n    !labels [\"Low\", \"High\"]\nsettings : preset\n");
+    parser.add_string(
+        "$schema preset\n  level int = 2\n    !options [1, 2]\n    !labels [\"Low\", \"High\"]\nsettings : preset\n"
+    );
     const auto env = parser.parse();
     const snt::dip::Inspector inspector{env};
     const auto hierarchy = inspector.schema_hierarchy();
     ASSERT_EQ(hierarchy.definitions.size(), 1);
     ASSERT_EQ(hierarchy.definitions[0].members.size(), 1);
-    EXPECT_EQ(hierarchy.definitions[0].members[0].option_labels,
-              (std::vector<std::string>{"Low", "High"}));
-    EXPECT_EQ(inspector.describe("settings.level").option_labels,
-              (std::vector<std::string>{"Low", "High"}));
+    EXPECT_EQ(hierarchy.definitions[0].members[0].option_labels, (std::vector<std::string>{"Low", "High"}));
+    EXPECT_EQ(inspector.describe("settings.level").option_labels, (std::vector<std::string>{"Low", "High"}));
 }
 
 TEST(DIPSemantic, RichDescriptionWithRecordedReads) {
@@ -107,8 +105,7 @@ TEST(DIPSemantic, RichDescriptionWithRecordedReads) {
     EXPECT_EQ(value.metadata.description, "Average speed calculated from distance and duration");
     EXPECT_EQ(value.metadata.authors, "Example Simulation Team");
     EXPECT_EQ(value.metadata.category, "Motion");
-    EXPECT_EQ(value.metadata.requires,
-              (std::vector<std::string>{"simulation.distance", "simulation.duration"}));
+    EXPECT_EQ(value.metadata.requires, (std::vector<std::string>{"simulation.distance", "simulation.duration"}));
     EXPECT_EQ(value.tags, (std::vector<std::string>{"physics", "derived"}));
     EXPECT_EQ(value.enforced_condition, "{.} > 0 m/s");
     EXPECT_TRUE(value.dependencies_recorded);
@@ -127,7 +124,8 @@ TEST(DIPSemantic, OverrideContractUsesCollectionRules) {
         "items[]\n"
         "materials map : item\n"
         "plain map\n"
-        "scalar float = 2 m\n");
+        "scalar float = 2 m\n"
+    );
     const auto env = parser.parse();
     const snt::dip::Inspector view{env};
 
@@ -237,9 +235,7 @@ TEST(DIPSemantic, SharedFactsStayAlignedForOverrides) {
 }
 
 TEST(DIPSemantic, PreviewValidAndInvalidOverride) {
-    const auto valid = snt::dip::preview(fixture, {
-        {snt::dip::PreviewOverride::Kind::Text, "experiment.steps = 200"}
-    });
+    const auto valid = snt::dip::preview(fixture, {{snt::dip::PreviewOverride::Kind::Text, "experiment.steps = 200"}});
     EXPECT_TRUE(valid.baseline_valid);
     EXPECT_TRUE(valid.candidate_valid);
     EXPECT_TRUE(valid.baseline_diagnostics.empty());
@@ -259,9 +255,7 @@ TEST(DIPSemantic, PreviewValidAndInvalidOverride) {
     EXPECT_EQ(difference.after, "200");
     EXPECT_EQ(difference.changed_elements, 1);
 
-    const auto invalid = snt::dip::preview(fixture, {
-        {snt::dip::PreviewOverride::Kind::Text, "missing = 2"}
-    });
+    const auto invalid = snt::dip::preview(fixture, {{snt::dip::PreviewOverride::Kind::Text, "missing = 2"}});
     EXPECT_TRUE(invalid.baseline_valid);
     EXPECT_FALSE(invalid.candidate_valid);
     EXPECT_TRUE(invalid.baseline_diagnostics.empty());

@@ -9,13 +9,13 @@ namespace snt::dip {
 
     /** One conditional case in a DIPL branching structure. */
     struct Case {
-        std::string path;   // case path up to last @ sign
-        std::string code;   // code line with the case
-        std::string expr;   // case logical expression
-        bool value = false;          // final value of the case
-        size_t branch_id = 0;        // branch ID
-        size_t branch_part = 0;      // part on the branch
-        size_t case_id = 0;          // case ID
+        std::string path;                  // case path up to last @ sign
+        std::string code;                  // code line with the case
+        std::string expr;                  // case logical expression
+        bool value = false;                // final value of the case
+        size_t branch_id = 0;              // branch ID
+        size_t branch_part = 0;            // part on the branch
+        size_t case_id = 0;                // case ID
         CaseType case_type = CaseType::IF; // one of the types: case/else/end
     };
 

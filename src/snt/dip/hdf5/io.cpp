@@ -8,9 +8,9 @@
 #include <limits>
 #include <optional>
 #include <set>
-#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/val/values.h>
 #include <string>
 #include <vector>
@@ -545,7 +545,8 @@ namespace snt::dip::hdf5 {
             }
             write_strings(dataset, ATTR_OPTIONS, option_values);
             write_strings(dataset, ATTR_OPTION_UNITS, option_units);
-            if (node.option_labels) write_strings(dataset, ATTR_OPTION_LABELS, option_labels);
+            if (node.option_labels)
+                write_strings(dataset, ATTR_OPTION_LABELS, option_labels);
             write_strings(dataset, ATTR_SCHEMAS, node.schemas);
             if (!node.schema_id.empty())
                 write_string(dataset, ATTR_NODE_SCHEMA_ID, node.schema_id);
@@ -800,11 +801,14 @@ namespace snt::dip::hdf5 {
             const auto option_values = read_strings(dataset, ATTR_OPTIONS);
             const auto option_units = read_strings(dataset, ATTR_OPTION_UNITS);
             const auto option_labels = read_strings(dataset, ATTR_OPTION_LABELS);
-            if (has_attribute(dataset, ATTR_OPTION_LABELS)) node->option_labels = option_labels;
+            if (has_attribute(dataset, ATTR_OPTION_LABELS))
+                node->option_labels = option_labels;
             for (size_t i = 0; i < option_values.size(); ++i) {
                 const std::string units_value = i < option_units.size() ? option_units[i] : "";
                 const std::string label = i < option_labels.size() ? option_labels[i] : "";
-                node->options.push_back({option_value(value_dtype, option_values[i]), option_values[i], units_value, label});
+                node->options.push_back(
+                    {option_value(value_dtype, option_values[i]), option_values[i], units_value, label}
+                );
             }
             node->schemas = read_strings(dataset, ATTR_SCHEMAS);
             node->schema_id = read_string(dataset, ATTR_NODE_SCHEMA_ID);
@@ -830,20 +834,21 @@ namespace snt::dip::hdf5 {
                     "Invalid value modification history",
                     "The persisted modification attributes have different lengths for `" + path + "`.",
                     "Use a DIPH5 file with matching modification sources, lines, and codes.",
-                    __FILE__, __LINE__
+                    __FILE__,
+                    __LINE__
                 );
             for (size_t i = 0; i < modification_sources.size(); ++i) {
                 try {
-                    const size_t line_number = checked_size(std::stoull(modification_lines[i]), "modification line number");
-                    node->modification_lines.push_back(
-                        {modification_codes[i], {modification_sources[i], line_number}}
-                    );
+                    const size_t line_number =
+                        checked_size(std::stoull(modification_lines[i]), "modification line number");
+                    node->modification_lines.push_back({modification_codes[i], {modification_sources[i], line_number}});
                 } catch (const std::exception&) {
                     throw dip::IOException(
                         "Invalid value modification history",
                         "A persisted modification line number is invalid for `" + path + "`.",
                         "Use a DIPH5 file with valid modification line numbers.",
-                        __FILE__, __LINE__
+                        __FILE__,
+                        __LINE__
                     );
                 }
             }
@@ -858,9 +863,8 @@ namespace snt::dip::hdf5 {
             node->value_origin =
                 static_cast<ValueOrigin>(read_scalar<uint64_t>(dataset, ATTR_VALUE_ORIGIN, H5T_NATIVE_UINT64));
             node->line.source.name = read_string(dataset, ATTR_SOURCE);
-            node->line.source.line_number = checked_size(
-                read_scalar<uint64_t>(dataset, ATTR_SOURCE_LINE, H5T_NATIVE_UINT64), "source line number"
-            );
+            node->line.source.line_number =
+                checked_size(read_scalar<uint64_t>(dataset, ATTR_SOURCE_LINE, H5T_NATIVE_UINT64), "source line number");
             node->line.code = read_string(dataset, ATTR_SOURCE_CODE);
             read_metadata(dataset, node->metadata);
             env.nodes.push_back(node);
@@ -1031,7 +1035,12 @@ namespace snt::dip::hdf5 {
             Id manifest(
                 H5Gopen2(file, manifest_path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the HDF5 unit manifest"
             );
-            struct Record { std::string name; std::string definition; std::string id; uint64_t order; };
+            struct Record {
+                std::string name;
+                std::string definition;
+                std::string id;
+                uint64_t order;
+            };
             std::vector<Record> records;
             std::set<std::string> names;
             std::set<std::string> ids;
@@ -1041,34 +1050,83 @@ namespace snt::dip::hdf5 {
             for (hsize_t index = 0; index < count; ++index) {
                 const std::string entry_name = object_name(manifest, index);
                 if (H5Gget_objtype_by_idx(manifest, index) != H5G_GROUP)
-                    throw dip::IOException("Invalid HDF5 unit manifest", "A unit-manifest entry is not an HDF5 group.", "Use a complete DIPH5 2.3 file.", __FILE__, __LINE__);
-                Id entry(H5Gopen2(manifest, entry_name.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open an HDF5 unit-manifest entry");
-                Record record{read_string(entry, ATTR_UNIT_NAME), read_string(entry, ATTR_UNIT_DEFINITION),
-                              read_string(entry, ATTR_TRACE_ID), read_scalar<uint64_t>(entry, ATTR_UNIT_ORDER, H5T_NATIVE_UINT64)};
-                if (record.name.empty() || record.definition.empty() || record.id.empty() || !names.insert(record.name).second ||
-                    !ids.insert(record.id).second || !orders.insert(record.order).second)
-                    throw dip::IOException("Invalid HDF5 unit manifest", "A unit-manifest entry has missing or duplicate identity data.", "Use a complete DIPH5 2.3 file.", __FILE__, __LINE__);
+                    throw dip::IOException(
+                        "Invalid HDF5 unit manifest",
+                        "A unit-manifest entry is not an HDF5 group.",
+                        "Use a complete DIPH5 2.3 file.",
+                        __FILE__,
+                        __LINE__
+                    );
+                Id entry(
+                    H5Gopen2(manifest, entry_name.c_str(), H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to open an HDF5 unit-manifest entry"
+                );
+                Record record{
+                    read_string(entry, ATTR_UNIT_NAME),
+                    read_string(entry, ATTR_UNIT_DEFINITION),
+                    read_string(entry, ATTR_TRACE_ID),
+                    read_scalar<uint64_t>(entry, ATTR_UNIT_ORDER, H5T_NATIVE_UINT64)
+                };
+                if (record.name.empty() || record.definition.empty() || record.id.empty() ||
+                    !names.insert(record.name).second || !ids.insert(record.id).second ||
+                    !orders.insert(record.order).second)
+                    throw dip::IOException(
+                        "Invalid HDF5 unit manifest",
+                        "A unit-manifest entry has missing or duplicate identity data.",
+                        "Use a complete DIPH5 2.3 file.",
+                        __FILE__,
+                        __LINE__
+                    );
                 const auto traces = env.get_trace_manifest();
-                const auto trace = std::find_if(traces.begin(), traces.end(), [&](const TraceInfo& item) { return item.id == record.id; });
+                const auto trace = std::find_if(traces.begin(), traces.end(), [&](const TraceInfo& item) {
+                    return item.id == record.id;
+                });
                 if (trace == traces.end() || trace->name != record.name || trace->kind != "unit")
-                    throw dip::IOException("Invalid HDF5 unit manifest", "A unit-manifest trace identifier does not match the trace manifest.", "Use a complete DIPH5 2.3 file.", __FILE__, __LINE__);
+                    throw dip::IOException(
+                        "Invalid HDF5 unit manifest",
+                        "A unit-manifest trace identifier does not match the trace manifest.",
+                        "Use a complete DIPH5 2.3 file.",
+                        __FILE__,
+                        __LINE__
+                    );
                 records.push_back(std::move(record));
             }
-            std::sort(records.begin(), records.end(), [](const Record& left, const Record& right) { return left.order < right.order; });
+            std::sort(records.begin(), records.end(), [](const Record& left, const Record& right) {
+                return left.order < right.order;
+            });
             for (const auto& record : records) {
                 try {
-                    env.units.append(record.name, EnvUnit{
-                        record.name, record.definition, 0, record.id,
-                        checked_size(record.order, "unit registration order")
-                    });
+                    env.units.append(
+                        record.name,
+                        EnvUnit{
+                            record.name,
+                            record.definition,
+                            0,
+                            record.id,
+                            checked_size(record.order, "unit registration order")
+                        }
+                    );
                 } catch (const std::exception& error) {
-                    throw dip::IOException("Invalid HDF5 unit manifest", "Unable to register custom unit `" + record.name + "`: " + error.what(), "Ensure unit definitions are valid and ordered by dependency.", __FILE__, __LINE__);
+                    throw dip::IOException(
+                        "Invalid HDF5 unit manifest",
+                        "Unable to register custom unit `" + record.name + "`: " + error.what(),
+                        "Ensure unit definitions are valid and ordered by dependency.",
+                        __FILE__,
+                        __LINE__
+                    );
                 }
             }
         }
 
-        void read_group(Environment& env, hid_t group, bool root = false, bool skip_value_payload = false,
-                        bool skip_dependency_manifest = false, bool skip_output_manifest = false) {
+        void read_group(
+            Environment& env,
+            hid_t group,
+            bool root = false,
+            bool skip_value_payload = false,
+            bool skip_dependency_manifest = false,
+            bool skip_output_manifest = false
+        ) {
             const hsize_t count = object_count(group);
             for (hsize_t i = 0; i < count; ++i) {
                 const std::string name = object_name(group, i);
@@ -1115,7 +1173,8 @@ namespace snt::dip::hdf5 {
                         (kind == "group" || kind == "item" || kind == "map_item" || kind == "list_item") &&
                         !env.hierarchy.has_collection(path))
                         env.hierarchy.set_collection(
-                            path, kind == "group" ? Path::Kind::Group : Path::Kind::Item,
+                            path,
+                            kind == "group" ? Path::Kind::Group : Path::Kind::Item,
                             read_strings(child, ATTR_SCHEMAS)
                         );
                     if (!path.empty() && (kind == "map" || kind == "list") && !env.hierarchy.has_collection(path)) {
@@ -1143,8 +1202,10 @@ namespace snt::dip::hdf5 {
                                 return std::stoull(a) < std::stoull(b);
                             });
                         env.hierarchy.set_collection(
-                            path, kind == "map" ? Path::Kind::Map : Path::Kind::List,
-                            read_strings(child, ATTR_SCHEMAS), items
+                            path,
+                            kind == "map" ? Path::Kind::Map : Path::Kind::List,
+                            read_strings(child, ATTR_SCHEMAS),
+                            items
                         );
                     }
                     read_group(env, child);
@@ -1155,9 +1216,12 @@ namespace snt::dip::hdf5 {
             }
         }
 
-        void write_source_manifest(hid_t file, const Environment& env,
-                                   const std::filesystem::path& output_path,
-                                   const SnapshotSaveOptions& options) {
+        void write_source_manifest(
+            hid_t file,
+            const Environment& env,
+            const std::filesystem::path& output_path,
+            const SnapshotSaveOptions& options
+        ) {
             const std::string manifest_path = "/" + std::string(GROUP_SOURCES);
             Id manifest(
                 H5Gcreate2(file, manifest_path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
@@ -1178,8 +1242,8 @@ namespace snt::dip::hdf5 {
                 if (!stored_path.empty() && options.source_paths == SourcePathPolicy::RelativeToSnapshot) {
                     std::filesystem::path source_path(stored_path);
                     if (source_path.is_relative()) {
-                        const auto base = env.source_path_base().empty()
-                            ? std::filesystem::current_path() : env.source_path_base();
+                        const auto base =
+                            env.source_path_base().empty() ? std::filesystem::current_path() : env.source_path_base();
                         source_path = base / source_path;
                     }
                     const auto output_dir = std::filesystem::absolute(output_path).parent_path();
@@ -1217,9 +1281,10 @@ namespace snt::dip::hdf5 {
                 write_string(entry, ATTR_TRACE_NAME, trace.name);
                 write_string(entry, ATTR_TRACE_KIND, trace.kind);
                 if (trace.kind == "schema") {
-                    const auto info = std::find_if(schema_infos.begin(), schema_infos.end(), [&](const SchemaInfo& candidate) {
-                        return candidate.id == trace.id;
-                    });
+                    const auto info =
+                        std::find_if(schema_infos.begin(), schema_infos.end(), [&](const SchemaInfo& candidate) {
+                            return candidate.id == trace.id;
+                        });
                     if (info != schema_infos.end()) {
                         write_string(entry, ATTR_SCHEMA_SOURCE, info->source_name);
                         write_scalar<uint64_t>(entry, ATTR_SCHEMA_SOURCE_LINE, H5T_NATIVE_UINT64, info->source_line);
@@ -1231,15 +1296,25 @@ namespace snt::dip::hdf5 {
 
         void write_unit_manifest(hid_t file, const Environment& env) {
             const std::string manifest_path = "/" + std::string(GROUP_UNITS);
-            Id manifest(H5Gcreate2(file, manifest_path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose, "Unable to create the HDF5 unit manifest");
+            Id manifest(
+                H5Gcreate2(file, manifest_path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                H5Gclose,
+                "Unable to create the HDF5 unit manifest"
+            );
             std::vector<const EnvUnit*> units;
             units.reserve(env.units.entries().size());
             for (const auto& entry : env.units.entries())
                 units.push_back(&entry.second);
-            std::sort(units.begin(), units.end(), [](const EnvUnit* left, const EnvUnit* right) { return left->registration_order < right->registration_order; });
+            std::sort(units.begin(), units.end(), [](const EnvUnit* left, const EnvUnit* right) {
+                return left->registration_order < right->registration_order;
+            });
             for (size_t index = 0; index < units.size(); ++index) {
                 const EnvUnit& unit = *units[index];
-                Id entry(H5Gcreate2(manifest, std::to_string(index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose, "Unable to create an HDF5 unit-manifest entry");
+                Id entry(
+                    H5Gcreate2(manifest, std::to_string(index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to create an HDF5 unit-manifest entry"
+                );
                 write_string(entry, ATTR_UNIT_NAME, unit.name);
                 write_string(entry, ATTR_UNIT_DEFINITION, unit.definition);
                 write_scalar<uint64_t>(entry, ATTR_UNIT_ORDER, H5T_NATIVE_UINT64, unit.registration_order);
@@ -1249,13 +1324,19 @@ namespace snt::dip::hdf5 {
 
         void write_dependency_graph(hid_t file, const DependencyGraph& graph) {
             const std::string path = "/" + std::string(GROUP_DEPENDENCIES);
-            Id root(H5Gcreate2(file, path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
-                    "Unable to create the DIP dependency graph");
+            Id root(
+                H5Gcreate2(file, path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                H5Gclose,
+                "Unable to create the DIP dependency graph"
+            );
             write_scalar<uint8_t>(root, "recorded", H5T_NATIVE_UINT8, graph.recorded ? 1 : 0);
             for (size_t index = 0; index < graph.events.size(); ++index) {
                 const auto& event = graph.events[index];
-                Id entry(H5Gcreate2(root, std::to_string(index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
-                         H5Gclose, "Unable to create a DIP dependency event");
+                Id entry(
+                    H5Gcreate2(root, std::to_string(index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to create a DIP dependency event"
+                );
                 write_string(entry, "owner", event.owner);
                 write_scalar<uint64_t>(entry, "kind", H5T_NATIVE_UINT64, static_cast<uint64_t>(event.kind));
                 if (event.location) {
@@ -1278,17 +1359,27 @@ namespace snt::dip::hdf5 {
                 if (!event.composition)
                     continue;
                 write_scalar<uint64_t>(entry, "root", H5T_NATIVE_UINT64, event.composition->root);
-                Id composition(H5Gcreate2(entry, "composition", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
-                               H5Gclose, "Unable to create a DIP operation tree");
+                Id composition(
+                    H5Gcreate2(entry, "composition", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to create a DIP operation tree"
+                );
                 for (size_t node_index = 0; node_index < event.composition->nodes.size(); ++node_index) {
                     const auto& node = event.composition->nodes[node_index];
-                    Id item(H5Gcreate2(composition, std::to_string(node_index).c_str(), H5P_DEFAULT,
-                                       H5P_DEFAULT, H5P_DEFAULT), H5Gclose, "Unable to create an operation node");
+                    Id item(
+                        H5Gcreate2(
+                            composition, std::to_string(node_index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT
+                        ),
+                        H5Gclose,
+                        "Unable to create an operation node"
+                    );
                     write_scalar<uint64_t>(item, "kind", H5T_NATIVE_UINT64, static_cast<uint64_t>(node.kind));
                     write_string(item, "text", node.text);
                     write_scalar<int64_t>(item, "operator", H5T_NATIVE_INT64, node.operator_type);
                     if (node.operation)
-                        write_scalar<int64_t>(item, "operation", H5T_NATIVE_INT64, static_cast<int64_t>(*node.operation));
+                        write_scalar<int64_t>(
+                            item, "operation", H5T_NATIVE_INT64, static_cast<int64_t>(*node.operation)
+                        );
                     std::vector<std::string> children;
                     for (auto child : node.children)
                         children.push_back(std::to_string(child));
@@ -1306,8 +1397,11 @@ namespace snt::dip::hdf5 {
             graph.recorded = read_scalar<uint8_t>(root, "recorded", H5T_NATIVE_UINT8, 1) != 0;
             const size_t count = checked_size(object_count(root), "dependency event count");
             for (size_t index = 0; index < count; ++index) {
-                Id entry(H5Gopen2(root, std::to_string(index).c_str(), H5P_DEFAULT), H5Gclose,
-                         "Unable to open a DIP dependency event");
+                Id entry(
+                    H5Gopen2(root, std::to_string(index).c_str(), H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to open a DIP dependency event"
+                );
                 DependencyEvent event;
                 event.owner = read_string(entry, "owner");
                 const auto kind = read_scalar<uint64_t>(entry, "kind", H5T_NATIVE_UINT64);
@@ -1317,8 +1411,9 @@ namespace snt::dip::hdf5 {
                 if (has_attribute(entry, "source"))
                     event.location = core::SourceLocation{
                         read_string(entry, "source"),
-                        checked_size(read_scalar<uint64_t>(entry, "line", H5T_NATIVE_UINT64),
-                                     "dependency event line number"),
+                        checked_size(
+                            read_scalar<uint64_t>(entry, "line", H5T_NATIVE_UINT64), "dependency event line number"
+                        ),
                         has_attribute(entry, "code") ? std::optional<std::string>(read_string(entry, "code"))
                                                      : std::nullopt
                     };
@@ -1332,16 +1427,19 @@ namespace snt::dip::hdf5 {
                 for (size_t edge = 0; edge < targets.size(); ++edge)
                     event.reads.push_back({targets[edge], requests[edge], operands[edge]});
                 if (H5Lexists(entry, "composition", H5P_DEFAULT) > 0) {
-                    Id composition(H5Gopen2(entry, "composition", H5P_DEFAULT), H5Gclose,
-                                   "Unable to open a DIP operation tree");
-                    event.composition.emplace();
-                    event.composition->root = checked_size(
-                        read_scalar<uint64_t>(entry, "root", H5T_NATIVE_UINT64), "operation root index"
+                    Id composition(
+                        H5Gopen2(entry, "composition", H5P_DEFAULT), H5Gclose, "Unable to open a DIP operation tree"
                     );
+                    event.composition.emplace();
+                    event.composition->root =
+                        checked_size(read_scalar<uint64_t>(entry, "root", H5T_NATIVE_UINT64), "operation root index");
                     const size_t node_count = checked_size(object_count(composition), "operation node count");
                     for (size_t node_index = 0; node_index < node_count; ++node_index) {
-                        Id item(H5Gopen2(composition, std::to_string(node_index).c_str(), H5P_DEFAULT), H5Gclose,
-                                "Unable to open a DIP operation node");
+                        Id item(
+                            H5Gopen2(composition, std::to_string(node_index).c_str(), H5P_DEFAULT),
+                            H5Gclose,
+                            "Unable to open a DIP operation node"
+                        );
                         exs::CompositionNode node;
                         const auto node_kind = read_scalar<uint64_t>(item, "kind", H5T_NATIVE_UINT64);
                         if (node_kind > static_cast<uint64_t>(exs::CompositionKind::Group))
@@ -1351,7 +1449,8 @@ namespace snt::dip::hdf5 {
                         node.operator_type = read_scalar<int64_t>(item, "operator", H5T_NATIVE_INT64);
                         if (has_attribute(item, "operation"))
                             node.operation = static_cast<exs::OperationType>(
-                                read_scalar<int64_t>(item, "operation", H5T_NATIVE_INT64));
+                                read_scalar<int64_t>(item, "operation", H5T_NATIVE_INT64)
+                            );
                         for (const auto& child : read_strings(item, "children")) {
                             size_t parsed = 0;
                             const auto value = std::stoull(child, &parsed);
@@ -1371,13 +1470,19 @@ namespace snt::dip::hdf5 {
 
         void write_output_plan(hid_t file, const OutputPlan& plan) {
             const std::string root = "/" + std::string(GROUP_OUTPUTS);
-            Id group(H5Gcreate2(file, root.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
-                     "Unable to create the DIPH5 output plan");
+            Id group(
+                H5Gcreate2(file, root.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                H5Gclose,
+                "Unable to create the DIPH5 output plan"
+            );
             for (size_t index = 0; index < plan.mappings().size(); ++index) {
                 const auto& mapping = plan.mappings()[index];
                 const std::string path = root + "/" + std::to_string(index);
-                Id entry(H5Gcreate2(file, path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
-                         "Unable to create a DIPH5 output mapping");
+                Id entry(
+                    H5Gcreate2(file, path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                    H5Gclose,
+                    "Unable to create a DIPH5 output mapping"
+                );
                 write_string(entry, "id", mapping.id);
                 write_string(entry, "target", mapping.target);
                 write_string(entry, "key", mapping.key);
@@ -1404,14 +1509,12 @@ namespace snt::dip::hdf5 {
                 throw Error("Unable to inspect the DIPH5 output plan");
             if (exists == 0)
                 return;
-            Id group(H5Gopen2(file, root.c_str(), H5P_DEFAULT), H5Gclose,
-                     "Unable to open the DIPH5 output plan");
+            Id group(H5Gopen2(file, root.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the DIPH5 output plan");
             OutputPlan plan;
             const hsize_t count = object_count(group);
             for (hsize_t index = 0; index < count; ++index) {
                 const std::string name = std::to_string(index);
-                Id entry(H5Gopen2(group, name.c_str(), H5P_DEFAULT), H5Gclose,
-                         "Unable to open a DIPH5 output mapping");
+                Id entry(H5Gopen2(group, name.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open a DIPH5 output mapping");
                 OutputMapping mapping;
                 mapping.id = read_string(entry, "id");
                 mapping.target = read_string(entry, "target");
@@ -1422,8 +1525,7 @@ namespace snt::dip::hdf5 {
                 mapping.replacements = read_strings(entry, "replacements");
                 mapping.dependencies = read_strings(entry, "dependencies");
                 mapping.active = read_scalar<uint8_t>(entry, "active", H5T_NATIVE_UINT8) != 0;
-                Id dataset(H5Dopen2(entry, "value", H5P_DEFAULT), H5Dclose,
-                           "Unable to open a DIPH5 output value");
+                Id dataset(H5Dopen2(entry, "value", H5P_DEFAULT), H5Dclose, "Unable to open a DIPH5 output value");
                 const auto dtype = data_type(read_string(entry, ATTR_VALUE_TYPE));
                 auto value = read_value(dataset, dtype);
                 if (!value)
@@ -1433,8 +1535,11 @@ namespace snt::dip::hdf5 {
                     units.emplace(read_string(entry, "units"));
                 const std::string value_path = read_string(entry, "value_path");
                 mapping.value = std::make_shared<PersistedValueNode>(
-                    Path(value_path.empty() ? "output_value" : value_path), std::move(value),
-                    node_type(read_string(entry, ATTR_NODE_TYPE)), std::move(units));
+                    Path(value_path.empty() ? "output_value" : value_path),
+                    std::move(value),
+                    node_type(read_string(entry, ATTR_NODE_TYPE)),
+                    std::move(units)
+                );
                 plan.restore(std::move(mapping));
             }
             plan.validate();
@@ -1442,8 +1547,12 @@ namespace snt::dip::hdf5 {
         }
 
         bool uses_reserved_path(const std::string& path) {
-            for (const auto name : {std::string(GROUP_SOURCES), std::string(GROUP_TRACE), std::string(GROUP_UNITS),
-                                    std::string(GROUP_DEPENDENCIES), std::string(GROUP_OUTPUTS)}) {
+            for (const auto name :
+                 {std::string(GROUP_SOURCES),
+                  std::string(GROUP_TRACE),
+                  std::string(GROUP_UNITS),
+                  std::string(GROUP_DEPENDENCIES),
+                  std::string(GROUP_OUTPUTS)}) {
                 if (path == name || path.rfind(name + ".", 0) == 0 || path.rfind(name + "[", 0) == 0)
                     return true;
             }
@@ -1459,8 +1568,7 @@ namespace snt::dip::hdf5 {
         }
     } // namespace
 
-    void save(const Environment& env, const std::filesystem::path& file,
-              const SnapshotSaveOptions& options) {
+    void save(const Environment& env, const std::filesystem::path& file, const SnapshotSaveOptions& options) {
         H5Eset_auto2(H5E_DEFAULT, nullptr, nullptr);
         Id output(
             H5Fcreate(file.string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT),
@@ -1542,8 +1650,9 @@ namespace snt::dip::hdf5 {
             read_unit_manifest(env, input);
         if (version == VERSION && minor_version >= 7)
             read_dependency_graph(env, input);
-        read_group(env, input, true, false, version == VERSION && minor_version >= 7,
-                   version == VERSION && minor_version >= 8);
+        read_group(
+            env, input, true, false, version == VERSION && minor_version >= 7, version == VERSION && minor_version >= 8
+        );
         if (version == VERSION && minor_version >= 8)
             read_output_plan(env, input);
     }

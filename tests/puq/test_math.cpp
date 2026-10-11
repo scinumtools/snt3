@@ -91,21 +91,25 @@ TEST(Math, PowerAcrossSystems) {
 
     for (const auto& squared : {si_squared, esu_squared}) {
         const auto in_joules_squared = squared.convert("J2", puq::SystemType::SI);
-        EXPECT_NEAR(val::ArrayValueFloat64(in_joules_squared.measurement.result.estimate.get()).get_value(0), 4.0,
-                    1e-12);
+        EXPECT_NEAR(
+            val::ArrayValueFloat64(in_joules_squared.measurement.result.estimate.get()).get_value(0), 4.0, 1e-12
+        );
         ASSERT_TRUE(in_joules_squared.measurement.result.uncertainty);
-        EXPECT_NEAR(val::ArrayValueFloat64(in_joules_squared.measurement.result.uncertainty.get()).get_value(0), 0.4,
-                    1e-12);
+        EXPECT_NEAR(
+            val::ArrayValueFloat64(in_joules_squared.measurement.result.uncertainty.get()).get_value(0), 0.4, 1e-12
+        );
     }
 
     const auto converted_then_squared = puq::math::pow(esu.convert("J", puq::SystemType::SI), 2);
     EXPECT_EQ(converted_then_squared.stype, puq::SystemType::SI);
     EXPECT_EQ(converted_then_squared.measurement.baseunits.to_string(), "J2");
-    EXPECT_NEAR(val::ArrayValueFloat64(converted_then_squared.measurement.result.estimate.get()).get_value(0), 4.0,
-                1e-12);
+    EXPECT_NEAR(
+        val::ArrayValueFloat64(converted_then_squared.measurement.result.estimate.get()).get_value(0), 4.0, 1e-12
+    );
     ASSERT_TRUE(converted_then_squared.measurement.result.uncertainty);
-    EXPECT_NEAR(val::ArrayValueFloat64(converted_then_squared.measurement.result.uncertainty.get()).get_value(0), 0.4,
-                1e-12);
+    EXPECT_NEAR(
+        val::ArrayValueFloat64(converted_then_squared.measurement.result.uncertainty.get()).get_value(0), 0.4, 1e-12
+    );
 }
 
 TEST(Math, Exponent) {
@@ -294,7 +298,10 @@ TEST(Math, Sinus) {
         } catch (const puq::UnitException& e) {
             EXPECT_EQ(e.info().message, "Dimension mismatch");
             EXPECT_EQ(e.info().details, "The sine function accepts only dimensionless quantities or angles.");
-            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity or an angle as the argument of the sine function.");
+            EXPECT_EQ(
+                e.info().suggestion,
+                "Provide a dimensionless quantity or an angle as the argument of the sine function."
+            );
         } catch (...) {
             FAIL() << "Expected puq::SyntaxException";
         }
@@ -330,7 +337,10 @@ TEST(Math, Cosinus) {
         } catch (const puq::UnitException& e) {
             EXPECT_EQ(e.info().message, "Dimension mismatch");
             EXPECT_EQ(e.info().details, "The cosine function accepts only dimensionless quantities or angles.");
-            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity or an angle as the argument of the cosine function.");
+            EXPECT_EQ(
+                e.info().suggestion,
+                "Provide a dimensionless quantity or an angle as the argument of the cosine function."
+            );
         } catch (...) {
             FAIL() << "Expected puq::SyntaxException";
         }
@@ -366,7 +376,10 @@ TEST(Math, Tangens) {
         } catch (const puq::UnitException& e) {
             EXPECT_EQ(e.info().message, "Dimension mismatch");
             EXPECT_EQ(e.info().details, "The tangent function accepts only dimensionless quantities or angles.");
-            EXPECT_EQ(e.info().suggestion, "Provide a dimensionless quantity or an angle as the argument of the tangent function.");
+            EXPECT_EQ(
+                e.info().suggestion,
+                "Provide a dimensionless quantity or an angle as the argument of the tangent function."
+            );
         } catch (...) {
             FAIL() << "Expected puq::SyntaxException";
         }
@@ -389,29 +402,37 @@ TEST(Math, TrigonometricAngles) {
     EXPECT_TRUE(sine.baseunits.size() == 0);
     ASSERT_TRUE(sine.result.uncertainty);
     EXPECT_NEAR(val::ArrayValueFloat64(sine.result.estimate.get()).get_value(0), 0.5, 1e-9);
-    EXPECT_NEAR(val::ArrayValueFloat64(sine.result.uncertainty.get()).get_value(0),
-                std::cos(30 * radians_per_degree) * 3 * radians_per_degree, 1e-9);
+    EXPECT_NEAR(
+        val::ArrayValueFloat64(sine.result.uncertainty.get()).get_value(0),
+        std::cos(30 * radians_per_degree) * 3 * radians_per_degree,
+        1e-9
+    );
 
     const auto cosine = puq::math::cos(puq::Measurement(60.0, 3.0, "deg"));
     EXPECT_TRUE(cosine.baseunits.size() == 0);
     ASSERT_TRUE(cosine.result.uncertainty);
     EXPECT_NEAR(val::ArrayValueFloat64(cosine.result.estimate.get()).get_value(0), 0.5, 1e-9);
-    EXPECT_NEAR(val::ArrayValueFloat64(cosine.result.uncertainty.get()).get_value(0),
-                std::sin(60 * radians_per_degree) * 3 * radians_per_degree, 1e-9);
+    EXPECT_NEAR(
+        val::ArrayValueFloat64(cosine.result.uncertainty.get()).get_value(0),
+        std::sin(60 * radians_per_degree) * 3 * radians_per_degree,
+        1e-9
+    );
 
     const auto tangent = puq::math::tan(puq::Measurement(45.0, 1.0, "deg"));
     EXPECT_TRUE(tangent.baseunits.size() == 0);
     ASSERT_TRUE(tangent.result.uncertainty);
     EXPECT_NEAR(val::ArrayValueFloat64(tangent.result.estimate.get()).get_value(0), 1.0, 1e-9);
-    EXPECT_NEAR(val::ArrayValueFloat64(tangent.result.uncertainty.get()).get_value(0),
-                2 * radians_per_degree, 1e-9);
+    EXPECT_NEAR(val::ArrayValueFloat64(tangent.result.uncertainty.get()).get_value(0), 2 * radians_per_degree, 1e-9);
 
     const auto radians = puq::math::sin(puq::Measurement(std::acos(-1.0) / 6.0, 0.1, "rad"));
     EXPECT_TRUE(radians.baseunits.size() == 0);
     EXPECT_NEAR(val::ArrayValueFloat64(radians.result.estimate.get()).get_value(0), 0.5, 1e-12);
     ASSERT_TRUE(radians.result.uncertainty);
-    EXPECT_NEAR(val::ArrayValueFloat64(radians.result.uncertainty.get()).get_value(0),
-                std::cos(std::acos(-1.0) / 6.0) * 0.1, 1e-12);
+    EXPECT_NEAR(
+        val::ArrayValueFloat64(radians.result.uncertainty.get()).get_value(0),
+        std::cos(std::acos(-1.0) / 6.0) * 0.1,
+        1e-12
+    );
 
     if constexpr (puq::Config::use_system_cgs) {
         puq::UnitSystem active_system(puq::SystemType::ESU);
@@ -420,9 +441,7 @@ TEST(Math, TrigonometricAngles) {
         EXPECT_TRUE(si_angle.measurement.baseunits.size() == 0);
         EXPECT_NEAR(val::ArrayValueFloat64(si_angle.measurement.result.estimate.get()).get_value(0), 0.5, 1e-9);
 
-        const auto esu_angle = puq::math::sin(
-            puq::Quantity(std::acos(-1.0) / 6.0, 0.1, "rad", puq::SystemType::ESU)
-        );
+        const auto esu_angle = puq::math::sin(puq::Quantity(std::acos(-1.0) / 6.0, 0.1, "rad", puq::SystemType::ESU));
         EXPECT_EQ(esu_angle.stype, puq::SystemType::ESU);
         EXPECT_TRUE(esu_angle.measurement.baseunits.size() == 0);
         EXPECT_NEAR(val::ArrayValueFloat64(esu_angle.measurement.result.estimate.get()).get_value(0), 0.5, 1e-12);
@@ -672,14 +691,13 @@ TEST(Math, QuantityUnaryAcrossSystems) {
             SCOPED_TRACE(name);
             SCOPED_TRACE(static_cast<int>(system));
 
-            const puq::Quantity quantity = unit[0] ? puq::Quantity(input, 0.01, unit, system)
-                                                   : puq::Quantity(input, 0.01, system);
+            const puq::Quantity quantity =
+                unit[0] ? puq::Quantity(input, 0.01, unit, system) : puq::Quantity(input, 0.01, system);
             const auto output = operation(quantity);
             EXPECT_EQ(output.stype, system);
             EXPECT_EQ(puq::UnitSystem::current.type, active);
             EXPECT_EQ(output.measurement.baseunits.size(), 0);
-            EXPECT_NEAR(val::ArrayValueFloat64(output.measurement.result.estimate.get()).get_value(0), expected,
-                        1e-12);
+            EXPECT_NEAR(val::ArrayValueFloat64(output.measurement.result.estimate.get()).get_value(0), expected, 1e-12);
         }
     };
 
@@ -728,24 +746,31 @@ TEST(Math, QuantityMinMaxAcrossSystems) {
         SCOPED_TRACE(static_cast<int>(system));
 
         const puq::Quantity left(2.0 * scale, 0.1 * scale, unit, system);
-        const puq::Quantity right(3.0 * scale / other_unit_scale, 0.2 * scale / other_unit_scale,
-                                  other_unit, system);
+        const puq::Quantity right(3.0 * scale / other_unit_scale, 0.2 * scale / other_unit_scale, other_unit, system);
         const auto minimum = puq::math::min(left, right);
         const auto maximum = puq::math::max(left, right);
         EXPECT_EQ(minimum.stype, system);
         EXPECT_EQ(maximum.stype, system);
         EXPECT_EQ(minimum.measurement.baseunits.to_string(), unit);
         EXPECT_EQ(maximum.measurement.baseunits.to_string(), unit);
-        EXPECT_NEAR(val::ArrayValueFloat64(minimum.measurement.result.estimate.get()).get_value(0), 2.0 * scale,
-                    1e-12 * scale);
-        EXPECT_NEAR(val::ArrayValueFloat64(maximum.measurement.result.estimate.get()).get_value(0), 3.0 * scale,
-                    1e-12 * scale);
+        EXPECT_NEAR(
+            val::ArrayValueFloat64(minimum.measurement.result.estimate.get()).get_value(0), 2.0 * scale, 1e-12 * scale
+        );
+        EXPECT_NEAR(
+            val::ArrayValueFloat64(maximum.measurement.result.estimate.get()).get_value(0), 3.0 * scale, 1e-12 * scale
+        );
         ASSERT_TRUE(minimum.measurement.result.uncertainty);
         ASSERT_TRUE(maximum.measurement.result.uncertainty);
-        EXPECT_NEAR(val::ArrayValueFloat64(minimum.measurement.result.uncertainty.get()).get_value(0), 0.1 * scale,
-                    1e-12 * scale);
-        EXPECT_NEAR(val::ArrayValueFloat64(maximum.measurement.result.uncertainty.get()).get_value(0), 0.2 * scale,
-                    1e-12 * scale);
+        EXPECT_NEAR(
+            val::ArrayValueFloat64(minimum.measurement.result.uncertainty.get()).get_value(0),
+            0.1 * scale,
+            1e-12 * scale
+        );
+        EXPECT_NEAR(
+            val::ArrayValueFloat64(maximum.measurement.result.uncertainty.get()).get_value(0),
+            0.2 * scale,
+            1e-12 * scale
+        );
         EXPECT_EQ(puq::UnitSystem::current.type, active);
     }
 

@@ -2,12 +2,11 @@
 #include "source_view.h"
 #include "viewer_model.h"
 
-#include <snt/val/values_array.h>
-
 #include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <snt/val/values_array.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -111,77 +110,119 @@ int main() {
         snt::view::ViewerModel project(relative_example);
         const snt::dip::Inspector view{project.environment()};
         const auto cube = view.value_summary("experiment.response_cube");
-        check(cube.shape == (snt::val::Array::ShapeType{2, 2, 3}) && cube.elements == 12,
-              "The example cube has the wrong inspection shape");
+        check(
+            cube.shape == (snt::val::Array::ShapeType{2, 2, 3}) && cube.elements == 12,
+            "The example cube has the wrong inspection shape"
+        );
         auto cube_page = view.value_slice("experiment.response_cube", {{1, 1}, {0, 1}, {1, 2}});
         const auto* cube_values = dynamic_cast<const snt::val::ArrayValue<double>*>(cube_page.get());
-        check(cube_values && cube_values->get_size() == 4 && cube_values->get_value(0) == 2.1 &&
-                  cube_values->get_value(3) == 2.5,
-              "The example cube cannot be read as a bounded slice");
-        check(cube_page->slice({{1, 1}, {1, 1}})->to_string() == "2.5",
-              "A displayed array cell was not formatted from its bounded page");
-        const auto cube_cells = snt::view::read_array_page(project.environment(),
-            "experiment.response_cube", cube.shape, {0, 0, 0}, 1, 2, 1, 1, 24, 8);
-        check(cube_cells.size() == 1 && cube_cells[0].size() == 2 &&
-                  cube_cells[0][0] == "1.4" && cube_cells[0][1] == "1.5",
-              "The cube page does not display the expected values with a fixed axis");
-        const auto transposed_cells = snt::view::read_array_page(project.environment(),
-            "experiment.response_cube", cube.shape, {0, 1, 0}, 2, 0, 1, 0, 2, 2);
-        check(transposed_cells.size() == 2 && transposed_cells[0].size() == 2 &&
-                  transposed_cells[0][0] == "1.4" && transposed_cells[0][1] == "2.4" &&
-                  transposed_cells[1][0] == "1.5" && transposed_cells[1][1] == "2.5",
-              "The cube page does not follow its selected row and column axes");
+        check(
+            cube_values && cube_values->get_size() == 4 && cube_values->get_value(0) == 2.1 &&
+                cube_values->get_value(3) == 2.5,
+            "The example cube cannot be read as a bounded slice"
+        );
+        check(
+            cube_page->slice({{1, 1}, {1, 1}})->to_string() == "2.5",
+            "A displayed array cell was not formatted from its bounded page"
+        );
+        const auto cube_cells = snt::view::read_array_page(
+            project.environment(), "experiment.response_cube", cube.shape, {0, 0, 0}, 1, 2, 1, 1, 24, 8
+        );
+        check(
+            cube_cells.size() == 1 && cube_cells[0].size() == 2 && cube_cells[0][0] == "1.4" &&
+                cube_cells[0][1] == "1.5",
+            "The cube page does not display the expected values with a fixed axis"
+        );
+        const auto transposed_cells = snt::view::read_array_page(
+            project.environment(), "experiment.response_cube", cube.shape, {0, 1, 0}, 2, 0, 1, 0, 2, 2
+        );
+        check(
+            transposed_cells.size() == 2 && transposed_cells[0].size() == 2 && transposed_cells[0][0] == "1.4" &&
+                transposed_cells[0][1] == "2.4" && transposed_cells[1][0] == "1.5" && transposed_cells[1][1] == "2.5",
+            "The cube page does not follow its selected row and column axes"
+        );
         const auto series = view.value_summary("experiment.sample_series");
-        const auto series_cells = snt::view::read_array_page(project.environment(),
-            "experiment.sample_series", series.shape, {0}, 0, 0, 24, 0, 24, 8);
-        check(series_cells.size() == 12 && series_cells.front()[0] == "24" &&
-                  series_cells.back()[0] == "35", "The series does not display its final page");
+        const auto series_cells = snt::view::read_array_page(
+            project.environment(), "experiment.sample_series", series.shape, {0}, 0, 0, 24, 0, 24, 8
+        );
+        check(
+            series_cells.size() == 12 && series_cells.front()[0] == "24" && series_cells.back()[0] == "35",
+            "The series does not display its final page"
+        );
         const auto named_curve = view.value_summary("reference?calibration_curve");
         auto named_page = view.value_slice("reference?calibration_curve", {{1, 2}});
         const auto* named_values = dynamic_cast<const snt::val::ArrayValue<double>*>(named_page.get());
-        check(named_curve.shape == (snt::val::Array::ShapeType{4}) && named_values &&
-                  named_values->get_value(0) == 1.0 && named_values->get_value(1) == 1.02,
-              "Named-source arrays cannot be inspected through the bounded slice API");
-        const auto named_cells = snt::view::read_array_page(project.environment(),
-            "reference?calibration_curve", named_curve.shape, {0}, 0, 0, 1, 0, 2, 1);
-        check(named_cells.size() == 2 && named_cells[0][0] == "1" && named_cells[1][0] == "1.02",
-              "The named-source array page shows incorrect values");
+        check(
+            named_curve.shape == (snt::val::Array::ShapeType{4}) && named_values && named_values->get_value(0) == 1.0 &&
+                named_values->get_value(1) == 1.02,
+            "Named-source arrays cannot be inspected through the bounded slice API"
+        );
+        const auto named_cells = snt::view::read_array_page(
+            project.environment(), "reference?calibration_curve", named_curve.shape, {0}, 0, 0, 1, 0, 2, 1
+        );
+        check(
+            named_cells.size() == 2 && named_cells[0][0] == "1" && named_cells[1][0] == "1.02",
+            "The named-source array page shows incorrect values"
+        );
         const auto table = view.table("experiment.readings");
-        check(project.object("experiment.readings") && project.object("experiment.readings")->has_table,
-              "The browser does not identify the example table");
-        for (const auto& path : {"experiment.readings", "experiment.readings.time",
-                                 "experiment.reference_readings", "experiment.reference_readings.time"}) {
+        check(
+            project.object("experiment.readings") && project.object("experiment.readings")->has_table,
+            "The browser does not identify the example table"
+        );
+        for (const auto& path :
+             {"experiment.readings",
+              "experiment.readings.time",
+              "experiment.reference_readings",
+              "experiment.reference_readings.time"}) {
             const auto* object = project.object(path);
             const auto sources = object ? project.source_targets(*object) : std::vector<snt::view::SourceTarget>{};
-            check(object && !sources.empty() && sources.front().file.filename() == "observations.dip",
-                  "A table or column does not lead to its DIPL declaration");
+            check(
+                object && !sources.empty() && sources.front().file.filename() == "observations.dip",
+                "A table or column does not lead to its DIPL declaration"
+            );
         }
-        check(table.rows == 4 && table.columns.size() == 3 && table.columns.front().name == "time" &&
-                  table.columns.back().name == "pressure",
-              "The example table lost its rows or column order");
+        check(
+            table.rows == 4 && table.columns.size() == 3 && table.columns.front().name == "time" &&
+                table.columns.back().name == "pressure",
+            "The example table lost its rows or column order"
+        );
         const auto table_cells = snt::view::read_table_page(project.environment(), table, 1, 0, 2, 3);
-        check(table_cells.size() == 2 && table_cells[0].size() == 3 &&
-                  table_cells[0][0] == "1" && table_cells[1][0] == "2",
-              "The table page does not follow its row offset and column order");
+        check(
+            table_cells.size() == 2 && table_cells[0].size() == 3 && table_cells[0][0] == "1" &&
+                table_cells[1][0] == "2",
+            "The table page does not follow its row offset and column order"
+        );
         const auto extended = view.table("experiment.extended_readings");
-        check(extended.rows == 48 && extended.columns.size() == 8,
-              "The example's large table has the wrong shape");
+        check(extended.rows == 48 && extended.columns.size() == 8, "The example's large table has the wrong shape");
         const auto extended_page = snt::view::read_table_page(project.environment(), extended, 32, 0, 32, 8);
-        check(extended_page.size() == 16 && extended_page.front()[0] == "32" &&
-                  extended_page.back()[0] == "47" && extended_page.front().size() == 8,
-              "The example's large table cannot be read on its second page");
-        check(view.capabilities("experiment.duration").hasReferenceGraph &&
-                  view.capabilities("reference?lab_name").hasReferenceGraph &&
-                  view.capabilities("reference?calibration_curve").hasArrayData,
-              "Graph or Data capability is missing from the example browser");
-        check(project.object("@project")->label == "Resolved nodes" &&
-              project.object("@overrides")->label == "Overridden nodes",
-              "Resolved and overridden branch labels are incorrect");
+        check(
+            extended_page.size() == 16 && extended_page.front()[0] == "32" && extended_page.back()[0] == "47" &&
+                extended_page.front().size() == 8,
+            "The example's large table cannot be read on its second page"
+        );
+        check(
+            view.capabilities("experiment.duration").hasReferenceGraph &&
+                view.capabilities("reference?lab_name").hasReferenceGraph &&
+                view.capabilities("reference?calibration_curve").hasArrayData,
+            "Graph or Data capability is missing from the example browser"
+        );
+        check(
+            project.object("@project")->label == "Resolved nodes" &&
+                project.object("@overrides")->label == "Overridden nodes",
+            "Resolved and overridden branch labels are incorrect"
+        );
         check(
             project.object("")->children ==
                 std::vector<std::string>{
-                    "@dipfile", "@overrides", "@project", "@schemas", "@units", "@local",
-                    "@blocks", "@sources", "@raw_sources"
+                    "@dipfile",
+                    "@overrides",
+                    "@project",
+                    "@schemas",
+                    "@units",
+                    "@local",
+                    "@blocks",
+                    "@sources",
+                    "@raw_sources"
                 },
             "Browser sections are not in the expected order"
         );
@@ -374,8 +415,7 @@ int main() {
             catalog && catalog->hierarchy_kind == snt::dip::Path::Kind::Map && family && family->has_value,
             "Second source map is not browsable"
         );
-        const auto catalog_reads =
-            view.graph().dependencies("?experiment.instrument_family");
+        const auto catalog_reads = view.graph().dependencies("?experiment.instrument_family");
         check(
             catalog_reads.size() == 1 && catalog_reads.front().target == "catalog?devices[thermometer].family" &&
                 project.object(catalog_reads.front().target),
@@ -395,10 +435,8 @@ int main() {
         snt::view::SourceView raw_view;
         std::string raw_error;
         check(
-            raw_view.open(
-                raw_targets.front().file, raw_targets.front().line, raw_error, raw_targets.front().format
-            ) && raw_error.empty() &&
-                raw_view.lines().front().spans.size() == 1 &&
+            raw_view.open(raw_targets.front().file, raw_targets.front().line, raw_error, raw_targets.front().format) &&
+                raw_error.empty() && raw_view.lines().front().spans.size() == 1 &&
                 raw_view.lines().front().spans.front().kind == snt::view::SyntaxKind::Text,
             "Raw source text should not receive DIPL syntax colors"
         );
@@ -410,40 +448,58 @@ int main() {
         );
         check(raw_source->parent == "@raw_sources", "Raw array source is not in Raw named sources");
         const auto* inline_table = project.object("@block?experiment.readings");
-        check(inline_table && inline_table->parent == "@blocks" &&
-              project.environment().block_inputs().at("experiment.readings").code.find("---") != std::string::npos,
-              "Inline table text is missing from Block value sources");
+        check(
+            inline_table && inline_table->parent == "@blocks" &&
+                project.environment().block_inputs().at("experiment.readings").code.find("---") != std::string::npos,
+            "Inline table text is missing from Block value sources"
+        );
         const auto inline_table_targets = project.source_targets(*inline_table);
-        check(inline_table_targets.size() == 1 && inline_table_targets.front().block_path &&
-              inline_table_targets.front().format == snt::view::SourceFormat::Table &&
-              inline_table_targets.front().file.filename() == "observations.dip",
-              "Inline table source does not open its table text");
+        check(
+            inline_table_targets.size() == 1 && inline_table_targets.front().block_path &&
+                inline_table_targets.front().format == snt::view::SourceFormat::Table &&
+                inline_table_targets.front().file.filename() == "observations.dip",
+            "Inline table source does not open its table text"
+        );
         snt::view::SourceView table_view;
         std::string table_error;
-        check(table_view.open_text(inline_table_targets.front().file, inline_table_targets.front().line,
-                                   project.environment().block_inputs().at(*inline_table_targets.front().block_path).code,
-                                   inline_table_targets.front().format, table_error) && table_error.empty() &&
-              has_span(table_view.lines().front(), snt::view::SyntaxKind::Type, "float") &&
-              table_view.lines()[3].text == "---" &&
-              table_view.lines()[4].spans.front().kind == snt::view::SyntaxKind::Text,
-              "Table header and data highlighting are incorrect");
+        check(
+            table_view.open_text(
+                inline_table_targets.front().file,
+                inline_table_targets.front().line,
+                project.environment().block_inputs().at(*inline_table_targets.front().block_path).code,
+                inline_table_targets.front().format,
+                table_error
+            ) && table_error.empty() &&
+                has_span(table_view.lines().front(), snt::view::SyntaxKind::Type, "float") &&
+                table_view.lines()[3].text == "---" &&
+                table_view.lines()[4].spans.front().kind == snt::view::SyntaxKind::Text,
+            "Table header and data highlighting are incorrect"
+        );
         const auto* raw_table = project.object("table_samples?");
-        check(raw_table && raw_table->parent == "@raw_sources" &&
-              project.environment().sources.at("table_samples").table_text,
-              "Raw table source is missing from Raw named sources");
+        check(
+            raw_table && raw_table->parent == "@raw_sources" &&
+                project.environment().sources.at("table_samples").table_text,
+            "Raw table source is missing from Raw named sources"
+        );
         const auto raw_table_targets = project.source_targets(*raw_table);
-        check(raw_table_targets.size() == 1 && raw_table_targets.front().format == snt::view::SourceFormat::Table &&
-              raw_table_targets.front().file.filename() == "table_samples.dipt",
-              "Raw table source does not open with table highlighting");
+        check(
+            raw_table_targets.size() == 1 && raw_table_targets.front().format == snt::view::SourceFormat::Table &&
+                raw_table_targets.front().file.filename() == "table_samples.dipt",
+            "Raw table source does not open with table highlighting"
+        );
         const auto* inline_array = project.object("@block?experiment.sample_grid");
-        check(inline_array && inline_array->parent == "@blocks" &&
-              project.environment().block_inputs().at("experiment.sample_grid").kind ==
-                  snt::dip::BlockInput::Kind::Array,
-              "Array string block is missing from Block value sources");
+        check(
+            inline_array && inline_array->parent == "@blocks" &&
+                project.environment().block_inputs().at("experiment.sample_grid").kind ==
+                    snt::dip::BlockInput::Kind::Array,
+            "Array string block is missing from Block value sources"
+        );
         const auto inline_array_targets = project.source_targets(*inline_array);
-        check(inline_array_targets.size() == 1 && inline_array_targets.front().block_path &&
-              inline_array_targets.front().format == snt::view::SourceFormat::Plain,
-              "Array string block does not open as plain text");
+        check(
+            inline_array_targets.size() == 1 && inline_array_targets.front().block_path &&
+                inline_array_targets.front().format == snt::view::SourceFormat::Plain,
+            "Array string block does not open as plain text"
+        );
         check(
             project.select("reference?lab_name") && project.reload() && project.selection() == "reference?lab_name" &&
                 project.input_path() == relative_example.string(),
@@ -462,8 +518,10 @@ int main() {
         project.environment().save(snapshot_path);
         snt::view::ViewerModel snapshot(snapshot_path);
         const auto snapshot_table = snt::dip::Inspector{snapshot.environment()}.table("experiment.extended_readings");
-        check(snapshot_table.rows == 48 && snapshot_table.columns.size() == 8,
-              "The large example table was not retained in the snapshot");
+        check(
+            snapshot_table.rows == 48 && snapshot_table.columns.size() == 8,
+            "The large example table was not retained in the snapshot"
+        );
         check(
             snapshot.object("experiment.geometry.length") && !snapshot.object("@dipfile") &&
                 snapshot.environment().project_entries().empty() &&

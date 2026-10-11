@@ -60,7 +60,9 @@ Examples:
         const std::string name(value.substr(0, separator));
         for (const unsigned char character : name) {
             if (!std::isalnum(character) && character != '_' && character != '-')
-                throw std::invalid_argument("Published environment names use letters, digits, hyphens, and underscores only.");
+                throw std::invalid_argument(
+                    "Published environment names use letters, digits, hyphens, and underscores only."
+                );
         }
         return {name, std::string(value.substr(separator + 1)), kind};
     }
@@ -109,10 +111,12 @@ int module_server(const int argc, char* argv[]) {
             }
             try {
                 const auto kind = option == "--project" ? snt::server::PublishedInputKind::Project
-                                                          : snt::server::PublishedInputKind::DIPH5;
+                                                        : snt::server::PublishedInputKind::DIPH5;
                 auto input = parse_published_input(argv[argument], kind);
                 if (!published_names.insert(input.name).second)
-                    throw std::invalid_argument("Each published environment name may be configured only once: " + input.name);
+                    throw std::invalid_argument(
+                        "Each published environment name may be configured only once: " + input.name
+                    );
                 published_inputs.emplace_back(std::move(input));
             } catch (const std::invalid_argument& exception) {
                 std::cerr << exception.what() << '\n';

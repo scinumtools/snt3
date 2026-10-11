@@ -2,7 +2,6 @@
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/nodes/parser.h>
 #include <snt/dip/solvers/template_solver.h>
-
 #include <utility>
 
 namespace snt::dip {

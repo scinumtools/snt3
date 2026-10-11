@@ -1,9 +1,8 @@
 #ifndef SNT_DIP_GENERATE_MODEL_H
 #define SNT_DIP_GENERATE_MODEL_H
 
-#include <snt/core/datatypes.h>
-
 #include <memory>
+#include <snt/core/datatypes.h>
 #include <string>
 #include <vector>
 

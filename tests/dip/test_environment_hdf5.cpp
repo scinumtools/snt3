@@ -4,12 +4,12 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
-#include <limits>
 #include <hdf5.h>
+#include <limits>
 #include <snt/dip/artifact.h>
-#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/cursor.h>
 #include <snt/dip/exceptions.h>
+#include <snt/dip/inspect/inspector.h>
 
 using namespace snt;
 
@@ -65,8 +65,7 @@ TEST(Environment, OptionLabelsSurviveHdf5RoundTrip) {
     ASSERT_EQ(node->options.size(), 2);
     EXPECT_EQ(node->options[0].label, "Low");
     EXPECT_EQ(node->options[1].label, "High");
-    EXPECT_EQ(dip::Inspector{loaded}.describe("level").option_labels,
-              (std::vector<std::string>{"Low", "High"}));
+    EXPECT_EQ(dip::Inspector{loaded}.describe("level").option_labels, (std::vector<std::string>{"Low", "High"}));
     std::filesystem::remove(file);
 }
 
@@ -90,10 +89,8 @@ TEST(Environment, DerivedTableValuesSurviveHdf5RoundTrip) {
     EXPECT_EQ(loaded["distance"].get_shape(), (val::Array::ShapeType{3}));
     ASSERT_TRUE(loaded["distance"].get_units().has_value());
     EXPECT_EQ(loaded["distance"].get_units()->to_string(), "m");
-    EXPECT_EQ(loaded["measurements.speed"].as<std::vector<double>>(),
-              (std::vector<double>{1.0, 2.0, 3.0}));
-    EXPECT_EQ(loaded["measurements.time"].as<std::vector<double>>(),
-              (std::vector<double>{1.0, 2.0, 3.0}));
+    EXPECT_EQ(loaded["measurements.speed"].as<std::vector<double>>(), (std::vector<double>{1.0, 2.0, 3.0}));
+    EXPECT_EQ(loaded["measurements.time"].as<std::vector<double>>(), (std::vector<double>{1.0, 2.0, 3.0}));
     std::filesystem::remove(file);
 }
 
@@ -119,8 +116,7 @@ TEST(Environment, ExactNumericValuesSurviveHdf5RoundTrip) {
     EXPECT_EQ(loaded["gain"].get_node()->value->get_dtype(), core::DataType::Float32);
     EXPECT_DOUBLE_EQ(loaded["gain"].as<double>(), static_cast<double>(static_cast<float>(1.23456789)));
     EXPECT_EQ(loaded["matrix"].get_shape(), (val::Array::ShapeType{2, 2}));
-    EXPECT_EQ(loaded["matrix"].as<std::vector<double>>(),
-              (std::vector<double>{1.25, -2.5, 3.75, 4.5}));
+    EXPECT_EQ(loaded["matrix"].as<std::vector<double>>(), (std::vector<double>{1.25, -2.5, 3.75, 4.5}));
     std::filesystem::remove(file);
 }
 
@@ -339,8 +335,8 @@ TEST(Environment, RelativeSourcePathsFollowSnapshotLocation) {
     dip::Environment reloaded;
     reloaded.load(copy);
     const auto copied_manifest = reloaded.get_source_manifest();
-    const auto copied_it = std::find_if(copied_manifest.begin(), copied_manifest.end(),
-        [&](const dip::SourceInfo& info) {
+    const auto copied_it =
+        std::find_if(copied_manifest.begin(), copied_manifest.end(), [&](const dip::SourceInfo& info) {
             return std::filesystem::path(info.path).filename() == source_file.filename();
         });
     ASSERT_NE(copied_it, copied_manifest.end());
@@ -381,9 +377,7 @@ TEST(Environment, TraceManifestRoundTrip) {
 
 TEST(Environment, SchemaProvenanceHdf5RoundTrip) {
     dip::DIP parser;
-    parser.add_schema_string(
-        "settings", "?descr \"Reusable settings\"\n?doi \"10.1234/settings\"\nvalue int = 42\n"
-    );
+    parser.add_schema_string("settings", "?descr \"Reusable settings\"\n?doi \"10.1234/settings\"\nvalue int = 42\n");
     parser.add_string("physics : settings\nitems list : settings\nitems[]\n");
     const dip::Environment source = parser.parse();
     const auto before = source.get_schema_manifest();

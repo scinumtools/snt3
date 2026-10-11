@@ -2,16 +2,14 @@
 #define DIP_ENVIRONMENT_H
 
 #include "nodes/node_value.h"
-#include <snt/dip/inspect/block_input.h>
-#include <snt/dip/inspect/dependency_graph.h>
-#include <snt/dip/inspect/declarations.h>
-#include <snt/dip/output_plan.h>
-#include <snt/dip/project_bundle.h>
 
 #include <algorithm>
 #include <filesystem>
 #include <map>
 #include <optional>
+#include <snt/dip/inspect/block_input.h>
+#include <snt/dip/inspect/declarations.h>
+#include <snt/dip/inspect/dependency_graph.h>
 #include <snt/dip/lists/list_branching.h>
 #include <snt/dip/lists/list_functions.h>
 #include <snt/dip/lists/list_hierarchy.h>
@@ -20,6 +18,8 @@
 #include <snt/dip/lists/list_schema.h>
 #include <snt/dip/lists/list_source.h>
 #include <snt/dip/lists/list_unit.h>
+#include <snt/dip/output_plan.h>
+#include <snt/dip/project_bundle.h>
 #include <vector>
 
 namespace snt::dip {
@@ -53,8 +53,8 @@ namespace snt::dip {
 
     /** How source paths are written into a DIPH5 source manifest. */
     enum class SourcePathPolicy {
-        Preserve,           ///< Write source paths as recorded during parsing or loading.
-        RelativeToSnapshot  ///< Write file paths relative to the output DIPH5 directory.
+        Preserve,          ///< Write source paths as recorded during parsing or loading.
+        RelativeToSnapshot ///< Write file paths relative to the output DIPH5 directory.
     };
 
     struct SnapshotSaveOptions {
@@ -128,6 +128,7 @@ namespace snt::dip {
      */
     class Environment {
         friend class Inspector;
+
       private:
         ProjectFileReader project_file_reader_ = snt::dip::read_project_file;
         std::vector<SourceInfo> source_manifest_;
@@ -147,10 +148,10 @@ namespace snt::dip {
         std::vector<SchemaApplicationEvent> schema_applications_;
         std::optional<OutputPlan> output_plan_; ///< Resolved adapter mappings loaded from DIPH5.
 
-        void record_dependency(const std::string& target, const std::string& request,
-                               std::string_view operand = {}) const;
-        std::vector<ValueNode::PointerType> selected_nodes(const std::string& request,
-                                                            const TagFilter& tags) const;
+        void record_dependency(
+            const std::string& target, const std::string& request, std::string_view operand = {}
+        ) const;
+        std::vector<ValueNode::PointerType> selected_nodes(const std::string& request, const TagFilter& tags) const;
 
       public:
         NodeList<ValueNode> nodes; ///< List of parsed nodes
@@ -170,9 +171,7 @@ namespace snt::dip {
         /** File access used by DIPfile registrations and $source nodes. */
         void set_project_file_reader(ProjectFileReader reader) { project_file_reader_ = std::move(reader); }
         const ProjectFileReader& project_file_reader() const { return project_file_reader_; }
-        std::string read_project_file(const std::filesystem::path& path) const {
-            return project_file_reader_(path);
-        }
+        std::string read_project_file(const std::filesystem::path& path) const { return project_file_reader_(path); }
 
         /** Enable graph capture for this parse. */
         void set_dependency_recording(bool enabled) {
@@ -192,9 +191,14 @@ namespace snt::dip {
         class DependencyScope {
             Environment& env_;
             std::optional<size_t> previous_;
+
           public:
-            DependencyScope(Environment& env, std::string owner, DependencyEventKind kind,
-                            std::optional<core::SourceLocation> location = std::nullopt);
+            DependencyScope(
+                Environment& env,
+                std::string owner,
+                DependencyEventKind kind,
+                std::optional<core::SourceLocation> location = std::nullopt
+            );
             ~DependencyScope();
             DependencyScope(const DependencyScope&) = delete;
             DependencyScope& operator=(const DependencyScope&) = delete;
@@ -217,8 +221,8 @@ namespace snt::dip {
         /** Registrations from parsed DIPfiles. Snapshot loading does not restore these entries. */
         const std::vector<ProjectEntry>& project_entries() const { return project_entries_; }
         void record_project_entry(ProjectEntry entry) {
-            const auto after = std::find_if(project_entries_.begin(), project_entries_.end(),
-                [&](const ProjectEntry& current) {
+            const auto after =
+                std::find_if(project_entries_.begin(), project_entries_.end(), [&](const ProjectEntry& current) {
                     return current.source_name == entry.source_name && current.line > entry.line;
                 });
             project_entries_.insert(after, std::move(entry));
@@ -229,21 +233,21 @@ namespace snt::dip {
         bool block_input_recording() const { return block_input_recording_; }
         void set_block_input_recording(bool enabled) { block_input_recording_ = enabled; }
         /** Capture the effective source literal after successful evaluation. */
-        void record_block_input(const BaseNode& declared, const BaseNode& input,
-                                const std::string& path);
+        void record_block_input(const BaseNode& declared, const BaseNode& input, const std::string& path);
         void erase_block_input(const std::string& path) { block_inputs_.erase(path); }
 
         /** Explicit declarations in the evaluated scope. */
         const ExplicitDeclarations& declarations() const { return declarations_; }
-        void record_declaration(const std::string& path, const Line& line) {
-            declarations_.record(path, line);
-        }
+        void record_declaration(const std::string& path, const Line& line) { declarations_.record(path, line); }
         /** Evaluation-order schema applications. Snapshots do not retain this history. */
         const std::vector<SchemaApplicationEvent>& schema_applications() const { return schema_applications_; }
-        void record_schema_application(std::string path, std::string schema_name,
-                                       bool inherited, const Line& line) {
-            schema_applications_.push_back({std::move(path), std::move(schema_name), inherited,
-                {line.source.name, line.source.line_number, line.code}});
+        void record_schema_application(std::string path, std::string schema_name, bool inherited, const Line& line) {
+            schema_applications_.push_back(
+                {std::move(path),
+                 std::move(schema_name),
+                 inherited,
+                 {line.source.name, line.source.line_number, line.code}}
+            );
         }
 
         /**
@@ -320,8 +324,7 @@ namespace snt::dip {
          * @return Selected value node data
          */
         ValueNodeData request_node_data(
-            const std::string& request, const RequestType rtype = RequestType::Reference,
-            std::string_view operand = {}
+            const std::string& request, const RequestType rtype = RequestType::Reference, std::string_view operand = {}
         ) const;
 
         /**

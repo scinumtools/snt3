@@ -56,9 +56,7 @@ TEST(Dimensions, Comparison) {
 
 TEST(Dimensions, ComparisonAcrossExponentRepresentations) {
     const puq::Dimensions integers(1, {2, -1, 0, 0, 0, 0, 0, 0});
-    const puq::Dimensions rationals(
-        1, {puq::Exponent(4, 2), puq::Exponent(-2, 2), 0, 0, 0, 0, 0, 0}
-    );
+    const puq::Dimensions rationals(1, {puq::Exponent(4, 2), puq::Exponent(-2, 2), 0, 0, 0, 0, 0, 0});
     const puq::Dimensions different(1, {puq::Exponent(3, 2), -1, 0, 0, 0, 0, 0, 0});
 
     EXPECT_TRUE(integers == rationals);

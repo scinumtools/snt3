@@ -10,8 +10,8 @@ namespace snt::dip {
     /** Conditional branch node in a DIPL hierarchy. */
     class CaseNode : public BaseNode {
       public:
-        bool value;         // case value
-        size_t case_id;     // ID of a case
+        bool value;                        // case value
+        size_t case_id;                    // ID of a case
         CaseType case_type = CaseType::IF; // type of a case
         static BaseNode::PointerType is_node(Parser& parser);
         CaseNode(Parser& parser) : BaseNode(parser, NodeDtype::Case), case_id(0), value(false) {};

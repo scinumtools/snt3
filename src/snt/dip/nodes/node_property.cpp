@@ -1,4 +1,5 @@
 #include "node_property.h"
+
 #include <snt/dip/exceptions.h>
 
 namespace snt::dip {
@@ -13,8 +14,12 @@ namespace snt::dip {
             if (ptype == PropertyType::Labels &&
                 (parser.value_origin != ValueOrigin::Array || parser.value_shape.size() != 1))
                 throw dip::SyntaxException(
-                    "Invalid labels", "The `!labels` directive requires a one-dimensional list.",
-                    "Provide one label for each option in a single list.", __FILE__, __LINE__, parser.line
+                    "Invalid labels",
+                    "The `!labels` directive requires a one-dimensional list.",
+                    "Provide one label for each option in a single list.",
+                    __FILE__,
+                    __LINE__,
+                    parser.line
                 );
             parser.part_units();
             parser.part_comment();

@@ -14,29 +14,43 @@ namespace snt::server {
     } // namespace
 
     std::string json_escape(const std::string_view value) {
-            std::string escaped;
-            escaped.reserve(value.size());
-            for (const unsigned char ch : value) {
-                switch (ch) {
-                case '"': escaped += "\\\""; break;
-                case '\\': escaped += "\\\\"; break;
-                case '\b': escaped += "\\b"; break;
-                case '\f': escaped += "\\f"; break;
-                case '\n': escaped += "\\n"; break;
-                case '\r': escaped += "\\r"; break;
-                case '\t': escaped += "\\t"; break;
-                default:
-                    if (ch < 0x20) {
-                        constexpr char hex[] = "0123456789abcdef";
-                        escaped += "\\u00";
-                        escaped += hex[(ch >> 4) & 0x0f];
-                        escaped += hex[ch & 0x0f];
-                    } else {
-                        escaped += static_cast<char>(ch);
-                    }
+        std::string escaped;
+        escaped.reserve(value.size());
+        for (const unsigned char ch : value) {
+            switch (ch) {
+            case '"':
+                escaped += "\\\"";
+                break;
+            case '\\':
+                escaped += "\\\\";
+                break;
+            case '\b':
+                escaped += "\\b";
+                break;
+            case '\f':
+                escaped += "\\f";
+                break;
+            case '\n':
+                escaped += "\\n";
+                break;
+            case '\r':
+                escaped += "\\r";
+                break;
+            case '\t':
+                escaped += "\\t";
+                break;
+            default:
+                if (ch < 0x20) {
+                    constexpr char hex[] = "0123456789abcdef";
+                    escaped += "\\u00";
+                    escaped += hex[(ch >> 4) & 0x0f];
+                    escaped += hex[ch & 0x0f];
+                } else {
+                    escaped += static_cast<char>(ch);
                 }
             }
-            return escaped;
+        }
+        return escaped;
     }
 
     namespace {

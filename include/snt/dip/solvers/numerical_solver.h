@@ -12,6 +12,7 @@ namespace snt::dip {
     class NumericalSolver {
       private:
         Environment* env_;
+
       public:
         static exs::Solver<NumericalAtom, NumericalSettings> solver; ///< Instance of an EXS expression solver
 

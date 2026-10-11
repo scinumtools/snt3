@@ -204,8 +204,7 @@ TEST(Uncertainty, DensityConversionPreservesEndpointBound) {
     const puq::Quantity volume(2.0, 0.05, "cm3");
     const auto density = (mass / volume).convert("kg/m3");
 
-    const auto* estimate =
-        dynamic_cast<const val::ArrayValue<double>*>(density.measurement.result.estimate.get());
+    const auto* estimate = dynamic_cast<const val::ArrayValue<double>*>(density.measurement.result.estimate.get());
     const auto* uncertainty =
         dynamic_cast<const val::ArrayValue<double>*>(density.measurement.result.uncertainty.get());
     ASSERT_NE(estimate, nullptr);
@@ -216,7 +215,6 @@ TEST(Uncertainty, DensityConversionPreservesEndpointBound) {
     const double upper_distance = 8.2 / 1.95 - center;
     const double lower_distance = center - 7.8 / 2.05;
     EXPECT_NEAR(estimate->get_values().at(0), center * 1000.0, 1e-9);
-    EXPECT_NEAR(uncertainty->get_values().at(0),
-                std::max(upper_distance, lower_distance) * 1000.0, 1e-9);
+    EXPECT_NEAR(uncertainty->get_values().at(0), std::max(upper_distance, lower_distance) * 1000.0, 1e-9);
     EXPECT_EQ(density.measurement.baseunits.to_string(), "kg*m-3");
 }

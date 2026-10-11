@@ -44,7 +44,10 @@ namespace snt::dip {
         std::vector<Output> outputs_;
 
         friend std::vector<std::filesystem::path> run_adapter(
-            const Environment&, const class Adapter&, const std::filesystem::path&, const std::filesystem::path&,
+            const Environment&,
+            const class Adapter&,
+            const std::filesystem::path&,
+            const std::filesystem::path&,
             ExistingOutputPolicy
         );
     };

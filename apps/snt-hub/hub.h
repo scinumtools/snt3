@@ -6,15 +6,15 @@
 
 namespace snt::hub {
 
-class Error : public std::runtime_error {
-    int code_;
-public:
-    explicit Error(std::string message, int code = 2)
-        : std::runtime_error(std::move(message)), code_(code) {}
-    int code() const noexcept { return code_; }
-};
+    class Error : public std::runtime_error {
+        int code_;
 
-int command(int argc, char* argv[]);
+      public:
+        explicit Error(std::string message, int code = 2) : std::runtime_error(std::move(message)), code_(code) {}
+        int code() const noexcept { return code_; }
+    };
+
+    int command(int argc, char* argv[]);
 
 } // namespace snt::hub
 

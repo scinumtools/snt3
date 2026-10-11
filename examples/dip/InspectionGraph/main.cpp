@@ -1,44 +1,46 @@
-#include <snt/dip/inspect/diagnostic.h>
-#include <snt/dip/artifact.h>
-#include <snt/dip/inspect/inspector.h>
-#include <snt/val/value_base.h>
-
 #include <exception>
 #include <filesystem>
 #include <iostream>
 #include <ostream>
+#include <snt/dip/artifact.h>
+#include <snt/dip/inspect/diagnostic.h>
+#include <snt/dip/inspect/inspector.h>
+#include <snt/val/value_base.h>
 #include <string>
 
 namespace fs = std::filesystem;
 
 namespace {
 
-void print_location(std::ostream& output, const snt::core::SourceLocation& location) {
-    output << fs::path(location.source).filename().string() << ':' << location.line;
-}
-
-const char* change_name(snt::dip::ValueChangeKind kind) {
-    switch (kind) {
-    case snt::dip::ValueChangeKind::Declaration: return "declaration";
-    case snt::dip::ValueChangeKind::Modification: return "modification";
-    case snt::dip::ValueChangeKind::Override: return "override";
+    void print_location(std::ostream& output, const snt::core::SourceLocation& location) {
+        output << fs::path(location.source).filename().string() << ':' << location.line;
     }
-    return "change";
-}
 
-void print_expression(const snt::exs::CompositionGraph& graph, std::size_t index, int depth = 0) {
-    const auto& node = graph.nodes.at(index);
-    std::cout << std::string(static_cast<std::size_t>(depth) * 2, ' ');
-    if (node.kind == snt::exs::CompositionKind::Operand)
-        std::cout << "operand ";
-    else if (node.kind == snt::exs::CompositionKind::Operator)
-        std::cout << "operator ";
-    else
-        std::cout << "group ";
-    std::cout << node.text << '\n';
-    for (const auto child : node.children)
-        print_expression(graph, child, depth + 1);
-}
+    const char* change_name(snt::dip::ValueChangeKind kind) {
+        switch (kind) {
+        case snt::dip::ValueChangeKind::Declaration:
+            return "declaration";
+        case snt::dip::ValueChangeKind::Modification:
+            return "modification";
+        case snt::dip::ValueChangeKind::Override:
+            return "override";
+        }
+        return "change";
+    }
+
+    void print_expression(const snt::exs::CompositionGraph& graph, std::size_t index, int depth = 0) {
+        const auto& node = graph.nodes.at(index);
+        std::cout << std::string(static_cast<std::size_t>(depth) * 2, ' ');
+        if (node.kind == snt::exs::CompositionKind::Operand)
+            std::cout << "operand ";
+        else if (node.kind == snt::exs::CompositionKind::Operator)
+            std::cout << "operator ";
+        else
+            std::cout << "group ";
+        std::cout << node.text << '\n';
+        for (const auto child : node.children)
+            print_expression(graph, child, depth + 1);
+    }
 
 } // namespace
 

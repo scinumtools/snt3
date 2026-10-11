@@ -22,9 +22,7 @@ namespace snt::dip {
         BaseNode() : dtype(NodeDtype::None) {};
         BaseNode(const BaseNode& other) = default;
         BaseNode(const NodeDtype dt) : dtype(dt) {};
-        BaseNode(const Parser& parser, const NodeDtype dt)
-            : dtype(dt), branch_id(0), case_id(0), Node(parser) {}
-            ;
+        BaseNode(const Parser& parser, const NodeDtype dt) : dtype(dt), branch_id(0), case_id(0), Node(parser) {};
         ~BaseNode() override = default;
         /** Parse the supplied expression.
          * @param env Environment providing symbols and configuration.

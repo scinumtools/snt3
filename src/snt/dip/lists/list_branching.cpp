@@ -251,9 +251,7 @@ namespace snt::dip {
             const size_t end = path.find(SIGN_SEPARATOR, start);
             const std::string component = path.substr(start, end - start);
             if (component.size() > 2 && component[0] == SIGN_CONDITION && component[1] == 'C' &&
-                std::all_of(component.begin() + 2, component.end(), [](unsigned char ch) {
-                    return std::isdigit(ch);
-                }))
+                std::all_of(component.begin() + 2, component.end(), [](unsigned char ch) { return std::isdigit(ch); }))
                 return true;
             if (end == std::string::npos)
                 break;

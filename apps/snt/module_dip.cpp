@@ -104,14 +104,18 @@ int module_dip_compare(int argc, char* argv[]) {
                 throw std::invalid_argument(argument + " requires a value.");
             const std::string value = argv[index];
             if (argument == "--scope") {
-                if (value == "full") options.scope = dip::ComparisonScope::Full;
-                else if (value != "effective") throw std::invalid_argument("Scope must be effective or full.");
+                if (value == "full")
+                    options.scope = dip::ComparisonScope::Full;
+                else if (value != "effective")
+                    throw std::invalid_argument("Scope must be effective or full.");
             } else {
                 if (value.empty() || value.find_first_not_of("0123456789") != std::string::npos)
                     throw std::invalid_argument(argument + " requires a nonnegative integer.");
                 const auto count = static_cast<std::size_t>(std::stoull(value));
-                if (argument == "--max-details") max_details = count;
-                else options.max_array_examples = count;
+                if (argument == "--max-details")
+                    max_details = count;
+                else
+                    options.max_array_examples = count;
             }
         } else if (!argument.empty() && argument[0] == '-') {
             throw std::invalid_argument("Unknown comparison option: " + argument);
@@ -158,7 +162,9 @@ void module_dip(ArgParser& argpar) {
                 throw std::runtime_error(key + " requires an input type and value.");
             for (size_t i = 0; i < values.size();) {
                 const auto& kind = values[i];
-                size_t count = (kind == "file" || kind == "string" || kind == "override_string" || kind == "override_file") ? 1 : 2;
+                size_t count =
+                    (kind == "file" || kind == "string" || kind == "override_string" || kind == "override_file") ? 1
+                                                                                                                 : 2;
                 if (i + count >= values.size())
                     throw std::runtime_error("Incomplete DIP input: " + kind);
                 cmd.argument_add(
@@ -189,8 +195,10 @@ void module_dip(ArgParser& argpar) {
         } else if (key == "--record-graph" || key == "--relative-source-paths") {
             if (!values.empty())
                 throw std::runtime_error(key + " does not take arguments.");
-            if (key == "--record-graph") record_graph = true;
-            else relative_source_paths = true;
+            if (key == "--record-graph")
+                record_graph = true;
+            else
+                relative_source_paths = true;
         } else if (key == "--generate") {
             if (values.size() != 2 || has_generate)
                 throw std::runtime_error("Specify one export format and one output file with --generate.");

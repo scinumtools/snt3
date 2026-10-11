@@ -17,8 +17,11 @@ namespace snt::dip {
     SchemaList::SchemaList() = default;
 
     void SchemaList::append(
-        const std::string& name, BaseNode::ListType& nodes, const std::string& parent_id,
-        const ValueMetadata& metadata, size_t source_line
+        const std::string& name,
+        BaseNode::ListType& nodes,
+        const std::string& parent_id,
+        const ValueMetadata& metadata,
+        size_t source_line
     ) {
         auto it = schemas.find(name);
         if (it != schemas.end())

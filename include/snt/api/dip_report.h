@@ -5,9 +5,13 @@
 
 namespace snt::api {
 
-/** Generate a report from an evaluated DIP environment. */
-void generate_dip_report(const dip::Environment& environment, dip::report::ReportFormat format,
-                       const std::filesystem::path& output, const dip::report::ReportOptions& options = {});
+    /** Generate a report from an evaluated DIP environment. */
+    void generate_dip_report(
+        const dip::Environment& environment,
+        dip::report::ReportFormat format,
+        const std::filesystem::path& output,
+        const dip::report::ReportOptions& options = {}
+    );
 
 } // namespace snt::api
 

@@ -11,14 +11,14 @@ namespace snt::dip {
 
     /** Reusable schema definition registered in a parsed DIPL environment. */
     struct EnvSchema {
-        std::string name;         // schema key
-        BaseNode::ListType nodes; // aggregated nodes
-        std::string id;           // internal trace identifier, e.g. DIP0_SCHEMA0
-        ValueMetadata metadata;   ///< Metadata on the definition, not inherited by instances.
-        std::string source_name;  ///< Source containing the declaration or schema body.
-        size_t source_line = 0;   ///< Declaration line, or first body line for host schemas.
+        std::string name;                     // schema key
+        BaseNode::ListType nodes;             // aggregated nodes
+        std::string id;                       // internal trace identifier, e.g. DIP0_SCHEMA0
+        ValueMetadata metadata;               ///< Metadata on the definition, not inherited by instances.
+        std::string source_name;              ///< Source containing the declaration or schema body.
+        size_t source_line = 0;               ///< Declaration line, or first body line for host schemas.
         std::string registration_source_name; ///< Source that registered a host schema, when available.
-        size_t registration_line = 0; ///< One-based host declaration line.
+        size_t registration_line = 0;         ///< One-based host declaration line.
     };
 
     class SchemaList {
@@ -35,8 +35,11 @@ namespace snt::dip {
          * @param metadata Metadata attached to the schema definition.
          */
         void append(
-            const std::string& name, BaseNode::ListType& nodes, const std::string& parent_id = {},
-            const ValueMetadata& metadata = {}, size_t source_line = 0
+            const std::string& name,
+            BaseNode::ListType& nodes,
+            const std::string& parent_id = {},
+            const ValueMetadata& metadata = {},
+            size_t source_line = 0
         );
         /** Append a schema record, assigning an identifier when it has none. */
         void append(const std::string& name, EnvSchema src, const std::string& parent_id = {});

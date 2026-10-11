@@ -1,16 +1,16 @@
-#include "nodes/node_schema.h"
 #include "nodes/node_group.h"
+#include "nodes/node_schema.h"
 #include "parsers.h"
 
 #include <algorithm>
 #include <map>
-#include <set>
 #include <regex>
+#include <set>
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
-#include <snt/dip/nodes/node_property.h>
 #include <snt/dip/nodes/node_case.h>
+#include <snt/dip/nodes/node_property.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/settings.h>
 #include <sstream>
@@ -208,14 +208,19 @@ overrides list : snt_project_override
     }
 
     void DIP::add_override_string(const std::string& source_code, const std::string& source_name) {
-        add_override_input(source_code, env.sources.at(source.name).path, {source.name, source.line_number}, source_name);
+        add_override_input(
+            source_code, env.sources.at(source.name).path, {source.name, source.line_number}, source_name
+        );
     }
 
     void DIP::add_override_input(
-        const std::string& source_code, const std::filesystem::path& source_file, const Source& parent,
+        const std::string& source_code,
+        const std::filesystem::path& source_file,
+        const Source& parent,
         std::string source_name
     ) {
-        if (source_name.empty()) source_name = source.name + "_OVERRIDE" + std::to_string(num_overrides);
+        if (source_name.empty())
+            source_name = source.name + "_OVERRIDE" + std::to_string(num_overrides);
         std::queue<Line> override_lines;
         parse_lines(override_lines, source_code, source_name);
         const auto nodes = parse_code_nodes(override_lines);
@@ -248,7 +253,9 @@ overrides list : snt_project_override
         validate_project_manifest(project);
 
         const EnvSource& project_definition = project.sources.at(project_source);
-        env.sources.append(project_source, absolute_project, project_definition.code, {source.name, source.line_number});
+        env.sources.append(
+            project_source, absolute_project, project_definition.code, {source.name, source.line_number}
+        );
         const std::filesystem::path project_directory = absolute_project.parent_path();
 
         if (project.hierarchy.has_collection("units")) {
@@ -260,8 +267,14 @@ overrides list : snt_project_override
                 auto& unit = env.units.at(name);
                 unit.source_name = project_source;
                 unit.source_line = project_field_line(project.get_node(item + ".unit")).source.line_number;
-                env.record_project_entry({ProjectEntry::Kind::Unit, name,
-                    project[item + ".unit"].as<std::string>(), {}, project_source, unit.source_line});
+                env.record_project_entry(
+                    {ProjectEntry::Kind::Unit,
+                     name,
+                     project[item + ".unit"].as<std::string>(),
+                     {},
+                     project_source,
+                     unit.source_line}
+                );
             }
         }
         if (project.hierarchy.has_collection("sources")) {
@@ -275,10 +288,14 @@ overrides list : snt_project_override
                     filepath.string(),
                     {project_source, project_field_line(node).source.line_number}
                 );
-                env.record_project_entry({ProjectEntry::Kind::Source,
-                    project[item + ".name"].as<std::string>(),
-                    project[item + ".filepath"].as<std::string>(), filepath.string(),
-                    project_source, project_field_line(node).source.line_number});
+                env.record_project_entry(
+                    {ProjectEntry::Kind::Source,
+                     project[item + ".name"].as<std::string>(),
+                     project[item + ".filepath"].as<std::string>(),
+                     filepath.string(),
+                     project_source,
+                     project_field_line(node).source.line_number}
+                );
             }
         }
         if (project.hierarchy.has_collection("schemas")) {
@@ -307,13 +324,19 @@ overrides list : snt_project_override
                         name, project_path(project_directory, project[item + ".file"].as<std::string>()), parent
                     );
                 } else {
-                    add_schema_string_input(name, project[item + ".string"].as<std::string>(), absolute_project, parent);
+                    add_schema_string_input(
+                        name, project[item + ".string"].as<std::string>(), absolute_project, parent
+                    );
                 }
-                env.record_project_entry({ProjectEntry::Kind::Schema, name,
-                    has_file ? project[item + ".file"].as<std::string>()
-                             : project[item + ".string"].as<std::string>(),
-                    has_file ? project_path(project_directory, project[item + ".file"].as<std::string>()).string()
-                             : std::string{}, project_source, parent.line_number});
+                env.record_project_entry(
+                    {ProjectEntry::Kind::Schema,
+                     name,
+                     has_file ? project[item + ".file"].as<std::string>() : project[item + ".string"].as<std::string>(),
+                     has_file ? project_path(project_directory, project[item + ".file"].as<std::string>()).string()
+                              : std::string{},
+                     project_source,
+                     parent.line_number}
+                );
             }
         }
         if (project.hierarchy.has_collection("overrides")) {
@@ -325,10 +348,14 @@ overrides list : snt_project_override
                     project_path(project_directory, project[item + ".file"].as<std::string>()),
                     {project_source, project_field_line(node).source.line_number}
                 );
-                env.record_project_entry({ProjectEntry::Kind::Override, {},
-                    project[item + ".file"].as<std::string>(),
-                    project_path(project_directory, project[item + ".file"].as<std::string>()).string(),
-                    project_source, project_field_line(node).source.line_number});
+                env.record_project_entry(
+                    {ProjectEntry::Kind::Override,
+                     {},
+                     project[item + ".file"].as<std::string>(),
+                     project_path(project_directory, project[item + ".file"].as<std::string>()).string(),
+                     project_source,
+                     project_field_line(node).source.line_number}
+                );
             }
         }
         if (project.hierarchy.has_collection("code")) {
@@ -352,24 +379,34 @@ overrides list : snt_project_override
                 const auto location_node = has_file ? file : string;
                 const Source parent = {project_source, project_field_line(location_node).source.line_number};
                 if (has_file) {
-                    add_file_input(project_path(project_directory, project[item + ".file"].as<std::string>()), {}, true, parent);
+                    add_file_input(
+                        project_path(project_directory, project[item + ".file"].as<std::string>()), {}, true, parent
+                    );
                 } else {
                     add_string_input(project[item + ".string"].as<std::string>(), absolute_project, parent);
                 }
-                env.record_project_entry({ProjectEntry::Kind::Code, {},
-                    has_file ? project[item + ".file"].as<std::string>()
-                             : project[item + ".string"].as<std::string>(),
-                    has_file ? project_path(project_directory, project[item + ".file"].as<std::string>()).string()
-                             : std::string{}, project_source, parent.line_number});
+                env.record_project_entry(
+                    {ProjectEntry::Kind::Code,
+                     {},
+                     has_file ? project[item + ".file"].as<std::string>() : project[item + ".string"].as<std::string>(),
+                     has_file ? project_path(project_directory, project[item + ".file"].as<std::string>()).string()
+                              : std::string{},
+                     project_source,
+                     parent.line_number}
+                );
             }
         }
     }
 
     void DIP::add_project(const ProjectInput& project) {
-        for (const auto& unit : project.units) add_unit(unit.name, unit.text);
-        for (const auto& schema : project.schemas) add_schema_string(schema.name, schema.text);
-        for (const auto& entry : project.overrides) add_override_string(entry.text, entry.name);
-        for (const auto& entry : project.code) add_string(entry.text, entry.name);
+        for (const auto& unit : project.units)
+            add_unit(unit.name, unit.text);
+        for (const auto& schema : project.schemas)
+            add_schema_string(schema.name, schema.text);
+        for (const auto& entry : project.overrides)
+            add_override_string(entry.text, entry.name);
+        for (const auto& entry : project.code)
+            add_string(entry.text, entry.name);
     }
 
     void DIP::add_function_value(const std::string& name, FunctionList::DataFunctionType func) {
@@ -389,7 +426,9 @@ overrides list : snt_project_override
         NodeDtype::Boolean, NodeDtype::Integer, NodeDtype::Float, NodeDtype::String, NodeDtype::Table
     };
 
-    inline void set_node_property(const BaseNode::PointerType& current_node, const BaseNode::PointerType& previous_node) {
+    inline void set_node_property(
+        const BaseNode::PointerType& current_node, const BaseNode::PointerType& previous_node
+    ) {
         // assign properties to the previous value node
         PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
         if (!previous_node || std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
@@ -442,13 +481,18 @@ overrides list : snt_project_override
                 "Schema metadata has an invalid indent",
                 "A schema metadata property must be indented one level beneath its declaration.",
                 "Indent the property " + std::to_string(INDENT_STEP) + " spaces more than the schema declaration.",
-                __FILE__, __LINE__, property->line
+                __FILE__,
+                __LINE__,
+                property->line
             );
         if (!schema_node->set_property(property->ptype, property->value_raw, property->units_raw))
             throw dip::SyntaxException(
-                "Invalid schema property", "Only metadata properties can describe a schema.",
+                "Invalid schema property",
+                "Only metadata properties can describe a schema.",
                 "Use a ? metadata property before the first schema value node.",
-                __FILE__, __LINE__, property->line
+                __FILE__,
+                __LINE__,
+                property->line
             );
     }
 
@@ -457,8 +501,10 @@ overrides list : snt_project_override
     }
 
     void DIP::add_schema_string_input(
-        const std::string& name, const std::string& source_code,
-        const std::filesystem::path& source_file, const Source& parent
+        const std::string& name,
+        const std::string& source_code,
+        const std::filesystem::path& source_file,
+        const Source& parent
     ) {
         const std::string source_name = source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings++);
         add_schema_input(name, source_code, source_file, source_name, parent);
@@ -483,13 +529,19 @@ overrides list : snt_project_override
     }
 
     void DIP::add_schema_input(
-        const std::string& name, const std::string& source_code,
-        const std::filesystem::path& source_file, const std::string& source_name, const Source& parent
+        const std::string& name,
+        const std::string& source_code,
+        const std::filesystem::path& source_file,
+        const std::string& source_name,
+        const Source& parent
     ) {
         if (!std::regex_match(name, std::regex(std::string(PATTERN_KEYWORD) + "+")))
             throw dip::SyntaxException(
-                "Invalid schema name", "The schema name `" + name + "` is not a DIPL keyword.",
-                "Use a nonempty name containing only letters, digits, underscores, and hyphens.", __FILE__, __LINE__
+                "Invalid schema name",
+                "The schema name `" + name + "` is not a DIPL keyword.",
+                "Use a nonempty name containing only letters, digits, underscores, and hyphens.",
+                __FILE__,
+                __LINE__
             );
         std::queue<Line> schema_lines;
         parse_lines(schema_lines, source_code, source_name);
@@ -502,28 +554,43 @@ overrides list : snt_project_override
                 continue;
             if (node->dtype == NodeDtype::Schema)
                 throw dip::SyntaxException(
-                    "Unexpected schema declaration", "A schema body cannot contain a $schema declaration.",
-                    "Pass the body without its $schema wrapper.", __FILE__, __LINE__, node->line
+                    "Unexpected schema declaration",
+                    "A schema body cannot contain a $schema declaration.",
+                    "Pass the body without its $schema wrapper.",
+                    __FILE__,
+                    __LINE__,
+                    node->line
                 );
             if (node->dtype == NodeDtype::Override)
                 throw dip::SyntaxException(
-                    "Invalid override region", "An $override directive cannot be declared inside a schema.",
-                    "Use a top-level region with fully qualified target paths.", __FILE__, __LINE__, node->line
+                    "Invalid override region",
+                    "An $override directive cannot be declared inside a schema.",
+                    "Use a top-level region with fully qualified target paths.",
+                    __FILE__,
+                    __LINE__,
+                    node->line
                 );
             check_indent(previous, node);
             if (!previous && node->indent != 0)
                 throw dip::SyntaxException(
-                    "Schema body has an invalid indent", "The first node must start at indentation zero.",
-                    "Remove the extra indentation from the schema body.", __FILE__, __LINE__, node->line
+                    "Schema body has an invalid indent",
+                    "The first node must start at indentation zero.",
+                    "Remove the extra indentation from the schema body.",
+                    __FILE__,
+                    __LINE__,
+                    node->line
                 );
             if (node->dtype == NodeDtype::Property) {
                 if (!previous) {
                     auto property = std::dynamic_pointer_cast<PropertyNode>(node);
                     if (!schema_metadata.set_property(property->ptype, property->value_raw))
                         throw dip::SyntaxException(
-                            "Invalid schema property", "Only metadata properties can describe a schema.",
+                            "Invalid schema property",
+                            "Only metadata properties can describe a schema.",
                             "Use a ? metadata property before the first schema value node.",
-                            __FILE__, __LINE__, node->line
+                            __FILE__,
+                            __LINE__,
+                            node->line
                         );
                 } else {
                     set_node_property(node, previous);
@@ -535,13 +602,18 @@ overrides list : snt_project_override
         }
         if (schema_nodes.empty())
             throw dip::SyntaxException(
-                "Schema does not contain any value nodes", "The schema is empty and does not contain any value nodes.",
-                "Declare or define value nodes in the schema.", __FILE__, __LINE__
+                "Schema does not contain any value nodes",
+                "The schema is empty and does not contain any value nodes.",
+                "Declare or define value nodes in the schema.",
+                __FILE__,
+                __LINE__
             );
         // Schema nodes are stored one level beneath their application point.
         for (const auto& node : schema_nodes)
             node->indent += INDENT_STEP;
-        env.schemas.append(name, schema_nodes, source_name, schema_metadata, schema_nodes.front()->line.source.line_number);
+        env.schemas.append(
+            name, schema_nodes, source_name, schema_metadata, schema_nodes.front()->line.source.line_number
+        );
         env.sources.append(source_name, source_file, source_code, parent);
     }
 
@@ -568,9 +640,12 @@ overrides list : snt_project_override
                         break;
                     if (schema_node->dtype == NodeDtype::Override)
                         throw dip::SyntaxException(
-                            "Invalid override region", "An $override directive cannot be declared inside a schema.",
+                            "Invalid override region",
+                            "An $override directive cannot be declared inside a schema.",
                             "Use a top-level region with fully qualified target paths.",
-                            __FILE__, __LINE__, schema_node->line
+                            __FILE__,
+                            __LINE__,
+                            schema_node->line
                         );
                     if (schema_node->dtype == NodeDtype::Property && schema_previous == current_node) {
                         set_schema_property(schema_previous, schema_node);
@@ -590,7 +665,10 @@ overrides list : snt_project_override
                 if (schema_nodes.size() > 0) {
                     auto schema = std::dynamic_pointer_cast<SchemaNode>(current_node);
                     env.schemas.append(
-                        current_node->value_raw.at(0), schema_nodes, current_node->line.source.name, schema->metadata,
+                        current_node->value_raw.at(0),
+                        schema_nodes,
+                        current_node->line.source.name,
+                        schema->metadata,
                         current_node->line.source.line_number
                     );
                 } else {
@@ -606,8 +684,12 @@ overrides list : snt_project_override
             } else if (current_node->dtype == NodeDtype::Override) {
                 if (current_node->indent != 0)
                     throw dip::SyntaxException(
-                        "Invalid override region", "An $override directive must be at the top level.",
-                        "Move the directive to indentation zero.", __FILE__, __LINE__, current_node->line
+                        "Invalid override region",
+                        "An $override directive must be at the top level.",
+                        "Move the directive to indentation zero.",
+                        __FILE__,
+                        __LINE__,
+                        current_node->line
                     );
                 BaseNode::ListType body;
                 while (i + 1 < queue.size() &&
@@ -675,9 +757,14 @@ overrides list : snt_project_override
                     std::optional<Environment::DependencyScope> graph_scope;
                     if (record_dependency_graph)
                         graph_scope.emplace(
-                            target, "?" + graph_path, DependencyEventKind::Value,
-                            core::SourceLocation{replacement->line.source.name, replacement->line.source.line_number,
-                                                 replacement->line.code}
+                            target,
+                            "?" + graph_path,
+                            DependencyEventKind::Value,
+                            core::SourceLocation{
+                                replacement->line.source.name,
+                                replacement->line.source.line_number,
+                                replacement->line.code
+                            }
                         );
                     declared->apply_override(replacement, target);
                     target.record_block_input(*declared, *replacement, graph_path);
@@ -689,9 +776,12 @@ overrides list : snt_project_override
                         std::optional<Environment::DependencyScope> graph_scope;
                         if (record_dependency_graph) {
                             graph_scope.emplace(
-                                target, "?" + graph_path, DependencyEventKind::Value,
-                                core::SourceLocation{node->line.source.name, node->line.source.line_number,
-                                                     node->line.code}
+                                target,
+                                "?" + graph_path,
+                                DependencyEventKind::Value,
+                                core::SourceLocation{
+                                    node->line.source.name, node->line.source.line_number, node->line.code
+                                }
                             );
                             const auto imported = std::dynamic_pointer_cast<ValueNode>(node);
                             if (imported && !imported->copied_from.empty())
@@ -703,9 +793,12 @@ overrides list : snt_project_override
                         std::optional<Environment::DependencyScope> graph_scope;
                         if (record_dependency_graph)
                             graph_scope.emplace(
-                                target, "#case:pending", DependencyEventKind::Decision,
-                                core::SourceLocation{node->line.source.name, node->line.source.line_number,
-                                                     node->line.code}
+                                target,
+                                "#case:pending",
+                                DependencyEventKind::Decision,
+                                core::SourceLocation{
+                                    node->line.source.name, node->line.source.line_number, node->line.code
+                                }
                             );
                         parsed = node->parse(target);
                         if (record_dependency_graph) {
@@ -751,8 +844,8 @@ overrides list : snt_project_override
                 }
             }
             if (node->dtype == NodeDtype::Group && !node->schemas.empty()) {
-                const std::string path = active_hierarchy
-                    ? target.branching.clean_name(node->path.name) : node->path.name;
+                const std::string path =
+                    active_hierarchy ? target.branching.clean_name(node->path.name) : node->path.name;
                 target.hierarchy.set_schemas(path, node->schemas);
             }
             // Add nodes to the node list
@@ -782,9 +875,12 @@ overrides list : snt_project_override
                                 std::optional<Environment::DependencyScope> graph_scope;
                                 if (record_dependency_graph)
                                     graph_scope.emplace(
-                                        target, "?" + node->path.name, DependencyEventKind::Value,
-                                        core::SourceLocation{node->line.source.name, node->line.source.line_number,
-                                                             node->line.code}
+                                        target,
+                                        "?" + node->path.name,
+                                        DependencyEventKind::Value,
+                                        core::SourceLocation{
+                                            node->line.source.name, node->line.source.line_number, node->line.code
+                                        }
                                     );
                                 mnode->modify_value(node, target);
                                 graph_value_evaluated = record_dependency_graph;
@@ -838,16 +934,21 @@ overrides list : snt_project_override
                     "Missing evaluated collection",
                     "The evaluated node `" + node->path.name + "` has no hierarchy collection.",
                     "Check the branch and collection declarations that produced this node.",
-                    __FILE__, __LINE__, node->line
+                    __FILE__,
+                    __LINE__,
+                    node->line
                 );
         }
         const auto unresolved = target.overrides.unresolved();
         if (!unresolved.empty()) {
             const auto entry = target.overrides.find(unresolved.front());
             throw dip::EnvironmentException(
-                "Unresolved override", "The override target `" + unresolved.front() + "` was not defined.",
+                "Unresolved override",
+                "The override target `" + unresolved.front() + "` was not defined.",
                 "Define the node outside $override or remove the override.",
-                __FILE__, __LINE__, entry->line
+                __FILE__,
+                __LINE__,
+                entry->line
             );
         }
         // Validate nodes
@@ -870,9 +971,12 @@ overrides list : snt_project_override
                         std::optional<Environment::DependencyScope> graph_scope;
                         if (record_dependency_graph)
                             graph_scope.emplace(
-                                target, "?" + vnode->path.name, DependencyEventKind::Condition,
-                                core::SourceLocation{vnode->line.source.name, vnode->line.source.line_number,
-                                                     vnode->line.code}
+                                target,
+                                "?" + vnode->path.name,
+                                DependencyEventKind::Condition,
+                                core::SourceLocation{
+                                    vnode->line.source.name, vnode->line.source.line_number, vnode->line.code
+                                }
                             );
                         vnode->validate_condition(target);
                     }
@@ -891,7 +995,8 @@ overrides list : snt_project_override
                     if (override_source != sources.end() && !override_source->second.path.empty())
                         info.details += "\nOverride file: " + override_source->second.path;
                     info.location = core::SourceLocation{
-                        vnode->override_line.source.name, vnode->override_line.source.line_number,
+                        vnode->override_line.source.name,
+                        vnode->override_line.source.line_number,
                         vnode->override_line.code
                     };
                     throw dip::SyntaxException(std::move(info));

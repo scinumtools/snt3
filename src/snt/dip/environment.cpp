@@ -1,5 +1,4 @@
 #include "generate/export.h"
-#include <snt/sha256.h>
 
 #include <algorithm>
 #include <snt/dip/cursor.h>
@@ -7,6 +6,7 @@
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/exs/exceptions.h>
+#include <snt/sha256.h>
 #include <unordered_set>
 
 namespace snt::dip {
@@ -56,31 +56,40 @@ namespace snt::dip {
 
     Environment::Environment() = default;
 
-    void Environment::record_block_input(const BaseNode& declared, const BaseNode& input,
-                                         const std::string& path) {
+    void Environment::record_block_input(const BaseNode& declared, const BaseNode& input, const std::string& path) {
         const bool table = declared.dtype == NodeDtype::Table;
         if (table && input.value_origin == ValueOrigin::ReferenceRaw && !input.value_raw.empty())
             sources.at(input.value_raw.front()).table_text = true;
-        if (!block_input_recording_ || input.value_origin != ValueOrigin::String ||
-            input.value_raw.empty()) return;
-        const bool array = (declared.dtype == NodeDtype::Boolean ||
-                            declared.dtype == NodeDtype::Integer ||
+        if (!block_input_recording_ || input.value_origin != ValueOrigin::String || input.value_raw.empty())
+            return;
+        const bool array = (declared.dtype == NodeDtype::Boolean || declared.dtype == NodeDtype::Integer ||
                             declared.dtype == NodeDtype::Float) &&
                            !declared.dimension.empty() && input.value_shape.empty();
-        if (!table && !array) return;
-        block_inputs_.insert_or_assign(path, BlockInput{
-            table ? BlockInput::Kind::Table : BlockInput::Kind::Array, path,
-            input.value_raw.front(), input.line.source.name, input.line.source.line_number});
+        if (!table && !array)
+            return;
+        block_inputs_.insert_or_assign(
+            path,
+            BlockInput{
+                table ? BlockInput::Kind::Table : BlockInput::Kind::Array,
+                path,
+                input.value_raw.front(),
+                input.line.source.name,
+                input.line.source.line_number
+            }
+        );
     }
 
-    Environment::DependencyScope::DependencyScope(Environment& env, std::string owner, DependencyEventKind kind,
-                                                   std::optional<core::SourceLocation> location)
+    Environment::DependencyScope::DependencyScope(
+        Environment& env, std::string owner, DependencyEventKind kind, std::optional<core::SourceLocation> location
+    )
         : env_(env), previous_(env.active_dependency_event_) {
         env_.dependency_graph_.events.push_back({std::move(owner), kind, std::move(location)});
         env_.active_dependency_event_ = env_.dependency_graph_.events.size() - 1;
     }
 
-    Environment::DependencyScope::~DependencyScope() { env_.active_dependency_event_ = previous_; }
+    Environment::DependencyScope::~DependencyScope() {
+        env_.active_dependency_event_ = previous_;
+    }
 
     exs::CompositionGraph* Environment::active_composition(const std::string& expression) {
         if (!active_dependency_event_)
@@ -111,10 +120,12 @@ namespace snt::dip {
         record_dependency(source_node_id, source_node_id);
     }
 
-    void Environment::record_dependency(const std::string& target, const std::string& request,
-                                        std::string_view operand) const {
+    void Environment::record_dependency(
+        const std::string& target, const std::string& request, std::string_view operand
+    ) const {
         if (active_dependency_event_)
-            dependency_graph_.events.at(*active_dependency_event_).reads.push_back({target, request, std::string(operand)});
+            dependency_graph_.events.at(*active_dependency_event_)
+                .reads.push_back({target, request, std::string(operand)});
     }
 
     void Environment::generate(ExportFormat format, const std::filesystem::path& file) const {
@@ -206,7 +217,8 @@ namespace snt::dip {
                 const auto schema = std::find_if(manifest.begin(), manifest.end(), [&](const SchemaInfo& entry) {
                     return entry.name == name;
                 });
-                if (schema != manifest.end() && std::none_of(result.begin(), result.end(), [&](const SchemaInfo& entry) {
+                if (schema != manifest.end() &&
+                    std::none_of(result.begin(), result.end(), [&](const SchemaInfo& entry) {
                         return entry.id == schema->id;
                     }))
                     result.push_back(*schema);
@@ -238,8 +250,9 @@ namespace snt::dip {
         return source.code;
     }
 
-    ValueNodeData Environment::request_node_data(const std::string& request, const RequestType rtype,
-                                                  std::string_view operand) const {
+    ValueNodeData Environment::request_node_data(
+        const std::string& request, const RequestType rtype, std::string_view operand
+    ) const {
         ValueNodeData new_value;
 
         switch (rtype) {
@@ -392,14 +405,17 @@ namespace snt::dip {
     }
 
     bool TagFilter::matches(const std::vector<std::string>& tags) const {
-        return std::all_of(all.begin(), all.end(), [&tags](const std::string& tag) {
-                   return std::find(tags.begin(), tags.end(), tag) != tags.end();
-               }) &&
+        return std::all_of(
+                   all.begin(),
+                   all.end(),
+                   [&tags](const std::string& tag) { return std::find(tags.begin(), tags.end(), tag) != tags.end(); }
+               ) &&
                (any.empty() || hasIntersection(tags, any)) && !hasIntersection(tags, none);
     }
 
     std::vector<ValueNode::PointerType> Environment::selected_nodes(
-        const std::string& request, const TagFilter& tags) const {
+        const std::string& request, const TagFilter& tags
+    ) const {
         auto [source_name, node_path, is_root] = parse_request(request);
         const NodeList<ValueNode>& node_pool = source_name.empty() ? nodes : sources.at(source_name).nodes;
         std::vector<ValueNode::PointerType> selected;
@@ -408,8 +424,9 @@ namespace snt::dip {
             if (!vnode)
                 continue;
             const auto& name = vnode->path.name;
-            const bool descendant = name.size() > node_path.size() && name.rfind(node_path, 0) == 0 &&
-                                    (name[node_path.size()] == SIGN_SEPARATOR || name[node_path.size()] == SIGN_ARRAY_OPEN);
+            const bool descendant =
+                name.size() > node_path.size() && name.rfind(node_path, 0) == 0 &&
+                (name[node_path.size()] == SIGN_SEPARATOR || name[node_path.size()] == SIGN_ARRAY_OPEN);
             const bool path_matches = name == node_path || (is_root && (node_path.empty() || descendant));
             if (path_matches && tags.matches(vnode->tags) && seen.insert(name).second)
                 selected.push_back(vnode);

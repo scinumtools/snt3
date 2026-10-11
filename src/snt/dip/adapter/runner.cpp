@@ -102,7 +102,9 @@ namespace snt::dip {
             std::string size_line;
             while (std::getline(in, size_line)) {
                 if (size_line.empty() || size_line.size() > 7 ||
-                    !std::all_of(size_line.begin(), size_line.end(), [](unsigned char ch) { return ch >= '0' && ch <= '9'; }))
+                    !std::all_of(size_line.begin(), size_line.end(), [](unsigned char ch) {
+                        return ch >= '0' && ch <= '9';
+                    }))
                     invalid_manifest(file);
                 const auto length = static_cast<size_t>(std::stoul(size_line));
                 if (length == 0 || length > 1000000 || paths.size() >= 100000)
@@ -241,7 +243,8 @@ namespace snt::dip {
                 }
             }
             const auto manifest_status = checked_status(root / manifest_name);
-            if (fs::exists(manifest_status) && (!fs::is_regular_file(manifest_status) || fs::is_symlink(manifest_status)))
+            if (fs::exists(manifest_status) &&
+                (!fs::is_regular_file(manifest_status) || fs::is_symlink(manifest_status)))
                 invalid_manifest(root / manifest_name);
         }
 
@@ -319,7 +322,10 @@ namespace snt::dip {
     }
 
     std::vector<fs::path> run_adapter(
-        const Environment& env, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot,
+        const Environment& env,
+        const Adapter& adapter,
+        const fs::path& output_dir,
+        const fs::path& snapshot,
         ExistingOutputPolicy policy
     ) {
         AdapterContext context;
@@ -530,7 +536,8 @@ namespace snt::dip {
                 stage.path.clear();
                 throw fs::filesystem_error(
                     "Cannot restore adapter outputs after publication failed; backups remain in the staging directory",
-                    recovery_dir, rollback_error
+                    recovery_dir,
+                    rollback_error
                 );
             }
             std::rethrow_exception(original_error);
@@ -540,7 +547,10 @@ namespace snt::dip {
     }
 
     std::vector<fs::path> run_adapter_project(
-        const fs::path& project, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot,
+        const fs::path& project,
+        const Adapter& adapter,
+        const fs::path& output_dir,
+        const fs::path& snapshot,
         ExistingOutputPolicy policy
     ) {
         DIP parser;
@@ -550,7 +560,10 @@ namespace snt::dip {
     }
 
     std::vector<fs::path> run_adapter_snapshot(
-        const fs::path& input, const Adapter& adapter, const fs::path& output_dir, const fs::path& snapshot,
+        const fs::path& input,
+        const Adapter& adapter,
+        const fs::path& output_dir,
+        const fs::path& snapshot,
         ExistingOutputPolicy policy
     ) {
         Environment env;

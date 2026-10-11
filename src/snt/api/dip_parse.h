@@ -1,8 +1,8 @@
 #ifndef SNT_CLI_DIP_PARSE
 #define SNT_CLI_DIP_PARSE
 
-#include <snt/dip/dip.h>
 #include <optional>
+#include <snt/dip/dip.h>
 #include <string>
 #include <vector>
 
@@ -21,18 +21,18 @@ namespace snt::api {
         };
 
       private:
-        dip::DIP dip;                  ///< DIP object handle
-        std::string request;           ///< Node request query
-        std::vector<std::string> tags; ///< List of node tags that should be selected
-        PrintOptions print;            ///< Printing option
-        std::string value_type;        ///< Optional scalar output type constraint
-        std::string load_file;         ///< Optional DIPH5 input path
-        std::string save_file;         ///< Optional DIPH5 output path
+        dip::DIP dip;                                     ///< DIP object handle
+        std::string request;                              ///< Node request query
+        std::vector<std::string> tags;                    ///< List of node tags that should be selected
+        PrintOptions print;                               ///< Printing option
+        std::string value_type;                           ///< Optional scalar output type constraint
+        std::string load_file;                            ///< Optional DIPH5 input path
+        std::string save_file;                            ///< Optional DIPH5 output path
         std::optional<dip::ExportFormat> generate_format; ///< Optional static export format
-        std::string generate_file;     ///< Optional static export output path
-        bool has_model_input = false;  ///< Whether a model input, excluding overrides, has been added
-        bool has_input = false;        ///< Whether DIPL inputs have been added
-        bool has_project = false;      ///< Whether a DIPfile project has been added
+        std::string generate_file;                        ///< Optional static export output path
+        bool has_model_input = false; ///< Whether a model input, excluding overrides, has been added
+        bool has_input = false;       ///< Whether DIPL inputs have been added
+        bool has_project = false;     ///< Whether a DIPfile project has been added
         bool record_dependency_graph_ = false;
         bool relative_source_paths_ = false;
 
@@ -45,7 +45,8 @@ namespace snt::api {
         /**
          * Add code
          *
-         * @param add_type project/file/string/override_string/override_file (one value), source/unit/schema_string/schema_file (name and value)
+         * @param add_type project/file/string/override_string/override_file (one value),
+         * source/unit/schema_string/schema_file (name and value)
          * @param add_values Code input values
          **/
         void argument_add(const std::string& add_type, const std::vector<std::string>& add_values);

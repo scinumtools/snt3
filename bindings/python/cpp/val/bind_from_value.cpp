@@ -211,7 +211,8 @@ namespace snt::bind::python {
             throw dip::PybindException(
                 "Unsupported NumPy data type",
                 "The NumPy array has an unsupported data format: `" + info.format + "`.",
-                "Provide a NumPy array with dtype `bool`, a signed integer type up to 64 bits, `float64`, or a string type.",
+                "Provide a NumPy array with dtype `bool`, a signed integer type up to 64 bits, `float64`, or a string "
+                "type.",
                 __FILE__,
                 __LINE__
             );

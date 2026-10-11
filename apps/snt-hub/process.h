@@ -6,12 +6,12 @@
 
 namespace snt::hub {
 
-struct ProcessResult {
-    int status = 0;
-    std::string output;
-};
+    struct ProcessResult {
+        int status = 0;
+        std::string output;
+    };
 
-ProcessResult process(const std::vector<std::string>& args, bool capture = true);
+    ProcessResult process(const std::vector<std::string>& args, bool capture = true);
 
 } // namespace snt::hub
 

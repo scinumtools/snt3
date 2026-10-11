@@ -5,8 +5,8 @@
 
 namespace snt::view {
 
-const char* object_kind_name(const ObjectInfo& object);
-void draw_browser(ViewerModel& model);
+    const char* object_kind_name(const ObjectInfo& object);
+    void draw_browser(ViewerModel& model);
 
 } // namespace snt::view
 

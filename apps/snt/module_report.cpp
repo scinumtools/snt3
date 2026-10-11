@@ -1,28 +1,38 @@
 #include "argparser.h"
 #include "main.h"
 
-#include <snt/api/dip_parse.h>
-#include <snt/api/dip_report.h>
 #include <cstddef>
 #include <iostream>
+#include <snt/api/dip_parse.h>
+#include <snt/api/dip_report.h>
 #include <stdexcept>
 
 namespace {
-snt::dip::report::ReportFormat report_format(const std::string& name) {
-    using Format = snt::dip::report::ReportFormat;
-    if (name == "tex") return Format::Tex;
-    if (name == "pdf") return Format::Pdf;
-    if (name == "md") return Format::Markdown;
-    if (name == "rst") return Format::Rst;
-    if (name == "html") return Format::Html;
-    if (name == "typ") return Format::Typst;
-    if (name == "txt") return Format::Text;
-    if (name == "json") return Format::Json;
-    throw std::runtime_error("Unknown report format: " + name + ". Use tex, pdf, md, rst, html, typ, txt, or json.");
-}
+    snt::dip::report::ReportFormat report_format(const std::string& name) {
+        using Format = snt::dip::report::ReportFormat;
+        if (name == "tex")
+            return Format::Tex;
+        if (name == "pdf")
+            return Format::Pdf;
+        if (name == "md")
+            return Format::Markdown;
+        if (name == "rst")
+            return Format::Rst;
+        if (name == "html")
+            return Format::Html;
+        if (name == "typ")
+            return Format::Typst;
+        if (name == "txt")
+            return Format::Text;
+        if (name == "json")
+            return Format::Json;
+        throw std::runtime_error(
+            "Unknown report format: " + name + ". Use tex, pdf, md, rst, html, typ, txt, or json."
+        );
+    }
 
-std::string help_report() {
-    return R"(
+    std::string help_report() {
+        return R"(
 Scientific Numerical Tools v3 (SNT)
 Module: DIP Report
 
@@ -77,7 +87,7 @@ Examples:
   snt report --input file parameters.dip -i override_string "steps = 200" \
       --output report.tex
 )";
-}
+    }
 
 } // namespace
 
@@ -100,19 +110,27 @@ void module_report(ArgParser& argpar) {
         const auto& key = argument.key;
         const auto& values = argument.values;
         if (key == "-i" || key == "--input") {
-            if (values.empty()) throw std::runtime_error(key + " requires an input type and value.");
+            if (values.empty())
+                throw std::runtime_error(key + " requires an input type and value.");
             for (size_t i = 0; i < values.size();) {
                 const auto& kind = values[i];
-                const size_t count = (kind == "file" || kind == "string" || kind == "override_string" ||
-                                      kind == "override_file") ? 1 : 2;
-                if (i + count >= values.size()) throw std::runtime_error("Incomplete DIP input: " + kind);
-                command.argument_add(kind, std::vector<std::string>(
-                    values.begin() + static_cast<std::ptrdiff_t>(i + 1),
-                    values.begin() + static_cast<std::ptrdiff_t>(i + count + 1)));
+                const size_t count =
+                    (kind == "file" || kind == "string" || kind == "override_string" || kind == "override_file") ? 1
+                                                                                                                 : 2;
+                if (i + count >= values.size())
+                    throw std::runtime_error("Incomplete DIP input: " + kind);
+                command.argument_add(
+                    kind,
+                    std::vector<std::string>(
+                        values.begin() + static_cast<std::ptrdiff_t>(i + 1),
+                        values.begin() + static_cast<std::ptrdiff_t>(i + count + 1)
+                    )
+                );
                 i += count + 1;
             }
             has_input = true;
-            if (input_label.empty()) input_label = "DIPL inputs";
+            if (input_label.empty())
+                input_label = "DIPL inputs";
         } else if (key == "--project") {
             if (values.size() != 1 || has_project)
                 throw std::runtime_error("Specify exactly one --project file.");
@@ -126,21 +144,32 @@ void module_report(ArgParser& argpar) {
             command.argument_load(values.front());
             has_load = true;
             input_label = values.front();
-        } else if (key == "--format" || key == "--output" || key == "--intro" || key == "--tex-compiler" ||
-                   key == "--title" || key == "--author" || key == "--date" || key == "--report-version") {
-            if (values.size() != 1) throw std::runtime_error(key + " requires exactly one value.");
+        } else if (
+            key == "--format" || key == "--output" || key == "--intro" || key == "--tex-compiler" || key == "--title" ||
+            key == "--author" || key == "--date" || key == "--report-version"
+        ) {
+            if (values.size() != 1)
+                throw std::runtime_error(key + " requires exactly one value.");
             if (key == "--format") {
-                if (has_format) throw std::runtime_error("Specify --format only once.");
-                format = values.front(); has_format = true;
+                if (has_format)
+                    throw std::runtime_error("Specify --format only once.");
+                format = values.front();
+                has_format = true;
             } else if (key == "--output") {
-                if (has_output) throw std::runtime_error("Specify --output only once.");
-                output = values.front(); has_output = true;
+                if (has_output)
+                    throw std::runtime_error("Specify --output only once.");
+                output = values.front();
+                has_output = true;
             } else if (key == "--intro") {
-                if (has_intro) throw std::runtime_error("Specify --intro only once.");
-                intro = values.front(); has_intro = true;
+                if (has_intro)
+                    throw std::runtime_error("Specify --intro only once.");
+                intro = values.front();
+                has_intro = true;
             } else if (key == "--tex-compiler") {
-                if (has_compiler) throw std::runtime_error("Specify --tex-compiler only once.");
-                compiler = values.front(); has_compiler = true;
+                if (has_compiler)
+                    throw std::runtime_error("Specify --tex-compiler only once.");
+                compiler = values.front();
+                has_compiler = true;
             } else if (key == "--title") {
                 title = values.front();
             } else if (key == "--author") {
@@ -157,7 +186,8 @@ void module_report(ArgParser& argpar) {
 
     if (!has_input && !has_project && !has_load)
         throw std::runtime_error("Specify --input, --project, or --load.");
-    if (output.empty()) throw std::runtime_error("Specify --output for the report.");
+    if (output.empty())
+        throw std::runtime_error("Specify --output for the report.");
     const auto selected_format = report_format(format);
     if (has_compiler && format != "pdf")
         throw std::runtime_error("--tex-compiler requires --format pdf.");
@@ -166,9 +196,11 @@ void module_report(ArgParser& argpar) {
 
     snt::dip::report::ReportOptions options;
     options.input_label = input_label;
-    if (has_intro) options.introduction_file = intro;
+    if (has_intro)
+        options.introduction_file = intro;
     options.tex_compiler = compiler;
-    if (!title.empty()) options.title = title;
+    if (!title.empty())
+        options.title = title;
     options.author = author;
     options.date = date;
     options.version = report_version;

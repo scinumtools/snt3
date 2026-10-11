@@ -9,11 +9,14 @@
 namespace snt::dip {
     namespace {
         bool is_index_selector(const std::string& item) {
-            return !item.empty() &&
-                   std::all_of(item.begin(), item.end(), [](unsigned char character) { return std::isdigit(character); });
+            return !item.empty() && std::all_of(item.begin(), item.end(), [](unsigned char character) {
+                return std::isdigit(character);
+            });
         }
 
-        void validate_list_index(const Collection& collection, const std::string& path, const std::string& item, const Line& line) {
+        void validate_list_index(
+            const Collection& collection, const std::string& path, const std::string& item, const Line& line
+        ) {
             const auto index = std::stoull(item);
             if (index >= collection.items.size())
                 throw dip::EnvironmentException(
@@ -34,7 +37,8 @@ namespace snt::dip {
     }
 
     void HierarchyList::record(
-        const BaseNode::PointerType& node, const std::vector<NodeDtype>& excluded,
+        const BaseNode::PointerType& node,
+        const std::vector<NodeDtype>& excluded,
         const std::function<std::string(const std::string&)>& collection_path
     ) {
         if (node->path.name == "")

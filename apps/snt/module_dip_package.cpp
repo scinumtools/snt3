@@ -1,10 +1,9 @@
 #include "main.h"
 
-#include <snt/dip/project_bundle.h>
-
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <snt/dip/project_bundle.h>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -24,25 +23,32 @@ int module_dip_package(int argc, char* argv[]) {
         const std::string option = argv[i];
         if (option != "--project" && option != "--output" && option != "--include")
             throw std::invalid_argument("Unknown option: " + option);
-        if (++i >= argc) throw std::invalid_argument(option + " requires a value.");
+        if (++i >= argc)
+            throw std::invalid_argument(option + " requires a value.");
         if (option == "--project") {
-            if (!project.empty()) throw std::invalid_argument("Specify one --project.");
+            if (!project.empty())
+                throw std::invalid_argument("Specify one --project.");
             project = argv[i];
         } else if (option == "--include") {
             additional_files.emplace_back(argv[i]);
         } else {
-            if (!output.empty()) throw std::invalid_argument("Specify one --output.");
+            if (!output.empty())
+                throw std::invalid_argument("Specify one --output.");
             output = argv[i];
         }
     }
-    if (project.empty()) throw std::invalid_argument("Specify --project DIPfile.");
+    if (project.empty())
+        throw std::invalid_argument("Specify --project DIPfile.");
     const std::string json = snt::dip::project_bundle_json(snt::dip::package_project(project, additional_files));
-    if (output.empty()) std::cout << json << '\n';
+    if (output.empty())
+        std::cout << json << '\n';
     else {
         std::ofstream file(output, std::ios::binary);
-        if (!file) throw std::runtime_error("Could not open bundle output: " + output);
+        if (!file)
+            throw std::runtime_error("Could not open bundle output: " + output);
         file << json << '\n';
-        if (!file) throw std::runtime_error("Could not write bundle output: " + output);
+        if (!file)
+            throw std::runtime_error("Could not write bundle output: " + output);
     }
     return 0;
 }

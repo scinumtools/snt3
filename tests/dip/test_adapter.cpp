@@ -59,19 +59,27 @@ namespace {
         mutable int declarations = 0;
         void describe_outputs(const dip::Environment& env, dip::OutputPlan& outputs) const override {
             ++declarations;
-            outputs.add_node(env, "run.steps", "settings", "Steps", "run.steps", false,
-                             "disabled by default", "base");
-            outputs.replace_node(env, "run.steps", "settings", "Steps", "run.steps", true,
-                                 "selected by profile", "profile");
+            outputs.add_node(env, "run.steps", "settings", "Steps", "run.steps", false, "disabled by default", "base");
+            outputs.replace_node(
+                env, "run.steps", "settings", "Steps", "run.steps", true, "selected by profile", "profile"
+            );
             outputs.add_value(
-                "run.enabled", "settings", "Enabled",
-                std::make_shared<dip::BooleanNode>(dip::Path("derived.enabled"),
-                    std::make_unique<val::ArrayValueBool>(env["run.steps"].as<int64_t>() > 0)),
-                true, "steps > 0", "adapter", {"run.steps"}
+                "run.enabled",
+                "settings",
+                "Enabled",
+                std::make_shared<dip::BooleanNode>(
+                    dip::Path("derived.enabled"),
+                    std::make_unique<val::ArrayValueBool>(env["run.steps"].as<int64_t>() > 0)
+                ),
+                true,
+                "steps > 0",
+                "adapter",
+                {"run.steps"}
             );
         }
-        void plan_resolved(const dip::Environment&, const dip::OutputPlan& outputs,
-                           dip::AdapterContext& context) const override {
+        void plan_resolved(
+            const dip::Environment&, const dip::OutputPlan& outputs, dip::AdapterContext& context
+        ) const override {
             context.add_text("settings.txt", std::to_string(outputs.select("settings", true).size()));
         }
     };
@@ -253,21 +261,29 @@ TEST(Adapter, ReplaceRegisteredRejectsDirectoryFileAndSymlinkConflicts) {
     work.write("output/parent", "original parent");
     const auto policy = dip::ExistingOutputPolicy::ReplaceRegistered;
 
-    adapter.callback = [](dip::AdapterContext& context) { context.add_text("directory", "new"); };
+    adapter.callback = [](dip::AdapterContext& context) {
+        context.add_text("directory", "new");
+    };
     EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
     EXPECT_TRUE(fs::is_directory(output / "directory"));
 
-    adapter.callback = [](dip::AdapterContext& context) { context.add_text("parent/child", "new"); };
+    adapter.callback = [](dip::AdapterContext& context) {
+        context.add_text("parent/child", "new");
+    };
     EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
     EXPECT_EQ(read(output / "parent"), "original parent");
 
     std::error_code error;
     fs::create_symlink(output / "parent", output / "link", error);
     if (!error) {
-        adapter.callback = [](dip::AdapterContext& context) { context.add_text("link", "new"); };
+        adapter.callback = [](dip::AdapterContext& context) {
+            context.add_text("link", "new");
+        };
         EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
         EXPECT_TRUE(fs::is_symlink(fs::symlink_status(output / "link")));
-        adapter.callback = [](dip::AdapterContext& context) { context.add_text("link/child", "new"); };
+        adapter.callback = [](dip::AdapterContext& context) {
+            context.add_text("link/child", "new");
+        };
         EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
     }
 }
@@ -289,8 +305,9 @@ TEST(Adapter, FailedStagedWritePreservesExistingFiles) {
             throw std::runtime_error("stream failed");
         });
     };
-    EXPECT_THROW(dip::run_adapter(env, adapter, output, dip::ExistingOutputPolicy::ReplaceRegistered),
-                 std::runtime_error);
+    EXPECT_THROW(
+        dip::run_adapter(env, adapter, output, dip::ExistingOutputPolicy::ReplaceRegistered), std::runtime_error
+    );
     EXPECT_EQ(read(output / "first.txt"), "old first");
     EXPECT_EQ(read(output / "unrelated.txt"), "unrelated");
     EXPECT_FALSE(fs::exists(output / "second.txt"));
@@ -323,8 +340,9 @@ TEST(Adapter, PublicationFailureRestoresFilesAlreadyReplaced) {
             out << "ready";
         });
     };
-    EXPECT_THROW(dip::run_adapter(env, adapter, output, dip::ExistingOutputPolicy::ReplaceRegistered),
-                 fs::filesystem_error);
+    EXPECT_THROW(
+        dip::run_adapter(env, adapter, output, dip::ExistingOutputPolicy::ReplaceRegistered), fs::filesystem_error
+    );
     EXPECT_EQ(read(output / "first.txt"), "old first");
     EXPECT_EQ(read(output / "second.txt"), "old second");
     EXPECT_EQ(read(output / "unrelated.txt"), "unrelated");
@@ -348,7 +366,9 @@ TEST(Adapter, SyncRegisteredRemovesStaleOutputsAndSnapshotOnly) {
     work.write("output/nested/unregistered.txt", "keep me");
     work.write("output/other.txt", "also keep me");
 
-    adapter.callback = [](dip::AdapterContext& context) { context.add_text("nested/keep.txt", "second"); };
+    adapter.callback = [](dip::AdapterContext& context) {
+        context.add_text("nested/keep.txt", "second");
+    };
     const auto written = dip::run_adapter(env, adapter, output, policy);
     ASSERT_EQ(written.size(), 1);
     EXPECT_EQ(read(written.front()), "second");
@@ -358,7 +378,8 @@ TEST(Adapter, SyncRegisteredRemovesStaleOutputsAndSnapshotOnly) {
     EXPECT_EQ(read(output / "other.txt"), "also keep me");
     EXPECT_NE(read(output / ".snt-adapter-manifest"), original_manifest);
 
-    adapter.callback = [](dip::AdapterContext&) {};
+    adapter.callback = [](dip::AdapterContext&) {
+    };
     EXPECT_TRUE(dip::run_adapter(env, adapter, output, policy).empty());
     EXPECT_FALSE(fs::exists(output / "nested/keep.txt"));
     EXPECT_EQ(read(output / "nested/unregistered.txt"), "keep me");
@@ -386,7 +407,9 @@ TEST(Adapter, SyncRegisteredHandlesFileDirectoryTransitionsWithoutRemovingUnregi
     EXPECT_EQ(read(output / "tree"), "new file");
 
     work.write("output/branch/unregistered.txt", "user file");
-    adapter.callback = [](dip::AdapterContext& context) { context.add_text("branch", "replacement"); };
+    adapter.callback = [](dip::AdapterContext& context) {
+        context.add_text("branch", "replacement");
+    };
     EXPECT_THROW(dip::run_adapter(env, adapter, output, policy), dip::EnvironmentException);
     EXPECT_EQ(read(output / "branch/leaf.txt"), "new leaf");
     EXPECT_EQ(read(output / "branch/unregistered.txt"), "user file");

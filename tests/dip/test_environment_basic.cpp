@@ -1,9 +1,9 @@
 #include "pch_tests.h"
 
-#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
+#include <snt/dip/inspect/inspector.h>
 #include <snt/dip/nodes/node_integer.h>
 #include <snt/val/values.h>
 
@@ -154,9 +154,9 @@ TEST(Environment, RequestFunctionGroup) {
     dip::DIP d;
     d.add_function_nodes("generated", [](const dip::Environment&) {
         dip::ValueNode::ListType nodes;
-        nodes.push_back(std::make_shared<dip::IntegerNode>(
-            dip::Path("count"), std::make_unique<val::ArrayValueInt32>(3)
-        ));
+        nodes.push_back(
+            std::make_shared<dip::IntegerNode>(dip::Path("count"), std::make_unique<val::ArrayValueInt32>(3))
+        );
         return nodes;
     });
     d.add_string("anchor bool = true");

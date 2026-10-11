@@ -1,25 +1,26 @@
 #include "pch_tests.h"
 
-#include <snt/dip/dip.h>
-#include <snt/dip/artifact.h>
-#include <snt/dip/inspect/diagnostic.h>
-#include <snt/dip/exceptions.h>
-#include <snt/dip/inspect/inspector.h>
-#include <snt/val/values_array.h>
-
 #include <chrono>
 #include <exception>
 #include <filesystem>
 #include <fstream>
+#include <snt/dip/artifact.h>
+#include <snt/dip/dip.h>
+#include <snt/dip/exceptions.h>
+#include <snt/dip/inspect/diagnostic.h>
+#include <snt/dip/inspect/inspector.h>
+#include <snt/val/values_array.h>
 
 using namespace snt;
 
 TEST(Inspection, RetainedBlockInputsFollowEffectiveValues) {
     dip::DIP parser;
-    parser.add_string("array int[2] = \"\"\"[1,2]\"\"\"\n"
-                      "changed int[2] = \"\"\"[3,4]\"\"\"\n"
-                      "changed = [5,6]\n"
-                      "ordinary int[2] = [7,8]\n");
+    parser.add_string(
+        "array int[2] = \"\"\"[1,2]\"\"\"\n"
+        "changed int[2] = \"\"\"[3,4]\"\"\"\n"
+        "changed = [5,6]\n"
+        "ordinary int[2] = [7,8]\n"
+    );
     parser.add_override_string("array = \"\"\"[9,10]\"\"\"");
     const auto env = parser.parse(false, true);
     const dip::Inspector view{env};
@@ -158,8 +159,8 @@ TEST(Inspection, BranchCollectionsCombineSelectedCases) {
     const auto env = parser.parse();
     EXPECT_EQ(env.hierarchy.get_collection("items").items, std::vector<std::string>({"0", "1"}));
     EXPECT_EQ(env.hierarchy.get_collection("lookup").items, std::vector<std::string>({"first", "second"}));
-    for (const auto& path : {"items[0].value", "items[1].value", "lookup[first].value",
-                             "lookup[second].value", "nested"}) {
+    for (const auto& path :
+         {"items[0].value", "items[1].value", "lookup[first].value", "lookup[second].value", "nested"}) {
         EXPECT_TRUE(env.hierarchy.has_collection(path)) << path;
         EXPECT_NO_THROW(env[path].get_provenance()) << path;
     }
@@ -390,8 +391,7 @@ TEST(Inspection, DependencyGraphConnectsBranchDecisionsToValues) {
 
 TEST(Inspection, SharedDiagnosticPreservesStructuredException) {
     const dip::Line line{"value int = bad", {"parameters.dip", 12}};
-    const dip::SyntaxException error("Invalid value", "Expected integer", "Use an integer",
-                                     __FILE__, __LINE__, line);
+    const dip::SyntaxException error("Invalid value", "Expected integer", "Use an integer", __FILE__, __LINE__, line);
     const auto diagnostic = dip::diagnostic_from_exception(error);
     EXPECT_EQ(diagnostic.severity, core::DiagnosticSeverity::Error);
     EXPECT_EQ(diagnostic.code, "dip.syntax");
@@ -426,8 +426,14 @@ TEST(Inspection, ArtifactDetectionAndFreshReload) {
     const auto good = std::filesystem::temp_directory_path() / ("snt-inspection-good-" + suffix + ".dip");
     const auto bad = std::filesystem::temp_directory_path() / ("snt-inspection-bad-" + suffix + ".dip");
     const auto snapshot = std::filesystem::temp_directory_path() / ("snt-inspection-run-" + suffix + ".diph5");
-    { std::ofstream output(good); output << "answer int = 7\n"; }
-    { std::ofstream output(bad); output << "answer int = \"bad\"\n"; }
+    {
+        std::ofstream output(good);
+        output << "answer int = 7\n";
+    }
+    {
+        std::ofstream output(bad);
+        output << "answer int = \"bad\"\n";
+    }
 
     auto env = dip::open_artifact(good);
 
@@ -524,8 +530,8 @@ TEST(Inspection, ReadOnlyTableViewSurvivesSnapshot) {
     const auto column_sources = view.source_locations({dip::SourceEntityKind::Path, "measurements.count", {}});
     const auto has_table_declaration = [](const auto& locations) {
         return std::any_of(locations.begin(), locations.end(), [](const auto& location) {
-            return location.role == dip::SourceLocationRole::Declaration &&
-                   location.logical_line == 1 && location.source_text_available;
+            return location.role == dip::SourceLocationRole::Declaration && location.logical_line == 1 &&
+                   location.source_text_available;
         });
     };
     EXPECT_TRUE(has_table_declaration(table_sources));

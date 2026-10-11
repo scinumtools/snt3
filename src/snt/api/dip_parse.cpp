@@ -23,7 +23,8 @@ namespace snt::api {
                 throw api::ArgumentException(
                     "Conflicting DIP inputs",
                     "A DIP project can only be combined with override inputs.",
-                    "Use one project or individual model inputs; override_string and override_file may accompany either.",
+                    "Use one project or individual model inputs; override_string and override_file may accompany "
+                    "either.",
                     __FILE__,
                     __LINE__
                 );
@@ -58,7 +59,8 @@ namespace snt::api {
             throw api::ArgumentException(
                 "Invalid add argument",
                 "The input type `" + add_type + "` was not recognized or has an invalid number of values.",
-                "Use `project`, `file`, `string`, `override_string`, or `override_file` with one value, or `source`, `unit`, `schema_string`, or `schema_file` with two values.",
+                "Use `project`, `file`, `string`, `override_string`, or `override_file` with one value, or `source`, "
+                "`unit`, `schema_string`, or `schema_file` with two values.",
                 __FILE__,
                 __LINE__
             );
@@ -110,10 +112,13 @@ namespace snt::api {
             );
         }
         const std::map<std::string, dip::ExportFormat> formats = {
-            {"cpp", dip::ExportFormat::CPP}, {"c", dip::ExportFormat::C},
-            {"fortran", dip::ExportFormat::FORTRAN}, {"rust", dip::ExportFormat::RUST},
+            {"cpp", dip::ExportFormat::CPP},
+            {"c", dip::ExportFormat::C},
+            {"fortran", dip::ExportFormat::FORTRAN},
+            {"rust", dip::ExportFormat::RUST},
             {"julia", dip::ExportFormat::JULIA},
-            {"json", dip::ExportFormat::JSON}, {"yaml", dip::ExportFormat::YAML}
+            {"json", dip::ExportFormat::JSON},
+            {"yaml", dip::ExportFormat::YAML}
         };
         const auto selected = formats.find(format);
         if (selected == formats.end()) {
@@ -167,14 +172,20 @@ namespace snt::api {
     std::string DIPParse::execute() {
         if (record_dependency_graph_ && !load_file.empty()) {
             throw api::ArgumentException(
-                "Invalid graph recording option", "Graph recording requires DIPL input.",
-                "Remove --load or disable graph recording.", __FILE__, __LINE__
+                "Invalid graph recording option",
+                "Graph recording requires DIPL input.",
+                "Remove --load or disable graph recording.",
+                __FILE__,
+                __LINE__
             );
         }
         if (relative_source_paths_ && save_file.empty()) {
             throw api::ArgumentException(
-                "Invalid source path option", "Relative source paths require a DIPH5 output.",
-                "Configure a save file or disable relative source paths.", __FILE__, __LINE__
+                "Invalid source path option",
+                "Relative source paths require a DIPH5 output.",
+                "Configure a save file or disable relative source paths.",
+                __FILE__,
+                __LINE__
             );
         }
         dip::Environment env = evaluate(record_dependency_graph_);

@@ -6,7 +6,8 @@ namespace snt::api {
     }
 
     const dip::Comparison& DIPCompare::comparison() const {
-        if (!comparison_) comparison_.emplace(before_, after_, options_);
+        if (!comparison_)
+            comparison_.emplace(before_, after_, options_);
         return *comparison_;
     }
 

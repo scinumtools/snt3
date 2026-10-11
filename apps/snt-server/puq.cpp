@@ -1,5 +1,4 @@
 #include "server.h"
-
 #include "snt/api/puq_convert.h"
 #include "snt/api/puq_eval.h"
 #include "snt/api/puq_info.h"

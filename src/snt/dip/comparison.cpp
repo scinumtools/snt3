@@ -377,8 +377,9 @@ namespace snt::dip {
     Comparison::Comparison(const Environment& before, const Environment& after, const ComparisonOptions& options)
         : result_(compare(before, after, options)) {}
 
-    Comparison::Comparison(const std::filesystem::path& before, const std::filesystem::path& after,
-                           const ComparisonOptions& options)
+    Comparison::Comparison(
+        const std::filesystem::path& before, const std::filesystem::path& after, const ComparisonOptions& options
+    )
         : result_(compare_diph5(before, after, options)) {}
 
     Comparison::Comparison(ComparisonResult result) : result_(std::move(result)) {}

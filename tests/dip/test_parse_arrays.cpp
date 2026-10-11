@@ -60,9 +60,12 @@ TEST(ParseArrays, IntegerValue) {
 
 TEST(ParseArrays, IntegerElementsOutsideDeclaredRangeAreRejected) {
     const std::vector<std::string> declarations = {
-        "value int8[2] = [-128, 128]", "value int16[2] = [-32769, 32767]",
-        "value uint8[2] = [0, 256]", "value uint8[2] = [0, -1]",
-        "value uint16[2] = [0, 65536]", "value uint16[2] = [0, -1]",
+        "value int8[2] = [-128, 128]",
+        "value int16[2] = [-32769, 32767]",
+        "value uint8[2] = [0, 256]",
+        "value uint8[2] = [0, -1]",
+        "value uint16[2] = [0, 65536]",
+        "value uint16[2] = [0, -1]",
         "value uint32[2] = [0, 4294967296]",
         "value uint64[2] = [0, 18446744073709551616]"
     };
@@ -88,8 +91,9 @@ TEST(ParseArrays, IntegerElementsAtDeclaredLimitsRemainExact) {
     EXPECT_EQ(env["unsigned8"].as<std::vector<uint64_t>>(), (std::vector<uint64_t>{0, 255}));
     EXPECT_EQ(env["signed16"].as<std::vector<int64_t>>(), (std::vector<int64_t>{-32768, 32767}));
     EXPECT_EQ(env["unsigned16"].as<std::vector<uint64_t>>(), (std::vector<uint64_t>{0, 65535}));
-    EXPECT_EQ(env["unsigned64"].as<std::vector<uint64_t>>(),
-              (std::vector<uint64_t>{0, std::numeric_limits<uint64_t>::max()}));
+    EXPECT_EQ(
+        env["unsigned64"].as<std::vector<uint64_t>>(), (std::vector<uint64_t>{0, std::numeric_limits<uint64_t>::max()})
+    );
 }
 
 TEST(ParseArrays, FloatValue) {
@@ -111,10 +115,10 @@ TEST(ParseArrays, FloatValue) {
 }
 
 TEST(ParseArrays, FloatElementsOutsideDeclaredRangeAreRejected) {
-    for (const auto& declaration : {
-             "value float32[2] = [1, 3.5e38]",
-             "value float32[2] = [1, 1e-50]",
-             "source float64[2] = [1, 1e39]\nvalue float32[2] = {?source}"}) {
+    for (const auto& declaration :
+         {"value float32[2] = [1, 3.5e38]",
+          "value float32[2] = [1, 1e-50]",
+          "source float64[2] = [1, 1e39]\nvalue float32[2] = {?source}"}) {
         SCOPED_TRACE(declaration);
         dip::DIP parser;
         parser.add_string(std::string(declaration) + "\n");

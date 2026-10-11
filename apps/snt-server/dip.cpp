@@ -1,16 +1,15 @@
-#include <map>
 #include "server.h"
-
 #include "snt/api/dip_parse.h"
-#include <snt/api/dip_compare.h>
-#include <snt/api/dip_report.h>
 
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <limits>
+#include <map>
 #include <random>
+#include <snt/api/dip_compare.h>
+#include <snt/api/dip_report.h>
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
@@ -42,8 +41,8 @@ namespace snt::server {
                 std::random_device random;
                 const auto temporary = std::filesystem::temp_directory_path();
                 for (size_t attempt = 0; attempt < 32; ++attempt) {
-                    const auto candidate = temporary / ("snt-server-" + std::to_string(random()) + "-" +
-                                                        std::to_string(random()));
+                    const auto candidate =
+                        temporary / ("snt-server-" + std::to_string(random()) + "-" + std::to_string(random()));
                     std::error_code error;
                     if (std::filesystem::create_directory(candidate, error))
                         return candidate;
@@ -132,7 +131,9 @@ namespace snt::server {
                         if (!schemas.emplace(name.substr(7), content).second)
                             throw std::invalid_argument("Duplicate schema part: " + name);
                     } else {
-                        throw std::invalid_argument("DIPL uploads accept code, override, and schema:<name> parts only.");
+                        throw std::invalid_argument(
+                            "DIPL uploads accept code, override, and schema:<name> parts only."
+                        );
                     }
                 };
                 for (const auto& [name, part] : request.form.fields)
@@ -170,45 +171,69 @@ namespace snt::server {
 #ifdef SNT_ENABLE_REPORT
         dip::report::ReportFormat report_format(const httplib::Request& request) {
             const auto format = request.has_param("format") ? request.get_param_value("format") : "tex";
-            if (format == "tex") return dip::report::ReportFormat::Tex;
-            if (format == "pdf") return dip::report::ReportFormat::Pdf;
-            if (format == "md") return dip::report::ReportFormat::Markdown;
-            if (format == "rst") return dip::report::ReportFormat::Rst;
-            if (format == "html") return dip::report::ReportFormat::Html;
-            if (format == "typ") return dip::report::ReportFormat::Typst;
-            if (format == "txt") return dip::report::ReportFormat::Text;
-            if (format == "json") return dip::report::ReportFormat::Json;
-            throw std::invalid_argument("The format query parameter must be tex, pdf, md, rst, html, typ, txt, or json.");
+            if (format == "tex")
+                return dip::report::ReportFormat::Tex;
+            if (format == "pdf")
+                return dip::report::ReportFormat::Pdf;
+            if (format == "md")
+                return dip::report::ReportFormat::Markdown;
+            if (format == "rst")
+                return dip::report::ReportFormat::Rst;
+            if (format == "html")
+                return dip::report::ReportFormat::Html;
+            if (format == "typ")
+                return dip::report::ReportFormat::Typst;
+            if (format == "txt")
+                return dip::report::ReportFormat::Text;
+            if (format == "json")
+                return dip::report::ReportFormat::Json;
+            throw std::invalid_argument(
+                "The format query parameter must be tex, pdf, md, rst, html, typ, txt, or json."
+            );
         }
 
         std::pair<const char*, const char*> report_response_type(dip::report::ReportFormat format) {
             using Format = dip::report::ReportFormat;
             switch (format) {
-            case Format::Tex: return {"report.tex", "application/x-tex"};
-            case Format::Pdf: return {"report.pdf", "application/pdf"};
-            case Format::Markdown: return {"report.md", "text/markdown"};
-            case Format::Rst: return {"report.rst", "text/x-rst"};
-            case Format::Html: return {"report.html", "text/html"};
-            case Format::Typst: return {"report.typ", "text/plain"};
-            case Format::Text: return {"report.txt", "text/plain"};
-            case Format::Json: return {"report.json", "application/json"};
+            case Format::Tex:
+                return {"report.tex", "application/x-tex"};
+            case Format::Pdf:
+                return {"report.pdf", "application/pdf"};
+            case Format::Markdown:
+                return {"report.md", "text/markdown"};
+            case Format::Rst:
+                return {"report.rst", "text/x-rst"};
+            case Format::Html:
+                return {"report.html", "text/html"};
+            case Format::Typst:
+                return {"report.typ", "text/plain"};
+            case Format::Text:
+                return {"report.txt", "text/plain"};
+            case Format::Json:
+                return {"report.json", "application/json"};
             }
             throw std::invalid_argument("Unknown report format.");
         }
 
         dip::report::ReportOptions report_options(const httplib::Request& request) {
             dip::report::ReportOptions options;
-            options.input_label = request.has_param("input_label") ? request.get_param_value("input_label") : "DIPL request";
-            if (request.has_param("title")) options.title = request.get_param_value("title");
-            if (request.has_param("author")) options.author = request.get_param_value("author");
-            if (request.has_param("date")) options.date = request.get_param_value("date");
-            if (request.has_param("version")) options.version = request.get_param_value("version");
+            options.input_label =
+                request.has_param("input_label") ? request.get_param_value("input_label") : "DIPL request";
+            if (request.has_param("title"))
+                options.title = request.get_param_value("title");
+            if (request.has_param("author"))
+                options.author = request.get_param_value("author");
+            if (request.has_param("date"))
+                options.date = request.get_param_value("date");
+            if (request.has_param("version"))
+                options.version = request.get_param_value("version");
             return options;
         }
 #endif
 
         std::size_t compare_count(const httplib::Request& request, const char* name, std::size_t fallback) {
-            if (!request.has_param(name)) return fallback;
+            if (!request.has_param(name))
+                return fallback;
             const auto value = request.get_param_value(name);
             if (value.empty() || value.find_first_not_of("0123456789") != std::string::npos)
                 throw std::invalid_argument(std::string(name) + " must be a nonnegative integer.");
@@ -221,28 +246,30 @@ namespace snt::server {
         std::string comparison_json(const dip::ComparisonResult& result, std::size_t max_details) {
             std::ostringstream out;
             out << "{\"scope\":\"" << (result.scope == dip::ComparisonScope::Full ? "full" : "effective")
-                << "\",\"equal\":" << (result.equal() ? "true" : "false")
-                << ",\"added\":" << result.added << ",\"removed\":" << result.removed
-                << ",\"changed\":" << result.changed << ",\"differences\":[";
+                << "\",\"equal\":" << (result.equal() ? "true" : "false") << ",\"added\":" << result.added
+                << ",\"removed\":" << result.removed << ",\"changed\":" << result.changed << ",\"differences\":[";
             const auto count = std::min(max_details, result.differences.size());
             for (std::size_t i = 0; i < count; ++i) {
                 const auto& difference = result.differences[i];
-                if (i) out << ',';
-                out << "{\"path\":\"" << json_escape(difference.path)
-                    << "\",\"category\":\"" << json_escape(difference.category)
-                    << "\",\"kind\":\"" << (difference.kind == dip::DifferenceKind::Added ? "added" :
-                                              difference.kind == dip::DifferenceKind::Removed ? "removed" : "changed")
+                if (i)
+                    out << ',';
+                out << "{\"path\":\"" << json_escape(difference.path) << "\",\"category\":\""
+                    << json_escape(difference.category) << "\",\"kind\":\""
+                    << (difference.kind == dip::DifferenceKind::Added     ? "added"
+                        : difference.kind == dip::DifferenceKind::Removed ? "removed"
+                                                                          : "changed")
                     << "\",\"fields\":[";
                 for (std::size_t j = 0; j < difference.fields.size(); ++j) {
-                    if (j) out << ',';
+                    if (j)
+                        out << ',';
                     out << '"' << json_escape(difference.fields[j]) << '"';
                 }
-                out << "],\"before\":\"" << json_escape(difference.before)
-                    << "\",\"after\":\"" << json_escape(difference.after)
-                    << "\",\"changed_elements\":" << difference.changed_elements
+                out << "],\"before\":\"" << json_escape(difference.before) << "\",\"after\":\""
+                    << json_escape(difference.after) << "\",\"changed_elements\":" << difference.changed_elements
                     << ",\"example_indices\":[";
                 for (std::size_t j = 0; j < difference.example_indices.size(); ++j) {
-                    if (j) out << ',';
+                    if (j)
+                        out << ',';
                     out << difference.example_indices[j];
                 }
                 out << "]}";
@@ -264,7 +291,8 @@ namespace snt::server {
                     throw std::invalid_argument("Comparison format must be json or text.");
                 dip::ComparisonOptions options;
                 const auto scope = request.has_param("scope") ? request.get_param_value("scope") : "effective";
-                if (scope == "full") options.scope = dip::ComparisonScope::Full;
+                if (scope == "full")
+                    options.scope = dip::ComparisonScope::Full;
                 else if (scope != "effective")
                     throw std::invalid_argument("Comparison scope must be effective or full.");
                 options.max_array_examples = compare_count(request, "max_array_examples", 3);
@@ -275,8 +303,10 @@ namespace snt::server {
                 api::DIPCompare command(bundle.output_file("before.diph5"), bundle.output_file("after.diph5"));
                 command.set_options(options);
                 const auto result = command.compare();
-                if (format == "text") response.set_content(api::render_dip_comparison(result, max_details), "text/plain");
-                else response.set_content(comparison_json(result, max_details), "application/json");
+                if (format == "text")
+                    response.set_content(api::render_dip_comparison(result, max_details), "text/plain");
+                else
+                    response.set_content(comparison_json(result, max_details), "application/json");
             });
         });
 #ifdef SNT_ENABLE_REPORT

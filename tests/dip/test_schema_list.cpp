@@ -1,7 +1,6 @@
 #include "pch_tests.h"
 
 #include <snt/dip/cursor.h>
-
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 

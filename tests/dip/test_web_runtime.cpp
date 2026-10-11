@@ -1,16 +1,16 @@
-#include <gtest/gtest.h>
-
 #include "../../bindings/web/runtime.h"
 
+#include <gtest/gtest.h>
+
 TEST(WebRuntime, ParsesInspectsAndReevaluatesOverrides) {
-    const std::string source =
-        "simulation\n"
-        "  distance float = 24 m\n"
-        "  duration float = 8 s\n"
-        "  speed float = ({?simulation.distance} / {?simulation.duration}) m/s\n";
+    const std::string source = "simulation\n"
+                               "  distance float = 24 m\n"
+                               "  duration float = 8 s\n"
+                               "  speed float = ({?simulation.distance} / {?simulation.duration}) m/s\n";
     const snt::web::Model original(source);
-    EXPECT_EQ(original.paths(), (std::vector<std::string>{
-        "simulation.distance", "simulation.duration", "simulation.speed"}));
+    EXPECT_EQ(
+        original.paths(), (std::vector<std::string>{"simulation.distance", "simulation.duration", "simulation.speed"})
+    );
     EXPECT_EQ(original.describe("simulation.speed").value_text, "3");
     EXPECT_EQ(original.describe("simulation.speed").units, "m*s-1");
 
@@ -54,12 +54,14 @@ TEST(WebRuntime, ParsesInMemoryProjectAndRetainsCodeSource) {
 }
 
 TEST(WebRuntime, ParsesSourceBackedBundleAndOverridesScalar) {
-    const snt::dip::ProjectBundle bundle{"DIPfile", {
-        {"DIPfile", "sources[]\n  name = \"data\"\n  filepath = \"measurements.dipt\"\n"
-                    "code[]\n  file = \"model.dip\"\n"},
-        {"measurements.dipt", "time float s\nmass float kg\n---\n0 1\n1 3\n"},
-        {"model.dip", "measurements table = {data}\nscale float = 2\nresult float = ({?scale} * 3)\n"}
-    }};
+    const snt::dip::ProjectBundle bundle{
+        "DIPfile",
+        {{"DIPfile",
+          "sources[]\n  name = \"data\"\n  filepath = \"measurements.dipt\"\n"
+          "code[]\n  file = \"model.dip\"\n"},
+         {"measurements.dipt", "time float s\nmass float kg\n---\n0 1\n1 3\n"},
+         {"model.dip", "measurements table = {data}\nscale float = 2\nresult float = ({?scale} * 3)\n"}}
+    };
     const snt::web::Model model(bundle);
     EXPECT_EQ(model.describe("result").value_text, "6");
     EXPECT_EQ(model.describe("measurements.mass").units, "kg");

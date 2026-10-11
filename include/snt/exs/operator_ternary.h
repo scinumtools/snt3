@@ -19,7 +19,7 @@ namespace snt::exs {
          * @param t Operator type or precedence.
          */
         OperatorTernary(std::string n, std::string s, std::string so, int t)
-           : OperatorBase(std::move(n), std::move(s), t), symbol_other(std::move(so)) {}
+            : OperatorBase(std::move(n), std::move(s), t), symbol_other(std::move(so)) {}
         void parse(Expression& expr) override;
     };
 

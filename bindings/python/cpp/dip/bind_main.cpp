@@ -49,12 +49,16 @@ namespace snt::bind::python {
         auto dip = py::class_<dip::DIP>(m, "DIP", "Parser and evaluator for DIPL source definitions.");
         dip.def(py::init<>(), "Create an empty DIPL parser.");
         dip.def(
-            "add_string", py::overload_cast<const std::string&>(&dip::DIP::add_string), py::arg("source_code"),
+            "add_string",
+            py::overload_cast<const std::string&>(&dip::DIP::add_string),
+            py::arg("source_code"),
             "Add DIPL source text to the parser.\n\nArgs:\n    source_code: Complete DIPL text to parse."
         );
         dip.def(
-            "add_schema_string", &dip::DIP::add_schema_string,
-            py::arg("name"), py::arg("source_code"),
+            "add_schema_string",
+            &dip::DIP::add_schema_string,
+            py::arg("name"),
+            py::arg("source_code"),
             R"doc(Register a named schema body without a $schema wrapper.
 Leading ? metadata describe the schema definition; metadata on a member
 follow that member into instances.
@@ -65,8 +69,10 @@ Args:
 )doc"
         );
         dip.def(
-            "add_schema_file", &dip::DIP::add_schema_file,
-            py::arg("name"), py::arg("source_file"),
+            "add_schema_file",
+            &dip::DIP::add_schema_file,
+            py::arg("name"),
+            py::arg("source_file"),
             R"doc(Register a named schema body from a file, with the same rules as add_schema_string().
 
 Args:
@@ -75,12 +81,16 @@ Args:
 )doc"
         );
         dip.def(
-            "add_override_string", py::overload_cast<const std::string&>(&dip::DIP::add_override_string), py::arg("source_code"),
+            "add_override_string",
+            py::overload_cast<const std::string&>(&dip::DIP::add_override_string),
+            py::arg("source_code"),
             "Collect unwrapped value modifications before evaluating nodes. Empty bodies make no changes.\n\n"
             "Args:\n    source_code: DIPL modifications with dotted paths or nested path prefixes."
         );
         dip.def(
-            "add_override_file", &dip::DIP::add_override_file, py::arg("source_file"),
+            "add_override_file",
+            &dip::DIP::add_override_file,
+            py::arg("source_file"),
             "Register an unwrapped override body from a file before evaluating nodes. Empty files make no changes.\n\n"
             "Args:\n    source_file: Path to an unwrapped body of modifications and optional nested path prefixes."
         );
@@ -107,7 +117,10 @@ Args:
             "    source_file: Path to the source file."
         );
         dip.def(
-            "add_unit", &dip::DIP::add_unit, py::arg("name"), py::arg("unit"),
+            "add_unit",
+            &dip::DIP::add_unit,
+            py::arg("name"),
+            py::arg("unit"),
             "Register a custom unit definition.\n\nArgs:\n    name: Unit name.\n"
             "    unit: PUEL expression defining the unit."
         );
@@ -133,7 +146,8 @@ Args:
                     return func(env).cast<dip::ValueNodeData>();
                 });
             },
-            py::arg("name"), py::arg("callback"),
+            py::arg("name"),
+            py::arg("callback"),
             "Register a Python callback that returns value data for a DIPL function.\n\n"
             "Args:\n    name: Function name used in DIPL.\n"
             "    callback: Callable receiving an Environment and returning ValueNodeData."
@@ -147,16 +161,19 @@ Args:
                     return func(env).cast<dip::ValueNode::ListType>();
                 });
             },
-            py::arg("name"), py::arg("callback"),
+            py::arg("name"),
+            py::arg("callback"),
             "Register a Python callback that returns nodes for a DIPL function.\n\n"
             "Args:\n    name: Function name used in DIPL.\n"
             "    callback: Callable receiving an Environment and returning value nodes."
         );
 
-        dip.def("parse", [](dip::DIP& parser, bool record_dependency_graph) {
-            return parser.parse(record_dependency_graph);
-        }, py::arg("record_dependency_graph") = false,
-                "Parse and evaluate DIPL inputs; retain a dependency graph when requested (default: False).");
+        dip.def(
+            "parse",
+            [](dip::DIP& parser, bool record_dependency_graph) { return parser.parse(record_dependency_graph); },
+            py::arg("record_dependency_graph") = false,
+            "Parse and evaluate DIPL inputs; retain a dependency graph when requested (default: False)."
+        );
 
         dip.def("enter", &dip_enter);
         dip.def("exit", &dip_exit);

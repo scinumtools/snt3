@@ -3,7 +3,7 @@
 
 namespace snt::view {
 
-enum class SourceFormat { DIPL, Plain, Table };
+    enum class SourceFormat { DIPL, Plain, Table };
 
 } // namespace snt::view
 

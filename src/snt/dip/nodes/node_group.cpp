@@ -91,8 +91,11 @@ namespace snt::dip {
                 const auto schemas_to_apply = schemas;
                 if (!schemas_to_apply.empty()) {
                     for (const auto& schema_name : schemas_to_apply)
-                        new_schema_applications.emplace_back(schema_name,
-                            std::find(inherited_schemas.begin(), inherited_schemas.end(), schema_name) != inherited_schemas.end());
+                        new_schema_applications.emplace_back(
+                            schema_name,
+                            std::find(inherited_schemas.begin(), inherited_schemas.end(), schema_name) !=
+                                inherited_schemas.end()
+                        );
                     schemas.insert(schemas.begin(), previous_schemas.begin(), previous_schemas.end());
                     nodes.push_back(shared_from_this()); // Now we return the group node ... (hence the infinite loop)
                     for (const auto& schema_name : schemas_to_apply) {

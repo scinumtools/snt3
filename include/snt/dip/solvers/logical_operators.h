@@ -6,10 +6,7 @@
 namespace snt::dip {
 
     /** Operators used to test whether a DIP symbol is defined. */
-    enum CustomOperatorType {
-        DEFINED_OPERATOR = exs::NUM_OPERATOR_TYPES,
-        NOT_DEFINED_OPERATOR
-    };
+    enum CustomOperatorType { DEFINED_OPERATOR = exs::NUM_OPERATOR_TYPES, NOT_DEFINED_OPERATOR };
 
     /** DIP operator that tests for a defined symbol. */
     class OperatorDefined : public exs::OperatorGroup<1> {

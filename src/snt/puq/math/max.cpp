@@ -53,8 +53,8 @@ namespace snt::puq::math {
     puq::Quantity max(const puq::Quantity& quant1, const puq::Quantity& quant2) {
         puq::UnitSystem system(quant1.stype);
         const puq::Measurement other = quant1.stype == quant2.stype
-                                            ? quant2.measurement
-                                            : quant2.convert(quant1.measurement.baseunits, quant1.stype).measurement;
+                                           ? quant2.measurement
+                                           : quant2.convert(quant1.measurement.baseunits, quant1.stype).measurement;
         return puq::Quantity(max(quant1.measurement, other), quant1.stype);
     }
 

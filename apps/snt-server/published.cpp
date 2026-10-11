@@ -1,11 +1,10 @@
 #include "server.h"
 
-#include <snt/core/string_format.h>
-#include <snt/dip/dip.h>
-
 #include <limits>
 #include <map>
 #include <memory>
+#include <snt/core/string_format.h>
+#include <snt/dip/dip.h>
 #include <sstream>
 #include <stdexcept>
 
@@ -58,12 +57,10 @@ namespace snt::server {
             }
         };
 
-        std::string render_environment(
-            const dip::Environment& environment, const httplib::Request& request
-        ) {
+        std::string render_environment(const dip::Environment& environment, const httplib::Request& request) {
             const std::string path = request.has_param("request") ? request.get_param_value("request") : "";
-            const auto tags = request.has_param("tags") ? split_tags(request.get_param_value("tags"))
-                                                        : std::vector<std::string>{};
+            const auto tags =
+                request.has_param("tags") ? split_tags(request.get_param_value("tags")) : std::vector<std::string>{};
             const auto nodes = environment.request_group(
                 path.empty() ? "?" : "?" + (path.front() == '?' ? path.substr(1) : path),
                 dip::RequestType::Reference,
@@ -84,8 +81,10 @@ namespace snt::server {
 
             const std::string type = request.has_param("type") ? request.get_param_value("type") : "";
             const std::map<std::string, dip::NodeDtype> types = {
-                {"bool", dip::NodeDtype::Boolean}, {"integer", dip::NodeDtype::Integer},
-                {"float", dip::NodeDtype::Float}, {"string", dip::NodeDtype::String}
+                {"bool", dip::NodeDtype::Boolean},
+                {"integer", dip::NodeDtype::Integer},
+                {"float", dip::NodeDtype::Float},
+                {"string", dip::NodeDtype::String}
             };
             if (!type.empty()) {
                 const auto expected = types.find(type);
@@ -107,9 +106,13 @@ namespace snt::server {
         server.Get("/snt/dip/environments", [environments](const httplib::Request&, httplib::Response& response) {
             response.set_content(environments->list(), "application/json");
         });
-        server.Get("/snt/dip/environment", [environments](const httplib::Request& request, httplib::Response& response) {
-            handle_json(response, [&] { return render_environment(environments->get(required_param(request, "name")), request); });
-        });
+        server.Get(
+            "/snt/dip/environment", [environments](const httplib::Request& request, httplib::Response& response) {
+                handle_json(response, [&] {
+                    return render_environment(environments->get(required_param(request, "name")), request);
+                });
+            }
+        );
     }
 
 } // namespace snt::server

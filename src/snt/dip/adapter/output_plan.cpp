@@ -1,8 +1,7 @@
-#include <snt/dip/environment.h>
-#include <snt/dip/output_plan.h>
-#include <snt/dip/exceptions.h>
-
 #include <map>
+#include <snt/dip/environment.h>
+#include <snt/dip/exceptions.h>
+#include <snt/dip/output_plan.h>
 #include <utility>
 
 namespace snt::dip {
@@ -12,7 +11,8 @@ namespace snt::dip {
                 "Invalid adapter output mapping",
                 "Output mapping `" + id + "` " + detail + ".",
                 "Give each output a stable ID, target, key, and typed value; replace existing IDs explicitly.",
-                __FILE__, __LINE__
+                __FILE__,
+                __LINE__
             );
         }
 
@@ -22,9 +22,16 @@ namespace snt::dip {
             return std::dynamic_pointer_cast<ValueNode>(value->clone(value->path));
         }
 
-        OutputMapping make_mapping(std::string id, std::string target, std::string key,
-                                   ValueNode::PointerType value, bool active, std::string rule,
-                                   std::string origin, std::vector<std::string> dependencies) {
+        OutputMapping make_mapping(
+            std::string id,
+            std::string target,
+            std::string key,
+            ValueNode::PointerType value,
+            bool active,
+            std::string rule,
+            std::string origin,
+            std::vector<std::string> dependencies
+        ) {
             OutputMapping mapping;
             mapping.id = std::move(id);
             mapping.target = std::move(target);
@@ -58,41 +65,109 @@ namespace snt::dip {
         mappings_.push_back(std::move(mapping));
     }
 
-    void OutputPlan::add_node(const Environment& env, std::string id, std::string target, std::string key,
-                              std::string source_path, bool active, std::string rule,
-                              std::string origin, std::vector<std::string> dependencies) {
-        auto mapping = make_mapping(std::move(id), std::move(target), std::move(key),
-                                    env.get_node(source_path), active, std::move(rule),
-                                    std::move(origin), std::move(dependencies));
+    void OutputPlan::add_node(
+        const Environment& env,
+        std::string id,
+        std::string target,
+        std::string key,
+        std::string source_path,
+        bool active,
+        std::string rule,
+        std::string origin,
+        std::vector<std::string> dependencies
+    ) {
+        auto mapping = make_mapping(
+            std::move(id),
+            std::move(target),
+            std::move(key),
+            env.get_node(source_path),
+            active,
+            std::move(rule),
+            std::move(origin),
+            std::move(dependencies)
+        );
         mapping.source_path = std::move(source_path);
         insert(std::move(mapping), false);
     }
 
-    void OutputPlan::replace_node(const Environment& env, std::string id, std::string target, std::string key,
-                                  std::string source_path, bool active, std::string rule,
-                                  std::string origin, std::vector<std::string> dependencies) {
-        auto mapping = make_mapping(std::move(id), std::move(target), std::move(key),
-                                    env.get_node(source_path), active, std::move(rule),
-                                    std::move(origin), std::move(dependencies));
+    void OutputPlan::replace_node(
+        const Environment& env,
+        std::string id,
+        std::string target,
+        std::string key,
+        std::string source_path,
+        bool active,
+        std::string rule,
+        std::string origin,
+        std::vector<std::string> dependencies
+    ) {
+        auto mapping = make_mapping(
+            std::move(id),
+            std::move(target),
+            std::move(key),
+            env.get_node(source_path),
+            active,
+            std::move(rule),
+            std::move(origin),
+            std::move(dependencies)
+        );
         mapping.source_path = std::move(source_path);
         insert(std::move(mapping), true);
     }
 
-    void OutputPlan::add_value(std::string id, std::string target, std::string key, ValueNode::PointerType value,
-                               bool active, std::string rule, std::string origin,
-                               std::vector<std::string> dependencies) {
-        insert(make_mapping(std::move(id), std::move(target), std::move(key), std::move(value),
-                            active, std::move(rule), std::move(origin), std::move(dependencies)), false);
+    void OutputPlan::add_value(
+        std::string id,
+        std::string target,
+        std::string key,
+        ValueNode::PointerType value,
+        bool active,
+        std::string rule,
+        std::string origin,
+        std::vector<std::string> dependencies
+    ) {
+        insert(
+            make_mapping(
+                std::move(id),
+                std::move(target),
+                std::move(key),
+                std::move(value),
+                active,
+                std::move(rule),
+                std::move(origin),
+                std::move(dependencies)
+            ),
+            false
+        );
     }
 
-    void OutputPlan::replace_value(std::string id, std::string target, std::string key, ValueNode::PointerType value,
-                                   bool active, std::string rule, std::string origin,
-                                   std::vector<std::string> dependencies) {
-        insert(make_mapping(std::move(id), std::move(target), std::move(key), std::move(value),
-                            active, std::move(rule), std::move(origin), std::move(dependencies)), true);
+    void OutputPlan::replace_value(
+        std::string id,
+        std::string target,
+        std::string key,
+        ValueNode::PointerType value,
+        bool active,
+        std::string rule,
+        std::string origin,
+        std::vector<std::string> dependencies
+    ) {
+        insert(
+            make_mapping(
+                std::move(id),
+                std::move(target),
+                std::move(key),
+                std::move(value),
+                active,
+                std::move(rule),
+                std::move(origin),
+                std::move(dependencies)
+            ),
+            true
+        );
     }
 
-    void OutputPlan::restore(OutputMapping mapping) { insert(std::move(mapping), false); }
+    void OutputPlan::restore(OutputMapping mapping) {
+        insert(std::move(mapping), false);
+    }
 
     void OutputPlan::validate() const {
         std::map<std::pair<std::string, std::string>, std::string> keys;

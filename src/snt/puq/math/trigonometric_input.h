@@ -2,8 +2,8 @@
 #define SNT_PUQ_MATH_TRIGONOMETRIC_INPUT_H
 
 #include <snt/puq/base_units.h>
-#include <snt/puq/exponent.h>
 #include <snt/puq/exceptions.h>
+#include <snt/puq/exponent.h>
 #include <snt/puq/measurement.h>
 #include <string>
 

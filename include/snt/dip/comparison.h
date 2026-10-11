@@ -58,8 +58,11 @@ namespace snt::dip {
     class Comparison {
       public:
         Comparison(const Environment& before, const Environment& after, const ComparisonOptions& options = {});
-        Comparison(const std::filesystem::path& before, const std::filesystem::path& after,
-                   const ComparisonOptions& options = {});
+        Comparison(
+            const std::filesystem::path& before,
+            const std::filesystem::path& after,
+            const ComparisonOptions& options = {}
+        );
         explicit Comparison(ComparisonResult result);
 
         const ComparisonResult& result() const { return result_; }

@@ -104,7 +104,9 @@ namespace snt::bind::python {
         );
 
         val.def(
-            "has_item", &dip::Cursor::has_item, py::arg("name"),
+            "has_item",
+            &dip::Cursor::has_item,
+            py::arg("name"),
             "Return whether a named child exists.\n\nArgs:\n    name: Child name to check."
         );
 

@@ -1,5 +1,5 @@
-#include "snt/api/dip_parse.h"
 #include "snt/api/dip_compare.h"
+#include "snt/api/dip_parse.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -32,7 +32,9 @@ Args:
         );
 
         command.def(
-            "argument_request", &api::DIPParse::argument_request, py::arg("path"),
+            "argument_request",
+            &api::DIPParse::argument_request,
+            py::arg("path"),
             "Select a DIPL node path.\n\nArgs:\n    path: Reference query to print or return as a scalar."
         );
 
@@ -47,7 +49,8 @@ Args:
             "argument_save",
             &api::DIPParse::argument_save,
             py::arg("file"),
-            "Save the full environment on execute(), overwriting the file; output filters do not limit the saved nodes.\n\n"
+            "Save the full environment on execute(), overwriting the file; output filters do not limit the saved "
+            "nodes.\n\n"
             "Args:\n    file: Output DIPH5 path."
         );
         command.def(

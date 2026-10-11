@@ -734,18 +734,30 @@ namespace snt::dip::generate {
 
         std::string julia_scalar_type(core::DataType type) {
             switch (type) {
-            case core::DataType::Integer8: return "Int8";
-            case core::DataType::Integer16: return "Int16";
-            case core::DataType::Integer32: return "Int32";
-            case core::DataType::Integer64: return "Int64";
-            case core::DataType::Integer8_U: return "UInt8";
-            case core::DataType::Integer16_U: return "UInt16";
-            case core::DataType::Integer32_U: return "UInt32";
-            case core::DataType::Integer64_U: return "UInt64";
-            case core::DataType::Float32: return "Float32";
-            case core::DataType::Float64: return "Float64";
-            case core::DataType::Float128: return "BigFloat";
-            default: return {};
+            case core::DataType::Integer8:
+                return "Int8";
+            case core::DataType::Integer16:
+                return "Int16";
+            case core::DataType::Integer32:
+                return "Int32";
+            case core::DataType::Integer64:
+                return "Int64";
+            case core::DataType::Integer8_U:
+                return "UInt8";
+            case core::DataType::Integer16_U:
+                return "UInt16";
+            case core::DataType::Integer32_U:
+                return "UInt32";
+            case core::DataType::Integer64_U:
+                return "UInt64";
+            case core::DataType::Float32:
+                return "Float32";
+            case core::DataType::Float64:
+                return "Float64";
+            case core::DataType::Float128:
+                return "BigFloat";
+            default:
+                return {};
             }
         }
 
@@ -784,7 +796,8 @@ namespace snt::dip::generate {
                 output_ << '(';
                 bool has_values = false;
                 while (position < node.literal.size()) {
-                    while (position < node.literal.size() && std::isspace(static_cast<unsigned char>(node.literal[position])))
+                    while (position < node.literal.size() &&
+                           std::isspace(static_cast<unsigned char>(node.literal[position])))
                         ++position;
                     if (position == node.literal.size() || node.literal[position] == ']') {
                         if (position < node.literal.size())
@@ -825,7 +838,8 @@ namespace snt::dip::generate {
                     has_values = true;
                     output_ << ',';
 
-                    while (position < node.literal.size() && std::isspace(static_cast<unsigned char>(node.literal[position])))
+                    while (position < node.literal.size() &&
+                           std::isspace(static_cast<unsigned char>(node.literal[position])))
                         ++position;
                     if (position < node.literal.size() && node.literal[position] == ',')
                         ++position;
@@ -1030,8 +1044,7 @@ namespace snt::dip::generate {
             void write_member(const Node& node, const std::string& name) {
                 if (is_scalar(node)) {
                     output_ << "    " << fortran_scalar_type(node)
-                            << (node.is_array ? fortran_dimensions(node.shape) : "") << " :: " << name
-                            << "\n";
+                            << (node.is_array ? fortran_dimensions(node.shape) : "") << " :: " << name << "\n";
                     return;
                 }
                 if (node.kind == NodeKind::Map) {

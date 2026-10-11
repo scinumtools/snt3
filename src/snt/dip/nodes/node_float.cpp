@@ -1,48 +1,55 @@
 #include "../parsers.h"
 
+#include <cmath>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_float.h>
 #include <snt/dip/solvers/numerical_solver.h>
 
-#include <cmath>
-
 namespace {
 
-template <typename Target>
-bool conversion_loses_range(long double number) {
-    const Target converted = static_cast<Target>(number);
-    return !std::isfinite(converted) || (number != 0 && converted == 0);
-}
-
-long double parse_float_literal(const std::string& input, snt::core::DataType dtype, const snt::dip::Line& line) {
-    try {
-        size_t consumed = 0;
-        const long double number = std::stold(input, &consumed);
-        if (consumed != input.size()) throw std::invalid_argument("trailing characters");
-        const snt::val::ArrayValueFloat128 parsed(number);
-        snt::dip::FloatNode::validate_value(&parsed, dtype, line);
-        return number;
-    } catch (const std::out_of_range&) {
-        throw snt::dip::SyntaxException(
-            "Float value outside declared range", "The value `" + input + "` is outside the declared float range.",
-            "Use a finite value representable by the declared floating-point type, or `inf` if intentional.",
-            __FILE__, __LINE__, line
-        );
-    } catch (const std::invalid_argument&) {
-        throw snt::dip::SyntaxException(
-            "Invalid float value", "The value `" + input + "` is not a valid floating-point literal.",
-            "Use a numeric literal such as `1.23` or `1e-6`.", __FILE__, __LINE__, line
-        );
+    template <typename Target> bool conversion_loses_range(long double number) {
+        const Target converted = static_cast<Target>(number);
+        return !std::isfinite(converted) || (number != 0 && converted == 0);
     }
-}
+
+    long double parse_float_literal(const std::string& input, snt::core::DataType dtype, const snt::dip::Line& line) {
+        try {
+            size_t consumed = 0;
+            const long double number = std::stold(input, &consumed);
+            if (consumed != input.size())
+                throw std::invalid_argument("trailing characters");
+            const snt::val::ArrayValueFloat128 parsed(number);
+            snt::dip::FloatNode::validate_value(&parsed, dtype, line);
+            return number;
+        } catch (const std::out_of_range&) {
+            throw snt::dip::SyntaxException(
+                "Float value outside declared range",
+                "The value `" + input + "` is outside the declared float range.",
+                "Use a finite value representable by the declared floating-point type, or `inf` if intentional.",
+                __FILE__,
+                __LINE__,
+                line
+            );
+        } catch (const std::invalid_argument&) {
+            throw snt::dip::SyntaxException(
+                "Invalid float value",
+                "The value `" + input + "` is not a valid floating-point literal.",
+                "Use a numeric literal such as `1.23` or `1e-6`.",
+                __FILE__,
+                __LINE__,
+                line
+            );
+        }
+    }
 
 } // namespace
 
 namespace snt::dip {
 
     void FloatNode::validate_value(const val::BaseValue* value, core::DataType dtype, const Line& line) {
-        if (!value) return;
+        if (!value)
+            return;
         unsigned bits = 0;
         switch (dtype) {
         case core::DataType::Float32:
@@ -54,13 +61,16 @@ namespace snt::dip {
         case core::DataType::Float128:
             bits = max_float_size;
             break;
-        default: return;
+        default:
+            return;
         }
         const auto outside = [dtype](const auto* values) {
-            if (!values) return false;
+            if (!values)
+                return false;
             for (size_t i = 0; i < values->get_size(); ++i) {
                 const auto number = static_cast<long double>(values->get_value(i));
-                if (!std::isfinite(number)) continue;
+                if (!std::isfinite(number))
+                    continue;
                 if ((dtype == core::DataType::Float32 && conversion_loses_range<float>(number)) ||
                     (dtype == core::DataType::Float64 && conversion_loses_range<double>(number)) ||
                     (dtype == core::DataType::Float128 && conversion_loses_range<long double>(number)))
@@ -69,17 +79,19 @@ namespace snt::dip {
             return false;
         };
         const bool invalid = outside(dynamic_cast<const val::ArrayValue<double>*>(value)) ||
-            outside(dynamic_cast<const val::ArrayValue<long double>*>(value)) ||
-            outside(dynamic_cast<const val::ArrayValue<int64_t>*>(value)) ||
-            outside(dynamic_cast<const val::ArrayValue<uint64_t>*>(value)) ||
-            outside(dynamic_cast<const val::ArrayValue<int8_t>*>(value)) ||
-            outside(dynamic_cast<const val::ArrayValue<uint8_t>*>(value));
+                             outside(dynamic_cast<const val::ArrayValue<long double>*>(value)) ||
+                             outside(dynamic_cast<const val::ArrayValue<int64_t>*>(value)) ||
+                             outside(dynamic_cast<const val::ArrayValue<uint64_t>*>(value)) ||
+                             outside(dynamic_cast<const val::ArrayValue<int8_t>*>(value)) ||
+                             outside(dynamic_cast<const val::ArrayValue<uint8_t>*>(value));
         if (invalid)
             throw dip::SyntaxException(
                 "Float value outside declared range",
                 "The value cannot be represented as a " + std::to_string(bits) + "-bit float.",
                 "Use a finite value within the declared floating-point type's range.",
-                __FILE__, __LINE__, line
+                __FILE__,
+                __LINE__,
+                line
             );
     }
 

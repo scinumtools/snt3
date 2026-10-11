@@ -1,8 +1,8 @@
-#include <snt/dip/nodes/node_integer.h>
-#include <snt/dip/nodes/node_float.h>
 #include <optional>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
+#include <snt/dip/nodes/node_float.h>
+#include <snt/dip/nodes/node_integer.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/parsers.h>
 #include <snt/dip/solvers/logical_solver.h>
@@ -21,13 +21,13 @@ namespace snt::dip {
 
     bool ValueMetadata::set_property(PropertyType property, const val::Array::StringType& values) {
         switch (property) {
-#define SNT_METADATA_SCALAR(TYPE, FIELD)                                                                                \
-    case PropertyType::TYPE:                                                                                             \
-        FIELD += values.at(0);                                                                                           \
+#define SNT_METADATA_SCALAR(TYPE, FIELD)                                                                               \
+    case PropertyType::TYPE:                                                                                           \
+        FIELD += values.at(0);                                                                                         \
         return true
-#define SNT_METADATA_LIST(TYPE, FIELD)                                                                                  \
-    case PropertyType::TYPE:                                                                                             \
-        FIELD.insert(FIELD.end(), values.begin(), values.end());                                                         \
+#define SNT_METADATA_LIST(TYPE, FIELD)                                                                                 \
+    case PropertyType::TYPE:                                                                                           \
+        FIELD.insert(FIELD.end(), values.begin(), values.end());                                                       \
         return true
             SNT_METADATA_SCALAR(Description, description);
             SNT_METADATA_SCALAR(Authors, authors);
@@ -67,11 +67,10 @@ namespace snt::dip {
 
     ValueNode::ValueNode(const ValueNode& other)
         : units(other.units), tags(other.tags), constant(other.constant), override(other.override),
-          override_line(other.override_line), modification_lines(other.modification_lines), table_path(other.table_path),
-          copied_from(other.copied_from),
-          table_column_index(other.table_column_index), metadata(other.metadata),
-          condition(other.condition), format(other.format), option_labels(other.option_labels),
-          value_dtype(other.value_dtype), BaseNode(other) {
+          override_line(other.override_line), modification_lines(other.modification_lines),
+          table_path(other.table_path), copied_from(other.copied_from), table_column_index(other.table_column_index),
+          metadata(other.metadata), condition(other.condition), format(other.format),
+          option_labels(other.option_labels), value_dtype(other.value_dtype), BaseNode(other) {
         options.reserve(other.options.size());
         for (const auto& option : other.options) {
             options.push_back({option.value->clone(), option.value_raw, option.units_raw, option.label});
@@ -89,8 +88,7 @@ namespace snt::dip {
     }
 
     ValueNode::ValueNode(
-        const Path& pth, val::BaseValue::PointerType val, const NodeDtype dt,
-        std::optional<puq::Quantity> unt
+        const Path& pth, val::BaseValue::PointerType val, const NodeDtype dt, std::optional<puq::Quantity> unt
     )
         : constant(false), value_dtype(val->get_dtype()), units(unt), BaseNode(dt) {
         path = pth;
@@ -335,13 +333,21 @@ namespace snt::dip {
     void ValueNode::apply_override(const BaseNode::PointerType& node, Environment& env) {
         if ((dtype == NodeDtype::Boolean || dtype == NodeDtype::String) && !units_raw.empty())
             throw dip::UnitException(
-                "Invalid units", "The declared value type does not support units.",
-                "Remove units from the original declaration.", __FILE__, __LINE__, line
+                "Invalid units",
+                "The declared value type does not support units.",
+                "Remove units from the original declaration.",
+                __FILE__,
+                __LINE__,
+                line
             );
         if (node->value_origin == ValueOrigin::None && !node->units_raw.empty())
             throw dip::UnitException(
-                "Invalid null override units", "A null value cannot specify replacement units.",
-                "Use `path = none` without units.", __FILE__, __LINE__, node->line
+                "Invalid null override units",
+                "A null value cannot specify replacement units.",
+                "Use `path = none` without units.",
+                __FILE__,
+                __LINE__,
+                node->line
             );
         set_units();
         auto evaluated = std::dynamic_pointer_cast<ValueNode>(clone(path, indent));
@@ -360,8 +366,12 @@ namespace snt::dip {
         if (evaluated->units) {
             if (!units)
                 throw dip::UnitException(
-                    "Dimension mismatch", "An override cannot add units to a nondimensional node.",
-                    "Use units compatible with the target declaration.", __FILE__, __LINE__, node->line
+                    "Dimension mismatch",
+                    "An override cannot add units to a nondimensional node.",
+                    "Use units compatible with the target declaration.",
+                    __FILE__,
+                    __LINE__,
+                    node->line
                 );
             if (evaluated->value) {
                 puq::Quantity quantity(std::move(evaluated->value), evaluated->units->to_string());
@@ -428,7 +438,8 @@ namespace snt::dip {
         }
         value_raw = node->value_raw;
         set_value(std::move(value));
-        if (env.block_input_recording()) env.erase_block_input(path.name);
+        if (env.block_input_recording())
+            env.erase_block_input(path.name);
         modification_lines.push_back(node->line);
     }
 
@@ -449,16 +460,20 @@ namespace snt::dip {
                 // TODO: account for multidimensional arrays as individual options
                 val::BaseValue::PointerType ovalue = cast_scalar_value(value_option);
                 const auto index = options.size();
-                const std::string label = option_labels && index < option_labels->size()
-                    ? option_labels->at(index) : "";
+                const std::string label =
+                    option_labels && index < option_labels->size() ? option_labels->at(index) : "";
                 options.push_back({std::move(ovalue), value_option, units, label});
             }
             return true;
         case PropertyType::Labels:
             if (dtype == NodeDtype::Boolean || option_labels || !units.empty())
                 throw dip::SyntaxException(
-                    "Invalid labels", "The `!labels` directive requires an option-bearing node, occurs once, and cannot have units.",
-                    "Provide one unitless `!labels` list for an integer, float, or string node.", __FILE__, __LINE__, line
+                    "Invalid labels",
+                    "The `!labels` directive requires an option-bearing node, occurs once, and cannot have units.",
+                    "Provide one unitless `!labels` list for an integer, float, or string node.",
+                    __FILE__,
+                    __LINE__,
+                    line
                 );
             option_labels = values;
             for (size_t i = 0; i < options.size() && i < values.size(); ++i)
@@ -566,10 +581,12 @@ namespace snt::dip {
         if (option_labels && (options.empty() || option_labels->size() != options.size()))
             throw dip::SyntaxException(
                 "Invalid labels",
-                "The `!labels` directive has " + std::to_string(option_labels->size()) +
-                    " labels for " + std::to_string(options.size()) + " options.",
+                "The `!labels` directive has " + std::to_string(option_labels->size()) + " labels for " +
+                    std::to_string(options.size()) + " options.",
                 "Provide exactly one label for each option, in the order of all `!options` directives.",
-                __FILE__, __LINE__, line
+                __FILE__,
+                __LINE__,
+                line
             );
         if (options.size() > 0) {
             bool match = false;

@@ -7,76 +7,84 @@
 
 namespace snt::dip::report {
 
-struct Publication {
-    std::string authors, title, journal, year, volume, issue, pages, doi, url;
-};
+    struct Publication {
+        std::string authors, title, journal, year, volume, issue, pages, doi, url;
+    };
 
-struct Origin {
-    std::string name, path, code;
-    size_t line = 0;
-};
+    struct Origin {
+        std::string name, path, code;
+        size_t line = 0;
+    };
 
-struct Parameter {
-    std::string path, value, units, type, shape;
-    dip::ValueMetadata metadata;
-    std::vector<std::string> tags, options;
-    std::vector<std::string> applied_schemas;
-    std::string contributing_schema;
-    bool overridden = false;
-    Origin declaration, replacement;
-    std::vector<Origin> modifications;
-    Publication publication;
-    std::vector<std::string> reads, used_by, selected_by;
-    std::string expression, condition;
-};
+    struct Parameter {
+        std::string path, value, units, type, shape;
+        dip::ValueMetadata metadata;
+        std::vector<std::string> tags, options;
+        std::vector<std::string> applied_schemas;
+        std::string contributing_schema;
+        bool overridden = false;
+        Origin declaration, replacement;
+        std::vector<Origin> modifications;
+        Publication publication;
+        std::vector<std::string> reads, used_by, selected_by;
+        std::string expression, condition;
+    };
 
-struct TableColumn {
-    std::string name, type, units;
-};
+    struct TableColumn {
+        std::string name, type, units;
+    };
 
-struct Table {
-    std::string path;
-    size_t rows = 0;
-    std::vector<TableColumn> columns;
-};
+    struct Table {
+        std::string path;
+        size_t rows = 0;
+        std::vector<TableColumn> columns;
+    };
 
-struct Schema {
-    std::string name, description;
-    Origin origin;
-    Publication publication;
-    std::vector<std::string> supplied_parameters;
-};
+    struct Schema {
+        std::string name, description;
+        Origin origin;
+        Publication publication;
+        std::vector<std::string> supplied_parameters;
+    };
 
-struct Source {
-    std::string name, path, parent, hash_algorithm, hash;
-    size_t parent_line = 0;
-};
+    struct Source {
+        std::string name, path, parent, hash_algorithm, hash;
+        size_t parent_line = 0;
+    };
 
-struct Unit {
-    std::string name, definition;
-};
+    struct Unit {
+        std::string name, definition;
+    };
 
-struct Function {
-    std::string name, kind;
-};
+    struct Function {
+        std::string name, kind;
+    };
 
-struct Document {
-    std::string input_label;
-    std::string introduction_tex;
-    std::string title, author, date, version;
-    bool loaded_snapshot = false;
-    bool graph_recorded = false;
-    std::vector<Parameter> parameters;
-    std::vector<Table> tables;
-    std::vector<Schema> schemas;
-    std::vector<Source> sources;
-    std::vector<Unit> units;
-    std::vector<Function> functions;
-};
+    struct Document {
+        std::string input_label;
+        std::string introduction_tex;
+        std::string title, author, date, version;
+        bool loaded_snapshot = false;
+        bool graph_recorded = false;
+        std::vector<Parameter> parameters;
+        std::vector<Table> tables;
+        std::vector<Schema> schemas;
+        std::vector<Source> sources;
+        std::vector<Unit> units;
+        std::vector<Function> functions;
+    };
 
-Document build_document(const dip::Environment& env, std::string input_label, std::string introduction_tex,
-                        std::string title, std::string author, std::string date, std::string version,
-                        const std::filesystem::path& source_root, bool loaded_snapshot = false);
+    Document build_document(
+        const dip::Environment& env,
+        std::string input_label,
+        std::string introduction_tex,
+        std::string title,
+        std::string author,
+        std::string date,
+        std::string version,
+        const std::filesystem::path& source_root,
+        bool loaded_snapshot = false
+    );
 
 } // namespace snt::dip::report
 

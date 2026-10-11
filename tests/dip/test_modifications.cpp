@@ -1,8 +1,8 @@
 #include "pch_tests.h"
-#include <fstream>
 
-#include <snt/dip/dip.h>
+#include <fstream>
 #include <snt/dip/cursor.h>
+#include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 
 using namespace snt;
@@ -131,7 +131,10 @@ TEST(Override, MultipleRegionsAndHostRegistration) {
     dip::DIP parser;
     parser.add_override_string("first = 5");
     const auto file = std::filesystem::temp_directory_path() / "snt-override-registration.dip";
-    { std::ofstream output(file); output << "second = 6"; }
+    {
+        std::ofstream output(file);
+        output << "second = 6";
+    }
     parser.add_override_file(file);
     // Registration reads the body immediately; parsing no longer needs the file.
     std::filesystem::remove(file);
@@ -162,7 +165,9 @@ TEST(Override, EmptyInputsDoNotChangeValues) {
     parser.add_override_string("");
     parser.add_override_string("  \n# No changes\n");
     const auto file = std::filesystem::temp_directory_path() / "snt-empty-override.dip";
-    { std::ofstream output(file); }
+    {
+        std::ofstream output(file);
+    }
     parser.add_override_file(file);
     std::filesystem::remove(file);
     parser.add_string("value int = 7\n");
@@ -245,7 +250,10 @@ TEST(Override, DuplicateAcrossOriginsAndSchemaValidation) {
     dip::DIP file_duplicate;
     file_duplicate.add_override_string("value = 2");
     const auto file = std::filesystem::temp_directory_path() / "snt-override-duplicate.dip";
-    { std::ofstream output(file); output << "value = 3"; }
+    {
+        std::ofstream output(file);
+        output << "value = 3";
+    }
     EXPECT_THROW(file_duplicate.add_override_file(file), dip::SyntaxException);
     std::filesystem::remove(file);
     EXPECT_THROW(file_duplicate.add_override_file(file), dip::IOException);

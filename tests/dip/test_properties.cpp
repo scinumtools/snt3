@@ -353,15 +353,14 @@ TEST(Properties, OptionalOptionLabels) {
 }
 
 TEST(Properties, OptionLabelsMustMatchAllOptions) {
-    for (const auto& source : {
-             "level int = 1\n  !options [1, 2]\n  !labels [\"Only one\"]\n",
-             "level int = 1\n  !labels [\"Only one\"]\n",
-             "level int = 1\n  !options [1]\n  !labels [\"One\"]\n  !labels [\"Again\"]\n",
-             "level int = 1\n  !options [1]\n  !labels [\"One\"] m\n",
-             "level int = 1\n  !options [1]\n  !labels \"One\"\n",
-             "level int = 1\n  !options [1, 2]\n  !labels [[\"One\"], [\"Two\"]]\n",
-             "enabled bool = true\n  !labels [\"Yes\"]\n"
-         }) {
+    for (const auto& source :
+         {"level int = 1\n  !options [1, 2]\n  !labels [\"Only one\"]\n",
+          "level int = 1\n  !labels [\"Only one\"]\n",
+          "level int = 1\n  !options [1]\n  !labels [\"One\"]\n  !labels [\"Again\"]\n",
+          "level int = 1\n  !options [1]\n  !labels [\"One\"] m\n",
+          "level int = 1\n  !options [1]\n  !labels \"One\"\n",
+          "level int = 1\n  !options [1, 2]\n  !labels [[\"One\"], [\"Two\"]]\n",
+          "enabled bool = true\n  !labels [\"Yes\"]\n"}) {
         dip::DIP parser;
         parser.add_string(source);
         EXPECT_THROW(parser.parse(), dip::SyntaxException) << source;

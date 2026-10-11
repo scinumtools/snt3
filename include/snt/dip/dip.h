@@ -42,25 +42,32 @@ namespace snt::dip {
         std::vector<NodeDtype> nodes_nohierarchy; ///< list of nodes that do not enter node path
         std::vector<NodeDtype> nodes_notypes;     ///< list of nodes that don't have types
 
-        size_t num_strings = 0; ///< counter of code inputs from a string
-        size_t num_files = 0;   ///< counter of code inputs from a file
-        size_t num_sources = 0; ///< number of explicitely added sources
-        size_t num_projects = 0; ///< number of project manifests added to this parser
+        size_t num_strings = 0;   ///< counter of code inputs from a string
+        size_t num_files = 0;     ///< counter of code inputs from a file
+        size_t num_sources = 0;   ///< number of explicitely added sources
+        size_t num_projects = 0;  ///< number of project manifests added to this parser
         size_t num_overrides = 0; ///< number of host-provided override sources
 
         void add_override_input(
-            const std::string& source_code, const std::filesystem::path& source_file, const Source& parent,
+            const std::string& source_code,
+            const std::filesystem::path& source_file,
+            const Source& parent,
             std::string source_name = {}
         );
         void add_override_file_input(const std::filesystem::path& source_file, const Source& parent);
 
         void add_schema_input(
-            const std::string& name, const std::string& source_code,
-            const std::filesystem::path& source_file, const std::string& source_name, const Source& parent
+            const std::string& name,
+            const std::string& source_code,
+            const std::filesystem::path& source_file,
+            const std::string& source_name,
+            const Source& parent
         );
         void add_schema_string_input(
-            const std::string& name, const std::string& source_code,
-            const std::filesystem::path& source_file, const Source& parent
+            const std::string& name,
+            const std::string& source_code,
+            const std::filesystem::path& source_file,
+            const Source& parent
         );
         void add_schema_file_input(
             const std::string& name, const std::filesystem::path& source_file, const Source& parent
@@ -72,10 +79,7 @@ namespace snt::dip {
             std::string source_name = {}
         );
         void add_file_input(
-            const std::filesystem::path& source_file,
-            std::string source_name,
-            bool absolute,
-            const Source& parent
+            const std::filesystem::path& source_file, std::string source_name, bool absolute, const Source& parent
         );
         void add_source_input(const std::string& source_name, const std::string& source_file, const Source& parent);
 
