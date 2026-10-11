@@ -16,6 +16,8 @@ namespace snt::dip {
 
       public:
         static constexpr size_t max_float_size = sizeof(long double) * CHAR_BIT;
+        /** Check finite values against the declared floating-point type before narrowing. */
+        static void validate_value(const val::BaseValue* value, core::DataType dtype, const Line& line);
         /** Return a floating-point node when the parser is positioned at a numeric literal.
          * @param parser Parser state to inspect.
          */

@@ -1,4 +1,5 @@
 #include <snt/dip/nodes/node_integer.h>
+#include <snt/dip/nodes/node_float.h>
 #include <optional>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
@@ -10,6 +11,13 @@
 #include <sstream>
 
 namespace snt::dip {
+
+    void ValueNode::validate_type_range(const val::BaseValue* candidate, const Line& source_line) const {
+        if (dtype == NodeDtype::Integer)
+            IntegerNode::validate_value(candidate, value_dtype, source_line);
+        else if (dtype == NodeDtype::Float)
+            FloatNode::validate_value(candidate, value_dtype, source_line);
+    }
 
     bool ValueMetadata::set_property(PropertyType property, const val::Array::StringType& values) {
         switch (property) {
@@ -249,14 +257,14 @@ namespace snt::dip {
         } else if (value_input == nullptr && value_origin == ValueOrigin::Array) {
             value = cast_value();
         } else if (value_input != nullptr) {
-            if (dtype == NodeDtype::Integer)
-                IntegerNode::validate_value(value_input.get(), value_dtype, line);
+            validate_type_range(value_input.get(), line);
             if (value_input->get_dtype() == value_dtype)
                 value = std::move(value_input);
             else
                 value = value_input->cast_as(value_dtype);
         }
         if (value != nullptr) {
+            validate_type_range(value.get(), line);
             if (!value_slice.empty()) {
                 value = value->slice(value_slice);
             }
@@ -360,8 +368,7 @@ namespace snt::dip {
                 evaluated->value = std::move(quantity.measurement.result.estimate);
             }
         }
-        if (dtype == NodeDtype::Integer)
-            IntegerNode::validate_value(evaluated->value.get(), value_dtype, node->line);
+        validate_type_range(evaluated->value.get(), node->line);
         if (evaluated->value && evaluated->value->get_dtype() != value_dtype)
             evaluated->value = evaluated->value->cast_as(value_dtype);
         value = std::move(evaluated->value);

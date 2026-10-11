@@ -55,6 +55,12 @@ The Float type represents real numbers with fractional components. It has a
 64-bit floating-point semantic representation, providing a wide range of
 values, including very large and very small numbers. In the reference
 implementation, Float values are internally represented using `double`.
+Finite values assigned to a floating-point node are checked against the
+declared type's range, even if its internal storage has a wider range. Zero is
+allowed; a nonzero magnitude smaller than the type's smallest positive
+subnormal value or larger than its largest finite value is rejected. This
+check applies to literals, arrays, evaluated expressions, references, and
+overrides before narrowing to the declared type.
 
 ``` DIPL
 duration float = 10            # integer form

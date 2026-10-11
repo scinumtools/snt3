@@ -442,7 +442,10 @@ void fetch(const std::string& id, const std::string& selected_dir, const std::st
     if (fs::is_regular_file(root / ".snthub/lock.json")) {
         const auto current = workspace(root.string());
         if (text(current.lock, "project") != id || text(current.lock, "hub_revision") != revision)
-            throw Error("Workspace already contains a different project or revision; update is not available yet");
+            throw Error("An SNT Hub workspace already exists at " + (root / ".snthub/lock.json").string() +
+                        "\n  Existing: " + text(current.lock, "project") + " @ " + text(current.lock, "hub_revision") +
+                        "\n  Requested: " + id + " @ " + revision +
+                        "\nFetch into a different directory; updating an existing workspace is not available yet");
         verify_workspace(current);
         std::cout << "Already fetched " << id << " at " << root << '\n';
         return;
@@ -548,8 +551,17 @@ fs::path workspace_runtime(const Workspace& current) {
         run({python, "-m", "venv", runtime.string()});
         const auto shared = inside(current.root / ".snthub/hub",
             relative_path(text(current.lock, "runtime_package"), "runtime package"));
-        run({runtime_python(runtime).string(), "-m", "pip", "install", "--disable-pip-version-check",
-             "--no-input", shared.string(), "-e", (current.root / "dipl").string()});
+        try {
+            run({runtime_python(runtime).string(), "-m", "pip", "install", "--disable-pip-version-check",
+                 "--no-input", shared.string(), "-e", (current.root / "dipl").string()});
+        } catch (const Error& error) {
+            const std::string message = error.what();
+            if (message.find("editable mode currently requires a setuptools-based build") != std::string::npos)
+                throw Error(message + "\nSuggestion: Set SNT_HUB_PYTHON to a compatible Python interpreter with "
+                                      "a recent pip, then retry. The adapter may also require a newer Python version.",
+                            error.code());
+            throw;
+        }
         if (!fs::is_regular_file(adapter_path(runtime, executable)))
             throw Error("Adapter package did not install its declared executable", 5);
         write_json(lock_path, Json{{"schema_version", 1}, {"project", text(current.lock, "project")},

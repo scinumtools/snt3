@@ -110,6 +110,18 @@ TEST(ParseArrays, FloatValue) {
     EXPECT_EQ(vnode->value->get_dtype(), core::DataType::Float64);
 }
 
+TEST(ParseArrays, FloatElementsOutsideDeclaredRangeAreRejected) {
+    for (const auto& declaration : {
+             "value float32[2] = [1, 3.5e38]",
+             "value float32[2] = [1, 1e-50]",
+             "source float64[2] = [1, 1e39]\nvalue float32[2] = {?source}"}) {
+        SCOPED_TRACE(declaration);
+        dip::DIP parser;
+        parser.add_string(std::string(declaration) + "\n");
+        EXPECT_THROW(parser.parse(), dip::SyntaxException);
+    }
+}
+
 TEST(ParseArrays, StringValue) {
 
     dip::DIP d;

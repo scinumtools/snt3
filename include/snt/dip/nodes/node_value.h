@@ -203,6 +203,7 @@ namespace snt::dip {
         virtual void validate_format() const;
 
       private:
+        void validate_type_range(const val::BaseValue* candidate, const Line& source_line) const;
         void validate_dimensions() const;
     };
 

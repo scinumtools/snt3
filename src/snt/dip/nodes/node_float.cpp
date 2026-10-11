@@ -5,7 +5,84 @@
 #include <snt/dip/nodes/node_float.h>
 #include <snt/dip/solvers/numerical_solver.h>
 
+#include <cmath>
+#include <limits>
+
+namespace {
+
+long double parse_float_literal(const std::string& input, snt::core::DataType dtype, const snt::dip::Line& line) {
+    try {
+        size_t consumed = 0;
+        const long double number = std::stold(input, &consumed);
+        if (consumed != input.size()) throw std::invalid_argument("trailing characters");
+        const snt::val::ArrayValueFloat128 parsed(number);
+        snt::dip::FloatNode::validate_value(&parsed, dtype, line);
+        return number;
+    } catch (const std::out_of_range&) {
+        throw snt::dip::SyntaxException(
+            "Float value outside declared range", "The value `" + input + "` is outside the declared float range.",
+            "Use a finite value representable by the declared floating-point type, or `inf` if intentional.",
+            __FILE__, __LINE__, line
+        );
+    } catch (const std::invalid_argument&) {
+        throw snt::dip::SyntaxException(
+            "Invalid float value", "The value `" + input + "` is not a valid floating-point literal.",
+            "Use a numeric literal such as `1.23` or `1e-6`.", __FILE__, __LINE__, line
+        );
+    }
+}
+
+} // namespace
+
 namespace snt::dip {
+
+    void FloatNode::validate_value(const val::BaseValue* value, core::DataType dtype, const Line& line) {
+        if (!value) return;
+        long double largest = 0;
+        long double smallest = 0;
+        unsigned bits = 0;
+        switch (dtype) {
+        case core::DataType::Float32:
+            largest = std::numeric_limits<float>::max();
+            smallest = std::numeric_limits<float>::denorm_min();
+            bits = 32;
+            break;
+        case core::DataType::Float64:
+            largest = std::numeric_limits<double>::max();
+            smallest = std::numeric_limits<double>::denorm_min();
+            bits = 64;
+            break;
+        case core::DataType::Float128:
+            largest = std::numeric_limits<long double>::max();
+            smallest = std::numeric_limits<long double>::denorm_min();
+            bits = max_float_size;
+            break;
+        default: return;
+        }
+        const auto outside = [largest, smallest](const auto* values) {
+            if (!values) return false;
+            for (size_t i = 0; i < values->get_size(); ++i) {
+                const auto number = static_cast<long double>(values->get_value(i));
+                if (std::isfinite(number) &&
+                    (std::fabs(number) > largest ||
+                     (number != 0 && std::fabs(number) < smallest))) return true;
+            }
+            return false;
+        };
+        const bool invalid = outside(dynamic_cast<const val::ArrayValue<double>*>(value)) ||
+            outside(dynamic_cast<const val::ArrayValue<long double>*>(value)) ||
+            outside(dynamic_cast<const val::ArrayValue<int64_t>*>(value)) ||
+            outside(dynamic_cast<const val::ArrayValue<uint64_t>*>(value)) ||
+            outside(dynamic_cast<const val::ArrayValue<int8_t>*>(value)) ||
+            outside(dynamic_cast<const val::ArrayValue<uint8_t>*>(value));
+        if (invalid)
+            throw dip::SyntaxException(
+                "Float value outside declared range",
+                "The value cannot be represented as a " + std::to_string(bits) + "-bit float.",
+                "Use a finite value within the declared floating-point type's range.",
+                __FILE__, __LINE__, line
+            );
+    }
 
     ValueNode::PointerType FloatNode::is_node(Parser& parser) {
         if (parser.dtype_raw[1] == "float") {
@@ -70,13 +147,14 @@ namespace snt::dip {
     }
 
     val::BaseValue::PointerType FloatNode::cast_scalar_value(const std::string& value_input) const {
+        const long double number = parse_float_literal(value_input, value_dtype, line);
         switch (value_dtype) {
         case core::DataType::Float32:
-            return std::make_unique<val::ArrayValueFloat32>(std::stof(value_input));
+            return std::make_unique<val::ArrayValueFloat32>(static_cast<float>(number));
         case core::DataType::Float64:
-            return std::make_unique<val::ArrayValueFloat64>(std::stod(value_input));
+            return std::make_unique<val::ArrayValueFloat64>(static_cast<double>(number));
         case core::DataType::Float128:
-            return std::make_unique<val::ArrayValueFloat128>(std::stold(value_input));
+            return std::make_unique<val::ArrayValueFloat128>(number);
         default:
             throw dip::SyntaxException(
                 "Invalid float cast",
@@ -100,7 +178,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back(std::stof(s));
+                    arr.push_back(static_cast<float>(parse_float_literal(s, value_dtype, line)));
             }
             return std::make_unique<val::ArrayValueFloat32>(arr, shape);
         }
@@ -109,7 +187,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back(std::stod(s));
+                    arr.push_back(static_cast<double>(parse_float_literal(s, value_dtype, line)));
             }
             return std::make_unique<val::ArrayValueFloat64>(arr, shape);
         }
@@ -118,7 +196,7 @@ namespace snt::dip {
             if (std::any_of(shape.begin(), shape.end(), [](auto x) { return x != 0; })) {
                 arr.reserve(value_inputs.size());
                 for (const auto& s : value_inputs)
-                    arr.push_back(std::stold(s));
+                    arr.push_back(parse_float_literal(s, value_dtype, line));
             }
             return std::make_unique<val::ArrayValueFloat128>(arr, shape);
         }

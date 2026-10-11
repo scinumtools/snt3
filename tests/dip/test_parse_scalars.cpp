@@ -319,3 +319,36 @@ TEST(ParseScalars, IntegerOverrideOutsideDeclaredRangeIsRejected) {
         EXPECT_THROW(parser.parse(), dip::SyntaxException);
     }
 }
+
+TEST(ParseScalars, FloatValuesOutsideDeclaredRangeAreRejected) {
+    const std::vector<std::string> declarations = {
+        "value float32 = 3.5e38", "value float32 = -3.5e38",
+        "value float32 = 1e-50", "value float64 = 1e309",
+        "value float32 = (1e38 * 10)",
+        "source float64 = 1e39\nvalue float32 = {?source}",
+        "source float64 = 1e-50\nvalue float32 = {?source}"
+    };
+    for (const auto& declaration : declarations) {
+        SCOPED_TRACE(declaration);
+        dip::DIP parser;
+        parser.add_string(declaration + "\n");
+        EXPECT_THROW(parser.parse(), dip::SyntaxException);
+    }
+    if (dip::FloatNode::max_float_size == 128) {
+        dip::DIP parser;
+        parser.add_string("source float128 = 1e400\nvalue float64 = {?source}\n");
+        EXPECT_THROW(parser.parse(), dip::SyntaxException);
+    }
+}
+
+TEST(ParseScalars, FloatOverrideOutsideDeclaredRangeIsRejected) {
+    dip::DIP parser;
+    parser.add_string("value float32 = 1\n");
+    parser.add_override_string("value = (1e38 * 10)\n");
+    EXPECT_THROW(parser.parse(), dip::SyntaxException);
+
+    dip::DIP with_units;
+    with_units.add_string("value float32 = 1 SI_m\n");
+    with_units.add_override_string("value = 1e36 SI_km\n");
+    EXPECT_THROW(with_units.parse(), dip::SyntaxException);
+}

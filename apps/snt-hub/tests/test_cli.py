@@ -132,6 +132,25 @@ class HubCLITest(unittest.TestCase):
         self.assertIn("already exists", result.stderr)
         self.assertFalse((workspace / ".snthub").exists())
 
+    def test_fetch_reports_existing_workspace_lock(self):
+        workspace, env, _, original_revision = self.workspace_fixture()
+        self.assertEqual(self.call("fetch", "project", cwd=workspace, env=env).returncode, 0)
+        hub = self.root / "published-hub"
+        (hub / "revision.txt").write_text("new published revision\n")
+        git("-C", str(hub), "add", "revision.txt")
+        new_revision = commit(hub, "new published revision")
+        catalog = self.root / "catalogue.json"
+        data = json.loads(catalog.read_text())
+        data["hub_revision"] = new_revision
+        catalog.write_text(json.dumps(data))
+
+        result = self.call("fetch", "project", cwd=workspace, env=env)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(str(workspace / ".snthub/lock.json"), result.stderr)
+        self.assertIn(f"Existing: project @ {original_revision}", result.stderr)
+        self.assertIn(f"Requested: project @ {new_revision}", result.stderr)
+        self.assertIn("Fetch into a different directory", result.stderr)
+
     def test_fetch_rejects_gitlink_and_capability_mismatch(self):
         workspace, env, _, _ = self.workspace_fixture()
         hub = self.root / "published-hub"
@@ -161,6 +180,36 @@ class HubCLITest(unittest.TestCase):
         self.assertIn("no reviewed build recipe", build.stderr)
         execution = self.call("run", cwd=workspace, env=env)
         self.assertIn("no reviewed run recipe", execution.stderr)
+        self.assertFalse((workspace / ".snthub/runtime").exists())
+
+    def test_setup_suggests_python_for_legacy_editable_install(self):
+        workspace, env, _, _ = self.workspace_fixture()
+        self.assertEqual(self.call("fetch", "project", cwd=workspace, env=env).returncode, 0)
+        pip_error = self.root / "pip-error"
+        pip_error.write_text(
+            "#!/bin/sh\n"
+            "echo 'ERROR: Directory cannot be installed in editable mode: dipl' >&2\n"
+            "echo '(A pyproject.toml file was found, but editable mode currently requires a setuptools-based build.)' >&2\n"
+            "exit 1\n"
+        )
+        pip_error.chmod(0o755)
+        fake_python = self.root / "fake-python"
+        fake_python.write_text(
+            f"#!{sys.executable}\n"
+            "from pathlib import Path\n"
+            "import shutil, sys\n"
+            "assert sys.argv[1:3] == ['-m', 'venv']\n"
+            "bin_dir = Path(sys.argv[3]) / 'bin'\n"
+            "bin_dir.mkdir(parents=True)\n"
+            f"shutil.copyfile({str(pip_error)!r}, bin_dir / 'python')\n"
+            "(bin_dir / 'python').chmod(0o755)\n"
+        )
+        fake_python.chmod(0o755)
+        result = self.call("setup", "complete", cwd=workspace,
+                           env=dict(env, SNT_HUB_PYTHON=str(fake_python)))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("editable mode currently requires a setuptools-based build", result.stderr)
+        self.assertIn("Set SNT_HUB_PYTHON to a compatible Python", result.stderr)
         self.assertFalse((workspace / ".snthub/runtime").exists())
 
     def test_optional_build_and_run_dispatch(self):
