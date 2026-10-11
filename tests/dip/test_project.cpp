@@ -90,10 +90,14 @@ TEST(Project, BundleRejectsMissingAndEscapingFiles) {
     dip::DIP parser;
     EXPECT_THROW(parser.add_project(bundle), dip::IOException);
     dip::DIP traversal;
-    EXPECT_THROW(traversal.add_project({"DIPfile", {{"DIPfile", "code[]\n  file = \"../outside.dip\"\n"}}}),
+    const dip::ProjectBundle escaping_bundle{
+        "DIPfile", {{"DIPfile", "code[]\n  file = \"../outside.dip\"\n"}}};
+    EXPECT_THROW(traversal.add_project(escaping_bundle),
                  dip::IOException);
     dip::DIP invalid_text;
-    EXPECT_THROW(invalid_text.add_project({"DIPfile", {{"DIPfile", std::string(1, static_cast<char>(0xff))}}}),
+    const dip::ProjectBundle invalid_bundle{
+        "DIPfile", {{"DIPfile", std::string(1, static_cast<char>(0xff))}}};
+    EXPECT_THROW(invalid_text.add_project(invalid_bundle),
                  dip::IOException);
 }
 
