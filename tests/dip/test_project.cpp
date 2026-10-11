@@ -101,6 +101,17 @@ TEST(Project, BundleRejectsMissingAndEscapingFiles) {
                  dip::IOException);
 }
 
+TEST(Project, ParsesCRLFManifestAndCode) {
+    const dip::ProjectBundle bundle{"DIPfile", {
+        {"DIPfile", "units[]\r\n  name = \"tick\"\r\n  unit = \"s\"\r\n"
+                    "code[]\r\n  file = \"model.dip\"\r\n"},
+        {"model.dip", "value float = 2 tick\r\n"}
+    }};
+    dip::DIP parser;
+    parser.add_project(bundle);
+    EXPECT_DOUBLE_EQ(parser.parse()["value"].as<double>(), 2.0);
+}
+
 #ifndef _WIN32
 TEST(Project, BundleKeepsLogicalSymlinkPath) {
     ProjectDirectory project("bundle-symlink");

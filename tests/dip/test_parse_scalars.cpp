@@ -241,6 +241,7 @@ TEST(ParseScalars, DataTypeRanges) {
         "uint64_max uint64 = 18446744073709551615\n"
         "float32_min float32 = -3.4028234663852886e+38\n"
         "float32_max float32 = 3.4028234663852886e+38\n"
+        "float32_tiny float32 = 1.401298464324817e-45\n"
         "float64_min float64 = -1.7976931348623157e+308\n"
         "float64_max float64 = 1.7976931348623157e+308\n"
     );
@@ -273,6 +274,7 @@ TEST(ParseScalars, DataTypeRanges) {
 
     EXPECT_DOUBLE_EQ(env["float32_min"].as<double>(), std::numeric_limits<float>::lowest());
     EXPECT_DOUBLE_EQ(env["float32_max"].as<double>(), std::numeric_limits<float>::max());
+    EXPECT_DOUBLE_EQ(env["float32_tiny"].as<double>(), std::numeric_limits<float>::denorm_min());
 
     EXPECT_DOUBLE_EQ(env["float64_min"].as<double>(), std::numeric_limits<double>::lowest());
     EXPECT_DOUBLE_EQ(env["float64_max"].as<double>(), std::numeric_limits<double>::max());

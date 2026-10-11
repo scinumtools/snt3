@@ -6,9 +6,14 @@
 #include <snt/dip/solvers/numerical_solver.h>
 
 #include <cmath>
-#include <limits>
 
 namespace {
+
+template <typename Target>
+bool conversion_loses_range(long double number) {
+    const Target converted = static_cast<Target>(number);
+    return !std::isfinite(converted) || (number != 0 && converted == 0);
+}
 
 long double parse_float_literal(const std::string& input, snt::core::DataType dtype, const snt::dip::Line& line) {
     try {
@@ -38,34 +43,28 @@ namespace snt::dip {
 
     void FloatNode::validate_value(const val::BaseValue* value, core::DataType dtype, const Line& line) {
         if (!value) return;
-        long double largest = 0;
-        long double smallest = 0;
         unsigned bits = 0;
         switch (dtype) {
         case core::DataType::Float32:
-            largest = std::numeric_limits<float>::max();
-            smallest = std::numeric_limits<float>::denorm_min();
             bits = 32;
             break;
         case core::DataType::Float64:
-            largest = std::numeric_limits<double>::max();
-            smallest = std::numeric_limits<double>::denorm_min();
             bits = 64;
             break;
         case core::DataType::Float128:
-            largest = std::numeric_limits<long double>::max();
-            smallest = std::numeric_limits<long double>::denorm_min();
             bits = max_float_size;
             break;
         default: return;
         }
-        const auto outside = [largest, smallest](const auto* values) {
+        const auto outside = [dtype](const auto* values) {
             if (!values) return false;
             for (size_t i = 0; i < values->get_size(); ++i) {
                 const auto number = static_cast<long double>(values->get_value(i));
-                if (std::isfinite(number) &&
-                    (std::fabs(number) > largest ||
-                     (number != 0 && std::fabs(number) < smallest))) return true;
+                if (!std::isfinite(number)) continue;
+                if ((dtype == core::DataType::Float32 && conversion_loses_range<float>(number)) ||
+                    (dtype == core::DataType::Float64 && conversion_loses_range<double>(number)) ||
+                    (dtype == core::DataType::Float128 && conversion_loses_range<long double>(number)))
+                    return true;
             }
             return false;
         };

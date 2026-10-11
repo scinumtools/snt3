@@ -99,6 +99,8 @@ namespace snt::dip {
         std::istringstream ss(source_code);
         size_t line_number = 1;
         while (std::getline(ss, line)) {
+            // Project files are read as bytes, so CRLF retains its carriage return.
+            if (!line.empty() && line.back() == '\r') line.pop_back();
             // skip empty lines
             if (!line.empty() && !std::all_of(line.begin(), line.end(), isspace))
                 lines.push({line, {source_name, line_number}});
