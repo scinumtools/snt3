@@ -28,6 +28,22 @@ namespace snt::puq {
                 {"yr_g", {Utype::LIN, "365.2425*day", "Gregorian year", true, {"k", "m", "G"}}},
                 {"yr", {Utype::LIN, "yr_j", "year", true, {"k", "m", "G"}}},
 
+                // information units (dimensionless in this unit system)
+                {"bit", {Utype::LIN, "1", "bit", true, {}}},
+                {"byte", {Utype::LIN, "8*bit", "byte", true, {}}},
+                {"kB", {Utype::LIN, "1e3*byte", "kilobyte", false, {}}},
+                {"MB", {Utype::LIN, "1e6*byte", "megabyte", false, {}}},
+                {"GB", {Utype::LIN, "1e9*byte", "gigabyte", false, {}}},
+                {"TB", {Utype::LIN, "1e12*byte", "terabyte", false, {}}},
+                {"PB", {Utype::LIN, "1e15*byte", "petabyte", false, {}}},
+                {"EB", {Utype::LIN, "1e18*byte", "exabyte", false, {}}},
+                {"KiB", {Utype::LIN, "1024*byte", "kibibyte", false, {}}},
+                {"MiB", {Utype::LIN, "1024*KiB", "mebibyte", false, {}}},
+                {"GiB", {Utype::LIN, "1024*MiB", "gibibyte", false, {}}},
+                {"TiB", {Utype::LIN, "1024*GiB", "tebibyte", false, {}}},
+                {"PiB", {Utype::LIN, "1024*TiB", "pebibyte", false, {}}},
+                {"EiB", {Utype::LIN, "1024*PiB", "exbibyte", false, {}}},
+
                 // units of temperature
                 {"degR", {UT_LIN_TMP, "5/9*K", "degree Rankine", false, {}}},
 

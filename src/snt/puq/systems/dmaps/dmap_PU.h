@@ -1,10 +1,10 @@
 /*
  * Do not modify this file!
- * This file can be updated using 'dmap' executable.
+ * This file can be updated using 'snt dmap'.
  * 
  * Unit system:  Planck units (PU)
- * Last update:  Thu Jun 25 06:02:36 2026
- * Code version: v0.5.0
+ * Last update:  Sun Oct 11 02:01:44 2026
+ * Code version: 0.9.3
  * 
  * Symbol legend:
  * ..    units

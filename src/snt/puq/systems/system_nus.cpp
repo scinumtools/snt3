@@ -12,6 +12,7 @@ namespace snt::puq {
                                                 {"{kap_0}", {UT_LIN_CST, "1", "permittivity", false, {}}},
                                                 {"{a_0}", {UT_LIN_CST, "{#kap_0}*{#hbar}2/({#m_e}*{#e}2)", "Bohr radius", false, {}}},
                                                 {"E_h", {Utype::LIN, "{#hbar}2/({#m_e}*{a_0}2)", "hartree", false, {}}},
+                                                {"Ry", {Utype::LIN, "0.5*E_h", "rydberg", false, {}}},
                                                 {"{alpha}", {UT_LIN_CST, "1/137", "fine-str. const.", false, {}}},
                                                 {"{c}", {UT_LIN_CST, "{alpha}-1*{a_0}*E_h/{#hbar}", "speed of light", false, {}}},
                                                 {"{r_e}", {UT_LIN_CST, "{alpha}2*{a_0}", "class. e. radius", false, {}}},

@@ -4,6 +4,7 @@
 #include <snt/puq/exceptions.h>
 #include <snt/puq/quantity.h>
 #include <snt/puq/systems/unit_system.h>
+#include <snt/puq/to_string.h>
 
 using namespace snt;
 
@@ -22,6 +23,44 @@ TEST(UnitSystem, PrintUnitSystem) {
     puq::UnitSystem us(puq::SystemType::AU);
     q = puq::Quantity("3*E_h");
     EXPECT_EQ(q.unit_system(), "AU");
+}
+
+TEST(UnitSystem, RydbergInAtomicUnits) {
+    if constexpr (!puq::Config::use_system_nus) {
+        GTEST_SKIP() << "Natural unit systems are disabled";
+        return;
+    }
+
+    const puq::Quantity rydberg("1*Ry", puq::SystemType::AU);
+    const puq::Quantity hartree("1*E_h", puq::SystemType::AU);
+    const auto half_hartree = rydberg.convert("E_h", puq::SystemType::AU);
+    const auto two_rydberg = hartree.convert("Ry", puq::SystemType::AU);
+    const auto* half = dynamic_cast<const val::ArrayValue<double>*>(half_hartree.measurement.result.estimate.get());
+    const auto* two = dynamic_cast<const val::ArrayValue<double>*>(two_rydberg.measurement.result.estimate.get());
+    ASSERT_NE(half, nullptr);
+    ASSERT_NE(two, nullptr);
+    EXPECT_NEAR(half->get_values().at(0), 0.5, 1e-12);
+    EXPECT_NEAR(two->get_values().at(0), 2.0, 1e-12);
+
+    const auto& au_map = puq::SystemData::AU.DimensionMap;
+    EXPECT_DOUBLE_EQ(au_map.at("Ry").estimate, 0.5 * au_map.at("E_h").estimate);
+    EXPECT_DOUBLE_EQ(au_map.at("Ry").uncertainty, 0.5 * au_map.at("E_h").uncertainty);
+}
+
+TEST(UnitSystem, DimensionlessInformationUnits) {
+    const auto& si_map = puq::SystemData::SI.DimensionMap;
+    for (const auto* symbol : {"bit", "byte", "kB", "MB", "GB", "TB", "PB", "EB",
+                               "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"}) {
+        const auto& unit = si_map.at(symbol);
+        EXPECT_EQ(unit.dimensions, si_map.at("%").dimensions) << symbol;
+        EXPECT_DOUBLE_EQ(unit.uncertainty, 0.0) << symbol;
+    }
+
+    EXPECT_EQ(puq::to_string(puq::Converter("byte", "bit").convert(1)), "8");
+    EXPECT_EQ(puq::to_string(puq::Converter("MB", "bit").convert(1)), "8e6");
+    EXPECT_EQ(puq::to_string(puq::Converter("MiB", "bit").convert(1)), "8.38861e6");
+    EXPECT_EQ(puq::to_string(puq::Converter("MiB", "MB").convert(1)), "1.04858");
+    EXPECT_EQ(puq::to_string(puq::Converter("kbyte", "kB").convert(1)), "1");
 }
 
 TEST(UnitSystem, DirectSetting) {

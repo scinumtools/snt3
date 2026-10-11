@@ -48,4 +48,4 @@ def test_list():
     c = PUQList("deriv")
     c.argument_system("AU")
 
-    assert c.execute() == """Symbol    Name                   Result        Dimension                      Definition                Allowed prefixes       \n--------- ---------------------- ------------- ------------------------------ ------------------------- ---------------------- \nE_h       hartree                4.3597447276(40)e-15 m2*g*s-2                       {#hbar}2/({#m_e}*{a_0}2)                         \n"""
+    assert c.execute() == """Symbol    Name                   Result        Dimension                      Definition                Allowed prefixes       \n--------- ---------------------- ------------- ------------------------------ ------------------------- ---------------------- \nE_h       hartree                4.3597447276(40)e-15 m2*g*s-2                       {#hbar}2/({#m_e}*{a_0}2)                         \nRy        rydberg                2.1798723638(20)e-15 m2*g*s-2                       0.5*E_h                                          \n"""
