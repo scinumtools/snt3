@@ -83,7 +83,8 @@ namespace snt {
             total_bytes_ += size;
             const auto* bytes = reinterpret_cast<const std::uint8_t*>(data);
             while (size != 0) {
-                const auto count = std::min(size, buffer_.size() - buffered_);
+                const auto available = buffer_.size() - buffered_;
+                const auto count = size < available ? size : available;
                 std::copy_n(bytes, count, buffer_.begin() + buffered_);
                 bytes += count;
                 size -= count;
