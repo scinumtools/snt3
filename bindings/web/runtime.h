@@ -16,12 +16,14 @@ namespace snt::web {
  */
 class Model {
     dip::ProjectInput project_;
+    std::optional<dip::ProjectBundle> bundle_;
     std::string override_body_;
     dip::Environment environment_;
 
   public:
     explicit Model(std::string source, std::string override_body = {});
     explicit Model(dip::ProjectInput project, std::string override_body = {});
+    explicit Model(dip::ProjectBundle bundle, std::string override_body = {});
     const dip::Environment& environment() const { return environment_; }
     std::vector<std::string> paths() const;
     dip::SemanticDescription describe(const std::string& path, std::size_t max_value_elements = 16) const;
@@ -37,6 +39,7 @@ struct Validation {
 
 Validation validate(const std::string& source, const std::string& override_body = {});
 Validation validate(const dip::ProjectInput& project, const std::string& override_body = {});
+Validation validate(const dip::ProjectBundle& bundle, const std::string& override_body = {});
 
 } // namespace snt::web
 

@@ -154,8 +154,11 @@ namespace snt::dip {
          * @param project_file Path to the DIPfile manifest.
          */
         void add_project(const std::filesystem::path& project_file);
+        /** Evaluate a self-contained text bundle with the normal DIPfile rules. */
+        void add_project(const ProjectBundle& bundle);
         /** Register a project entirely from memory, without filesystem access. */
         void add_project(const ProjectInput& project);
+        void set_project_file_reader(ProjectFileReader reader) { env.set_project_file_reader(std::move(reader)); }
 
         /**
          * Add function that returns a value

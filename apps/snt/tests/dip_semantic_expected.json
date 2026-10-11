@@ -8,7 +8,7 @@
     "declared_type": "int32",
     "current_shape": [1],
     "units": null,
-    "rules": {"options": [], "condition": null},
+    "rules": {"options": [], "option_labels": [], "condition": null},
     "item_schemas": [],
     "snapshot_input": false,
     "requires_preview": true
@@ -34,7 +34,7 @@
     "tags": [],
     "overridden": false,
     "default": {"available": false, "reason": "not_separately_evaluated"},
-    "rules": {"options": [], "condition": null},
+    "rules": {"options": [], "option_labels": [], "condition": null},
     "dependencies": {"available": false, "reason": "not_recorded"},
     "source_text": {"available": true},
     "provenance": {"declaration": {"source": "@INPUT@", "line": 3}, "override": null}
@@ -60,7 +60,7 @@
     "tags": [],
     "overridden": false,
     "default": {"available": false, "reason": "not_separately_evaluated"},
-    "rules": {"options": [], "condition": null},
+    "rules": {"options": [], "option_labels": [], "condition": null},
     "dependencies": {"available": false, "reason": "not_recorded"},
     "source_text": {"available": true},
     "provenance": {"declaration": {"source": "@INPUT@", "line": 2}, "override": null}
@@ -111,7 +111,7 @@
     "tags": ["physics", "derived"],
     "overridden": false,
     "default": {"available": false, "reason": "not_separately_evaluated"},
-    "rules": {"options": [], "condition": "{.} > 0 m/s"},
+    "rules": {"options": [], "option_labels": [], "condition": "{.} > 0 m/s"},
     "dependencies": {"available": true, "reads": [
       {"target": "?simulation.distance", "request": "?simulation.distance"},
       {"target": "?simulation.duration", "request": "?simulation.duration"}

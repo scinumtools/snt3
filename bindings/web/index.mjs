@@ -29,11 +29,17 @@ export async function loadDIPL(options = {}) {
     parseProject(project) {
       return new DIPLModel(runtime, runtime.parseProjectDIPL(project, ""));
     },
+    parseBundle(bundle) {
+      return new DIPLModel(runtime, runtime.parseBundleDIPL(bundle, ""));
+    },
     validate(source, overrideBody = "") {
       return runtime.validateDIPL(source, overrideBody);
     },
     validateProject(project, overrideBody = "") {
       return runtime.validateProjectDIPL(project, overrideBody);
+    },
+    validateBundle(bundle, overrideBody = "") {
+      return runtime.validateBundleDIPL(bundle, overrideBody);
     },
   };
 }

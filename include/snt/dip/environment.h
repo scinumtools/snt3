@@ -6,6 +6,7 @@
 #include <snt/dip/inspect/dependency_graph.h>
 #include <snt/dip/inspect/declarations.h>
 #include <snt/dip/output_plan.h>
+#include <snt/dip/project_bundle.h>
 
 #include <algorithm>
 #include <filesystem>
@@ -128,6 +129,7 @@ namespace snt::dip {
     class Environment {
         friend class Inspector;
       private:
+        ProjectFileReader project_file_reader_ = snt::dip::read_project_file;
         std::vector<SourceInfo> source_manifest_;
         std::vector<TraceInfo> trace_manifest_;
         std::vector<SchemaInfo> schema_manifest_;
@@ -164,6 +166,13 @@ namespace snt::dip {
          * Constructor of the Environment class
          */
         Environment();
+
+        /** File access used by DIPfile registrations and $source nodes. */
+        void set_project_file_reader(ProjectFileReader reader) { project_file_reader_ = std::move(reader); }
+        const ProjectFileReader& project_file_reader() const { return project_file_reader_; }
+        std::string read_project_file(const std::filesystem::path& path) const {
+            return project_file_reader_(path);
+        }
 
         /** Enable graph capture for this parse. */
         void set_dependency_recording(bool enabled) {

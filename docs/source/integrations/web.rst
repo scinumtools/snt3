@@ -3,7 +3,7 @@ WebAssembly and JavaScript
 
 The web integration runs the existing C++ DIPL parser and
 inspector, and the PUQ conversion command, in a browser through WebAssembly.
-Its JavaScript module provides string-based parsing, value descriptions,
+Its JavaScript module provides string and bundled-project parsing, value descriptions,
 schema inspection, validation, override reevaluation, and unit conversion. It
 has no browser UI dependency. The JavaScript module is built from this
 repository and is not currently published as an npm package.
@@ -87,13 +87,40 @@ project input already contains an override for the path being edited, replace
 that entry in ``project.overrides`` and call ``parseProject`` again; the web
 binding retains the core parser's duplicate-override rule.
 
-The project input is an in-memory registration list, not a DIPfile parser. A
-site preparing assets from a DIPfile must resolve its referenced files and
-preserve their code order when it builds this object. Filesystem-backed source
-imports, DIPH5 persistence, reports, adapters, and DIPL source serialization
-are outside this prototype. For an editable configuration, retain the original
-project input and the accepted override body; the core does not currently
-provide a DIPL round-trip serializer.
+``parseProject`` remains useful for projects assembled in memory. For a DIPfile
+with local files, package it with the SNT CLI instead. The package command
+uses the native C++ project loader to collect files opened during evaluation,
+including ``sources[]`` entries and raw ``.dipt`` tables. It rejects missing
+files and paths outside the DIPfile directory.
+
+.. code-block:: shell
+
+   snt dip package --project path/to/DIPfile --output project.bundle.json
+
+The result is a static JSON object containing ``format``, ``entry`` and
+``files``. Its paths are relative to the DIPfile directory. A site may fetch
+this asset explicitly, then load it without further network access:
+
+.. code-block:: javascript
+
+   const bundle = await fetch("./project.bundle.json").then((response) => response.json());
+   const model = dipl.parseBundle(bundle);
+   console.log(model.describe("measurements.mass"));
+   const candidate = model.withOverride("scale = 4");
+   console.log(candidate.describe("result").valueText);
+   console.log(dipl.validateBundle(bundle, "scale = 4"));
+   candidate.dispose();
+   model.dispose();
+
+The browser calls the same C++ DIPfile registration and table parsers as native
+SNT. A missing bundled file or a path escaping the bundle is an error; the
+runtime does not fetch it. ``$source`` paths derived from values are collected
+when packaging the original project. If a later override selects a different
+file, pass ``--include relative/path`` to ``snt dip package`` or the override
+will fail clearly. Run
+the package command from the project directory when its ``$source`` paths are
+relative to the working directory. DIPH5 persistence, reports, adapters, and
+DIPL source serialization are separate features.
 
 PUQ conversion
 --------------

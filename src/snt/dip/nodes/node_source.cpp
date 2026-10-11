@@ -2,8 +2,6 @@
 
 #include "../parsers.h"
 
-#include <array>
-#include <fstream>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
 #include <snt/val/values.h>
@@ -59,7 +57,7 @@ namespace snt::dip {
                 line
             );
         }
-        EnvSource senv = parse_source(value_raw.at(0), source_file, line.source);
+        EnvSource senv = parse_source(value_raw.at(0), source_file, line.source, env.project_file_reader());
         senv.named_source = true;
         env.sources.append(value_raw.at(0), senv);
         return {};

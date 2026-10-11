@@ -84,6 +84,17 @@ place the declarations in a :doc:`DIPfile project <../modules/dip/projects>`:
 It can be combined with ``--input override_string`` or ``--input override_file``
 to tune its values.
 
+To use a DIPfile project in the browser, package its local text dependencies
+into one static JSON asset:
+
+.. code-block:: bash
+
+   snt dip package --project DIPfile --output project.bundle.json
+
+The packager evaluates the project with the native parser, includes files it
+opens (including ``.dipt`` tables), and reports missing or out-of-directory
+files. See :doc:`web` for ``parseBundle`` and ``validateBundle``.
+
 Values for shell scripts
 ------------------------
 

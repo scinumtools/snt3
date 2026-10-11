@@ -27,6 +27,7 @@ Usage:
   snt dip override-contract --project DIPfile --path PATH [--format json]
   snt dip list --project DIPfile [--query QUERY] [--limit N] [--format json]
   snt dip preview --project DIPfile --override-file FILE [--format json]
+  snt dip package --project DIPfile [--output project.bundle.json]
 
 Description:
   Parse and query dimensional input parameter definitions.
@@ -77,6 +78,7 @@ Examples:
   snt dip describe --project DIPfile --path simulation.cooling --format json
   snt dip list --project DIPfile --query '?simulation.' --limit 50 --format json
   snt dip preview --project DIPfile --override-file candidate.dip --format json
+  snt dip package --project DIPfile --output project.bundle.json
 
   snt dip parse \
       -i file parameters.dip \

@@ -1,4 +1,6 @@
 #include "runtime.h"
+#include <snt/dip/exceptions.h>
+#include <snt/dip/inspect/diagnostic.h>
 
 #include <emscripten/bind.h>
 #include <snt/api/puq_convert.h>
@@ -212,8 +214,40 @@ snt::dip::ProjectInput project_input(const val& project) {
     return result;
 }
 
+snt::dip::ProjectBundle project_bundle(const val& input) {
+    const val format = input["format"];
+    if (format.isUndefined() || format.isNull() ||
+        format.as<std::string>() != "snt-dipl-project-bundle/1")
+        throw snt::dip::IOException(
+            "Invalid project bundle", "Unsupported or missing project bundle format.",
+            "Use a bundle produced by `snt dip package`.", __FILE__, __LINE__);
+    snt::dip::ProjectBundle bundle;
+    const val entry = input["entry"];
+    const val files = input["files"];
+    if (entry.isUndefined() || entry.isNull() || files.isUndefined() || files.isNull())
+        throw snt::dip::IOException(
+            "Invalid project bundle", "The bundle requires `entry` and `files`.",
+            "Include the DIPfile and its local source files.", __FILE__, __LINE__);
+    bundle.entry = entry.as<std::string>();
+    const unsigned count = files["length"].as<unsigned>();
+    bundle.files.reserve(count);
+    for (unsigned i = 0; i < count; ++i) {
+        const val item = files[i];
+        if (item["path"].isUndefined() || item["text"].isUndefined())
+            throw snt::dip::IOException(
+                "Invalid project bundle", "Every bundled file requires `path` and `text`.",
+                "Provide the path and text for each local file.", __FILE__, __LINE__);
+        bundle.files.push_back({item["path"].as<std::string>(), item["text"].as<std::string>()});
+    }
+    return bundle;
+}
+
 snt::web::Model parse_project(const val& project, const std::string& override_body) {
     return snt::web::Model(project_input(project), override_body);
+}
+
+snt::web::Model parse_bundle(const val& bundle, const std::string& override_body) {
+    return snt::web::Model(project_bundle(bundle), override_body);
 }
 
 val validation_result(const snt::web::Validation& result) {
@@ -239,6 +273,14 @@ val validate(const std::string& source, const std::string& override_body) {
 val validate_project(const val& project, const std::string& override_body) {
     return validation_result(snt::web::validate(project_input(project), override_body));
 }
+
+val validate_bundle(const val& bundle, const std::string& override_body) {
+    try {
+        return validation_result(snt::web::validate(project_bundle(bundle), override_body));
+    } catch (const std::exception& error) {
+        return validation_result({false, snt::dip::diagnostic_from_exception(error)});
+    }
+}
 } // namespace
 
 EMSCRIPTEN_BINDINGS(snt_dipl_web) {
@@ -250,7 +292,9 @@ EMSCRIPTEN_BINDINGS(snt_dipl_web) {
         .function("withOverride", &snt::web::Model::with_override);
     emscripten::function("validateDIPL", &validate);
     emscripten::function("parseProjectDIPL", &parse_project);
+    emscripten::function("parseBundleDIPL", &parse_bundle);
     emscripten::function("validateProjectDIPL", &validate_project);
+    emscripten::function("validateBundleDIPL", &validate_bundle);
     emscripten::function("convertPUQ", &convert_puq);
     emscripten::function("puqSystems", &puq_systems);
 }

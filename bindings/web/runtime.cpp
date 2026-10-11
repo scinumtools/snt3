@@ -17,6 +17,14 @@ Model::Model(dip::ProjectInput project, std::string override_body)
     environment_ = parser.parse(true);
 }
 
+Model::Model(dip::ProjectBundle bundle, std::string override_body)
+    : bundle_(std::move(bundle)), override_body_(std::move(override_body)) {
+    dip::DIP parser;
+    parser.add_project(*bundle_);
+    if (!override_body_.empty()) parser.add_override_string(override_body_);
+    environment_ = parser.parse(true);
+}
+
 std::vector<std::string> Model::paths() const {
     return dip::Inspector{environment_}.select_paths();
 }
@@ -30,6 +38,7 @@ dip::SchemaHierarchyInspection Model::schemas() const {
 }
 
 Model Model::with_override(std::string body) const {
+    if (bundle_) return Model(*bundle_, std::move(body));
     return Model(project_, std::move(body));
 }
 
@@ -40,6 +49,15 @@ Validation validate(const std::string& source, const std::string& override_body)
 Validation validate(const dip::ProjectInput& project, const std::string& override_body) {
     try {
         Model model(project, override_body);
+        return {true, std::nullopt};
+    } catch (const std::exception& error) {
+        return {false, dip::diagnostic_from_exception(error)};
+    }
+}
+
+Validation validate(const dip::ProjectBundle& bundle, const std::string& override_body) {
+    try {
+        Model model(bundle, override_body);
         return {true, std::nullopt};
     } catch (const std::exception& error) {
         return {false, dip::diagnostic_from_exception(error)};

@@ -52,3 +52,23 @@ TEST(WebRuntime, ParsesInMemoryProjectAndRetainsCodeSource) {
     ASSERT_TRUE(invalid.diagnostic);
     EXPECT_FALSE(invalid.diagnostic->code.empty());
 }
+
+TEST(WebRuntime, ParsesSourceBackedBundleAndOverridesScalar) {
+    const snt::dip::ProjectBundle bundle{"DIPfile", {
+        {"DIPfile", "sources[]\n  name = \"data\"\n  filepath = \"measurements.dipt\"\n"
+                    "code[]\n  file = \"model.dip\"\n"},
+        {"measurements.dipt", "time float s\nmass float kg\n---\n0 1\n1 3\n"},
+        {"model.dip", "measurements table = {data}\nscale float = 2\nresult float = ({?scale} * 3)\n"}
+    }};
+    const snt::web::Model model(bundle);
+    EXPECT_EQ(model.describe("result").value_text, "6");
+    EXPECT_EQ(model.describe("measurements.mass").units, "kg");
+    EXPECT_EQ(model.with_override("scale = 4").describe("result").value_text, "12");
+    EXPECT_TRUE(snt::web::validate(bundle).valid);
+    auto missing = bundle;
+    missing.files.erase(missing.files.begin() + 1);
+    const auto invalid = snt::web::validate(missing);
+    EXPECT_FALSE(invalid.valid);
+    ASSERT_TRUE(invalid.diagnostic);
+    EXPECT_EQ(invalid.diagnostic->message, "Missing bundled source");
+}

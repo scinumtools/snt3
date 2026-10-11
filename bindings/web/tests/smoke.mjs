@@ -43,6 +43,27 @@ if (projectInvalid.valid || !projectInvalid.diagnostic?.code)
   throw new Error("WASM in-memory project validation failed");
 projectChanged.dispose();
 projectModel.dispose();
+const bundle = {
+  format: "snt-dipl-project-bundle/1",
+  entry: "DIPfile",
+  files: [
+    { path: "DIPfile", text: 'sources[]\n  name = "data"\n  filepath = "measurements.dipt"\ncode[]\n  file = "model.dip"\n' },
+    { path: "measurements.dipt", text: "time float s\nmass float kg\n---\n0 1\n1 3\n" },
+    { path: "model.dip", text: "measurements table = {data}\nscale float = 2\nresult float = ({?scale} * 3)\n" },
+  ],
+};
+const bundled = dipl.parseBundle(bundle);
+if (bundled.describe("result").valueText !== "6" || bundled.describe("measurements.mass").units !== "kg")
+  throw new Error("WASM source-backed project evaluation failed");
+const bundledOverride = bundled.withOverride("scale = 4");
+if (bundledOverride.describe("result").valueText !== "12")
+  throw new Error("WASM source-backed project override failed");
+const missingBundle = { ...bundle, files: bundle.files.filter((file) => file.path !== "measurements.dipt") };
+const missingValidation = dipl.validateBundle(missingBundle);
+if (missingValidation.valid || missingValidation.diagnostic?.message !== "Missing bundled source")
+  throw new Error("WASM did not report a missing bundled source");
+bundledOverride.dispose();
+bundled.dispose();
 changed.dispose();
 model.dispose();
 console.log("DIPL WebAssembly smoke test passed");

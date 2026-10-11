@@ -82,6 +82,12 @@ export interface ProjectInput {
   code: NamedText[];
   overrides?: NamedText[];
 }
+/** Static text bundle produced by `snt dip package`. No network access occurs during evaluation. */
+export interface ProjectBundle {
+  format: "snt-dipl-project-bundle/1";
+  entry: string;
+  files: { path: string; text: string }[];
+}
 export class DIPLModel {
   paths(): string[];
   describe(path: string, maxValueElements?: number): Description;
@@ -93,8 +99,10 @@ export class DIPLModel {
 export function loadDIPL(options?: Record<string, unknown>): Promise<{
   parse(source: string): DIPLModel;
   parseProject(project: ProjectInput): DIPLModel;
+  parseBundle(bundle: ProjectBundle): DIPLModel;
   validate(source: string, overrideBody?: string): Validation;
   validateProject(project: ProjectInput, overrideBody?: string): Validation;
+  validateBundle(bundle: ProjectBundle, overrideBody?: string): Validation;
 }>;
 export interface PUQConversionOptions {
   inputSystem?: string;

@@ -3,8 +3,6 @@
 #include "parsers.h"
 
 #include <algorithm>
-#include <fstream>
-#include <iostream>
 #include <map>
 #include <set>
 #include <regex>
@@ -172,17 +170,7 @@ overrides list : snt_project_override
     ) {
 
         // prepare source data
-        std::ifstream file(source_file);
-        if (!file)
-            throw dip::IOException(
-                "File not found",
-                "The file `" + source_file.string() + "` could not be opened.",
-                "Check whether the file exists and whether you have sufficient permissions.",
-                __FILE__,
-                __LINE__
-            );
-        std::ostringstream source_code;
-        source_code << file.rdbuf();
+        const std::string source_code = env.read_project_file(source_file);
         if (source_name.empty()) {
             // TODO: implement 'absolute' switch
             source_name = source.name + "_" + std::string(FILE_SOURCE) + std::to_string(num_files);
@@ -191,10 +179,10 @@ overrides list : snt_project_override
 
         // create a new source
         (void)absolute;
-        env.sources.append(source_name, source_file, source_code.str(), parent);
+        env.sources.append(source_name, source_file, source_code, parent);
 
         // parse lines from the source code
-        parse_lines(lines, source_code.str(), source_name);
+        parse_lines(lines, source_code, source_name);
     }
 
     void DIP::add_source(const std::string& sname, const std::string& spath) {
@@ -205,7 +193,7 @@ overrides list : snt_project_override
         std::string source_name = source.name + "_" + std::string(DIRECT_SOURCE) + std::to_string(num_sources);
         num_sources++;
         Source sparent = {source_name, parent.line_number};
-        EnvSource senv = parse_source(sname, spath, sparent);
+        EnvSource senv = parse_source(sname, spath, sparent, env.project_file_reader());
         senv.parent = parent;
         senv.named_source = true;
         env.sources.append(sname, senv);
@@ -245,15 +233,7 @@ overrides list : snt_project_override
     }
 
     void DIP::add_override_file_input(const std::filesystem::path& source_file, const Source& parent) {
-        std::ifstream file(source_file);
-        if (!file)
-            throw dip::IOException(
-                "File not found", "The file `" + source_file.string() + "` could not be opened.",
-                "Check whether the file exists and whether you have sufficient permissions.", __FILE__, __LINE__
-            );
-        std::ostringstream code;
-        code << file.rdbuf();
-        add_override_input(code.str(), source_file, parent);
+        add_override_input(env.read_project_file(source_file), source_file, parent);
     }
 
     void DIP::add_project(const std::filesystem::path& project_file) {
@@ -261,6 +241,7 @@ overrides list : snt_project_override
         const std::string project_source = source.name + "_project" + std::to_string(num_projects++);
 
         DIP manifest;
+        manifest.set_project_file_reader(env.project_file_reader());
         manifest.add_string(std::string(project_preamble));
         manifest.add_file(absolute_project, project_source, true);
         const Environment project = manifest.parse();
@@ -494,16 +475,8 @@ overrides list : snt_project_override
     void DIP::add_schema_file_input(
         const std::string& name, const std::filesystem::path& source_file, const Source& parent
     ) {
-        std::ifstream file(source_file);
-        if (!file)
-            throw dip::IOException(
-                "File not found", "The file `" + source_file.string() + "` could not be opened.",
-                "Check whether the file exists and whether you have sufficient permissions.", __FILE__, __LINE__
-            );
-        std::ostringstream code;
-        code << file.rdbuf();
         const std::string source_name = source.name + "_" + std::string(FILE_SOURCE) + std::to_string(num_files++);
-        add_schema_input(name, code.str(), source_file, source_name, parent);
+        add_schema_input(name, env.read_project_file(source_file), source_file, source_name, parent);
         auto& schema = env.schemas.at(name);
         schema.registration_source_name = parent.name;
         schema.registration_line = parent.line_number;

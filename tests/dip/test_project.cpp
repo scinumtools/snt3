@@ -6,6 +6,8 @@
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/inspect/inspector.h>
+#include <snt/dip/project_bundle.h>
+#include <algorithm>
 #include <string>
 #include <utility>
 
@@ -36,6 +38,87 @@ class ProjectDirectory {
 };
 
 } // namespace
+
+TEST(Project, PackagesTypedTableAndMatchesNativeEvaluation) {
+    ProjectDirectory project("source-backed-bundle");
+    project.write("DIPfile",
+        "units[]\n  name = \"tick\"\n  unit = \"s\"\n"
+        "sources[]\n  name = \"measurements\"\n  filepath = \"measurements.dipt\"\n"
+        "schemas[]\n  name = \"settings_schema\"\n  file = \"settings.dip\"\n"
+        "overrides[]\n  file = \"preset.dip\"\n"
+        "code[]\n  file = \"model.dip\"\n");
+    project.write("settings.dip", "factor float = 2\nmode int = 1\n");
+    project.write("preset.dip", "settings.mode = 2\n");
+    project.write("model.dip",
+        "settings : settings_schema\n"
+        "samples table = {measurements}\n"
+        "interval float = 3 tick\n"
+        "scaled float = ({?settings.factor} * 3)\n");
+    project.write("measurements.dipt", "time float s\nmass float kg\n---\n0 1\n1 3\n");
+
+    dip::DIP native;
+    native.add_project(project.path() / "DIPfile");
+    const auto expected = native.parse();
+    const auto bundle = dip::package_project(project.path() / "DIPfile");
+    ASSERT_EQ(bundle.files.size(), 5);
+    EXPECT_NE(dip::project_bundle_json(bundle).find("measurements.dipt"), std::string::npos);
+    dip::DIP packaged;
+    packaged.add_project(bundle);
+    const auto actual = packaged.parse();
+    EXPECT_EQ(actual["scaled"].as<double>(), expected["scaled"].as<double>());
+    EXPECT_EQ(actual["settings.mode"].as<int64_t>(), expected["settings.mode"].as<int64_t>());
+    EXPECT_EQ(actual["samples.time"].as<std::vector<double>>(), expected["samples.time"].as<std::vector<double>>());
+    EXPECT_EQ(actual["samples.mass"].as<std::vector<double>>(), expected["samples.mass"].as<std::vector<double>>());
+    EXPECT_EQ(dip::Inspector{actual}.describe("samples.mass").units, "kg");
+    EXPECT_EQ(dip::Inspector{actual}.describe("scaled").value_text, "6");
+    ASSERT_EQ(actual.project_entries().size(), expected.project_entries().size());
+    for (size_t i = 0; i < actual.project_entries().size(); ++i) {
+        EXPECT_EQ(actual.project_entries()[i].kind, expected.project_entries()[i].kind);
+        EXPECT_EQ(actual.project_entries()[i].value, expected.project_entries()[i].value);
+    }
+
+    dip::DIP tuned;
+    tuned.add_project(bundle);
+    tuned.add_override_string("settings.factor = 4");
+    EXPECT_EQ(tuned.parse()["scaled"].as<double>(), 12);
+    project.write("alternate.dipt", "time float s\nmass float kg\n---\n0 5\n");
+    EXPECT_EQ(dip::package_project(project.path() / "DIPfile", {"alternate.dipt"}).files.size(), 6);
+}
+
+TEST(Project, BundleRejectsMissingAndEscapingFiles) {
+    const dip::ProjectBundle bundle{"DIPfile", {{"DIPfile", "code[]\n  file = \"missing.dip\"\n"}}};
+    dip::DIP parser;
+    EXPECT_THROW(parser.add_project(bundle), dip::IOException);
+    dip::DIP traversal;
+    EXPECT_THROW(traversal.add_project({"DIPfile", {{"DIPfile", "code[]\n  file = \"../outside.dip\"\n"}}}),
+                 dip::IOException);
+    dip::DIP invalid_text;
+    EXPECT_THROW(invalid_text.add_project({"DIPfile", {{"DIPfile", std::string(1, static_cast<char>(0xff))}}}),
+                 dip::IOException);
+}
+
+#ifndef _WIN32
+TEST(Project, BundleKeepsLogicalSymlinkPath) {
+    ProjectDirectory project("bundle-symlink");
+    project.write("DIPfile", "sources[]\n  name = \"data\"\n  filepath = \"alias.dipt\"\n"
+                             "code[]\n  string = \"samples table = {data}\"\n");
+    project.write("real.dipt", "mass float kg\n---\n3\n");
+    std::filesystem::create_symlink("real.dipt", project.path() / "alias.dipt");
+    const auto bundle = dip::package_project(project.path() / "DIPfile");
+    EXPECT_NE(std::find_if(bundle.files.begin(), bundle.files.end(), [](const auto& file) {
+        return file.path == "alias.dipt";
+    }), bundle.files.end());
+    dip::DIP parser;
+    parser.add_project(bundle);
+    EXPECT_EQ(parser.parse()["samples.mass"].as<std::vector<double>>(), (std::vector<double>{3.0}));
+
+    ProjectDirectory outside("bundle-outside");
+    outside.write("outside.dipt", "mass float kg\n---\n9\n");
+    std::filesystem::remove(project.path() / "alias.dipt");
+    std::filesystem::create_symlink(outside.path() / "outside.dipt", project.path() / "alias.dipt");
+    EXPECT_THROW(dip::package_project(project.path() / "DIPfile"), dip::IOException);
+}
+#endif
 
 TEST(Project, ParsesUnitsSourcesFilesAndStrings) {
     ProjectDirectory project("dip-project");

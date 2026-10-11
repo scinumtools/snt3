@@ -12,8 +12,6 @@
 #include "nodes/node_table.h"
 #include "nodes/node_unit.h"
 
-#include <fstream>
-#include <iostream>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_boolean.h>
@@ -59,9 +57,11 @@ namespace snt::dip {
 
 
     inline EnvSource parse_file_source(
-        const std::string& source_name, const std::string& source_file, const Source& parent
+        const std::string& source_name, const std::string& source_file, const Source& parent,
+        const ProjectFileReader& reader
     ) {
         DIP d(parent);
+        d.set_project_file_reader(reader);
         d.add_file(source_file, source_name);
         Environment senv = d.parse();
         EnvSource source{source_name, source_file, senv.sources.at(source_name).code, parent, senv.nodes};
@@ -70,32 +70,22 @@ namespace snt::dip {
         return source;
     }
 
-    EnvSource parse_source(const std::string& source_name, const std::string& source_file, const Source& parent) {
+    EnvSource parse_source(const std::string& source_name, const std::string& source_file, const Source& parent,
+                           const ProjectFileReader& reader) {
         if (source_file.size() >= FILE_SUFFIX_DIP1.size() &&
             source_file.compare(
                 source_file.size() - FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1.size(), FILE_SUFFIX_DIP1
             ) == 0) {
-            return parse_file_source(source_name, source_file, parent);
+            return parse_file_source(source_name, source_file, parent, reader);
         } else if (
             source_file.size() >= FILE_SUFFIX_DIP2.size() &&
             source_file.compare(
                 source_file.size() - FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2.size(), FILE_SUFFIX_DIP2
             ) == 0
         ) {
-            return parse_file_source(source_name, source_file, parent);
+            return parse_file_source(source_name, source_file, parent, reader);
         } else {
-            std::ifstream file(source_file);
-            if (!file)
-                throw dip::IOException(
-                    "File could not be found",
-                    "The file `" + source_file + "` could not be opened.",
-                    "Check whether the file exists at this path and whether you have sufficient permissions.",
-                    __FILE__,
-                    __LINE__
-                );
-            std::ostringstream source_code;
-            source_code << file.rdbuf();
-            EnvSource source{source_name, source_file, source_code.str(), parent};
+            EnvSource source{source_name, source_file, reader(source_file), parent};
             source.raw_text = true;
             return source;
         }

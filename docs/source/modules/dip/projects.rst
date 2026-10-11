@@ -84,3 +84,34 @@ respective interfaces: :doc:`C++ basic usage <basic-usage>`,
 :doc:`the Python binding <../../integrations/python>`, :doc:`the C bindings
 <../../integrations/c>`, and the command-oriented :ref:`C++ API
 <module-api-dip>`.
+
+Static browser bundles
+----------------------
+
+``package_project()`` evaluates a DIPfile with the native C++ parser and
+collects the text files it opens. The resulting ``ProjectBundle`` stores the
+DIPfile and its local sources with relative paths. ``DIP::add_project(bundle)``
+then evaluates those bytes with the same registration and table parsing rules,
+without filesystem or network reads:
+
+.. code-block:: cpp
+
+   #include <snt/dip/dip.h>
+   #include <snt/dip/project_bundle.h>
+
+   auto bundle = snt::dip::package_project("DIPfile");
+   snt::dip::DIP parser;
+   parser.add_project(bundle);
+   auto environment = parser.parse();
+
+The CLI writes the versioned JSON form for static sites:
+
+.. code-block:: shell
+
+   snt dip package --project DIPfile --output project.bundle.json
+
+The bundle is limited to UTF-8 text within the DIPfile directory. Missing
+files, path traversal, and symlinks escaping that directory are errors. Use
+``--include relative/path`` for an additional file that a later override may
+select through ``$source``. See :doc:`the Web integration
+<../../integrations/web>` for ``parseBundle`` and ``validateBundle``.
