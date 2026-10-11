@@ -1,4 +1,4 @@
-#include "artifact_input.h"
+#include "../input/artifact_input.h"
 
 #include <set>
 #include <snt/dip/artifact.h>

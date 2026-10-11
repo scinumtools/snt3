@@ -48,6 +48,13 @@ namespace snt::dip {
         size_t num_projects = 0;  ///< number of project manifests added to this parser
         size_t num_overrides = 0; ///< number of host-provided override sources
 
+        void register_code_source(
+            const std::string& source_code,
+            const std::filesystem::path& source_file,
+            const Source& parent,
+            const std::string& source_name,
+            bool embedded
+        );
         void add_override_input(
             const std::string& source_code,
             const std::filesystem::path& source_file,

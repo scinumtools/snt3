@@ -108,25 +108,9 @@ overrides list : snt_project_override
 
     int DIP::num_instances = 0;
 
-    DIP::DIP() {
-        // initial settings
-        instance_number = DIP::num_instances++;
-        source.name = "DIP" + std::to_string(instance_number);
-        source.line_number = 0;
-        env.sources.append(source.name, "", "", {"", 0});
+    DIP::DIP() : DIP(Source{"DIP" + std::to_string(num_instances), 0}) {}
 
-        // populate node lists
-        nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_special.begin(), nodes_special.end());
-        nodes_nohierarchy.insert(nodes_nohierarchy.end(), nodes_properties.begin(), nodes_properties.end());
-        nodes_notypes.insert(nodes_notypes.end(), nodes_special.begin(), nodes_special.end());
-        nodes_notypes.insert(nodes_notypes.end(), nodes_properties.begin(), nodes_properties.end());
-        nodes_notypes.insert(nodes_notypes.end(), nodes_hierarchy.begin(), nodes_hierarchy.end());
-    }
-
-    DIP::DIP(const Source& src) {
-        // initial settings
-        instance_number = DIP::num_instances++;
-        source = src;
+    DIP::DIP(const Source& src) : instance_number(num_instances++), source(src) {
         env.sources.append(source.name, "", "", {"", 0});
 
         // populate node lists
@@ -150,6 +134,18 @@ overrides list : snt_project_override
         add_file_input(source_file, std::move(source_name), absolute, {source.name, source.line_number});
     }
 
+    void DIP::register_code_source(
+        const std::string& source_code,
+        const std::filesystem::path& source_file,
+        const Source& parent,
+        const std::string& source_name,
+        bool embedded
+    ) {
+        env.sources.append(source_name, source_file, source_code, parent);
+        env.sources.at(source_name).embedded = embedded;
+        parse_lines(lines, source_code, source_name);
+    }
+
     void DIP::add_string_input(
         const std::string& source_code,
         const std::filesystem::path& source_file,
@@ -160,9 +156,7 @@ overrides list : snt_project_override
             source_name = source.name + "_" + std::string(STRING_SOURCE) + std::to_string(num_strings);
             num_strings++;
         }
-        env.sources.append(source_name, source_file, source_code, parent);
-        env.sources.at(source_name).embedded = true;
-        parse_lines(lines, source_code, source_name);
+        register_code_source(source_code, source_file, parent, source_name, true);
     }
 
     void DIP::add_file_input(
@@ -177,12 +171,8 @@ overrides list : snt_project_override
             num_files++;
         }
 
-        // create a new source
         (void)absolute;
-        env.sources.append(source_name, source_file, source_code, parent);
-
-        // parse lines from the source code
-        parse_lines(lines, source_code, source_name);
+        register_code_source(source_code, source_file, parent, source_name, false);
     }
 
     void DIP::add_source(const std::string& sname, const std::string& spath) {

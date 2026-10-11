@@ -32,7 +32,7 @@ file(GLOB_RECURSE SNT_SOURCES CONFIGURE_DEPENDS
   "${SNT_ROOT}/src/snt/puq/*.cpp"
   "${SNT_ROOT}/src/snt/dip/*.cpp")
 list(FILTER SNT_SOURCES EXCLUDE REGEX "/(hdf5|report|adapter|generate)/")
-list(FILTER SNT_SOURCES EXCLUDE REGEX "/src/snt/dip/(artifact|comparison|preview)\\.cpp$")
+list(FILTER SNT_SOURCES EXCLUDE REGEX "/src/snt/dip/(input/artifact|analysis/(comparison|comparison_text|preview))\\.cpp$")
 
 add_executable(dipl_web embind.cpp runtime.cpp "${SNT_ROOT}/src/snt/api/puq_convert.cpp" ${SNT_SOURCES})
 target_include_directories(dipl_web PRIVATE "${SNT_ROOT}/include" "${SNT_ROOT}/src")
