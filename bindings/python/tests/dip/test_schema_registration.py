@@ -9,9 +9,11 @@ def test_schema_registration(tmp_path, from_file):
     body = ('speed float = 2 m/s\n  !tags ["export"]\n  ?descr "Flow speed"\n'
             'count int = {?base}\nchild\n  enabled bool = true\n')
     parser = DIP()
+    source_bytes = body.encode()
     if from_file:
         path = tmp_path / "settings.dipl"
         path.write_text(body)
+        source_bytes = path.read_bytes()
         parser.add_schema_file("settings", path)
     else:
         parser.add_schema_string("settings", body)
@@ -27,7 +29,7 @@ def test_schema_registration(tmp_path, from_file):
     provenance = env['items[0].speed'].provenance
     assert provenance.source_line == 1
     import hashlib
-    assert provenance.source.hash == hashlib.sha256(body.encode()).hexdigest()
+    assert provenance.source.hash == hashlib.sha256(source_bytes).hexdigest()
 
 
 @pytest.mark.parametrize('kind', ['schema_string', 'schema_file'])
