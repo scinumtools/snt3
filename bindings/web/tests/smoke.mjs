@@ -10,6 +10,10 @@ const source = [
 ].join("\n");
 
 const model = dipl.parse(source);
+const labeled = dipl.parse('level int = 2\n  !options [1, 2]\n  !labels ["Low", "High"]');
+if (JSON.stringify(labeled.describe("level").optionLabels) !== JSON.stringify(["Low", "High"]))
+  throw new Error("WASM option labels were not exposed");
+labeled.dispose();
 if (model.describe("simulation.speed").valueText !== "3")
   throw new Error("WASM evaluation differs from the expected C++ result");
 if (model.schemas().definitions[0].id !== "settings")

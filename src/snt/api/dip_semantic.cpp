@@ -118,6 +118,7 @@ void description(std::ostream& out, const dip::SemanticDescription& value) {
     out << ",\"overridden\":" << (value.overridden ? "true" : "false")
         << ",\"default\":{\"available\":false,\"reason\":\"not_separately_evaluated\"}"
         << ",\"rules\":{\"options\":"; strings(out, value.enforced_options);
+    out << ",\"option_labels\":"; strings(out, value.option_labels);
     out << ",\"condition\":";
     if (value.enforced_condition.empty()) out << "null";
     else out << quote(value.enforced_condition);
@@ -180,6 +181,7 @@ void schema_member(std::ostream& out, const dip::SchemaMemberInspection& value,
     }
     out << "],\"schema_refs\":"; strings(out, value.schema_refs);
     out << ",\"options\":"; strings(out, value.options);
+    out << ",\"option_labels\":"; strings(out, value.option_labels);
     out << ",\"condition\":";
     if (value.condition.empty()) out << "null"; else out << quote(value.condition);
     out << ",\"metadata\":"; metadata(out, value.metadata);
@@ -247,6 +249,7 @@ std::string DIPSemantic::override_contract_json(const std::string& path) const {
     if (contract.units) out << quote(*contract.units); else out << "null";
     out << ",\"rules\":{\"options\":";
     strings(out, contract.enforced_options);
+    out << ",\"option_labels\":"; strings(out, contract.option_labels);
     out << ",\"condition\":";
     if (contract.enforced_condition.empty()) out << "null";
     else out << quote(contract.enforced_condition);

@@ -40,6 +40,7 @@ export interface Description {
   tags: string[];
   overridden: boolean;
   options: string[];
+  optionLabels: string[];
   condition: string | null;
   declaration: SourceLocation | null;
   overrideLocation: SourceLocation | null;
@@ -54,6 +55,7 @@ export interface SchemaMember {
   units: string | null;
   schemaRefs: string[];
   options: string[];
+  optionLabels: string[];
   condition: string | null;
   metadata: Metadata;
   origin: SourceLocation | null;

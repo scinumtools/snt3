@@ -7,9 +7,9 @@
 namespace snt::dip::hdf5::schema {
 
     inline constexpr std::string_view FORMAT = "SciNumTools3 Environment";
-    // DIPH5 2.8 may retain a resolved adapter output plan.
+    // DIPH5 2.9 may also retain optional labels for value options.
     inline constexpr uint64_t VERSION = 2;
-    inline constexpr uint64_t VERSION_MINOR = 8;
+    inline constexpr uint64_t VERSION_MINOR = 9;
     inline constexpr uint64_t FIRST_SUPPORTED_VERSION = 1;
 
     inline constexpr std::string_view ATTR_FORMAT = "_DIPL_Format";
@@ -29,6 +29,7 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_TAGS = "_DIPL_Tags";
     inline constexpr std::string_view ATTR_OPTIONS = "_DIPL_Options";
     inline constexpr std::string_view ATTR_OPTION_UNITS = "_DIPL_Option_Units";
+    inline constexpr std::string_view ATTR_OPTION_LABELS = "_DIPL_Option_Labels";
     inline constexpr std::string_view ATTR_SCHEMAS = "_DIPL_Schemas";
     inline constexpr std::string_view ATTR_NODE_SCHEMA_ID = "_DIPL_Node_Schema_Id";
     inline constexpr std::string_view ATTR_TABLE_PATH = "_DIPL_Table_Path";

@@ -2,7 +2,7 @@
 title: "SciNumTools DIPH5"
 subtitle: "Environment HDF5 Format Specification"
 author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
-date: "Version 2.8"
+date: "Version 2.9"
 ---
 
 # Scope
@@ -45,6 +45,7 @@ DIPL program can be reconstructed exactly.
 Version 2.7 retains the evaluated dependency graph. Version 2.8 may retain
 the resolved output plan of an application adapter. Output plans contain
 values and decisions, not executable adapter callbacks.
+Version 2.9 may retain display labels for value options.
 
 # File identification and versioning
 
@@ -54,11 +55,11 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
-| `_DIPL_Schema_Version_Minor` | unsigned integer | `8` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `9` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2.8 readers support version 1 files and versions 2.0
-through 2.8. Future schema
+schema version. Version 2.9 readers support version 1 files and versions 2.0
+through 2.9. Future schema
 revisions MUST preserve the meaning of existing attributes or increment the
 major or minor schema version.
 
@@ -161,8 +162,13 @@ are stored in the dataspace rather than in a separate attribute.
 When present, node settings are stored as attributes on the value dataset:
 
 `_DIPL_Constant`, `_DIPL_Condition`, `_DIPL_Format_Spec`, `_DIPL_Tags`,
-`_DIPL_Options`, `_DIPL_Option_Units`, `_DIPL_Schemas`, and
+`_DIPL_Options`, `_DIPL_Option_Units`, `_DIPL_Option_Labels`, `_DIPL_Schemas`, and
 `_DIPL_Value_Origin`.
+
+Version 2.9 adds the optional `_DIPL_Option_Labels` UTF-8 string array.
+When present, it has one entry for each `_DIPL_Options` entry in the same
+order. When absent, options have no display labels. Labels do not affect
+value validation.
 
 Version 2.5 adds `_DIPL_Override` (unsigned 8-bit boolean) to each value
 dataset. If true, `_DIPL_Override_Source`, `_DIPL_Override_Line`, and

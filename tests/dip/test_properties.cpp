@@ -326,6 +326,48 @@ TEST(Properties, OptionsInteger) {
     }
 }
 
+TEST(Properties, OptionalOptionLabels) {
+    dip::DIP parser;
+    parser.add_string("level int = 2\n  !labels [\"Low\", \"High\"]\n  !options [1]\n  !options [2]\n");
+    const auto env = parser.parse();
+    const auto node = env.get_node("level");
+    ASSERT_EQ(node->options.size(), 2);
+    EXPECT_EQ(node->options[0].label, "Low");
+    EXPECT_EQ(node->options[1].label, "High");
+    const auto copy = std::dynamic_pointer_cast<dip::ValueNode>(node->clone(dip::Path("copy")));
+    ASSERT_TRUE(copy);
+    EXPECT_EQ(copy->options[1].label, "High");
+
+    dip::DIP unlabeled;
+    unlabeled.add_string("level int = 1\n  !options [1, 2]\n");
+    const auto plain = unlabeled.parse().get_node("level");
+    ASSERT_EQ(plain->options.size(), 2);
+    EXPECT_EQ(plain->options[0].label, "");
+    EXPECT_FALSE(plain->option_labels.has_value());
+
+    dip::DIP text;
+    text.add_string("mode str = \"fast\"\n  !options [\"fast\", \"safe\"]\n  !labels [\"Fast mode\", \"Safe mode\"]\n");
+    const auto string_node = text.parse().get_node("mode");
+    ASSERT_EQ(string_node->options.size(), 2);
+    EXPECT_EQ(string_node->options[1].label, "Safe mode");
+}
+
+TEST(Properties, OptionLabelsMustMatchAllOptions) {
+    for (const auto& source : {
+             "level int = 1\n  !options [1, 2]\n  !labels [\"Only one\"]\n",
+             "level int = 1\n  !labels [\"Only one\"]\n",
+             "level int = 1\n  !options [1]\n  !labels [\"One\"]\n  !labels [\"Again\"]\n",
+             "level int = 1\n  !options [1]\n  !labels [\"One\"] m\n",
+             "level int = 1\n  !options [1]\n  !labels \"One\"\n",
+             "level int = 1\n  !options [1, 2]\n  !labels [[\"One\"], [\"Two\"]]\n",
+             "enabled bool = true\n  !labels [\"Yes\"]\n"
+         }) {
+        dip::DIP parser;
+        parser.add_string(source);
+        EXPECT_THROW(parser.parse(), dip::SyntaxException) << source;
+    }
+}
+
 TEST(Properties, OptionsFloat) {
 
     dip::DIP d;

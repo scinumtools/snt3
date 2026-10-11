@@ -534,14 +534,18 @@ namespace snt::dip::hdf5 {
             write_strings(dataset, ATTR_TAGS, node.tags);
             std::vector<std::string> option_values;
             std::vector<std::string> option_units;
+            std::vector<std::string> option_labels;
             option_values.reserve(node.options.size());
             option_units.reserve(node.options.size());
+            option_labels.reserve(node.options.size());
             for (const auto& option : node.options) {
                 option_values.push_back(option.value_raw);
                 option_units.push_back(option.units_raw);
+                option_labels.push_back(option.label);
             }
             write_strings(dataset, ATTR_OPTIONS, option_values);
             write_strings(dataset, ATTR_OPTION_UNITS, option_units);
+            if (node.option_labels) write_strings(dataset, ATTR_OPTION_LABELS, option_labels);
             write_strings(dataset, ATTR_SCHEMAS, node.schemas);
             if (!node.schema_id.empty())
                 write_string(dataset, ATTR_NODE_SCHEMA_ID, node.schema_id);
@@ -795,9 +799,12 @@ namespace snt::dip::hdf5 {
             node->tags = read_strings(dataset, ATTR_TAGS);
             const auto option_values = read_strings(dataset, ATTR_OPTIONS);
             const auto option_units = read_strings(dataset, ATTR_OPTION_UNITS);
+            const auto option_labels = read_strings(dataset, ATTR_OPTION_LABELS);
+            if (has_attribute(dataset, ATTR_OPTION_LABELS)) node->option_labels = option_labels;
             for (size_t i = 0; i < option_values.size(); ++i) {
                 const std::string units_value = i < option_units.size() ? option_units[i] : "";
-                node->options.push_back({option_value(value_dtype, option_values[i]), option_values[i], units_value});
+                const std::string label = i < option_labels.size() ? option_labels[i] : "";
+                node->options.push_back({option_value(value_dtype, option_values[i]), option_values[i], units_value, label});
             }
             node->schemas = read_strings(dataset, ATTR_SCHEMAS);
             node->schema_id = read_string(dataset, ATTR_NODE_SCHEMA_ID);

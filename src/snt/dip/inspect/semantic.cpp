@@ -57,6 +57,7 @@ SemanticDescription Inspector::describe(std::string_view path, std::size_t max_v
     result.source_text_available = facts.source_text_available;
     result.enforced_condition = facts.enforced_condition;
     result.enforced_options = facts.enforced_options;
+    result.option_labels = facts.option_labels;
     if (result.dependencies_recorded)
         result.dependencies = this->graph().dependencies("?" + result.path);
     return result;
@@ -117,8 +118,10 @@ SchemaHierarchyInspection Inspector::schema_hierarchy() const {
                     member.dimensions = value->dimension;
                     member.condition = value->condition;
                     member.metadata = value->metadata;
-                    for (const auto& option : value->options)
+                    for (const auto& option : value->options) {
                         member.options.push_back(option.value_raw + (option.units_raw.empty() ? "" : " " + option.units_raw));
+                        if (value->option_labels) member.option_labels.push_back(option.label);
+                    }
                 }
                 std::vector<SchemaMemberInspection>* children = &definition.members;
                 if (!parents.empty()) {

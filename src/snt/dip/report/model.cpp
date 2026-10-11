@@ -67,6 +67,8 @@ Document build_document(const dip::Environment& env, std::string input_label, st
             const auto description = inspector.describe(item.path, 0);
             item.tags = description.tags;
             item.options = description.enforced_options;
+            for (size_t i = 0; i < item.options.size() && i < description.option_labels.size(); ++i)
+                item.options[i] += " (" + description.option_labels[i] + ")";
             item.condition = description.enforced_condition;
         }
         item.publication = publication_of(node->metadata);

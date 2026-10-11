@@ -147,6 +147,7 @@ namespace snt::dip {
         static constexpr Keyword keywords[] = {
             // directives
             {KEYWORD_OPTIONS, PropertyType::Options},
+            {KEYWORD_LABELS, PropertyType::Labels},
             {KEYWORD_CONSTANT, PropertyType::Constant},
             {KEYWORD_FORMAT, PropertyType::Format},
             {KEYWORD_TAGS, PropertyType::Tags},

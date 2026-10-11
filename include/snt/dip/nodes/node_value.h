@@ -75,6 +75,7 @@ namespace snt::dip {
             val::BaseValue::PointerType value;
             std::string value_raw;
             std::string units_raw;
+            std::string label; ///< Optional display text for this option.
         };
 
         core::DataType value_dtype;
@@ -96,6 +97,7 @@ namespace snt::dip {
         size_t table_column_index = 0; ///< Position in the original table header.
         std::string condition;
         std::vector<OptionStruct> options;
+        std::optional<val::Array::StringType> option_labels; ///< Explicit labels before alignment with options.
         std::string format;
 
         // metadata

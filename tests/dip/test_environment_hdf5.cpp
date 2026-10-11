@@ -54,6 +54,22 @@ TEST(Environment, Load) {
     std::filesystem::remove(file);
 }
 
+TEST(Environment, OptionLabelsSurviveHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string("level int = 2\n  !options [1, 2]\n  !labels [\"Low\", \"High\"]\n");
+    const auto file = environment_file("option-labels");
+    parser.parse().save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    const auto node = loaded.get_node("level");
+    ASSERT_EQ(node->options.size(), 2);
+    EXPECT_EQ(node->options[0].label, "Low");
+    EXPECT_EQ(node->options[1].label, "High");
+    EXPECT_EQ(dip::Inspector{loaded}.describe("level").option_labels,
+              (std::vector<std::string>{"Low", "High"}));
+    std::filesystem::remove(file);
+}
+
 TEST(Environment, DerivedTableValuesSurviveHdf5RoundTrip) {
     dip::DIP parser;
     parser.add_string(
@@ -534,7 +550,7 @@ TEST(Environment, SaveHdf5Content) {
         H5Handle minor_version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
         uint64_t minor_version = 0;
         ASSERT_GE(H5Aread(minor_version_attribute, H5T_NATIVE_UINT64, &minor_version), 0);
-        EXPECT_EQ(minor_version, 8);
+        EXPECT_EQ(minor_version, 9);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Trace", H5P_DEFAULT), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Dependencies", H5P_DEFAULT), 0);

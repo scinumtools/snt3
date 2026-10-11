@@ -56,6 +56,7 @@ namespace snt::dip {
     constexpr std::string_view KEYWORD_FORMAT = "!format";
     constexpr std::string_view KEYWORD_TAGS = "!tags";
     constexpr std::string_view KEYWORD_OPTIONS = "!options";
+    constexpr std::string_view KEYWORD_LABELS = "!labels";
     constexpr std::string_view KEYWORD_DELIMITER = "!delimiter";
 
     // metadata
@@ -173,6 +174,7 @@ namespace snt::dip {
         Tags,
         Format, // global properties
         Options,
+        Labels,
 
         Description, // proverance metadata
         Authors,

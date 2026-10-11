@@ -107,6 +107,7 @@ struct OverrideContract {
     std::optional<val::Array::ShapeType> current_shape; ///< Evaluated shape, not declared bounds.
     std::optional<std::string> units;
     std::vector<std::string> enforced_options;
+    std::vector<std::string> option_labels;
     std::string enforced_condition;
     std::vector<std::string> item_schemas;
     bool snapshot_input = false; ///< A snapshot has no parser input to preview directly.
@@ -122,6 +123,7 @@ struct SchemaMemberInspection {
     val::Array::RangeType dimensions;
     std::vector<std::string> schema_refs;
     std::vector<std::string> options;
+    std::vector<std::string> option_labels;
     std::string condition;
     ValueMetadata metadata;
     core::SourceLocation origin;

@@ -29,6 +29,7 @@ struct SemanticDescription {
     std::optional<core::SourceLocation> override_location;
     bool source_text_available = false;
     std::vector<std::string> enforced_options;
+    std::vector<std::string> option_labels; ///< Parallel to enforced_options when labels are declared.
     std::string enforced_condition;
     bool dependencies_recorded = false;
     std::vector<DependencyEdge> dependencies;

@@ -28,6 +28,7 @@ struct ValueFacts {
     std::string table_path;
     std::string enforced_condition;
     std::vector<std::string> enforced_options;
+    std::vector<std::string> option_labels;
 };
 
 ValueFacts inspect_value_facts(const Environment& env, std::string_view path,

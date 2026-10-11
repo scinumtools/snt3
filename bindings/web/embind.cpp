@@ -66,6 +66,7 @@ val description(const snt::web::Model& model, const std::string& path, std::size
     result.set("tags", strings(item.tags));
     result.set("overridden", item.overridden);
     result.set("options", strings(item.enforced_options));
+    result.set("optionLabels", strings(item.option_labels));
     result.set("condition", item.enforced_condition.empty() ? val::null() : val(item.enforced_condition));
     result.set("declaration", location(item.declaration));
     result.set("overrideLocation", location(item.override_location));
@@ -127,6 +128,7 @@ val member(const snt::dip::SchemaMemberInspection& item) {
     result.set("units", item.units.empty() ? val::null() : val(item.units));
     result.set("schemaRefs", strings(item.schema_refs));
     result.set("options", strings(item.options));
+    result.set("optionLabels", strings(item.option_labels));
     result.set("condition", item.condition.empty() ? val::null() : val(item.condition));
     result.set("metadata", metadata(item.metadata));
     result.set("origin", location(item.origin));

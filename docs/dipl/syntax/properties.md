@@ -50,15 +50,25 @@ energy float = 23 J
 # all options: [23, 45, 10, 234, 490, 1939, 3.4e-6, 2.34e-7] J
 ```
 
-If individual options need some additional description, this can be included in a comment.
+Optional display labels can be attached to options with one ``!labels`` list.
+Its strings correspond, in order, to the combined values from every ``!options``
+directive on the node. The number of labels must equal the number of options.
+Labels are preserved in DIPH5 and exposed by inspection tools; they do not
+change which values are accepted. Nodes without ``!labels`` behave as before.
 
 ``` DIPL
 resolution int = 16
-  !options [
-    16,  # low
-    32,  # medium
-    64   # high
-  ]
+  !options [16, 32, 64]
+  !labels ["Low", "Medium", "High"]
+```
+
+For options declared in several clauses, provide all labels in one list:
+
+``` DIPL
+energy float = 23 J
+  !options [23, 45] J
+  !options [34] erg
+  !labels ["Reference", "High", "Low"]
 ```
 
 ### Condition

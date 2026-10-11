@@ -70,10 +70,11 @@ namespace snt::dip {
           override_line(other.override_line), modification_lines(other.modification_lines), table_path(other.table_path),
           copied_from(other.copied_from),
           table_column_index(other.table_column_index), metadata(other.metadata),
-          condition(other.condition), format(other.format), value_dtype(other.value_dtype), BaseNode(other) {
+          condition(other.condition), format(other.format), option_labels(other.option_labels),
+          value_dtype(other.value_dtype), BaseNode(other) {
         options.reserve(other.options.size());
         for (const auto& option : other.options) {
-            options.push_back({option.value->clone(), option.value_raw, option.units_raw});
+            options.push_back({option.value->clone(), option.value_raw, option.units_raw, option.label});
         }
         if (other.value)
             value = other.value->clone();
@@ -447,8 +448,21 @@ namespace snt::dip {
                     );
                 // TODO: account for multidimensional arrays as individual options
                 val::BaseValue::PointerType ovalue = cast_scalar_value(value_option);
-                options.push_back({std::move(ovalue), value_option, units});
+                const auto index = options.size();
+                const std::string label = option_labels && index < option_labels->size()
+                    ? option_labels->at(index) : "";
+                options.push_back({std::move(ovalue), value_option, units, label});
             }
+            return true;
+        case PropertyType::Labels:
+            if (dtype == NodeDtype::Boolean || option_labels || !units.empty())
+                throw dip::SyntaxException(
+                    "Invalid labels", "The `!labels` directive requires an option-bearing node, occurs once, and cannot have units.",
+                    "Provide one unitless `!labels` list for an integer, float, or string node.", __FILE__, __LINE__, line
+                );
+            option_labels = values;
+            for (size_t i = 0; i < options.size() && i < values.size(); ++i)
+                options[i].label = values[i];
             return true;
         case PropertyType::Constant:
             constant = true;
@@ -549,6 +563,14 @@ namespace snt::dip {
     }
 
     void ValueNode::validate_options() const {
+        if (option_labels && (options.empty() || option_labels->size() != options.size()))
+            throw dip::SyntaxException(
+                "Invalid labels",
+                "The `!labels` directive has " + std::to_string(option_labels->size()) +
+                    " labels for " + std::to_string(options.size()) + " options.",
+                "Provide exactly one label for each option, in the order of all `!options` directives.",
+                __FILE__, __LINE__, line
+            );
         if (options.size() > 0) {
             bool match = false;
             for (const auto& option : options) {

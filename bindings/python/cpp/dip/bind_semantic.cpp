@@ -24,6 +24,7 @@ void init_semantic(py::module_& m) {
         })
         .def_readonly("schema_refs", &dip::SchemaMemberInspection::schema_refs)
         .def_readonly("options", &dip::SchemaMemberInspection::options)
+        .def_readonly("option_labels", &dip::SchemaMemberInspection::option_labels)
         .def_readonly("condition", &dip::SchemaMemberInspection::condition)
         .def_readonly("metadata", &dip::SchemaMemberInspection::metadata)
         .def_readonly("origin", &dip::SchemaMemberInspection::origin)
@@ -65,6 +66,7 @@ void init_semantic(py::module_& m) {
         .def_readonly("current_shape", &dip::OverrideContract::current_shape)
         .def_readonly("units", &dip::OverrideContract::units)
         .def_readonly("enforced_options", &dip::OverrideContract::enforced_options)
+        .def_readonly("option_labels", &dip::OverrideContract::option_labels)
         .def_readonly("enforced_condition", &dip::OverrideContract::enforced_condition)
         .def_readonly("item_schemas", &dip::OverrideContract::item_schemas)
         .def_readonly("snapshot_input", &dip::OverrideContract::snapshot_input);
@@ -85,6 +87,7 @@ void init_semantic(py::module_& m) {
         .def_readonly("override_location", &dip::SemanticDescription::override_location)
         .def_readonly("source_text_available", &dip::SemanticDescription::source_text_available)
         .def_readonly("enforced_options", &dip::SemanticDescription::enforced_options)
+        .def_readonly("option_labels", &dip::SemanticDescription::option_labels)
         .def_readonly("enforced_condition", &dip::SemanticDescription::enforced_condition)
         .def_readonly("dependencies_recorded", &dip::SemanticDescription::dependencies_recorded)
         .def_readonly("dependencies", &dip::SemanticDescription::dependencies);

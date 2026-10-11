@@ -71,6 +71,32 @@ TEST(DIPSemantic, SchemaApplicationsPreserveCompositionOrder) {
     EXPECT_EQ(result.applications[0].schema_ids, (std::vector<std::string>{"first", "second"}));
 }
 
+TEST(DIPSemantic, DescribesOptionalOptionLabels) {
+    snt::dip::DIP parser;
+    parser.add_string("level int = 2\n  !options [1, 2]\n  !labels [\"Low\", \"High\"]\n");
+    const auto env = parser.parse();
+    const snt::dip::Inspector inspector{env};
+    const auto description = inspector.describe("level");
+    EXPECT_EQ(description.enforced_options, (std::vector<std::string>{"1", "2"}));
+    EXPECT_EQ(description.option_labels, (std::vector<std::string>{"Low", "High"}));
+    const auto contract = inspector.override_contract("level");
+    EXPECT_EQ(contract.option_labels, description.option_labels);
+}
+
+TEST(DIPSemantic, SchemaMembersExposeOptionLabels) {
+    snt::dip::DIP parser;
+    parser.add_string("$schema preset\n  level int = 2\n    !options [1, 2]\n    !labels [\"Low\", \"High\"]\nsettings : preset\n");
+    const auto env = parser.parse();
+    const snt::dip::Inspector inspector{env};
+    const auto hierarchy = inspector.schema_hierarchy();
+    ASSERT_EQ(hierarchy.definitions.size(), 1);
+    ASSERT_EQ(hierarchy.definitions[0].members.size(), 1);
+    EXPECT_EQ(hierarchy.definitions[0].members[0].option_labels,
+              (std::vector<std::string>{"Low", "High"}));
+    EXPECT_EQ(inspector.describe("settings.level").option_labels,
+              (std::vector<std::string>{"Low", "High"}));
+}
+
 TEST(DIPSemantic, RichDescriptionWithRecordedReads) {
     snt::dip::DIP parser;
     parser.add_file(rich_fixture);

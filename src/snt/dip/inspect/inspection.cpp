@@ -202,17 +202,21 @@ detail::ValueFacts detail::inspect_value_facts(const Environment& env, std::stri
     if (replacement)
         changes.push_back({ValueChangeKind::Override, *replacement});
     std::vector<std::string> options;
+    std::vector<std::string> labels;
     if (include_description_details) {
         options.reserve(node->options.size());
-        for (const auto& option : node->options)
+        if (node->option_labels) labels.reserve(node->options.size());
+        for (const auto& option : node->options) {
             options.push_back(option.value_raw + (option.units_raw.empty() ? "" : " " + option.units_raw));
+            if (node->option_labels) labels.push_back(option.label);
+        }
     }
     return {name, node->value_dtype, node->value->get_dtype(), node->value->get_shape(),
             node->value->get_size(), node->dimension.empty(), node->value.get(),
             node->units, node->metadata, node->tags,
             node->override, provenance, declaration, replacement, std::move(changes),
             declaration_source && declaration_source->source_text_available, node->table_path,
-            node->condition, std::move(options)};
+            node->condition, std::move(options), std::move(labels)};
 }
 
 ValueInspection Inspector::value(std::string_view path) const {
@@ -348,6 +352,7 @@ OverrideContract Inspector::override_contract(std::string_view path) const {
         if (facts.units) result.units = facts.units->to_string();
         result.enforced_condition = facts.enforced_condition;
         result.enforced_options = facts.enforced_options;
+        result.option_labels = facts.option_labels;
         return result;
     }
 
