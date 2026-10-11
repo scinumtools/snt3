@@ -15,7 +15,7 @@ TEST(SourceList, KeywordSourceCode) {
     std::string source_code = "foo int = 3\nbar bool = false";
     std::string source_name = "foo_source";
     {
-        std::ofstream source_file(source_filename);
+        std::ofstream source_file(source_filename, std::ios::binary);
         ASSERT_TRUE(source_file.is_open()) << "Failed to create temp file.";
         source_file << source_code;
     }
@@ -85,7 +85,7 @@ TEST(SourceList, AddSourceFromCode) {
     std::string source_code = "foo int = 3\nbar bool = false";
     std::string source_name = "foo_source";
     {
-        std::ofstream source_file(source_filename);
+        std::ofstream source_file(source_filename, std::ios::binary);
         ASSERT_TRUE(source_file.is_open()) << "Failed to create temp file.";
         source_file << source_code;
     }
