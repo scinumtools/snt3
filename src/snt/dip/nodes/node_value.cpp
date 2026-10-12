@@ -529,7 +529,9 @@ namespace snt::dip {
      */
 
     void ValueNode::validate_constant() const {
-        if (constant)
+        // A constant declaration can receive its initial value after a schema
+        // is instantiated. Once assigned, ordinary modifications are forbidden.
+        if (constant && (value_origin != ValueOrigin::Empty || value != nullptr || !modification_lines.empty()))
             throw dip::SyntaxException(
                 "Constant node",
                 "The node `" + path.name + "` is constant and cannot be modified.",

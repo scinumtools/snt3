@@ -54,6 +54,7 @@ calculated float = ({?length} * 2) cm
   !format "%.3f"
   !tags ["example", "highlight"]
   !options [1, 2, 3] cm
+  !labels ["One", "Two", "Three"]
   !delimiter ","
   ?descr "A highlighted test value"
   ?authors "Ada Lovelace, Emmy Noether"

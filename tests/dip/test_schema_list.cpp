@@ -42,6 +42,65 @@ TEST(SchemaList, Properties) {
     EXPECT_EQ(vnode->value->to_string(), "32");
 }
 
+TEST(SchemaList, PerInstanceConstants) {
+    dip::DIP d;
+    d.add_string(
+        "$schema edge\n"
+        "  subject str\n"
+        "    !constant\n"
+        "  relation str\n"
+        "    !constant\n"
+        "  object str\n"
+        "    !constant\n"
+        "edges[example] : edge\n"
+        "  subject = \"person\"\n"
+        "  relation = \"has_substantial_form\"\n"
+        "  object = \"human\"\n"
+        "edges[other] : edge\n"
+        "  subject = \"animal\"\n"
+        "  relation = \"is_a\"\n"
+        "  object = \"organism\"\n"
+    );
+    const dip::Environment env = d.parse();
+    ASSERT_EQ(env.nodes.size(), 6);
+    for (const auto& node : env.nodes.get_nodes()) {
+        ASSERT_TRUE(node);
+        EXPECT_TRUE(node->constant);
+        ASSERT_EQ(node->modification_lines.size(), 1);
+    }
+    EXPECT_EQ(env.get_node("edges[example].relation")->value->to_string(), "\"has_substantial_form\"");
+    EXPECT_EQ(env.get_node("edges[other].relation")->value->to_string(), "\"is_a\"");
+}
+
+TEST(SchemaList, PerInstanceConstantRejectsLaterModification) {
+    dip::DIP d;
+    d.add_string(
+        "$schema edge\n"
+        "  relation str\n"
+        "    !constant\n"
+        "edges[example] : edge\n"
+        "  relation = \"has_substantial_form\"\n"
+        "edges[example].relation = \"is_a\"\n"
+    );
+    try {
+        d.parse();
+        FAIL() << "Expected dip::SyntaxException";
+    } catch (const dip::SyntaxException& error) {
+        EXPECT_EQ(error.info().message, "Constant node");
+    }
+}
+
+TEST(SchemaList, PerInstanceConstantRequiresValue) {
+    dip::DIP d;
+    d.add_string(
+        "$schema edge\n"
+        "  relation str\n"
+        "    !constant\n"
+        "edges[example] : edge\n"
+    );
+    EXPECT_THROW(d.parse(), dip::SyntaxException);
+}
+
 TEST(SchemaList, Collections) {
 
     dip::DIP d;

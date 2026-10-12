@@ -99,6 +99,37 @@ people[] : person
   age = 28 years
 ```
 
+Schema fields can be declared constant without a value. Each instance then
+supplies its own initial value; later ordinary modifications to that field
+are rejected:
+
+```DIPL
+$schema edge
+  subject str
+    !constant
+  relation str
+    !constant
+  object str
+    !constant
+
+edges[example] : edge
+  subject = "person"
+  relation = "has_substantial_form"
+  object = "human"
+
+edges[other] : edge
+  subject = "animal"
+  relation = "is_a"
+  object = "organism"
+
+edges[example].relation = "is_a"  # error: already assigned
+```
+
+All declared fields still need a value in each instance. A schema field
+defined with a value is constant immediately; its instance cannot assign a
+different initial value through an ordinary modification. Explicit
+``$override`` regions retain their usual ability to replace constants.
+
 ## Collection schemas
 
 Schemas can also be applied to entire `map` and `list` collections. 

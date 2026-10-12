@@ -105,8 +105,12 @@ name str = "Ferdinant"
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
-Sometimes nodes have to stay constant and exclude all possible modifications.
+Sometimes nodes have to stay constant and exclude ordinary modifications.
 This can be achieved by a directive ``!constant``.
+If the node is declared without a value, its first assignment supplies the
+initial value. Later ordinary modifications are rejected. This applies
+independently to each instance of a schema field. An explicit ``$override``
+may still replace a constant value.
 
 Node ``name`` in the following example cannot be further modified.
      

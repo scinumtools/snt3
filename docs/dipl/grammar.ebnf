@@ -152,6 +152,7 @@ property-line
 
 property
   = options-property
+  | labels-property
   | condition-property
   | format-property
   | constant-property
@@ -161,6 +162,9 @@ property
 
 options-property
   = "!options" whitespace array [ whitespace PUEL-unit-expression ] ;
+
+labels-property
+  = "!labels" whitespace array ;
 
 condition-property
   = "!condition" whitespace parenthesized-logical-expression ;
