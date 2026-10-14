@@ -42,7 +42,6 @@ Current limitations
 The current implementation does not yet preserve every detail on a save/load
 round trip:
 
-* Single-element arrays lose their array classification when loaded.
 * Units associated with null values are not restored by the loader.
 * Groups and collections without value-node descendants are not written:
   the writer constructs the hierarchy from the saved value paths.

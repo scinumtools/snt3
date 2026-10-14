@@ -105,6 +105,30 @@ if(NOT source_metadata_found)
   message(FATAL_ERROR "Source metadata or explicit-empty presence is wrong: ${output}")
 endif()
 
+set(SCHEMA_METADATA_INPUT "${CMAKE_CURRENT_BINARY_DIR}/schema-instance-metadata-test.dip")
+file(WRITE "${SCHEMA_METADATA_INPUT}"
+  "$schema evidence\n"
+  "  source_id str\n"
+  "    ?category \"Citation\"\n"
+  "    ?rationale \"Schema rationale\"\n"
+  "records map : evidence\n"
+  "records[first]\n"
+  "  source_id = \"source_a\"\n"
+  "    ?rationale \"Local rationale\"\n")
+execute_process(
+  COMMAND "${SNT_EXECUTABLE}" dip describe --input "${SCHEMA_METADATA_INPUT}"
+    --path "records[first].source_id" --format json
+  RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error)
+file(REMOVE "${SCHEMA_METADATA_INPUT}")
+if(NOT status EQUAL 0)
+  message(FATAL_ERROR "schema field metadata inspection failed: ${error}")
+endif()
+string(JSON local_rationale GET "${output}" metadata rationale)
+string(JSON inherited_category GET "${output}" metadata category)
+if(NOT local_rationale STREQUAL "Local rationale" OR NOT inherited_category STREQUAL "Citation")
+  message(FATAL_ERROR "Schema and instance metadata were not combined: ${output}")
+endif()
+
 set(METADATA_INPUT "${CMAKE_CURRENT_BINARY_DIR}/json-metadata-test.dip")
 set(METADATA_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/json-metadata-test.json")
 file(WRITE "${METADATA_INPUT}"

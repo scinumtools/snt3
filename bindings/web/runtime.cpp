@@ -33,6 +33,16 @@ dip::SemanticDescription Model::describe(const std::string& path, std::size_t ma
     return dip::Inspector{environment_}.describe(path, max_value_elements);
 }
 
+std::vector<dip::SemanticDescription> Model::describe_many(
+    const std::vector<std::string>& paths, std::size_t max_value_elements) const {
+    dip::Inspector inspector{environment_};
+    std::vector<dip::SemanticDescription> descriptions;
+    descriptions.reserve(paths.size());
+    for (const auto& path : paths)
+        descriptions.push_back(inspector.describe(path, max_value_elements));
+    return descriptions;
+}
+
 dip::SchemaHierarchyInspection Model::schemas() const {
     return dip::Inspector{environment_}.schema_hierarchy();
 }

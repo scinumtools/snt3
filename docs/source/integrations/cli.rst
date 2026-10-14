@@ -249,6 +249,19 @@ the graph is stored by ``--save``. It cannot be used with ``--load``.
 ``--relative-source-paths`` stores source-manifest paths relative to the saved
 DIPH5 file and requires ``--save``. This is useful when a project and its
 snapshot are distributed together.
+
+To inspect many values without evaluating the original DIPL project for each
+query, save one evaluated snapshot and list from it:
+
+.. code-block:: bash
+
+   snt dip parse --project DIPfile --save evaluated.diph5
+   snt dip list --input evaluated.diph5 --query '?' --format json
+
+The snapshot contains evaluated state, not a reevaluable copy of the DIPL
+program. Recreate it after changing project inputs or overrides; the CLI does
+not automatically check snapshot freshness.
+
 File errors are reported on standard error with a nonzero exit status.
 See :doc:`DIP environment persistence <../modules/dip/persistence>` for
 the format and its limitations.

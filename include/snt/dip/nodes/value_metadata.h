@@ -27,7 +27,8 @@ namespace snt::dip {
         std::string license;
         std::string rationale;
         std::vector<std::string> native;
-        std::vector<std::string> requires;
+        std::vector<std::string>
+            requires;
         std::vector<std::string> conflicts;
         std::vector<std::string> implies;
         std::vector<std::string> see;

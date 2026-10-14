@@ -422,9 +422,9 @@ overrides list : snt_project_override
         // assign properties to the previous value node
         PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
         const bool is_metadata = pnode->ptype >= PropertyType::Description && pnode->ptype < PropertyType::Delimiter;
-        if (!previous_node || (!is_metadata &&
-                               std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
-                                   preceeding_nodes.end())) {
+        if (!previous_node ||
+            (!is_metadata && std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
+                                 preceeding_nodes.end())) {
             std::stringstream ss;
             for (size_t i = 0; i < preceeding_nodes.size(); i++) {
                 if (i == preceeding_nodes.size() - 1)
@@ -622,8 +622,8 @@ overrides list : snt_project_override
                 sources_with_nodes.insert(current_node->line.source.name);
             if (current_node->dtype == NodeDtype::Property) {
                 const auto property = std::dynamic_pointer_cast<PropertyNode>(current_node);
-                const bool is_metadata = property->ptype >= PropertyType::Description &&
-                                         property->ptype < PropertyType::Delimiter;
+                const bool is_metadata =
+                    property->ptype >= PropertyType::Description && property->ptype < PropertyType::Delimiter;
                 const std::string& source_name = current_node->line.source.name;
                 if (is_metadata && current_node->indent == 0 && !sources_with_nodes.count(source_name)) {
                     const auto source = env.sources.entries().find(source_name);
@@ -633,7 +633,9 @@ overrides list : snt_project_override
                             "Invalid source metadata",
                             "The metadata property could not be assigned to its source.",
                             "Place a supported ? metadata property at indentation zero before the source's first node.",
-                            __FILE__, __LINE__, current_node->line
+                            __FILE__,
+                            __LINE__,
+                            current_node->line
                         );
                 } else {
                     set_node_property(current_node, previous_node);

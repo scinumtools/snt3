@@ -41,6 +41,7 @@ array type information through an implicit JavaScript conversion:
    const model = dipl.parse(source);
    console.log(model.paths());
    console.log(model.describe("speed").valueText);
+   console.log(model.describeMany(["distance", "duration", "speed"]));
 
    const candidate = model.withOverride("distance = 32 m");
    console.log(candidate.describe("speed").valueText);
@@ -52,6 +53,10 @@ array type information through an implicit JavaScript conversion:
 body and returns a new model. It does not mutate the original. This uses the
 same parser and validation rules as native DIPL. ``schemas()`` exposes the
 schema definition and application hierarchy for building navigation or forms.
+``describeMany(paths, maxValueElements)`` returns one description per requested
+path, in the same order, through a single WebAssembly call. It uses the model's
+already evaluated environment; each result has the same fields and value limits
+as ``describe()``. Pass the paths you need to avoid serializing the full model.
 See :doc:`../modules/dip/inspection` for the related C++ inspection API.
 
 For a model split across several sources, pass text-backed registrations to

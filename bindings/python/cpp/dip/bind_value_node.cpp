@@ -1,3 +1,4 @@
+#include "../../../../src/snt/dip/nodes/metadata_fields.h"
 #include "../val/bind_from_value.h"
 #include "../val/bind_to_value.h"
 
@@ -27,35 +28,10 @@ namespace snt::bind::python {
             m, "ValueMetadata", "Citation, licensing, and descriptive metadata attached to a DIPL value or schema."
         );
         metadata.def(py::init<>(), "Create empty DIPL value or schema metadata.");
-        metadata.def_readonly("description", &dip::ValueMetadata::description);
-        metadata.def_readonly("authors", &dip::ValueMetadata::authors);
-        metadata.def_readonly("title", &dip::ValueMetadata::title);
-        metadata.def_readonly("journal", &dip::ValueMetadata::journal);
-        metadata.def_readonly("year", &dip::ValueMetadata::year);
-        metadata.def_readonly("volume", &dip::ValueMetadata::volume);
-        metadata.def_readonly("issue", &dip::ValueMetadata::issue);
-        metadata.def_readonly("pages", &dip::ValueMetadata::pages);
-        metadata.def_readonly("doi", &dip::ValueMetadata::doi);
-        metadata.def_readonly("url", &dip::ValueMetadata::url);
-        metadata.def_readonly("version", &dip::ValueMetadata::version);
-        metadata.def_readonly("created", &dip::ValueMetadata::created);
-        metadata.def_readonly("modified", &dip::ValueMetadata::modified);
-        metadata.def_readonly("license", &dip::ValueMetadata::license);
-        metadata.def_readonly("rationale", &dip::ValueMetadata::rationale);
-        metadata.def_readonly("native", &dip::ValueMetadata::native);
-        metadata.def_readonly("requires", &dip::ValueMetadata::requires);
-        metadata.def_readonly("conflicts", &dip::ValueMetadata::conflicts);
-        metadata.def_readonly("implies", &dip::ValueMetadata::implies);
-        metadata.def_readonly("see", &dip::ValueMetadata::see);
-        metadata.def_readonly("example", &dip::ValueMetadata::example);
-        metadata.def_readonly("recommended_range", &dip::ValueMetadata::recommended_range);
-        metadata.def_readonly("performance_impact", &dip::ValueMetadata::performance_impact);
-        metadata.def_readonly("scientific_impact", &dip::ValueMetadata::scientific_impact);
-        metadata.def_readonly("deprecated", &dip::ValueMetadata::deprecated);
-        metadata.def_readonly("replacement", &dip::ValueMetadata::replacement);
-        metadata.def_readonly("since", &dip::ValueMetadata::since);
-        metadata.def_readonly("category", &dip::ValueMetadata::category);
-        metadata.def_readonly("visibility", &dip::ValueMetadata::visibility);
+#define SNT_PY_METADATA(TYPE, FIELD, NAME) metadata.def_readonly(NAME, &dip::ValueMetadata::FIELD);
+        SNT_DIP_METADATA_SCALAR_FIELDS(SNT_PY_METADATA)
+        SNT_DIP_METADATA_LIST_FIELDS(SNT_PY_METADATA)
+#undef SNT_PY_METADATA
 
         auto vdata = py::class_<dip::ValueNodeData>(
             m, "ValueNodeData", "Evaluated value data returned by DIPL functions and nodes."

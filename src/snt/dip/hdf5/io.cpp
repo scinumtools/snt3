@@ -1,5 +1,6 @@
 #include "io.h"
 
+#include "../nodes/metadata_fields.h"
 #include "schema.h"
 
 #include <algorithm>
@@ -476,42 +477,15 @@ namespace snt::dip::hdf5 {
         }
 
         void write_metadata(hid_t object, const ValueMetadata& metadata) {
-#define SNT_WRITE_METADATA(NAME)                                                                                       \
-    if (!metadata.NAME.empty())                                                                                        \
-    write_string(object, #NAME, metadata.NAME)
-            SNT_WRITE_METADATA(description);
-            SNT_WRITE_METADATA(authors);
-            SNT_WRITE_METADATA(title);
-            SNT_WRITE_METADATA(journal);
-            SNT_WRITE_METADATA(year);
-            SNT_WRITE_METADATA(volume);
-            SNT_WRITE_METADATA(issue);
-            SNT_WRITE_METADATA(pages);
-            SNT_WRITE_METADATA(doi);
-            SNT_WRITE_METADATA(url);
-            SNT_WRITE_METADATA(version);
-            SNT_WRITE_METADATA(created);
-            SNT_WRITE_METADATA(modified);
-            SNT_WRITE_METADATA(license);
-            SNT_WRITE_METADATA(rationale);
-            SNT_WRITE_METADATA(recommended_range);
-            SNT_WRITE_METADATA(performance_impact);
-            SNT_WRITE_METADATA(scientific_impact);
-            SNT_WRITE_METADATA(deprecated);
-            SNT_WRITE_METADATA(replacement);
-            SNT_WRITE_METADATA(since);
-            SNT_WRITE_METADATA(category);
-            SNT_WRITE_METADATA(visibility);
+#define SNT_WRITE_METADATA(TYPE, FIELD, NAME)                                                                          \
+    if (!metadata.FIELD.empty())                                                                                       \
+        write_string(object, NAME, metadata.FIELD);
+            SNT_DIP_METADATA_SCALAR_FIELDS(SNT_WRITE_METADATA)
 #undef SNT_WRITE_METADATA
-#define SNT_WRITE_METADATA_LIST(NAME)                                                                                  \
-    if (!metadata.NAME.empty())                                                                                        \
-    write_strings(object, #NAME, metadata.NAME)
-            SNT_WRITE_METADATA_LIST(native);
-            SNT_WRITE_METADATA_LIST(requires);
-            SNT_WRITE_METADATA_LIST(conflicts);
-            SNT_WRITE_METADATA_LIST(implies);
-            SNT_WRITE_METADATA_LIST(see);
-            SNT_WRITE_METADATA_LIST(example);
+#define SNT_WRITE_METADATA_LIST(TYPE, FIELD, NAME)                                                                     \
+    if (!metadata.FIELD.empty())                                                                                       \
+        write_strings(object, NAME, metadata.FIELD);
+            SNT_DIP_METADATA_LIST_FIELDS(SNT_WRITE_METADATA_LIST)
 #undef SNT_WRITE_METADATA_LIST
             write_strings(object, "metadata_present", metadata.present_names());
         }
@@ -623,9 +597,15 @@ namespace snt::dip::hdf5 {
                 const std::string hdf5_path = dataset_path(file, env, path);
                 std::string kind;
                 switch (collection.kind) {
-                case Path::Kind::Group: kind = "group"; break;
-                case Path::Kind::Map: kind = "map"; break;
-                case Path::Kind::List: kind = "list"; break;
+                case Path::Kind::Group:
+                    kind = "group";
+                    break;
+                case Path::Kind::Map:
+                    kind = "map";
+                    break;
+                case Path::Kind::List:
+                    kind = "list";
+                    break;
                 case Path::Kind::Item: {
                     const auto open = path.rfind('[');
                     if (open == std::string::npos)
@@ -634,7 +614,8 @@ namespace snt::dip::hdf5 {
                     kind = parent.kind == Path::Kind::List ? "list_item" : "map_item";
                     break;
                 }
-                default: continue;
+                default:
+                    continue;
                 }
                 Id group = ensure_group(file, hdf5_path, kind);
                 write_string(group, ATTR_PATH, path);
@@ -765,103 +746,24 @@ namespace snt::dip::hdf5 {
         }
 
         void read_metadata(hid_t object, ValueMetadata& metadata) {
-#define SNT_READ_METADATA(NAME) metadata.NAME = read_string(object, #NAME)
-            SNT_READ_METADATA(description);
-            SNT_READ_METADATA(authors);
-            SNT_READ_METADATA(title);
-            SNT_READ_METADATA(journal);
-            SNT_READ_METADATA(year);
-            SNT_READ_METADATA(volume);
-            SNT_READ_METADATA(issue);
-            SNT_READ_METADATA(pages);
-            SNT_READ_METADATA(doi);
-            SNT_READ_METADATA(url);
-            SNT_READ_METADATA(version);
-            SNT_READ_METADATA(created);
-            SNT_READ_METADATA(modified);
-            SNT_READ_METADATA(license);
-            SNT_READ_METADATA(rationale);
-            SNT_READ_METADATA(recommended_range);
-            SNT_READ_METADATA(performance_impact);
-            SNT_READ_METADATA(scientific_impact);
-            SNT_READ_METADATA(deprecated);
-            SNT_READ_METADATA(replacement);
-            SNT_READ_METADATA(since);
-            SNT_READ_METADATA(category);
-            SNT_READ_METADATA(visibility);
+#define SNT_READ_METADATA(TYPE, FIELD, NAME) metadata.FIELD = read_string(object, NAME);
+            SNT_DIP_METADATA_SCALAR_FIELDS(SNT_READ_METADATA)
 #undef SNT_READ_METADATA
-#define SNT_READ_METADATA_LIST(NAME) metadata.NAME = read_strings(object, #NAME)
-            SNT_READ_METADATA_LIST(native);
-            SNT_READ_METADATA_LIST(requires);
-            SNT_READ_METADATA_LIST(conflicts);
-            SNT_READ_METADATA_LIST(implies);
-            SNT_READ_METADATA_LIST(see);
-            SNT_READ_METADATA_LIST(example);
+#define SNT_READ_METADATA_LIST(TYPE, FIELD, NAME) metadata.FIELD = read_strings(object, NAME);
+            SNT_DIP_METADATA_LIST_FIELDS(SNT_READ_METADATA_LIST)
 #undef SNT_READ_METADATA_LIST
-#define SNT_READ_METADATA_PRESENCE(TYPE, NAME, FIELD)                                                                  \
+#define SNT_READ_METADATA_PRESENCE(TYPE, FIELD, NAME)                                                                  \
     if (has_attribute(object, NAME) || !metadata.FIELD.empty())                                                        \
-    metadata.present.insert(PropertyType::TYPE)
-            SNT_READ_METADATA_PRESENCE(Description, "description", description);
-            SNT_READ_METADATA_PRESENCE(Authors, "authors", authors);
-            SNT_READ_METADATA_PRESENCE(Title, "title", title);
-            SNT_READ_METADATA_PRESENCE(Journal, "journal", journal);
-            SNT_READ_METADATA_PRESENCE(Year, "year", year);
-            SNT_READ_METADATA_PRESENCE(Volume, "volume", volume);
-            SNT_READ_METADATA_PRESENCE(Issue, "issue", issue);
-            SNT_READ_METADATA_PRESENCE(Pages, "pages", pages);
-            SNT_READ_METADATA_PRESENCE(DOI, "doi", doi);
-            SNT_READ_METADATA_PRESENCE(URL, "url", url);
-            SNT_READ_METADATA_PRESENCE(Version, "version", version);
-            SNT_READ_METADATA_PRESENCE(Created, "created", created);
-            SNT_READ_METADATA_PRESENCE(Modified, "modified", modified);
-            SNT_READ_METADATA_PRESENCE(License, "license", license);
-            SNT_READ_METADATA_PRESENCE(Rationale, "rationale", rationale);
-            SNT_READ_METADATA_PRESENCE(Native, "native", native);
-            SNT_READ_METADATA_PRESENCE(Requires, "requires", requires);
-            SNT_READ_METADATA_PRESENCE(Conflicts, "conflicts", conflicts);
-            SNT_READ_METADATA_PRESENCE(Implies, "implies", implies);
-            SNT_READ_METADATA_PRESENCE(See, "see", see);
-            SNT_READ_METADATA_PRESENCE(Example, "example", example);
-            SNT_READ_METADATA_PRESENCE(RecommendedRange, "recommended_range", recommended_range);
-            SNT_READ_METADATA_PRESENCE(PerformanceImpact, "performance_impact", performance_impact);
-            SNT_READ_METADATA_PRESENCE(ScientificImpact, "scientific_impact", scientific_impact);
-            SNT_READ_METADATA_PRESENCE(Deprecated, "deprecated", deprecated);
-            SNT_READ_METADATA_PRESENCE(Replacement, "replacement", replacement);
-            SNT_READ_METADATA_PRESENCE(Since, "since", since);
-            SNT_READ_METADATA_PRESENCE(Category, "category", category);
-            SNT_READ_METADATA_PRESENCE(Visibility, "visibility", visibility);
+        metadata.present.insert(PropertyType::TYPE);
+            SNT_DIP_METADATA_SCALAR_FIELDS(SNT_READ_METADATA_PRESENCE)
+            SNT_DIP_METADATA_LIST_FIELDS(SNT_READ_METADATA_PRESENCE)
 #undef SNT_READ_METADATA_PRESENCE
             for (const auto& name : read_strings(object, "metadata_present")) {
-#define SNT_READ_METADATA_NAME(TYPE, NAME) if (name == NAME) metadata.present.insert(PropertyType::TYPE)
-                SNT_READ_METADATA_NAME(Description, "description");
-                else SNT_READ_METADATA_NAME(Authors, "authors");
-                else SNT_READ_METADATA_NAME(Title, "title");
-                else SNT_READ_METADATA_NAME(Journal, "journal");
-                else SNT_READ_METADATA_NAME(Year, "year");
-                else SNT_READ_METADATA_NAME(Volume, "volume");
-                else SNT_READ_METADATA_NAME(Issue, "issue");
-                else SNT_READ_METADATA_NAME(Pages, "pages");
-                else SNT_READ_METADATA_NAME(DOI, "doi");
-                else SNT_READ_METADATA_NAME(URL, "url");
-                else SNT_READ_METADATA_NAME(Version, "version");
-                else SNT_READ_METADATA_NAME(Created, "created");
-                else SNT_READ_METADATA_NAME(Modified, "modified");
-                else SNT_READ_METADATA_NAME(License, "license");
-                else SNT_READ_METADATA_NAME(Rationale, "rationale");
-                else SNT_READ_METADATA_NAME(Native, "native");
-                else SNT_READ_METADATA_NAME(Requires, "requires");
-                else SNT_READ_METADATA_NAME(Conflicts, "conflicts");
-                else SNT_READ_METADATA_NAME(Implies, "implies");
-                else SNT_READ_METADATA_NAME(See, "see");
-                else SNT_READ_METADATA_NAME(Example, "example");
-                else SNT_READ_METADATA_NAME(RecommendedRange, "recommended_range");
-                else SNT_READ_METADATA_NAME(PerformanceImpact, "performance_impact");
-                else SNT_READ_METADATA_NAME(ScientificImpact, "scientific_impact");
-                else SNT_READ_METADATA_NAME(Deprecated, "deprecated");
-                else SNT_READ_METADATA_NAME(Replacement, "replacement");
-                else SNT_READ_METADATA_NAME(Since, "since");
-                else SNT_READ_METADATA_NAME(Category, "category");
-                else SNT_READ_METADATA_NAME(Visibility, "visibility");
+#define SNT_READ_METADATA_NAME(TYPE, FIELD, NAME)                                                                      \
+    if (name == NAME)                                                                                                  \
+        metadata.present.insert(PropertyType::TYPE);
+                SNT_DIP_METADATA_SCALAR_FIELDS(SNT_READ_METADATA_NAME)
+                SNT_DIP_METADATA_LIST_FIELDS(SNT_READ_METADATA_NAME)
 #undef SNT_READ_METADATA_NAME
             }
         }
@@ -1304,9 +1206,8 @@ namespace snt::dip::hdf5 {
                             items
                         );
                     }
-                    if (!path.empty() &&
-                        (kind == "group" || kind == "item" || kind == "map_item" || kind == "list_item" ||
-                         kind == "map" || kind == "list")) {
+                    if (!path.empty() && (kind == "group" || kind == "item" || kind == "map_item" ||
+                                          kind == "list_item" || kind == "map" || kind == "list")) {
                         ValueMetadata metadata;
                         read_metadata(child, metadata);
                         env.hierarchy.merge_metadata(path, metadata);

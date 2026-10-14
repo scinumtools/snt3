@@ -10,6 +10,7 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/inspect/inspector.h>
+#include <sstream>
 
 using namespace snt;
 
@@ -197,6 +198,53 @@ TEST(Environment, ExactNumericValuesSurviveHdf5RoundTrip) {
     EXPECT_EQ(loaded["matrix"].get_shape(), (val::Array::ShapeType{2, 2}));
     EXPECT_EQ(loaded["matrix"].as<std::vector<double>>(), (std::vector<double>{1.25, -2.5, 3.75, 4.5}));
     std::filesystem::remove(file);
+}
+
+TEST(Environment, ArrayShapeSurvivesHdf5AndStructuredExport) {
+    dip::DIP parser;
+    parser.add_string(
+        "scalar str = \"example\"\n"
+        "singleton str[1] = [\"example\"]\n"
+        "matrix int[2,2] = [[1,2],[3,4]]\n"
+    );
+    const auto original = parser.parse();
+    const auto snapshot = environment_file("array-shape-roundtrip");
+    const auto json_file = std::filesystem::path(snapshot.string() + ".json");
+    original.save(snapshot);
+
+    dip::Environment loaded;
+    loaded.load(snapshot);
+    ASSERT_NE(loaded.get_node("scalar"), nullptr);
+    ASSERT_NE(loaded.get_node("singleton"), nullptr);
+    ASSERT_NE(loaded.get_node("matrix"), nullptr);
+    EXPECT_TRUE(loaded.get_node("scalar")->dimension.empty());
+    ASSERT_EQ(loaded.get_node("singleton")->dimension.size(), 1);
+    EXPECT_EQ(loaded.get_node("singleton")->dimension.front().dmin, 1);
+    ASSERT_EQ(loaded.get_node("matrix")->dimension.size(), 2);
+    EXPECT_EQ(loaded.get_node("matrix")->dimension[0].dmin, 2);
+    EXPECT_EQ(loaded.get_node("matrix")->dimension[1].dmin, 2);
+
+    loaded.generate(dip::ExportFormat::JSON_METADATA, json_file);
+    std::ifstream generated(json_file);
+    std::stringstream content;
+    content << generated.rdbuf();
+    const auto json = content.str();
+    EXPECT_NE(
+        json.find("\"scalar\": {\"name\": \"scalar\", \"type\": \"str\", \"shape\": [], \"is_array\": false"),
+        std::string::npos
+    );
+    EXPECT_NE(
+        json.find("\"singleton\": {\"name\": \"singleton\", \"type\": \"str\", \"shape\": [1], \"is_array\": true"),
+        std::string::npos
+    );
+    EXPECT_NE(json.find("\"value\": \"example\""), std::string::npos);
+    EXPECT_NE(
+        json.find("\"matrix\": {\"name\": \"matrix\", \"type\": \"int32\", \"shape\": [2, 2], \"is_array\": true"),
+        std::string::npos
+    );
+    generated.close();
+    std::filesystem::remove(snapshot);
+    std::filesystem::remove(json_file);
 }
 
 TEST(Environment, RejectsCorruptModificationHistoryWithoutReplacingEnvironment) {

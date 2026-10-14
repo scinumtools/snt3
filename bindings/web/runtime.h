@@ -27,6 +27,8 @@ class Model {
     const dip::Environment& environment() const { return environment_; }
     std::vector<std::string> paths() const;
     dip::SemanticDescription describe(const std::string& path, std::size_t max_value_elements = 16) const;
+    std::vector<dip::SemanticDescription> describe_many(
+        const std::vector<std::string>& paths, std::size_t max_value_elements = 16) const;
     dip::SchemaHierarchyInspection schemas() const;
     /** Evaluate a replacement override body against the same original source. */
     Model with_override(std::string body) const;

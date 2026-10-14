@@ -35,6 +35,11 @@ The C++ ``ExportFormat`` values implemented by the generator are ``CPP``,
 versioned record for each evaluated value, keyed by its stable DIPL path, with
 its type, shape, value, units, effective metadata, and declaration or override
 provenance. It also includes source identities and source-level metadata.
+Array records retain explicit ``shape`` and ``is_array`` fields, so a scalar
+string ``"example"`` remains distinct from a singleton array declared as
+``["example"]``. The singleton's value payload may itself be the scalar
+``"example"``; consumers should use the shape fields to reconstruct its array
+classification. Nested arrays retain their JSON nesting.
 
 Use ``json-metadata`` with the CLI to request the versioned form:
 

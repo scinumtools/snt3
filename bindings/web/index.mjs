@@ -10,6 +10,9 @@ export class DIPLModel {
   describe(path, maxValueElements = 16) {
     return this.native.describe(path, maxValueElements);
   }
+  describeMany(paths, maxValueElements = 16) {
+    return this.native.describeMany(paths, maxValueElements);
+  }
   schemas() { return this.native.schemas(); }
   withOverride(body) {
     return new DIPLModel(this.runtime, this.native.withOverride(body));

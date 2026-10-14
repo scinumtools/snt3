@@ -180,8 +180,20 @@ TEST(Environment, GenerateJsonMetadataAndProvenance) {
     EXPECT_NE(json.find("\"value\": \"after\""), std::string::npos);
     EXPECT_NE(json.find("\"rationale\": \"\""), std::string::npos);
     EXPECT_NE(json.find("\"metadata\": {\"present\": [\"rationale\"]"), std::string::npos);
-    EXPECT_NE(json.find("\"blank\": {\"name\": \"blank\", \"type\": \"str\", \"shape\": [], \"is_array\": false, \"presence\": \"value\", \"value\": \"\""), std::string::npos);
-    EXPECT_NE(json.find("\"absent\": {\"name\": \"absent\", \"type\": \"str\", \"shape\": [], \"is_array\": false, \"presence\": \"none\", \"value\": null"), std::string::npos);
+    EXPECT_NE(
+        json.find(
+            "\"blank\": {\"name\": \"blank\", \"type\": \"str\", \"shape\": [], \"is_array\": false, \"presence\": "
+            "\"value\", \"value\": \"\""
+        ),
+        std::string::npos
+    );
+    EXPECT_NE(
+        json.find(
+            "\"absent\": {\"name\": \"absent\", \"type\": \"str\", \"shape\": [], \"is_array\": false, \"presence\": "
+            "\"none\", \"value\": null"
+        ),
+        std::string::npos
+    );
     EXPECT_NE(json.find("\"sample.dip\""), std::string::npos);
     EXPECT_NE(json.find("\"authors\": \"Sample team\""), std::string::npos);
     generated.close();

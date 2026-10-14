@@ -50,8 +50,7 @@ val metadata(const snt::dip::ValueMetadata& value) {
     return result;
 }
 
-val description(const snt::web::Model& model, const std::string& path, std::size_t max_elements) {
-    const auto item = model.describe(path, max_elements);
+val description_value(const snt::dip::SemanticDescription& item) {
     val result = val::object();
     result.set("path", item.path);
     result.set("kind", item.kind);
@@ -81,6 +80,24 @@ val description(const snt::web::Model& model, const std::string& path, std::size
         dependencies.call<void>("push", entry);
     }
     result.set("dependencies", dependencies);
+    return result;
+}
+
+val description(const snt::web::Model& model, const std::string& path, std::size_t max_elements) {
+    return description_value(model.describe(path, max_elements));
+}
+
+val descriptions(const snt::web::Model& model, const val& paths, std::size_t max_elements) {
+    const unsigned count = paths["length"].as<unsigned>();
+    std::vector<std::string> requested_paths;
+    requested_paths.reserve(count);
+    for (unsigned index = 0; index < count; ++index)
+        requested_paths.push_back(paths[index].as<std::string>());
+
+    const auto inspected = model.describe_many(requested_paths, max_elements);
+    val result = val::array();
+    for (const auto& item : inspected)
+        result.call<void>("push", description_value(item));
     return result;
 }
 
@@ -288,6 +305,7 @@ EMSCRIPTEN_BINDINGS(snt_dipl_web) {
         .constructor<std::string, std::string>()
         .function("paths", &paths)
         .function("describe", &description)
+        .function("describeMany", &descriptions)
         .function("schemas", &schemas)
         .function("withOverride", &snt::web::Model::with_override);
     emscripten::function("validateDIPL", &validate);

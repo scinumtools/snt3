@@ -91,6 +91,7 @@ export interface ProjectBundle {
 export class DIPLModel {
   paths(): string[];
   describe(path: string, maxValueElements?: number): Description;
+  describeMany(paths: string[], maxValueElements?: number): Description[];
   schemas(): SchemaHierarchy;
   /** Reevaluate the original source with this replacement override body. */
   withOverride(body: string): DIPLModel;

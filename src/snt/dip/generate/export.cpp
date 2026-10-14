@@ -1,5 +1,6 @@
 #include "export.h"
 
+#include "../nodes/metadata_fields.h"
 #include "model.h"
 #include "naming.h"
 
@@ -64,13 +65,27 @@ namespace snt::dip::generate {
             output << '"';
             for (const unsigned char character : value) {
                 switch (character) {
-                case '"': output << "\\\""; break;
-                case '\\': output << "\\\\"; break;
-                case '\b': output << "\\b"; break;
-                case '\f': output << "\\f"; break;
-                case '\n': output << "\\n"; break;
-                case '\r': output << "\\r"; break;
-                case '\t': output << "\\t"; break;
+                case '"':
+                    output << "\\\"";
+                    break;
+                case '\\':
+                    output << "\\\\";
+                    break;
+                case '\b':
+                    output << "\\b";
+                    break;
+                case '\f':
+                    output << "\\f";
+                    break;
+                case '\n':
+                    output << "\\n";
+                    break;
+                case '\r':
+                    output << "\\r";
+                    break;
+                case '\t':
+                    output << "\\t";
+                    break;
                 default:
                     if (character < 0x20) {
                         constexpr char hex[] = "0123456789abcdef";
@@ -94,45 +109,18 @@ namespace snt::dip::generate {
         }
 
         void write_metadata_value(std::ostream& output, const ValueMetadata& metadata, const std::string& name) {
-#define SNT_METADATA_JSON(TYPE, FIELD)                                                                                 \
+#define SNT_METADATA_JSON(TYPE, FIELD, NAME)                                                                           \
     if (name == #FIELD) {                                                                                              \
         write_json_string(output, metadata.FIELD);                                                                     \
         return;                                                                                                        \
     }
-#define SNT_METADATA_JSON_LIST(TYPE, FIELD)                                                                            \
+#define SNT_METADATA_JSON_LIST(TYPE, FIELD, NAME)                                                                      \
     if (name == #FIELD) {                                                                                              \
         write_string_list(output, metadata.FIELD);                                                                     \
         return;                                                                                                        \
     }
-            SNT_METADATA_JSON(Description, description)
-            SNT_METADATA_JSON(Authors, authors)
-            SNT_METADATA_JSON(Title, title)
-            SNT_METADATA_JSON(Journal, journal)
-            SNT_METADATA_JSON(Year, year)
-            SNT_METADATA_JSON(Volume, volume)
-            SNT_METADATA_JSON(Issue, issue)
-            SNT_METADATA_JSON(Pages, pages)
-            SNT_METADATA_JSON(DOI, doi)
-            SNT_METADATA_JSON(URL, url)
-            SNT_METADATA_JSON(Version, version)
-            SNT_METADATA_JSON(Created, created)
-            SNT_METADATA_JSON(Modified, modified)
-            SNT_METADATA_JSON(License, license)
-            SNT_METADATA_JSON(Rationale, rationale)
-            SNT_METADATA_JSON_LIST(Native, native)
-            SNT_METADATA_JSON_LIST(Requires, requires)
-            SNT_METADATA_JSON_LIST(Conflicts, conflicts)
-            SNT_METADATA_JSON_LIST(Implies, implies)
-            SNT_METADATA_JSON_LIST(See, see)
-            SNT_METADATA_JSON_LIST(Example, example)
-            SNT_METADATA_JSON(RecommendedRange, recommended_range)
-            SNT_METADATA_JSON(PerformanceImpact, performance_impact)
-            SNT_METADATA_JSON(ScientificImpact, scientific_impact)
-            SNT_METADATA_JSON(Deprecated, deprecated)
-            SNT_METADATA_JSON(Replacement, replacement)
-            SNT_METADATA_JSON(Since, since)
-            SNT_METADATA_JSON(Category, category)
-            SNT_METADATA_JSON(Visibility, visibility)
+            SNT_DIP_METADATA_SCALAR_FIELDS(SNT_METADATA_JSON)
+            SNT_DIP_METADATA_LIST_FIELDS(SNT_METADATA_JSON_LIST)
 #undef SNT_METADATA_JSON_LIST
 #undef SNT_METADATA_JSON
             output << "null";

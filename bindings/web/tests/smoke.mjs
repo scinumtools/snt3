@@ -16,6 +16,12 @@ if (JSON.stringify(labeled.describe("level").optionLabels) !== JSON.stringify(["
 labeled.dispose();
 if (model.describe("simulation.speed").valueText !== "3")
   throw new Error("WASM evaluation differs from the expected C++ result");
+const batch = model.describeMany(["simulation.speed", "simulation.distance"]);
+if (batch.length !== 2 || batch[0].path !== "simulation.speed" ||
+    JSON.stringify(batch[0]) !== JSON.stringify(model.describe("simulation.speed")) ||
+    batch[1].path !== "simulation.distance" ||
+    JSON.stringify(batch[1]) !== JSON.stringify(model.describe("simulation.distance")))
+  throw new Error("WASM bulk descriptions differ from individual descriptions");
 if (model.schemas().definitions[0].id !== "settings")
   throw new Error("WASM schema inspection failed");
 const changed = model.withOverride("simulation.distance = 32 m");

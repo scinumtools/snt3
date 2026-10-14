@@ -25,6 +25,26 @@ TEST(WebRuntime, ParsesInspectsAndReevaluatesOverrides) {
     EXPECT_FALSE(invalid.diagnostic->code.empty());
 }
 
+TEST(WebRuntime, DescribesManyPathsFromOneModelInInputOrder) {
+    const snt::web::Model model(
+        "distance float = 24 m\n"
+        "  ?category \"Input\"\n"
+        "duration float = 8 s\n"
+        "speed float = ({?distance} / {?duration}) m/s\n"
+    );
+    const auto batch = model.describe_many({"speed", "distance"});
+    ASSERT_EQ(batch.size(), 2);
+    EXPECT_EQ(batch[0].path, "speed");
+    EXPECT_EQ(batch[0].value_text, model.describe("speed").value_text);
+    EXPECT_EQ(batch[0].shape, model.describe("speed").shape);
+    ASSERT_TRUE(batch[0].declaration);
+    EXPECT_EQ(batch[0].declaration->source, model.describe("speed").declaration->source);
+    EXPECT_EQ(batch[1].path, "distance");
+    EXPECT_EQ(batch[1].value_text, model.describe("distance").value_text);
+    EXPECT_EQ(batch[1].metadata.category, "Input");
+    EXPECT_EQ(batch[1].units, model.describe("distance").units);
+}
+
 TEST(WebRuntime, ReusesSchemaInspection) {
     const snt::web::Model model("$schema settings\n  speed float = 2 m/s\nphysics : settings\n");
     const auto schemas = model.schemas();
