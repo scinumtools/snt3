@@ -1,3 +1,5 @@
+cmake_policy(SET CMP0054 NEW)
+
 set(INPUT "${SOURCE_DIR}/tests/dip/fixtures/generated_parameters.dip")
 set(GRAPH_INPUT "${SOURCE_DIR}/examples/dip/SemanticDescription/parameters.dip")
 file(READ "${CMAKE_CURRENT_LIST_DIR}/dip_semantic_expected.json" expected_template)
