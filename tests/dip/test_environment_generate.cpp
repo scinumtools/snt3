@@ -139,6 +139,62 @@ TEST(Environment, GenerateValueNodeWithChildren) {
     std::filesystem::remove(yaml_file);
 }
 
+TEST(Environment, GenerateJsonMetadataAndProvenance) {
+    dip::DIP parser;
+    parser.add_string(
+        "?authors \"Sample team\"\n"
+        "$schema edge\n"
+        "  source_id str\n"
+        "    ?rationale \"Schema explanation\"\n"
+        "edges map\n"
+        "edges[uses_material] : edge\n"
+        "  source_id = \"material_1\"\n"
+        "    ?rationale \"Local explanation\"\n"
+        "edges[generic] : edge\n"
+        "  source_id = \"material_3\"\n"
+        "empty str = \"sample\"\n"
+        "  ?rationale \"\"\n"
+        "blank str = \"\"\n"
+        "override_value str = \"before\"\n"
+        "absent str = none\n",
+        "sample.dip"
+    );
+    parser.add_override_string("override_value = \"after\"\n", "sample.override.dip");
+    const auto env = parser.parse();
+    const auto file = environment_file("metadata-values.json");
+    const auto legacy_file = environment_file("metadata-values-legacy.json");
+    env.generate(dip::ExportFormat::JSON_METADATA, file);
+    env.generate(dip::ExportFormat::JSON, legacy_file);
+
+    std::ifstream generated(file);
+    std::stringstream content;
+    content << generated.rdbuf();
+    const auto json = content.str();
+    EXPECT_NE(json.find("\"schema\": \"snt-dip-values/1\""), std::string::npos);
+    EXPECT_NE(json.find("\"edges[uses_material].source_id\""), std::string::npos);
+    EXPECT_NE(json.find("\"name\": \"source_id\""), std::string::npos);
+    EXPECT_NE(json.find("\"value\": \"material_1\""), std::string::npos);
+    EXPECT_NE(json.find("\"rationale\": \"Local explanation\""), std::string::npos);
+    EXPECT_NE(json.find("\"rationale\": \"Schema explanation\""), std::string::npos);
+    EXPECT_NE(json.find("\"override_value\""), std::string::npos);
+    EXPECT_NE(json.find("\"value\": \"after\""), std::string::npos);
+    EXPECT_NE(json.find("\"rationale\": \"\""), std::string::npos);
+    EXPECT_NE(json.find("\"metadata\": {\"present\": [\"rationale\"]"), std::string::npos);
+    EXPECT_NE(json.find("\"blank\": {\"name\": \"blank\", \"type\": \"str\", \"shape\": [], \"is_array\": false, \"presence\": \"value\", \"value\": \"\""), std::string::npos);
+    EXPECT_NE(json.find("\"absent\": {\"name\": \"absent\", \"type\": \"str\", \"shape\": [], \"is_array\": false, \"presence\": \"none\", \"value\": null"), std::string::npos);
+    EXPECT_NE(json.find("\"sample.dip\""), std::string::npos);
+    EXPECT_NE(json.find("\"authors\": \"Sample team\""), std::string::npos);
+    generated.close();
+    std::ifstream legacy_generated(legacy_file);
+    std::stringstream legacy_content;
+    legacy_content << legacy_generated.rdbuf();
+    EXPECT_NE(legacy_content.str().find("\"blank\": \"\""), std::string::npos);
+    EXPECT_EQ(legacy_content.str().find("\"absent\""), std::string::npos);
+    legacy_generated.close();
+    std::filesystem::remove(file);
+    std::filesystem::remove(legacy_file);
+}
+
 TEST(Environment, GenerateThreeDimensionalArray) {
     dip::DIP parser;
     parser.add_string("volume int[2,2,3] = [[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]]");

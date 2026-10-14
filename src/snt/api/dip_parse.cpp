@@ -118,6 +118,7 @@ namespace snt::api {
             {"rust", dip::ExportFormat::RUST},
             {"julia", dip::ExportFormat::JULIA},
             {"json", dip::ExportFormat::JSON},
+            {"json-metadata", dip::ExportFormat::JSON_METADATA},
             {"yaml", dip::ExportFormat::YAML}
         };
         const auto selected = formats.find(format);
@@ -125,7 +126,7 @@ namespace snt::api {
             throw api::ArgumentException(
                 "Invalid export format",
                 "Unknown static export format: " + format,
-                "Use cpp, c, fortran, rust, julia, json, or yaml.",
+                "Use cpp, c, fortran, rust, julia, json, json-metadata, or yaml.",
                 __FILE__,
                 __LINE__
             );

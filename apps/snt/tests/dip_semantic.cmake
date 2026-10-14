@@ -103,6 +103,63 @@ if(NOT source_metadata_found)
   message(FATAL_ERROR "Source metadata or explicit-empty presence is wrong: ${output}")
 endif()
 
+set(METADATA_INPUT "${CMAKE_CURRENT_BINARY_DIR}/json-metadata-test.dip")
+set(METADATA_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/json-metadata-test.json")
+file(WRITE "${METADATA_INPUT}"
+  "?authors \"Sample team\"\n"
+  "$schema edge\n"
+  "  source_id str\n"
+  "    ?rationale \"Schema explanation\"\n"
+  "edges map\n"
+  "edges[uses_material] : edge\n"
+  "  source_id = \"material_1\"\n"
+  "    ?rationale \"Local explanation\"\n"
+  "empty str = \"\"\n"
+  "  ?rationale \"\"\n"
+  "absent str = none\n")
+execute_process(
+  COMMAND "${SNT_EXECUTABLE}" dip parse -i file "${METADATA_INPUT}" --generate json-metadata "${METADATA_OUTPUT}"
+  RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error)
+file(REMOVE "${METADATA_INPUT}")
+if(NOT status EQUAL 0)
+  file(REMOVE "${METADATA_OUTPUT}")
+  message(FATAL_ERROR "json-metadata generation failed: ${error}")
+endif()
+file(READ "${METADATA_OUTPUT}" output)
+file(REMOVE "${METADATA_OUTPUT}")
+string(JSON export_schema GET "${output}" schema)
+string(JSON edge_value GET "${output}" values "edges[uses_material].source_id" value)
+string(JSON edge_rationale GET "${output}" values "edges[uses_material].source_id" metadata values rationale)
+string(JSON empty_value GET "${output}" values empty value)
+string(JSON empty_presence GET "${output}" values empty presence)
+string(JSON empty_rationale GET "${output}" values empty metadata values rationale)
+string(JSON empty_metadata_present GET "${output}" values empty metadata present 0)
+string(JSON absent_presence GET "${output}" values absent presence)
+string(JSON absent_value_type TYPE "${output}" values absent value)
+string(JSON source_count LENGTH "${output}" sources)
+set(source_authors_found FALSE)
+if(source_count GREATER 0)
+  math(EXPR source_last "${source_count} - 1")
+  foreach(index RANGE 0 ${source_last})
+    string(JSON source_name MEMBER "${output}" sources ${index})
+    string(JSON source_metadata ERROR_VARIABLE source_error GET "${output}" sources "${source_name}" metadata values authors)
+    if(NOT source_error AND source_metadata STREQUAL "Sample team")
+      set(source_authors_found TRUE)
+    endif()
+  endforeach()
+endif()
+if(NOT export_schema STREQUAL "snt-dip-values/1" OR
+   NOT edge_value STREQUAL "material_1" OR
+   NOT edge_rationale STREQUAL "Local explanation" OR
+   NOT empty_value STREQUAL "" OR
+   NOT empty_presence STREQUAL "value" OR
+   NOT empty_rationale STREQUAL "" OR
+   NOT empty_metadata_present STREQUAL "rationale" OR
+   NOT absent_presence STREQUAL "none" OR NOT absent_value_type STREQUAL "NULL" OR
+   NOT source_authors_found)
+  message(FATAL_ERROR "Structured values, metadata, presence, or source provenance is wrong: ${output}")
+endif()
+
 set(SCHEMA_INPUT "${SOURCE_DIR}/tests/dip/fixtures/schema_hierarchy.dip")
 execute_process(
   COMMAND "${SNT_EXECUTABLE}" dip schemas --input "${SCHEMA_INPUT}" --format json

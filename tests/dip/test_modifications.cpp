@@ -91,6 +91,33 @@ TEST(Modifications, Declarations) {
     }
 }
 
+TEST(Modifications, EmptyStringIsAValueAndCanBeModified) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema defaults\n"
+        "  label str = \"\"\n"
+        "instance : defaults\n"
+        "empty str = \"\"\n"
+        "modified str = \"initial\"\n"
+        "modified = \"\"\n"
+        "overridden str = \"initial\"\n"
+    );
+    parser.add_override_string("overridden = \"\"\n");
+    const auto env = parser.parse();
+    EXPECT_EQ(env["empty"].get_value()->to_string(), "\"\"");
+    EXPECT_EQ(env["modified"].get_value()->to_string(), "\"\"");
+    EXPECT_EQ(env["overridden"].get_value()->to_string(), "\"\"");
+    EXPECT_EQ(env["instance.label"].get_value()->to_string(), "\"\"");
+    EXPECT_EQ(env["empty"].get_value()->get_size(), 1);
+}
+
+TEST(Modifications, EmptyStringsArePreservedInArrays) {
+    dip::DIP parser;
+    parser.add_string("values str[3] = [\"\", \"sample\", \"\"]\n");
+    const auto env = parser.parse();
+    EXPECT_EQ(env["values"].get_value()->to_string(), "[\"\", \"sample\", \"\"]");
+}
+
 TEST(Modifications, Reference) {
 
     dip::DIP d;

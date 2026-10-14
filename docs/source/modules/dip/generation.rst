@@ -29,6 +29,28 @@ Parse a DIPfile project, then generate output from the evaluated environment:
    environment.generate(snt::dip::ExportFormat::JULIA, "parameters.jl");
 
 The C++ ``ExportFormat`` values implemented by the generator are ``CPP``,
-``C``, ``FORTRAN``, ``RUST``, ``JULIA``, ``JSON``, and ``YAML``. Each call
-exports the complete evaluated environment. For the command-oriented C++
-interface, see :ref:`the DIP API guide <module-api-dip>`.
+``C``, ``FORTRAN``, ``RUST``, ``JULIA``, ``JSON``, ``JSON_METADATA``, and
+``YAML``. Each call exports the complete evaluated environment. The existing
+``JSON`` format remains a values-only tree. ``JSON_METADATA`` writes a
+versioned record for each evaluated value, keyed by its stable DIPL path, with
+its type, shape, value, units, effective metadata, and declaration or override
+provenance. It also includes source identities and source-level metadata.
+
+Use ``json-metadata`` with the CLI to request the versioned form:
+
+.. code-block:: console
+
+   snt dip parse --input file settings.dip --generate json-metadata settings.json
+
+Each metadata object has a ``present`` list and a ``values`` object. Missing
+properties are absent from ``values``; explicitly empty scalar metadata appear
+as ``""`` and their names remain in ``present``. Thus absence and an explicit
+empty annotation remain distinct. Value records use ``presence: "none"`` and
+JSON ``null`` for explicit ``none``; fields absent from the evaluated
+environment have no record. The new schema is identified by
+``snt-dip-values/1``. For the command-oriented C++ interface, see
+:ref:`the DIP API guide <module-api-dip>`.
+
+The legacy values-only JSON generator omits explicit ``none`` values to retain
+its existing output contract. The ``JSON_METADATA`` format includes them as
+records with ``presence: "none"`` and a JSON ``null`` value.

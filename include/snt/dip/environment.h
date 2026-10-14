@@ -118,6 +118,7 @@ namespace snt::dip {
         R,
         JULIA,
         JSON,
+        JSON_METADATA,
         TOML,
         YAML,
     };

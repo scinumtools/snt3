@@ -322,7 +322,8 @@ namespace snt::dip {
         // Keep declarations unassigned until instance modifications or final validation.
         if (value_input == nullptr && value_origin == ValueOrigin::Empty && value_raw.empty())
             return;
-        if (value_input == nullptr && !value_raw.empty() && !value_raw.at(0).empty()) {
+        if (value_input == nullptr && !value_raw.empty() &&
+            (!value_raw.at(0).empty() || value_origin == ValueOrigin::String)) {
             // Triple-quoted values are initially parsed as a single string. When
             // an array dimension is declared, parse an array literal contained
             // in that string before converting it to the node's value type.

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
+#include <snt/dip/cursor.h>
 #include <snt/dip/exceptions.h>
 #include <unordered_map>
 #include <vector>
@@ -57,6 +58,208 @@ namespace snt::dip::generate {
             if (has_embedded_value(node) || !node.children.empty())
                 output << '\n' << indent(depth);
             output << '}';
+        }
+
+        void write_json_string(std::ostream& output, const std::string& value) {
+            output << '"';
+            for (const unsigned char character : value) {
+                switch (character) {
+                case '"': output << "\\\""; break;
+                case '\\': output << "\\\\"; break;
+                case '\b': output << "\\b"; break;
+                case '\f': output << "\\f"; break;
+                case '\n': output << "\\n"; break;
+                case '\r': output << "\\r"; break;
+                case '\t': output << "\\t"; break;
+                default:
+                    if (character < 0x20) {
+                        constexpr char hex[] = "0123456789abcdef";
+                        output << "\\u00" << hex[character >> 4] << hex[character & 0x0f];
+                    } else {
+                        output << static_cast<char>(character);
+                    }
+                }
+            }
+            output << '"';
+        }
+
+        void write_string_list(std::ostream& output, const std::vector<std::string>& values) {
+            output << '[';
+            for (size_t index = 0; index < values.size(); ++index) {
+                if (index)
+                    output << ", ";
+                write_json_string(output, values[index]);
+            }
+            output << ']';
+        }
+
+        void write_metadata_value(std::ostream& output, const ValueMetadata& metadata, const std::string& name) {
+#define SNT_METADATA_JSON(TYPE, FIELD)                                                                                 \
+    if (name == #FIELD) {                                                                                              \
+        write_json_string(output, metadata.FIELD);                                                                     \
+        return;                                                                                                        \
+    }
+#define SNT_METADATA_JSON_LIST(TYPE, FIELD)                                                                            \
+    if (name == #FIELD) {                                                                                              \
+        write_string_list(output, metadata.FIELD);                                                                     \
+        return;                                                                                                        \
+    }
+            SNT_METADATA_JSON(Description, description)
+            SNT_METADATA_JSON(Authors, authors)
+            SNT_METADATA_JSON(Title, title)
+            SNT_METADATA_JSON(Journal, journal)
+            SNT_METADATA_JSON(Year, year)
+            SNT_METADATA_JSON(Volume, volume)
+            SNT_METADATA_JSON(Issue, issue)
+            SNT_METADATA_JSON(Pages, pages)
+            SNT_METADATA_JSON(DOI, doi)
+            SNT_METADATA_JSON(URL, url)
+            SNT_METADATA_JSON(Version, version)
+            SNT_METADATA_JSON(Created, created)
+            SNT_METADATA_JSON(Modified, modified)
+            SNT_METADATA_JSON(License, license)
+            SNT_METADATA_JSON(Rationale, rationale)
+            SNT_METADATA_JSON_LIST(Native, native)
+            SNT_METADATA_JSON_LIST(Requires, requires)
+            SNT_METADATA_JSON_LIST(Conflicts, conflicts)
+            SNT_METADATA_JSON_LIST(Implies, implies)
+            SNT_METADATA_JSON_LIST(See, see)
+            SNT_METADATA_JSON_LIST(Example, example)
+            SNT_METADATA_JSON(RecommendedRange, recommended_range)
+            SNT_METADATA_JSON(PerformanceImpact, performance_impact)
+            SNT_METADATA_JSON(ScientificImpact, scientific_impact)
+            SNT_METADATA_JSON(Deprecated, deprecated)
+            SNT_METADATA_JSON(Replacement, replacement)
+            SNT_METADATA_JSON(Since, since)
+            SNT_METADATA_JSON(Category, category)
+            SNT_METADATA_JSON(Visibility, visibility)
+#undef SNT_METADATA_JSON_LIST
+#undef SNT_METADATA_JSON
+            output << "null";
+        }
+
+        void write_metadata(std::ostream& output, const ValueMetadata& metadata) {
+            const auto names = metadata.present_names();
+            output << "{\"present\": ";
+            write_string_list(output, names);
+            output << ", \"values\": {";
+            for (size_t index = 0; index < names.size(); ++index) {
+                if (index)
+                    output << ", ";
+                write_json_string(output, names[index]);
+                output << ": ";
+                write_metadata_value(output, metadata, names[index]);
+            }
+            output << "}}";
+        }
+
+        const Node* find_value_node(const Node& node, const std::string& path) {
+            if (node.path == path && node.has_value)
+                return &node;
+            for (const auto& child : node.children)
+                if (const auto* found = find_value_node(*child, path))
+                    return found;
+            return nullptr;
+        }
+
+        std::string path_leaf(const std::string& path) {
+            const size_t separator = path.rfind('.');
+            const size_t begin = separator == std::string::npos ? 0 : separator + 1;
+            const size_t bracket = path.find('[', begin);
+            return path.substr(begin, bracket == std::string::npos ? std::string::npos : bracket - begin);
+        }
+
+        void write_source_info(std::ostream& output, const SourceInfo& source) {
+            output << "{\"path\": ";
+            write_json_string(output, source.path);
+            output << ", \"parent\": ";
+            if (source.parent_name.empty())
+                output << "null";
+            else {
+                output << "{\"name\": ";
+                write_json_string(output, source.parent_name);
+                output << ", \"line\": " << source.parent_line << '}';
+            }
+            output << ", \"hash_algorithm\": ";
+            if (source.hash_algorithm.empty())
+                output << "null";
+            else
+                write_json_string(output, source.hash_algorithm);
+            output << ", \"hash\": ";
+            if (source.hash.empty())
+                output << "null";
+            else
+                write_json_string(output, source.hash);
+            output << ", \"metadata\": ";
+            write_metadata(output, source.metadata);
+            output << '}';
+        }
+
+        void write_json_metadata(std::ostream& output, const Environment& environment, const Node& model) {
+            output << "{\n  \"schema\": \"snt-dip-values/1\",\n  \"values\": {";
+            bool first_value = true;
+            for (const auto& evaluated_node : environment.nodes.get_nodes()) {
+                if (!evaluated_node || (!evaluated_node->value && evaluated_node->value_origin != ValueOrigin::None))
+                    continue;
+                const auto* model_node = find_value_node(model, evaluated_node->path.name);
+                if (!model_node && evaluated_node->value_origin != ValueOrigin::None)
+                    continue;
+                if (!first_value)
+                    output << ",\n";
+                else
+                    output << '\n';
+                first_value = false;
+                const auto provenance = environment[evaluated_node->path.name].get_provenance();
+                output << "    ";
+                write_json_string(output, evaluated_node->path.name);
+                output << ": {\"name\": ";
+                write_json_string(output, model_node ? model_node->name : path_leaf(evaluated_node->path.name));
+                output << ", \"type\": ";
+                const auto type = core::DataTypeNames.find(evaluated_node->value_dtype);
+                write_json_string(output, type == core::DataTypeNames.end() ? "unknown" : type->second);
+                output << ", \"shape\": [";
+                const auto shape = model_node && model_node->is_array ? model_node->shape : std::vector<size_t>{};
+                for (size_t dimension = 0; dimension < shape.size(); ++dimension) {
+                    if (dimension)
+                        output << ", ";
+                    output << shape[dimension];
+                }
+                output << "], \"is_array\": " << (!evaluated_node->dimension.empty() ? "true" : "false")
+                       << ", \"presence\": " << (evaluated_node->value ? "\"value\"" : "\"none\"")
+                       << ", \"value\": " << (model_node ? model_node->literal : "null") << ", \"units\": ";
+                if (evaluated_node->units)
+                    write_json_string(output, evaluated_node->units->to_string());
+                else
+                    output << "null";
+                output << ", \"metadata\": ";
+                write_metadata(output, evaluated_node->metadata);
+                output << ", \"provenance\": {\"source\": ";
+                write_json_string(output, provenance.source_name);
+                output << ", \"line\": " << provenance.source_line << ", \"code\": ";
+                write_json_string(output, provenance.source_code);
+                output << ", \"overridden\": " << (evaluated_node->override ? "true" : "false");
+                if (evaluated_node->override) {
+                    output << ", \"override\": {\"source\": ";
+                    write_json_string(output, evaluated_node->override_line.source.name);
+                    output << ", \"line\": " << evaluated_node->override_line.source.line_number << '}';
+                }
+                output << "}}";
+            }
+            if (!first_value)
+                output << '\n' << "  ";
+            output << "},\n  \"sources\": {";
+            const auto sources = environment.get_source_manifest();
+            for (size_t index = 0; index < sources.size(); ++index) {
+                if (index)
+                    output << ',';
+                output << '\n' << "    ";
+                write_json_string(output, sources[index].name);
+                output << ": ";
+                write_source_info(output, sources[index]);
+            }
+            if (!sources.empty())
+                output << '\n' << "  ";
+            output << "}\n}\n";
         }
 
         void write_yaml(std::ostream& output, const Node& node, size_t depth) {
@@ -1181,6 +1384,9 @@ namespace snt::dip::generate {
         case ExportFormat::JSON:
             write_json(output, *model, 0);
             output << '\n';
+            break;
+        case ExportFormat::JSON_METADATA:
+            write_json_metadata(output, environment, *model);
             break;
         case ExportFormat::YAML:
             write_yaml(output, *model, 0);

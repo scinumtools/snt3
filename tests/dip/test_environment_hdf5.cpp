@@ -94,6 +94,18 @@ TEST(Environment, HierarchyNodeMetadataSurvivesHdf5RoundTrip) {
     std::filesystem::remove(file);
 }
 
+TEST(Environment, EmptyStringsSurviveHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string("empty str = \"\"\nvalues str[2] = [\"\", \"sample\"]\n");
+    const auto file = environment_file("empty-strings");
+    parser.parse().save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_EQ(loaded["empty"].get_value()->to_string(), "\"\"");
+    EXPECT_EQ(loaded["values"].get_value()->to_string(), "[\"\", \"sample\"]");
+    std::filesystem::remove(file);
+}
+
 TEST(Environment, TableAndColumnMetadataSurviveHdf5RoundTrip) {
     dip::DIP parser;
     parser.add_string(

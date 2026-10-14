@@ -54,8 +54,9 @@ Options:
       Record evaluation dependencies for inspection and include them in --save output.
   --relative-source-paths
       Store source paths relative to the --save DIPH5 file.
-  --generate <cpp|c|fortran|rust|julia|json|yaml> <file>
+  --generate <cpp|c|fortran|rust|julia|json|json-metadata|yaml> <file>
       Generate static parameters in the selected format, overwriting the file.
+      json-metadata writes versioned value records with metadata and provenance.
       Request and tag filters affect printed output only.
   -r,--request <query>
       Request specific nodes (e.g. "family.father").

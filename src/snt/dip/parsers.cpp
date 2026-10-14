@@ -510,7 +510,7 @@ namespace snt::dip {
             );
 
         std::string value;
-        bool inString = false;
+        bool has_value = false;
         int dim = 1;
         value_shape.push_back(0);
 
@@ -522,20 +522,23 @@ namespace snt::dip {
                     value_shape.push_back(0);
                 value.clear();
             } else if (ch == SEPARATOR_ARRAY) {
-                if (!value.empty()) {
+                if (has_value) {
                     value_raw.push_back(value);
                     value.clear();
+                    has_value = false;
                 }
                 value_shape[dim - 1]++;
             } else if (ch == SIGN_ARRAY_CLOSE) {
-                if (!value.empty()) {
+                if (has_value) {
                     value_raw.push_back(value);
                     value.clear();
+                    has_value = false;
                 }
                 value_shape[dim - 1]++;
                 dim--;
             } else if (ch == '"') {
                 value.clear();
+                has_value = true;
                 while (ss.get(ch) && ch != '"') {
                     value += ch;
                     rm << ch;
@@ -545,6 +548,7 @@ namespace snt::dip {
                 continue;
             } else {
                 value += ch;
+                has_value = true;
             }
         }
 
