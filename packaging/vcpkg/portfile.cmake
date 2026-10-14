@@ -2,7 +2,7 @@ vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO scinumtools/snt3
     REF v0.9.0
-    SHA512 55b0440b42cb1614208f1b6b77a6a6942f9a062270f949bf2a919e63e19cd5792102b37dab0836b3d342bd339d10d7ecc87927274708945c003faf71ef98ff53
+    SHA512 e53fbf6cc93ea125fa8f7d8461d5411d67d6e7a31390077504e7158172d70f887ebc27de43f20c766da693f6968cccbe725c3853cfe65173465156c5376fcc0c
     # Remove these patches when REF points to a release containing both changes.
     PATCHES
         fix-diph5-size-t.patch
