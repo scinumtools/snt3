@@ -10,8 +10,7 @@ docs/banners/*
 dist/*
 bindings/web/dist/
 docs/source/_static/web/
-!PROPOSALS/*
-!PROPOSALS/backlog.md
+PROPOSALS/
 bindings/python/.pytest_cache/*
 **/__pycache__/*
 .venv
