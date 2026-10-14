@@ -69,6 +69,73 @@ TEST(Environment, OptionLabelsSurviveHdf5RoundTrip) {
     std::filesystem::remove(file);
 }
 
+TEST(Environment, HierarchyNodeMetadataSurvivesHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string(
+        "ontology\n"
+        "  ?descr \"Concept register\"\n"
+        "  sources map\n"
+        "  sources[st_i_3_7]\n"
+        "    ?authors \"Sample authors\"\n"
+        "    ?title \"\"\n"
+        "    locator str = \"I, q. 3, a. 7\"\n"
+    );
+    const auto file = environment_file("hierarchy-node-metadata");
+    parser.parse().save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    const dip::Inspector view{loaded};
+    const auto group = view.describe("ontology");
+    EXPECT_EQ(group.metadata.description, "Concept register");
+    const auto source = view.describe("ontology.sources[st_i_3_7]");
+    EXPECT_EQ(source.metadata.authors, "Sample authors");
+    EXPECT_TRUE(source.metadata.has_property(dip::PropertyType::Title));
+    EXPECT_TRUE(source.metadata.title.empty());
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, TableAndColumnMetadataSurviveHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string(
+        "measurements table = \"\"\"\n"
+        "?descr \"Experiment measurements\"\n"
+        "time float s\n  ?descr \"Elapsed time\"\n"
+        "speed float m/s\n  ?descr \"Measured speed\"\n"
+        "---\n0 3\n1 4\n\"\"\"\n"
+    );
+    const auto file = environment_file("table-metadata");
+    parser.parse().save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    const dip::Inspector view{loaded};
+    EXPECT_EQ(view.describe("measurements").metadata.description, "Experiment measurements");
+    const auto table = view.table("measurements");
+    ASSERT_EQ(table.columns.size(), 2);
+    EXPECT_EQ(table.columns[0].metadata.description, "Elapsed time");
+    EXPECT_EQ(table.columns[1].metadata.description, "Measured speed");
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, SourceMetadataSurvivesHdf5RoundTrip) {
+    dip::DIP parser;
+    parser.add_string(
+        "?authors \"Sample research group\"\n"
+        "?title \"Example source\"\n"
+        "concept str = \"substance\"\n",
+        "ontology.dip"
+    );
+    const auto file = environment_file("source-metadata");
+    parser.parse().save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    const auto source = loaded.get_source_info("ontology.dip");
+    ASSERT_TRUE(source);
+    EXPECT_EQ(source->metadata.authors, "Sample research group");
+    EXPECT_EQ(source->metadata.title, "Example source");
+    EXPECT_TRUE(source->metadata.has_property(dip::PropertyType::Authors));
+    std::filesystem::remove(file);
+}
+
 TEST(Environment, DerivedTableValuesSurviveHdf5RoundTrip) {
     dip::DIP parser;
     parser.add_string(

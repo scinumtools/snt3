@@ -37,7 +37,7 @@ namespace snt::dip {
     };
 
     /**
-     * Durable identity information for one DIPL source.
+     * Durable identity and source-level metadata for one DIPL source.
      *
      * The digest covers the exact UTF-8 bytes parsed by DIP. It is a
      * fingerprint, not embedded source content.
@@ -49,6 +49,7 @@ namespace snt::dip {
         size_t parent_line = 0;
         std::string hash_algorithm;
         std::string hash;
+        ValueMetadata metadata;
     };
 
     /** How source paths are written into a DIPH5 source manifest. */

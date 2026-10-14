@@ -9,6 +9,9 @@ namespace snt::dip {
     }
 
     bool BaseNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
+        (void)units;
+        if (metadata.set_property(property, values))
+            return true;
         throw dip::SyntaxException(
             "Unsupported node property",
             "This node type does not implement property handling.",

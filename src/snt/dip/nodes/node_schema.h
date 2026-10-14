@@ -7,7 +7,6 @@ namespace snt::dip {
 
     class SchemaNode : public BaseNode {
       public:
-        ValueMetadata metadata; ///< Metadata describing the schema definition.
         static BaseNode::PointerType is_node(Parser& parser);
         SchemaNode(Parser& parser) : BaseNode(parser, NodeDtype::Schema) {};
         BaseNode::ListType parse(Environment& env) override;

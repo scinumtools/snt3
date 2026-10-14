@@ -17,45 +17,6 @@ namespace snt::dip {
     class Environment;
 
     /**
-     * Metadata attached to a value node or schema definition.
-     */
-    struct ValueMetadata {
-        std::string description;         ///< Value or schema description
-        std::string authors;             ///< Publication authors
-        std::string title;               ///< Publication title
-        std::string journal;             ///< Publication journal
-        std::string year;                ///< Publication year
-        std::string volume;              ///< Publication volume
-        std::string issue;               ///< Publication issue
-        std::string pages;               ///< Publication pages
-        std::string doi;                 ///< Publication DOI
-        std::string url;                 ///< Online URL of the publication
-        std::string version;             ///< Publication version
-        std::string created;             ///< Date of creation
-        std::string modified;            ///< Date of modification
-        std::string license;             ///< License of the value or schema
-        std::string rationale;           ///< Why the selected value is appropriate
-        std::vector<std::string> native; ///< Native target name(s)
-        std::vector<std::string>
-            requires;                       ///< Required paths or capabilities
-        std::vector<std::string> conflicts; ///< Incompatible paths or capabilities
-        std::vector<std::string> implies;   ///< Implied paths or capabilities
-        std::vector<std::string> see;       ///< Related paths
-        std::vector<std::string> example;   ///< Recommended example values
-        std::string recommended_range;      ///< Advisory, non-enforcing range
-        std::string performance_impact;     ///< Computational-cost implication
-        std::string scientific_impact;      ///< Modelling implication
-        std::string deprecated;             ///< Deprecation notice
-        std::string replacement;            ///< Replacement path
-        std::string since;                  ///< Introducing schema/software version
-        std::string category;               ///< Documentation grouping
-        std::string visibility;             ///< Documentation/UI visibility
-
-        /** Assign a ? metadata property; return false for directives and other properties. */
-        bool set_property(PropertyType property, const val::Array::StringType& values);
-    };
-
-    /**
      * Structure that holds value node data
      *
      * This structure is used in solvers as a lightweight value node data
@@ -100,9 +61,6 @@ namespace snt::dip {
         std::vector<OptionStruct> options;
         std::optional<val::Array::StringType> option_labels; ///< Explicit labels before alignment with options.
         std::string format;
-
-        // metadata
-        ValueMetadata metadata; ///< Metadata on this value node, including schema member metadata.
 
         /** Construct an empty value node. */
         ValueNode() : constant(false), value_dtype(core::DataType::None) {};

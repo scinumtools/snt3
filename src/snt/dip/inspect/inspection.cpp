@@ -508,6 +508,8 @@ namespace snt::dip {
         const auto& env = *env_;
         TableInspection table;
         table.path = std::string(path);
+        if (env.hierarchy.has_collection(table.path))
+            table.metadata = env.hierarchy.get_collection(table.path).metadata;
         const std::string prefix = table.path + ".";
         for (const auto& node : env.nodes.get_nodes()) {
             if (!node || node->table_path != table.path)

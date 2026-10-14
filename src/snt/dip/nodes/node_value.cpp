@@ -24,10 +24,12 @@ namespace snt::dip {
 #define SNT_METADATA_SCALAR(TYPE, FIELD)                                                                               \
     case PropertyType::TYPE:                                                                                           \
         FIELD += values.at(0);                                                                                         \
+        present.insert(PropertyType::TYPE);                                                                            \
         return true
 #define SNT_METADATA_LIST(TYPE, FIELD)                                                                                 \
     case PropertyType::TYPE:                                                                                           \
         FIELD.insert(FIELD.end(), values.begin(), values.end());                                                       \
+        present.insert(PropertyType::TYPE);                                                                            \
         return true
             SNT_METADATA_SCALAR(Description, description);
             SNT_METADATA_SCALAR(Authors, authors);
@@ -65,11 +67,90 @@ namespace snt::dip {
         }
     }
 
+    void ValueMetadata::merge_explicit(const ValueMetadata& other) {
+#define SNT_METADATA_MERGE(TYPE, FIELD)                                                                                \
+    if (other.has_property(PropertyType::TYPE)) {                                                                      \
+        FIELD = other.FIELD;                                                                                           \
+        present.insert(PropertyType::TYPE);                                                                            \
+    }
+        SNT_METADATA_MERGE(Description, description)
+        SNT_METADATA_MERGE(Authors, authors)
+        SNT_METADATA_MERGE(Title, title)
+        SNT_METADATA_MERGE(Journal, journal)
+        SNT_METADATA_MERGE(Year, year)
+        SNT_METADATA_MERGE(Volume, volume)
+        SNT_METADATA_MERGE(Issue, issue)
+        SNT_METADATA_MERGE(Pages, pages)
+        SNT_METADATA_MERGE(DOI, doi)
+        SNT_METADATA_MERGE(URL, url)
+        SNT_METADATA_MERGE(Version, version)
+        SNT_METADATA_MERGE(Created, created)
+        SNT_METADATA_MERGE(Modified, modified)
+        SNT_METADATA_MERGE(License, license)
+        SNT_METADATA_MERGE(Rationale, rationale)
+        SNT_METADATA_MERGE(Native, native)
+        SNT_METADATA_MERGE(Requires, requires)
+        SNT_METADATA_MERGE(Conflicts, conflicts)
+        SNT_METADATA_MERGE(Implies, implies)
+        SNT_METADATA_MERGE(See, see)
+        SNT_METADATA_MERGE(Example, example)
+        SNT_METADATA_MERGE(RecommendedRange, recommended_range)
+        SNT_METADATA_MERGE(PerformanceImpact, performance_impact)
+        SNT_METADATA_MERGE(ScientificImpact, scientific_impact)
+        SNT_METADATA_MERGE(Deprecated, deprecated)
+        SNT_METADATA_MERGE(Replacement, replacement)
+        SNT_METADATA_MERGE(Since, since)
+        SNT_METADATA_MERGE(Category, category)
+        SNT_METADATA_MERGE(Visibility, visibility)
+#undef SNT_METADATA_MERGE
+    }
+
+    std::vector<std::string> ValueMetadata::present_names() const {
+        std::vector<std::string> names;
+        for (const auto property : present) {
+            switch (property) {
+#define SNT_METADATA_NAME(TYPE, NAME) case PropertyType::TYPE: names.emplace_back(NAME); break
+            SNT_METADATA_NAME(Description, "description");
+            SNT_METADATA_NAME(Authors, "authors");
+            SNT_METADATA_NAME(Title, "title");
+            SNT_METADATA_NAME(Journal, "journal");
+            SNT_METADATA_NAME(Year, "year");
+            SNT_METADATA_NAME(Volume, "volume");
+            SNT_METADATA_NAME(Issue, "issue");
+            SNT_METADATA_NAME(Pages, "pages");
+            SNT_METADATA_NAME(DOI, "doi");
+            SNT_METADATA_NAME(URL, "url");
+            SNT_METADATA_NAME(Version, "version");
+            SNT_METADATA_NAME(Created, "created");
+            SNT_METADATA_NAME(Modified, "modified");
+            SNT_METADATA_NAME(License, "license");
+            SNT_METADATA_NAME(Rationale, "rationale");
+            SNT_METADATA_NAME(Native, "native");
+            SNT_METADATA_NAME(Requires, "requires");
+            SNT_METADATA_NAME(Conflicts, "conflicts");
+            SNT_METADATA_NAME(Implies, "implies");
+            SNT_METADATA_NAME(See, "see");
+            SNT_METADATA_NAME(Example, "example");
+            SNT_METADATA_NAME(RecommendedRange, "recommended_range");
+            SNT_METADATA_NAME(PerformanceImpact, "performance_impact");
+            SNT_METADATA_NAME(ScientificImpact, "scientific_impact");
+            SNT_METADATA_NAME(Deprecated, "deprecated");
+            SNT_METADATA_NAME(Replacement, "replacement");
+            SNT_METADATA_NAME(Since, "since");
+            SNT_METADATA_NAME(Category, "category");
+            SNT_METADATA_NAME(Visibility, "visibility");
+#undef SNT_METADATA_NAME
+            default: break;
+            }
+        }
+        return names;
+    }
+
     ValueNode::ValueNode(const ValueNode& other)
         : units(other.units), tags(other.tags), constant(other.constant), override(other.override),
           override_line(other.override_line), modification_lines(other.modification_lines),
           table_path(other.table_path), copied_from(other.copied_from), table_column_index(other.table_column_index),
-          metadata(other.metadata), condition(other.condition), format(other.format),
+          condition(other.condition), format(other.format),
           option_labels(other.option_labels), value_dtype(other.value_dtype), BaseNode(other) {
         options.reserve(other.options.size());
         for (const auto& option : other.options) {
@@ -393,6 +474,7 @@ namespace snt::dip {
 
     void ValueNode::modify_value(const BaseNode::PointerType& node, Environment& env) {
         validate_modification(node);
+        metadata.merge_explicit(node->metadata);
         // Nested schema expansion can repeat a declaration before its value is assigned.
         if (node->dtype != NodeDtype::Modification && node->value_origin == ValueOrigin::Empty &&
             node->value_raw.empty())

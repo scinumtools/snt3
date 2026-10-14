@@ -288,6 +288,12 @@ namespace snt::dip {
         collections.at(path).schemas = std::move(schemas);
     }
 
+    void HierarchyList::merge_metadata(const std::string& path, const ValueMetadata& metadata) {
+        if (!has_collection(path))
+            collections[path] = Collection{path, {}, Path::Kind::Group, {}};
+        collections.at(path).metadata.merge_explicit(metadata);
+    }
+
     void HierarchyList::erase_collection(const std::string& path) {
         collections.erase(path);
     }

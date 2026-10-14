@@ -181,6 +181,9 @@ namespace snt::dip {
          */
         Provenance get_provenance() const;
 
+        /** Return effective metadata on a value, explicit group, collection, or collection item. */
+        ValueMetadata get_metadata() const;
+
         /**
          * Get shape of a value node at the current cursor path
          *

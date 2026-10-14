@@ -199,6 +199,7 @@ namespace snt::dip {
     struct TableInspection {
         std::string path;
         size_t rows = 0;
+        ValueMetadata metadata;
         std::vector<TableColumnInspection> columns;
     };
 

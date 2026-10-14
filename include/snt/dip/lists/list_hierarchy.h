@@ -24,6 +24,7 @@ namespace snt::dip {
         std::vector<std::string> items;     ///< List of collection items
         Path::Kind kind = Path::Kind::None; ///< Collection path kind
         std::vector<std::string> schemas;   ///< List of item schemas
+        ValueMetadata metadata;             ///< Metadata attached to this explicit group or collection node.
     };
 
     /**
@@ -105,6 +106,8 @@ namespace snt::dip {
 
         /** Record schemas applied to an existing group or collection item. */
         void set_schemas(const std::string& path, std::vector<std::string> schemas);
+        /** Merge explicit metadata fields attached to a hierarchy node. */
+        void merge_metadata(const std::string& path, const ValueMetadata& metadata);
 
         /**
          * Test if collection whith the given path exists

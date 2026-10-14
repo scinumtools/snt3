@@ -134,6 +134,8 @@ namespace snt::dip {
         }
 
         bool same_metadata(const ValueMetadata& a, const ValueMetadata& b) {
+            if (a.present != b.present)
+                return false;
 #define SNT_META_EQUAL(name)                                                                                           \
     if (a.name != b.name)                                                                                              \
     return false

@@ -22,10 +22,11 @@ namespace snt::dip {
         const auto capabilities = this->capabilities(path);
         result.dependencies_recorded = this->graph().recorded;
         result.kind = capabilities.hasValue ? "value" : capabilities.hasTabularData ? "table" : "group";
-        if (!capabilities.hasValue && !capabilities.hasTabularData && env.hierarchy.has_collection(result.path)) {
+        if (!capabilities.hasValue && env.hierarchy.has_collection(result.path)) {
             const auto kind = env.hierarchy.get_collection(result.path).kind;
-            if (kind == Path::Kind::Map || kind == Path::Kind::List)
+            if (!capabilities.hasTabularData && (kind == Path::Kind::Map || kind == Path::Kind::List))
                 result.kind = "collection";
+            result.metadata = env.hierarchy.get_collection(result.path).metadata;
         }
         if (!capabilities.hasValue) {
             result.value_unavailable_reason = "not_a_value";
@@ -127,13 +128,13 @@ namespace snt::dip {
                         member.kind = "table";
                     else
                         member.kind = "value";
+                    member.metadata = node->metadata;
                     if (const auto value = std::dynamic_pointer_cast<ValueNode>(node)) {
                         if (value->value_dtype != core::DataType::None)
                             member.type = type_name(value->value_dtype);
                         member.units = value->units_raw;
                         member.dimensions = value->dimension;
                         member.condition = value->condition;
-                        member.metadata = value->metadata;
                         for (const auto& option : value->options) {
                             member.options.push_back(
                                 option.value_raw + (option.units_raw.empty() ? "" : " " + option.units_raw)

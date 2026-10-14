@@ -115,7 +115,14 @@ namespace snt::api {
             strings(out, value.see);
             out << ",\"example\":";
             strings(out, value.example);
-            out << '}';
+            out << ",\"present\":[";
+            const auto present = value.present_names();
+            for (std::size_t i = 0; i < present.size(); ++i) {
+                if (i)
+                    out << ',';
+                out << quote(present[i]);
+            }
+            out << "]}";
         }
 
         void description(std::ostream& out, const dip::SemanticDescription& value) {
@@ -389,6 +396,25 @@ namespace snt::api {
                 out << quote(*value.contributing_schema_id);
             else
                 out << "null";
+            out << '}';
+        }
+        out << "]}";
+        return out.str();
+    }
+
+    std::string DIPSemantic::sources_json() const {
+        const auto sources = inspector().sources();
+        std::ostringstream out;
+        out << "{\"schema\":\"snt-source-manifest/1\",\"sources\":[";
+        for (std::size_t i = 0; i < sources.size(); ++i) {
+            if (i)
+                out << ',';
+            const auto& source = sources[i];
+            out << "{\"name\":" << quote(source.name) << ",\"path\":" << quote(source.path)
+                << ",\"parent\":" << quote(source.parent_name) << ",\"parent_line\":" << source.parent_line
+                << ",\"hash_algorithm\":" << quote(source.hash_algorithm) << ",\"hash\":" << quote(source.hash)
+                << ",\"metadata\":";
+            metadata(out, source.metadata);
             out << '}';
         }
         out << "]}";

@@ -421,8 +421,10 @@ overrides list : snt_project_override
     ) {
         // assign properties to the previous value node
         PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
-        if (!previous_node || std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
-                                  preceeding_nodes.end()) {
+        const bool is_metadata = pnode->ptype >= PropertyType::Description && pnode->ptype < PropertyType::Delimiter;
+        if (!previous_node || (!is_metadata &&
+                               std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
+                                   preceeding_nodes.end())) {
             std::stringstream ss;
             for (size_t i = 0; i < preceeding_nodes.size(); i++) {
                 if (i == preceeding_nodes.size() - 1)
@@ -613,11 +615,29 @@ overrides list : snt_project_override
 
         // set properties to nodes and aggregate schemas
         BaseNode::PointerType previous_node = nullptr;
+        std::set<std::string> sources_with_nodes;
         for (size_t i = 0; i < queue.size(); ++i) {
             BaseNode::PointerType current_node = queue.at(i);
+            if (current_node->dtype != NodeDtype::Property && current_node->dtype != NodeDtype::Empty)
+                sources_with_nodes.insert(current_node->line.source.name);
             if (current_node->dtype == NodeDtype::Property) {
-                // set property to a node
-                set_node_property(current_node, previous_node);
+                const auto property = std::dynamic_pointer_cast<PropertyNode>(current_node);
+                const bool is_metadata = property->ptype >= PropertyType::Description &&
+                                         property->ptype < PropertyType::Delimiter;
+                const std::string& source_name = current_node->line.source.name;
+                if (is_metadata && current_node->indent == 0 && !sources_with_nodes.count(source_name)) {
+                    const auto source = env.sources.entries().find(source_name);
+                    if (source == env.sources.entries().end() ||
+                        !env.sources.at(source_name).metadata.set_property(property->ptype, property->value_raw))
+                        throw dip::SyntaxException(
+                            "Invalid source metadata",
+                            "The metadata property could not be assigned to its source.",
+                            "Place a supported ? metadata property at indentation zero before the source's first node.",
+                            __FILE__, __LINE__, current_node->line
+                        );
+                } else {
+                    set_node_property(current_node, previous_node);
+                }
             } else if (current_node->dtype == NodeDtype::Schema) {
                 // create a schema and aggregate all child nodes
                 check_indent(previous_node, current_node);
@@ -820,6 +840,8 @@ overrides list : snt_project_override
                 });
             else
                 target.hierarchy.record(node, nodes_nohierarchy);
+            if (active_hierarchy && node->dtype == NodeDtype::Group && !node->metadata.present.empty())
+                target.hierarchy.merge_metadata(target.branching.clean_name(node->path.name), node->metadata);
             if (active_hierarchy && node->dtype == NodeDtype::Group)
                 target.record_declaration(target.branching.clean_name(node->path.name), node->line);
             if (active_hierarchy && node->dtype == NodeDtype::Group) {

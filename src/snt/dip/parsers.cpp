@@ -326,16 +326,58 @@ namespace snt::dip {
         return nodes;
     }
 
-    BaseNode::ListType parse_table_nodes(std::queue<Line>& lines, const char delimiter) {
+    BaseNode::ListType parse_table_nodes(
+        std::queue<Line>& lines, ValueMetadata& table_metadata, const char delimiter
+    ) {
         // parse nodes from a table header
         BaseNode::ListType nodes;
         while (!lines.empty()) {
             Line line = lines.front();
             lines.pop();
-            trim(line.code);
+            const auto first = line.code.find_first_not_of(' ');
+            const size_t indent = first == std::string::npos ? 0 : first;
+            std::string normalized = line.code;
+            trim(normalized);
             // stop when the end of the table header is reached
-            if (line.code == SEPARATOR_TABLE_HEADER)
+            if (normalized == SEPARATOR_TABLE_HEADER)
                 break;
+            // Metadata at header indentation describes the table; one level
+            // beneath a column definition describes that column.
+            Parser property_parser(line);
+            property_parser.part_indent();
+            if (auto property = std::dynamic_pointer_cast<PropertyNode>(PropertyNode::is_node(property_parser))) {
+                const bool is_metadata = property->ptype >= PropertyType::Description &&
+                                         property->ptype < PropertyType::Delimiter;
+                if (!is_metadata)
+                    throw dip::SyntaxException(
+                        "Unsupported table header property",
+                        "Only metadata properties are supported in table headers.",
+                        "Use metadata at indentation zero for the table or indentation two under a column.",
+                        __FILE__, __LINE__, line
+                    );
+                if (indent == 0 && nodes.empty()) {
+                    table_metadata.set_property(property->ptype, property->value_raw);
+                } else if (indent == INDENT_STEP && !nodes.empty()) {
+                    auto& column = nodes.back();
+                    if (!column->set_property(property->ptype, property->value_raw, property->units_raw))
+                        throw dip::SyntaxException(
+                            "Unsupported column metadata",
+                            "The table column does not accept this metadata property.",
+                            "Use a defined metadata property under the column definition.",
+                            __FILE__, __LINE__, line
+                        );
+                } else {
+                    throw dip::SyntaxException(
+                        "Invalid table metadata indentation",
+                        "Table metadata must precede columns at indentation zero, and column metadata must be indented "
+                        "two spaces beneath its column.",
+                        "Move the property to the table header or beneath its column definition.",
+                        __FILE__, __LINE__, line
+                    );
+                }
+                continue;
+            }
+            line.code = std::move(normalized);
             // parse a node from the current line
             Parser parser(line);
             parser.part_path();

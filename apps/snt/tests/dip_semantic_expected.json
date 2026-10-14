@@ -29,7 +29,7 @@
       "created": "", "modified": "", "license": "", "rationale": "",
       "recommended_range": "", "performance_impact": "", "scientific_impact": "",
       "deprecated": "", "replacement": "", "since": "", "category": "", "visibility": "",
-      "native": [], "requires": [], "conflicts": [], "implies": [], "see": [], "example": []
+      "native": [], "requires": [], "conflicts": [], "implies": [], "see": [], "example": [], "present": []
     },
     "tags": [],
     "overridden": false,
@@ -55,7 +55,7 @@
       "created": "", "modified": "", "license": "", "rationale": "",
       "recommended_range": "", "performance_impact": "", "scientific_impact": "",
       "deprecated": "", "replacement": "", "since": "", "category": "", "visibility": "",
-      "native": [], "requires": [], "conflicts": [], "implies": [], "see": [], "example": []
+      "native": [], "requires": [], "conflicts": [], "implies": [], "see": [], "example": [], "present": []
     },
     "tags": [],
     "overridden": false,
@@ -106,7 +106,8 @@
       "deprecated": "", "replacement": "", "since": "", "category": "Motion", "visibility": "public",
       "native": ["mean_speed"], "requires": ["simulation.distance", "simulation.duration"],
       "conflicts": [], "implies": [], "see": ["simulation.distance", "simulation.duration"],
-      "example": ["2 m/s", "3 m/s"]
+      "example": ["2 m/s", "3 m/s"],
+      "present": ["description", "authors", "title", "version", "license", "rationale", "native", "requires", "see", "example", "recommended_range", "performance_impact", "scientific_impact", "category", "visibility"]
     },
     "tags": ["physics", "derived"],
     "overridden": false,

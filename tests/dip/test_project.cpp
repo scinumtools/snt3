@@ -58,7 +58,13 @@ TEST(Project, PackagesTypedTableAndMatchesNativeEvaluation) {
         "interval float = 3 tick\n"
         "scaled float = ({?settings.factor} * 3)\n"
     );
-    project.write("measurements.dipt", "time float s\nmass float kg\n---\n0 1\n1 3\n");
+    project.write(
+        "measurements.dipt",
+        "?descr \"External measurement set\"\n"
+        "time float s\n  ?descr \"Sample time\"\n"
+        "mass float kg\n  ?descr \"Measured mass\"\n"
+        "---\n0 1\n1 3\n"
+    );
 
     dip::DIP native;
     native.add_project(project.path() / "DIPfile");
@@ -73,6 +79,12 @@ TEST(Project, PackagesTypedTableAndMatchesNativeEvaluation) {
     EXPECT_EQ(actual["settings.mode"].as<int64_t>(), expected["settings.mode"].as<int64_t>());
     EXPECT_EQ(actual["samples.time"].as<std::vector<double>>(), expected["samples.time"].as<std::vector<double>>());
     EXPECT_EQ(actual["samples.mass"].as<std::vector<double>>(), expected["samples.mass"].as<std::vector<double>>());
+    const dip::Inspector inspected{actual};
+    EXPECT_EQ(inspected.describe("samples").metadata.description, "External measurement set");
+    const auto table = inspected.table("samples");
+    ASSERT_EQ(table.columns.size(), 2);
+    EXPECT_EQ(table.columns[0].metadata.description, "Sample time");
+    EXPECT_EQ(table.columns[1].metadata.description, "Measured mass");
     EXPECT_EQ(dip::Inspector{actual}.describe("samples.mass").units, "kg");
     EXPECT_EQ(dip::Inspector{actual}.describe("scaled").value_text, "6");
     ASSERT_EQ(actual.project_entries().size(), expected.project_entries().size());

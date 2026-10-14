@@ -22,16 +22,17 @@ namespace snt::dip {
     }
 
     inline BaseNode::ListType parse_nodes(
-        const std::string& value_raw, const std::string& source_name, const char delimiter
+        const std::string& value_raw, const std::string& source_name, ValueMetadata& metadata, const char delimiter
     ) {
         std::queue<Line> lines;
         parse_lines(lines, value_raw, source_name);
-        return parse_table_nodes(lines, delimiter);
+        return parse_table_nodes(lines, metadata, delimiter);
     }
 
     BaseNode::ListType TableNode::parse(Environment& env) {
         std::string source_name = line.source.name + "_" + std::string(TABLE_SOURCE);
         BaseNode::ListType nodes;
+        ValueMetadata header_metadata;
         switch (value_origin) {
         case ValueOrigin::Function: {
             ValueNode::ListType vnodes = env.request_group(value_raw.at(0), RequestType::Function);
@@ -46,10 +47,10 @@ namespace snt::dip {
             break;
         }
         case ValueOrigin::ReferenceRaw:
-            nodes = parse_nodes(env.request_code(value_raw.at(0)), source_name, delimiter);
+            nodes = parse_nodes(env.request_code(value_raw.at(0)), source_name, header_metadata, delimiter);
             break;
         case ValueOrigin::String:
-            nodes = parse_nodes(value_raw.at(0), source_name, delimiter);
+            nodes = parse_nodes(value_raw.at(0), source_name, header_metadata, delimiter);
             break;
         case ValueOrigin::Empty: {
             // if value is empty, we have to defer this node until its value will be defined
@@ -67,7 +68,10 @@ namespace snt::dip {
                 line
             );
         }
+        metadata.merge_explicit(header_metadata);
         const std::string full_name = env.hierarchy.get_current_path(indent, path.name).name;
+        if (!metadata.present.empty())
+            env.hierarchy.merge_metadata(full_name, metadata);
         env.record_declaration(full_name, line);
         env.record_block_input(*this, *this, full_name);
         // we have to check if a deferred table node is already in the node list
@@ -112,12 +116,11 @@ namespace snt::dip {
     }
 
     bool TableNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
-        const std::string& delimiter_raw = values.at(0);
-        if (property == PropertyType::Delimiter && !delimiter_raw.empty()) {
-            delimiter = delimiter_raw[0];
+        if (property == PropertyType::Delimiter && !values.empty() && !values[0].empty()) {
+            delimiter = values[0][0];
             return true;
         }
-        return false;
+        return BaseNode::set_property(property, values, units);
     }
 
 } // namespace snt::dip

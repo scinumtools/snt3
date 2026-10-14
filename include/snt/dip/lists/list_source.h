@@ -27,6 +27,7 @@ namespace snt::dip {
         HierarchyList hierarchy;           // source-local hierarchy
         ExplicitDeclarations declarations; // explicit source-local paths
         bool embedded = false;             // code came from a string rather than the file at path
+        ValueMetadata metadata;            // metadata declared at indentation zero in this source
                                            // std::shared_ptr<SourceList> sources;
     };
 

@@ -180,9 +180,45 @@ Metadata provide additional information about a parameter without affecting its 
 In particular, provenance metadata describe the origin of a parameter's value, such as the publication, dataset, or other source from which it was obtained. This allows scientific and engineering data to remain traceable and properly attributed.
 
 Unlike comments, metadata are part of the parsed document and are preserved during processing.
-On a `$schema` declaration, metadata describe the reusable definition and
-must appear before its first member. They stay on the schema definition rather
-than the group, collection, item, or value nodes that result from applying it.
+Metadata may be attached to any explicit node in a dot-separated hierarchy:
+groups, map/list collections, map/list items, and values. For example, a map
+item can carry citation metadata directly, while its typed fields continue to
+be validated by the map's schema. Metadata is available through node
+inspection and is retained in DIPH5 artifacts.
+
+At indentation zero before the first node in a `.dip` source, `?` metadata
+describes the source file itself. It is available through source inspection
+(`snt dip sources`) and is not inherited by the nodes declared in that file.
+
+On a `$schema` declaration, metadata before the first member describe the
+reusable definition. Metadata attached to an individual schema member provide
+defaults for instances of that member. Explicit metadata on an instance
+replaces the corresponding schema-member field, while fields not set on the
+instance retain their defaults. Metadata on a schema definition itself is not
+inherited by instances. Explicitly empty metadata values are preserved and can
+be distinguished from fields that are absent in inspection results.
+
+Table headers use indentation to distinguish table metadata from column
+metadata. Properties at indentation zero before the first column describe the
+table node; properties indented by two spaces beneath a column describe that
+column. This header syntax is shared by inline block tables and external
+`.dipt` files:
+
+```DIPL
+measurements table = """?descr "Experiment measurements"
+time float s
+  ?descr "Elapsed time"
+speed float m/s
+  ?descr "Measured flow speed"
+---
+0 3
+1 4
+"""
+```
+
+The table and column properties use the same metadata fields and merge rules
+as other DIPL nodes. Table-level metadata can also be attached to the table
+declaration in the enclosing `.dip` file.
 
 The following metadata properties are currently defined:
 

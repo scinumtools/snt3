@@ -38,6 +38,12 @@ namespace snt::dip {
         TableInspection table(std::string_view path) const;
         /** All evaluated tables in environment order. */
         std::vector<TableInspection> tables() const;
+        /** Source manifest entries, including source-level metadata. */
+        std::vector<SourceInfo> sources() const { return env_->get_source_manifest(); }
+        /** Find one source by its DIPL source name. */
+        std::optional<SourceInfo> source(std::string_view name) const {
+            return env_->get_source_info(std::string(name));
+        }
         /** Available facts and operations for a value, group, collection, table, or named-source path. */
         InspectionCapabilities capabilities(std::string_view path) const;
         /** Static override target and known constraints; preview decides candidate validity. */

@@ -5,6 +5,7 @@
 #include <snt/c/dip.h>
 #include <sstream>
 #include <string>
+#include <vector>
 
 class Environment : public testing::Test {
   protected:
@@ -47,6 +48,161 @@ TEST(DIP, ParseAndGet) {
     snt_dip_parser_free(dip);
 }
 
+TEST(DIP, TypedNodeTraversal) {
+    snt_dip* dip = nullptr;
+    snt_dip_error error{};
+    ASSERT_EQ(snt_dip_parser_create(&dip, &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_string(
+        dip,
+        "simulation\n  enabled bool = true\n  timestep float = 0.5 fs\n  steps int = 42\n"
+        "    !options [42,43]\n    !labels [\"42 steps\",\"43 steps\"]\n"
+        "    ?rationale \"fixed step count\"\n    ?native [\"nsteps\"]\n"
+        "  title str = \"run\"\n"
+        "$schema integer\n  value int\n"
+        "$schema edge\n  code int\n"
+        "items list : integer\n"
+        "items[]\n  value = 7\nitems[]\n  value = 9\n"
+        "edges map : edge\nedges[first]\n  code = 11\n"
+        "samples int[3] = [3,5,8]",
+        &error), 0) << error.message;
+    ASSERT_EQ(snt_dip_parser_parse(dip, &error), 0) << error.message;
+
+    snt_dip_node* group = nullptr;
+    ASSERT_EQ(snt_dip_environment_get_node(dip, "simulation", &group, &error), 0) << error.message;
+    snt_dip_node_kind kind{};
+    ASSERT_EQ(snt_dip_node_get_kind(group, &kind, &error), 0);
+    EXPECT_EQ(kind, SNT_DIP_NODE_GROUP);
+    size_t size = 0;
+    ASSERT_EQ(snt_dip_node_get_size(group, &size, &error), 0);
+    EXPECT_EQ(size, 4);
+
+    snt_dip_node* steps = nullptr;
+    ASSERT_EQ(snt_dip_node_get_child(group, "steps", &steps, &error), 0) << error.message;
+    int64_t integer = 0;
+    ASSERT_EQ(snt_dip_node_get_int64(steps, &integer, &error), 0) << error.message;
+    EXPECT_EQ(integer, 42);
+    snt_dip_value_type value_type{};
+    ASSERT_EQ(snt_dip_node_get_type(steps, &value_type, &error), 0);
+    EXPECT_EQ(value_type, SNT_DIP_VALUE_INT32);
+    size_t rank = 99;
+    ASSERT_EQ(snt_dip_node_get_shape(steps, nullptr, 0, &rank, &error), 0);
+    EXPECT_EQ(rank, 1);
+    size_t extent = 0;
+    ASSERT_EQ(snt_dip_node_get_shape(steps, &extent, 1, &rank, &error), 0);
+    EXPECT_EQ(extent, 1);
+    size_t metadata_size = 0;
+    ASSERT_EQ(snt_dip_node_get_metadata(steps, "rationale", nullptr, 0, &metadata_size, &error), 0);
+    std::vector<char> rationale(metadata_size);
+    ASSERT_EQ(snt_dip_node_get_metadata(steps, "rationale", rationale.data(), rationale.size(), &metadata_size, &error), 0);
+    EXPECT_STREQ(rationale.data(), "fixed step count");
+    int has_metadata = 0;
+    ASSERT_EQ(snt_dip_node_has_metadata(steps, "rationale", &has_metadata, &error), 0);
+    EXPECT_EQ(has_metadata, 1);
+    ASSERT_EQ(snt_dip_node_has_metadata(steps, "title", &has_metadata, &error), 0);
+    EXPECT_EQ(has_metadata, 0);
+    ASSERT_EQ(snt_dip_node_get_metadata_list_size(steps, "native", &metadata_size, &error), 0);
+    EXPECT_EQ(metadata_size, 1);
+    std::array<char, 256> source_name{}, source_code{}, override_source_name{}, override_code{};
+    size_t source_name_required = 0, source_code_required = 0;
+    size_t override_source_name_required = 0, override_code_required = 0;
+    size_t source_line = 0, override_line = 0;
+    ASSERT_EQ(snt_dip_node_get_provenance(
+        steps, source_name.data(), source_name.size(), &source_name_required, &source_line,
+        source_code.data(), source_code.size(), &source_code_required,
+        override_source_name.data(), override_source_name.size(), &override_source_name_required,
+        &override_line, override_code.data(), override_code.size(), &override_code_required, &error), 0) << error.message;
+    EXPECT_GT(source_line, 0);
+    EXPECT_NE(std::string(source_code.data()).find("steps int = 42"), std::string::npos);
+    EXPECT_EQ(override_line, 0);
+    EXPECT_STREQ(override_source_name.data(), "");
+    EXPECT_NE(snt_dip_node_get_bool(steps, nullptr, &error), 0);
+    int overridden = -1;
+    ASSERT_EQ(snt_dip_node_is_overridden(steps, &overridden, &error), 0);
+    EXPECT_EQ(overridden, 0);
+    size_t option_count = 0;
+    ASSERT_EQ(snt_dip_node_get_option_count(steps, &option_count, &error), 0);
+    EXPECT_EQ(option_count, 2);
+    size_t option_text_size = 0;
+    ASSERT_EQ(snt_dip_node_get_option_value(steps, 1, nullptr, 0, &option_text_size, &error), 0);
+    std::vector<char> option_text(option_text_size);
+    ASSERT_EQ(snt_dip_node_get_option_value(steps, 1, option_text.data(), option_text.size(), &option_text_size, &error), 0);
+    EXPECT_STREQ(option_text.data(), "43");
+    ASSERT_EQ(snt_dip_node_get_option_label(steps, 1, nullptr, 0, &option_text_size, &error), 0);
+    option_text.resize(option_text_size);
+    ASSERT_EQ(snt_dip_node_get_option_label(steps, 1, option_text.data(), option_text.size(), &option_text_size, &error), 0);
+    EXPECT_STREQ(option_text.data(), "43 steps");
+
+    snt_dip_node* timestep = nullptr;
+    ASSERT_EQ(snt_dip_environment_get_node(dip, "simulation.timestep", &timestep, &error), 0);
+    int has_units = 0;
+    ASSERT_EQ(snt_dip_node_has_units(timestep, &has_units, &error), 0);
+    EXPECT_EQ(has_units, 1);
+    size_t unit_size = 0;
+    ASSERT_EQ(snt_dip_node_get_units(timestep, nullptr, 0, &unit_size, &error), 0);
+    std::vector<char> unit_text(unit_size);
+    ASSERT_EQ(snt_dip_node_get_units(timestep, unit_text.data(), unit_text.size(), &unit_size, &error), 0);
+    EXPECT_NE(std::string(unit_text.data()).find("fs"), std::string::npos);
+
+    snt_dip_node* sequence = nullptr;
+    ASSERT_EQ(snt_dip_environment_get_node(dip, "items", &sequence, &error), 0);
+    ASSERT_EQ(snt_dip_node_get_size(sequence, &size, &error), 0);
+    EXPECT_EQ(size, 2);
+    snt_dip_node* element = nullptr;
+    ASSERT_EQ(snt_dip_node_get_element(sequence, 1, &element, &error), 0) << error.message;
+    snt_dip_node* list_value = nullptr;
+    ASSERT_EQ(snt_dip_node_get_child(element, "value", &list_value, &error), 0);
+    ASSERT_EQ(snt_dip_node_get_int64(list_value, &integer, &error), 0);
+    EXPECT_EQ(integer, 9);
+    snt_dip_node* mapping = nullptr;
+    ASSERT_EQ(snt_dip_environment_get_node(dip, "edges", &mapping, &error), 0);
+    ASSERT_EQ(snt_dip_node_get_size(mapping, &size, &error), 0);
+    EXPECT_EQ(size, 1);
+    size_t key_size = 0;
+    ASSERT_EQ(snt_dip_node_get_key(mapping, 0, nullptr, 0, &key_size, &error), 0);
+    std::vector<char> key(key_size);
+    ASSERT_EQ(snt_dip_node_get_key(mapping, 0, key.data(), key.size(), &key_size, &error), 0);
+    EXPECT_STREQ(key.data(), "first");
+    snt_dip_node* item = nullptr;
+    ASSERT_EQ(snt_dip_node_get_item(mapping, "first", &item, &error), 0) << error.message;
+    snt_dip_node* code = nullptr;
+    ASSERT_EQ(snt_dip_node_get_child(item, "code", &code, &error), 0) << error.message;
+    size_t path_size = 0;
+    ASSERT_EQ(snt_dip_node_get_path(code, nullptr, 0, &path_size, &error), 0);
+    std::vector<char> path(path_size);
+    ASSERT_EQ(snt_dip_node_get_path(code, path.data(), path.size(), &path_size, &error), 0);
+    EXPECT_STREQ(path.data(), "edges[first].code");
+
+    size_t required = 0;
+    snt_dip_node* title = nullptr;
+    ASSERT_EQ(snt_dip_node_get_child(group, "title", &title, &error), 0);
+    EXPECT_EQ(snt_dip_node_get_string(title, nullptr, 0, &required, &error), 0);
+    std::vector<char> text(required);
+    ASSERT_EQ(snt_dip_node_get_string(title, text.data(), text.size(), &required, &error), 0);
+    EXPECT_STREQ(text.data(), "run");
+
+    snt_dip_node* samples = nullptr;
+    ASSERT_EQ(snt_dip_environment_get_node(dip, "samples", &samples, &error), 0);
+    ASSERT_EQ(snt_dip_node_get_value_size(samples, &size, &error), 0);
+    EXPECT_EQ(size, 3);
+    int64_t sample = 0;
+    ASSERT_EQ(snt_dip_node_get_int64_at(samples, 2, &sample, &error), 0) << error.message;
+    EXPECT_EQ(sample, 8);
+    EXPECT_NE(snt_dip_node_get_int64_at(samples, 3, &sample, &error), 0);
+
+    snt_dip_node_free(samples);
+    snt_dip_node_free(timestep);
+    snt_dip_node_free(code);
+    snt_dip_node_free(item);
+    snt_dip_node_free(mapping);
+    snt_dip_node_free(element);
+    snt_dip_node_free(sequence);
+    snt_dip_node_free(list_value);
+    snt_dip_node_free(steps);
+    snt_dip_node_free(title);
+    snt_dip_node_free(group);
+    snt_dip_parser_free(dip);
+}
+
 TEST(DIP, ReportsErrors) {
     snt_dip_error error{};
 
@@ -81,6 +237,11 @@ TEST(DIP, Overrides) {
     EXPECT_STREQ(output.data(), "30");
     ASSERT_EQ(snt_dip_parser_is_overridden(parser, "value", &overridden, &error), 0);
     EXPECT_EQ(overridden, 1);
+    snt_dip_node* value_node = nullptr;
+    ASSERT_EQ(snt_dip_environment_get_node(parser, "value", &value_node, &error), 0);
+    ASSERT_EQ(snt_dip_node_is_overridden(value_node, &overridden, &error), 0);
+    EXPECT_EQ(overridden, 1);
+    snt_dip_node_free(value_node);
     ASSERT_EQ(snt_dip_parser_is_overridden(parser, "plain", &overridden, &error), 0);
     EXPECT_EQ(overridden, 0);
     EXPECT_NE(snt_dip_parser_is_overridden(parser, "missing", &overridden, &error), 0);

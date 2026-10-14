@@ -513,6 +513,7 @@ namespace snt::dip::hdf5 {
             SNT_WRITE_METADATA_LIST(see);
             SNT_WRITE_METADATA_LIST(example);
 #undef SNT_WRITE_METADATA_LIST
+            write_strings(object, "metadata_present", metadata.present_names());
         }
 
         void write_value_dataset(hid_t file, const std::string& path, const ValueNode& node) {
@@ -613,6 +614,33 @@ namespace snt::dip::hdf5 {
             Id group = ensure_group(file, path, std::string(KIND_VALUE_GROUP));
             write_string(group, ATTR_PATH, node.path.name);
             write_value_dataset(group, std::string(VALUE_PAYLOAD), node);
+        }
+
+        void write_hierarchy_metadata(hid_t file, const Environment& env) {
+            for (const auto& [path, collection] : env.hierarchy.get_collections()) {
+                if (collection.metadata.present.empty())
+                    continue;
+                const std::string hdf5_path = dataset_path(file, env, path);
+                std::string kind;
+                switch (collection.kind) {
+                case Path::Kind::Group: kind = "group"; break;
+                case Path::Kind::Map: kind = "map"; break;
+                case Path::Kind::List: kind = "list"; break;
+                case Path::Kind::Item: {
+                    const auto open = path.rfind('[');
+                    if (open == std::string::npos)
+                        throw Error("A metadata-bearing collection item has an invalid path");
+                    const auto parent = env.hierarchy.get_collection(path.substr(0, open));
+                    kind = parent.kind == Path::Kind::List ? "list_item" : "map_item";
+                    break;
+                }
+                default: continue;
+                }
+                Id group = ensure_group(file, hdf5_path, kind);
+                write_string(group, ATTR_PATH, path);
+                write_strings(group, ATTR_SCHEMAS, collection.schemas);
+                write_metadata(group, collection.metadata);
+            }
         }
 
         std::vector<hsize_t> dimensions(hid_t dataset) {
@@ -770,6 +798,72 @@ namespace snt::dip::hdf5 {
             SNT_READ_METADATA_LIST(see);
             SNT_READ_METADATA_LIST(example);
 #undef SNT_READ_METADATA_LIST
+#define SNT_READ_METADATA_PRESENCE(TYPE, NAME, FIELD)                                                                  \
+    if (has_attribute(object, NAME) || !metadata.FIELD.empty())                                                        \
+    metadata.present.insert(PropertyType::TYPE)
+            SNT_READ_METADATA_PRESENCE(Description, "description", description);
+            SNT_READ_METADATA_PRESENCE(Authors, "authors", authors);
+            SNT_READ_METADATA_PRESENCE(Title, "title", title);
+            SNT_READ_METADATA_PRESENCE(Journal, "journal", journal);
+            SNT_READ_METADATA_PRESENCE(Year, "year", year);
+            SNT_READ_METADATA_PRESENCE(Volume, "volume", volume);
+            SNT_READ_METADATA_PRESENCE(Issue, "issue", issue);
+            SNT_READ_METADATA_PRESENCE(Pages, "pages", pages);
+            SNT_READ_METADATA_PRESENCE(DOI, "doi", doi);
+            SNT_READ_METADATA_PRESENCE(URL, "url", url);
+            SNT_READ_METADATA_PRESENCE(Version, "version", version);
+            SNT_READ_METADATA_PRESENCE(Created, "created", created);
+            SNT_READ_METADATA_PRESENCE(Modified, "modified", modified);
+            SNT_READ_METADATA_PRESENCE(License, "license", license);
+            SNT_READ_METADATA_PRESENCE(Rationale, "rationale", rationale);
+            SNT_READ_METADATA_PRESENCE(Native, "native", native);
+            SNT_READ_METADATA_PRESENCE(Requires, "requires", requires);
+            SNT_READ_METADATA_PRESENCE(Conflicts, "conflicts", conflicts);
+            SNT_READ_METADATA_PRESENCE(Implies, "implies", implies);
+            SNT_READ_METADATA_PRESENCE(See, "see", see);
+            SNT_READ_METADATA_PRESENCE(Example, "example", example);
+            SNT_READ_METADATA_PRESENCE(RecommendedRange, "recommended_range", recommended_range);
+            SNT_READ_METADATA_PRESENCE(PerformanceImpact, "performance_impact", performance_impact);
+            SNT_READ_METADATA_PRESENCE(ScientificImpact, "scientific_impact", scientific_impact);
+            SNT_READ_METADATA_PRESENCE(Deprecated, "deprecated", deprecated);
+            SNT_READ_METADATA_PRESENCE(Replacement, "replacement", replacement);
+            SNT_READ_METADATA_PRESENCE(Since, "since", since);
+            SNT_READ_METADATA_PRESENCE(Category, "category", category);
+            SNT_READ_METADATA_PRESENCE(Visibility, "visibility", visibility);
+#undef SNT_READ_METADATA_PRESENCE
+            for (const auto& name : read_strings(object, "metadata_present")) {
+#define SNT_READ_METADATA_NAME(TYPE, NAME) if (name == NAME) metadata.present.insert(PropertyType::TYPE)
+                SNT_READ_METADATA_NAME(Description, "description");
+                else SNT_READ_METADATA_NAME(Authors, "authors");
+                else SNT_READ_METADATA_NAME(Title, "title");
+                else SNT_READ_METADATA_NAME(Journal, "journal");
+                else SNT_READ_METADATA_NAME(Year, "year");
+                else SNT_READ_METADATA_NAME(Volume, "volume");
+                else SNT_READ_METADATA_NAME(Issue, "issue");
+                else SNT_READ_METADATA_NAME(Pages, "pages");
+                else SNT_READ_METADATA_NAME(DOI, "doi");
+                else SNT_READ_METADATA_NAME(URL, "url");
+                else SNT_READ_METADATA_NAME(Version, "version");
+                else SNT_READ_METADATA_NAME(Created, "created");
+                else SNT_READ_METADATA_NAME(Modified, "modified");
+                else SNT_READ_METADATA_NAME(License, "license");
+                else SNT_READ_METADATA_NAME(Rationale, "rationale");
+                else SNT_READ_METADATA_NAME(Native, "native");
+                else SNT_READ_METADATA_NAME(Requires, "requires");
+                else SNT_READ_METADATA_NAME(Conflicts, "conflicts");
+                else SNT_READ_METADATA_NAME(Implies, "implies");
+                else SNT_READ_METADATA_NAME(See, "see");
+                else SNT_READ_METADATA_NAME(Example, "example");
+                else SNT_READ_METADATA_NAME(RecommendedRange, "recommended_range");
+                else SNT_READ_METADATA_NAME(PerformanceImpact, "performance_impact");
+                else SNT_READ_METADATA_NAME(ScientificImpact, "scientific_impact");
+                else SNT_READ_METADATA_NAME(Deprecated, "deprecated");
+                else SNT_READ_METADATA_NAME(Replacement, "replacement");
+                else SNT_READ_METADATA_NAME(Since, "since");
+                else SNT_READ_METADATA_NAME(Category, "category");
+                else SNT_READ_METADATA_NAME(Visibility, "visibility");
+#undef SNT_READ_METADATA_NAME
+            }
         }
 
         void read_dataset(Environment& env, hid_t dataset) {
@@ -936,7 +1030,9 @@ namespace snt::dip::hdf5 {
                     ),
                     read_string(entry, ATTR_SOURCE_HASH_ALGORITHM),
                     read_string(entry, ATTR_SOURCE_HASH),
+                    {},
                 };
+                read_metadata(entry, source.metadata);
                 if (source.name.empty() || source.hash_algorithm.empty() || source.hash.empty())
                     throw dip::IOException(
                         "Invalid HDF5 source manifest",
@@ -1208,6 +1304,13 @@ namespace snt::dip::hdf5 {
                             items
                         );
                     }
+                    if (!path.empty() &&
+                        (kind == "group" || kind == "item" || kind == "map_item" || kind == "list_item" ||
+                         kind == "map" || kind == "list")) {
+                        ValueMetadata metadata;
+                        read_metadata(child, metadata);
+                        env.hierarchy.merge_metadata(path, metadata);
+                    }
                     read_group(env, child);
                 } else if (type == H5G_DATASET) {
                     Id dataset(H5Dopen2(group, name.c_str(), H5P_DEFAULT), H5Dclose, "Unable to open an HDF5 dataset");
@@ -1257,6 +1360,7 @@ namespace snt::dip::hdf5 {
                 write_scalar<uint64_t>(entry, ATTR_SOURCE_PARENT_LINE, H5T_NATIVE_UINT64, source.parent_line);
                 write_string(entry, ATTR_SOURCE_HASH_ALGORITHM, source.hash_algorithm);
                 write_string(entry, ATTR_SOURCE_HASH, source.hash);
+                write_metadata(entry, source.metadata);
             }
         }
 
@@ -1605,6 +1709,7 @@ namespace snt::dip::hdf5 {
         write_dependency_graph(output, Inspector{env}.graph());
         if (options.output_plan)
             write_output_plan(output, *options.output_plan);
+        write_hierarchy_metadata(output, env);
         for (const auto& node : env.nodes.get_nodes())
             if (node)
                 write_node(output, env, *node);

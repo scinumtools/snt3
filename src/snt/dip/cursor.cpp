@@ -166,6 +166,15 @@ namespace snt::dip {
         return provenance;
     }
 
+    ValueMetadata Cursor::get_metadata() const {
+        for (const auto& node : env_->nodes.get_nodes())
+            if (node && node->path.name == path_)
+                return node->metadata;
+        if (env_->hierarchy.has_collection(path_))
+            return env_->hierarchy.get_collection(path_).metadata;
+        return {};
+    }
+
     val::Array::ShapeType Cursor::get_shape() const {
         val::BaseValue::PointerType value = env_->request_value("?" + path_);
         if (value)

@@ -211,6 +211,92 @@ TEST(DIPSemantic, DescribeAndListBoundValues) {
     EXPECT_EQ(long_text.value_unavailable_reason, "omitted_by_byte_limit");
 }
 
+TEST(DIPSemantic, MetadataIsAvailableOnHierarchyNodesAndSchemaMembers) {
+    snt::dip::DIP parser;
+    parser.add_string(
+        "$schema citation\n"
+        "  title str\n"
+        "    ?authors \"Schema author\"\n"
+        "    ?title \"Schema title\"\n"
+        "library\n"
+        "  ?descr \"Reference library\"\n"
+        "  sources map : citation\n"
+        "  sources[st_i_3_7]\n"
+        "    ?authors \"Sample authors\"\n"
+        "    ?title \"\"\n"
+        "    title = \"Example work title\"\n"
+        "      ?authors \"Field author\"\n"
+        "      ?title \"\"\n"
+    );
+    const auto env = parser.parse();
+    const snt::dip::Inspector view{env};
+    const auto group = view.describe("library");
+    EXPECT_EQ(group.metadata.description, "Reference library");
+    EXPECT_TRUE(group.metadata.has_property(snt::dip::PropertyType::Description));
+
+    const auto source = view.describe("library.sources[st_i_3_7]");
+    EXPECT_EQ(source.metadata.authors, "Sample authors");
+    EXPECT_TRUE(source.metadata.has_property(snt::dip::PropertyType::Authors));
+    const auto title = view.describe("library.sources[st_i_3_7].title");
+    EXPECT_EQ(title.metadata.authors, "Field author");
+    EXPECT_EQ(title.metadata.title, "");
+    EXPECT_TRUE(title.metadata.has_property(snt::dip::PropertyType::Title));
+
+    const auto schema = view.schema_hierarchy();
+    ASSERT_EQ(schema.definitions.size(), 1);
+    ASSERT_EQ(schema.definitions[0].members.size(), 1);
+    EXPECT_EQ(schema.definitions[0].members[0].metadata.authors, "Schema author");
+    EXPECT_EQ(schema.definitions[0].members[0].metadata.title, "Schema title");
+}
+
+TEST(DIPSemantic, TableAndColumnMetadataComeFromHeaderIndentation) {
+    snt::dip::DIP parser;
+    parser.add_string(
+        "measurements table = \"\"\"\n"
+        "?descr \"Experiment measurements\"\n"
+        "time float s\n"
+        "  ?descr \"Elapsed time\"\n"
+        "speed float m/s\n"
+        "  ?descr \"Measured flow speed\"\n"
+        "---\n"
+        "0 3\n"
+        "1 4\n"
+        "\"\"\"\n"
+    );
+    const auto env = parser.parse();
+    const snt::dip::Inspector view{env};
+    const auto table_description = view.describe("measurements");
+    EXPECT_EQ(table_description.kind, "table");
+    EXPECT_EQ(table_description.metadata.description, "Experiment measurements");
+    const auto table = view.table("measurements");
+    EXPECT_EQ(table.metadata.description, "Experiment measurements");
+    ASSERT_EQ(table.columns.size(), 2);
+    EXPECT_EQ(table.columns[0].metadata.description, "Elapsed time");
+    EXPECT_EQ(table.columns[1].metadata.description, "Measured flow speed");
+}
+
+TEST(DIPSemantic, SourceMetadataIsInspectableWithoutValueInheritance) {
+    snt::dip::DIP parser;
+    parser.add_string(
+        "?authors \"Sample research group\"\n"
+        "?title \"Sample source register\"\n"
+        "ontology\n"
+        "  title str = \"Example work title\"\n"
+        "    ?descr \"The work title\"\n",
+        "ontology.dip"
+    );
+    const auto env = parser.parse();
+    const snt::dip::Inspector view{env};
+    const auto source = view.source("ontology.dip");
+    ASSERT_TRUE(source);
+    EXPECT_EQ(source->metadata.authors, "Sample research group");
+    EXPECT_EQ(source->metadata.title, "Sample source register");
+    EXPECT_TRUE(source->metadata.has_property(snt::dip::PropertyType::Authors));
+    EXPECT_TRUE(view.source("missing.dip") == std::nullopt);
+    EXPECT_TRUE(view.describe("ontology.title").metadata.authors.empty());
+    EXPECT_EQ(view.describe("ontology.title").metadata.description, "The work title");
+}
+
 TEST(DIPSemantic, SharedFactsStayAlignedForOverrides) {
     snt::dip::DIP parser;
     parser.add_string("speed float = 2 m/s\n  !tags [\"runtime\"]\n  ?descr \"Flow speed\"\n");

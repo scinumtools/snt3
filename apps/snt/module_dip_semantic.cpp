@@ -115,6 +115,8 @@ int module_dip_semantic(int argc, char* argv[]) {
         std::cout << semantic.override_contract_json(path) << '\n';
     else if (command == "schemas")
         std::cout << semantic.schemas_json() << '\n';
+    else if (command == "sources")
+        std::cout << semantic.sources_json() << '\n';
     else if (command == "list")
         std::cout << semantic.list_json(query, tags, limit, max_value_elements) << '\n';
     else

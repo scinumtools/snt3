@@ -21,6 +21,7 @@ namespace snt::dip {
                 source.parent.line_number,
                 "SHA-256",
                 snt::sha256(source.code),
+                source.metadata,
             };
         }
 

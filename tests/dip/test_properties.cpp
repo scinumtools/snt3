@@ -592,36 +592,22 @@ TEST(Properties, Metadata) {
     EXPECT_EQ(vnode->metadata.modified, "2024-04-02");
     EXPECT_EQ(vnode->metadata.license, "CC BY 4.0");
 
-    // A group property must be rejected even when a value node precedes the group.
+    // Metadata is available on explicit groups, even when a value node precedes one.
     for (bool preceding_value : {false, true}) {
         SCOPED_TRACE(preceding_value);
         d = dip::DIP();
-        if (preceding_value)
-            d.add_string("prior int = 1");
-        d.add_string("foo");
-        d.add_string("  ?descr \"This is a group node\"");
-        d.add_string("bar int = 3");
-        try {
-            d.parse();
-            FAIL() << "Expected dip::SyntaxException";
-        } catch (const dip::SyntaxException& e) {
-            EXPECT_EQ(e.info().message, "Cannot set a property on a non-value node");
-            EXPECT_EQ(
-                e.info().details,
-                "Only value nodes (boolean, integer, float, string and table) can have properties, but the node type "
-                "is "
-                "`group`."
-            );
-            EXPECT_EQ(e.info().suggestion, "Remove the property or move it behind a value node.");
-        } catch (...) {
-            FAIL() << "Expected dip::SyntaxException";
-        }
+        d.add_string(
+            std::string(preceding_value ? "prior int = 1\n" : "") +
+            "foo\n  ?descr \"This is a group node\"\nbar int = 3\n"
+        );
+        const auto env = d.parse();
+        ASSERT_TRUE(env.hierarchy.has_collection("foo"));
+        EXPECT_EQ(env.hierarchy.get_collection("foo").metadata.description, "This is a group node");
     }
 
     // Throw an error if indent is not higher
     d = dip::DIP();
-    d.add_string("  foo bool = true");
-    d.add_string("?descr \"If foo is true, bar is false\"");
+    d.add_string("  foo bool = true\n?descr \"If foo is true, bar is false\"\n");
     try {
         d.parse();
         FAIL() << "Expected dip::SyntaxException";

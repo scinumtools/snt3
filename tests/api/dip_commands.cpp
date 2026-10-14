@@ -265,10 +265,11 @@ TEST(DIPSemanticCommand, ReusesEnvironmentUntilReload) {
     const auto file = std::filesystem::temp_directory_path() / ("snt-semantic-" + suffix + ".dipl");
     {
         std::ofstream output(file);
-        output << "value int = 1\n";
+        output << "value int = 1\n  ?title \"\"\n";
     }
     api::DIPSemantic semantic(file);
     EXPECT_NE(semantic.describe_json("value").find("\"text\":\"1\""), std::string::npos);
+    EXPECT_NE(semantic.describe_json("value").find("\"present\":[\"title\"]"), std::string::npos);
     EXPECT_NE(semantic.list_json().find("\"total\":1"), std::string::npos);
     {
         std::ofstream output(file);
