@@ -34,7 +34,11 @@ The C++ ``ExportFormat`` values implemented by the generator are ``CPP``,
 ``JSON`` format remains a values-only tree. ``JSON_METADATA`` writes a
 versioned record for each evaluated value, keyed by its stable DIPL path, with
 its type, shape, value, units, effective metadata, and declaration or override
-provenance. It also includes source identities and source-level metadata.
+provenance. Its ``node_metadata`` inventory is keyed by stable DIPL path and
+includes effective metadata for metadata-bearing hierarchy nodes and values,
+with each record's node kind. This covers groups, maps, lists, map/list items,
+table headers, and table columns. Source identities and source-level metadata
+remain in the separate ``sources`` object.
 Array records retain explicit ``shape`` and ``is_array`` fields, so a scalar
 string ``"example"`` remains distinct from a singleton array declared as
 ``["example"]``. The singleton's value payload may itself be the scalar
@@ -52,8 +56,11 @@ properties are absent from ``values``; explicitly empty scalar metadata appear
 as ``""`` and their names remain in ``present``. Thus absence and an explicit
 empty annotation remain distinct. Value records use ``presence: "none"`` and
 JSON ``null`` for explicit ``none``; fields absent from the evaluated
-environment have no record. The new schema is identified by
-``snt-dip-values/1``. For the command-oriented C++ interface, see
+environment have no value record. ``node_metadata`` contains records only for
+nodes with at least one explicitly present metadata property. The schema is
+identified by ``snt-dip-values/2``; its ``values`` and ``sources`` members
+retain the version 1 record layouts, with ``node_metadata`` added for complete
+hierarchy coverage. For the command-oriented C++ interface, see
 :ref:`the DIP API guide <module-api-dip>`.
 
 The legacy values-only JSON generator omits explicit ``none`` values to retain

@@ -137,9 +137,18 @@ file(WRITE "${METADATA_INPUT}"
   "  source_id str\n"
   "    ?rationale \"Schema explanation\"\n"
   "edges map\n"
+  "  ?descr \"Edge collection\"\n"
   "edges[uses_material] : edge\n"
+  "  ?descr \"Material relationship\"\n"
   "  source_id = \"material_1\"\n"
   "    ?rationale \"Local explanation\"\n"
+  "measurements table = \"\"\"\n"
+  "?descr \"Measurement table\"\n"
+  "time float s\n"
+  "  ?descr \"Elapsed time\"\n"
+  "---\n"
+  "0\n"
+  "\"\"\"\n"
   "empty str = \"\"\n"
   "  ?rationale \"\"\n"
   "absent str = none\n")
@@ -156,6 +165,13 @@ file(REMOVE "${METADATA_OUTPUT}")
 string(JSON export_schema GET "${output}" schema)
 string(JSON edge_value GET "${output}" values "edges[uses_material].source_id" value)
 string(JSON edge_rationale GET "${output}" values "edges[uses_material].source_id" metadata values rationale)
+string(JSON edge_collection_metadata GET "${output}" node_metadata edges metadata values description)
+string(JSON edge_item_kind GET "${output}" node_metadata "edges[uses_material]" kind)
+string(JSON edge_item_metadata GET "${output}" node_metadata "edges[uses_material]" metadata values description)
+string(JSON table_kind GET "${output}" node_metadata measurements kind)
+string(JSON table_metadata GET "${output}" node_metadata measurements metadata values description)
+string(JSON column_kind GET "${output}" node_metadata measurements.time kind)
+string(JSON column_metadata GET "${output}" node_metadata measurements.time metadata values description)
 string(JSON empty_value GET "${output}" values empty value)
 string(JSON empty_presence GET "${output}" values empty presence)
 string(JSON empty_rationale GET "${output}" values empty metadata values rationale)
@@ -174,9 +190,16 @@ if(source_count GREATER 0)
     endif()
   endforeach()
 endif()
-if(NOT export_schema STREQUAL "snt-dip-values/1" OR
+if(NOT export_schema STREQUAL "snt-dip-values/2" OR
    NOT edge_value STREQUAL "material_1" OR
    NOT edge_rationale STREQUAL "Local explanation" OR
+   NOT edge_collection_metadata STREQUAL "Edge collection" OR
+   NOT edge_item_kind STREQUAL "map_item" OR
+   NOT edge_item_metadata STREQUAL "Material relationship" OR
+   NOT table_kind STREQUAL "table" OR
+   NOT table_metadata STREQUAL "Measurement table" OR
+   NOT column_kind STREQUAL "table_column" OR
+   NOT column_metadata STREQUAL "Elapsed time" OR
    NOT empty_value STREQUAL "" OR
    NOT empty_presence STREQUAL "value" OR
    NOT empty_rationale STREQUAL "" OR

@@ -336,6 +336,11 @@ nuclear-isotope database and decay-chain calculator built with SciNumTools3.
 It uses DIPL for validated nuclide data, scenarios, provenance, and CMake build
 configuration.
 
+[Ad Imaginem](https://github.com/vrtulka23/adimaginem) is a cited, interactive
+ontology atlas with a graph, guided tours, and scholarly documentation. Its
+ontology, citations, and graph parameters are authored in DIPL and built with
+SciNumTools3.
+
 ## Development
 
 The repository contains the C++ sources, Python bindings, command-line

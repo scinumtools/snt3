@@ -71,4 +71,7 @@ html_theme = 'sphinx_rtd_theme'
 html_logo = '_static/snt-logo-dark.png'
 html_static_path = ['_static']
 html_css_files = ['dipl.css', 'puq-converter.css']
-html_js_files = [('puq-converter.js', {'type': 'module'})]
+html_js_files = [
+    ('puq-converter.js', {'type': 'module'}),
+    ('//gc.zgo.at/count.js', {'async': 'async', 'data-goatcounter': 'https://snt.goatcounter.com/count'}),
+]

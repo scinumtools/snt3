@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
+#include <map>
 #include <snt/dip/cursor.h>
 #include <snt/dip/exceptions.h>
 #include <unordered_map>
@@ -183,8 +184,73 @@ namespace snt::dip::generate {
             output << '}';
         }
 
+        const char* hierarchy_node_kind(const std::string& path, const Collection& collection,
+                                        const std::unordered_map<std::string, Collection>& collections) {
+            if (collection.kind == Path::Kind::Map)
+                return "map";
+            if (collection.kind == Path::Kind::List)
+                return "list";
+            if (collection.kind == Path::Kind::Group)
+                return "group";
+            if (collection.kind == Path::Kind::Item) {
+                const size_t open = path.rfind('[');
+                if (open != std::string::npos) {
+                    const auto parent = collections.find(path.substr(0, open));
+                    if (parent != collections.end() && parent->second.kind == Path::Kind::List)
+                        return "list_item";
+                }
+                return "map_item";
+            }
+            return "node";
+        }
+
+        void write_node_metadata(std::ostream& output, const Environment& environment) {
+            struct Record {
+                std::string kind;
+                const ValueMetadata* metadata = nullptr;
+            };
+            std::map<std::string, Record> records;
+            const auto& collections = environment.hierarchy.get_collections();
+            std::unordered_map<std::string, bool> table_paths;
+            for (const auto& node : environment.nodes.get_nodes())
+                if (node && !node->table_path.empty())
+                    table_paths[node->table_path] = true;
+            for (const auto& [path, collection] : collections) {
+                if (!collection.metadata.present.empty()) {
+                    const std::string kind = table_paths.count(path)
+                                                 ? "table"
+                                                 : hierarchy_node_kind(path, collection, collections);
+                    records[path] = {kind, &collection.metadata};
+                }
+            }
+            for (const auto& node : environment.nodes.get_nodes()) {
+                if (node && !node->metadata.present.empty()) {
+                    const std::string kind = node->table_path.empty() ? "value" : "table_column";
+                    records[node->path.name] = {kind, &node->metadata};
+                }
+            }
+
+            output << "{\n";
+            bool first = true;
+            for (const auto& [path, record] : records) {
+                if (!first)
+                    output << ",\n";
+                first = false;
+                output << "    ";
+                write_json_string(output, path);
+                output << ": {\"kind\": ";
+                write_json_string(output, record.kind);
+                output << ", \"metadata\": ";
+                write_metadata(output, *record.metadata);
+                output << '}';
+            }
+            if (!records.empty())
+                output << '\n';
+            output << "  }";
+        }
+
         void write_json_metadata(std::ostream& output, const Environment& environment, const Node& model) {
-            output << "{\n  \"schema\": \"snt-dip-values/1\",\n  \"values\": {";
+            output << "{\n  \"schema\": \"snt-dip-values/2\",\n  \"values\": {";
             bool first_value = true;
             for (const auto& evaluated_node : environment.nodes.get_nodes()) {
                 if (!evaluated_node || (!evaluated_node->value && evaluated_node->value_origin != ValueOrigin::None))
@@ -235,7 +301,9 @@ namespace snt::dip::generate {
             }
             if (!first_value)
                 output << '\n' << "  ";
-            output << "},\n  \"sources\": {";
+            output << "},\n  \"node_metadata\": ";
+            write_node_metadata(output, environment);
+            output << ",\n  \"sources\": {";
             const auto sources = environment.get_source_manifest();
             for (size_t index = 0; index < sources.size(); ++index) {
                 if (index)

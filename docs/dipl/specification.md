@@ -1,13 +1,14 @@
 ---
 title: "Dimensional Input Parameter Language"
-subtitle: "DIPL Specification for SciNumTools v3"
-author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
-version: "0.1.0"
+subtitle: "DIPL Language Specification"
+author: "Ondrej Pego Jaura"
+orcid: "0000-0002-5391-3714"
+version: "1.0.0"
 date: "September 2026"
 titlepage: true
 ---
 
-# DIPL - Language Specification
+# DIPL - Language Specification — Version 1.0
 
 ## Introduction
 
@@ -138,9 +139,11 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
    Remote sources MUST be processed independently before their results are used.
 4. **Expression and Value Evaluation**  
    All node values MUST be evaluated, including:
+   
    - scalar values
    - arrays and structured values
    - expressions involving references
+   
    For an overridden node, only its replacement value MUST be evaluated, at
    the target declaration. Its dependencies MUST already be available then.
    The original value MUST NOT be evaluated. Subsequent dependents and
@@ -192,7 +195,7 @@ These steps are provided for guidance only. Implementations MAY use different in
 The following conditions MUST result in evaluation failure:
 
 - unresolved source or node reference
-- cyapic dependencies
+- cyclic dependencies
 - invalid query path
 - type mismatch
 - unit incompatibility
@@ -214,6 +217,7 @@ Backward compatibility SHOULD be preserved where feasible.
 A reference implementation of the DIPL language is provided as part of the SciNumTools v3 project.
 
 The reference implementation includes:
+
 - A C++ implementation
 - Python bindings for integration and scripting use cases
 

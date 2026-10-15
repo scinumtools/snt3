@@ -170,7 +170,7 @@ TEST(Environment, GenerateJsonMetadataAndProvenance) {
     std::stringstream content;
     content << generated.rdbuf();
     const auto json = content.str();
-    EXPECT_NE(json.find("\"schema\": \"snt-dip-values/1\""), std::string::npos);
+    EXPECT_NE(json.find("\"schema\": \"snt-dip-values/2\""), std::string::npos);
     EXPECT_NE(json.find("\"edges[uses_material].source_id\""), std::string::npos);
     EXPECT_NE(json.find("\"name\": \"source_id\""), std::string::npos);
     EXPECT_NE(json.find("\"value\": \"material_1\""), std::string::npos);
