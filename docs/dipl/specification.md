@@ -1,14 +1,39 @@
 ---
 title: "Dimensional Input Parameter Language"
 subtitle: "DIPL Language Specification"
-author: "Ondrej Pego Jaura"
-orcid: "0000-0002-5391-3714"
+author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
 version: "1.0.0"
-date: "September 2026"
+date: "October 2026"
+doi: "10.5281/zenodo.23376301"
+keywords:
+  - domain-specific language
+  - scientific computing
+  - configuration language
+  - input parameters
+  - physical units
 titlepage: true
 ---
 
-# DIPL - Language Specification — Version 1.0
+# DIPL Language Specification — Version 1.0.0
+
+**DOI:** [10.5281/zenodo.23376301](https://doi.org/10.5281/zenodo.23376301)
+
+## Abstract
+
+DIPL (Dimensional Input Parameter Language) is a declarative language for
+describing structured input parameters for scientific and numerical software.
+It brings parameter values, data types, physical units, constraints, metadata,
+and relationships into one human-readable format. This specification defines
+DIPL's syntax, type system, expression and unit semantics, schemas, validation,
+and execution model. It is intended for language users and implementers, and
+serves as the reference for the SNT implementation. The document includes a
+formal grammar and examples of the language's main constructs. DIPL aims to make
+scientific input definitions easier to inspect, validate, reuse, and exchange
+while preserving the dimensional and structural information that applications
+need.
+
+**Keywords:** domain-specific language; scientific computing; configuration
+language; input parameters; physical units
 
 ## Introduction
 
@@ -75,7 +100,7 @@ All parameters declare explicit types (e.g., `bool`, `uint32`, `float64`, `str`)
 Values may include physical units, which are automatically normalized and validated during evaluation, allowing dimensional consistency to be maintained throughout computations.
 
 **Declarative constraints and metadata**
-Properties such as `!condition` define constraints that must be satisfied for a valid document, while metadata such as `?author` provides descriptive information about individual nodes.
+Properties such as `!condition` define constraints that must be satisfied for a valid document, while metadata such as `?authors` provides descriptive information about individual nodes.
 
 **Hierarchical organization**
 An indentation-based structure allows related parameters to be organized into groups, maps, and lists without additional syntactic overhead.
@@ -131,11 +156,19 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
    All top-level override regions MUST be collected at this stage, before
    normal node evaluation. Duplicate override targets MUST result in an error.
 2. **Dependency Resolution**  
-   All references MUST be resolved into a directed acyclic graph (DAG) of node dependencies.
-   - Unresolved sources or node references MUST result in an error.
+   Value references MUST be resolved into a directed acyclic graph (DAG) of node dependencies.
+   - An unresolved source or ordinary value reference MUST result in an error.
+     The `def` and `ndef` operators test whether a node has a non-`none` value
+     in an already-resolved domain at the point of evaluation. A missing node,
+     a declaration without an assigned value, or an explicit `none` value
+     yields `false` for `def` and `true` for `ndef`. These operators do not
+     suppress errors resolving the source domain.
    - Cyclic dependencies MUST result in an error.
 3. **Reference Evaluation**  
-   All reference expressions (e.g. ``{<source>?<path>}``, ``{?<path>}``) MUST be resolved to their corresponding values or node sets.
+   All ordinary reference expressions (e.g. ``{<source>?<path>}``,
+   ``{?<path>}``) MUST be resolved to their corresponding values or node sets.
+   `def` and `ndef` evaluate the referenced path's definition state as
+   described above.
    Remote sources MUST be processed independently before their results are used.
 4. **Expression and Value Evaluation**  
    All node values MUST be evaluated, including:
@@ -227,6 +260,11 @@ The reference implementation includes:
 **Issues:**         <https://github.com/scinumtools/snt3/issues>  
 
 Independent implementations of the DIPL language (e.g., in Rust or Julia) are encouraged and welcome, and can be added to this list on request.
+
+## License
+
+This specification is distributed under the MIT License. The license text is
+available in the [SciNumTools v3 repository](https://github.com/scinumtools/snt3/blob/main/LICENSE).
 
 ## Glossary
 

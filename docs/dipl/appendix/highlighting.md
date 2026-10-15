@@ -1,7 +1,3 @@
-```{=latex}
-\appendix
-```
-
 # Syntax Highlighting Fixture
 
 The following shared fixture is rendered with the DIPL Skylight definition when

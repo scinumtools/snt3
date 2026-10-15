@@ -262,6 +262,10 @@ defined by the specification.
 Specification
 -------------
 
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.23376301.svg
+   :target: https://doi.org/10.5281/zenodo.23376301
+   :alt: DIPL Language Specification v1.0.0 DOI
+
 * Specification: `<https://github.com/scinumtools/snt3/blob/main/docs/dipl/specification.md>`_
 * Grammar: `<https://github.com/scinumtools/snt3/blob/main/docs/dipl/grammar.ebnf>`_
 

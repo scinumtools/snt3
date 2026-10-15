@@ -59,8 +59,12 @@ Expression operators evaluate only boolean values, either given directly or as a
 | Syntax          | Priority | Description                                                                              |
 |-----------------|----------|------------------------------------------------------------------------------------------|
 | `(<expr>)`      | 2        | Parentheses operator evaluates expression `A` in a separate thread and returns its value |
-| `def( <ref> )`  | 1        | Definition operator returns true if <reference> node exists                              |
-| `ndef( <ref> )` | 1        | Non-definition operator returns true if <reference> node does not exist                  |
+| `def( <ref> )`  | 1        | Returns true if the referenced node currently has a non-`none` value                     |
+| `ndef( <ref> )` | 1        | Returns true if the referenced node is missing or currently has no non-`none` value     |
+
+The test uses the current state of the resolved domain. An unresolved source
+remains an error; `def` and `ndef` test a target path only after its source
+domain has been resolved.
 
 **Logical operators**
 
@@ -69,10 +73,16 @@ Expression operators evaluate only boolean values, either given directly or as a
 | `A \|\| B \|\| C ...` | 6        | Logical OR operator returns true if at least one expression (`A`, `B`, `C`, ...) is true |
 | `A && B && C ...`     | 5        | Logical AND operator returns true if all expressions (`A`, `B`, `C`, ...) are true       |
 
-Numerical values with dimensions compared using comparison operations are automatically converted into same units. The result of such comparison is always a boolean value.
+Numerical values with dimensions compared using comparison operations are
+automatically converted into the same units. Comparisons return a boolean or
+boolean array, depending on the operand shapes.
 
-> [!NOTE]
-> At the moment, it is possible to compare only scalar numerical values. Support for array comparison is planned to be provided in next versions of DIPL.
+Comparisons also support arrays and operate element-wise. Two array operands
+must have identical shapes; a scalar operand is applied to every element of
+the array. An array comparison produces a boolean array with the array shape,
+while a scalar comparison produces a scalar boolean. When units are present,
+the operands must have compatible dimensions and are converted to the same
+units before comparison.
 
 **Comparison operators**
 

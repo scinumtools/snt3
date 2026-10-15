@@ -10,7 +10,13 @@
 (* ========================================================================== *)
 
 document
-  = { blank-line | comment-line | statement | override-region } ;
+  = { blank-line | comment-line | source-metadata }
+    { blank-line | comment-line | statement | override-region } ;
+
+(* Source metadata belongs to the source file and is allowed only before its  *)
+(* first statement, at indentation level zero.                                 *)
+source-metadata
+  = metadata-property [ comment ] newline ;
 
 statement
   = source-declaration
@@ -302,15 +308,20 @@ array
 string-block
   = triple-quote { block-character | newline } triple-quote ;
 
-(* Table headers are unindented declarations, followed by --- and data rows. *)
+(* Table metadata is unindented; per-column metadata is indented beneath the  *)
+(* corresponding column declaration.                                          *)
 table-block
   = triple-quote table-header "---" newline { table-row newline } triple-quote ;
 
 table-header
-  = { table-column newline } ;
+  = { metadata-property newline }
+    { table-column newline { table-column-metadata newline } } ;
 
 table-column
   = name whitespace type-spec [ shape-spec ] [ whitespace PUEL-unit-expression ] ;
+
+table-column-metadata
+  = INDENT metadata-property ;
 
 table-row
   = table-field { table-delimiter table-field } ;
@@ -506,6 +517,8 @@ non-negative-integer
 (*   floating-point value node.                                                *)
 (* - Units are valid only for numerical value nodes and numerical table       *)
 (*   columns.                                                                 *)
+(* - float16, float128, byte, and char are optional types; implementations     *)
+(*   that do not support an optional type MUST reject its use.                 *)
 (* - Properties immediately follow their node and are one indentation level   *)
 (*   deeper. Their applicability is defined in syntax/properties.md.          *)
 (* - {.} is valid only in a !condition expression.                            *)
