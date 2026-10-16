@@ -1,0 +1,16 @@
+clients:
+  catalog: &retry_policy
+    attempts: 3
+    timeout:
+      value: 500
+      unit: ms
+      provenance:
+        title: Timeout per attempt
+        description: Maximum duration allowed for one request attempt
+    retry_delay: {value: 250, unit: ms}
+    budget: {value: 4, unit: s}
+  search:
+    <<: *retry_policy
+
+overrides:
+  clients.search.timeout: {value: 1, unit: s}

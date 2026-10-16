@@ -1,0 +1,23 @@
+$schema retry_policy
+  attempts uint32 = 3
+    !condition ({.} >= 1 && {.} <= 10)
+  timeout float = 500 ms
+    !condition ({.} > 0 ms)
+    ?title "Timeout per attempt"
+    ?descr "Maximum duration allowed for one request attempt"
+  retry_delay float = 250 ms
+    !condition ({.} >= 0 ms)
+  budget float = 4 s
+    !condition ({.} > 0 s)
+  timeout_seconds float = {.timeout} s
+  delay_seconds float = {.retry_delay} s
+  retries uint32 = ({.attempts} - 1)
+  max_duration float = ({.attempts} * {.timeout} + {.retries} * {.retry_delay}) s
+    !condition ({.} <= {.budget})
+
+clients map : retry_policy
+clients[catalog]
+clients[search]
+
+$override
+  clients[search].timeout = 1 s
