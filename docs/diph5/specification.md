@@ -2,7 +2,7 @@
 title: "SciNumTools DIPH5"
 subtitle: "Environment HDF5 Format Specification"
 author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
-date: "Version 2.9"
+date: "Version 2.10"
 ---
 
 # Scope
@@ -45,7 +45,8 @@ DIPL program can be reconstructed exactly.
 Version 2.7 retains the evaluated dependency graph. Version 2.8 may retain
 the resolved output plan of an application adapter. Output plans contain
 values and decisions, not executable adapter callbacks.
-Version 2.9 may retain display labels for value options.
+Version 2.9 may retain display labels for value options. Version 2.10 records
+explicit sibling order for hierarchy children and map entries.
 
 # File identification and versioning
 
@@ -55,11 +56,11 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
-| `_DIPL_Schema_Version_Minor` | unsigned integer | `9` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `10` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2.9 readers support version 1 files and versions 2.0
-through 2.9. Future schema
+schema version. Version 2.10 readers support version 1 files and versions 2.0
+through 2.10. Future schema
 revisions MUST preserve the meaning of existing attributes or increment the
 major or minor schema version.
 
@@ -101,7 +102,7 @@ identified by `_DIPL_Kind`:
 | `_DIPL_Kind` | Meaning | Additional attributes |
 | --- | --- | --- |
 | `map` | keyed collection | — |
-| `map_item` | item of a keyed collection | `_DIPL_Key` |
+| `map_item` | item of a keyed collection | `_DIPL_Key`, `_DIPL_Order` |
 | `list` | ordered collection | — |
 | `list_item` | item of an ordered collection | `_DIPL_Index` |
 
@@ -124,6 +125,29 @@ An implementation MUST use the kind attribute to distinguish a collection
 from an ordinary hierarchy group. HDF5 object names alone are not sufficient,
 because a numbered or keyed collection item is deliberately flattened into a
 normal group path.
+
+## Collection and sibling order (2.10)
+
+Version 2.10 adds the `_DIPL_Order` unsigned integer attribute. A writer MUST
+store it on each direct child object of a hierarchy group or collection item,
+and on every map item group. It records a zero-based position among that
+parent's named children. The attribute is written on child groups and value
+datasets, including value groups. Positions within a parent MUST be unique and
+contiguous, beginning at zero. The attribute is optional only when reading
+older files or when the object is a list item.
+
+Map item groups also carry `_DIPL_Order`, recording map declaration order.
+List item groups continue to use `_DIPL_Index`; readers MUST order list items
+by its numeric value and MUST ignore `_DIPL_Order` for list ordering. An
+override of an existing map or group member retains its position; a newly
+introduced member is appended according to the evaluated environment order.
+
+Readers MUST honor a complete `_DIPL_Order` sequence. If the attribute is
+absent or incomplete for a set of siblings, readers use lexical HDF5 object
+name order as a deterministic fallback. Files written before version 2.10
+cannot recover declaration order for maps, groups, or group children; list
+order remains recoverable from `_DIPL_Index`. Keyed lookup semantics are
+unaffected by enumeration order.
 
 # Value datasets
 

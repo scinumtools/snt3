@@ -198,6 +198,8 @@ namespace snt::dip {
         // register FQ name and collection set with the node
         // std::cout << '\n';
         node->path.name = name_full;
+        if (collection_path)
+            record_ordered_path(collection_path(name_full));
         // std::cout << "name  " << node->name << '\n';
         node->path.collections = std::move(collections_full);
     }
@@ -286,6 +288,51 @@ namespace snt::dip {
     void HierarchyList::set_schemas(const std::string& path, std::vector<std::string> schemas) {
         get_collection(path);
         collections.at(path).schemas = std::move(schemas);
+    }
+
+    void HierarchyList::record_ordered_path(const std::string& path) {
+        if (path.empty())
+            return;
+        const auto append_unique = [](std::vector<std::string>& values, const std::string& value) {
+            if (std::find(values.begin(), values.end(), value) == values.end())
+                values.push_back(value);
+        };
+
+        std::string current;
+        size_t position = 0;
+        while (position < path.size()) {
+            if (path[position] == '.') {
+                ++position;
+                continue;
+            }
+            if (path[position] == '[') {
+                const size_t end = path.find(']', position);
+                if (end == std::string::npos)
+                    return;
+                current += path.substr(position, end - position + 1);
+                position = end + 1;
+                continue;
+            }
+
+            const size_t start = position;
+            while (position < path.size() && path[position] != '.' && path[position] != '[')
+                ++position;
+            const std::string name = path.substr(start, position - start);
+            if (name.empty())
+                return;
+
+            if (current.empty()) {
+                append_unique(root_children, name);
+                current = name;
+                continue;
+            }
+
+            const auto parent = collections.find(current);
+            if (parent != collections.end() &&
+                (parent->second.kind == Path::Kind::Group || parent->second.kind == Path::Kind::Item))
+                append_unique(parent->second.children, name);
+            current += SIGN_SEPARATOR + name;
+        }
     }
 
     void HierarchyList::merge_metadata(const std::string& path, const ValueMetadata& metadata) {

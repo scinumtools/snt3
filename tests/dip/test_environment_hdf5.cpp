@@ -30,6 +30,25 @@ namespace {
         hid_t id_;
         Closer closer_;
     };
+
+    void remove_order_attributes(hid_t group) {
+        hsize_t count = 0;
+        ASSERT_GE(H5Gget_num_objs(group, &count), 0);
+        for (hsize_t index = 0; index < count; ++index) {
+            const ssize_t length = H5Gget_objname_by_idx(group, index, nullptr, 0);
+            ASSERT_GE(length, 0);
+            std::string name(static_cast<size_t>(length) + 1, '\0');
+            ASSERT_GE(H5Gget_objname_by_idx(group, index, name.data(), name.size()), 0);
+            name.resize(static_cast<size_t>(length));
+            const int type = H5Gget_objtype_by_idx(group, index);
+            ASSERT_GE(type, 0);
+            H5Handle object(H5Oopen(group, name.c_str(), H5P_DEFAULT), H5Oclose);
+            if (type == H5G_GROUP)
+                remove_order_attributes(object);
+            if (H5Aexists(object, "_DIPL_Order") > 0)
+                ASSERT_GE(H5Adelete(object, "_DIPL_Order"), 0);
+        }
+    }
 } // namespace
 
 TEST(Environment, Load) {
@@ -53,6 +72,68 @@ TEST(Environment, Load) {
     EXPECT_EQ(env.get_node("title")->options[1].value_raw, "Other");
     EXPECT_EQ(env.get_node("title")->metadata.description, "Environment round-trip fixture");
     std::filesystem::remove(file);
+}
+
+TEST(Environment, CollectionOrderSurvivesHdf5RoundTrip) {
+    dip::DIP parser;
+    std::string source =
+        "zeta\n"
+        "  second int = 2\n"
+        "  first int = 1\n"
+        "alpha\n"
+        "  value int = 3\n"
+        "catalog map\n"
+        "catalog[zeta]\n"
+        "  value int = 4\n"
+        "catalog[alpha]\n"
+        "  value int = 5\n"
+        "numbers list\n";
+    for (int index = 0; index < 12; ++index)
+        source += "numbers[]\n  value int = " + std::to_string(index) + "\n";
+    parser.add_string(source);
+    const dip::Environment original = parser.parse();
+
+    const auto file = environment_file("collection-order");
+    original.save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+
+    EXPECT_EQ(loaded.hierarchy.root_children_order(), (std::vector<std::string>{"zeta", "alpha", "catalog", "numbers"}));
+    EXPECT_EQ(loaded.hierarchy.get_collection("zeta").children, (std::vector<std::string>{"second", "first"}));
+    EXPECT_EQ(loaded.hierarchy.get_collection("catalog").items, (std::vector<std::string>{"zeta", "alpha"}));
+    std::vector<std::string> expected_indices;
+    for (int index = 0; index < 12; ++index)
+        expected_indices.push_back(std::to_string(index));
+    EXPECT_EQ(loaded.hierarchy.get_collection("numbers").items, expected_indices);
+
+    const auto round_trip = environment_file("collection-order-resaved");
+    loaded.save(round_trip);
+    dip::Environment reloaded;
+    reloaded.load(round_trip);
+    EXPECT_EQ(reloaded.hierarchy.root_children_order(), loaded.hierarchy.root_children_order());
+    EXPECT_EQ(reloaded.hierarchy.get_collection("zeta").children, loaded.hierarchy.get_collection("zeta").children);
+    EXPECT_EQ(reloaded.hierarchy.get_collection("catalog").items, loaded.hierarchy.get_collection("catalog").items);
+    EXPECT_EQ(reloaded.hierarchy.get_collection("numbers").items, expected_indices);
+
+    const auto legacy_file = environment_file("collection-order-legacy");
+    std::filesystem::copy_file(file, legacy_file, std::filesystem::copy_options::overwrite_existing);
+    {
+        H5Handle legacy(H5Fopen(legacy_file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        remove_order_attributes(legacy);
+        H5Handle minor(H5Aopen(legacy, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
+        const uint64_t legacy_minor = 9;
+        ASSERT_GE(H5Awrite(minor, H5T_NATIVE_UINT64, &legacy_minor), 0);
+    }
+    dip::Environment legacy_loaded;
+    legacy_loaded.load(legacy_file);
+    EXPECT_EQ(legacy_loaded.hierarchy.root_children_order(), (std::vector<std::string>{"alpha", "catalog", "numbers", "zeta"}));
+    EXPECT_EQ(legacy_loaded.hierarchy.get_collection("zeta").children, (std::vector<std::string>{"first", "second"}));
+    EXPECT_EQ(legacy_loaded.hierarchy.get_collection("catalog").items, (std::vector<std::string>{"alpha", "zeta"}));
+    EXPECT_EQ(legacy_loaded.hierarchy.get_collection("numbers").items, expected_indices);
+
+    std::filesystem::remove(file);
+    std::filesystem::remove(round_trip);
+    std::filesystem::remove(legacy_file);
 }
 
 TEST(Environment, OptionLabelsSurviveHdf5RoundTrip) {
@@ -671,7 +752,7 @@ TEST(Environment, SaveHdf5Content) {
         H5Handle minor_version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
         uint64_t minor_version = 0;
         ASSERT_GE(H5Aread(minor_version_attribute, H5T_NATIVE_UINT64, &minor_version), 0);
-        EXPECT_EQ(minor_version, 9);
+        EXPECT_EQ(minor_version, 10);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Trace", H5P_DEFAULT), 0);
         ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Dependencies", H5P_DEFAULT), 0);

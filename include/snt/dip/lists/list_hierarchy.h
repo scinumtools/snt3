@@ -25,6 +25,7 @@ namespace snt::dip {
         Path::Kind kind = Path::Kind::None; ///< Collection path kind
         std::vector<std::string> schemas;   ///< List of item schemas
         ValueMetadata metadata;             ///< Metadata attached to this explicit group or collection node.
+        std::vector<std::string> children;  ///< Direct named children in declaration order for groups and items
     };
 
     /**
@@ -34,6 +35,7 @@ namespace snt::dip {
       private:
         std::vector<Parent> parents;                             ///< List of all parents of a current node hierarchy
         std::unordered_map<std::string, Collection> collections; ///< Map of all registered node collections
+        std::vector<std::string> root_children;                  ///< Top-level DIPL children in declaration order
 
       public:
         /**
@@ -106,6 +108,10 @@ namespace snt::dip {
 
         /** Record schemas applied to an existing group or collection item. */
         void set_schemas(const std::string& path, std::vector<std::string> schemas);
+        /** Record a resolved node path in its parent's declaration order. */
+        void record_ordered_path(const std::string& path);
+        /** Direct top-level DIPL child names in declaration order. */
+        const std::vector<std::string>& root_children_order() const { return root_children; }
         /** Merge explicit metadata fields attached to a hierarchy node. */
         void merge_metadata(const std::string& path, const ValueMetadata& metadata);
 

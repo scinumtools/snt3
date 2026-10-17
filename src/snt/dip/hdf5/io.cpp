@@ -14,6 +14,7 @@
 #include <snt/dip/inspect/inspector.h>
 #include <snt/val/values.h>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 namespace snt::dip::hdf5 {
@@ -296,6 +297,103 @@ namespace snt::dip::hdf5 {
             if (!(exists > 0 && kind == "group" && read_string(group, ATTR_KIND) == KIND_VALUE_GROUP))
                 write_string(group, ATTR_KIND, kind);
             return group;
+        }
+
+        std::string hdf5_path(const std::string& path) {
+            std::string result = "/";
+            for (char character : path) {
+                if (character == '.')
+                    result.push_back('/');
+                else if (character == '[')
+                    result.push_back('/');
+                else if (character != ']')
+                    result.push_back(character);
+            }
+            return result;
+        }
+
+        void write_order(hid_t file, const std::string& path, uint64_t order) {
+            Id object(H5Oopen(file, path.c_str(), H5P_DEFAULT), H5Oclose, "Unable to open an ordered DIPH5 node");
+            write_scalar<uint64_t>(object, ATTR_ORDER, H5T_NATIVE_UINT64, order);
+        }
+
+        void write_hierarchy_structure(hid_t file, const Environment& env) {
+            std::unordered_set<std::string> value_paths;
+            std::unordered_set<std::string> paths_with_descendants;
+            for (const auto& node : env.nodes.get_nodes()) {
+                if (!node)
+                    continue;
+                const std::string& path = node->path.name;
+                value_paths.insert(path);
+                size_t separator = path.find_first_of(".[");
+                while (separator != std::string::npos) {
+                    paths_with_descendants.insert(path.substr(0, separator));
+                    separator = path.find_first_of(".[", separator + 1);
+                }
+            }
+            std::vector<const Collection*> collections;
+            for (const auto& [path, collection] : env.hierarchy.get_collections())
+                collections.push_back(&collection);
+            std::sort(collections.begin(), collections.end(), [](const auto* left, const auto* right) {
+                return left->path.size() < right->path.size();
+            });
+            for (const Collection* collection : collections) {
+                const bool leaf_value = value_paths.find(collection->path) != value_paths.end() &&
+                                        paths_with_descendants.find(collection->path) == paths_with_descendants.end();
+                if (leaf_value)
+                    continue;
+                std::string kind;
+                switch (collection->kind) {
+                case Path::Kind::Group:
+                    kind = "group";
+                    break;
+                case Path::Kind::Map:
+                    kind = "map";
+                    break;
+                case Path::Kind::List:
+                    kind = "list";
+                    break;
+                case Path::Kind::Item: {
+                    const size_t open = collection->path.rfind('[');
+                    if (open == std::string::npos)
+                        continue;
+                    const auto parent = env.hierarchy.get_collection(collection->path.substr(0, open));
+                    kind = parent.kind == Path::Kind::List ? "list_item" : "map_item";
+                    break;
+                }
+                default:
+                    continue;
+                }
+                Id group = ensure_group(file, hdf5_path(collection->path), kind);
+                write_string(group, ATTR_PATH, collection->path);
+                write_strings(group, ATTR_SCHEMAS, collection->schemas);
+            }
+
+            const auto write_children = [&](const std::string& parent, const std::vector<std::string>& children) {
+                for (size_t index = 0; index < children.size(); ++index) {
+                    const std::string child = parent.empty() ? children[index] : parent + "." + children[index];
+                    const std::string path = hdf5_path(child);
+                    const htri_t exists = H5Lexists(file, path.c_str(), H5P_DEFAULT);
+                    if (exists <= 0)
+                        throw Error("Unable to find hierarchy child `" + child + "` while saving DIPH5 order");
+                    write_order(file, path, static_cast<uint64_t>(index));
+                }
+            };
+            write_children({}, env.hierarchy.root_children_order());
+            for (const auto* collection : collections) {
+                if (collection->kind == Path::Kind::Group || collection->kind == Path::Kind::Item)
+                    write_children(collection->path, collection->children);
+                else if (collection->kind == Path::Kind::Map) {
+                    for (size_t index = 0; index < collection->items.size(); ++index) {
+                        const std::string child = collection->path + "[" + collection->items[index] + "]";
+                        const std::string path = hdf5_path(child);
+                        const htri_t exists = H5Lexists(file, path.c_str(), H5P_DEFAULT);
+                        if (exists <= 0)
+                            throw Error("Unable to find map item `" + child + "` while saving DIPH5 order");
+                        write_order(file, path, static_cast<uint64_t>(index));
+                    }
+                }
+            }
         }
 
         std::string dataset_path(hid_t file, const Environment& env, const std::string& path) {
@@ -887,6 +985,64 @@ namespace snt::dip::hdf5 {
             return name.data();
         }
 
+        struct ChildObject {
+            std::string name;
+            int type = 0;
+            bool semantic = false;
+            std::optional<uint64_t> order;
+        };
+
+        std::vector<ChildObject> ordered_children(hid_t group) {
+            std::vector<ChildObject> children;
+            const bool ordered_list = read_string(group, ATTR_KIND) == "list";
+            const hsize_t count = object_count(group);
+            children.reserve(checked_size(count, "child count"));
+            for (hsize_t index = 0; index < count; ++index) {
+                ChildObject child;
+                child.name = object_name(group, index);
+                child.type = H5Gget_objtype_by_idx(group, index);
+                if (child.type < 0)
+                    throw Error("Unable to inspect an HDF5 child object");
+                if (child.name != std::string(VALUE_PAYLOAD)) {
+                    Id object(H5Oopen(group, child.name.c_str(), H5P_DEFAULT), H5Oclose,
+                              "Unable to inspect a DIPH5 child object");
+                    child.semantic = has_attribute(object, ATTR_PATH);
+                    if (child.semantic && ordered_list && child.type == H5G_GROUP &&
+                        read_string(object, ATTR_KIND) == "list_item")
+                        child.order = read_scalar<uint64_t>(object, ATTR_INDEX, H5T_NATIVE_UINT64);
+                    else if (child.semantic && has_attribute(object, ATTR_ORDER))
+                        child.order = read_scalar<uint64_t>(object, ATTR_ORDER, H5T_NATIVE_UINT64);
+                }
+                children.push_back(std::move(child));
+            }
+
+            bool complete_order = std::all_of(children.begin(), children.end(), [](const auto& child) {
+                return !child.semantic || child.order.has_value();
+            });
+            if (complete_order) {
+                std::vector<uint64_t> positions;
+                for (const auto& child : children)
+                    if (child.semantic)
+                        positions.push_back(*child.order);
+                std::sort(positions.begin(), positions.end());
+                for (size_t index = 0; index < positions.size(); ++index)
+                    if (positions[index] != index) {
+                        complete_order = false;
+                        break;
+                    }
+            }
+            std::stable_sort(children.begin(), children.end(), [complete_order](const auto& left, const auto& right) {
+                if (left.semantic != right.semantic)
+                    return left.semantic;
+                if (!left.semantic)
+                    return left.name < right.name;
+                if (complete_order && left.order != right.order)
+                    return left.order < right.order;
+                return left.name < right.name;
+            });
+            return children;
+        }
+
         void read_source_manifest(Environment& env, hid_t file) {
             const std::string manifest_path = "/" + std::string(GROUP_SOURCES);
             const htri_t exists = H5Lexists(file, manifest_path.c_str(), H5P_DEFAULT);
@@ -1125,9 +1281,9 @@ namespace snt::dip::hdf5 {
             bool skip_dependency_manifest = false,
             bool skip_output_manifest = false
         ) {
-            const hsize_t count = object_count(group);
-            for (hsize_t i = 0; i < count; ++i) {
-                const std::string name = object_name(group, i);
+            const auto children = ordered_children(group);
+            for (const auto& child_object : children) {
+                const std::string& name = child_object.name;
                 if (root && (name == std::string(GROUP_SOURCES) || name == std::string(GROUP_TRACE) ||
                              name == std::string(GROUP_UNITS) ||
                              (skip_dependency_manifest && name == std::string(GROUP_DEPENDENCIES)) ||
@@ -1135,11 +1291,13 @@ namespace snt::dip::hdf5 {
                     continue;
                 if (skip_value_payload && name == VALUE_PAYLOAD)
                     continue;
-                const int type = H5Gget_objtype_by_idx(group, i);
+                const int type = child_object.type;
                 if (type == H5G_GROUP) {
                     Id child(H5Gopen2(group, name.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open an HDF5 group");
                     const std::string kind = read_string(child, ATTR_KIND);
                     const std::string path = read_string(child, ATTR_PATH);
+                    if (!path.empty())
+                        env.hierarchy.record_ordered_path(path);
                     if (kind == KIND_VALUE_GROUP) {
                         const htri_t payload_exists = H5Lexists(child, std::string(VALUE_PAYLOAD).c_str(), H5P_DEFAULT);
                         if (payload_exists <= 0)
@@ -1177,13 +1335,11 @@ namespace snt::dip::hdf5 {
                         );
                     if (!path.empty() && (kind == "map" || kind == "list") && !env.hierarchy.has_collection(path)) {
                         std::vector<std::string> items;
-                        const hsize_t child_count = object_count(child);
-                        for (hsize_t j = 0; j < child_count; ++j) {
-                            if (H5Gget_objtype_by_idx(child, j) != H5G_GROUP)
+                        for (const auto& item_object : ordered_children(child)) {
+                            if (item_object.type != H5G_GROUP)
                                 continue;
-                            const std::string item_name = object_name(child, j);
                             Id item(
-                                H5Gopen2(child, item_name.c_str(), H5P_DEFAULT),
+                                H5Gopen2(child, item_object.name.c_str(), H5P_DEFAULT),
                                 H5Gclose,
                                 "Unable to open an HDF5 collection item"
                             );
@@ -1215,6 +1371,9 @@ namespace snt::dip::hdf5 {
                     read_group(env, child);
                 } else if (type == H5G_DATASET) {
                     Id dataset(H5Dopen2(group, name.c_str(), H5P_DEFAULT), H5Dclose, "Unable to open an HDF5 dataset");
+                    const std::string path = read_string(dataset, ATTR_PATH);
+                    if (!path.empty())
+                        env.hierarchy.record_ordered_path(path);
                     read_dataset(env, dataset);
                 }
             }
@@ -1614,6 +1773,7 @@ namespace snt::dip::hdf5 {
         for (const auto& node : env.nodes.get_nodes())
             if (node)
                 write_node(output, env, *node);
+        write_hierarchy_structure(output, env);
         check(H5Fflush(output, H5F_SCOPE_GLOBAL), "Unable to flush the HDF5 file");
     }
 

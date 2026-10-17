@@ -7,9 +7,9 @@
 namespace snt::dip::hdf5::schema {
 
     inline constexpr std::string_view FORMAT = "SciNumTools3 Environment";
-    // DIPH5 2.9 may also retain optional labels for value options.
+    // DIPH5 2.9 adds value option labels; 2.10 adds explicit named-child order.
     inline constexpr uint64_t VERSION = 2;
-    inline constexpr uint64_t VERSION_MINOR = 9;
+    inline constexpr uint64_t VERSION_MINOR = 10;
     inline constexpr uint64_t FIRST_SUPPORTED_VERSION = 1;
 
     inline constexpr std::string_view ATTR_FORMAT = "_DIPL_Format";
@@ -18,6 +18,7 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_KIND = "_DIPL_Kind";
     inline constexpr std::string_view ATTR_KEY = "_DIPL_Key";
     inline constexpr std::string_view ATTR_INDEX = "_DIPL_Index";
+    inline constexpr std::string_view ATTR_ORDER = "_DIPL_Order";
     inline constexpr std::string_view ATTR_PATH = "_DIPL_Path";
     inline constexpr std::string_view ATTR_NODE_TYPE = "_DIPL_Node_Type";
     inline constexpr std::string_view ATTR_VALUE_TYPE = "_DIPL_Value_Type";
