@@ -8,6 +8,11 @@ namespace py = pybind11;
 
 namespace snt::bind::python {
     void init_semantic(py::module_& m) {
+        py::class_<dip::MetadataConstraintInspection>(m, "MetadataConstraintInspection")
+            .def_readonly("property", &dip::MetadataConstraintInspection::property)
+            .def_readonly("rule", &dip::MetadataConstraintInspection::rule)
+            .def_readonly("schema", &dip::MetadataConstraintInspection::schema)
+            .def_readonly("origin", &dip::MetadataConstraintInspection::origin);
         py::class_<dip::SchemaMemberInspection>(m, "SchemaMemberInspection")
             .def_readonly("name", &dip::SchemaMemberInspection::name)
             .def_readonly("relative_path", &dip::SchemaMemberInspection::relative_path)
@@ -31,12 +36,14 @@ namespace snt::bind::python {
             .def_readonly("option_labels", &dip::SchemaMemberInspection::option_labels)
             .def_readonly("condition", &dip::SchemaMemberInspection::condition)
             .def_readonly("metadata", &dip::SchemaMemberInspection::metadata)
+            .def_readonly("metadata_constraints", &dip::SchemaMemberInspection::metadata_constraints)
             .def_readonly("origin", &dip::SchemaMemberInspection::origin)
             .def_readonly("members", &dip::SchemaMemberInspection::members);
         py::class_<dip::SchemaDefinitionInspection>(m, "SchemaDefinitionInspection")
             .def_readonly("id", &dip::SchemaDefinitionInspection::id)
             .def_readonly("name", &dip::SchemaDefinitionInspection::name)
             .def_readonly("metadata", &dip::SchemaDefinitionInspection::metadata)
+            .def_readonly("instance_metadata_constraints", &dip::SchemaDefinitionInspection::instance_metadata_constraints)
             .def_readonly("origin", &dip::SchemaDefinitionInspection::origin)
             .def_readonly("members", &dip::SchemaDefinitionInspection::members);
         py::class_<dip::SchemaApplicationInspection>(m, "SchemaApplicationInspection")

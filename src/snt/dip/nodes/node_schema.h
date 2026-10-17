@@ -7,6 +7,8 @@ namespace snt::dip {
 
     class SchemaNode : public BaseNode {
       public:
+        std::vector<MetadataConstraint> instance_metadata_constraints;
+      public:
         static BaseNode::PointerType is_node(Parser& parser);
         SchemaNode(Parser& parser) : BaseNode(parser, NodeDtype::Schema) {};
         BaseNode::ListType parse(Environment& env) override;

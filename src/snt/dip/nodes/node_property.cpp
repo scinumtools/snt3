@@ -10,7 +10,19 @@ namespace snt::dip {
         parser.kwd_property(ptype);
         // parse rest of the parts
         if (ptype != PropertyType::None) {
-            parser.part_value();
+            if (ptype == PropertyType::MetadataConstraint) {
+                if (!parser.part_metadata_constraint())
+                    throw dip::SyntaxException(
+                        "Invalid metadata constraint",
+                        "The !metadata directive requires a metadata name and either `required` or `nonempty`.",
+                        "Write `!metadata authors required` or `!metadata url nonempty`.",
+                        __FILE__,
+                        __LINE__,
+                        parser.line
+                    );
+            } else {
+                parser.part_value();
+            }
             if (ptype == PropertyType::Labels &&
                 (parser.value_origin != ValueOrigin::Array || parser.value_shape.size() != 1))
                 throw dip::SyntaxException(

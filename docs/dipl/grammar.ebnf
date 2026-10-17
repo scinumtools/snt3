@@ -102,7 +102,7 @@ schema-block
     { blank-line | comment-line | schema-member } DEDENT ;
 
 schema-metadata
-  = metadata-property [ comment ] newline ;
+  = ( metadata-property | metadata-constraint ) [ comment ] newline ;
 
 schema-member
   = value-declaration
@@ -164,7 +164,19 @@ property
   | constant-property
   | tags-property
   | delimiter-property
+  | metadata-constraint
   | metadata-property ;
+
+metadata-constraint
+  = "!metadata" whitespace metadata-name whitespace ("required" | "nonempty") ;
+
+metadata-name
+  = "description" | "authors" | "title" | "journal" | "year" | "volume"
+  | "issue" | "pages" | "doi" | "url" | "version" | "created" | "modified"
+  | "license" | "rationale" | "native" | "requires" | "conflicts" | "implies"
+  | "see" | "example" | "recommended_range" | "performance_impact"
+  | "scientific_impact" | "deprecated" | "replacement" | "since" | "category"
+  | "visibility" ;
 
 options-property
   = "!options" whitespace array [ whitespace PUEL-unit-expression ] ;

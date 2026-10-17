@@ -62,6 +62,7 @@ OverrideTargetKind = _dip.OverrideTargetKind
 OverrideContract = _dip.OverrideContract
 SemanticList = _dip.SemanticList
 SchemaMemberInspection = _dip.SchemaMemberInspection
+MetadataConstraintInspection = _dip.MetadataConstraintInspection
 SchemaDefinitionInspection = _dip.SchemaDefinitionInspection
 SchemaApplicationInspection = _dip.SchemaApplicationInspection
 SchemaValueAssociation = _dip.SchemaValueAssociation

@@ -2,9 +2,11 @@
 #define DIP_VALUE_METADATA_H
 
 #include <set>
+#include <optional>
 #include <snt/dip/settings.h>
 #include <snt/val/array.h>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace snt::dip {
@@ -45,6 +47,9 @@ namespace snt::dip {
 
         bool set_property(PropertyType property, const val::Array::StringType& values);
         bool has_property(PropertyType property) const { return present.count(property) != 0; }
+        bool has_nonempty_value(PropertyType property) const;
+        static std::optional<PropertyType> property_type(std::string_view name);
+        static std::string property_name(PropertyType property);
         std::vector<std::string> present_names() const;
         /** Replace fields explicitly present in `other`; list metadata replaces as a whole. */
         void merge_explicit(const ValueMetadata& other);

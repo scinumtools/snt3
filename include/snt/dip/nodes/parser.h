@@ -132,6 +132,7 @@ namespace snt::dip {
          * @return True if the value was successfully parsed; otherwise, false.
          */
         bool part_value();
+        bool part_metadata_constraint();
 
         bool part_slice();
         bool part_format();

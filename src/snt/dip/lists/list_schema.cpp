@@ -21,7 +21,8 @@ namespace snt::dip {
         BaseNode::ListType& nodes,
         const std::string& parent_id,
         const ValueMetadata& metadata,
-        size_t source_line
+        size_t source_line,
+        const std::vector<MetadataConstraint>& instance_constraints
     ) {
         auto it = schemas.find(name);
         if (it != schemas.end())
@@ -32,7 +33,8 @@ namespace snt::dip {
                 __FILE__,
                 __LINE__
             );
-        schemas.insert({name, {name, nodes, next_schema_id(id_counters, parent_id), metadata, parent_id, source_line}});
+        EnvSchema schema{name, nodes, next_schema_id(id_counters, parent_id), metadata, instance_constraints, parent_id, source_line};
+        schemas.insert({name, std::move(schema)});
     }
 
     void SchemaList::append(const std::string& name, EnvSchema src, const std::string& parent_id) {

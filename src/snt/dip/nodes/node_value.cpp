@@ -1,6 +1,7 @@
 #include "metadata_fields.h"
 
 #include <optional>
+#include <cctype>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_float.h>
@@ -13,6 +14,43 @@
 #include <sstream>
 
 namespace snt::dip {
+
+    bool ValueMetadata::has_nonempty_value(PropertyType property) const {
+        const auto nonempty = [](const std::string& value) {
+            return std::any_of(value.begin(), value.end(), [](unsigned char character) {
+                return !std::isspace(character);
+            });
+        };
+        switch (property) {
+#define SNT_METADATA_NONEMPTY_SCALAR(TYPE, FIELD, NAME) case PropertyType::TYPE: return nonempty(FIELD);
+#define SNT_METADATA_NONEMPTY_LIST(TYPE, FIELD, NAME) \
+    case PropertyType::TYPE: \
+        return !FIELD.empty() && std::all_of(FIELD.begin(), FIELD.end(), nonempty);
+            SNT_DIP_METADATA_SCALAR_FIELDS(SNT_METADATA_NONEMPTY_SCALAR)
+            SNT_DIP_METADATA_LIST_FIELDS(SNT_METADATA_NONEMPTY_LIST)
+#undef SNT_METADATA_NONEMPTY_SCALAR
+#undef SNT_METADATA_NONEMPTY_LIST
+        default: return false;
+        }
+    }
+
+    std::optional<PropertyType> ValueMetadata::property_type(std::string_view name) {
+#define SNT_METADATA_LOOKUP(TYPE, FIELD, NAME) if (name == NAME) return PropertyType::TYPE;
+        SNT_DIP_METADATA_SCALAR_FIELDS(SNT_METADATA_LOOKUP)
+        SNT_DIP_METADATA_LIST_FIELDS(SNT_METADATA_LOOKUP)
+#undef SNT_METADATA_LOOKUP
+        return std::nullopt;
+    }
+
+    std::string ValueMetadata::property_name(PropertyType property) {
+        switch (property) {
+#define SNT_METADATA_NAME(TYPE, FIELD, NAME) case PropertyType::TYPE: return NAME;
+            SNT_DIP_METADATA_SCALAR_FIELDS(SNT_METADATA_NAME)
+            SNT_DIP_METADATA_LIST_FIELDS(SNT_METADATA_NAME)
+#undef SNT_METADATA_NAME
+        default: return {};
+        }
+    }
 
     void ValueNode::validate_type_range(const val::BaseValue* candidate, const Line& source_line) const {
         if (dtype == NodeDtype::Integer)
@@ -390,6 +428,7 @@ namespace snt::dip {
         if (evaluated->value && evaluated->value->get_dtype() != value_dtype)
             evaluated->value = evaluated->value->cast_as(value_dtype);
         value = std::move(evaluated->value);
+        metadata.merge_explicit(node->metadata);
         value_origin = node->value_origin;
         value_raw = node->value_raw;
         value_shape = node->value_shape;
@@ -452,6 +491,8 @@ namespace snt::dip {
     }
 
     bool ValueNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
+        if (property == PropertyType::MetadataConstraint)
+            return BaseNode::set_property(property, values, units);
         switch (property) {
             // directives
         case PropertyType::Options:

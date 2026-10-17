@@ -153,6 +153,7 @@ namespace snt::dip {
             {KEYWORD_TAGS, PropertyType::Tags},
             {KEYWORD_CONDITION, PropertyType::Condition},
             {KEYWORD_DELIMITER, PropertyType::Delimiter},
+            {KEYWORD_METADATA, PropertyType::MetadataConstraint},
             // metadata
             {KEYWORD_DESCRIPTION, PropertyType::Description},
             {KEYWORD_AUTHORS, PropertyType::Authors},
@@ -819,6 +820,17 @@ namespace snt::dip {
         if (part_keyword(false))
             return true;
         return false;
+    }
+
+    bool Parser::part_metadata_constraint() {
+        static const std::regex pattern(R"(^([A-Za-z_][A-Za-z0-9_]*)[ \t]+(required|nonempty)(?=[ \t]|$))");
+        std::smatch match;
+        if (!std::regex_search(code, match, pattern))
+            return false;
+        value_raw = {match[1].str(), match[2].str()};
+        value_origin = ValueOrigin::String;
+        strip(match[0].str());
+        return true;
     }
 
     bool Parser::part_slice() {

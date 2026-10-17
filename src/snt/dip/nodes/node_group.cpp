@@ -100,6 +100,17 @@ namespace snt::dip {
                     nodes.push_back(shared_from_this()); // Now we return the group node ... (hence the infinite loop)
                     for (const auto& schema_name : schemas_to_apply) {
                         EnvSchema schema = env.schemas.at(schema_name);
+                        for (const auto& constraint : schema.instance_metadata_constraints) {
+                            const auto duplicate = std::find_if(
+                                metadata_constraints.begin(), metadata_constraints.end(),
+                                [&](const MetadataConstraint& current) {
+                                    return current.schema_name == constraint.schema_name &&
+                                           current.property == constraint.property && current.rule == constraint.rule;
+                                }
+                            );
+                            if (duplicate == metadata_constraints.end())
+                                metadata_constraints.push_back(constraint);
+                        }
                         for (const auto& node : schema.nodes) { // ... and unwrap the schema nodes
                             BaseNode::PointerType node_new = node->clone(node->path, node->indent + indent);
                             node_new->schema_id = schema.id;

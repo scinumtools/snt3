@@ -26,6 +26,7 @@ namespace snt::dip {
         std::vector<std::string> schemas;   ///< List of item schemas
         ValueMetadata metadata;             ///< Metadata attached to this explicit group or collection node.
         std::vector<std::string> children;  ///< Direct named children in declaration order for groups and items
+        std::vector<MetadataConstraint> metadata_constraints;
     };
 
     /**

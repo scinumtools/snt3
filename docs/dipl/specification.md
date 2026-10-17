@@ -136,7 +136,7 @@ The following topics are covered:
 * [Functions](syntax/functions.md) — functions available for processing and transforming data.
 * [Properties](syntax/properties.md) — metadata and properties associated with nodes.
 * [Conditions](syntax/conditions.md) — conditional definitions and constraints.
-* [Schemas](syntax/schemas.md) — schemas for defining and validating structured data.
+* [Schemas](syntax/schemas.md) — schemas for defining and validating structured data, including required metadata constraints.
 * [Overrides](syntax/overrides.md) — value replacements applied before normal evaluation.
 
 ## File Format
@@ -195,7 +195,8 @@ Evaluation of a DIPL document MUST proceed in the following stages, in order:
    All validation rules MUST be applied, including:
    - option constraints
    - value format checks
-   - structural constraints  
+   - structural constraints
+   - schema metadata constraints against effective metadata after schema defaults, instance metadata, and supported overrides have been applied. `required` MUST accept an explicitly present empty value; `nonempty` MUST reject empty or whitespace-only strings and empty or blank list entries.
    
    Any violation MUST result in an error.
 
@@ -234,6 +235,7 @@ The following conditions MUST result in evaluation failure:
 - unit incompatibility
 - expression evaluation failure
 - duplicate, invalid, or unresolved override target
+- a violated schema metadata constraint
 
 Errors MUST be deterministic and MUST NOT be ignored.
 

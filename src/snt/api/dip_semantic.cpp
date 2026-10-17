@@ -204,6 +204,22 @@ namespace snt::api {
             out << ']';
         }
 
+        void metadata_constraints(
+            std::ostream& out, const std::vector<dip::MetadataConstraintInspection>& values,
+            const std::map<std::string, dip::SourceInfo>& sources, const std::filesystem::path& input
+        ) {
+            out << '[';
+            for (size_t i = 0; i < values.size(); ++i) {
+                if (i)
+                    out << ',';
+                out << "{\"property\":" << quote(values[i].property) << ",\"rule\":" << quote(values[i].rule)
+                    << ",\"schema\":" << quote(values[i].schema) << ",\"origin\":";
+                schema_location(out, values[i].origin, sources, input);
+                out << '}';
+            }
+            out << ']';
+        }
+
         void schema_member(
             std::ostream& out,
             const dip::SchemaMemberInspection& value,
@@ -245,6 +261,8 @@ namespace snt::api {
                 out << quote(value.condition);
             out << ",\"metadata\":";
             metadata(out, value.metadata);
+            out << ",\"metadata_constraints\":";
+            metadata_constraints(out, value.metadata_constraints, sources, input);
             out << ",\"origin\":";
             schema_location(out, value.origin, sources, input);
             out << ",\"members\":[";
@@ -347,7 +365,7 @@ namespace snt::api {
     std::string DIPSemantic::schemas_json() const {
         const auto result = inspector().schema_hierarchy();
         std::ostringstream out;
-        out << "{\"schema\":\"snt-schema-hierarchy/1\",\"definitions_available\":"
+        out << "{\"schema\":\"snt-schema-hierarchy/2\",\"definitions_available\":"
             << (result.definitions_available ? "true" : "false")
             << ",\"applications_complete\":" << (result.applications_complete ? "true" : "false")
             << ",\"definitions\":[";
@@ -357,6 +375,8 @@ namespace snt::api {
             const auto& definition = result.definitions[i];
             out << "{\"id\":" << quote(definition.id) << ",\"name\":" << quote(definition.name) << ",\"metadata\":";
             metadata(out, definition.metadata);
+            out << ",\"instance_metadata_constraints\":";
+            metadata_constraints(out, definition.instance_metadata_constraints, result.sources, input_);
             out << ",\"origin\":";
             schema_location(out, definition.origin, result.sources, input_);
             out << ",\"members\":[";

@@ -27,9 +27,11 @@ $schema settings
     ?descr "Flow speed"
 ```
 
-Schema-level metadata are available through the environment's schema registry.
-Only `?` metadata properties are accepted on a schema declaration; directives
-such as `!tags` remain value-node properties.
+Schema-level descriptive metadata are available through the environment's
+schema registry. A schema may also declare `!metadata` constraints before its
+first member. These constraints apply to metadata on each group or item that
+uses the schema; they are not descriptive metadata and are not inherited by
+instances.
 
 For example, the following schemas define common structures that can be combined to describe a car:
 
@@ -130,6 +132,53 @@ defined with a value is constant immediately; its instance cannot assign a
 different initial value through an ordinary modification. Explicit
 ``$override`` regions retain their usual ability to replace constants.
 
+## Required metadata
+
+Schemas can require metadata on the instance itself and on individual schema
+members. Use `required` to require that an annotation is present, or `nonempty`
+to require a value containing non-whitespace content:
+
+```DIPL
+$schema citation
+  !metadata authors required
+  locator str
+    ?url "https://example.org/reference"
+    !metadata url nonempty
+
+records map : citation
+records[example]
+  ?authors "Example author"
+  locator = "Section 1"
+```
+
+The schema-level rule applies to the metadata on each applying group or item.
+The member rule applies to `locator` metadata. The schema's URL annotation is
+a default, so it satisfies `nonempty` when an instance leaves that field
+unspecified. An explicit empty instance annotation replaces the default and
+fails `nonempty`. Under `required`, an explicitly empty annotation counts as
+present.
+
+`nonempty` rejects empty and whitespace-only scalar strings. For list-valued
+metadata, the list must contain an item and every item must contain
+non-whitespace text. Thus an empty list or a list containing an empty item
+fails. Metadata property names use their regular spelling without the `?`,
+such as `authors`, `url`, or `requires`.
+
+Constraints are evaluated after schema defaults and instance annotations have
+been combined, after declarations are complete, and after supported overrides
+have been applied. An explicit empty override does not fall back to a schema
+default. Requirements from multiple applied schemas are combined: `nonempty`
+also satisfies `required`, while both rules remain independently visible in
+inspection. Unknown metadata names and rules are rejected during parsing.
+Diagnostics identify the affected path, metadata property, rule, and schema
+source location.
+
+The schema hierarchy inspection API exposes instance-level and member-level
+constraints. DIPH5 snapshots retain evaluated metadata and schema application
+provenance, but do not contain reusable schema definitions. A snapshot records
+the result of evaluation; loading it does not re-run the original schema
+constraints.
+
 ## Collection schemas
 
 Schemas can also be applied to entire `map` and `list` collections. 
@@ -181,3 +230,6 @@ The following rules shall apply:
 * A schema may instantiate other schemas.
 * Schemas may be instantiated within groups, map items, and list items.
 * The structure defined by a schema is inherited by all of its instances.
+* Metadata remains optional unless an instance or member constraint is declared.
+* Schema metadata constraints are validated against effective metadata after
+  defaults, instance annotations, and supported overrides have been applied.

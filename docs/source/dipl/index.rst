@@ -217,6 +217,35 @@ map items, lists, or complete collections:
      density = 8960
      conductivity = 401
 
+Schemas can also require metadata on each applying group or item, and on
+individual members. ``required`` checks that a metadata annotation is present;
+``nonempty`` additionally rejects empty and whitespace-only values. Schema
+member defaults count toward these checks, while an explicit empty instance
+annotation overrides the default and fails ``nonempty``:
+
+.. code-block:: dipl
+
+   $schema citation
+     !metadata authors required
+     locator str
+       ?url "https://example.org/reference"
+       !metadata url nonempty
+
+   records map : citation
+   records[example]
+     ?authors "Example author"
+     locator = "Section 1"
+
+The first constraint applies to metadata on each citation item. The second
+applies to the ``locator`` member and accepts its inherited URL default.
+Constraints are checked after schema defaults and instance annotations have
+been combined, including after overrides. List-valued metadata must contain at
+least one nonempty item under ``nonempty``. Constraints from multiple applied
+schemas are all enforced. Schema inspection exposes the declared rules.
+DIPH5 stores evaluated metadata and schema provenance, but does not store
+reusable schema definitions; constraints are checked when parsing the source
+project and cannot be re-applied when loading a snapshot.
+
 Value overrides
 ^^^^^^^^^^^^^^^
 

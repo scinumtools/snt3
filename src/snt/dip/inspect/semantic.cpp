@@ -1,4 +1,5 @@
 #include "value_facts.h"
+#include "../nodes/metadata_fields.h"
 
 #include <algorithm>
 #include <limits>
@@ -12,6 +13,16 @@ namespace snt::dip {
         std::string type_name(core::DataType type) {
             const auto found = core::DataTypeNames.find(type);
             return found == core::DataTypeNames.end() ? "unknown" : found->second;
+        }
+        MetadataConstraintInspection metadata_constraint(const MetadataConstraint& constraint) {
+            MetadataConstraintInspection result;
+            result.property = ValueMetadata::property_name(constraint.property);
+            if (result.property.empty())
+                result.property = "unknown";
+            result.rule = constraint.rule == MetadataRule::Required ? "required" : "nonempty";
+            result.schema = constraint.schema_name;
+            result.origin = {constraint.source_name, constraint.source_line, {}};
+            return result;
         }
     } // namespace
 
@@ -96,6 +107,8 @@ namespace snt::dip {
                 definition.id = name;
                 definition.name = name;
                 definition.metadata = schema.metadata;
+                for (const auto& constraint : schema.instance_metadata_constraints)
+                    definition.instance_metadata_constraints.push_back(metadata_constraint(constraint));
                 definition.origin = {schema.source_name, schema.source_line, {}};
                 struct Parent {
                     size_t indent;
@@ -129,6 +142,8 @@ namespace snt::dip {
                     else
                         member.kind = "value";
                     member.metadata = node->metadata;
+                    for (const auto& constraint : node->metadata_constraints)
+                        member.metadata_constraints.push_back(metadata_constraint(constraint));
                     if (const auto value = std::dynamic_pointer_cast<ValueNode>(node)) {
                         if (value->value_dtype != core::DataType::None)
                             member.type = type_name(value->value_dtype);

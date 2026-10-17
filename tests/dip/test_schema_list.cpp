@@ -3,6 +3,7 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
+#include <snt/dip/inspect/inspector.h>
 
 using namespace snt;
 
@@ -40,6 +41,126 @@ TEST(SchemaList, Properties) {
     dip::ValueNode::PointerType vnode = env.nodes.at(0);
     EXPECT_EQ(vnode->path.name, "dark_matter.resolution");
     EXPECT_EQ(vnode->value->to_string(), "32");
+}
+
+TEST(SchemaList, MetadataConstraintsAcceptInheritedDefaultsAndInspectRules) {
+    dip::DIP d;
+    d.add_string(
+        "$schema citation\n"
+        "  !metadata authors required\n"
+        "  locator str\n"
+        "    ?url \"https://example.org/reference\"\n"
+        "    !metadata url nonempty\n"
+        "records map : citation\n"
+        "records[example]\n"
+        "  ?authors \"\"\n"
+        "  locator = \"Section 1\"\n"
+    );
+    const auto env = d.parse();
+    EXPECT_EQ(env["records[example].locator"].get_metadata().url, "https://example.org/reference");
+    const auto inspection = dip::Inspector{env}.schema_hierarchy();
+    ASSERT_EQ(inspection.definitions.size(), 1);
+    ASSERT_EQ(inspection.definitions[0].instance_metadata_constraints.size(), 1);
+    EXPECT_EQ(inspection.definitions[0].instance_metadata_constraints[0].property, "authors");
+    EXPECT_EQ(inspection.definitions[0].instance_metadata_constraints[0].rule, "required");
+    ASSERT_EQ(inspection.definitions[0].members[0].metadata_constraints.size(), 1);
+    EXPECT_EQ(inspection.definitions[0].members[0].metadata_constraints[0].property, "url");
+    EXPECT_EQ(inspection.definitions[0].members[0].metadata_constraints[0].rule, "nonempty");
+}
+
+TEST(SchemaList, MetadataConstraintsRejectMissingAndExplicitEmptyMetadata) {
+    dip::DIP missing;
+    missing.add_string(
+        "$schema citation\n"
+        "  !metadata authors required\n"
+        "  locator str\n"
+        "records map : citation\n"
+        "records[example]\n"
+        "  locator = \"Section 1\"\n"
+    );
+    try {
+        missing.parse();
+        FAIL() << "Expected missing instance metadata to fail";
+    } catch (const dip::SyntaxException& error) {
+        EXPECT_NE(error.info().details.find("?authors"), std::string::npos);
+        EXPECT_NE(error.info().details.find("records[example]"), std::string::npos);
+    }
+
+    for (const auto& url : {std::string("\"\""), std::string("\"   \"")}) {
+        dip::DIP empty;
+        empty.add_string(
+            "$schema citation\n"
+            "  locator str\n"
+            "    ?url \"https://example.org/reference\"\n"
+            "    !metadata url nonempty\n"
+            "records map : citation\n"
+            "records[example]\n"
+            "  locator = \"Section 1\"\n"
+            "    ?url " + url + "\n"
+        );
+        try {
+            empty.parse();
+            FAIL() << "Expected explicit empty metadata to fail";
+        } catch (const dip::SyntaxException& error) {
+            EXPECT_NE(error.info().details.find("empty or whitespace-only"), std::string::npos);
+            EXPECT_NE(error.info().details.find("?url"), std::string::npos);
+        }
+    }
+}
+
+TEST(SchemaList, MetadataNonemptyRejectsEmptyAndBlankListItems) {
+    for (const auto& annotation : {std::string("[]"), std::string("[\"   \"]")}) {
+        dip::DIP d;
+        d.add_string(
+            "$schema citation\n"
+            "  locator str\n"
+            "    !metadata see nonempty\n"
+            "records map : citation\n"
+            "records[example]\n"
+            "  locator = \"Section 1\"\n"
+            "    ?see " + annotation + "\n"
+        );
+        EXPECT_THROW(d.parse(), dip::SyntaxException);
+    }
+}
+
+TEST(SchemaList, MetadataConstraintsApplyToGroupsListsAndOverrides) {
+    dip::DIP group;
+    group.add_string(
+        "$schema record\n"
+        "  !metadata authors required\n"
+        "  value str\n"
+        "record : record\n"
+        "  value = \"ready\"\n"
+    );
+    EXPECT_THROW(group.parse(), dip::SyntaxException);
+
+    dip::DIP list;
+    list.add_string(
+        "$schema record\n"
+        "  !metadata authors required\n"
+        "  value str\n"
+        "records list : record\n"
+        "records[]\n"
+        "  ?authors \"\"\n"
+        "  value = \"ready\"\n"
+    );
+    EXPECT_NO_THROW(list.parse());
+
+    dip::DIP override;
+    override.add_string(
+        "$schema citation\n"
+        "  locator str\n"
+        "    ?url \"https://example.org/reference\"\n"
+        "    !metadata url nonempty\n"
+        "records map : citation\n"
+        "records[example]\n"
+        "  locator = \"Section 1\"\n"
+        "$override\n"
+        "  records[example].locator = \"Section 2\"\n"
+        "    ?url \"\"\n"
+    );
+    EXPECT_THROW(override.parse(), dip::SyntaxException);
 }
 
 TEST(SchemaList, PerInstanceConstants) {

@@ -198,6 +198,29 @@ instance retain their defaults. Metadata on a schema definition itself is not
 inherited by instances. Explicitly empty metadata values are preserved and can
 be distinguished from fields that are absent in inspection results.
 
+Schemas can impose metadata requirements with `!metadata`:
+
+```DIPL
+$schema citation
+  !metadata authors required
+  locator str
+    ?url "https://example.org/reference"
+    !metadata url nonempty
+```
+
+At the schema level, the rule applies to metadata on each group or item that
+uses the schema. Beneath a schema member, it applies to that member's metadata.
+Write the metadata name without its `?` prefix. `required` checks presence, so
+an explicitly empty annotation satisfies it. `nonempty` rejects empty and
+whitespace-only scalar strings. For list-valued metadata, it requires at least
+one item and rejects empty or whitespace-only items.
+
+Member metadata defaults count toward constraints. An explicit instance value
+replaces the matching default, including an explicitly empty value. Constraints
+are checked after declarations and supported overrides. Metadata remains
+optional for schemas that declare no such rule. Schema inspection exposes the
+rules.
+
 Table headers use indentation to distinguish table metadata from column
 metadata. Properties at indentation zero before the first column describe the
 table node; properties indented by two spaces beneath a column describe that

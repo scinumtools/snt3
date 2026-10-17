@@ -29,6 +29,16 @@ namespace snt::dip {
 
     bool SchemaNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
         (void)units;
+        if (property == PropertyType::MetadataConstraint) {
+            if (!BaseNode::set_property(property, values, units))
+                return false;
+            for (auto constraint : metadata_constraints) {
+                constraint.schema_name = value_raw.empty() ? std::string{} : value_raw.front();
+                instance_metadata_constraints.push_back(std::move(constraint));
+            }
+            metadata_constraints.clear();
+            return true;
+        }
         return metadata.set_property(property, values);
     }
 

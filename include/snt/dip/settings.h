@@ -58,6 +58,7 @@ namespace snt::dip {
     constexpr std::string_view KEYWORD_OPTIONS = "!options";
     constexpr std::string_view KEYWORD_LABELS = "!labels";
     constexpr std::string_view KEYWORD_DELIMITER = "!delimiter";
+    constexpr std::string_view KEYWORD_METADATA = "!metadata";
 
     // metadata
     constexpr std::string_view KEYWORD_DESCRIPTION = "?descr";
@@ -206,7 +207,8 @@ namespace snt::dip {
         Category,
         Visibility,
 
-        Delimiter // specific properties
+        Delimiter, // specific properties
+        MetadataConstraint // schema constraint directive
     };
 
     namespace detail {

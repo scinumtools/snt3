@@ -198,6 +198,15 @@ namespace snt::dip {
         // register FQ name and collection set with the node
         // std::cout << '\n';
         node->path.name = name_full;
+        if (node->dtype == NodeDtype::Group && !node->metadata_constraints.empty()) {
+            const auto collection = collections.find(key_for(name_full));
+            if (collection != collections.end())
+                collection->second.metadata_constraints.insert(
+                    collection->second.metadata_constraints.end(),
+                    node->metadata_constraints.begin(),
+                    node->metadata_constraints.end()
+                );
+        }
         if (collection_path)
             record_ordered_path(collection_path(name_full));
         // std::cout << "name  " << node->name << '\n';

@@ -112,6 +112,13 @@ namespace snt::dip {
         bool snapshot_input = false; ///< A snapshot has no parser input to preview directly.
     };
 
+    struct MetadataConstraintInspection {
+        std::string property;
+        std::string rule;
+        std::string schema;
+        core::SourceLocation origin;
+    };
+
     /** A declared schema member. Children preserve source declaration order. */
     struct SchemaMemberInspection {
         std::string name;
@@ -125,6 +132,7 @@ namespace snt::dip {
         std::vector<std::string> option_labels;
         std::string condition;
         ValueMetadata metadata;
+        std::vector<MetadataConstraintInspection> metadata_constraints;
         core::SourceLocation origin;
         std::vector<SchemaMemberInspection> members;
     };
@@ -133,6 +141,7 @@ namespace snt::dip {
         std::string id; ///< Registered, project-scoped schema name.
         std::string name;
         ValueMetadata metadata;
+        std::vector<MetadataConstraintInspection> instance_metadata_constraints;
         core::SourceLocation origin;
         std::vector<SchemaMemberInspection> members;
     };

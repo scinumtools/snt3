@@ -10,6 +10,19 @@ namespace snt::dip {
 
     bool BaseNode::set_property(PropertyType property, val::Array::StringType& values, std::string& units) {
         (void)units;
+        if (property == PropertyType::MetadataConstraint && values.size() == 2) {
+            const auto constrained_property = ValueMetadata::property_type(values[0]);
+            if (!constrained_property || (values[1] != "required" && values[1] != "nonempty"))
+                return false;
+            metadata_constraints.push_back({
+                *constrained_property,
+                values[1] == "required" ? MetadataRule::Required : MetadataRule::Nonempty,
+                {},
+                line.source.name,
+                line.source.line_number
+            });
+            return true;
+        }
         if (metadata.set_property(property, values))
             return true;
         throw dip::SyntaxException(

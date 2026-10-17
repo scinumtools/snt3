@@ -1,4 +1,5 @@
 #include "nodes/node_group.h"
+#include "nodes/metadata_fields.h"
 #include "nodes/node_schema.h"
 #include "parsers.h"
 
@@ -17,6 +18,43 @@
 #include <string>
 
 namespace snt::dip {
+
+    namespace {
+        std::string metadata_name(PropertyType property) {
+            const auto name = ValueMetadata::property_name(property);
+            return name.empty() ? "unknown" : name;
+        }
+
+        void validate_metadata_constraints(
+            const std::string& path, const ValueMetadata& metadata,
+            const std::vector<MetadataConstraint>& constraints, const Line* declaration = nullptr
+        ) {
+            for (const auto& constraint : constraints) {
+                const bool present = metadata.has_property(constraint.property);
+                const bool valid = constraint.rule == MetadataRule::Required ? present
+                                                                              : metadata.has_nonempty_value(constraint.property);
+                if (valid)
+                    continue;
+                const std::string rule = constraint.rule == MetadataRule::Required ? "required" : "nonempty";
+                const std::string property = metadata_name(constraint.property);
+                std::string detail = "The metadata property `?" + property + "` on `" + path + "` is " + rule +
+                                     " by schema `" + constraint.schema_name + "`";
+                if (present && constraint.rule == MetadataRule::Nonempty)
+                    detail += ", but its effective value is empty or whitespace-only";
+                else
+                    detail += ", but it is missing";
+                detail += ".";
+                if (!constraint.source_name.empty())
+                    detail += " Constraint declared at " + constraint.source_name + ":" +
+                              std::to_string(constraint.source_line) + ".";
+                throw dip::SyntaxException(
+                    "Schema metadata constraint failed", detail,
+                    "Add a valid metadata annotation or update the schema constraint.",
+                    __FILE__, __LINE__, declaration ? *declaration : Line{}
+                );
+            }
+        }
+    } // namespace
 
     namespace {
 
@@ -421,7 +459,9 @@ overrides list : snt_project_override
     ) {
         // assign properties to the previous value node
         PropertyNode::PointerType pnode = std::dynamic_pointer_cast<PropertyNode>(current_node);
-        const bool is_metadata = pnode->ptype >= PropertyType::Description && pnode->ptype < PropertyType::Delimiter;
+        const bool is_metadata =
+            (pnode->ptype >= PropertyType::Description && pnode->ptype < PropertyType::Delimiter) ||
+            pnode->ptype == PropertyType::MetadataConstraint;
         if (!previous_node ||
             (!is_metadata && std::find(preceeding_nodes.begin(), preceeding_nodes.end(), previous_node->dtype) ==
                                  preceeding_nodes.end())) {
@@ -453,7 +493,14 @@ overrides list : snt_project_override
                 __LINE__,
                 pnode->line
             );
-        if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw))
+        if (!previous_node->set_property(pnode->ptype, pnode->value_raw, pnode->units_raw)) {
+            if (pnode->ptype == PropertyType::MetadataConstraint)
+                throw dip::SyntaxException(
+                    "Invalid metadata constraint",
+                    "The metadata name or constraint rule is not supported.",
+                    "Use a supported metadata name followed by `required` or `nonempty`.",
+                    __FILE__, __LINE__, pnode->line
+                );
             throw dip::SyntaxException(
                 "Node property could not be set",
                 "The property could not be assigned to the preceding value node `" + previous_node->path.name + "`.",
@@ -462,6 +509,7 @@ overrides list : snt_project_override
                 __LINE__,
                 pnode->line
             );
+        }
     }
 
     inline void set_schema_property(
@@ -477,6 +525,16 @@ overrides list : snt_project_override
                 __LINE__,
                 property->line
             );
+        if (property->ptype == PropertyType::MetadataConstraint) {
+            if (!schema_node->set_property(property->ptype, property->value_raw, property->units_raw))
+                throw dip::SyntaxException(
+                    "Invalid schema metadata constraint",
+                    "The metadata name or constraint rule is not supported.",
+                    "Use a supported metadata name followed by `required` or `nonempty`.",
+                    __FILE__, __LINE__, property->line
+                );
+            return;
+        }
         if (!schema_node->set_property(property->ptype, property->value_raw, property->units_raw))
             throw dip::SyntaxException(
                 "Invalid schema property",
@@ -541,6 +599,7 @@ overrides list : snt_project_override
         BaseNode::ListType schema_nodes;
         BaseNode::PointerType previous = nullptr;
         ValueMetadata schema_metadata;
+        std::vector<MetadataConstraint> instance_constraints;
         for (const auto& node : body) {
             if (node->dtype == NodeDtype::Empty)
                 continue;
@@ -575,6 +634,22 @@ overrides list : snt_project_override
             if (node->dtype == NodeDtype::Property) {
                 if (!previous) {
                     auto property = std::dynamic_pointer_cast<PropertyNode>(node);
+                    if (property->ptype == PropertyType::MetadataConstraint) {
+                        BaseNode holder;
+                        holder.line = node->line;
+                        if (!holder.set_property(property->ptype, property->value_raw, property->units_raw))
+                            throw dip::SyntaxException(
+                                "Invalid schema metadata constraint",
+                                "The metadata name or constraint rule is not supported.",
+                                "Use a supported metadata name followed by `required` or `nonempty`.",
+                                __FILE__, __LINE__, node->line
+                            );
+                        for (auto constraint : holder.metadata_constraints) {
+                            constraint.schema_name = name;
+                            instance_constraints.push_back(std::move(constraint));
+                        }
+                        continue;
+                    }
                     if (!schema_metadata.set_property(property->ptype, property->value_raw))
                         throw dip::SyntaxException(
                             "Invalid schema property",
@@ -603,8 +678,12 @@ overrides list : snt_project_override
         // Schema nodes are stored one level beneath their application point.
         for (const auto& node : schema_nodes)
             node->indent += INDENT_STEP;
+        for (const auto& node : schema_nodes)
+            for (auto& constraint : node->metadata_constraints)
+                constraint.schema_name = name;
         env.schemas.append(
-            name, schema_nodes, source_name, schema_metadata, schema_nodes.front()->line.source.line_number
+            name, schema_nodes, source_name, schema_metadata, schema_nodes.front()->line.source.line_number,
+            instance_constraints
         );
         env.sources.append(source_name, source_file, source_code, parent);
     }
@@ -622,6 +701,13 @@ overrides list : snt_project_override
                 sources_with_nodes.insert(current_node->line.source.name);
             if (current_node->dtype == NodeDtype::Property) {
                 const auto property = std::dynamic_pointer_cast<PropertyNode>(current_node);
+                if (property->ptype == PropertyType::MetadataConstraint)
+                    throw dip::SyntaxException(
+                        "Metadata constraints require a schema",
+                        "The !metadata directive can only be declared inside a schema.",
+                        "Place it in a $schema definition, on the schema itself or beneath a schema member.",
+                        __FILE__, __LINE__, current_node->line
+                    );
                 const bool is_metadata =
                     property->ptype >= PropertyType::Description && property->ptype < PropertyType::Delimiter;
                 const std::string& source_name = current_node->line.source.name;
@@ -676,12 +762,17 @@ overrides list : snt_project_override
                 previous_node = schema_previous;
                 if (schema_nodes.size() > 0) {
                     auto schema = std::dynamic_pointer_cast<SchemaNode>(current_node);
+                    const std::string schema_name = current_node->value_raw.at(0);
+                    for (const auto& schema_member : schema_nodes)
+                        for (auto& constraint : schema_member->metadata_constraints)
+                            constraint.schema_name = schema_name;
                     env.schemas.append(
-                        current_node->value_raw.at(0),
+                        schema_name,
                         schema_nodes,
                         current_node->line.source.name,
                         schema->metadata,
-                        current_node->line.source.line_number
+                        current_node->line.source.line_number,
+                        schema->instance_metadata_constraints
                     );
                 } else {
                     throw dip::SyntaxException(
@@ -1026,6 +1117,12 @@ overrides list : snt_project_override
                 );
             }
         }
+        for (const auto& vnode : target.nodes.get_nodes())
+            if (vnode && !vnode->metadata_constraints.empty())
+                validate_metadata_constraints(vnode->path.name, vnode->metadata, vnode->metadata_constraints, &vnode->line);
+        for (const auto& [path, collection] : target.hierarchy.get_collections())
+            if (!collection.metadata_constraints.empty())
+                validate_metadata_constraints(path, collection.metadata, collection.metadata_constraints);
         return target;
     }
 

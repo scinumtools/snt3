@@ -8,6 +8,16 @@
 
 namespace snt::dip {
 
+    enum class MetadataRule { Required, Nonempty };
+
+    struct MetadataConstraint {
+        PropertyType property = PropertyType::None;
+        MetadataRule rule = MetadataRule::Required;
+        std::string schema_name;
+        std::string source_name;
+        size_t source_line = 0;
+    };
+
     class Node {
       public:
         Line line;     ///< source code line information; in Python this were 'code' & 'source' variables
@@ -22,6 +32,7 @@ namespace snt::dip {
         std::string units_raw;                ///< raw units string
         val::Array::RangeType dimension;      ///< list of array dimensions
         std::vector<std::string> schemas;     ///< list of parsed schemas
+        std::vector<MetadataConstraint> metadata_constraints;
         Node() : indent(0), value_origin(ValueOrigin::Empty) {};
         Node(const Node& other) = default;
         Node(const Line& l) : line(l), indent(0), value_origin(ValueOrigin::Empty) {};
