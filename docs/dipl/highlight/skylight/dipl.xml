@@ -26,7 +26,7 @@
         <!-- Data types -->
         <RegExpr
             attribute="Datatype"
-            String="\b(int64|int32|int16|int8|int|uint64|uint32|uint16|uint8|uint|float128|float64|float32|float16|float|str|bool|char|byte|table|map|list)\b"
+            String="\b(int64|int32|int16|int8|int|uint64|uint32|uint16|uint8|uint|float128|float64|float32|float16|float|str|bool|char|byte|table|map|list|link)\b"
             context="#stay"/>
 
         <!-- Option directives -->

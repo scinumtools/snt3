@@ -4,6 +4,7 @@
 #include "nodes/node_empty.h"
 #include "nodes/node_group.h"
 #include "nodes/node_import.h"
+#include "nodes/node_link.h"
 #include "nodes/node_modification.h"
 #include "nodes/node_override.h"
 #include "nodes/node_property.h"
@@ -282,6 +283,8 @@ namespace snt::dip {
                 node = ModificationNode::is_node(parser);
             if (node == nullptr)
                 parser.part_type();
+            if (node == nullptr)
+                node = LinkNode::is_node(parser);
             if (node == nullptr)
                 node = BooleanNode::is_node(parser);
             if (node == nullptr)

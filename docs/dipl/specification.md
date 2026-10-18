@@ -83,6 +83,7 @@ At a conceptual level:
 
 * **Nodes** define the values and hierarchical structure of the configuration.
 * **References and expressions** establish dependencies between parameters and allow values to be derived from other values.
+* **Links** expose a canonical node through another read-only path without copying its data.
 * **Units** provide dimensional information and ensure physical consistency during evaluation.
 * **Properties** attach metadata and declarative constraints to the configuration.
 * **Schemas** define expected structures and provide a basis for validating complete configurations.

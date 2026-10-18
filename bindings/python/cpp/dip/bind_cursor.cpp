@@ -145,6 +145,42 @@ namespace snt::bind::python {
 
         val.def_property_readonly("kind", &dip::Cursor::get_kind, "Kind of DIPL path represented by this cursor.");
 
+        val.def_property_readonly(
+            "node_type",
+            [](const dip::Cursor& self) {
+                try {
+                    return dip::NodeDtypeNames.at(self.get_node()->dtype);
+                } catch (const dip::EnvironmentException&) {
+                    return dip::Path::KindNames.at(self.get_kind());
+                }
+            },
+            "DIPL node type at this path, such as `integer`, `string`, or `link`."
+        );
+        val.def_property_readonly(
+            "link_source",
+            [](const dip::Cursor& self) -> py::object {
+                try {
+                    const auto node = self.get_node();
+                    return node->dtype == dip::NodeDtype::Link ? py::cast(node->link_source) : py::none();
+                } catch (const dip::EnvironmentException&) {
+                    return py::none();
+                }
+            },
+            "Named source for a link, or None when this path is not a link or is local."
+        );
+        val.def_property_readonly(
+            "link_target",
+            [](const dip::Cursor& self) -> py::object {
+                try {
+                    const auto node = self.get_node();
+                    return node->dtype == dip::NodeDtype::Link ? py::cast(node->link_target) : py::none();
+                } catch (const dip::EnvironmentException&) {
+                    return py::none();
+                }
+            },
+            "Target path for a link, or None when this path is not a link."
+        );
+
         val.def(
             "to_numpy",
             [](const dip::Cursor& self) -> py::object { return to_numpy_value(self.get_value()); },

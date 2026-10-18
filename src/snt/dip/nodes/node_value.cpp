@@ -112,7 +112,8 @@ namespace snt::dip {
     ValueNode::ValueNode(const ValueNode& other)
         : units(other.units), tags(other.tags), constant(other.constant), override(other.override),
           override_line(other.override_line), modification_lines(other.modification_lines),
-          table_path(other.table_path), copied_from(other.copied_from), table_column_index(other.table_column_index),
+          table_path(other.table_path), copied_from(other.copied_from), link_source(other.link_source),
+          link_target(other.link_target), table_column_index(other.table_column_index),
           condition(other.condition), format(other.format), option_labels(other.option_labels),
           value_dtype(other.value_dtype), BaseNode(other) {
         options.reserve(other.options.size());
@@ -362,6 +363,12 @@ namespace snt::dip {
     }
 
     void ValueNode::validate_modification(const BaseNode::PointerType& node) const {
+        if (dtype == NodeDtype::Link)
+            throw dip::SyntaxException(
+                "Read-only link",
+                "The link node `" + path.name + "` cannot be modified.",
+                "Modify the canonical target path instead.", __FILE__, __LINE__, node->line
+            );
         // check if modification and target node have the same node type
         if (node->dtype != NodeDtype::Modification && node->dtype != dtype)
             throw dip::SyntaxException(
@@ -376,6 +383,12 @@ namespace snt::dip {
     }
 
     void ValueNode::apply_override(const BaseNode::PointerType& node, Environment& env) {
+        if (dtype == NodeDtype::Link)
+            throw dip::SyntaxException(
+                "Read-only link",
+                "The link node `" + path.name + "` cannot be overridden.",
+                "Override the canonical target path instead.", __FILE__, __LINE__, node->line
+            );
         if ((dtype == NodeDtype::Boolean || dtype == NodeDtype::String) && !units_raw.empty())
             throw dip::UnitException(
                 "Invalid units",
@@ -592,7 +605,7 @@ namespace snt::dip {
     }
 
     void ValueNode::validate_definition() const {
-        if (value == nullptr && value_origin != ValueOrigin::None)
+        if (dtype != NodeDtype::Link && value == nullptr && value_origin != ValueOrigin::None)
             throw dip::SyntaxException(
                 "Undefined value",
                 "The node has a value origin but no value has been defined.",

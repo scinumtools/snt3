@@ -65,4 +65,7 @@ hierarchy coverage. For the command-oriented C++ interface, see
 
 The legacy values-only JSON generator omits explicit ``none`` values to retain
 its existing output contract. The ``JSON_METADATA`` format includes them as
-records with ``presence: "none"`` and a JSON ``null`` value.
+records with ``presence: "none"`` and a JSON ``null`` value. Identity-preserving
+links are represented as records with ``type: "link"``, ``presence: "link"``,
+a null value, and an explicit ``link`` object containing the source name and
+target path; their target data is not duplicated.

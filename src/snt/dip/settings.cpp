@@ -34,6 +34,7 @@ namespace snt::dip {
         {NodeDtype::Integer, "integer"},
         {NodeDtype::Float, "float"},
         {NodeDtype::String, "string"},
+        {NodeDtype::Link, "link"},
         {NodeDtype::Table, "table"},
         {NodeDtype::Deferred, "deffered"},
         {NodeDtype::Modification, "modification"},

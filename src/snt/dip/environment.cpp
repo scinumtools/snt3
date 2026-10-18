@@ -264,16 +264,23 @@ namespace snt::dip {
         }
         case RequestType::Reference: {
             auto [source_name, node_path, is_root] = parse_request(request);
-            const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
-            for (size_t i = 0; i < node_pool.size(); i++) {
-                ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode && vnode->path.name == node_path) {
-                    record_dependency(source_name + "?" + node_path, request, operand);
-                    new_value.value = vnode->value ? vnode->value->clone() : nullptr;
-                    if (vnode->units)
-                        new_value.units = vnode->units;
-                    break;
-                }
+            if (is_root)
+                break;
+            const auto resolved = resolve_link_path(node_path, source_name);
+            std::vector<std::string> link_stack;
+            const auto vnode = resolve_path_node(resolved.source_name, resolved.path, link_stack);
+            if (vnode && vnode->dtype == NodeDtype::Link)
+                throw dip::EnvironmentException(
+                    "Link has no scalar value",
+                    "The link at `" + vnode->path.name + "` identifies a node, not a scalar value.",
+                    "Read a value below the link or inspect the link target.", __FILE__, __LINE__
+                );
+            if (vnode) {
+                const std::string canonical = source_name + "?" + vnode->path.name;
+                record_dependency(canonical, request, operand);
+                new_value.value = vnode->value ? vnode->value->clone() : nullptr;
+                if (vnode->units)
+                    new_value.units = vnode->units;
             }
             break;
         }
@@ -333,49 +340,28 @@ namespace snt::dip {
             break;
         }
         case RequestType::Reference: {
-            auto [source_name, node_path, is_root] = parse_request(request);
-            const NodeList<ValueNode>& node_pool = (source_name.empty()) ? nodes : sources.at(source_name).nodes;
-            for (size_t i = 0; i < node_pool.size(); i++) {
-                ValueNode::PointerType vnode = node_pool.at(i);
-                if (vnode && vnode->path.name == node_path) {
-                    record_dependency(source_name + "?" + node_path, request);
-                    if (vnode->value != nullptr) {
-                        new_value = vnode->value->clone();
-                    } else {
-                        new_value = nullptr;
-                        break;
-                    }
-                    if (to_unit && to_unit.value() != core::KEYWORD_NONE) {
-                        // NOTE: If unit conversion is not required, the to_unit should be set to
-                        // "none". This is usefull if we want to simply get a reference node as it is.
-                        if (!vnode->units && !to_unit->empty()) {
-                            throw dip::UnitException(
-                                "Dimension mismatch",
-                                "The final quantity should have the physical dimension `" + std::string(*to_unit) +
-                                    "`, but the converted quantity has no physical dimensions.",
-                                "Check the units of the input quantity.",
-                                __FILE__,
-                                __LINE__,
-                                vnode->line // TODO:: this is a referenced node, we should show also referencing node
-                            );
-                        } else if (vnode->units && to_unit->empty()) {
-                            throw dip::UnitException(
-                                "Dimension mismatch",
-                                "The final quantity should have no physical dimensions, but the converted quantity has "
-                                "physical dimensions `" +
-                                    vnode->units_raw + "`.",
-                                "Check the units of the input quantity.",
-                                __FILE__,
-                                __LINE__,
-                                vnode->line // TODO:: this is a referenced node, we should show also referencing node
-                            );
-                        } else if (vnode->units) {
-                            puq::Quantity quantity = std::move(new_value) * (*vnode->units);
-                            quantity = quantity.convert(std::string(to_unit.value()));
-                            new_value = std::move(quantity.measurement.result.estimate);
-                            break;
-                        }
-                    }
+            ValueNodeData data = request_node_data(request, rtype);
+            new_value = std::move(data.value);
+            if (to_unit && to_unit.value() != core::KEYWORD_NONE) {
+                Line line{"", Source{request, 0}};
+                if (!data.units && !to_unit->empty())
+                    throw dip::UnitException(
+                        "Dimension mismatch",
+                        "The final quantity should have the physical dimension `" + std::string(*to_unit) +
+                            "`, but the converted quantity has no physical dimensions.",
+                        "Check the units of the input quantity.", __FILE__, __LINE__, line
+                    );
+                if (data.units && to_unit->empty())
+                    throw dip::UnitException(
+                        "Dimension mismatch",
+                        "The final quantity should have no physical dimensions, but the converted quantity has "
+                        "physical dimensions `" + data.units->to_string() + "`.",
+                        "Check the units of the input quantity.", __FILE__, __LINE__, line
+                    );
+                if (data.units) {
+                    puq::Quantity quantity = std::move(new_value) * *data.units;
+                    quantity = quantity.convert(std::string(*to_unit));
+                    new_value = std::move(quantity.measurement.result.estimate);
                 }
             }
             break;
@@ -637,12 +623,15 @@ namespace snt::dip {
         return node->value ? node->value->clone() : nullptr;
     }
 
-    ValueNode::PointerType Environment::get_node(const std::string& path) const {
-
-        for (const auto& node : nodes.get_nodes()) {
-            if (node->path.name == path)
-                return node;
-        }
+    ValueNode::PointerType Environment::get_node(const std::string& path, const std::string& source_name) const {
+        if (source_name.empty())
+            for (const auto& node : nodes.get_nodes())
+                if (node && node->path.name == path && node->dtype == NodeDtype::Link)
+                    return node;
+        std::vector<std::string> link_stack;
+        const auto resolved = resolve_link_path(path, source_name);
+        if (auto node = resolve_path_node(resolved.source_name, resolved.path, link_stack))
+            return node;
         throw dip::EnvironmentException(
             "Path does not exist",
             "The requested path `" + path + "` does not point to any node.",
@@ -650,6 +639,156 @@ namespace snt::dip {
             __FILE__,
             __LINE__
         );
+    }
+
+    ResolvedPath Environment::resolve_link_path(const std::string& path, const std::string& source_name) const {
+        ResolvedPath result{source_name, path, false};
+        std::unordered_set<std::string> visited;
+        while (true) {
+            const NodeList<ValueNode>* pool = &nodes;
+            if (!result.source_name.empty()) {
+                const auto source = sources.entries().find(result.source_name);
+                if (snapshot_loaded_ || source == sources.entries().end())
+                    return result;
+                pool = &source->second.nodes;
+            }
+            ValueNode::PointerType link;
+            for (const auto& candidate : pool->get_nodes()) {
+                if (!candidate || candidate->dtype != NodeDtype::Link)
+                    continue;
+                const std::string& alias = candidate->path.name;
+                if (result.path == alias ||
+                    (result.path.size() > alias.size() && result.path.compare(0, alias.size(), alias) == 0 &&
+                     (result.path[alias.size()] == SIGN_SEPARATOR || result.path[alias.size()] == SIGN_ARRAY_OPEN))) {
+                    link = candidate;
+                    break;
+                }
+            }
+            if (!link)
+                return result;
+            const std::string identity = result.source_name + "?" + link->path.name;
+            if (!visited.insert(identity).second)
+                throw dip::EnvironmentException(
+                    "Link cycle", "Following `" + identity + "` creates a link cycle.",
+                    "Change one of the links so that its target chain terminates.", __FILE__, __LINE__, link->line
+                );
+            const std::string suffix = result.path.substr(link->path.name.size());
+            result.source_name = link->link_source;
+            result.path = link->link_target + suffix;
+            result.followed_link = true;
+        }
+    }
+
+    void Environment::validate_write_path(const std::string& path) const {
+        const auto resolved = resolve_link_path(path);
+        if (!resolved.followed_link)
+            return;
+        const std::string canonical = resolved.source_name.empty() ? resolved.path :
+                                                                     resolved.source_name + "?" + resolved.path;
+        throw dip::SyntaxException(
+            "Read-only link",
+            "The path `" + path + "` traverses a read-only link to `" + canonical + "`.",
+            "Address modifications and overrides to the canonical target path.", __FILE__, __LINE__
+        );
+    }
+
+    ValueNode::PointerType Environment::resolve_path_node(
+        const std::string& source_name, const std::string& path, std::vector<std::string>& link_stack
+    ) const {
+        const NodeList<ValueNode>* pool = &nodes;
+        if (!source_name.empty()) {
+            if (snapshot_loaded_)
+                throw dip::EnvironmentException(
+                    "Unresolved remote link",
+                    "The target `" + source_name + "?" + path + "` is remote and is not loaded in this DIPH5 snapshot.",
+                    "Load the original DIPL project with the remote source available.", __FILE__, __LINE__
+                );
+            const auto source = sources.entries().find(source_name);
+            if (source == sources.entries().end())
+                throw dip::EnvironmentException(
+                    "Unknown source",
+                    "The source `" + source_name + "` was not found in the environment source list.",
+                    "Check whether the source name is correct.", __FILE__, __LINE__
+                );
+            pool = &source->second.nodes;
+        }
+        for (const auto& node : pool->get_nodes()) {
+            if (node && node->path.name == path)
+                return node;
+        }
+        for (const auto& node : pool->get_nodes()) {
+            if (!node || node->dtype != NodeDtype::Link)
+                continue;
+            const std::string& alias = node->path.name;
+            if (path.size() <= alias.size() || path.compare(0, alias.size(), alias) != 0 ||
+                (path[alias.size()] != SIGN_SEPARATOR && path[alias.size()] != SIGN_ARRAY_OPEN))
+                continue;
+            const std::string identity = (source_name.empty() ? "" : source_name + "?") + alias;
+            if (std::find(link_stack.begin(), link_stack.end(), identity) != link_stack.end())
+                throw dip::EnvironmentException(
+                    "Link cycle", "Following `" + identity + "` creates a link cycle.",
+                    "Change one of the links so that its target chain terminates.", __FILE__, __LINE__, node->line
+                );
+            link_stack.push_back(identity);
+            const std::string suffix = path.substr(alias.size());
+            auto resolved = resolve_path_node(node->link_source, node->link_target + suffix, link_stack);
+            link_stack.pop_back();
+            return resolved;
+        }
+        return nullptr;
+    }
+
+    void Environment::validate_links() const {
+        const auto validate_pool = [&](const NodeList<ValueNode>& pool, const std::string& owner) {
+            for (const auto& node : pool.get_nodes()) {
+                if (!node || node->dtype != NodeDtype::Link)
+                    continue;
+                const std::string child_prefix = node->path.name + SIGN_SEPARATOR;
+                const std::string item_prefix = node->path.name + SIGN_ARRAY_OPEN;
+                for (const auto& candidate : pool.get_nodes())
+                    if (candidate && candidate.get() != node.get() &&
+                        (candidate->path.name.rfind(child_prefix, 0) == 0 ||
+                         candidate->path.name.rfind(item_prefix, 0) == 0))
+                        throw dip::EnvironmentException(
+                            "Link has local children",
+                            "The link `" + owner + node->path.name + "` also declares local descendant `" +
+                                candidate->path.name + "`.",
+                            "Declare descendants at the canonical target path instead.", __FILE__, __LINE__, candidate->line
+                        );
+                std::unordered_set<std::string> visited;
+                auto current = node;
+                ValueNode::PointerType target;
+                while (current) {
+                    const std::string identity = current->link_source + "?" + current->link_target;
+                    if (!visited.insert(identity).second)
+                        throw dip::EnvironmentException(
+                            "Link cycle", "The link `" + owner + node->path.name + "` participates in a target cycle.",
+                            "Change one of the links so that its target chain terminates.", __FILE__, __LINE__, node->line
+                        );
+                    std::vector<std::string> stack;
+                    target = resolve_path_node(current->link_source, current->link_target, stack);
+                    if (!target || target->dtype != NodeDtype::Link)
+                        break;
+                    current = target;
+                }
+                bool exists = static_cast<bool>(target);
+                if (!exists && node->link_source.empty())
+                    exists = hierarchy.has_collection(node->link_target);
+                if (!exists && !node->link_source.empty()) {
+                    const auto source = sources.entries().find(node->link_source);
+                    exists = source != sources.entries().end() &&
+                             source->second.hierarchy.has_collection(node->link_target);
+                }
+                if (!exists)
+                    throw dip::EnvironmentException(
+                        "Unresolved link target",
+                        "The link `" + owner + node->path.name + "` targets missing node `" +
+                            (node->link_source.empty() ? "?" : node->link_source + "?") + node->link_target + "`.",
+                        "Correct the target path or define the target node.", __FILE__, __LINE__, node->line
+                    );
+            }
+        };
+        validate_pool(nodes, "");
     }
 
     const std::string Environment::to_string() const {

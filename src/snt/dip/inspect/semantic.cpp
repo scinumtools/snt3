@@ -30,14 +30,54 @@ namespace snt::dip {
         const auto& env = *env_;
         SemanticDescription result;
         result.path = std::string(path);
-        const auto capabilities = this->capabilities(path);
         result.dependencies_recorded = this->graph().recorded;
+        const auto resolved_path = env.resolve_link_path(result.path);
+        if (resolved_path.followed_link) {
+            result.canonical_path = (resolved_path.source_name.empty() ? "" : resolved_path.source_name + "?") +
+                                    resolved_path.path;
+            result.link_source = resolved_path.source_name;
+            result.link_target = resolved_path.path;
+            result.link_status = env.is_loaded_snapshot() && !resolved_path.source_name.empty() ? "unresolved"
+                                                                                               : "resolved";
+        }
+        if (env.is_loaded_snapshot() && resolved_path.followed_link && !resolved_path.source_name.empty()) {
+            result.kind = "link";
+            result.link_status = "unresolved";
+            result.value_unavailable_reason = "unresolved_remote_link";
+            return result;
+        }
+        InspectionCapabilities capabilities;
+        try {
+            capabilities = this->capabilities(path);
+        } catch (const dip::EnvironmentException&) {
+            throw;
+        }
         result.kind = capabilities.hasValue ? "value" : capabilities.hasTabularData ? "table" : "group";
+        bool link_node = false;
+        try {
+            const auto node = env.get_node(result.path);
+            if (node && node->dtype == NodeDtype::Link) {
+                link_node = true;
+                result.kind = "link";
+                result.metadata = node->metadata;
+                result.link_status = env.is_loaded_snapshot() && !node->link_source.empty() ? "unresolved"
+                                                                                           : "resolved";
+                result.link_source = node->link_source;
+                result.link_target = node->link_target;
+                const auto target = (node->link_source.empty() ? "" : node->link_source + "?") + node->link_target;
+                result.canonical_path = target;
+            }
+        } catch (const dip::EnvironmentException&) {
+        }
         if (!capabilities.hasValue && env.hierarchy.has_collection(result.path)) {
             const auto kind = env.hierarchy.get_collection(result.path).kind;
             if (!capabilities.hasTabularData && (kind == Path::Kind::Map || kind == Path::Kind::List))
                 result.kind = "collection";
             result.metadata = env.hierarchy.get_collection(result.path).metadata;
+        }
+        if (link_node) {
+            result.value_unavailable_reason = "link_node";
+            return result;
         }
         if (!capabilities.hasValue) {
             result.value_unavailable_reason = "not_a_value";

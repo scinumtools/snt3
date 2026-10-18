@@ -266,7 +266,8 @@ namespace snt::dip {
 
     bool Parser::part_type(const bool required) {
         constexpr std::string_view types[] = {
-            KEYWORD_BOOLEAN, KEYWORD_INTEGER, KEYWORD_FLOAT, KEYWORD_STRING, KEYWORD_TABLE, KEYWORD_MAP, KEYWORD_LIST
+            KEYWORD_BOOLEAN, KEYWORD_INTEGER, KEYWORD_FLOAT, KEYWORD_STRING, KEYWORD_LINK, KEYWORD_TABLE,
+            KEYWORD_MAP, KEYWORD_LIST
         };
         constexpr std::string_view precisions[] = {"128", "64", "32", "16", "8"};
         const auto fail = [&] {

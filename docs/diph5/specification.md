@@ -2,14 +2,15 @@
 title: "SciNumTools DIPH5"
 subtitle: "Environment HDF5 Format Specification"
 author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
-date: "Version 2.10"
+date: "Version 2.11"
 ---
 
 # Scope
 
 DIPH5 is the HDF5 interchange format used by SciNumTools to persist an
 *evaluated DIPL environment*. It stores evaluated value nodes together with
-their DIPL paths, collection structure, units, settings, and provenance.
+their DIPL paths, collection structure, units, settings, and provenance. It
+also stores link nodes as source and target paths without copying linked data.
 
 The persisted object is therefore a data environment suitable for exchange
 with scientific applications. It is not a serialization of the complete
@@ -46,7 +47,8 @@ Version 2.7 retains the evaluated dependency graph. Version 2.8 may retain
 the resolved output plan of an application adapter. Output plans contain
 values and decisions, not executable adapter callbacks.
 Version 2.9 may retain display labels for value options. Version 2.10 records
-explicit sibling order for hierarchy children and map entries.
+explicit sibling order for hierarchy children and map entries. Version 2.11
+stores identity-preserving link targets without embedding the linked data.
 
 # File identification and versioning
 
@@ -56,11 +58,11 @@ The HDF5 root object MUST contain the following scalar attributes:
 | --- | --- | --- |
 | `_DIPL_Format` | UTF-8 string | `SciNumTools3 Environment` |
 | `_DIPL_Schema_Version` | unsigned integer | `2` |
-| `_DIPL_Schema_Version_Minor` | unsigned integer | `10` |
+| `_DIPL_Schema_Version_Minor` | unsigned integer | `11` |
 
 Readers MUST reject files with a different format identifier or unsupported
-schema version. Version 2.10 readers support version 1 files and versions 2.0
-through 2.10. Future schema
+schema version. Version 2.11 readers support version 1 files and versions 2.0
+through 2.11. Future schema
 revisions MUST preserve the meaning of existing attributes or increment the
 major or minor schema version.
 
@@ -155,6 +157,17 @@ Every value dataset has `_DIPL_Kind=value`, `_DIPL_Path`,
 `_DIPL_Node_Type`, and `_DIPL_Value_Type` attributes. `_DIPL_Array` identifies
 array values; scalar values use a scalar dataspace and arrays use a simple
 dataspace whose dimensions match the DIPL value shape.
+
+A link node is stored on the hierarchy group at its requested path with
+`_DIPL_Node_Type=link` and the required UTF-8 string attributes
+`_DIPL_Link_Source` and `_DIPL_Link_Target`. The group retains its normal
+hierarchy attributes, such as the map key or list index when the link is a
+collection item. An empty source means the local DIPH5 environment. The target
+data is stored only at its canonical path. Loading a snapshot preserves
+remote link identity but does not resolve it because named source definitions
+are not restored; traversal through such a link MUST report an unresolved
+remote link without making snapshot loading fail. Local links resolve against
+the nodes in the snapshot.
 
 Values are written using native HDF5 numeric types. Strings use fixed-width
 UTF-8 HDF5 string datatypes. A null DIPL value is represented by a dataset

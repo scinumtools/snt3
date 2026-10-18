@@ -6,6 +6,26 @@
 namespace snt::dip {
 
     namespace {
+        struct CursorTarget {
+            const HierarchyList* hierarchy;
+            std::string path;
+            std::string source_name;
+        };
+
+        CursorTarget cursor_target(const Environment& env, const std::string& path) {
+            const auto resolved = env.resolve_link_path(path);
+            if (resolved.source_name.empty())
+                return {&env.hierarchy, resolved.path, {}};
+            if (env.is_loaded_snapshot())
+                throw dip::EnvironmentException(
+                    "Unresolved remote link",
+                    "The link at `" + path + "` targets `" + resolved.source_name + "?" + resolved.path +
+                        "`, which is not resolved in this DIPH5 snapshot.",
+                    "Load the source DIPL project to follow this link.", __FILE__, __LINE__
+                );
+            return {&env.sources.at(resolved.source_name).hierarchy, resolved.path, resolved.source_name};
+        }
+
         bool has_group_descendants(const HierarchyList& hierarchy, const std::string& path) {
             const std::string prefix = path + ".";
             for (const auto& [candidate, collection] : hierarchy.get_collections()) {
@@ -20,28 +40,31 @@ namespace snt::dip {
     Cursor::Cursor(const Environment* env, std::string_view path) : env_(env), path_(path) {
         if (path_.empty()) {
             kind = Path::Kind::Empty;
-        } else if (!env_->hierarchy.has_collection(path_) && has_group_descendants(env_->hierarchy, path_)) {
-            kind = Path::Kind::Group;
         } else {
-            const Collection& col = env_->hierarchy.get_collection(path_);
-            switch (col.kind) {
-            case Path::Kind::None:
-                throw dip::EnvironmentException(
-                    "Unknown path",
-                    "The path `" + std::string(path) + "` was not found in the collections.",
-                    "Check whether the path is correct.",
-                    __FILE__,
-                    __LINE__
-                );
-                break;
-            case Path::Kind::Empty:
-            case Path::Kind::Group:
-            case Path::Kind::List:
-            case Path::Kind::Map:
-            case Path::Kind::Item:
-            case Path::Kind::Root:
-                kind = col.kind;
-                break;
+            const auto target = cursor_target(*env_, path_);
+            if (!target.hierarchy->has_collection(target.path) &&
+                has_group_descendants(*target.hierarchy, target.path)) {
+                kind = Path::Kind::Group;
+            } else {
+                const Collection& col = target.hierarchy->get_collection(target.path);
+                switch (col.kind) {
+                case Path::Kind::None:
+                    throw dip::EnvironmentException(
+                        "Unknown path",
+                        "The path `" + std::string(path) + "` was not found in the collections.",
+                        "Check whether the path is correct.",
+                        __FILE__,
+                        __LINE__
+                    );
+                case Path::Kind::Empty:
+                case Path::Kind::Group:
+                case Path::Kind::List:
+                case Path::Kind::Map:
+                case Path::Kind::Item:
+                case Path::Kind::Root:
+                    kind = col.kind;
+                    break;
+                }
             }
         }
     }
@@ -58,23 +81,27 @@ namespace snt::dip {
             );
 
         std::unordered_map<std::string, Cursor> children;
-        const std::string prefix = path_.empty() ? "" : path_ + ".";
-        for (const auto& [candidate, collection] : env_->hierarchy.get_collections()) {
+        const auto target = cursor_target(*env_, path_);
+        const std::string canonical_prefix = target.path.empty() ? "" : target.path + ".";
+        const std::string alias_prefix = path_.empty() ? "" : path_ + ".";
+        for (const auto& [candidate, collection] : target.hierarchy->get_collections()) {
             (void)collection;
-            if (candidate.size() <= prefix.size() || candidate.compare(0, prefix.size(), prefix) != 0)
+            if (candidate.size() <= canonical_prefix.size() ||
+                candidate.compare(0, canonical_prefix.size(), canonical_prefix) != 0)
                 continue;
-            const std::string remainder = candidate.substr(prefix.size());
+            const std::string remainder = candidate.substr(canonical_prefix.size());
             const std::size_t end = remainder.find_first_of(".[");
             const std::string name = remainder.substr(0, end);
             if (!name.empty() && children.find(name) == children.end())
-                children.emplace(name, Cursor(env_, prefix + name));
+                children.emplace(name, Cursor(env_, alias_prefix + name));
         }
         return children;
     }
 
     std::vector<Cursor> Cursor::elements() const {
         std::vector<Cursor> list;
-        const Collection& col = env_->hierarchy.get_collection(path_);
+        const auto target = cursor_target(*env_, path_);
+        const Collection& col = target.hierarchy->get_collection(target.path);
         if (col.kind == Path::Kind::List) {
             for (const auto& key : col.items) {
                 list.push_back(Cursor(env_, path_ + "[" + key + "]"));
@@ -94,7 +121,8 @@ namespace snt::dip {
 
     std::unordered_map<std::string, Cursor> Cursor::items() const {
         std::unordered_map<std::string, Cursor> map;
-        const Collection& col = env_->hierarchy.get_collection(path_);
+        const auto target = cursor_target(*env_, path_);
+        const Collection& col = target.hierarchy->get_collection(target.path);
         if (col.kind == Path::Kind::Map) {
             for (const auto& key : col.items) {
                 map.insert({key, Cursor(env_, path_ + "[" + key + "]")});
@@ -113,7 +141,8 @@ namespace snt::dip {
     }
 
     bool Cursor::has_item(const std::string& item) const {
-        const Collection& col = env_->hierarchy.get_collection(path_);
+        const auto target = cursor_target(*env_, path_);
+        const Collection& col = target.hierarchy->get_collection(target.path);
         if (col.kind == Path::Kind::Map) {
             for (const auto& key : col.items) {
                 if (key == item)
@@ -137,12 +166,12 @@ namespace snt::dip {
     }
 
     val::BaseValue::PointerType Cursor::get_value() const {
-        const auto node = env_->get_node(path_);
-        return node->value ? node->value->clone() : nullptr;
+        return env_->request_value("?" + path_);
     }
 
     std::optional<puq::Quantity> Cursor::get_units() const {
-        return env_->get_node(path_)->units;
+        const auto target = cursor_target(*env_, path_);
+        return env_->get_node(target.path, target.source_name)->units;
     }
 
     dip::ValueNode::PointerType Cursor::get_node() const {
@@ -167,11 +196,15 @@ namespace snt::dip {
     }
 
     ValueMetadata Cursor::get_metadata() const {
-        for (const auto& node : env_->nodes.get_nodes())
-            if (node && node->path.name == path_)
+        try {
+            const auto node = env_->get_node(path_);
+            if (node)
                 return node->metadata;
-        if (env_->hierarchy.has_collection(path_))
-            return env_->hierarchy.get_collection(path_).metadata;
+        } catch (const dip::EnvironmentException&) {
+        }
+        const auto target = cursor_target(*env_, path_);
+        if (target.hierarchy->has_collection(target.path))
+            return target.hierarchy->get_collection(target.path).metadata;
         return {};
     }
 

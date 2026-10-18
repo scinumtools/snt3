@@ -12,6 +12,35 @@ def test_cursor_none_value():
     assert env['optional'].value is None
 
 
+def test_link_node_is_inspectable_and_value_access_is_safe():
+    dip = DIP()
+    dip.add_string('catalog map')
+    dip.add_string('catalog[source]')
+    dip.add_string('  value str = "shared"')
+    dip.add_string('aliases map')
+    dip.add_string('aliases[item] link = {?catalog[source]}')
+    env = dip.parse()
+
+    link = env['aliases[item]']
+    assert link.node_type == 'link'
+    assert link.link_source == ''
+    assert link.link_target == 'catalog[source]'
+    assert link.value is None
+    assert link.to_numpy() is None
+    assert link['value'].value == 'shared'
+    assert link['value'].node_type == 'string'
+    assert env['catalog'].node_type == 'map'
+    assert env['catalog'].link_target is None
+
+    node = next(node for node in env.nodes if node.name == 'aliases[item]')
+    assert node.node_type == 'link'
+    assert node.link_target == 'catalog[source]'
+    assert node.value is None
+    assert node.dtype is not None
+    assert node.shape == []
+    assert node.to_numpy() is None
+
+
 def test_cursor_children():
     dip = DIP()
     dip.add_string(

@@ -253,10 +253,12 @@ namespace snt::dip::generate {
             output << "{\n  \"schema\": \"snt-dip-values/2\",\n  \"values\": {";
             bool first_value = true;
             for (const auto& evaluated_node : environment.nodes.get_nodes()) {
-                if (!evaluated_node || (!evaluated_node->value && evaluated_node->value_origin != ValueOrigin::None))
+                if (!evaluated_node || (!evaluated_node->value && evaluated_node->value_origin != ValueOrigin::None &&
+                                        evaluated_node->dtype != NodeDtype::Link))
                     continue;
+                const bool is_link = evaluated_node->dtype == NodeDtype::Link;
                 const auto* model_node = find_value_node(model, evaluated_node->path.name);
-                if (!model_node && evaluated_node->value_origin != ValueOrigin::None)
+                if (!model_node && evaluated_node->value_origin != ValueOrigin::None && !is_link)
                     continue;
                 if (!first_value)
                     output << ",\n";
@@ -270,7 +272,8 @@ namespace snt::dip::generate {
                 write_json_string(output, model_node ? model_node->name : path_leaf(evaluated_node->path.name));
                 output << ", \"type\": ";
                 const auto type = core::DataTypeNames.find(evaluated_node->value_dtype);
-                write_json_string(output, type == core::DataTypeNames.end() ? "unknown" : type->second);
+                write_json_string(output, is_link ? "link" :
+                                                type == core::DataTypeNames.end() ? "unknown" : type->second);
                 output << ", \"shape\": [";
                 const auto shape = model_node && model_node->is_array ? model_node->shape : std::vector<size_t>{};
                 for (size_t dimension = 0; dimension < shape.size(); ++dimension) {
@@ -279,12 +282,20 @@ namespace snt::dip::generate {
                     output << shape[dimension];
                 }
                 output << "], \"is_array\": " << (!evaluated_node->dimension.empty() ? "true" : "false")
-                       << ", \"presence\": " << (evaluated_node->value ? "\"value\"" : "\"none\"")
+                       << ", \"presence\": " << (is_link ? "\"link\"" :
+                                                      evaluated_node->value ? "\"value\"" : "\"none\"")
                        << ", \"value\": " << (model_node ? model_node->literal : "null") << ", \"units\": ";
                 if (evaluated_node->units)
                     write_json_string(output, evaluated_node->units->to_string());
                 else
                     output << "null";
+                if (is_link) {
+                    output << ", \"link\": {\"source\": ";
+                    write_json_string(output, evaluated_node->link_source);
+                    output << ", \"target\": ";
+                    write_json_string(output, evaluated_node->link_target);
+                    output << '}';
+                }
                 output << ", \"metadata\": ";
                 write_metadata(output, evaluated_node->metadata);
                 output << ", \"provenance\": {\"source\": ";

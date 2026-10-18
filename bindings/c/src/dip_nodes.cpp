@@ -63,6 +63,38 @@ extern "C" int snt_dip_node_get_kind(const snt_dip_node* node, snt_dip_node_kind
     });
 }
 
+extern "C" int snt_dip_node_get_node_type(
+    const snt_dip_node* node, char* buffer, size_t capacity, size_t* required, snt_dip_error* error
+) {
+    return node_call(error, [&] {
+        const auto current = cursor(node);
+        std::string type_name;
+        try {
+            const auto value_node = current.get_node();
+            const auto type = snt::dip::NodeDtypeNames.find(value_node->dtype);
+            type_name = type == snt::dip::NodeDtypeNames.end() ? "node" : type->second;
+        } catch (const snt::dip::EnvironmentException&) {
+            type_name = snt::dip::Path::KindNames.at(current.get_kind());
+        }
+        copy_string(type_name, buffer, capacity, required, error);
+    });
+}
+
+extern "C" int snt_dip_node_get_link_target(
+    const snt_dip_node* node,
+    char* source, size_t source_capacity, size_t* source_required,
+    char* target, size_t target_capacity, size_t* target_required,
+    snt_dip_error* error
+) {
+    return node_call(error, [&] {
+        const auto value_node = cursor(node).get_node();
+        if (value_node->dtype != snt::dip::NodeDtype::Link)
+            throw std::invalid_argument("node is not a link");
+        copy_string(value_node->link_source, source, source_capacity, source_required, error);
+        copy_string(value_node->link_target, target, target_capacity, target_required, error);
+    });
+}
+
 extern "C" int snt_dip_node_get_path(
     const snt_dip_node* node, char* buffer, size_t capacity, size_t* required, snt_dip_error* error
 ) {

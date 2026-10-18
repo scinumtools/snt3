@@ -594,6 +594,10 @@ namespace snt::dip::hdf5 {
             write_string(dataset, ATTR_KIND, "value");
             write_string(dataset, ATTR_PATH, node.path.name);
             write_string(dataset, ATTR_NODE_TYPE, node_type_name(node.dtype));
+            if (node.dtype == NodeDtype::Link) {
+                write_string(dataset, ATTR_LINK_SOURCE, node.link_source);
+                write_string(dataset, ATTR_LINK_TARGET, node.link_target);
+            }
             write_string(dataset, ATTR_VALUE_TYPE, data_type_name(node.value_dtype));
             write_scalar<uint8_t>(dataset, ATTR_ARRAY, H5T_NATIVE_UINT8, !node.dimension.empty());
             write_scalar<uint8_t>(dataset, ATTR_CONSTANT, H5T_NATIVE_UINT8, node.constant);
@@ -679,6 +683,37 @@ namespace snt::dip::hdf5 {
                     __LINE__
                 );
             const std::string path = dataset_path(file, env, node.path.name);
+            if (node.dtype == NodeDtype::Link) {
+                std::string kind = "group";
+                const auto open = node.path.name.rfind('[');
+                if (open != std::string::npos) {
+                    const std::string parent = node.path.name.substr(0, open);
+                    if (env.hierarchy.get_collection(parent).kind == Path::Kind::List)
+                        kind = "list_item";
+                    else
+                        kind = "map_item";
+                }
+                Id group = ensure_group(file, path, kind);
+                if (kind == "map_item")
+                    write_string(group, ATTR_KEY, node.path.name.substr(open + 1, node.path.name.size() - open - 2));
+                if (kind == "list_item")
+                    write_scalar<uint64_t>(
+                        group, ATTR_INDEX, H5T_NATIVE_UINT64,
+                        std::stoull(node.path.name.substr(open + 1, node.path.name.size() - open - 2))
+                    );
+                write_string(group, ATTR_PATH, node.path.name);
+                write_string(group, ATTR_NODE_TYPE, node_type_name(node.dtype));
+                write_string(group, ATTR_LINK_SOURCE, node.link_source);
+                write_string(group, ATTR_LINK_TARGET, node.link_target);
+                write_string(group, ATTR_SOURCE, node.line.source.name);
+                write_scalar<uint64_t>(
+                    group, ATTR_SOURCE_LINE, H5T_NATIVE_UINT64, static_cast<uint64_t>(node.line.source.line_number)
+                );
+                if (!node.line.code.empty())
+                    write_string(group, ATTR_SOURCE_CODE, node.line.code);
+                write_metadata(group, node.metadata);
+                return;
+            }
             if (!has_descendant(env, node.path.name)) {
                 write_value_dataset(file, path, node);
                 return;
@@ -889,6 +924,11 @@ namespace snt::dip::hdf5 {
                     node->dimension.push_back({extent, extent});
             }
             node->constant = read_scalar<uint8_t>(dataset, ATTR_CONSTANT, H5T_NATIVE_UINT8) != 0;
+            if (dtype == NodeDtype::Link) {
+                node->link_source = read_string(dataset, ATTR_LINK_SOURCE);
+                node->link_target = read_string(dataset, ATTR_LINK_TARGET);
+                node->value_origin = ValueOrigin::Empty;
+            }
             node->condition = read_string(dataset, ATTR_CONDITION);
             node->format = read_string(dataset, ATTR_FORMAT_SPEC);
             node->tags = read_strings(dataset, ATTR_TAGS);
@@ -1298,6 +1338,21 @@ namespace snt::dip::hdf5 {
                     const std::string path = read_string(child, ATTR_PATH);
                     if (!path.empty())
                         env.hierarchy.record_ordered_path(path);
+                    if (read_string(child, ATTR_NODE_TYPE) == "link") {
+                        auto link = std::make_shared<PersistedValueNode>(
+                            Path(path), core::DataType::None, NodeDtype::Link
+                        );
+                        link->link_source = read_string(child, ATTR_LINK_SOURCE);
+                        link->link_target = read_string(child, ATTR_LINK_TARGET);
+                        link->value_origin = ValueOrigin::Empty;
+                        link->line.source.name = read_string(child, ATTR_SOURCE);
+                        link->line.source.line_number = checked_size(
+                            read_scalar<uint64_t>(child, ATTR_SOURCE_LINE, H5T_NATIVE_UINT64), "source line number"
+                        );
+                        link->line.code = read_string(child, ATTR_SOURCE_CODE);
+                        read_metadata(child, link->metadata);
+                        env.nodes.push_back(link);
+                    }
                     if (kind == KIND_VALUE_GROUP) {
                         const htri_t payload_exists = H5Lexists(child, std::string(VALUE_PAYLOAD).c_str(), H5P_DEFAULT);
                         if (payload_exists <= 0)

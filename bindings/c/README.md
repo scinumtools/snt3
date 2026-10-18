@@ -24,6 +24,12 @@ primitive values and flattened array elements. `snt_dip_node_get_value_size`
 returns the scalar/array element count; typed `_at` getters read an element by
 zero-based index. Array dimensions are available through `snt_dip_node_get_shape`.
 
+`snt_dip_node_get_node_type` returns the DIPL node type name independently of
+the primitive value type. For links, `snt_dip_node_get_link_target` returns the
+source name and target path; the source is empty for a local link. Traversal
+through a link keeps the requested alias path while reads resolve to the
+canonical target.
+
 ```c
 snt_dip_node *node = NULL;
 snt_dip_error error = {0};

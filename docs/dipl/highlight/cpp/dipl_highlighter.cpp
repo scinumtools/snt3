@@ -26,7 +26,7 @@ bool name_char(char ch) {
 }
 
 bool type_name(std::string_view name) {
-    if (name == "bool" || name == "str" || name == "table" || name == "map" || name == "list") return true;
+    if (name == "bool" || name == "str" || name == "table" || name == "map" || name == "list" || name == "link") return true;
     if (name.substr(0, 3) == "int" || name.substr(0, 4) == "uint" || name.substr(0, 5) == "float") return true;
     return false;
 }

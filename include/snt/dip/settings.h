@@ -47,6 +47,7 @@ namespace snt::dip {
     constexpr std::string_view KEYWORD_FLOAT = "float";
     constexpr std::string_view KEYWORD_STRING = "str";
     constexpr std::string_view KEYWORD_TABLE = "table";
+    constexpr std::string_view KEYWORD_LINK = "link";
     constexpr std::string_view KEYWORD_MAP = "map";
     constexpr std::string_view KEYWORD_LIST = "list";
 
@@ -161,6 +162,7 @@ namespace snt::dip {
         Integer,
         Float,
         String,
+        Link,
         Table,
         Deferred,     // deffered value node
         Modification, // data handling

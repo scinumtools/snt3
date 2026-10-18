@@ -203,6 +203,48 @@ TEST(DIP, TypedNodeTraversal) {
     snt_dip_parser_free(dip);
 }
 
+TEST(DIP, LinkNodeTypeAndTargetAreInspectable) {
+    snt_dip* dip = nullptr;
+    snt_dip_error error{};
+    ASSERT_EQ(snt_dip_parser_create(&dip, &error), 0);
+    ASSERT_EQ(snt_dip_parser_add_string(
+        dip,
+        "catalog map\n"
+        "catalog[source]\n"
+        "  value str = \"shared\"\n"
+        "aliases map\n"
+        "aliases[item] link = {?catalog[source]}",
+        &error), 0) << error.message;
+    ASSERT_EQ(snt_dip_parser_parse(dip, &error), 0) << error.message;
+
+    snt_dip_node* link = nullptr;
+    ASSERT_EQ(snt_dip_environment_get_node(dip, "aliases[item]", &link, &error), 0) << error.message;
+    size_t type_size = 0;
+    ASSERT_EQ(snt_dip_node_get_node_type(link, nullptr, 0, &type_size, &error), 0);
+    std::vector<char> type(type_size);
+    ASSERT_EQ(snt_dip_node_get_node_type(link, type.data(), type.size(), &type_size, &error), 0);
+    EXPECT_STREQ(type.data(), "link");
+
+    size_t source_size = 0, target_size = 0;
+    ASSERT_EQ(snt_dip_node_get_link_target(link, nullptr, 0, &source_size, nullptr, 0, &target_size, &error), 0);
+    std::vector<char> source(source_size), target(target_size);
+    ASSERT_EQ(snt_dip_node_get_link_target(
+        link, source.data(), source.size(), &source_size, target.data(), target.size(), &target_size, &error), 0);
+    EXPECT_STREQ(source.data(), "");
+    EXPECT_STREQ(target.data(), "catalog[source]");
+
+    snt_dip_node* value = nullptr;
+    ASSERT_EQ(snt_dip_node_get_child(link, "value", &value, &error), 0) << error.message;
+    std::array<char, 32> text{};
+    size_t value_size = 0;
+    ASSERT_EQ(snt_dip_node_get_string(value, text.data(), text.size(), &value_size, &error), 0) << error.message;
+    EXPECT_STREQ(text.data(), "shared");
+
+    snt_dip_node_free(value);
+    snt_dip_node_free(link);
+    snt_dip_parser_free(dip);
+}
+
 TEST(DIP, ReportsErrors) {
     snt_dip_error error{};
 

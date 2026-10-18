@@ -56,6 +56,8 @@ namespace snt::dip {
         std::vector<Line> modification_lines; ///< Applied value modifications in evaluation order.
         std::string table_path;               ///< Parent table when this value is a parsed table column.
         std::string copied_from;              ///< Source-qualified DIP node ID when created by an import.
+        std::string link_source;              ///< Optional source identifier for an identity-preserving link.
+        std::string link_target;              ///< Target path for a link node; target data is never copied.
         size_t table_column_index = 0;        ///< Position in the original table header.
         std::string condition;
         std::vector<OptionStruct> options;
@@ -79,7 +81,7 @@ namespace snt::dip {
          */
         ValueNode(const Parser& parser, const NodeDtype dt, const core::DataType vdt = core::DataType::None)
             : BaseNode(parser, dt), constant(false), value_dtype(vdt) {
-            if (path.kind == Path::Kind::Map || path.kind == Path::Kind::List)
+            if ((path.kind == Path::Kind::Map || path.kind == Path::Kind::List) && parser.dtype_raw[1] != KEYWORD_LINK)
                 throw dip::SyntaxException(
                     "Invalid value-node path",
                     "A map or list item cannot itself be a value node: `" + path.name + "`.",

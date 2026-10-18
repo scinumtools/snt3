@@ -830,7 +830,8 @@ overrides list : snt_project_override
             bool already_defined = false;
             bool graph_value_evaluated = false;
             const bool value_node = node->dtype == NodeDtype::Boolean || node->dtype == NodeDtype::Integer ||
-                                    node->dtype == NodeDtype::Float || node->dtype == NodeDtype::String;
+                                    node->dtype == NodeDtype::Float || node->dtype == NodeDtype::String ||
+                                    node->dtype == NodeDtype::Link;
             std::string graph_path;
             if (!target.branching.false_case() && (value_node || node->dtype == NodeDtype::Modification))
                 graph_path = target.branching.clean_name(target.hierarchy.resolve_list_selectors(
@@ -839,8 +840,11 @@ overrides list : snt_project_override
             if (!target.branching.false_case() &&
                 (node->dtype == NodeDtype::Boolean || node->dtype == NodeDtype::Integer ||
                  node->dtype == NodeDtype::Float || node->dtype == NodeDtype::String ||
+                 node->dtype == NodeDtype::Link ||
                  node->dtype == NodeDtype::Modification)) {
                 const std::string& path = graph_path;
+                if (node->dtype == NodeDtype::Modification)
+                    target.validate_write_path(path);
                 for (const auto& existing : target.nodes.get_nodes())
                     if (existing && existing->path.name == path) {
                         already_defined = true;
@@ -1047,6 +1051,7 @@ overrides list : snt_project_override
         const auto unresolved = target.overrides.unresolved();
         if (!unresolved.empty()) {
             const auto entry = target.overrides.find(unresolved.front());
+            target.validate_write_path(unresolved.front());
             throw dip::EnvironmentException(
                 "Unresolved override",
                 "The override target `" + unresolved.front() + "` was not defined.",
@@ -1057,6 +1062,7 @@ overrides list : snt_project_override
             );
         }
         // Validate nodes
+        target.validate_links();
         for (size_t i = 0; i < target.nodes.size(); i++) {
             ValueNode::PointerType vnode = target.nodes.at(i);
             if (vnode) {

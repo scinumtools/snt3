@@ -427,7 +427,7 @@ function-arguments
 
 type-spec
   = "bool" | "int" | "uint" | "float" | "float128" | "str" | "char"
-  | "byte" | "table" | signed-integer-type | unsigned-integer-type
+  | "byte" | "table" | "link" | signed-integer-type | unsigned-integer-type
   | floating-type ;
 
 signed-integer-type
@@ -537,6 +537,10 @@ non-negative-integer
 (* - A trailing dot in a reference selects a subtree and is invalid where a   *)
 (*   single value is required.                                                *)
 (* - Map and list selectors cannot be mixed at the same collection path.      *)
+(* - A `link` value MUST be one absolute node reference with a nonempty path; *)
+(*   it cannot select a subtree or use a relative/self reference.              *)
+(* - Links store only target source/path identity. Traversal follows targets,  *)
+(*   while local descendants and writes through a link are invalid.            *)
 (* - Schemas must be declared before use; source and unit names are unique.   *)
 (* - Expanded override paths are unique across all override inputs,  *)
 (*   and must resolve to value nodes instantiated normally or by an override *)

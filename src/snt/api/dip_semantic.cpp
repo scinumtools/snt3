@@ -127,7 +127,23 @@ namespace snt::api {
 
         void description(std::ostream& out, const dip::SemanticDescription& value) {
             out << "{\"schema_version\":\"1\",\"path\":" << quote(value.path) << ",\"kind\":" << quote(value.kind)
-                << ",\"declared_type\":" << quote(value.declared_type)
+                << ",\"canonical_path\":";
+            if (value.canonical_path)
+                out << quote(*value.canonical_path);
+            else
+                out << "null";
+            out << ",\"link\":{";
+            out << "\"status\":" << quote(value.link_status) << ",\"source\":";
+            if (value.link_source)
+                out << quote(*value.link_source);
+            else
+                out << "null";
+            out << ",\"target\":";
+            if (value.link_target)
+                out << quote(*value.link_target);
+            else
+                out << "null";
+            out << "},\"declared_type\":" << quote(value.declared_type)
                 << ",\"stored_type\":" << quote(value.stored_type) << ",\"shape\":[";
             for (std::size_t i = 0; i < value.shape.size(); ++i) {
                 if (i)

@@ -14,6 +14,10 @@ namespace snt::dip {
     struct SemanticDescription {
         std::string path;
         std::string kind;
+        std::optional<std::string> canonical_path;
+        std::optional<std::string> link_source;
+        std::optional<std::string> link_target;
+        std::string link_status; ///< Empty for ordinary nodes; otherwise resolved or unresolved.
         std::string declared_type;
         std::string stored_type;
         val::Array::ShapeType shape;

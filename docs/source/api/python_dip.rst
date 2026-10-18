@@ -32,6 +32,13 @@ when no nodes match.
 .. autoclass:: scinumtools3.dip.ValueNode
    :members:
 
+``Cursor.node_type`` and ``ValueNode.node_type`` expose the DIPL node type
+independently of the primitive value dtype. For a link node, ``link_source``
+and ``link_target`` expose its source name and target path. A link node has no
+stored scalar value, so ``ValueNode.value`` and ``ValueNode.to_numpy()`` return
+``None`` and its ``shape`` is empty; cursor reads through the link resolve to
+the target.
+
 .. autoclass:: scinumtools3.dip.ValueNodeData
    :members:
 

@@ -134,3 +134,9 @@ value. Neither type specifies an inherent text encoding.
 > by ``uint8_t``. ``byte`` values may be assigned from integer literals,
 > while ``char`` values may be assigned from character or string
 > literals. Neither type specifies a text encoding.
+
+## Link nodes
+
+The `link` type is an identity-preserving node relation, not a scalar value
+type. It stores a target path and provides read-only traversal through that
+path; see [References](references.md#identity-preserving-links).

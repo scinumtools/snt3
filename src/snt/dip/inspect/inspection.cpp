@@ -320,6 +320,20 @@ namespace snt::dip {
     InspectionCapabilities Inspector::capabilities(std::string_view path) const {
         const auto& env = *env_;
         const std::string name(path);
+        const auto resolved = env.resolve_link_path(name);
+        if (resolved.followed_link) {
+            if (env.is_loaded_snapshot() && !resolved.source_name.empty())
+                throw dip::EnvironmentException(
+                    "Unresolved remote link",
+                    "The link path `" + name + "` targets `" + resolved.source_name + "?" + resolved.path +
+                        "`, which is not resolved in this DIPH5 snapshot.",
+                    "Load the source DIPL project to inspect this path.", __FILE__, __LINE__
+                );
+            const std::string canonical = resolved.source_name.empty()
+                                              ? resolved.path
+                                              : resolved.source_name + "?" + resolved.path;
+            return capabilities(canonical);
+        }
         InspectionCapabilities capabilities;
         const auto separator = name.find('?');
         if (separator != std::string::npos && separator > 0) {

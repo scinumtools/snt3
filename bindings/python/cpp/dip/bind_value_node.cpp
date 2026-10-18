@@ -135,6 +135,26 @@ namespace snt::bind::python {
         );
 
         val.def_property_readonly(
+            "node_type",
+            [](const dip::ValueNode& vnode) { return dip::NodeDtypeNames.at(vnode.dtype); },
+            "DIPL node type, such as `integer`, `string`, or `link`."
+        );
+        val.def_property_readonly(
+            "link_source",
+            [](const dip::ValueNode& vnode) -> py::object {
+                return vnode.dtype == dip::NodeDtype::Link ? py::cast(vnode.link_source) : py::none();
+            },
+            "Named source for a link, or None for non-links and local links."
+        );
+        val.def_property_readonly(
+            "link_target",
+            [](const dip::ValueNode& vnode) -> py::object {
+                return vnode.dtype == dip::NodeDtype::Link ? py::cast(vnode.link_target) : py::none();
+            },
+            "Target path for a link, or None for non-links."
+        );
+
+        val.def_property_readonly(
             "tags",
             [](const dip::ValueNode& vnode) { return vnode.tags; },
             "Copy of the node's explicitly assigned tags. Editing this Python list does not change the environment."
@@ -159,12 +179,16 @@ namespace snt::bind::python {
         );
 
         val.def_property_readonly(
-            "shape", [](const dip::ValueNode& vnode) { return vnode.value->get_shape(); }, "Shape of the stored value."
+            "shape", [](const dip::ValueNode& vnode) {
+                return vnode.value ? vnode.value->get_shape() : val::Array::ShapeType{};
+            }, "Shape of the stored value; an empty shape is returned for nodes without values."
         );
 
         val.def_property_readonly(
             "dtype",
-            [](const dip::ValueNode& vnode) { return vnode.value->get_dtype(); },
+            [](const dip::ValueNode& vnode) {
+                return vnode.value ? vnode.value->get_dtype() : core::DataType::None;
+            },
             "SNT data type of the stored value."
         );
 
@@ -177,7 +201,9 @@ namespace snt::bind::python {
 
         val.def(
             "to_numpy",
-            [](const dip::ValueNode& vnode) -> py::object { return to_numpy_value(vnode.value); },
+            [](const dip::ValueNode& vnode) -> py::object {
+                return vnode.value ? to_numpy_value(vnode.value) : py::none();
+            },
             "Return the stored value as a NumPy array."
         );
     }

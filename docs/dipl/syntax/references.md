@@ -239,6 +239,39 @@ pressure float = {pressure?magnetic}
 
 For injections, a path always identifies the node whose **value** is to be injected. Unlike node imports, injection paths MUST NOT select a node set.
 
+## Identity-preserving links
+
+A link stores a source name and target path. It does not copy the target node or
+its descendants. Reads and path traversal through the link reach the canonical
+node, while the link keeps its own requested path and declaration location.
+
+```DIPL
+ontology
+  concepts map
+  concepts[body]
+    label str = "body"
+
+featured map
+featured[body] link = {?ontology.concepts[body]}
+```
+
+The link may target a local node with `{?path}` or a named source with
+`{source?path}`. Targets must identify one node, without a trailing dot. A
+missing target or a chain of links that forms a cycle is an error in a live
+DIPL evaluation. Remote links resolve when the named source is loaded; a
+missing source or target is an error.
+
+Links are read-only aliases. A value reached through a link may be read, but a
+definition, modification, or override must use its canonical path. A link to a
+group, map, list, or collection item exposes its descendants and collection
+items through the alias path. A link itself has no scalar value.
+
+DIPH5 stores the link's source name and target path without copying target
+data. Since a DIPH5 snapshot does not restore executable named sources, loading
+a snapshot with a remote link succeeds but following that link reports it as
+unresolved. Local links continue to resolve from the nodes stored in the
+snapshot.
+
 ### Array and String Slicing
 
 Array values can be injected directly or sliced to match the required dimensions of the receiving node. Strings and arrays use the same slicing notation as Python.

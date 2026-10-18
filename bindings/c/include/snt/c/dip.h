@@ -144,6 +144,15 @@ int snt_dip_parser_get(const snt_dip* dip, const char* path, char* buffer, size_
 int snt_dip_environment_get_node(const snt_dip* dip, const char* path, snt_dip_node** result, snt_dip_error* error);
 /** Return the node kind. */
 int snt_dip_node_get_kind(const snt_dip_node* node, snt_dip_node_kind* result, snt_dip_error* error);
+/** Copy the DIPL node type name (for example, `integer`, `string`, or `link`). */
+int snt_dip_node_get_node_type(const snt_dip_node* node, char* buffer, size_t capacity, size_t* required, snt_dip_error* error);
+/** Copy a link's named source and target path. The source is empty for a local link. */
+int snt_dip_node_get_link_target(
+    const snt_dip_node* node,
+    char* source, size_t source_capacity, size_t* source_required,
+    char* target, size_t target_capacity, size_t* target_required,
+    snt_dip_error* error
+);
 /** Copy the UTF-8 path into a caller buffer; query required bytes (including NUL) with NULL/0. */
 int snt_dip_node_get_path(const snt_dip_node* node, char* buffer, size_t capacity, size_t* required, snt_dip_error* error);
 /** Return direct group child by name, map item by key, or list element by index. Caller owns result. */

@@ -63,6 +63,13 @@ namespace snt::dip {
         const OutputPlan* output_plan = nullptr; ///< Optional resolved adapter mappings.
     };
 
+    /** Canonical location reached by following zero or more links. */
+    struct ResolvedPath {
+        std::string source_name;
+        std::string path;
+        bool followed_link = false;
+    };
+
     /** Durable identity information for one registered DIPL construct. */
     struct TraceInfo {
         std::string id;   ///< Internal trace identifier, e.g. DIP0_UNIT0.
@@ -154,6 +161,9 @@ namespace snt::dip {
             const std::string& target, const std::string& request, std::string_view operand = {}
         ) const;
         std::vector<ValueNode::PointerType> selected_nodes(const std::string& request, const TagFilter& tags) const;
+        ValueNode::PointerType resolve_path_node(
+            const std::string& source_name, const std::string& path, std::vector<std::string>& link_stack
+        ) const;
 
       public:
         NodeList<ValueNode> nodes; ///< List of parsed nodes
@@ -402,7 +412,15 @@ namespace snt::dip {
          * @param path Path name of a searched node
          * @return Pointer to a selected node
          */
-        ValueNode::PointerType get_node(const std::string& path) const;
+        ValueNode::PointerType get_node(const std::string& path, const std::string& source_name = {}) const;
+
+        /** Resolve a local path through links while retaining named-source identity. */
+        ResolvedPath resolve_link_path(const std::string& path, const std::string& source_name = {}) const;
+        /** Reject writes addressed through a link; callers must use its canonical target path. */
+        void validate_write_path(const std::string& path) const;
+
+        /** Validate live link targets after all local and named sources are parsed. */
+        void validate_links() const;
 
         /**
          * Represent environment as a string
