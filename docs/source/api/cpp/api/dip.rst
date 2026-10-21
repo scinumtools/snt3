@@ -7,6 +7,8 @@ DIP commands
    :headers: src/snt/api/dip_parse.h
       include/snt/api/dip_compare.h
       include/snt/api/dip_semantic.h
+      include/snt/api/dip_format.h
+      include/snt/api/dip_validate.h
 
 .. _cpp-api-report-generation:
 

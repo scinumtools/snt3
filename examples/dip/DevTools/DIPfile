@@ -1,0 +1,9 @@
+format
+  blank_lines_between_nodes = 1
+  final_newline = true
+
+validate
+  max_syntax_errors = 2
+
+code[]
+  file = "parameters.dip"

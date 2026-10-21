@@ -77,12 +77,15 @@ $schema snt_project_override
 $schema snt_project_format
   blank_lines_between_nodes int = 1
   final_newline bool = true
+$schema snt_project_validate
+  max_syntax_errors int = 100
 units list : snt_project_unit
 sources list : snt_project_source
 schemas list : snt_project_schema
 code list : snt_project_code
 overrides list : snt_project_override
 format : snt_project_format
+validate : snt_project_validate
 )DIPL";
 
         std::string top_level_name(const std::string& path) {
@@ -102,11 +105,12 @@ format : snt_project_format
 
             for (const auto& [path, collection] : manifest.hierarchy.get_collections()) {
                 (void)collection;
-                if (collections.find(top_level_name(path)) == collections.end() && top_level_name(path) != "format") {
+                if (collections.find(top_level_name(path)) == collections.end() && top_level_name(path) != "format" &&
+                    top_level_name(path) != "validate") {
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest contains the unsupported top-level collection `" + top_level_name(path) + "`.",
-                        "Use the declared project collections or the format group.",
+                        "Use the declared project collections, format group, or validate group.",
                         __FILE__,
                         __LINE__
                     );
@@ -121,15 +125,16 @@ format : snt_project_format
                 const size_t field_start = (item_end == std::string::npos) ? std::string::npos : item_end + 2;
                 const bool valid_format =
                     path == "format" || path == "format.blank_lines_between_nodes" || path == "format.final_newline";
+                const bool valid_validate = path == "validate" || path == "validate.max_syntax_errors";
                 const bool valid_item = collections.find(top) != collections.end() && item_end != std::string::npos &&
                                         field_start != std::string::npos && field_start < path.size() &&
                                         path.find('.', field_start) == std::string::npos &&
                                         fields.at(top).find(path.substr(field_start)) != fields.at(top).end();
-                if (!valid_item && !valid_format) {
+                if (!valid_item && !valid_format && !valid_validate) {
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest node `" + path + "` is not part of the DIPfile schema.",
-                        "Use only the declared project fields and format settings.",
+                        "Use only the declared project fields, format settings, and validate settings.",
                         __FILE__,
                         __LINE__,
                         node->line
@@ -151,6 +156,20 @@ format : snt_project_format
 
     } // namespace
 
+    std::optional<std::filesystem::path> nearest_project_manifest(const std::filesystem::path& input) {
+        auto directory = std::filesystem::absolute(input).lexically_normal().parent_path();
+        while (!directory.empty()) {
+            const auto manifest = directory / "DIPfile";
+            if (std::filesystem::is_regular_file(manifest))
+                return manifest;
+            const auto parent = directory.parent_path();
+            if (parent == directory)
+                break;
+            directory = parent;
+        }
+        return std::nullopt;
+    }
+
     Environment parse_project_manifest(
         const std::filesystem::path& project_file, ProjectFileReader reader, std::string source_name
     ) {
@@ -161,6 +180,14 @@ format : snt_project_format
         manifest.add_file(std::filesystem::absolute(project_file), std::move(source_name), true);
         Environment project = manifest.parse();
         validate_project_manifest(project);
+        const int max_syntax_errors = project["validate.max_syntax_errors"].as<int>();
+        if (max_syntax_errors < 1 || max_syntax_errors > 1000)
+            throw SyntaxException(
+                "Invalid validation setting",
+                "validate.max_syntax_errors must be between 1 and 1000.",
+                "Set max_syntax_errors to a positive value no greater than 1000.",
+                __FILE__, __LINE__, project_field_line(project.get_node("validate.max_syntax_errors"))
+            );
         return project;
     }
 
@@ -701,6 +728,23 @@ format : snt_project_format
             instance_constraints
         );
         env.sources.append(source_name, source_file, source_code, parent);
+    }
+
+    std::vector<core::Diagnostic> DIP::collect_syntax_diagnostics(std::size_t max_diagnostics) const {
+        std::vector<core::Diagnostic> diagnostics;
+        if (max_diagnostics == 0)
+            return diagnostics;
+        auto remaining = lines;
+        (void)parse_code_nodes(remaining, &diagnostics, max_diagnostics);
+        for (auto& diagnostic : diagnostics) {
+            if (!diagnostic.location)
+                continue;
+            const auto source_entry = env.sources.entries().find(diagnostic.location->source);
+            if (source_entry != env.sources.entries().end() && !source_entry->second.embedded &&
+                !source_entry->second.path.empty())
+                diagnostic.location->source = source_entry->second.path;
+        }
+        return diagnostics;
     }
 
     Environment DIP::parse(bool record_dependency_graph, bool retain_block_inputs) {

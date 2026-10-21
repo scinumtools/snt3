@@ -24,15 +24,16 @@ Options:
       Show version information.
 
 Modules:
-  dip     Dimensional Input Parameters
-  report  Generate a DIP report (optional build feature)
-  puq     Physical Units & Quantities
-  dmap    Regenerate PUQ dimension-map headers (developer tool; optional)
-  server  REST API server (optional build feature)
-  view    Read-only parameter browser (optional build feature)
-  hub     Install and prepare pinned code examples
-  mcp     Expose DIPL and PUQ tools through Model Context Protocol
-  fmt     Format DIPL source files
+  dip       Dimensional Input Parameters
+  report    Generate a DIP report (optional build feature)
+  puq       Physical Units & Quantities
+  dmap      Regenerate PUQ dimension-map headers (developer tool; optional)
+  server    REST API server (optional build feature)
+  view      Read-only parameter browser (optional build feature)
+  hub       Install and prepare pinned code examples
+  mcp       Expose DIPL and PUQ tools through Model Context Protocol
+  format    Format DIPL source files
+  validate  Validate DIPL files and DIPfile projects
 
 Run 'snt <module> --help' for module-specific commands.
 )";
@@ -43,6 +44,15 @@ int main(int argc, char* argv[]) {
     if (argc > 1 && (std::string(argv[1]) == "fmt" || std::string(argv[1]) == "format")) {
         try {
             return module_fmt(argc, argv);
+        } catch (const std::exception& error) {
+            std::cerr << error.what() << '\n';
+            return 2;
+        }
+    }
+
+    if (argc > 1 && std::string(argv[1]) == "validate") {
+        try {
+            return module_validate(argc, argv);
         } catch (const std::exception& error) {
             std::cerr << error.what() << '\n';
             return 2;

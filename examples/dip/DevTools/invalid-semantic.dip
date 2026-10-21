@@ -1,0 +1,3 @@
+# Valid syntax, but the value is not among its declared options.
+mode str = "manual"
+  !options ["safe", "fast"]

@@ -1,8 +1,9 @@
 DIP examples
 ============
 
-The DIP examples cover a minimal DIPL definition, CMake configuration,
-inspection and dependency graphs, application adapters, and report generation.
+The DIP examples cover a minimal DIPL definition, developer tools, CMake
+configuration, inspection and dependency graphs, application adapters, and
+report generation.
 
 Quick Example
 -------------
@@ -23,6 +24,30 @@ tree.
    width float = 40 cm
    area float = ({?length} * {?width})
      !condition ({.} > 0 m2)
+
+.. _dip-devtools-example:
+
+Developer Tools
+---------------
+
+The `DevTools source directory
+<https://github.com/scinumtools/snt3/tree/main/examples/dip/DevTools>`_
+contains a valid DIPfile project, an intentionally unformatted DIPL file, and
+separate syntax and semantic error examples. Its DIPfile sets formatter style
+and limits syntax reporting to two errors. From the repository root:
+
+.. code-block:: console
+
+   build/bin/snt validate examples/dip/DevTools/DIPfile
+   build/bin/snt format --check examples/dip/DevTools/parameters.dip
+   build/bin/snt validate --json examples/dip/DevTools/invalid-syntax.dip
+
+The project passes; the format check and invalid-file validation exit with
+status 1. The `example README
+<https://github.com/scinumtools/snt3/blob/main/examples/dip/DevTools/README.md>`_
+also demonstrates formatted output and a semantic validation error. See
+:doc:`the developer-tools guide <../integrations/devtools>` for both commands
+and their DIPfile settings.
 
 CMake Integration
 -----------------

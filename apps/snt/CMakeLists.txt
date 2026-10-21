@@ -106,6 +106,13 @@ if(ENABLE_UNIT_TESTS)
       "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-formatter"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/formatter.cmake"
   )
+  add_test(
+    NAME cli.dip.validator
+    COMMAND ${CMAKE_COMMAND}
+      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
+      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-validator"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/validator.cmake"
+  )
 endif()
 
 if(ENABLE_SNT_SERVER)

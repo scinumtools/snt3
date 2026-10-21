@@ -15,6 +15,7 @@
 
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
+#include <snt/dip/inspect/diagnostic.h>
 #include <snt/dip/nodes/node_boolean.h>
 #include <snt/dip/nodes/node_case.h>
 #include <snt/dip/nodes/node_float.h>
@@ -156,175 +157,204 @@ namespace snt::dip {
         return str;
     }
 
-    BaseNode::ListType parse_code_nodes(std::queue<Line>& lines) {
+    BaseNode::ListType parse_code_nodes(
+        std::queue<Line>& lines, std::vector<core::Diagnostic>* diagnostics, std::size_t max_diagnostics
+    ) {
         BaseNode::ListType nodes;
         while (!lines.empty()) {
             Line line = lines.front();
             lines.pop();
-            {
-                // add node definition (after = sign) on a new line
-                // to the node declaration on the current line
-                if (!lines.empty()) {
-                    const Line& next = lines.front();
-                    std::size_t line_indent = line.code.find_first_not_of(' ');
-                    std::size_t next_indent = next.code.find_first_not_of(' ');
-                    if (next.code[next_indent] == SIGN_EQUAL) {
-                        if (line_indent != std::string::npos && next_indent == line_indent + INDENT_STEP &&
-                            next_indent < next.code.size()) {
-                            line.code = remove_comments(line.code) + " " + next.code.substr(next_indent);
-                            lines.pop();
-                        } else {
-                            throw dip::SyntaxException(
-                                "Node definition on a new line has an invalid indent",
-                                "The node is indented " + std::to_string(next_indent) + " spaces, but it should be " +
-                                    std::to_string(line_indent + INDENT_STEP) + " spaces.",
-                                "Indent the node " + std::to_string(INDENT_STEP) +
-                                    " spaces more than the preceding node.",
-                                __FILE__,
-                                __LINE__,
-                                next
-                            );
-                        }
-                    }
-                }
-            }
-            {
-                // group block strings
-                size_t pos = 0;
-                if ((pos = line.code.find(SIGN_BLOCK)) != std::string::npos) { // opening block quotes
-                    pos += SIGN_BLOCK.length();
-                    std::ostringstream oss;
-                    oss << line.code;
-                    if (line.code.find(SIGN_BLOCK, pos) == std::string::npos) { // closing block quotes on the same line
-                        while (lines.size() > 0) {
-                            Line block_line = lines.front();
-                            lines.pop();
-                            oss << SEPARATOR_NEWLINE << block_line.code;
-                            if (block_line.code.find(SIGN_BLOCK) !=
-                                std::string::npos) { // closing block quotes on a subsequent line
-                                break;
+            try {
+                {
+                    // add node definition (after = sign) on a new line
+                    // to the node declaration on the current line
+                    if (!lines.empty()) {
+                        const Line& next = lines.front();
+                        std::size_t line_indent = line.code.find_first_not_of(' ');
+                        std::size_t next_indent = next.code.find_first_not_of(' ');
+                        if (next.code[next_indent] == SIGN_EQUAL) {
+                            if (line_indent != std::string::npos && next_indent == line_indent + INDENT_STEP &&
+                                next_indent < next.code.size()) {
+                                line.code = remove_comments(line.code) + " " + next.code.substr(next_indent);
+                                lines.pop();
+                            } else {
+                                throw dip::SyntaxException(
+                                    "Node definition on a new line has an invalid indent",
+                                    "The node is indented " + std::to_string(next_indent) +
+                                        " spaces, but it should be " + std::to_string(line_indent + INDENT_STEP) +
+                                        " spaces.",
+                                    "Indent the node " + std::to_string(INDENT_STEP) +
+                                        " spaces more than the preceding node.",
+                                    __FILE__,
+                                    __LINE__,
+                                    next
+                                );
                             }
                         }
                     }
-                    line.code = oss.str();
                 }
-            }
-            {
-                // group expression parentheses group
-                int balance = count_group_balance(line.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
-                while (balance > 0 && !lines.empty()) {
-                    Line next = lines.front();
-                    lines.pop();
-                    line.code += remove_comments(next.code);
-                    balance += count_group_balance(next.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
+                {
+                    // group block strings
+                    size_t pos = 0;
+                    if ((pos = line.code.find(SIGN_BLOCK)) != std::string::npos) { // opening block quotes
+                        pos += SIGN_BLOCK.length();
+                        std::ostringstream oss;
+                        oss << line.code;
+                        if (line.code.find(SIGN_BLOCK, pos) ==
+                            std::string::npos) { // closing block quotes on the same line
+                            while (lines.size() > 0) {
+                                Line block_line = lines.front();
+                                lines.pop();
+                                oss << SEPARATOR_NEWLINE << block_line.code;
+                                if (block_line.code.find(SIGN_BLOCK) !=
+                                    std::string::npos) { // closing block quotes on a subsequent line
+                                    break;
+                                }
+                            }
+                        }
+                        line.code = oss.str();
+                    }
                 }
-                if (balance != 0) {
+                {
+                    // group expression parentheses group
+                    int balance = count_group_balance(line.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
+                    while (balance > 0 && !lines.empty()) {
+                        Line next = lines.front();
+                        lines.pop();
+                        line.code += remove_comments(next.code);
+                        balance += count_group_balance(next.code, SIGN_EXPRESSION_OPEN, SIGN_EXPRESSION_CLOSE);
+                    }
+                    if (balance != 0) {
+                        throw dip::SyntaxException(
+                            "Unbalanced parentheses",
+                            "The expression contains unmatched parentheses.",
+                            "Check that every opening `(` has a corresponding closing `)`.",
+                            __FILE__,
+                            __LINE__,
+                            line
+                        );
+                    }
+                }
+                {
+                    // group array brackets group
+                    int balance = count_group_balance(line.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
+                    while (balance > 0 && !lines.empty()) {
+                        Line next = lines.front();
+                        lines.pop();
+                        line.code += remove_comments(next.code);
+                        balance += count_group_balance(next.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
+                    }
+                    if (balance != 0) {
+                        throw dip::SyntaxException(
+                            "Unbalanced array brackets",
+                            "The array expression contains unmatched brackets.",
+                            "Check that every opening `[` has a corresponding closing `]`.",
+                            __FILE__,
+                            __LINE__,
+                            line
+                        );
+                    }
+                }
+
+                // add replacement mark for escape symbols
+                Parser::encode_escape_symbols(line.code);
+
+                // determine node type
+                Parser parser(line);
+                BaseNode::PointerType node = nullptr;
+                node = EmptyNode::is_node(parser);
+                if (node == nullptr)
+                    parser.part_indent();
+                if (node == nullptr)
+                    node = ImportNode::is_node(parser);
+                if (node == nullptr)
+                    node = UnitNode::is_node(parser);
+                if (node == nullptr)
+                    node = SourceNode::is_node(parser);
+                if (node == nullptr)
+                    node = SchemaNode::is_node(parser);
+                if (node == nullptr)
+                    node = OverrideNode::is_node(parser);
+                if (node == nullptr)
+                    node = CaseNode::is_node(parser);
+                if (node == nullptr)
+                    node = PropertyNode::is_node(parser);
+                if (node == nullptr)
+                    parser.part_path();
+                if (node == nullptr)
+                    node = GroupNode::is_node(parser); // groups
+                if (node == nullptr)
+                    node = ImportNode::is_node(parser);
+                if (node == nullptr)
+                    node = ModificationNode::is_node(parser);
+                if (node == nullptr)
+                    parser.part_type();
+                if (node == nullptr)
+                    node = LinkNode::is_node(parser);
+                if (node == nullptr)
+                    node = BooleanNode::is_node(parser);
+                if (node == nullptr)
+                    node = IntegerNode::is_node(parser);
+                if (node == nullptr)
+                    node = FloatNode::is_node(parser);
+                if (node == nullptr)
+                    node = StringNode::is_node(parser);
+                if (node == nullptr)
+                    node = TableNode::is_node(parser);
+                if (node == nullptr)
+                    node = GroupNode::is_node(parser); // maps and lists
+
+                // make sure that everything was parsed
+                if (node == nullptr)
                     throw dip::SyntaxException(
-                        "Unbalanced parentheses",
-                        "The expression contains unmatched parentheses.",
-                        "Check that every opening `(` has a corresponding closing `)`.",
+                        "Unknown node",
+                        "No node could be determined from the line.",
+                        "Check the syntax of the node definition.",
                         __FILE__,
                         __LINE__,
                         line
                     );
-                }
-            }
-            {
-                // group array brackets group
-                int balance = count_group_balance(line.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
-                while (balance > 0 && !lines.empty()) {
-                    Line next = lines.front();
-                    lines.pop();
-                    line.code += remove_comments(next.code);
-                    balance += count_group_balance(next.code, SIGN_ARRAY_OPEN, SIGN_ARRAY_CLOSE);
-                }
-                if (balance != 0) {
+                if (parser.do_continue())
                     throw dip::SyntaxException(
-                        "Unbalanced array brackets",
-                        "The array expression contains unmatched brackets.",
-                        "Check that every opening `[` has a corresponding closing `]`.",
+                        "Unparsed input",
+                        "Additional text remains after the parsed node type.",
+                        "Check the syntax and remove or correct the unparsed text.",
                         __FILE__,
                         __LINE__,
                         line
                     );
+
+                // convert escape symbols to original characterss
+                for (auto& rval : node->value_raw)
+                    Parser::decode_escape_symbols(rval);
+                Parser::decode_escape_symbols(node->line.code);
+
+                // put node into the list
+                nodes.push_back(node);
+            } catch (const dip::SyntaxException& error) {
+                if (!diagnostics)
+                    throw;
+                auto diagnostic = diagnostic_from_exception(error);
+                if (!diagnostic.location)
+                    diagnostic.location = core::SourceLocation{line.source.name, line.source.line_number, line.code};
+                // A misindented `=` continuation is reported on the next
+                // source line. Discard it with its declaration so it does not
+                // produce a second, spurious error when parsed alone.
+                if (!lines.empty()) {
+                    const auto& next = lines.front();
+                    const auto first = next.code.find_first_not_of(' ');
+                    if (diagnostic.location->source == next.source.name &&
+                        diagnostic.location->line == next.source.line_number && first != std::string::npos &&
+                        next.code[first] == SIGN_EQUAL)
+                        lines.pop();
                 }
+                diagnostics->push_back(std::move(diagnostic));
+                // The current logical statement has been consumed. A separate
+                // following statement can still be checked, but evaluating the
+                // incomplete node list would produce misleading follow-on errors.
+                if (diagnostics->size() >= max_diagnostics)
+                    break;
             }
-
-            // add replacement mark for escape symbols
-            Parser::encode_escape_symbols(line.code);
-
-            // determine node type
-            Parser parser(line);
-            BaseNode::PointerType node = nullptr;
-            node = EmptyNode::is_node(parser);
-            if (node == nullptr)
-                parser.part_indent();
-            if (node == nullptr)
-                node = ImportNode::is_node(parser);
-            if (node == nullptr)
-                node = UnitNode::is_node(parser);
-            if (node == nullptr)
-                node = SourceNode::is_node(parser);
-            if (node == nullptr)
-                node = SchemaNode::is_node(parser);
-            if (node == nullptr)
-                node = OverrideNode::is_node(parser);
-            if (node == nullptr)
-                node = CaseNode::is_node(parser);
-            if (node == nullptr)
-                node = PropertyNode::is_node(parser);
-            if (node == nullptr)
-                parser.part_path();
-            if (node == nullptr)
-                node = GroupNode::is_node(parser); // groups
-            if (node == nullptr)
-                node = ImportNode::is_node(parser);
-            if (node == nullptr)
-                node = ModificationNode::is_node(parser);
-            if (node == nullptr)
-                parser.part_type();
-            if (node == nullptr)
-                node = LinkNode::is_node(parser);
-            if (node == nullptr)
-                node = BooleanNode::is_node(parser);
-            if (node == nullptr)
-                node = IntegerNode::is_node(parser);
-            if (node == nullptr)
-                node = FloatNode::is_node(parser);
-            if (node == nullptr)
-                node = StringNode::is_node(parser);
-            if (node == nullptr)
-                node = TableNode::is_node(parser);
-            if (node == nullptr)
-                node = GroupNode::is_node(parser); // maps and lists
-
-            // make sure that everything was parsed
-            if (node == nullptr)
-                throw dip::SyntaxException(
-                    "Unknown node",
-                    "No node could be determined from the line.",
-                    "Check the syntax of the node definition.",
-                    __FILE__,
-                    __LINE__,
-                    line
-                );
-            if (parser.do_continue())
-                throw dip::SyntaxException(
-                    "Unparsed input",
-                    "Additional text remains after the parsed node type.",
-                    "Check the syntax and remove or correct the unparsed text.",
-                    __FILE__,
-                    __LINE__,
-                    line
-                );
-
-            // convert escape symbols to original characterss
-            for (auto& rval : node->value_raw)
-                Parser::decode_escape_symbols(rval);
-            Parser::decode_escape_symbols(node->line.code);
-
-            // put node into the list
-            nodes.push_back(node);
         }
         return nodes;
     }

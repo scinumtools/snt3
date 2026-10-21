@@ -18,6 +18,8 @@ int module_mcp(int argc, char* argv[]);
 int module_dmap(int argc, char* argv[]);
 /** Format DIPL source files or check whether they match the project style. */
 int module_fmt(int argc, char* argv[]);
+/** Validate DIPL files and DIPfile projects through the native parser. */
+int module_validate(int argc, char* argv[]);
 
 /** Execute a DIP parse command using parsed CLI arguments. */
 void module_dip(ArgParser& argpar);

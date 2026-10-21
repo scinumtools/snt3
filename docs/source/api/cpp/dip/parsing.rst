@@ -20,3 +20,5 @@ Load DIPL definitions, evaluate environments, and retrieve values.
       include/snt/dip/preview.h
       include/snt/dip/exceptions.h
       include/snt/dip/settings.h
+      include/snt/dip/tools/formatter.h
+      include/snt/dip/tools/validator.h

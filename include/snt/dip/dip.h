@@ -6,9 +6,15 @@
 #include <array>
 #include <filesystem>
 #include <iostream>
+#include <optional>
 #include <queue>
+#include <snt/core/diagnostic.h>
+#include <vector>
 
 namespace snt::dip {
+
+    /** Find the nearest parent DIPfile for a source or project path. */
+    std::optional<std::filesystem::path> nearest_project_manifest(const std::filesystem::path& input);
 
     /** Parse and validate a DIPfile without loading its referenced model files. */
     Environment parse_project_manifest(
@@ -195,6 +201,12 @@ namespace snt::dip {
          * Dependency recording and retention of parsed string blocks are opt-in.
          */
         Environment parse(bool record_dependency_graph = false, bool retain_block_inputs = false);
+
+        /** Collect recoverable statement syntax errors without evaluating the model.
+         * Normal parse() remains fail-fast. A malformed multiline statement may
+         * consume following lines, so diagnostics are limited to safe boundaries.
+         */
+        std::vector<core::Diagnostic> collect_syntax_diagnostics(std::size_t max_diagnostics = 100) const;
 
         /**
          * Get a string representation of the current DIPL instance

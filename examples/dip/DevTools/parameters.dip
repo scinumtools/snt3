@@ -1,0 +1,5 @@
+# Valid DIPL, intentionally left unformatted for the formatter demo.
+experiment
+  name str="baseline"
+  steps int=8
+  enabled bool=true

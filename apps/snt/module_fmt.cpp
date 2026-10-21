@@ -25,7 +25,7 @@ int module_fmt(int argc, char* argv[]) {
     for (int i = 2; i < argc; ++i) {
         const std::string arg = argv[i];
         if (arg == "--help" || arg == "-h") {
-            std::cout << "Usage: snt fmt [--check | --write] <file> [<file> ...]\n"
+            std::cout << "Usage: snt format [--check | --write] <file> [<file> ...]\n"
                          "Format DIPL source. Output goes to stdout unless --check or --write is used.\n";
             return 0;
         }
@@ -34,7 +34,7 @@ int module_fmt(int argc, char* argv[]) {
         else if (arg == "--write")
             write = true;
         else if (!arg.empty() && arg[0] == '-')
-            throw std::invalid_argument("Unknown fmt option: " + arg);
+            throw std::invalid_argument("Unknown format option: " + arg);
         else
             files.emplace_back(arg);
     }

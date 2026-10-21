@@ -1,0 +1,5 @@
+# Three independent syntax errors; the DIPfile limits the report to two.
+first unknown_type = 1
+valid int = 2
+second unknown_type = 3
+third unknown_type = 4

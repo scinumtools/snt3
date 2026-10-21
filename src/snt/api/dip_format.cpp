@@ -8,22 +8,14 @@
 namespace snt::api {
 
     dip::tools::FormatOptions dip_format_options(const std::filesystem::path& input) {
-        auto directory = std::filesystem::absolute(input).lexically_normal().parent_path();
-        while (!directory.empty()) {
-            const auto manifest = directory / "DIPfile";
-            if (std::filesystem::is_regular_file(manifest)) {
-                const auto project = dip::parse_project_manifest(manifest);
-                dip::tools::FormatOptions options;
-                options.blank_lines_between_nodes = project["format.blank_lines_between_nodes"].as<int>();
-                options.final_newline = project["format.final_newline"].as<bool>();
-                return options;
-            }
-            const auto parent = directory.parent_path();
-            if (parent == directory)
-                break;
-            directory = parent;
-        }
-        return {};
+        const auto manifest = dip::nearest_project_manifest(input);
+        if (!manifest)
+            return {};
+        const auto project = dip::parse_project_manifest(*manifest);
+        dip::tools::FormatOptions options;
+        options.blank_lines_between_nodes = project["format.blank_lines_between_nodes"].as<int>();
+        options.final_newline = project["format.final_newline"].as<bool>();
+        return options;
     }
 
     std::string format_dip_file(const std::filesystem::path& input) {

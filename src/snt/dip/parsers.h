@@ -1,9 +1,12 @@
 #ifndef DIP_PARSERS_H
 #define DIP_PARSERS_H
 
+#include <cstddef>
 #include <queue>
+#include <snt/core/diagnostic.h>
 #include <snt/dip/lists/list_source.h>
 #include <snt/dip/project_bundle.h>
+#include <vector>
 
 namespace snt::dip {
 
@@ -17,7 +20,10 @@ namespace snt::dip {
     std::queue<Line> parse_lines(
         std::queue<Line>& lines, const std::string& source_code, const std::string& source_name
     );
-    BaseNode::ListType parse_code_nodes(std::queue<Line>& lines);
+    BaseNode::ListType parse_code_nodes(
+        std::queue<Line>& lines, std::vector<core::Diagnostic>* diagnostics = nullptr,
+        std::size_t max_diagnostics = 100
+    );
     BaseNode::ListType parse_table_nodes(
         std::queue<Line>& lines, ValueMetadata& table_metadata, const char delimiter = ' '
     );

@@ -10,13 +10,13 @@ if(NOT parse_status EQUAL 0)
   message(FATAL_ERROR "Original DIPL did not parse: ${parse_error}")
 endif()
 
-execute_process(COMMAND "${SNT_EXECUTABLE}" fmt --check "${input}"
+execute_process(COMMAND "${SNT_EXECUTABLE}" format --check "${input}"
   RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
 if(NOT status EQUAL 1)
   message(FATAL_ERROR "Expected --check to find changes; status=${status}, stderr=${err}")
 endif()
 
-execute_process(COMMAND "${SNT_EXECUTABLE}" fmt --write "${input}"
+execute_process(COMMAND "${SNT_EXECUTABLE}" format --write "${input}"
   RESULT_VARIABLE status ERROR_VARIABLE err)
 if(NOT status EQUAL 0)
   message(FATAL_ERROR "--write failed: ${err}")
@@ -31,7 +31,7 @@ if(NOT parse_status EQUAL 0 OR NOT before_values STREQUAL after_values)
   message(FATAL_ERROR "Formatting changed evaluated values: ${parse_error}")
 endif()
 
-execute_process(COMMAND "${SNT_EXECUTABLE}" fmt --check "${input}"
+execute_process(COMMAND "${SNT_EXECUTABLE}" format --check "${input}"
   RESULT_VARIABLE status ERROR_VARIABLE err)
 if(NOT status EQUAL 0)
   message(FATAL_ERROR "Expected formatted file to pass --check: ${err}")
@@ -40,6 +40,7 @@ endif()
 # A standalone file outside any DIPfile tree uses the built-in defaults.
 set(standalone "${TEST_DIR}/../standalone-formatter.dip")
 file(WRITE "${standalone}" "first int=1\nsecond int=2\n")
+# Keep the former shorthand working for existing scripts without advertising it.
 execute_process(COMMAND "${SNT_EXECUTABLE}" fmt "${standalone}"
   RESULT_VARIABLE status OUTPUT_VARIABLE actual ERROR_VARIABLE err)
 if(NOT status EQUAL 0 OR NOT actual STREQUAL "first int = 1\n\nsecond int = 2\n")
