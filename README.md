@@ -148,7 +148,8 @@ Try the runnable [UsingMCP example](examples/dip/UsingMCP).
   for browser-side DIPL inspection, validation, and override previews, plus PUQ conversion.
 - **Command line:**
   [PUQ evaluation and conversion](https://scinumtools.github.io/snt3/integrations/cli.html#quantities-and-units),
-  [DIP parsing](https://scinumtools.github.io/snt3/integrations/cli.html#dipl-parameters),
+  [DIP parsing](https://scinumtools.github.io/snt3/integrations/cli.html#dipl-parameters) and
+  [DIPL developer tools](docs/source/integrations/devtools.rst),
   DIPH5 persistence, export, and
   [reports](https://scinumtools.github.io/snt3/integrations/cli.html#generating-reports).
 - **Parameter Viewer:**

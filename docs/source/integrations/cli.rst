@@ -24,6 +24,9 @@ Once the executable is on your ``PATH``, inspect the available commands:
    snt report -h
    snt hub -h
    snt mcp -h
+   snt fmt -h
+
+For DIPL source formatting and DIPfile style settings, see :doc:`devtools`.
 
 Model Context Protocol
 ----------------------

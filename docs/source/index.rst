@@ -78,6 +78,7 @@ Python client in ``examples/dip/UsingMCP``; the MCP server itself is C++.
    integrations/c
    integrations/web
    integrations/cli
+   integrations/devtools
    integrations/viewer
    integrations/cmake
    integrations/rest

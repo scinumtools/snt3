@@ -4,15 +4,17 @@ DIPfile projects
 A ``DIPfile`` gathers the units, named sources, reusable schemas, override
 files, DIPL files, and inline DIPL definitions used by one parameter
 environment. It is itself ordinary DIPL: the project loader supplies the
-schemas for its five lists and parses the file with the standard DIP parser.
+schemas for its five lists and its optional ``format`` group, then parses the
+file with the standard DIP parser.
 
 Project format
 --------------
 
-Each project contains only ``units[]``, ``sources[]``, ``schemas[]``,
-``overrides[]``, and ``code[]`` items. A schema item has a ``name`` and exactly
-one of ``file`` or ``string``. Its file or string is a schema body without a
-``$schema`` wrapper.
+Each project contains ``units[]``, ``sources[]``, ``schemas[]``,
+``overrides[]``, and ``code[]`` items, plus an optional ``format`` group for
+:doc:`the DIPL developer tools <../../integrations/devtools>`. A schema item
+has a ``name`` and exactly one of ``file`` or ``string``. Its file or string is
+a schema body without a ``$schema`` wrapper.
 Schema-level ``?`` metadata may appear before the first body node.
 Each override item has a required ``file`` field. Its file contains value
 modifications without a ``$override`` wrapper. Schemas and overrides are

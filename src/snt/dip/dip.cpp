@@ -16,6 +16,7 @@
 #include <snt/dip/settings.h>
 #include <sstream>
 #include <string>
+#include <utility>
 
 namespace snt::dip {
 
@@ -73,11 +74,15 @@ $schema snt_project_code
   string str = none
 $schema snt_project_override
   file str
+$schema snt_project_format
+  blank_lines_between_nodes int = 1
+  final_newline bool = true
 units list : snt_project_unit
 sources list : snt_project_source
 schemas list : snt_project_schema
 code list : snt_project_code
 overrides list : snt_project_override
+format : snt_project_format
 )DIPL";
 
         std::string top_level_name(const std::string& path) {
@@ -97,11 +102,11 @@ overrides list : snt_project_override
 
             for (const auto& [path, collection] : manifest.hierarchy.get_collections()) {
                 (void)collection;
-                if (collections.find(top_level_name(path)) == collections.end()) {
+                if (collections.find(top_level_name(path)) == collections.end() && top_level_name(path) != "format") {
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest contains the unsupported top-level collection `" + top_level_name(path) + "`.",
-                        "Use only the units[], sources[], schemas[], code[], and overrides[] collections.",
+                        "Use the declared project collections or the format group.",
                         __FILE__,
                         __LINE__
                     );
@@ -114,15 +119,17 @@ overrides list : snt_project_override
                 const std::string top = top_level_name(path);
                 const size_t item_end = path.find(']');
                 const size_t field_start = (item_end == std::string::npos) ? std::string::npos : item_end + 2;
+                const bool valid_format =
+                    path == "format" || path == "format.blank_lines_between_nodes" || path == "format.final_newline";
                 const bool valid_item = collections.find(top) != collections.end() && item_end != std::string::npos &&
                                         field_start != std::string::npos && field_start < path.size() &&
                                         path.find('.', field_start) == std::string::npos &&
                                         fields.at(top).find(path.substr(field_start)) != fields.at(top).end();
-                if (!valid_item) {
+                if (!valid_item && !valid_format) {
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest node `" + path + "` is not part of the DIPfile schema.",
-                        "Use only the declared fields of units[], sources[], schemas[], code[], and overrides[] items.",
+                        "Use only the declared project fields and format settings.",
                         __FILE__,
                         __LINE__,
                         node->line
@@ -143,6 +150,19 @@ overrides list : snt_project_override
         }
 
     } // namespace
+
+    Environment parse_project_manifest(
+        const std::filesystem::path& project_file, ProjectFileReader reader, std::string source_name
+    ) {
+        DIP manifest;
+        if (reader)
+            manifest.set_project_file_reader(std::move(reader));
+        manifest.add_string(std::string(project_preamble));
+        manifest.add_file(std::filesystem::absolute(project_file), std::move(source_name), true);
+        Environment project = manifest.parse();
+        validate_project_manifest(project);
+        return project;
+    }
 
     int DIP::num_instances = 0;
 
@@ -273,12 +293,7 @@ overrides list : snt_project_override
         const std::filesystem::path absolute_project = std::filesystem::absolute(project_file);
         const std::string project_source = source.name + "_project" + std::to_string(num_projects++);
 
-        DIP manifest;
-        manifest.set_project_file_reader(env.project_file_reader());
-        manifest.add_string(std::string(project_preamble));
-        manifest.add_file(absolute_project, project_source, true);
-        const Environment project = manifest.parse();
-        validate_project_manifest(project);
+        const Environment project = parse_project_manifest(absolute_project, env.project_file_reader(), project_source);
 
         const EnvSource& project_definition = project.sources.at(project_source);
         env.sources.append(

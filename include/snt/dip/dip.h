@@ -10,6 +10,11 @@
 
 namespace snt::dip {
 
+    /** Parse and validate a DIPfile without loading its referenced model files. */
+    Environment parse_project_manifest(
+        const std::filesystem::path& project_file, ProjectFileReader reader = {}, std::string source_name = "DIPfile"
+    );
+
     struct ProjectText {
         std::string name;
         std::string text;
