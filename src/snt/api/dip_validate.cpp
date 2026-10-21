@@ -73,16 +73,30 @@ namespace snt::api {
     }
 
     std::string dip_validation_json(const std::filesystem::path& input, const dip::tools::ValidationResult& result) {
+        return dip_diagnostics_json(input, result.valid(), result.diagnostics);
+    }
+
+    std::string dip_diagnostics_json(
+        const std::filesystem::path& input, bool valid, const std::vector<core::Diagnostic>& diagnostics,
+        std::optional<bool> clean
+    ) {
         std::ostringstream out;
-        out << "{\"input\":" << quote(input.generic_string()) << ",\"valid\":" << (result.valid() ? "true" : "false")
-            << ",\"diagnostics\":[";
-        for (std::size_t i = 0; i < result.diagnostics.size(); ++i) {
+        out << "{\"input\":" << quote(input.generic_string()) << ",\"valid\":" << (valid ? "true" : "false");
+        if (clean)
+            out << ",\"clean\":" << (*clean ? "true" : "false");
+        out << ",\"diagnostics\":[";
+        for (std::size_t i = 0; i < diagnostics.size(); ++i) {
             if (i)
                 out << ',';
-            const auto& diagnostic = result.diagnostics[i];
+            const auto& diagnostic = diagnostics[i];
             out << "{\"severity\":" << quote(severity(diagnostic.severity)) << ",\"code\":" << quote(diagnostic.code)
                 << ",\"message\":" << quote(diagnostic.message) << ",\"details\":" << quote(diagnostic.details)
-                << ",\"suggestion\":" << quote(diagnostic.suggestion) << ",\"location\":";
+                << ",\"suggestion\":" << quote(diagnostic.suggestion) << ",\"node_path\":";
+            if (diagnostic.node_path)
+                out << quote(*diagnostic.node_path);
+            else
+                out << "null";
+            out << ",\"location\":";
             location(out, diagnostic.location);
             out << '}';
         }

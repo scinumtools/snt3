@@ -1,0 +1,8 @@
+# Valid DIPL with two advisory findings for the linter demo.
+output int = 8
+  ?visibility "public"
+  !options [8, 8, 16]
+
+old_output int = 4
+  ?deprecated "Use output for new projects."
+  ?replacement "output"

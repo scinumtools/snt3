@@ -79,6 +79,13 @@ $schema snt_project_format
   final_newline bool = true
 $schema snt_project_validate
   max_syntax_errors int = 100
+$schema snt_project_lint
+  require_public_descriptions bool = true
+  warn_deprecated_values bool = true
+  warn_duplicate_options bool = true
+  require_public_option_labels bool = true
+  warn_broken_metadata_references bool = false
+  warn_unused_schemas bool = false
 units list : snt_project_unit
 sources list : snt_project_source
 schemas list : snt_project_schema
@@ -86,6 +93,7 @@ code list : snt_project_code
 overrides list : snt_project_override
 format : snt_project_format
 validate : snt_project_validate
+lint : snt_project_lint
 )DIPL";
 
         std::string top_level_name(const std::string& path) {
@@ -106,11 +114,11 @@ validate : snt_project_validate
             for (const auto& [path, collection] : manifest.hierarchy.get_collections()) {
                 (void)collection;
                 if (collections.find(top_level_name(path)) == collections.end() && top_level_name(path) != "format" &&
-                    top_level_name(path) != "validate") {
+                    top_level_name(path) != "validate" && top_level_name(path) != "lint") {
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest contains the unsupported top-level collection `" + top_level_name(path) + "`.",
-                        "Use the declared project collections, format group, or validate group.",
+                        "Use the declared project collections, format, validate, or lint group.",
                         __FILE__,
                         __LINE__
                     );
@@ -126,15 +134,19 @@ validate : snt_project_validate
                 const bool valid_format =
                     path == "format" || path == "format.blank_lines_between_nodes" || path == "format.final_newline";
                 const bool valid_validate = path == "validate" || path == "validate.max_syntax_errors";
+                const bool valid_lint = path == "lint" || path == "lint.require_public_descriptions" ||
+                                        path == "lint.warn_deprecated_values" || path == "lint.warn_duplicate_options" ||
+                                        path == "lint.require_public_option_labels" ||
+                                        path == "lint.warn_broken_metadata_references" || path == "lint.warn_unused_schemas";
                 const bool valid_item = collections.find(top) != collections.end() && item_end != std::string::npos &&
                                         field_start != std::string::npos && field_start < path.size() &&
                                         path.find('.', field_start) == std::string::npos &&
                                         fields.at(top).find(path.substr(field_start)) != fields.at(top).end();
-                if (!valid_item && !valid_format && !valid_validate) {
+                if (!valid_item && !valid_format && !valid_validate && !valid_lint) {
                     throw SyntaxException(
                         "Invalid DIP project manifest",
                         "The manifest node `" + path + "` is not part of the DIPfile schema.",
-                        "Use only the declared project fields, format settings, and validate settings.",
+                        "Use only the declared project fields, format, validate, and lint settings.",
                         __FILE__,
                         __LINE__,
                         node->line

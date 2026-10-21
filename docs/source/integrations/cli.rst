@@ -26,8 +26,9 @@ Once the executable is on your ``PATH``, inspect the available commands:
    snt mcp -h
    snt format -h
    snt validate -h
+   snt lint -h
 
-For DIPL formatting, validation, and DIPfile style settings, see :doc:`devtools`.
+For DIPL formatting, validation, linting, and DIPfile tool settings, see :doc:`devtools`.
 
 Model Context Protocol
 ----------------------

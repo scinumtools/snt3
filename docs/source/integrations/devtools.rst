@@ -1,9 +1,8 @@
 DIPL developer tools
 ====================
 
-This page covers tools for maintaining DIPL source. The formatter and validator
-are available now. Linter rules can be documented here as they are added.
-Try both commands with the :ref:`dip-devtools-example`.
+This page covers tools for maintaining DIPL source. Try the formatter,
+validator, and linter with the :ref:`dip-devtools-example`.
 
 Formatter
 ---------
@@ -100,3 +99,52 @@ limits how many independent syntax errors are shown; it does not change
 whether a file is valid or how semantic rules are checked. Files without a
 parent DIPfile use the default. The C++ ``validate_text()`` function accepts
 the same limit through ``ValidationOptions``.
+
+Linter
+------
+
+``snt lint`` first validates and evaluates DIPL, then reports advisory issues
+with source locations. Invalid input reports validation errors only. The
+default rules warn when an explicitly public value or schema lacks ``?descr``,
+when an evaluated value carries ``?deprecated``, when ``!options`` contains
+an exact duplicate, and when a public numeric choice list lacks complete
+``!labels``. Deprecation findings use ``?replacement`` in their suggestion
+when present. These rules do not change whether a model is valid.
+
+Two optional rules can check local paths named by ``?replacement``,
+``?requires``, ``?conflicts``, and ``?implies``, and schemas with no evaluated
+application. The reference check only treats a ``?``-prefixed or dotted or
+collection path as a local path; plain words and prose are skipped. It checks
+the evaluated model, so conditional paths absent from that model may be
+reported. Unused schemas can be intentional in a reusable schema library.
+
+.. code-block:: bash
+
+   snt lint parameters.dip
+   snt lint DIPfile
+   snt lint --project experiment.manifest
+   snt lint --json parameters.dip
+
+Exit status is 0 when clean, 1 for lint findings or invalid DIPL, and 2 for an
+unreadable input or command error. JSON contains ``valid`` for input validity,
+``clean`` for lint cleanliness, and structured diagnostics with severity,
+source location, and node path. Multiple inputs produce an array.
+
+The nearest parent ``DIPfile`` supplies the ``lint`` settings for standalone
+files; a project uses its own manifest. The first four rules default to enabled,
+and the last two are opt-in:
+
+.. code-block:: dipl
+
+   lint
+     require_public_descriptions = true
+     warn_deprecated_values = true
+     warn_duplicate_options = true
+     require_public_option_labels = true
+     warn_broken_metadata_references = false
+     warn_unused_schemas = false
+
+The C++ entry points are ``snt::dip::tools::lint_environment()``,
+``lint_text()``, and ``lint_file()`` in ``<snt/dip/tools/linter.h>``. The
+application API exposes ``snt::api::lint_dip_file()`` and ``dip_lint_json()``
+in ``<snt/api/dip_lint.h>``.

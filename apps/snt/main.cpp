@@ -34,6 +34,7 @@ Modules:
   mcp       Expose DIPL and PUQ tools through Model Context Protocol
   format    Format DIPL source files
   validate  Validate DIPL files and DIPfile projects
+  lint      Check evaluated DIPL for advisory issues
 
 Run 'snt <module> --help' for module-specific commands.
 )";
@@ -53,6 +54,15 @@ int main(int argc, char* argv[]) {
     if (argc > 1 && std::string(argv[1]) == "validate") {
         try {
             return module_validate(argc, argv);
+        } catch (const std::exception& error) {
+            std::cerr << error.what() << '\n';
+            return 2;
+        }
+    }
+
+    if (argc > 1 && std::string(argv[1]) == "lint") {
+        try {
+            return module_lint(argc, argv);
         } catch (const std::exception& error) {
             std::cerr << error.what() << '\n';
             return 2;

@@ -1,0 +1,7 @@
+# Valid DIPL; enable the optional lint rules in DIPfile to see both findings.
+$schema spare
+  value int = 1
+
+model
+  active int = 1
+    ?requires "model.missing"
