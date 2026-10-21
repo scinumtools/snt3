@@ -1,3 +1,6 @@
+/** @file
+ * @brief Viewer semantic inspection and source panels.
+ */
 #ifndef SNT_VIEW_INSPECTOR_VIEW_H
 #define SNT_VIEW_INSPECTOR_VIEW_H
 

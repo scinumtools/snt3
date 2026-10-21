@@ -7,6 +7,10 @@ if(NOT ENABLE_SNT_REPORT)
 endif()
 add_executable(${EXEC_NAME} ${EXEC_FILES} )
 add_subdirectory(../snt-hub ${CMAKE_CURRENT_BINARY_DIR}/hub)
+if(ENABLE_SNT_MCP)
+  target_compile_definitions(snt PRIVATE ENABLE_SNT_MCP)
+  add_subdirectory(../snt-mcp ${CMAKE_CURRENT_BINARY_DIR}/mcp)
+endif()
 
 target_include_directories(${EXEC_NAME}
   PRIVATE

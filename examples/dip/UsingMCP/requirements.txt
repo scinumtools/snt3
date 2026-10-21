@@ -1,0 +1,2 @@
+# Client only. The SNT server is native C++ and does not import this package.
+mcp==2.3.0

@@ -1,3 +1,6 @@
+/** @file
+ * @brief Read-only source buffers and syntax highlighting.
+ */
 #ifndef SNT_VIEW_SOURCE_VIEW_H
 #define SNT_VIEW_SOURCE_VIEW_H
 

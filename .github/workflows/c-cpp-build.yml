@@ -151,8 +151,22 @@ jobs:
         if: runner.os != 'Windows'
         run: ./setup.sh -t
 
+      - name: Test native MCP over HTTP (Linux/macOS)
+        if: runner.os != 'Windows'
+        env:
+          SNT_MCP_TEST_HTTP: "1"
+        run: |
+          python apps/snt-mcp/tests/test_mcp.py build/bin/snt
+
       - name: Test (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: ./setup.sh -t
+
+      - name: Test native MCP over HTTP (Windows)
+        if: runner.os == 'Windows'
+        env:
+          SNT_MCP_TEST_HTTP: "1"
+        run: |
+          python apps/snt-mcp/tests/test_mcp.py build/bin/snt.exe
         

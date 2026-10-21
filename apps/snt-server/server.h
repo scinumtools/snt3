@@ -1,3 +1,6 @@
+/** @file
+ * @brief REST route registration, input publication, and response helpers.
+ */
 #ifndef SNT_SERVER_H
 #define SNT_SERVER_H
 

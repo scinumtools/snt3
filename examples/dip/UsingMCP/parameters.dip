@@ -1,0 +1,22 @@
+# Illustrative channel-flow setup. The Reynolds limit is a model constraint,
+# not a substitute for choosing an appropriate physical model for a real system.
+fluid
+  density float = 1000 kg/m3
+    ?descr "Fluid density"
+    !condition ({.} > 0 kg/m3)
+  viscosity float = 0.001 Pa*s
+    ?descr "Dynamic viscosity"
+    !condition ({.} > 0 Pa*s)
+geometry
+  diameter float = 0.01 m
+    ?descr "Hydraulic diameter used by this example"
+    !condition ({.} > 0 m)
+flow
+  velocity float = 0.1 m/s
+    ?descr "Mean inlet velocity"
+    !tags ["input", "flow"]
+    !condition ({.} > 0 m/s)
+  reynolds float = ({?fluid.density} * {?flow.velocity} * {?geometry.diameter} / {?fluid.viscosity})
+    ?descr "Reynolds number; the example requires a value below 2300"
+    !tags ["derived", "flow"]
+    !condition ({.} < 2300)

@@ -1,3 +1,6 @@
+/** @file
+ * @brief Viewer dependency graph state and rendering.
+ */
 #ifndef SNT_VIEW_GRAPH_VIEW_H
 #define SNT_VIEW_GRAPH_VIEW_H
 

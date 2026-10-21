@@ -1,17 +1,13 @@
 #include "server.h"
 
+#include "../service_support.h"
+
 #include <exception>
 #include <iostream>
 #include <mutex>
 #include <stdexcept>
 
 namespace snt::server {
-
-    namespace {
-
-        std::mutex api_mutex;
-
-    } // namespace
 
     std::string json_escape(const std::string_view value) {
         std::string escaped;
@@ -99,7 +95,7 @@ namespace snt::server {
 
     void handle_response(httplib::Response& response, const std::function<void()>& handler) {
         try {
-            std::lock_guard<std::mutex> lock(api_mutex);
+            std::lock_guard<std::mutex> lock(app::api_mutex);
             handler();
         } catch (const std::exception& exception) {
             response.status = 400;

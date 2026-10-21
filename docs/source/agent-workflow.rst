@@ -38,7 +38,10 @@ The example below uses
 Replace that path with your own ``DIPfile`` or DIPL file. CLI commands return
 JSON for use by both applications and agents; :doc:`Python <integrations/python>`
 and :doc:`C++ <modules/dip/inspection>` expose the same underlying inspection
-and preview operations.
+and preview operations. MCP-capable clients can use the native
+:doc:`MCP integration <integrations/mcp>` for the same checks, then create
+immutable candidates and retrieve their exports and reports. The runnable
+``examples/dip/UsingMCP`` example demonstrates that protocol workflow.
 
 1. Inspect the evaluated model
 ------------------------------
@@ -129,11 +132,15 @@ Alternatively, edit the DIPL source itself or use its ``$override`` block.
 See :doc:`DIPfile projects <modules/dip/projects>` for the project layout.
 Evaluate the resulting inputs again for a report, :doc:`static generation
 <modules/dip/generation>`, or a :doc:`project-specific adapter
-<modules/dip/adapters>`. At present, preview discards its candidate after
-returning the result. SNT does not yet provide an approval action that retains
-and exports that exact validated candidate or checks whether source files
-changed between preview and export. Re-evaluate the final inputs before using
-generated files.
+<modules/dip/adapters>`. Preview discards its candidate after returning the
+result, so re-evaluate final inputs before using generated files.
+
+For an MCP workflow, ``dipl_snapshot`` validates and retains an immutable
+candidate with the accepted overrides. Subsequent inspection, comparison,
+export, and report calls can use that candidate's identifier. Snapshot creation
+reads current sources again; it is not an approval action that retains the
+previous preview or locks source files between calls. See
+:doc:`integrations/mcp` for the consistency and artifact-lifetime details.
 
 This workflow is useful without an AI assistant: an editor, CI job, or script
 can use the same inspection and preview commands. SNT performs deterministic

@@ -9,6 +9,7 @@ This directory contains Docker images for **SciNumTools3**.
 | `python/` | Ready-to-use Python environment with SciNumTools3 installed.               |
 | `dev/`    | Development environment for building, testing, and modifying SciNumTools3. |
 | `rest/`   | REST API server exposing SciNumTools3 functionality.                       |
+| `mcp/`    | MCP over HTTP or stdio, reusing the REST image's SNT executable.           |
 
 ---
 
@@ -139,6 +140,20 @@ file to publish an already evaluated environment.
 ---
 
 # Notes
+
+For MCP clients, build the REST image above, then:
+
+```bash
+docker build -f packaging/docker/mcp/Dockerfile -t scinumtools3-mcp .
+docker run --rm -p 127.0.0.1:8081:8081 \
+    -v "$PWD/model:/data:ro" scinumtools3-mcp \
+    --transport streamable-http --address 0.0.0.0 --project model=/data/DIPfile
+```
+
+The MCP endpoint is `http://localhost:8081/mcp`. Docker arguments replace the
+default `CMD`, so include the transport and bind address when adding projects.
+See [the MCP adapter guide](../../apps/snt-mcp/README.md) for stdio configuration,
+available tools, and access controls. The REST image remains a separate service.
 
 * Always execute `docker build` from the repository root.
 * The development image does **not** contain the SciNumTools3 sources. Instead, the repository is mounted into the container, allowing changes made on the host to be immediately visible inside the container without rebuilding the image.

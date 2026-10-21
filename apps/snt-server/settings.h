@@ -1,3 +1,6 @@
+/** @file
+ * @brief Default REST service address and port.
+ */
 #ifndef SNT_SERVER_SETTINGS_H
 #define SNT_SERVER_SETTINGS_H
 

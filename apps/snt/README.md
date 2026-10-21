@@ -29,7 +29,12 @@ For more help and examples use the following:
 snt -h
 snt puq -h
 snt dip -h
+snt mcp -h
 ```
+
+The optional [MCP adapter](../snt-mcp/README.md) exposes DIPL inspection,
+override previews, exports, reports, and PUQ operations to AI clients through
+`snt mcp`, using stdio or Streamable HTTP.
 
 For configure-time build switches, use the [DIPL CMake integration](../../bindings/cmake/README.md).
 The CLI's `--value` mode returns a single unitless scalar for scripts:

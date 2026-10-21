@@ -1,3 +1,6 @@
+/** @file
+ * @brief Viewer object browser rendering.
+ */
 #ifndef SNT_VIEW_BROWSER_VIEW_H
 #define SNT_VIEW_BROWSER_VIEW_H
 

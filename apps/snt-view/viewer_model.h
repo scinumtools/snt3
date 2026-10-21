@@ -1,3 +1,6 @@
+/** @file
+ * @brief Viewer environment ownership, browser hierarchy, and navigation.
+ */
 #ifndef SNT_VIEW_VIEWER_MODEL_H
 #define SNT_VIEW_VIEWER_MODEL_H
 

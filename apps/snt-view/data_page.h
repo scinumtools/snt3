@@ -1,3 +1,6 @@
+/** @file
+ * @brief Bounded array and table data retrieval for the viewer.
+ */
 #ifndef SNT_VIEW_DATA_PAGE_H
 #define SNT_VIEW_DATA_PAGE_H
 

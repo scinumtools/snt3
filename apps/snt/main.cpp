@@ -31,12 +31,22 @@ Modules:
   server  REST API server (optional build feature)
   view    Read-only parameter browser (optional build feature)
   hub     Install and prepare pinned code examples
+  mcp     Expose DIPL and PUQ tools through Model Context Protocol
 
 Run 'snt <module> --help' for module-specific commands.
 )";
 }
 
 int main(int argc, char* argv[]) {
+
+    if (argc > 1 && std::string(argv[1]) == "mcp") {
+#ifdef ENABLE_SNT_MCP
+        return module_mcp(argc, argv);
+#else
+        std::cerr << "MCP support is not included in this build. Configure with ENABLE_SNT_MCP=ON.\n";
+        return 1;
+#endif
+    }
 
     // Server arguments have their own parser; pass through without reinterpreting them.
     if (argc > 1 && std::string(argv[1]) == "server") {

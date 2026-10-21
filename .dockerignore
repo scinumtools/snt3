@@ -3,6 +3,8 @@
 build/
 build-*/
 docs/build/
+**/CMakeFiles/
+**/CMakeCache.txt
 
 # Local environments and generated Python artifacts are not source inputs.
 .venv/

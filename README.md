@@ -99,6 +99,11 @@ The current tools let an assistant or script [list and describe](https://scinumt
 parameters, then preview proposed overrides as JSON.
 The same operations are available through the [C++ inspection API](https://scinumtools.github.io/snt3/modules/dip/inspection.html#cpp-semantic-interface)
 and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.html#python-semantic-interface).
+
+The native [`snt mcp` interface](docs/source/integrations/mcp.rst)
+lets AI agents validate, compare, and export DIPL candidates.
+Try the runnable [UsingMCP example](examples/dip/UsingMCP).
+
 ## Features
 
 - **Unit-aware quantities:**
@@ -124,7 +129,7 @@ and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.htm
 - **One definition, many entry points:**
   Use the same semantics from C/C++17, Python, command line, CMake, and the
   optional local REST service; see the
-  [integration guides](https://scinumtools.github.io/snt3/integrations/index.html).
+  [integration guides](https://scinumtools.github.io/snt3/).
 
 ## Interfaces
 
@@ -157,11 +162,14 @@ and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.htm
 - **REST API server:**
   [Local HTTP access](https://scinumtools.github.io/snt3/integrations/rest.html)
   to the command-oriented PUQ and DIP API.
+- **MCP for AI agents:**
+  [Native `snt mcp` server](docs/source/integrations/mcp.rst)
+  exposing DIPL and PUQ tools over stdio or Streamable HTTP.
 - **Docker:**
   Reproducible [Python environment](https://scinumtools.github.io/snt3/integrations/docker.html#python-environment)
   and [development environment](https://scinumtools.github.io/snt3/integrations/docker.html#development-environment).
 
-See the [integration overview](https://scinumtools.github.io/snt3/integrations/index.html)
+See the [documentation index](https://scinumtools.github.io/snt3/)
 for the complete usage guides.
 
 ## Quick example

@@ -1,3 +1,6 @@
+/** @file
+ * @brief Viewer data panel state and rendering.
+ */
 #ifndef SNT_VIEW_DATA_VIEW_H
 #define SNT_VIEW_DATA_VIEW_H
 

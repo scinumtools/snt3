@@ -1,3 +1,6 @@
+/** @file
+ * @brief Desktop viewer event-loop entry point.
+ */
 #ifndef SNT_VIEW_APPLICATION_H
 #define SNT_VIEW_APPLICATION_H
 

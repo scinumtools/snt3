@@ -34,7 +34,10 @@ approach and its path toward deeper integration. Today, scripts and agents
 can :ref:`discover and describe evaluated parameters and preview candidate
 overrides <cli-semantic-interface>` through versioned CLI JSON. The
 :doc:`inspection and preview workflow <agent-workflow>` shows the full
-review cycle and its current export boundary.
+review cycle. The native :doc:`MCP integration <integrations/mcp>` lets AI
+clients discover these operations, validate overrides, retain immutable
+candidates, compare them, and retrieve exports and reports. Try the runnable
+Python client in ``examples/dip/UsingMCP``; the MCP server itself is C++.
 
 .. toctree::
    :maxdepth: 2
@@ -78,6 +81,7 @@ review cycle and its current export boundary.
    integrations/viewer
    integrations/cmake
    integrations/rest
+   integrations/mcp
    integrations/docker
 
 .. toctree::

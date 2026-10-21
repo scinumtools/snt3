@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     ninja-build \
+    pkg-config \
     libhdf5-dev \
+    libcurl4-openssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/scinumtools3
@@ -26,6 +28,7 @@ RUN cmake -G Ninja -S . -B build \
     -DENABLE_EXEC_APPS_SNT=ON \
     -DENABLE_SNT_DMAP=OFF \
     -DENABLE_SNT_SERVER=ON \
+    -DENABLE_SNT_MCP=ON \
     -DENABLE_SNT_VIEW=OFF \
     && cmake --build build --target snt
 

@@ -141,9 +141,11 @@ message(STATUS "ENABLE_SNT_DMAP              ${ENABLE_SNT_DMAP}")
 # Server and viewer are optional modules of the main executable.
 option(ENABLE_SNT_SERVER "Enable snt server command support" "${ENABLE_EXEC_APPS_SNT}")
 message(STATUS "ENABLE_SNT_SERVER            ${ENABLE_SNT_SERVER}")
+option(ENABLE_SNT_MCP "Enable native snt mcp command support" "${ENABLE_EXEC_APPS_SNT}")
+message(STATUS "ENABLE_SNT_MCP               ${ENABLE_SNT_MCP}")
 option(ENABLE_SNT_VIEW "Enable snt view command support" OFF)
 message(STATUS "ENABLE_SNT_VIEW              ${ENABLE_SNT_VIEW}")
-if((ENABLE_SNT_SERVER OR ENABLE_SNT_VIEW OR ENABLE_SNT_DMAP) AND
+if((ENABLE_SNT_SERVER OR ENABLE_SNT_MCP OR ENABLE_SNT_VIEW OR ENABLE_SNT_DMAP) AND
    NOT (ENABLE_EXEC_APPS AND ENABLE_EXEC_APPS_SNT AND ENABLE_PUQ AND ENABLE_DIP AND ENABLE_API))
     message(FATAL_ERROR "snt modules require ENABLE_EXEC_APPS, ENABLE_EXEC_APPS_SNT, ENABLE_PUQ, ENABLE_DIP, and ENABLE_API.")
 endif()

@@ -1,3 +1,6 @@
+/** @file
+ * @brief Source highlighting modes used by the viewer.
+ */
 #ifndef SNT_VIEW_SOURCE_FORMAT_H
 #define SNT_VIEW_SOURCE_FORMAT_H
 

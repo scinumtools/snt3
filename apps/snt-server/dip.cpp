@@ -1,3 +1,5 @@
+#include "../comparison_json.h"
+#include "../service_support.h"
 #include "server.h"
 #include "snt/api/dip_parse.h"
 
@@ -7,7 +9,6 @@
 #include <iterator>
 #include <limits>
 #include <map>
-#include <random>
 #include <snt/api/dip_compare.h>
 #include <snt/api/dip_report.h>
 #include <sstream>
@@ -34,31 +35,11 @@ namespace snt::server {
 
         class ProjectBundle {
           private:
-            std::filesystem::path directory;
+            app::TemporaryDirectory temporary;
             std::unordered_set<std::string> files;
 
-            static std::filesystem::path create_directory() {
-                std::random_device random;
-                const auto temporary = std::filesystem::temp_directory_path();
-                for (size_t attempt = 0; attempt < 32; ++attempt) {
-                    const auto candidate =
-                        temporary / ("snt-server-" + std::to_string(random()) + "-" + std::to_string(random()));
-                    std::error_code error;
-                    if (std::filesystem::create_directory(candidate, error))
-                        return candidate;
-                    if (error)
-                        throw std::filesystem::filesystem_error("create_directory", candidate, error);
-                }
-                throw std::runtime_error("Unable to create a temporary directory for the DIP project bundle.");
-            }
-
           public:
-            ProjectBundle() : directory(create_directory()) {}
-
-            ~ProjectBundle() {
-                std::error_code error;
-                std::filesystem::remove_all(directory, error);
-            }
+            ProjectBundle() = default;
 
             ProjectBundle(const ProjectBundle&) = delete;
             ProjectBundle& operator=(const ProjectBundle&) = delete;
@@ -68,7 +49,7 @@ namespace snt::server {
                 if (!files.insert(key).second)
                     throw std::invalid_argument("Each bundle file may be uploaded only once: " + key);
 
-                const auto path = directory / relative_path;
+                const auto path = temporary.path / relative_path;
                 std::error_code error;
                 std::filesystem::create_directories(path.parent_path(), error);
                 if (error)
@@ -82,8 +63,8 @@ namespace snt::server {
                     throw std::runtime_error("Unable to write uploaded bundle file: " + key);
             }
 
-            std::filesystem::path project_file() const { return directory / "DIPfile"; }
-            std::filesystem::path output_file(const std::string_view name) const { return directory / name; }
+            std::filesystem::path project_file() const { return temporary.path / "DIPfile"; }
+            std::filesystem::path output_file(const std::string_view name) const { return temporary.path / name; }
         };
 
         std::filesystem::path add_project_bundle(const httplib::Request& request, ProjectBundle& bundle) {
@@ -243,41 +224,6 @@ namespace snt::server {
             return static_cast<std::size_t>(count);
         }
 
-        std::string comparison_json(const dip::ComparisonResult& result, std::size_t max_details) {
-            std::ostringstream out;
-            out << "{\"scope\":\"" << (result.scope == dip::ComparisonScope::Full ? "full" : "effective")
-                << "\",\"equal\":" << (result.equal() ? "true" : "false") << ",\"added\":" << result.added
-                << ",\"removed\":" << result.removed << ",\"changed\":" << result.changed << ",\"differences\":[";
-            const auto count = std::min(max_details, result.differences.size());
-            for (std::size_t i = 0; i < count; ++i) {
-                const auto& difference = result.differences[i];
-                if (i)
-                    out << ',';
-                out << "{\"path\":\"" << json_escape(difference.path) << "\",\"category\":\""
-                    << json_escape(difference.category) << "\",\"kind\":\""
-                    << (difference.kind == dip::DifferenceKind::Added     ? "added"
-                        : difference.kind == dip::DifferenceKind::Removed ? "removed"
-                                                                          : "changed")
-                    << "\",\"fields\":[";
-                for (std::size_t j = 0; j < difference.fields.size(); ++j) {
-                    if (j)
-                        out << ',';
-                    out << '"' << json_escape(difference.fields[j]) << '"';
-                }
-                out << "],\"before\":\"" << json_escape(difference.before) << "\",\"after\":\""
-                    << json_escape(difference.after) << "\",\"changed_elements\":" << difference.changed_elements
-                    << ",\"example_indices\":[";
-                for (std::size_t j = 0; j < difference.example_indices.size(); ++j) {
-                    if (j)
-                        out << ',';
-                    out << difference.example_indices[j];
-                }
-                out << "]}";
-            }
-            out << "],\"omitted\":" << result.differences.size() - count << "}\n";
-            return out.str();
-        }
-
     } // namespace
 
     void register_dip_routes(httplib::Server& server) {
@@ -306,7 +252,7 @@ namespace snt::server {
                 if (format == "text")
                     response.set_content(api::render_dip_comparison(result, max_details), "text/plain");
                 else
-                    response.set_content(comparison_json(result, max_details), "application/json");
+                    response.set_content(app::comparison_json(result, max_details).dump() + "\n", "application/json");
             });
         });
 #ifdef SNT_ENABLE_REPORT

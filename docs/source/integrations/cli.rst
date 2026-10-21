@@ -23,6 +23,13 @@ Once the executable is on your ``PATH``, inspect the available commands:
    snt dip -h
    snt report -h
    snt hub -h
+   snt mcp -h
+
+Model Context Protocol
+----------------------
+
+Use ``snt mcp`` to connect AI agents through the Model Context Protocol.
+See :doc:`mcp` for setup, capabilities, examples, and Docker deployment.
 
 Quantities and units
 --------------------
