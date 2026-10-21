@@ -47,3 +47,18 @@ if(NOT status EQUAL 0 OR NOT actual STREQUAL "first int = 1\n\nsecond int = 2\n"
   string(HEX "${actual}" actual_hex)
   message(FATAL_ERROR "Standalone formatter defaults failed: ${err}; output_hex=${actual_hex}")
 endif()
+
+# Stdout must preserve CRLF input exactly, including on Windows where the C
+# runtime otherwise translates every LF written through a text-mode stream.
+set(crlf "${TEST_DIR}/../standalone-formatter-crlf.dip")
+set(crlf_output "${TEST_DIR}/../standalone-formatter-crlf-output.dip")
+set(crlf_expected "${TEST_DIR}/../standalone-formatter-crlf-expected.dip")
+file(WRITE "${crlf}" "first int=1\r\nsecond int=2\r\n")
+file(WRITE "${crlf_expected}" "first int = 1\r\n\r\nsecond int = 2\r\n")
+execute_process(COMMAND "${SNT_EXECUTABLE}" format "${crlf}"
+  RESULT_VARIABLE status OUTPUT_FILE "${crlf_output}" ERROR_VARIABLE err)
+file(SHA256 "${crlf_output}" actual_hash)
+file(SHA256 "${crlf_expected}" expected_hash)
+if(NOT status EQUAL 0 OR NOT actual_hash STREQUAL expected_hash)
+  message(FATAL_ERROR "CRLF formatter stdout changed line endings: ${err}")
+endif()

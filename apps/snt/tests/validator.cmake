@@ -73,7 +73,10 @@ execute_process(COMMAND "${SNT_EXECUTABLE}" validate --json "${manifest}"
   RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
 string(JSON project_count LENGTH "${out}" diagnostics)
 string(JSON project_source GET "${out}" diagnostics 0 location source)
-if(NOT status EQUAL 1 OR NOT project_count EQUAL 2 OR NOT project_source STREQUAL "${multiple}")
+file(TO_CMAKE_PATH "${project_source}" project_source_normalized)
+file(TO_CMAKE_PATH "${multiple}" multiple_normalized)
+if(NOT status EQUAL 1 OR NOT project_count EQUAL 2 OR
+   NOT "${project_source_normalized}" STREQUAL "${multiple_normalized}")
   message(FATAL_ERROR "Project code syntax errors were not collected: ${out} ${err}")
 endif()
 
@@ -97,8 +100,10 @@ execute_process(COMMAND "${SNT_EXECUTABLE}" validate --json "${invalid_settings_
   RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
 string(JSON invalid_setting_line GET "${out}" diagnostics 0 location line)
 string(JSON invalid_setting_source GET "${out}" diagnostics 0 location source)
+file(TO_CMAKE_PATH "${invalid_setting_source}" invalid_setting_source_normalized)
+file(TO_CMAKE_PATH "${invalid_settings_dir}/DIPfile" invalid_setting_expected_normalized)
 if(NOT status EQUAL 1 OR NOT invalid_setting_line EQUAL 2 OR
-   NOT invalid_setting_source STREQUAL "${invalid_settings_dir}/DIPfile" OR
+   NOT "${invalid_setting_source_normalized}" STREQUAL "${invalid_setting_expected_normalized}" OR
    NOT out MATCHES "Invalid validation setting")
   message(FATAL_ERROR "Invalid DIPfile validation limit was not rejected: ${out} ${err}")
 endif()

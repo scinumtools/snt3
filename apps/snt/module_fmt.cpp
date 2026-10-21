@@ -1,5 +1,6 @@
 #include "main.h"
 
+#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -8,6 +9,10 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 namespace {
     std::string read_file(const std::filesystem::path& path) {
@@ -58,7 +63,14 @@ int module_fmt(int argc, char* argv[]) {
                 throw std::runtime_error("Cannot write DIPL file: " + path.string());
         }
     }
-    if (!check && !write)
+    if (!check && !write) {
+#ifdef _WIN32
+        // The formatter preserves the input's line endings. Windows text-mode
+        // stdout would silently translate each LF and change those bytes.
+        if (_setmode(_fileno(stdout), _O_BINARY) == -1)
+            throw std::runtime_error("Cannot set binary stdout for formatted DIPL");
+#endif
         std::cout << snt::api::format_dip_file(files.front());
+    }
     return check && changed ? 1 : 0;
 }
