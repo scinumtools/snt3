@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
+#include <string>
 
 namespace snt::mcp {
     using Json = nlohmann::json; ///< JSON values shared by MCP requests and structured results.

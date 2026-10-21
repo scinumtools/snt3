@@ -8,6 +8,8 @@
 #include <mutex>
 #include <random>
 #include <stdexcept>
+#include <string>
+#include <system_error>
 #include <utility>
 
 namespace snt::app {
