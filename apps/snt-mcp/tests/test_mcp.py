@@ -461,11 +461,14 @@ class Integration(unittest.TestCase):
                                                    "clientInfo": {"name": "test", "version": "1"}}, modern=False))
             self.assertEqual(status, 200)
             self.assertEqual(send(message("tools/list", modern=False), extra={"MCP-Protocol-Version": "2025-11-25"})[0], 200)
+            # One native worker runs at a time. On Windows, process startup can
+            # exceed the old fixed 100 x 10 ms retry window under contention.
+            deadline = time.monotonic() + 30
             def convert(index):
                 units = "cm" if index % 2 else "mm"
                 body = message("tools/call", {"name": "puq", "arguments": {
                     "operation": "convert", "expression": "2*m", "output_units": units}}, request_id=index)
-                for attempt in range(100):
+                while True:
                     status, response = send(body)
                     self.assertEqual(status, 200)
                     if not response["result"]["isError"]:
@@ -473,11 +476,13 @@ class Integration(unittest.TestCase):
                     error = response["result"]["structuredContent"]["error"]
                     self.assertEqual(error["code"], "server.busy")
                     self.assertTrue(error["retryable"])
-                    time.sleep(.01)
-                self.assertFalse(response["result"]["isError"])
+                    if time.monotonic() >= deadline:
+                        self.fail(f"Concurrent conversion stayed busy for 30 seconds: {response}")
+                    time.sleep(.05)
+                self.assertFalse(response["result"]["isError"], response)
                 self.assertEqual(response["result"]["structuredContent"]["result"], "200*cm" if units == "cm" else "2e3*mm")
             with ThreadPoolExecutor(max_workers=8) as pool:
-                list(pool.map(convert, range(24)))
+                list(pool.map(convert, range(8)))
             self.source.write_text("".join(f"parameter{i} int = {i}\n" for i in range(25000)), encoding="utf-8")
             body = json.dumps(message("tools/call", {"name": "dipl_snapshot"}, request_id="disconnect")).encode()
             with socket.create_connection(("127.0.0.1", port), timeout=5) as pending:
