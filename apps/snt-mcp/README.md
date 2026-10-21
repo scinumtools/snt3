@@ -25,7 +25,9 @@ build/bin/snt mcp --transport streamable-http --project flow=examples/dip/UsingM
 
 Connect to `http://127.0.0.1:8081/mcp`. Multiple `--project NAME=PATH` arguments
 publish multiple sources or saved DIPH5 inputs. `--input PATH` names an input
-`default`. HTTP is intended for trusted clients; it has no built-in authentication.
+`default`. For remote machine-to-machine access, use an owner-only token file
+with `--auth-token-file` and put an HTTPS reverse proxy in front of the HTTP
+listener. Every token holder has access to all published inputs and artifacts.
 
 Try [examples/dip/UsingMCP](../../examples/dip/UsingMCP) for a practical,
 verified workflow using the official Python SDK **as a client only**. It checks

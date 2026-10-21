@@ -214,15 +214,37 @@ ordinary HTTP integrations can continue using :doc:`REST <rest>` separately.
 The adapters reuse the native API, comparison serialization, temporary-directory
 helper, and cpp-httplib dependency setup.
 
+For private machine-to-machine access, add ``--auth-token-file snt-http.token``
+and send ``Authorization: Bearer TOKEN`` with every HTTP request. Generate the
+owner-only file with ``umask 077; openssl rand -hex 32 > snt-http.token``.
+Non-loopback binds require this option. Keep the HTTP backend reachable only
+from an HTTPS reverse proxy; restart to rotate the token. The one token is a
+shared service identity with access to every published project and artifact.
+It is not per-client isolation or MCP OAuth interoperability. Stdio requires
+no token. For example, a Caddy gateway on the same host can use:
+
+.. code-block:: text
+
+   mcp.example.org {
+       reverse_proxy 127.0.0.1:8081
+   }
+
+The proxy is a deployment choice, not a SNT build dependency. Keep port
+``8081`` unavailable to remote clients except through the gateway.
+
 The Docker image reuses the executable built by the REST image:
 
 .. code-block:: bash
 
    docker build -f packaging/docker/rest/Dockerfile -t scinumtools3-rest .
    docker build -f packaging/docker/mcp/Dockerfile -t scinumtools3-mcp .
+   umask 077; openssl rand -hex 32 > snt-http.token
    docker run --rm -p 127.0.0.1:8081:8081 \
+     --user "$(id -u):$(id -g)" \
+     -v "$PWD/snt-http.token:/run/snt-http.token:ro" \
      -v "$PWD/examples/dip/UsingMCP:/data:ro" scinumtools3-mcp \
-     --transport streamable-http --address 0.0.0.0 --project flow=/data/DIPfile
+     --transport streamable-http --address 0.0.0.0 \
+     --auth-token-file /run/snt-http.token --project flow=/data/DIPfile
 
 For a client-managed container using stdio, use ``docker run --rm -i`` with
 the same mount and ``--transport stdio --project flow=/data/DIPfile``. Do not
@@ -231,11 +253,11 @@ include transport and bind address when configuring an HTTP service.
 
 The service is intended for trusted clients and projects. Named environments
 are not a filesystem sandbox: DIPL may read referenced files with the service
-user's permissions. HTTP has no built-in authentication or client isolation;
-use loopback or an authenticated reverse proxy. Browser ``Origin`` headers
+user's permissions. Browser ``Origin`` headers
 must match the configured loopback origins or an explicit
 ``--allow-origin https://your-client.example``. The image runs as a non-root
-user; mount only the data it should access.
+user by default; the example selects the token file owner's UID so it can read
+the owner-only secret. Mount only the data the service should access.
 
 Protocol coverage and tests
 ---------------------------

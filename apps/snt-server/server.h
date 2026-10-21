@@ -48,8 +48,13 @@ namespace snt::server {
     void register_published_routes(httplib::Server& server, const std::vector<PublishedInput>& inputs);
     /** Expose the REST OpenAPI description. */
     void register_openapi_route(httplib::Server& server);
-    /** Serve the REST API at the requested address and port, returning a process exit status. */
-    int run(std::string_view address, int port, const std::vector<PublishedInput>& inputs = {});
+    /** Serve REST at the requested address and port; an optional token file protects every HTTP route. */
+    int run(
+        std::string_view address,
+        int port,
+        const std::vector<PublishedInput>& inputs = {},
+        const std::string& auth_token_file = {}
+    );
 
 } // namespace snt::server
 

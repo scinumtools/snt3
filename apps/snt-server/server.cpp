@@ -1,6 +1,7 @@
 #include "server.h"
 
 #include "../service_support.h"
+#include "../http_security.h"
 
 #include <exception>
 #include <iostream>
@@ -107,9 +108,19 @@ namespace snt::server {
         handle_response(response, [&] { response.set_content(json_result(handler()), "application/json"); });
     }
 
-    int run(const std::string_view address, const int port, const std::vector<PublishedInput>& inputs) {
+    int run(
+        const std::string_view address,
+        const int port,
+        const std::vector<PublishedInput>& inputs,
+        const std::string& auth_token_file
+    ) {
         try {
+            const http::Security security(address, port, auth_token_file);
             httplib::Server server;
+            server.set_pre_routing_handler([&](const httplib::Request& request, httplib::Response& response) {
+                return security.reject(request, response) ? httplib::Server::HandlerResponse::Handled
+                                                          : httplib::Server::HandlerResponse::Unhandled;
+            });
             server.Get("/", [](const httplib::Request&, httplib::Response& response) {
                 response.set_content(
                     R"({"service":"SNT REST API","endpoints":["/snt/puq/eval","/snt/puq/convert","/snt/puq/info","/snt/puq/list","/snt/dip/parse","/snt/dip/compare","/snt/dip/report","/snt/dip/environments","/snt/dip/environment"]}
@@ -128,7 +139,7 @@ namespace snt::server {
                 return 1;
             }
         } catch (const std::exception& exception) {
-            std::cerr << "Unable to load published environment: " << exception.what() << '\n';
+            std::cerr << "Unable to start SNT REST API server: " << exception.what() << '\n';
             return 1;
         }
         return 0;

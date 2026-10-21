@@ -29,7 +29,7 @@ Usage:
 Description:
   Serve the SNT API over HTTP. By default, listen on 127.0.0.1:8080.
   Published DIP environments are loaded once at startup and served read-only.
-  Use external access controls when binding to a public address.
+  Non-loopback binding requires a protected token file and an HTTPS gateway.
 
 Options:
   -h, --help
@@ -38,6 +38,8 @@ Options:
       Listening address (default: 127.0.0.1).
   --port <port>
       Listening port from 1 to 65535 (default: 8080).
+  --auth-token-file <path>
+      Require a 64-character hex bearer token from an owner-only file.
   --project <name=path>
       Publish a DIPfile project under the given name. May be repeated.
   --diph5 <name=path>
@@ -72,6 +74,7 @@ Examples:
 int module_server(const int argc, char* argv[]) {
     int port = SERVER_PORT;
     std::string address(SERVER_ADDRESS);
+    std::string auth_token_file;
     std::vector<snt::server::PublishedInput> published_inputs;
     std::set<std::string> published_names;
     for (int argument = 1; argument < argc; ++argument) {
@@ -103,6 +106,14 @@ int module_server(const int argc, char* argv[]) {
             address = argv[argument];
             continue;
         }
+        if (option == "--auth-token-file") {
+            if (++argument == argc || std::string_view(argv[argument]).empty()) {
+                std::cerr << "Missing value for --auth-token-file.\n";
+                return 2;
+            }
+            auth_token_file = argv[argument];
+            continue;
+        }
         if (option == "--project" || option == "--diph5") {
             if (++argument == argc) {
                 std::cerr << "Missing value for " << option << ".\n";
@@ -129,5 +140,5 @@ int module_server(const int argc, char* argv[]) {
         return 2;
     }
 
-    return snt::server::run(address, port, published_inputs);
+    return snt::server::run(address, port, published_inputs, auth_token_file);
 }

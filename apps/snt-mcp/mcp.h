@@ -88,9 +88,13 @@ namespace snt::mcp {
 
     /** Serve newline-delimited JSON-RPC while accepting cancellation notifications during tool execution. */
     int run_stdio(Protocol& protocol);
-    /** Serve POST /mcp with cpp-httplib; reject browser origins outside the supplied allowlist. */
+    /** Serve POST /mcp with shared Host, Origin, and optional bearer-token checks. */
     int run_http(
-        Protocol& protocol, const std::string& address, int port, const std::vector<std::string>& allowed_origins
+        Protocol& protocol,
+        const std::string& address,
+        int port,
+        const std::vector<std::string>& allowed_origins,
+        const std::string& auth_token_file = {}
     );
 } // namespace snt::mcp
 #endif

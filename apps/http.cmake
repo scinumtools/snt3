@@ -25,3 +25,4 @@ if(WIN32)
 endif()
 
 target_include_directories(snt PRIVATE "${SNT_HTTPLIB_INCLUDE_DIR}")
+target_sources(snt PRIVATE "${PROJECT_SOURCE_DIR}/apps/http_security.cpp")

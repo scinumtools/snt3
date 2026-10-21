@@ -20,10 +20,28 @@ The server listens on ``127.0.0.1:8080`` by default. Pass ``--port PORT`` to
 choose another port, for example when the default is already occupied.
 ``--address ADDRESS`` changes the listening address; it is intended for
 container deployments, where ``0.0.0.0`` accepts connections from outside the
-container. ``--help`` shows the available program options. It returns JSON and
-has no authentication or authorization layer. Run it only for trusted local
-users unless a reverse proxy or equivalent deployment boundary supplies those
-controls.
+container. A non-loopback address requires ``--auth-token-file``. The same
+option can protect a loopback listener. The file must be owner-only (mode
+``0600`` on Unix) and contain one 64-character lowercase hex token. Generate
+one with ``umask 077; openssl rand -hex 32 > snt-http.token``. The token is
+read at startup; restart the server to rotate it. Every HTTP route, including
+``/`` and ``/openapi.json``, requires ``Authorization: Bearer TOKEN`` when the
+option is set. A single token grants the same access to every holder; there
+are no per-user or per-project permissions.
+
+For remote use, terminate HTTPS at a reverse proxy and keep the SNT listener
+reachable only from that proxy. A minimal Caddy site block is:
+
+.. code-block:: text
+
+   snt.example.org {
+       reverse_proxy 127.0.0.1:8080
+   }
+
+Start SNT with ``snt server --auth-token-file snt-http.token`` on the same host.
+Do not expose the backend port directly. The reverse proxy is a deployment
+choice, not a SNT build dependency. The local default needs no token and
+rejects non-loopback Host and browser Origin headers.
 
 OpenAPI document
 ----------------

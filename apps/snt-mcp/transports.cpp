@@ -1,4 +1,5 @@
 #include "mcp.h"
+#include "../http_security.h"
 
 #include <algorithm>
 #include <atomic>
@@ -94,23 +95,20 @@ namespace snt::mcp {
     } // namespace
 
     int run_http(
-        Protocol& protocol, const std::string& address, int port, const std::vector<std::string>& allowed_origins
+        Protocol& protocol,
+        const std::string& address,
+        int port,
+        const std::vector<std::string>& allowed_origins,
+        const std::string& auth_token_file
     ) {
+        const http::Security security(address, port, auth_token_file);
         httplib::Server server;
         server.set_payload_max_length(message_limit);
         server.set_read_timeout(30);
         server.set_write_timeout(30);
         server.set_pre_routing_handler([&](const httplib::Request& request, httplib::Response& response) {
-            if (request.path == "/mcp" && request.has_header("Origin")) {
-                const auto origin = request.get_header_value("Origin");
-                if (request.get_header_value_count("Origin") != 1 ||
-                    std::find(allowed_origins.begin(), allowed_origins.end(), origin) == allowed_origins.end()) {
-                    response.status = 403;
-                    response.set_content("Origin is not allowed.", "text/plain");
-                    return httplib::Server::HandlerResponse::Handled;
-                }
-            }
-            return httplib::Server::HandlerResponse::Unhandled;
+            return security.reject(request, response, allowed_origins) ? httplib::Server::HandlerResponse::Handled
+                                                                      : httplib::Server::HandlerResponse::Unhandled;
         });
         server.Post("/mcp", [&](const httplib::Request& request, httplib::Response& response) {
             if (!media_type(request.get_header_value("Content-Type"), "application/json")) {

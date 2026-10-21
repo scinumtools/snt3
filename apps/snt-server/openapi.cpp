@@ -12,6 +12,7 @@ namespace snt::server {
     "version": ")json" CODE_VERSION R"json(",
     "description": "PUEL evaluation and DIPL environment access. Mounted DIPL projects and DIPH5 environments are read-only startup inputs."
   },
+  "security": [{"serviceToken": []}, {}],
   "paths": {
     "/": {
       "get": {"summary": "Service information", "responses": {"200": {"description": "Service and endpoint list"}}}
@@ -148,6 +149,9 @@ namespace snt::server {
     }
   },
   "components": {
+    "securitySchemes": {
+      "serviceToken": {"type": "http", "scheme": "bearer", "description": "Required on every route when --auth-token-file is configured; a single token grants service-wide access."}
+    },
     "parameters": {
       "expression": {"name": "expression", "in": "query", "required": true, "schema": {"type": "string"}},
       "inputSystem": {"name": "input_system", "in": "query", "schema": {"type": "string"}},

@@ -324,7 +324,9 @@ There is one active tool execution at a time. server.busy is retryable. Executio
 limits stop native workers; cancellation publishes no partial artifacts.
 
 The server exposes files with its own permissions. It is intended for trusted
-projects and clients. HTTP authentication belongs in a reverse proxy. This MCP
+projects and clients. HTTP can require a service bearer token from an owner-only
+file; remote deployment also needs an HTTPS reverse proxy. Token holders share
+access to every published input and artifact. This MCP
 does not edit sources, launch simulations, or register host callbacks.
 )HELP";
         return text;
