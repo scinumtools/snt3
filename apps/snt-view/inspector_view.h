@@ -12,18 +12,21 @@ namespace snt::view {
 
     class SourceView;
 
+    /** Cache semantic inspection fields and source targets for a model selection. */
     struct InspectorCache {
-        std::string path;
-        std::size_t revision = 0;
-        bool valid = false;
-        std::vector<std::pair<const char*, std::string>> fields;
-        std::vector<std::string> reads;
-        std::vector<std::string> readers;
-        std::vector<std::string> schema_values;
-        std::vector<SourceTarget> source_targets;
-        std::string error;
+        std::string path;         ///< Selected browser object path.
+        std::size_t revision = 0; ///< Model revision used to populate these fields.
+        bool valid = false;       ///< Whether cached inspection data may be reused.
+        std::vector<std::pair<const char*, std::string>>
+            fields;                               ///< Display labels paired with formatted semantic values.
+        std::vector<std::string> reads;           ///< Paths read while evaluating the selected value.
+        std::vector<std::string> readers;         ///< Paths whose evaluation read the selected value.
+        std::vector<std::string> schema_values;   ///< Values associated with the selected schema.
+        std::vector<SourceTarget> source_targets; ///< Navigable source locations for the selection.
+        std::string error;                        ///< Inspection failure shown by the panel.
     };
 
+    /** Draw semantic details and source links, updating the source tab and scroll request on navigation. */
     void draw_inspector(
         ViewerModel& model,
         InspectorCache& cache,
@@ -32,6 +35,7 @@ namespace snt::view {
         bool& scroll_to_target,
         std::string& source_error
     );
+    /** Draw the loaded source buffer and honor a pending scroll-to-target request. */
     void draw_source_view(
         const ViewerModel& model, const SourceView& source, bool& scroll_to_target, const std::string& error
     );

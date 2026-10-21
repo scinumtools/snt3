@@ -3,7 +3,12 @@
 
 namespace snt::view {
 
-    enum class SourceFormat { DIPL, Plain, Table };
+    /** Select highlighting for a source buffer. */
+    enum class SourceFormat {
+        DIPL,  ///< Highlight DIPL syntax throughout the buffer.
+        Plain, ///< Display text without syntax highlighting.
+        Table  ///< Highlight the DIPL header before the table separator.
+    };
 
 } // namespace snt::view
 

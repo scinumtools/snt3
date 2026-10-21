@@ -8,8 +8,9 @@
 
 namespace snt::view {
 
-    using DataCells = std::vector<std::vector<std::string>>;
+    using DataCells = std::vector<std::vector<std::string>>; ///< Row-major display text for a bounded data page.
 
+    /** Read a bounded rectangular array slice. Other axes use fixed_indices; invalid axes or ranges throw. */
     DataCells read_array_page(
         const dip::Environment& environment,
         const std::string& path,
@@ -23,6 +24,7 @@ namespace snt::view {
         std::size_t column_limit
     );
 
+    /** Read a bounded table page as cell text; invalid starting coordinates or zero limits throw. */
     DataCells read_table_page(
         const dip::Environment& environment,
         const dip::TableInspection& table,

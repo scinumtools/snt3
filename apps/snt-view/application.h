@@ -3,6 +3,7 @@
 
 namespace snt::view {
     class ViewerModel;
+    /** Create the viewer window and run its event loop using the supplied model. */
     int run_application(ViewerModel& model);
 } // namespace snt::view
 
