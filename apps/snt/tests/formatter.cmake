@@ -1,4 +1,48 @@
 file(MAKE_DIRECTORY "${TEST_DIR}")
+
+# Compare files as bytes: execute_process(OUTPUT_VARIABLE) can change line
+# endings on Windows, so it cannot verify the formatter's stdout faithfully.
+function(assert_same_bytes expected_path actual_path description)
+  file(READ "${expected_path}" expected_hex HEX)
+  file(READ "${actual_path}" actual_hex HEX)
+  if(expected_hex STREQUAL actual_hex)
+    return()
+  endif()
+
+  file(READ "${expected_path}" expected_text)
+  file(READ "${actual_path}" actual_text)
+  foreach(name IN ITEMS expected actual)
+    string(REPLACE "\\" "\\\\" ${name}_text "${${name}_text}")
+    string(REPLACE "\r" "\\r" ${name}_text "${${name}_text}")
+    string(REPLACE "\n" "\\n" ${name}_text "${${name}_text}")
+    string(REPLACE "\t" "\\t" ${name}_text "${${name}_text}")
+  endforeach()
+
+  string(LENGTH "${expected_hex}" expected_length)
+  string(LENGTH "${actual_hex}" actual_length)
+  if(expected_length LESS actual_length)
+    set(common_length "${expected_length}")
+  else()
+    set(common_length "${actual_length}")
+  endif()
+  math(EXPR first_difference "${common_length} / 2")
+  if(common_length GREATER 0)
+    math(EXPR last_pair "${common_length} - 2")
+    foreach(index RANGE 0 ${last_pair} 2)
+      string(SUBSTRING "${expected_hex}" ${index} 2 expected_byte)
+      string(SUBSTRING "${actual_hex}" ${index} 2 actual_byte)
+      if(NOT expected_byte STREQUAL actual_byte)
+        math(EXPR first_difference "${index} / 2")
+        break()
+      endif()
+    endforeach()
+  endif()
+  message(FATAL_ERROR
+    "${description}; first differing byte: ${first_difference}\n"
+    "  expected: \"${expected_text}\" (hex: ${expected_hex})\n"
+    "  actual:   \"${actual_text}\" (hex: ${actual_hex})")
+endfunction()
+
 set(manifest "${TEST_DIR}/DIPfile")
 set(input "${TEST_DIR}/parameters.dip")
 file(WRITE "${manifest}" "format\n  blank_lines_between_nodes = 0\n  final_newline = true\n")
@@ -39,26 +83,48 @@ endif()
 
 # A standalone file outside any DIPfile tree uses the built-in defaults.
 set(standalone "${TEST_DIR}/../standalone-formatter.dip")
+set(standalone_written "${TEST_DIR}/../standalone-formatter-written.dip")
+set(standalone_output "${TEST_DIR}/../standalone-formatter-output.dip")
+set(standalone_expected "${TEST_DIR}/../standalone-formatter-expected.dip")
 file(WRITE "${standalone}" "first int=1\nsecond int=2\n")
+file(WRITE "${standalone_expected}" "first int = 1\n\nsecond int = 2\n")
+configure_file("${standalone}" "${standalone_written}" COPYONLY)
+execute_process(COMMAND "${SNT_EXECUTABLE}" format --write "${standalone_written}"
+  RESULT_VARIABLE status ERROR_VARIABLE err)
+if(NOT status EQUAL 0)
+  message(FATAL_ERROR "Standalone formatter --write failed: ${err}")
+endif()
+assert_same_bytes("${standalone_expected}" "${standalone_written}"
+  "Standalone formatter defaults failed")
 # Keep the former shorthand working for existing scripts without advertising it.
 execute_process(COMMAND "${SNT_EXECUTABLE}" fmt "${standalone}"
-  RESULT_VARIABLE status OUTPUT_VARIABLE actual ERROR_VARIABLE err)
-if(NOT status EQUAL 0 OR NOT actual STREQUAL "first int = 1\n\nsecond int = 2\n")
-  string(HEX "${actual}" actual_hex)
-  message(FATAL_ERROR "Standalone formatter defaults failed: ${err}; output_hex=${actual_hex}")
+  RESULT_VARIABLE status OUTPUT_FILE "${standalone_output}" ERROR_VARIABLE err)
+if(NOT status EQUAL 0)
+  message(FATAL_ERROR "Standalone formatter stdout failed: ${err}")
 endif()
+assert_same_bytes("${standalone_written}" "${standalone_output}"
+  "Standalone formatter stdout differs from --write")
 
-# Stdout must preserve CRLF input exactly, including on Windows where the C
-# runtime otherwise translates every LF written through a text-mode stream.
+# For CRLF input, stdout must match the formatter's binary --write output.
+# Windows text-mode stdout can otherwise add CR bytes to the result.
 set(crlf "${TEST_DIR}/../standalone-formatter-crlf.dip")
+set(crlf_written "${TEST_DIR}/../standalone-formatter-crlf-written.dip")
 set(crlf_output "${TEST_DIR}/../standalone-formatter-crlf-output.dip")
 set(crlf_expected "${TEST_DIR}/../standalone-formatter-crlf-expected.dip")
 file(WRITE "${crlf}" "first int=1\r\nsecond int=2\r\n")
 file(WRITE "${crlf_expected}" "first int = 1\r\n\r\nsecond int = 2\r\n")
+configure_file("${crlf}" "${crlf_written}" COPYONLY)
+execute_process(COMMAND "${SNT_EXECUTABLE}" format --write "${crlf_written}"
+  RESULT_VARIABLE status ERROR_VARIABLE err)
+if(NOT status EQUAL 0)
+  message(FATAL_ERROR "CRLF formatter --write failed: ${err}")
+endif()
+assert_same_bytes("${crlf_expected}" "${crlf_written}"
+  "CRLF formatter --write changed line endings or formatting")
 execute_process(COMMAND "${SNT_EXECUTABLE}" format "${crlf}"
   RESULT_VARIABLE status OUTPUT_FILE "${crlf_output}" ERROR_VARIABLE err)
-file(SHA256 "${crlf_output}" actual_hash)
-file(SHA256 "${crlf_expected}" expected_hash)
-if(NOT status EQUAL 0 OR NOT actual_hash STREQUAL expected_hash)
-  message(FATAL_ERROR "CRLF formatter stdout changed line endings: ${err}")
+if(NOT status EQUAL 0)
+  message(FATAL_ERROR "CRLF formatter stdout failed: ${err}")
 endif()
+assert_same_bytes("${crlf_written}" "${crlf_output}"
+  "CRLF formatter stdout differs from --write")
