@@ -100,9 +100,6 @@ SciNumTools is available as a vcpkg package:
 
    ./vcpkg install scinumtools3
 
-The local vcpkg port builds report support with the ``reports`` feature:
-``./vcpkg install 'scinumtools3[reports]'``. The feature fetches Brief++.
-
 On Windows, use ``bootstrap-vcpkg.bat`` instead of
 ``bootstrap-vcpkg.sh``.
 
@@ -131,11 +128,11 @@ package without the three features using:
 
    conan create . -o 'scinumtools3/*:with_server=False' -o 'scinumtools3/*:with_viewer=False' -o 'scinumtools3/*:with_reports=False'
 
-To put ``snt`` on ``PATH`` in a consuming project, add
-``scinumtools3/0.9.0`` under ``[tool_requires]`` in its ``conanfile.txt`` and
-generate ``VirtualBuildEnv``. A regular library requirement still provides
-the executable in the package's ``bin`` directory, but does not add that
-directory to the runtime environment.
+To put ``snt`` on ``PATH`` in a consuming project, add the versioned
+``scinumtools3`` package created above under ``[tool_requires]`` in its
+``conanfile.txt`` and generate ``VirtualBuildEnv``. A regular library
+requirement still provides the executable in the package's ``bin`` directory,
+but does not add that directory to the runtime environment.
 
 
 macOS / Homebrew

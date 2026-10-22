@@ -353,7 +353,7 @@ SciNumTools3.
 ## Development
 
 The repository contains the C++ sources, Python bindings, command-line
-applications, tests, examples, packaging recipes, and documentation.
+applications, tests, examples, packaging tools, and documentation.
 
 SciNumTools v3 is the compiled successor to the original
 [SciNumTools v2](https://github.com/scinumtools/snt2), with the same focus

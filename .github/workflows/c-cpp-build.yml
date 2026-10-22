@@ -14,7 +14,6 @@ on:
       - 'tests/**'
       - 'CMakeLists.txt'
       - 'pyproject.toml'
-      - 'packaging/vcpkg/**'
       - '.github/workflows/c-cpp-build.yml'
   pull_request:
     branches: [ "main" ]
@@ -28,7 +27,6 @@ on:
       - 'tests/**'
       - 'CMakeLists.txt'
       - 'pyproject.toml'
-      - 'packaging/vcpkg/**'
       - '.github/workflows/c-cpp-build.yml'
 
 jobs:
@@ -80,9 +78,6 @@ jobs:
 
       - name: Test x86 source
         run: ctest --test-dir build-x86 -C Release --output-on-failure
-
-      - name: Install x86 vcpkg port
-        run: vcpkg install scinumtools3:x86-windows --overlay-ports=packaging/vcpkg
 
   build:
     strategy:

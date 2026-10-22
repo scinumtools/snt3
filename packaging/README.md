@@ -4,74 +4,22 @@
 They use the precompiled GitHub release archives and also accept a local archive
 for offline cluster installations. See the installation guide for user commands.
 
-The Homebrew and vcpkg recipes build the libraries and unified `snt` executable,
-including `snt server`. They declare HDF5 and cpp-httplib dependencies explicitly;
-GitHub source archives do not contain Git submodule contents. The archive-based
-recipes can fetch the pinned header-only Brief++ source separately for DIP reports.
-The vcpkg port enables reports with the `reports` feature
-(`scinumtools3[reports]`); its default build omits Brief++ and report generation.
-Source builds use `ENABLE_SNT_REPORT`, which defaults to on when DIP is enabled.
-Local source builds can initialize `external/briefpp` or set
-`SNT_BRIEFPP_INCLUDE_DIR`. Server builds accept `SNT_HTTPLIB_INCLUDE_DIR` and
-require cpp-httplib 0.46.0 or newer. Homebrew, vcpkg, and Conan include the
-unified `snt` executable. The vcpkg and Conan packages enable `snt view`;
-Homebrew disables it. Conan's developer-only `snt dmap` command is disabled.
-Conda and PyPI package Python bindings without application commands. The vcpkg
-recipe fetches pinned Dear ImGui and GLFW sources because GitHub archives omit
-submodules. On Linux it builds GLFW's X11 backend and requires the system's
-OpenGL and X11 development libraries.
+`docker/` contains development, Python, REST, and MCP container images.
+The root `conanfile.py` packages the C++ libraries and `snt` executable.
+The `with_server`, `with_viewer`, and `with_reports` options select optional
+features. Consumers can declare the package as a `tool_requires` dependency
+and use `VirtualBuildEnv` to put `snt` on `PATH`.
 
-Conan packages the C++ libraries and executable, and propagates the HDF5
-C-library dependency to consumers. Create it from a checkout with the
-`external/briefpp`, `external/cpp-httplib`, `external/glfw`, and `external/imgui`
-submodules initialized for the corresponding enabled features. Building the viewer
-also requires the platform's OpenGL and window-system development libraries.
-The `with_server`, `with_viewer`, and `with_reports` Conan options default to
-`True`; disabling one omits its bundled dependency from the build and package.
-Consumers that need `snt` on `PATH` can declare the package as a
-`tool_requires` dependency and generate `VirtualBuildEnv`. Conda and PyPI
-package the Python bindings with application features disabled. Conda obtains
-HDF5 from its host environment and uses its runtime pinning.
-The development and Python Docker images install HDF5 development files; the REST
-image builds and starts `snt server`.
+Publishing a GitHub release runs the Release SNT CLI workflow. It attaches
+precompiled archives for Linux x86-64, macOS ARM64, and Windows x86-64 to the
+published release. The installers consume those archives. The `snt hub`
+command additionally needs Git and Python 3 for project adapters.
 
-## Preparing a release
-
-Publishing a GitHub release builds CLI archives for Linux x86_64, macOS arm64,
-and Windows x86_64 and attaches them to that release. To rebuild the executables
-for an existing published release, open **Actions → Release SNT CLI → Run workflow**
-and enter its exact tag, such as `v0.9.3`. The workflow checks that the tag matches
-the source version and replaces the CLI archives attached to that release.
-The archives contain the executable and a short runtime note; `snt hub` additionally
-needs Git and Python 3 for project adapters.
-
-Archive-based recipes retain their last published version and checksums until a
-new release archive is available. Do not change the version while retaining an
-old checksum, or use a locally generated archive's checksum for a GitHub URL.
-
-After publishing the intended Git tag, update all archive-based recipes together:
-
-```sh
-python3 packaging/update_release.py 0.9.0
-python3 packaging/update_release.py 0.9.0 --check
-```
-
-The command downloads the GitHub tag archive, checks its `CODE_VERSION` and unified `snt server` / `snt dmap` support, and
-computes SHA-256 and SHA-512 digests for Homebrew, vcpkg, and Conda. It updates the
-vcpkg manifest version as well. It does not publish packages or modify the project
-version. `--archive /path/to/downloaded.tar.gz` supports an already downloaded copy
-of the same GitHub archive. Download and validation failures leave recipes unchanged.
-
-Homebrew, vcpkg, and Conda are pinned to the published 0.9.0 archive with
-verified checksums. Conan and PyPI both read their version from `settings.env`.
-
-## Local checks
+Run the local installer checks with:
 
 ```sh
 python3 -m unittest discover -s packaging/tests
-ruby -c packaging/homebrew/scinumtools3.rb
 ```
 
-Before publishing, also build the recipes with their native package managers,
-verify `snt --version` and `snt server --help` for CLI packages, and import
-`scinumtools3` for Python packages. Docker builds require a running Docker daemon.
+The vcpkg, Homebrew, and conda-forge recipes are maintained outside this
+repository.
