@@ -54,8 +54,11 @@ has exactly one of ``file`` or ``string``.
    """
 
 Paths in ``filepath`` and ``file`` are interpreted relative to the directory
-containing the DIPfile. The contents of a ``string`` block are passed to DIP
-unchanged, so a root DIPL node inside the block must begin at column zero.
+containing the DIPfile. A ``$source`` declaration inside a ``code[].file``
+resolves its relative path from that DIPL file's directory; inside a
+``code[].string`` block, it resolves from the DIPfile's directory. The contents
+of a ``string`` block are passed to DIP unchanged, so a root DIPL node inside
+the block must begin at column zero.
 The ``schemas[]`` entries match host-code ``add_schema_file()`` and
 ``add_schema_string()``; ``overrides[]`` matches ``add_override_file()``.
 Override targets must exist in the evaluated model and may be specified only

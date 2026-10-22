@@ -422,7 +422,8 @@ namespace snt::dip {
     }
 
     ValueNode::ListType Environment::request_group(
-        const std::string& request, const RequestType rtype, const std::vector<std::string>& tags
+        const std::string& request, const RequestType rtype, const std::vector<std::string>& tags,
+        const std::string& target_prefix
     ) const {
         ValueNode::ListType new_nodes;
         switch (rtype) {
@@ -446,14 +447,28 @@ namespace snt::dip {
                 // if path is a root, select its children nodes
                 for (size_t i = 0; i < node_pool.size(); i++) {
                     ValueNode::PointerType vnode = node_pool.at(i);
-                    if (vnode && vnode->path.name.rfind(node_path_child, 0) == 0 &&
-                        vnode->path.name.size() > node_path_child.size()) {
+                    const bool child = vnode && vnode->path.name.rfind(node_path_child, 0) == 0 &&
+                                       vnode->path.name.size() > node_path_child.size();
+                    const bool item = vnode && !node_path.empty() && vnode->path.name.size() > node_path.size() &&
+                                      vnode->path.name.compare(0, node_path.size(), node_path) == 0 &&
+                                      vnode->path.name[node_path.size()] == SIGN_ARRAY_OPEN;
+                    if (child || item) {
                         // filter nodes based on tags
                         if (!tags.empty() && !hasIntersection(vnode->tags, tags))
                             continue;
                         record_dependency(source_name + "?" + vnode->path.name, request);
                         // select node
-                        std::string new_name = vnode->path.name.substr(node_path_child.size(), vnode->path.name.size());
+                        std::string new_name;
+                        if (item) {
+                            // A collection root has items directly after '[';
+                            // retain its name when no destination was supplied.
+                            new_name = (target_prefix.empty() ? node_path : target_prefix) +
+                                       vnode->path.name.substr(node_path.size());
+                        } else {
+                            new_name = vnode->path.name.substr(node_path_child.size());
+                            if (!target_prefix.empty())
+                                new_name = target_prefix + std::string(1, SIGN_SEPARATOR) + new_name;
+                        }
                         ValueNode::PointerType new_vnode =
                             std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
                         if (dependency_recording_)
@@ -472,6 +487,8 @@ namespace snt::dip {
                         record_dependency(source_name + "?" + vnode->path.name, request);
                         // select node
                         std::string new_name = vnode->path.basename();
+                        if (!target_prefix.empty())
+                            new_name = target_prefix + std::string(1, SIGN_SEPARATOR) + new_name;
                         ValueNode::PointerType new_vnode =
                             std::dynamic_pointer_cast<ValueNode>(vnode->clone(Path(new_name), 0));
                         if (dependency_recording_)

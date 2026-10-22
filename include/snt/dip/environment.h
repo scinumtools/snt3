@@ -361,12 +361,14 @@ namespace snt::dip {
          * @param request Request expression
          * @param rtype Request type: reference, or function
          * @param tags Tags of which at least one must occur on each returned node
+         * @param target_prefix Optional import path prepended to each selected node
          * @return Group of selected nodes
          */
         ValueNode::ListType request_group(
             const std::string& request,
             const RequestType rtype = RequestType::Reference,
-            const std::vector<std::string>& tags = {}
+            const std::vector<std::string>& tags = {},
+            const std::string& target_prefix = {}
         ) const;
 
         /**

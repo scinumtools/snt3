@@ -39,6 +39,37 @@ namespace {
 
 } // namespace
 
+TEST(Project, SourcesUseManifestDirectoryAndCodeSourcesUseTheirOwnFileDirectory) {
+    ProjectDirectory project("relative-source-anchors");
+    std::filesystem::create_directories(project.path() / "data");
+    std::filesystem::create_directories(project.path() / "model");
+    project.write(
+        "DIPfile",
+        "sources[]\n  name = \"registered\"\n  filepath = \"data/registered.dip\"\n"
+        "code[]\n  file = \"model/main.dip\"\n"
+        "code[]\n  string = \"\"\"\n"
+        "$source inline = \"data/inline.dip\"\n"
+        "from_inline int = {inline?value}\n"
+        "\"\"\"\n"
+    );
+    project.write("data/registered.dip", "value int = 20\n");
+    project.write("data/inline.dip", "value int = 24\n");
+    project.write("model/main.dip", "$source local = \"child.dip\"\n"
+                                    "from_project int = {registered?value}\n"
+                                    "from_local int = {local?value}\n");
+    project.write("model/child.dip", "value int = 22\n");
+
+    dip::DIP parser;
+    parser.add_project(project.path() / "DIPfile");
+    const auto env = parser.parse();
+    EXPECT_EQ(env["from_project"].as<int>(), 20);
+    EXPECT_EQ(env["from_local"].as<int>(), 22);
+    EXPECT_EQ(env["from_inline"].as<int>(), 24);
+    EXPECT_EQ(env.sources.at("registered").path, (project.path() / "data/registered.dip").string());
+    EXPECT_EQ(env.sources.at("local").path, (project.path() / "model/child.dip").string());
+    EXPECT_EQ(env.sources.at("inline").path, (project.path() / "data/inline.dip").string());
+}
+
 TEST(Project, PackagesTypedTableAndMatchesNativeEvaluation) {
     ProjectDirectory project("source-backed-bundle");
     project.write(

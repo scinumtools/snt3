@@ -104,6 +104,12 @@ namespace snt::dip {
             const std::string& path, Path::Kind kind, std::vector<std::string> schemas, std::vector<std::string> items
         );
 
+        /** Copy evaluated collection structure under a new import path. */
+        void import_subtree(const HierarchyList& source, const std::string& source_root, const std::string& target_root);
+
+        /** Names of schemas applied within a selected collection subtree. */
+        std::vector<std::string> subtree_schemas(const std::string& source_root) const;
+
         /** Remove a collection entry after parse-time path bookkeeping is complete. */
         void erase_collection(const std::string& path);
 

@@ -8,6 +8,12 @@
 
 namespace snt::dip {
     namespace {
+        bool in_subtree(const std::string& path, const std::string& root) {
+            return root.empty() || path == root ||
+                   (path.size() > root.size() && path.compare(0, root.size(), root) == 0 &&
+                    (path[root.size()] == SIGN_SEPARATOR || path[root.size()] == SIGN_ARRAY_OPEN));
+        }
+
         bool is_index_selector(const std::string& item) {
             return !item.empty() && std::all_of(item.begin(), item.end(), [](unsigned char character) {
                 return std::isdigit(character);
@@ -292,6 +298,73 @@ namespace snt::dip {
                 __LINE__
             );
         collections[path] = Collection{path, std::move(items), kind, std::move(schemas)};
+    }
+
+    void HierarchyList::import_subtree(
+        const HierarchyList& source, const std::string& source_root, const std::string& target_root
+    ) {
+        const std::string destination = target_root.empty() ? source_root : target_root;
+        std::vector<Collection> selected;
+        for (const auto& [path, collection] : source.collections) {
+            if (!in_subtree(path, source_root))
+                continue;
+            std::string mapped;
+            if (source_root.empty()) {
+                mapped = destination.empty() ? path : destination + std::string(1, SIGN_SEPARATOR) + path;
+            } else if (path == source_root) {
+                mapped = destination;
+            } else {
+                mapped = destination + path.substr(source_root.size());
+            }
+            if (mapped.empty())
+                continue;
+            Collection copy = collection;
+            copy.path = mapped;
+            selected.push_back(std::move(copy));
+        }
+
+        // A whole-source import introduces its destination group even when the
+        // source's first evaluated value is inside a keyed collection.
+        if (source_root.empty() && !destination.empty() && !has_collection(destination))
+            collections[destination] = Collection{destination, {}, Path::Kind::Group, {}};
+        if (!destination.empty())
+            record_ordered_path(destination);
+
+        for (auto& copy : selected) {
+            const auto existing = collections.find(copy.path);
+            if (existing == collections.end()) {
+                collections.emplace(copy.path, std::move(copy));
+                continue;
+            }
+            if (existing->second.kind != copy.kind)
+                throw dip::EnvironmentException(
+                    "Invalid imported collection type",
+                    "The imported collection `" + copy.path + "` has a different type from the existing collection.",
+                    "Import it under a different path or use collections of the same type.",
+                    __FILE__, __LINE__
+                );
+            const auto append_unique = [](auto& target, const auto& values) {
+                for (const auto& value : values)
+                    if (std::find(target.begin(), target.end(), value) == target.end())
+                        target.push_back(value);
+            };
+            append_unique(existing->second.items, copy.items);
+            append_unique(existing->second.children, copy.children);
+            append_unique(existing->second.schemas, copy.schemas);
+        }
+    }
+
+    std::vector<std::string> HierarchyList::subtree_schemas(const std::string& source_root) const {
+        std::vector<std::string> result;
+        for (const auto& [path, collection] : collections) {
+            if (!in_subtree(path, source_root))
+                continue;
+            for (const auto& schema : collection.schemas)
+                if (std::find(result.begin(), result.end(), schema) == result.end())
+                    result.push_back(schema);
+        }
+        std::sort(result.begin(), result.end());
+        return result;
     }
 
     void HierarchyList::set_schemas(const std::string& path, std::vector<std::string> schemas) {

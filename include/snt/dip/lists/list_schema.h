@@ -45,6 +45,8 @@ namespace snt::dip {
         );
         /** Append a schema record, assigning an identifier when it has none. */
         void append(const std::string& name, EnvSchema src, const std::string& parent_id = {});
+        /** Import selected definitions and their dependencies, rejecting conflicting names. */
+        void import_referenced_from(const SchemaList& source, const std::vector<std::string>& names);
         EnvSchema& at(const std::string& name);
         const EnvSchema& at(const std::string& name) const;
 

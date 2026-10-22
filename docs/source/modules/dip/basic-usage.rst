@@ -41,6 +41,10 @@ external DIPL file immediately in a separate source environment. Its values
 can then be referenced using expressions such as ``{shared?scale}``; they
 are not automatically added to the local node tree. Register custom units
 with ``add_unit(name, expression)`` before parsing the local definitions.
+Importing a collection with ``copy {shared?items.}`` also carries its applied
+schema definitions, so new ``copy[key]`` items follow the same declarations.
+If another definition already uses a required schema name locally, the
+import reports a conflict.
 
 For a reusable :doc:`DIPfile project <projects>`, load the complete manifest
 instead of registering its units, sources, and code inputs individually:

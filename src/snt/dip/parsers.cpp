@@ -68,6 +68,7 @@ namespace snt::dip {
         Environment senv = d.parse();
         EnvSource source{source_name, source_file, senv.sources.at(source_name).code, parent, senv.nodes};
         source.hierarchy = std::move(senv.hierarchy);
+        source.schemas = std::move(senv.schemas);
         source.declarations = senv.declarations();
         return source;
     }

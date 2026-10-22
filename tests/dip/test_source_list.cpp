@@ -1,7 +1,9 @@
 #include "pch_tests.h"
 
+#include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 
@@ -75,6 +77,35 @@ TEST(SourceList, KeywordSourceText) {
     EXPECT_EQ(senv.code, source_code);
     EXPECT_FALSE(senv.parent.name.empty());
     EXPECT_EQ(senv.nodes.size(), 0);
+}
+
+TEST(SourceList, RelativePathsUseDeclaringFileDirectory) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto root = std::filesystem::temp_directory_path() / ("snt-relative-source-" + suffix);
+    std::filesystem::create_directories(root / "sub" / "deeper");
+    {
+        std::ofstream main(root / "main.dip");
+        main << "$source child = \"sub/child.dip\"\n"
+                "$source raw = \"sub/note.txt\"\n"
+                "answer int = {child?answer}\n";
+        std::ofstream child(root / "sub" / "child.dip");
+        child << "$source leaf = \"deeper/leaf.dip\"\n"
+                 "answer int = {leaf?value}\n";
+        std::ofstream leaf(root / "sub" / "deeper" / "leaf.dip");
+        leaf << "value int = 42\n";
+        std::ofstream raw(root / "sub" / "note.txt");
+        raw << "relative raw source\n";
+    }
+
+    dip::DIP d;
+    d.add_file(root / "main.dip");
+    const dip::Environment env = d.parse();
+    EXPECT_EQ(env["answer"].as<int>(), 42);
+    EXPECT_EQ(env.sources.at("child").path, (root / "sub" / "child.dip").string());
+    EXPECT_EQ(env.sources.at("raw").path, (root / "sub" / "note.txt").string());
+    EXPECT_EQ(env.sources.at("raw").code, "relative raw source\n");
+
+    std::filesystem::remove_all(root);
 }
 
 TEST(SourceList, AddSourceFromCode) {

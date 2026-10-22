@@ -2,6 +2,7 @@
 
 #include "../parsers.h"
 
+#include <filesystem>
 #include <snt/dip/dip.h>
 #include <snt/dip/environment.h>
 #include <snt/val/values.h>
@@ -56,6 +57,17 @@ namespace snt::dip {
                 __LINE__,
                 line
             );
+        }
+        // A declaration in a file owns its relative paths. Resolve them here
+        // before parsing the named source, so nested sources and raw files use
+        // the declaring file's directory regardless of the caller's cwd.
+        const std::filesystem::path requested(source_file);
+        if (!requested.empty() && requested.is_relative()) {
+            const std::filesystem::path declaring_file(env.sources.at(line.source.name).path);
+            if (!declaring_file.empty()) {
+                const auto base = std::filesystem::absolute(declaring_file).parent_path();
+                source_file = (base / requested).lexically_normal().string();
+            }
         }
         EnvSource senv = parse_source(value_raw.at(0), source_file, line.source, env.project_file_reader());
         senv.named_source = true;

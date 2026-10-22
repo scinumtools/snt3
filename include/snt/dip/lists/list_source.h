@@ -6,6 +6,7 @@
 #include <snt/dip/inspect/declarations.h>
 #include <snt/dip/lists/list_hierarchy.h>
 #include <snt/dip/lists/list_node.h>
+#include <snt/dip/lists/list_schema.h>
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/settings.h>
 #include <string>
@@ -25,6 +26,7 @@ namespace snt::dip {
         bool raw_text = false;             // content is read verbatim, not parsed as DIPL
         bool table_text = false;           // raw content was parsed as a table
         HierarchyList hierarchy;           // source-local hierarchy
+        SchemaList schemas;                 // schema definitions available to imported collections
         ExplicitDeclarations declarations; // explicit source-local paths
         bool embedded = false;             // code came from a string rather than the file at path
         ValueMetadata metadata;            // metadata declared at indentation zero in this source

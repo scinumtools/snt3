@@ -26,7 +26,23 @@ namespace snt::dip {
             break;
         }
         case ValueOrigin::Reference: {
-            vnodes = env.request_group(value_raw.at(0), RequestType::Reference);
+            const std::string& request = value_raw.at(0);
+            vnodes = env.request_group(request, RequestType::Reference, {}, path.name);
+            if (!request.empty() && (request.back() == SIGN_SEPARATOR || request.back() == SIGN_QUERY)) {
+                const size_t separator = request.find(SIGN_QUERY);
+                const std::string source_name = request.substr(0, separator);
+                std::string source_root = request.substr(separator + 1);
+                if (!source_root.empty() && source_root.back() == SIGN_SEPARATOR)
+                    source_root.pop_back();
+                const EnvSource* named_source = source_name.empty() ? nullptr : &env.sources.at(source_name);
+                const HierarchyList& source_hierarchy = named_source ? named_source->hierarchy : env.hierarchy;
+                if (named_source)
+                    env.schemas.import_referenced_from(
+                        named_source->schemas, source_hierarchy.subtree_schemas(source_root)
+                    );
+                const std::string destination = env.hierarchy.get_current_path(indent, path.name).name;
+                env.hierarchy.import_subtree(source_hierarchy, source_root, destination);
+            }
             break;
         }
         default:
@@ -43,7 +59,7 @@ namespace snt::dip {
         BaseNode::ListType nodes;
         for (const auto& vnode : vnodes) {
             vnode->indent += indent;
-            if (!path.name.empty())
+            if (value_origin == ValueOrigin::Function && !path.name.empty())
                 vnode->path = Path(path.name + std::string(1, SIGN_SEPARATOR) + vnode->path.name);
             size_t size = vnode->value_raw.size();
             vnode->value_shape = {size};

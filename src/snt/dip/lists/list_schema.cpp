@@ -1,5 +1,7 @@
 #include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_schema.h>
+#include <functional>
+#include <set>
 #include <stdexcept>
 #include <utility>
 
@@ -50,6 +52,48 @@ namespace snt::dip {
         if (src.id.empty())
             src.id = next_schema_id(id_counters, parent_id);
         schemas.insert({name, std::move(src)});
+    }
+
+    void SchemaList::import_referenced_from(const SchemaList& source, const std::vector<std::string>& names) {
+        std::set<std::string> visited;
+        std::vector<std::string> ordered;
+        std::function<void(const std::string&)> visit = [&](const std::string& name) {
+            if (!visited.insert(name).second)
+                return;
+            const EnvSchema& schema = source.at(name);
+            // Schema members can themselves apply schemas to groups or collections.
+            for (const auto& node : schema.nodes) {
+                if (!node || node->dtype != NodeDtype::Group)
+                    continue;
+                for (const auto& dependency : node->value_raw)
+                    visit(dependency);
+                for (const auto& dependency : node->schemas)
+                    visit(dependency);
+            }
+            ordered.push_back(name);
+        };
+        for (const auto& name : names)
+            visit(name);
+
+        // Check every name before changing the destination registry. Repeated
+        // imports of the same source may reuse a definition; unrelated ones may not.
+        for (const auto& name : ordered) {
+            const auto existing = schemas.find(name);
+            if (existing == schemas.end())
+                continue;
+            const EnvSchema& incoming = source.at(name);
+            if (existing->second.id != incoming.id || existing->second.source_name != incoming.source_name ||
+                existing->second.source_line != incoming.source_line)
+                throw dip::EnvironmentException(
+                    "Conflicting imported schema",
+                    "The imported schema `" + name + "` conflicts with a definition already registered in this environment.",
+                    "Rename one schema or import sources with distinct schema names.",
+                    __FILE__, __LINE__
+                );
+        }
+        for (const auto& name : ordered)
+            if (schemas.find(name) == schemas.end())
+                append(name, source.at(name));
     }
 
     EnvSchema& SchemaList::at(const std::string& name) {
