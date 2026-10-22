@@ -16,49 +16,40 @@ Precompiled ``snt`` executable
 ------------------------------
 
 Download the archive for your system from the `latest GitHub release
-<https://github.com/scinumtools/snt3/releases/latest>`_. The v0.9.3 archives
-are:
-
-* `Linux x86-64 <https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-linux-x86_64.tar.gz>`_
-* `macOS ARM64 <https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-macos-arm64.tar.gz>`_
-* `Windows x86-64 <https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-windows-x86_64.zip>`_
-
-On macOS, download and unpack the archive, then run the executable:
+<https://github.com/scinumtools/snt3/releases/latest>`_, or use the installer
+for Linux x86-64 and macOS ARM64. It finds the latest release and installs
+``snt`` under ``~/.local`` without administrator rights:
 
 .. code-block:: console
 
-   curl -fLO https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-macos-arm64.tar.gz
-   tar -xzf snt-v0.9.3-macos-arm64.tar.gz
-   ./snt-v0.9.3-macos-arm64/snt --version
-
-On Linux, use the corresponding archive:
-
-.. code-block:: console
-
-   curl -fLO https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-linux-x86_64.tar.gz
-   tar -xzf snt-v0.9.3-linux-x86_64.tar.gz
-   ./snt-v0.9.3-linux-x86_64/snt --version
+   curl -fsSLO https://raw.githubusercontent.com/scinumtools/snt3/main/packaging/installers/install-cli.sh
+   sh install-cli.sh
 
 The Linux executable requires system runtime libraries, including libcurl and
-libaec. Keep the extracted directory together when moving it, because the
-macOS archive includes libraries beside ``snt``. To call ``snt`` by name in
-the current shell, add the extracted directory to ``PATH`` (use
-``linux-x86_64`` in this command on Linux):
+libaec. The installer checks that the executable runs before making it the
+active ``snt`` command. If ``~/.local/bin`` is not already on ``PATH``, add it
+to your shell configuration:
 
 .. code-block:: console
 
-   export PATH="$PWD/snt-v0.9.3-macos-arm64:$PATH"
+   export PATH="$HOME/.local/bin:$PATH"
 
-For a permanent installation, move the entire extracted directory to a stable
-location and add its absolute path to your shell's ``PATH`` configuration.
+Use ``sh install-cli.sh --version vX.Y.Z`` to install a specific release, or
+``sh install-cli.sh --prefix /path/to/prefix`` for a shared project directory.
+On a cluster without network access, download the archive on a login node and
+run ``sh install-cli.sh --archive /path/to/snt-vX.Y.Z-linux-x86_64.tar.gz``.
 
-On Windows, extract the ZIP archive with File Explorer or PowerShell:
+On Windows x86-64, use the PowerShell installer. It installs into the current
+user's profile and adds its command directory to the user ``PATH``:
 
 .. code-block:: powershell
 
-   Invoke-WebRequest https://github.com/scinumtools/snt3/releases/download/v0.9.3/snt-v0.9.3-windows-x86_64.zip -OutFile snt-v0.9.3-windows-x86_64.zip
-   Expand-Archive snt-v0.9.3-windows-x86_64.zip -DestinationPath .
-   .\snt-v0.9.3-windows-x86_64\snt.exe --version
+   Invoke-WebRequest https://raw.githubusercontent.com/scinumtools/snt3/main/packaging/installers/install-cli.ps1 -OutFile install-cli.ps1 -UseBasicParsing
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install-cli.ps1
+
+Use ``-Version vX.Y.Z``, ``-Prefix C:\path\to\prefix``, or ``-Archive
+C:\path\to\snt-vX.Y.Z-windows-x86_64.zip`` for the corresponding options.
+Open a new terminal after installation to use ``snt`` by name.
 
 The archives contain the command-line application, not the C++ development
 libraries or Python bindings. The ``snt hub`` command additionally requires

@@ -1,5 +1,9 @@
 # Packaging
 
+`installers/` contains the no-admin CLI installers for Linux/macOS and Windows.
+They use the precompiled GitHub release archives and also accept a local archive
+for offline cluster installations. See the installation guide for user commands.
+
 The Homebrew and vcpkg recipes build the libraries and unified `snt` executable,
 including `snt server`. They declare HDF5 and cpp-httplib dependencies explicitly;
 GitHub source archives do not contain Git submodule contents. The archive-based
