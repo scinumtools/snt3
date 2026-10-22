@@ -65,9 +65,12 @@ TEST(Project, SourcesUseManifestDirectoryAndCodeSourcesUseTheirOwnFileDirectory)
     EXPECT_EQ(env["from_project"].as<int>(), 20);
     EXPECT_EQ(env["from_local"].as<int>(), 22);
     EXPECT_EQ(env["from_inline"].as<int>(), 24);
-    EXPECT_EQ(env.sources.at("registered").path, (project.path() / "data/registered.dip").string());
-    EXPECT_EQ(env.sources.at("local").path, (project.path() / "model/child.dip").string());
-    EXPECT_EQ(env.sources.at("inline").path, (project.path() / "data/inline.dip").string());
+    EXPECT_EQ(std::filesystem::path(env.sources.at("registered").path).generic_string(),
+              (project.path() / "data/registered.dip").generic_string());
+    EXPECT_EQ(std::filesystem::path(env.sources.at("local").path).generic_string(),
+              (project.path() / "model/child.dip").generic_string());
+    EXPECT_EQ(std::filesystem::path(env.sources.at("inline").path).generic_string(),
+              (project.path() / "data/inline.dip").generic_string());
 }
 
 TEST(Project, PackagesTypedTableAndMatchesNativeEvaluation) {

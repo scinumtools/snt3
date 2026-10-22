@@ -93,7 +93,7 @@ TEST(SourceList, RelativePathsUseDeclaringFileDirectory) {
                  "answer int = {leaf?value}\n";
         std::ofstream leaf(root / "sub" / "deeper" / "leaf.dip");
         leaf << "value int = 42\n";
-        std::ofstream raw(root / "sub" / "note.txt");
+        std::ofstream raw(root / "sub" / "note.txt", std::ios::binary);
         raw << "relative raw source\n";
     }
 
