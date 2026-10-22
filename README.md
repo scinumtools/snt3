@@ -106,69 +106,41 @@ Try the runnable [UsingMCP example](examples/dip/UsingMCP).
 
 ## Features
 
-- **Unit-aware quantities:**
-  Parse and calculate with [physical quantities](https://scinumtools.github.io/snt3/modules/puq/quantities.html),
-  then [convert units](https://scinumtools.github.io/snt3/modules/puq/conversion.html).
-  Quantities support uncertainties, arrays, prefixes, and unit systems.
-  Try the [live converter](https://scinumtools.github.io/snt3/modules/puq/conversion.html#try-a-conversion).
-- **Single source of validated truth:**
-  Define [typed DIPL hierarchies](https://scinumtools.github.io/snt3/modules/dip/basic-usage.html)
-  with constraints, expressions, dependencies, and metadata; inspect their
-  [source provenance](https://scinumtools.github.io/snt3/modules/dip/traceability.html).
-- **Reproducible parameter exchange:**
-  Save evaluated environments as [DIPH5 files](https://scinumtools.github.io/snt3/modules/dip/persistence.html)
-  with source-content hashes, or
-  [generate native files](https://scinumtools.github.io/snt3/modules/dip/generation.html)
+- **Unit-aware quantities:** [Calculate and convert](https://scinumtools.github.io/snt3/modules/puq/quantities.html)
+  values with units, uncertainties, arrays, prefixes, and unit systems.
+- **Validated parameter models:** Define [typed DIPL hierarchies](https://scinumtools.github.io/snt3/modules/dip/basic-usage.html)
+  with constraints, expressions, dependencies, and metadata.
+- **Reviewable changes:** [Inspect provenance, preview overrides, and compare](https://scinumtools.github.io/snt3/modules/dip/inspection.html)
+  evaluated environments before accepting new settings.
+- **Portable results:** Save [DIPH5 snapshots](https://scinumtools.github.io/snt3/modules/dip/persistence.html)
+  with source-content hashes, or [generate files](https://scinumtools.github.io/snt3/modules/dip/generation.html)
   for C++, C, Fortran, Rust, Julia, JSON, and YAML.
-- **Readable parameter reports:**
-  Generate [Brief++ reports](https://scinumtools.github.io/snt3/modules/dip/report.html)
-  in TeX, PDF, Markdown, HTML, and other formats
-  with effective DIP values, units, overrides,
-  provenance, schemas, and publication references. See the
-  [example report and PDF](https://scinumtools.github.io/snt3/examples/dip.html#dip-create-report-example).
-- **One definition, many entry points:**
-  Use the same semantics from C/C++17, Python, command line, CMake, and the
-  optional local REST service; see the
-  [integration guides](https://scinumtools.github.io/snt3/).
+- **Readable reports:** [Generate reports](https://scinumtools.github.io/snt3/modules/dip/report.html)
+  with effective values, units, overrides, provenance, schemas, and references
+  in TeX, PDF, Markdown, HTML, and other formats.
 
 ## Interfaces
 
-- **C++ API:**
-  [C++17 library reference](https://scinumtools.github.io/snt3/api/index.html#c-api)
-  and [application commands](https://scinumtools.github.io/snt3/api/cpp_api.html).
-- **Python:**
-  [PUQ, DIP, and API bindings](https://scinumtools.github.io/snt3/integrations/python.html)
-  with [native Python values and NumPy arrays](https://scinumtools.github.io/snt3/integrations/python.html#python-values-and-numpy).
-- **C binding:**
-  Experimental opaque-handle interfaces for
-  [PUQ](https://scinumtools.github.io/snt3/integrations/c.html#quantities-and-units)
-  and [DIPL](https://scinumtools.github.io/snt3/integrations/c.html#dipl-parameters).
-- **WebAssembly and JavaScript:**
-  [Web integration](https://scinumtools.github.io/snt3/integrations/web.html)
-  for browser-side DIPL inspection, validation, and override previews, plus PUQ conversion.
-- **Command line:**
-  [PUQ evaluation and conversion](https://scinumtools.github.io/snt3/integrations/cli.html#quantities-and-units),
-  [DIP parsing](https://scinumtools.github.io/snt3/integrations/cli.html#dipl-parameters) and
-  [DIPL formatting, validation, and linting](docs/source/integrations/devtools.rst),
-  DIPH5 persistence, export, and
-  [reports](https://scinumtools.github.io/snt3/integrations/cli.html#generating-reports).
-- **Parameter Viewer:**
-  Browse evaluated DIPL projects and DIPH5 snapshots, inspect dependencies and
-  provenance, and open source locations in the optional
-  [graphical viewer](https://scinumtools.github.io/snt3/integrations/viewer.html).
-- **CMake:**
-  [Package integration](https://scinumtools.github.io/snt3/integrations/cmake.html#getting-started)
-  and [DIPL evaluation](https://scinumtools.github.io/snt3/integrations/cmake.html#dipl-parameters)
-  during project configuration.
-- **REST API server:**
-  [Local HTTP access](https://scinumtools.github.io/snt3/integrations/rest.html)
-  to the command-oriented PUQ and DIP API.
-- **MCP for AI agents:**
-  [Native `snt mcp` server](docs/source/integrations/mcp.rst)
-  exposing DIPL and PUQ tools over stdio or Streamable HTTP.
-- **Docker:**
-  Reproducible [Python environment](https://scinumtools.github.io/snt3/integrations/docker.html#python-environment)
-  and [development environment](https://scinumtools.github.io/snt3/integrations/docker.html#development-environment).
+- **C++ API:** [C++17 reference](https://scinumtools.github.io/snt3/api/index.html)
+  for quantities, DIPL, and application commands.
+- **Python:** [Bindings](https://scinumtools.github.io/snt3/integrations/python.html)
+  for PUQ, DIP, and API, including NumPy arrays.
+- **C binding:** Experimental [PUQ and DIPL interfaces](https://scinumtools.github.io/snt3/integrations/c.html)
+  using opaque handles.
+- **WebAssembly and JavaScript:** [Browser-side tools](https://scinumtools.github.io/snt3/integrations/web.html)
+  for DIPL inspection and PUQ conversion.
+- **Command line:** [PUQ, DIPL, export, and report commands](https://scinumtools.github.io/snt3/integrations/cli.html),
+  plus [formatting, validation, and linting](docs/source/integrations/devtools.rst).
+- **Parameter Viewer:** [Graphical browser](https://scinumtools.github.io/snt3/integrations/viewer.html)
+  for DIPL projects, DIPH5 snapshots, dependencies, and provenance.
+- **CMake:** [Package integration and DIPL evaluation](https://scinumtools.github.io/snt3/integrations/cmake.html)
+  during configuration.
+- **REST API server:** [Local HTTP service](https://scinumtools.github.io/snt3/integrations/rest.html)
+  for the command-oriented PUQ and DIP API.
+- **MCP for AI agents:** Native [`snt mcp` server](docs/source/integrations/mcp.rst)
+  with DIPL and PUQ tools over stdio or Streamable HTTP.
+- **Docker:** [Images](packaging/docker/README.md)
+  for Python, development, REST, and MCP.
 
 See the [documentation index](https://scinumtools.github.io/snt3/)
 for the complete usage guides.
@@ -195,24 +167,8 @@ simulation
       !options ["steady", "transient"]
 ```
 
-DIPL also preserves provenance metadata such as authors, DOI, source URL,
-creation date, and license alongside parameter values.
-
-The parsed environment remains available throughout the application, so the
-same validated parameters can be passed between its components.
-
-An evaluated environment can be saved in the DIPH5 HDF5 format for later use
-or exchange. DIPH5 retains node provenance and a SHA-256 source manifest for
-later verification. Environments can also be generated as native C/C++,
-Fortran, Rust, or Julia parameters and as JSON or YAML data files for
-applications that should not parse DIPL at run time.
-
-Use `snt report --project DIPfile --output report.tex` to turn an evaluated
-project into a readable report. Brief++ renders TeX, Markdown, reStructuredText,
-HTML, Typst, plain text, and document JSON without external tools. PDF output
-is also available when a TeX compiler is installed. See the [CLI guide](https://scinumtools.github.io/snt3/integrations/cli.html#generating-reports)
-and the [CreateReport example](examples/dip/CreateReport/README.md), which
-includes a generated PDF.
+The same definition can be read from C++, Python, and the command line. For
+persistence, exports, and reports, see the [CLI guide](https://scinumtools.github.io/snt3/integrations/cli.html).
 
 Use the PUQ and DIP APIs from C++:
 
@@ -257,7 +213,7 @@ The command-line interface can consume the same definitions:
 ```console
 $ snt puq convert "3.048*m" ft -s SI -S US
 10*ft
-$ snt dip parse -a file parameters.dip -r simulation.fluid.density --print
+$ snt dip parse -i file parameters.dip -r simulation.fluid.density --print
 density = 998.2 kg*m-3
 ```
 
@@ -267,49 +223,23 @@ for complete examples.
 
 ## Installation
 
-### Python
+For Python, install from PyPI with `pip install scinumtools3` or from
+conda-forge with `conda install conda-forge::scinumtools3`.
 
-```console
-pip install scinumtools3
+For C++, use `vcpkg install scinumtools3`. On macOS, use
+`brew tap scinumtools/tap` followed by `brew install scinumtools3`.
+
+To install the precompiled `snt` command without administrator rights on
+Linux x86-64 or macOS ARM64, run:
+
+```sh
+curl -fsSLO https://raw.githubusercontent.com/scinumtools/snt3/main/packaging/installers/install-cli.sh
+sh install-cli.sh
 ```
 
-The package is also available from conda-forge:
-
-```console
-conda install conda-forge::scinumtools3
-```
-
-### C++
-
-SciNumTools is available through vcpkg, Conan, and Homebrew (macOS):
-
-```console
-vcpkg install scinumtools3
-brew tap scinumtools/tap
-brew install scinumtools3
-```
-
-For Conan, clone the repository with its submodules and run `conan create .`
-from its root. The package includes the C++ libraries and the `snt` command
-with server, viewer, and report support. The `with_server`, `with_viewer`, and
-`with_reports` options default to enabled; set one to `False` with Conan's
-`-o` option when creating the package. The viewer
-needs system OpenGL and windowing dependencies.
-Use it as a Conan `tool_requires` dependency with `VirtualBuildEnv` to put
-`snt` on `PATH`. Language bindings are configured separately.
-
-### From source
-
-```console
-git clone --recurse-submodules https://github.com/scinumtools/snt3.git
-cd snt3
-cmake -G Ninja -B build
-cmake --build build
-ctest --test-dir build
-```
-
-For build options, installation, and package-manager details, see the
-[installation guide](https://scinumtools.github.io/snt3/installation.html).
+On Windows x86-64, use the [PowerShell installer](packaging/installers/install-cli.ps1).
+See the [installation guide](https://scinumtools.github.io/snt3/installation.html)
+for Windows commands, offline installation, Conan, and source builds.
 
 ## CMake
 
