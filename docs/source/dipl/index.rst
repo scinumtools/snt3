@@ -335,18 +335,8 @@ highlighting directly.
 
    highlighting
 
-Application
------------
+Applications
+------------
 
-`Nuclide Atlas <https://github.com/vrtulka23/nuclide-atlas>`_ is a unit-aware
-nuclear-isotope database and decay-chain calculator built with SciNumTools3.
-It uses DIPL sources for validated nuclide records and scenarios, including
-units and provenance metadata, and its CMake build configuration is driven by
-DIPL through the SNT CMake integration.
-
-`Ad Imaginem <https://github.com/vrtulka23/adimaginem>`_ is a cited,
-interactive ontology atlas with a graph, guided tours, and scholarly
-documentation. Its ontology, citations, and graph parameters are authored in
-DIPL and built with SciNumTools3.
-
-   
+See :doc:`applications using DIPL <../examples/index>` for scientific and
+cross-domain examples.
