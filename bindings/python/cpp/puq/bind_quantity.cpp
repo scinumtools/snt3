@@ -5,6 +5,7 @@
 #include <pybind11/stl.h>
 #include <snt/puq/exceptions.h>
 #include <snt/puq/quantity.h>
+#include <utility>
 #include <variant>
 
 namespace py = pybind11;
@@ -65,7 +66,8 @@ namespace snt::bind::python {
         } else {
             return nullptr;
         }
-        return std::make_unique<val::ArrayValueFloat64>(vec);
+        const val::Array::ShapeType shape{vec.size()};
+        return std::make_unique<val::ArrayValueFloat64>(std::move(vec), shape);
     }
 
     val::BaseValue::PointerType buffer_to_array(py::buffer_info& info) {
@@ -87,7 +89,7 @@ namespace snt::bind::python {
 
         val::Array::ShapeType s(info.shape.size());
         std::copy(info.shape.begin(), info.shape.end(), s.begin());
-        return std::make_unique<val::ArrayValueFloat64>(a, s);
+        return std::make_unique<val::ArrayValueFloat64>(std::move(a), s);
     }
 
     void init_puq_quantity(py::module_& m) {

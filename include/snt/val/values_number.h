@@ -19,6 +19,8 @@ namespace snt::val {
         ArrayValue(const T& val, const core::DataType dtype) : BaseArrayValue<T>(val, dtype) {};
         ArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh, const core::DataType dtype)
             : BaseArrayValue<T>(arr, sh, dtype) {};
+        ArrayValue(std::vector<T>&& arr, const Array::ShapeType& sh, const core::DataType dtype)
+            : BaseArrayValue<T>(std::move(arr), sh, dtype) {};
         /** Create a one-dimensional typed array value.
          * @param arr Values to store; the shape is set to `{arr.size()}`.
          * @param dtype Data type tag exposed to callers.

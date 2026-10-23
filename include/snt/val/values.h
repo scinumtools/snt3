@@ -124,6 +124,8 @@ namespace snt::val {
         ArrayValueFloat64(const double& val) : ArrayValue<double>(val, core::DataType::Float64) {};
         ArrayValueFloat64(const std::vector<double>& arr, const Array::ShapeType& sh)
             : ArrayValue<double>(arr, sh, core::DataType::Float64) {};
+        ArrayValueFloat64(std::vector<double>&& arr, const Array::ShapeType& sh)
+            : ArrayValue<double>(std::move(arr), sh, core::DataType::Float64) {};
         ArrayValueFloat64(const std::vector<double>& arr) : ArrayValue<double>(arr, core::DataType::Float64) {};
         ArrayValueFloat64(const BaseValue* other) : ArrayValue<double>(other, core::DataType::Float64) {};
     };

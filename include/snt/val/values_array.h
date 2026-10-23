@@ -3,6 +3,7 @@
 
 #include <snt/val/value_base.h>
 #include <typeinfo>
+#include <utility>
 
 namespace snt::val {
 
@@ -42,6 +43,16 @@ namespace snt::val {
          */
         BaseArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh, const core::DataType dtype)
             : value(arr), BaseValue(dtype, sh) {};
+
+        /**
+         * Take ownership of an already allocated value vector.
+         *
+         * @param arr Owned flattened values to move into this array.
+         * @param sh Array shape.
+         * @param dtype Datatype flag.
+         */
+        BaseArrayValue(std::vector<T>&& arr, const Array::ShapeType& sh, const core::DataType dtype)
+            : value(std::move(arr)), BaseValue(dtype, sh) {};
 
         /**
          * Base array value constructor from a BaseValue pointer
@@ -143,7 +154,7 @@ namespace snt::val {
             std::vector<R> arr(value.size());
             for (int i = 0; i < value.size(); i++)
                 arr[i] = static_cast<R>(f(value[i]));
-            return std::make_unique<ArrayValue<R>>(arr, this->shape, output_dtype);
+            return std::make_unique<ArrayValue<R>>(std::move(arr), this->shape, output_dtype);
         };
 
         /**
@@ -183,13 +194,13 @@ namespace snt::val {
                 arr.reserve(other->get_size());
                 for (int i = 0; i < other->get_size(); i++)
                     arr.push_back(f(this->get_value(0), otherT.get_value(i)));
-                return std::make_unique<ArrayValue<R>>(arr, otherT.get_shape(), output_dtype);
+                return std::make_unique<ArrayValue<R>>(std::move(arr), otherT.get_shape(), output_dtype);
             } else if (other->get_size() == 1) { // right is a scalar
                 const ArrayValue<T> otherT(other, dtype);
                 arr.reserve(this->get_size());
                 for (int i = 0; i < this->get_size(); i++)
                     arr.push_back(f(this->get_value(i), otherT.get_value(0)));
-                return std::make_unique<ArrayValue<R>>(arr, this->get_shape(), output_dtype);
+                return std::make_unique<ArrayValue<R>>(std::move(arr), this->get_shape(), output_dtype);
             } else { // both are arrays
                 // test if shape match
                 if (shape.size() != other->get_shape().size()) // Compare shape size
@@ -216,7 +227,7 @@ namespace snt::val {
                 arr.reserve(this->get_size());
                 for (int i = 0; i < this->get_size(); i++)
                     arr.push_back(f(this->get_value(i), otherT.get_value(i)));
-                return std::make_unique<ArrayValue<R>>(arr, this->get_shape(), output_dtype);
+                return std::make_unique<ArrayValue<R>>(std::move(arr), this->get_shape(), output_dtype);
             }
         };
 
@@ -341,7 +352,7 @@ namespace snt::val {
             std::vector<R> arr(value.size());
             for (int i = 0; i < value.size(); i++)
                 arr[i] = f(other1T.get_value(i), value[i], other2T.value[i]);
-            return std::make_unique<ArrayValue<R>>(arr, this->shape, dtype);
+            return std::make_unique<ArrayValue<R>>(std::move(arr), this->shape, dtype);
         };
 
       public:
@@ -416,7 +427,7 @@ namespace snt::val {
                 }
             }
             if (new_size > 1)
-                return std::make_unique<ArrayValue<T>>(new_value, new_shape, dtype);
+                return std::make_unique<ArrayValue<T>>(std::move(new_value), new_shape, dtype);
             else
                 return std::make_unique<ArrayValue<T>>(new_value[0], dtype);
         };
