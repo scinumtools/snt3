@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <set>
 #include <snt/puq/converter.h>
@@ -23,6 +24,87 @@ namespace snt::puq {
             return true;
         }
 
+        template <typename Transform>
+        void write_temperature_expression(
+            const val::ArrayValue<double>& array,
+            double source_scale,
+            double target_scale,
+            Transform transform,
+            Result& output
+        ) {
+            auto source = val::array_expression(array.get_data(), array.get_size(), array.get_shape());
+            auto scaled = val::map_array_expression(
+                std::move(source), [source_scale](double value) { return value * source_scale; }
+            );
+            auto adjusted = val::map_array_expression(std::move(scaled), std::move(transform));
+            auto converted = val::map_array_expression(
+                std::move(adjusted), [target_scale](double value) { return value / target_scale; }
+            );
+            auto values = val::evaluate_array_expression(converted);
+            output = Result(std::make_unique<val::ArrayValueFloat64>(std::move(values), array.get_shape()));
+        }
+
+        bool try_temperature_float64_expression(
+            const Result& input,
+            const std::string& source_unit,
+            const std::string& target_unit,
+            double source_scale,
+            double target_scale,
+            Result& output
+        ) {
+            if (input.uncertainty || target_scale == 0.0)
+                return false;
+            const auto* array = dynamic_cast<const val::ArrayValue<double>*>(input.estimate.get());
+            if (!array || array->get_dtype() != core::DataType::Float64 || array->get_size() <= 1)
+                return false;
+
+            constexpr double nine_fifths = 9.0 / 5.0;
+            constexpr double five_ninths = 5.0 / 9.0;
+            if (source_unit == "K" && target_unit == "Cel")
+                write_temperature_expression(*array, source_scale, target_scale, [](double value) { return value - 273.15; }, output);
+            else if (source_unit == "K" && target_unit == "degF")
+                write_temperature_expression(
+                    *array, source_scale, target_scale,
+                    [](double value) { return (value - 273.15) * nine_fifths + 32.0; }, output
+                );
+            else if (source_unit == "degR" && target_unit == "degF")
+                write_temperature_expression(
+                    *array, source_scale, target_scale, [](double value) { return value * nine_fifths - 459.67; }, output
+                );
+            else if (source_unit == "degR" && target_unit == "Cel")
+                write_temperature_expression(
+                    *array, source_scale, target_scale,
+                    [](double value) { return (value * nine_fifths - 491.67) * five_ninths; }, output
+                );
+            else if (source_unit == "Cel" && target_unit == "K")
+                write_temperature_expression(*array, source_scale, target_scale, [](double value) { return value + 273.15; }, output);
+            else if (source_unit == "Cel" && target_unit == "degF")
+                write_temperature_expression(
+                    *array, source_scale, target_scale, [](double value) { return value * nine_fifths + 32.0; }, output
+                );
+            else if (source_unit == "Cel" && target_unit == "degR")
+                write_temperature_expression(
+                    *array, source_scale, target_scale,
+                    [](double value) { return (value * nine_fifths + 491.67) * five_ninths; }, output
+                );
+            else if (source_unit == "degF" && target_unit == "K")
+                write_temperature_expression(
+                    *array, source_scale, target_scale,
+                    [](double value) { return ((value - 32.0) * five_ninths) + 273.15; }, output
+                );
+            else if (source_unit == "degF" && target_unit == "Cel")
+                write_temperature_expression(
+                    *array, source_scale, target_scale, [](double value) { return (value - 32.0) * five_ninths; }, output
+                );
+            else if (source_unit == "degF" && target_unit == "degR")
+                write_temperature_expression(
+                    *array, source_scale, target_scale, [](double value) { return (value + 459.67) * five_ninths; }, output
+                );
+            else
+                return false;
+            return true;
+        }
+
         bool scale_owned_array(val::BaseValue::PointerType& value, double source_scale, double target_scale) {
             auto* array = dynamic_cast<val::ArrayValue<double>*>(value.get());
             if (!array)
@@ -38,27 +120,57 @@ namespace snt::puq {
             return true;
         }
 
+        bool make_scaled_float64_copy(
+            const val::BaseValue* source,
+            double source_scale,
+            double target_scale,
+            val::BaseValue::PointerType& output
+        ) {
+            const auto* array = dynamic_cast<const val::ArrayValue<double>*>(source);
+            if (!array || array->get_dtype() != core::DataType::Float64)
+                return false;
+
+            const std::size_t size = array->get_size();
+            const double* source_values = array->get_data();
+            val::ArrayStorage<double> values(size);
+            if (size > 0) {
+                if (source_scale == target_scale) {
+                    std::copy_n(source_values, size, values.begin());
+                } else {
+                    for (std::size_t i = 0; i < size; ++i)
+                        values[i] = (source_values[i] * source_scale) / target_scale;
+                }
+            }
+            output = std::make_unique<val::ArrayValueFloat64>(std::move(values), array->get_shape());
+            return true;
+        }
+
     } // namespace
 
     Result Converter::_convert_linear(const Result& m1, const Result& m2) {
         // The common unit conversion has exact scalar scale factors and no
-        // contextual multiplier. Clone each source buffer once, then scale it
-        // in one pass so the result remains independent without temporary arrays.
+        // contextual multiplier. Copy and scale Float64 data into the result in
+        // one pass, preserving ownership without an intermediate full-array copy.
         double source_scale = 0.0;
         double target_scale = 0.0;
         double context_scale = 0.0;
         if (get_exact_scalar(dimensions1.numerical, source_scale) &&
             get_exact_scalar(dimensions2.numerical, target_scale) &&
             get_exact_scalar(m2, context_scale) && context_scale == 1.0 && target_scale != 0.0) {
-            auto estimate = m1.estimate->clone();
-            if (!scale_owned_array(estimate, source_scale, target_scale))
-                return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
+            val::BaseValue::PointerType estimate;
+            if (!make_scaled_float64_copy(m1.estimate.get(), source_scale, target_scale, estimate)) {
+                estimate = m1.estimate->clone();
+                if (!scale_owned_array(estimate, source_scale, target_scale))
+                    return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
+            }
 
             val::BaseValue::PointerType uncertainty = nullptr;
             if (m1.uncertainty && m1.uncertainty->any_of()) {
-                uncertainty = m1.uncertainty->clone();
-                if (!scale_owned_array(uncertainty, source_scale, target_scale))
-                    return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
+                if (!make_scaled_float64_copy(m1.uncertainty.get(), source_scale, target_scale, uncertainty)) {
+                    uncertainty = m1.uncertainty->clone();
+                    if (!scale_owned_array(uncertainty, source_scale, target_scale))
+                        return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
+                }
             }
             return Result(std::move(estimate), std::move(uncertainty));
         }
@@ -180,36 +292,46 @@ namespace snt::puq {
         );
     }
 
-    Result Converter::_convert_temperature(Result m) {
+    Result Converter::_convert_temperature(const Result& m) {
         std::string s1 = baseunits1[0].unit;
         std::string s2 = baseunits2[0].unit;
         Result const9div5 = 9. / 5.;
         Result const5div9 = 5. / 9.;
         if (s1 == s2) {
             return m;
-        } else {
-            m = m * dimensions1.numerical;
         }
+
+        double source_scale = 0.0;
+        double target_scale = 0.0;
+        Result fused;
+        if (get_exact_scalar(dimensions1.numerical, source_scale) &&
+            get_exact_scalar(dimensions2.numerical, target_scale) &&
+            try_temperature_float64_expression(m, s1, s2, source_scale, target_scale, fused))
+            return fused;
+
+        // Keep the existing Result operations for scalars, uncertainty-bearing
+        // values, and storage types that cannot use the elementwise expression.
+        Result converted = m * dimensions1.numerical;
         if (s1 == "K" && s2 == "Cel") {
-            m = m - (Result)273.15;
+            converted = converted - (Result)273.15;
         } else if (s1 == "K" && s2 == "degF") {
-            m = (m - (Result)273.15) * const9div5 + (Result)32;
+            converted = (converted - (Result)273.15) * const9div5 + (Result)32;
         } else if (s1 == "degR" && s2 == "degF") {
-            m = m * const9div5 - (Result)459.67;
+            converted = converted * const9div5 - (Result)459.67;
         } else if (s1 == "degR" && s2 == "Cel") {
-            m = (m * const9div5 - (Result)491.67) * const5div9;
+            converted = (converted * const9div5 - (Result)491.67) * const5div9;
         } else if (s1 == "Cel" && s2 == "K") {
-            m = m + (Result)273.15;
+            converted = converted + (Result)273.15;
         } else if (s1 == "Cel" && s2 == "degF") {
-            m = (m * const9div5) + (Result)32;
+            converted = (converted * const9div5) + (Result)32;
         } else if (s1 == "Cel" && s2 == "degR") {
-            m = ((m * const9div5) + (Result)491.67) * const5div9;
+            converted = ((converted * const9div5) + (Result)491.67) * const5div9;
         } else if (s1 == "degF" && s2 == "K") {
-            m = ((m - (Result)32) * const5div9) + (Result)273.15;
+            converted = ((converted - (Result)32) * const5div9) + (Result)273.15;
         } else if (s1 == "degF" && s2 == "Cel") {
-            m = (m - (Result)32) * const5div9;
+            converted = (converted - (Result)32) * const5div9;
         } else if (s1 == "degF" && s2 == "degR") {
-            m = (m + (Result)459.67) * const5div9;
+            converted = (converted + (Result)459.67) * const5div9;
         } else {
             throw puq::UnitException(
                 "Conversion unavailable",
@@ -219,7 +341,7 @@ namespace snt::puq {
                 __LINE__
             );
         }
-        return m / dimensions2.numerical;
+        return converted / dimensions2.numerical;
     }
 
     Converter::Converter(const BaseUnits& bu1, const BaseUnits& bu2)

@@ -61,7 +61,12 @@ namespace snt::puq {
         Measurement(const Result& est, const Dimensions& dim);
         Measurement(const Result& est, const BaseUnits& bun) : result(est), baseunits(bun) {};
         Measurement(const Result& est, const BaseUnits::ListType& bun) : result(est), baseunits(bun) {};
+        Measurement(Result&& est, const BaseUnits& bun) : result(std::move(est)), baseunits(bun) {};
+        Measurement(Result&& est, const BaseUnits::ListType& bun) : result(std::move(est)), baseunits(bun) {};
         Measurement(const Measurement& msr) = default;
+        Measurement& operator=(const Measurement& msr) = default;
+        Measurement(Measurement&& msr) noexcept = default;
+        Measurement& operator=(Measurement&& msr) noexcept = default;
         Measurement(const Measurement& msr, const std::string& str);
         Measurement(const Measurement& msr, const Dimensions& dim);
         Measurement(const Measurement& msr, const BaseUnits& bun) : result(msr.result), baseunits(bun) {};

@@ -1,4 +1,3 @@
-#include <numeric>
 #include <snt/puq/math/sum.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
@@ -20,7 +19,37 @@ namespace snt::puq::math {
             if (values->get_size() == 0)
                 return 0.0;
             const double* data = values->get_data();
-            return std::accumulate(data, data + values->get_size(), 0.0);
+            const std::size_t size = values->get_size();
+
+            // Independent partial sums break the dependency chain in a serial
+            // accumulation. This lets optimizing compilers process several
+            // values at once while keeping a fixed, reproducible reduction
+            // order. The final combination follows the original element order
+            // within each lane; only the grouping changes.
+            double sum0 = 0.0;
+            double sum1 = 0.0;
+            double sum2 = 0.0;
+            double sum3 = 0.0;
+            double sum4 = 0.0;
+            double sum5 = 0.0;
+            double sum6 = 0.0;
+            double sum7 = 0.0;
+            std::size_t i = 0;
+            for (; i + 7 < size; i += 8) {
+                sum0 += data[i];
+                sum1 += data[i + 1];
+                sum2 += data[i + 2];
+                sum3 += data[i + 3];
+                sum4 += data[i + 4];
+                sum5 += data[i + 5];
+                sum6 += data[i + 6];
+                sum7 += data[i + 7];
+            }
+
+            double sum = ((sum0 + sum1) + (sum2 + sum3)) + ((sum4 + sum5) + (sum6 + sum7));
+            for (; i < size; ++i)
+                sum += data[i];
+            return sum;
         }
 
     } // namespace

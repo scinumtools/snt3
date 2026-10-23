@@ -4,6 +4,7 @@
 #include <snt/puq/quantity.h>
 #include <snt/puq/to_string.h>
 #include <snt/puq/unit_format.h>
+#include <utility>
 
 namespace snt::puq {
 
@@ -44,6 +45,11 @@ namespace snt::puq {
     Quantity::Quantity(const Measurement& v, const SystemType system) : stype(system) {
         UnitSystem us(stype);
         measurement = v;
+    }
+
+    Quantity::Quantity(Measurement&& v, const SystemType system)
+        : stype(system), measurement(std::move(v)) {
+        UnitSystem us(stype);
     }
 
     Quantity::Quantity(const Result& m, const SystemType system) : stype(system) {
@@ -111,8 +117,7 @@ namespace snt::puq {
     Quantity::Quantity(val::BaseValue::PointerType m, std::string s, const SystemType system) : stype(system) {
         preprocess(s, stype);
         UnitSystem us(stype);
-        Result mag(std::move(m));
-        measurement = Measurement(mag, s);
+        measurement = Measurement(std::move(m), s);
     }
 
     Quantity::Quantity(val::BaseValue::PointerType m, val::BaseValue::PointerType e, const SystemType system)
@@ -138,8 +143,7 @@ namespace snt::puq {
         : stype(system) {
         preprocess(s, stype);
         UnitSystem us(stype);
-        Result mag(std::move(m), std::move(e));
-        measurement = Measurement(mag, s);
+        measurement = Measurement(std::move(m), std::move(e), s);
     }
 
     std::string Quantity::unit_system() const {
@@ -548,7 +552,7 @@ namespace snt::puq {
     Quantity Quantity::convert(const Measurement& msr1) const {
         UnitSystem us(stype);
         Measurement msr2 = measurement.convert(msr1);
-        return Quantity(msr2);
+        return Quantity(std::move(msr2));
     }
 
     Quantity Quantity::convert(const Measurement& msr1, const SystemType system, const std::string& q) const {
@@ -606,7 +610,7 @@ namespace snt::puq {
     Quantity Quantity::convert(const BaseUnits& bu) const {
         UnitSystem us(stype);
         Measurement msr = measurement.convert(bu);
-        return Quantity(msr);
+        return Quantity(std::move(msr));
     }
 
     Quantity Quantity::convert(const BaseUnits& bu, const SystemType system, const std::string& q) const {
@@ -666,7 +670,7 @@ namespace snt::puq {
         UnitSystem us(stype);
         if (stype == system) {
             Measurement msr = measurement.convert(s);
-            return Quantity(msr);
+            return Quantity(std::move(msr));
         } else if (q == "") {
             Measurement msr = _convert_without_context(us, system);
             try {
@@ -717,13 +721,13 @@ namespace snt::puq {
     Quantity Quantity::rebase_prefixes() {
         UnitSystem us(stype);
         Measurement msr = measurement.rebase_prefixes();
-        return Quantity(msr);
+        return Quantity(std::move(msr));
     }
 
     Quantity Quantity::rebase_dimensions() {
         UnitSystem us(stype);
         Measurement msr = measurement.rebase_dimensions();
-        return Quantity(msr);
+        return Quantity(std::move(msr));
     }
 
 } // namespace snt::puq

@@ -13,23 +13,34 @@ namespace py = pybind11;
 
 namespace snt::bind::python {
 
-    py::array_t<double> array_to_numpy(const val::ArrayValueFloat64& varray) {
+    py::array_t<double> array_to_numpy(const val::ArrayValue<double>& varray) {
         py::array_t<double> numpy(varray.get_shape());
         py::buffer_info buf_info = numpy.request();
         double* ptr = static_cast<double*>(buf_info.ptr);
-        std::memcpy(ptr, varray.get_values().data(), varray.get_size() * sizeof(double));
+        std::memcpy(ptr, varray.get_data(), varray.get_size() * sizeof(double));
         return numpy;
     }
 
-    std::variant<double, std::vector<double>, py::array_t<double>> quantity_value(puq::Quantity q, bool numpy) {
-        val::ArrayValueFloat64 varray(q.measurement.result.estimate.get());
-        if (numpy) {
-            return array_to_numpy(varray);
-        } else if (q.measurement.result.estimate->get_size() == 1) {
-            return varray.get_value(0);
-        } else {
-            return varray.get_values();
+    std::variant<double, std::vector<double>, py::array_t<double>> quantity_value(
+        const puq::Quantity& q, bool numpy
+    ) {
+        const auto* value = dynamic_cast<const val::ArrayValue<double>*>(q.measurement.result.estimate.get());
+        if (value && value->get_dtype() == core::DataType::Float64) {
+            if (numpy)
+                return array_to_numpy(*value);
+            if (value->get_size() == 1)
+                return value->get_value(0);
+            return value->get_values();
         }
+
+        // Preserve conversion behavior for non-Float64 value types while letting
+        // the common Float64 path read directly from the quantity's storage.
+        val::ArrayValueFloat64 converted(q.measurement.result.estimate.get());
+        if (numpy)
+            return array_to_numpy(converted);
+        if (converted.get_size() == 1)
+            return converted.get_value(0);
+        return converted.get_values();
     }
 
     std::variant<double, std::vector<double>, py::array_t<double>> quantity_get_value(
@@ -42,14 +53,21 @@ namespace snt::bind::python {
     std::variant<double, std::vector<double>, py::array_t<double>> quantity_uncertainty(
         const puq::Quantity& q, bool numpy
     ) {
-        val::ArrayValueFloat64 varray(q.measurement.result.uncertainty.get());
-        if (numpy) {
-            return array_to_numpy(varray);
-        } else if (varray.get_size() == 1) {
-            return varray.get_value(0);
-        } else {
-            return varray.get_values();
+        const auto* value = dynamic_cast<const val::ArrayValue<double>*>(q.measurement.result.uncertainty.get());
+        if (value && value->get_dtype() == core::DataType::Float64) {
+            if (numpy)
+                return array_to_numpy(*value);
+            if (value->get_size() == 1)
+                return value->get_value(0);
+            return value->get_values();
         }
+
+        val::ArrayValueFloat64 converted(q.measurement.result.uncertainty.get());
+        if (numpy)
+            return array_to_numpy(converted);
+        if (converted.get_size() == 1)
+            return converted.get_value(0);
+        return converted.get_values();
     }
 
     val::BaseValue::PointerType buffer_to_array(py::buffer_info& info);
@@ -72,8 +90,6 @@ namespace snt::bind::python {
     }
 
     val::BaseValue::PointerType buffer_to_array(py::buffer_info& info) {
-        std::vector<double> a(info.size);
-
         if (info.format != py::format_descriptor<double>::format())
             throw puq::PybindException(
                 "Incompatible buffer format",
@@ -86,7 +102,11 @@ namespace snt::bind::python {
                 __LINE__
             );
 
-        std::copy(static_cast<double*>(info.ptr), static_cast<double*>(info.ptr) + info.size, a.begin());
+        val::ArrayStorage<double> a;
+        if (info.size > 0) {
+            const auto* values = static_cast<const double*>(info.ptr);
+            a.assign(values, values + info.size);
+        }
 
         val::Array::ShapeType s(info.shape.size());
         std::copy(info.shape.begin(), info.shape.end(), s.begin());

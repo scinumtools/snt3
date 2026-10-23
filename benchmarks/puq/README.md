@@ -55,6 +55,17 @@ before-and-after measurements. Use the paper repository for cross-library
 comparisons. The C++ benchmark isolates the core path; these measurements are
 not timings of downstream applications.
 
+The array suite also includes a `MultiplyLayers` diagnostic at one million
+elements. It compares raw array and `Result` multiplication, Quantity
+multiplication with separate arrays (`m*s`), and squaring one Quantity by
+itself. This helps distinguish unit-handling cost from the memory traffic of
+reading one input array versus two:
+
+```sh
+build-bench/bin/benchmark-puq-array --benchmark_filter=MultiplyLayers \
+  --benchmark_repetitions=5 --benchmark_min_time=0.1s
+```
+
 ## Keeping and comparing runs
 
 `benchmark_history.py` runs the available C++ benchmarks and the Python array

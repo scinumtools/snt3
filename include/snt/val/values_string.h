@@ -24,6 +24,10 @@ namespace snt::val {
          */
         ArrayValue(const val::Array::StringType& arr, const val::Array::ShapeType& sh, const core::DataType dtype)
             : BaseArrayValue(arr, sh, dtype) {};
+        ArrayValue(const ArrayStorage<std::string>& arr, const val::Array::ShapeType& sh, const core::DataType dtype)
+            : BaseArrayValue(arr, sh, dtype) {};
+        ArrayValue(ArrayStorage<std::string>&& arr, const val::Array::ShapeType& sh, const core::DataType dtype)
+            : BaseArrayValue(std::move(arr), sh, dtype) {};
         ArrayValue(const val::Array::StringType& arr, const core::DataType dtype)
             : BaseArrayValue(arr, {arr.size()}, dtype) {};
         ArrayValue(const BaseValue* other, const core::DataType dtype) : BaseArrayValue<std::string>(other, dtype) {};

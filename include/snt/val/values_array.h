@@ -2,14 +2,125 @@
 #define VAL_VALUES_ARRAY_H
 
 #include <snt/val/value_base.h>
+#include <cstddef>
+#include <iterator>
+#include <memory>
+#include <new>
 #include <typeinfo>
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace snt::val {
 
     // here we need a forward declaration
     template <typename T> class BaseArrayValue;
     template <typename T> class ArrayValue;
+
+    /** Allocator for array storage whose elements are assigned before they are read.
+     *
+     * Default construction leaves scalar elements uninitialized. Array operation
+     * kernels write each output element before exposing the resulting value.
+     */
+    template <typename T> class ArrayStorageAllocator {
+      public:
+        using value_type = T;
+        using is_always_equal = std::true_type;
+
+        ArrayStorageAllocator() noexcept = default;
+        template <typename U> ArrayStorageAllocator(const ArrayStorageAllocator<U>&) noexcept {}
+
+        T* allocate(const std::size_t count) { return std::allocator<T>{}.allocate(count); }
+        void deallocate(T* pointer, const std::size_t count) noexcept {
+            std::allocator<T>{}.deallocate(pointer, count);
+        }
+
+        template <typename U, typename... Args> void construct(U* pointer, Args&&... args) {
+            if constexpr (sizeof...(Args) == 0)
+                ::new (static_cast<void*>(pointer)) U;
+            else
+                ::new (static_cast<void*>(pointer)) U(std::forward<Args>(args)...);
+        }
+
+        template <typename U> void destroy(U* pointer) noexcept { pointer->~U(); }
+
+        template <typename U> struct rebind { using other = ArrayStorageAllocator<U>; };
+    };
+
+    template <typename T, typename U>
+    bool operator==(const ArrayStorageAllocator<T>&, const ArrayStorageAllocator<U>&) noexcept {
+        return true;
+    }
+    template <typename T, typename U>
+    bool operator!=(const ArrayStorageAllocator<T>&, const ArrayStorageAllocator<U>&) noexcept {
+        return false;
+    }
+
+    template <typename T> using ArrayStorage = std::vector<T, ArrayStorageAllocator<T>>;
+
+    /** Read-only view used as the input to a lazy elementwise expression. */
+    template <typename T> class ArrayExpressionView {
+      public:
+        using value_type = T;
+
+      private:
+        const T* data;
+        std::size_t size;
+        Array::ShapeType shape;
+
+      public:
+        ArrayExpressionView(const T* values, std::size_t count, const Array::ShapeType& dimensions)
+            : data(values), size(count), shape(dimensions) {}
+
+        /** Read one source element. */
+        T operator[](std::size_t index) const { return data[index]; }
+        /** Number of source elements. */
+        std::size_t get_size() const { return size; }
+        /** Shape retained by the expression. */
+        const Array::ShapeType& get_shape() const { return shape; }
+    };
+
+    /** Elementwise expression that maps each input value without allocating an intermediate array. */
+    template <typename Input, typename Transform> class MappedArrayExpression {
+      public:
+        using value_type = std::decay_t<std::invoke_result_t<Transform, typename Input::value_type>>;
+
+      private:
+        Input input;
+        Transform transform;
+
+      public:
+        MappedArrayExpression(Input source, Transform operation)
+            : input(std::move(source)), transform(std::move(operation)) {}
+
+        /** Evaluate the mapped value for one element. */
+        value_type operator[](std::size_t index) const { return transform(input[index]); }
+        /** Number of elements in the expression. */
+        std::size_t get_size() const { return input.get_size(); }
+        /** Shape retained by the expression. */
+        const Array::ShapeType& get_shape() const { return input.get_shape(); }
+    };
+
+    /** Create a read-only expression over existing array data. */
+    template <typename T>
+    ArrayExpressionView<T> array_expression(const T* data, std::size_t size, const Array::ShapeType& shape) {
+        return ArrayExpressionView<T>(data, size, shape);
+    }
+
+    /** Append one elementwise operation to an expression pipeline. */
+    template <typename Input, typename Transform>
+    auto map_array_expression(Input input, Transform transform) {
+        return MappedArrayExpression<Input, Transform>(std::move(input), std::move(transform));
+    }
+
+    /** Evaluate a composed elementwise expression into one owned output buffer. */
+    template <typename Expression>
+    ArrayStorage<typename Expression::value_type> evaluate_array_expression(const Expression& expression) {
+        ArrayStorage<typename Expression::value_type> values(expression.get_size());
+        for (std::size_t i = 0; i < expression.get_size(); ++i)
+            values[i] = expression[i];
+        return values;
+    }
 
     /**
      * Base class for all array values
@@ -23,7 +134,7 @@ namespace snt::val {
         static_assert(!std::is_same_v<T, char>, "BaseArrayValue<char> is not allowed");
 
       protected:
-        std::vector<T> value; ///< Internal data container that holds flattend array values
+        ArrayStorage<T> value; ///< Internal data container that holds flattened array values
 
       public:
         /**
@@ -42,7 +153,7 @@ namespace snt::val {
          * @param dtype Datatype flag
          */
         BaseArrayValue(const std::vector<T>& arr, const Array::ShapeType& sh, const core::DataType dtype)
-            : value(arr), BaseValue(dtype, sh) {};
+            : value(arr.begin(), arr.end()), BaseValue(dtype, sh) {};
 
         /**
          * Take ownership of an already allocated value vector.
@@ -52,6 +163,22 @@ namespace snt::val {
          * @param dtype Datatype flag.
          */
         BaseArrayValue(std::vector<T>&& arr, const Array::ShapeType& sh, const core::DataType dtype)
+            : value(std::make_move_iterator(arr.begin()), std::make_move_iterator(arr.end())), BaseValue(dtype, sh) {};
+
+        /** Copy from storage produced by an array operation.
+         * @param arr Array values to copy.
+         * @param sh Array shape.
+         * @param dtype Data type flag.
+         */
+        BaseArrayValue(const ArrayStorage<T>& arr, const Array::ShapeType& sh, const core::DataType dtype)
+            : value(arr), BaseValue(dtype, sh) {};
+
+        /** Take ownership of array-operation output storage without copying it.
+         * @param arr Internal storage produced by an array operation.
+         * @param sh Array shape.
+         * @param dtype Data type flag.
+         */
+        BaseArrayValue(ArrayStorage<T>&& arr, const Array::ShapeType& sh, const core::DataType dtype)
             : value(std::move(arr)), BaseValue(dtype, sh) {};
 
         /**
@@ -70,7 +197,7 @@ namespace snt::val {
                 otherT = dynamic_cast<const ArrayValue<T>*>(casted_other.get());
             }
             if (otherT) {
-                this->value = otherT->value;
+                this->value.assign(otherT->value.begin(), otherT->value.end());
             } else
                 throw val::ArrayException(
                     "Invalid array initialization",
@@ -92,7 +219,7 @@ namespace snt::val {
          *
          * @return Flattened array of values
          */
-        std::vector<T> get_values() const { return value; };
+        std::vector<T> get_values() const { return std::vector<T>(value.begin(), value.end()); };
 
         /**
          * Get copy of a particular value
@@ -138,7 +265,7 @@ namespace snt::val {
          * @return String representation
          */
         std::string to_string(const core::StringFormatType& format = core::StringFormatType()) const override {
-            return core::array_to_string(value, shape, dtype, format);
+            return core::array_to_string(get_values(), shape, dtype, format);
         };
 
         /*
@@ -158,7 +285,7 @@ namespace snt::val {
             if (output_dtype == core::DataType::None)
                 output_dtype = dtype;
             // apply operation
-            std::vector<R> arr(value.size());
+            ArrayStorage<R> arr(value.size());
             for (int i = 0; i < value.size(); i++)
                 arr[i] = static_cast<R>(f(value[i]));
             return std::make_unique<ArrayValue<R>>(std::move(arr), this->shape, output_dtype);
@@ -172,9 +299,12 @@ namespace snt::val {
          * @tparam Func Type of the operation function (is deduced)
          */
         template <typename R, typename Func> void operate_unary_equal(Func f) {
-            // apply operation
-            for (int i = 0; i < value.size(); i++)
-                value[i] = f(value[i]);
+            // Keep the data pointer and length outside the loop so the compiler
+            // can optimize the contiguous in-place traversal.
+            T* values = value.data();
+            const std::size_t size = value.size();
+            for (std::size_t i = 0; i < size; ++i)
+                values[i] = f(values[i]);
         };
 
         /**
@@ -192,7 +322,9 @@ namespace snt::val {
         ) const {
             if (output_dtype == core::DataType::None)
                 output_dtype = dtype;
-            std::vector<R> arr;
+            ArrayStorage<R> arr;
+            const std::size_t left_size = this->get_size();
+            const std::size_t right_size = other->get_size();
             // Reuse an already compatible array as a read-only view. Constructing
             // ArrayValue<T> from BaseValue copies every element, so only convert
             // when the input storage type actually differs.
@@ -202,17 +334,20 @@ namespace snt::val {
                 converted_other = std::make_unique<ArrayValue<T>>(other, dtype);
                 otherT = converted_other.get();
             }
-            if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
+            if (left_size == 1 && right_size == 1) { // both are scalars
                 return std::make_unique<ArrayValue<R>>(f(value[0], otherT->get_data()[0]), output_dtype);
-            } else if (this->get_size() == 1) { // left is a scalar
-                arr.reserve(other->get_size());
-                for (int i = 0; i < other->get_size(); i++)
-                    arr.push_back(f(value[0], otherT->get_data()[i]));
+            } else if (left_size == 1) { // left is a scalar
+                arr.resize(right_size);
+                const T left_value = value[0];
+                const T* right_values = otherT->get_data();
+                for (std::size_t i = 0; i < right_size; ++i)
+                    arr[i] = f(left_value, right_values[i]);
                 return std::make_unique<ArrayValue<R>>(std::move(arr), otherT->get_shape(), output_dtype);
-            } else if (other->get_size() == 1) { // right is a scalar
-                arr.reserve(this->get_size());
-                for (int i = 0; i < this->get_size(); i++)
-                    arr.push_back(f(value[i], otherT->get_data()[0]));
+            } else if (right_size == 1) { // right is a scalar
+                arr.resize(left_size);
+                const T right_value = otherT->get_data()[0];
+                for (std::size_t i = 0; i < left_size; ++i)
+                    arr[i] = f(value[i], right_value);
                 return std::make_unique<ArrayValue<R>>(std::move(arr), this->get_shape(), output_dtype);
             } else { // both are arrays
                 // test if shape match
@@ -238,9 +373,9 @@ namespace snt::val {
                 // apply operation
                 const T* left_values = value.data();
                 const T* right_values = otherT->get_data();
-                arr.reserve(this->get_size());
-                for (int i = 0; i < this->get_size(); i++)
-                    arr.push_back(f(left_values[i], right_values[i]));
+                arr.resize(left_size);
+                for (std::size_t i = 0; i < left_size; ++i)
+                    arr[i] = f(left_values[i], right_values[i]);
                 return std::make_unique<ArrayValue<R>>(std::move(arr), this->get_shape(), output_dtype);
             }
         };
@@ -254,21 +389,33 @@ namespace snt::val {
          * @tparam Func Type of the operation function (is deduced)
          */
         template <typename R, typename Func> void operate_binary_equal(const BaseValue* other, Func f) {
-            if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
-                const ArrayValue<T> otherT(other, dtype);
-                value[0] = f(this->get_value(0), otherT.get_value(0));
-            } else if (this->get_size() == 1) { // left is a scalar
-                const ArrayValue<T> otherT(other, dtype);
-                T val = this->get_value(0);
-                value.clear();
-                value.reserve(otherT.get_size());
-                shape = otherT.get_shape();
-                for (int i = 0; i < otherT.get_size(); i++)
-                    value.push_back(f(val, otherT.get_value(i)));
-            } else if (other->get_size() == 1) { // right is a scalar
-                const ArrayValue<T> otherT(other, dtype);
-                for (int i = 0; i < this->get_size(); i++)
-                    value[i] = f(this->get_value(i), otherT.get_value(0));
+            const std::size_t left_size = value.size();
+            const std::size_t right_size = other->get_size();
+
+            // Keep compatible input arrays as read-only views. Conversion is
+            // still performed when the value type or dtype differs.
+            std::unique_ptr<ArrayValue<T>> converted_other;
+            const auto* otherT = other->get_dtype() == dtype ? dynamic_cast<const ArrayValue<T>*>(other) : nullptr;
+            if (!otherT) {
+                converted_other = std::make_unique<ArrayValue<T>>(other, dtype);
+                otherT = converted_other.get();
+            }
+            const T* right_values = otherT->get_data();
+
+            if (left_size == 1 && right_size == 1) { // both are scalars
+                value[0] = f(value[0], right_values[0]);
+            } else if (left_size == 1) { // left scalar expands to the right array
+                const T left_value = value[0];
+                ArrayStorage<T> expanded(right_size);
+                for (std::size_t i = 0; i < right_size; ++i)
+                    expanded[i] = f(left_value, right_values[i]);
+                value = std::move(expanded);
+                shape = otherT->get_shape();
+            } else if (right_size == 1) { // right scalar broadcasts across the left array
+                const T right_value = right_values[0];
+                T* left_values = value.data();
+                for (std::size_t i = 0; i < left_size; ++i)
+                    left_values[i] = f(left_values[i], right_value);
             } else { // both are arrays
                 // test if shape match
                 if (shape.size() != other->get_shape().size()) // Compare shape size
@@ -291,9 +438,9 @@ namespace snt::val {
                             __LINE__
                         );
                 // apply operation
-                const ArrayValue<T> otherT(other, dtype);
-                for (int i = 0; i < this->get_size(); i++)
-                    value[i] = f(this->get_value(i), otherT.get_value(i));
+                T* left_values = value.data();
+                for (std::size_t i = 0; i < left_size; ++i)
+                    left_values[i] = f(left_values[i], right_values[i]);
             }
         };
 
@@ -363,7 +510,7 @@ namespace snt::val {
             // apply operation
             const ArrayValue<U> other1T(other1, first_dtype);
             const ArrayValue<R> other2T(other2, third_dtype);
-            std::vector<R> arr(value.size());
+            ArrayStorage<R> arr(value.size());
             for (int i = 0; i < value.size(); i++)
                 arr[i] = f(other1T.get_value(i), value[i], other2T.value[i]);
             return std::make_unique<ArrayValue<R>>(std::move(arr), this->shape, dtype);

@@ -132,6 +132,71 @@ static void BM_Quantity_AddArrays(benchmark::State& state) {
     }
 }
 
+// Split multiplication into its array, Result, Measurement, and Quantity layers.
+// The m*s versus m*m pair checks whether unit combination explains the paper
+// benchmark's multiplication/square timing difference.
+static void BM_MultiplyLayers(benchmark::State& state, const char* right_units, int layer, bool same_operand) {
+    const auto values = values_for(static_cast<std::size_t>(state.range(0)));
+    const auto left = quantity_from(values, "m");
+    const auto right = quantity_from(values, right_units);
+    const auto& rhs = same_operand ? left : right;
+    const auto expected = [&] {
+        std::vector<double> result(values.size());
+        for (std::size_t i = 0; i < values.size(); ++i)
+            result[i] = values[i] * values[i];
+        return result;
+    }();
+    const auto checked = left * rhs;
+    check_quantity(checked, expected);
+
+    for (auto _ : state) {
+        if (layer == 2) {
+            auto product = left * rhs;
+            benchmark::DoNotOptimize(product);
+        } else if (layer == 1) {
+            auto product = left.measurement.result * rhs.measurement.result;
+            benchmark::DoNotOptimize(product);
+        } else {
+            auto product = left.measurement.result.estimate->math_mul(rhs.measurement.result.estimate.get());
+            benchmark::DoNotOptimize(product);
+        }
+    }
+}
+
+// Compare the normal vector result allocation with an uninitialized result
+// buffer, which avoids zero-filling values that the arithmetic loop overwrites.
+static void BM_ArrayMultiply_UninitializedOutput(benchmark::State& state) {
+    const auto size = static_cast<std::size_t>(state.range(0));
+    const auto left = values_for(size);
+    const auto right = values_for(size);
+    auto check = std::make_unique_for_overwrite<double[]>(size);
+    for (std::size_t i = 0; i < size; ++i)
+        check[i] = left[i] * right[i];
+    if (check[0] != left[0] * right[0] || check[size - 1] != left[size - 1] * right[size - 1])
+        throw std::runtime_error("Uninitialized output probe produced incorrect values");
+
+    for (auto _ : state) {
+        auto output = std::make_unique_for_overwrite<double[]>(size);
+        for (std::size_t i = 0; i < size; ++i)
+            output[i] = left[i] * right[i];
+        benchmark::DoNotOptimize(output.get());
+        benchmark::ClobberMemory();
+    }
+}
+
+static void BM_ArrayMultiply_VectorOutput(benchmark::State& state) {
+    const auto size = static_cast<std::size_t>(state.range(0));
+    const auto left = values_for(size);
+    const auto right = values_for(size);
+    for (auto _ : state) {
+        std::vector<double> output(size);
+        for (std::size_t i = 0; i < size; ++i)
+            output[i] = left[i] * right[i];
+        benchmark::DoNotOptimize(output.data());
+        benchmark::ClobberMemory();
+    }
+}
+
 static void BM_Quantity_MultiplyWithUncertainty(benchmark::State& state) {
     const auto values = values_for(static_cast<std::size_t>(state.range(0)));
     const std::vector<double> errors(values.size(), 0.25);
@@ -171,6 +236,13 @@ BENCHMARK_CAPTURE(BM_Quantity_Convert, Cel_to_K, "Cel", "K") ARRAY_LENGTHS;
 BENCHMARK_CAPTURE(BM_Quantity_Convert, dBm_to_mW, "dBm", "mW") ARRAY_LENGTHS;
 BENCHMARK(BM_Quantity_ConvertWithUncertainty) ARRAY_LENGTHS;
 BENCHMARK(BM_Quantity_AddArrays) ARRAY_LENGTHS;
+BENCHMARK_CAPTURE(BM_MultiplyLayers, raw_array_multiply_separate, "s", 0, false)->Arg(1000000);
+BENCHMARK_CAPTURE(BM_MultiplyLayers, raw_array_multiply_same, "m", 0, true)->Arg(1000000);
+BENCHMARK_CAPTURE(BM_MultiplyLayers, result_multiply_separate, "s", 1, false)->Arg(1000000);
+BENCHMARK_CAPTURE(BM_MultiplyLayers, quantity_multiply_ms, "s", 2, false)->Arg(1000000);
+BENCHMARK_CAPTURE(BM_MultiplyLayers, quantity_square_same_operand, "m", 2, true)->Arg(1000000);
+BENCHMARK(BM_ArrayMultiply_UninitializedOutput)->Arg(1000000);
+BENCHMARK(BM_ArrayMultiply_VectorOutput)->Arg(1000000);
 BENCHMARK(BM_Quantity_MultiplyWithUncertainty) ARRAY_LENGTHS;
 
 BENCHMARK_MAIN();

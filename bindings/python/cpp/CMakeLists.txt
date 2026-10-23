@@ -87,6 +87,15 @@ if(
     foreach(TEST_FILE ${PYTEST_FILES})
         get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
         string(REGEX REPLACE "^test_" "" TEST_NAME ${TEST_NAME})
+
+        # The cross-module example imports both public Python bindings. The
+        # misc suite is registered whenever any binding tests are enabled, so
+        # skip this example when either required submodule is disabled.
+        if(MODULE_DIR STREQUAL "misc" AND TEST_NAME STREQUAL "example" AND
+           (NOT ENABLE_DIP_PYBIND OR NOT ENABLE_PUQ_PYBIND))
+            continue()
+        endif()
+
         set(TEST_FULL_NAME pytest.${MODULE_DIR}.${TEST_NAME})
         add_test(
             NAME ${TEST_FULL_NAME}

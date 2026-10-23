@@ -213,7 +213,6 @@ namespace snt::puq {
         if (multiply_float64_with_uncertainty(m, n, estimate, uncertainty))
             return Result(std::move(estimate), std::move(uncertainty));
 
-        const val::ArrayValueFloat64 otherT(n->estimate.get());
         Result nm(m->estimate->math_mul(n->estimate.get()));
         if ((m->uncertainty && n->uncertainty) && (m->uncertainty->any_of() && n->uncertainty->any_of())) {
             val::BaseValue::PointerType maxuncertainty =

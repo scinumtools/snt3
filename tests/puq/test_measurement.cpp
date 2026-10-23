@@ -205,6 +205,49 @@ TEST(Measurement, ArithmeticsAdd) {
     EXPECT_EQ(q1.to_string(), "3*cm2");
 }
 
+TEST(Measurement, CompatibleArrayAdditionAndSubtractionPreserveUncertainty) {
+    const puq::Measurement metres(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{10.0, 20.0}),
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{0.1, 0.2}),
+        "m"
+    );
+    const puq::Measurement centimetres(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{100.0, 200.0}),
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{1.0, 2.0}),
+        "cm"
+    );
+
+    const auto sum = metres + centimetres;
+    const auto difference = metres - centimetres;
+    const val::ArrayValueFloat64 sum_values(sum.result.estimate.get());
+    const val::ArrayValueFloat64 sum_errors(sum.result.uncertainty.get());
+    const val::ArrayValueFloat64 difference_values(difference.result.estimate.get());
+    const val::ArrayValueFloat64 difference_errors(difference.result.uncertainty.get());
+
+    EXPECT_EQ(sum_values.get_values(), (std::vector<double>{11.0, 22.0}));
+    EXPECT_NEAR(sum_errors.get_value(0), 0.11, 1e-15);
+    EXPECT_NEAR(sum_errors.get_value(1), 0.22, 1e-15);
+    EXPECT_EQ(difference_values.get_values(), (std::vector<double>{9.0, 18.0}));
+    EXPECT_NEAR(difference_errors.get_value(0), 0.11, 1e-15);
+    EXPECT_NEAR(difference_errors.get_value(1), 0.22, 1e-15);
+    EXPECT_EQ(sum.baseunits.to_string(), "m");
+    EXPECT_EQ(difference.baseunits.to_string(), "m");
+
+    const puq::Measurement metres_without_uncertainty(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{10.0, 20.0}), "m"
+    );
+    const puq::Measurement centimetres_without_uncertainty(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{100.0, 200.0}), "cm"
+    );
+    const auto left_only = metres + centimetres_without_uncertainty;
+    const auto right_only = metres_without_uncertainty + centimetres;
+    const val::ArrayValueFloat64 left_only_errors(left_only.result.uncertainty.get());
+    const val::ArrayValueFloat64 right_only_errors(right_only.result.uncertainty.get());
+    EXPECT_EQ(left_only_errors.get_values(), (std::vector<double>{0.1, 0.2}));
+    EXPECT_NEAR(right_only_errors.get_value(0), 0.01, 1e-15);
+    EXPECT_NEAR(right_only_errors.get_value(1), 0.02, 1e-15);
+}
+
 TEST(Measurement, ArithmeticsSubtract) {
 
     puq::Measurement q1, q2, q3;

@@ -6,9 +6,122 @@
 #include <snt/puq/math/pow.h>
 #include <snt/puq/measurement.h>
 #include <snt/puq/solver/unit_solver.h>
+#include <optional>
 #include <sstream>
 
 namespace snt::puq {
+
+    namespace {
+
+        bool same_base_units(const BaseUnits& left, const BaseUnits& right) {
+            if (left.size() != right.size())
+                return false;
+            for (std::size_t i = 0; i < left.size(); ++i) {
+                const BaseUnit& a = left[static_cast<int>(i)];
+                const BaseUnit& b = right[static_cast<int>(i)];
+                if (a.prefix != b.prefix || a.unit != b.unit || a.exponent.index() != b.exponent.index())
+                    return false;
+                if (std::holds_alternative<int>(a.exponent)) {
+                    if (std::get<int>(a.exponent) != std::get<int>(b.exponent))
+                        return false;
+                } else if (std::get<Exponent>(a.exponent) != std::get<Exponent>(b.exponent)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        bool exact_scalar(const Result& result, double& value) {
+            if (!result.estimate || result.estimate->get_size() != 1 ||
+                (result.uncertainty && result.uncertainty->any_of()))
+                return false;
+            const auto* scalar = dynamic_cast<const val::ArrayValue<double>*>(result.estimate.get());
+            if (!scalar)
+                return false;
+            value = scalar->get_value(0);
+            return true;
+        }
+
+        bool exact_unity(const Result& result) {
+            double value = 0.0;
+            return exact_scalar(result, value) && value == 1.0;
+        }
+
+        const val::ArrayValue<double>* float64_array(const val::BaseValue* value) {
+            const auto* array = dynamic_cast<const val::ArrayValue<double>*>(value);
+            return array && array->get_dtype() == core::DataType::Float64 ? array : nullptr;
+        }
+
+        std::optional<Measurement> add_sub_converted_arrays(
+            const Measurement& left,
+            const Measurement& right,
+            const Converter& converter,
+            bool subtract
+        ) {
+            const auto* left_values = float64_array(left.result.estimate.get());
+            const auto* right_values = float64_array(right.result.estimate.get());
+            if (!left_values || !right_values || left_values->get_size() <= 1 ||
+                left_values->get_shape() != right_values->get_shape())
+                return std::nullopt;
+
+            double source_scale = 0.0;
+            double target_scale = 0.0;
+            if (!exact_scalar(converter.dimensions1.numerical, source_scale) ||
+                !exact_scalar(converter.dimensions2.numerical, target_scale) || target_scale == 0.0)
+                return std::nullopt;
+
+            const auto* left_uncertainty = left.result.uncertainty
+                                               ? float64_array(left.result.uncertainty.get())
+                                               : nullptr;
+            const auto* right_uncertainty = right.result.uncertainty
+                                                ? float64_array(right.result.uncertainty.get())
+                                                : nullptr;
+            if ((left.result.uncertainty &&
+                 (!left_uncertainty || left_uncertainty->get_shape() != left_values->get_shape())) ||
+                (right.result.uncertainty &&
+                 (!right_uncertainty || right_uncertainty->get_shape() != right_values->get_shape())))
+                return std::nullopt;
+
+            const std::size_t size = left_values->get_size();
+            const double* left_data = left_values->get_data();
+            const double* right_data = right_values->get_data();
+            const double* left_error_data = left_uncertainty ? left_uncertainty->get_data() : nullptr;
+            const double* right_error_data = right_uncertainty ? right_uncertainty->get_data() : nullptr;
+            val::ArrayStorage<double> values(size);
+            val::ArrayStorage<double> errors;
+            if (left_uncertainty || right_uncertainty)
+                errors.resize(size);
+
+            for (std::size_t i = 0; i < size; ++i) {
+                // Match Converter::_convert_linear's multiply-then-divide order
+                // before applying the requested arithmetic operation.
+                const double converted_right = source_scale == target_scale
+                                                   ? right_data[i]
+                                                   : (right_data[i] * source_scale) / target_scale;
+                values[i] = subtract ? left_data[i] - converted_right : left_data[i] + converted_right;
+                if (left_error_data && right_error_data) {
+                    const double converted_error = source_scale == target_scale
+                                                       ? right_error_data[i]
+                                                       : (right_error_data[i] * source_scale) / target_scale;
+                    errors[i] = left_error_data[i] + converted_error;
+                } else if (left_error_data) {
+                    errors[i] = left_error_data[i];
+                } else if (right_error_data) {
+                    errors[i] = source_scale == target_scale
+                                    ? right_error_data[i]
+                                    : (right_error_data[i] * source_scale) / target_scale;
+                }
+            }
+
+            val::BaseValue::PointerType estimate =
+                std::make_unique<val::ArrayValueFloat64>(std::move(values), left_values->get_shape());
+            val::BaseValue::PointerType uncertainty = nullptr;
+            if (left_uncertainty || right_uncertainty)
+                uncertainty = std::make_unique<val::ArrayValueFloat64>(std::move(errors), left_values->get_shape());
+            return Measurement(Result(std::move(estimate), std::move(uncertainty)), left.baseunits);
+        }
+
+    } // namespace
 
     /*
      * Convert absolute and relative (in %) uncertainties
@@ -95,13 +208,18 @@ namespace snt::puq {
     Measurement::Measurement(val::BaseValue::PointerType est, const std::string& str) {
         UnitSolver solver;
         UnitAtom atom = solver.eval(str);
-        result = Result(std::move(est)) * atom.value.result;
+        Result input(std::move(est));
+        // A unit with numerical scale 1 changes only the unit metadata. Keep
+        // ownership of the supplied array instead of allocating and multiplying
+        // a second full-sized array just to reproduce the same values.
+        result = exact_unity(atom.value.result) ? std::move(input) : input * atom.value.result;
         baseunits = atom.value.baseunits;
     }
     Measurement::Measurement(val::BaseValue::PointerType est, val::BaseValue::PointerType unc, const std::string& str) {
         UnitSolver solver;
         UnitAtom atom = solver.eval(str);
-        result = Result(std::move(est), std::move(unc)) * atom.value.result;
+        Result input(std::move(est), std::move(unc));
+        result = exact_unity(atom.value.result) ? std::move(input) : input * atom.value.result;
         baseunits = atom.value.baseunits;
     }
 
@@ -172,6 +290,12 @@ namespace snt::puq {
 
     Measurement operator+(const Measurement& msr1, const Measurement& msr2) {
         Converter conv(msr2.baseunits, msr1.baseunits);
+        if (conv.utype == Utype::LIN && same_base_units(msr1.baseunits, msr2.baseunits))
+            return Measurement(msr1.result + msr2.result, msr1.baseunits);
+        if (conv.utype == Utype::LIN) {
+            if (auto optimized = add_sub_converted_arrays(msr1, msr2, conv, false))
+                return std::move(*optimized);
+        }
         if constexpr (puq::Config::use_units_logarithmic) {
             if (conv.utype == Utype::LOG) {
                 Result res1 = msr1.result * conv.dimensions1.numerical;
@@ -209,6 +333,12 @@ namespace snt::puq {
 
     Measurement operator-(const Measurement& msr1, const Measurement& msr2) {
         Converter conv(msr2.baseunits, msr1.baseunits);
+        if (conv.utype == Utype::LIN && same_base_units(msr1.baseunits, msr2.baseunits))
+            return Measurement(msr1.result - msr2.result, msr1.baseunits);
+        if (conv.utype == Utype::LIN) {
+            if (auto optimized = add_sub_converted_arrays(msr1, msr2, conv, true))
+                return std::move(*optimized);
+        }
         if constexpr (puq::Config::use_units_logarithmic) {
             if (conv.utype == Utype::LOG) {
                 Result res1 = msr1.result * conv.dimensions1.numerical;
@@ -275,7 +405,7 @@ namespace snt::puq {
     Measurement Measurement::convert(const Measurement& msr) const {
         Converter conv(baseunits, msr.baseunits);
         Result res = conv.convert(result, msr.result);
-        return Measurement(res, msr.baseunits);
+        return Measurement(std::move(res), msr.baseunits);
     }
 
     Measurement Measurement::convert(const BaseUnits& bun) const {
@@ -334,7 +464,7 @@ namespace snt::puq {
         for (const auto& bum : bumap) {
             bus.append(bum.second);
         }
-        return Measurement(res, bus);
+        return Measurement(std::move(res), bus);
     }
 
     Measurement Measurement::rebase_dimensions() {
@@ -375,7 +505,7 @@ namespace snt::puq {
         for (const auto& bum : bumap) {
             bus.append(bum.second);
         }
-        return Measurement(res, bus);
+        return Measurement(std::move(res), bus);
     }
 
 } // namespace snt::puq

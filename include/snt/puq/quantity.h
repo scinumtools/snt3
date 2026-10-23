@@ -41,6 +41,10 @@ namespace snt::puq {
         /// @param v Measurement providing value, uncertainty, and units.
         /// @param system Unit system associated with the quantity.
         Quantity(const Measurement& v, const SystemType system = UnitSystem::current.type);
+        /// Construct a quantity by taking ownership of a temporary measurement.
+        /// @param v Temporary measurement whose result storage can be moved.
+        /// @param system Unit system associated with the quantity.
+        Quantity(Measurement&& v, const SystemType system = UnitSystem::current.type);
         /// Construct from a numerical result and parse the target unit expression.
         /// @param m Estimate and optional uncertainty.
         /// @param s Unit or quantity expression.

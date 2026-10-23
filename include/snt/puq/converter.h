@@ -25,7 +25,7 @@ namespace snt::puq {
         BaseUnits baseunits2;
         Result _convert_linear(const Result& m1, const Result& m2);
         Result _convert_logarithmic(const Result& m);
-        Result _convert_temperature(Result m);
+        Result _convert_temperature(const Result& m);
 
       public:
         Utype utype;
