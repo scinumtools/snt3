@@ -12,6 +12,9 @@ namespace snt::puq {
 
     namespace {
 
+        constexpr double nine_fifths = 9.0 / 5.0;
+        constexpr double five_ninths = 5.0 / 9.0;
+
         bool get_exact_scalar(const Result& result, double& value) {
             if (!result.estimate || result.estimate->get_size() != 1)
                 return false;
@@ -58,8 +61,6 @@ namespace snt::puq {
             if (!array || array->get_dtype() != core::DataType::Float64 || array->get_size() <= 1)
                 return false;
 
-            constexpr double nine_fifths = 9.0 / 5.0;
-            constexpr double five_ninths = 5.0 / 9.0;
             if (source_unit == "K" && target_unit == "Cel")
                 write_temperature_expression(*array, source_scale, target_scale, [](double value) { return value - 273.15; }, output);
             else if (source_unit == "K" && target_unit == "degF")
