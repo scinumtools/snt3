@@ -29,6 +29,42 @@ TEST(Converter, LinearConv) {
     EXPECT_EQ(puq::to_string(puq::Converter("J/erg", "1").convert(2)), "2e7"); // converting to number
 }
 
+TEST(Converter, LinearArrayConversionScalesEstimateAndUncertaintyInPlace) {
+    const std::vector<double> values{1.5, -2.0, 0.25};
+    const std::vector<double> errors{0.1, 0.2, 0.05};
+    const puq::Result input(
+        std::make_unique<val::ArrayValueFloat64>(values),
+        std::make_unique<val::ArrayValueFloat64>(errors)
+    );
+
+    const puq::Result converted = puq::Converter("m", "mm").convert(input);
+    const auto* converted_values = dynamic_cast<const val::ArrayValue<double>*>(converted.estimate.get());
+    const auto* converted_errors = dynamic_cast<const val::ArrayValue<double>*>(converted.uncertainty.get());
+    ASSERT_NE(converted_values, nullptr);
+    ASSERT_NE(converted_errors, nullptr);
+    EXPECT_EQ(converted_values->get_shape(), (val::Array::ShapeType{3}));
+    EXPECT_EQ(converted_values->get_values(), (std::vector<double>{1500.0, -2000.0, 250.0}));
+    EXPECT_EQ(converted_errors->get_values(), (std::vector<double>{100.0, 200.0, 50.0}));
+
+    // A conversion owns new arrays; mutating the output must not change input.
+    const val::ArrayValueFloat64 twice(2.0);
+    converted.estimate->math_mul_equal(&twice);
+    const auto* original_values = dynamic_cast<const val::ArrayValue<double>*>(input.estimate.get());
+    ASSERT_NE(original_values, nullptr);
+    EXPECT_EQ(original_values->get_values(), values);
+}
+
+TEST(Converter, LinearScalarConversionScalesUncertainty) {
+    const puq::Result input(1.25, 0.1);
+    const puq::Result converted = puq::Converter("m", "cm").convert(input);
+    const auto* value = dynamic_cast<const val::ArrayValue<double>*>(converted.estimate.get());
+    const auto* uncertainty = dynamic_cast<const val::ArrayValue<double>*>(converted.uncertainty.get());
+    ASSERT_NE(value, nullptr);
+    ASSERT_NE(uncertainty, nullptr);
+    EXPECT_DOUBLE_EQ(value->get_value(0), 125.0);
+    EXPECT_DOUBLE_EQ(uncertainty->get_value(0), 10.0);
+}
+
 TEST(Converter, LogarithmicConv) {
     if constexpr (!puq::Config::use_units_logarithmic) {
         GTEST_SKIP() << "Logarithmic units are disabled";

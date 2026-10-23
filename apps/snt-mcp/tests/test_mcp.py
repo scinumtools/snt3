@@ -483,7 +483,7 @@ class Integration(unittest.TestCase):
                 self.assertEqual(response["result"]["structuredContent"]["result"], "200*cm" if units == "cm" else "2e3*mm")
             with ThreadPoolExecutor(max_workers=8) as pool:
                 list(pool.map(convert, range(8)))
-            self.source.write_text("".join(f"parameter{i} int = {i}\n" for i in range(25000)), encoding="utf-8")
+            self.source.write_text("".join(f"parameter{i} int = {i}\n" for i in range(100000)), encoding="utf-8")
             body = json.dumps(message("tools/call", {"name": "dipl_snapshot"}, request_id="disconnect")).encode()
             with socket.create_connection(("127.0.0.1", port), timeout=5) as pending:
                 headers = (f"POST /mcp HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\n"
@@ -492,12 +492,21 @@ class Integration(unittest.TestCase):
                            f"Content-Length: {len(body)}\r\n\r\n")
                 pending.sendall(headers.encode() + body)
                 probe = message("tools/call", {"name": "puq", "arguments": {"operation": "eval", "expression": "2*m"}})
-                for _ in range(100):
+                busy_response = None
+                for _ in range(300):
                     _, response = send(probe)
-                    if response["result"]["isError"]:
+                    result = response.get("result", {})
+                    if result.get("isError"):
+                        busy_response = response
                         break
                     time.sleep(.01)
-                self.assertEqual(response["result"]["structuredContent"]["error"]["code"], "server.busy")
+                self.assertIsNotNone(
+                    busy_response,
+                    f"Expected server.busy while snapshot request remained connected; last response: {response}",
+                )
+                self.assertEqual(
+                    busy_response["result"]["structuredContent"]["error"]["code"], "server.busy", busy_response
+                )
             # Closing the socket must release the worker well before its 30-second timeout.
             deadline = time.monotonic() + 5
             while time.monotonic() < deadline:

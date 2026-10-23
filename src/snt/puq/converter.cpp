@@ -9,7 +9,61 @@
 
 namespace snt::puq {
 
+    namespace {
+
+        bool get_exact_scalar(const Result& result, double& value) {
+            if (!result.estimate || result.estimate->get_size() != 1)
+                return false;
+            if (result.uncertainty && result.uncertainty->any_of())
+                return false;
+            const auto* scalar = dynamic_cast<const val::ArrayValue<double>*>(result.estimate.get());
+            if (!scalar)
+                return false;
+            value = scalar->get_value(0);
+            return true;
+        }
+
+        bool scale_owned_array(val::BaseValue::PointerType& value, double source_scale, double target_scale) {
+            auto* array = dynamic_cast<val::ArrayValue<double>*>(value.get());
+            if (!array)
+                return false;
+            if (source_scale == target_scale)
+                return true;
+
+            // Keep the original multiply-then-divide order for numerical
+            // stability, but perform both operations in one output-buffer pass.
+            double* data = array->get_data();
+            for (std::size_t i = 0; i < array->get_size(); ++i)
+                data[i] = (data[i] * source_scale) / target_scale;
+            return true;
+        }
+
+    } // namespace
+
     Result Converter::_convert_linear(const Result& m1, const Result& m2) {
+        // The common unit conversion has exact scalar scale factors and no
+        // contextual multiplier. Clone each source buffer once, then scale it
+        // in one pass so the result remains independent without temporary arrays.
+        double source_scale = 0.0;
+        double target_scale = 0.0;
+        double context_scale = 0.0;
+        if (get_exact_scalar(dimensions1.numerical, source_scale) &&
+            get_exact_scalar(dimensions2.numerical, target_scale) &&
+            get_exact_scalar(m2, context_scale) && context_scale == 1.0 && target_scale != 0.0) {
+            auto estimate = m1.estimate->clone();
+            if (!scale_owned_array(estimate, source_scale, target_scale))
+                return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
+
+            val::BaseValue::PointerType uncertainty = nullptr;
+            if (m1.uncertainty && m1.uncertainty->any_of()) {
+                uncertainty = m1.uncertainty->clone();
+                if (!scale_owned_array(uncertainty, source_scale, target_scale))
+                    return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
+            }
+            return Result(std::move(estimate), std::move(uncertainty));
+        }
+
+        // Keep the general arithmetic path for contextual or non-scalar scales.
         return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
     }
 
