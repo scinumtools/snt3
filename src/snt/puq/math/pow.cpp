@@ -6,7 +6,42 @@
 #include <snt/puq/quantity.h>
 #include <snt/puq/result.h>
 
+#include <algorithm>
+#include <cmath>
+#include <limits>
+
 namespace snt::puq::math {
+
+    namespace {
+
+        Exponent rational_exponent(const double value) {
+            if (!std::isfinite(value) || std::abs(value) > std::numeric_limits<int>::max())
+                throw puq::UnitException(
+                    "Invalid unit exponent",
+                    "The power exponent cannot be represented as a rational unit exponent.",
+                    "Use a finite exponent within the supported unit-exponent range.",
+                    __FILE__,
+                    __LINE__
+                );
+
+            constexpr int max_denominator = 100000;
+            const double tolerance = 1e-12 * std::max(1.0, std::abs(value));
+            for (int denominator = 1; denominator <= max_denominator; ++denominator) {
+                const auto numerator = std::llround(value * denominator);
+                if (std::abs(value - static_cast<double>(numerator) / denominator) <= tolerance &&
+                    std::abs(numerator) <= std::numeric_limits<int>::max())
+                    return Exponent(static_cast<int>(numerator), denominator);
+            }
+            throw puq::UnitException(
+                "Unsupported unit exponent",
+                "The power exponent cannot be represented by a rational denominator up to 100000.",
+                "Use a rational exponent such as 0.5 or 1/3 for quantities with units.",
+                __FILE__,
+                __LINE__
+            );
+        }
+
+    } // namespace
 
     puq::BaseUnits pow(puq::BaseUnits bu, const ExponentVariant& exp) {
         for (auto& unit : bu.baseunits) {
@@ -65,7 +100,8 @@ namespace snt::puq::math {
     }
 
     puq::Measurement pow(const puq::Measurement& msr, const double exp) {
-        return puq::Measurement(pow(msr.result, exp), pow(msr.baseunits, exp));
+        const auto units = msr.baseunits.has_dimensions() ? pow(msr.baseunits, rational_exponent(exp)) : msr.baseunits;
+        return puq::Measurement(pow(msr.result, exp), units);
     }
 
     puq::Measurement pow(const puq::Measurement& msr, const ExponentVariant& exp) {

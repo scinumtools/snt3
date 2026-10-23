@@ -4,6 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <snt/puq/exceptions.h>
+#include <snt/puq/math.h>
 #include <snt/puq/quantity.h>
 #include <utility>
 #include <variant>
@@ -51,18 +52,18 @@ namespace snt::bind::python {
         }
     }
 
+    val::BaseValue::PointerType buffer_to_array(py::buffer_info& info);
+
     val::BaseValue::PointerType parseBaseValue(const py::object& other) {
         std::vector<double> vec;
-        if (py::isinstance<py::int_>(other)) {
-            vec = {static_cast<double>(other.cast<int>())};
+        if (py::isinstance<py::int_>(other) || py::isinstance<py::float_>(other)) {
+            vec = {other.cast<double>()};
         } else if (py::isinstance<py::list>(other)) {
             vec = other.cast<std::vector<double>>();
         } else if (py::isinstance<py::array>(other)) {
             py::array_t<double, py::array::c_style | py::array::forcecast> arr(other);
-            auto buf = arr.unchecked<1>();
-            vec.resize(buf.shape(0));
-            for (py::ssize_t i = 0; i < buf.shape(0); ++i)
-                vec[i] = buf(i);
+            auto info = arr.request();
+            return buffer_to_array(info);
         } else {
             return nullptr;
         }
@@ -116,6 +117,12 @@ namespace snt::bind::python {
             //.def(py::init<std::vector<double>, std::vector<double>, std::string>())
             //.def(py::init<std::vector<double>, std::vector<double>, std::string, puq::SystemType>())
             ;
+
+        q.def(
+            "__pow__",
+            [](const puq::Quantity& quantity, double exponent) { return puq::math::pow(quantity, exponent); },
+            py::is_operator()
+        );
 
         // Set higher priority than NumpyArrays
         q.attr("__array_priority__") = 1000;
@@ -264,7 +271,7 @@ namespace snt::bind::python {
             [](const puq::Quantity& quant, const py::object& other) -> py::object {
                 val::BaseValue::PointerType varray = parseBaseValue(other);
                 if (varray == nullptr)
-                    py::reinterpret_borrow<py::object>(Py_NotImplemented);
+                    return py::reinterpret_borrow<py::object>(Py_NotImplemented);
                 return py::cast(quant + std::move(varray));
             },
             py::is_operator()
@@ -274,7 +281,7 @@ namespace snt::bind::python {
             [](const puq::Quantity& quant, const py::object& other) -> py::object {
                 val::BaseValue::PointerType varray = parseBaseValue(other);
                 if (varray == nullptr)
-                    py::reinterpret_borrow<py::object>(Py_NotImplemented);
+                    return py::reinterpret_borrow<py::object>(Py_NotImplemented);
                 return py::cast(std::move(varray) + quant);
             },
             py::is_operator()
@@ -288,7 +295,7 @@ namespace snt::bind::python {
             [](const puq::Quantity& quant, const py::object& other) -> py::object {
                 val::BaseValue::PointerType varray = parseBaseValue(other);
                 if (varray == nullptr)
-                    py::reinterpret_borrow<py::object>(Py_NotImplemented);
+                    return py::reinterpret_borrow<py::object>(Py_NotImplemented);
                 return py::cast(quant - std::move(varray));
             },
             py::is_operator()
@@ -298,7 +305,7 @@ namespace snt::bind::python {
             [](const puq::Quantity& quant, const py::object& other) -> py::object {
                 val::BaseValue::PointerType varray = parseBaseValue(other);
                 if (varray == nullptr)
-                    py::reinterpret_borrow<py::object>(Py_NotImplemented);
+                    return py::reinterpret_borrow<py::object>(Py_NotImplemented);
                 return py::cast(std::move(varray) - quant);
             },
             py::is_operator()
@@ -312,7 +319,7 @@ namespace snt::bind::python {
             [](const puq::Quantity& quant, const py::object& other) -> py::object {
                 val::BaseValue::PointerType varray = parseBaseValue(other);
                 if (varray == nullptr)
-                    py::reinterpret_borrow<py::object>(Py_NotImplemented);
+                    return py::reinterpret_borrow<py::object>(Py_NotImplemented);
                 return py::cast(quant * std::move(varray));
             },
             py::is_operator()
@@ -322,7 +329,7 @@ namespace snt::bind::python {
             [](const puq::Quantity& quant, const py::object& other) -> py::object {
                 val::BaseValue::PointerType varray = parseBaseValue(other);
                 if (varray == nullptr)
-                    py::reinterpret_borrow<py::object>(Py_NotImplemented);
+                    return py::reinterpret_borrow<py::object>(Py_NotImplemented);
                 return py::cast(std::move(varray) * quant);
             },
             py::is_operator()
@@ -336,7 +343,7 @@ namespace snt::bind::python {
             [](const puq::Quantity& quant, const py::object& other) -> py::object {
                 val::BaseValue::PointerType varray = parseBaseValue(other);
                 if (varray == nullptr)
-                    py::reinterpret_borrow<py::object>(Py_NotImplemented);
+                    return py::reinterpret_borrow<py::object>(Py_NotImplemented);
                 return py::cast(quant / std::move(varray));
             },
             py::is_operator()
@@ -346,7 +353,7 @@ namespace snt::bind::python {
             [](const puq::Quantity& quant, const py::object& other) -> py::object {
                 val::BaseValue::PointerType varray = parseBaseValue(other);
                 if (varray == nullptr)
-                    py::reinterpret_borrow<py::object>(Py_NotImplemented);
+                    return py::reinterpret_borrow<py::object>(Py_NotImplemented);
                 return py::cast(std::move(varray) / quant);
             },
             py::is_operator()
@@ -377,6 +384,107 @@ namespace snt::bind::python {
             py::is_operator()
         );
 
+        q.def(
+            "__array_ufunc__",
+            [](const puq::Quantity& self,
+               const py::object& ufunc,
+               const std::string& method,
+               const py::args& inputs,
+               const py::kwargs& kwargs) -> py::object {
+                auto not_implemented = [] { return py::reinterpret_borrow<py::object>(Py_NotImplemented); };
+                if (method != "__call__" || !kwargs.empty())
+                    return not_implemented();
+
+                const auto numpy = py::module_::import("numpy");
+                if (ufunc.is(numpy.attr("sqrt"))) {
+                    if (inputs.size() != 1 || !py::isinstance<puq::Quantity>(inputs[0]))
+                        return not_implemented();
+                    return py::cast(puq::math::sqrt(self));
+                }
+                int operation = -1;
+                if (ufunc.is(numpy.attr("add")))
+                    operation = 0;
+                else if (ufunc.is(numpy.attr("subtract")))
+                    operation = 1;
+                else if (ufunc.is(numpy.attr("multiply")))
+                    operation = 2;
+                else if (ufunc.is(numpy.attr("true_divide")))
+                    operation = 3;
+                if (operation < 0 || inputs.size() != 2)
+                    return not_implemented();
+
+                auto quantities = [operation](const puq::Quantity& left, const puq::Quantity& right) {
+                    switch (operation) {
+                    case 0: return left + right;
+                    case 1: return left - right;
+                    case 2: return left * right;
+                    default: return left / right;
+                    }
+                };
+                auto quantity_array = [operation](const puq::Quantity& left, val::BaseValue::PointerType right) {
+                    switch (operation) {
+                    case 0: return left + std::move(right);
+                    case 1: return left - std::move(right);
+                    case 2: return left * std::move(right);
+                    default: return left / std::move(right);
+                    }
+                };
+                auto array_quantity = [operation](val::BaseValue::PointerType left, const puq::Quantity& right) {
+                    switch (operation) {
+                    case 0: return std::move(left) + right;
+                    case 1: return std::move(left) - right;
+                    case 2: return std::move(left) * right;
+                    default: return std::move(left) / right;
+                    }
+                };
+                const bool left_is_quantity = py::isinstance<puq::Quantity>(inputs[0]);
+                const bool right_is_quantity = py::isinstance<puq::Quantity>(inputs[1]);
+                if (left_is_quantity && right_is_quantity) {
+                    return py::cast(quantities(
+                        inputs[0].cast<const puq::Quantity&>(), inputs[1].cast<const puq::Quantity&>()
+                    ));
+                }
+                if (left_is_quantity) {
+                    auto right = parseBaseValue(inputs[1]);
+                    if (!right)
+                        return not_implemented();
+                    return py::cast(quantity_array(inputs[0].cast<const puq::Quantity&>(), std::move(right)));
+                }
+                if (right_is_quantity) {
+                    auto left = parseBaseValue(inputs[0]);
+                    if (!left)
+                        return not_implemented();
+                    return py::cast(array_quantity(std::move(left), inputs[1].cast<const puq::Quantity&>()));
+                }
+                return not_implemented();
+            }
+        );
+
+        q.def(
+            "__array_function__",
+            [](const puq::Quantity& self,
+               const py::object& function,
+               const py::tuple&,
+               const py::tuple& args,
+               const py::dict& kwargs) -> py::object {
+                auto not_implemented = [] { return py::reinterpret_borrow<py::object>(Py_NotImplemented); };
+                const auto numpy = py::module_::import("numpy");
+                if (!function.is(numpy.attr("sum")))
+                    return not_implemented();
+
+                bool supported_args = args.size() == 1 && py::isinstance<puq::Quantity>(args[0]);
+                if (args.size() == 2 && py::isinstance<puq::Quantity>(args[0]) && args[1].is_none())
+                    supported_args = true;
+                if (!supported_args)
+                    return not_implemented();
+
+                if (!kwargs.empty() &&
+                    (kwargs.size() != 1 || !kwargs.contains("axis") || !kwargs["axis"].is_none()))
+                    return not_implemented();
+                return py::cast(puq::math::sum(self));
+            }
+        );
+
         q.def("__array__", [](const puq::Quantity& q, const py::object& dtype) {
             throw puq::PybindException(
                 "Implicit NumPy conversion is not supported",
@@ -396,6 +504,12 @@ namespace snt::bind::python {
             &puq::Quantity::to_string,
             py::arg("format") = puq::UnitFormat(),
             "Format the quantity as text."
+        );
+        m.def(
+            "sqrt",
+            [](const puq::Quantity& quantity) { return puq::math::sqrt(quantity); },
+            py::arg("quantity"),
+            "Return the unit-aware square root of a quantity."
         );
     }
 

@@ -48,6 +48,12 @@ Incompatible dimensions are rejected instead of being combined silently.
 supports unit-aware arithmetic, comparisons, uncertainties, and conversion between
 compatible units and unit systems.
 
+Quantity-aware NumPy operations include `np.add`, `np.sqrt`, and `np.sum` over all
+elements. `Quantity ** exponent` and `scinumtools3.puq.sqrt(quantity)` also preserve
+units. The sum keeps the quantity's units and adds absolute uncertainties linearly.
+Use `.to_numpy()` or `.value(numpy=True)` when you explicitly want a plain NumPy
+array without units.
+
 PUEL (Physical Units Expression Language) expressions may contain scalar or array
 values, uncertainties, dimensions, constants, and units. For example:
 

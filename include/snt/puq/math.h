@@ -16,6 +16,7 @@
 #include <snt/puq/math/round.h>
 #include <snt/puq/math/sin.h>
 #include <snt/puq/math/sqrt.h>
+#include <snt/puq/math/sum.h>
 #include <snt/puq/math/tan.h>
 
 #endif // PUQ_MATH_H

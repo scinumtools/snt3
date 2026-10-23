@@ -3,6 +3,7 @@ from .._snt import puq as _puq
 Quantity = _puq.Quantity
 Calculator = _puq.Calculator
 UnitSystem = _puq.UnitSystem
+sqrt = _puq.sqrt
 
 import sys
 

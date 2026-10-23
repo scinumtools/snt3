@@ -730,6 +730,29 @@ TEST(Math, QuantityUnaryAcrossSystems) {
     }
 }
 
+TEST(Math, SqrtWithoutUncertaintyAndArraySum) {
+    const puq::Quantity squared(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{4.0, 9.0}), "m2"
+    );
+    const auto roots = puq::math::sqrt(squared);
+    const val::ArrayValueFloat64 root_values(roots.measurement.result.estimate.get());
+    EXPECT_EQ(root_values.get_values(), (std::vector<double>{2.0, 3.0}));
+    EXPECT_FALSE(roots.measurement.result.uncertainty);
+    EXPECT_EQ(roots.measurement.baseunits.to_string(), "m");
+    EXPECT_EQ(puq::math::pow(squared, 0.5).measurement.baseunits.to_string(), "m");
+
+    const puq::Quantity measured(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{1.0, 2.0, 3.0}),
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{0.1, 0.2, 0.3}),
+        "km"
+    );
+    const auto total = puq::math::sum(measured);
+    EXPECT_DOUBLE_EQ(val::ArrayValueFloat64(total.measurement.result.estimate.get()).get_value(0), 6.0);
+    EXPECT_DOUBLE_EQ(val::ArrayValueFloat64(total.measurement.result.uncertainty.get()).get_value(0), 0.6);
+    EXPECT_EQ(total.measurement.baseunits.to_string(), "km");
+    EXPECT_EQ(total.stype, measured.stype);
+}
+
 TEST(Math, QuantityMinMaxAcrossSystems) {
     if constexpr (!puq::Config::use_system_cgs) {
         GTEST_SKIP() << "CGS unit system is disabled";

@@ -527,6 +527,13 @@ The C++ VAL layer maps to familiar Python types: ``int``, ``float``, ``str``,
 ``bool``, lists, and ``numpy.ndarray``. Results therefore work directly with
 Python and NumPy; there is no separate VAL value class to learn.
 
+PUQ quantities preserve their units through ``numpy.add``, ``numpy.sqrt``, and
+``numpy.sum``. The sum reduces the complete quantity to one value and combines
+absolute uncertainties linearly. Quantity powers and ``scinumtools3.puq.sqrt``
+also retain unit dimensions. Implicit conversion of a quantity to a plain NumPy
+array remains disabled; use ``.to_numpy()`` or ``.value(numpy=True)`` when dropping
+the units is intentional.
+
 Why EXS is not exposed
 ----------------------
 
