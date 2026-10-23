@@ -141,6 +141,41 @@ TEST(Uncertainty, ArithmeticsMultiply) {
     EXPECT_EQ(msr1.to_string(), "2.000(25)e1");
 }
 
+TEST(Uncertainty, ArrayMultiplicationPropagatesBothUncertainties) {
+    const puq::Result left(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{2.0, -3.0, 1.5}),
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{0.1, 0.2, 0.05})
+    );
+    const puq::Result right(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{4.0, 2.0, -2.0}),
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{0.3, 0.1, 0.4})
+    );
+
+    const puq::Result product = left * right;
+    const auto* values = dynamic_cast<const val::ArrayValue<double>*>(product.estimate.get());
+    const auto* errors = dynamic_cast<const val::ArrayValue<double>*>(product.uncertainty.get());
+    ASSERT_NE(values, nullptr);
+    ASSERT_NE(errors, nullptr);
+    EXPECT_EQ(values->get_values(), (std::vector<double>{8.0, -6.0, -3.0}));
+    const std::vector<double> expected_errors{1.03, 0.12, 0.52};
+    ASSERT_EQ(errors->get_size(), expected_errors.size());
+    for (std::size_t i = 0; i < expected_errors.size(); ++i)
+        EXPECT_NEAR(errors->get_value(i), expected_errors[i], 1e-12);
+}
+
+TEST(Uncertainty, ArrayMultiplicationPropagatesOneUncertainty) {
+    const puq::Result left(
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{2.0, 3.0}),
+        std::make_unique<val::ArrayValueFloat64>(std::vector<double>{0.1, 0.2})
+    );
+    const puq::Result right(std::make_unique<val::ArrayValueFloat64>(std::vector<double>{4.0, 5.0}));
+
+    const puq::Result product = left * right;
+    const auto* errors = dynamic_cast<const val::ArrayValue<double>*>(product.uncertainty.get());
+    ASSERT_NE(errors, nullptr);
+    EXPECT_EQ(errors->get_values(), (std::vector<double>{0.4, 1.0}));
+}
+
 TEST(Uncertainty, ArithmeticsDivide) {
 
     puq::Measurement msr1, msr2, msr3;

@@ -92,6 +92,12 @@ def run_size(size: int, warmups: int, samples: int, iterations: int | None) -> d
     source_dbm = Quantity(values, "dBm")
     source_uncertain = Quantity(values, errors, "m")
     other_m = Quantity(np.full(size, 2.0), "m")
+    other_uncertain = Quantity(np.full(size, 2.0), errors, "s")
+    product_values = values * 2.0
+    product_uncertainty = np.maximum(
+        np.abs((values + errors) * (2.0 + errors) - product_values),
+        np.abs((values - errors) * (2.0 - errors) - product_values),
+    )
 
     cases = {
         "construct_contiguous_m": (lambda: Quantity(values, "m"), values, None),
@@ -104,6 +110,11 @@ def run_size(size: int, warmups: int, samples: int, iterations: int | None) -> d
         "convert_logarithmic_dBm_to_mW": (lambda: source_dbm.convert("mW"), 10.0 ** (values / 10.0), None),
         "convert_uncertain_m_to_mm": (lambda: source_uncertain.convert("mm"), values * 1000.0, errors * 1000.0),
         "add_arrays_m": (lambda: source_m + other_m, values + 2.0, None),
+        "multiply_arrays_with_uncertainty_m_s": (
+            lambda: source_uncertain * other_uncertain,
+            product_values,
+            product_uncertainty,
+        ),
     }
 
     result = {}

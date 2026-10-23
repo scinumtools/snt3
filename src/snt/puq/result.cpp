@@ -151,10 +151,68 @@ namespace snt::puq {
         // uncertainty += m.uncertainty;
     }
 
+    namespace {
+
+        bool multiply_float64_with_uncertainty(
+            const Result* left,
+            const Result* right,
+            val::BaseValue::PointerType& estimate,
+            val::BaseValue::PointerType& uncertainty
+        ) {
+            auto* x = dynamic_cast<val::ArrayValue<double>*>(left->estimate.get());
+            auto* y = dynamic_cast<val::ArrayValue<double>*>(right->estimate.get());
+            if (!x || !y || x->get_dtype() != core::DataType::Float64 || y->get_dtype() != core::DataType::Float64 ||
+                x->get_shape() != y->get_shape())
+                return false;
+
+            auto* dx = left->uncertainty ? dynamic_cast<val::ArrayValue<double>*>(left->uncertainty.get()) : nullptr;
+            auto* dy = right->uncertainty ? dynamic_cast<val::ArrayValue<double>*>(right->uncertainty.get()) : nullptr;
+            if ((left->uncertainty && (!dx || dx->get_dtype() != core::DataType::Float64 || dx->get_shape() != x->get_shape())) ||
+                (right->uncertainty && (!dy || dy->get_dtype() != core::DataType::Float64 || dy->get_shape() != y->get_shape())))
+                return false;
+
+            const bool has_dx = dx && dx->any_of();
+            const bool has_dy = dy && dy->any_of();
+            if (!has_dx && !has_dy)
+                return false;
+
+            // The generic interval formula creates a chain of temporary arrays.
+            // Matching Float64 shapes allow the same operations in one output pass.
+            const std::size_t size = x->get_size();
+            const double* x_values = x->get_data();
+            const double* y_values = y->get_data();
+            const double* dx_values = dx ? dx->get_data() : nullptr;
+            const double* dy_values = dy ? dy->get_data() : nullptr;
+            std::vector<double> products(size);
+            std::vector<double> errors(size);
+            for (std::size_t i = 0; i < size; ++i) {
+                products[i] = x_values[i] * y_values[i];
+                if (has_dx && has_dy) {
+                    const double upper = std::abs((x_values[i] + dx_values[i]) * (y_values[i] + dy_values[i]) - products[i]);
+                    const double lower = std::abs((x_values[i] - dx_values[i]) * (y_values[i] - dy_values[i]) - products[i]);
+                    errors[i] = std::max(upper, lower);
+                } else if (has_dx) {
+                    errors[i] = dx_values[i] * y_values[i];
+                } else {
+                    errors[i] = dy_values[i] * x_values[i];
+                }
+            }
+            estimate = std::make_unique<val::ArrayValueFloat64>(std::move(products), x->get_shape());
+            uncertainty = std::make_unique<val::ArrayValueFloat64>(std::move(errors), x->get_shape());
+            return true;
+        }
+
+    } // namespace
+
     /*
      * Multiply measurement result by another measurement result
      */
     const Result multiply(const Result* m, const Result* n) {
+        val::BaseValue::PointerType estimate;
+        val::BaseValue::PointerType uncertainty;
+        if (multiply_float64_with_uncertainty(m, n, estimate, uncertainty))
+            return Result(std::move(estimate), std::move(uncertainty));
+
         const val::ArrayValueFloat64 otherT(n->estimate.get());
         Result nm(m->estimate->math_mul(n->estimate.get()));
         if ((m->uncertainty && n->uncertainty) && (m->uncertainty->any_of() && n->uncertainty->any_of())) {
