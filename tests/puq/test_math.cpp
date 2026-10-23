@@ -751,6 +751,10 @@ TEST(Math, SqrtWithoutUncertaintyAndArraySum) {
     EXPECT_DOUBLE_EQ(val::ArrayValueFloat64(total.measurement.result.uncertainty.get()).get_value(0), 0.6);
     EXPECT_EQ(total.measurement.baseunits.to_string(), "km");
     EXPECT_EQ(total.stype, measured.stype);
+
+    const puq::Result empty(std::make_unique<val::ArrayValueFloat64>(std::vector<double>{}));
+    const auto empty_total = puq::math::sum(empty);
+    EXPECT_DOUBLE_EQ(val::ArrayValueFloat64(empty_total.estimate.get()).get_value(0), 0.0);
 }
 
 TEST(Math, QuantityMinMaxAcrossSystems) {

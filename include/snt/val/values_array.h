@@ -110,6 +110,13 @@ namespace snt::val {
         T* get_data() { return value.data(); };
 
         /**
+         * Get read-only access to the internal data container.
+         *
+         * @return Const pointer to the flattened array values.
+         */
+        const T* get_data() const { return value.data(); };
+
+        /**
          * Get size of an array
          *
          * @return Size of the flattened array value
@@ -186,20 +193,26 @@ namespace snt::val {
             if (output_dtype == core::DataType::None)
                 output_dtype = dtype;
             std::vector<R> arr;
+            // Reuse an already compatible array as a read-only view. Constructing
+            // ArrayValue<T> from BaseValue copies every element, so only convert
+            // when the input storage type actually differs.
+            std::unique_ptr<ArrayValue<T>> converted_other;
+            const auto* otherT = other->get_dtype() == dtype ? dynamic_cast<const ArrayValue<T>*>(other) : nullptr;
+            if (!otherT) {
+                converted_other = std::make_unique<ArrayValue<T>>(other, dtype);
+                otherT = converted_other.get();
+            }
             if (this->get_size() == 1 && other->get_size() == 1) { // both are scalars
-                const ArrayValue<T> otherT(other, dtype);
-                return std::make_unique<ArrayValue<R>>(f(this->get_value(0), otherT.get_value(0)), output_dtype);
+                return std::make_unique<ArrayValue<R>>(f(value[0], otherT->get_data()[0]), output_dtype);
             } else if (this->get_size() == 1) { // left is a scalar
-                const ArrayValue<T> otherT(other, dtype);
                 arr.reserve(other->get_size());
                 for (int i = 0; i < other->get_size(); i++)
-                    arr.push_back(f(this->get_value(0), otherT.get_value(i)));
-                return std::make_unique<ArrayValue<R>>(std::move(arr), otherT.get_shape(), output_dtype);
+                    arr.push_back(f(value[0], otherT->get_data()[i]));
+                return std::make_unique<ArrayValue<R>>(std::move(arr), otherT->get_shape(), output_dtype);
             } else if (other->get_size() == 1) { // right is a scalar
-                const ArrayValue<T> otherT(other, dtype);
                 arr.reserve(this->get_size());
                 for (int i = 0; i < this->get_size(); i++)
-                    arr.push_back(f(this->get_value(i), otherT.get_value(0)));
+                    arr.push_back(f(value[i], otherT->get_data()[0]));
                 return std::make_unique<ArrayValue<R>>(std::move(arr), this->get_shape(), output_dtype);
             } else { // both are arrays
                 // test if shape match
@@ -223,10 +236,11 @@ namespace snt::val {
                             __LINE__
                         );
                 // apply operation
-                const ArrayValue<T> otherT(other, dtype);
+                const T* left_values = value.data();
+                const T* right_values = otherT->get_data();
                 arr.reserve(this->get_size());
                 for (int i = 0; i < this->get_size(); i++)
-                    arr.push_back(f(this->get_value(i), otherT.get_value(i)));
+                    arr.push_back(f(left_values[i], right_values[i]));
                 return std::make_unique<ArrayValue<R>>(std::move(arr), this->get_shape(), output_dtype);
             }
         };
