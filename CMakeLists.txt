@@ -238,24 +238,26 @@ endif()
 
 if(ENABLE_EXEC_BENCHMARKS)
 
-  include(FetchContent)
-  
-  FetchContent_Declare(
-      benchmark
-      GIT_REPOSITORY https://github.com/google/benchmark.git
-      GIT_TAG v1.8.3
-  )
-  
-  set(BENCHMARK_ENABLE_TESTING OFF)
+  find_package(benchmark 1.8.3 CONFIG QUIET)
+  if(NOT benchmark_FOUND)
+    include(FetchContent)
 
-  FetchContent_MakeAvailable(benchmark)
+    FetchContent_Declare(
+        benchmark
+        GIT_REPOSITORY https://github.com/google/benchmark.git
+        GIT_TAG v1.8.3
+    )
 
-  set_target_properties(
-      benchmark
-      benchmark_main
-      PROPERTIES
-      CXX_CLANG_TIDY ""
-  )
+    set(BENCHMARK_ENABLE_TESTING OFF)
+    FetchContent_MakeAvailable(benchmark)
+
+    set_target_properties(
+        benchmark
+        benchmark_main
+        PROPERTIES
+        CXX_CLANG_TIDY ""
+    )
+  endif()
 
   add_subdirectory(benchmarks)
 endif()

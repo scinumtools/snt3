@@ -201,10 +201,69 @@ function refactor_code {
 }
 
 function run_benchmark {
-    STAMP=$(date +%Y%m%d_%H%M%S)
-    FILE_OUTPUT=benchmarks/puq/results/result_$STAMP.txt
-    ./build/bin/benchmark-puq --benchmark_out=$FILE_OUTPUT   --benchmark_out_format=console
-    echo "Benchmark results: " $FILE_OUTPUT
+    local selection="${1:-puq}"
+    local cpp_targets=()
+    local python_enabled=OFF
+
+    case "$selection" in
+        puq)
+            cpp_targets=(benchmark-puq);;
+        scalar)
+            cpp_targets=(benchmark-puq-scalar);;
+        array)
+            cpp_targets=(benchmark-puq-array);;
+        python)
+            python_enabled=ON;;
+        all)
+            cpp_targets=(benchmark-puq benchmark-puq-scalar benchmark-puq-array)
+            python_enabled=ON;;
+        *)
+            echo "Unknown benchmark '$selection'. Choose puq, scalar, array, python, or all." >&2
+            return 2;;
+    esac
+
+    CMAKE_FLAGS+=(
+        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+        -DENABLE_EXEC_BENCHMARKS=ON
+    )
+    local python_executable="${PYTHON:-$DIR_ROOT/.venv/bin/python}"
+    if [[ ! -x "$python_executable" ]]; then
+        python_executable="$(command -v python3 || true)"
+    fi
+    if [[ -z "$python_executable" || ! -x "$python_executable" ]]; then
+        echo "A usable Python interpreter is required to record benchmark history." >&2
+        echo "Set PYTHON=/path/to/python or create .venv/bin/python." >&2
+        return 1
+    fi
+    if [[ "$python_enabled" == ON ]]; then
+        CMAKE_FLAGS+=(
+            -DENABLE_BINDING_PYTHON=ON
+            "-DPython3_EXECUTABLE=${python_executable}"
+        )
+    fi
+
+    cmake -G Ninja -B "$DIR_BUILD" "${CMAKE_FLAGS[@]}"
+    if [[ ${#cpp_targets[@]} -gt 0 ]]; then
+        cmake --build "$DIR_BUILD" --target "${cpp_targets[@]}" --parallel "$NUM_MAKE_CORES"
+    fi
+
+    local history_args=()
+    if [[ ${#cpp_targets[@]} -eq 0 ]]; then
+        history_args+=(--skip-cpp)
+    else
+        local target
+        for target in "${cpp_targets[@]}"; do
+            history_args+=(--cpp-benchmark "$DIR_BUILD/bin/$target")
+        done
+    fi
+    if [[ "$python_enabled" == OFF ]]; then
+        history_args+=(--skip-python)
+    else
+        cmake --build "$DIR_BUILD" --target _snt --parallel "$NUM_MAKE_CORES"
+        history_args+=(--python "$python_executable" --python-path "$DIR_BUILD/python")
+    fi
+
+    "$python_executable" "$DIR_ROOT/benchmarks/puq/benchmark_history.py" record "${history_args[@]}"
 }
 
 function run_python_build {
@@ -235,13 +294,15 @@ function show_help {
     echo " --num-cores N           number of compiliation cores"
     echo " --refactor <from> <to>  replace <from> a string <to> another string"
     echo " --github-workflows      set a specific configuration of settings for GitHub Workflows"
-    echo " --benchmark             run benchmarks"
+    echo " --benchmark [suite]     run and record puq, scalar, array, python, or all"
     echo " --pyrun                 run python with the newest scinumtools3 build"
     echo ""
     echo "Examples:"
     echo "./setup.sh -c -b               clean and build the code"
     echo "./setup.sh -t Output.Data      run 'Output.Data' test"
     echo "./setup.sh -g class            find 'class' in the code or test"
+    echo "./setup.sh --benchmark array   build and record the C++ array benchmark"
+    echo "./setup.sh --benchmark all     build and record all PUQ benchmarks"
 }
 
 if [[ "${1}" == "" ]]; then
@@ -283,7 +344,13 @@ while [[ $# -gt 0 ]]; do
         --github-workflows)
             GITHUB_WORKFLOWS=ON; shift;;
         --benchmark)
-            run_benchmark; shift;;
+            if [[ $# -gt 1 && "$2" != -* ]]; then
+                run_benchmark "$2"; shift 2
+            else
+                run_benchmark puq; shift
+            fi;;
+        --benchmark=*)
+            run_benchmark "${1#*=}"; shift;;
         --pyrun)
             run_python_build; shift;;
 	-*|--*)
