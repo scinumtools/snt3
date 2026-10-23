@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import queue
+import select
 import socket
 import subprocess
 import sys
@@ -491,10 +492,21 @@ class Integration(unittest.TestCase):
                            f"MCP-Protocol-Version: {VERSION}\r\nMcp-Method: tools/call\r\nMcp-Name: dipl_snapshot\r\n"
                            f"Content-Length: {len(body)}\r\n\r\n")
                 pending.sendall(headers.encode() + body)
+                # Let the HTTP worker register this execution before starting
+                # the competing call. Without this small handoff window, a
+                # fast probe can acquire the execution slot first on Windows.
+                time.sleep(.1)
                 probe = message("tools/call", {"name": "puq", "arguments": {"operation": "eval", "expression": "2*m"}})
                 busy_response = None
-                for _ in range(300):
-                    _, response = send(probe)
+                response = None
+                deadline = time.monotonic() + 10
+                while time.monotonic() < deadline:
+                    # Stop probing once the pending operation has replied; each
+                    # successful probe would otherwise launch another worker.
+                    if select.select([pending], [], [], 0)[0]:
+                        break
+                    status, response = send(probe)
+                    self.assertEqual(status, 200, response)
                     result = response.get("result", {})
                     if result.get("isError"):
                         busy_response = response

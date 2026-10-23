@@ -1,13 +1,17 @@
-function(add_puq_benchmark target source)
+function(add_snt_benchmark target source library language_standard)
     add_executable(${target} ${source})
-    target_link_libraries(${target} PRIVATE benchmark::benchmark snt-puq)
-    target_compile_features(${target} PRIVATE cxx_std_20)
+    target_link_libraries(${target} PRIVATE benchmark::benchmark ${library})
+    target_compile_features(${target} PRIVATE ${language_standard})
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
         CXX_CLANG_TIDY ""
     )
 endfunction()
 
-add_puq_benchmark(benchmark-puq puq/puq_benchmark.cpp)
-add_puq_benchmark(benchmark-puq-scalar puq/scalar_benchmark.cpp)
-add_puq_benchmark(benchmark-puq-array puq/array_benchmark.cpp)
+add_snt_benchmark(benchmark-puq puq/puq_benchmark.cpp snt-puq cxx_std_20)
+add_snt_benchmark(benchmark-puq-scalar puq/scalar_benchmark.cpp snt-puq cxx_std_20)
+add_snt_benchmark(benchmark-puq-array puq/array_benchmark.cpp snt-puq cxx_std_20)
+
+if(ENABLE_DIP)
+    add_snt_benchmark(benchmark-dip dip/dip_benchmark.cpp snt-dip cxx_std_17)
+endif()

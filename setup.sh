@@ -204,6 +204,7 @@ function run_benchmark {
     local selection="${1:-puq}"
     local cpp_targets=()
     local python_enabled=OFF
+    local dip_enabled=OFF
 
     case "$selection" in
         puq)
@@ -214,11 +215,15 @@ function run_benchmark {
             cpp_targets=(benchmark-puq-array);;
         python)
             python_enabled=ON;;
+        dip)
+            cpp_targets=(benchmark-dip)
+            python_enabled=ON
+            dip_enabled=ON;;
         all)
             cpp_targets=(benchmark-puq benchmark-puq-scalar benchmark-puq-array)
             python_enabled=ON;;
         *)
-            echo "Unknown benchmark '$selection'. Choose puq, scalar, array, python, or all." >&2
+            echo "Unknown benchmark '$selection'. Choose puq, scalar, array, python, dip, or all." >&2
             return 2;;
     esac
 
@@ -241,6 +246,12 @@ function run_benchmark {
             "-DPython3_EXECUTABLE=${python_executable}"
         )
     fi
+    if [[ "$dip_enabled" == ON ]]; then
+        CMAKE_FLAGS+=(
+            -DENABLE_DIP=ON
+            -DENABLE_DIP_PYBIND=ON
+        )
+    fi
 
     cmake -G Ninja -B "$DIR_BUILD" "${CMAKE_FLAGS[@]}"
     if [[ ${#cpp_targets[@]} -gt 0 ]]; then
@@ -256,14 +267,29 @@ function run_benchmark {
             history_args+=(--cpp-benchmark "$DIR_BUILD/bin/$target")
         done
     fi
-    if [[ "$python_enabled" == OFF ]]; then
+    if [[ "$python_enabled" == ON ]]; then
+        cmake --build "$DIR_BUILD" --target _snt --parallel "$NUM_MAKE_CORES"
+    fi
+    if [[ "$python_enabled" == OFF || "$dip_enabled" == ON ]]; then
         history_args+=(--skip-python)
     else
-        cmake --build "$DIR_BUILD" --target _snt --parallel "$NUM_MAKE_CORES"
         history_args+=(--python "$python_executable" --python-path "$DIR_BUILD/python")
+    fi
+    if [[ "$dip_enabled" == ON ]]; then
+        history_args+=(
+            --history "$DIR_ROOT/benchmarks/dip/results/history.json"
+            --cpp-repetitions 3
+            --cpp-min-time 0.01s
+        )
     fi
 
     "$python_executable" "$DIR_ROOT/benchmarks/puq/benchmark_history.py" record "${history_args[@]}"
+    if [[ "$dip_enabled" == ON ]]; then
+        PYTHONPATH="$DIR_BUILD/python${PYTHONPATH:+:$PYTHONPATH}" \
+            "$python_executable" "$DIR_ROOT/benchmarks/dip/python_parse_benchmark.py" \
+            --samples 3 --warmups 1 --target-ms 10 \
+            --output "$DIR_BUILD/dip-python-benchmark.csv"
+    fi
 }
 
 function run_python_build {
@@ -294,7 +320,7 @@ function show_help {
     echo " --num-cores N           number of compiliation cores"
     echo " --refactor <from> <to>  replace <from> a string <to> another string"
     echo " --github-workflows      set a specific configuration of settings for GitHub Workflows"
-    echo " --benchmark [suite]     run and record puq, scalar, array, python, or all"
+    echo " --benchmark [suite]     run and record puq, scalar, array, python, dip, or all"
     echo " --pyrun                 run python with the newest scinumtools3 build"
     echo ""
     echo "Examples:"
@@ -302,6 +328,7 @@ function show_help {
     echo "./setup.sh -t Output.Data      run 'Output.Data' test"
     echo "./setup.sh -g class            find 'class' in the code or test"
     echo "./setup.sh --benchmark array   build and record the C++ array benchmark"
+    echo "./setup.sh --benchmark dip     benchmark DIPL core and Python extraction"
     echo "./setup.sh --benchmark all     build and record all PUQ benchmarks"
 }
 

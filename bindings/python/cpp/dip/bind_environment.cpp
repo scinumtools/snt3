@@ -91,7 +91,10 @@ namespace snt::bind::python {
         );
         env.def(py::init<>(), "Create an empty evaluation environment.");
         env.def_property_readonly(
-            "nodes", [](const dip::Environment& e) { return &e.nodes; }, "Evaluated top-level nodes."
+            "nodes",
+            [](const dip::Environment& e) { return &e.nodes; },
+            py::return_value_policy::reference_internal,
+            "Evaluated top-level nodes."
         );
         env.def_property_readonly(
             "size", [](const dip::Environment& e) { return e.nodes.size(); }, "Number of top-level nodes."
