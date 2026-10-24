@@ -806,6 +806,12 @@ namespace snt::dip {
     bool Parser::part_value() {
         if (part_reference())
             return true;
+        const auto first = code.find_first_not_of(" \t\n\r");
+        if (first != std::string::npos &&
+            ((code[first] >= '0' && code[first] <= '9') || code[first] == '+' || code[first] == '-')) {
+            if (part_number(false))
+                return true;
+        }
         if (part_function())
             return true;
         if (part_expression())
