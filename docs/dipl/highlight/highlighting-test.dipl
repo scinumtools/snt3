@@ -30,6 +30,8 @@ missing bool = none
 count int = -42
 unsigned uint64 = 18446744073709551615
 ratio float = 3.14159e-4
+relative_tolerance float = 1e-12
+  ?descr "Relative tolerance for the value correctness checks."
 length float = 2.5 m
 duration float = 12.0 s
 

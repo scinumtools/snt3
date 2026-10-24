@@ -83,7 +83,7 @@
   "Face for highlighting numbers")
 
 (defconst dip-number-regexp
-  "-?\\b[0-9]+\\b\\(?:\\.[0-9]*\\(?:[eE][-+]?[0-9]+\\)?\\)?\\b\\.?"
+  "-?\\b[0-9]+\\(?:\\.[0-9]*\\)?\\(?:[eE][-+]?[0-9]+\\)?\\b\\.?"
   "Regular expression matching a DIPL numeric literal.")
 
 (defconst dip-collection-path-regexp

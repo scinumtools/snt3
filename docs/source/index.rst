@@ -39,6 +39,9 @@ clients discover these operations, validate overrides, retain immutable
 candidates, compare them, and retrieve exports and reports. Try the runnable
 Python client in ``examples/dip/UsingMCP``; the MCP server itself is C++.
 
+The official SNT3 benchmarking project is
+`scinumtools/snt-bench <https://github.com/scinumtools/snt-bench>`_.
+
 .. toctree::
    :maxdepth: 2
    :caption: Getting Started

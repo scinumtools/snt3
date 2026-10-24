@@ -78,3 +78,6 @@ SciNumTools, followed by guides for the individual modules, practical
 examples, installation instructions, and detailed API references. If you
 are new to the project, start with :doc:`installation`, followed by
 :doc:`puel/index` and :doc:`dipl/index`.
+
+The official SNT3 benchmarking project is
+`scinumtools/snt-bench <https://github.com/scinumtools/snt-bench>`_.

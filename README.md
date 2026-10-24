@@ -36,6 +36,8 @@ configuration files and application code.
 
 The [online documentation](https://scinumtools.github.io/snt3/) contains
 the concepts, language specifications, tutorials, examples, and API reference.
+The official SNT3 benchmarking project is
+[scinumtools/snt-bench](https://github.com/scinumtools/snt-bench).
 
 ![DIPL architecture: scientific parameters are parsed and validated by the C++ core, then made available through command-line, Python, C, CMake, and REST interfaces.](docs/img/snt-schema-readme.png)
 
