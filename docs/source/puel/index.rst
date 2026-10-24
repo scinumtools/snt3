@@ -26,6 +26,23 @@ Language features
 This overview introduces PUEL's principal language features. The complete
 normative specification is provided below.
 
+PUEL expressions support:
+
+* numerical values with units, such as ``9.81*m/s2``, and dimensionless values;
+* unit multiplication, division, grouping, and integer or fractional
+  exponents, such as ``kg*m2/(sr*s2)`` and ``m1:2``;
+* numerical arrays and elementwise operations, such as ``[2,3.4,5e6]*km/s``;
+* absolute and significant-digit uncertainties, such as ``3.452(3)*kg`` and
+  ``[2.00(20),3.00(30)]*m``;
+* unit-system qualifiers and decimal prefixes, such as ``US_lb*ft`` and
+  ``MHz``;
+* named constants, quantities, and conversion factors, such as ``{#m_p}``,
+  ``<E>``, and ``|E|``;
+* offset temperature units and logarithmic ratios or levels, such as
+  ``23*Cel``, ``0*dB``, and ``0*dBm``;
+* custom units registered by the embedding application. In DIPL, custom units
+  can be declared with ``$unit``.
+
 Trailing ``#`` annotations in the examples below explain each expression; they
 are documentation comments and are not part of PUEL syntax.
 
@@ -34,12 +51,16 @@ Quantities with physical units
 
 A PUEL expression combines a numerical value, unit factors, or both. A value
 without units is dimensionless; a unit without a value denotes one unit.
-There is no whitespace within an expression.
+There is no whitespace within an expression. Numerical values support signs,
+decimal and scientific notation, and may appear as multiplicative factors
+within a unit expression.
 
 .. code-block:: text
 
    m                   # one metre
    9.81*m/s2           # acceleration
+   2.34e3*mol          # scientific notation
+   3*(2.0e1/5.0)       # dimensionless numerical expression
    293.15*K            # absolute temperature
    3.452(3)*kg*m/s2    # value with absolute uncertainty
 
@@ -84,13 +105,28 @@ uses its own typed array syntax and attaches one scalar PUEL unit expression
 to the complete array, for example ``velocity float[3] = [1,0,0] m/s``. A
 DIPL unit expression must not contain whitespace or a PUEL numerical array.
 
+Uncertainties
+^^^^^^^^^^^^^
+
+Write uncertainty digits in parentheses immediately after the numerical
+value. They specify the uncertainty at the value's least significant places,
+and remain attached to the quantity through unit conversions and calculations.
+
+.. code-block:: text
+
+   3.452(3)*kg            # uncertainty of 0.003 kg
+   3.45234(12)*kg         # uncertainty of 0.00012 kg
+   [2.00(20),3.00(30)]*m  # separate uncertainty for each element
+
 Dimensions and normalization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 PUEL resolves each expression to a scale and base dimensions. SciNumTools
 uses ``m``, ``g``, ``s``, ``K``, ``A``, ``cd``, ``mol``, and ``rad`` as its
 base dimensions. Thus ``1*kg`` and ``1000*g`` have the same dimensional
-meaning, while ``m`` and ``s`` do not and cannot be converted.
+meaning, while ``m`` and ``s`` do not and cannot be converted. Angle is
+represented by a base dimension for dimensional checks, while angular units
+remain convertible to dimensionless quantities.
 
 This normalization allows PUQ and DIPL to validate dimensional compatibility,
 convert values into a requested display unit, and evaluate expressions without
@@ -116,23 +152,37 @@ decibels (``dB``), nepers (``Np``), ``dBm``, and ``dBW``. A bare ``dB`` is a
 ratio and does not identify an absolute power; levels such as ``dBm`` and
 ``dBW`` carry their reference power.
 
-Prefixes and unit systems
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Prefixes
+^^^^^^^^
 
 Supported prefixes express conventional decimal scaling while preserving a
-unit's dimensions. PUEL also recognizes unit-system qualifiers at the start
-of an expression, separated by an underscore.
+unit's dimensions.
 
 .. code-block:: text
 
    cm              # centi- prefix on metre
    MHz             # mega- prefix on hertz
-   US_lb*ft        # US customary mass-length expression
-   SI_9.81*m/s2    # explicitly SI acceleration
 
 The available unit systems, units, constants, and allowed prefixes are defined
 by the reference tables in the specification. A prefix is accepted only where
 the corresponding unit allows it.
+
+Unit-system selection
+^^^^^^^^^^^^^^^^^^^^^
+
+A system qualifier at the beginning of an expression selects how its unit
+symbols are interpreted. Without a qualifier, the active system supplied by
+the host application is used; it defaults to SI. Supported systems include
+SI, English systems such as ``US`` and ``IU``, CGS variants such as ``ESU``
+and ``EMU``, and natural systems such as ``AU`` and ``GRU``.
+
+.. code-block:: text
+
+   SI_9.81*m/s2       # explicitly SI acceleration
+   US_lb*ft           # US customary mass-length expression
+
+The qualifier appears once, at the start, followed by an underscore. It
+cannot be inserted before individual unit symbols within an expression.
 
 Named constants and quantities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -148,6 +198,9 @@ unambiguous inside a larger unit expression.
    <E>             # physical quantity scale
    |E|             # unit-system conversion factor
 
+Named entities can also carry exponents, for example ``<E>2`` and
+``{#m_p}1:2``.
+
 Custom units
 ^^^^^^^^^^^^
 
@@ -156,6 +209,47 @@ expression. Once registered, the symbol behaves like a built-in unit in later
 expressions—for example, an application may define ``step`` as ``0.75*m`` and
 then evaluate ``4*step``. PUEL itself has no assignment syntax for custom-unit
 registration; DIPL provides its ``$unit`` declaration for configuration files.
+Custom units are scoped to a unit system and do not accept prefixes.
+
+Conversions
+^^^^^^^^^^^
+
+The host API converts quantities between compatible units, including units
+from different systems. Conversion preserves dimensions and the quantity's
+uncertainty. Temperature offsets and logarithmic units use specialized
+conversion rules.
+
+.. code-block:: text
+
+   km  -> m       # length conversion
+   eV  -> J       # energy conversion
+   dBW -> W       # referenced power-level conversion
+
+PUQ calculator expressions
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Arithmetic between complete quantities is provided by the PUQ calculator,
+not by standalone PUEL syntax. Its binary operators require whitespace around
+them so each operand remains a valid PUEL expression:
+
+.. code-block:: text
+
+   23*cm + 3*m
+   2*g * ( 6*m2/s2 - 3*cm2 / 1.5*s2 )
+
+Optional Unicode and display notation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+ASCII is the portable input form. Implementations may optionally accept
+Unicode input such as superscript exponents, a middle dot for multiplication,
+the Unicode minus sign, or a multiplication sign in scientific notation.
+They may also produce Unicode or HTML for display; HTML output is not valid
+PUEL input. PUEL does not require one canonical text serialization for all
+equivalent expressions.
+
+For portable interchange, prefer SI linear units, ASCII notation, and
+expressions without custom symbols, system-specific constants or quantity
+scales, or specialized temperature and logarithmic units.
 
 Specification
 -------------

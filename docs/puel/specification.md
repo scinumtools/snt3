@@ -5,6 +5,20 @@ author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https:/
 version: "0.1.0"
 date: "September 2026"
 titlepage: true
+abstract: >
+  This specification defines the syntax and semantics of the Physical Units
+  Expression Language (PUEL), a compact notation for physical quantities,
+  unit expressions, uncertainties, and system-specific entities in
+  SciNumTools3. It provides the standalone expression grammar, validity and
+  conformance requirements, uncertainty rules, special-unit behavior, and
+  reference tables for supported unit systems. PUEL is designed for use in
+  scientific software and machine-readable exchange; the specification also
+  identifies a portable profile for interoperable expressions.
+keywords:
+  - physical units
+  - scientific computing
+  - domain-specific language
+  - measurement uncertainty
 ---
 
 # PUEL Specification
@@ -26,6 +40,8 @@ This chapter defines the language syntax and conversion rules. The following cha
 Focused normative sections define [validity and errors](sections/validity.md),
 [uncertainty propagation](sections/uncertainty.md), and [special-unit
 semantics and conformance options](sections/special-units.md).
+The [formal grammar](#formal-grammar) is reproduced in the appendix from the
+maintained EBNF source.
 
 ### Terminology
 

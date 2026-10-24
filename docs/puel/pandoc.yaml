@@ -1,6 +1,8 @@
 from: markdown
 pdf-engine: xelatex
+lang: en-US
 toc: true
+toc-depth: 3
 number-sections: true
 resource-path: [docs/puel]
 
@@ -28,3 +30,7 @@ input-files:
   - docs/puel/tables/sru.md
   - docs/puel/tables/gru.md
   - docs/puel/tables/geo.md
+  - docs/puel/appendix/grammar.md
+
+filters:
+  - docs/dipl/pandoc-include-code.lua
