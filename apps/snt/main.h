@@ -22,6 +22,8 @@ int module_fmt(int argc, char* argv[]);
 int module_validate(int argc, char* argv[]);
 /** Check evaluated DIPL for advisory quality issues. */
 int module_lint(int argc, char* argv[]);
+/** Print the generated Bash or Zsh shell completion script. */
+int module_completion(int argc, char* argv[]);
 
 /** Execute a DIP parse command using parsed CLI arguments. */
 void module_dip(ArgParser& argpar);

@@ -42,6 +42,9 @@ Run 'snt <module> --help' for module-specific commands.
 
 int main(int argc, char* argv[]) {
 
+    if (argc > 1 && std::string(argv[1]) == "completion")
+        return module_completion(argc - 1, argv + 1);
+
     if (argc > 1 && (std::string(argv[1]) == "fmt" || std::string(argv[1]) == "format")) {
         try {
             return module_fmt(argc, argv);

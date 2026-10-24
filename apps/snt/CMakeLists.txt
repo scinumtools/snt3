@@ -29,6 +29,26 @@ install(TARGETS ${EXEC_NAME}
         EXPORT SNTExecutables
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+# Generate shell completions from the CLI's own completion metadata.
+set(SNT_COMPLETION_DIR "${CMAKE_CURRENT_BINARY_DIR}/completions")
+add_custom_command(TARGET ${EXEC_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${SNT_COMPLETION_DIR}"
+  COMMAND ${CMAKE_COMMAND}
+    "-DSNT_EXECUTABLE=$<TARGET_FILE:${EXEC_NAME}>"
+    "-DOUTPUT_FILE=${SNT_COMPLETION_DIR}/snt"
+    "-DSHELL=bash"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/write_completion.cmake"
+  COMMAND ${CMAKE_COMMAND}
+    "-DSNT_EXECUTABLE=$<TARGET_FILE:${EXEC_NAME}>"
+    "-DOUTPUT_FILE=${SNT_COMPLETION_DIR}/_snt"
+    "-DSHELL=zsh"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/write_completion.cmake"
+  VERBATIM)
+install(FILES "${SNT_COMPLETION_DIR}/snt"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/bash-completion/completions)
+install(FILES "${SNT_COMPLETION_DIR}/_snt"
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/zsh/site-functions)
+
 install(EXPORT SNTExecutables
         FILE snt-executables.cmake
         NAMESPACE snt::
