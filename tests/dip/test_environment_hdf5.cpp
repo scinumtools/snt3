@@ -120,9 +120,9 @@ TEST(Environment, CollectionOrderSurvivesHdf5RoundTrip) {
     {
         H5Handle legacy(H5Fopen(legacy_file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
         remove_order_attributes(legacy);
-        H5Handle minor(H5Aopen(legacy, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
+        H5Handle minor_attribute(H5Aopen(legacy, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
         const uint64_t legacy_minor = 9;
-        ASSERT_GE(H5Awrite(minor, H5T_NATIVE_UINT64, &legacy_minor), 0);
+        ASSERT_GE(H5Awrite(minor_attribute, H5T_NATIVE_UINT64, &legacy_minor), 0);
     }
     dip::Environment legacy_loaded;
     legacy_loaded.load(legacy_file);
