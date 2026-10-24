@@ -20,14 +20,17 @@ add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
 # snt-dip is static.  HDF5 must therefore propagate to every final binary
 # that consumes it, including the Python extension built for wheels.
 target_link_libraries(${EXEC_NAME} PUBLIC snt-puq HDF5::HDF5)
-# FindHDF5 can report "Included by compiler wrappers" without adding a C
-# library to HDF5::HDF5 or HDF5_LIBRARIES.  That leaves every consumer of this
-# static library with unresolved H5* symbols, including the DIP tests.
-find_library(SNT_HDF5_C_LIBRARY NAMES hdf5
-  HINTS "${HDF5_ROOT}" ENV HDF5_ROOT ENV CONDA_PREFIX
-  PATH_SUFFIXES lib lib/hdf5/serial hdf5/serial serial
-  REQUIRED)
-target_link_libraries(${EXEC_NAME} PUBLIC ${SNT_HDF5_C_LIBRARY})
+# Some environments report HDF5 as "Included by compiler wrappers" and
+# leave HDF5_LIBRARIES empty. Try to find the library in common package roots;
+# keep wrapper-only setups configurable when no standalone library is present.
+if(NOT HDF5_LIBRARIES)
+  find_library(SNT_HDF5_C_LIBRARY NAMES hdf5
+    HINTS "${HDF5_ROOT}" ENV HDF5_ROOT ENV CONDA_PREFIX
+    PATH_SUFFIXES lib lib/hdf5/serial hdf5/serial serial)
+  if(SNT_HDF5_C_LIBRARY)
+    target_link_libraries(${EXEC_NAME} PUBLIC ${SNT_HDF5_C_LIBRARY})
+  endif()
+endif()
 if(ENABLE_SNT_REPORT)
   target_compile_definitions(${EXEC_NAME} PUBLIC SNT_ENABLE_REPORT)
 endif()
