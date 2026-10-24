@@ -16,6 +16,7 @@
 #include <snt/dip/settings.h>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 
 namespace snt::dip {
@@ -886,6 +887,11 @@ lint : snt_project_lint
         Environment target = env;
         target.set_dependency_recording(record_dependency_graph);
         target.set_block_input_recording(retain_block_inputs);
+        std::unordered_map<std::string, ValueNode::PointerType> node_index;
+        node_index.reserve(target.nodes.size() + queue.size());
+        for (const auto& existing : target.nodes.get_nodes())
+            if (existing)
+                node_index.try_emplace(existing->path.name, existing);
         size_t next_item_group = 0;
         while (queue.size() > 0 || next_item_group < target.overrides.item_group_count()) {
             if (queue.size() == 0) {
@@ -916,12 +922,11 @@ lint : snt_project_lint
                 const std::string& path = graph_path;
                 if (node->dtype == NodeDtype::Modification)
                     target.validate_write_path(path);
-                for (const auto& existing : target.nodes.get_nodes())
-                    if (existing && existing->path.name == path) {
-                        already_defined = true;
-                        suppress_value = existing->override;
-                        break;
-                    }
+                const auto existing = node_index.find(path);
+                if (existing != node_index.end()) {
+                    already_defined = true;
+                    suppress_value = existing->second->override;
+                }
                 if (!already_defined && node->dtype != NodeDtype::Modification) {
                     replacement = target.overrides.find(path);
                     if (replacement)
@@ -1041,33 +1046,32 @@ lint : snt_project_lint
                 node->path = Path(target.branching.clean_name(node->path.name));
                 //  If node was previously defined, modify its value
                 bool new_node = true;
-                for (size_t i = 0; i < target.nodes.size(); i++) {
-                    if (target.nodes.at(i)->path.name == node->path.name) {
-                        ValueNode::PointerType mnode = target.nodes.at(i);
-                        if (mnode->override) {
-                            mnode->validate_modification(node);
+                const auto existing = node_index.find(node->path.name);
+                if (existing != node_index.end()) {
+                    ValueNode::PointerType mnode = existing->second;
+                    if (mnode->override) {
+                        mnode->validate_modification(node);
+                    } else {
+                        mnode->validate_constant();
+                        if (node->dtype != NodeDtype::Modification && node->value_origin == ValueOrigin::Empty &&
+                            node->value_raw.empty()) {
+                            mnode->modify_value(node, target);
                         } else {
-                            mnode->validate_constant();
-                            if (node->dtype != NodeDtype::Modification && node->value_origin == ValueOrigin::Empty &&
-                                node->value_raw.empty()) {
-                                mnode->modify_value(node, target);
-                            } else {
-                                std::optional<Environment::DependencyScope> graph_scope;
-                                if (record_dependency_graph)
-                                    graph_scope.emplace(
-                                        target,
-                                        "?" + node->path.name,
-                                        DependencyEventKind::Value,
-                                        core::SourceLocation{
-                                            node->line.source.name, node->line.source.line_number, node->line.code
-                                        }
-                                    );
-                                mnode->modify_value(node, target);
-                                graph_value_evaluated = record_dependency_graph;
-                            }
+                            std::optional<Environment::DependencyScope> graph_scope;
+                            if (record_dependency_graph)
+                                graph_scope.emplace(
+                                    target,
+                                    "?" + node->path.name,
+                                    DependencyEventKind::Value,
+                                    core::SourceLocation{
+                                        node->line.source.name, node->line.source.line_number, node->line.code
+                                    }
+                                );
+                            mnode->modify_value(node, target);
+                            graph_value_evaluated = record_dependency_graph;
                         }
-                        new_node = false;
                     }
+                    new_node = false;
                 }
                 if (new_node) {
                     if (node->dtype == NodeDtype::Modification) {
@@ -1093,6 +1097,7 @@ lint : snt_project_lint
                             node->line
                         );
                     target.nodes.push_back(vnode);
+                    node_index.try_emplace(vnode->path.name, vnode);
                 }
                 if (record_dependency_graph && graph_value_evaluated)
                     target.set_value_controls("?" + node->path.name, target.branching.active_case_ids());

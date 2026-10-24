@@ -26,23 +26,6 @@ Language features
 This overview introduces PUEL's principal language features. The complete
 normative specification is provided below.
 
-PUEL expressions support:
-
-* numerical values with units, such as ``9.81*m/s2``, and dimensionless values;
-* unit multiplication, division, grouping, and integer or fractional
-  exponents, such as ``kg*m2/(sr*s2)`` and ``m1:2``;
-* numerical arrays and elementwise operations, such as ``[2,3.4,5e6]*km/s``;
-* absolute and significant-digit uncertainties, such as ``3.452(3)*kg`` and
-  ``[2.00(20),3.00(30)]*m``;
-* unit-system qualifiers and decimal prefixes, such as ``US_lb*ft`` and
-  ``MHz``;
-* named constants, quantities, and conversion factors, such as ``{#m_p}``,
-  ``<E>``, and ``|E|``;
-* offset temperature units and logarithmic ratios or levels, such as
-  ``23*Cel``, ``0*dB``, and ``0*dBm``;
-* custom units registered by the embedding application. In DIPL, custom units
-  can be declared with ``$unit``.
-
 Trailing ``#`` annotations in the examples below explain each expression; they
 are documentation comments and are not part of PUEL syntax.
 

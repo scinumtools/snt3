@@ -60,7 +60,7 @@ namespace snt::dip {
     bool Parser::kwd_case() {
         constexpr auto pstr =
             ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_CONDITION, "](", KEYWORD_IF, "|", KEYWORD_ELIF, "))[ ]*");
-        std::regex pattern(pstr.data());
+        static const std::regex pattern(pstr.data());
         std::smatch matchResult;
         if (std::regex_search(code, matchResult, pattern)) {
             path = Path(matchResult[1].str());
@@ -82,8 +82,8 @@ namespace snt::dip {
                 KEYWORD_END,
                 ")"
             );
-            pattern = pstr.data();
-            if (std::regex_search(code, matchResult, pattern)) {
+            static const std::regex end_pattern(pstr.data());
+            if (std::regex_search(code, matchResult, end_pattern)) {
                 path = Path(matchResult[0].str());
                 strip(matchResult[0].str());
                 return true;
@@ -595,7 +595,7 @@ namespace snt::dip {
 
     bool Parser::part_function() {
         constexpr auto pstr = ce_concat<50>("^[ ]*(", PATTERN_KEYWORD, "+)[(][)]");
-        std::regex pattern(pstr.data());
+        static const std::regex pattern(pstr.data());
         std::smatch matchResult;
         if (std::regex_search(code, matchResult, pattern)) {
             value_raw.push_back(matchResult[1].str());
@@ -730,7 +730,7 @@ namespace snt::dip {
 
     bool Parser::part_number(const bool required, const char delimiter) {
         constexpr auto pstr = ce_concat<50>("^", PATTERN_NUMBER);
-        std::regex pattern(pstr.data());
+        static const std::regex pattern(pstr.data());
         std::smatch matchResult;
         if (std::regex_search(code, matchResult, pattern)) {
             value_raw.push_back(matchResult[0].str());
@@ -761,7 +761,7 @@ namespace snt::dip {
 
     bool Parser::part_keyword(const bool required, const char delimiter) {
         constexpr auto pstr = ce_concat<50>("^", PATTERN_KEYWORD, "+");
-        std::regex pattern(pstr.data());
+        static const std::regex pattern(pstr.data());
         std::smatch matchResult;
         if (std::regex_search(code, matchResult, pattern)) {
             value_raw.push_back(matchResult[0].str());
@@ -835,7 +835,7 @@ namespace snt::dip {
     }
 
     bool Parser::part_slice() {
-        std::regex pattern(R"(^\[([0-9:,]*)\])");
+        static const std::regex pattern(R"(^\[([0-9:,]*)\])");
         std::smatch matchResult;
         if (std::regex_search(code, matchResult, pattern)) {
             std::string slices = matchResult[1].str();
@@ -868,7 +868,7 @@ namespace snt::dip {
         // Run regex on the correct substring
         std::string target = (delimiter != '\0') ? code.substr(1) : code;
         // In numerical expressions starting signs +-*/ have to be explicitely excluded
-        std::regex pattern(R"(^(?![/*+\-]+)([^#= ]+))");
+        static const std::regex pattern(R"(^(?![/*+\-]+)([^#= ]+))");
         std::smatch matchResult;
         if (std::regex_search(target, matchResult, pattern)) {
             units_raw = matchResult[1].str();
