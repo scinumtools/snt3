@@ -39,7 +39,7 @@ the concepts, language specifications, tutorials, examples, and API reference.
 The official SNT3 benchmarking project is
 [scinumtools/snt-bench](https://github.com/scinumtools/snt-bench).
 
-![DIPL architecture: scientific parameters are parsed and validated by the C++ core, then shared through C++, Python, C, WebAssembly and JavaScript, command-line, CMake, REST, MCP, and Parameter Viewer interfaces.](docs/img/snt-schema-readme-interfaces.png)
+![DIPL architecture: scientific parameters include physical units, hierarchies, references, constraints, dependencies, sources, and provenance; the C++ core shares them through C++, Python, C, WebAssembly and JavaScript, command-line, CMake, REST, MCP, and Parameter Viewer interfaces.](docs/img/snt-schema-readme-interfaces-provenance.png)
 
 ## Why DIPL?
 
