@@ -110,6 +110,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             libgtest-dev libhdf5-dev libcurl4-openssl-dev pybind11-dev \
+            gdb \
             libgl-dev libglvnd-dev libx11-dev libxext-dev libxrandr-dev \
             libxinerama-dev libxcursor-dev libxi-dev \
             libwayland-dev libwayland-bin libxkbcommon-dev wayland-protocols pkg-config
@@ -141,6 +142,23 @@ jobs:
         if: runner.os == 'Windows'
         shell: bash
         run: ./setup.sh --github-workflows -b
+
+      # Temporary diagnostics for PUQ crashes reported by the Ubuntu runner.
+      - name: Debug PUQ segmentation faults (Linux)
+        if: runner.os == 'Linux'
+        continue-on-error: true
+        run: |
+          for test_filter in \
+            Converter.LogarithmicConv \
+            Math.Exponent \
+            Math.QuantityUnaryAcrossSystems; do
+            echo "===== gdb: ${test_filter} ====="
+            gdb --batch \
+              -ex 'set pagination off' \
+              -ex run \
+              -ex 'thread apply all bt full' \
+              --args build/bin/gtest-puq "--gtest_filter=${test_filter}" || true
+          done
 
       - name: Test (Linux/macOS)
         if: runner.os != 'Windows'
