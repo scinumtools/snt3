@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include <memory>
 #include <snt/puq/converter.h>
 #include <snt/puq/exceptions.h>
@@ -58,6 +59,10 @@ namespace snt::puq {
             const Converter& converter,
             bool subtract
         ) {
+            // The scalar fast path below predates source-aware propagation.
+            // Use the general Result operators whenever uncertainty provenance exists.
+            if (!left.result.sources.empty() || !right.result.sources.empty())
+                return std::nullopt;
             const auto* left_values = float64_array(left.result.estimate.get());
             const auto* right_values = float64_array(right.result.estimate.get());
             if (!left_values || !right_values || left_values->get_size() <= 1 ||
@@ -103,7 +108,7 @@ namespace snt::puq {
                     const double converted_error = source_scale == target_scale
                                                        ? right_error_data[i]
                                                        : (right_error_data[i] * source_scale) / target_scale;
-                    errors[i] = left_error_data[i] + converted_error;
+                    errors[i] = std::hypot(left_error_data[i], converted_error);
                 } else if (left_error_data) {
                     errors[i] = left_error_data[i];
                 } else if (right_error_data) {

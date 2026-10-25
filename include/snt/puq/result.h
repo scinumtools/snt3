@@ -6,6 +6,8 @@
 #include <snt/puq/unit_format.h>
 #include <snt/val/values.h>
 #include <variant>
+#include <map>
+#include <vector>
 
 namespace snt::puq {
 
@@ -19,11 +21,17 @@ namespace snt::puq {
      */
     class Result {
       public:
+        enum class PropagationMode { Standard, Interval };
+        using SourceMap = std::map<std::size_t, val::BaseValue::PointerType>;
         val::BaseValue::PointerType estimate;    ///< Estimated scalar or array value.
         val::BaseValue::PointerType uncertainty; ///< Optional absolute uncertainty matching `estimate`.
+        /** Signed first-order contributions, keyed by independent source identity. */
+        SourceMap sources;
         Result(const Result& other) {
             estimate = other.estimate ? other.estimate->clone() : nullptr;
             uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
+            for (const auto& [id, contribution] : other.sources)
+                sources.emplace(id, contribution->clone());
         }
         /** Assign the right-hand result to this object.
          * @param other Other value used in the operation.
@@ -32,6 +40,9 @@ namespace snt::puq {
             if (this != &other) {
                 estimate = other.estimate ? other.estimate->clone() : nullptr;
                 uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
+                sources.clear();
+                for (const auto& [id, contribution] : other.sources)
+                    sources.emplace(id, contribution->clone());
             }
             return *this;
         }
@@ -39,11 +50,22 @@ namespace snt::puq {
         Result& operator=(Result&&) noexcept = default;
         Result() : estimate(std::make_unique<val::ArrayValueFloat64>(1)), uncertainty(nullptr) {}
         Result(const double m) : estimate(std::make_unique<val::ArrayValueFloat64>(m)), uncertainty(nullptr) {}
-        Result(const double m, const double e)
-            : estimate(std::make_unique<val::ArrayValueFloat64>(m)),
-              uncertainty(std::make_unique<val::ArrayValueFloat64>(e)) {}
+        Result(const double m, const double e);
         Result(val::BaseValue::PointerType m);
         Result(val::BaseValue::PointerType m, val::BaseValue::PointerType e);
+        /** Apply a pointwise derivative while retaining the input source identities. */
+        Result transformed(val::BaseValue::PointerType value, val::BaseValue::PointerType derivative) const;
+        /** Recompute the displayed standard uncertainty from source contributions. */
+        void refresh_uncertainty();
+        /** Set the correlation coefficient between two primitive uncertain results.
+         * Both results must each contain one uncertainty source and have matching shapes.
+         */
+        static void correlate(Result& left, Result& right, double coefficient);
+        /** Assign a covariance matrix to a set of primitive uncertain results. */
+        static void correlate_many(const std::vector<Result*>& values, const std::vector<std::vector<double>>& covariance);
+        /** Select process-wide propagation semantics. Standard is the default. */
+        static void set_propagation_mode(PropagationMode mode);
+        static PropagationMode propagation_mode();
 
         /** Convert an absolute uncertainty to a relative uncertainty.
          * @param v Central value.

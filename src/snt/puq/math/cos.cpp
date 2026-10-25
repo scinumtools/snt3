@@ -10,12 +10,8 @@ namespace snt::puq::math {
 
     puq::Result cos(const puq::Result& m) {
         // y ± Dy = cos(x ± Dx) -> Dy = |sin(x)| * Dx
-        if (m.uncertainty)
-            return puq::Result(
-                m.estimate->math_cos(), m.uncertainty->math_mul(m.estimate->math_sin()->math_abs().get())
-            );
-        else
-            return puq::Result(m.estimate->math_cos());
+        auto derivative = m.estimate->math_sin()->math_neg();
+        return m.transformed(m.estimate->math_cos(), std::move(derivative));
         // return puq::Result(cos(m.estimate), m.uncertainty / m.estimate);
     }
 

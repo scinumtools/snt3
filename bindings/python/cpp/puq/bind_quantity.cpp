@@ -138,6 +138,45 @@ namespace snt::bind::python {
             //.def(py::init<std::vector<double>, std::vector<double>, std::string, puq::SystemType>())
             ;
 
+        q.def_static(
+            "set_propagation_mode",
+            [](const std::string& mode) {
+                if (mode == "standard")
+                    puq::Result::set_propagation_mode(puq::Result::PropagationMode::Standard);
+                else if (mode == "interval")
+                    puq::Result::set_propagation_mode(puq::Result::PropagationMode::Interval);
+                else
+                    throw py::value_error("mode must be 'standard' or 'interval'");
+            },
+            py::arg("mode"),
+            "Set process-wide uncertainty propagation to 'standard' or 'interval'."
+        );
+        q.def_static(
+            "correlate",
+            [](puq::Quantity& left, puq::Quantity& right, double coefficient) {
+                puq::Result::correlate(left.measurement.result, right.measurement.result, coefficient);
+            },
+            py::arg("left"),
+            py::arg("right"),
+            py::arg("coefficient"),
+            "Set the correlation coefficient between two primitive uncertain quantities."
+        );
+        q.def_static(
+            "correlate_many",
+            [](py::sequence quantities, const std::vector<std::vector<double>>& covariance) {
+                std::vector<puq::Result*> results;
+                results.reserve(quantities.size());
+                for (const auto& item : quantities) {
+                    auto& quantity = py::cast<puq::Quantity&>(item);
+                    results.push_back(&quantity.measurement.result);
+                }
+                puq::Result::correlate_many(results, covariance);
+            },
+            py::arg("quantities"),
+            py::arg("covariance"),
+            "Assign a covariance matrix to scalar primitive uncertain quantities."
+        );
+
         q.def(
             "__pow__",
             [](const puq::Quantity& quantity, double exponent) { return puq::math::pow(quantity, exponent); },

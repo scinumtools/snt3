@@ -10,12 +10,7 @@ namespace snt::puq::math {
 
     puq::Result sin(const puq::Result& m) {
         // y ± Dy = sin(x ± Dx) -> Dy = |cos(x)| * Dx
-        if (m.uncertainty)
-            return puq::Result(
-                m.estimate->math_sin(), m.uncertainty->math_mul(m.estimate->math_cos()->math_abs().get())
-            );
-        else
-            return puq::Result(m.estimate->math_sin());
+        return m.transformed(m.estimate->math_sin(), m.estimate->math_cos());
         // return puq::Result(sin(m.estimate), m.uncertainty / m.estimate);
     }
 

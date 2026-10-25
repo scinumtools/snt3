@@ -165,15 +165,8 @@ namespace snt::puq {
                     return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
             }
 
-            val::BaseValue::PointerType uncertainty = nullptr;
-            if (m1.uncertainty && m1.uncertainty->any_of()) {
-                if (!make_scaled_float64_copy(m1.uncertainty.get(), source_scale, target_scale, uncertainty)) {
-                    uncertainty = m1.uncertainty->clone();
-                    if (!scale_owned_array(uncertainty, source_scale, target_scale))
-                        return (m1 * dimensions1.numerical) / (m2 * dimensions2.numerical);
-                }
-            }
-            return Result(std::move(estimate), std::move(uncertainty));
+            auto scale = std::make_unique<val::ArrayValueFloat64>(source_scale / target_scale);
+            return m1.transformed(std::move(estimate), std::move(scale));
         }
 
         // Keep the general arithmetic path for contextual or non-scalar scales.

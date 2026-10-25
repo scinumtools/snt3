@@ -55,11 +55,11 @@ namespace snt::puq::math {
     } // namespace
 
     puq::Result sum(const puq::Result& result) {
-        const double estimate = sum_values(result.estimate.get());
-        if (!result.uncertainty)
-            return puq::Result(estimate);
-
-        return puq::Result(estimate, sum_values(result.uncertainty.get()));
+        puq::Result output(sum_values(result.estimate.get()));
+        for (const auto& [id, contribution] : result.sources)
+            output.sources.emplace(id, std::make_unique<val::ArrayValueFloat64>(sum_values(contribution.get())));
+        output.refresh_uncertainty();
+        return output;
     }
 
     puq::Measurement sum(const puq::Measurement& measurement) {

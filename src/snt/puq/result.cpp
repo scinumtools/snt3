@@ -1,12 +1,41 @@
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <snt/puq/exceptions.h>
 #include <snt/puq/result.h>
 #include <sstream>
+#include <stdexcept>
 
 namespace snt::puq {
+
+    namespace {
+        std::atomic_size_t next_source_id{1};
+        std::atomic<Result::PropagationMode> active_mode{Result::PropagationMode::Standard};
+
+        void add_scaled_sources(
+            Result::SourceMap& target,
+            const Result::SourceMap& source,
+            const val::BaseValue* derivative
+        ) {
+            for (const auto& [id, contribution] : source) {
+                auto scaled = derivative ? contribution->math_mul(derivative) : contribution->clone();
+                if (auto it = target.find(id); it != target.end())
+                    it->second->math_add_equal(scaled.get());
+                else
+                    target.emplace(id, std::move(scaled));
+            }
+        }
+    } // namespace
+
+    void Result::set_propagation_mode(PropagationMode mode) {
+        active_mode.store(mode);
+    }
+
+    Result::PropagationMode Result::propagation_mode() {
+        return active_mode.load();
+    }
 
     Result::Result(val::BaseValue::PointerType m) : estimate(std::move(m)), uncertainty(nullptr) {
         if (!estimate)
@@ -18,6 +47,9 @@ namespace snt::puq {
                 __LINE__
             );
     }
+
+    Result::Result(const double m, const double e)
+        : Result(std::make_unique<val::ArrayValueFloat64>(m), std::make_unique<val::ArrayValueFloat64>(e)) {}
 
     Result::Result(val::BaseValue::PointerType m, val::BaseValue::PointerType e)
         : estimate(std::move(m)), uncertainty(std::move(e)) {
@@ -38,6 +70,123 @@ namespace snt::puq {
                 __FILE__,
                 __LINE__
             );
+        if (uncertainty && uncertainty->any_of())
+            sources.emplace(next_source_id++, uncertainty->clone());
+    }
+
+    void Result::refresh_uncertainty() {
+        uncertainty.reset();
+        for (const auto& [id, contribution] : sources) {
+            auto square = contribution->math_pow(2);
+            uncertainty = uncertainty ? uncertainty->math_add(square.get()) : std::move(square);
+        }
+        if (uncertainty)
+            uncertainty = uncertainty->math_sqrt();
+    }
+
+    Result Result::transformed(val::BaseValue::PointerType value, val::BaseValue::PointerType derivative) const {
+        Result output(std::move(value));
+        add_scaled_sources(output.sources, sources, derivative.get());
+        output.refresh_uncertainty();
+        return output;
+    }
+
+    void Result::correlate(Result& left, Result& right, double coefficient) {
+        if (!std::isfinite(coefficient) || coefficient < -1.0 || coefficient > 1.0)
+            throw std::invalid_argument("Correlation coefficient must be finite and in [-1, 1].");
+        if (left.sources.size() != 1 || right.sources.size() != 1 || left.shape() != right.shape())
+            throw std::invalid_argument("Correlation requires primitive uncertain results with matching shapes.");
+        if (coefficient == 0.0)
+            return;
+
+        auto left_error = left.uncertainty->clone();
+        auto right_error = right.uncertainty->clone();
+        left.sources.clear();
+        right.sources.clear();
+        const double common_scale = std::sqrt(std::abs(coefficient));
+        const double residual_scale = std::sqrt(1.0 - std::abs(coefficient));
+        const auto common_id = next_source_id++;
+        auto common_left = left_error->math_mul(std::make_unique<val::ArrayValueFloat64>(common_scale).get());
+        auto common_right = right_error->math_mul(
+            std::make_unique<val::ArrayValueFloat64>(coefficient < 0.0 ? -common_scale : common_scale).get()
+        );
+        left.sources.emplace(common_id, std::move(common_left));
+        right.sources.emplace(common_id, std::move(common_right));
+        if (residual_scale > 0.0) {
+            auto scale = std::make_unique<val::ArrayValueFloat64>(residual_scale);
+            left.sources.emplace(next_source_id++, left_error->math_mul(scale.get()));
+            right.sources.emplace(next_source_id++, right_error->math_mul(scale.get()));
+        }
+        left.refresh_uncertainty();
+        right.refresh_uncertainty();
+    }
+
+    void Result::correlate_many(const std::vector<Result*>& values, const std::vector<std::vector<double>>& covariance) {
+        const std::size_t count = values.size();
+        if (count == 0 || covariance.size() != count)
+            throw std::invalid_argument("Covariance matrix dimensions must match the non-empty input list.");
+        for (const auto& row : covariance)
+            if (row.size() != count)
+                throw std::invalid_argument("Covariance matrix must be square.");
+        for (const auto* value : values)
+            if (!value)
+                throw std::invalid_argument("Covariance input list contains a null result.");
+
+        const auto expected_shape = values.front()->shape();
+        std::vector<double> stddev(count);
+        for (std::size_t i = 0; i < count; ++i) {
+            if (!values[i] || values[i]->sources.size() != 1 || !values[i]->uncertainty ||
+                values[i]->shape() != expected_shape || values[i]->size() != 1)
+                throw std::invalid_argument("Covariance inputs must be scalar primitive uncertain results.");
+            const auto* uncertainty = dynamic_cast<const val::ArrayValue<double>*>(values[i]->uncertainty.get());
+            if (!uncertainty)
+                throw std::invalid_argument("Covariance inputs must use floating-point uncertainties.");
+            stddev[i] = uncertainty->get_value(0);
+        }
+
+        std::vector<std::vector<double>> factor(count, std::vector<double>(count, 0.0));
+        for (std::size_t i = 0; i < count; ++i) {
+            for (std::size_t j = 0; j < count; ++j) {
+                if (!std::isfinite(covariance[i][j]) ||
+                    std::abs(covariance[i][j] - covariance[j][i]) >
+                        1e-12 * std::max({1e-300, std::abs(covariance[i][j]), std::abs(covariance[j][i])}))
+                    throw std::invalid_argument("Covariance matrix must be finite and symmetric.");
+            }
+            if (covariance[i][i] < 0.0 ||
+                std::abs(covariance[i][i] - stddev[i] * stddev[i]) >
+                    1e-10 * std::max({1e-300, covariance[i][i], stddev[i] * stddev[i]}))
+                throw std::invalid_argument("Covariance diagonal must match the input uncertainty variances.");
+            for (std::size_t j = 0; j <= i; ++j) {
+                double residual = covariance[i][j];
+                for (std::size_t k = 0; k < j; ++k)
+                    residual -= factor[i][k] * factor[j][k];
+                if (i == j) {
+                    if (residual < -1e-12 * std::max(1e-300, covariance[i][i]))
+                        throw std::invalid_argument("Covariance matrix must be positive semidefinite.");
+                    factor[i][j] = std::sqrt(std::max(0.0, residual));
+                } else if (factor[j][j] > 0.0) {
+                    factor[i][j] = residual / factor[j][j];
+                } else if (std::abs(residual) > 1e-12) {
+                    throw std::invalid_argument("Covariance matrix must be positive semidefinite.");
+                }
+            }
+        }
+
+        std::vector<std::size_t> source_ids(count);
+        for (auto& id : source_ids)
+            id = next_source_id++;
+        for (std::size_t i = 0; i < count; ++i) {
+            values[i]->sources.clear();
+            if (stddev[i] > 0.0) {
+                for (std::size_t k = 0; k <= i; ++k) {
+                    if (factor[i][k] == 0.0)
+                        continue;
+                    auto scale = std::make_unique<val::ArrayValueFloat64>(factor[i][k] / stddev[i]);
+                    values[i]->sources.emplace(source_ids[k], values[i]->uncertainty->math_mul(scale.get()));
+                }
+            }
+            values[i]->refresh_uncertainty();
+        }
     }
 
     /*
@@ -90,29 +239,25 @@ namespace snt::puq {
      * Add two measurement results
      */
     Result operator+(const Result& m1, const Result& m2) {
-        // z ± Dz = (x ± Dx) + (y ± Dy) -> Dz = Dx + Dy     (average uncertainties)
-        val::BaseValue::PointerType Dz = nullptr;
-        if (m1.uncertainty && m2.uncertainty)
-            Dz = m1.uncertainty->math_add(m2.uncertainty.get());
-        else if (m1.uncertainty)
-            Dz = m1.uncertainty->clone();
-        else if (m2.uncertainty)
-            Dz = m2.uncertainty->clone();
-        // Array Dz = math::sqrt(math::pow(m1.uncertainty,2)+math::pow(m2.uncertainty,2)); // Gaussian uncertainty
-        // propagation
-        return Result(m1.estimate->math_add(m2.estimate.get()), std::move(Dz));
-        // Array Dz = m1.uncertainty + m2.uncertainty;
-        //// Array Dz = math::sqrt(math::pow(m1.uncertainty,2)+math::pow(m2.uncertainty,2)); // Gaussian uncertainty
-        /// propagation
-        // return Result(m1.estimate + m2.estimate, Dz);
+        if (Result::propagation_mode() == Result::PropagationMode::Interval) {
+            auto error = m1.uncertainty && m2.uncertainty
+                             ? m1.uncertainty->math_add(m2.uncertainty.get())
+                             : (m1.uncertainty ? m1.uncertainty->clone()
+                                               : (m2.uncertainty ? m2.uncertainty->clone() : nullptr));
+            return Result(m1.estimate->math_add(m2.estimate.get()), std::move(error));
+        }
+        Result out(m1.estimate->math_add(m2.estimate.get()));
+        add_scaled_sources(out.sources, m1.sources, nullptr);
+        add_scaled_sources(out.sources, m2.sources, nullptr);
+        out.refresh_uncertainty();
+        return out;
     }
 
     void Result::operator+=(const Result& m) {
-        estimate->math_add_equal(m.estimate.get());
-        if (uncertainty && m.uncertainty)
-            uncertainty->math_add_equal(m.uncertainty.get());
-        else if (m.uncertainty)
-            uncertainty = m.uncertainty->clone();
+        Result out = *this + m;
+        estimate = std::move(out.estimate);
+        uncertainty = std::move(out.uncertainty);
+        sources = std::move(out.sources);
         // estimate += m.estimate;
         // uncertainty += m.uncertainty;
         //// uncertainty = math::sqrt(math::pow(uncertainty,2)+math::pow(m.uncertainty,2));
@@ -122,128 +267,61 @@ namespace snt::puq {
      * Subtract two measurement results
      */
     Result operator-(const Result& m1) {
-        if (m1.uncertainty)
-            return Result(m1.estimate->math_neg(), m1.uncertainty->clone());
-        else
-            return Result(m1.estimate->math_neg());
+        auto minus_one = std::make_unique<val::ArrayValueFloat64>(-1.0);
+        return m1.transformed(m1.estimate->math_neg(), std::move(minus_one));
         // return Result(-m1.estimate, m1.uncertainty);
     }
     Result operator-(const Result& m1, const Result& m2) {
-        // z ± Dz = (x ± Dx) - (y ± Dy) -> Dz = Dx + Dy     (average uncertainties)
-        val::BaseValue::PointerType Dz = nullptr;
-        if (m1.uncertainty && m2.uncertainty)
-            Dz = m1.uncertainty->math_add(m2.uncertainty.get());
-        else if (m1.uncertainty)
-            Dz = m1.uncertainty->clone();
-        else if (m2.uncertainty)
-            Dz = m2.uncertainty->clone();
-        return Result(m1.estimate->math_sub(m2.estimate.get()), std::move(Dz));
+        if (Result::propagation_mode() == Result::PropagationMode::Interval) {
+            auto error = m1.uncertainty && m2.uncertainty
+                             ? m1.uncertainty->math_add(m2.uncertainty.get())
+                             : (m1.uncertainty ? m1.uncertainty->clone()
+                                               : (m2.uncertainty ? m2.uncertainty->clone() : nullptr));
+            return Result(m1.estimate->math_sub(m2.estimate.get()), std::move(error));
+        }
+        Result out(m1.estimate->math_sub(m2.estimate.get()));
+        auto negative = std::make_unique<val::ArrayValueFloat64>(-1.0);
+        add_scaled_sources(out.sources, m1.sources, nullptr);
+        add_scaled_sources(out.sources, m2.sources, negative.get());
+        out.refresh_uncertainty();
+        return out;
         // return Result(m1.estimate - m2.estimate, m1.uncertainty + m2.uncertainty);
     }
 
     void Result::operator-=(const Result& m) {
-        estimate->math_sub_equal(m.estimate.get());
-        if (uncertainty && m.uncertainty)
-            uncertainty->math_add_equal(m.uncertainty.get());
-        else if (m.uncertainty)
-            uncertainty = m.uncertainty->clone();
+        Result out = *this - m;
+        estimate = std::move(out.estimate);
+        uncertainty = std::move(out.uncertainty);
+        sources = std::move(out.sources);
         // estimate -= m.estimate;
         // uncertainty += m.uncertainty;
     }
-
-    namespace {
-
-        bool multiply_float64_with_uncertainty(
-            const Result* left,
-            const Result* right,
-            val::BaseValue::PointerType& estimate,
-            val::BaseValue::PointerType& uncertainty
-        ) {
-            auto* x = dynamic_cast<val::ArrayValue<double>*>(left->estimate.get());
-            auto* y = dynamic_cast<val::ArrayValue<double>*>(right->estimate.get());
-            if (!x || !y || x->get_dtype() != core::DataType::Float64 || y->get_dtype() != core::DataType::Float64 ||
-                x->get_shape() != y->get_shape())
-                return false;
-
-            auto* dx = left->uncertainty ? dynamic_cast<val::ArrayValue<double>*>(left->uncertainty.get()) : nullptr;
-            auto* dy = right->uncertainty ? dynamic_cast<val::ArrayValue<double>*>(right->uncertainty.get()) : nullptr;
-            if ((left->uncertainty && (!dx || dx->get_dtype() != core::DataType::Float64 || dx->get_shape() != x->get_shape())) ||
-                (right->uncertainty && (!dy || dy->get_dtype() != core::DataType::Float64 || dy->get_shape() != y->get_shape())))
-                return false;
-
-            const bool has_dx = dx && dx->any_of();
-            const bool has_dy = dy && dy->any_of();
-            if (!has_dx && !has_dy)
-                return false;
-
-            // The generic interval formula creates a chain of temporary arrays.
-            // Matching Float64 shapes allow the same operations in one output pass.
-            const std::size_t size = x->get_size();
-            const double* x_values = x->get_data();
-            const double* y_values = y->get_data();
-            const double* dx_values = dx ? dx->get_data() : nullptr;
-            const double* dy_values = dy ? dy->get_data() : nullptr;
-            std::vector<double> products(size);
-            std::vector<double> errors(size);
-            for (std::size_t i = 0; i < size; ++i) {
-                products[i] = x_values[i] * y_values[i];
-                if (has_dx && has_dy) {
-                    const double upper = std::abs((x_values[i] + dx_values[i]) * (y_values[i] + dy_values[i]) - products[i]);
-                    const double lower = std::abs((x_values[i] - dx_values[i]) * (y_values[i] - dy_values[i]) - products[i]);
-                    errors[i] = std::max(upper, lower);
-                } else if (has_dx) {
-                    errors[i] = dx_values[i] * y_values[i];
-                } else {
-                    errors[i] = dy_values[i] * x_values[i];
-                }
-            }
-            estimate = std::make_unique<val::ArrayValueFloat64>(std::move(products), x->get_shape());
-            uncertainty = std::make_unique<val::ArrayValueFloat64>(std::move(errors), x->get_shape());
-            return true;
-        }
-
-    } // namespace
 
     /*
      * Multiply measurement result by another measurement result
      */
     const Result multiply(const Result* m, const Result* n) {
-        val::BaseValue::PointerType estimate;
-        val::BaseValue::PointerType uncertainty;
-        if (multiply_float64_with_uncertainty(m, n, estimate, uncertainty))
-            return Result(std::move(estimate), std::move(uncertainty));
-
-        Result nm(m->estimate->math_mul(n->estimate.get()));
-        if ((m->uncertainty && n->uncertainty) && (m->uncertainty->any_of() && n->uncertainty->any_of())) {
-            val::BaseValue::PointerType maxuncertainty =
-                ((m->estimate->math_add(m->uncertainty.get()))
-                     ->math_mul((n->estimate->math_add(n->uncertainty.get())).get())
-                     ->math_sub(nm.estimate.get()))
-                    ->math_abs();
-            val::BaseValue::PointerType minuncertainty =
-                ((m->estimate->math_sub(m->uncertainty.get()))
-                     ->math_mul((n->estimate->math_sub(n->uncertainty.get())).get())
-                     ->math_sub(nm.estimate.get()))
-                    ->math_abs();
-            nm.uncertainty = maxuncertainty->math_max(minuncertainty.get());
-        } else if ((!m->uncertainty || m->uncertainty->none_of()) && (n->uncertainty && n->uncertainty->any_of())) {
-            nm.uncertainty = n->uncertainty->math_mul(m->estimate.get());
-        } else if ((m->uncertainty && m->uncertainty->any_of()) && (!n->uncertainty || n->uncertainty->none_of())) {
-            nm.uncertainty = m->uncertainty->math_mul(n->estimate.get());
+        if (Result::propagation_mode() == Result::PropagationMode::Interval) {
+            Result output(m->estimate->math_mul(n->estimate.get()));
+            if (m->uncertainty && n->uncertainty) {
+                auto upper = m->estimate->math_add(m->uncertainty.get())
+                                 ->math_mul(n->estimate->math_add(n->uncertainty.get()).get())
+                                 ->math_sub(output.estimate.get())->math_abs();
+                auto lower = m->estimate->math_sub(m->uncertainty.get())
+                                 ->math_mul(n->estimate->math_sub(n->uncertainty.get()).get())
+                                 ->math_sub(output.estimate.get())->math_abs();
+                output.uncertainty = upper->math_max(lower.get());
+            } else if (m->uncertainty) {
+                output.uncertainty = m->uncertainty->math_mul(n->estimate.get());
+            } else if (n->uncertainty) {
+                output.uncertainty = n->uncertainty->math_mul(m->estimate.get());
+            }
+            return output;
         }
-        // Result nm(m->estimate * n->estimate);
-        // if (m->uncertainty == 0 && n->uncertainty == 0) {
-        //   nm.uncertainty = (m->uncertainty.size() > n->uncertainty.size()) ? m->uncertainty : n->uncertainty;
-        // } else if (m->uncertainty == 0 && n->uncertainty != 0) {
-        //   nm.uncertainty = n->uncertainty * m->estimate;
-        // } else if (m->uncertainty != 0 && n->uncertainty == 0) {
-        //   nm.uncertainty = m->uncertainty * n->estimate;
-        // } else {
-        //   val::BaseValue::PointerType maxuncertainty = math::abs((m->estimate + m->uncertainty) * (n->estimate +
-        //   n->uncertainty) - nm.estimate); val::BaseValue::PointerType minuncertainty = math::abs((m->estimate -
-        //   m->uncertainty) * (n->estimate - n->uncertainty) - nm.estimate); nm.uncertainty = math::max(maxuncertainty,
-        //   minuncertainty);
-        // }
+        Result nm(m->estimate->math_mul(n->estimate.get()));
+        add_scaled_sources(nm.sources, m->sources, n->estimate.get());
+        add_scaled_sources(nm.sources, n->sources, m->estimate.get());
+        nm.refresh_uncertainty();
         return nm;
     }
 
@@ -254,8 +332,8 @@ namespace snt::puq {
     void Result::operator*=(const Result& m) {
         Result nm = multiply(this, &m);
         estimate = nm.estimate->clone();
-        if (nm.uncertainty)
-            uncertainty = nm.uncertainty->clone();
+        uncertainty = nm.uncertainty ? nm.uncertainty->clone() : nullptr;
+        sources = std::move(nm.sources);
         // estimate = nm.estimate;
         // uncertainty = nm.uncertainty;
     }
@@ -265,31 +343,32 @@ namespace snt::puq {
      */
     const Result divide(const Result* m, const Result* n) {
         Result nm(m->estimate->math_div(n->estimate.get()));
-        if ((m->uncertainty && n->uncertainty) && (m->uncertainty->any_of() && n->uncertainty->any_of())) {
-            val::BaseValue::PointerType maxuncertainty =
-                (((m->estimate->math_add(m->uncertainty.get()))
-                      ->math_div((n->estimate->math_sub(n->uncertainty.get())).get()))
-                     ->math_sub(nm.estimate.get()))
-                    ->math_abs();
-            val::BaseValue::PointerType minuncertainty =
-                (((m->estimate->math_sub(m->uncertainty.get()))
-                      ->math_div((n->estimate->math_add(n->uncertainty.get())).get()))
-                     ->math_sub(nm.estimate.get()))
-                    ->math_abs();
-            nm.uncertainty = maxuncertainty->math_max(minuncertainty.get());
-        } else if ((!m->uncertainty || m->uncertainty->none_of()) && (n->uncertainty && n->uncertainty->any_of())) {
-            val::BaseValue::PointerType maxuncertainty =
-                (m->estimate->math_div((n->estimate->math_add(n->uncertainty.get())).get())
-                     ->math_sub(nm.estimate.get()))
-                    ->math_abs();
-            val::BaseValue::PointerType minuncertainty =
-                (m->estimate->math_div((n->estimate->math_sub(n->uncertainty.get())).get())
-                     ->math_sub(nm.estimate.get()))
-                    ->math_abs();
-            nm.uncertainty = maxuncertainty->math_max(minuncertainty.get());
-        } else if ((m->uncertainty && m->uncertainty->any_of()) && (!n->uncertainty || n->uncertainty->none_of())) {
-            nm.uncertainty = m->uncertainty->math_div(n->estimate.get());
+        if (Result::propagation_mode() == Result::PropagationMode::Interval) {
+            if (m->uncertainty && n->uncertainty) {
+                auto upper = m->estimate->math_add(m->uncertainty.get())
+                                 ->math_div(n->estimate->math_sub(n->uncertainty.get()).get())
+                                 ->math_sub(nm.estimate.get())->math_abs();
+                auto lower = m->estimate->math_sub(m->uncertainty.get())
+                                 ->math_div(n->estimate->math_add(n->uncertainty.get()).get())
+                                 ->math_sub(nm.estimate.get())->math_abs();
+                nm.uncertainty = upper->math_max(lower.get());
+            } else if (m->uncertainty) {
+                nm.uncertainty = m->uncertainty->math_div(n->estimate.get());
+            } else if (n->uncertainty) {
+                auto upper = m->estimate->math_div(n->estimate->math_add(n->uncertainty.get()).get())
+                                 ->math_sub(nm.estimate.get())->math_abs();
+                auto lower = m->estimate->math_div(n->estimate->math_sub(n->uncertainty.get()).get())
+                                 ->math_sub(nm.estimate.get())->math_abs();
+                nm.uncertainty = upper->math_max(lower.get());
+            }
+            return nm;
         }
+        auto numerator_derivative = n->estimate->math_inv();
+        auto denominator_squared = n->estimate->math_pow(2);
+        auto denominator_derivative = m->estimate->math_neg()->math_div(denominator_squared.get());
+        add_scaled_sources(nm.sources, m->sources, numerator_derivative.get());
+        add_scaled_sources(nm.sources, n->sources, denominator_derivative.get());
+        nm.refresh_uncertainty();
         // Result nm(m->estimate / n->estimate);
         // if (m->uncertainty == 0 && n->uncertainty == 0) {
         //   nm.uncertainty = (m->uncertainty.size() > n->uncertainty.size()) ? m->uncertainty : n->uncertainty;
@@ -315,16 +394,19 @@ namespace snt::puq {
     void Result::operator/=(const Result& m) {
         Result nm = divide(this, &m);
         estimate = nm.estimate->clone();
-        if (nm.uncertainty)
-            uncertainty = nm.uncertainty->clone();
+        uncertainty = nm.uncertainty ? nm.uncertainty->clone() : nullptr;
+        sources = std::move(nm.sources);
         // estimate = nm.estimate;
         // uncertainty = nm.uncertainty;
     }
 
     void Result::pow(const ExponentVariant& e) {
         double fexp = exponent_to_float(e);
+        auto derivative = estimate->math_pow(fexp - 1)->math_mul(std::make_unique<val::ArrayValueFloat64>(fexp).get());
         estimate = estimate->math_pow(fexp);
-        // estimate = math::pow(estimate, fexp);
+        for (auto& [id, contribution] : sources)
+            contribution = contribution->math_mul(derivative.get());
+        refresh_uncertainty();
     }
 
     bool Result::operator==(const Result& a) const {

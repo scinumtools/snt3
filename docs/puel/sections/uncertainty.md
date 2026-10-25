@@ -22,16 +22,21 @@ conversion scales both estimate and uncertainty by the conversion factor.
 Offset temperature conversion changes the estimate by its offset while scaling
 the uncertainty only by the scale.
 
-For addition and subtraction, the reference implementation uses a conservative
-sum of absolute uncertainties:
+PUQ propagates standard uncertainties to first order. For addition and
+subtraction, it assumes the input uncertainties are independent and combines
+them by root-sum-square:
 
 ```text
-(x ± dx) ± (y ± dy) = (x ± y) ± (dx + dy)
+(x ± dx) ± (y ± dy) = (x ± y) ± sqrt(dx² + dy²)
 ```
 
-For multiplication and division, it evaluates the extrema formed by the input
-intervals and retains the larger absolute deviation from the central result.
-This is an interval-style bound, not Gaussian root-sum-square propagation.
+For multiplication and division, PUQ uses first-order derivatives and combines
+the independent contributions by root-sum-square. For example:
+
+```text
+u(xy) = sqrt((y·u(x))² + (x·u(y))²)
+u(x/y) = sqrt((u(x)/y)² + (x·u(y)/y²)²)
+```
 
 The public PUQ mathematical functions use first-order derivative propagation
 where applicable. For example, for a constant exponent `p`:
@@ -45,7 +50,23 @@ For a variable exponent, the independent contributions are combined by
 root-sum-square. Logarithmic conversion and mathematical functions propagate
 uncertainty through their corresponding transformation.
 
-PUQ does not model correlations between input uncertainties. Applications
-requiring covariance-aware or statistical uncertainty analysis MUST provide
-that model outside the PUEL expression language.
+By default, inputs are independent. Copies and differentiable operations retain
+source identity, so reusing one uncertain quantity preserves its correlation
+(for example, `x - x` has zero uncertainty). Correlations can be assigned to
+primitive uncertain quantities in Python. For a pair, use
+`Quantity.correlate(x, y, rho)`, where `rho` is between -1 and 1. For a set,
+use `Quantity.correlate_many(values, covariance_matrix)`. The matrix diagonal
+must match the input uncertainty variances; the inputs must be scalar primitive
+quantities. The matrix must be symmetric and positive semidefinite.
+
+For legacy conservative bounds, select interval propagation explicitly:
+
+```python
+Quantity.set_propagation_mode("interval")
+# Restore the default first-order model when desired:
+Quantity.set_propagation_mode("standard")
+```
+
+The propagation mode is process-wide. Standard mode is first-order and does
+not represent distribution shape or nonlinear higher-order effects.
 

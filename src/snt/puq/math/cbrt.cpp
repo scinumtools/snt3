@@ -16,10 +16,8 @@ namespace snt::puq::math {
         // y ± Dz = pow(x ± Dx, 1/3) -> Dy = 1/3 * pow(x, -2/3) * Dx
         std::unique_ptr<val::ArrayValueFloat64> third1 = std::make_unique<val::ArrayValueFloat64>(1. / 3.);
         std::unique_ptr<val::ArrayValueFloat64> third2 = std::make_unique<val::ArrayValueFloat64>(-2 * 1. / 3.);
-        return puq::Result(
-            res.estimate->math_cbrt(),
-            res.estimate->math_pow(third2.get())->math_mul(third1.get())->math_mul(res.uncertainty.get())
-        );
+        auto derivative = res.estimate->math_pow(third2.get())->math_mul(third1.get());
+        return res.transformed(res.estimate->math_cbrt(), std::move(derivative));
         // constexpr double third = 1. / 3.;
         // return puq::Result(cbrt(res.estimate), third * pow(res.estimate, -2 * third) * res.uncertainty);
     }

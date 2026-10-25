@@ -12,17 +12,23 @@ namespace snt::puq::math {
         // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
         // TODO: this implementation is fishy, need a check, or a Monte Carlo propagation
         val::BaseValue::PointerType estimate = res1.estimate->math_max(res2.estimate.get());
-        if (res1.uncertainty && res2.uncertainty) {
-            val::BaseValue::PointerType new_uncertainty =
-                res1.uncertainty->where(estimate->compare_equal(res1.estimate.get()).get(), res2.uncertainty.get());
-            return puq::Result(std::move(estimate), std::move(new_uncertainty));
-        } else if (res1.uncertainty) {
-            return puq::Result(std::move(estimate), res1.uncertainty->clone());
-        } else if (res2.uncertainty) {
-            return puq::Result(std::move(estimate), res2.uncertainty->clone());
-        } else {
-            return puq::Result(std::move(estimate));
-        }
+        auto selected_left = estimate->compare_equal(res1.estimate.get());
+        val::ArrayValueFloat64 zero(0.0);
+        puq::Result output(std::move(estimate));
+        auto add_selected = [&](const puq::Result& input, bool is_left) {
+            for (const auto& [id, contribution] : input.sources) {
+                auto selected = is_left ? contribution->where(selected_left.get(), &zero)
+                                        : zero.where(selected_left.get(), contribution.get());
+                if (auto it = output.sources.find(id); it != output.sources.end())
+                    it->second->math_add_equal(selected.get());
+                else
+                    output.sources.emplace(id, std::move(selected));
+            }
+        };
+        add_selected(res1, true);
+        add_selected(res2, false);
+        output.refresh_uncertainty();
+        return output;
         // val::BaseValue::PointerType estimate = max(res1.estimate, res2.estimate);
         // return puq::Result(estimate, (estimate == res1.estimate) ? res1.uncertainty : res2.uncertainty);
     }
