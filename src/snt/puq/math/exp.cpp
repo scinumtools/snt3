@@ -9,7 +9,8 @@ namespace snt::puq::math {
     puq::Result exp(const puq::Result& res) {
         // z ± Dz = pow(e, y ± Dy) -> Dz = pow(e, y) * log(e) * Dy
         auto value = res.estimate->math_exp();
-        return res.transformed(value->clone(), std::move(value));
+        auto estimate = value->clone();
+        return res.transformed(std::move(estimate), std::move(value));
         // return puq::Result(exp(res.estimate), exp(res.estimate) * res.uncertainty);
     }
 
