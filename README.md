@@ -55,57 +55,6 @@ exposes one evaluated and validated environment to every part of an
 application. The result is less duplicated glue code and a clearer boundary
 between a scientific model's assumptions and its implementation.
 
-## One parameter layer for many scientific codes
-
-<a href="https://scinumtools.github.io/snt3/initiative.html"><img align="left" src="docs/img/snt-initiative-readme.png" alt="A parameter model is validated and translated into a scientific code's native input file" width="180" height="180" hspace="16" style="margin-right:30px"></a>
-
-We are inviting maintainers of established, open-source scientific codes to
-try a shared, optional parameter layer. A project-specific adapter can turn a
-DIPL definition into its existing native input file, while SciNumTools handles
-units, constraints, dependencies, and parameter documentation. The first step
-keeps the solver and its native parser in place. [Read about the initiative
-and see the full flyer](https://scinumtools.github.io/snt3/initiative.html).
-The long-term aim is direct integration where a project judges the model and
-tooling stable and trustworthy.
-Explore related projects and integrations in the
-[SNT Hub registry](https://scinumtools.github.io/snt-hub/#registry).
-
-With SNT installed, create a workspace and choose a Hub project:
-
-```bash
-mkdir study && cd study
-snt hub list
-snt hub fetch PROJECT
-snt hub examples
-snt hub setup EXAMPLE
-```
-
-Replace `PROJECT` and `EXAMPLE` with names listed by `list` and `examples`.
-Generated files are placed in `runs/EXAMPLE`;
-see the [SNT Hub CLI guide](https://scinumtools.github.io/snt3/integrations/cli.html#pinned-code-examples-with-snt-hub) for prerequisites and overrides.
-
-<br clear="left">
-
-## AI-assisted scientific setup
-
-AI assistants, including large language models (LLMs), can draft scientific
-setups, but those drafts need explicit checks. DIPL gives them a readable,
-structured description of run settings and references to initial-condition
-files. SciNumTools checks declared types, units, constraints, and dependencies;
-a code-specific adapter can check further requirements and write the code's
-native input files. This makes an AI-assisted setup easier to inspect and test
-before a run. Scientific review is still needed to judge whether the choices
-are physically appropriate.
-
-The current tools let an assistant or script [list and describe](https://scinumtools.github.io/snt3/integrations/cli.html#cli-semantic-interface)  evaluated
-parameters, then preview proposed overrides as JSON.
-The same operations are available through the [C++ inspection API](https://scinumtools.github.io/snt3/modules/dip/inspection.html#cpp-semantic-interface)
-and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.html#python-semantic-interface).
-
-The native [`snt mcp` interface](docs/source/integrations/mcp.rst)
-lets AI agents validate, compare, and export DIPL candidates.
-Try the runnable [UsingMCP example](examples/dip/UsingMCP).
-
 ## Features
 
 - **Unit-aware quantities:** [Calculate and convert](https://scinumtools.github.io/snt3/modules/puq/quantities.html)
@@ -269,6 +218,57 @@ snt_dip_get(
     REQUIRED
 )
 ```
+
+## One parameter layer for many scientific codes
+
+<a href="https://scinumtools.github.io/snt3/initiative.html"><img align="left" src="docs/img/snt-initiative-readme.png" alt="A parameter model is validated and translated into a scientific code's native input file" width="180" height="180" hspace="16" style="margin-right:30px"></a>
+
+We are inviting maintainers of established, open-source scientific codes to
+try a shared, optional parameter layer. A project-specific adapter can turn a
+DIPL definition into its existing native input file, while SciNumTools handles
+units, constraints, dependencies, and parameter documentation. The first step
+keeps the solver and its native parser in place. [Read about the initiative
+and see the full flyer](https://scinumtools.github.io/snt3/initiative.html).
+The long-term aim is direct integration where a project judges the model and
+tooling stable and trustworthy.
+Explore related projects and integrations in the
+[SNT Hub registry](https://scinumtools.github.io/snt-hub/#registry).
+
+With SNT installed, create a workspace and choose a Hub project:
+
+```bash
+mkdir study && cd study
+snt hub list
+snt hub fetch PROJECT
+snt hub examples
+snt hub setup EXAMPLE
+```
+
+Replace `PROJECT` and `EXAMPLE` with names listed by `list` and `examples`.
+Generated files are placed in `runs/EXAMPLE`;
+see the [SNT Hub CLI guide](https://scinumtools.github.io/snt3/integrations/cli.html#pinned-code-examples-with-snt-hub) for prerequisites and overrides.
+
+<br clear="left">
+
+## AI-assisted scientific setup
+
+AI assistants, including large language models (LLMs), can draft scientific
+setups, but those drafts need explicit checks. DIPL gives them a readable,
+structured description of run settings and references to initial-condition
+files. SciNumTools checks declared types, units, constraints, and dependencies;
+a code-specific adapter can check further requirements and write the code's
+native input files. This makes an AI-assisted setup easier to inspect and test
+before a run. Scientific review is still needed to judge whether the choices
+are physically appropriate.
+
+The current tools let an assistant or script [list and describe](https://scinumtools.github.io/snt3/integrations/cli.html#cli-semantic-interface)  evaluated
+parameters, then preview proposed overrides as JSON.
+The same operations are available through the [C++ inspection API](https://scinumtools.github.io/snt3/modules/dip/inspection.html#cpp-semantic-interface)
+and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.html#python-semantic-interface).
+
+The native [`snt mcp` interface](docs/source/integrations/mcp.rst)
+lets AI agents validate, compare, and export DIPL candidates.
+Try the runnable [UsingMCP example](examples/dip/UsingMCP).
 
 ## Built with SciNumTools
 
