@@ -39,6 +39,10 @@ namespace snt::puq {
         if (group.atom) {
             UnitAtom* atom = static_cast<UnitAtom*>(group.atom);
             atom->value.result.estimate = std::make_unique<val::ArrayValueFloat64>(nv);
+            // The final array element's source belongs only to that scalar.
+            // Replace it with the assembled array uncertainty and let Result
+            // register the array source lazily when it is next propagated.
+            atom->value.result.sources.clear();
             if (hasUncertainties) {
                 std::reverse(ne.begin(), ne.end());
                 atom->value.result.uncertainty = std::make_unique<val::ArrayValueFloat64>(ne);

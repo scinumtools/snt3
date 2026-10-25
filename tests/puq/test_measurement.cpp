@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 
+#include <cmath>
 #include <snt/puq/base_units.h>
 #include <snt/puq/converter.h>
 #include <snt/puq/dimensions.h>
@@ -225,11 +226,11 @@ TEST(Measurement, CompatibleArrayAdditionAndSubtractionPreserveUncertainty) {
     const val::ArrayValueFloat64 difference_errors(difference.result.uncertainty.get());
 
     EXPECT_EQ(sum_values.get_values(), (std::vector<double>{11.0, 22.0}));
-    EXPECT_NEAR(sum_errors.get_value(0), 0.11, 1e-15);
-    EXPECT_NEAR(sum_errors.get_value(1), 0.22, 1e-15);
+    EXPECT_NEAR(sum_errors.get_value(0), std::hypot(0.1, 0.01), 1e-15);
+    EXPECT_NEAR(sum_errors.get_value(1), std::hypot(0.2, 0.02), 1e-15);
     EXPECT_EQ(difference_values.get_values(), (std::vector<double>{9.0, 18.0}));
-    EXPECT_NEAR(difference_errors.get_value(0), 0.11, 1e-15);
-    EXPECT_NEAR(difference_errors.get_value(1), 0.22, 1e-15);
+    EXPECT_NEAR(difference_errors.get_value(0), std::hypot(0.1, 0.01), 1e-15);
+    EXPECT_NEAR(difference_errors.get_value(1), std::hypot(0.2, 0.02), 1e-15);
     EXPECT_EQ(sum.baseunits.to_string(), "m");
     EXPECT_EQ(difference.baseunits.to_string(), "m");
 

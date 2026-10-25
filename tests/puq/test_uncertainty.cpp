@@ -1,6 +1,7 @@
 #include "pch_tests.h"
 
 #include <algorithm>
+#include <cmath>
 #include <snt/puq/measurement.h>
 #include <snt/puq/quantity.h>
 
@@ -81,9 +82,9 @@ TEST(Uncertainty, ArithmeticsAdd) {
     msr1 = puq::Measurement(4, 0.01);
     msr2 = puq::Measurement(1, 0.005);
     msr3 = msr1 + msr2;
-    EXPECT_EQ(msr3.to_string(), "5.000(15)");
+    EXPECT_EQ(msr3.to_string(), "5.000(11)");
     msr1 += msr2;
-    EXPECT_EQ(msr1.to_string(), "5.000(15)");
+    EXPECT_EQ(msr1.to_string(), "5.000(11)");
 
     msr1 = puq::Measurement(4, 0.01);
     msr2 = puq::Measurement(3);
@@ -103,9 +104,9 @@ TEST(Uncertainty, ArithmeticsSubtract) {
     msr1 = puq::Measurement(4, 0.01);
     msr2 = puq::Measurement(1, 0.005);
     msr3 = msr1 - msr2;
-    EXPECT_EQ(msr3.to_string(), "3.000(15)");
+    EXPECT_EQ(msr3.to_string(), "3.000(11)");
     msr1 -= msr2;
-    EXPECT_EQ(msr1.to_string(), "3.000(15)");
+    EXPECT_EQ(msr1.to_string(), "3.000(11)");
 
     msr1 = puq::Measurement(4, 0.01);
     msr2 = puq::Measurement(3);
@@ -122,9 +123,9 @@ TEST(Uncertainty, ArithmeticsMultiply) {
     msr1 = puq::Measurement(4.0, 0.05);
     msr2 = puq::Measurement(7, 0.1);
     msr3 = msr1 * msr2;
-    EXPECT_EQ(msr3.to_string(), "2.800(75)e1");
+    EXPECT_EQ(msr3.to_string(), "2.800(53)e1");
     msr1 *= msr2;
-    EXPECT_EQ(msr1.to_string(), "2.800(75)e1");
+    EXPECT_EQ(msr1.to_string(), "2.800(53)e1");
 
     msr1 = puq::Measurement(4.0, 0.05);
     msr2 = puq::Measurement(5, 0);
@@ -157,7 +158,11 @@ TEST(Uncertainty, ArrayMultiplicationPropagatesBothUncertainties) {
     ASSERT_NE(values, nullptr);
     ASSERT_NE(errors, nullptr);
     EXPECT_EQ(values->get_values(), (std::vector<double>{8.0, -6.0, -3.0}));
-    const std::vector<double> expected_errors{1.03, 0.12, 0.52};
+    const std::vector<double> expected_errors{
+        std::hypot(4.0 * 0.1, 2.0 * 0.3),
+        std::hypot(2.0 * 0.2, -3.0 * 0.1),
+        std::hypot(-2.0 * 0.05, 1.5 * 0.4)
+    };
     ASSERT_EQ(errors->get_size(), expected_errors.size());
     for (std::size_t i = 0; i < expected_errors.size(); ++i)
         EXPECT_NEAR(errors->get_value(i), expected_errors[i], 1e-12);
@@ -183,9 +188,9 @@ TEST(Uncertainty, ArithmeticsDivide) {
     msr1 = puq::Measurement(12.0, 0.2);
     msr2 = puq::Measurement(4, 0.1);
     msr3 = msr1 / msr2;
-    EXPECT_EQ(msr3.to_string(), "3.00(13)");
+    EXPECT_EQ(msr3.to_string(), "3.000(90)");
     msr1 /= msr2;
-    EXPECT_EQ(msr1.to_string(), "3.00(13)");
+    EXPECT_EQ(msr1.to_string(), "3.000(90)");
 
     msr1 = puq::Measurement(12.0, 0.2);
     msr2 = puq::Measurement(6, 0);
@@ -197,9 +202,9 @@ TEST(Uncertainty, ArithmeticsDivide) {
     msr1 = puq::Measurement(6, 0);
     msr2 = puq::Measurement(12.0, 0.2);
     msr3 = msr1 / msr2;
-    EXPECT_EQ(msr3.to_string(), "5.000(85)e-1");
+    EXPECT_EQ(msr3.to_string(), "5.000(83)e-1");
     msr1 /= msr2;
-    EXPECT_EQ(msr1.to_string(), "5.000(85)e-1");
+    EXPECT_EQ(msr1.to_string(), "5.000(83)e-1");
 }
 
 TEST(Uncertainty, Comparison) {
@@ -234,7 +239,7 @@ TEST(Uncertainty, Arrays) {
     EXPECT_EQ(msr1.to_string(), "[1.210(10)e1, 2.220(20)e1, 3.230(30)e1]");
 }
 
-TEST(Uncertainty, DensityConversionPreservesEndpointBound) {
+TEST(Uncertainty, DensityConversionPropagatesStandardUncertainty) {
     const puq::Quantity mass(8.0, 0.2, "g");
     const puq::Quantity volume(2.0, 0.05, "cm3");
     const auto density = (mass / volume).convert("kg/m3");
@@ -245,11 +250,11 @@ TEST(Uncertainty, DensityConversionPreservesEndpointBound) {
     ASSERT_NE(estimate, nullptr);
     ASSERT_NE(uncertainty, nullptr);
 
-    // The division model bounds the result using both measurement endpoints.
+    // First-order independent propagation combines the relative uncertainties
+    // of the numerator and denominator in quadrature.
     const double center = 8.0 / 2.0;
-    const double upper_distance = 8.2 / 1.95 - center;
-    const double lower_distance = center - 7.8 / 2.05;
+    const double propagated = center * std::hypot(0.2 / 8.0, 0.05 / 2.0);
     EXPECT_NEAR(estimate->get_values().at(0), center * 1000.0, 1e-9);
-    EXPECT_NEAR(uncertainty->get_values().at(0), std::max(upper_distance, lower_distance) * 1000.0, 1e-9);
+    EXPECT_NEAR(uncertainty->get_values().at(0), propagated * 1000.0, 1e-9);
     EXPECT_EQ(density.measurement.baseunits.to_string(), "kg*m-3");
 }

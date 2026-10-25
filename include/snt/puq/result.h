@@ -26,8 +26,9 @@ namespace snt::puq {
         val::BaseValue::PointerType estimate;    ///< Estimated scalar or array value.
         val::BaseValue::PointerType uncertainty; ///< Optional absolute uncertainty matching `estimate`.
         /** Signed first-order contributions, keyed by independent source identity. */
-        SourceMap sources;
+        mutable SourceMap sources;
         Result(const Result& other) {
+            other.ensure_source();
             estimate = other.estimate ? other.estimate->clone() : nullptr;
             uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
             for (const auto& [id, contribution] : other.sources)
@@ -38,6 +39,7 @@ namespace snt::puq {
          */
         Result& operator=(const Result& other) {
             if (this != &other) {
+                other.ensure_source();
                 estimate = other.estimate ? other.estimate->clone() : nullptr;
                 uncertainty = other.uncertainty ? other.uncertainty->clone() : nullptr;
                 sources.clear();
@@ -57,6 +59,8 @@ namespace snt::puq {
         Result transformed(val::BaseValue::PointerType value, val::BaseValue::PointerType derivative) const;
         /** Recompute the displayed standard uncertainty from source contributions. */
         void refresh_uncertainty();
+        /** Lazily register an uncertainty assigned by parsers or legacy callers. */
+        void ensure_source() const;
         /** Set the correlation coefficient between two primitive uncertain results.
          * Both results must each contain one uncertainty source and have matching shapes.
          */

@@ -60,6 +60,8 @@ namespace snt::puq::math {
     }
 
     puq::Result pow(const puq::Result& res1, const puq::Result& res2) {
+        res1.ensure_source();
+        res2.ensure_source();
         // Dz = sqrt(pow(Dzx,2)+pow(Dzy,2))
         // z ± Dz = pow(x ± Dx, y ± Dy)
         auto one = std::make_unique<val::ArrayValueFloat64>(1.0);

@@ -8,6 +8,8 @@
 namespace snt::puq::math {
 
     extern puq::Result max(const puq::Result& res1, const puq::Result& res2) {
+        res1.ensure_source();
+        res2.ensure_source();
         // x ± Dx = max(x ± Dx, y ± Dy)  <- if x > y
         // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
         // TODO: this implementation is fishy, need a check, or a Monte Carlo propagation

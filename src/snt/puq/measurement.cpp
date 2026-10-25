@@ -61,6 +61,8 @@ namespace snt::puq {
         ) {
             // The scalar fast path below predates source-aware propagation.
             // Use the general Result operators whenever uncertainty provenance exists.
+            left.result.ensure_source();
+            right.result.ensure_source();
             if (!left.result.sources.empty() || !right.result.sources.empty())
                 return std::nullopt;
             const auto* left_values = float64_array(left.result.estimate.get());

@@ -84,7 +84,13 @@ namespace snt::puq {
             uncertainty = uncertainty->math_sqrt();
     }
 
+    void Result::ensure_source() const {
+        if (sources.empty() && uncertainty && uncertainty->any_of())
+            sources.emplace(next_source_id++, uncertainty->clone());
+    }
+
     Result Result::transformed(val::BaseValue::PointerType value, val::BaseValue::PointerType derivative) const {
+        ensure_source();
         Result output(std::move(value));
         add_scaled_sources(output.sources, sources, derivative.get());
         output.refresh_uncertainty();
@@ -94,6 +100,8 @@ namespace snt::puq {
     void Result::correlate(Result& left, Result& right, double coefficient) {
         if (!std::isfinite(coefficient) || coefficient < -1.0 || coefficient > 1.0)
             throw std::invalid_argument("Correlation coefficient must be finite and in [-1, 1].");
+        left.ensure_source();
+        right.ensure_source();
         if (left.sources.size() != 1 || right.sources.size() != 1 || left.shape() != right.shape())
             throw std::invalid_argument("Correlation requires primitive uncertain results with matching shapes.");
         if (coefficient == 0.0)
@@ -135,6 +143,7 @@ namespace snt::puq {
         const auto expected_shape = values.front()->shape();
         std::vector<double> stddev(count);
         for (std::size_t i = 0; i < count; ++i) {
+            values[i]->ensure_source();
             if (!values[i] || values[i]->sources.size() != 1 || !values[i]->uncertainty ||
                 values[i]->shape() != expected_shape || values[i]->size() != 1)
                 throw std::invalid_argument("Covariance inputs must be scalar primitive uncertain results.");
@@ -246,6 +255,8 @@ namespace snt::puq {
                                                : (m2.uncertainty ? m2.uncertainty->clone() : nullptr));
             return Result(m1.estimate->math_add(m2.estimate.get()), std::move(error));
         }
+        m1.ensure_source();
+        m2.ensure_source();
         Result out(m1.estimate->math_add(m2.estimate.get()));
         add_scaled_sources(out.sources, m1.sources, nullptr);
         add_scaled_sources(out.sources, m2.sources, nullptr);
@@ -279,6 +290,8 @@ namespace snt::puq {
                                                : (m2.uncertainty ? m2.uncertainty->clone() : nullptr));
             return Result(m1.estimate->math_sub(m2.estimate.get()), std::move(error));
         }
+        m1.ensure_source();
+        m2.ensure_source();
         Result out(m1.estimate->math_sub(m2.estimate.get()));
         auto negative = std::make_unique<val::ArrayValueFloat64>(-1.0);
         add_scaled_sources(out.sources, m1.sources, nullptr);
@@ -318,6 +331,8 @@ namespace snt::puq {
             }
             return output;
         }
+        m->ensure_source();
+        n->ensure_source();
         Result nm(m->estimate->math_mul(n->estimate.get()));
         add_scaled_sources(nm.sources, m->sources, n->estimate.get());
         add_scaled_sources(nm.sources, n->sources, m->estimate.get());
@@ -363,6 +378,8 @@ namespace snt::puq {
             }
             return nm;
         }
+        m->ensure_source();
+        n->ensure_source();
         auto numerator_derivative = n->estimate->math_inv();
         auto denominator_squared = n->estimate->math_pow(2);
         auto denominator_derivative = m->estimate->math_neg()->math_div(denominator_squared.get());
@@ -401,6 +418,7 @@ namespace snt::puq {
     }
 
     void Result::pow(const ExponentVariant& e) {
+        ensure_source();
         double fexp = exponent_to_float(e);
         auto derivative = estimate->math_pow(fexp - 1)->math_mul(std::make_unique<val::ArrayValueFloat64>(fexp).get());
         estimate = estimate->math_pow(fexp);

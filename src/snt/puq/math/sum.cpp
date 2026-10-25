@@ -55,6 +55,7 @@ namespace snt::puq::math {
     } // namespace
 
     puq::Result sum(const puq::Result& result) {
+        result.ensure_source();
         puq::Result output(sum_values(result.estimate.get()));
         for (const auto& [id, contribution] : result.sources)
             output.sources.emplace(id, std::make_unique<val::ArrayValueFloat64>(sum_values(contribution.get())));
