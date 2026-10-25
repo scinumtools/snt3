@@ -148,16 +148,29 @@ jobs:
         if: runner.os == 'Linux'
         continue-on-error: true
         run: |
+          diagnostic_dir="$RUNNER_TEMP/puq-gdb"
+          mkdir -p "$diagnostic_dir"
           for test_filter in \
             Converter.LogarithmicConv \
             Math.Exponent \
             Math.QuantityUnaryAcrossSystems; do
             echo "===== gdb: ${test_filter} ====="
+            diagnostic_file="$diagnostic_dir/${test_filter//./_}.log"
             gdb --batch \
               -ex 'set pagination off' \
+              -ex 'handle SIGSEGV stop print nopass' \
               -ex run \
+              -ex 'bt' \
               -ex 'thread apply all bt full' \
-              --args build/bin/gtest-puq "--gtest_filter=${test_filter}" || true
+              --args build/bin/gtest-puq "--gtest_filter=${test_filter}" >"$diagnostic_file" 2>&1 || true
+            cat "$diagnostic_file"
+            {
+              echo "### GDB: ${test_filter}"
+              echo '```text'
+              cat "$diagnostic_file"
+              echo '```'
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
           done
 
       - name: Test (Linux/macOS)
