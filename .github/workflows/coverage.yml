@@ -44,7 +44,8 @@ jobs:
               ninja-build \
               libhdf5-dev \
               libcurl4-openssl-dev \
-              gcovr
+              gcovr \
+              gdb
 
       - name: Install Python dependencies
         run: |
@@ -64,6 +65,22 @@ jobs:
       - name: Build
         run: |
           cmake --build build --parallel
+
+      # Temporary diagnostics for PUQ crashes reported by the Ubuntu coverage job.
+      - name: Debug PUQ segmentation faults
+        continue-on-error: true
+        run: |
+          for test_filter in \
+            Converter.LogarithmicConv \
+            Math.Exponent \
+            Math.QuantityUnaryAcrossSystems; do
+            echo "===== gdb: ${test_filter} ====="
+            gdb --batch \
+              -ex 'set pagination off' \
+              -ex run \
+              -ex 'thread apply all bt full' \
+              --args build/bin/gtest-puq "--gtest_filter=${test_filter}" || true
+          done
 
       - name: Run tests
         run: |
