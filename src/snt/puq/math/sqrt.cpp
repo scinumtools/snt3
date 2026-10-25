@@ -14,10 +14,10 @@ namespace snt::puq::math {
 
     puq::Result sqrt(const puq::Result& res) {
         // y ± Dz = pow(x ± Dx, 0.5) -> Dy = 0.5 * pow(x, -0.5) * Dx
-        std::unique_ptr<val::ArrayValueFloat64> cst = std::make_unique<val::ArrayValueFloat64>(0.5);
-        auto estimate = res.estimate->math_sqrt();
-        auto derivative = res.estimate->math_pow(-0.5)->math_mul(cst.get());
-        return res.transformed(std::move(estimate), std::move(derivative));
+        return res.transformed_lazy(res.estimate->math_sqrt(), [&] {
+            auto cst = std::make_unique<val::ArrayValueFloat64>(0.5);
+            return res.estimate->math_pow(-0.5)->math_mul(cst.get());
+        });
         // return puq::Result(sqrt(res.estimate), 0.5 * pow(res.estimate, -0.5) * res.uncertainty);
     }
 

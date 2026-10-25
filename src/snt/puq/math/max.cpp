@@ -14,6 +14,8 @@ namespace snt::puq::math {
         // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
         // TODO: this implementation is fishy, need a check, or a Monte Carlo propagation
         val::BaseValue::PointerType estimate = res1.estimate->math_max(res2.estimate.get());
+        if (res1.sources.empty() && res2.sources.empty())
+            return puq::Result(std::move(estimate));
         auto selected_left = estimate->compare_equal(res1.estimate.get());
         val::ArrayValueFloat64 zero(0.0);
         puq::Result output(std::move(estimate));

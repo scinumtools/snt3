@@ -380,11 +380,18 @@ namespace snt::puq {
         }
         m->ensure_source();
         n->ensure_source();
-        auto numerator_derivative = n->estimate->math_inv();
-        auto denominator_squared = n->estimate->math_pow(2);
-        auto denominator_derivative = m->estimate->math_neg()->math_div(denominator_squared.get());
-        add_scaled_sources(nm.sources, m->sources, numerator_derivative.get());
-        add_scaled_sources(nm.sources, n->sources, denominator_derivative.get());
+        if (m->sources.empty() && n->sources.empty())
+            return nm;
+
+        if (!m->sources.empty()) {
+            auto numerator_derivative = n->estimate->math_inv();
+            add_scaled_sources(nm.sources, m->sources, numerator_derivative.get());
+        }
+        if (!n->sources.empty()) {
+            auto denominator_squared = n->estimate->math_pow(2);
+            auto denominator_derivative = m->estimate->math_neg()->math_div(denominator_squared.get());
+            add_scaled_sources(nm.sources, n->sources, denominator_derivative.get());
+        }
         nm.refresh_uncertainty();
         // Result nm(m->estimate / n->estimate);
         // if (m->uncertainty == 0 && n->uncertainty == 0) {
@@ -420,8 +427,14 @@ namespace snt::puq {
     void Result::pow(const ExponentVariant& e) {
         ensure_source();
         double fexp = exponent_to_float(e);
+        auto value = estimate->math_pow(fexp);
+        if (sources.empty()) {
+            estimate = std::move(value);
+            uncertainty.reset();
+            return;
+        }
         auto derivative = estimate->math_pow(fexp - 1)->math_mul(std::make_unique<val::ArrayValueFloat64>(fexp).get());
-        estimate = estimate->math_pow(fexp);
+        estimate = std::move(value);
         for (auto& [id, contribution] : sources)
             contribution = contribution->math_mul(derivative.get());
         refresh_uncertainty();

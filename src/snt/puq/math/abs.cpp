@@ -7,12 +7,13 @@ namespace snt::puq::math {
 
     puq::Result abs(const puq::Result& res) {
         // abs(y ± Dy) = abs(y) ± Dy
-        auto derivative = res.estimate->math_div(res.estimate->math_abs().get());
-        val::ArrayValueFloat64 zero(0.0);
-        val::ArrayValueFloat64 one(1.0);
-        auto at_zero = res.estimate->compare_equal(&zero);
-        derivative = one.where(at_zero.get(), derivative.get());
-        return res.transformed(res.estimate->math_abs(), std::move(derivative));
+        return res.transformed_lazy(res.estimate->math_abs(), [&] {
+            auto derivative = res.estimate->math_div(res.estimate->math_abs().get());
+            val::ArrayValueFloat64 zero(0.0);
+            val::ArrayValueFloat64 one(1.0);
+            auto at_zero = res.estimate->compare_equal(&zero);
+            return one.where(at_zero.get(), derivative.get());
+        });
         // return puq::Result(abs(m.estimate), m.uncertainty);
     }
 

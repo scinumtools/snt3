@@ -7,6 +7,7 @@
 #include <snt/val/values.h>
 #include <variant>
 #include <map>
+#include <utility>
 #include <vector>
 
 namespace snt::puq {
@@ -57,6 +58,14 @@ namespace snt::puq {
         Result(val::BaseValue::PointerType m, val::BaseValue::PointerType e);
         /** Apply a pointwise derivative while retaining the input source identities. */
         Result transformed(val::BaseValue::PointerType value, val::BaseValue::PointerType derivative) const;
+        /** Apply a pointwise transform, evaluating its derivative only when needed. */
+        template <typename Derivative>
+        Result transformed_lazy(val::BaseValue::PointerType value, Derivative&& derivative) const {
+            ensure_source();
+            if (sources.empty())
+                return Result(std::move(value));
+            return transformed(std::move(value), std::forward<Derivative>(derivative)());
+        }
         /** Recompute the displayed standard uncertainty from source contributions. */
         void refresh_uncertainty();
         /** Lazily register an uncertainty assigned by parsers or legacy callers. */

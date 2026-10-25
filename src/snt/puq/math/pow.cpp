@@ -53,9 +53,10 @@ namespace snt::puq::math {
 
     puq::Result pow(const puq::Result& res, const double exp) {
         // z ± Dz = pow(x ± Dx, y) -> Dz = y * pow(x, y-1) * Dx
-        std::unique_ptr<val::ArrayValueFloat64> cst = std::make_unique<val::ArrayValueFloat64>(exp);
-        auto derivative = res.estimate->math_pow(exp - 1)->math_mul(cst.get());
-        return res.transformed(res.estimate->math_pow(exp), std::move(derivative));
+        return res.transformed_lazy(res.estimate->math_pow(exp), [&] {
+            auto cst = std::make_unique<val::ArrayValueFloat64>(exp);
+            return res.estimate->math_pow(exp - 1)->math_mul(cst.get());
+        });
         // return puq::Result(pow(res.estimate, exp), abs(exp * pow(res.estimate, exp - 1)) * res.uncertainty);
     }
 
@@ -64,18 +65,24 @@ namespace snt::puq::math {
         res2.ensure_source();
         // Dz = sqrt(pow(Dzx,2)+pow(Dzy,2))
         // z ± Dz = pow(x ± Dx, y ± Dy)
-        auto one = std::make_unique<val::ArrayValueFloat64>(1.0);
-        auto derivative_x = res2.estimate->math_mul(res1.estimate->math_pow(res2.estimate->math_sub(one.get()).get()).get());
-        auto derivative_y = res1.estimate->math_pow(res2.estimate.get())->math_mul(res1.estimate->math_log().get());
         puq::Result output(res1.estimate->math_pow(res2.estimate.get()));
-        for (const auto& [id, contribution] : res1.sources)
-            output.sources.emplace(id, contribution->math_mul(derivative_x.get()));
-        for (const auto& [id, contribution] : res2.sources) {
-            auto term = contribution->math_mul(derivative_y.get());
-            if (auto it = output.sources.find(id); it != output.sources.end())
-                it->second->math_add_equal(term.get());
-            else
-                output.sources.emplace(id, std::move(term));
+        if (!res1.sources.empty()) {
+            auto one = std::make_unique<val::ArrayValueFloat64>(1.0);
+            auto derivative_x = res2.estimate->math_mul(
+                res1.estimate->math_pow(res2.estimate->math_sub(one.get()).get()).get()
+            );
+            for (const auto& [id, contribution] : res1.sources)
+                output.sources.emplace(id, contribution->math_mul(derivative_x.get()));
+        }
+        if (!res2.sources.empty()) {
+            auto derivative_y = res1.estimate->math_pow(res2.estimate.get())->math_mul(res1.estimate->math_log().get());
+            for (const auto& [id, contribution] : res2.sources) {
+                auto term = contribution->math_mul(derivative_y.get());
+                if (auto it = output.sources.find(id); it != output.sources.end())
+                    it->second->math_add_equal(term.get());
+                else
+                    output.sources.emplace(id, std::move(term));
+            }
         }
         output.refresh_uncertainty();
         return output;

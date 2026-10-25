@@ -8,9 +8,10 @@ namespace snt::puq::math {
 
     puq::Result log10(const puq::Result& m) {
         // y ± Dy = log(x ± Dx) -> Dy = 1 / ln(10) * Dx / x
-        std::unique_ptr<val::ArrayValueFloat64> cst = std::make_unique<val::ArrayValueFloat64>(std::log(10));
-        auto derivative = m.estimate->math_mul(cst.get())->math_inv();
-        return m.transformed(m.estimate->math_log10(), std::move(derivative));
+        return m.transformed_lazy(m.estimate->math_log10(), [&] {
+            auto cst = std::make_unique<val::ArrayValueFloat64>(std::log(10));
+            return m.estimate->math_mul(cst.get())->math_inv();
+        });
         // return puq::Result(log10(m.estimate), m.uncertainty / (m.estimate * std::log(10)));
     }
 

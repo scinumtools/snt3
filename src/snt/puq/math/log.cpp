@@ -9,7 +9,7 @@ namespace snt::puq::math {
 
     puq::Result log(const puq::Result& m) {
         // y ± Dy = log(x ± Dx) -> Dy = Dx / x
-        return m.transformed(m.estimate->math_log(), m.estimate->math_inv());
+        return m.transformed_lazy(m.estimate->math_log(), [&] { return m.estimate->math_inv(); });
         // return puq::Result(log(m.estimate), m.uncertainty / m.estimate);
     }
 
