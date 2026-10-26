@@ -207,10 +207,22 @@ namespace snt::hub {
             curl_easy_setopt(curl, CURLOPT_TIMEOUT, 20L);
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
             curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 3L);
-            curl_easy_setopt(
-                curl, CURLOPT_PROTOCOLS, local_fixture() ? CURLPROTO_HTTPS | CURLPROTO_FILE : CURLPROTO_HTTPS
+#if LIBCURL_VERSION_NUM >= 0x075500
+            const auto protocols_status =
+                curl_easy_setopt(curl, CURLOPT_PROTOCOLS_STR, local_fixture() ? "https,file" : "https");
+            const auto redirect_status = curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS_STR, "https");
+#else
+            const auto protocols_status = curl_easy_setopt(
+                curl, CURLOPT_PROTOCOLS,
+                static_cast<long>(local_fixture() ? CURLPROTO_HTTPS | CURLPROTO_FILE : CURLPROTO_HTTPS)
             );
-            curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTPS);
+            const auto redirect_status =
+                curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS, static_cast<long>(CURLPROTO_HTTPS));
+#endif
+            if (protocols_status != CURLE_OK || redirect_status != CURLE_OK) {
+                curl_easy_cleanup(curl);
+                throw Error("Cannot restrict Hub catalogue transfer protocols", 3);
+            }
             const auto status = curl_easy_perform(curl);
             long http_status = 0;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_status);
