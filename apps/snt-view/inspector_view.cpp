@@ -14,7 +14,7 @@
 #include <snt/core/datatypes.h>
 #include <snt/dip/artifact.h>
 #include <snt/dip/inspect/dependency_graph.h>
-#include <snt/dip/parsers.h>
+#include <snt/dip/tools/formatter.h>
 #include <stdexcept>
 #include <string>
 #include <system_error>
@@ -62,56 +62,76 @@ namespace snt::view {
             return report;
         }
 
-        std::string block_value_report(const dip::BlockInput& input, const std::string& text) {
-            try {
-                if (input.kind == dip::BlockInput::Kind::Array) {
-                    std::string normalized = text;
-                    normalized.erase(std::remove(normalized.begin(), normalized.end(), '\n'), normalized.end());
-                    const auto first = std::find_if_not(normalized.begin(), normalized.end(), [](unsigned char ch) {
-                        return std::isspace(ch);
-                    });
-                    const auto last = std::find_if_not(normalized.rbegin(), normalized.rend(), [](unsigned char ch) {
-                        return std::isspace(ch);
-                    }).base();
-                    normalized = first < last ? std::string(first, last) : std::string{};
-                    val::Array::StringType values;
-                    val::Array::ShapeType shape;
-                    const std::string parsed = dip::parse_array(normalized, values, shape);
-                    if (std::any_of(parsed.size() < normalized.size() ? normalized.begin() + parsed.size()
-                                                                      : normalized.end(),
-                                    normalized.end(), [](unsigned char ch) { return !std::isspace(ch); }))
-                        return "Unexpected text after the closing array bracket.";
-                    return "Array block value syntax is valid.";
-                }
+        struct SourceSearchState {
+            std::string owner;
+            std::string query;
+            std::string replacement;
+            std::string indexed_text;
+            std::string indexed_query;
+            bool match_case = true;
+            bool indexed_match_case = true;
+            std::vector<std::size_t> matches;
+            std::optional<std::size_t> active_match;
+            std::optional<std::pair<std::size_t, std::size_t>> pending_selection;
+        };
 
-                std::queue<dip::Line> lines;
-                lines = dip::parse_lines(lines, text, input.source_name);
-                bool has_separator = false;
-                auto remaining = lines;
-                while (!remaining.empty()) {
-                    std::string line = remaining.front().code;
-                    remaining.pop();
-                    const auto first = line.find_first_not_of(" \t\r\n");
-                    if (first == std::string::npos)
-                        line.clear();
-                    else
-                        line = line.substr(first, line.find_last_not_of(" \t\r\n") - first + 1);
-                    if (line == "---") {
-                        has_separator = true;
-                        break;
+        bool text_matches_at(
+            const std::string& text, std::size_t position, const std::string& query, bool match_case
+        ) {
+            if (query.empty() || position > text.size() || query.size() > text.size() - position)
+                return false;
+            for (std::size_t index = 0; index < query.size(); ++index) {
+                const auto lhs = static_cast<unsigned char>(text[position + index]);
+                const auto rhs = static_cast<unsigned char>(query[index]);
+                if (match_case ? lhs != rhs : std::tolower(lhs) != std::tolower(rhs))
+                    return false;
+            }
+            return true;
+        }
+
+        void refresh_search_matches(SourceSearchState& search, const std::string& text) {
+            if (search.indexed_text == text && search.indexed_query == search.query &&
+                search.indexed_match_case == search.match_case)
+                return;
+            search.matches.clear();
+            search.active_match.reset();
+            if (!search.query.empty()) {
+                for (std::size_t position = 0; position + search.query.size() <= text.size();) {
+                    if (text_matches_at(text, position, search.query, search.match_case)) {
+                        search.matches.push_back(position);
+                        position += search.query.size();
+                    } else {
+                        ++position;
                     }
                 }
-                if (!has_separator)
-                    return "Table block value is missing the `---` header separator.";
-
-                dip::ValueMetadata metadata;
-                const auto columns = dip::parse_table_nodes(lines, metadata);
-                if (columns.empty())
-                    return "Table block value must define at least one column.";
-                return "Table block value syntax is valid.";
-            } catch (const std::exception& exception) {
-                return exception.what();
             }
+            search.indexed_text = text;
+            search.indexed_query = search.query;
+            search.indexed_match_case = search.match_case;
+        }
+
+        std::size_t line_for_offset(const std::string& text, std::size_t offset) {
+            return 1 + static_cast<std::size_t>(std::count(text.begin(), text.begin() + std::min(offset, text.size()), '\n'));
+        }
+
+        void activate_search_match(SourceSearchState& search, SourceView& source, std::size_t index) {
+            search.active_match = index;
+            const auto position = search.matches[index];
+            source.request_line_jump(line_for_offset(source.text(), position));
+            search.pending_selection = std::make_pair(position, position + search.query.size());
+        }
+
+        bool input_text_string(const char* label, const char* hint, std::string& value) {
+            value.reserve(std::max<std::size_t>(value.capacity(), 256));
+            return ImGui::InputTextWithHint(
+                label,
+                hint,
+                value.data(),
+                value.capacity() + 1,
+                ImGuiInputTextFlags_CallbackResize,
+                resize_string_callback,
+                &value
+            );
         }
 
         void labeled_text(const char* label, const std::string& value) {
@@ -217,7 +237,7 @@ namespace snt::view {
                 for (const auto& node : named.nodes.get_nodes())
                     if (node && !node->path.name.empty())
                         cache.source_nodes.emplace_back(
-                            node->path.name, object->source_name + "?" + node->path.name
+                            node->path.name, model.named_source_node_path(object->source_name, node->path.name)
                         );
                 if (named.table_text && !named.table_path.empty()) {
                     const std::string prefix = named.table_path + ".";
@@ -377,7 +397,9 @@ namespace snt::view {
 
                 const auto& graph = view.graph();
                 if (graph.recorded) {
-                    const std::string graph_path = object->source_name.empty() ? "?" + object->node_path : object->path;
+                    const std::string graph_path =
+                        object->source_name.empty() ? "?" + object->node_path
+                                                    : object->source_name + "?" + object->node_path;
                     for (const auto& read : graph.dependencies(graph_path))
                         cache.reads.push_back(read.target);
                     cache.readers = graph.referenced_by(graph_path);
@@ -403,10 +425,16 @@ namespace snt::view {
         std::string& error,
         std::string& edit_report,
         bool& request_save_as,
+        bool& select_source_tab,
         NotificationCenter& notifications
     ) {
         const auto* selected = model.object(model.selection());
         const bool block_value = selected && selected->role == ObjectRole::BlockSource;
+        static SourceSearchState search;
+        if (search.owner != model.selection()) {
+            search = SourceSearchState{};
+            search.owner = model.selection();
+        }
         ImGui::TextUnformatted(model.display_file_path(source.file().string()).c_str());
         ImGui::SameLine();
         const auto edit_path = model.editable_document_path(source.file());
@@ -423,9 +451,14 @@ namespace snt::view {
             ImGui::SameLine();
             if (ImGui::Button("Check")) {
                 const auto& input = dip::Inspector{model.environment()}.block_inputs().at(selected->node_path);
-                edit_report = block_value_report(input, source.text());
-                const bool valid = edit_report.find("syntax is valid.") != std::string::npos;
-                notifications.notify(edit_report, valid ? NoticeLevel::Info : NoticeLevel::Error);
+                const auto result = model.preview_block(selected->node_path, source.text());
+                source.set_diagnostics(result.candidate_diagnostics);
+                edit_report = result.candidate_valid
+                                  ? (input.kind == dip::BlockInput::Kind::Table
+                                         ? "Table block value syntax is valid."
+                                         : "Array block value syntax is valid.")
+                                  : preview_report(result);
+                notifications.notify(edit_report, result.candidate_valid ? NoticeLevel::Info : NoticeLevel::Error);
             }
         }
         if (edit_path) {
@@ -436,15 +469,41 @@ namespace snt::view {
                     edit_report.clear();
                 }
             } else {
+                if (!block_value && source.format() == SourceFormat::DIPL && ImGui::Button("Format")) {
+                    try {
+                        source.set_diagnostics({});
+                        const std::string formatted = dip::tools::format(source.text());
+                        if (formatted != source.text()) {
+                            source.set_text(formatted);
+                            edit_report = "DIPL source formatted. Review the changes and save when ready.";
+                        } else {
+                            edit_report = "DIPL source is already formatted.";
+                        }
+                        notifications.notify(edit_report, NoticeLevel::Info);
+                    } catch (const std::exception& exception) {
+                        edit_report = exception.what();
+                        notifications.notify(edit_report, NoticeLevel::Error);
+                    }
+                }
+                ImGui::SameLine();
                 if (ImGui::Button("Check")) {
                     try {
                         if (block_value) {
                             const auto& input = dip::Inspector{model.environment()}.block_inputs().at(selected->node_path);
-                            edit_report = block_value_report(input, source.text());
+                            const auto result = model.preview_block(selected->node_path, source.text());
+                            source.set_diagnostics(result.candidate_diagnostics);
+                            edit_report = result.candidate_valid
+                                              ? (input.kind == dip::BlockInput::Kind::Table
+                                                     ? "Table block value syntax is valid."
+                                                     : "Array block value syntax is valid.")
+                                              : preview_report(result);
                         } else {
-                            edit_report = preview_report(model.preview_document(*edit_path, source.text()));
+                            const auto result = model.preview_document(*edit_path, source.text());
+                            source.set_diagnostics(result.candidate_diagnostics);
+                            edit_report = preview_report(result);
                         }
                     } catch (const std::exception& exception) {
+                        source.set_diagnostics({});
                         edit_report = exception.what();
                     }
                     const auto check_level = edit_report.find("syntax is valid.") != std::string::npos ||
@@ -459,19 +518,16 @@ namespace snt::view {
                 ImGui::EndDisabled();
                 if (save) {
                     edit_report.clear();
-                    std::string document = source.text();
-                    try {
-                        if (block_value)
-                            document = model.document_text_with_block(selected->node_path, source.text());
-                    } catch (const std::exception& exception) {
-                        edit_report = exception.what();
-                    }
-                    if (edit_report.empty() && model.save_document(*edit_path, document)) {
+                    const bool saved = block_value ? model.save_block(selected->node_path, source.text())
+                                                   : model.save_document(*edit_path, source.text());
+                    if (saved) {
                         source.mark_saved();
+                        source.set_editing(false);
+                        select_source_tab = true;
                         edit_report = model.error().empty()
                                           ? "Saved and reloaded."
                                           : "Saved; reload could not evaluate the new text: " + model.error();
-                    } else if (edit_report.empty())
+                    } else
                         edit_report = model.error();
                 }
                 ImGui::SameLine();
@@ -491,18 +547,111 @@ namespace snt::view {
                 }
             }
         }
+        if (edit_path && source.editing()) {
+            ImGui::Separator();
+            ImGui::SetNextItemWidth(std::max(120.0f, ImGui::GetContentRegionAvail().x * 0.45f));
+            input_text_string("##FindText", "Find", search.query);
+            ImGui::SameLine();
+            refresh_search_matches(search, source.text());
+            ImGui::BeginDisabled(search.matches.empty());
+            if (ImGui::SmallButton("Previous")) {
+                const auto index = search.active_match
+                                      ? (*search.active_match + search.matches.size() - 1) % search.matches.size()
+                                      : search.matches.size() - 1;
+                activate_search_match(search, source, index);
+            }
+            ImGui::SameLine();
+            if (ImGui::SmallButton("Next")) {
+                const auto index = search.active_match ? (*search.active_match + 1) % search.matches.size() : 0;
+                activate_search_match(search, source, index);
+            }
+            ImGui::EndDisabled();
+            ImGui::SameLine();
+            if (search.matches.empty())
+                ImGui::TextDisabled(search.query.empty() ? "" : "No matches");
+            else if (search.active_match)
+                ImGui::TextDisabled("%zu of %zu", *search.active_match + 1, search.matches.size());
+            else
+                ImGui::TextDisabled("%zu matches", search.matches.size());
+
+            ImGui::SetNextItemWidth(std::max(120.0f, ImGui::GetContentRegionAvail().x * 0.45f));
+            input_text_string("##ReplaceText", "Replace with", search.replacement);
+            ImGui::SameLine();
+            ImGui::BeginDisabled(!search.active_match || search.matches.empty());
+            if (ImGui::SmallButton("Replace")) {
+                const auto position = search.matches[*search.active_match];
+                std::string updated = source.text();
+                updated.replace(position, search.query.size(), search.replacement);
+                const std::size_t resume_at = position + search.replacement.size();
+                source.set_text(std::move(updated));
+                search.indexed_text.clear();
+                refresh_search_matches(search, source.text());
+                const auto next = std::lower_bound(search.matches.begin(), search.matches.end(), resume_at);
+                if (next != search.matches.end())
+                    activate_search_match(search, source, static_cast<std::size_t>(next - search.matches.begin()));
+                else if (!search.matches.empty())
+                    activate_search_match(search, source, 0);
+                notifications.notify("Replaced one occurrence.");
+            }
+            ImGui::EndDisabled();
+            ImGui::SameLine();
+            ImGui::BeginDisabled(search.matches.empty());
+            if (ImGui::SmallButton("Replace all")) {
+                std::string updated = source.text();
+                for (auto match = search.matches.rbegin(); match != search.matches.rend(); ++match)
+                    updated.replace(*match, search.query.size(), search.replacement);
+                const std::size_t count = search.matches.size();
+                source.set_text(std::move(updated));
+                search.indexed_text.clear();
+                refresh_search_matches(search, source.text());
+                search.pending_selection.reset();
+                notifications.notify("Replaced " + std::to_string(count) + " occurrences.");
+            }
+            ImGui::EndDisabled();
+            ImGui::SameLine();
+            if (ImGui::Checkbox("Match case", &search.match_case)) {
+                search.active_match.reset();
+                search.indexed_text.clear();
+                refresh_search_matches(search, source.text());
+            }
+        }
         notifications.observe("source-view-error", error, NoticeLevel::Warning);
         const auto starts_with = [&](const char* prefix) {
             return edit_report.compare(0, std::char_traits<char>::length(prefix), prefix) == 0;
         };
         const auto report_level = starts_with("Saved and reloaded.") ||
-                                          starts_with("Candidate parses and evaluates successfully")
+                                          starts_with("Candidate parses and evaluates successfully") ||
+                                          starts_with("DIPL source formatted.") ||
+                                          starts_with("DIPL source is already formatted.")
                                       ? NoticeLevel::Info
                                       : starts_with("Saved; reload could not evaluate")
                                             ? NoticeLevel::Warning
                                             : NoticeLevel::Error;
         if (!block_value)
             notifications.observe("edit-report", edit_report, report_level);
+        if (!source.diagnostics().empty()) {
+            ImGui::SeparatorText("Diagnostics");
+            for (std::size_t index = 0; index < source.diagnostics().size(); ++index) {
+                const auto& diagnostic = source.diagnostics()[index];
+                if (!diagnostic.location || diagnostic.location->line == 0)
+                    continue;
+                std::string label = "Line " + std::to_string(diagnostic.location->line);
+                if (diagnostic.location->column)
+                    label += ":" + std::to_string(*diagnostic.location->column);
+                label += "  " + diagnostic.message;
+                ImGui::PushID(static_cast<int>(index));
+                const ImVec4 color = diagnostic.severity == core::DiagnosticSeverity::Error
+                                         ? ImVec4(0.82f, 0.30f, 0.28f, 1.0f)
+                                     : diagnostic.severity == core::DiagnosticSeverity::Warning
+                                         ? ImVec4(0.78f, 0.55f, 0.22f, 1.0f)
+                                         : ImGui::GetStyleColorVec4(ImGuiCol_Text);
+                ImGui::PushStyleColor(ImGuiCol_Text, color);
+                if (ImGui::Selectable(label.c_str()))
+                    source.request_line_jump(diagnostic.location->line);
+                ImGui::PopStyleColor();
+                ImGui::PopID();
+            }
+        }
         ImGui::Separator();
         if (edit_path && source.editing()) {
             std::string buffer = source.text();
@@ -524,11 +673,15 @@ namespace snt::view {
                 ImGui::GetCurrentWindow()->Name,
                 editor_id
             );
-            const ImGuiWindow* editor_window = ImGui::FindWindowByName(editor_window_name);
+            ImGuiWindow* editor_window = ImGui::FindWindowByName(editor_window_name);
+            if (const auto jump_line = source.take_line_jump(); jump_line && editor_window) {
+                const float target_y = static_cast<float>(*jump_line - 1) * line_height;
+                editor_window->Scroll.y = std::max(0.0f, target_y - editor_window->Size.y * 0.45f);
+            }
             ImGui::BeginChild(
                 "##SourceLineNumbers",
                 ImVec2(gutter_width, editor_size.y),
-                ImGuiChildFlags_Borders,
+                ImGuiChildFlags_None,
                 ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoInputs
             );
             if (editor_window)
@@ -543,9 +696,31 @@ namespace snt::view {
                     const auto number = std::to_string(index + 1);
                     const ImVec2 position = ImGui::GetCursorScreenPos();
                     const float number_width = ImGui::CalcTextSize(number.c_str()).x;
+                    const bool has_diagnostic = std::any_of(
+                        source.diagnostics().begin(), source.diagnostics().end(), [&](const core::Diagnostic& item) {
+                            return item.location && item.location->line == static_cast<std::size_t>(index + 1);
+                        }
+                    );
+                    const bool is_search_match = search.active_match &&
+                        line_for_offset(source.text(), search.matches[*search.active_match]) ==
+                            static_cast<std::size_t>(index + 1);
+                    if (has_diagnostic)
+                        ImGui::GetWindowDrawList()->AddCircleFilled(
+                            ImVec2(position.x + 4.0f, position.y + line_height * 0.5f),
+                            2.5f,
+                            ImGui::GetColorU32(ImVec4(0.82f, 0.30f, 0.28f, 1.0f))
+                        );
+                    else if (is_search_match)
+                        ImGui::GetWindowDrawList()->AddCircleFilled(
+                            ImVec2(position.x + 4.0f, position.y + line_height * 0.5f),
+                            2.5f,
+                            ImGui::GetColorU32(ImVec4(0.88f, 0.68f, 0.20f, 1.0f))
+                        );
                     ImGui::GetWindowDrawList()->AddText(
                         ImVec2(position.x + gutter_width - number_width - 8.0f, position.y),
-                        ImGui::GetColorU32(ImGuiCol_TextDisabled),
+                        ImGui::GetColorU32(has_diagnostic ? ImVec4(0.82f, 0.30f, 0.28f, 1.0f)
+                                                 : is_search_match ? ImVec4(0.88f, 0.68f, 0.20f, 1.0f)
+                                                                   : ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled)),
                         number.c_str()
                     );
                     ImGui::Dummy(ImVec2(gutter_width - 4.0f, line_height));
@@ -554,6 +729,11 @@ namespace snt::view {
             ImGui::PopStyleVar();
             ImGui::EndChild();
             ImGui::SameLine(0.0f, 0.0f);
+            if (search.pending_selection) {
+                ImGui::SetKeyboardFocusHere();
+                if (auto* state = ImGui::GetInputTextState(editor_id))
+                    state->ReloadUserBufAndKeepSelection();
+            }
             const bool changed = ImGui::InputTextMultiline(
                     "##SourceEditor",
                     buffer.data(),
@@ -563,6 +743,16 @@ namespace snt::view {
                     resize_string_callback,
                     &buffer
                 );
+            if (search.pending_selection) {
+                if (auto* state = ImGui::GetInputTextState(editor_id)) {
+                    state->SetSelection(
+                        static_cast<int>(search.pending_selection->first),
+                        static_cast<int>(search.pending_selection->second)
+                    );
+                    state->CursorFollow = true;
+                }
+                search.pending_selection.reset();
+            }
             buffer.resize(std::strlen(buffer.c_str()));
             if (changed)
                 source.set_text(std::move(buffer));
@@ -573,7 +763,10 @@ namespace snt::view {
         );
         const float line_height = ImGui::GetTextLineHeightWithSpacing();
         const float glyph_height = ImGui::GetTextLineHeight();
-        if (scroll_to_target && source.target_line() > 0) {
+        if (const auto jump_line = source.take_line_jump(); jump_line && *jump_line > 0) {
+            const float target_y = static_cast<float>(*jump_line - 1) * line_height;
+            ImGui::SetScrollY(std::max(0.0f, target_y - ImGui::GetWindowHeight() * 0.45f));
+        } else if (scroll_to_target && source.target_line() > 0) {
             const float target_y = static_cast<float>(source.target_line() - 1) * line_height;
             ImGui::SetScrollY(std::max(0.0f, target_y - ImGui::GetWindowHeight() * 0.45f));
             scroll_to_target = false;
@@ -592,14 +785,26 @@ namespace snt::view {
                 );
                 ImGui::Dummy(ImVec2(width, glyph_height));
                 auto* draw = ImGui::GetWindowDrawList();
+                const bool has_diagnostic = std::any_of(
+                    source.diagnostics().begin(), source.diagnostics().end(), [&](const core::Diagnostic& item) {
+                        return item.location && item.location->line == static_cast<std::size_t>(index + 1);
+                    }
+                );
                 if (static_cast<std::size_t>(index + 1) == source.target_line())
                     draw->AddRectFilled(
                         pos, ImVec2(pos.x + width, pos.y + line_height), ImGui::GetColorU32(ImGuiCol_Header)
                     );
+                else if (has_diagnostic)
+                    draw->AddRectFilled(
+                        pos,
+                        ImVec2(pos.x + width, pos.y + line_height),
+                        ImGui::GetColorU32(ImVec4(0.55f, 0.12f, 0.12f, 0.16f))
+                    );
                 const std::string number = std::to_string(index + 1);
                 draw->AddText(
                     ImVec2(pos.x + number_width - 12.0f - ImGui::CalcTextSize(number.c_str()).x, pos.y),
-                    ImGui::GetColorU32(ImGuiCol_TextDisabled),
+                    ImGui::GetColorU32(has_diagnostic ? ImVec4(0.82f, 0.30f, 0.28f, 1.0f)
+                                                      : ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled)),
                     number.c_str()
                 );
                 float x = pos.x + number_width;
@@ -673,6 +878,22 @@ namespace snt::view {
             }
         }
         notifications.observe("source-navigation-error", source_error, NoticeLevel::Warning);
+        const auto graph_browser_path = [&](const std::string& graph_path) {
+            if (graph_path.size() > 1 && graph_path.front() == '?') {
+                const std::string resolved_path = graph_path.substr(1);
+                if (model.object(resolved_path))
+                    return resolved_path;
+            }
+            const auto separator = graph_path.find('?');
+            if (separator != std::string::npos && separator + 1 < graph_path.size()) {
+                const auto named_path = model.named_source_node_path(
+                    graph_path.substr(0, separator), graph_path.substr(separator + 1)
+                );
+                if (!named_path.empty())
+                    return named_path;
+            }
+            return model.object(graph_path) ? graph_path : std::string{};
+        };
         for (const auto& [label, value] : cache.fields)
             labeled_text(label, value);
         if (!cache.source_nodes.empty()) {
@@ -722,7 +943,7 @@ namespace snt::view {
         if (!cache.reads.empty()) {
             ImGui::SeparatorText("Depends on");
             for (const auto& read : cache.reads) {
-                const std::string target = read.size() > 1 && read.front() == '?' ? read.substr(1) : read;
+                const std::string target = graph_browser_path(read);
                 if (!target.empty() && model.object(target)) {
                     if (ImGui::Selectable(read.c_str()))
                         model.select(target);
@@ -734,7 +955,7 @@ namespace snt::view {
         if (!cache.readers.empty()) {
             ImGui::SeparatorText("Referenced by");
             for (const auto& reader : cache.readers) {
-                const std::string target = reader.size() > 1 && reader.front() == '?' ? reader.substr(1) : reader;
+                const std::string target = graph_browser_path(reader);
                 if (!target.empty() && model.object(target)) {
                     if (ImGui::Selectable(reader.c_str()))
                         model.select(target);

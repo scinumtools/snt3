@@ -18,6 +18,10 @@ namespace snt::view {
             return "DIPfile entry";
         if (object.role == ObjectRole::LocalSources)
             return "Local sources";
+        if (object.role == ObjectRole::NamedSourceNodes)
+            return "Named source nodes";
+        if (object.role == ObjectRole::NamedSourceNodeGroup)
+            return "Named source node group";
         if (object.role == ObjectRole::BlockSources)
             return "Block value sources";
         if (object.role == ObjectRole::Sources)
@@ -92,6 +96,7 @@ namespace snt::view {
             if (object.role == ObjectRole::Units || object.role == ObjectRole::Unit)
                 return ImVec4(0.61f, 0.45f, 0.22f, 1.0f);
             if (object.role == ObjectRole::LocalSources || object.role == ObjectRole::Sources ||
+                object.role == ObjectRole::NamedSourceNodes || object.role == ObjectRole::NamedSourceNodeGroup ||
                 object.role == ObjectRole::CodeSource || object.role == ObjectRole::DIPfileSource)
                 return ImVec4(0.29f, 0.47f, 0.61f, 1.0f);
             if (object.role == ObjectRole::RawSources)
@@ -317,13 +322,35 @@ namespace snt::view {
             return clicked;
         }
 
+        int root_section_group(ObjectRole role) {
+            if (role == ObjectRole::DIPfile)
+                return 0;
+            if (role == ObjectRole::Overrides || role == ObjectRole::Project || role == ObjectRole::NamedSourceNodes)
+                return 1;
+            if (role == ObjectRole::Schemas)
+                return 2;
+            if (role == ObjectRole::Units)
+                return 3;
+            if (role == ObjectRole::LocalSources || role == ObjectRole::Sources || role == ObjectRole::BlockSources ||
+                role == ObjectRole::RawSources)
+                return 4;
+            return 5;
+        }
+
         void draw_tree(
             ViewerModel& model, const ObjectInfo& object, const std::string& query, TreeExpansionState& expansion
         ) {
+            std::optional<int> previous_root_group;
             for (const auto& path : object.children) {
                 const auto* item = model.object(path);
                 if (!item || !matches(model, *item, query))
                     continue;
+                if (object.path.empty()) {
+                    const int group = root_section_group(item->role);
+                    if (previous_root_group && *previous_root_group != group)
+                        ImGui::Separator();
+                    previous_root_group = group;
+                }
                 ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick |
                                            ImGuiTreeNodeFlags_SpanAvailWidth;
                 if (item->children.empty())
@@ -335,6 +362,7 @@ namespace snt::view {
                 if (item->role == ObjectRole::Project || item->role == ObjectRole::DIPfile ||
                     item->role == ObjectRole::LocalSources || item->role == ObjectRole::BlockSources ||
                     item->role == ObjectRole::Sources || item->role == ObjectRole::RawSources ||
+                    item->role == ObjectRole::NamedSourceNodes || item->role == ObjectRole::NamedSourceNodeGroup ||
                     item->role == ObjectRole::Overrides || item->role == ObjectRole::Schemas ||
                     item->role == ObjectRole::Units)
                     flags |= ImGuiTreeNodeFlags_DefaultOpen;

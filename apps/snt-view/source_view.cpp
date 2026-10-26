@@ -120,6 +120,8 @@ namespace snt::view {
         format_ = format;
         editing_ = false;
         lines_ = std::move(highlighted);
+        diagnostics_.clear();
+        requested_line_.reset();
         if (target_line == 0 || target_line > lines_.size())
             error = "The recorded line is outside the current file; reload the project to refresh locations.";
         return true;
@@ -140,6 +142,8 @@ namespace snt::view {
         }
         text_ = std::move(text);
         lines_ = std::move(highlighted);
+        diagnostics_.clear();
+        requested_line_.reset();
     }
 
 } // namespace snt::view

@@ -57,7 +57,9 @@ namespace snt::dip {
 
     Environment::Environment() = default;
 
-    void Environment::record_block_input(const BaseNode& declared, const BaseNode& input, const std::string& path) {
+    void Environment::record_block_input(
+        const BaseNode& declared, const BaseNode& input, const std::string& path, char delimiter
+    ) {
         const bool table = declared.dtype == NodeDtype::Table;
         if (table && input.value_origin == ValueOrigin::ReferenceRaw && !input.value_raw.empty()) {
             sources.at(input.value_raw.front()).table_text = true;
@@ -77,7 +79,8 @@ namespace snt::dip {
                 path,
                 input.value_raw.front(),
                 input.line.source.name,
-                input.line.source.line_number
+                input.line.source.line_number,
+                delimiter
             }
         );
     }

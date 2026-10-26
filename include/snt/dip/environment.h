@@ -245,7 +245,9 @@ namespace snt::dip {
         bool block_input_recording() const { return block_input_recording_; }
         void set_block_input_recording(bool enabled) { block_input_recording_ = enabled; }
         /** Capture the effective source literal after successful evaluation. */
-        void record_block_input(const BaseNode& declared, const BaseNode& input, const std::string& path);
+        void record_block_input(
+            const BaseNode& declared, const BaseNode& input, const std::string& path, char delimiter = ' '
+        );
         void erase_block_input(const std::string& path) { block_inputs_.erase(path); }
 
         /** Explicit declarations in the evaluated scope. */

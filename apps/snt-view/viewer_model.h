@@ -26,6 +26,8 @@ namespace snt::view {
         ManifestCategory, ///< Group of manifest entries.
         ManifestEntry,    ///< One project manifest entry.
         LocalSources,     ///< Sources loaded from local files.
+        NamedSourceNodes, ///< Nodes contributed by named sources.
+        NamedSourceNodeGroup, ///< One named source's nodes in the provenance browser.
         DIPfileSource,    ///< Editable project manifest document.
         CodeSource,       ///< Source code file.
         BlockSources,     ///< Group of embedded source blocks.
@@ -96,16 +98,20 @@ namespace snt::view {
         std::vector<SourceTarget> source_targets(const ObjectInfo& object) const;
         /** Find the browser entry under Sources that represents a source target. */
         std::string source_object_path(const SourceTarget& target) const;
+        /** Browser identity for a node contributed by a named source. */
+        std::string named_source_node_path(const std::string& source, const std::string& node_path) const;
         /** Return a project-relative path if this source is a bundled editable document. */
         std::optional<std::string> editable_document_path(const std::filesystem::path& file) const;
         /** Return packaged text for an editable source document. */
         const std::string& document_text(const std::string& path) const;
-        /** Return the source document with one embedded block value replaced. */
-        std::string document_text_with_block(const std::string& path, const std::string& text) const;
         /** Preview candidate text through the core project parser and comparison engine. */
         dip::PreviewResult preview_document(const std::string& path, const std::string& text) const;
+        /** Validate block text using its recorded array or table format. */
+        dip::PreviewResult preview_block(const std::string& path, const std::string& text) const;
         /** Save an editable document and refresh the evaluated environment when possible. */
         bool save_document(const std::string& path, const std::string& text);
+        /** Save an edited block value into its original document and refresh the environment. */
+        bool save_block(const std::string& path, const std::string& text);
         /** Copy the current project and optionally include the active unsaved document. */
         bool save_as(
             const std::filesystem::path& destination_directory,

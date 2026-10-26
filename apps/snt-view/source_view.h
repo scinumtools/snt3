@@ -9,7 +9,10 @@
 #include <cstddef>
 #include <dipl_highlighter.h>
 #include <filesystem>
+#include <optional>
+#include <snt/core/diagnostic.h>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace snt::view {
@@ -63,6 +66,18 @@ namespace snt::view {
         void set_editing(bool editing) { editing_ = editing; }
         /** Mark the current text as saved. */
         void mark_saved() { saved_text_ = text_; }
+        /** Replace diagnostics associated with the current buffer. */
+        void set_diagnostics(std::vector<core::Diagnostic> diagnostics) { diagnostics_ = std::move(diagnostics); }
+        /** Diagnostics from the most recent check of this buffer. */
+        const std::vector<core::Diagnostic>& diagnostics() const { return diagnostics_; }
+        /** Request that the editor scroll to a one-based source line. */
+        void request_line_jump(std::size_t line) { requested_line_ = line; }
+        /** Consume a pending source-line jump request. */
+        std::optional<std::size_t> take_line_jump() {
+            auto line = requested_line_;
+            requested_line_.reset();
+            return line;
+        }
         /** Return lines tokenized for the selected display format. */
         const std::vector<HighlightedLine>& lines() const { return lines_; }
 
@@ -84,6 +99,8 @@ namespace snt::view {
         SourceFormat format_ = SourceFormat::DIPL;
         bool editing_ = false;
         std::vector<HighlightedLine> lines_; ///< Tokenized lines for rendering.
+        std::vector<core::Diagnostic> diagnostics_;
+        std::optional<std::size_t> requested_line_;
     };
 
 } // namespace snt::view

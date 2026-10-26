@@ -192,14 +192,14 @@ namespace snt::view {
             if (ImGui::BeginChild(
                     "Array data viewport",
                     ImVec2(0, data_table_height(state.cells.size())),
-                    ImGuiChildFlags_None,
-                    ImGuiWindowFlags_HorizontalScrollbar
+                    ImGuiChildFlags_None
                 ) &&
                 ImGui::BeginTable(
                     "Array data",
                     static_cast<int>(visible_columns + 1),
                     ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable |
-                        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX
+                        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX,
+                    ImVec2(0, data_table_height(state.cells.size()))
                 )) {
                 ImGui::TableSetupColumn(matrix ? "Row" : "Index", ImGuiTableColumnFlags_WidthFixed, min_column_width);
                 for (std::size_t column = 0; column < visible_columns; ++column) {
@@ -251,14 +251,14 @@ namespace snt::view {
             if (ImGui::BeginChild(
                     "Table data viewport",
                     ImVec2(0, data_table_height(state.cells.size())),
-                    ImGuiChildFlags_None,
-                    ImGuiWindowFlags_HorizontalScrollbar
+                    ImGuiChildFlags_None
                 ) &&
                 ImGui::BeginTable(
                     "Table data",
                     static_cast<int>(visible_columns + 1),
                     ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable |
-                        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX
+                        ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX,
+                    ImVec2(0, data_table_height(state.cells.size()))
                 )) {
                 ImGui::TableSetupColumn("#", ImGuiTableColumnFlags_WidthFixed, min_column_width);
                 for (std::size_t column = 0; column < visible_columns; ++column) {

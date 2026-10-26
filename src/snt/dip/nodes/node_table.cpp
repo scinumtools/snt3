@@ -73,7 +73,7 @@ namespace snt::dip {
         if (!metadata.present.empty())
             env.hierarchy.merge_metadata(full_name, metadata);
         env.record_declaration(full_name, line);
-        env.record_block_input(*this, *this, full_name);
+        env.record_block_input(*this, *this, full_name, delimiter);
         // we have to check if a deferred table node is already in the node list
         for (size_t i = 0; i < env.nodes.size(); i++) {
             auto node = env.nodes.at(i);

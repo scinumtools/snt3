@@ -14,6 +14,7 @@ namespace snt::dip {
         std::string code;
         std::string source_name;
         std::size_t source_line = 0;
+        char delimiter = ' ';
     };
 
 } // namespace snt::dip

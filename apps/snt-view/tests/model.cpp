@@ -217,11 +217,12 @@ int main() {
                     "@dipfile",
                     "@overrides",
                     "@project",
+                    "@named-nodes",
                     "@schemas",
                     "@units",
                     "@local",
-                    "@blocks",
                     "@sources",
+                    "@blocks",
                     "@raw_sources"
                 },
             "Browser sections are not in the expected order"

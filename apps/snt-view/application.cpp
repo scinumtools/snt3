@@ -221,9 +221,12 @@ namespace snt::view {
                 static bool has_graph = false;
                 const bool selection_changed =
                     displayed_selection != model.selection() || displayed_revision != model.revision();
+                const bool preserve_source_tab = select_source_tab && displayed_selection == model.selection() &&
+                                                 source_owner == model.selection() && !source.file().empty();
                 if (selection_changed) {
                     source_error.clear();
-                    select_source_tab = false;
+                    if (!preserve_source_tab)
+                        select_source_tab = false;
                     scroll_to_target = false;
                     data_state = {};
                     graph_state = {};
@@ -232,6 +235,8 @@ namespace snt::view {
                     if (open_selected_source(model, source, source_error)) {
                         source_owner = model.selection();
                     }
+                    if (preserve_source_tab)
+                        select_source_tab = true;
                     if (const auto* selected = model.object(model.selection()); selected) {
                         try {
                             const std::string inspect_path = model.data_path(*selected);
@@ -273,7 +278,7 @@ namespace snt::view {
                     if (selected_source && !source.file().empty() && source_owner == model.selection() &&
                         ImGui::BeginTabItem("Source", nullptr, select_source_tab ? ImGuiTabItemFlags_SetSelected : 0)) {
                         draw_source_view(model, source, scroll_to_target, source_error, edit_report,
-                                         request_save_as, notifications);
+                                         request_save_as, select_source_tab, notifications);
                         ImGui::EndTabItem();
                     }
                     if (has_data && ImGui::BeginTabItem("Data")) {
@@ -284,7 +289,8 @@ namespace snt::view {
                         draw_graph_view(model, graph_state);
                         ImGui::EndTabItem();
                     }
-                    select_source_tab = false;
+                    if (displayed_selection == model.selection() && displayed_revision == model.revision())
+                        select_source_tab = false;
                     ImGui::EndTabBar();
                 }
                 ImGui::EndChild();

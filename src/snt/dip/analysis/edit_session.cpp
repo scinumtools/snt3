@@ -6,6 +6,11 @@
 #include <snt/dip/comparison.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/inspect/diagnostic.h>
+#include "../helpers.h"
+#include "../parsers.h"
+#include <algorithm>
+#include <cctype>
+#include <queue>
 #include <stdexcept>
 #include <system_error>
 #ifdef _WIN32
@@ -46,7 +51,52 @@ namespace snt::dip {
         Environment evaluate(const ProjectBundle& bundle) {
             DIP parser;
             parser.add_project(bundle);
-            return parser.parse();
+            return parser.parse(false, true);
+        }
+
+        void validate_block(const BlockInput& input, const std::string& text) {
+            if (input.kind == BlockInput::Kind::Array) {
+                std::string normalized = text;
+                normalized.erase(std::remove(normalized.begin(), normalized.end(), '\n'), normalized.end());
+                trim(normalized);
+                val::Array::StringType values;
+                val::Array::ShapeType shape;
+                const std::string parsed = parse_array(normalized, values, shape);
+                const auto trailing = normalized.substr(parsed.size());
+                if (std::any_of(trailing.begin(), trailing.end(), [](unsigned char ch) { return !std::isspace(ch); }))
+                    throw std::invalid_argument("Unexpected text after the closing array bracket.");
+                return;
+            }
+
+            std::queue<Line> lines;
+            lines = parse_lines(lines, text, input.source_name);
+            bool has_separator = false;
+            auto remaining = lines;
+            while (!remaining.empty()) {
+                std::string line = remaining.front().code;
+                remaining.pop();
+                trim(line);
+                if (line == "---") {
+                    has_separator = true;
+                    break;
+                }
+            }
+            if (!has_separator)
+                throw std::invalid_argument("Table block value is missing the `---` header separator.");
+            ValueMetadata metadata;
+            const auto columns = parse_table_nodes(lines, metadata, input.delimiter);
+            if (columns.empty())
+                throw std::invalid_argument("Table block value must define at least one column.");
+        }
+
+        std::filesystem::path canonical_or_absolute(const std::filesystem::path& path) {
+            std::error_code error;
+            const auto canonical = std::filesystem::weakly_canonical(path, error);
+            if (!error)
+                return canonical;
+            error.clear();
+            const auto absolute = std::filesystem::absolute(path, error);
+            return error ? path.lexically_normal() : absolute.lexically_normal();
         }
 
         PreviewResult evaluate_candidate(const Environment& baseline, const ProjectBundle& candidate_bundle) {
@@ -177,6 +227,76 @@ namespace snt::dip {
                 break;
             }
         return evaluate_candidate(baseline_, candidate);
+    }
+
+    PreviewResult EditSession::preview_block(const std::string& path, const std::string& text) const {
+        PreviewResult result;
+        result.baseline_valid = true;
+        try {
+            const auto input = baseline_.block_inputs().find(path);
+            if (input == baseline_.block_inputs().end())
+                throw std::invalid_argument("The selected block value is not available in this edit session.");
+            validate_block(input->second, text);
+            result.candidate_valid = true;
+        } catch (const std::exception& error) {
+            result.candidate_diagnostics.push_back(diagnostic_from_exception(error));
+        }
+        return result;
+    }
+
+    std::pair<std::string, std::string> EditSession::document_for_block(
+        const std::string& path, const std::string& text
+    ) const {
+        const auto input = baseline_.block_inputs().find(path);
+        if (input == baseline_.block_inputs().end())
+            throw std::invalid_argument("The selected block value is no longer available.");
+        const auto source = baseline_.sources.entries().find(input->second.source_name);
+        if (source == baseline_.sources.entries().end())
+            throw std::invalid_argument("The source document for this block value is unavailable.");
+
+        std::filesystem::path source_path = source->second.path;
+        std::size_t source_line = input->second.source_line;
+        if (source->second.embedded) {
+            const auto parent = baseline_.sources.entries().find(source->second.parent.name);
+            if (parent == baseline_.sources.entries().end())
+                throw std::invalid_argument("The parent document for this embedded block value is unavailable.");
+            source_path = parent->second.path;
+            source_line = source->second.parent.line_number;
+        }
+        if (source_path.empty())
+            throw std::invalid_argument("The source document for this block value has no file path.");
+
+        const auto source_absolute = source_path.is_absolute() ? source_path : root_ / source_path;
+        const auto canonical_source = canonical_or_absolute(source_absolute);
+        const ProjectBundleFile* document_file = nullptr;
+        for (const auto& file : bundle_.files) {
+            const auto bundled_path = canonical_or_absolute(root_ / file.path);
+            if (bundled_path == canonical_source) {
+                document_file = &file;
+                break;
+            }
+        }
+        if (!document_file)
+            throw std::invalid_argument("The source document for this block value is not part of the project bundle.");
+
+        std::string document = document_file->text;
+        std::size_t offset = 0;
+        for (std::size_t line = 1; line < source_line; ++line) {
+            const auto newline = document.find('\n', offset);
+            if (newline == std::string::npos)
+                throw std::invalid_argument("The block value source line is outside its document.");
+            offset = newline + 1;
+        }
+        const auto position = document.find(input->second.code, offset);
+        if (position == std::string::npos)
+            throw std::invalid_argument("Cannot locate the original block value in its source document.");
+        document.replace(position, input->second.code.size(), text);
+        return {document_file->path, std::move(document)};
+    }
+
+    void EditSession::save_block(const std::string& path, const std::string& text) {
+        const auto replacement = document_for_block(path, text);
+        save_document(replacement.first, replacement.second);
     }
 
     void EditSession::save_document(const std::string& spelling, const std::string& text) {

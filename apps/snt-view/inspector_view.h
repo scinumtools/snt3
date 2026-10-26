@@ -51,6 +51,7 @@ namespace snt::view {
         std::string& error,
         std::string& edit_report,
         bool& request_save_as,
+        bool& select_source_tab,
         NotificationCenter& notifications
     );
 

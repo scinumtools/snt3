@@ -7,6 +7,7 @@
 #include <snt/dip/preview.h>
 #include <snt/dip/project_bundle.h>
 #include <string>
+#include <utility>
 
 namespace snt::dip {
 
@@ -39,12 +40,18 @@ namespace snt::dip {
          */
         PreviewResult preview_document(const std::string& path, const std::string& text) const;
 
+        /** Validate edited text using the recorded array or table block format. */
+        PreviewResult preview_block(const std::string& path, const std::string& text) const;
+
         /**
          * Write a document back only if its on-disk contents still match the
          * version loaded by this session. The path must be an existing bundled
          * document. After a successful write, the session's baseline is updated.
          */
         void save_document(const std::string& path, const std::string& text);
+
+        /** Replace and save one block value inside its original bundled source document. */
+        void save_block(const std::string& path, const std::string& text);
 
         /**
          * Copy the bundled project into a new directory. The destination must
@@ -59,6 +66,8 @@ namespace snt::dip {
         );
 
       private:
+        std::pair<std::string, std::string> document_for_block(const std::string& path,
+                                                               const std::string& text) const;
         ProjectBundle bundle_;
         std::filesystem::path root_;
         Environment baseline_;

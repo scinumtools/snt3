@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <functional>
 #include <snt/dip/artifact.h>
+#include <string_view>
 #include <utility>
 
 namespace snt::view {
@@ -25,8 +26,21 @@ namespace snt::view {
 
         std::string parent_id(const std::string& id) {
             if (id == "@project" || id == "@dipfile" || id == "@local" || id == "@blocks" || id == "@sources" ||
-                id == "@raw_sources" || id == "@overrides" || id == "@schemas" || id == "@units")
+                id == "@raw_sources" || id == "@overrides" || id == "@schemas" || id == "@units" ||
+                id == "@named-nodes")
                 return "";
+            constexpr std::string_view named_nodes_prefix = "@named-nodes?";
+            if (id.compare(0, named_nodes_prefix.size(), named_nodes_prefix) == 0) {
+                const auto separator = id.find('?', named_nodes_prefix.size());
+                if (separator == std::string::npos)
+                    return "@named-nodes";
+                const std::string group = id.substr(0, separator);
+                const std::string node_path = id.substr(separator + 1);
+                const std::string parent = parent_path(node_path);
+                return parent.empty() ? group : group + "?" + parent;
+            }
+            if (id == "@dipfile-source")
+                return "@local";
             if (id.compare(0, 9, "@dipfile?") == 0) {
                 const auto next = id.find('?', 9);
                 return next == std::string::npos ? "@dipfile" : id.substr(0, next);
@@ -177,6 +191,34 @@ namespace snt::view {
             );
             objects_.at(parent_id).children.push_back(id);
         };
+        std::function<void(const std::string&, const std::string&)> ensure_named_source_object =
+            [&](const std::string& path, const std::string& source) {
+                if (path.empty())
+                    return;
+                const std::string group = "@named-nodes?" + source;
+                const std::string id = group + "?" + path;
+                if (objects_.find(id) != objects_.end())
+                    return;
+                const std::string parent = parent_path(path);
+                if (!parent.empty())
+                    ensure_named_source_object(parent, source);
+                const std::string parent_entry = parent.empty() ? group : group + "?" + parent;
+                objects_.emplace(
+                    id,
+                    ObjectInfo{
+                        id,
+                        path_label(path, parent),
+                        parent_entry,
+                        {},
+                        false,
+                        dip::Path::Kind::None,
+                        ObjectRole::Path,
+                        source,
+                        path
+                    }
+                );
+                objects_.at(parent_entry).children.push_back(id);
+            };
         for (const auto& node : environment_.nodes.get_nodes()) {
             if (!node)
                 continue;
@@ -243,15 +285,47 @@ namespace snt::view {
                 );
                 objects_.at(root).source_kind = source.raw_text ? kind : "dipl";
                 objects_.at(category).children.push_back(root);
+                bool has_source_nodes = !source.nodes.get_nodes().empty() || !source.hierarchy.get_collections().empty();
+                if (has_source_nodes && objects_.find("@named-nodes") == objects_.end()) {
+                    objects_.emplace(
+                        "@named-nodes",
+                        ObjectInfo{
+                            "@named-nodes",
+                            "Named source nodes",
+                            "",
+                            {},
+                            false,
+                            dip::Path::Kind::None,
+                            ObjectRole::NamedSourceNodes
+                        }
+                    );
+                }
+                if (has_source_nodes) {
+                    const std::string node_group = "@named-nodes?" + name;
+                    objects_.emplace(
+                        node_group,
+                        ObjectInfo{
+                            node_group,
+                            label,
+                            "@named-nodes",
+                            {},
+                            false,
+                            dip::Path::Kind::None,
+                            ObjectRole::NamedSourceNodeGroup,
+                            name
+                        }
+                    );
+                    objects_.at("@named-nodes").children.push_back(node_group);
+                }
                 for (const auto& node : source.nodes.get_nodes()) {
                     if (!node || node->path.name.empty())
                         continue;
-                    ensure_object(node->path.name, name);
-                    objects_.at(name + "?" + node->path.name).has_value = node->value != nullptr;
+                    ensure_named_source_object(node->path.name, name);
+                    objects_.at("@named-nodes?" + name + "?" + node->path.name).has_value = node->value != nullptr;
                 }
                 for (const auto& [path, collection] : source.hierarchy.get_collections()) {
-                    ensure_object(path, name);
-                    objects_.at(name + "?" + path).hierarchy_kind = collection.kind;
+                    ensure_named_source_object(path, name);
+                    objects_.at("@named-nodes?" + name + "?" + path).hierarchy_kind = collection.kind;
                 }
             }
         }
@@ -383,6 +457,7 @@ namespace snt::view {
              {"@dipfile",
               "@overrides",
               "@project",
+              "@named-nodes",
               "@schemas",
               "@units",
               "@local",
@@ -616,6 +691,11 @@ namespace snt::view {
         return {};
     }
 
+    std::string ViewerModel::named_source_node_path(const std::string& source, const std::string& node_path) const {
+        const std::string path = "@named-nodes?" + source + "?" + node_path;
+        return object(path) ? path : std::string{};
+    }
+
     std::optional<std::string> ViewerModel::editable_document_path(const std::filesystem::path& file) const {
         if (!edit_session_ || file.empty())
             return std::nullopt;
@@ -638,39 +718,16 @@ namespace snt::view {
         return edit_session_->document_text(path);
     }
 
-    std::string ViewerModel::document_text_with_block(const std::string& path, const std::string& text) const {
-        const auto input = environment_.block_inputs().find(path);
-        if (input == environment_.block_inputs().end())
-            throw std::invalid_argument("The selected block value is no longer available.");
-        const auto* object_info = object("@block?" + path);
-        if (!object_info)
-            throw std::invalid_argument("The selected block value is not listed in the viewer.");
-        const auto targets = source_targets(*object_info);
-        if (targets.empty())
-            throw std::invalid_argument("The source document for this block value is unavailable.");
-        const auto document_path = editable_document_path(targets.front().file);
-        if (!document_path)
-            throw std::invalid_argument("The source document for this block value is read-only.");
-
-        std::string document = document_text(*document_path);
-        std::size_t offset = 0;
-        for (std::size_t line = 1; line < input->second.source_line; ++line) {
-            const auto newline = document.find('\n', offset);
-            if (newline == std::string::npos)
-                throw std::invalid_argument("The block value source line is outside its document.");
-            offset = newline + 1;
-        }
-        const auto position = document.find(input->second.code, offset);
-        if (position == std::string::npos)
-            throw std::invalid_argument("Cannot locate the original block value in its source document.");
-        document.replace(position, input->second.code.size(), text);
-        return document;
-    }
-
     dip::PreviewResult ViewerModel::preview_document(const std::string& path, const std::string& text) const {
         if (!edit_session_)
             throw std::logic_error("No editable project session is active.");
         return edit_session_->preview_document(path, text);
+    }
+
+    dip::PreviewResult ViewerModel::preview_block(const std::string& path, const std::string& text) const {
+        if (!edit_session_)
+            throw std::logic_error("No editable project session is active.");
+        return edit_session_->preview_block(path, text);
     }
 
     bool ViewerModel::save_document(const std::string& path, const std::string& text) {
@@ -681,6 +738,21 @@ namespace snt::view {
         try {
             edit_session_->save_document(path, text);
             reload(); // Preserve the last valid environment if the saved candidate is not valid yet.
+            return true;
+        } catch (const std::exception& error) {
+            error_ = error.what();
+            return false;
+        }
+    }
+
+    bool ViewerModel::save_block(const std::string& path, const std::string& text) {
+        if (!edit_session_) {
+            error_ = "No editable project session is active.";
+            return false;
+        }
+        try {
+            edit_session_->save_block(path, text);
+            reload();
             return true;
         } catch (const std::exception& error) {
             error_ = error.what();
