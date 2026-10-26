@@ -8,19 +8,33 @@ need a separate application binary.
 
 .. container:: viewer-figures
 
-   .. figure:: ../_static/snt-view-inspect.png
-      :alt: Parameter Viewer showing the Overridden nodes branch with experiment.geometry.length selected, its value of 3 m, and links to its declaration and override.
+   .. figure:: ../_static/snt-view/snt-view-node.png
+      :alt: Parameter Viewer showing the parameter tree and inspector for a selected scientific input node.
       :width: 100%
-      :target: ../_static/snt-view-inspect.png
+      :target: ../_static/snt-view/snt-view-node.png
 
-      Inspecting an overridden value and its source locations.
+      Browse nodes and inspect values, provenance, and dependencies.
 
-   .. figure:: ../_static/snt-view-source.png
-      :alt: Parameter Viewer Source tab showing syntax-highlighted parameters.dip with the length declaration selected at line 17.
+   .. figure:: ../_static/snt-view/snt-view-table.png
       :width: 100%
-      :target: ../_static/snt-view-source.png
+      :alt: Parameter Viewer displaying tabular parameter data.
+      :target: ../_static/snt-view/snt-view-table.png
 
-      Viewing DIPL source at the selected declaration.
+      Inspect array and table values in the data view.
+
+   .. figure:: ../_static/snt-view/snt-view-source.png
+      :width: 100%
+      :alt: Parameter Viewer displaying a syntax-highlighted DIPL source with its source inspector.
+      :target: ../_static/snt-view/snt-view-source.png
+
+      View source text and navigate to the nodes it defines.
+
+   .. figure:: ../_static/snt-view/snt-view-edit.png
+      :width: 100%
+      :alt: Parameter Viewer editing a DIPL source with line numbers and editing controls.
+      :target: ../_static/snt-view/snt-view-edit.png
+
+      Edit, check, format, and search source documents in the viewer.
 
 Select either image to open it at full size.
 
@@ -105,19 +119,20 @@ units, expressions, arrays, and a table for exploring these views.
 Open source and reload
 ----------------------
 
-For live ``DIPfile`` projects, **Open source** opens the selected declaration
-with DIPL syntax highlighting. Documents included in the project bundle can be
-edited as source text. **Check** evaluates the candidate through the normal DIP
-parser and shows diagnostics and a comparison with the loaded environment;
-**Save** writes the document and reloads the project. **Save As** copies the
-complete bundled project to a new directory and switches the viewer to that
-copy; it refuses an existing destination and requires the candidate to evaluate
-successfully. The source highlighter is
-available while viewing; the built-in editable text box currently uses plain
-text. If the document changed on disk after it was opened, saving is rejected
-to avoid overwriting that change. Use **Discard** to abandon unsaved edits.
-Opening another source or reloading is blocked while the current document has
-unsaved edits.
+For live ``DIPfile`` projects, selecting a source opens it in the source
+section; **View Source** from a node inspector navigates to the source that
+defines it. Documents in the project bundle can be edited in the built-in
+editor, which provides syntax highlighting, line numbers, and diagnostics with
+line references. **Check** validates the current buffer using its source type:
+DIPL documents use the normal DIP parser, while array and table block values
+use their corresponding value parsers. **Format** formats DIPL code. Find and
+replace supports previous/next navigation, replace current or all matches, and
+a case-sensitivity option. **Save** writes the document and reloads the
+project; **Discard** abandons unsaved edits. **Save As** copies the complete
+bundled project to a chosen directory and switches the viewer to that copy.
+If the document changed on disk after it was opened, saving is rejected to
+avoid overwriting that change. Opening another source or reloading is blocked
+while the current document has unsaved edits.
 
 Standalone ``.dip`` and ``.dipl`` inputs remain read-only in this version.
 An overridden parameter offers its effective override and original

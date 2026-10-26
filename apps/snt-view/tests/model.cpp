@@ -229,9 +229,9 @@ int main() {
         );
         const auto& entries = project.environment().project_entries();
         check(
-            entries.size() == 9 && entries.front().kind == snt::dip::ProjectEntry::Kind::Unit &&
+            entries.size() == 10 && entries.front().kind == snt::dip::ProjectEntry::Kind::Unit &&
                 entries.front().line == 3 && entries.back().kind == snt::dip::ProjectEntry::Kind::Source &&
-                entries.back().line == 29,
+                entries.back().line == 32,
             "DIPfile entries should retain source order and line numbers"
         );
         const auto* source_entry = project.object("@dipfile?Sources?1");
@@ -339,15 +339,19 @@ int main() {
         );
         const auto modified_targets = project.source_targets(*project.object("experiment.target_temperature"));
         check(
-            modified_targets.size() == 2 && modified_targets.front().line == 11 && modified_targets.back().line == 10,
+            modified_targets.size() == 2 && modified_targets.front().line == 17 && modified_targets.back().line == 15,
             "Modified parameter needs both its latest change and original declaration"
         );
-        const auto source_targets = project.source_targets(*project.object("reference?lab_name"));
+        const auto source_targets = project.source_targets(
+            *project.object(project.named_source_node_path("reference", "lab_name"))
+        );
         check(
             source_targets.size() == 1 && source_targets.front().file.filename() == "reference.dip",
             "Named-source value does not lead to its source file"
         );
-        const auto source_group = project.source_targets(*project.object("catalog?devices[thermometer]"));
+        const auto source_group = project.source_targets(
+            *project.object(project.named_source_node_path("catalog", "devices[thermometer]"))
+        );
         check(
             source_group.size() == 1 && source_group.front().file.filename() == "catalog.dip" &&
                 source_group.front().line == 2,
@@ -394,24 +398,26 @@ int main() {
                 has_span(*formatted, snt::view::SyntaxKind::Reference, "{{?length}}"),
             "DIPL highlighting lost a source token category"
         );
-        const auto* source = project.object("reference?lab_name");
+        const auto source_id = project.named_source_node_path("reference", "lab_name");
+        const auto* source = project.object(source_id);
         check(
             project.object("@project") && project.object("@sources") && project.object("reference?") && source &&
                 source->has_value,
             "Named source is missing from the example browser"
         );
         check(
-            source->parent == "reference?" && source->source_name == "reference" && source->node_path == "lab_name",
+            source->parent == "@named-nodes?reference" && source->source_name == "reference" &&
+                source->node_path == "lab_name",
             "Named source path has the wrong identity"
         );
         check(project.value_node(*source)->value->to_string() == "\"North Lab\"", "Named source value is unavailable");
         const auto reads = view.graph().dependencies("?experiment.lab_name");
         check(
-            reads.size() == 1 && reads.front().target == "reference?lab_name" && project.object(reads.front().target),
+            reads.size() == 1 && reads.front().target == "reference?lab_name" && project.object(source_id),
             "Named source dependency is not navigable"
         );
-        const auto* catalog = project.object("catalog?devices");
-        const auto* family = project.object("catalog?devices[thermometer].family");
+        const auto* catalog = project.object(project.named_source_node_path("catalog", "devices"));
+        const auto* family = project.object(project.named_source_node_path("catalog", "devices[thermometer].family"));
         check(
             catalog && catalog->hierarchy_kind == snt::dip::Path::Kind::Map && family && family->has_value,
             "Second source map is not browsable"
@@ -419,7 +425,7 @@ int main() {
         const auto catalog_reads = view.graph().dependencies("?experiment.instrument_family");
         check(
             catalog_reads.size() == 1 && catalog_reads.front().target == "catalog?devices[thermometer].family" &&
-                project.object(catalog_reads.front().target),
+                project.object(project.named_source_node_path("catalog", "devices[thermometer].family")),
             "Second source dependency is not navigable"
         );
         const auto* raw_source = project.object("raw_samples?");
@@ -502,7 +508,7 @@ int main() {
             "Array string block does not open as plain text"
         );
         check(
-            project.select("reference?lab_name") && project.reload() && project.selection() == "reference?lab_name" &&
+            project.select(source_id) && project.reload() && project.selection() == source_id &&
                 project.input_path() == relative_example.string(),
             "Reload lost the source selection or original input path"
         );

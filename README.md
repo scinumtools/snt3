@@ -82,8 +82,9 @@ between a scientific model's assumptions and its implementation.
   for DIPL inspection and PUQ conversion.
 - **Command line:** [PUQ, DIPL, export, and report commands](https://scinumtools.github.io/snt3/integrations/cli.html),
   plus [formatting, validation, and linting](docs/source/integrations/devtools.rst).
-- **Parameter Viewer:** [Graphical browser](https://scinumtools.github.io/snt3/integrations/viewer.html)
-  for DIPL projects, DIPH5 snapshots, dependencies, and provenance.
+- **Parameter Viewer:** [Graphical browser and source editor](https://scinumtools.github.io/snt3/integrations/viewer.html)
+  for DIPL projects and DIPH5 snapshots, with dependency and provenance views;
+  edit project sources with check, format, and find/replace tools.
 - **CMake:** [Package integration and DIPL evaluation](https://scinumtools.github.io/snt3/integrations/cmake.html)
   during configuration.
 - **REST API server:** [Local HTTP service](https://scinumtools.github.io/snt3/integrations/rest.html)
