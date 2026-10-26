@@ -1,7 +1,7 @@
 Parameter Viewer
 ================
 
-``snt view`` is an optional, read-only graphical browser for DIPL parameters.
+``snt view`` is an optional graphical browser and source editor for DIPL parameters.
 It uses the evaluated DIP environment to show values, provenance, and recorded
 dependencies. The viewer is part of the main ``snt`` executable; it does not
 need a separate application binary.
@@ -20,7 +20,7 @@ need a separate application binary.
       :width: 100%
       :target: ../_static/snt-view-source.png
 
-      Viewing the read-only DIPL source at the selected declaration.
+      Viewing DIPL source at the selected declaration.
 
 Select either image to open it at full size.
 
@@ -105,18 +105,31 @@ units, expressions, arrays, and a table for exploring these views.
 Open source and reload
 ----------------------
 
-For live ``.dip``, ``.dipl``, and ``DIPfile`` inputs, **Open source** opens the
-selected declaration in a read-only tab with DIPL syntax highlighting. An
-overridden parameter offers its effective override and original declaration.
-Custom units and schemas link to their definitions. The source tab also has a
-**Copy source** button. For code embedded as a string in a ``DIPfile``, the
-action points to the string's registration line;
-its internal line numbers do not refer to physical file lines.
+For live ``DIPfile`` projects, **Open source** opens the selected declaration
+with DIPL syntax highlighting. Documents included in the project bundle can be
+edited as source text. **Check** evaluates the candidate through the normal DIP
+parser and shows diagnostics and a comparison with the loaded environment;
+**Save** writes the document and reloads the project. **Save As** copies the
+complete bundled project to a new directory and switches the viewer to that
+copy; it refuses an existing destination and requires the candidate to evaluate
+successfully. The source highlighter is
+available while viewing; the built-in editable text box currently uses plain
+text. If the document changed on disk after it was opened, saving is rejected
+to avoid overwriting that change. Use **Discard** to abandon unsaved edits.
+Opening another source or reloading is blocked while the current document has
+unsaved edits.
+
+Standalone ``.dip`` and ``.dipl`` inputs remain read-only in this version.
+An overridden parameter offers its effective override and original
+declaration. Custom units and schemas link to their definitions. The source
+tab also has a **Copy source** button. For code embedded as a string in a
+``DIPfile``, the action points to the string's registration line; its internal
+line numbers do not refer to physical file lines.
 
 Use **File → Reload** or **Ctrl+R** after editing an input file externally.
 If the updated input fails to parse, the viewer keeps the last valid state
-and displays the error. Selecting a different browser object closes the
-previous object's Source tab and refreshes the contextual tabs.
+and displays the error. The Source tab remains open when selecting another
+browser object; use **Open source** to switch to a different document.
 
 Snapshot limits
 ---------------

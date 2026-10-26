@@ -28,6 +28,8 @@ namespace snt::view {
             return "Named source";
         if (object.role == ObjectRole::CodeSource)
             return "Local source";
+        if (object.role == ObjectRole::DIPfileSource)
+            return "DIPfile source";
         if (object.role == ObjectRole::BlockSource)
             return "Block value source";
         if (object.role == ObjectRole::Overrides)
@@ -59,6 +61,50 @@ namespace snt::view {
 
     namespace {
 
+        ImVec4 source_kind_color(const std::string& kind) {
+            if (kind == "code")
+                return ImVec4(0.22f, 0.43f, 0.61f, 1.0f);
+            if (kind == "override")
+                return ImVec4(0.66f, 0.34f, 0.29f, 1.0f);
+            if (kind == "manifest")
+                return ImVec4(0.42f, 0.43f, 0.59f, 1.0f);
+            if (kind == "dipl")
+                return ImVec4(0.45f, 0.39f, 0.66f, 1.0f);
+            if (kind == "array")
+                return ImVec4(0.14f, 0.48f, 0.52f, 1.0f);
+            if (kind == "table")
+                return ImVec4(0.27f, 0.49f, 0.35f, 1.0f);
+            if (kind == "text")
+                return ImVec4(0.59f, 0.45f, 0.20f, 1.0f);
+            return ImGui::GetStyleColorVec4(ImGuiCol_Text);
+        }
+
+        ImVec4 object_icon_color(const ObjectInfo& object) {
+            if (!object.source_kind.empty())
+                return source_kind_color(object.source_kind);
+            if (object.role == ObjectRole::DIPfile || object.role == ObjectRole::ManifestCategory ||
+                object.role == ObjectRole::ManifestEntry)
+                return ImVec4(0.39f, 0.47f, 0.56f, 1.0f);
+            if (object.role == ObjectRole::Schemas || object.role == ObjectRole::Schema)
+                return ImVec4(0.47f, 0.39f, 0.66f, 1.0f);
+            if (object.role == ObjectRole::Overrides || object.role == ObjectRole::Override)
+                return source_kind_color("override");
+            if (object.role == ObjectRole::Units || object.role == ObjectRole::Unit)
+                return ImVec4(0.61f, 0.45f, 0.22f, 1.0f);
+            if (object.role == ObjectRole::LocalSources || object.role == ObjectRole::Sources ||
+                object.role == ObjectRole::CodeSource || object.role == ObjectRole::DIPfileSource)
+                return ImVec4(0.29f, 0.47f, 0.61f, 1.0f);
+            if (object.role == ObjectRole::RawSources)
+                return source_kind_color("text");
+            if (object.role == ObjectRole::BlockSources || object.role == ObjectRole::BlockSource)
+                return source_kind_color(object.role == ObjectRole::BlockSource ? object.source_kind : "array");
+            if (object.has_table)
+                return source_kind_color("table");
+            if (object.has_value)
+                return ImVec4(0.24f, 0.48f, 0.54f, 1.0f);
+            return ImVec4(0.39f, 0.46f, 0.53f, 1.0f);
+        }
+
         bool matches(const ViewerModel& model, const ObjectInfo& object, const std::string& query) {
             if (query.empty() || object.path.find(query) != std::string::npos ||
                 object.label.find(query) != std::string::npos)
@@ -71,7 +117,7 @@ namespace snt::view {
 
         void draw_kind_icon(const ObjectInfo& object, ImVec2 pos, float size) {
             ImDrawList* draw = ImGui::GetWindowDrawList();
-            const ImU32 color = ImGui::GetColorU32(ImGuiCol_Text);
+            const ImU32 color = ImGui::ColorConvertFloat4ToU32(object_icon_color(object));
             const auto point = [&](float x, float y) {
                 return ImVec2(pos.x + x * size, pos.y + y * size);
             };
@@ -102,6 +148,7 @@ namespace snt::view {
                 draw->AddCircleFilled(point(0.69f, 0.46f), size * 0.085f, color, 6);
             } else if (
                 object.role == ObjectRole::LocalSources || object.role == ObjectRole::CodeSource ||
+                object.role == ObjectRole::DIPfileSource ||
                 object.role == ObjectRole::BlockSources || object.role == ObjectRole::BlockSource ||
                 object.role == ObjectRole::Sources || object.role == ObjectRole::RawSources ||
                 object.role == ObjectRole::Source
@@ -148,6 +195,66 @@ namespace snt::view {
                 draw->AddRect(point(0.08f, 0.39f), point(0.92f, 0.88f), color, size * 0.1f);
                 if (object.has_value)
                     draw->AddCircleFilled(point(0.76f, 0.69f), size * 0.13f, color);
+            }
+        }
+
+        const char* source_kind_label(const std::string& kind) {
+            if (kind == "code")
+                return "Code source";
+            if (kind == "override")
+                return "Override source";
+            if (kind == "dipl")
+                return "DIPL source";
+            if (kind == "array")
+                return "Array data";
+            if (kind == "table")
+                return "Table data";
+            if (kind == "text")
+                return "Plain text";
+            return "";
+        }
+
+        void draw_source_kind_icon(const std::string& kind, ImVec2 pos, float size) {
+            if (kind.empty())
+                return;
+            auto* draw = ImGui::GetWindowDrawList();
+            const ImU32 color = ImGui::ColorConvertFloat4ToU32(source_kind_color(kind));
+            const auto point = [&](float x, float y) { return ImVec2(pos.x + x * size, pos.y + y * size); };
+            if (kind == "array") {
+                for (int row = 0; row < 2; ++row)
+                    for (int column = 0; column < 2; ++column)
+                        draw->AddRect(
+                            point(0.08f + column * 0.46f, 0.08f + row * 0.46f),
+                            point(0.43f + column * 0.46f, 0.43f + row * 0.46f),
+                            color
+                        );
+            } else if (kind == "table") {
+                draw->AddRect(point(0.08f, 0.08f), point(0.92f, 0.92f), color);
+                draw->AddLine(point(0.08f, 0.37f), point(0.92f, 0.37f), color);
+                draw->AddLine(point(0.08f, 0.64f), point(0.92f, 0.64f), color);
+                draw->AddLine(point(0.43f, 0.08f), point(0.43f, 0.92f), color);
+            } else if (kind == "text" || kind == "dipl") {
+                draw->AddRect(point(0.18f, 0.06f), point(0.82f, 0.94f), color);
+                if (kind == "dipl") {
+                    draw->AddLine(point(0.31f, 0.36f), point(0.24f, 0.48f), color);
+                    draw->AddLine(point(0.24f, 0.48f), point(0.31f, 0.60f), color);
+                    draw->AddLine(point(0.69f, 0.36f), point(0.76f, 0.48f), color);
+                    draw->AddLine(point(0.76f, 0.48f), point(0.69f, 0.60f), color);
+                } else {
+                    for (float y : {0.34f, 0.51f, 0.68f})
+                        draw->AddLine(point(0.30f, y), point(0.70f, y), color);
+                }
+            } else if (kind == "override") {
+                draw->AddLine(point(0.18f, 0.76f), point(0.70f, 0.24f), color, 1.5f);
+                draw->AddLine(point(0.60f, 0.20f), point(0.78f, 0.38f), color, 1.5f);
+                draw->AddLine(point(0.15f, 0.84f), point(0.35f, 0.80f), color, 1.5f);
+                draw->AddLine(point(0.15f, 0.84f), point(0.20f, 0.64f), color, 1.5f);
+            } else if (kind == "code") {
+                draw->AddLine(point(0.32f, 0.20f), point(0.10f, 0.50f), color, 1.5f);
+                draw->AddLine(point(0.10f, 0.50f), point(0.32f, 0.80f), color, 1.5f);
+                draw->AddLine(point(0.68f, 0.20f), point(0.90f, 0.50f), color, 1.5f);
+                draw->AddLine(point(0.90f, 0.50f), point(0.68f, 0.80f), color, 1.5f);
+                draw->AddLine(point(0.59f, 0.12f), point(0.41f, 0.88f), color, 1.2f);
             }
         }
 
@@ -253,8 +360,23 @@ namespace snt::view {
                     ImGui::GetItemRectMin().y + (ImGui::GetItemRectSize().y - icon_size) * 0.5f
                 );
                 draw_kind_icon(*item, icon_pos, icon_size);
-                if (ImGui::IsItemHovered())
-                    ImGui::SetTooltip("%s", object_kind_name(*item));
+                if (!item->source_kind.empty()) {
+                    const float text_start = cursor.x + ImGui::GetFontSize() + 2.0f * style.FramePadding.x +
+                                             ImGui::CalcTextSize("   ").x;
+                    const float badge_x = text_start + ImGui::CalcTextSize(item->label.c_str()).x + 5.0f;
+                    const ImVec2 badge_pos(
+                        badge_x,
+                        ImGui::GetItemRectMin().y + (ImGui::GetItemRectSize().y - icon_size) * 0.5f
+                    );
+                    draw_source_kind_icon(item->source_kind, badge_pos, icon_size);
+                }
+                if (ImGui::IsItemHovered()) {
+                    const char* source_kind = source_kind_label(item->source_kind);
+                    if (*source_kind)
+                        ImGui::SetTooltip("%s · %s", source_kind, object_kind_name(*item));
+                    else
+                        ImGui::SetTooltip("%s", object_kind_name(*item));
+                }
                 if (ImGui::IsItemClicked())
                     model.select(path);
                 if (open && !item->children.empty()) {

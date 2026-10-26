@@ -13,9 +13,9 @@ Module: Parameter viewer
 Usage:
   snt view <artifact>
 
-Open a read-only DIP parameter browser. Supported artifacts are .dip,
-.dipl, DIPfile, and .diph5. Standalone .dipt files are not yet supported.
-Press Ctrl+R or use File > Reload after editing a source externally.
+Open the DIP parameter browser. Project documents can be edited; standalone .dip,
+.dipl, DIPfile, and .diph5 inputs are supported. Standalone .dipt files are
+not yet supported. Save or discard in-app edits before reloading.
 )";
         return 0;
     }

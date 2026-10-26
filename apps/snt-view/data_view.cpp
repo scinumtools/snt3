@@ -314,12 +314,14 @@ namespace snt::view {
         const auto* object = model.object(path);
         if (!object)
             return;
-        value_path = object->source_name.empty() ? object->node_path : object->path;
+        value_path = model.data_path(*object);
+        if (value_path.empty())
+            return;
         try {
             const dip::Inspector view{model.environment()};
             const auto capabilities = view.capabilities(value_path);
             if (capabilities.hasTabularData) {
-                table = view.table(object->node_path);
+                table = view.table(value_path);
             } else if (capabilities.hasArrayData) {
                 summary = view.value_summary(value_path);
                 const auto& shape = summary->shape;

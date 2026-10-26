@@ -14,6 +14,7 @@
 namespace snt::view {
 
     class SourceView;
+    class NotificationCenter;
 
     /** Cache semantic inspection fields and source targets for a model selection. */
     struct InspectorCache {
@@ -25,6 +26,7 @@ namespace snt::view {
         std::vector<std::string> reads;           ///< Paths read while evaluating the selected value.
         std::vector<std::string> readers;         ///< Paths whose evaluation read the selected value.
         std::vector<std::string> schema_values;   ///< Values associated with the selected schema.
+        std::vector<std::pair<std::string, std::string>> source_nodes; ///< Source node labels and browser paths.
         std::vector<SourceTarget> source_targets; ///< Navigable source locations for the selection.
         std::string error;                        ///< Inspection failure shown by the panel.
     };
@@ -36,11 +38,20 @@ namespace snt::view {
         SourceView& source,
         bool& select_source_tab,
         bool& scroll_to_target,
-        std::string& source_error
+        std::string& source_error,
+        NotificationCenter& notifications
     );
+    /** Open the source represented by the currently selected source-section entry. */
+    bool open_selected_source(ViewerModel& model, SourceView& source, std::string& error);
     /** Draw the loaded source buffer and honor a pending scroll-to-target request. */
     void draw_source_view(
-        const ViewerModel& model, const SourceView& source, bool& scroll_to_target, const std::string& error
+        ViewerModel& model,
+        SourceView& source,
+        bool& scroll_to_target,
+        std::string& error,
+        std::string& edit_report,
+        bool& request_save_as,
+        NotificationCenter& notifications
     );
 
 } // namespace snt::view

@@ -39,7 +39,7 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
 
 | File | Purpose |
 | --- | --- |
-| `DIPfile` | Registers the custom unit, two DIPL sources, a raw array source, a raw table source, schema, override, and two code files. |
+| `DIPfile` | Registers the custom unit, two DIPL sources, raw array, table, and text sources, schema, override, and two code files. |
 | `parameters.diph5` | Evaluated snapshot generated from `DIPfile`. |
 | `parameters.dip` | Groups, scalar types, a value with a child, units, expressions, metadata, validation, map and list collections, and schema use. |
 | `observations.dip` | One-, two-, and three-dimensional arrays, a paged series, an array slice, inline and referenced tables, a formatted string, a compatible modification, a Boolean decision, and a conditional branch. |
@@ -47,6 +47,7 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
 | `catalog.dip` | A second named source containing a map of devices. |
 | `samples.txt` | Raw array data injected through the `raw_samples` source. |
 | `table_samples.dipt` | Raw table data injected through the `table_samples` source. |
+| `field_notes.txt` | Plain-text named source, displayed without DIPL highlighting. |
 | `probe.dip` | Reusable probe schema. |
 | `overrides.dip` | Replaces the declared channel length for this run. |
 
@@ -94,16 +95,20 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
    jump to the DIPL declaration. Select `experiment.extended_readings` for a
    48-row, eight-column table that fills the Data panel; use the next row page
    and horizontal scrolling to inspect the rest.
-   Select **Raw named sources → raw_samples** and use **Open source** to view the raw
-   text without DIPL coloring. `experiment.sample_values` reads that source.
+   **Raw named sources → raw_samples** opens its raw text and evaluated
+   **Data** tab; `experiment.sample_values` reads that source. Hover the source
+   type icon to distinguish array, table, and plain text inputs. The table
+   source also exposes its evaluated rows under **Data**. Select
+   **Raw named sources → field_notes** to view plain text without DIPL
+   highlighting.
    **Local sources → parameters.dip** and **Local sources → observations.dip** open the
    project code files with DIPL highlighting.
-   **Block value sources → experiment.readings (table)** also offers the evaluated
+   **Block value sources → experiment.readings** also offers the evaluated
    **Data** tab; **Source** shows the inline table with its DIPL header highlighted
    and data rows in plain text. **Block value sources →
-   experiment.sample_grid (array)** shows an array parsed from a string literal.
-   **Raw named sources → table_samples** opens `table_samples.dipt` with the same presentation;
-   `experiment.reference_readings` reads it.
+   experiment.sample_grid** shows an array parsed from a string literal.
+   `experiment.reference_readings` reads **Raw named sources → table_samples**,
+   whose source text and evaluated table data are both available.
 9. Select `experiment.summary` to see string interpolation and
    `experiment.target_temperature` to see a compatible modification from
    `294 K` to `295 K`.

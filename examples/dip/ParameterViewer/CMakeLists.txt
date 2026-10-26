@@ -1,6 +1,7 @@
 set(parameter_viewer_inputs
     DIPfile
     catalog.dip
+    field_notes.txt
     observations.dip
     overrides.dip
     parameters.dip

@@ -77,6 +77,16 @@ namespace snt::view {
         return set_content(file, source_line, 1, std::move(content), format, error);
     }
 
+    bool SourceView::open_document(
+        const std::filesystem::path& file,
+        std::size_t line,
+        std::string content,
+        SourceFormat format,
+        std::string& error
+    ) {
+        return set_content(file, line, line, std::move(content), format, error);
+    }
+
     bool SourceView::set_content(
         const std::filesystem::path& file,
         std::size_t source_line,
@@ -106,10 +116,30 @@ namespace snt::view {
         source_line_ = source_line;
         target_line_ = target_line;
         text_ = std::move(content);
+        saved_text_ = text_;
+        format_ = format;
+        editing_ = false;
         lines_ = std::move(highlighted);
         if (target_line == 0 || target_line > lines_.size())
             error = "The recorded line is outside the current file; reload the project to refresh locations.";
         return true;
+    }
+
+    void SourceView::set_text(std::string text) {
+        std::vector<HighlightedLine> highlighted;
+        switch (format_) {
+        case SourceFormat::DIPL:
+            highlighted = dipl::highlight::tokenize(text);
+            break;
+        case SourceFormat::Plain:
+            highlighted = plain_lines(text);
+            break;
+        case SourceFormat::Table:
+            highlighted = table_lines(text);
+            break;
+        }
+        text_ = std::move(text);
+        lines_ = std::move(highlighted);
     }
 
 } // namespace snt::view

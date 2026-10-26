@@ -8,7 +8,9 @@
 
 #include <filesystem>
 #include <map>
+#include <memory>
 #include <optional>
+#include <snt/dip/edit_session.h>
 #include <snt/dip/inspect/inspector.h>
 #include <string>
 #include <utility>
@@ -24,6 +26,7 @@ namespace snt::view {
         ManifestCategory, ///< Group of manifest entries.
         ManifestEntry,    ///< One project manifest entry.
         LocalSources,     ///< Sources loaded from local files.
+        DIPfileSource,    ///< Editable project manifest document.
         CodeSource,       ///< Source code file.
         BlockSources,     ///< Group of embedded source blocks.
         BlockSource,      ///< One embedded source block.
@@ -52,6 +55,7 @@ namespace snt::view {
         std::string node_path;                     ///< Underlying DIPL node path when different from the browser path.
         std::optional<std::size_t> manifest_index; ///< Index into the applicable project manifest collection.
         bool has_table = false;                    ///< Whether this entry exposes a tabular data view.
+        std::string source_kind;                    ///< Source file or raw data kind shown as a browser icon.
     };
 
     /** Source location or embedded block that the inspector can open. */
@@ -64,7 +68,7 @@ namespace snt::view {
         std::optional<std::string> block_path; ///< Embedded source block path, when text is stored in the environment.
     };
 
-    /** Own a read-only evaluated environment, its browser hierarchy, and navigation history. */
+    /** Own an evaluated environment, its browser hierarchy, source editing, and navigation history. */
     class ViewerModel {
       public:
         /** Load the requested project, source file, or saved environment for viewing. */
@@ -86,8 +90,30 @@ namespace snt::view {
         const ObjectInfo* object(const std::string& path) const;
         /** Resolve the value node represented by a browser entry, if any. */
         dip::ValueNode::PointerType value_node(const ObjectInfo& object) const;
+        /** Return the inspection path for array or table data represented by an entry. */
+        std::string data_path(const ObjectInfo& object) const;
         /** Collect navigable source locations for the given entry. */
         std::vector<SourceTarget> source_targets(const ObjectInfo& object) const;
+        /** Find the browser entry under Sources that represents a source target. */
+        std::string source_object_path(const SourceTarget& target) const;
+        /** Return a project-relative path if this source is a bundled editable document. */
+        std::optional<std::string> editable_document_path(const std::filesystem::path& file) const;
+        /** Return packaged text for an editable source document. */
+        const std::string& document_text(const std::string& path) const;
+        /** Return the source document with one embedded block value replaced. */
+        std::string document_text_with_block(const std::string& path, const std::string& text) const;
+        /** Preview candidate text through the core project parser and comparison engine. */
+        dip::PreviewResult preview_document(const std::string& path, const std::string& text) const;
+        /** Save an editable document and refresh the evaluated environment when possible. */
+        bool save_document(const std::string& path, const std::string& text);
+        /** Copy the current project and optionally include the active unsaved document. */
+        bool save_as(
+            const std::filesystem::path& destination_directory,
+            const std::optional<std::string>& edited_path = std::nullopt,
+            const std::string& edited_text = {}
+        );
+        /** Report whether the loaded artifact has a file-backed project session. */
+        bool can_save_as() const { return static_cast<bool>(edit_session_); }
         /** Return the currently loaded environment for read-only inspection. */
         const dip::Environment& environment() const { return environment_; }
         /** Return the resolved input artifact path. */
@@ -115,6 +141,7 @@ namespace snt::view {
         std::string input_path_;                    ///< Original input argument.
         std::filesystem::path artifact_;            ///< Resolved artifact used for loading.
         dip::Environment environment_;              ///< Loaded environment retained for inspection.
+        std::unique_ptr<dip::EditSession> edit_session_; ///< Core project editing session, when file-backed.
         std::map<std::string, ObjectInfo> objects_; ///< Browser hierarchy indexed by entry path.
         std::string selection_;                     ///< Currently selected entry path.
         std::string search_;                        ///< Browser filter query.

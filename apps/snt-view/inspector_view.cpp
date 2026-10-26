@@ -1,25 +1,136 @@
 #include "inspector_view.h"
 
 #include "browser_view.h"
+#include "notifications.h"
 #include "source_view.h"
 
 #include <algorithm>
+#include <cctype>
+#include <cstdio>
+#include <cstring>
+#include <filesystem>
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <snt/core/datatypes.h>
 #include <snt/dip/artifact.h>
 #include <snt/dip/inspect/dependency_graph.h>
+#include <snt/dip/parsers.h>
 #include <stdexcept>
 #include <string>
 #include <system_error>
+#include <unordered_set>
 #include <utility>
 
 namespace snt::view {
     namespace {
 
+        int resize_string_callback(ImGuiInputTextCallbackData* data) {
+            if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
+                auto* text = static_cast<std::string*>(data->UserData);
+                text->resize(static_cast<std::size_t>(data->BufTextLen));
+                data->Buf = text->data();
+            }
+            return 0;
+        }
+
+        std::string preview_report(const dip::PreviewResult& result) {
+            std::string report;
+            if (!result.candidate_valid) {
+                report = "Candidate has errors.";
+                for (const auto& diagnostic : result.candidate_diagnostics) {
+                    report += "\n";
+                    if (diagnostic.location) {
+                        if (diagnostic.location->line)
+                            report += "Line " + std::to_string(diagnostic.location->line);
+                        else if (!diagnostic.location->source.empty())
+                            report += diagnostic.location->source;
+                        if (diagnostic.location->column)
+                            report += ":" + std::to_string(*diagnostic.location->column);
+                        if (diagnostic.location->line || !diagnostic.location->source.empty())
+                            report += ": ";
+                    }
+                    report += diagnostic.code + ": " + diagnostic.message;
+                    if (!diagnostic.details.empty())
+                        report += "\n" + diagnostic.details;
+                    if (!diagnostic.suggestion.empty())
+                        report += "\nSuggestion: " + diagnostic.suggestion;
+                }
+                return report;
+            }
+            report = "Candidate parses and evaluates successfully.";
+            report += "\n" + dip::render_comparison(result.comparison);
+            return report;
+        }
+
+        std::string block_value_report(const dip::BlockInput& input, const std::string& text) {
+            try {
+                if (input.kind == dip::BlockInput::Kind::Array) {
+                    std::string normalized = text;
+                    normalized.erase(std::remove(normalized.begin(), normalized.end(), '\n'), normalized.end());
+                    const auto first = std::find_if_not(normalized.begin(), normalized.end(), [](unsigned char ch) {
+                        return std::isspace(ch);
+                    });
+                    const auto last = std::find_if_not(normalized.rbegin(), normalized.rend(), [](unsigned char ch) {
+                        return std::isspace(ch);
+                    }).base();
+                    normalized = first < last ? std::string(first, last) : std::string{};
+                    val::Array::StringType values;
+                    val::Array::ShapeType shape;
+                    const std::string parsed = dip::parse_array(normalized, values, shape);
+                    if (std::any_of(parsed.size() < normalized.size() ? normalized.begin() + parsed.size()
+                                                                      : normalized.end(),
+                                    normalized.end(), [](unsigned char ch) { return !std::isspace(ch); }))
+                        return "Unexpected text after the closing array bracket.";
+                    return "Array block value syntax is valid.";
+                }
+
+                std::queue<dip::Line> lines;
+                lines = dip::parse_lines(lines, text, input.source_name);
+                bool has_separator = false;
+                auto remaining = lines;
+                while (!remaining.empty()) {
+                    std::string line = remaining.front().code;
+                    remaining.pop();
+                    const auto first = line.find_first_not_of(" \t\r\n");
+                    if (first == std::string::npos)
+                        line.clear();
+                    else
+                        line = line.substr(first, line.find_last_not_of(" \t\r\n") - first + 1);
+                    if (line == "---") {
+                        has_separator = true;
+                        break;
+                    }
+                }
+                if (!has_separator)
+                    return "Table block value is missing the `---` header separator.";
+
+                dip::ValueMetadata metadata;
+                const auto columns = dip::parse_table_nodes(lines, metadata);
+                if (columns.empty())
+                    return "Table block value must define at least one column.";
+                return "Table block value syntax is valid.";
+            } catch (const std::exception& exception) {
+                return exception.what();
+            }
+        }
+
         void labeled_text(const char* label, const std::string& value) {
             ImGui::TextDisabled("%s", label);
             ImGui::SameLine(120.0f);
             ImGui::TextWrapped("%s", value.c_str());
+        }
+
+        bool same_file(const std::string& lhs, const std::string& rhs) {
+            const auto normalized = [](const std::string& value) {
+                std::error_code error;
+                const auto canonical = std::filesystem::weakly_canonical(value, error);
+                if (!error)
+                    return canonical;
+                error.clear();
+                const auto absolute = std::filesystem::absolute(value, error);
+                return error ? std::filesystem::path(value).lexically_normal() : absolute.lexically_normal();
+            };
+            return normalized(lhs) == normalized(rhs);
         }
 
         void refresh_inspector(ViewerModel& model, InspectorCache& cache) {
@@ -103,12 +214,29 @@ namespace snt::view {
                     cache.fields.emplace_back("Size", std::to_string(named.code.size()) + " bytes");
                 if (view.graph().recorded)
                     cache.readers = view.graph().referenced_by(object->path);
+                for (const auto& node : named.nodes.get_nodes())
+                    if (node && !node->path.name.empty())
+                        cache.source_nodes.emplace_back(
+                            node->path.name, object->source_name + "?" + node->path.name
+                        );
+                if (named.table_text && !named.table_path.empty()) {
+                    const std::string prefix = named.table_path + ".";
+                    for (const auto& node : model.environment().nodes.get_nodes()) {
+                        if (!node || node->table_path != named.table_path ||
+                            node->path.name.compare(0, prefix.size(), prefix) != 0)
+                            continue;
+                        cache.source_nodes.emplace_back(node->path.name, node->path.name);
+                    }
+                }
                 return;
             }
             if (object->role == ObjectRole::CodeSource && object->manifest_index) {
                 const auto& entry = model.environment().project_entries().at(*object->manifest_index);
                 cache.fields.emplace_back(
-                    "Kind", entry.resolved_path.empty() ? "Inline local source" : "Local source file"
+                    "Kind",
+                    entry.kind == dip::ProjectEntry::Kind::Override ? "Override source file"
+                    : entry.resolved_path.empty() ? "Inline local source"
+                                                  : "Local source file"
                 );
                 cache.fields.emplace_back(
                     "Source",
@@ -116,6 +244,36 @@ namespace snt::view {
                         ? model.display_file_path(model.artifact().string()) + ":" + std::to_string(entry.line)
                         : model.display_file_path(entry.resolved_path)
                 );
+                if (!entry.resolved_path.empty()) {
+                    const auto& sources = model.environment().sources.entries();
+                    const auto source_matches_file = [&](const std::string& source_name) {
+                        const auto source = sources.find(source_name);
+                        return source != sources.end() && !source->second.path.empty() &&
+                               same_file(source->second.path, entry.resolved_path);
+                    };
+                    std::unordered_set<std::string> listed_nodes;
+                    for (const auto& node : model.environment().nodes.get_nodes()) {
+                        if (!node || node->path.name.empty())
+                            continue;
+                        bool belongs_to_file = source_matches_file(node->line.source.name) ||
+                                                source_matches_file(node->override_line.source.name);
+                        if (!belongs_to_file)
+                            belongs_to_file = std::any_of(
+                                node->modification_lines.begin(),
+                                node->modification_lines.end(),
+                                [&](const auto& modification) {
+                                    return source_matches_file(modification.source.name);
+                                }
+                            );
+                        if (belongs_to_file && listed_nodes.insert(node->path.name).second)
+                            cache.source_nodes.emplace_back(node->path.name, node->path.name);
+                    }
+                }
+                return;
+            }
+            if (object->role == ObjectRole::DIPfileSource) {
+                cache.fields.emplace_back("Kind", "DIPfile manifest source");
+                cache.fields.emplace_back("Source", model.display_file_path(model.artifact().string()));
                 return;
             }
             if (object->role == ObjectRole::BlockSource) {
@@ -129,6 +287,18 @@ namespace snt::view {
                     cache.fields.emplace_back(
                         "Declared", model.display_file_path(target.file.string()) + ":" + std::to_string(target.line)
                     );
+                }
+                const std::string prefix = object->node_path + ".";
+                for (const auto& node : model.environment().nodes.get_nodes()) {
+                    if (!node)
+                        continue;
+                    if (input.kind == dip::BlockInput::Kind::Table) {
+                        if (node->table_path == object->node_path &&
+                            node->path.name.compare(0, prefix.size(), prefix) == 0)
+                            cache.source_nodes.emplace_back(node->path.name, node->path.name);
+                    } else if (node->path.name == object->node_path) {
+                        cache.source_nodes.emplace_back(node->path.name, node->path.name);
+                    }
                 }
                 return;
             }
@@ -227,16 +397,177 @@ namespace snt::view {
     } // namespace
 
     void draw_source_view(
-        const ViewerModel& model, const SourceView& source, bool& scroll_to_target, const std::string& error
+        ViewerModel& model,
+        SourceView& source,
+        bool& scroll_to_target,
+        std::string& error,
+        std::string& edit_report,
+        bool& request_save_as,
+        NotificationCenter& notifications
     ) {
+        const auto* selected = model.object(model.selection());
+        const bool block_value = selected && selected->role == ObjectRole::BlockSource;
         ImGui::TextUnformatted(model.display_file_path(source.file().string()).c_str());
         ImGui::SameLine();
-        ImGui::TextDisabled(":%zu  Read-only", source.source_line());
-        if (ImGui::Button("Copy source"))
+        const auto edit_path = model.editable_document_path(source.file());
+        ImGui::TextDisabled(":%zu  %s", source.source_line(), edit_path ? "Project source" : "Read-only");
+        if (source.dirty()) {
+            ImGui::SameLine();
+            ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f), "Modified");
+        }
+        if (ImGui::Button("Copy source")) {
             ImGui::SetClipboardText(source.text().c_str());
-        if (!error.empty())
-            ImGui::TextWrapped("%s", error.c_str());
+            notifications.notify("Source copied to clipboard.");
+        }
+        if (block_value && !source.editing()) {
+            ImGui::SameLine();
+            if (ImGui::Button("Check")) {
+                const auto& input = dip::Inspector{model.environment()}.block_inputs().at(selected->node_path);
+                edit_report = block_value_report(input, source.text());
+                const bool valid = edit_report.find("syntax is valid.") != std::string::npos;
+                notifications.notify(edit_report, valid ? NoticeLevel::Info : NoticeLevel::Error);
+            }
+        }
+        if (edit_path) {
+            ImGui::SameLine();
+            if (!source.editing()) {
+                if (ImGui::Button("Edit")) {
+                    source.set_editing(true);
+                    edit_report.clear();
+                }
+            } else {
+                if (ImGui::Button("Check")) {
+                    try {
+                        if (block_value) {
+                            const auto& input = dip::Inspector{model.environment()}.block_inputs().at(selected->node_path);
+                            edit_report = block_value_report(input, source.text());
+                        } else {
+                            edit_report = preview_report(model.preview_document(*edit_path, source.text()));
+                        }
+                    } catch (const std::exception& exception) {
+                        edit_report = exception.what();
+                    }
+                    const auto check_level = edit_report.find("syntax is valid.") != std::string::npos ||
+                                                     edit_report.find("Candidate parses and evaluates successfully.") == 0
+                                                 ? NoticeLevel::Info
+                                                 : NoticeLevel::Error;
+                    notifications.notify(edit_report, check_level);
+                }
+                ImGui::SameLine();
+                ImGui::BeginDisabled(!source.dirty());
+                const bool save = ImGui::Button("Save");
+                ImGui::EndDisabled();
+                if (save) {
+                    edit_report.clear();
+                    std::string document = source.text();
+                    try {
+                        if (block_value)
+                            document = model.document_text_with_block(selected->node_path, source.text());
+                    } catch (const std::exception& exception) {
+                        edit_report = exception.what();
+                    }
+                    if (edit_report.empty() && model.save_document(*edit_path, document)) {
+                        source.mark_saved();
+                        edit_report = model.error().empty()
+                                          ? "Saved and reloaded."
+                                          : "Saved; reload could not evaluate the new text: " + model.error();
+                    } else if (edit_report.empty())
+                        edit_report = model.error();
+                }
+                ImGui::SameLine();
+                ImGui::BeginDisabled(!model.can_save_as() || block_value);
+                if (ImGui::Button("Save As..."))
+                    request_save_as = true;
+                ImGui::EndDisabled();
+                ImGui::SameLine();
+                if (ImGui::Button("Discard")) {
+                    source.set_text(block_value
+                                        ? dip::Inspector{model.environment()}.block_inputs().at(selected->node_path).code
+                                        : model.document_text(*edit_path));
+                    source.mark_saved();
+                    source.set_editing(false);
+                    edit_report.clear();
+                    error.clear();
+                }
+            }
+        }
+        notifications.observe("source-view-error", error, NoticeLevel::Warning);
+        const auto starts_with = [&](const char* prefix) {
+            return edit_report.compare(0, std::char_traits<char>::length(prefix), prefix) == 0;
+        };
+        const auto report_level = starts_with("Saved and reloaded.") ||
+                                          starts_with("Candidate parses and evaluates successfully")
+                                      ? NoticeLevel::Info
+                                      : starts_with("Saved; reload could not evaluate")
+                                            ? NoticeLevel::Warning
+                                            : NoticeLevel::Error;
+        if (!block_value)
+            notifications.observe("edit-report", edit_report, report_level);
         ImGui::Separator();
+        if (edit_path && source.editing()) {
+            std::string buffer = source.text();
+            buffer.reserve(std::max<std::size_t>(buffer.capacity(), 4096));
+            const ImVec2 editor_size = ImGui::GetContentRegionAvail();
+            const auto& lines = source.lines();
+            // InputTextMultiline lays out each hard line at the font size and
+            // does not add ImGui's normal item spacing between lines. Match
+            // that exact row pitch in the gutter as well.
+            const float line_height = ImGui::GetFontSize();
+            const float gutter_width =
+                ImGui::CalcTextSize(std::to_string(std::max<std::size_t>(1, lines.size())).c_str()).x + 14.0f;
+            const ImGuiID editor_id = ImGui::GetID("##SourceEditor");
+            char editor_window_name[512];
+            std::snprintf(
+                editor_window_name,
+                sizeof(editor_window_name),
+                "%s/##SourceEditor_%08X",
+                ImGui::GetCurrentWindow()->Name,
+                editor_id
+            );
+            const ImGuiWindow* editor_window = ImGui::FindWindowByName(editor_window_name);
+            ImGui::BeginChild(
+                "##SourceLineNumbers",
+                ImVec2(gutter_width, editor_size.y),
+                ImGuiChildFlags_Borders,
+                ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoInputs
+            );
+            if (editor_window)
+                ImGui::SetScrollY(editor_window->Scroll.y);
+            ImGui::SetCursorPosY(ImGui::GetStyle().FramePadding.y);
+            const ImVec2 item_spacing = ImGui::GetStyle().ItemSpacing;
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(item_spacing.x, 0.0f));
+            ImGuiListClipper clipper;
+            clipper.Begin(static_cast<int>(lines.size()), line_height);
+            while (clipper.Step()) {
+                for (int index = clipper.DisplayStart; index < clipper.DisplayEnd; ++index) {
+                    const auto number = std::to_string(index + 1);
+                    const ImVec2 position = ImGui::GetCursorScreenPos();
+                    const float number_width = ImGui::CalcTextSize(number.c_str()).x;
+                    ImGui::GetWindowDrawList()->AddText(
+                        ImVec2(position.x + gutter_width - number_width - 8.0f, position.y),
+                        ImGui::GetColorU32(ImGuiCol_TextDisabled),
+                        number.c_str()
+                    );
+                    ImGui::Dummy(ImVec2(gutter_width - 4.0f, line_height));
+                }
+            }
+            ImGui::PopStyleVar();
+            ImGui::EndChild();
+            ImGui::SameLine(0.0f, 0.0f);
+            const bool changed = ImGui::InputTextMultiline(
+                    "##SourceEditor",
+                    buffer.data(),
+                    buffer.capacity() + 1,
+                    ImVec2(editor_size.x - gutter_width, editor_size.y),
+                    ImGuiInputTextFlags_CallbackResize | ImGuiInputTextFlags_AllowTabInput,
+                    resize_string_callback,
+                    &buffer
+                );
+            buffer.resize(std::strlen(buffer.c_str()));
+            if (changed)
+                source.set_text(std::move(buffer));
+            return;
+        }
         ImGui::BeginChild(
             "Source lines", ImVec2(0.0f, 0.0f), ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar
         );
@@ -287,19 +618,23 @@ namespace snt::view {
         SourceView& source,
         bool& select_source_tab,
         bool& scroll_to_target,
-        std::string& source_error
+        std::string& source_error,
+        NotificationCenter& notifications
     ) {
         const dip::Inspector view{model.environment()};
         if (!cache.valid || cache.path != model.selection() || cache.revision != model.revision())
             refresh_inspector(model, cache);
         if (const auto* object = model.object(model.selection())) {
-            if (dip::detect_artifact(model.artifact()) == dip::ArtifactKind::DIPH5) {
+            const bool selected_source = object->role == ObjectRole::Source || object->role == ObjectRole::CodeSource ||
+                                         object->role == ObjectRole::BlockSource ||
+                                         object->role == ObjectRole::DIPfileSource;
+            if (!selected_source && dip::detect_artifact(model.artifact()) == dip::ArtifactKind::DIPH5) {
                 ImGui::BeginDisabled();
                 ImGui::Button("Open source");
                 ImGui::EndDisabled();
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
                     ImGui::SetTooltip("Source text is not stored in .diph5 snapshots");
-            } else {
+            } else if (!selected_source) {
                 const auto& targets = cache.source_targets;
                 for (std::size_t index = 0; index < targets.size(); ++index) {
                     const auto& target = targets[index];
@@ -317,20 +652,19 @@ namespace snt::view {
                         ImGui::SetTooltip("%s:%zu%s", location.c_str(), target.line, available ? "" : " (unavailable)");
                     }
                     if (clicked) {
-                        const bool opened = target.block_path
-                                                ? source.open_text(
-                                                      target.file,
-                                                      target.line,
-                                                      view.block_inputs().at(*target.block_path).code,
-                                                      target.format,
-                                                      source_error
-                                                  )
-                                                : source.open(target.file, target.line, source_error, target.format);
-                        if (opened) {
-                            const auto parsed = model.environment().sources.entries().find(target.source_name);
-                            if (!target.block_path && parsed != model.environment().sources.entries().end() &&
-                                parsed->second.code != source.text())
-                                source_error = "Source file changed since parsing; reload to update line locations.";
+                        const std::string source_path = model.source_object_path(target);
+                        if (source_path.empty()) {
+                            source_error = "The source is not listed in the Sources section.";
+                            continue;
+                        }
+                        if (source.dirty()) {
+                            if (source.file() != target.file) {
+                                source_error = "Save or discard the current document before opening another source.";
+                                continue;
+                            }
+                        }
+                        if (model.select(source_path)) {
+                            source_error.clear();
                             select_source_tab = true;
                             scroll_to_target = true;
                         }
@@ -338,10 +672,15 @@ namespace snt::view {
                 }
             }
         }
-        if (!source_error.empty() && !select_source_tab)
-            ImGui::TextWrapped("%s", source_error.c_str());
+        notifications.observe("source-navigation-error", source_error, NoticeLevel::Warning);
         for (const auto& [label, value] : cache.fields)
             labeled_text(label, value);
+        if (!cache.source_nodes.empty()) {
+            ImGui::SeparatorText("Nodes");
+            for (const auto& [label, target] : cache.source_nodes)
+                if (ImGui::Selectable(label.c_str()))
+                    model.select(target);
+        }
         if (const auto* object = model.object(model.selection());
             object && object->role == ObjectRole::ManifestEntry && object->manifest_index) {
             const auto& entry = model.environment().project_entries().at(*object->manifest_index);
@@ -404,8 +743,50 @@ namespace snt::view {
                 }
             }
         }
-        if (!cache.error.empty())
-            ImGui::TextWrapped("Inspection failed: %s", cache.error.c_str());
+        notifications.observe("inspector-error", cache.error, NoticeLevel::Error);
+    }
+
+    bool open_selected_source(ViewerModel& model, SourceView& source, std::string& error) {
+        const auto* selected = model.object(model.selection());
+        if (!selected || (selected->role != ObjectRole::Source && selected->role != ObjectRole::CodeSource &&
+                          selected->role != ObjectRole::BlockSource && selected->role != ObjectRole::DIPfileSource))
+            return false;
+        const auto targets = model.source_targets(*selected);
+        if (targets.empty()) {
+            error = "No source text is available for this entry.";
+            return false;
+        }
+        const auto& target = targets.front();
+        if (source.dirty()) {
+            if (source.file() == target.file)
+                return true;
+            error = "Save or discard the current document before opening another source.";
+            return false;
+        }
+        bool opened = false;
+        if (target.block_path) {
+            const dip::Inspector view{model.environment()};
+            opened = source.open_text(
+                target.file,
+                target.line,
+                view.block_inputs().at(*target.block_path).code,
+                target.format,
+                error
+            );
+        } else if (const auto edit_path = model.editable_document_path(target.file)) {
+            opened = source.open_document(
+                target.file, target.line, model.document_text(*edit_path), target.format, error
+            );
+        } else {
+            opened = source.open(target.file, target.line, error, target.format);
+        }
+        if (!opened)
+            return false;
+        const auto parsed = model.environment().sources.entries().find(target.source_name);
+        if (!target.block_path && !model.editable_document_path(target.file) &&
+            parsed != model.environment().sources.entries().end() && parsed->second.code != source.text())
+            error = "Source file changed since parsing; reload to update line locations.";
+        return true;
     }
 
 } // namespace snt::view

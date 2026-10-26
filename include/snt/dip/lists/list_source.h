@@ -25,6 +25,7 @@ namespace snt::dip {
         bool named_source = false;         // registered for source?path references
         bool raw_text = false;             // content is read verbatim, not parsed as DIPL
         bool table_text = false;           // raw content was parsed as a table
+        std::string table_path;             // resolved table populated by this raw source, when applicable
         HierarchyList hierarchy;           // source-local hierarchy
         SchemaList schemas;                 // schema definitions available to imported collections
         ExplicitDeclarations declarations; // explicit source-local paths

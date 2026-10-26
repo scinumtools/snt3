@@ -27,3 +27,6 @@ sources[]
 sources[]
   name = "table_samples"
   filepath = "table_samples.dipt"
+sources[]
+  name = "field_notes"
+  filepath = "field_notes.txt"
