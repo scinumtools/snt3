@@ -891,9 +891,15 @@ lint : snt_project_lint
         target.set_block_input_recording(retain_block_inputs);
         std::unordered_map<std::string, ValueNode::PointerType> node_index;
         node_index.reserve(target.nodes.size() + queue.size());
+        // Both flags are monotonic: a removed deferred node may cause an extra scan, never a missed one.
+        bool has_local_links = false;
+        bool has_deferred_nodes = false;
         for (const auto& existing : target.nodes.get_nodes())
-            if (existing)
+            if (existing) {
                 node_index.try_emplace(existing->path.name, existing);
+                has_local_links |= existing->dtype == NodeDtype::Link;
+                has_deferred_nodes |= existing->dtype == NodeDtype::Deferred;
+            }
         size_t next_item_group = 0;
         while (queue.size() > 0 || next_item_group < target.overrides.item_group_count()) {
             if (queue.size() == 0) {
@@ -922,7 +928,7 @@ lint : snt_project_lint
                  node->dtype == NodeDtype::Link ||
                  node->dtype == NodeDtype::Modification)) {
                 const std::string& path = graph_path;
-                if (node->dtype == NodeDtype::Modification)
+                if (node->dtype == NodeDtype::Modification && has_local_links)
                     target.validate_write_path(path);
                 const auto existing = node_index.find(path);
                 if (existing != node_index.end()) {
@@ -992,7 +998,8 @@ lint : snt_project_lint
                                 target.set_active_dependency_owner("#case:" + std::to_string(case_node->case_id));
                         }
                     } else {
-                        parsed = node->parse(target);
+                        if (node->dtype != NodeDtype::Modification || has_deferred_nodes)
+                            parsed = node->parse(target);
                     }
                 }
                 if (parsed.size() > 0) {
@@ -1100,6 +1107,8 @@ lint : snt_project_lint
                         );
                     target.nodes.push_back(vnode);
                     node_index.try_emplace(vnode->path.name, vnode);
+                    has_local_links |= vnode->dtype == NodeDtype::Link;
+                    has_deferred_nodes |= vnode->dtype == NodeDtype::Deferred;
                 }
                 if (record_dependency_graph && graph_value_evaluated)
                     target.set_value_controls("?" + node->path.name, target.branching.active_case_ids());

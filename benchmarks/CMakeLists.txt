@@ -14,4 +14,5 @@ add_snt_benchmark(benchmark-puq-array puq/array_benchmark.cpp snt-puq cxx_std_20
 
 if(ENABLE_DIP)
     add_snt_benchmark(benchmark-dip dip/dip_benchmark.cpp snt-dip cxx_std_17)
+    add_snt_benchmark(benchmark-dip-schema-map dip/schema_map_benchmark.cpp snt-dip cxx_std_17)
 endif()

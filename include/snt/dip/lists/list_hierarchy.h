@@ -4,6 +4,7 @@
 #include <functional>
 #include <snt/dip/nodes/node_base.h>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace snt::dip {
 
@@ -36,6 +37,7 @@ namespace snt::dip {
       private:
         std::vector<Parent> parents;                             ///< List of all parents of a current node hierarchy
         std::unordered_map<std::string, Collection> collections; ///< Map of all registered node collections
+        std::unordered_map<std::string, std::unordered_set<std::string>> map_item_lookup; ///< Fast map-key membership checks
         std::vector<std::string> root_children;                  ///< Top-level DIPL children in declaration order
 
       public:

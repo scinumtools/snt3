@@ -58,6 +58,8 @@ namespace snt::dip {
      */
 
     bool Parser::kwd_case() {
+        if (code.find(SIGN_CONDITION) == std::string::npos)
+            return false;
         constexpr auto pstr =
             ce_concat<50>("^(", PATTERN_PATH, "*[", SIGN_CONDITION, "](", KEYWORD_IF, "|", KEYWORD_ELIF, "))[ ]*");
         static const std::regex pattern(pstr.data());
@@ -595,6 +597,8 @@ namespace snt::dip {
     }
 
     bool Parser::part_function() {
+        if (code.find('(') == std::string::npos)
+            return false;
         constexpr auto pstr = ce_concat<50>("^[ ]*(", PATTERN_KEYWORD, "+)[(][)]");
         static const std::regex pattern(pstr.data());
         std::smatch matchResult;

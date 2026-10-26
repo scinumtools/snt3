@@ -239,9 +239,13 @@ namespace snt::dip {
     }
 
     std::string BranchingList::clean_name(const std::string& name) const {
-        std::ostringstream oss;
-        oss << "(" << SIGN_CONDITION << "C[0-9]+" << SIGN_SEPARATOR << ")";
-        std::regex pattern(oss.str());
+        if (name.find(SIGN_CONDITION) == std::string::npos)
+            return name;
+        static const std::regex pattern = [] {
+            std::ostringstream oss;
+            oss << "(" << SIGN_CONDITION << "C[0-9]+" << SIGN_SEPARATOR << ")";
+            return std::regex(oss.str());
+        }();
         return std::regex_replace(name, pattern, "");
     }
 

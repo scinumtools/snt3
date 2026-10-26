@@ -31,6 +31,32 @@ to Python scalar values. Source generation and the correctness checks are
 outside the timed regions. The benchmark uses the same nested scalar parameter
 shape as `snt-paper/benchmarks/pyserial`.
 
+The `benchmark-dip-schema-map` target isolates typed configuration structure
+costs at 10, 100, 1,000, and 10,000 values. It reports:
+
+- `BM_DipSchemaDeclarationsOnly`: parse two schemas without creating instances.
+- `BM_DipTypedFlat`: create typed scalar values beneath ordinary groups.
+- `BM_DipTypedExplicitMap`: create keyed map items and typed child values
+  directly, without schemas.
+- `BM_DipTypedSchemaMap`: expand a map item schema and apply each value as an
+  instance modification.
+- `BM_DipTypedSchemaMapCondition`: the same schema-backed map with a condition
+  evaluated for every value.
+- `BM_DipTypedSchemaMapDefault`: expand schema-backed items with a default
+  value and no instance modifications.
+- `BM_DipTypedSchemaMapDefaultOverride`: use that same default schema, then
+  modify each item value.
+
+All timed cases parse a prebuilt input; source generation and a value-node count
+check are outside timing. Payload bytes and values processed are reported too.
+These cases separate schema declaration setup, flat node creation, map and
+hierarchy work, schema expansion, and per-value condition checks. The direct
+map and schema-backed map forms are diagnostic representations: the latter
+retains schema-based declarations and applies values as modifications, while
+the former declares each typed child with its value. Compare timings as clues
+about where work is spent, not as a claim that the two DIPL models are
+semantically interchangeable.
+
 ## Run
 
 Run both the native and Python suites from the repository root with:
@@ -39,13 +65,20 @@ Run both the native and Python suites from the repository root with:
 ./setup.sh --benchmark dip
 ```
 
-This builds `benchmark-dip` and the Python DIP binding. Google Benchmark's
+This builds `benchmark-dip`, `benchmark-dip-schema-map`, and the Python DIP binding. Google Benchmark's
 colored report is retained, and Python per-case timing samples are written to
 `build/dip-python-benchmark.csv`. Native C++ runs are recorded in the ignored
 `benchmarks/dip/results/history.json` and can be compared with the existing
 `benchmarks/puq/benchmark_history.py compare --history ...` command.
 The setup helper uses a quick profile (three C++ repetitions and three Python
 samples) so large parse cases do not make routine runs too slow.
+
+The `dip` suite also builds and records `benchmark-dip-schema-map`. Run it
+directly to focus on these cases:
+
+```sh
+build/bin/benchmark-dip-schema-map --benchmark_repetitions=5 --benchmark_min_time=0.05s
+```
 
 To run only the Python phases, first build the binding with DIP enabled, then
 use:

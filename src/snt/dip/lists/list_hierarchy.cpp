@@ -3,7 +3,6 @@
 #include <iostream>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_hierarchy.h>
-#include <sstream>
 #include <utility>
 
 namespace snt::dip {
@@ -55,6 +54,13 @@ namespace snt::dip {
         const auto key_for = [&](const std::string& path) {
             return collection_path ? collection_path(path) : path;
         };
+        const auto contains_item = [&](const Collection& collection, const std::string& path, const std::string& item) {
+            if (collection.kind == Path::Kind::Map) {
+                const auto lookup = map_item_lookup.find(path);
+                return lookup != map_item_lookup.end() && lookup->second.find(item) != lookup->second.end();
+            }
+            return std::find(collection.items.begin(), collection.items.end(), item) != collection.items.end();
+        };
 
         // closed children nodes and register new parent
         record_parent(node);
@@ -100,9 +106,7 @@ namespace snt::dip {
                     );
                 else if (itc->second.kind == Path::Kind::List && is_index_selector(cnode.item)) {
                     validate_list_index(itc->second, key, cnode.item, node->line);
-                } else if (
-                    std::find(itc->second.items.begin(), itc->second.items.end(), cnode.item) == itc->second.items.end()
-                )
+                } else if (!contains_item(itc->second, key, cnode.item))
                     throw dip::EnvironmentException(
                         "Unknown collection item",
                         "The item `" + cnode.item + "` was not found in the collection `" + name_full + "`.",
@@ -144,6 +148,7 @@ namespace snt::dip {
                     name_full += "[" + cnode.item + "]";
                 } else if (it == collections.end()) { // create new collection
                     collections[key] = Collection{key, {cnode.item}, Path::Kind::Map, {}};
+                    map_item_lookup[key].insert(cnode.item);
                 } else if (it->second.kind != Path::Kind::Map) {
                     throw dip::EnvironmentException(
                         "Invalid collection type",
@@ -153,10 +158,10 @@ namespace snt::dip {
                         __LINE__,
                         node->line
                     );
-                } else if (
-                    std::find(it->second.items.begin(), it->second.items.end(), cnode.item) == it->second.items.end()
-                ) { // append new item with a new key
+                } else if (!contains_item(it->second, key, cnode.item)) {
+                    // append new item with a new key
                     it->second.items.push_back(cnode.item);
+                    map_item_lookup.at(key).insert(cnode.item);
                 } else {
                     throw dip::EnvironmentException(
                         "Duplicate collection item",
@@ -220,13 +225,14 @@ namespace snt::dip {
     }
 
     const Path HierarchyList::get_current_path(size_t indent, const std::string& path, bool show_item) const {
-        std::stringstream new_path;
+        std::string new_path;
+        new_path.reserve(path.size() + parents.size() * 16);
         for (size_t parent = 0; parent < parents.size(); parent++) {
             if (parents[parent].indent >= indent)
                 continue;
             if (parent > 0)
-                new_path << SIGN_SEPARATOR;
-            new_path << parents[parent].name;
+                new_path += SIGN_SEPARATOR;
+            new_path += parents[parent].name;
         }
         std::string clean_path = path;
         if (!show_item && !clean_path.empty() && clean_path.back() == ']') {
@@ -235,11 +241,11 @@ namespace snt::dip {
                 clean_path.erase(pos);
         }
         if (!clean_path.empty()) {
-            if (!new_path.str().empty())
-                new_path << SIGN_SEPARATOR;
-            new_path << clean_path;
+            if (!new_path.empty())
+                new_path += SIGN_SEPARATOR;
+            new_path += clean_path;
         }
-        return Path(new_path.str());
+        return Path(new_path);
     }
 
     std::string HierarchyList::resolve_list_selectors(std::string path) const {
@@ -284,6 +290,8 @@ namespace snt::dip {
                 __LINE__
             );
         collections[path] = Collection{path, {}, kind, std::move(schemas)};
+        if (kind == Path::Kind::Map)
+            map_item_lookup[path];
     }
 
     void HierarchyList::set_collection(
@@ -298,6 +306,11 @@ namespace snt::dip {
                 __LINE__
             );
         collections[path] = Collection{path, std::move(items), kind, std::move(schemas)};
+        if (kind == Path::Kind::Map) {
+            auto& lookup = map_item_lookup[path];
+            const auto& restored_items = collections.at(path).items;
+            lookup.insert(restored_items.begin(), restored_items.end());
+        }
     }
 
     void HierarchyList::import_subtree(
@@ -333,6 +346,10 @@ namespace snt::dip {
         for (auto& copy : selected) {
             const auto existing = collections.find(copy.path);
             if (existing == collections.end()) {
+                if (copy.kind == Path::Kind::Map) {
+                    auto& lookup = map_item_lookup[copy.path];
+                    lookup.insert(copy.items.begin(), copy.items.end());
+                }
                 collections.emplace(copy.path, std::move(copy));
                 continue;
             }
@@ -349,6 +366,10 @@ namespace snt::dip {
                         target.push_back(value);
             };
             append_unique(existing->second.items, copy.items);
+            if (existing->second.kind == Path::Kind::Map) {
+                auto& lookup = map_item_lookup[copy.path];
+                lookup.insert(existing->second.items.begin(), existing->second.items.end());
+            }
             append_unique(existing->second.children, copy.children);
             append_unique(existing->second.schemas, copy.schemas);
         }
@@ -425,6 +446,7 @@ namespace snt::dip {
 
     void HierarchyList::erase_collection(const std::string& path) {
         collections.erase(path);
+        map_item_lookup.erase(path);
     }
 
     const bool HierarchyList::has_collection(const std::string& path) const {

@@ -5,6 +5,7 @@
 #include <pybind11/stl.h>
 #include <snt/puq/exceptions.h>
 #include <snt/puq/math.h>
+#include <snt/puq/monte_carlo.h>
 #include <snt/puq/quantity.h>
 #include <utility>
 #include <variant>
@@ -137,6 +138,53 @@ namespace snt::bind::python {
             //.def(py::init<std::vector<double>, std::vector<double>, std::string>())
             //.def(py::init<std::vector<double>, std::vector<double>, std::string, puq::SystemType>())
             ;
+
+        py::class_<puq::MonteCarloResult>(m, "MonteCarloResult", "Distribution-aware propagation result.")
+            .def_readonly("quantity", &puq::MonteCarloResult::quantity)
+            .def_readonly("lower", &puq::MonteCarloResult::lower)
+            .def_readonly("upper", &puq::MonteCarloResult::upper)
+            .def_readonly("coverage", &puq::MonteCarloResult::coverage)
+            .def_readonly("samples", &puq::MonteCarloResult::samples);
+
+        q.def_static(
+            "monte_carlo",
+            [](py::function model, py::sequence inputs, py::object distributions, std::size_t samples,
+               std::uint64_t seed, double coverage) {
+                std::vector<puq::Quantity> quantities;
+                quantities.reserve(inputs.size());
+                for (const auto& input : inputs)
+                    quantities.push_back(py::cast<puq::Quantity>(input));
+
+                std::vector<puq::InputDistribution> kinds(quantities.size(), puq::InputDistribution::Normal);
+                if (!distributions.is_none()) {
+                    auto names = py::cast<py::sequence>(distributions);
+                    if (names.size() != static_cast<py::ssize_t>(quantities.size()))
+                        throw py::value_error("distributions must have one entry per input");
+                    for (std::size_t i = 0; i < kinds.size(); ++i) {
+                        const std::string name = py::cast<std::string>(names[i]);
+                        if (name == "normal")
+                            kinds[i] = puq::InputDistribution::Normal;
+                        else if (name == "uniform")
+                            kinds[i] = puq::InputDistribution::Uniform;
+                        else
+                            throw py::value_error("distribution must be 'normal' or 'uniform'");
+                    }
+                }
+                return puq::monte_carlo(
+                    quantities, kinds,
+                    [&model](const std::vector<puq::Quantity>& values) {
+                        py::tuple args(values.size());
+                        for (std::size_t i = 0; i < values.size(); ++i)
+                            args[i] = py::cast(values[i]);
+                        return py::cast<puq::Quantity>(model(*args));
+                    },
+                    samples, seed, coverage
+                );
+            },
+            py::arg("model"), py::arg("inputs"), py::arg("distributions") = py::none(),
+            py::arg("samples") = 100000, py::arg("seed") = 0, py::arg("coverage") = 0.95,
+            "Propagate scalar inputs through a model; returns mean, standard deviation, and central coverage interval."
+        );
 
         q.def_static(
             "set_propagation_mode",

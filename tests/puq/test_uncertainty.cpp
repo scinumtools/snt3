@@ -3,9 +3,60 @@
 #include <algorithm>
 #include <cmath>
 #include <snt/puq/measurement.h>
+#include <snt/puq/monte_carlo.h>
 #include <snt/puq/quantity.h>
 
 using namespace snt;
+
+TEST(Uncertainty, MonteCarloNonlinearAndUniform) {
+    const puq::Quantity square_input(0.5, 0.4, "m");
+    const auto square = puq::monte_carlo(
+        {square_input}, {puq::InputDistribution::Normal},
+        [](const std::vector<puq::Quantity>& inputs) { return inputs[0] * inputs[0]; },
+        100000, 42
+    );
+    const val::ArrayValueFloat64 square_mean(square.quantity.measurement.result.estimate.get());
+    const val::ArrayValueFloat64 square_sd(square.quantity.measurement.result.uncertainty.get());
+    EXPECT_NEAR(square_mean.get_value(0), 0.41, 0.01);
+    EXPECT_NEAR(square_sd.get_value(0), std::sqrt(0.2112), 0.01);
+    EXPECT_GE(square.lower, 0.0);
+    EXPECT_GT(square.upper, 1.5);
+
+    const puq::Quantity uniform_input(10.0, 0.2, "m");
+    const auto uniform = puq::monte_carlo(
+        {uniform_input}, {puq::InputDistribution::Uniform},
+        [](const std::vector<puq::Quantity>& inputs) { return inputs[0]; },
+        100000, 42
+    );
+    const val::ArrayValueFloat64 uniform_mean(uniform.quantity.measurement.result.estimate.get());
+    const val::ArrayValueFloat64 uniform_sd(uniform.quantity.measurement.result.uncertainty.get());
+    EXPECT_NEAR(uniform_mean.get_value(0), 10.0, 0.005);
+    EXPECT_NEAR(uniform_sd.get_value(0), 0.2, 0.005);
+    EXPECT_NEAR(uniform.lower, 10.0 - 0.95 * std::sqrt(3.0) * 0.2, 0.005);
+    EXPECT_NEAR(uniform.upper, 10.0 + 0.95 * std::sqrt(3.0) * 0.2, 0.005);
+}
+
+TEST(Uncertainty, MonteCarloPreservesSourceIdentity) {
+    const puq::Quantity input(2.0, 0.3, "m");
+    const auto cancelled = puq::monte_carlo(
+        {input, input}, {puq::InputDistribution::Normal, puq::InputDistribution::Normal},
+        [](const std::vector<puq::Quantity>& inputs) { return inputs[0] - inputs[1]; },
+        1000, 42
+    );
+    const val::ArrayValueFloat64 sd(cancelled.quantity.measurement.result.uncertainty.get());
+    EXPECT_DOUBLE_EQ(sd.get_value(0), 0.0);
+
+    puq::Quantity left(1.0, 0.2, "m");
+    puq::Quantity right(2.0, 0.3, "m");
+    puq::Result::correlate(left.measurement.result, right.measurement.result, 1.0);
+    const auto correlated = puq::monte_carlo(
+        {left, right}, {puq::InputDistribution::Normal, puq::InputDistribution::Normal},
+        [](const std::vector<puq::Quantity>& inputs) { return inputs[0] - inputs[1]; },
+        100000, 42
+    );
+    const val::ArrayValueFloat64 correlated_sd(correlated.quantity.measurement.result.uncertainty.get());
+    EXPECT_NEAR(correlated_sd.get_value(0), 0.1, 0.003);
+}
 
 TEST(Uncertainty, Initialization) {
 

@@ -216,7 +216,7 @@ function run_benchmark {
         python)
             python_enabled=ON;;
         dip)
-            cpp_targets=(benchmark-dip)
+            cpp_targets=(benchmark-dip benchmark-dip-schema-map)
             python_enabled=ON
             dip_enabled=ON;;
         all)
