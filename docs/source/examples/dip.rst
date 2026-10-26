@@ -170,6 +170,29 @@ project parse; source nodes are not yet stored in ``.diph5`` snapshots. The
 <https://github.com/scinumtools/snt3/blob/main/examples/dip/ParameterViewer/README.md>`_
 provides a longer guided tour and a command-line parse check.
 
+.. _dip-guided-setup-example:
+
+Guided Setup
+------------
+
+The `GuidedSetup source directory
+<https://github.com/scinumtools/snt3/tree/main/examples/dip/GuidedSetup>`_
+demonstrates DIPL-driven prompts with ``snt setup``. It includes a boolean,
+labelled options, constrained integer and unit-bearing number, formatted text,
+an array expression, a required value without a default, and a derived value
+that is not prompted.
+
+From the repository root, run:
+
+.. code-block:: bash
+
+   build/bin/snt setup examples/dip/GuidedSetup/DIPfile --output build/run-settings.dip
+   build/bin/snt dip parse --project examples/dip/GuidedSetup/DIPfile \
+       --input override_file build/run-settings.dip --print
+
+The setup answers are validated through DIP before they are written as an
+override file. See :doc:`the CLI guide <../integrations/cli>` for details.
+
 Adapter Outputs
 ---------------
 

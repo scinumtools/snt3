@@ -114,7 +114,7 @@ namespace snt::dip {
           override_line(other.override_line), modification_lines(other.modification_lines),
           table_path(other.table_path), copied_from(other.copied_from), link_source(other.link_source),
           link_target(other.link_target), table_column_index(other.table_column_index),
-          condition(other.condition), format(other.format), option_labels(other.option_labels),
+          condition(other.condition), option_labels(other.option_labels), setup(other.setup), format(other.format),
           value_dtype(other.value_dtype), BaseNode(other) {
         options.reserve(other.options.size());
         for (const auto& option : other.options) {
@@ -540,6 +540,18 @@ namespace snt::dip {
             option_labels = values;
             for (size_t i = 0; i < options.size() && i < values.size(); ++i)
                 options[i].label = values[i];
+            return true;
+        case PropertyType::Setup:
+            if (!values.empty() || !units.empty())
+                throw dip::SyntaxException(
+                    "Invalid setup directive",
+                    "The `!setup` directive does not take a value or units.",
+                    "Write `!setup` on a value that should be prompted for during guided setup.",
+                    __FILE__,
+                    __LINE__,
+                    line
+                );
+            setup = true;
             return true;
         case PropertyType::Constant:
             constant = true;

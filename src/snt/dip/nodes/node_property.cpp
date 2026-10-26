@@ -20,7 +20,7 @@ namespace snt::dip {
                         __LINE__,
                         parser.line
                     );
-            } else {
+            } else if (ptype != PropertyType::Setup) {
                 parser.part_value();
             }
             if (ptype == PropertyType::Labels &&

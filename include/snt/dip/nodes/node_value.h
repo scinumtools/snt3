@@ -62,6 +62,7 @@ namespace snt::dip {
         std::string condition;
         std::vector<OptionStruct> options;
         std::optional<val::Array::StringType> option_labels; ///< Explicit labels before alignment with options.
+        bool setup = false; ///< Include this value in guided project setup.
         std::string format;
 
         /** Construct an empty value node. */

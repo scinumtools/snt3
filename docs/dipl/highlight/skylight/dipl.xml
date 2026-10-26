@@ -32,7 +32,7 @@
         <!-- Option directives -->
         <RegExpr
             attribute="Directive"
-            String="!(options|labels|condition|format|constant|tags|delimiter)"
+            String="!(options|labels|setup|condition|format|constant|tags|delimiter)"
             context="#stay"/>
 
         <!-- Metadata -->

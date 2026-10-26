@@ -760,7 +760,9 @@ lint : snt_project_lint
         return diagnostics;
     }
 
-    Environment DIP::parse(bool record_dependency_graph, bool retain_block_inputs) {
+    Environment DIP::parse(
+        bool record_dependency_graph, bool retain_block_inputs, bool allow_unset_setup_values
+    ) {
         NodeList<BaseNode> queue = parse_code_nodes(lines);
         NodeList<BaseNode> queue_filtered;
 
@@ -1152,9 +1154,12 @@ lint : snt_project_lint
                         vnode->line
                     );
                 try {
-                    vnode->validate_definition();
-                    vnode->validate_options();
-                    if (!vnode->condition.empty()) {
+                    const bool deferred_setup_value = allow_unset_setup_values && vnode->setup && !vnode->value;
+                    if (!deferred_setup_value)
+                        vnode->validate_definition();
+                    if (!deferred_setup_value)
+                        vnode->validate_options();
+                    if (!deferred_setup_value && !vnode->condition.empty()) {
                         std::optional<Environment::DependencyScope> graph_scope;
                         if (record_dependency_graph)
                             graph_scope.emplace(
@@ -1167,7 +1172,8 @@ lint : snt_project_lint
                             );
                         vnode->validate_condition(target);
                     }
-                    vnode->validate_format();
+                    if (!deferred_setup_value)
+                        vnode->validate_format();
                 } catch (const dip::SyntaxException& exception) {
                     if (!vnode->override)
                         throw;

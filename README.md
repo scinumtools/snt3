@@ -80,7 +80,7 @@ between a scientific model's assumptions and its implementation.
   using opaque handles.
 - **WebAssembly and JavaScript:** [Browser-side tools](https://scinumtools.github.io/snt3/integrations/web.html)
   for DIPL inspection and PUQ conversion.
-- **Command line:** [PUQ, DIPL, export, and report commands](https://scinumtools.github.io/snt3/integrations/cli.html),
+- **Command line:** [PUQ, DIPL, guided setup, export, and report commands](https://scinumtools.github.io/snt3/integrations/cli.html),
   plus [formatting, validation, and linting](docs/source/integrations/devtools.rst).
 - **Parameter Viewer:** [Graphical browser and source editor](https://scinumtools.github.io/snt3/integrations/viewer.html)
   for DIPL projects and DIPH5 snapshots, with dependency and provenance views;

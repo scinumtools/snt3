@@ -148,6 +148,7 @@ namespace snt::dip {
             // directives
             {KEYWORD_OPTIONS, PropertyType::Options},
             {KEYWORD_LABELS, PropertyType::Labels},
+            {KEYWORD_SETUP, PropertyType::Setup},
             {KEYWORD_CONSTANT, PropertyType::Constant},
             {KEYWORD_FORMAT, PropertyType::Format},
             {KEYWORD_TAGS, PropertyType::Tags},

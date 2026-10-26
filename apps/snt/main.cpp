@@ -31,6 +31,7 @@ Modules:
   server    REST API server (optional build feature)
   view      Read-only parameter browser (optional build feature)
   hub       Install and prepare pinned code examples
+  setup     Create a validated DIPL override through guided prompts
   mcp       Expose DIPL and PUQ tools through Model Context Protocol
   format    Format DIPL source files
   validate  Validate DIPL files and DIPfile projects
@@ -108,6 +109,14 @@ int main(int argc, char* argv[]) {
     }
     if (argc > 1 && std::string(argv[1]) == "hub") {
         return module_hub(argc, argv);
+    }
+    if (argc > 1 && std::string(argv[1]) == "setup") {
+        try {
+            return module_setup(argc, argv);
+        } catch (const std::exception& error) {
+            std::cerr << error.what() << '\n';
+            return 2;
+        }
     }
     if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "compare") {
         try {

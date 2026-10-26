@@ -87,6 +87,32 @@ energy float = 25 erg
   !condition (23 < {.} && {.} < 26)
 ```
 
+### Guided setup
+
+**Used by:** ``int``, ``float``, ``str``, ``bool``
+
+The valueless ``!setup`` directive marks a value for guided input by ``snt setup``.
+The command infers a yes/no prompt for booleans, a choice list from ``!options``
+(displaying ``!labels`` when supplied), text input for strings, and a DIPL value
+expression for numeric and array values. Existing values are offered as defaults.
+Each answer is checked immediately for type, shape, units, options, condition,
+and format. Invalid input is reported at its prompt. The complete project is
+validated again before the override is written.
+
+```DIPL
+method str = "rk4"
+  !options ["euler", "rk4", "adaptive"]
+  !labels ["Euler", "Runge–Kutta 4", "Adaptive Runge–Kutta"]
+  !setup
+
+steps int = 500
+  !condition ({.} > 0)
+  !setup
+```
+
+``!setup`` only marks values for the guided command. It does not change ordinary
+DIPL parsing or force a value to be prompted in other interfaces.
+
 ### Format
 
 **Used by:** ``str``

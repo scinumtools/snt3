@@ -57,6 +57,7 @@ calculated float = ({?length} * 2) cm
   !tags ["example", "highlight"]
   !options [1, 2, 3] cm
   !labels ["One", "Two", "Three"]
+  !setup
   !delimiter ","
   ?descr "A highlighted test value"
   ?authors "Ada Lovelace, Emmy Noether"

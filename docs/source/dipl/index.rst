@@ -167,6 +167,27 @@ definition may also be declared without a value and completed by a later
 compatible modification; compatible units are converted to the definition's
 unit.
 
+The opt-in ``!setup`` directive marks a value for the guided ``snt setup``
+questionnaire. It does not change parsing or evaluation. The command uses the
+DIPL type to choose a prompt, renders ``!options`` with matching ``!labels``,
+and checks each answer immediately through the normal parser. Invalid input is
+reported at its prompt; the complete project is validated again before saving.
+A marked value without a default is required; marked arrays accept a DIPL value
+expression. Conditions and formats remain the validation rules for the answer.
+
+.. code-block:: dipl
+
+   solver
+     method str = "rk4"
+       ?descr "Time integration method"
+       !options ["euler", "rk4", "adaptive"]
+       !labels ["Euler", "Runge–Kutta 4", "Adaptive Runge–Kutta"]
+       !setup
+
+     steps int = 500
+       !condition ({.} > 0)
+       !setup
+
 .. _dipl-tag-design:
 
 Tags for discovery and selection

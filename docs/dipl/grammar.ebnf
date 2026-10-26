@@ -153,12 +153,15 @@ override-path-segment
 (* Properties and metadata                                                    *)
 (* -------------------------------------------------------------------------- *)
 
+(* Version 1.1.0 adds the opt-in !setup marker for guided input tools. *)
+
 property-line
   = INDENT property [ comment ] newline ;
 
 property
   = options-property
   | labels-property
+  | setup-property
   | condition-property
   | format-property
   | constant-property
@@ -183,6 +186,9 @@ options-property
 
 labels-property
   = "!labels" whitespace array ;
+
+setup-property
+  = "!setup" ;
 
 condition-property
   = "!condition" whitespace parenthesized-logical-expression ;

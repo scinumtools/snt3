@@ -2,7 +2,7 @@
 title: "Dimensional Input Parameter Language"
 subtitle: "DIPL Language Specification"
 author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
-version: "1.0.0"
+version: "1.1.0"
 date: "October 2026"
 doi: "10.5281/zenodo.23376301"
 keywords:
@@ -14,7 +14,7 @@ keywords:
 titlepage: true
 ---
 
-# DIPL Language Specification — Version 1.0.0
+# DIPL Language Specification — Version 1.1.0
 
 **DOI:** [10.5281/zenodo.23376301](https://doi.org/10.5281/zenodo.23376301)
 
@@ -117,6 +117,11 @@ Values and nodes can reference data from external sources, allowing DIPL documen
 
 **Composable schemas**
 Schemas provide a mechanism for describing the expected structure and constraints of data, supporting consistent definitions and validation across documents.
+
+**Guided setup annotations**
+The optional ``!setup`` directive marks typed values for interactive input by
+supporting tools. Input controls can be inferred from the declared type,
+``!options``, ``!labels``, units, and existing validation properties.
 
 ## Language Syntax
 
@@ -247,6 +252,9 @@ Each implementation MUST explicitly declare the version of the DIPL language it 
 
 Future versions of the language MAY introduce extensions or modifications. 
 Backward compatibility SHOULD be preserved where feasible.
+
+Version 1.1.0 adds the valueless ``!setup`` property. Documents that do not use
+this property retain their Version 1.0.0 behavior.
 
 ## Reference Implementation
 

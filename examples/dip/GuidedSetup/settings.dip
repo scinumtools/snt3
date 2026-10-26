@@ -1,0 +1,41 @@
+simulation
+  enabled bool = true
+    ?descr "Run the simulation"
+    !setup
+
+  method str = "rk4"
+    ?descr "Time integration method"
+    !options ["euler", "rk4", "adaptive"]
+    !labels ["Euler", "Runge–Kutta 4", "Adaptive Runge–Kutta"]
+    !setup
+
+  steps int = 500
+    ?descr "Number of time steps"
+    !condition ({.} > 0)
+    !setup
+
+  timestep float = 0.5 ms
+    ?descr "Time step"
+    !condition ({.} > 0 ms)
+    !setup
+
+  tolerance float = 1e-8
+    ?descr "Relative error tolerance"
+    !condition ({.} > 0)
+    !setup
+
+  run_name str = "baseline"
+    ?descr "Name for this run"
+    !format "[A-Za-z0-9_-]+"
+    !setup
+
+  initial_state float[3] = [1.0, 0.0, 0.0]
+    ?descr "Initial state vector (enter a DIPL array expression)"
+    !setup
+
+  random_seed int
+    ?descr "Random seed (required; no default is declared)"
+    !setup
+
+  derived_step_count int = ({?simulation.steps} * 2)
+    ?descr "Calculated from the selected step count; not prompted"

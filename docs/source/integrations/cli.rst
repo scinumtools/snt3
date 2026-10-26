@@ -96,6 +96,68 @@ place the declarations in a :doc:`DIPfile project <../modules/dip/projects>`:
 It can be combined with ``--input override_string`` or ``--input override_file``
 to tune its values.
 
+Guided parameter setup
+~~~~~~~~~~~~~~~~~~~~~~
+
+Mark project values with ``!setup`` to include them in a guided questionnaire.
+``snt setup`` uses the DIPL type for the prompt, displays labelled ``!options``
+as selectable choices, and accepts numeric values with units, plain text, and
+DIPL expressions for arrays. Existing values are shown as defaults; values
+without defaults must be supplied. Each answer is checked immediately with the
+regular DIP parser, so ``!condition``, ``!format``, units, shape, and type checks
+apply at each prompt. The complete project is validated again before the
+override is written; invalid values return to their prompt.
+
+.. code-block:: bash
+
+   snt setup examples/dip/GuidedSetup/DIPfile --output run-settings.dip
+   snt dip parse --project examples/dip/GuidedSetup/DIPfile \
+       --input override_file run-settings.dip --print
+
+For example, the setup can keep existing defaults, reject invalid input, and
+repeat that prompt until a valid value is entered:
+
+.. code-block:: console
+
+   $ snt setup examples/dip/GuidedSetup/DIPfile --output run-settings.dip
+   [1/8] simulation.enabled — Run the simulation
+     Enable? [Y/n] <Enter keeps true>
+   [2/8] simulation.method — Time integration method
+     1) Euler
+     2) Runge–Kutta 4
+     3) Adaptive Runge–Kutta
+     Select option (Enter keeps current): <Enter>
+   [3/8] simulation.steps — Number of time steps
+     Enter a value (with units if needed; Enter keeps current): 700
+   [4/8] simulation.timestep — Time step
+     Enter a value (with units if needed; Enter keeps current): 3 m
+     Incompatible dimensions: m cannot be converted to ms.
+     Enter a value (with units if needed; Enter keeps current): 0.3 ms
+   [5/8] simulation.tolerance — Relative error tolerance
+     Enter a value (with units if needed; Enter keeps current): 1e-5
+   [6/8] simulation.run_name — Name for this run
+     Enter text (Enter keeps current): "run 1"
+     Format mismatch: the value does not match [A-Za-z0-9_-]+.
+     Enter text (Enter keeps current): run-1
+   [7/8] simulation.initial_state — Initial state vector
+     Enter a DIPL value expression (Enter keeps current): [3, 4, 6, 7]
+     Dimension range mismatch: expected exactly 3 values.
+     Enter a DIPL value expression (Enter keeps current): [3, 4, 6]
+   [8/8] simulation.random_seed — Random seed (required; no default is declared)
+     Enter a value (with units if needed; Enter keeps current): 234429
+   Write to run-settings.dip? [Y/n] y
+   Saved run-settings.dip
+
+The full parser diagnostics include details and source locations; they are
+shortened above to keep the interaction readable. Text entries are plain text,
+so enter ``run-1`` without quotes. Enter accepts the displayed default where
+one exists. The output file is an ordinary DIPL override that can be reused
+with ``snt dip parse`` or another DIP integration.
+
+The guided setup example demonstrates the input controls inferable from DIPL
+types and directives.
+See :ref:`guided-setup-example <dip-guided-setup-example>`.
+
 To use a DIPfile project in the browser, package its local text dependencies
 into one static JSON asset:
 
