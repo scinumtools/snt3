@@ -111,7 +111,7 @@ jobs:
             -DENABLE_EXEC_EXAMPLES=OFF \
             -DENABLE_EXEC_BENCHMARKS=OFF \
             -DENABLE_MAT=OFF \
-            -DENABLE_SNT_VIEW=OFF \
+            -DENABLE_SNT_VIEW=ON \
             -DENABLE_SNT_REPORT=ON \
             -DENABLE_SNT_SERVER=ON \
             -DENABLE_SNT_DMAP=ON \
