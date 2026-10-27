@@ -41,6 +41,8 @@ Python client in ``examples/dip/UsingMCP``; the MCP server itself is C++.
 
 The official SNT3 benchmarking project is
 `scinumtools/snt-bench <https://github.com/scinumtools/snt-bench>`_.
+For measured results and the changes behind them, see
+:doc:`performance/optimisation-progress`.
 
 .. toctree::
    :maxdepth: 2
@@ -93,6 +95,12 @@ The official SNT3 benchmarking project is
    :caption: Resources
 
    examples/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Performance
+
+   performance/optimisation-progress
 
 .. toctree::
    :maxdepth: 2
