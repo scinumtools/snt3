@@ -14,6 +14,8 @@ function(run_cli expected_status expected_output)
     endif()
   elseif(status EQUAL 0 OR error STREQUAL "")
     message(FATAL_ERROR "Expected a failure with stderr: ${ARGN}\nstdout: ${output}")
+  elseif(error MATCHES "Saved DIPH5:")
+    message(FATAL_ERROR "Failed command reported a saved DIPH5 file: ${ARGN}\nstderr: ${error}")
   endif()
 endfunction()
 
@@ -23,7 +25,14 @@ if(NOT EXISTS "${saved}")
   message(FATAL_ERROR "Save did not create a DIPH5 file")
 endif()
 run_cli(success "100\n" --load "${saved}" --request steps --value --type integer)
-run_cli(success "enabled = true\n" --load "${saved}" --tags selected --print --save "${copied}")
+execute_process(
+  COMMAND "${SNT_EXECUTABLE}" dip parse --load "${saved}" --tags selected --print --save "${copied}"
+  RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error
+)
+if(NOT status EQUAL 0 OR NOT output STREQUAL "enabled = true\n" OR
+   NOT error STREQUAL "Saved DIPH5: ${copied}\n")
+  message(FATAL_ERROR "Save should report its path on stderr without changing printed values\nstdout: ${output}\nstderr: ${error}")
+endif()
 run_cli(success "100\n" --load "${copied}" --request steps --value --type integer)
 run_cli(success "" --load "${copied}" --save "${copied}")
 run_cli(success "100\n" --load "${copied}" --request steps --value)

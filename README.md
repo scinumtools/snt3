@@ -189,7 +189,11 @@ curl -fsSLO https://raw.githubusercontent.com/scinumtools/snt3/main/packaging/in
 sh install-cli.sh
 ```
 
+Run `sh install-cli.sh --uninstall` to remove releases installed this way.
+
 On Windows x86-64, use the [PowerShell installer](packaging/installers/install-cli.ps1).
+Run it with `-Uninstall` to remove its installation. The precompiled CLI
+archives include the desktop viewer.
 See the [installation guide](https://scinumtools.github.io/snt3/installation.html)
 for Windows commands, offline installation, Conan, and source builds.
 

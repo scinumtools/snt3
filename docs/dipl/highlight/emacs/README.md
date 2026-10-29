@@ -16,4 +16,5 @@ the brackets in collection items such as `units[]`, `berries[0]`, and
 `sources[constants]` gray. Item names and keys keep the default text color.
 It also highlights `$source`/`$unit`/`$schema` declarations, properties,
 `@if`/`@elif`/`@else`/`@end` branching, booleans, and numbers.
-Numbers within `#` line comments retain the comment face.
+Quotes, parentheses, references, and numbers within `#` line comments retain
+the comment face.

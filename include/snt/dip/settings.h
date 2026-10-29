@@ -145,6 +145,7 @@ namespace snt::dip {
         Function,      // value should be parsed from a function
         FunctionRes,   // value was parsed and set from a function request
         Expression,    // value should be parsed from an expression
+        Concatenation, // adjacent quoted string and template segments
         Schema         // value is a schema name
     };
     extern std::unordered_map<ValueOrigin, std::string> ValueOriginNames;

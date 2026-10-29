@@ -3,7 +3,6 @@ cmake_policy(SET CMP0074 NEW)
 if(POLICY CMP0135)
     cmake_policy(SET CMP0135 NEW)
 endif()
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 # set environmental variables
 file(READ "settings.env" ENV_CONTENTS)
@@ -11,6 +10,9 @@ string(REGEX MATCH "CODE_VERSION=([^\n\r]*)" _ ${ENV_CONTENTS})
 string(REGEX REPLACE ".*CODE_VERSION=([^\n\r]*).*" "\\1" CODE_VERSION "${_}")
 
 project(scinumtools3 VERSION "${CODE_VERSION}" LANGUAGES C CXX)
+if(CMAKE_CROSSCOMPILING)
+    set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+endif()
 include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 17)

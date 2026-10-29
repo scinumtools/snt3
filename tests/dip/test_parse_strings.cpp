@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <limits>
+#include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 
 using namespace snt;
@@ -55,4 +56,29 @@ TEST(ParseStrings, CommentSymbol) {
     node = env.nodes.at(1);
     EXPECT_EQ(node->path.name, "baz");
     EXPECT_EQ(node->value_raw, val::Array::StringType({"foo#", "bar"}));
+}
+
+TEST(ParseStrings, AdjacentQuotedSegments) {
+    dip::DIP d;
+    d.add_string(
+        "message str = (\n"
+        "  \"string 1\\n\"\n"
+        "  \"string 2\\n\"\n"
+        "  \"string 3\"\n"
+        ")\n"
+        "literal str = (\"{{?message}}\" \" stays literal\")\n"
+        "punctuation str = (\"(inside)\" \" and \\\"quoted\\\"\")\n"
+    );
+    const auto env = d.parse();
+    EXPECT_EQ(env["message"].as<std::string>(), "string 1\nstring 2\nstring 3");
+    EXPECT_EQ(env["literal"].as<std::string>(), "{{?message}} stays literal");
+    EXPECT_EQ(env["punctuation"].as<std::string>(), "(inside) and \"quoted\"");
+}
+
+TEST(ParseStrings, AdjacentQuotedSegmentsRejectInvalidContent) {
+    for (const auto& expression : {"()", "(\"ok\" + \"no\")", "(\"ok\" missing)"}) {
+        dip::DIP d;
+        d.add_string(std::string("message str = ") + expression);
+        EXPECT_ANY_THROW(d.parse());
+    }
 }

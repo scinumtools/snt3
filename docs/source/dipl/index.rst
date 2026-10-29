@@ -132,6 +132,19 @@ reference with double braces:
    first_component float = {?velocity}[0]
    message str = f"Speed: {{?speed}}"
 
+Long strings can also be assembled from adjacent quoted segments inside
+parentheses. Prefix individual segments with ``f`` to interpolate references;
+plain segments remain literal. No spaces or newlines are inserted between
+segments:
+
+.. code-block:: dipl
+
+   message str = (
+     "Speed: "
+     f"{{?speed}}"
+     "\nMeasurement complete."
+   )
+
 Derived values and decisions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

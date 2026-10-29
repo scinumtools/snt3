@@ -18,6 +18,17 @@
 
 ;; Syntax highlighter for DIP serialization language
 
+(defun dip-match-outside-comment (regexp limit)
+  "Match REGEXP before LIMIT, ignoring matches in line comments."
+  (catch 'match
+    (while (re-search-forward regexp limit t)
+      (unless (save-excursion
+                (let ((start (match-beginning 0)))
+                  (save-match-data
+                    (nth 4 (parse-partial-sexp (line-beginning-position) start)))))
+        (throw 'match t)))
+    nil))
+
 (setq dip-font-lock-keywords
       (let* (
             ;; define several category of keywords
@@ -37,7 +48,6 @@
             (x-functions-regexp (regexp-opt x-functions 'signs)))
 
         `(
-          ("#[^\n]*" . 'font-lock-comment-face)
           (dip-match-collection-selector
            (0 'default t)
            (1 'dip-collection-bracket-face t)
@@ -48,11 +58,16 @@
           (,x-metadata-regexp . 'dip-metadata-face)
           (,x-functions-regexp . 'font-lock-function-name-face)
           (,x-keywords-regexp . 'font-lock-keyword-face)
-          ("{{[^}\n]*}\\(?:\\[[^]\n]*\\]\\)?}" (0 'dip-reference-face prepend))
-          ("{[^{}\n]*}\\[\\([0-9:., ]*\\)\\]"
+          ((lambda (limit)
+             (dip-match-outside-comment "{{[^}\n]*}\\(?:\\[[^]\n]*\\]\\)?}" limit))
+           (0 'dip-reference-face prepend))
+          ((lambda (limit)
+             (dip-match-outside-comment "{[^{}\n]*}\\[\\([0-9:., ]*\\)\\]" limit))
            (0 'dip-reference-face prepend)
            (1 'dip-slice-face prepend))
-          ("{[^{}\n]*}\\(?:\\[[^]\n]*\\)?" (0 'dip-reference-face prepend))
+          ((lambda (limit)
+             (dip-match-outside-comment "{[^{}\n]*}\\(?:\\[[^]\n]*\\)?" limit))
+           (0 'dip-reference-face prepend))
           (dip-match-number . 'my-number-face)
           ;; note: order above matters, because once colored, that part won't change.
           ;; in general, put longer words first
@@ -118,6 +133,8 @@ Skip numbers after `#` so comment text keeps the comment face."
 
 (defvar dip-mode-syntax-table
   (let ((st (make-syntax-table)))
+    (modify-syntax-entry ?# "<" st)
+    (modify-syntax-entry ?\n ">" st)
     (modify-syntax-entry ?{ "." st)
     (modify-syntax-entry ?} "." st)
     st)

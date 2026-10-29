@@ -111,6 +111,25 @@ TEST(Modifications, EmptyStringIsAValueAndCanBeModified) {
     EXPECT_EQ(env["empty"].get_value()->get_size(), 1);
 }
 
+TEST(Modifications, TrailingWhitespaceAfterSchemaItemString) {
+    dip::DIP parser;
+    parser.add_string(
+        "$schema item\n"
+        "  name str = \"default\"\n"
+        "items map : item\n"
+        "items[first]\n"
+        "  name = \"first value  \"   \n"
+    );
+    parser.add_override_string("items[second]\n  name = \"second value\"\t  \n");
+    const auto env = parser.parse();
+    EXPECT_EQ(env["items[first].name"].as<std::string>(), "first value  ");
+    EXPECT_EQ(env["items[second].name"].as<std::string>(), "second value");
+
+    dip::DIP invalid;
+    invalid.add_string("name str = \"value\" extra   \n");
+    EXPECT_ANY_THROW(invalid.parse());
+}
+
 TEST(Modifications, EmptyStringsArePreservedInArrays) {
     dip::DIP parser;
     parser.add_string("values str[3] = [\"\", \"sample\", \"\"]\n");

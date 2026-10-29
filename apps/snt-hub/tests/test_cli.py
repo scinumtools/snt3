@@ -87,6 +87,10 @@ class HubCLITest(unittest.TestCase):
 
     def test_help(self):
         help_text = self.call("--help").stdout
+        bare = self.call()
+        self.assertEqual(bare.returncode, 0, bare.stderr)
+        self.assertEqual(bare.stdout, help_text)
+        self.assertIn("Commands:", help_text)
         self.assertIn("local SNT Hub workspace", help_text)
         self.assertNotIn("install PROJECT", help_text)
         self.assertIn("fetch PROJECT", self.call("fetch", "--help").stdout)
@@ -412,10 +416,18 @@ class HubCLITest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("40-character", result.stderr)
         data["hub_revision"] = "b" * 40
+        project["name"] = "Quantum ESPRESSO"
+        data["projects"].append({**project, "id": "other", "name": "Other", "source_revision": "c" * 40})
         catalogue.write_text(json.dumps(data))
         result = self.call("list", env=env)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("project\tProject\t" + "a" * 40, result.stdout)
+        self.assertIn("ID       Project           Revision", result.stdout)
+        self.assertIn("project  Quantum ESPRESSO  " + "a" * 10, result.stdout)
+        self.assertIn("other    Other             " + "c" * 10, result.stdout)
+        lines = result.stdout.splitlines()
+        self.assertEqual(lines[2].find("a" * 10), lines[3].find("c" * 10))
+        self.assertNotIn("a" * 40, result.stdout)
+        self.assertNotIn("\t", result.stdout)
 
 
 

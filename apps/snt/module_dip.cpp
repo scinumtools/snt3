@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <deque>
+#include <filesystem>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -20,7 +21,7 @@ Scientific Numerical Tools v3 (SNT)
 Module: Dimensional Input Parameters (DIP)
 
 Usage:
-  snt dip parse [options] [arguments]
+  snt dip parse [options]
   snt dip compare <before.diph5> <after.diph5> [options]
   snt dip describe --project DIPfile --path PATH [--format json]
   snt dip schemas --project DIPfile [--format json]
@@ -28,12 +29,25 @@ Usage:
   snt dip override-contract --project DIPfile --path PATH [--format json]
   snt dip list --project DIPfile [--query QUERY] [--limit N] [--format json]
   snt dip preview --project DIPfile --override-file FILE [--format json]
-  snt dip package --project DIPfile [--output project.bundle.json]
+  snt dip package --project DIPfile [--output project.bundle.json] [--include FILE ...]
 
 Description:
-  Parse and query dimensional input parameter definitions.
+  Evaluate, inspect, compare, and package DIPL projects and DIPH5 snapshots.
+
+Commands:
+  parse              Evaluate input; print values, save DIPH5, or generate code.
+  compare            Compare two saved DIPH5 environments.
+  describe           Inspect one evaluated node as JSON.
+  schemas            List schema definitions, applications, and associations.
+  sources            List the project's registered sources.
+  override-contract  Inspect constraints for an override target.
+  list               Select evaluated nodes by path and tags.
+  preview            Validate proposed overrides and show their effect.
+  package            Bundle project source files for browser use.
 
 Options:
+  The following options apply to parse. Run 'snt dip <command> --help'
+  for options specific to another command.
   -h, --help
       Show help.
   -v, --version
@@ -49,6 +63,7 @@ Options:
       Load an evaluated DIPH5 environment instead of --input.
   --save <file>
       Save the full environment as DIPH5, overwriting the file.
+      Report the saved file's absolute path on stderr.
       Request and tag filters affect printed output only.
   --record-graph
       Record evaluation dependencies for inspection and include them in --save output.
@@ -90,10 +105,77 @@ Examples:
 )";
 }
 
+std::string help_dip_parse() {
+    return R"(
+Scientific Numerical Tools v3 (SNT)
+Module: Dimensional Input Parameters (DIP)
+Command: parse
+
+Usage:
+  snt dip parse [options]
+
+Description:
+  Evaluate DIPL input or load a DIPH5 snapshot, then print, save, or export values.
+
+Options:
+  -h, --help
+      Show help.
+  -v, --version
+      Show version information.
+  -i,--input <type> [<name>] <value>
+      Add input (file/string/override_string/override_file/unit/source/schema_string/schema_file).
+      override_string takes an unwrapped body of path = value modifications
+      and collection item groups. override_file reads such a body from a file.
+      Unit, source, and schema inputs require name and value.
+  --project <file>
+      Load a DIPfile project; override_string/override_file inputs may tune its values.
+  --load <file>
+      Load an evaluated DIPH5 environment instead of --input.
+  --save <file>
+      Save the full environment as DIPH5, overwriting the file.
+      Report the saved file's absolute path on stderr.
+      Request and tag filters affect printed output only.
+  --record-graph
+      Record evaluation dependencies for inspection and include them in --save output.
+  --relative-source-paths
+      Store source paths relative to the --save DIPH5 file.
+  --generate <cpp|c|fortran|rust|julia|json|json-metadata|yaml> <file>
+      Generate static parameters in the selected format, overwriting the file.
+      json-metadata writes versioned value records with metadata and provenance.
+      Request and tag filters affect printed output only.
+  -r,--request <query>
+      Request specific nodes (e.g. "family.father").
+  --print
+      Print nodes with their names and units.
+  --value
+      Print exactly one defined, unitless scalar without a name or quotes.
+      Requires --request. Errors are written to stderr with a nonzero exit status.
+  --type <bool|integer|float|string>
+      Require this DIPL type with --value (no implicit conversion).
+
+Examples:
+  snt dip parse -i file parameters.dip --print
+  snt dip parse --project DIPfile --print
+  snt dip parse -i file parameters.dip --save parameters.diph5
+  snt dip parse --load parameters.diph5 --print
+  snt dip parse -i file parameters.dip --generate cpp parameters.hpp
+
+  snt dip parse \
+      -i file parameters.dip \
+      -i string "age int = 23 yr" \
+      -r "family.father" \
+      --print
+)";
+}
+
 int module_dip_compare(int argc, char* argv[]) {
     if (argc == 2 && std::string(argv[1]) == "--help") {
-        std::cout << "Usage: snt dip compare <before.diph5> <after.diph5> "
-                     "[--scope effective|full] [--max-details N] [--max-array-examples N]\n";
+        std::cout << "Usage: snt dip compare <before.diph5> <after.diph5> [options]\n\n"
+                     "Compare two saved environments; exit 0 if equal or 1 if different.\n\n"
+                     "Options:\n"
+                     "  --scope effective|full   Compare effective values (default) or full saved state\n"
+                     "  --max-details N         Maximum reported differences (default 50)\n"
+                     "  --max-array-examples N  Maximum differing indices shown per array (default 3)\n";
         return 0;
     }
     std::vector<std::string> paths;
@@ -137,7 +219,9 @@ int module_dip_compare(int argc, char* argv[]) {
 
 void module_dip(ArgParser& argpar) {
     if (argpar.hasKeyword("-h") || argpar.hasKeyword("--help") || argpar.numPositional() < 2) {
-        std::cout << help_dip();
+        std::cout << (argpar.numPositional() >= 2 && argpar.getPositionalValue(1) == "parse"
+                          ? help_dip_parse()
+                          : help_dip());
         return;
     }
     if (argpar.getPositionalValue(1) != "parse" || argpar.numPositional() != 2) {
@@ -149,6 +233,7 @@ void module_dip(ArgParser& argpar) {
     bool has_project = false;
     bool has_load = false;
     bool has_save = false;
+    std::string save_file;
     bool has_generate = false;
     bool record_graph = false;
     bool relative_source_paths = false;
@@ -192,7 +277,8 @@ void module_dip(ArgParser& argpar) {
         } else if (key == "--save") {
             if (values.size() != 1 || has_save)
                 throw std::runtime_error("Specify exactly one --save file.");
-            cmd.argument_save(values.front());
+            save_file = values.front();
+            cmd.argument_save(save_file);
             has_save = true;
         } else if (key == "--record-graph" || key == "--relative-source-paths") {
             if (!values.empty())
@@ -248,5 +334,9 @@ void module_dip(ArgParser& argpar) {
         cmd.argument_value(type);
     cmd.argument_record_dependency_graph(record_graph);
     cmd.argument_relative_source_paths(relative_source_paths);
-    std::cout << cmd.execute();
+    const auto saved_path = has_save ? std::filesystem::absolute(save_file).lexically_normal() : std::filesystem::path{};
+    const auto output = cmd.execute();
+    std::cout << output;
+    if (has_save)
+        std::cerr << "Saved DIPH5: " << saved_path.string() << '\n';
 }

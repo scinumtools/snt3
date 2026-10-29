@@ -11,7 +11,8 @@
 #include <stdexcept>
 
 std::string help() {
-    return R"(
+    std::ostringstream output;
+    output << R"(
 Scientific Numerical Tools v3 (SNT)
 
 Usage:
@@ -24,21 +25,50 @@ Options:
       Show version information.
 
 Modules:
-  dip       Dimensional Input Parameters
-  report    Generate a DIP report (optional build feature)
-  puq       Physical Units & Quantities
-  dmap      Regenerate PUQ dimension-map headers (developer tool; optional)
-  server    REST API server (optional build feature)
-  view      Read-only parameter browser (optional build feature)
-  hub       Install and prepare pinned code examples
-  setup     Create a validated DIPL override through guided prompts
-  mcp       Expose DIPL and PUQ tools through Model Context Protocol
-  format    Format DIPL source files
-  validate  Validate DIPL files and DIPfile projects
-  lint      Check evaluated DIPL for advisory issues
-
+  Command     Built  Description
+)";
+    const auto module = [&output](const char* name, bool built, const char* description) {
+        output << "  " << std::left << std::setw(12) << name << (built ? "+      " : "-      ")
+               << description << '\n';
+    };
+    module("puq", true, "Physical Units & Quantities");
+    module("dip", true, "Dimensional Input Parameters");
+#ifdef SNT_ENABLE_REPORT
+    module("report", true, "Generate a DIP report");
+#else
+    module("report", false, "Generate a DIP report");
+#endif
+#ifdef ENABLE_SNT_DMAP
+    module("dmap", true, "Regenerate PUQ dimension-map headers (developer tool)");
+#else
+    module("dmap", false, "Regenerate PUQ dimension-map headers (developer tool)");
+#endif
+#ifdef ENABLE_SNT_SERVER
+    module("server", true, "REST API server");
+#else
+    module("server", false, "REST API server");
+#endif
+#ifdef ENABLE_SNT_VIEW
+    module("view", true, "Graphical parameter browser and editor");
+#else
+    module("view", false, "Graphical parameter browser and editor");
+#endif
+    module("hub", true, "Install and prepare pinned code examples");
+    module("setup", true, "Create a validated DIPL override through guided prompts");
+#ifdef ENABLE_SNT_MCP
+    module("mcp", true, "Expose DIPL and PUQ tools through Model Context Protocol");
+#else
+    module("mcp", false, "Expose DIPL and PUQ tools through Model Context Protocol");
+#endif
+    module("format", true, "Format DIPL source files");
+    module("validate", true, "Validate DIPL files and DIPfile projects");
+    module("lint", true, "Check evaluated DIPL for advisory issues");
+    module("completion", true, "Generate Bash and Zsh completion scripts");
+    output << R"(
+  + included in this build; - unavailable in this build.
 Run 'snt <module> --help' for module-specific commands.
 )";
+    return output.str();
 }
 
 int main(int argc, char* argv[]) {

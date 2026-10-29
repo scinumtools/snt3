@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdio>
+#include <cstdlib>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -28,6 +29,13 @@ namespace snt::view {
 
         void glfw_error(int code, const char* description) {
             std::fprintf(stderr, "GLFW error %d: %s\n", code, description);
+        }
+
+        void trace_startup(const char* stage) {
+            if (std::getenv("SNT_VIEW_TRACE")) {
+                std::fprintf(stderr, "snt view startup: %s\n", stage);
+                std::fflush(stderr);
+            }
         }
 
         void open_save_as_dialog(
@@ -303,9 +311,19 @@ namespace snt::view {
     } // namespace
 
     int run_application(ViewerModel& model) {
+        trace_startup("model loaded");
         glfwSetErrorCallback(glfw_error);
-        if (!glfwInit())
+#if defined(__linux__)
+        // A virtual or regular X11 display should use the X11 backend even when
+        // the release also supports Wayland.
+        if (std::getenv("DISPLAY") && !std::getenv("WAYLAND_DISPLAY"))
+            glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+#endif
+        if (!glfwInit()) {
+            std::fprintf(stderr, "snt view: could not initialize a graphical display; check the desktop session and display server\n");
             return 1;
+        }
+        trace_startup("GLFW initialized");
 #ifdef __APPLE__
         const char* glsl_version = "#version 150";
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -320,16 +338,23 @@ namespace snt::view {
         glfwWindowHint(GLFW_SCALE_FRAMEBUFFER, GLFW_TRUE);
         GLFWwindow* window = glfwCreateWindow(1200, 760, VIEWER_TITLE, nullptr, nullptr);
         if (!window) {
+            std::fprintf(stderr, "snt view: could not create an OpenGL window; check the display and graphics drivers\n");
             glfwTerminate();
             return 1;
         }
+        trace_startup("window created");
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
+        trace_startup("OpenGL context current");
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+        trace_startup("ImGui context created");
         ImGuiIO& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.IniFilename = nullptr;
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init(glsl_version);
+        trace_startup("ImGui backends initialized");
         ImGui::StyleColorsLight();
         ImGuiStyle& style = ImGui::GetStyle();
         const float ui_scale = std::max(1.0f, ImGui_ImplGlfw_GetContentScaleForWindow(window));
@@ -337,8 +362,7 @@ namespace snt::view {
         style.FontScaleDpi = ui_scale;
         style.FontSizeBase = 16.0f;
         io.Fonts->AddFontDefaultVector();
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init(glsl_version);
+        trace_startup("font loaded");
         InspectorCache inspector_cache;
         DataViewState data_state;
         GraphViewState graph_state;
@@ -353,6 +377,7 @@ namespace snt::view {
         std::array<char, 256> save_as_name{};
         std::string save_as_error;
         NotificationCenter notifications;
+        bool first_frame = true;
         while (!glfwWindowShouldClose(window)) {
             // Input wakes the frame immediately; the timeout keeps idle UI updates active.
             glfwWaitEventsTimeout(1.0 / 60.0);
@@ -385,6 +410,10 @@ namespace snt::view {
             glClear(GL_COLOR_BUFFER_BIT);
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             glfwSwapBuffers(window);
+            if (first_frame) {
+                trace_startup("first frame rendered");
+                first_frame = false;
+            }
         }
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();

@@ -18,20 +18,46 @@ namespace {
 int module_dip_semantic(int argc, char* argv[]) {
     const std::string command = argv[0];
     if (argc == 2 && std::string(argv[1]) == "--help") {
-        std::cout << "Usage: snt dip " << command
-                  << " --project DIPfile [--path PATH | --query QUERY] [options]\n"
-                     "  --input FILE             DIPfile, .dip, or .dipl; describe/list/schemas/override-contract also "
-                     "accept .diph5\n"
-                     "  --path PATH              Required for describe and override-contract\n"
-                     "  --query QUERY            List selection (default ?)\n"
-                     "  --tag-all/any/none TAG   Repeatable list filters\n"
-                     "  --limit N                Maximum list items (default 100)\n"
-                     "  --max-value-elements N   Include values up to N elements (describe default 16)\n"
-                     "  --override TEXT          Repeatable preview override body\n"
-                     "  --override-file FILE     Repeatable preview override file\n"
-                     "  --max-details N          Maximum preview differences (default 50)\n"
-                     "  --record-graph           Record dependencies while parsing\n"
-                     "  --format json            JSON is the supported format\n";
+        std::cout << "Usage: snt dip " << command << " (--project DIPfile | --input FILE)";
+        if (command == "describe" || command == "override-contract")
+            std::cout << " --path PATH";
+        std::cout << " [options]\n\n";
+        if (command == "describe")
+            std::cout << "Describe one evaluated node, including values, metadata, and provenance.\n";
+        else if (command == "override-contract")
+            std::cout << "Show the target kind and constraints for a proposed override.\n";
+        else if (command == "schemas")
+            std::cout << "List schema definitions, applications, and value associations.\n";
+        else if (command == "sources")
+            std::cout << "List the project's registered sources.\n";
+        else if (command == "list")
+            std::cout << "Select evaluated nodes by path query and tags.\n";
+        else
+            std::cout << "Validate proposed overrides and report their effective-value changes.\n";
+        std::cout << "\nOptions:\n"
+                     "  --project DIPfile        Read a DIPfile project\n"
+                     "  --input FILE             Read a DIPfile, .dip, or .dipl file";
+        if (command == "describe" || command == "list" || command == "schemas" || command == "override-contract")
+            std::cout << ", or a .diph5 snapshot";
+        std::cout << '\n';
+        if (command == "describe")
+            std::cout << "  --path PATH              Evaluated node to inspect\n"
+                         "  --max-value-elements N   Include values up to N elements (default 16)\n";
+        if (command == "override-contract")
+            std::cout << "  --path PATH              Override target to inspect\n";
+        if (command == "list")
+            std::cout << "  --query QUERY            Path selection (default ?)\n"
+                         "  --tag-all TAG            Require every specified tag; repeatable\n"
+                         "  --tag-any TAG            Require any specified tag; repeatable\n"
+                         "  --tag-none TAG           Exclude specified tags; repeatable\n"
+                         "  --limit N                Maximum results (default 100)\n"
+                         "  --max-value-elements N   Include values up to N elements (default 0)\n";
+        if (command == "preview")
+            std::cout << "  --override TEXT          Add a DIPL override body; repeatable\n"
+                         "  --override-file FILE     Add an override file; repeatable\n"
+                         "  --max-details N          Maximum reported differences (default 50)\n";
+        std::cout << "  --record-graph           Record dependencies while parsing DIPL input\n"
+                     "  --format json            Output JSON (the default and only format)\n";
         return 0;
     }
     std::filesystem::path input;

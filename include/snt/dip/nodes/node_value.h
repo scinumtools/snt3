@@ -128,13 +128,18 @@ namespace snt::dip {
             Environment& env, const std::string& name, std::optional<std::string_view> units
         ) const;
         val::BaseValue::PointerType parse_reference(
-            Environment& env, std::string query, std::optional<std::string_view> units, ValueOrigin origin
+            Environment& env, std::string query, std::optional<std::string_view> units, ValueOrigin origin,
+            const Path* current_path = nullptr
         ) const;
         val::BaseValue::PointerType parse_expression(
             Environment& env,
             const std::string& expression,
             std::optional<std::string_view> units,
-            const NodeDtype ntype
+            const NodeDtype ntype,
+            const Path* current_path = nullptr
+        ) const;
+        val::BaseValue::PointerType parse_concatenation(
+            Environment& env, const Node& source, const Path* current_path = nullptr
         ) const;
         val::BaseValue::PointerType cast_value() const;
         val::BaseValue::PointerType cast_value(
@@ -149,7 +154,7 @@ namespace snt::dip {
          */
         void set_units(const std::optional<puq::Quantity>& units_input = std::nullopt);
         /** Evaluate an override against this declaration without evaluating its original value. */
-        void apply_override(const BaseNode::PointerType& node, Environment& env);
+        void apply_override(const BaseNode::PointerType& node, Environment& env, const Path& target_path);
         /** Check that a subsequent declaration preserves the node type. */
         void validate_modification(const BaseNode::PointerType& node) const;
         virtual void modify_value(const BaseNode::PointerType& node, Environment& env);

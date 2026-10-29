@@ -175,13 +175,14 @@ namespace snt::dip {
     }
 
     val::BaseValue::PointerType ValueNode::parse_reference(
-        Environment& env, std::string query, std::optional<std::string_view> units, ValueOrigin origin
+        Environment& env, std::string query, std::optional<std::string_view> units, ValueOrigin origin,
+        const Path* current_path
     ) const {
         switch (origin) {
         case ValueOrigin::Reference:
         case ValueOrigin::ReferenceRel: {
             if (origin == ValueOrigin::ReferenceRel) {
-                Path current = env.hierarchy.get_current_path(indent, path.name);
+                Path current = current_path ? *current_path : env.hierarchy.get_current_path(indent, path.name);
                 query = std::string(1, SIGN_QUERY) + current.resolve(query).name;
             }
             val::BaseValue::PointerType val = env.request_value(query, RequestType::Reference, units);
@@ -217,23 +218,24 @@ namespace snt::dip {
     }
 
     val::BaseValue::PointerType ValueNode::parse_expression(
-        Environment& env, const std::string& expression, std::optional<std::string_view> units, const NodeDtype ntype
+        Environment& env, const std::string& expression, std::optional<std::string_view> units, const NodeDtype ntype,
+        const Path* current_path
     ) const {
-        Path current_path = env.hierarchy.get_current_path(indent, path.name);
+        Path current = current_path ? *current_path : env.hierarchy.get_current_path(indent, path.name);
         switch (ntype) {
         case NodeDtype::Integer:
         case NodeDtype::Float: {
-            NumericalSolver solver(env, current_path);
+            NumericalSolver solver(env, current);
             ValueNodeData data = solver.eval(expression, std::string(units ? units.value() : ""));
             return std::move(data.value);
         }
         case NodeDtype::Boolean: {
-            LogicalSolver solver(env, current_path);
+            LogicalSolver solver(env, current);
             ValueNodeData data = solver.eval(expression);
             return std::move(data.value);
         }
         case NodeDtype::String: {
-            TemplateSolver solver(env, current_path);
+            TemplateSolver solver(env, current);
             ValueNodeData data = solver.eval(expression);
             return std::move(data.value);
         }
@@ -247,6 +249,27 @@ namespace snt::dip {
                 line
             );
         }
+    }
+
+    val::BaseValue::PointerType ValueNode::parse_concatenation(
+        Environment& env, const Node& source, const Path* current_path
+    ) const {
+        if (source.value_raw.size() != source.string_parts_formatted.size())
+            throw dip::SyntaxException(
+                "Invalid string concatenation", "The string segments and format markers do not match.",
+                "Parse the parenthesized string value again.", __FILE__, __LINE__, source.line
+            );
+        std::string result;
+        for (size_t i = 0; i < source.value_raw.size(); ++i) {
+            if (source.string_parts_formatted[i]) {
+                val::BaseValue::PointerType part =
+                    parse_expression(env, source.value_raw[i], std::nullopt, NodeDtype::String, current_path);
+                result += val::ArrayValueStr(part.get()).get_value(0);
+            } else {
+                result += source.value_raw[i];
+            }
+        }
+        return std::make_unique<val::ArrayValueStr>(result);
     }
 
     val::BaseValue::PointerType ValueNode::cast_value() const {
@@ -382,7 +405,7 @@ namespace snt::dip {
             );
     }
 
-    void ValueNode::apply_override(const BaseNode::PointerType& node, Environment& env) {
+    void ValueNode::apply_override(const BaseNode::PointerType& node, Environment& env, const Path& target_path) {
         if (dtype == NodeDtype::Link)
             throw dip::SyntaxException(
                 "Read-only link",
@@ -408,7 +431,7 @@ namespace snt::dip {
                 node->line
             );
         set_units();
-        auto evaluated = std::dynamic_pointer_cast<ValueNode>(clone(path, indent));
+        auto evaluated = std::dynamic_pointer_cast<ValueNode>(clone(target_path, 0));
         evaluated->value_dtype = value_dtype;
         evaluated->value.reset();
         evaluated->units.reset();
@@ -416,6 +439,7 @@ namespace snt::dip {
         evaluated->line = node->line;
         evaluated->value_origin = node->value_origin;
         evaluated->value_raw = node->value_raw;
+        evaluated->string_parts_formatted = node->string_parts_formatted;
         evaluated->value_shape = node->value_shape;
         evaluated->value_slice = node->value_slice;
         if (!node->units_raw.empty())
@@ -444,6 +468,7 @@ namespace snt::dip {
         metadata.merge_explicit(node->metadata);
         value_origin = node->value_origin;
         value_raw = node->value_raw;
+        string_parts_formatted = node->string_parts_formatted;
         value_shape = node->value_shape;
         value_slice = node->value_slice;
         override = true;
@@ -469,12 +494,20 @@ namespace snt::dip {
         case ValueOrigin::Reference:
         case ValueOrigin::ReferenceRel:
         case ValueOrigin::ReferenceRaw:
-            value = parse_reference(env, node->value_raw.at(0), units, node->value_origin);
+            value = parse_reference(env, node->value_raw.at(0), units, node->value_origin, &path);
             break;
         case ValueOrigin::Expression: {
-            value = parse_expression(env, node->value_raw.at(0), units, dtype);
+            value = parse_expression(env, node->value_raw.at(0), units, dtype, &path);
             break;
         }
+        case ValueOrigin::Concatenation:
+            if (dtype != NodeDtype::String)
+                throw dip::SyntaxException(
+                    "Invalid string concatenation", "A string concatenation cannot modify a non-string node.",
+                    "Use a string node for parenthesized quoted segments.", __FILE__, __LINE__, node->line
+                );
+            value = parse_concatenation(env, *node, &path);
+            break;
         default:
             value = cast_value(node->value_raw, node->value_shape);
             break;
@@ -497,6 +530,7 @@ namespace snt::dip {
             }
         }
         value_raw = node->value_raw;
+        string_parts_formatted = node->string_parts_formatted;
         set_value(std::move(value));
         if (env.block_input_recording())
             env.erase_block_input(path.name);

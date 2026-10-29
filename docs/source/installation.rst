@@ -25,10 +25,11 @@ for Linux x86-64 and macOS ARM64. It finds the latest release and installs
    curl -fsSLO https://raw.githubusercontent.com/scinumtools/snt3/main/packaging/installers/install-cli.sh
    sh install-cli.sh
 
-The Linux executable requires system runtime libraries, including libcurl and
-libaec. The installer checks that the executable runs before making it the
-active ``snt`` command. If ``~/.local/bin`` is not already on ``PATH``, add it
-to your shell configuration:
+The Linux executable requires system runtime libraries, including libcurl,
+libsz.so.2 (Ubuntu package ``libsz2``), and libGL.so.1 (Ubuntu package
+``libgl1``). The installer lists missing Linux libraries before activating the
+executable, and checks that it runs. If ``~/.local/bin`` is not already on
+``PATH``, add it to your shell configuration:
 
 .. code-block:: console
 
@@ -38,6 +39,17 @@ Use ``sh install-cli.sh --version vX.Y.Z`` to install a specific release, or
 ``sh install-cli.sh --prefix /path/to/prefix`` for a shared project directory.
 On a cluster without network access, download the archive on a login node and
 run ``sh install-cli.sh --archive /path/to/snt-vX.Y.Z-linux-x86_64.tar.gz``.
+
+To remove all releases installed by this script, run:
+
+.. code-block:: console
+
+   sh install-cli.sh --uninstall
+
+Add ``--version vX.Y.Z`` to remove only one release, and use the same
+``--prefix`` value used for installation when installing outside ``~/.local``.
+Removing the active release also removes its ``snt`` command symlink. Other
+files in the prefix are preserved.
 
 On Windows x86-64, use the PowerShell installer. It installs into the current
 user's profile and adds its command directory to the user ``PATH``:
@@ -51,9 +63,22 @@ Use ``-Version vX.Y.Z``, ``-Prefix C:\path\to\prefix``, or ``-Archive
 C:\path\to\snt-vX.Y.Z-windows-x86_64.zip`` for the corresponding options.
 Open a new terminal after installation to use ``snt`` by name.
 
+To remove all releases installed by the PowerShell script, run:
+
+.. code-block:: powershell
+
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install-cli.ps1 -Uninstall
+
+Add ``-Version vX.Y.Z`` to remove only one release, and pass the original
+``-Prefix`` if you used a custom location. The installer removes its managed
+command shim and the user ``PATH`` entry it added when no installed command
+remains. Open a new terminal to see the updated ``PATH``.
+
 The archives contain the command-line application, not the C++ development
 libraries or Python bindings. The ``snt hub`` command additionally requires
 Git and Python 3 to fetch and run project adapters.
+The release archives include the ``snt view`` desktop viewer. It requires a
+working graphical desktop and OpenGL support on the target machine.
 
 
 Python

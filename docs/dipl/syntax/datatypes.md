@@ -71,8 +71,23 @@ distance float = 2.3e20        # scientific form
 **String** (``str``)
 
 The String type represents sequences of characters.
-In DIPL, all strings must be enclosed in double quotes, or in triple double quotes when spanning multiple lines.
+In DIPL, strings are enclosed in double quotes. Triple double quotes can
+contain literal line breaks.
 It is used for textual data, labels, and any form of human-readable content.
+
+Adjacent quoted strings inside parentheses are concatenated without adding
+spaces or newlines. Use `\n` inside a segment when a newline is wanted. A
+segment prefixed with `f` interpolates references; ordinary segments remain
+literal even when they contain `{{...}}`.
+
+``` DIPL
+name str = "Tina"
+message str = (
+  "Hello, "
+  f"{{?name}}"
+  "!\nWelcome."
+)
+```
 
 ``` DIPL
 country str = "United States"  # single line text

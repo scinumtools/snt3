@@ -313,6 +313,7 @@ value
   | string
   | string-block
   | template
+  | parenthesized-string-concatenation
   | array
   | table-block
   | reference [ slice ]
@@ -346,6 +347,10 @@ table-row
 
 template
   = "f" ( string | string-block ) ;
+
+parenthesized-string-concatenation
+  = "(" optional-whitespace ( string | template )
+    { optional-whitespace ( string | template ) } optional-whitespace ")" ;
 
 template-substitution
   = "{{" node-reference [ slice ] [ ":" format-spec ] "}}" ;

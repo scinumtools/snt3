@@ -367,18 +367,20 @@ int main() {
         );
         const auto fixture =
             std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "docs/dipl/highlight/highlighting-test.dipl";
-        check(
-            source_view.open(fixture, 1, source_error) &&
-                has_span(source_view.lines()[0], snt::view::SyntaxKind::Comment, "DIPL") &&
-                has_span(source_view.lines()[9], snt::view::SyntaxKind::Keyword, "$unit") &&
-                has_span(source_view.lines()[9], snt::view::SyntaxKind::Name, "local_length"),
-            "DIPL source highlighting lost comment or directive categories"
-        );
+        check(source_view.open(fixture, 1, source_error), "DIPL highlighting fixture could not be opened");
         const auto find_fixture_line = [&](const std::string& text) {
             return std::find_if(source_view.lines().begin(), source_view.lines().end(), [&](const auto& line) {
                 return line.text.find(text) != std::string::npos;
             });
         };
+        const auto unit_directive = find_fixture_line("$unit local_length");
+        check(
+            has_span(source_view.lines()[0], snt::view::SyntaxKind::Comment, "DIPL") &&
+                unit_directive != source_view.lines().end() &&
+                has_span(*unit_directive, snt::view::SyntaxKind::Keyword, "$unit") &&
+                has_span(*unit_directive, snt::view::SyntaxKind::Name, "local_length"),
+            "DIPL source highlighting lost comment or directive categories"
+        );
         const auto scalar = find_fixture_line("length float = 2.5 m");
         const auto reference = find_fixture_line("reference_direct float");
         const auto metadata = find_fixture_line("?descr \"A highlighted");

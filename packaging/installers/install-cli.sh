@@ -1,13 +1,16 @@
 #!/bin/sh
-# Install the precompiled snt CLI without administrator privileges.
+# Install or uninstall the precompiled snt CLI without administrator privileges.
 set -eu
 
 usage() {
     cat <<'EOF'
 Usage: sh install-cli.sh [--version vX.Y.Z] [--prefix DIR] [--archive FILE]
+       sh install-cli.sh --uninstall [--version vX.Y.Z] [--prefix DIR]
 
 Installs the latest release into ~/.local by default. --archive installs an
 already downloaded release archive, for example on an offline HPC system.
+--uninstall removes all installed CLI releases by default, or one release when
+--version is given. It does not require a network connection.
 EOF
 }
 
@@ -16,17 +19,39 @@ fail() {
     exit 1
 }
 
+check_linux_runtime() {
+    [ "$platform" = linux-x86_64 ] || return 0
+    command -v ldd >/dev/null 2>&1 || return 0
+    dependency_report=$(ldd "$1" 2>&1) || :
+    missing=$(printf '%s\n' "$dependency_report" |
+        sed -n 's/^[[:space:]]*\([^[:space:]]*\)[[:space:]]*=>[[:space:]]*not found.*$/\1/p')
+    if [ -n "$missing" ]; then
+        printf 'snt install: missing system libraries required by snt:\n%s\n' "$missing" >&2
+        fail 'install the corresponding runtime packages, then run this installer again'
+    fi
+    if printf '%s\n' "$dependency_report" | grep -Fq 'no version information available'; then
+        printf 'snt install: warning: a system library lacks the symbol version expected by this release; check libcurl compatibility if snt fails to run\n' >&2
+    fi
+}
+
+valid_tag() {
+    printf '%s\n' "$1" | LC_ALL=C grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'
+}
+
 tag=latest
 archive_path=
+uninstall=0
+version_given=0
 prefix=${SNT_INSTALL_PREFIX:-"$HOME/.local"}
 while [ "$#" -gt 0 ]; do
     case "$1" in
+        --uninstall) uninstall=1 ;;
         --version|--prefix|--archive)
             option=$1
             shift
             [ "$#" -gt 0 ] || fail "$option requires a value"
             case "$option" in
-                --version) tag=$1 ;;
+                --version) tag=$1; version_given=1 ;;
                 --prefix) prefix=$1 ;;
                 --archive) archive_path=$1 ;;
             esac
@@ -36,6 +61,57 @@ while [ "$#" -gt 0 ]; do
     esac
     shift
 done
+
+if [ "$uninstall" -eq 1 ]; then
+    [ -z "$archive_path" ] || fail "--archive cannot be used with --uninstall"
+    if [ "$version_given" -eq 1 ]; then
+        valid_tag "$tag" || fail "invalid release tag: $tag"
+    fi
+    if [ ! -d "$prefix" ]; then
+        printf 'No snt CLI installation found under %s\n' "$prefix"
+        exit 0
+    fi
+    prefix=$(cd "$prefix" && pwd -P)
+    root="$prefix/opt/snt"
+    link="$prefix/bin/snt"
+    active_tag=
+    if [ -L "$link" ]; then
+        link_target=$(readlink "$link") || fail "could not inspect $link"
+        case "$link_target" in
+            "$root"/*/snt)
+                active_tag=${link_target#"$root"/}
+                active_tag=${active_tag%/snt}
+                valid_tag "$active_tag" || active_tag=
+                ;;
+        esac
+    fi
+    removed=0
+    if [ -n "$active_tag" ] && { [ "$version_given" -eq 0 ] || [ "$active_tag" = "$tag" ]; }; then
+        rm "$link"
+        removed=1
+    fi
+    if [ "$version_given" -eq 1 ]; then
+        if [ -d "$root/$tag" ]; then
+            rm -rf "$root/$tag"
+            removed=1
+        fi
+    else
+        for target in "$root"/v*; do
+            [ -d "$target" ] || continue
+            candidate_tag=${target##*/}
+            valid_tag "$candidate_tag" || continue
+            rm -rf "$target"
+            removed=1
+        done
+    fi
+    rmdir "$root" "$prefix/opt" "$prefix/bin" 2>/dev/null || :
+    if [ "$removed" -eq 1 ]; then
+        printf 'Uninstalled snt CLI from %s\n' "$prefix"
+    else
+        printf 'No matching snt CLI release found under %s\n' "$prefix"
+    fi
+    exit 0
+fi
 
 case "$(uname -s):$(uname -m)" in
     Linux:x86_64) platform=linux-x86_64 ;;
@@ -67,19 +143,19 @@ else
     archive_name="snt-${tag}-${platform}.tar.gz"
 fi
 
-case "$tag" in
-    v[0-9]*.[0-9]*.[0-9]*) ;;
-    *) fail "invalid release tag: $tag" ;;
-esac
-case "$tag" in
-    *[!A-Za-z0-9._-]*) fail "invalid release tag: $tag" ;;
-esac
+valid_tag "$tag" || fail "invalid release tag: $tag"
 
 mkdir -p "$prefix/opt/snt" "$prefix/bin"
 prefix=$(cd "$prefix" && pwd -P)
 target="$prefix/opt/snt/$tag"
 link="$prefix/bin/snt"
-if [ -e "$link" ] && [ ! -L "$link" ]; then
+if [ -L "$link" ]; then
+    link_target=$(readlink "$link") || fail "could not inspect $link"
+    case "$link_target" in
+        "$prefix"/opt/snt/*/snt) ;;
+        *) fail "will not replace an existing symlink: $link" ;;
+    esac
+elif [ -e "$link" ]; then
     fail "will not replace an existing file: $link"
 fi
 
@@ -95,8 +171,11 @@ if [ ! -d "$target" ]; then
     tar -xzf "$archive_path" -C "$stage" || fail "could not extract $archive_name"
     extracted="$stage/snt-${tag}-${platform}"
     [ -x "$extracted/snt" ] || fail "archive does not contain an executable snt"
+    check_linux_runtime "$extracted/snt"
     "$extracted/snt" --version >/dev/null || fail "snt could not run; check system runtime libraries"
     mv "$extracted" "$target"
+else
+    check_linux_runtime "$target/snt"
 fi
 
 [ -x "$target/snt" ] || fail "installation is incomplete: $target"

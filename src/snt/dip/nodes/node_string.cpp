@@ -51,6 +51,9 @@ namespace snt::dip {
             set_value(parse_expression(env, value_raw.at(0), std::nullopt, dtype));
             break;
         }
+        case ValueOrigin::Concatenation:
+            set_value(parse_concatenation(env, *this));
+            break;
         default:
             set_value();
             break;

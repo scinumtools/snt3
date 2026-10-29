@@ -262,6 +262,10 @@ namespace snt::dip {
 
                 // determine node type
                 Parser parser(line);
+                // Trailing whitespace is outside a completed value or comment. Keep
+                // the original line intact for diagnostics and source provenance.
+                const auto last_content = parser.code.find_last_not_of(" \t\r\n");
+                parser.code.erase(last_content == std::string::npos ? 0 : last_content + 1);
                 BaseNode::PointerType node = nullptr;
                 node = EmptyNode::is_node(parser);
                 if (node == nullptr)

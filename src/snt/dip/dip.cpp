@@ -957,7 +957,7 @@ lint : snt_project_lint
                                 replacement->line.code
                             }
                         );
-                    declared->apply_override(replacement, target);
+                    declared->apply_override(replacement, target, Path(graph_path));
                     target.record_block_input(*declared, *replacement, graph_path);
                     graph_value_evaluated = record_dependency_graph;
                     target.overrides.consume(replacement->path.name);

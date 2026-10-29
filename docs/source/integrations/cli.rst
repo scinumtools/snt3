@@ -317,7 +317,9 @@ reevaluating their DIPL sources:
 ``--load`` cannot be combined with any ``--input``. ``--save`` overwrites an
 existing file and does not require ``--print`` or ``--value``. It saves the
 entire environment even when ``--request`` or ``--tags`` restricts printed
-output. If output validation fails, the destination is not written.
+output. After a successful save, the CLI reports the absolute DIPH5 path on
+stderr, leaving printed values on stdout. If output validation fails, the
+destination is not written.
 ``--record-graph`` records evaluation dependencies while parsing DIPL input;
 the graph is stored by ``--save``. It cannot be used with ``--load``.
 ``--relative-source-paths`` stores source-manifest paths relative to the saved
@@ -469,7 +471,9 @@ Discover and pin a project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``snt hub list`` reads the live catalogue on each invocation; it needs network
-access and does not use a local cache. ``fetch`` also needs Git and network
+access and does not use a local cache. Its table shows the first 10 characters
+of each pinned source revision; the full revision remains in the catalogue.
+``fetch`` also needs Git and network
 access. It writes into the current directory unless you pass ``--dir PATH``.
 You can pin a particular catalogue revision with ``--revision HUB_SHA``; use
 the full SHA currently advertised by the catalogue.

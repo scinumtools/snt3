@@ -83,7 +83,8 @@ jobs:
               wayland-protocols \
               libxkbcommon-dev \
               libegl1-mesa-dev \
-              xorg-dev
+              xorg-dev \
+              xvfb xauth libgl1-mesa-dri gdb
       
       - name: Install macOS dependencies
         if: runner.os == 'macOS'
@@ -126,6 +127,9 @@ jobs:
             -DENABLE_SNT_SERVER=ON \
             -DENABLE_SNT_DMAP=ON \
             "${extra[@]}"
+          if [ "${{ runner.os }}" = Linux ]; then
+            grep -q '^GLFW_BUILD_X11:BOOL=ON$' build-release/CMakeCache.txt
+          fi
 
       - name: Build CLI
         shell: bash
@@ -139,6 +143,7 @@ jobs:
           test -f "$executable"
           test "$("$executable" --version)" = "${RELEASE_TAG#v}"
           "$executable" puq convert '35*eV' J
+          "$executable" view --help | grep -F 'Module: Parameter viewer'
 
       - name: Package Linux and macOS CLI
         if: runner.os != 'Windows'
@@ -178,9 +183,37 @@ jobs:
           Run ./snt --help for commands. The binary was built for the platform named
           in this archive. The snt hub command also needs Git and Python 3 to fetch
           and run a project's adapter. System libraries are required at runtime;
-          on Linux, install libcurl and libaec if they are absent.
+          on Linux, install libcurl, libsz.so.2, and libGL.so.1 if absent.
           EOF
           tar -C package -czf "dist/$PACKAGE_NAME.tar.gz" "$PACKAGE_NAME"
+
+      - name: Verify installed Linux and macOS CLI
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          prefix="$RUNNER_TEMP/snt-release-install"
+          sh packaging/installers/install-cli.sh \
+            --prefix "$prefix" --archive "dist/$PACKAGE_NAME.tar.gz"
+          test "$("$prefix/bin/snt" --version)" = "${RELEASE_TAG#v}"
+          "$prefix/bin/snt" view --help | grep -F 'Module: Parameter viewer'
+          if [ "${{ runner.os }}" = Linux ]; then
+            printf 'value int = 1\n' > "$RUNNER_TEMP/view-smoke.dip"
+            set +e
+            SNT_VIEW_TRACE=1 LIBGL_ALWAYS_SOFTWARE=1 timeout 10s \
+              xvfb-run -a "$prefix/bin/snt" view "$RUNNER_TEMP/view-smoke.dip" \
+              > "$RUNNER_TEMP/view-smoke.log" 2>&1
+            status=$?
+            set -e
+            cat "$RUNNER_TEMP/view-smoke.log"
+            if [ "$status" -ne 124 ] || ! grep -Fq 'first frame rendered' "$RUNNER_TEMP/view-smoke.log"; then
+              echo "Installed viewer failed to render a frame (exit $status)" >&2
+              SNT_VIEW_TRACE=1 LIBGL_ALWAYS_SOFTWARE=1 timeout 20s \
+                xvfb-run -a gdb -q -batch -ex run -ex 'thread apply all bt' \
+                --args "$prefix/bin/snt" view "$RUNNER_TEMP/view-smoke.dip" || true
+              exit 1
+            fi
+          fi
+          sh packaging/installers/install-cli.sh --uninstall --prefix "$prefix"
 
       - name: Package Windows CLI
         if: runner.os == 'Windows'
@@ -193,6 +226,14 @@ jobs:
           Python 3 to fetch and run a project's adapter.
           '@ | Set-Content "package/$env:PACKAGE_NAME/README.txt"
           Compress-Archive -Path "package/$env:PACKAGE_NAME" -DestinationPath "dist/$env:PACKAGE_NAME.zip"
+
+      - name: Verify packaged Windows CLI
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $output = & "package/$env:PACKAGE_NAME/snt.exe" view --help
+          if ($LASTEXITCODE -ne 0) { throw 'Packaged viewer command failed.' }
+          if ($output -notmatch 'Module: Parameter viewer') { throw 'Packaged viewer command is missing.' }
 
       - uses: actions/upload-artifact@v4
         with:

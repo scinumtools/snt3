@@ -17,6 +17,7 @@ namespace snt::dip {
         {ValueOrigin::Function, "function"},
         {ValueOrigin::FunctionRes, "function result"},
         {ValueOrigin::Expression, "expression"},
+        {ValueOrigin::Concatenation, "string concatenation"},
         {ValueOrigin::Schema, "schema"},
     };
 

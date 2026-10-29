@@ -25,6 +25,7 @@ namespace snt::dip {
         Path path;     ///< fully qualified node path
         std::array<std::string, 3> dtype_raw; ///< data type properties (unsigned/type/precision)
         val::Array::StringType value_raw;     ///< raw value string(s)
+        std::vector<bool> string_parts_formatted; ///< f-prefixed segments in a string concatenation
         val::Array::ShapeType value_shape;    ///< shape of an array value
         ValueOrigin value_origin;             ///< origin of the value; in Python there were separate variables:
                                               ///< value_ref, value_expr, value_func

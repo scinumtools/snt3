@@ -166,6 +166,19 @@ Templates, or formatted text values, are used to convert node values into a text
 They follow the same syntax as standard string values, but are prefixed with an `f` before the opening quotation mark.
 All value types can be embedded into the text using standard Python-style formatting notation.
 
+For longer output, adjacent quoted segments inside parentheses are joined
+without a separator. Each segment may independently use the `f` prefix, so
+only formatted segments interpolate references:
+
+``` DIPL
+name str = "Tina"
+greeting str = (
+  "Hello, "
+  f"{{?name}}"
+  "!"
+)
+```
+
 ``` DIPL
 id int = 345
 name str = "Tina"

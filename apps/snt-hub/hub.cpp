@@ -9,6 +9,7 @@
 #include <curl/curl.h>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -1045,15 +1046,26 @@ namespace snt::hub {
                 std::cout << "Usage: snt hub run [--setup DIR] [--executable PATH] [--workspace DIR]\n"
                              "Run a complete setup with a reviewed local project recipe.\n";
             } else {
-                std::cout << "Usage: snt hub {list|fetch|examples|info|setup|build|run} [arguments]\n"
-                             "Prepare pinned code examples in a local SNT Hub workspace.\n"
+                std::cout << "\nScientific Numerical Tools v3 (SNT)\n"
+                             "Module: SNT Hub\n\n"
+                             "Usage:\n"
+                             "  snt hub <command> [arguments]\n\n"
+                             "Description:\n"
+                             "  Prepare pinned code examples in a local SNT Hub workspace.\n\n"
+                             "Commands:\n"
                              "  list             Show projects in the live catalogue\n"
                              "  fetch PROJECT    Fetch a pinned project into the current directory\n"
                              "  examples         Show the current workspace's example recipes\n"
                              "  info             Show the current workspace's lock\n"
                              "  setup EXAMPLE    Prepare a run in runs/EXAMPLE\n"
                              "  build            Use an optional reviewed project build recipe\n"
-                             "  run              Use an optional reviewed local run recipe\n";
+                             "  run              Use an optional reviewed local run recipe\n\n"
+                             "Options:\n"
+                             "  -h, --help       Show help for Hub or a Hub command\n\n"
+                             "Examples:\n"
+                             "  snt hub list\n"
+                             "  snt hub fetch PROJECT\n"
+                             "  snt hub setup EXAMPLE --inputs-only\n";
             }
         }
 
@@ -1103,6 +1115,10 @@ namespace snt::hub {
                 throw Error("Too many hub command arguments");
             if (args.show_help)
                 return args;
+            if (argc == 2) {
+                args.show_help = true;
+                return args;
+            }
             if (args.action != "list" && args.action != "fetch" && args.action != "examples" && args.action != "info" &&
                 args.action != "setup" && args.action != "build" && args.action != "run")
                 throw Error("Unknown hub command. Use 'snt hub --help'.");
@@ -1137,9 +1153,21 @@ namespace snt::hub {
         }
         if (args.action == "list") {
             const auto data = catalog();
-            for (const auto& project : data.at("projects"))
-                std::cout << text(project, "id") << '\t' << text(project, "name") << '\t'
-                          << text(project, "source_revision") << '\n';
+            const auto& projects = data.at("projects");
+            std::size_t id_width = std::string("ID").size();
+            std::size_t name_width = std::string("Project").size();
+            for (const auto& project : projects) {
+                id_width = std::max(id_width, text(project, "id").size());
+                name_width = std::max(name_width, text(project, "name").size());
+            }
+            const auto row = [&](const std::string& id, const std::string& name, const std::string& revision) {
+                std::cout << std::left << std::setw(static_cast<int>(id_width)) << id << "  "
+                          << std::setw(static_cast<int>(name_width)) << name << "  " << revision << '\n';
+            };
+            row("ID", "Project", "Revision");
+            row(std::string(id_width, '-'), std::string(name_width, '-'), std::string(10, '-'));
+            for (const auto& project : projects)
+                row(text(project, "id"), text(project, "name"), text(project, "source_revision").substr(0, 10));
         } else if (args.action == "fetch") {
             fetch(args.target, args.directory, args.revision);
         } else if (args.action == "examples") {

@@ -619,19 +619,23 @@ namespace snt::dip {
         // Try to parse numerical or logical expression
         if (start == std::string::npos || (code[start] != '('))
             return false;
-        if (dtype_raw[1] == std::string(KEYWORD_STRING))
-            throw dip::SyntaxException(
-                "Invalid template expression",
-                "A parenthesized expression was used where an f-prefixed string is required.",
-                "Use an f-prefixed string such as `f\"str\"` or `f\"\"\"str\"\"\"`.",
-                __FILE__,
-                __LINE__,
-                line
-            );
+        const auto first_part = code.find_first_not_of(" \t\n\r", start + 1);
+        const bool string_concat = dtype_raw[1] == std::string(KEYWORD_STRING) ||
+            (first_part != std::string::npos &&
+             (code[first_part] == '"' ||
+              (code[first_part] == 'f' && first_part + 1 < code.size() && code[first_part + 1] == '"')));
         int depth = 0;
         size_t i = start;
+        bool in_string = false;
         // Parse parentheses from first '('
         for (; i < code.size(); ++i) {
+            if (string_concat && code[i] == '"' &&
+                (i == 0 || code[i - 1] != '\\')) {
+                in_string = !in_string;
+                continue;
+            }
+            if (in_string)
+                continue;
             if (code[i] == '(')
                 depth++;
             else if (code[i] == ')') {
@@ -661,6 +665,33 @@ namespace snt::dip {
                 __LINE__,
                 line
             );
+        if (string_concat) {
+            Parser parts({inside, line.source});
+            while (true) {
+                const auto next = parts.code.find_first_not_of(" \t\n\r");
+                if (next == std::string::npos)
+                    break;
+                parts.code.erase(0, next);
+                if (!parts.part_string())
+                    throw dip::SyntaxException(
+                        "Invalid string concatenation",
+                        "A parenthesized string value contains an unquoted or incomplete segment.",
+                        "Use adjacent quoted strings, optionally prefixed with `f`, inside the parentheses.",
+                        __FILE__, __LINE__, line
+                    );
+                value_raw.push_back(std::move(parts.value_raw.back()));
+                string_parts_formatted.push_back(parts.value_origin == ValueOrigin::Expression);
+                parts.value_raw.clear();
+            }
+            if (value_raw.empty())
+                throw dip::SyntaxException(
+                    "Empty string concatenation", "The parentheses contain no quoted strings.",
+                    "Add at least one quoted string.", __FILE__, __LINE__, line
+                );
+            value_origin = ValueOrigin::Concatenation;
+            strip(code.substr(0, i + 1));
+            return true;
+        }
         value_raw.push_back(inside);
         value_origin = ValueOrigin::Expression;
         // Strip including leading whitespace + full "(...)"
