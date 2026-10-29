@@ -116,7 +116,12 @@ namespace snt::val {
         /** Copy the stored values into an output container.
          * @param output_value Destination container receiving the converted values.
          */
-        void get_data(std::vector<float>& output_value) const { output_value.assign(value.begin(), value.end()); };
+        void get_data(std::vector<float>& output_value) const {
+            output_value.clear();
+            output_value.reserve(value.size());
+            for (double item : value)
+                output_value.push_back(static_cast<float>(item));
+        };
     };
 
     class ArrayValueFloat64 : public ArrayValue<double> {

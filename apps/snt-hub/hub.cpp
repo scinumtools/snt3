@@ -1157,8 +1157,8 @@ namespace snt::hub {
             std::size_t id_width = std::string("ID").size();
             std::size_t name_width = std::string("Project").size();
             for (const auto& project : projects) {
-                id_width = std::max(id_width, text(project, "id").size());
-                name_width = std::max(name_width, text(project, "name").size());
+                id_width = (std::max)(id_width, text(project, "id").size());
+                name_width = (std::max)(name_width, text(project, "name").size());
             }
             const auto row = [&](const std::string& id, const std::string& name, const std::string& revision) {
                 std::cout << std::left << std::setw(static_cast<int>(id_width)) << id << "  "
