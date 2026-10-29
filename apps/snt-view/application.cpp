@@ -6,6 +6,7 @@
 #include "inspector_view.h"
 #include "notifications.h"
 #include "source_view.h"
+#include "setup_view.h"
 #include "viewer_model.h"
 
 #include <imgui.h>
@@ -66,6 +67,7 @@ namespace snt::view {
             std::array<char, 4096>& save_as_parent,
             std::array<char, 256>& save_as_name,
             std::string& save_as_error,
+            SetupViewState& setup_state,
             NotificationCenter& notifications
         ) {
             const auto reload = [&] {
@@ -104,6 +106,8 @@ namespace snt::view {
                     }
                     ImGui::EndMenu();
                 }
+                if (model.object("@setup") && ImGui::MenuItem("Setup", nullptr, model.selection() == "@setup"))
+                    model.select("@setup");
                 ImGui::EndMainMenuBar();
             }
             const auto& io = ImGui::GetIO();
@@ -260,7 +264,10 @@ namespace snt::view {
                 }
                 displayed_selection = model.selection();
                 displayed_revision = model.revision();
-                if (ImGui::BeginTabBar("Inspector tabs")) {
+                const auto* selected_object = model.object(model.selection());
+                if (selected_object && selected_object->role == ObjectRole::Setup) {
+                    draw_setup_view(model, setup_state, notifications);
+                } else if (ImGui::BeginTabBar("Inspector tabs")) {
                     if (ImGui::BeginTabItem(
                             "Inspector",
                             nullptr,
@@ -277,7 +284,6 @@ namespace snt::view {
                         );
                         ImGui::EndTabItem();
                     }
-                    const auto* selected_object = model.object(model.selection());
                     const bool selected_source =
                         selected_object &&
                         (selected_object->role == ObjectRole::Source || selected_object->role == ObjectRole::CodeSource ||
@@ -376,6 +382,7 @@ namespace snt::view {
         std::array<char, 4096> save_as_parent{};
         std::array<char, 256> save_as_name{};
         std::string save_as_error;
+        SetupViewState setup_state;
         NotificationCenter notifications;
         bool first_frame = true;
         while (!glfwWindowShouldClose(window)) {
@@ -399,6 +406,7 @@ namespace snt::view {
                 save_as_parent,
                 save_as_name,
                 save_as_error,
+                setup_state,
                 notifications
             );
             notifications.draw();

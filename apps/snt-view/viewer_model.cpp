@@ -25,7 +25,7 @@ namespace snt::view {
         }
 
         std::string parent_id(const std::string& id) {
-            if (id == "@project" || id == "@dipfile" || id == "@local" || id == "@blocks" || id == "@sources" ||
+            if (id == "@project" || id == "@dipfile" || id == "@setup" || id == "@local" || id == "@blocks" || id == "@sources" ||
                 id == "@raw_sources" || id == "@overrides" || id == "@schemas" || id == "@units" ||
                 id == "@named-nodes")
                 return "";
@@ -65,14 +65,24 @@ namespace snt::view {
             return parent.empty() ? "@project" : parent;
         }
 
+        dip::Environment load_environment(const std::filesystem::path& artifact) {
+            if (dip::detect_artifact(artifact) == dip::ArtifactKind::Project) {
+                dip::DIP parser;
+                parser.add_project(artifact);
+                return parser.parse(true, true, true);
+            }
+            return dip::open_artifact(artifact, true, true);
+        }
+
     } // namespace
 
     ViewerModel::ViewerModel(std::filesystem::path artifact)
         : input_path_(artifact.string()), artifact_(std::filesystem::absolute(std::move(artifact))) {
-        environment_ = dip::open_artifact(artifact_, true, true);
+        environment_ = load_environment(artifact_);
         if (dip::detect_artifact(artifact_) == dip::ArtifactKind::Project) {
+            setup_session_ = std::make_unique<dip::SetupSession>(artifact_);
             try {
-                edit_session_ = std::make_unique<dip::EditSession>(artifact_);
+                edit_session_ = std::make_unique<dip::EditSession>(artifact_, true);
             } catch (const std::exception& error) {
                 error_ = std::string("Project opened read-only: ") + error.what();
             }
@@ -103,6 +113,8 @@ namespace snt::view {
             ObjectInfo{"@project", "Resolved nodes", "", {}, false, dip::Path::Kind::None, ObjectRole::Project}
         );
         objects_.at("").children.push_back("@project");
+        if (setup_session_ && !setup_session_->questions().empty())
+            objects_.emplace("@setup", ObjectInfo{"@setup", "Setup", "", {}, false, dip::Path::Kind::None, ObjectRole::Setup});
         if (dip::detect_artifact(artifact_) == dip::ArtifactKind::Project) {
             objects_.emplace(
                 "@dipfile", ObjectInfo{"@dipfile", "DIPfile", "", {}, false, dip::Path::Kind::None, ObjectRole::DIPfile}
@@ -474,18 +486,21 @@ namespace snt::view {
 
     bool ViewerModel::reload() {
         try {
-            auto fresh = dip::open_artifact(artifact_, true, true);
+            auto fresh = load_environment(artifact_);
             std::unique_ptr<dip::EditSession> fresh_session;
+            std::unique_ptr<dip::SetupSession> fresh_setup;
             std::string edit_error;
             if (dip::detect_artifact(artifact_) == dip::ArtifactKind::Project) {
+                fresh_setup = std::make_unique<dip::SetupSession>(artifact_);
                 try {
-                    fresh_session = std::make_unique<dip::EditSession>(artifact_);
+                    fresh_session = std::make_unique<dip::EditSession>(artifact_, true);
                 } catch (const std::exception& error) {
                     edit_error = std::string("Project opened read-only: ") + error.what();
                 }
             }
             environment_ = std::move(fresh);
             edit_session_ = std::move(fresh_session);
+            setup_session_ = std::move(fresh_setup);
             rebuild_objects();
             ++revision_;
             error_ = std::move(edit_error);
@@ -756,6 +771,87 @@ namespace snt::view {
             return true;
         } catch (const std::exception& error) {
             error_ = error.what();
+            return false;
+        }
+    }
+
+    const std::vector<dip::SetupQuestion>& ViewerModel::setup_questions() const {
+        static const std::vector<dip::SetupQuestion> empty;
+        return setup_session_ ? setup_session_->questions() : empty;
+    }
+
+    bool ViewerModel::commit_setup(
+        const std::map<std::string, std::string>& answers,
+        const std::map<std::string, std::size_t>& choices,
+        const std::string& output_name
+    ) {
+        setup_error_path_.clear();
+        if (!setup_session_) {
+            error_ = "Guided setup is available only for a DIPfile project.";
+            return false;
+        }
+        try {
+            const std::filesystem::path output(output_name);
+            if (output_name.empty() || output.filename() != output || output == "." || output == ".." ||
+                output.extension() != ".dip") {
+                setup_error_path_ = "@setup-file";
+                throw std::invalid_argument("Setup file name must be a .dip filename in the project directory.");
+            }
+            dip::SetupSession candidate(artifact_);
+            candidate.answer_batch(answers, choices);
+            try {
+                candidate.save_and_register(artifact_.parent_path() / output);
+            } catch (...) {
+                setup_error_path_ = "@setup-file";
+                throw;
+            }
+            return reload();
+        } catch (const dip::SetupInputError& error) {
+            setup_error_path_ = error.path();
+            error_ = error.what();
+            return false;
+        } catch (const std::exception& error) {
+            error_ = error.what();
+            return false;
+        }
+    }
+
+    bool ViewerModel::remove_setup_override(const std::string& output_name) {
+        try {
+            if (!output_name.empty()) {
+                const auto& entries = environment_.project_entries();
+                for (std::size_t index = 0; index < entries.size(); ++index) {
+                    const auto& entry = entries[index];
+                    if (entry.kind == dip::ProjectEntry::Kind::Override && !entry.resolved_path.empty() &&
+                        std::filesystem::path(entry.value).filename() == output_name)
+                        return delete_override_source(index);
+                }
+                error_ = "No registered override named `" + output_name + "` is present in " + artifact_.string() + ".";
+                return false;
+            }
+            dip::SetupSession candidate(artifact_);
+            candidate.remove_registered_overrides();
+            return reload();
+        } catch (const std::exception& error) {
+            const std::string message = error.what();
+            reload();
+            error_ = message;
+            return false;
+        }
+    }
+
+    bool ViewerModel::delete_override_source(const std::size_t project_entry_index) {
+        if (!edit_session_) {
+            error_ = "No editable project session is active.";
+            return false;
+        }
+        try {
+            edit_session_->delete_override(project_entry_index);
+            return reload();
+        } catch (const std::exception& error) {
+            const std::string message = error.what();
+            reload();
+            error_ = message;
             return false;
         }
     }

@@ -447,6 +447,27 @@ namespace snt::view {
             ImGui::SetClipboardText(source.text().c_str());
             notifications.notify("Source copied to clipboard.");
         }
+        const bool override_source = selected && selected->role == ObjectRole::CodeSource &&
+                                     selected->source_kind == "override" && selected->manifest_index.has_value();
+        if (override_source && edit_path) {
+            ImGui::SameLine();
+            ImGui::BeginDisabled(source.dirty());
+            const bool delete_clicked = ImGui::Button("Delete override");
+            ImGui::EndDisabled();
+            if (delete_clicked) {
+                if (model.delete_override_source(*selected->manifest_index)) {
+                    source = SourceView{};
+                    select_source_tab = false;
+                    scroll_to_target = false;
+                    error.clear();
+                    edit_report.clear();
+                    notifications.notify("Override source deleted and project reloaded.");
+                    return;
+                }
+                notifications.notify(model.error(), NoticeLevel::Error);
+                return;
+            }
+        }
         if (block_value && !source.editing()) {
             ImGui::SameLine();
             if (ImGui::Button("Check")) {

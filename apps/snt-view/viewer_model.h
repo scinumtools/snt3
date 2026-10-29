@@ -12,6 +12,7 @@
 #include <optional>
 #include <snt/dip/edit_session.h>
 #include <snt/dip/inspect/inspector.h>
+#include <snt/dip/setup.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -23,6 +24,7 @@ namespace snt::view {
         Artifact,         ///< Input artifact root.
         Project,          ///< Evaluated source project.
         DIPfile,          ///< Project manifest.
+        Setup,            ///< Guided inputs marked with !setup.
         ManifestCategory, ///< Group of manifest entries.
         ManifestEntry,    ///< One project manifest entry.
         LocalSources,     ///< Sources loaded from local files.
@@ -120,6 +122,24 @@ namespace snt::view {
         );
         /** Report whether the loaded artifact has a file-backed project session. */
         bool can_save_as() const { return static_cast<bool>(edit_session_); }
+        /** Guided setup questions for a project, in source order. */
+        const std::vector<dip::SetupQuestion>& setup_questions() const;
+        /** Form field associated with the most recent setup commit failure, if known. */
+        const std::string& setup_error_path() const { return setup_error_path_; }
+        /** Whether a guided setup override file is registered in this project. */
+        bool can_remove_setup_override() const {
+            return setup_session_ && setup_session_->registered_override_count() > 0;
+        }
+        /** Remove the project override named by the setup output field. An empty name removes generated setup files. */
+        bool remove_setup_override(const std::string& output_name = {});
+        /** Delete a file-backed override source and its DIPfile registration. */
+        bool delete_override_source(std::size_t project_entry_index);
+        /** Validate staged setup answers and commit them to the project. */
+        bool commit_setup(
+            const std::map<std::string, std::string>& answers,
+            const std::map<std::string, std::size_t>& choices,
+            const std::string& output_name
+        );
         /** Return the currently loaded environment for read-only inspection. */
         const dip::Environment& environment() const { return environment_; }
         /** Return the resolved input artifact path. */
@@ -148,10 +168,12 @@ namespace snt::view {
         std::filesystem::path artifact_;            ///< Resolved artifact used for loading.
         dip::Environment environment_;              ///< Loaded environment retained for inspection.
         std::unique_ptr<dip::EditSession> edit_session_; ///< Core project editing session, when file-backed.
+        std::unique_ptr<dip::SetupSession> setup_session_; ///< Core guided setup for project inputs.
         std::map<std::string, ObjectInfo> objects_; ///< Browser hierarchy indexed by entry path.
         std::string selection_;                     ///< Currently selected entry path.
         std::string search_;                        ///< Browser filter query.
         std::string error_;                         ///< Latest reload failure message.
+        std::string setup_error_path_;              ///< Field to highlight after a failed setup commit.
         bool stale_ = false;                        ///< True when the retained environment predates a failed reload.
         std::size_t revision_ = 0;                  ///< Counter incremented after successful reloads.
         std::vector<std::string> history_;          ///< Visited browser paths in navigation order.

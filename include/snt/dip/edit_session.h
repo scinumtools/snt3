@@ -22,7 +22,7 @@ namespace snt::dip {
     class EditSession {
       public:
         /** Package a project and its evaluated local inputs for editing. */
-        explicit EditSession(const std::filesystem::path& project_file);
+        explicit EditSession(const std::filesystem::path& project_file, bool allow_unset_setup_values = false);
 
         /** Return the original packaged project. */
         const ProjectBundle& bundle() const { return bundle_; }
@@ -53,6 +53,9 @@ namespace snt::dip {
         /** Replace and save one block value inside its original bundled source document. */
         void save_block(const std::string& path, const std::string& text);
 
+        /** Delete one file-backed override and its DIPfile registration after validating the remaining project. */
+        void delete_override(std::size_t project_entry_index);
+
         /**
          * Copy the bundled project into a new directory. The destination must
          * not exist. An optional document replacement is included in the copy.
@@ -70,6 +73,7 @@ namespace snt::dip {
                                                                const std::string& text) const;
         ProjectBundle bundle_;
         std::filesystem::path root_;
+        bool allow_unset_setup_values_ = false;
         Environment baseline_;
     };
 

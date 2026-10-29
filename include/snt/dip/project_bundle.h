@@ -31,7 +31,8 @@ namespace snt::dip {
      * DIPfile directory, including symlinks escaping it, are rejected.
      */
     ProjectBundle package_project(
-        const std::filesystem::path& project_file, const std::vector<std::filesystem::path>& additional_files = {}
+        const std::filesystem::path& project_file, const std::vector<std::filesystem::path>& additional_files = {},
+        bool allow_unset_setup_values = false
     );
 
     /** Stable JSON representation accepted by the browser parseBundle API. */

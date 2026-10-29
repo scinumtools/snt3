@@ -171,7 +171,8 @@ namespace snt::dip {
     }
 
     ProjectBundle package_project(
-        const std::filesystem::path& project_file, const std::vector<std::filesystem::path>& additional_files
+        const std::filesystem::path& project_file, const std::vector<std::filesystem::path>& additional_files,
+        const bool allow_unset_setup_values
     ) {
         const auto absolute = std::filesystem::canonical(project_file);
         const auto root = absolute.parent_path();
@@ -195,7 +196,7 @@ namespace snt::dip {
             return contents;
         });
         parser.add_project(absolute);
-        parser.parse(); // Also discovers files opened by $source during evaluation.
+        parser.parse(false, false, allow_unset_setup_values); // Also discovers files opened by $source during evaluation.
         for (const auto& file : additional_files) {
             if (file.is_absolute())
                 invalid_bundle("Additional bundle files must use paths relative to the DIPfile directory.");

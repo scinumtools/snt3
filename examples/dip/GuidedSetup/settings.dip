@@ -6,7 +6,7 @@ simulation
   method str = "rk4"
     ?descr "Time integration method"
     !options ["euler", "rk4", "adaptive"]
-    !labels ["Euler", "Runge–Kutta 4", "Adaptive Runge–Kutta"]
+    !labels ["Euler", "Runge-Kutta 4", "Adaptive Runge-Kutta"]
     !setup
 
   steps int = 500

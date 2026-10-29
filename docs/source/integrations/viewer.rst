@@ -116,6 +116,29 @@ directory. The :ref:`ParameterViewer example <dip-parameter-viewer-example>`
 provides a project with groups, collections, overrides, schemas, sources,
 units, expressions, arrays, and a table for exploring these views.
 
+Guided setup
+------------
+
+For a live ``DIPfile`` project with ``!setup`` parameters, select **Setup** in
+the top menu. The menu entry appears only when setup parameters are available.
+The form shows every setup parameter at once, including its
+description and current value. Declared ``!options`` appear as a choice list;
+Boolean values use True/False controls. Other values accept text, numbers with
+units, or a DIPL array expression as appropriate. Leave a field unchanged to
+keep its current value. Source files remain editable while required setup
+values are still unset.
+
+After entering the answers, click **Commit setup**. The core validates the
+complete answer set before writing. A successful commit creates a new DIPL
+override file beside the ``DIPfile``, registers it in the project, and reloads
+the viewer so the resolved values update immediately. Invalid answers leave
+the project untouched. If validation identifies an input, the form scrolls to
+it and highlights it alongside the error notification. To revise a committed
+answer, edit the generated override source in the viewer.
+**Remove override** deletes the guided setup override file and unregisters it
+from the ``DIPfile``. Other project overrides remain active. The button is
+disabled until a guided setup override has been committed.
+
 Open source and reload
 ----------------------
 
@@ -130,6 +153,9 @@ replace supports previous/next navigation, replace current or all matches, and
 a case-sensitivity option. **Save** writes the document and reloads the
 project; **Discard** abandons unsaved edits. **Save As** copies the complete
 bundled project to a chosen directory and switches the viewer to that copy.
+Each file-backed override source also has a **Delete override** button. It
+removes that file and its ``DIPfile`` registration after validating the
+remaining project. Save or discard unsaved edits before deleting a source.
 If the document changed on disk after it was opened, saving is rejected to
 avoid overwriting that change. Opening another source or reloading is blocked
 while the current document has unsaved edits.

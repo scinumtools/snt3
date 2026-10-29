@@ -570,6 +570,92 @@ int main() {
                 empty_project.object("")->children.front() == "@dipfile",
             "An empty DIPfile should have an inspectable branch"
         );
+        const auto setup_dir = inline_dir / "setup";
+        std::filesystem::create_directory(setup_dir);
+        write(setup_dir / "DIPfile", "code[]\n  file = \"settings.dip\"\noverrides[]\n  file = \"manual.dip\"\n");
+        write(setup_dir / "settings.dip", "count int\n  !setup\nname str = \"old\"\n  !setup\nuntouched int = 1\n");
+        write(setup_dir / "manual.dip", "untouched = 2\n");
+        snt::view::ViewerModel setup_project(setup_dir / "DIPfile");
+        check(setup_project.object("@setup") && setup_project.setup_questions().size() == 2,
+              "Incomplete project should expose all setup questions");
+        check(std::find(setup_project.object("")->children.begin(), setup_project.object("")->children.end(),
+                        "@setup") == setup_project.object("")->children.end() && setup_project.select("@setup"),
+              "Setup should open from the top menu without appearing in the browser tree");
+        const auto settings_path = setup_project.editable_document_path(setup_dir / "settings.dip");
+        check(settings_path && *settings_path == "settings.dip" && setup_project.can_save_as(),
+              "An incomplete setup source should remain editable");
+        const auto edited_settings = setup_project.document_text(*settings_path) + "# setup source edit\n";
+        check(setup_project.preview_document(*settings_path, edited_settings).candidate_valid &&
+                  setup_project.save_document(*settings_path, edited_settings) &&
+                  setup_project.document_text(*settings_path) == edited_settings,
+              "Editing a setup source should work before required values are filled");
+        check(!setup_project.commit_setup({{"count", "invalid"}}, {}, "answers.dip") &&
+                  setup_project.setup_error_path() == "count" &&
+                  !std::filesystem::exists(setup_dir / "answers.dip"),
+              "Invalid setup must not write an override");
+        check(!setup_project.commit_setup({{"name", "new"}}, {}, "answers.dip") &&
+                  setup_project.setup_error_path() == "count",
+              "A missing required answer should identify its setup field");
+        check(!setup_project.commit_setup({{"count", "4"}}, {}, "answers.txt") &&
+                  setup_project.setup_error_path() == "@setup-file",
+              "An invalid setup filename should identify the filename field");
+        check(!setup_project.can_remove_setup_override(),
+              "Remove override should be unavailable before setup creates an override");
+        check(setup_project.commit_setup({{"count", "4"}, {"name", "new"}}, {}, "answers.dip"),
+              "Complete setup should commit successfully");
+        check(setup_project.can_remove_setup_override() && std::filesystem::exists(setup_dir / "answers.dip") &&
+                  setup_project.environment().get_node("count")->value->to_string() == "4" &&
+                  setup_project.environment()["name"].as<std::string>() == "new" &&
+                  setup_project.can_save_as(),
+              "Committed setup values should appear immediately");
+        snt::view::ViewerModel reopened_setup(setup_dir / "DIPfile");
+        check(reopened_setup.environment().get_node("count")->value->to_string() == "4" &&
+                  reopened_setup.environment()["name"].as<std::string>() == "new",
+              "Reopened project should retain setup values");
+        check(reopened_setup.can_remove_setup_override() && reopened_setup.remove_setup_override() &&
+                  !std::filesystem::exists(setup_dir / "answers.dip") &&
+                  std::filesystem::exists(setup_dir / "manual.dip") &&
+                  !reopened_setup.environment().get_node("count")->value &&
+                  reopened_setup.environment()["name"].as<std::string>() == "old" &&
+                  reopened_setup.environment().get_node("untouched")->value->to_string() == "2" &&
+                  reopened_setup.setup_questions().size() == 2,
+              "Removing guided setup should restore prior values and preserve unrelated overrides");
+        std::size_t manual_override_index = reopened_setup.environment().project_entries().size();
+        for (std::size_t index = 0; index < reopened_setup.environment().project_entries().size(); ++index)
+            if (reopened_setup.environment().project_entries()[index].kind ==
+                    snt::dip::ProjectEntry::Kind::Override)
+                manual_override_index = index;
+        check(manual_override_index < reopened_setup.environment().project_entries().size() &&
+                  reopened_setup.delete_override_source(manual_override_index) &&
+                  !std::filesystem::exists(setup_dir / "manual.dip") &&
+                  std::filesystem::exists(setup_dir / "settings.dip") &&
+                  reopened_setup.environment().get_node("untouched")->value->to_string() == "1",
+              "Deleting an override source should remove only its file and registration");
+        snt::view::ViewerModel stale_setup(setup_dir / "DIPfile");
+        check(!stale_setup.can_remove_setup_override() &&
+                  reopened_setup.commit_setup({{"count", "9"}}, {}, "second-answers.dip") &&
+                  stale_setup.remove_setup_override() &&
+                  !std::filesystem::exists(setup_dir / "second-answers.dip"),
+              "Remove override should detect a committed setup even if the viewer state is stale");
+        write(setup_dir / "DIPfile", "code[]\n  file = \"settings.dip\"\noverrides[]\n  file = \"setup-overrides.dip\"\n");
+        write(setup_dir / "setup-overrides.dip", "count = 7\n");
+        snt::view::ViewerModel registered_setup(setup_dir / "DIPfile");
+        check(!registered_setup.can_remove_setup_override() &&
+                  registered_setup.remove_setup_override("setup-overrides.dip") &&
+                  !std::filesystem::exists(setup_dir / "setup-overrides.dip") &&
+                  registered_setup.environment().project_entries().size() == 1 &&
+                  !registered_setup.environment().get_node("count")->value,
+              "Setup removal should use the visible project registration even without a generated-file header");
+        const auto guided_example = std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "examples/dip/GuidedSetup/DIPfile";
+        const auto guided_copy = inline_dir / "guided";
+        std::filesystem::create_directory(guided_copy);
+        write(guided_copy / "DIPfile", "code[]\n  file = \"settings.dip\"\n");
+        std::filesystem::copy_file(guided_example.parent_path() / "settings.dip", guided_copy / "settings.dip");
+        snt::view::ViewerModel guided_project(guided_copy / "DIPfile");
+        check(!guided_project.commit_setup({{"simulation.timestep", "3 m"},
+                                            {"simulation.random_seed", "12"}}, {}, "invalid-setup.dip") &&
+                  guided_project.setup_error_path() == "simulation.timestep",
+              "A setup unit error should identify the input that caused it");
         std::filesystem::remove(path);
         std::filesystem::remove(snapshot_path);
         std::filesystem::remove_all(inline_dir);
