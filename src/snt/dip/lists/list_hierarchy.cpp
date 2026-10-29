@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cctype>
 #include <iostream>
+#include <optional>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/lists/list_hierarchy.h>
 #include <utility>
@@ -17,6 +18,48 @@ namespace snt::dip {
             return !item.empty() && std::all_of(item.begin(), item.end(), [](unsigned char character) {
                 return std::isdigit(character);
             });
+        }
+
+        std::string unknown_collection_suggestion(
+            const std::string& requested, const std::unordered_map<std::string, Collection>& collections
+        ) {
+            // Scale tolerance with the final path component, not the full qualified path:
+            // a long parent path should not make a short misspelled child look plausible.
+            const std::size_t leaf_start = requested.find_last_of(".[");
+            const std::size_t leaf_length = requested.size() -
+                                            (leaf_start == std::string::npos ? 0 : leaf_start + 1);
+            const std::size_t max_distance = std::clamp((leaf_length + 2) / 4, std::size_t{2}, std::size_t{4});
+            std::optional<std::string> nearest;
+            std::size_t nearest_distance = max_distance + 1;
+            for (const auto& [candidate, collection] : collections) {
+                (void)collection;
+                if (candidate.size() > requested.size() + max_distance ||
+                    requested.size() > candidate.size() + max_distance)
+                    continue;
+                std::vector<std::size_t> previous(candidate.size() + 1);
+                std::vector<std::size_t> current(candidate.size() + 1);
+                for (std::size_t j = 0; j <= candidate.size(); ++j)
+                    previous[j] = j;
+                for (std::size_t i = 1; i <= requested.size(); ++i) {
+                    current[0] = i;
+                    for (std::size_t j = 1; j <= candidate.size(); ++j)
+                        current[j] = std::min({
+                            previous[j] + 1,
+                            current[j - 1] + 1,
+                            previous[j - 1] + (requested[i - 1] == candidate[j - 1] ? 0u : 1u)
+                        });
+                    previous.swap(current);
+                }
+                const std::size_t distance = previous.back();
+                if (distance <= max_distance &&
+                    (distance < nearest_distance || (distance == nearest_distance && (!nearest || candidate < *nearest)))) {
+                    nearest = candidate;
+                    nearest_distance = distance;
+                }
+            }
+            if (nearest)
+                return "Did you mean `" + *nearest + "`?";
+            return "Check whether the collection path is correct.";
         }
 
         void validate_list_index(
@@ -99,7 +142,7 @@ namespace snt::dip {
                     throw dip::EnvironmentException(
                         "Unknown collection",
                         "The collection `" + name_full + "` was not found.",
-                        "Check whether the collection path is correct.",
+                        unknown_collection_suggestion(name_full, collections),
                         __FILE__,
                         __LINE__,
                         node->line
@@ -121,7 +164,7 @@ namespace snt::dip {
                     throw dip::EnvironmentException(
                         "Unknown collection",
                         "The collection `" + name_full + "` was not found.",
-                        "Check whether the collection path is correct.",
+                        unknown_collection_suggestion(name_full, collections),
                         __FILE__,
                         __LINE__,
                         node->line
@@ -272,7 +315,7 @@ namespace snt::dip {
             throw dip::EnvironmentException(
                 "Unknown collection",
                 "The collection `" + path + "` was not found in the environment hierarchy.",
-                "Check whether the collection path is correct.",
+                unknown_collection_suggestion(path, collections),
                 __FILE__,
                 __LINE__
             );

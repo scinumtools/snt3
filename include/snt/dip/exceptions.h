@@ -6,14 +6,36 @@
 
 namespace snt::dip {
 
+    /** Current DIPL line for diagnostics created during nested evaluation. */
+    class ExceptionLocationScope {
+        const Line* previous_;
+
+      public:
+        explicit ExceptionLocationScope(const Line& line);
+        ~ExceptionLocationScope();
+        ExceptionLocationScope(const ExceptionLocationScope&) = delete;
+        ExceptionLocationScope& operator=(const ExceptionLocationScope&) = delete;
+    };
+
+    /** Return the active DIPL line, if one is being evaluated. */
+    const Line* current_exception_line() noexcept;
+
     struct ExceptionInfo : public core::ExceptionInfo {
         std::optional<core::SourceLocation> location; ///< DIPL code line where exception occured
     };
 
     class Exception : public core::ExceptionBase<dip::ExceptionInfo> {
+        static dip::ExceptionInfo with_current_location(dip::ExceptionInfo info) {
+            if (!info.location) {
+                if (const Line* line = current_exception_line())
+                    info.location = core::SourceLocation{line->source.name, line->source.line_number, line->code};
+            }
+            return info;
+        }
+
       public:
         explicit Exception(dip::ExceptionInfo info)
-            : core::ExceptionBase<dip::ExceptionInfo>(std::move(info), "[SNT-DIP] ") {
+            : core::ExceptionBase<dip::ExceptionInfo>(with_current_location(std::move(info)), "[SNT-DIP] ") {
             m_what = format(m_info, "[SNT-DIP] ");
         }
         explicit Exception(

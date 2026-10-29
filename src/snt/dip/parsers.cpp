@@ -165,6 +165,7 @@ namespace snt::dip {
         while (!lines.empty()) {
             Line line = lines.front();
             lines.pop();
+            ExceptionLocationScope parse_scope(line);
             try {
                 {
                     // add node definition (after = sign) on a new line

@@ -211,7 +211,7 @@ TEST(ReferencesInjections, RemoteSource) {
 TEST(ReferencesInjections, ExceptionSource) {
 
     dip::DIP d;
-    d.add_string("foo int = {bar?baz}");
+    d.add_string("foo int = {bar?baz}", "missing_source_request");
     try {
         d.parse();
         FAIL() << "Expected dip::EnvironmentException";
@@ -219,8 +219,25 @@ TEST(ReferencesInjections, ExceptionSource) {
         EXPECT_EQ(e.info().message, "Unknown source");
         EXPECT_EQ(e.info().details, "The source `bar` was not found in the environment source list.");
         EXPECT_EQ(e.info().suggestion, "Check whether the source name is correct.");
+        ASSERT_TRUE(e.info().location.has_value());
+        EXPECT_EQ(e.info().location->line, 1);
+        EXPECT_EQ(e.info().location->code, "foo int = {bar?baz}");
+        EXPECT_NE(std::string(e.what()).find("  at:         "), std::string::npos);
     } catch (...) {
         FAIL() << "Expected dip::EnvironmentException";
+    }
+}
+
+TEST(ReferencesInjections, UnknownSourceInTemplateReportsRequestLine) {
+    dip::DIP d;
+    d.add_string("title str = \"ok\"\nmessage str = f\"{{missing?title}}\"", "template_source_request");
+    try {
+        d.parse();
+        FAIL() << "Expected an unknown source error";
+    } catch (const dip::EnvironmentException& error) {
+        ASSERT_TRUE(error.info().location.has_value());
+        EXPECT_EQ(error.info().location->line, 2);
+        EXPECT_EQ(error.info().location->code, "message str = f\"{{missing?title}}\"");
     }
 }
 

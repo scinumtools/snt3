@@ -61,3 +61,35 @@ TEST(Exceptions, BaseException) {
         );
     }
 }
+
+TEST(Exceptions, ActiveLineAppliesToMissingLocationsAndRestoresNestedScopes) {
+    const dip::Line outer{"value str = {?missing}", {"main.dip", 3}};
+    const dip::Line inner{"value str = {?other}", {"nested.dip", 7}};
+    const auto check = [](const dip::Line* expected) {
+        const dip::EnvironmentException error("Unknown source", "missing", "check", __FILE__, __LINE__);
+        if (expected) {
+            ASSERT_TRUE(error.info().location.has_value());
+            EXPECT_EQ(error.info().location->source, expected->source.name);
+            EXPECT_EQ(error.info().location->line, expected->source.line_number);
+            EXPECT_EQ(error.info().location->code, expected->code);
+        } else {
+            EXPECT_FALSE(error.info().location.has_value());
+        }
+    };
+    check(nullptr);
+    {
+        dip::ExceptionLocationScope outer_scope(outer);
+        check(&outer);
+        {
+            dip::ExceptionLocationScope inner_scope(inner);
+            check(&inner);
+            const dip::SyntaxException explicit_line(
+                "Explicit location", "", "", __FILE__, __LINE__, outer
+            );
+            ASSERT_TRUE(explicit_line.info().location.has_value());
+            EXPECT_EQ(explicit_line.info().location->source, "main.dip");
+        }
+        check(&outer);
+    }
+    check(nullptr);
+}

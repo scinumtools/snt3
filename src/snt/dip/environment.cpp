@@ -725,14 +725,7 @@ namespace snt::dip {
                     "The target `" + source_name + "?" + path + "` is remote and is not loaded in this DIPH5 snapshot.",
                     "Load the original DIPL project with the remote source available.", __FILE__, __LINE__
                 );
-            const auto source = sources.entries().find(source_name);
-            if (source == sources.entries().end())
-                throw dip::EnvironmentException(
-                    "Unknown source",
-                    "The source `" + source_name + "` was not found in the environment source list.",
-                    "Check whether the source name is correct.", __FILE__, __LINE__
-                );
-            pool = &source->second.nodes;
+            pool = &sources.at(source_name).nodes;
         }
         for (const auto& node : pool->get_nodes()) {
             if (node && node->path.name == path)

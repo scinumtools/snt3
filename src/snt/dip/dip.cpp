@@ -910,6 +910,7 @@ lint : snt_project_lint
             }
             BaseNode::PointerType node = queue.pop_front();
             BaseNode::PointerType replacement;
+            ExceptionLocationScope request_scope(node->line);
             ValueNode::PointerType declared;
             bool suppress_value = false;
             bool already_defined = false;
@@ -957,8 +958,11 @@ lint : snt_project_lint
                                 replacement->line.code
                             }
                         );
-                    declared->apply_override(replacement, target, Path(graph_path));
-                    target.record_block_input(*declared, *replacement, graph_path);
+                    {
+                        ExceptionLocationScope override_scope(replacement->line);
+                        declared->apply_override(replacement, target, Path(graph_path));
+                        target.record_block_input(*declared, *replacement, graph_path);
+                    }
                     graph_value_evaluated = record_dependency_graph;
                     target.overrides.consume(replacement->path.name);
                 } else if (!suppress_value) {
@@ -1153,6 +1157,7 @@ lint : snt_project_lint
         for (size_t i = 0; i < target.nodes.size(); i++) {
             ValueNode::PointerType vnode = target.nodes.at(i);
             if (vnode) {
+                ExceptionLocationScope validation_scope(vnode->override ? vnode->override_line : vnode->line);
                 if (!vnode->schemas.empty())
                     throw dip::SyntaxException(
                         "Invalid value-node schema",

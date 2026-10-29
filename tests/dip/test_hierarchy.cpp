@@ -71,3 +71,29 @@ TEST(Hierarchy, IndentationChecking) {
         FAIL() << "Expected dip::SyntaxException";
     }
 }
+
+TEST(Hierarchy, UnknownCollectionSuggestsNearbyPath) {
+    dip::HierarchyList hierarchy;
+    hierarchy.set_collection("netcdf.attribute.coordinates", dip::Path::Kind::Group, {});
+    try {
+        (void)hierarchy.get_collection("netcdf.attribute.cooridnates");
+        FAIL() << "Expected dip::EnvironmentException";
+    } catch (const dip::EnvironmentException& error) {
+        EXPECT_EQ(error.info().message, "Unknown collection");
+        EXPECT_EQ(error.info().suggestion, "Did you mean `netcdf.attribute.coordinates`?");
+    }
+
+    try {
+        (void)hierarchy.get_collection("netcdf.attribute.cxxrdinatxs");
+        FAIL() << "Expected dip::EnvironmentException";
+    } catch (const dip::EnvironmentException& error) {
+        EXPECT_EQ(error.info().suggestion, "Did you mean `netcdf.attribute.coordinates`?");
+    }
+
+    try {
+        (void)hierarchy.get_collection("unrelated.path");
+        FAIL() << "Expected dip::EnvironmentException";
+    } catch (const dip::EnvironmentException& error) {
+        EXPECT_EQ(error.info().suggestion, "Check whether the collection path is correct.");
+    }
+}
