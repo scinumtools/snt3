@@ -29,8 +29,10 @@ execute_process(
   COMMAND "${SNT_EXECUTABLE}" dip parse --load "${saved}" --tags selected --print --save "${copied}"
   RESULT_VARIABLE status OUTPUT_VARIABLE output ERROR_VARIABLE error
 )
+string(REPLACE "\\" "/" normalized_error "${error}")
+string(REPLACE "\r\n" "\n" normalized_error "${normalized_error}")
 if(NOT status EQUAL 0 OR NOT output STREQUAL "enabled = true\n" OR
-   NOT error STREQUAL "Saved DIPH5: ${copied}\n")
+   NOT normalized_error STREQUAL "Saved DIPH5: ${copied}\n")
   message(FATAL_ERROR "Save should report its path on stderr without changing printed values\nstdout: ${output}\nstderr: ${error}")
 endif()
 run_cli(success "100\n" --load "${copied}" --request steps --value --type integer)
