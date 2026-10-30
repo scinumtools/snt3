@@ -56,6 +56,11 @@ jobs:
           ref: ${{ needs.release.outputs.tag }}
           submodules: recursive
 
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-tools
+
       - name: Check source version and architecture
         shell: bash
         run: |
@@ -192,8 +197,10 @@ jobs:
         shell: bash
         run: |
           prefix="$RUNNER_TEMP/snt-release-install"
-          sh packaging/installers/install-cli.sh \
-            --prefix "$prefix" --archive "dist/$PACKAGE_NAME.tar.gz"
+          bundle="$RUNNER_TEMP/snt-${RELEASE_TAG}-bundle.tar.gz"
+          tar -C dist -czf "$bundle" "$PACKAGE_NAME.tar.gz"
+          sh workflow-tools/packaging/installers/install-cli.sh \
+            --prefix "$prefix" --archive "$bundle"
           test "$("$prefix/bin/snt" --version)" = "${RELEASE_TAG#v}"
           "$prefix/bin/snt" view --help | grep -F 'Module: Parameter viewer'
           if [ "${{ runner.os }}" = Linux ]; then
@@ -213,7 +220,7 @@ jobs:
               exit 1
             fi
           fi
-          sh packaging/installers/install-cli.sh --uninstall --prefix "$prefix"
+          sh workflow-tools/packaging/installers/install-cli.sh --uninstall --prefix "$prefix"
 
       - name: Package Windows CLI
         if: runner.os == 'Windows'
@@ -233,7 +240,21 @@ jobs:
         run: |
           $output = & "package/$env:PACKAGE_NAME/snt.exe" view --help
           if ($LASTEXITCODE -ne 0) { throw 'Packaged viewer command failed.' }
-          if ($output -notmatch 'Module: Parameter viewer') { throw 'Packaged viewer command is missing.' }
+          if (-not ($output -match 'Module: Parameter viewer')) { throw 'Packaged viewer command is missing.' }
+
+      - name: Verify installed Windows CLI from bundle
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $bundle = Join-Path $env:RUNNER_TEMP "snt-$env:RELEASE_TAG-bundle.zip"
+          $prefix = Join-Path $env:RUNNER_TEMP 'snt-release-install'
+          Compress-Archive -Path "dist/$env:PACKAGE_NAME.zip" -DestinationPath $bundle
+          & ./workflow-tools/packaging/installers/install-cli.ps1 -Archive $bundle -Prefix $prefix
+          $output = & (Join-Path $prefix "versions/$env:RELEASE_TAG/snt.exe") view --help
+          if ($LASTEXITCODE -ne 0 -or -not ($output -match 'Module: Parameter viewer')) {
+            throw 'Installed Windows viewer command failed.'
+          }
+          & ./workflow-tools/packaging/installers/install-cli.ps1 -Uninstall -Prefix $prefix
 
       - uses: actions/upload-artifact@v4
         with:
@@ -254,10 +275,25 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - name: Attach CLI archives to release
+      - name: Attach universal CLI bundles to release
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ needs.release.outputs.tag }}
         run: |
           test "$(find dist -maxdepth 1 -type f | wc -l)" -eq 3
-          gh release upload "$RELEASE_TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          test -f "dist/snt-${RELEASE_TAG}-linux-x86_64.tar.gz"
+          test -f "dist/snt-${RELEASE_TAG}-macos-arm64.tar.gz"
+          test -f "dist/snt-${RELEASE_TAG}-windows-x86_64.zip"
+          bundle_zip="snt-${RELEASE_TAG}-bundle.zip"
+          bundle_tar="snt-${RELEASE_TAG}-bundle.tar.gz"
+          zip -j "$bundle_zip" \
+            "dist/snt-${RELEASE_TAG}-linux-x86_64.tar.gz" \
+            "dist/snt-${RELEASE_TAG}-macos-arm64.tar.gz" \
+            "dist/snt-${RELEASE_TAG}-windows-x86_64.zip"
+          tar -C dist -czf "$bundle_tar" \
+            "snt-${RELEASE_TAG}-linux-x86_64.tar.gz" \
+            "snt-${RELEASE_TAG}-macos-arm64.tar.gz" \
+            "snt-${RELEASE_TAG}-windows-x86_64.zip"
+          unzip -tq "$bundle_zip"
+          tar -tzf "$bundle_tar" | grep -Fx "snt-${RELEASE_TAG}-windows-x86_64.zip"
+          gh release upload "$RELEASE_TAG" "$bundle_zip" "$bundle_tar" --clobber --repo "$GITHUB_REPOSITORY"

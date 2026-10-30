@@ -7,8 +7,9 @@ usage() {
 Usage: sh install-cli.sh [--version vX.Y.Z] [--prefix DIR] [--archive FILE]
        sh install-cli.sh --uninstall [--version vX.Y.Z] [--prefix DIR]
 
-Installs the latest release into ~/.local by default. --archive installs an
-already downloaded release archive, for example on an offline HPC system.
+Installs the latest release into ~/.local by default. --archive accepts a
+multi-platform .tar.gz or .zip bundle, or a legacy platform archive, for
+example on an offline HPC system.
 --uninstall removes all installed CLI releases by default, or one release when
 --version is given. It does not require a network connection.
 EOF
@@ -123,11 +124,15 @@ if [ -n "$archive_path" ]; then
     [ -f "$archive_path" ] || fail "archive not found: $archive_path"
     archive_name=${archive_path##*/}
     case "$archive_name" in
+        snt-v*-bundle.tar.gz|snt-v*-bundle.zip)
+            archive_tag=${archive_name#snt-}
+            archive_tag=${archive_tag%-bundle.*}
+            ;;
         snt-v*-"$platform".tar.gz)
             archive_tag=${archive_name#snt-}
             archive_tag=${archive_tag%-"$platform".tar.gz}
             ;;
-        *) fail "expected an snt-<version>-$platform.tar.gz archive" ;;
+        *) fail "expected an snt-<version>-bundle.tar.gz, .zip, or $platform.tar.gz archive" ;;
     esac
     if [ "$tag" != latest ] && [ "$tag" != "$archive_tag" ]; then
         fail "archive version $archive_tag does not match $tag"
@@ -140,7 +145,7 @@ else
             https://github.com/scinumtools/snt3/releases/latest) || fail "could not find the latest release"
         tag=${release_url##*/}
     fi
-    archive_name="snt-${tag}-${platform}.tar.gz"
+    archive_name="snt-${tag}-bundle.tar.gz"
 fi
 
 valid_tag "$tag" || fail "invalid release tag: $tag"
@@ -164,11 +169,38 @@ if [ ! -d "$target" ]; then
     trap 'rm -rf "$stage"' EXIT HUP INT TERM
     if [ -z "$archive_path" ]; then
         archive_path="$stage/$archive_name"
-        curl -fL --retry 3 \
+        if ! curl -fL --retry 3 \
             "https://github.com/scinumtools/snt3/releases/download/$tag/$archive_name" \
-            -o "$archive_path" || fail "could not download $archive_name"
+            -o "$archive_path"; then
+            archive_name="snt-${tag}-bundle.zip"
+            archive_path="$stage/$archive_name"
+            if ! curl -fL --retry 3 \
+                "https://github.com/scinumtools/snt3/releases/download/$tag/$archive_name" \
+                -o "$archive_path"; then
+                archive_name="snt-${tag}-${platform}.tar.gz"
+                archive_path="$stage/$archive_name"
+                curl -fL --retry 3 \
+                    "https://github.com/scinumtools/snt3/releases/download/$tag/$archive_name" \
+                    -o "$archive_path" || fail "could not download $archive_name"
+            fi
+        fi
     fi
-    tar -xzf "$archive_path" -C "$stage" || fail "could not extract $archive_name"
+    case "$archive_name" in
+        *-bundle.tar.gz)
+            platform_archive="$stage/snt-${tag}-${platform}.tar.gz"
+            tar -xOzf "$archive_path" "snt-${tag}-${platform}.tar.gz" > "$platform_archive" ||
+                fail "bundle does not contain the $platform archive"
+            tar -xzf "$platform_archive" -C "$stage" || fail "could not extract the $platform archive"
+            ;;
+        *-bundle.zip)
+            command -v unzip >/dev/null 2>&1 || fail "unzip is required to install the release bundle"
+            platform_archive="$stage/snt-${tag}-${platform}.tar.gz"
+            unzip -p "$archive_path" "snt-${tag}-${platform}.tar.gz" > "$platform_archive" ||
+                fail "bundle does not contain the $platform archive"
+            tar -xzf "$platform_archive" -C "$stage" || fail "could not extract the $platform archive"
+            ;;
+        *) tar -xzf "$archive_path" -C "$stage" || fail "could not extract $archive_name" ;;
+    esac
     extracted="$stage/snt-${tag}-${platform}"
     [ -x "$extracted/snt" ] || fail "archive does not contain an executable snt"
     check_linux_runtime "$extracted/snt"

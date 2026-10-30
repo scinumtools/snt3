@@ -15,9 +15,10 @@ build options, or integrating a development version of the library.
 Precompiled ``snt`` executable
 ------------------------------
 
-Download the archive for your system from the `latest GitHub release
-<https://github.com/scinumtools/snt3/releases/latest>`_, or use the installer
-for Linux x86-64 and macOS ARM64. It finds the latest release and installs
+Download either multi-platform bundle (``.tar.gz`` or ``.zip``) from the
+`latest GitHub release <https://github.com/scinumtools/snt3/releases/latest>`_,
+or use the installer for Linux x86-64 and macOS ARM64. It selects the matching
+platform archive from the bundle and installs
 ``snt`` under ``~/.local`` without administrator rights:
 
 .. code-block:: console
@@ -37,8 +38,10 @@ executable, and checks that it runs. If ``~/.local/bin`` is not already on
 
 Use ``sh install-cli.sh --version vX.Y.Z`` to install a specific release, or
 ``sh install-cli.sh --prefix /path/to/prefix`` for a shared project directory.
-On a cluster without network access, download the archive on a login node and
-run ``sh install-cli.sh --archive /path/to/snt-vX.Y.Z-linux-x86_64.tar.gz``.
+On a cluster without network access, download ``snt-vX.Y.Z-bundle.tar.gz`` on a
+login node and run ``sh install-cli.sh --archive /path/to/snt-vX.Y.Z-bundle.tar.gz``.
+The shell installer also accepts the ZIP bundle when ``unzip`` is available.
+Separate platform archives from older releases are accepted as well.
 
 To remove all releases installed by this script, run:
 
@@ -60,7 +63,10 @@ user's profile and adds its command directory to the user ``PATH``:
    powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install-cli.ps1
 
 Use ``-Version vX.Y.Z``, ``-Prefix C:\path\to\prefix``, or ``-Archive
-C:\path\to\snt-vX.Y.Z-windows-x86_64.zip`` for the corresponding options.
+C:\path\to\snt-vX.Y.Z-bundle.zip`` for the corresponding options. Separate
+Windows archives from older releases are also accepted. The PowerShell
+installer can also read the ``.tar.gz`` bundle when Windows ``tar.exe`` is
+available.
 Open a new terminal after installation to use ``snt`` by name.
 
 To remove all releases installed by the PowerShell script, run:
@@ -74,10 +80,10 @@ Add ``-Version vX.Y.Z`` to remove only one release, and pass the original
 command shim and the user ``PATH`` entry it added when no installed command
 remains. Open a new terminal to see the updated ``PATH``.
 
-The archives contain the command-line application, not the C++ development
+The bundle contains platform-specific command-line applications, not the C++ development
 libraries or Python bindings. The ``snt hub`` command additionally requires
 Git and Python 3 to fetch and run project adapters.
-The release archives include the ``snt view`` desktop viewer. It requires a
+The bundled executables include the ``snt view`` desktop viewer. It requires a
 working graphical desktop and OpenGL support on the target machine.
 
 

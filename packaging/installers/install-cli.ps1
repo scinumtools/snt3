@@ -94,8 +94,8 @@ if ($env:PROCESSOR_ARCHITECTURE -ne 'AMD64') {
 if ($Archive) {
     $Archive = (Resolve-Path -LiteralPath $Archive).Path
     $name = [IO.Path]::GetFileName($Archive)
-    if ($name -notmatch '^snt-(v[0-9]+\.[0-9]+\.[0-9]+)-windows-x86_64\.zip$') {
-        throw 'Expected an snt-<version>-windows-x86_64.zip archive.'
+    if ($name -notmatch '^snt-(v[0-9]+\.[0-9]+\.[0-9]+)-(bundle\.(zip|tar\.gz)|windows-x86_64\.zip)$') {
+        throw 'Expected an snt-<version>-bundle.zip, .tar.gz, or snt-<version>-windows-x86_64.zip archive.'
     }
     $archiveTag = $Matches[1]
     if ($Version -ne 'latest' -and $Version -ne $archiveTag) {
@@ -110,7 +110,7 @@ if ($Version -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') {
     throw "Invalid release tag: $Version"
 }
 
-$name = "snt-$Version-windows-x86_64.zip"
+$name = if ($Archive) { [IO.Path]::GetFileName($Archive) } else { "snt-$Version-bundle.zip" }
 $target = Join-Path $versions $Version
 New-Item -ItemType Directory -Force -Path $versions, $bin | Out-Null
 
@@ -128,10 +128,39 @@ if (-not (Test-Path -LiteralPath $target)) {
         if (-not $Archive) {
             $Archive = Join-Path $stage $name
             $url = "https://github.com/scinumtools/snt3/releases/download/$Version/$name"
-            Invoke-WebRequest -Uri $url -OutFile $Archive -UseBasicParsing
+            try {
+                Invoke-WebRequest -Uri $url -OutFile $Archive -UseBasicParsing
+            } catch {
+                $name = "snt-$Version-bundle.tar.gz"
+                $Archive = Join-Path $stage $name
+                $url = "https://github.com/scinumtools/snt3/releases/download/$Version/$name"
+                try {
+                    Invoke-WebRequest -Uri $url -OutFile $Archive -UseBasicParsing
+                } catch {
+                    $name = "snt-$Version-windows-x86_64.zip"
+                    $Archive = Join-Path $stage $name
+                    $url = "https://github.com/scinumtools/snt3/releases/download/$Version/$name"
+                    Invoke-WebRequest -Uri $url -OutFile $Archive -UseBasicParsing
+                }
+            }
         }
-        Expand-Archive -LiteralPath $Archive -DestinationPath $stage
-        $extracted = Join-Path $stage "snt-$Version-windows-x86_64"
+        if ($name -eq "snt-$Version-bundle.tar.gz") {
+            & tar.exe -xzf $Archive -C $stage "snt-$Version-windows-x86_64.zip"
+            if ($LASTEXITCODE -ne 0) { throw 'Could not extract the Windows archive from the release bundle.' }
+        } else {
+            Expand-Archive -LiteralPath $Archive -DestinationPath $stage
+        }
+        if ($name -like "snt-$Version-bundle.*") {
+            $platformArchive = Join-Path $stage "snt-$Version-windows-x86_64.zip"
+            if (-not (Test-Path -LiteralPath $platformArchive -PathType Leaf)) {
+                throw 'Bundle does not contain the Windows x86-64 archive.'
+            }
+            $platformStage = Join-Path $stage 'windows'
+            Expand-Archive -LiteralPath $platformArchive -DestinationPath $platformStage
+            $extracted = Join-Path $platformStage "snt-$Version-windows-x86_64"
+        } else {
+            $extracted = Join-Path $stage "snt-$Version-windows-x86_64"
+        }
         $executable = Join-Path $extracted 'snt.exe'
         if (-not (Test-Path -LiteralPath $executable)) {
             throw 'Archive does not contain snt.exe.'

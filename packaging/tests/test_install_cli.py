@@ -7,6 +7,7 @@ import subprocess
 import tarfile
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 
@@ -27,14 +28,32 @@ class InstallCliTest(unittest.TestCase):
         self.platform = ARCHIVES[SYSTEM]
         self.archive = self.make_archive(self.tag)
 
-    def make_archive(self, tag):
-        archive = self.root / f"snt-{tag}-{self.platform}.tar.gz"
+    def make_archive(self, tag, legacy=False, include_platform=True, bundle_format="tar.gz"):
+        archive = self.root / (f"snt-{tag}-{self.platform}.tar.gz" if legacy else f"snt-{tag}-bundle.{bundle_format}")
         executable = f"#!/bin/sh\nprintf '{tag[1:]}\\n'\n".encode()
-        with tarfile.open(archive, "w:gz") as package:
+        payload = io.BytesIO()
+        with tarfile.open(fileobj=payload, mode="w:gz") as package:
             member = tarfile.TarInfo(f"snt-{tag}-{self.platform}/snt")
             member.mode = 0o755
             member.size = len(executable)
             package.addfile(member, io.BytesIO(executable))
+        if legacy:
+            archive.write_bytes(payload.getvalue())
+        elif bundle_format == "zip":
+            with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
+                if include_platform:
+                    bundle.writestr(f"snt-{tag}-{self.platform}.tar.gz", payload.getvalue())
+                bundle.writestr(f"snt-{tag}-windows-x86_64.zip", b"other platform")
+        else:
+            with tarfile.open(archive, "w:gz") as bundle:
+                if include_platform:
+                    member = tarfile.TarInfo(f"snt-{tag}-{self.platform}.tar.gz")
+                    member.size = len(payload.getvalue())
+                    bundle.addfile(member, io.BytesIO(payload.getvalue()))
+                other = b"other platform"
+                member = tarfile.TarInfo(f"snt-{tag}-windows-x86_64.zip")
+                member.size = len(other)
+                bundle.addfile(member, io.BytesIO(other))
         return archive
 
     def install(self, *extra, env=None):
@@ -70,6 +89,22 @@ class InstallCliTest(unittest.TestCase):
         self.assertEqual(subprocess.check_output([command], text=True), "0.9.7\n")
         second = self.install()
         self.assertEqual(second.returncode, 0, second.stderr)
+
+    def test_legacy_platform_archive_still_installs(self):
+        self.archive = self.make_archive(self.tag, legacy=True)
+        result = self.install()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_zip_bundle_installs_when_unzip_is_available(self):
+        self.archive = self.make_archive(self.tag, bundle_format="zip")
+        result = self.install()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_bundle_requires_the_current_platform(self):
+        self.archive = self.make_archive(self.tag, include_platform=False)
+        result = self.install()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("bundle does not contain", result.stderr)
 
     def test_missing_linux_library_is_named_before_install(self):
         if SYSTEM[0] != "Linux":
