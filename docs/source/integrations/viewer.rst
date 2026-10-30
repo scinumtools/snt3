@@ -142,17 +142,22 @@ disabled until a guided setup override has been committed.
 Open source and reload
 ----------------------
 
-For live ``DIPfile`` projects, selecting a source opens it in the source
-section; **View Source** from a node inspector navigates to the source that
-defines it. Documents in the project bundle can be edited in the built-in
+For live ``DIPfile`` projects and standalone ``.dip`` or ``.dipl`` files,
+selecting a source opens it in the source section; **Open source** from a node
+inspector navigates to the line that defines it. The opened source can be edited in the built-in
 editor, which provides syntax highlighting, line numbers, and diagnostics with
 line references. **Check** validates the current buffer using its source type:
 DIPL documents use the normal DIP parser, while array and table block values
 use their corresponding value parsers. **Format** formats DIPL code. Find and
 replace supports previous/next navigation, replace current or all matches, and
 a case-sensitivity option. **Save** writes the document and reloads the
-project; **Discard** abandons unsaved edits. **Save As** copies the complete
+values; **Discard** abandons unsaved edits. For ``DIPfile`` projects, **Save As** copies the complete
 bundled project to a chosen directory and switches the viewer to that copy.
+**File → Export DIPH5...** writes the currently evaluated live project to a
+``.diph5`` snapshot in a chosen directory. The dialog lets you choose the file
+name and reports the saved path. Save or discard source edits and commit any
+setup changes before exporting. Export leaves the open project in place and
+does not replace an existing file.
 Each file-backed override source also has a **Delete override** button. It
 removes that file and its ``DIPfile`` registration after validating the
 remaining project. Save or discard unsaved edits before deleting a source.
@@ -160,7 +165,12 @@ If the document changed on disk after it was opened, saving is rejected to
 avoid overwriting that change. Opening another source or reloading is blocked
 while the current document has unsaved edits.
 
-Standalone ``.dip`` and ``.dipl`` inputs remain read-only in this version.
+Standalone ``.dip`` and ``.dipl`` files appear under **Local sources** and can
+be checked, edited, and saved. They do not offer project-only actions such as
+**Save As**, guided setup, or DIPH5 export.
+Use **File → Convert to Project...** to create a ``DIPfile`` beside a standalone
+source and open it as a project. The source stays in place. Conversion refuses
+to replace an existing ``DIPfile``.
 An overridden parameter offers its effective override and original
 declaration. Custom units and schemas link to their definitions. The source
 tab also has a **Copy source** button. For code embedded as a string in a

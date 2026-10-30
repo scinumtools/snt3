@@ -12,7 +12,7 @@
 namespace snt::dip {
 
     /**
-     * A source editing session for a file-backed DIP project.
+     * A source editing session for a file-backed DIP project or standalone DIPL file.
      *
      * The session retains the project as an in-memory bundle. Candidate text is
      * evaluated by replaying that bundle, so relative includes and normal DIP
@@ -21,8 +21,8 @@ namespace snt::dip {
      */
     class EditSession {
       public:
-        /** Package a project and its evaluated local inputs for editing. */
-        explicit EditSession(const std::filesystem::path& project_file, bool allow_unset_setup_values = false);
+        /** Load a project or standalone .dip/.dipl file for editing. */
+        explicit EditSession(const std::filesystem::path& artifact, bool allow_unset_setup_values = false);
 
         /** Return the original packaged project. */
         const ProjectBundle& bundle() const { return bundle_; }
@@ -53,6 +53,12 @@ namespace snt::dip {
         /** Replace and save one block value inside its original bundled source document. */
         void save_block(const std::string& path, const std::string& text);
 
+        /** Create a new project-root .dip source and register it as a code[] entry. */
+        void create_code_source(const std::string& filename);
+
+        /** Create a new project-root .dip source and register it as a named sources[] entry. */
+        void create_named_source(const std::string& name, const std::string& filename);
+
         /** Delete one file-backed override and its DIPfile registration after validating the remaining project. */
         void delete_override(std::size_t project_entry_index);
 
@@ -69,10 +75,12 @@ namespace snt::dip {
         );
 
       private:
+        void create_source(const std::string& filename, const std::optional<std::string>& name);
         std::pair<std::string, std::string> document_for_block(const std::string& path,
                                                                const std::string& text) const;
         ProjectBundle bundle_;
         std::filesystem::path root_;
+        bool standalone_ = false;
         bool allow_unset_setup_values_ = false;
         Environment baseline_;
     };

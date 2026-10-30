@@ -72,6 +72,11 @@ namespace snt::view {
         const std::vector<core::Diagnostic>& diagnostics() const { return diagnostics_; }
         /** Request that the editor scroll to a one-based source line. */
         void request_line_jump(std::size_t line) { requested_line_ = line; }
+        /** Highlight and scroll to a line in the currently displayed source text. */
+        void focus_line(std::size_t line) {
+            target_line_ = line;
+            request_line_jump(line);
+        }
         /** Consume a pending source-line jump request. */
         std::optional<std::size_t> take_line_jump() {
             auto line = requested_line_;

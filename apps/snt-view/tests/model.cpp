@@ -38,8 +38,59 @@ int main() {
     const auto snapshot_path = std::filesystem::temp_directory_path() / ("snt-view-model-" + suffix + ".diph5");
     const auto inline_dir = std::filesystem::temp_directory_path() / ("snt-view-inline-" + suffix);
     try {
+        const auto standalone_dir = inline_dir / "standalone";
+        std::filesystem::create_directories(standalone_dir);
+        const auto standalone_file = standalone_dir / "test.dip";
+        write(standalone_file, "value int = 1\n");
+        snt::view::ViewerModel standalone(standalone_file);
+        const auto* standalone_source = standalone.object("@code?0");
+        check(standalone.object("@local") && standalone_source && standalone_source->parent == "@local" &&
+                  standalone_source->label == "test.dip" && standalone_source->source_kind == "code",
+              "A standalone DIPL file should appear under Local sources");
+        const auto standalone_targets = standalone.source_targets(*standalone_source);
+        check(standalone_targets.size() == 1 && standalone_targets.front().file == standalone_file &&
+                  standalone.source_object_path(standalone.source_targets(*standalone.object("value")).front()) ==
+                      "@code?0" &&
+                  standalone.editable_document_path(standalone_file) == "test.dip" && !standalone.can_save_as(),
+              "Standalone source links should open the editable file");
+        check(standalone.preview_document("test.dip", "value int = 2\n").candidate_valid &&
+                  !standalone.preview_document("test.dip", "value int =\n").candidate_valid &&
+                  standalone.save_document("test.dip", "value int = 2\n") &&
+                  standalone.environment()["value"].as<int>() == 2,
+              "A standalone source should check, save, and reload edited values");
+        write(standalone_file, "value int = 3\n");
+        check(!standalone.save_document("test.dip", "value int = 4\n") &&
+                  standalone.environment()["value"].as<int>() == 2,
+              "Saving must not overwrite a standalone file changed outside the editor");
+        const auto dipl_file = standalone_dir / "test.dipl";
+        write(dipl_file, "answer int = 5\n");
+        snt::view::ViewerModel dipl(dipl_file);
+        check(dipl.object("@code?0") && dipl.editable_document_path(dipl_file) == "test.dipl" &&
+                  dipl.save_document("test.dipl", "answer int = 6\n") && dipl.environment()["answer"].as<int>() == 6,
+              "Standalone .dipl files should support the same editing workflow");
+        write(standalone_dir / "child.dip", "base int = 3\n");
+        const auto referencing_file = standalone_dir / "referencing.dip";
+        write(referencing_file, "$source lookup = \"child.dip\"\nvalue int = {lookup?base}\n");
+        snt::view::ViewerModel referencing(referencing_file);
+        check(referencing.preview_document(
+                  "referencing.dip", "$source lookup = \"child.dip\"\nvalue int = ({lookup?base} + 1)\n"
+              ).candidate_valid,
+              "Checking a standalone edit should resolve sources relative to the original file");
+        const auto convertible_file = standalone_dir / "convert.dip";
+        write(convertible_file, "converted int = 9\n");
+        snt::view::ViewerModel convertible(convertible_file);
+        check(convertible.can_convert_to_project() && convertible.convert_to_project() &&
+                  convertible.artifact() == standalone_dir / "DIPfile" && convertible.can_save_as() &&
+                  !convertible.can_convert_to_project() && convertible.object("@dipfile-source") &&
+                  convertible.environment()["converted"].as<int>() == 9 &&
+                  convertible.editable_document_path(convertible_file) == "convert.dip",
+              "Converting a standalone file should open its new editable project");
+        check(!dipl.convert_to_project() && dipl.can_convert_to_project() &&
+                  dipl.artifact() == dipl_file && dipl.environment()["answer"].as<int>() == 6,
+              "Conversion must preserve a standalone viewer when a DIPfile already exists");
         write(path, "a int = 1\nb int = 2\ngroup\n  boundary[inlet]\n    speed int = 4\n");
         snt::view::ViewerModel model(path);
+        check(!model.can_export_diph5(), "Standalone source files should not expose project snapshot export");
         check(model.input_path() == path.string(), "Absolute input path was changed for display");
         check(
             model.display_file_path(path.string()) == path.filename().string(),
@@ -208,7 +259,7 @@ int main() {
         );
         check(
             project.object("@project")->label == "Resolved nodes" &&
-                project.object("@overrides")->label == "Overridden nodes",
+                project.object("@overrides")->label == "Overrides",
             "Resolved and overridden branch labels are incorrect"
         );
         check(
@@ -282,6 +333,12 @@ int main() {
         );
         check(materials && materials->hierarchy_kind == snt::dip::Path::Kind::Map, "Example map kind is incorrect");
         check(probes && probes->hierarchy_kind == snt::dip::Path::Kind::List, "Example list kind is incorrect");
+        const auto* optional_note = project.object("experiment.optional_note");
+        check(optional_note && !optional_note->has_value &&
+                  optional_note->node_dtype == snt::dip::NodeDtype::String &&
+                  optional_note->value_origin == snt::dip::ValueOrigin::None &&
+                  optional_note->children.empty(),
+              "Explicit none values should be distinguished from groups in the browser");
         const auto* override = project.object("@override?experiment.geometry.length");
         check(
             project.object("@overrides") && override && override->has_value && override->parent == "@overrides" &&
@@ -543,6 +600,19 @@ int main() {
         write(inline_dir / "DIPfile", "code[]\n  string = \"\"\"\nanswer int = 7\n\"\"\"\n");
         snt::view::ViewerModel inline_project(inline_dir / "DIPfile");
         check(inline_project.object("answer"), "Embedded project value is missing");
+        const auto exported_snapshot = inline_dir / "exported.diph5";
+        check(inline_project.can_export_diph5() && inline_project.export_diph5(exported_snapshot) &&
+                  std::filesystem::exists(exported_snapshot),
+              "A live project should export a DIPH5 snapshot");
+        snt::dip::Environment exported_environment;
+        exported_environment.load(exported_snapshot);
+        check(exported_environment.get_node("answer")->value->to_string() == "7" &&
+                  inline_project.artifact() == inline_dir / "DIPfile",
+              "The exported snapshot should retain evaluated values without replacing the open project");
+        check(!inline_project.export_diph5(exported_snapshot) &&
+                  inline_project.error().find("Refusing to replace") != std::string::npos &&
+                  !inline_project.export_diph5(inline_dir / "wrong.txt"),
+              "Snapshot export should reject existing files and non-DIPH5 names");
         check(
             inline_project.environment().project_entries().size() == 1 &&
                 inline_project.environment().project_entries().front().resolved_path.empty() &&
@@ -570,6 +640,35 @@ int main() {
                 empty_project.object("")->children.front() == "@dipfile",
             "An empty DIPfile should have an inspectable branch"
         );
+        check(empty_project.create_code_source("new-source.dip") &&
+                  empty_project.selection() == "@code?0" &&
+                  empty_project.object("@code?0") &&
+                  empty_project.document_text("new-source.dip") == "# New source\n" &&
+                  std::filesystem::exists(inline_dir / "empty/new-source.dip"),
+              "Creating a source should register and open it in the project");
+        check(!empty_project.create_code_source("new-source.dip") &&
+                  !empty_project.create_code_source("../outside.dip") &&
+                  !empty_project.create_code_source("invalid\".dip") &&
+                  empty_project.environment().project_entries().size() == 1,
+              "Creating a source must reject duplicate and unsafe filenames");
+        write(inline_dir / "empty/existing.dip", "existing int = 1\n");
+        check(!empty_project.create_code_source("existing.dip") &&
+                  !empty_project.object("@code?1") &&
+                  std::filesystem::file_size(inline_dir / "empty/existing.dip") > 0,
+              "Creating a source must preserve existing project files");
+        check(empty_project.create_named_source("reference", "reference.dip") &&
+                  empty_project.selection() == "reference?" &&
+                  empty_project.object("reference?") &&
+                  empty_project.document_text("reference.dip") == "# New named source\n" &&
+                  std::filesystem::exists(inline_dir / "empty/reference.dip") &&
+                  empty_project.environment().project_entries().size() == 2,
+              "Creating a named source should register and open it in the project");
+        check(!empty_project.create_named_source("reference", "another.dip") &&
+                  !empty_project.create_named_source("bad name", "another.dip") &&
+                  !empty_project.create_named_source("other", "reference.dip") &&
+                  !std::filesystem::exists(inline_dir / "empty/another.dip") &&
+                  empty_project.environment().project_entries().size() == 2,
+              "Creating a named source must reject duplicate names, paths, and invalid identifiers");
         const auto setup_dir = inline_dir / "setup";
         std::filesystem::create_directory(setup_dir);
         write(setup_dir / "DIPfile", "code[]\n  file = \"settings.dip\"\noverrides[]\n  file = \"manual.dip\"\n");

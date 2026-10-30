@@ -4,6 +4,7 @@
 #include <cerrno>
 #include <fstream>
 #include <snt/dip/comparison.h>
+#include <snt/dip/artifact.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/inspect/diagnostic.h>
 #include "../helpers.h"
@@ -48,9 +49,29 @@ namespace snt::dip {
             throw std::invalid_argument("Document is not part of the packaged project: " + path);
         }
 
-        Environment evaluate(const ProjectBundle& bundle, const bool allow_unset_setup_values) {
+        ProjectBundle load_edit_bundle(const std::filesystem::path& artifact, const bool allow_unset_setup_values) {
+            if (detect_artifact(artifact) == ArtifactKind::Project)
+                return package_project(artifact, {}, allow_unset_setup_values);
+            if (detect_artifact(artifact) == ArtifactKind::DIPL) {
+                const auto filename = std::filesystem::canonical(artifact).filename().generic_string();
+                return {filename, {{filename, read_project_file(artifact)}}};
+            }
+            throw std::invalid_argument("Only a DIPfile project or standalone .dip/.dipl file can be edited.");
+        }
+
+        Environment evaluate(const ProjectBundle& bundle, const bool allow_unset_setup_values,
+                             const bool standalone, const std::filesystem::path& root) {
             DIP parser;
-            parser.add_project(bundle);
+            if (standalone) {
+                const auto source = root / bundle.entry;
+                parser.set_project_file_reader([&](const std::filesystem::path& requested) {
+                    if (std::filesystem::weakly_canonical(requested) == source)
+                        return find_file(bundle, bundle.entry).text;
+                    return read_project_file(requested);
+                });
+                parser.add_file(source);
+            } else
+                parser.add_project(bundle);
             return parser.parse(false, true, allow_unset_setup_values);
         }
 
@@ -100,12 +121,13 @@ namespace snt::dip {
         }
 
         PreviewResult evaluate_candidate(const Environment& baseline, const ProjectBundle& candidate_bundle,
-                                         const bool allow_unset_setup_values) {
+                                         const bool allow_unset_setup_values, const bool standalone,
+                                         const std::filesystem::path& root) {
             PreviewResult result;
             Environment candidate;
             result.baseline_valid = true;
             try {
-                candidate = evaluate(candidate_bundle, allow_unset_setup_values);
+                candidate = evaluate(candidate_bundle, allow_unset_setup_values, standalone, root);
                 result.candidate_valid = true;
             } catch (const std::exception& error) {
                 result.candidate_diagnostics.push_back(diagnostic_from_exception(error));
@@ -224,11 +246,12 @@ namespace snt::dip {
 
     } // namespace
 
-    EditSession::EditSession(const std::filesystem::path& project_file, const bool allow_unset_setup_values)
-        : bundle_(package_project(project_file, {}, allow_unset_setup_values)),
-          root_(std::filesystem::canonical(project_file).parent_path()),
+    EditSession::EditSession(const std::filesystem::path& artifact, const bool allow_unset_setup_values)
+        : bundle_(load_edit_bundle(artifact, allow_unset_setup_values)),
+          root_(std::filesystem::canonical(artifact).parent_path()),
+          standalone_(detect_artifact(artifact) == ArtifactKind::DIPL),
           allow_unset_setup_values_(allow_unset_setup_values),
-          baseline_(evaluate(bundle_, allow_unset_setup_values_)) {}
+          baseline_(evaluate(bundle_, allow_unset_setup_values_, standalone_, root_)) {}
 
     bool EditSession::contains_document(const std::string& spelling) const {
         try {
@@ -252,7 +275,7 @@ namespace snt::dip {
                 file.text = text;
                 break;
             }
-        return evaluate_candidate(baseline_, candidate, allow_unset_setup_values_);
+        return evaluate_candidate(baseline_, candidate, allow_unset_setup_values_, standalone_, root_);
     }
 
     PreviewResult EditSession::preview_block(const std::string& path, const std::string& text) const {
@@ -325,7 +348,94 @@ namespace snt::dip {
         save_document(replacement.first, replacement.second);
     }
 
+    void EditSession::create_code_source(const std::string& filename) {
+        create_source(filename, std::nullopt);
+    }
+
+    void EditSession::create_named_source(const std::string& name, const std::string& filename) {
+        if (name.empty() || !(std::isalpha(static_cast<unsigned char>(name.front())) || name.front() == '_') ||
+            !std::all_of(name.begin() + 1, name.end(), [](unsigned char ch) {
+                return std::isalnum(ch) || ch == '_';
+            }))
+            throw std::invalid_argument("Named source name must start with a letter or '_' and contain only letters, digits, and '_'.");
+        if (baseline_.sources.entries().find(name) != baseline_.sources.entries().end())
+            throw std::runtime_error("Source name is already used in the project: " + name);
+        create_source(filename, name);
+    }
+
+    void EditSession::create_source(const std::string& filename, const std::optional<std::string>& source_name) {
+        if (standalone_)
+            throw std::logic_error("Creating sources requires a DIPfile project.");
+        const auto relative = checked_path(filename);
+        if (relative.has_parent_path() || relative.extension() != ".dip" ||
+            relative.filename() == ".dip")
+            throw std::invalid_argument("New source must be a .dip filename in the project directory.");
+        const auto name = relative.generic_string();
+        if (!std::all_of(name.begin(), name.end(), [](unsigned char ch) {
+                return std::isalnum(ch) || ch == '-' || ch == '_' || ch == '.' || ch == ' ';
+            }))
+            throw std::invalid_argument("Source filename may contain only letters, digits, spaces, '.', '-' and '_'.");
+        if (contains_document(name))
+            throw std::runtime_error("Source is already registered in the project: " + name);
+        const auto target = root_ / relative;
+        if (std::filesystem::exists(target) || std::filesystem::is_symlink(target))
+            throw std::runtime_error("Refusing to replace existing file: " + target.string());
+
+        const auto manifest_file = root_ / bundle_.entry;
+        const auto& original_manifest = find_file(bundle_, bundle_.entry).text;
+        std::string edited_manifest = original_manifest;
+        if (!edited_manifest.empty() && edited_manifest.back() != '\n')
+            edited_manifest.push_back('\n');
+        if (source_name)
+            edited_manifest += "sources[]\n  name = \"" + *source_name + "\"\n  filepath = \"" + name + "\"\n";
+        else
+            edited_manifest += "code[]\n  file = \"" + name + "\"\n";
+        const std::string initial_text = source_name ? "# New named source\n" : "# New source\n";
+        ProjectBundle candidate_bundle = bundle_;
+        for (auto& file : candidate_bundle.files)
+            if (file.path == bundle_.entry) {
+                file.text = edited_manifest;
+                break;
+            }
+        candidate_bundle.files.push_back({name, initial_text});
+        Environment candidate = evaluate(candidate_bundle, allow_unset_setup_values_, standalone_, root_);
+        if (read_file(manifest_file) != original_manifest)
+            throw std::runtime_error("DIPfile changed on disk; reload before creating a source.");
+
+        static std::atomic<unsigned long long> sequence{0};
+        const auto temporary = root_ /
+            (name + ".snt-new-" + std::to_string(sequence.fetch_add(1, std::memory_order_relaxed)) + ".tmp");
+        try {
+            {
+                std::ofstream output(temporary, std::ios::binary | std::ios::trunc);
+                if (!output)
+                    throw std::runtime_error("Cannot create temporary source file: " + temporary.string());
+                output << initial_text;
+                output.flush();
+                if (!output)
+                    throw std::runtime_error("Cannot write temporary source file: " + temporary.string());
+            }
+            rename_new_directory(temporary, target);
+            try {
+                if (read_file(manifest_file) != original_manifest)
+                    throw std::runtime_error("DIPfile changed on disk; reload before creating a source.");
+                atomic_write(manifest_file, edited_manifest);
+            } catch (...) {
+                std::filesystem::remove(target);
+                throw;
+            }
+        } catch (...) {
+            std::error_code ignored;
+            std::filesystem::remove(temporary, ignored);
+            throw;
+        }
+        bundle_ = std::move(candidate_bundle);
+        baseline_ = std::move(candidate);
+    }
+
     void EditSession::delete_override(const std::size_t project_entry_index) {
+        if (standalone_)
+            throw std::logic_error("Deleting overrides requires a DIPfile project.");
         const auto& entries = baseline_.project_entries();
         if (project_entry_index >= entries.size() || entries[project_entry_index].kind != ProjectEntry::Kind::Override ||
             entries[project_entry_index].resolved_path.empty())
@@ -353,7 +463,7 @@ namespace snt::dip {
                            [&](const ProjectBundleFile& file) { return file.path == relative.generic_string(); }),
             candidate_bundle.files.end()
         );
-        Environment candidate = evaluate(candidate_bundle, allow_unset_setup_values_);
+        Environment candidate = evaluate(candidate_bundle, allow_unset_setup_values_, standalone_, root_);
         if (read_file(manifest_file) != original_manifest || read_file(override_file) != original_override)
             throw std::runtime_error("The DIPfile or override changed on disk; reload before deleting it.");
         atomic_write(manifest_file, edited_manifest);
@@ -374,7 +484,7 @@ namespace snt::dip {
             }
         std::optional<Environment> candidate_environment;
         try {
-            candidate_environment = evaluate(candidate_bundle, allow_unset_setup_values_);
+            candidate_environment = evaluate(candidate_bundle, allow_unset_setup_values_, standalone_, root_);
         } catch (const std::exception&) {
             // Invalid text can still be saved; keep the last valid comparison baseline.
         }
@@ -402,6 +512,8 @@ namespace snt::dip {
         const std::optional<std::string>& edited_path,
         const std::string& edited_text
     ) {
+        if (standalone_)
+            throw std::logic_error("Save As requires a DIPfile project.");
         if (destination_directory.empty() || destination_directory.filename().empty() ||
             destination_directory.filename() == "." || destination_directory.filename() == "..")
             throw std::invalid_argument("Save As requires a new project directory path.");
@@ -423,7 +535,7 @@ namespace snt::dip {
         }
         std::optional<Environment> candidate_environment;
         try {
-            candidate_environment = evaluate(candidate_bundle, allow_unset_setup_values_);
+            candidate_environment = evaluate(candidate_bundle, allow_unset_setup_values_, standalone_, root_);
         } catch (const std::exception&) {
             return false;
         }

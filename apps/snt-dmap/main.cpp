@@ -1,3 +1,5 @@
+#include "../snt/help.h"
+
 #include <chrono>
 #include <ctime>
 #include <fstream>
@@ -254,7 +256,7 @@ int module_dmap(int argc, char* argv[]) {
     InputParser input(argc, argv);
 
     if (input.cmdOptionExists("--help") || input.cmdOptionExists("-h")) {
-        std::cout << R"(
+        std::cout << snt::cli::format_help(R"(
 Scientific Numerical Tools v3 (SNT)
 Module: PUQ dimension-map generator
 
@@ -276,7 +278,7 @@ Options:
 Examples:
   snt dmap
   snt dmap -e
-)";
+)");
         return 0;
     }
 

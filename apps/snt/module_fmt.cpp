@@ -1,4 +1,5 @@
 #include "main.h"
+#include "help.h"
 
 #include <cstdio>
 #include <filesystem>
@@ -24,14 +25,29 @@ namespace {
 } // namespace
 
 int module_fmt(int argc, char* argv[]) {
+    const auto print_help = [] {
+        snt::cli::HelpPage page;
+        page.command = "format";
+        page.usage = "snt format [--check | --write] <file> [<file> ...]";
+        page.description = "Format DIPL source. Output goes to stdout unless --check or --write is used.";
+        page.arguments = "<file>  DIPL source file. Multiple files require --check or --write.";
+        page.options = R"(-h, --help  Show this help.
+--check     Report files that need formatting; exit 1 if any do.
+--write     Format files in place.)";
+        page.examples = "snt format parameters.dip\nsnt format --check parameters.dip\nsnt format --write a.dip b.dip";
+        std::cout << snt::cli::render_help(page);
+    };
+    if (argc == 2) {
+        print_help();
+        return 0;
+    }
     bool check = false;
     bool write = false;
     std::vector<std::filesystem::path> files;
     for (int i = 2; i < argc; ++i) {
         const std::string arg = argv[i];
         if (arg == "--help" || arg == "-h") {
-            std::cout << "Usage: snt format [--check | --write] <file> [<file> ...]\n"
-                         "Format DIPL source. Output goes to stdout unless --check or --write is used.\n";
+            print_help();
             return 0;
         }
         if (arg == "--check")

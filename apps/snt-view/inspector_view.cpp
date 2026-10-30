@@ -250,26 +250,27 @@ namespace snt::view {
                 }
                 return;
             }
-            if (object->role == ObjectRole::CodeSource && object->manifest_index) {
-                const auto& entry = model.environment().project_entries().at(*object->manifest_index);
+            if (object->role == ObjectRole::CodeSource) {
+                const auto* entry = object->manifest_index
+                    ? &model.environment().project_entries().at(*object->manifest_index) : nullptr;
+                const std::string resolved_path = entry ? entry->resolved_path : model.artifact().string();
                 cache.fields.emplace_back(
                     "Kind",
-                    entry.kind == dip::ProjectEntry::Kind::Override ? "Override source file"
-                    : entry.resolved_path.empty() ? "Inline local source"
-                                                  : "Local source file"
+                    entry && entry->kind == dip::ProjectEntry::Kind::Override ? "Override source file"
+                    : resolved_path.empty() ? "Inline local source" : "Local source file"
                 );
                 cache.fields.emplace_back(
                     "Source",
-                    entry.resolved_path.empty()
-                        ? model.display_file_path(model.artifact().string()) + ":" + std::to_string(entry.line)
-                        : model.display_file_path(entry.resolved_path)
+                    resolved_path.empty()
+                        ? model.display_file_path(model.artifact().string()) + ":" + std::to_string(entry->line)
+                        : model.display_file_path(resolved_path)
                 );
-                if (!entry.resolved_path.empty()) {
+                if (!resolved_path.empty()) {
                     const auto& sources = model.environment().sources.entries();
                     const auto source_matches_file = [&](const std::string& source_name) {
                         const auto source = sources.find(source_name);
                         return source != sources.end() && !source->second.path.empty() &&
-                               same_file(source->second.path, entry.resolved_path);
+                               same_file(source->second.path, resolved_path);
                     };
                     std::unordered_set<std::string> listed_nodes;
                     for (const auto& node : model.environment().nodes.get_nodes()) {
@@ -324,6 +325,8 @@ namespace snt::view {
             }
             if (!object->has_value) {
                 cache.fields.emplace_back("Kind", object->path.empty() ? "Artifact" : object_kind_name(*object));
+                if (object->value_origin == dip::ValueOrigin::None)
+                    cache.fields.emplace_back("Value", "none");
                 if (object->has_table) {
                     const auto table = view.table(object->node_path);
                     cache.fields.emplace_back("Rows", std::to_string(table.rows));
@@ -420,14 +423,14 @@ namespace snt::view {
 
     void draw_source_view(
         ViewerModel& model,
-        SourceView& source,
-        bool& scroll_to_target,
-        std::string& error,
-        std::string& edit_report,
+        SourceNavigationState& navigation,
         bool& request_save_as,
-        bool& select_source_tab,
         NotificationCenter& notifications
     ) {
+        auto& source = navigation.source;
+        auto& error = navigation.error;
+        auto& edit_report = navigation.edit_report;
+        auto& select_source_tab = navigation.select_tab;
         const auto* selected = model.object(model.selection());
         const bool block_value = selected && selected->role == ObjectRole::BlockSource;
         static SourceSearchState search;
@@ -438,7 +441,8 @@ namespace snt::view {
         ImGui::TextUnformatted(model.display_file_path(source.file().string()).c_str());
         ImGui::SameLine();
         const auto edit_path = model.editable_document_path(source.file());
-        ImGui::TextDisabled(":%zu  %s", source.source_line(), edit_path ? "Project source" : "Read-only");
+        ImGui::TextDisabled(":%zu  %s", source.source_line(),
+                            edit_path ? (model.can_export_diph5() ? "Project source" : "Source file") : "Read-only");
         if (source.dirty()) {
             ImGui::SameLine();
             ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f), "Modified");
@@ -458,7 +462,6 @@ namespace snt::view {
                 if (model.delete_override_source(*selected->manifest_index)) {
                     source = SourceView{};
                     select_source_tab = false;
-                    scroll_to_target = false;
                     error.clear();
                     edit_report.clear();
                     notifications.notify("Override source deleted and project reloaded.");
@@ -695,9 +698,12 @@ namespace snt::view {
                 editor_id
             );
             ImGuiWindow* editor_window = ImGui::FindWindowByName(editor_window_name);
-            if (const auto jump_line = source.take_line_jump(); jump_line && editor_window) {
-                const float target_y = static_cast<float>(*jump_line - 1) * line_height;
-                editor_window->Scroll.y = std::max(0.0f, target_y - editor_window->Size.y * 0.45f);
+            if (const auto jump_line = source.take_line_jump()) {
+                if (editor_window) {
+                    const float target_y = static_cast<float>(*jump_line - 1) * line_height;
+                    editor_window->Scroll.y = std::max(0.0f, target_y - editor_window->Size.y * 0.45f);
+                } else
+                    source.request_line_jump(*jump_line);
             }
             ImGui::BeginChild(
                 "##SourceLineNumbers",
@@ -725,6 +731,7 @@ namespace snt::view {
                     const bool is_search_match = search.active_match &&
                         line_for_offset(source.text(), search.matches[*search.active_match]) ==
                             static_cast<std::size_t>(index + 1);
+                    const bool is_target_line = source.target_line() == static_cast<std::size_t>(index + 1);
                     if (has_diagnostic)
                         ImGui::GetWindowDrawList()->AddCircleFilled(
                             ImVec2(position.x + 4.0f, position.y + line_height * 0.5f),
@@ -741,7 +748,8 @@ namespace snt::view {
                         ImVec2(position.x + gutter_width - number_width - 8.0f, position.y),
                         ImGui::GetColorU32(has_diagnostic ? ImVec4(0.82f, 0.30f, 0.28f, 1.0f)
                                                  : is_search_match ? ImVec4(0.88f, 0.68f, 0.20f, 1.0f)
-                                                                   : ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled)),
+                                                 : is_target_line ? ImVec4(0.24f, 0.48f, 0.54f, 1.0f)
+                                                                  : ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled)),
                         number.c_str()
                     );
                     ImGui::Dummy(ImVec2(gutter_width - 4.0f, line_height));
@@ -787,10 +795,6 @@ namespace snt::view {
         if (const auto jump_line = source.take_line_jump(); jump_line && *jump_line > 0) {
             const float target_y = static_cast<float>(*jump_line - 1) * line_height;
             ImGui::SetScrollY(std::max(0.0f, target_y - ImGui::GetWindowHeight() * 0.45f));
-        } else if (scroll_to_target && source.target_line() > 0) {
-            const float target_y = static_cast<float>(source.target_line() - 1) * line_height;
-            ImGui::SetScrollY(std::max(0.0f, target_y - ImGui::GetWindowHeight() * 0.45f));
-            scroll_to_target = false;
         }
         const auto& lines = source.lines();
         const float number_width = ImGui::CalcTextSize(std::to_string(lines.size()).c_str()).x + 18.0f;
@@ -841,12 +845,11 @@ namespace snt::view {
     void draw_inspector(
         ViewerModel& model,
         InspectorCache& cache,
-        SourceView& source,
-        bool& select_source_tab,
-        bool& scroll_to_target,
-        std::string& source_error,
+        SourceNavigationState& navigation,
         NotificationCenter& notifications
     ) {
+        auto& source = navigation.source;
+        auto& source_error = navigation.error;
         const dip::Inspector view{model.environment()};
         if (!cache.valid || cache.path != model.selection() || cache.revision != model.revision())
             refresh_inspector(model, cache);
@@ -891,8 +894,7 @@ namespace snt::view {
                         }
                         if (model.select(source_path)) {
                             source_error.clear();
-                            select_source_tab = true;
-                            scroll_to_target = true;
+                            navigation.pending_target = target;
                         }
                     }
                 }
@@ -917,6 +919,32 @@ namespace snt::view {
         };
         for (const auto& [label, value] : cache.fields)
             labeled_text(label, value);
+        if (const auto* object = model.object(model.selection());
+            object && (object->role == ObjectRole::Path || object->role == ObjectRole::Project ||
+                       object->role == ObjectRole::NamedSourceNodeGroup) &&
+            !object->children.empty()) {
+            ImGui::SeparatorText("Children");
+            for (const auto& path : object->children) {
+                const auto* child = model.object(path);
+                if (!child || child->parent != object->path)
+                    continue;
+                ImGui::PushID(path.c_str());
+                const std::string label = "    " + child->label;
+                const bool selected = ImGui::Selectable(label.c_str());
+                const float icon_size = ImGui::GetFontSize() * 0.72f;
+                const ImVec2 row = ImGui::GetItemRectMin();
+                draw_object_icon(
+                    *child,
+                    ImVec2(row.x + 4.0f, row.y + (ImGui::GetItemRectSize().y - icon_size) * 0.5f),
+                    icon_size
+                );
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Go to %s", child->path.c_str());
+                ImGui::PopID();
+                if (selected)
+                    model.select(path);
+            }
+        }
         if (!cache.source_nodes.empty()) {
             ImGui::SeparatorText("Nodes");
             for (const auto& [label, target] : cache.source_nodes)
@@ -988,7 +1016,7 @@ namespace snt::view {
         notifications.observe("inspector-error", cache.error, NoticeLevel::Error);
     }
 
-    bool open_selected_source(ViewerModel& model, SourceView& source, std::string& error) {
+    static bool open_selected_source(ViewerModel& model, SourceView& source, std::string& error) {
         const auto* selected = model.object(model.selection());
         if (!selected || (selected->role != ObjectRole::Source && selected->role != ObjectRole::CodeSource &&
                           selected->role != ObjectRole::BlockSource && selected->role != ObjectRole::DIPfileSource))
@@ -1029,6 +1057,28 @@ namespace snt::view {
             parsed != model.environment().sources.entries().end() && parsed->second.code != source.text())
             error = "Source file changed since parsing; reload to update line locations.";
         return true;
+    }
+
+    void SourceNavigationState::clear() {
+        source = SourceView{};
+        owner.clear();
+        pending_target.reset();
+        error.clear();
+        edit_report.clear();
+        select_tab = false;
+    }
+
+    bool SourceNavigationState::open_selected(ViewerModel& model) {
+        const bool opened = open_selected_source(model, source, error);
+        if (opened) {
+            owner = model.selection();
+            if (pending_target) {
+                source.focus_line(pending_target->block_path ? 1 : pending_target->line);
+                select_tab = true;
+            }
+        }
+        pending_target.reset();
+        return opened;
     }
 
 } // namespace snt::view

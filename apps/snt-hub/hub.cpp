@@ -1,5 +1,6 @@
 #include "hub.h"
 
+#include "../snt/help.h"
 #include "process.h"
 
 #include <algorithm>
@@ -1032,41 +1033,60 @@ namespace snt::hub {
         }
 
         void help(const std::string& action = {}) {
+            snt::cli::HelpPage page;
+            page.module = "SNT Hub";
             if (action == "setup") {
-                std::cout << "Usage: snt hub setup EXAMPLE [--output DIR] [--override-file PATH] [--inputs-only] "
-                             "[--workspace DIR]\n"
-                             "Prepare a run in the current workspace (default: runs/EXAMPLE).\n";
+                page.command = "setup";
+                page.usage = "snt hub setup EXAMPLE [--output DIR] [--override-file PATH] [--inputs-only] [--workspace DIR]";
+                page.description = "Prepare a run in the current workspace (default: runs/EXAMPLE).";
+                page.arguments = "EXAMPLE  Example recipe from the current workspace.";
+                page.options = R"(-h, --help          Show this help.
+--output DIR         Write the prepared run to DIR.
+--override-file PATH Apply a DIPL override file.
+--inputs-only        Prepare inputs without building or running.
+--workspace DIR      Use a different local workspace.)";
+                page.examples = "snt hub setup EXAMPLE --inputs-only";
             } else if (action == "fetch") {
-                std::cout << "Usage: snt hub fetch PROJECT [--dir PATH] [--revision HUB_SHA]\n"
-                             "Fetch a pinned project into a local scientific workspace.\n";
+                page.command = "fetch";
+                page.usage = "snt hub fetch PROJECT [--dir PATH] [--revision HUB_SHA]";
+                page.description = "Fetch a pinned project into a local scientific workspace.";
+                page.arguments = "PROJECT  Project name from the live catalogue.";
+                page.options = R"(-h, --help       Show this help.
+--dir PATH         Destination directory.
+--revision HUB_SHA Fetch the specified catalogue revision.)";
+                page.examples = "snt hub fetch PROJECT";
             } else if (action == "build") {
-                std::cout << "Usage: snt hub build [--setup DIR] [--profile NAME] [--workspace DIR]\n"
-                             "Build with a reviewed project recipe, when declared by this workspace.\n";
+                page.command = "build";
+                page.usage = "snt hub build [--setup DIR] [--profile NAME] [--workspace DIR]";
+                page.description = "Build with a reviewed project recipe, when declared by this workspace.";
+                page.options = R"(-h, --help      Show this help.
+--setup DIR       Prepared run directory.
+--profile NAME    Build profile.
+--workspace DIR   Use a different local workspace.)";
+                page.examples = "snt hub build --setup runs/EXAMPLE";
             } else if (action == "run") {
-                std::cout << "Usage: snt hub run [--setup DIR] [--executable PATH] [--workspace DIR]\n"
-                             "Run a complete setup with a reviewed local project recipe.\n";
+                page.command = "run";
+                page.usage = "snt hub run [--setup DIR] [--executable PATH] [--workspace DIR]";
+                page.description = "Run a complete setup with a reviewed local project recipe.";
+                page.options = R"(-h, --help        Show this help.
+--setup DIR         Prepared run directory.
+--executable PATH   Use a local executable.
+--workspace DIR     Use a different local workspace.)";
+                page.examples = "snt hub run --setup runs/EXAMPLE";
             } else {
-                std::cout << "\nScientific Numerical Tools v3 (SNT)\n"
-                             "Module: SNT Hub\n\n"
-                             "Usage:\n"
-                             "  snt hub <command> [arguments]\n\n"
-                             "Description:\n"
-                             "  Prepare pinned code examples in a local SNT Hub workspace.\n\n"
-                             "Commands:\n"
-                             "  list             Show projects in the live catalogue\n"
-                             "  fetch PROJECT    Fetch a pinned project into the current directory\n"
-                             "  examples         Show the current workspace's example recipes\n"
-                             "  info             Show the current workspace's lock\n"
-                             "  setup EXAMPLE    Prepare a run in runs/EXAMPLE\n"
-                             "  build            Use an optional reviewed project build recipe\n"
-                             "  run              Use an optional reviewed local run recipe\n\n"
-                             "Options:\n"
-                             "  -h, --help       Show help for Hub or a Hub command\n\n"
-                             "Examples:\n"
-                             "  snt hub list\n"
-                             "  snt hub fetch PROJECT\n"
-                             "  snt hub setup EXAMPLE --inputs-only\n";
+                page.usage = "snt hub <command> [arguments]";
+                page.description = "Prepare pinned code examples in a local SNT Hub workspace.";
+                page.commands = R"(list             Show projects in the live catalogue
+fetch PROJECT    Fetch a pinned project into the current directory
+examples         Show the current workspace's example recipes
+info             Show the current workspace's lock
+setup EXAMPLE    Prepare a run in runs/EXAMPLE
+build            Use an optional reviewed project build recipe
+run              Use an optional reviewed local run recipe)";
+                page.options = "-h, --help       Show help for Hub or a Hub command";
+                page.examples = "snt hub list\nsnt hub fetch PROJECT\nsnt hub setup EXAMPLE --inputs-only";
             }
+            std::cout << snt::cli::render_help(page);
         }
 
         struct Arguments {
@@ -1123,8 +1143,13 @@ namespace snt::hub {
                 args.action != "setup" && args.action != "build" && args.action != "run")
                 throw Error("Unknown hub command. Use 'snt hub --help'.");
             const auto expected = args.action == "fetch" || args.action == "setup" ? 2u : 1u;
-            if (positionals.size() != expected)
+            if (positionals.size() != expected) {
+                if (argc == 3 && positionals.size() == 1 && expected == 2u) {
+                    args.show_help = true;
+                    return args;
+                }
                 throw Error("Unexpected hub command arguments");
+            }
             if (args.action != "setup" && (!args.output.empty() || !args.override_file.empty() || args.inputs_only))
                 throw Error("Setup options require 'snt hub setup'");
             if (args.action != "fetch" && !args.revision.empty())

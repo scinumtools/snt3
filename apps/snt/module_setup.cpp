@@ -1,4 +1,5 @@
 #include "main.h"
+#include "help.h"
 
 #include <snt/api/dip_setup.h>
 
@@ -11,17 +12,16 @@
 namespace {
 
     void print_help() {
-        std::cout << R"(Usage:
-  snt setup <DIPfile> [--output FILE]
-
-Guide through values marked with `!setup`, validate the answers with DIP, and
+        snt::cli::HelpPage page;
+        page.command = "setup";
+        page.usage = "snt setup <DIPfile> [--output FILE]";
+        page.description = R"(Guide through values marked with `!setup`, validate the answers with DIP, and
 write them as an unwrapped DIPL override file. The default output is
-setup-overrides.dip in the current directory. Existing files are not replaced.
-
-Options:
-  -h, --help       Show this help.
-  --output FILE    Write answers to FILE instead of setup-overrides.dip.
-)";
+setup-overrides.dip in the current directory. Existing files are not replaced.)";
+        page.arguments = "<DIPfile>  Project manifest with !setup parameters.";
+        page.options = "-h, --help       Show this help.\n--output FILE    Write answers to FILE instead of setup-overrides.dip.";
+        page.examples = "snt setup DIPfile\nsnt setup DIPfile --output run-overrides.dip";
+        std::cout << snt::cli::render_help(page);
     }
 
     std::string trim_lower(std::string value) {

@@ -14,6 +14,8 @@ int module_view(int argc, char* argv[]);
 int module_hub(int argc, char* argv[]);
 /** Run the guided DIPL project setup command. */
 int module_setup(int argc, char* argv[]);
+/** Initialize a DIPfile project in the current directory. */
+int module_init(int argc, char* argv[]);
 /** Run the native MCP service using the requested transport and published inputs. */
 int module_mcp(int argc, char* argv[]);
 /** Dispatch the data mapping command and return its process exit status. */

@@ -1,4 +1,5 @@
 #include "argparser.h"
+#include "help.h"
 #include "main.h"
 #include "snt/api/dip_compare.h"
 #include "snt/api/dip_parse.h"
@@ -16,7 +17,7 @@
 using namespace snt;
 
 std::string help_dip() {
-    return R"(
+    return snt::cli::format_help(R"(
 Scientific Numerical Tools v3 (SNT)
 Module: Dimensional Input Parameters (DIP)
 
@@ -102,11 +103,11 @@ Examples:
       -i string "age int = 23 yr" \
       -r "family.father" \
       --print
-)";
+)");
 }
 
 std::string help_dip_parse() {
-    return R"(
+    return snt::cli::format_help(R"(
 Scientific Numerical Tools v3 (SNT)
 Module: Dimensional Input Parameters (DIP)
 Command: parse
@@ -165,17 +166,23 @@ Examples:
       -i string "age int = 23 yr" \
       -r "family.father" \
       --print
-)";
+)");
 }
 
 int module_dip_compare(int argc, char* argv[]) {
-    if (argc == 2 && std::string(argv[1]) == "--help") {
-        std::cout << "Usage: snt dip compare <before.diph5> <after.diph5> [options]\n\n"
-                     "Compare two saved environments; exit 0 if equal or 1 if different.\n\n"
-                     "Options:\n"
-                     "  --scope effective|full   Compare effective values (default) or full saved state\n"
-                     "  --max-details N         Maximum reported differences (default 50)\n"
-                     "  --max-array-examples N  Maximum differing indices shown per array (default 3)\n";
+    if (argc == 1 || (argc == 2 && (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h"))) {
+        snt::cli::HelpPage page;
+        page.module = "Dimensional Input Parameters (DIP)";
+        page.command = "compare";
+        page.usage = "snt dip compare <before.diph5> <after.diph5> [options]";
+        page.description = "Compare two saved environments; exit 0 if equal or 1 if different.";
+        page.arguments = "<before.diph5>  Baseline snapshot.\n<after.diph5>   Snapshot to compare.";
+        page.options = R"(-h, --help              Show this help.
+--scope effective|full   Compare effective values (default) or full saved state
+--max-details N         Maximum reported differences (default 50)
+--max-array-examples N  Maximum differing indices shown per array (default 3))";
+        page.examples = "snt dip compare before.diph5 after.diph5\nsnt dip compare before.diph5 after.diph5 --scope full";
+        std::cout << snt::cli::render_help(page);
         return 0;
     }
     std::vector<std::string> paths;
@@ -218,7 +225,8 @@ int module_dip_compare(int argc, char* argv[]) {
 }
 
 void module_dip(ArgParser& argpar) {
-    if (argpar.hasKeyword("-h") || argpar.hasKeyword("--help") || argpar.numPositional() < 2) {
+    if (argpar.hasKeyword("-h") || argpar.hasKeyword("--help") || argpar.numPositional() < 2 ||
+        (argpar.numPositional() == 2 && argpar.getPositionalValue(1) == "parse" && !argpar.hasKeywords())) {
         std::cout << (argpar.numPositional() >= 2 && argpar.getPositionalValue(1) == "parse"
                           ? help_dip_parse()
                           : help_dip());

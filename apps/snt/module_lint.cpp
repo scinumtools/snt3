@@ -1,4 +1,5 @@
 #include "main.h"
+#include "help.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -30,6 +31,24 @@ namespace {
 } // namespace
 
 int module_lint(int argc, char* argv[]) {
+    const auto print_help = [] {
+        snt::cli::HelpPage page;
+        page.command = "lint";
+        page.usage = "snt lint [--project] [--json] <file> [<file> ...]";
+        page.description = "Validate, then check evaluated DIPL for advisory issues.";
+        page.arguments = "<file>  One or more DIPL files, or DIPfile projects with --project.";
+        page.options = R"(-h, --help  Show this help.
+--project    Treat each input as a DIPfile project.
+--json       Write machine-readable findings.
+--           Treat later arguments as file names.)";
+        page.examples = "snt lint parameters.dip\nsnt lint --project DIPfile\nsnt lint --json parameters.dip";
+        page.notes = "Exit status: 0 clean, 1 findings or invalid DIPL, 2 input or command error.";
+        std::cout << snt::cli::render_help(page);
+    };
+    if (argc == 2) {
+        print_help();
+        return 0;
+    }
     bool project = false;
     bool json = false;
     bool positional_only = false;
@@ -37,9 +56,7 @@ int module_lint(int argc, char* argv[]) {
     for (int i = 2; i < argc; ++i) {
         const std::string arg = argv[i];
         if (!positional_only && (arg == "--help" || arg == "-h")) {
-            std::cout << "Usage: snt lint [--project] [--json] <file> [<file> ...]\n"
-                         "Validate, then check evaluated DIPL for advisory issues.\n"
-                         "Exit status: 0 clean, 1 findings or invalid DIPL, 2 input or command error.\n";
+            print_help();
             return 0;
         }
         if (!positional_only && arg == "--project")

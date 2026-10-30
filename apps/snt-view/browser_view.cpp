@@ -7,6 +7,23 @@
 
 namespace snt::view {
 
+    namespace {
+        bool represents_value(const ObjectInfo& object) {
+            switch (object.node_dtype) {
+            case dip::NodeDtype::Boolean:
+            case dip::NodeDtype::Integer:
+            case dip::NodeDtype::Float:
+            case dip::NodeDtype::String:
+            case dip::NodeDtype::Link:
+            case dip::NodeDtype::Table:
+            case dip::NodeDtype::Deferred:
+                return true;
+            default:
+                return object.has_value;
+            }
+        }
+    } // namespace
+
     const char* object_kind_name(const ObjectInfo& object) {
         if (object.role == ObjectRole::Project)
             return "Resolved nodes";
@@ -37,7 +54,7 @@ namespace snt::view {
         if (object.role == ObjectRole::BlockSource)
             return "Block value source";
         if (object.role == ObjectRole::Overrides)
-            return "Overridden nodes";
+            return "Overrides";
         if (object.role == ObjectRole::Override)
             return "Overridden node";
         if (object.role == ObjectRole::Schemas)
@@ -50,9 +67,11 @@ namespace snt::view {
             return "Custom unit";
         if (object.has_table)
             return "Table";
-        if (object.has_value && !object.children.empty())
+        if (represents_value(object) && !object.children.empty())
             return "Value and children";
-        if (object.has_value)
+        if (object.value_origin == dip::ValueOrigin::None)
+            return "Value (none)";
+        if (represents_value(object))
             return "Value";
         if (object.hierarchy_kind == dip::Path::Kind::Map)
             return "Map collection";
@@ -105,7 +124,7 @@ namespace snt::view {
                 return source_kind_color(object.role == ObjectRole::BlockSource ? object.source_kind : "array");
             if (object.has_table)
                 return source_kind_color("table");
-            if (object.has_value)
+            if (represents_value(object))
                 return ImVec4(0.24f, 0.48f, 0.54f, 1.0f);
             return ImVec4(0.39f, 0.46f, 0.53f, 1.0f);
         }
@@ -174,7 +193,7 @@ namespace snt::view {
                 draw->AddLine(point(0.08f, 0.36f), point(0.92f, 0.36f), color, 1.2f);
                 draw->AddLine(point(0.08f, 0.62f), point(0.92f, 0.62f), color, 1.2f);
                 draw->AddLine(point(0.49f, 0.12f), point(0.49f, 0.88f), color, 1.2f);
-            } else if (object.has_value && object.children.empty()) {
+            } else if (represents_value(object) && object.children.empty()) {
                 draw->AddQuadFilled(
                     point(0.5f, 0.06f), point(0.94f, 0.5f), point(0.5f, 0.94f), point(0.06f, 0.5f), color
                 );
@@ -198,7 +217,7 @@ namespace snt::view {
                 draw->AddLine(point(0.39f, 0.25f), point(0.5f, 0.39f), color);
                 draw->AddLine(point(0.5f, 0.39f), point(0.92f, 0.39f), color);
                 draw->AddRect(point(0.08f, 0.39f), point(0.92f, 0.88f), color, size * 0.1f);
-                if (object.has_value)
+                if (represents_value(object))
                     draw->AddCircleFilled(point(0.76f, 0.69f), size * 0.13f, color);
             }
         }
@@ -325,16 +344,18 @@ namespace snt::view {
         int root_section_group(ObjectRole role) {
             if (role == ObjectRole::DIPfile)
                 return 0;
-            if (role == ObjectRole::Overrides || role == ObjectRole::Project || role == ObjectRole::NamedSourceNodes)
+            if (role == ObjectRole::Overrides)
                 return 1;
-            if (role == ObjectRole::Schemas)
+            if (role == ObjectRole::Project || role == ObjectRole::NamedSourceNodes)
                 return 2;
-            if (role == ObjectRole::Units)
+            if (role == ObjectRole::Schemas)
                 return 3;
+            if (role == ObjectRole::Units)
+                return 4;
             if (role == ObjectRole::LocalSources || role == ObjectRole::Sources || role == ObjectRole::BlockSources ||
                 role == ObjectRole::RawSources)
-                return 4;
-            return 5;
+                return 5;
+            return 6;
         }
 
         void draw_tree(
@@ -387,7 +408,7 @@ namespace snt::view {
                     cursor.x + ImGui::GetFontSize() + 2.0f * style.FramePadding.x + 1.0f,
                     ImGui::GetItemRectMin().y + (ImGui::GetItemRectSize().y - icon_size) * 0.5f
                 );
-                draw_kind_icon(*item, icon_pos, icon_size);
+                draw_object_icon(*item, icon_pos, icon_size);
                 if (!item->source_kind.empty()) {
                     const float text_start = cursor.x + ImGui::GetFontSize() + 2.0f * style.FramePadding.x +
                                              ImGui::CalcTextSize("   ").x;
@@ -415,6 +436,10 @@ namespace snt::view {
         }
 
     } // namespace
+
+    void draw_object_icon(const ObjectInfo& object, ImVec2 position, float size) {
+        draw_kind_icon(object, position, size);
+    }
 
     void draw_browser(ViewerModel& model) {
         static char search[256] = {};

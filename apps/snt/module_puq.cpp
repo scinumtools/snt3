@@ -1,5 +1,6 @@
 // #include <snt/puq/lists.h>
 #include "argparser.h"
+#include "help.h"
 #include "main.h"
 #include "snt/api/puq_convert.h"
 #include "snt/api/puq_eval.h"
@@ -11,7 +12,7 @@
 using namespace snt;
 
 std::string help_puq() {
-    return R"(
+    return snt::cli::format_help(R"(
 Scientific Numerical Tools v3 (SNT)
 Module: Physical Units & Quantities (PUQ)
 
@@ -70,7 +71,7 @@ Examples:
 
   snt puq convert "35*eV" "J"
   snt puq convert "12*statA" "A" -s ESU -S SI -Q "I"
-)";
+)");
 }
 
 void module_puq(ArgParser& argpar) {

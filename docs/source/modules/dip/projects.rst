@@ -7,6 +7,20 @@ environment. It is itself ordinary DIPL: the project loader supplies the
 schemas for its five lists and its optional ``format`` group, then parses the
 file with the standard DIP parser.
 
+Start a project
+---------------
+
+Run ``snt init`` in an empty directory to create a ``DIPfile`` that loads
+``main.dip``. Replace the example parameter in ``main.dip`` with your own. The command refuses
+to overwrite either file if it already exists.
+
+.. code-block:: console
+
+   $ mkdir my-project
+   $ cd my-project
+   $ snt init
+   $ snt dip parse --project DIPfile --print
+
 Project format
 --------------
 

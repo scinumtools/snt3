@@ -5,16 +5,30 @@
 #define SNT_VIEW_INSPECTOR_VIEW_H
 
 #include "viewer_model.h"
+#include "source_view.h"
 
 #include <cstddef>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
 namespace snt::view {
 
-    class SourceView;
     class NotificationCenter;
+
+    /** Source buffer and navigation requests shared by the browser, inspector, and editor. */
+    struct SourceNavigationState {
+        SourceView source;
+        std::string owner;
+        std::optional<SourceTarget> pending_target;
+        std::string error;
+        std::string edit_report;
+        bool select_tab = false;
+
+        void clear();
+        bool open_selected(ViewerModel& model);
+    };
 
     /** Cache semantic inspection fields and source targets for a model selection. */
     struct InspectorCache {
@@ -31,27 +45,18 @@ namespace snt::view {
         std::string error;                        ///< Inspection failure shown by the panel.
     };
 
-    /** Draw semantic details and source links, updating the source tab and scroll request on navigation. */
+    /** Draw semantic details and source links. */
     void draw_inspector(
         ViewerModel& model,
         InspectorCache& cache,
-        SourceView& source,
-        bool& select_source_tab,
-        bool& scroll_to_target,
-        std::string& source_error,
+        SourceNavigationState& navigation,
         NotificationCenter& notifications
     );
-    /** Open the source represented by the currently selected source-section entry. */
-    bool open_selected_source(ViewerModel& model, SourceView& source, std::string& error);
     /** Draw the loaded source buffer and honor a pending scroll-to-target request. */
     void draw_source_view(
         ViewerModel& model,
-        SourceView& source,
-        bool& scroll_to_target,
-        std::string& error,
-        std::string& edit_report,
+        SourceNavigationState& navigation,
         bool& request_save_as,
-        bool& select_source_tab,
         NotificationCenter& notifications
     );
 

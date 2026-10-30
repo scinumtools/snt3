@@ -3,12 +3,15 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/inspect/inspector.h>
 #include <snt/dip/project_bundle.h>
+#include <snt/dip/project_init.h>
 #include <string>
+#include <stdexcept>
 #include <utility>
 
 using namespace snt;
@@ -38,6 +41,53 @@ namespace {
     };
 
 } // namespace
+
+TEST(Project, InitializeCreatesParseableStarterProject) {
+    ProjectDirectory project("initialize-starter");
+    dip::initialize_project(project.path());
+
+    EXPECT_TRUE(std::filesystem::is_regular_file(project.path() / "DIPfile"));
+    EXPECT_TRUE(std::filesystem::is_regular_file(project.path() / "main.dip"));
+    dip::DIP parser;
+    parser.add_project(project.path() / "DIPfile");
+    EXPECT_EQ(parser.parse()["example"].as<int>(), 1);
+}
+
+TEST(Project, InitializePreservesExistingProjectFiles) {
+    ProjectDirectory project("initialize-existing");
+    project.write("main.dip", "existing int = 7\n");
+    EXPECT_THROW(dip::initialize_project(project.path()), std::runtime_error);
+    EXPECT_FALSE(std::filesystem::exists(project.path() / "DIPfile"));
+    std::ifstream source(project.path() / "main.dip");
+    EXPECT_EQ(std::string(std::istreambuf_iterator<char>(source), {}), "existing int = 7\n");
+
+    std::filesystem::remove(project.path() / "main.dip");
+    project.write("DIPfile", "existing manifest\n");
+    EXPECT_THROW(dip::initialize_project(project.path()), std::runtime_error);
+    EXPECT_FALSE(std::filesystem::exists(project.path() / "main.dip"));
+}
+
+TEST(Project, ConvertStandaloneSourceCreatesManifestWithoutChangingSource) {
+    ProjectDirectory project("convert-standalone");
+    project.write("parameters.dipl", "answer int = 7\n");
+    const auto manifest = dip::create_project_from_source(project.path() / "parameters.dipl");
+    EXPECT_EQ(manifest, project.path() / "DIPfile");
+    EXPECT_EQ(dip::read_project_file(project.path() / "parameters.dipl"), "answer int = 7\n");
+    EXPECT_EQ(dip::read_project_file(manifest), "code[]\n  file = \"parameters.dipl\"\n");
+    dip::DIP parser;
+    parser.add_project(manifest);
+    EXPECT_EQ(parser.parse()["answer"].as<int>(), 7);
+    EXPECT_THROW(dip::create_project_from_source(project.path() / "parameters.dipl"), std::runtime_error);
+    EXPECT_EQ(dip::read_project_file(manifest), "code[]\n  file = \"parameters.dipl\"\n");
+}
+
+TEST(Project, ConvertStandaloneSourceRollsBackInvalidProject) {
+    ProjectDirectory project("convert-invalid");
+    project.write("broken.dip", "answer int = {missing?value}\n");
+    EXPECT_THROW(dip::create_project_from_source(project.path() / "broken.dip"), std::exception);
+    EXPECT_FALSE(std::filesystem::exists(project.path() / "DIPfile"));
+    EXPECT_EQ(dip::read_project_file(project.path() / "broken.dip"), "answer int = {missing?value}\n");
+}
 
 TEST(Project, SourcesUseManifestDirectoryAndCodeSourcesUseTheirOwnFileDirectory) {
     ProjectDirectory project("relative-source-anchors");

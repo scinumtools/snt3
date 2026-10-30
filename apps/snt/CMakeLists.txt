@@ -55,6 +55,7 @@ install(EXPORT SNTExecutables
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/snt)
 
 if(ENABLE_UNIT_TESTS)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
   set(GENERATED_PARAMETERS_DIR "${CMAKE_CURRENT_BINARY_DIR}/tests/generated-parameters")
   set(GENERATED_CPP_HEADER "${GENERATED_PARAMETERS_DIR}/parameters.hpp")
   set(GENERATED_C_HEADER "${GENERATED_PARAMETERS_DIR}/parameters.h")
@@ -84,62 +85,30 @@ if(ENABLE_UNIT_TESTS)
   add_test(NAME cli.generated.cpp-values COMMAND $<TARGET_FILE:snt-generated-parameters-cpp>)
   add_test(NAME cli.generated.c-values COMMAND $<TARGET_FILE:snt-generated-parameters-c>)
 
+  function(add_snt_pytest name filename)
+    add_test(NAME ${name}
+      COMMAND ${CMAKE_COMMAND} -E env
+        "SNT_EXECUTABLE=$<TARGET_FILE:snt>"
+        "SERVER_ENABLED=${ENABLE_SNT_SERVER}"
+        "DMAP_ENABLED=${ENABLE_SNT_DMAP}"
+        "VIEW_ENABLED=${ENABLE_SNT_VIEW}"
+        "MCP_ENABLED=${ENABLE_SNT_MCP}"
+        "REPORT_ENABLED=${ENABLE_SNT_REPORT}"
+        "${Python3_EXECUTABLE}" -m pytest -q
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/${filename}")
+  endfunction()
+
   if(ENABLE_SNT_REPORT)
-    add_test(NAME cli.report
-      COMMAND ${CMAKE_COMMAND}
-        "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-        "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/report"
-        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/report.cmake")
+    add_snt_pytest(cli.report test_report.py)
   endif()
-  add_test(
-    NAME cli.dip.persistence
-    COMMAND ${CMAKE_COMMAND}
-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-persistence"
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dip_persistence.cmake"
-  )
-  add_test(
-    NAME cli.dip.comparison
-    COMMAND ${CMAKE_COMMAND}
-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-comparison"
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dip_comparison.cmake"
-  )
-  add_test(
-    NAME cli.dip.semantic
-    COMMAND ${CMAKE_COMMAND}
-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-      "-DSOURCE_DIR=${PROJECT_SOURCE_DIR}"
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dip_semantic.cmake"
-  )
-  add_test(
-    NAME cli.dip.bundle
-    COMMAND ${CMAKE_COMMAND}
-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-bundle"
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dip_bundle.cmake"
-  )
-  add_test(
-    NAME cli.dip.formatter
-    COMMAND ${CMAKE_COMMAND}
-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-formatter"
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/formatter.cmake"
-  )
-  add_test(
-    NAME cli.dip.validator
-    COMMAND ${CMAKE_COMMAND}
-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-validator"
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/validator.cmake"
-  )
-  add_test(
-    NAME cli.dip.linter
-    COMMAND ${CMAKE_COMMAND}
-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-      "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dip-linter"
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/linter.cmake"
-  )
+  add_snt_pytest(cli.dip.persistence test_dip_persistence.py)
+  add_snt_pytest(cli.init test_init.py)
+  add_snt_pytest(cli.dip.comparison test_dip_comparison.py)
+  add_snt_pytest(cli.dip.semantic test_dip_semantic.py)
+  add_snt_pytest(cli.dip.bundle test_dip_bundle.py)
+  add_snt_pytest(cli.dip.formatter test_formatter.py)
+  add_snt_pytest(cli.dip.validator test_validator.py)
+  add_snt_pytest(cli.dip.linter test_linter.py)
 endif()
 
 if(ENABLE_SNT_SERVER)
@@ -158,21 +127,9 @@ endif()
 
 if(ENABLE_UNIT_TESTS)
   if(ENABLE_SNT_DMAP)
-    add_test(NAME cli.dmap
-      COMMAND ${CMAKE_COMMAND}
-        "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-        "-DTEST_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests/dmap"
-        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/dmap.cmake")
+    add_snt_pytest(cli.dmap test_dmap.py)
   endif()
-  add_test(NAME cli.commands
-    COMMAND ${CMAKE_COMMAND}
-      "-DSNT_EXECUTABLE=$<TARGET_FILE:snt>"
-      "-DSERVER_ENABLED=${ENABLE_SNT_SERVER}"
-      "-DDMAP_ENABLED=${ENABLE_SNT_DMAP}"
-      "-DVIEW_ENABLED=${ENABLE_SNT_VIEW}"
-      "-DMCP_ENABLED=${ENABLE_SNT_MCP}"
-      "-DREPORT_ENABLED=${ENABLE_SNT_REPORT}"
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/commands.cmake")
+  add_snt_pytest(cli.commands test_commands.py)
 endif()
 
 enable_coverage(${EXEC_NAME})

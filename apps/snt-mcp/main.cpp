@@ -1,4 +1,5 @@
 #include "../snt/main.h"
+#include "../snt/help.h"
 
 #include "mcp.h"
 
@@ -20,27 +21,26 @@ int module_mcp(int argc, char* argv[]) {
         for (int i = 2; i < argc; ++i) {
             const std::string option = argv[i];
             if (option == "--help" || option == "-h") {
-                std::cout << R"(Usage: snt mcp [options]
-Native C++ Model Context Protocol server using the SNT APIs directly.
-
-  --input PATH               Publish a DIPfile, .dip/.dipl or .diph5 as "default"
-  --project NAME=PATH        Publish a named input (repeatable)
-  --transport stdio|streamable-http
-                             Transport (default: stdio)
-  --address ADDRESS          HTTP bind address (default: 127.0.0.1)
-  --port PORT                HTTP port (default: 8081); endpoint /mcp
-  --allow-origin ORIGIN      Allow an additional exact HTTP Origin (repeatable)
-  --auth-token-file PATH     Require a 64-character hex bearer token from an owner-only file
-  --timeout-ms MILLISECONDS  Tool execution deadline (default: 30000; maximum: 3600000)
-
-Examples:
-  snt mcp --input model/DIPfile
-  snt mcp --transport streamable-http --project model=model/DIPfile
-
-Evaluation uses supervised native C++ workers. No Python or MCP SDK is required.
+                snt::cli::HelpPage page;
+                page.module = "Model Context Protocol (MCP) server";
+                page.usage = "snt mcp [options]";
+                page.description = "Native C++ Model Context Protocol server using the SNT APIs directly.";
+                page.options = R"(-h, --help                 Show this help.
+--input PATH               Publish a DIPfile, .dip/.dipl or .diph5 as "default"
+--project NAME=PATH        Publish a named input (repeatable)
+--transport stdio|streamable-http
+                           Transport (default: stdio)
+--address ADDRESS          HTTP bind address (default: 127.0.0.1)
+--port PORT                HTTP port (default: 8081); endpoint /mcp
+--allow-origin ORIGIN      Allow an additional exact HTTP Origin (repeatable)
+--auth-token-file PATH     Require a 64-character hex bearer token from an owner-only file
+--timeout-ms MILLISECONDS  Tool execution deadline (default: 30000; maximum: 3600000))";
+                page.examples = R"(snt mcp --input model/DIPfile
+snt mcp --transport streamable-http --project model=model/DIPfile)";
+                page.notes = R"(Evaluation uses supervised native C++ workers. No Python or MCP SDK is required.
 Generated artifacts expire after one hour or shutdown; storage is limited to 256 MiB.
-Non-loopback HTTP requires a token file and an HTTPS gateway.
-)";
+Non-loopback HTTP requires a token file and an HTTPS gateway.)";
+                std::cout << snt::cli::render_help(page);
                 return 0;
             }
             if (++i == argc)

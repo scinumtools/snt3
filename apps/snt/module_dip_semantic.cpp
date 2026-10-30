@@ -1,7 +1,9 @@
 #include "main.h"
+#include "help.h"
 
 #include <filesystem>
 #include <iostream>
+#include <sstream>
 #include <snt/api/dip_semantic.h>
 #include <stdexcept>
 #include <string>
@@ -17,47 +19,51 @@ namespace {
 
 int module_dip_semantic(int argc, char* argv[]) {
     const std::string command = argv[0];
-    if (argc == 2 && std::string(argv[1]) == "--help") {
-        std::cout << "Usage: snt dip " << command << " (--project DIPfile | --input FILE)";
+    if (argc == 1 || (argc == 2 && (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h"))) {
+        std::ostringstream out;
+        out << "Module: Dimensional Input Parameters (DIP)\nCommand: " << command
+            << "\n\nUsage:\n  snt dip " << command << " (--project DIPfile | --input FILE)";
         if (command == "describe" || command == "override-contract")
-            std::cout << " --path PATH";
-        std::cout << " [options]\n\n";
+            out << " --path PATH";
+        out << " [options]\n\nDescription:\n";
         if (command == "describe")
-            std::cout << "Describe one evaluated node, including values, metadata, and provenance.\n";
+            out << "Describe one evaluated node, including values, metadata, and provenance.\n";
         else if (command == "override-contract")
-            std::cout << "Show the target kind and constraints for a proposed override.\n";
+            out << "Show the target kind and constraints for a proposed override.\n";
         else if (command == "schemas")
-            std::cout << "List schema definitions, applications, and value associations.\n";
+            out << "List schema definitions, applications, and value associations.\n";
         else if (command == "sources")
-            std::cout << "List the project's registered sources.\n";
+            out << "List the project's registered sources.\n";
         else if (command == "list")
-            std::cout << "Select evaluated nodes by path query and tags.\n";
+            out << "Select evaluated nodes by path query and tags.\n";
         else
-            std::cout << "Validate proposed overrides and report their effective-value changes.\n";
-        std::cout << "\nOptions:\n"
+            out << "Validate proposed overrides and report their effective-value changes.\n";
+        out << "\nOptions:\n"
+                     "  -h, --help              Show this help.\n"
                      "  --project DIPfile        Read a DIPfile project\n"
                      "  --input FILE             Read a DIPfile, .dip, or .dipl file";
         if (command == "describe" || command == "list" || command == "schemas" || command == "override-contract")
-            std::cout << ", or a .diph5 snapshot";
-        std::cout << '\n';
+            out << ", or a .diph5 snapshot";
+        out << '\n';
         if (command == "describe")
-            std::cout << "  --path PATH              Evaluated node to inspect\n"
+            out << "  --path PATH              Evaluated node to inspect\n"
                          "  --max-value-elements N   Include values up to N elements (default 16)\n";
         if (command == "override-contract")
-            std::cout << "  --path PATH              Override target to inspect\n";
+            out << "  --path PATH              Override target to inspect\n";
         if (command == "list")
-            std::cout << "  --query QUERY            Path selection (default ?)\n"
+            out << "  --query QUERY            Path selection (default ?)\n"
                          "  --tag-all TAG            Require every specified tag; repeatable\n"
                          "  --tag-any TAG            Require any specified tag; repeatable\n"
                          "  --tag-none TAG           Exclude specified tags; repeatable\n"
                          "  --limit N                Maximum results (default 100)\n"
                          "  --max-value-elements N   Include values up to N elements (default 0)\n";
         if (command == "preview")
-            std::cout << "  --override TEXT          Add a DIPL override body; repeatable\n"
+            out << "  --override TEXT          Add a DIPL override body; repeatable\n"
                          "  --override-file FILE     Add an override file; repeatable\n"
                          "  --max-details N          Maximum reported differences (default 50)\n";
-        std::cout << "  --record-graph           Record dependencies while parsing DIPL input\n"
+        out << "  --record-graph           Record dependencies while parsing DIPL input\n"
                      "  --format json            Output JSON (the default and only format)\n";
+        std::cout << snt::cli::format_help(out.str());
         return 0;
     }
     std::filesystem::path input;

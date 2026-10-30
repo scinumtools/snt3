@@ -19,6 +19,7 @@ Once the executable is on your ``PATH``, inspect the available commands:
 .. code-block:: bash
 
    snt -h
+   snt init -h
    snt puq -h
    snt dip -h
    snt report -h
@@ -90,7 +91,15 @@ place the declarations in a :doc:`DIPfile project <../modules/dip/projects>`:
 
 .. code-block:: bash
 
+   mkdir my-project
+   cd my-project
+   snt init
+   printf 'simulation.steps int = 100\n' >> main.dip
    snt dip parse --project DIPfile --request simulation.steps --print
+
+``snt init`` creates ``DIPfile`` and ``main.dip`` in the current directory.
+It refuses to replace either existing file. Replace the example parameter in
+``main.dip`` with your own declarations.
 
 ``--project`` supplies the model and resolves paths relative to the DIPfile.
 It can be combined with ``--input override_string`` or ``--input override_file``

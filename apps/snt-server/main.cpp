@@ -1,5 +1,6 @@
 #include "server.h"
 #include "settings.h"
+#include "../snt/help.h"
 
 #include <charconv>
 #include <iostream>
@@ -19,7 +20,7 @@ namespace {
     }
 
     void print_usage() {
-        std::cout << R"(
+        std::cout << snt::cli::format_help(R"(
 Scientific Numerical Tools v3 (SNT)
 Module: REST API server
 
@@ -50,7 +51,7 @@ Examples:
   snt server --project model=/srv/model/DIPfile
   snt server --project model=/srv/model/DIPfile \
       --diph5 baseline=/srv/model/baseline.diph5
-)";
+)");
     }
 
     snt::server::PublishedInput parse_published_input(

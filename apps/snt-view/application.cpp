@@ -28,6 +28,29 @@ namespace snt::view {
 
         constexpr char VIEWER_TITLE[] = "SNT3 v" CODE_VERSION " -  Parameter Viewer";
 
+        struct ExportDialogState {
+            std::array<char, 4096> directory{};
+            std::array<char, 256> filename{};
+            std::string error;
+        };
+
+        struct SaveAsDialogState {
+            std::array<char, 4096> parent{};
+            std::array<char, 256> name{};
+            std::string error;
+        };
+
+        struct NewSourceDialogState {
+            std::array<char, 256> filename{};
+            std::array<char, 256> name{};
+            bool named = false;
+            std::string error;
+        };
+
+        struct ConvertDialogState {
+            std::string error;
+        };
+
         void glfw_error(int code, const char* description) {
             std::fprintf(stderr, "GLFW error %d: %s\n", code, description);
         }
@@ -41,15 +64,68 @@ namespace snt::view {
 
         void open_save_as_dialog(
             const ViewerModel& model,
-            std::array<char, 4096>& parent_directory,
-            std::array<char, 256>& project_name
+            SaveAsDialogState& state
         ) {
             const auto source_dir = model.artifact().parent_path();
             const std::string parent = source_dir.parent_path().string();
             const std::string name = source_dir.filename().string() + "-copy";
-            std::snprintf(parent_directory.data(), parent_directory.size(), "%s", parent.c_str());
-            std::snprintf(project_name.data(), project_name.size(), "%s", name.c_str());
+            std::snprintf(state.parent.data(), state.parent.size(), "%s", parent.c_str());
+            std::snprintf(state.name.data(), state.name.size(), "%s", name.c_str());
+            state.error.clear();
             ImGui::OpenPopup("Save Project As");
+        }
+
+        void open_export_dialog(const ViewerModel& model, ExportDialogState& state) {
+            const auto project_directory = model.artifact().parent_path();
+            const auto filename = project_directory.filename().string() + ".diph5";
+            const auto directory = project_directory.string();
+            std::snprintf(state.directory.data(), state.directory.size(), "%s", directory.c_str());
+            std::snprintf(state.filename.data(), state.filename.size(), "%s", filename.c_str());
+            state.error.clear();
+            ImGui::OpenPopup("Export DIPH5");
+        }
+
+        void draw_directory_picker(const char* label, const char* child_id, std::array<char, 4096>& directory_text) {
+            ImGui::PushID(label);
+            ImGui::TextUnformatted(label);
+            const auto& style = ImGui::GetStyle();
+            const float up_width = ImGui::CalcTextSize("Up").x + 2.0f * style.FramePadding.x;
+            ImGui::SetNextItemWidth(std::max(1.0f, ImGui::GetContentRegionAvail().x - up_width - style.ItemSpacing.x));
+            ImGui::InputText("##directory", directory_text.data(), directory_text.size());
+            ImGui::SameLine();
+            const std::filesystem::path current_directory(directory_text.data());
+            const auto parent = current_directory.parent_path();
+            ImGui::BeginDisabled(parent.empty() || parent == current_directory);
+            if (ImGui::Button("Up")) {
+                const auto path = parent.string();
+                std::snprintf(directory_text.data(), directory_text.size(), "%s", path.c_str());
+            }
+            ImGui::EndDisabled();
+            std::vector<std::filesystem::path> directories;
+            std::error_code directory_error;
+            for (std::filesystem::directory_iterator it(
+                     current_directory, std::filesystem::directory_options::skip_permission_denied, directory_error
+                 ),
+                 end;
+                 !directory_error && it != end;
+                 it.increment(directory_error)) {
+                std::error_code type_error;
+                if (it->is_directory(type_error) && !type_error)
+                    directories.push_back(it->path());
+            }
+            std::sort(directories.begin(), directories.end());
+            ImGui::BeginChild(child_id, ImVec2(560.0f, 230.0f), ImGuiChildFlags_Borders);
+            for (const auto& directory : directories) {
+                const auto name = directory.filename().string() + "/";
+                if (ImGui::Selectable(name.c_str())) {
+                    const auto path = directory.string();
+                    std::snprintf(directory_text.data(), directory_text.size(), "%s", path.c_str());
+                }
+            }
+            ImGui::EndChild();
+            if (directory_error)
+                ImGui::TextWrapped("Cannot list this directory: %s", directory_error.message().c_str());
+            ImGui::PopID();
         }
 
         void draw_view(
@@ -57,39 +133,64 @@ namespace snt::view {
             InspectorCache& inspector_cache,
             DataViewState& data_state,
             GraphViewState& graph_state,
-            SourceView& source,
-            std::string& source_owner,
-            bool& select_source_tab,
-            bool& scroll_to_target,
-            std::string& source_error,
-            std::string& edit_report,
+            SourceNavigationState& navigation,
             bool& request_save_as,
-            std::array<char, 4096>& save_as_parent,
-            std::array<char, 256>& save_as_name,
-            std::string& save_as_error,
+            SaveAsDialogState& save_as,
+            NewSourceDialogState& new_source_state,
+            ConvertDialogState& convert_state,
+            ExportDialogState& export_state,
             SetupViewState& setup_state,
             NotificationCenter& notifications
         ) {
+            auto& source = navigation.source;
+            auto& source_owner = navigation.owner;
+            auto& select_source_tab = navigation.select_tab;
+            auto& source_error = navigation.error;
+            auto& edit_report = navigation.edit_report;
+            auto& save_as_parent = save_as.parent;
+            auto& save_as_name = save_as.name;
+            auto& save_as_error = save_as.error;
             const auto reload = [&] {
                 if (source.dirty()) {
                     source_error = "Save or discard the edited document before reloading.";
                     return;
                 }
                 if (model.reload()) {
-                    source = SourceView{};
-                    source_owner.clear();
-                    source_error.clear();
-                    edit_report.clear();
-                    select_source_tab = false;
-                    scroll_to_target = false;
+                    navigation.clear();
                 }
             };
+            bool request_export_diph5 = false;
+            bool request_new_source = false;
+            bool request_convert = false;
+            bool created_source = false;
             if (ImGui::BeginMainMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
                     if (ImGui::MenuItem("Reload", "Ctrl+R"))
                         reload();
+                    if (ImGui::MenuItem("New Source...", nullptr, false,
+                                        model.can_save_as() && model.can_export_diph5())) {
+                        if (source.dirty())
+                            notifications.notify("Save or discard the edited document before creating a source.",
+                                                 NoticeLevel::Warning);
+                        else
+                            request_new_source = true;
+                    }
+                    if (ImGui::MenuItem("Convert to Project...", nullptr, false, model.can_convert_to_project())) {
+                        if (source.dirty())
+                            notifications.notify("Save or discard the edited document before converting it to a project.",
+                                                 NoticeLevel::Warning);
+                        else
+                            request_convert = true;
+                    }
                     if (ImGui::MenuItem("Save As...", nullptr, false, model.can_save_as()))
-                        open_save_as_dialog(model, save_as_parent, save_as_name);
+                        request_save_as = true;
+                    if (ImGui::MenuItem("Export DIPH5...", nullptr, false, model.can_export_diph5())) {
+                        if (source.dirty())
+                            notifications.notify("Save or discard the edited document before exporting DIPH5.",
+                                                 NoticeLevel::Warning);
+                        else
+                            request_export_diph5 = true;
+                    }
                     if (ImGui::MenuItem("Close"))
                         glfwSetWindowShouldClose(glfwGetCurrentContext(), GLFW_TRUE);
                     ImGui::EndMenu();
@@ -114,49 +215,96 @@ namespace snt::view {
             if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_R, false) && !io.WantTextInput)
                 reload();
             if (request_save_as) {
-                open_save_as_dialog(model, save_as_parent, save_as_name);
+                open_save_as_dialog(model, save_as);
                 request_save_as = false;
             }
+            if (request_new_source) {
+                std::snprintf(new_source_state.filename.data(), new_source_state.filename.size(), "%s", "new-source.dip");
+                std::snprintf(new_source_state.name.data(), new_source_state.name.size(), "%s", "new_source");
+                new_source_state.named = false;
+                new_source_state.error.clear();
+                ImGui::OpenPopup("New Source");
+            }
+            if (request_convert) {
+                convert_state.error.clear();
+                ImGui::OpenPopup("Convert to Project");
+            }
+            if (request_export_diph5)
+                open_export_dialog(model, export_state);
 
+            ImGui::PushStyleColor(ImGuiCol_PopupBg, ImGui::GetStyleColorVec4(ImGuiCol_WindowBg));
+            ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+            if (ImGui::BeginPopupModal("New Source", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+                ImGui::TextWrapped("Create a DIPL source in this project and add it to the DIPfile.");
+                if (ImGui::RadioButton("Local code source", !new_source_state.named))
+                    new_source_state.named = false;
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Named source", new_source_state.named))
+                    new_source_state.named = true;
+                if (new_source_state.named) {
+                    ImGui::TextUnformatted("Source name");
+                    ImGui::SetNextItemWidth(420.0f);
+                    ImGui::InputText("##new_source_name", new_source_state.name.data(), new_source_state.name.size());
+                    ImGui::TextDisabled("Reference its values as {name?path.to.value}.");
+                }
+                ImGui::TextUnformatted("Source file name");
+                ImGui::SetNextItemWidth(420.0f);
+                ImGui::InputText("##new_source_filename", new_source_state.filename.data(), new_source_state.filename.size());
+                ImGui::TextDisabled("Project directory: %s", model.artifact().parent_path().string().c_str());
+                notifications.observe("new-source-error", new_source_state.error, NoticeLevel::Error);
+                ImGui::Separator();
+                ImGui::BeginDisabled(new_source_state.filename[0] == '\0' ||
+                                     (new_source_state.named && new_source_state.name[0] == '\0'));
+                if (ImGui::Button("Create Source")) {
+                    const bool created = new_source_state.named
+                        ? model.create_named_source(new_source_state.name.data(), new_source_state.filename.data())
+                        : model.create_code_source(new_source_state.filename.data());
+                    if (created) {
+                        new_source_state.error.clear();
+                        navigation.clear();
+                        created_source = true;
+                        notifications.notify("Created source: " + std::string(new_source_state.filename.data()));
+                        ImGui::CloseCurrentPopup();
+                    } else
+                        new_source_state.error = model.error();
+                }
+                ImGui::EndDisabled();
+                ImGui::SameLine();
+                if (ImGui::Button("Cancel")) {
+                    new_source_state.error.clear();
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
+            ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+            if (ImGui::BeginPopupModal("Convert to Project", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+                ImGui::TextWrapped("Create a DIPfile that loads the current source. The source file stays in place.");
+                ImGui::TextDisabled("Source: %s", model.artifact().string().c_str());
+                ImGui::TextDisabled("Will create: %s", (model.artifact().parent_path() / "DIPfile").string().c_str());
+                notifications.observe("convert-project-error", convert_state.error, NoticeLevel::Error);
+                ImGui::Separator();
+                if (ImGui::Button("Convert")) {
+                    if (model.convert_to_project()) {
+                        navigation.clear();
+                        convert_state.error.clear();
+                        notifications.notify("Opened project: " + model.artifact().string());
+                        ImGui::CloseCurrentPopup();
+                    } else
+                        convert_state.error = model.error();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Cancel")) {
+                    convert_state.error.clear();
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
             ImGui::SetNextWindowPos(
                 ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f)
             );
             if (ImGui::BeginPopupModal("Save Project As", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
                 ImGui::TextWrapped("Choose a parent directory and a name for the project copy.");
-                ImGui::InputText("Parent directory", save_as_parent.data(), save_as_parent.size());
-                ImGui::SameLine();
-                const std::filesystem::path current_parent(save_as_parent.data());
-                const auto parent_parent = current_parent.parent_path();
-                ImGui::BeginDisabled(parent_parent.empty() || parent_parent == current_parent);
-                if (ImGui::Button("Up")) {
-                    const std::string path = parent_parent.string();
-                    std::snprintf(save_as_parent.data(), save_as_parent.size(), "%s", path.c_str());
-                }
-                ImGui::EndDisabled();
-                std::vector<std::filesystem::path> directories;
-                std::error_code directory_error;
-                for (std::filesystem::directory_iterator it(
-                         current_parent, std::filesystem::directory_options::skip_permission_denied, directory_error
-                     ),
-                     end;
-                     !directory_error && it != end;
-                     it.increment(directory_error)) {
-                    std::error_code type_error;
-                    if (it->is_directory(type_error) && !type_error)
-                        directories.push_back(it->path());
-                }
-                std::sort(directories.begin(), directories.end());
-                ImGui::BeginChild("Save As directories", ImVec2(560.0f, 230.0f), ImGuiChildFlags_Borders);
-                for (const auto& directory : directories) {
-                    const auto label = directory.filename().string() + "/";
-                    if (ImGui::Selectable(label.c_str())) {
-                        const std::string path = directory.string();
-                        std::snprintf(save_as_parent.data(), save_as_parent.size(), "%s", path.c_str());
-                    }
-                }
-                ImGui::EndChild();
-                if (directory_error)
-                    ImGui::TextWrapped("Cannot list this directory: %s", directory_error.message().c_str());
+                draw_directory_picker("Parent directory", "Save As directories", save_as_parent);
                 ImGui::TextUnformatted("New project folder name");
                 ImGui::SetNextItemWidth(-1.0f);
                 ImGui::InputText("##save_as_project_folder_name", save_as_name.data(), save_as_name.size());
@@ -204,6 +352,40 @@ namespace snt::view {
                 ImGui::EndPopup();
             }
 
+            ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+            if (ImGui::BeginPopupModal("Export DIPH5", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+                ImGui::TextWrapped("Save the currently evaluated project as a DIPH5 snapshot. Commit setup and save source edits first.");
+                draw_directory_picker("Destination directory", "Export directories", export_state.directory);
+                ImGui::TextUnformatted("File name");
+                ImGui::SetNextItemWidth(-1.0f);
+                ImGui::InputText("##export_diph5_filename", export_state.filename.data(), export_state.filename.size());
+                const auto destination = std::filesystem::path(export_state.directory.data()) / export_state.filename.data();
+                ImGui::TextDisabled("Will create: %s", destination.string().c_str());
+                notifications.observe("export-diph5-error", export_state.error, NoticeLevel::Error);
+                ImGui::Separator();
+                ImGui::BeginDisabled(export_state.filename[0] == '\0');
+                if (ImGui::Button("Export")) {
+                    if (source.dirty())
+                        export_state.error = "Save or discard the edited document before exporting DIPH5.";
+                    else if (std::filesystem::path(export_state.filename.data()).filename() != export_state.filename.data())
+                        export_state.error = "Enter a file name without a directory path.";
+                    else if (model.export_diph5(destination)) {
+                        export_state.error.clear();
+                        notifications.notify("Exported DIPH5: " + std::filesystem::absolute(destination).string());
+                        ImGui::CloseCurrentPopup();
+                    } else
+                        export_state.error = model.error();
+                }
+                ImGui::EndDisabled();
+                ImGui::SameLine();
+                if (ImGui::Button("Cancel")) {
+                    export_state.error.clear();
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
+            ImGui::PopStyleColor();
+
             const ImGuiViewport* viewport = ImGui::GetMainViewport();
             ImGui::SetNextWindowPos(viewport->WorkPos);
             ImGui::SetNextWindowSize(viewport->WorkSize);
@@ -239,13 +421,15 @@ namespace snt::view {
                     source_error.clear();
                     if (!preserve_source_tab)
                         select_source_tab = false;
-                    scroll_to_target = false;
                     data_state = {};
                     graph_state = {};
                     has_data = false;
                     has_graph = false;
-                    if (open_selected_source(model, source, source_error)) {
-                        source_owner = model.selection();
+                    if (navigation.open_selected(model)) {
+                        if (created_source) {
+                            source.set_editing(true);
+                            select_source_tab = true;
+                        }
                     }
                     if (preserve_source_tab)
                         select_source_tab = true;
@@ -273,15 +457,7 @@ namespace snt::view {
                             nullptr,
                             selection_changed && !select_source_tab ? ImGuiTabItemFlags_SetSelected : 0
                         )) {
-                        draw_inspector(
-                            model,
-                            inspector_cache,
-                            source,
-                            select_source_tab,
-                            scroll_to_target,
-                            source_error,
-                            notifications
-                        );
+                        draw_inspector(model, inspector_cache, navigation, notifications);
                         ImGui::EndTabItem();
                     }
                     const bool selected_source =
@@ -291,8 +467,7 @@ namespace snt::view {
                          selected_object->role == ObjectRole::DIPfileSource);
                     if (selected_source && !source.file().empty() && source_owner == model.selection() &&
                         ImGui::BeginTabItem("Source", nullptr, select_source_tab ? ImGuiTabItemFlags_SetSelected : 0)) {
-                        draw_source_view(model, source, scroll_to_target, source_error, edit_report,
-                                         request_save_as, select_source_tab, notifications);
+                        draw_source_view(model, navigation, request_save_as, notifications);
                         ImGui::EndTabItem();
                     }
                     if (has_data && ImGui::BeginTabItem("Data")) {
@@ -372,16 +547,12 @@ namespace snt::view {
         InspectorCache inspector_cache;
         DataViewState data_state;
         GraphViewState graph_state;
-        SourceView source;
-        std::string source_owner;
-        bool select_source_tab = false;
-        bool scroll_to_target = false;
-        std::string source_error;
-        std::string edit_report;
+        SourceNavigationState navigation;
         bool request_save_as = false;
-        std::array<char, 4096> save_as_parent{};
-        std::array<char, 256> save_as_name{};
-        std::string save_as_error;
+        SaveAsDialogState save_as;
+        NewSourceDialogState new_source_state;
+        ConvertDialogState convert_state;
+        ExportDialogState export_state;
         SetupViewState setup_state;
         NotificationCenter notifications;
         bool first_frame = true;
@@ -396,16 +567,12 @@ namespace snt::view {
                 inspector_cache,
                 data_state,
                 graph_state,
-                source,
-                source_owner,
-                select_source_tab,
-                scroll_to_target,
-                source_error,
-                edit_report,
+                navigation,
                 request_save_as,
-                save_as_parent,
-                save_as_name,
-                save_as_error,
+                save_as,
+                new_source_state,
+                convert_state,
+                export_state,
                 setup_state,
                 notifications
             );

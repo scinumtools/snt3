@@ -1,6 +1,7 @@
 #include "main.h"
 
 #include "argparser.h"
+#include "help.h"
 
 #include <deque>
 #include <iomanip>
@@ -17,6 +18,9 @@ Scientific Numerical Tools v3 (SNT)
 
 Usage:
   snt [<module> [<command>]] [options [arguments]]
+
+Description:
+  Work with physical units and dimensional input parameters.
 
 Options:
   -h, --help
@@ -54,6 +58,7 @@ Modules:
     module("view", false, "Graphical parameter browser and editor");
 #endif
     module("hub", true, "Install and prepare pinned code examples");
+    module("init", true, "Initialize a DIP project in the current directory");
     module("setup", true, "Create a validated DIPL override through guided prompts");
 #ifdef ENABLE_SNT_MCP
     module("mcp", true, "Expose DIPL and PUQ tools through Model Context Protocol");
@@ -65,10 +70,11 @@ Modules:
     module("lint", true, "Check evaluated DIPL for advisory issues");
     module("completion", true, "Generate Bash and Zsh completion scripts");
     output << R"(
+Notes:
   + included in this build; - unavailable in this build.
 Run 'snt <module> --help' for module-specific commands.
 )";
-    return output.str();
+    return snt::cli::format_help(output.str());
 }
 
 int main(int argc, char* argv[]) {
@@ -139,6 +145,14 @@ int main(int argc, char* argv[]) {
     }
     if (argc > 1 && std::string(argv[1]) == "hub") {
         return module_hub(argc, argv);
+    }
+    if (argc > 1 && std::string(argv[1]) == "init") {
+        try {
+            return module_init(argc, argv);
+        } catch (const std::exception& error) {
+            std::cerr << "snt init: " << error.what() << '\n';
+            return 2;
+        }
     }
     if (argc > 1 && std::string(argv[1]) == "setup") {
         try {

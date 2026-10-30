@@ -1,4 +1,5 @@
 #include "argparser.h"
+#include "help.h"
 #include "main.h"
 
 #include <cstddef>
@@ -32,7 +33,7 @@ namespace {
     }
 
     std::string help_report() {
-        return R"(
+        return snt::cli::format_help(R"(
 Scientific Numerical Tools v3 (SNT)
 Module: DIP Report
 
@@ -86,13 +87,14 @@ Examples:
   snt report --project DIPfile --intro introduction.tex --format pdf --output report.pdf
   snt report --input file parameters.dip -i override_string "steps = 200" \
       --output report.tex
-)";
+)");
     }
 
 } // namespace
 
 void module_report(ArgParser& argpar) {
-    if (argpar.hasKeyword("-h") || argpar.hasKeyword("--help")) {
+    if (argpar.hasKeyword("-h") || argpar.hasKeyword("--help") ||
+        (argpar.numPositional() == 1 && !argpar.hasKeywords())) {
         std::cout << help_report();
         return;
     }

@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <functional>
 #include <snt/dip/artifact.h>
+#include <snt/dip/project_init.h>
+#include <stdexcept>
 #include <string_view>
 #include <utility>
 
@@ -74,19 +76,30 @@ namespace snt::view {
             return dip::open_artifact(artifact, true, true);
         }
 
+        std::unique_ptr<dip::EditSession> open_edit_session(const std::filesystem::path& artifact,
+                                                             std::string& error) {
+            const auto kind = dip::detect_artifact(artifact);
+            if (kind != dip::ArtifactKind::Project && kind != dip::ArtifactKind::DIPL)
+                return {};
+            try {
+                return std::make_unique<dip::EditSession>(artifact, true);
+            } catch (const std::exception& exception) {
+                error = std::string(kind == dip::ArtifactKind::Project
+                                        ? "Project opened read-only: " : "Source opened read-only: ") +
+                        exception.what();
+                return {};
+            }
+        }
+
     } // namespace
 
     ViewerModel::ViewerModel(std::filesystem::path artifact)
         : input_path_(artifact.string()), artifact_(std::filesystem::absolute(std::move(artifact))) {
         environment_ = load_environment(artifact_);
-        if (dip::detect_artifact(artifact_) == dip::ArtifactKind::Project) {
+        const auto kind = dip::detect_artifact(artifact_);
+        if (kind == dip::ArtifactKind::Project)
             setup_session_ = std::make_unique<dip::SetupSession>(artifact_);
-            try {
-                edit_session_ = std::make_unique<dip::EditSession>(artifact_, true);
-            } catch (const std::exception& error) {
-                error_ = std::string("Project opened read-only: ") + error.what();
-            }
-        }
+        edit_session_ = open_edit_session(artifact_, error_);
         rebuild_objects();
         history_.push_back(selection_);
     }
@@ -115,6 +128,18 @@ namespace snt::view {
         objects_.at("").children.push_back("@project");
         if (setup_session_ && !setup_session_->questions().empty())
             objects_.emplace("@setup", ObjectInfo{"@setup", "Setup", "", {}, false, dip::Path::Kind::None, ObjectRole::Setup});
+        if (dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPL) {
+            objects_.emplace(
+                "@local",
+                ObjectInfo{"@local", "Local sources", "", {}, false, dip::Path::Kind::None, ObjectRole::LocalSources}
+            );
+            objects_.at("").children.push_back("@local");
+            ObjectInfo source{"@code?0", artifact_.filename().string(), "@local", {}, false,
+                              dip::Path::Kind::None, ObjectRole::CodeSource};
+            source.source_kind = "code";
+            objects_.emplace("@code?0", std::move(source));
+            objects_.at("@local").children.push_back("@code?0");
+        }
         if (dip::detect_artifact(artifact_) == dip::ArtifactKind::Project) {
             objects_.emplace(
                 "@dipfile", ObjectInfo{"@dipfile", "DIPfile", "", {}, false, dip::Path::Kind::None, ObjectRole::DIPfile}
@@ -239,6 +264,8 @@ namespace snt::view {
                 continue;
             ensure_object(full, "");
             objects_.at(full).has_value = node->value != nullptr;
+            objects_.at(full).node_dtype = node->dtype;
+            objects_.at(full).value_origin = node->value_origin;
             if (!node->table_path.empty()) {
                 ensure_object(node->table_path, "");
                 objects_.at(node->table_path).has_table = true;
@@ -334,6 +361,8 @@ namespace snt::view {
                         continue;
                     ensure_named_source_object(node->path.name, name);
                     objects_.at("@named-nodes?" + name + "?" + node->path.name).has_value = node->value != nullptr;
+                    objects_.at("@named-nodes?" + name + "?" + node->path.name).node_dtype = node->dtype;
+                    objects_.at("@named-nodes?" + name + "?" + node->path.name).value_origin = node->value_origin;
                 }
                 for (const auto& [path, collection] : source.hierarchy.get_collections()) {
                     ensure_named_source_object(path, name);
@@ -403,7 +432,7 @@ namespace snt::view {
                 objects_.emplace(
                     "@overrides",
                     ObjectInfo{
-                        "@overrides", "Overridden nodes", "", {}, false, dip::Path::Kind::None, ObjectRole::Overrides
+                        "@overrides", "Overrides", "", {}, false, dip::Path::Kind::None, ObjectRole::Overrides
                     }
                 );
                 objects_.at("").children.push_back("@overrides");
@@ -490,14 +519,10 @@ namespace snt::view {
             std::unique_ptr<dip::EditSession> fresh_session;
             std::unique_ptr<dip::SetupSession> fresh_setup;
             std::string edit_error;
-            if (dip::detect_artifact(artifact_) == dip::ArtifactKind::Project) {
+            const auto kind = dip::detect_artifact(artifact_);
+            if (kind == dip::ArtifactKind::Project)
                 fresh_setup = std::make_unique<dip::SetupSession>(artifact_);
-                try {
-                    fresh_session = std::make_unique<dip::EditSession>(artifact_, true);
-                } catch (const std::exception& error) {
-                    edit_error = std::string("Project opened read-only: ") + error.what();
-                }
-            }
+            fresh_session = open_edit_session(artifact_, edit_error);
             environment_ = std::move(fresh);
             edit_session_ = std::move(fresh_session);
             setup_session_ = std::move(fresh_setup);
@@ -583,6 +608,8 @@ namespace snt::view {
             return {};
         if (object.role == ObjectRole::DIPfileSource)
             return {{"DIPfile", artifact_, 1, {}}};
+        if (object.role == ObjectRole::CodeSource && dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPL)
+            return {{"Source", artifact_, 1, {}}};
         if (object.role == ObjectRole::Artifact || object.role == ObjectRole::Project ||
             object.role == ObjectRole::DIPfile)
             return {{"Source", artifact_, 1, {}}};
@@ -694,6 +721,8 @@ namespace snt::view {
             return error ? std::filesystem::absolute(path).lexically_normal() : canonical;
         };
         const auto target_file = normalized(target.file);
+        if (dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPL && target_file == normalized(artifact_))
+            return "@code?0";
         if (object("@dipfile-source") && target_file == normalized(artifact_))
             return "@dipfile-source";
         for (const auto& [path, entry] : objects_) {
@@ -769,6 +798,64 @@ namespace snt::view {
             edit_session_->save_block(path, text);
             reload();
             return true;
+        } catch (const std::exception& error) {
+            error_ = error.what();
+            return false;
+        }
+    }
+
+    bool ViewerModel::create_code_source(const std::string& filename) {
+        if (!edit_session_ || !can_export_diph5()) {
+            error_ = "New Source is available only for an editable DIPfile project.";
+            return false;
+        }
+        try {
+            edit_session_->create_code_source(filename);
+            if (!reload())
+                return false;
+            const auto target = artifact_.parent_path() / filename;
+            const auto& entries = environment_.project_entries();
+            for (std::size_t index = 0; index < entries.size(); ++index) {
+                if (entries[index].kind == dip::ProjectEntry::Kind::Code &&
+                    std::filesystem::path(entries[index].resolved_path) == target) {
+                    select("@code?" + std::to_string(index));
+                    break;
+                }
+            }
+            return true;
+        } catch (const std::exception& error) {
+            error_ = error.what();
+            return false;
+        }
+    }
+
+    bool ViewerModel::create_named_source(const std::string& name, const std::string& filename) {
+        if (!edit_session_ || !can_export_diph5()) {
+            error_ = "New Source is available only for an editable DIPfile project.";
+            return false;
+        }
+        try {
+            edit_session_->create_named_source(name, filename);
+            if (!reload())
+                return false;
+            select(name + "?");
+            return true;
+        } catch (const std::exception& error) {
+            error_ = error.what();
+            return false;
+        }
+    }
+
+    bool ViewerModel::convert_to_project() {
+        if (!can_convert_to_project()) {
+            error_ = "Convert to Project is available only for a standalone .dip or .dipl file.";
+            return false;
+        }
+        try {
+            const auto manifest = dip::create_project_from_source(artifact_);
+            artifact_ = manifest;
+            input_path_ = manifest.string();
+            return reload();
         } catch (const std::exception& error) {
             error_ = error.what();
             return false;
@@ -874,6 +961,37 @@ namespace snt::view {
             input_path_ = artifact_.string();
             if (!reload())
                 return false;
+            return true;
+        } catch (const std::exception& error) {
+            error_ = error.what();
+            return false;
+        }
+    }
+
+    bool ViewerModel::can_export_diph5() const {
+        return dip::detect_artifact(artifact_) == dip::ArtifactKind::Project;
+    }
+
+    bool ViewerModel::export_diph5(const std::filesystem::path& destination_file) {
+        if (!can_export_diph5()) {
+            error_ = "Export DIPH5 is available only for a DIPfile project.";
+            return false;
+        }
+        if (stale_) {
+            error_ = "Reload and resolve the project error before exporting a DIPH5 snapshot.";
+            return false;
+        }
+        try {
+            if (destination_file.empty() || destination_file.filename().empty() ||
+                destination_file.extension() != ".diph5")
+                throw std::invalid_argument("Choose a destination file ending in .diph5.");
+            const auto destination = std::filesystem::absolute(destination_file).lexically_normal();
+            if (!std::filesystem::is_directory(destination.parent_path()))
+                throw std::invalid_argument("Choose an existing destination directory.");
+            if (std::filesystem::symlink_status(destination).type() != std::filesystem::file_type::not_found)
+                throw std::runtime_error("Refusing to replace existing file: " + destination.string());
+            environment_.save(destination);
+            error_.clear();
             return true;
         } catch (const std::exception& error) {
             error_ = error.what();

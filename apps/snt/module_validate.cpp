@@ -1,4 +1,5 @@
 #include "main.h"
+#include "help.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -26,6 +27,24 @@ namespace {
 } // namespace
 
 int module_validate(int argc, char* argv[]) {
+    const auto print_help = [] {
+        snt::cli::HelpPage page;
+        page.command = "validate";
+        page.usage = "snt validate [--project] [--json] <file> [<file> ...]";
+        page.description = "Validate DIPL files or DIPfile projects with the native parser.";
+        page.arguments = "<file>  One or more DIPL files, or DIPfile projects with --project.";
+        page.options = R"(-h, --help  Show this help.
+--project    Treat each input as a DIPfile project.
+--json       Write machine-readable diagnostics.
+--           Treat later arguments as file names.)";
+        page.examples = "snt validate parameters.dip\nsnt validate --project DIPfile\nsnt validate --json parameters.dip";
+        page.notes = "Exit status: 0 valid, 1 invalid DIPL, 2 input or command error.";
+        std::cout << snt::cli::render_help(page);
+    };
+    if (argc == 2) {
+        print_help();
+        return 0;
+    }
     bool project = false;
     bool json = false;
     bool positional_only = false;
@@ -33,9 +52,7 @@ int module_validate(int argc, char* argv[]) {
     for (int i = 2; i < argc; ++i) {
         const std::string arg = argv[i];
         if (!positional_only && (arg == "--help" || arg == "-h")) {
-            std::cout << "Usage: snt validate [--project] [--json] <file> [<file> ...]\n"
-                         "Validate DIPL files or DIPfile projects with the native parser.\n"
-                         "Exit status: 0 valid, 1 invalid DIPL, 2 input or command error.\n";
+            print_help();
             return 0;
         }
         if (!positional_only && arg == "--project")

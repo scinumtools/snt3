@@ -11,6 +11,7 @@
 #include <memory>
 #include <optional>
 #include <snt/dip/edit_session.h>
+#include <snt/dip/artifact.h>
 #include <snt/dip/inspect/inspector.h>
 #include <snt/dip/setup.h>
 #include <string>
@@ -60,6 +61,8 @@ namespace snt::view {
         std::optional<std::size_t> manifest_index; ///< Index into the applicable project manifest collection.
         bool has_table = false;                    ///< Whether this entry exposes a tabular data view.
         std::string source_kind;                    ///< Source file or raw data kind shown as a browser icon.
+        dip::NodeDtype node_dtype = dip::NodeDtype::None; ///< Declared DIPL node type, when this is a value node.
+        dip::ValueOrigin value_origin = dip::ValueOrigin::Empty; ///< Origin of a declared value, including `none`.
     };
 
     /** Source location or embedded block that the inspector can open. */
@@ -114,14 +117,28 @@ namespace snt::view {
         bool save_document(const std::string& path, const std::string& text);
         /** Save an edited block value into its original document and refresh the environment. */
         bool save_block(const std::string& path, const std::string& text);
+        /** Create and register a new .dip code source, then select it in the browser. */
+        bool create_code_source(const std::string& filename);
+        /** Create and register a named .dip source, then select it in the browser. */
+        bool create_named_source(const std::string& name, const std::string& filename);
+        /** Turn a standalone DIPL file into a DIPfile project beside it. */
+        bool convert_to_project();
+        /** Report whether the opened artifact is a standalone DIPL file. */
+        bool can_convert_to_project() const { return dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPL; }
         /** Copy the current project and optionally include the active unsaved document. */
         bool save_as(
             const std::filesystem::path& destination_directory,
             const std::optional<std::string>& edited_path = std::nullopt,
             const std::string& edited_text = {}
         );
+        /** Export the evaluated project as a DIPH5 snapshot without changing the open project. */
+        bool export_diph5(const std::filesystem::path& destination_file);
+        /** Report whether the open artifact is a live DIPfile project. */
+        bool can_export_diph5() const;
         /** Report whether the loaded artifact has a file-backed project session. */
-        bool can_save_as() const { return static_cast<bool>(edit_session_); }
+        bool can_save_as() const {
+            return static_cast<bool>(edit_session_) && dip::detect_artifact(artifact_) == dip::ArtifactKind::Project;
+        }
         /** Guided setup questions for a project, in source order. */
         const std::vector<dip::SetupQuestion>& setup_questions() const;
         /** Form field associated with the most recent setup commit failure, if known. */
