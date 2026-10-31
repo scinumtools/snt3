@@ -103,10 +103,10 @@ jobs:
             HDF5_ROOT=${{ steps.macos_deps.outputs.hdf5_root }}
             CMAKE_PREFIX_PATH=${{ steps.macos_deps.outputs.hdf5_root }}
             DYLD_FALLBACK_LIBRARY_PATH=${{ steps.macos_deps.outputs.hdf5_root }}/lib
-            MACOSX_DEPLOYMENT_TARGET=14.0
+            MACOSX_DEPLOYMENT_TARGET=15.0
 
           CIBW_REPAIR_WHEEL_COMMAND_MACOS: >-
-            MACOSX_DEPLOYMENT_TARGET=14.0
+            MACOSX_DEPLOYMENT_TARGET=15.0
             DYLD_FALLBACK_LIBRARY_PATH=${{ steps.macos_deps.outputs.hdf5_root }}/lib
             delocate-wheel
             --require-archs {delocate_archs}
