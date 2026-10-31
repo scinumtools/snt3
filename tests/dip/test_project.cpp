@@ -10,8 +10,8 @@
 #include <snt/dip/inspect/inspector.h>
 #include <snt/dip/project_bundle.h>
 #include <snt/dip/project_init.h>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 using namespace snt;
@@ -104,9 +104,12 @@ TEST(Project, SourcesUseManifestDirectoryAndCodeSourcesUseTheirOwnFileDirectory)
     );
     project.write("data/registered.dip", "value int = 20\n");
     project.write("data/inline.dip", "value int = 24\n");
-    project.write("model/main.dip", "$source local = \"child.dip\"\n"
-                                    "from_project int = {registered?value}\n"
-                                    "from_local int = {local?value}\n");
+    project.write(
+        "model/main.dip",
+        "$source local = \"child.dip\"\n"
+        "from_project int = {registered?value}\n"
+        "from_local int = {local?value}\n"
+    );
     project.write("model/child.dip", "value int = 22\n");
 
     dip::DIP parser;
@@ -115,12 +118,18 @@ TEST(Project, SourcesUseManifestDirectoryAndCodeSourcesUseTheirOwnFileDirectory)
     EXPECT_EQ(env["from_project"].as<int>(), 20);
     EXPECT_EQ(env["from_local"].as<int>(), 22);
     EXPECT_EQ(env["from_inline"].as<int>(), 24);
-    EXPECT_EQ(std::filesystem::path(env.sources.at("registered").path).generic_string(),
-              (project.path() / "data/registered.dip").generic_string());
-    EXPECT_EQ(std::filesystem::path(env.sources.at("local").path).generic_string(),
-              (project.path() / "model/child.dip").generic_string());
-    EXPECT_EQ(std::filesystem::path(env.sources.at("inline").path).generic_string(),
-              (project.path() / "data/inline.dip").generic_string());
+    EXPECT_EQ(
+        std::filesystem::path(env.sources.at("registered").path).generic_string(),
+        (project.path() / "data/registered.dip").generic_string()
+    );
+    EXPECT_EQ(
+        std::filesystem::path(env.sources.at("local").path).generic_string(),
+        (project.path() / "model/child.dip").generic_string()
+    );
+    EXPECT_EQ(
+        std::filesystem::path(env.sources.at("inline").path).generic_string(),
+        (project.path() / "data/inline.dip").generic_string()
+    );
 }
 
 TEST(Project, PackagesTypedTableAndMatchesNativeEvaluation) {
@@ -539,7 +548,7 @@ TEST(Project, ParameterViewerExampleStaysBrowsable) {
     ASSERT_EQ(source_group.size(), 1);
     EXPECT_EQ(
         std::filesystem::path(source_group.front().source.path).generic_string(),
-        (project.parent_path() / "catalog.dip").generic_string()
+        (project.parent_path() / "sources/catalog.dip").generic_string()
     );
 
     const auto unit = locations(dip::SourceEntityKind::Unit, "sample_tick");
@@ -555,7 +564,7 @@ TEST(Project, ParameterViewerExampleStaysBrowsable) {
     ASSERT_EQ(source.size(), 1);
     EXPECT_EQ(
         std::filesystem::path(source.front().source.path).generic_string(),
-        (project.parent_path() / "reference.dip").generic_string()
+        (project.parent_path() / "sources/reference.dip").generic_string()
     );
     const auto registration = locations(dip::SourceEntityKind::ProjectEntry, {}, {}, 1);
     ASSERT_EQ(registration.size(), 1);
