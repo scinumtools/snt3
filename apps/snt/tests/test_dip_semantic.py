@@ -1,15 +1,15 @@
 import json
 from pathlib import Path
 
-from conftest import checked
+from conftest import checked, fixture_path
 
 
 def test_semantic_json_contract(cli, source_root, tmp_path):
     input_file = source_root / "tests/dip/fixtures/generated_parameters.dip"
     graph_input = source_root / "examples/dip/SemanticDescription/parameters.dip"
     fixture = Path(__file__).with_name("dip_semantic_expected.json").read_text()
-    expected = json.loads(fixture.replace("@INPUT@", str(input_file).replace("\\", "\\\\"))
-                          .replace("@GRAPH_INPUT@", str(graph_input).replace("\\", "\\\\")))
+    expected = json.loads(fixture.replace("@INPUT@", fixture_path(input_file))
+                          .replace("@GRAPH_INPUT@", fixture_path(graph_input)))
 
     def query(*args):
         return json.loads(checked(cli("dip", *args)))

@@ -1,6 +1,6 @@
 import json
 
-from conftest import checked
+from conftest import checked, normalize_path
 
 
 def test_validate_cli(cli, tmp_path):
@@ -39,13 +39,13 @@ def test_validate_cli(cli, tmp_path):
     manifest.write_text('code[]\n  file = "multiple.dip"\n')
     result = validate_json(manifest)
     assert len(result["diagnostics"]) == 2
-    assert result["diagnostics"][0]["location"]["source"].replace("\\", "/") == str(multiple).replace("\\", "/")
+    assert normalize_path(result["diagnostics"][0]["location"]["source"]) == normalize_path(multiple)
     assert len(validate_json("--project", invalid_manifest)["diagnostics"]) == 2
     for path in (settings / "limited.dip", settings / "DIPfile"):
         assert len(validate_json(path)["diagnostics"]) == 1
     result = validate_json(bad_settings / "DIPfile")
     assert result["diagnostics"][0]["location"]["line"] == 2
-    assert result["diagnostics"][0]["location"]["source"].replace("\\", "/") == str(bad_settings / "DIPfile").replace("\\", "/")
+    assert normalize_path(result["diagnostics"][0]["location"]["source"]) == normalize_path(bad_settings / "DIPfile")
     assert "Invalid validation setting" in str(result)
     combined = cli("validate", valid, invalid)
     checked(combined, 1)

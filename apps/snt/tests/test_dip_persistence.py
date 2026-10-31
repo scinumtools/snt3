@@ -1,4 +1,4 @@
-from conftest import checked
+from conftest import checked, normalize_newlines, normalize_path
 
 
 def test_diph5_save_load_and_arguments(cli, tmp_path):
@@ -8,7 +8,7 @@ def test_diph5_save_load_and_arguments(cli, tmp_path):
     def parse(*args, output=b""):
         result = cli("dip", "parse", *args)
         checked(result)
-        assert result.stdout.replace(b"\r\n", b"\n") == output
+        assert normalize_newlines(result.stdout) == output
         return result
 
     def fails(*args):
@@ -20,7 +20,7 @@ def test_diph5_save_load_and_arguments(cli, tmp_path):
     assert saved.exists()
     parse("--load", saved, "--request", "steps", "--value", "--type", "integer", output=b"100\n")
     result = parse("--load", saved, "--tags", "selected", "--print", "--save", copied, output=b"enabled = true\n")
-    assert result.stderr.decode().replace("\\", "/").replace("\r\n", "\n") == f"Saved DIPH5: {copied.as_posix()}\n"
+    assert normalize_path(normalize_newlines(result.stderr.decode())) == f"Saved DIPH5: {copied.as_posix()}\n"
     parse("--load", copied, "--request", "steps", "--value", "--type", "integer", output=b"100\n")
     parse("--load", copied, "--save", copied)
     parse("--load", copied, "--request", "steps", "--value", output=b"100\n")

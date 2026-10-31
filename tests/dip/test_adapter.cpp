@@ -1,4 +1,5 @@
 #include "pch_tests.h"
+#include "test_file_helpers.h"
 
 #include <chrono>
 #include <filesystem>
@@ -26,16 +27,12 @@ namespace {
             fs::remove_all(path, error);
         }
         void write(const fs::path& name, const std::string& value) const {
-            std::ofstream out(path / name, std::ios::binary);
-            out << value;
+            test_file::write_text(path / name, value);
         }
     };
 
     std::string read(const fs::path& path) {
-        std::ifstream in(path, std::ios::binary);
-        std::ostringstream out;
-        out << in.rdbuf();
-        return out.str();
+        return test_file::read_text(path);
     }
 
     struct ExampleAdapter final : dip::Adapter {
