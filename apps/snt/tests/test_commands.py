@@ -85,7 +85,7 @@ def test_help_pages_have_consistent_sections(cli):
     section_order = ["Usage", "Description", "Commands", "Modules", "Arguments", "Options", "Examples", "Notes"]
     for raw_args in pages:
         args = tuple(arg for arg in raw_args if arg)
-        page = checked(cli(*args))
+        page = checked(cli(*args)).replace("\r\n", "\n")
         assert page.startswith("Scientific Numerical Tools (SNT)\n\n"), (args, page)
         assert page.count("Scientific Numerical Tools (SNT)") == 1, args
         headings = [line[:-1] for line in page.splitlines() if line.endswith(":") and line[:-1] in section_order]

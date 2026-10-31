@@ -31,7 +31,7 @@ namespace {
         const std::filesystem::path& path() const { return path_; }
 
         void write(const std::string& name, const std::string& contents) const {
-            std::ofstream file(path_ / name);
+            std::ofstream file(path_ / name, std::ios::binary);
             ASSERT_TRUE(file.is_open());
             file << contents;
         }
@@ -58,8 +58,9 @@ TEST(Project, InitializePreservesExistingProjectFiles) {
     project.write("main.dip", "existing int = 7\n");
     EXPECT_THROW(dip::initialize_project(project.path()), std::runtime_error);
     EXPECT_FALSE(std::filesystem::exists(project.path() / "DIPfile"));
-    std::ifstream source(project.path() / "main.dip");
+    std::ifstream source(project.path() / "main.dip", std::ios::binary);
     EXPECT_EQ(std::string(std::istreambuf_iterator<char>(source), {}), "existing int = 7\n");
+    source.close();
 
     std::filesystem::remove(project.path() / "main.dip");
     project.write("DIPfile", "existing manifest\n");
