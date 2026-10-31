@@ -64,11 +64,13 @@ namespace snt::dip {
             DIP parser;
             if (standalone) {
                 const auto source = root / bundle.entry;
-                parser.set_project_file_reader([&](const std::filesystem::path& requested) {
-                    if (std::filesystem::weakly_canonical(requested) == source)
-                        return find_file(bundle, bundle.entry).text;
-                    return read_project_file(requested);
-                });
+                parser.set_project_file_reader(
+                    [source, text = find_file(bundle, bundle.entry).text](const std::filesystem::path& requested) {
+                        if (std::filesystem::weakly_canonical(requested) == source)
+                            return text;
+                        return read_project_file(requested);
+                    }
+                );
                 parser.add_file(source);
             } else
                 parser.add_project(bundle);

@@ -174,12 +174,6 @@ jobs:
         if: runner.os != 'Windows'
         run: ./setup.sh -t
 
-      - name: Diagnose viewer model crash
-        if: failure() && runner.os == 'Linux'
-        run: |
-          gdb -q -batch -ex run -ex 'thread apply all bt' \
-            --args build/apps/snt/view/snt-view-model-test
-
       - name: Test native MCP over HTTP (Linux/macOS)
         if: runner.os != 'Windows'
         env:
