@@ -133,7 +133,6 @@ namespace snt::view {
             ImGui::TextDisabled("No direct source reads recorded.");
 
         ImGui::Dummy(ImVec2(1.0f, 18.0f));
-        ImGui::SeparatorText("Selected source");
         const auto source_targets = model.source_targets(*selected);
         const auto center = draw_card(
             model, *selected, source_targets.empty() ? nullptr : &source_targets.front(),

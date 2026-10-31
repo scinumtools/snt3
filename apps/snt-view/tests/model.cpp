@@ -23,7 +23,7 @@ namespace {
     }
 
     void write(const std::filesystem::path& path, const std::string& contents) {
-        std::ofstream file(path);
+        std::ofstream file(path, std::ios::binary);
         file << contents;
         if (!file)
             throw std::runtime_error("Unable to write test artifact");
@@ -51,8 +51,10 @@ int main() {
         const auto* standalone_source = standalone.object("@code?0");
         const auto* standalone_files = standalone.object("@files");
         const auto* standalone_file_entry = standalone.object("@project-file?test.dip");
+        const auto* standalone_root = standalone.object("");
         check(standalone_files && standalone_file_entry && standalone_file_entry->parent == "@files" &&
-                  standalone.object("")->children.front() == "@files" && standalone_file_entry->children.empty() &&
+                  standalone_root && !standalone_root->children.empty() &&
+                  standalone_root->children.front() == "@files" && standalone_file_entry->children.empty() &&
                   standalone.project_files().size() == 1 && standalone.project_files().front().links.size() == 1 &&
                   standalone.project_files().front().size_bytes == 14 &&
                   standalone.project_files().front().modified_at.has_value() &&
@@ -65,8 +67,12 @@ int main() {
                   standalone_source->label == "test.dip" && standalone_source->source_kind == "code",
               "A standalone DIPL file should appear under Local sources");
         const auto standalone_targets = standalone.source_targets(*standalone_source);
+        const auto* standalone_value = standalone.object("value");
+        const auto standalone_value_targets = standalone_value ? standalone.source_targets(*standalone_value)
+                                                                 : std::vector<snt::view::SourceTarget>{};
         check(standalone_targets.size() == 1 && standalone_targets.front().file == standalone_file &&
-                  standalone.source_object_path(standalone.source_targets(*standalone.object("value")).front()) ==
+                  !standalone_value_targets.empty() &&
+                  standalone.source_object_path(standalone_value_targets.front()) ==
                       "@code?0" &&
                   standalone.editable_document_path(standalone_file) == "test.dip" && !standalone.can_save_as(),
               "Standalone source links should open the editable file");

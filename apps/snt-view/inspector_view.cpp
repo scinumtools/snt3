@@ -1000,10 +1000,7 @@ namespace snt::view {
         };
         for (const auto& [label, value] : cache.fields)
             labeled_text(label, value);
-        if (const auto* object = model.object(model.selection());
-            object && (object->role == ObjectRole::Path || object->role == ObjectRole::Project ||
-                       object->role == ObjectRole::NamedSourceNodeGroup) &&
-            !object->children.empty()) {
+        if (const auto* object = model.object(model.selection()); object && !object->children.empty()) {
             ImGui::SeparatorText("Children");
             for (const auto& path : object->children) {
                 const auto* child = model.object(path);

@@ -8,7 +8,7 @@ def test_diph5_save_load_and_arguments(cli, tmp_path):
     def parse(*args, output=b""):
         result = cli("dip", "parse", *args)
         checked(result)
-        assert result.stdout == output
+        assert result.stdout.replace(b"\r\n", b"\n") == output
         return result
 
     def fails(*args):
@@ -20,7 +20,7 @@ def test_diph5_save_load_and_arguments(cli, tmp_path):
     assert saved.exists()
     parse("--load", saved, "--request", "steps", "--value", "--type", "integer", output=b"100\n")
     result = parse("--load", saved, "--tags", "selected", "--print", "--save", copied, output=b"enabled = true\n")
-    assert result.stderr.decode().replace("\\", "/").replace("\r\n", "\n") == f"Saved DIPH5: {copied}\n"
+    assert result.stderr.decode().replace("\\", "/").replace("\r\n", "\n") == f"Saved DIPH5: {copied.as_posix()}\n"
     parse("--load", copied, "--request", "steps", "--value", "--type", "integer", output=b"100\n")
     parse("--load", copied, "--save", copied)
     parse("--load", copied, "--request", "steps", "--value", output=b"100\n")
