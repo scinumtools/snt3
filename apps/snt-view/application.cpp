@@ -6,6 +6,7 @@
 #include "inspector_view.h"
 #include "notifications.h"
 #include "source_view.h"
+#include "source_graph_view.h"
 #include "setup_view.h"
 #include "viewer_model.h"
 
@@ -463,6 +464,7 @@ namespace snt::view {
                     const bool selected_source =
                         selected_object &&
                         (selected_object->role == ObjectRole::Source || selected_object->role == ObjectRole::CodeSource ||
+                         selected_object->role == ObjectRole::ProjectFile ||
                          selected_object->role == ObjectRole::BlockSource ||
                          selected_object->role == ObjectRole::DIPfileSource);
                     if (selected_source && !source.file().empty() && source_owner == model.selection() &&
@@ -478,10 +480,16 @@ namespace snt::view {
                         draw_graph_view(model, graph_state);
                         ImGui::EndTabItem();
                     }
+                    if (selected_object && supports_source_graph(*selected_object) &&
+                        ImGui::BeginTabItem("Sources graph")) {
+                        draw_source_graph_view(model, navigation);
+                        ImGui::EndTabItem();
+                    }
                     if (displayed_selection == model.selection() && displayed_revision == model.revision())
                         select_source_tab = false;
                     ImGui::EndTabBar();
                 }
+                notifications.observe("source-navigation-error", source_error, NoticeLevel::Warning);
                 ImGui::EndChild();
                 ImGui::EndTable();
             }

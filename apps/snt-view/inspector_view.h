@@ -28,6 +28,8 @@ namespace snt::view {
 
         void clear();
         bool open_selected(ViewerModel& model);
+        /** Navigate to a source entry, preserving unsaved edits and selecting its line. */
+        bool navigate_to(ViewerModel& model, const SourceTarget& target);
     };
 
     /** Cache semantic inspection fields and source targets for a model selection. */

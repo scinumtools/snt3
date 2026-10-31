@@ -4,6 +4,41 @@
 #include <snt/dip/nodes/node_integer.h>
 #include <snt/dip/nodes/node_string.h>
 #include <snt/dip/solvers/logical_atom.h>
+#include <snt/dip/solvers/logical_operators.h>
+
+#include <cmath>
+
+namespace {
+    template <typename T>
+    bool classify_number(T number, snt::dip::NumericPredicate predicate) {
+        using snt::dip::NumericPredicate;
+        switch (predicate) {
+        case NumericPredicate::Nan: return std::isnan(number);
+        case NumericPredicate::Inf: return std::isinf(number);
+        case NumericPredicate::PosInf: return std::isinf(number) && number > 0;
+        case NumericPredicate::NegInf: return std::isinf(number) && number < 0;
+        case NumericPredicate::Positive: return number > 0;
+        case NumericPredicate::Negative: return number < 0;
+        case NumericPredicate::Zero: return number == 0;
+        case NumericPredicate::AllFinite: return std::isfinite(number);
+        }
+        return false;
+    }
+
+    template <typename T>
+    bool classify_values(const snt::val::ArrayValue<T>& values, snt::dip::NumericPredicate predicate) {
+        if (predicate == snt::dip::NumericPredicate::AllFinite) {
+            for (size_t i = 0; i < values.get_size(); ++i)
+                if (!classify_number(values.get_value(i), predicate))
+                    return false;
+            return true;
+        }
+        for (size_t i = 0; i < values.get_size(); ++i)
+            if (classify_number(values.get_value(i), predicate))
+                return true;
+        return false;
+    }
+}
 
 namespace snt::dip {
     namespace {
@@ -269,6 +304,38 @@ namespace snt::dip {
     }
     void LogicalAtom::custom_not_defined() {
         value.value = std::make_unique<val::ArrayValueBool>(value.value == nullptr);
+    }
+
+    void LogicalAtom::apply_numeric_predicate(NumericPredicate predicate) {
+        if (!value.value || !core::any(value.value->get_dtype() & (core::DataType::Integer | core::DataType::Float)))
+            throw dip::SolverException(
+                "Numerical value required",
+                "A numerical predicate requires a defined integer or floating-point value.",
+                "Pass a numerical literal or a reference to a numerical node.",
+                __FILE__,
+                __LINE__
+            );
+
+        bool result;
+        if (const auto* numbers = dynamic_cast<const val::ArrayValue<double>*>(value.value.get()))
+            result = classify_values(*numbers, predicate);
+        else if (const auto* numbers = dynamic_cast<const val::ArrayValue<long double>*>(value.value.get()))
+            result = classify_values(*numbers, predicate);
+        else if (const auto* numbers = dynamic_cast<const val::ArrayValue<int64_t>*>(value.value.get()))
+            result = classify_values(*numbers, predicate);
+        else if (const auto* numbers = dynamic_cast<const val::ArrayValue<uint64_t>*>(value.value.get()))
+            result = classify_values(*numbers, predicate);
+        else
+            throw dip::SolverException(
+                "Unsupported numerical value",
+                "The numerical predicate cannot inspect this numerical storage type.",
+                "Use a supported integer or floating-point value.",
+                __FILE__,
+                __LINE__
+            );
+
+        value.value = std::make_unique<val::ArrayValueBool>(result);
+        value.units = std::nullopt;
     }
 
 } // namespace snt::dip

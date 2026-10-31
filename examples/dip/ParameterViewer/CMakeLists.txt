@@ -1,12 +1,12 @@
 set(parameter_viewer_inputs
     DIPfile
-    catalog.dip
+    sources/catalog.dip
     field_notes.txt
-    observations.dip
+    code/observations.dip
     overrides.dip
     parameters.dip
-    probe.dip
-    reference.dip
+    schemas/probe.dip
+    sources/reference.dip
     samples.txt
     table_samples.dipt
 )

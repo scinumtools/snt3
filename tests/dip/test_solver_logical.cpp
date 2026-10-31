@@ -109,6 +109,39 @@ TEST(SolverLogical, Definition) {
     EXPECT_EQ(data.value->to_string(), "false");
 }
 
+TEST(SolverLogical, NumericalPredicates) {
+    dip::DIP input;
+    input.add_string("nan_value float = nan\npositive_inf float = inf\nnegative_inf float = -inf");
+    dip::Environment env = input.parse();
+    dip::LogicalSolver solver(env);
+    for (const auto& [expression, expected] : std::vector<std::pair<std::string, bool>>{
+             {"has_nan({?nan_value})", true}, {"has_nan({?positive_inf})", false},
+             {"has_inf({?negative_inf})", true}, {"has_pos_inf({?positive_inf})", true},
+             {"has_pos_inf({?negative_inf})", false}, {"has_neg_inf({?negative_inf})", true},
+             {"has_positive({?positive_inf})", true}, {"has_negative({?negative_inf})", true},
+             {"has_zero(-0.0)", true}, {"has_zero(1)", false},
+             {"all_finite(3 m)", true}, {"all_finite({?nan_value})", false},
+             {"~has_nan(1)", true}}) {
+        EXPECT_EQ(solver.eval(expression).value->to_string(), expected ? "true" : "false") << expression;
+    }
+    EXPECT_THROW(solver.eval("has_nan(true)"), dip::SolverException);
+    EXPECT_THROW(solver.eval("has_zero(\"0\")"), dip::SolverException);
+}
+
+TEST(SolverLogical, NumericalPredicatesOnArrays) {
+    dip::DIP input;
+    input.add_string("samples float[3] = [1, nan, -inf]");
+    input.add_string("empty float[0] = []");
+    dip::Environment env = input.parse();
+    dip::LogicalSolver solver(env);
+    EXPECT_EQ(solver.eval("has_nan({?samples})").value->to_string(), "true");
+    EXPECT_EQ(solver.eval("has_neg_inf({?samples})").value->to_string(), "true");
+    EXPECT_EQ(solver.eval("has_zero({?samples})").value->to_string(), "false");
+    EXPECT_EQ(solver.eval("all_finite({?samples})").value->to_string(), "false");
+    EXPECT_EQ(solver.eval("has_nan({?empty})").value->to_string(), "false");
+    EXPECT_EQ(solver.eval("all_finite({?empty})").value->to_string(), "true");
+}
+
 TEST(SolverLogical, CombinedExpressions) {
 
     dip::Environment env;

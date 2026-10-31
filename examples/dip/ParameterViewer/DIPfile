@@ -4,14 +4,14 @@ units[]
 
 sources[]
   name = "reference"
-  filepath = "reference.dip"
+  filepath = "sources/reference.dip"
 sources[]
   name = "catalog"
-  filepath = "catalog.dip"
+  filepath = "sources/catalog.dip"
 
 schemas[]
   name = "probe"
-  file = "probe.dip"
+  file = "schemas/probe.dip"
 
 overrides[]
   file = "overrides.dip"
@@ -19,7 +19,7 @@ overrides[]
 code[]
   file = "parameters.dip"
 code[]
-  file = "observations.dip"
+  file = "code/observations.dip"
 
 sources[]
   name = "raw_samples"

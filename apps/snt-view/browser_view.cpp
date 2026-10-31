@@ -28,7 +28,13 @@ namespace snt::view {
         if (object.role == ObjectRole::Project)
             return "Resolved nodes";
         if (object.role == ObjectRole::DIPfile)
-            return "DIPfile manifest";
+            return "Project manifest";
+        if (object.role == ObjectRole::ProjectFiles)
+            return "Project files";
+        if (object.role == ObjectRole::ProjectFolder)
+            return "Project folder";
+        if (object.role == ObjectRole::ProjectFile)
+            return "Project file";
         if (object.role == ObjectRole::ManifestCategory)
             return "DIPfile category";
         if (object.role == ObjectRole::ManifestEntry)
@@ -105,6 +111,9 @@ namespace snt::view {
         ImVec4 object_icon_color(const ObjectInfo& object) {
             if (!object.source_kind.empty())
                 return source_kind_color(object.source_kind);
+            if (object.role == ObjectRole::ProjectFiles || object.role == ObjectRole::ProjectFolder ||
+                object.role == ObjectRole::ProjectFile)
+                return ImVec4(0.34f, 0.47f, 0.59f, 1.0f);
             if (object.role == ObjectRole::DIPfile || object.role == ObjectRole::ManifestCategory ||
                 object.role == ObjectRole::ManifestEntry)
                 return ImVec4(0.39f, 0.47f, 0.56f, 1.0f);
@@ -145,7 +154,11 @@ namespace snt::view {
             const auto point = [&](float x, float y) {
                 return ImVec2(pos.x + x * size, pos.y + y * size);
             };
-            if (object.role == ObjectRole::DIPfile || object.role == ObjectRole::ManifestCategory ||
+            if (object.role == ObjectRole::ProjectFile) {
+                draw->AddRect(point(0.22f, 0.08f), point(0.78f, 0.92f), color, 0.0f, 0, 1.3f);
+                draw->AddLine(point(0.33f, 0.45f), point(0.67f, 0.45f), color, 1.1f);
+                draw->AddLine(point(0.33f, 0.63f), point(0.67f, 0.63f), color, 1.1f);
+            } else if (object.role == ObjectRole::DIPfile || object.role == ObjectRole::ManifestCategory ||
                 object.role == ObjectRole::ManifestEntry) {
                 for (float x : {0.27f, 0.73f})
                     for (float y : {0.27f, 0.73f})
@@ -342,7 +355,7 @@ namespace snt::view {
         }
 
         int root_section_group(ObjectRole role) {
-            if (role == ObjectRole::DIPfile)
+            if (role == ObjectRole::ProjectFiles || role == ObjectRole::DIPfile)
                 return 0;
             if (role == ObjectRole::Overrides)
                 return 1;
@@ -358,9 +371,8 @@ namespace snt::view {
             return 6;
         }
 
-        void draw_tree(
-            ViewerModel& model, const ObjectInfo& object, const std::string& query, TreeExpansionState& expansion
-        ) {
+        void draw_tree(ViewerModel& model, const ObjectInfo& object, const std::string& query,
+                       TreeExpansionState& expansion) {
             std::optional<int> previous_root_group;
             for (const auto& path : object.children) {
                 const auto* item = model.object(path);
@@ -381,6 +393,7 @@ namespace snt::view {
                 if (!query.empty())
                     flags |= ImGuiTreeNodeFlags_DefaultOpen;
                 if (item->role == ObjectRole::Project || item->role == ObjectRole::DIPfile ||
+                    item->role == ObjectRole::ProjectFiles ||
                     item->role == ObjectRole::LocalSources || item->role == ObjectRole::BlockSources ||
                     item->role == ObjectRole::Sources || item->role == ObjectRole::RawSources ||
                     item->role == ObjectRole::NamedSourceNodes || item->role == ObjectRole::NamedSourceNodeGroup ||

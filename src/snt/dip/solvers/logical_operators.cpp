@@ -26,4 +26,14 @@ namespace snt::dip {
         tokens->put_left(group1);
     };
 
+    OperatorNumericPredicate::OperatorNumericPredicate(const char* name, NumericPredicate predicate, CustomOperatorType type)
+        : exs::OperatorGroup<1>(name, {name, "(", ")", ","}, type),
+          predicate_(predicate) {}
+
+    void OperatorNumericPredicate::operate_group(exs::TokenListBase* tokens) {
+        exs::Token group = tokens->get_left();
+        static_cast<LogicalAtom*>(group.atom)->apply_numeric_predicate(predicate_);
+        tokens->put_left(group);
+    }
+
 } // namespace snt::dip

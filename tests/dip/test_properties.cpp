@@ -268,6 +268,16 @@ TEST(Properties, DimensionalCondition) {
     EXPECT_THROW(mismatch.parse(), dip::UnitException);
 }
 
+TEST(Properties, NumericalPredicateSelfReference) {
+    dip::DIP accepted;
+    accepted.add_string("samples float[2] = [1, 2]\n  !condition (all_finite({.}) && ~has_negative({.}))");
+    EXPECT_NO_THROW(accepted.parse());
+
+    dip::DIP rejected;
+    rejected.add_string("samples float[2] = [1, nan]\n  !condition (~has_nan({.}))");
+    EXPECT_THROW(rejected.parse(), dip::SyntaxException);
+}
+
 TEST(Properties, OptionsBolean) {
 
     // boolean nodes cannot have options

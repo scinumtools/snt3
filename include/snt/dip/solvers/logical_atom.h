@@ -6,6 +6,8 @@
 
 namespace snt::dip {
 
+    enum class NumericPredicate;
+
     struct LogicalSettings : exs::BaseSettings {
         Environment* env = nullptr; ///< Environment for the references
         Path current;               ///< Current path for in the hierarchy
@@ -45,6 +47,7 @@ namespace snt::dip {
         void logical_or(LogicalAtom* other) override;
         void custom_defined();
         void custom_not_defined();
+        void apply_numeric_predicate(NumericPredicate predicate);
     };
 
 } // namespace snt::dip

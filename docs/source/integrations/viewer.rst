@@ -110,11 +110,31 @@ registered by ``sources[]``. A value that injects raw source content links
 back to its entry when dependency recording is enabled. Raw table files use
 the same header and data presentation as table block values.
 
+The **Sources graph** tab on a source or project file shows direct reads between
+source files and named sources. Sources read by the selected source appear above
+it; sources that read it appear below. Click a source card to open the relevant
+declaration or reading line. The graph includes schema files such as
+``schemas/probe.dip`` in the ParameterViewer example when dependency recording
+captures their reads.
+
 The top path bar shows the argument supplied to ``snt view``. Source file
 locations in the inspector are displayed relative to the opened artifact's
 directory. The :ref:`ParameterViewer example <dip-parameter-viewer-example>`
 provides a project with groups, collections, overrides, schemas, sources,
 units, expressions, arrays, and a table for exploring these views.
+
+The **Files** section above **Project** shows the directory structure of
+files loaded by a ``DIPfile`` project, or the file opened as a standalone
+``.dip`` or ``.dipl`` source. Select **Files** to see only the top-level files
+and folders in the Inspector. Select a folder to see its immediate children in the
+Inspector. Select an individual file to see its metadata and source links, then
+choose a link to open the source. The file also has a **Source** tab using the
+same editor as the corresponding source entry. A file used by multiple
+named sources lists each source separately. The file list updates when the
+project is reloaded or its sources are changed in the viewer. File details
+include size and modification time, plus creation time where the filesystem
+provides it. Referenced ``.dipt`` table files appear alongside other project
+files.
 
 Guided setup
 ------------

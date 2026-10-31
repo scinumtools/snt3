@@ -1,7 +1,23 @@
 #include "viewer_model.h"
 
 #include <algorithm>
+#include <chrono>
 #include <functional>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
+#if defined(__APPLE__) || defined(__linux__)
+#include <sys/stat.h>
+#endif
+#if defined(__linux__)
+#include <fcntl.h>
+#endif
+#if defined(_WIN32)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 #include <snt/dip/artifact.h>
 #include <snt/dip/project_init.h>
 #include <stdexcept>
@@ -10,6 +26,41 @@
 
 namespace snt::view {
     namespace {
+        void read_file_metadata(ProjectFile& file, const std::filesystem::path& path) {
+            std::error_code error;
+            const auto size = std::filesystem::file_size(path, error);
+            if (!error)
+                file.size_bytes = size;
+            error.clear();
+            const auto modified = std::filesystem::last_write_time(path, error);
+            if (!error) {
+                const auto system_time = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+                    modified - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()
+                );
+                file.modified_at = std::chrono::system_clock::to_time_t(system_time);
+            }
+#if defined(__APPLE__)
+            struct stat attributes {};
+            if (::stat(path.c_str(), &attributes) == 0 && attributes.st_birthtimespec.tv_sec > 0)
+                file.created_at = attributes.st_birthtimespec.tv_sec;
+#elif defined(__linux__) && defined(STATX_BTIME)
+            struct statx attributes {};
+            if (::statx(AT_FDCWD, path.c_str(), AT_STATX_SYNC_AS_STAT, STATX_BTIME, &attributes) == 0 &&
+                (attributes.stx_mask & STATX_BTIME) != 0 && attributes.stx_btime.tv_sec > 0)
+                file.created_at = attributes.stx_btime.tv_sec;
+#elif defined(_WIN32)
+            WIN32_FILE_ATTRIBUTE_DATA attributes {};
+            if (GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &attributes)) {
+                ULARGE_INTEGER ticks {};
+                ticks.LowPart = attributes.ftCreationTime.dwLowDateTime;
+                ticks.HighPart = attributes.ftCreationTime.dwHighDateTime;
+                constexpr std::uint64_t windows_epoch = 116444736000000000ULL;
+                if (ticks.QuadPart >= windows_epoch)
+                    file.created_at = static_cast<std::time_t>((ticks.QuadPart - windows_epoch) / 10000000ULL);
+            }
+#endif
+        }
+
         std::string parent_path(const std::string& path) {
             if (!path.empty() && path.back() == ']') {
                 const auto bracket = path.rfind('[');
@@ -117,6 +168,7 @@ namespace snt::view {
     void ViewerModel::rebuild_objects() {
         const dip::Inspector view{environment_};
         objects_.clear();
+        project_files_.clear();
         objects_.emplace(
             "",
             ObjectInfo{"", artifact_.filename().string(), "", {}, false, dip::Path::Kind::None, ObjectRole::Artifact}
@@ -142,7 +194,7 @@ namespace snt::view {
         }
         if (dip::detect_artifact(artifact_) == dip::ArtifactKind::Project) {
             objects_.emplace(
-                "@dipfile", ObjectInfo{"@dipfile", "DIPfile", "", {}, false, dip::Path::Kind::None, ObjectRole::DIPfile}
+                "@dipfile", ObjectInfo{"@dipfile", "Project", "", {}, false, dip::Path::Kind::None, ObjectRole::DIPfile}
             );
             objects_.emplace(
                 "@local",
@@ -492,10 +544,89 @@ namespace snt::view {
                 objects_.at("@units").children.push_back(id);
             }
         }
+        const auto artifact_kind = dip::detect_artifact(artifact_);
+        if (edit_session_ && artifact_kind == dip::ArtifactKind::Project) {
+            const auto root = artifact_.parent_path();
+            for (const auto& bundled : edit_session_->bundle().files) {
+                ProjectFile file{bundled.path, {}};
+                const auto physical = (root / bundled.path).lexically_normal();
+                std::set<std::string> linked_objects;
+                const auto add_link = [&](SourceTarget target) {
+                    const auto browser_path = source_object_path(target);
+                    if (!browser_path.empty() && linked_objects.insert(browser_path).second)
+                        file.links.push_back(std::move(target));
+                };
+                add_link({bundled.path, physical, 1, {}});
+                for (const auto& [name, source] : environment_.sources.entries()) {
+                    if (!source.named_source || source.embedded || source.path.empty())
+                        continue;
+                    std::error_code error;
+                    if (std::filesystem::weakly_canonical(source.path, error) !=
+                        std::filesystem::weakly_canonical(physical, error))
+                        continue;
+                    const auto format = source.table_text ? SourceFormat::Table
+                                       : source.raw_text ? SourceFormat::Plain : SourceFormat::DIPL;
+                    add_link({name, physical, 1, name, format});
+                }
+                if (file.links.empty()) {
+                    const std::string id = "@file?" + bundled.path;
+                    ObjectInfo item{id, bundled.path, "@local", {}, false, dip::Path::Kind::None, ObjectRole::CodeSource};
+                    item.node_path = bundled.path;
+                    item.source_kind = "code";
+                    objects_.emplace(id, std::move(item));
+                    objects_.at("@local").children.push_back(id);
+                    file.links.push_back({bundled.path, physical, 1, {}});
+                }
+                read_file_metadata(file, physical);
+                project_files_.push_back(std::move(file));
+            }
+            std::sort(project_files_.begin(), project_files_.end(), [](const auto& left, const auto& right) {
+                if (left.path == "DIPfile")
+                    return right.path != "DIPfile";
+                if (right.path == "DIPfile")
+                    return false;
+                return left.path < right.path;
+            });
+        }
+        if (artifact_kind == dip::ArtifactKind::DIPL) {
+            const auto file = artifact_.filename().string();
+            ProjectFile entry{file, {{file, artifact_, 1, {}}}};
+            read_file_metadata(entry, artifact_);
+            project_files_.push_back(std::move(entry));
+        }
+        if (!project_files_.empty()) {
+            objects_.emplace("@files", ObjectInfo{"@files", "Files", "", {}, false, dip::Path::Kind::None,
+                                                   ObjectRole::ProjectFiles});
+            for (std::size_t file_index = 0; file_index < project_files_.size(); ++file_index) {
+                const auto& file = project_files_[file_index];
+                const std::filesystem::path path(file.path);
+                std::string parent = "@files";
+                std::filesystem::path directory;
+                for (const auto& part : path.parent_path()) {
+                    directory /= part;
+                    const std::string id = "@folder?" + directory.generic_string();
+                    if (objects_.find(id) == objects_.end()) {
+                        objects_.emplace(id, ObjectInfo{id, part.string(), parent, {}, false,
+                                                       dip::Path::Kind::None, ObjectRole::ProjectFolder});
+                        objects_.at(parent).children.push_back(id);
+                    }
+                    parent = id;
+                }
+                const std::string id = "@project-file?" + file.path;
+                ObjectInfo item{id, path.filename().string(), parent, {}, false, dip::Path::Kind::None,
+                                ObjectRole::ProjectFile};
+                item.project_file_index = file_index;
+                if (file.links.size() == 1)
+                    item.project_link_index = 0;
+                objects_.emplace(id, std::move(item));
+                objects_.at(parent).children.push_back(id);
+            }
+        }
         auto& root_sections = objects_.at("").children;
         root_sections.clear();
         for (const char* section :
-             {"@dipfile",
+             {"@files",
+              "@dipfile",
               "@overrides",
               "@project",
               "@named-nodes",
@@ -511,6 +642,171 @@ namespace snt::view {
             while (!selection_.empty() && objects_.find(selection_) == objects_.end())
                 selection_ = parent_id(selection_);
         }
+        rebuild_source_relations();
+    }
+
+    void ViewerModel::rebuild_source_relations() {
+        source_relations_.clear();
+        const auto& graph = dip::Inspector{environment_}.graph();
+        if (!graph.recorded)
+            return;
+
+        const auto normalized_file = [&](std::filesystem::path file) {
+            if (file.is_relative())
+                file = artifact_.parent_path() / file;
+            std::error_code error;
+            const auto canonical = std::filesystem::weakly_canonical(file, error);
+            return (error ? file.lexically_normal() : canonical).generic_string();
+        };
+        std::unordered_map<std::string, std::string> file_objects;
+        for (const auto& file : project_files_)
+            file_objects.emplace(normalized_file(file.path), "@project-file?" + file.path);
+
+        std::unordered_map<std::string, std::string> source_objects;
+        for (const auto& [name, source] : environment_.sources.entries()) {
+            const std::string path = name + "?";
+            if (object(path))
+                source_objects.emplace(name, path);
+        }
+        for (const auto& info : environment_.get_source_manifest()) {
+            if (source_objects.find(info.name) != source_objects.end() || info.path.empty())
+                continue;
+            std::filesystem::path file(info.path);
+            if (file.is_relative())
+                file = artifact_.parent_path() / file;
+            const std::string path = source_object_path({info.name, file, 1, {}});
+            if (const auto* entry = object(path); entry &&
+                (entry->role == ObjectRole::CodeSource || entry->role == ObjectRole::DIPfileSource))
+                source_objects.emplace(info.name, path);
+            else if (const auto found = file_objects.find(normalized_file(file)); found != file_objects.end())
+                source_objects.emplace(info.name, found->second);
+        }
+
+        const auto source_for_event = [&](const dip::DependencyEvent& event) -> std::string {
+            const auto separator = event.owner.find('?');
+            if (separator != std::string::npos && separator > 0) {
+                const std::string named = event.owner.substr(0, separator) + "?";
+                if (object(named))
+                    return named;
+            }
+            if (event.location) {
+                const auto found = source_objects.find(event.location->source);
+                if (found != source_objects.end())
+                    return found->second;
+            }
+            return {};
+        };
+
+        std::unordered_map<std::string, const dip::DependencyEvent*> latest_values;
+        for (auto it = graph.events.rbegin(); it != graph.events.rend(); ++it)
+            if (it->kind == dip::DependencyEventKind::Value)
+                latest_values.emplace(it->owner, &*it);
+        const auto source_for_target = [&](const std::string& target) -> std::string {
+            const auto separator = target.find('?');
+            if (separator != std::string::npos && separator > 0) {
+                const std::string named = target.substr(0, separator) + "?";
+                if (object(named))
+                    return named;
+            }
+            if (const auto found = latest_values.find(target); found != latest_values.end())
+                return source_for_event(*found->second);
+            if (!target.empty() && target.front() == '?') {
+                if (const auto node = environment_.get_node(target.substr(1))) {
+                    if (const auto found = source_objects.find(node->line.source.name);
+                        found != source_objects.end())
+                        return found->second;
+                }
+            }
+            return {};
+        };
+
+        const auto navigation_target = [&](const std::string& path, std::size_t line)
+            -> std::optional<SourceTarget> {
+            const auto* entry = object(path);
+            if (!entry)
+                return std::nullopt;
+            auto targets = source_targets(*entry);
+            if (targets.empty())
+                return std::nullopt;
+            SourceTarget target = std::move(targets.front());
+            if (line)
+                target.line = line;
+            return target;
+        };
+        const auto referenced_line = [&](const std::string& target) -> std::size_t {
+            if (const auto found = latest_values.find(target); found != latest_values.end() &&
+                found->second->location)
+                return found->second->location->line;
+            if (!target.empty() && target.front() == '?') {
+                if (const auto node = environment_.get_node(target.substr(1)))
+                    return node->line.source.line_number;
+            }
+            return 1;
+        };
+
+        std::unordered_set<std::string> seen_events;
+        std::map<std::pair<std::string, std::string>, std::pair<SourceTarget, SourceTarget>> relationships;
+        for (auto it = graph.events.rbegin(); it != graph.events.rend(); ++it) {
+            const std::string event_key = std::to_string(static_cast<int>(it->kind)) + ":" + it->owner;
+            if (!seen_events.insert(event_key).second)
+                continue;
+            const std::string from = source_for_event(*it);
+            if (from.empty())
+                continue;
+            for (const auto& read : it->reads) {
+                const std::string to = source_for_target(read.target);
+                if (to.empty() || to == from)
+                    continue;
+                auto reader = navigation_target(from, it->location ? it->location->line : 1);
+                auto dependency = navigation_target(to, referenced_line(read.target));
+                if (reader && dependency)
+                    relationships.try_emplace({from, to}, std::move(*reader), std::move(*dependency));
+            }
+        }
+        for (const auto& [pair, targets] : relationships) {
+            const auto& [from, to] = pair;
+            source_relations_[from].depends_on.push_back(to);
+            source_relations_[from].dependency_targets.emplace(to, targets.second);
+            source_relations_[to].used_by.push_back(from);
+            source_relations_[to].reader_targets.emplace(from, targets.first);
+        }
+        for (const auto& [source_path, relations] : source_relations_) {
+            const auto* entry = object(source_path);
+            if (!entry || (entry->role != ObjectRole::Source && entry->role != ObjectRole::CodeSource &&
+                           entry->role != ObjectRole::DIPfileSource))
+                continue;
+            const auto targets = source_targets(*entry);
+            if (targets.empty())
+                continue;
+            const auto file = file_objects.find(normalized_file(targets.front().file));
+            if (file == file_objects.end() || file->second == source_path)
+                continue;
+            auto& file_relations = source_relations_[file->second];
+            file_relations.depends_on.insert(
+                file_relations.depends_on.end(), relations.depends_on.begin(), relations.depends_on.end()
+            );
+            file_relations.used_by.insert(
+                file_relations.used_by.end(), relations.used_by.begin(), relations.used_by.end()
+            );
+            file_relations.dependency_targets.insert(
+                relations.dependency_targets.begin(), relations.dependency_targets.end()
+            );
+            file_relations.reader_targets.insert(relations.reader_targets.begin(), relations.reader_targets.end());
+        }
+        for (auto& [path, relations] : source_relations_) {
+            const auto deduplicate = [](std::vector<std::string>& entries) {
+                std::sort(entries.begin(), entries.end());
+                entries.erase(std::unique(entries.begin(), entries.end()), entries.end());
+            };
+            deduplicate(relations.depends_on);
+            deduplicate(relations.used_by);
+        }
+    }
+
+    const SourceRelations& ViewerModel::source_relations(const ObjectInfo& object) const {
+        static const SourceRelations empty;
+        const auto found = source_relations_.find(object.path);
+        return found == source_relations_.end() ? empty : found->second;
     }
 
     bool ViewerModel::reload() {
@@ -606,10 +902,15 @@ namespace snt::view {
         const dip::Inspector view{environment_};
         if (dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPH5)
             return {};
+        if (object.role == ObjectRole::ProjectFile && object.project_file_index &&
+            *object.project_file_index < project_files_.size())
+            return project_files_[*object.project_file_index].links;
         if (object.role == ObjectRole::DIPfileSource)
             return {{"DIPfile", artifact_, 1, {}}};
         if (object.role == ObjectRole::CodeSource && dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPL)
             return {{"Source", artifact_, 1, {}}};
+        if (object.role == ObjectRole::CodeSource && !object.manifest_index && !object.node_path.empty())
+            return {{"Source", artifact_.parent_path() / object.node_path, 1, {}}};
         if (object.role == ObjectRole::Artifact || object.role == ObjectRole::Project ||
             object.role == ObjectRole::DIPfile)
             return {{"Source", artifact_, 1, {}}};
@@ -727,12 +1028,27 @@ namespace snt::view {
             return "@dipfile-source";
         for (const auto& [path, entry] : objects_) {
             if (entry.role != ObjectRole::CodeSource || !entry.manifest_index)
-                continue;
+                {
+                    if (entry.role == ObjectRole::CodeSource && !entry.node_path.empty() &&
+                        normalized(artifact_.parent_path() / entry.node_path) == target_file)
+                        return path;
+                    continue;
+                }
             const auto& project_entry = environment_.project_entries().at(*entry.manifest_index);
             if (!project_entry.resolved_path.empty() && normalized(project_entry.resolved_path) == target_file)
                 return path;
         }
         return {};
+    }
+
+    std::optional<SourceTarget> ViewerModel::project_file_target(const ObjectInfo& object) const {
+        if (!object.project_file_index || !object.project_link_index ||
+            *object.project_file_index >= project_files_.size())
+            return std::nullopt;
+        const auto& links = project_files_[*object.project_file_index].links;
+        if (*object.project_link_index >= links.size())
+            return std::nullopt;
+        return links[*object.project_link_index];
     }
 
     std::string ViewerModel::named_source_node_path(const std::string& source, const std::string& node_path) const {

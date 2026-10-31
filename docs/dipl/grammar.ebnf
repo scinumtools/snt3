@@ -415,10 +415,15 @@ quantity
   = ( integer | float ) [ whitespace PUEL-unit-expression ] ;
 
 built-in-call
-  = definition-test | numerical-function ;
+  = definition-test | numerical-function | numerical-predicate ;
 
 definition-test
   = ( "def" | "ndef" ) "(" whitespace node-reference whitespace ")" ;
+
+numerical-predicate
+  = ( "has_nan" | "has_inf" | "has_pos_inf" | "has_neg_inf"
+    | "has_positive" | "has_negative" | "has_zero" | "all_finite" )
+    "(" optional-whitespace primary-expression optional-whitespace ")" ;
 
 numerical-function
   = ( "exp" | "ln" | "log10" | "sin" | "cos" | "tan" | "floor" | "ceil" | "round" )

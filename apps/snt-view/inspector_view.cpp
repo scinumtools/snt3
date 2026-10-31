@@ -7,8 +7,10 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
+#include <ctime>
 #include <cstring>
 #include <filesystem>
+#include <iterator>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <snt/core/datatypes.h>
@@ -138,6 +140,47 @@ namespace snt::view {
             ImGui::TextDisabled("%s", label);
             ImGui::SameLine(120.0f);
             ImGui::TextWrapped("%s", value.c_str());
+        }
+
+        std::string file_size_text(std::uintmax_t bytes) {
+            if (bytes < 1024)
+                return std::to_string(bytes) + " B";
+            constexpr const char* units[] = {"B", "KiB", "MiB", "GiB", "TiB"};
+            double scaled = static_cast<double>(bytes);
+            std::size_t unit = 0;
+            while (scaled >= 1024.0 && unit + 1 < std::size(units)) {
+                scaled /= 1024.0;
+                ++unit;
+            }
+            char rounded[32];
+            std::snprintf(rounded, sizeof(rounded), "%.1f %s", scaled, units[unit]);
+            return rounded;
+        }
+
+        std::string utc_time_text(std::time_t time) {
+            std::tm parts {};
+#if defined(_WIN32)
+            if (gmtime_s(&parts, &time) != 0)
+                return {};
+#else
+            if (!gmtime_r(&time, &parts))
+                return {};
+#endif
+            char formatted[32];
+            if (std::strftime(formatted, sizeof(formatted), "%Y-%m-%d %H:%M:%S UTC", &parts) == 0)
+                return {};
+            return formatted;
+        }
+
+        void draw_file_metadata(const ProjectFile& file) {
+            if (file.size_bytes) {
+                labeled_text("Size", std::to_string(*file.size_bytes) + " bytes (" +
+                                         file_size_text(*file.size_bytes) + ")");
+            }
+            if (file.created_at)
+                labeled_text("Created", utc_time_text(*file.created_at));
+            if (file.modified_at)
+                labeled_text("Modified", utc_time_text(*file.modified_at));
         }
 
         bool same_file(const std::string& lhs, const std::string& rhs) {
@@ -849,7 +892,60 @@ namespace snt::view {
         NotificationCenter& notifications
     ) {
         auto& source = navigation.source;
-        auto& source_error = navigation.error;
+        const auto draw_file_sources = [&](const ProjectFile& file) {
+            for (std::size_t index = 0; index < file.links.size(); ++index) {
+                const auto& target = file.links[index];
+                const auto* entry = model.object(model.source_object_path(target));
+                const std::string label = entry ? entry->label + " (" + object_kind_name(*entry) + ")"
+                                                : target.label;
+                ImGui::PushID(static_cast<int>(index));
+                const bool clicked = ImGui::Selectable(label.c_str());
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Open %s:%zu", file.path.c_str(), target.line);
+                ImGui::PopID();
+                if (clicked)
+                    return navigation.navigate_to(model, target);
+            }
+            return false;
+        };
+        if (const auto* object = model.object(model.selection());
+            object && (object->role == ObjectRole::ProjectFiles || object->role == ObjectRole::ProjectFolder)) {
+            ImGui::SeparatorText(object->label.c_str());
+            for (const auto& child_path : object->children) {
+                const auto* child = model.object(child_path);
+                if (!child || child->parent != object->path ||
+                    (child->role != ObjectRole::ProjectFolder && child->role != ObjectRole::ProjectFile))
+                    continue;
+                ImGui::PushID(child_path.c_str());
+                const std::string label = "    " + child->label;
+                const bool selected = ImGui::Selectable(label.c_str());
+                const float icon_size = ImGui::GetFontSize() * 0.72f;
+                const ImVec2 row = ImGui::GetItemRectMin();
+                draw_object_icon(
+                    *child,
+                    ImVec2(row.x + 4.0f, row.y + (ImGui::GetItemRectSize().y - icon_size) * 0.5f),
+                    icon_size
+                );
+                ImGui::PopID();
+                if (selected) {
+                    model.select(child_path);
+                    break;
+                }
+            }
+            return;
+        }
+        if (const auto* object = model.object(model.selection());
+            object && object->role == ObjectRole::ProjectFile && object->project_file_index &&
+            *object->project_file_index < model.project_files().size()) {
+            const auto& file = model.project_files()[*object->project_file_index];
+            ImGui::Text("File: %s", file.path.c_str());
+            if (!file.links.empty())
+                labeled_text("Location", file.links.front().file.string());
+            draw_file_metadata(file);
+            ImGui::SeparatorText("Sources");
+            draw_file_sources(file);
+            return;
+        }
         const dip::Inspector view{model.environment()};
         if (!cache.valid || cache.path != model.selection() || cache.revision != model.revision())
             refresh_inspector(model, cache);
@@ -881,26 +977,11 @@ namespace snt::view {
                         ImGui::SetTooltip("%s:%zu%s", location.c_str(), target.line, available ? "" : " (unavailable)");
                     }
                     if (clicked) {
-                        const std::string source_path = model.source_object_path(target);
-                        if (source_path.empty()) {
-                            source_error = "The source is not listed in the Sources section.";
-                            continue;
-                        }
-                        if (source.dirty()) {
-                            if (source.file() != target.file) {
-                                source_error = "Save or discard the current document before opening another source.";
-                                continue;
-                            }
-                        }
-                        if (model.select(source_path)) {
-                            source_error.clear();
-                            navigation.pending_target = target;
-                        }
+                        navigation.navigate_to(model, target);
                     }
                 }
             }
         }
-        notifications.observe("source-navigation-error", source_error, NoticeLevel::Warning);
         const auto graph_browser_path = [&](const std::string& graph_path) {
             if (graph_path.size() > 1 && graph_path.front() == '?') {
                 const std::string resolved_path = graph_path.substr(1);
@@ -1019,7 +1100,8 @@ namespace snt::view {
     static bool open_selected_source(ViewerModel& model, SourceView& source, std::string& error) {
         const auto* selected = model.object(model.selection());
         if (!selected || (selected->role != ObjectRole::Source && selected->role != ObjectRole::CodeSource &&
-                          selected->role != ObjectRole::BlockSource && selected->role != ObjectRole::DIPfileSource))
+                          selected->role != ObjectRole::BlockSource && selected->role != ObjectRole::DIPfileSource &&
+                          selected->role != ObjectRole::ProjectFile))
             return false;
         const auto targets = model.source_targets(*selected);
         if (targets.empty()) {
@@ -1027,9 +1109,15 @@ namespace snt::view {
             return false;
         }
         const auto& target = targets.front();
-        if (source.dirty()) {
-            if (source.file() == target.file)
+        if (source.file() == target.file) {
+            if (source.dirty())
                 return true;
+            if (source.format() == target.format) {
+                if (const auto edit_path = model.editable_document_path(target.file);
+                    edit_path && source.text() == model.document_text(*edit_path))
+                    return true;
+            }
+        } else if (source.dirty()) {
             error = "Save or discard the current document before opening another source.";
             return false;
         }
@@ -1079,6 +1167,29 @@ namespace snt::view {
         }
         pending_target.reset();
         return opened;
+    }
+
+    bool SourceNavigationState::navigate_to(ViewerModel& model, const SourceTarget& target) {
+        const std::string source_path = model.source_object_path(target);
+        if (source_path.empty()) {
+            error = "The source is not listed in the source selection.";
+            return false;
+        }
+        if (source.dirty() && source.file() != target.file) {
+            error = "Save or discard the current document before opening another source.";
+            return false;
+        }
+        error.clear();
+        if (model.selection() == source_path) {
+            source.focus_line(target.block_path ? 1 : target.line);
+            select_tab = true;
+            return true;
+        }
+        if (model.select(source_path)) {
+            pending_target = target;
+            return true;
+        }
+        return false;
     }
 
 } // namespace snt::view

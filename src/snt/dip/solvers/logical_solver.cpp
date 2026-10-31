@@ -13,6 +13,17 @@ namespace snt::dip {
         );
         operators.append(dip::DEFINED_OPERATOR, std::make_shared<dip::OperatorDefined>());
         operators.append(dip::NOT_DEFINED_OPERATOR, std::make_shared<dip::OperatorNotDefined>());
+        const auto add_predicate = [&operators](dip::CustomOperatorType type, const char* name, dip::NumericPredicate predicate) {
+            operators.append(type, std::make_shared<dip::OperatorNumericPredicate>(name, predicate, type));
+        };
+        add_predicate(dip::HAS_NAN_OPERATOR, "has_nan", dip::NumericPredicate::Nan);
+        add_predicate(dip::HAS_INF_OPERATOR, "has_inf", dip::NumericPredicate::Inf);
+        add_predicate(dip::HAS_POS_INF_OPERATOR, "has_pos_inf", dip::NumericPredicate::PosInf);
+        add_predicate(dip::HAS_NEG_INF_OPERATOR, "has_neg_inf", dip::NumericPredicate::NegInf);
+        add_predicate(dip::HAS_POSITIVE_OPERATOR, "has_positive", dip::NumericPredicate::Positive);
+        add_predicate(dip::HAS_NEGATIVE_OPERATOR, "has_negative", dip::NumericPredicate::Negative);
+        add_predicate(dip::HAS_ZERO_OPERATOR, "has_zero", dip::NumericPredicate::Zero);
+        add_predicate(dip::ALL_FINITE_OPERATOR, "all_finite", dip::NumericPredicate::AllFinite);
         operators.append(exs::EQUAL_OPERATOR, std::make_shared<exs::OperatorEqual>(" == "));
         operators.append(exs::NOT_EQUAL_OPERATOR, std::make_shared<exs::OperatorNotEqual>(" != "));
         operators.append(
@@ -28,7 +39,12 @@ namespace snt::dip {
         operators.append(exs::OR_OPERATOR, std::make_shared<exs::OperatorOr>(" || "));
 
         exs::StepList steps;
-        steps.append(exs::GROUP_OPERATION, {dip::DEFINED_OPERATOR, dip::NOT_DEFINED_OPERATOR});
+        steps.append(
+            exs::GROUP_OPERATION,
+            {dip::DEFINED_OPERATOR, dip::NOT_DEFINED_OPERATOR, dip::HAS_NAN_OPERATOR, dip::HAS_INF_OPERATOR,
+             dip::HAS_POS_INF_OPERATOR, dip::HAS_NEG_INF_OPERATOR, dip::HAS_POSITIVE_OPERATOR,
+             dip::HAS_NEGATIVE_OPERATOR, dip::HAS_ZERO_OPERATOR, dip::ALL_FINITE_OPERATOR}
+        );
         steps.append(exs::GROUP_OPERATION, {exs::PARENTHESES_OPERATOR});
         steps.append(
             exs::BINARY_OPERATION,

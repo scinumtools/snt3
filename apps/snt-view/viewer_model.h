@@ -14,6 +14,8 @@
 #include <snt/dip/artifact.h>
 #include <snt/dip/inspect/inspector.h>
 #include <snt/dip/setup.h>
+#include <cstdint>
+#include <ctime>
 #include <string>
 #include <utility>
 #include <vector>
@@ -25,6 +27,9 @@ namespace snt::view {
         Artifact,         ///< Input artifact root.
         Project,          ///< Evaluated source project.
         DIPfile,          ///< Project manifest.
+        ProjectFiles,     ///< Loaded project file hierarchy.
+        ProjectFolder,    ///< Directory inside a loaded project.
+        ProjectFile,      ///< One loaded physical file.
         Setup,            ///< Guided inputs marked with !setup.
         ManifestCategory, ///< Group of manifest entries.
         ManifestEntry,    ///< One project manifest entry.
@@ -63,6 +68,8 @@ namespace snt::view {
         std::string source_kind;                    ///< Source file or raw data kind shown as a browser icon.
         dip::NodeDtype node_dtype = dip::NodeDtype::None; ///< Declared DIPL node type, when this is a value node.
         dip::ValueOrigin value_origin = dip::ValueOrigin::Empty; ///< Origin of a declared value, including `none`.
+        std::optional<std::size_t> project_file_index; ///< Index into the loaded file list.
+        std::optional<std::size_t> project_link_index; ///< Source link for a loaded file.
     };
 
     /** Source location or embedded block that the inspector can open. */
@@ -73,6 +80,23 @@ namespace snt::view {
         std::string source_name;                  ///< Source identifier for locating embedded text.
         SourceFormat format = SourceFormat::DIPL; ///< Highlighting mode for the source target.
         std::optional<std::string> block_path; ///< Embedded source block path, when text is stored in the environment.
+    };
+
+    /** A loaded project file and the source entries that can open it. */
+    struct ProjectFile {
+        std::string path;                 ///< Project-relative path.
+        std::vector<SourceTarget> links;  ///< Source choices for this physical file.
+        std::optional<std::uintmax_t> size_bytes; ///< File size when readable.
+        std::optional<std::time_t> created_at;    ///< Filesystem creation time when available.
+        std::optional<std::time_t> modified_at;   ///< Last modification time when readable.
+    };
+
+    /** Direct effective reads between browser source entries. */
+    struct SourceRelations {
+        std::vector<std::string> depends_on;
+        std::vector<std::string> used_by;
+        std::map<std::string, SourceTarget> dependency_targets; ///< Referenced declaration lines.
+        std::map<std::string, SourceTarget> reader_targets; ///< Lines that read this source.
     };
 
     /** Own an evaluated environment, its browser hierarchy, source editing, and navigation history. */
@@ -103,6 +127,12 @@ namespace snt::view {
         std::vector<SourceTarget> source_targets(const ObjectInfo& object) const;
         /** Find the browser entry under Sources that represents a source target. */
         std::string source_object_path(const SourceTarget& target) const;
+        /** Files packaged by the core project loader, grouped by physical path. */
+        const std::vector<ProjectFile>& project_files() const { return project_files_; }
+        /** Direct source relationships inferred from recorded value and condition reads. */
+        const SourceRelations& source_relations(const ObjectInfo& object) const;
+        /** Resolve the source link represented by a project file browser entry. */
+        std::optional<SourceTarget> project_file_target(const ObjectInfo& object) const;
         /** Browser identity for a node contributed by a named source. */
         std::string named_source_node_path(const std::string& source, const std::string& node_path) const;
         /** Return a project-relative path if this source is a bundled editable document. */
@@ -181,12 +211,15 @@ namespace snt::view {
       private:
         /** Rebuild browser entries from the current environment and input metadata. */
         void rebuild_objects();
+        void rebuild_source_relations();
         std::string input_path_;                    ///< Original input argument.
         std::filesystem::path artifact_;            ///< Resolved artifact used for loading.
         dip::Environment environment_;              ///< Loaded environment retained for inspection.
         std::unique_ptr<dip::EditSession> edit_session_; ///< Core project editing session, when file-backed.
         std::unique_ptr<dip::SetupSession> setup_session_; ///< Core guided setup for project inputs.
         std::map<std::string, ObjectInfo> objects_; ///< Browser hierarchy indexed by entry path.
+        std::vector<ProjectFile> project_files_; ///< Files available to the project file panel.
+        std::map<std::string, SourceRelations> source_relations_; ///< Source reads keyed by browser entry.
         std::string selection_;                     ///< Currently selected entry path.
         std::string search_;                        ///< Browser filter query.
         std::string error_;                         ///< Latest reload failure message.

@@ -17,6 +17,11 @@ namespace {
             throw std::runtime_error(message);
     }
 
+    void check(bool condition, const std::string& message) {
+        if (!condition)
+            throw std::runtime_error(message);
+    }
+
     void write(const std::filesystem::path& path, const std::string& contents) {
         std::ofstream file(path);
         file << contents;
@@ -44,6 +49,18 @@ int main() {
         write(standalone_file, "value int = 1\n");
         snt::view::ViewerModel standalone(standalone_file);
         const auto* standalone_source = standalone.object("@code?0");
+        const auto* standalone_files = standalone.object("@files");
+        const auto* standalone_file_entry = standalone.object("@project-file?test.dip");
+        check(standalone_files && standalone_file_entry && standalone_file_entry->parent == "@files" &&
+                  standalone.object("")->children.front() == "@files" && standalone_file_entry->children.empty() &&
+                  standalone.project_files().size() == 1 && standalone.project_files().front().links.size() == 1 &&
+                  standalone.project_files().front().size_bytes == 14 &&
+                  standalone.project_files().front().modified_at.has_value() &&
+                  standalone.source_targets(*standalone_file_entry).size() == 1 &&
+                  standalone.source_targets(*standalone_file_entry).front().file == standalone_file &&
+                  standalone.source_object_path(standalone.project_files().front().links.front()) == "@code?0" &&
+                  standalone.select(standalone_file_entry->path),
+              "Standalone .dip files should appear in Files and link to their source in the inspector");
         check(standalone.object("@local") && standalone_source && standalone_source->parent == "@local" &&
                   standalone_source->label == "test.dip" && standalone_source->source_kind == "code",
               "A standalone DIPL file should appear under Local sources");
@@ -65,7 +82,10 @@ int main() {
         const auto dipl_file = standalone_dir / "test.dipl";
         write(dipl_file, "answer int = 5\n");
         snt::view::ViewerModel dipl(dipl_file);
-        check(dipl.object("@code?0") && dipl.editable_document_path(dipl_file) == "test.dipl" &&
+        check(dipl.object("@code?0") && dipl.object("@project-file?test.dipl") &&
+                  dipl.project_files().size() == 1 &&
+                  dipl.source_object_path(dipl.project_files().front().links.front()) == "@code?0" &&
+                  dipl.editable_document_path(dipl_file) == "test.dipl" &&
                   dipl.save_document("test.dipl", "answer int = 6\n") && dipl.environment()["answer"].as<int>() == 6,
               "Standalone .dipl files should support the same editing workflow");
         write(standalone_dir / "child.dip", "base int = 3\n");
@@ -85,6 +105,17 @@ int main() {
                   convertible.environment()["converted"].as<int>() == 9 &&
                   convertible.editable_document_path(convertible_file) == "convert.dip",
               "Converting a standalone file should open its new editable project");
+        const auto nested_dir = inline_dir / "nested-project";
+        std::filesystem::create_directories(nested_dir / "config");
+        write(nested_dir / "DIPfile", "code[]\n  file = \"config/settings.dip\"\n");
+        write(nested_dir / "config/settings.dip", "setting int = 4\n");
+        snt::view::ViewerModel nested_project(nested_dir / "DIPfile");
+        const auto* folder = nested_project.object("@folder?config");
+        const auto* nested_file = nested_project.object("@project-file?config/settings.dip");
+        check(folder && folder->parent == "@files" && nested_file && nested_file->parent == folder->path &&
+                  nested_project.project_file_target(*nested_file).has_value() &&
+                  !nested_project.source_object_path(*nested_project.project_file_target(*nested_file)).empty(),
+              "Project files should retain folder structure and open their source entries");
         check(!dipl.convert_to_project() && dipl.can_convert_to_project() &&
                   dipl.artifact() == dipl_file && dipl.environment()["answer"].as<int>() == 6,
               "Conversion must preserve a standalone viewer when a DIPfile already exists");
@@ -259,12 +290,14 @@ int main() {
         );
         check(
             project.object("@project")->label == "Resolved nodes" &&
+                project.object("@dipfile")->label == "Project" &&
                 project.object("@overrides")->label == "Overrides",
             "Resolved and overridden branch labels are incorrect"
         );
         check(
             project.object("")->children ==
                 std::vector<std::string>{
+                    "@files",
                     "@dipfile",
                     "@overrides",
                     "@project",
@@ -279,6 +312,51 @@ int main() {
             "Browser sections are not in the expected order"
         );
         const auto& entries = project.environment().project_entries();
+        const auto* files_section = project.object("@files");
+        const auto* source_folder = project.object("@folder?sources");
+        const auto* schema_folder = project.object("@folder?schemas");
+        const auto* code_folder = project.object("@folder?code");
+        const auto* file_entry = project.object("@project-file?sources/reference.dip");
+        check(files_section && source_folder && schema_folder && code_folder &&
+                  source_folder->parent == "@files" && schema_folder->parent == "@files" &&
+                  code_folder->parent == "@files" &&
+                  std::find(files_section->children.begin(), files_section->children.end(),
+                            "@project-file?sources/reference.dip") == files_section->children.end() &&
+                  file_entry && file_entry->parent == source_folder->path &&
+                  project.source_targets(*file_entry).size() == 1 &&
+                  project.source_targets(*file_entry).front().file.filename() == "reference.dip" &&
+                  std::find(source_folder->children.begin(), source_folder->children.end(),
+                            "@project-file?sources/catalog.dip") != source_folder->children.end() &&
+                  std::find(code_folder->children.begin(), code_folder->children.end(),
+                            "@project-file?code/observations.dip") != code_folder->children.end() &&
+                  project.project_file_target(*file_entry).has_value() &&
+                  project.source_object_path(*project.project_file_target(*file_entry)) == "reference?",
+              "Project file tree should group nested files and link them to their source entries");
+        const auto& project_files = project.project_files();
+        check(!project_files.empty() && project_files.front().path == "DIPfile",
+              "Files tab should include the project manifest first");
+        for (const auto& file : project_files) {
+            check(!file.links.empty(), "Every loaded project file needs a source link: " + file.path);
+            for (const auto& link : file.links)
+                check(!project.source_object_path(link).empty(),
+                      "Loaded project file link has no source entry: " + file.path);
+        }
+        const auto has_project_file = [&](const std::string& path) {
+            return std::any_of(project_files.begin(), project_files.end(), [&](const auto& file) {
+                return file.path == path;
+            });
+        };
+        check(has_project_file("sources/reference.dip") && has_project_file("sources/catalog.dip") &&
+                  has_project_file("schemas/probe.dip") && has_project_file("code/observations.dip") &&
+                  has_project_file("samples.txt") && has_project_file("parameters.dip") &&
+                  has_project_file("table_samples.dipt"),
+              "Files tab should include named, schema, raw, table, and code sources");
+        const auto* table_file = project.object("@project-file?table_samples.dipt");
+        check(table_file && project.source_targets(*table_file).size() == 1 &&
+                  project.source_targets(*table_file).front().format == snt::view::SourceFormat::Table &&
+                  project.editable_document_path(project.source_targets(*table_file).front().file) ==
+                      "table_samples.dipt",
+              "Table files should open the table source in the shared editor");
         check(
             entries.size() == 10 && entries.front().kind == snt::dip::ProjectEntry::Kind::Unit &&
                 entries.front().line == 3 && entries.back().kind == snt::dip::ProjectEntry::Kind::Source &&
@@ -302,7 +380,7 @@ int main() {
         const auto* second_code_source = project.object("@code?6");
         check(
             code_source && code_source->parent == "@local" && code_source->label == "parameters.dip" &&
-                second_code_source && second_code_source->label == "observations.dip",
+                second_code_source && second_code_source->label == "code/observations.dip",
             "Project code files are missing from Local sources"
         );
         const auto code_targets = project.source_targets(*code_source);
@@ -321,7 +399,8 @@ int main() {
             provenance.source && provenance.override_source &&
                 project.display_file_path(provenance.source->path) == "parameters.dip" &&
                 project.display_file_path(provenance.override_source->path) == "overrides.dip" &&
-                project.display_file_path(project.environment().sources.at("reference").path) == "reference.dip",
+                project.display_file_path(project.environment().sources.at("reference").path) ==
+                    "sources/reference.dip",
             "Inspector file paths are not relative to the opened project"
         );
         const auto* combined = project.object("experiment.repeats");
@@ -360,7 +439,7 @@ int main() {
         const auto manifest = project.environment().get_schema_manifest();
         check(
             manifest.size() == 1 && manifest.front().name == schema->node_path && manifest.front().source &&
-                project.display_file_path(manifest.front().source->path) == "probe.dip" &&
+                project.display_file_path(manifest.front().source->path) == "schemas/probe.dip" &&
                 project.environment().get_node("experiment.instrument.model")->schema_id == manifest.front().id,
             "Schema declaration or contributed value cannot be inspected"
         );
@@ -512,6 +591,35 @@ int main() {
                 project.object(raw_reads.front().target),
             "Raw source dependency is not navigable"
         );
+        const auto& parameter_relations = project.source_relations(*code_source);
+        const auto& raw_relations = project.source_relations(*raw_source);
+        check(std::find(parameter_relations.depends_on.begin(), parameter_relations.depends_on.end(),
+                        "raw_samples?") != parameter_relations.depends_on.end() &&
+                  std::find(raw_relations.used_by.begin(), raw_relations.used_by.end(), code_source->path) !=
+                      raw_relations.used_by.end() &&
+                  raw_relations.reader_targets.at(code_source->path).line == 74 &&
+                  parameter_relations.dependency_targets.at("raw_samples?").line == 1,
+              "Source graph should show both sides of a raw-source dependency");
+        const auto& reference_relations = project.source_relations(*project.object("reference?"));
+        check(std::find(reference_relations.used_by.begin(), reference_relations.used_by.end(),
+                        code_source->path) != reference_relations.used_by.end(),
+              "Named source graph should link back to dependent source files");
+        const auto& observation_relations = project.source_relations(*second_code_source);
+        check(std::find(observation_relations.depends_on.begin(), observation_relations.depends_on.end(),
+                        code_source->path) != observation_relations.depends_on.end() &&
+                  std::find(parameter_relations.used_by.begin(), parameter_relations.used_by.end(),
+                            second_code_source->path) != parameter_relations.used_by.end(),
+              "Source graph should show cross-file dependencies in both directions");
+        const auto* schema_file = project.object("@project-file?schemas/probe.dip");
+        check(schema_file &&
+                  std::find(project.source_relations(*schema_file).depends_on.begin(),
+                            project.source_relations(*schema_file).depends_on.end(), code_source->path) !=
+                      project.source_relations(*schema_file).depends_on.end() &&
+                  project.source_relations(*schema_file).dependency_targets.at(code_source->path).line > 1 &&
+                  project.source_object_path(
+                      project.source_relations(*schema_file).dependency_targets.at(code_source->path)
+                  ) == code_source->path,
+              "Schema file source graph should show its dependency on the parameter source");
         check(raw_source->parent == "@raw_sources", "Raw array source is not in Raw named sources");
         const auto* inline_table = project.object("@block?experiment.readings");
         check(
@@ -637,7 +745,8 @@ int main() {
         snt::view::ViewerModel empty_project(inline_dir / "empty/DIPfile");
         check(
             empty_project.object("@dipfile") && empty_project.object("@dipfile")->children.empty() &&
-                empty_project.object("")->children.front() == "@dipfile",
+                empty_project.object("")->children.front() == "@files" &&
+                empty_project.object("@project-file?DIPfile"),
             "An empty DIPfile should have an inspectable branch"
         );
         check(empty_project.create_code_source("new-source.dip") &&

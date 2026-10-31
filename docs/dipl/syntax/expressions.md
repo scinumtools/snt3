@@ -62,6 +62,31 @@ Expression operators evaluate only boolean values, either given directly or as a
 | `def( <ref> )`  | 1        | Returns true if the referenced node currently has a non-`none` value                     |
 | `ndef( <ref> )` | 1        | Returns true if the referenced node is missing or currently has no non-`none` value     |
 
+**Numerical predicates**
+
+These functions inspect the evaluated numerical value, including values with
+units. Each returns one boolean: `has_*` is true when any element matches,
+and `all_finite` is true when every element is finite. They accept integer and
+floating-point scalars or arrays, including the `{.}` self-reference inside
+`!condition`. They inspect the value, not its uncertainty.
+
+| Function | Meaning |
+|----------|---------|
+| `has_nan(x)` | At least one element is NaN. |
+| `has_inf(x)` | At least one element is either infinity. |
+| `has_pos_inf(x)` / `has_neg_inf(x)` | At least one element is the specified infinity. |
+| `has_positive(x)` / `has_negative(x)` | At least one element is strictly above / below zero; infinities qualify. |
+| `has_zero(x)` | At least one element is exactly zero, including negative zero. |
+| `all_finite(x)` | No element is NaN or infinite. |
+
+For an empty array, `has_*` returns false and `all_finite` returns true.
+For example:
+
+```DIPL
+samples float[3] = [1, 2, 3]
+  !condition (all_finite({.}) && ~has_negative({.}))
+```
+
 The test uses the current state of the resolved domain. An unresolved source
 remains an error; `def` and `ndef` test a target path only after its source
 domain has been resolved.

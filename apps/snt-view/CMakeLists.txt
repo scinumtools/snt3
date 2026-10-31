@@ -52,6 +52,7 @@ target_sources(snt PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/inspector_view.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/notifications.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/source_view.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/source_graph_view.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/setup_view.cpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/viewer_model.cpp")
 target_link_libraries(snt PRIVATE snt-view-imgui snt-dipl-highlighter)

@@ -1,7 +1,9 @@
 # Parameter Viewer example
 
-This is a synthetic DIP project for exercising the read-only SNT3 parameter
-viewer. It is intentionally varied while remaining small enough to browse.
+This is a synthetic DIP project for exercising the SNT3 parameter viewer. It
+is intentionally varied while remaining small enough to browse. Its source,
+schema, and code files are split across subfolders to demonstrate the Files
+browser hierarchy.
 
 From the repository root, build the viewer and open the project:
 
@@ -42,18 +44,20 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
 | `DIPfile` | Registers the custom unit, two DIPL sources, raw array, table, and text sources, schema, override, and two code files. |
 | `parameters.diph5` | Evaluated snapshot generated from `DIPfile`. |
 | `parameters.dip` | Groups, scalar types, a value with a child, units, expressions, metadata, validation, map and list collections, and schema use. |
-| `observations.dip` | One-, two-, and three-dimensional arrays, a paged series, an array slice, inline and referenced tables, a formatted string, a compatible modification, a Boolean decision, and a conditional branch. |
-| `reference.dip` | Values read through the named `reference` source. |
-| `catalog.dip` | A second named source containing a map of devices. |
+| `code/observations.dip` | One-, two-, and three-dimensional arrays, a paged series, an array slice, inline and referenced tables, a formatted string, a compatible modification, a Boolean decision, and a conditional branch. |
+| `sources/reference.dip` | Values read through the named `reference` source. |
+| `sources/catalog.dip` | A second named source containing a map of devices. |
 | `samples.txt` | Raw array data injected through the `raw_samples` source. |
 | `table_samples.dipt` | Raw table data injected through the `table_samples` source. |
 | `field_notes.txt` | Plain-text named source, displayed without DIPL highlighting. |
-| `probe.dip` | Reusable probe schema. |
+| `schemas/probe.dip` | Reusable probe schema. |
 | `overrides.dip` | Replaces the declared channel length for this run. |
 
 ## Suggested tour
 
-1. Open **DIPfile** to inspect the ordered registrations under Units, Sources,
+1. Open **Files** to browse `code/`, `schemas/`, and `sources/`. Select a file
+   to inspect its metadata and follow its source link. Open **Project** to
+   inspect the ordered registrations under Units, Sources,
    Schemas, Overrides, and Code. Select an entry to see its declared and
    resolved paths, then open the corresponding DIPfile line.
 2. Expand `experiment.repeats`. It has a value (`4`) **and** a child
@@ -62,11 +66,11 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
    `experiment.probes` (list), and `experiment.duration` (value).
 4. Select `experiment.geometry.length`. The effective value is `3 m`; its
    declaration is in `parameters.dip`, and its override is in `overrides.dip`.
-   The same target appears under **Overridden nodes**; selecting it shows the effective
+   The same target appears under **Overrides**; selecting it shows the effective
    value and a link back to **Resolved nodes**. File locations in the
    inspector are shown relative to this project's `DIPfile`. Use **Open effective
    override** or **Open declaration** to view the corresponding source line in
-   the read-only **Source** tab.
+   the **Source** tab.
 5. Select `experiment.average_speed`. It evaluates to `0.375 m/s` and depends
    on the effective length and duration. Open **Graph** to follow its incoming
    dependencies and the value that reads it. Select `experiment.duration` to
@@ -101,7 +105,7 @@ build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
    source also exposes its evaluated rows under **Data**. Select
    **Raw named sources → field_notes** to view plain text without DIPL
    highlighting.
-   **Local sources → parameters.dip** and **Local sources → observations.dip** open the
+   **Local sources → parameters.dip** and **Local sources → code/observations.dip** open the
    project code files with DIPL highlighting.
    **Block value sources → experiment.readings** also offers the evaluated
    **Data** tab; **Source** shows the inline table with its DIPL header highlighted
@@ -124,4 +128,5 @@ Source-node browsing currently requires a live DIPL or DIPfile parse; a
 Source viewing is also disabled for `.diph5` snapshots because they do not
 contain the complete source text. The Source tab highlights DIPL files and
 table headers, and shows table data rows and other raw sources as plain text.
-It offers a **Copy source** button; it does not edit files.
+Live project sources can be edited, checked, formatted, and saved from the
+viewer.
