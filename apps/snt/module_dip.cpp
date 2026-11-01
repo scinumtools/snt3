@@ -29,6 +29,7 @@ Usage:
   snt dip sources --project DIPfile [--format json]
   snt dip override-contract --project DIPfile --path PATH [--format json]
   snt dip list --project DIPfile [--query QUERY] [--limit N] [--format json]
+  snt dip records --input FILE --collection MAP [--where-eq FIELD=VALUE] [--field FIELD] [--limit N]
   snt dip preview --project DIPfile --override-file FILE [--format json]
   snt dip package --project DIPfile [--output project.bundle.json] [--include FILE ...]
 
@@ -43,6 +44,7 @@ Commands:
   sources            List the project's registered sources.
   override-contract  Inspect constraints for an override target.
   list               Select evaluated nodes by path and tags.
+  records            Query selected fields of keyed collection items.
   preview            Validate proposed overrides and show their effect.
   package            Bundle project source files for browser use.
 
@@ -95,6 +97,7 @@ Examples:
   snt dip compare before.diph5 after.diph5 --scope full
   snt dip describe --project DIPfile --path simulation.cooling --format json
   snt dip list --project DIPfile --query '?simulation.' --limit 50 --format json
+  snt dip records --input findings.dip --collection findings --where-eq category=warning --field quote
   snt dip preview --project DIPfile --override-file candidate.dip --format json
   snt dip package --project DIPfile --output project.bundle.json
 

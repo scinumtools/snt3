@@ -36,6 +36,8 @@ int module_dip_semantic(int argc, char* argv[]) {
             out << "List the project's registered sources.\n";
         else if (command == "list")
             out << "Select evaluated nodes by path query and tags.\n";
+        else if (command == "records")
+            out << "Query scalar fields of keyed collection items. Equality filters accept strings.\n";
         else
             out << "Validate proposed overrides and report their effective-value changes.\n";
         out << "\nOptions:\n"
@@ -57,6 +59,12 @@ int module_dip_semantic(int argc, char* argv[]) {
                          "  --tag-none TAG           Exclude specified tags; repeatable\n"
                          "  --limit N                Maximum results (default 100)\n"
                          "  --max-value-elements N   Include values up to N elements (default 0)\n";
+        if (command == "records")
+            out << "  --collection PATH        Keyed map collection to query\n"
+                   "  --where-eq FIELD=VALUE   Match a scalar string field; repeatable\n"
+                   "  --field FIELD            Include this relative field; repeatable\n"
+                   "  --offset N               Skip N matching records (default 0)\n"
+                   "  --limit N                Maximum records (default 100)\n";
         if (command == "preview")
             out << "  --override TEXT          Add a DIPL override body; repeatable\n"
                          "  --override-file FILE     Add an override file; repeatable\n"
@@ -79,6 +87,8 @@ int module_dip_semantic(int argc, char* argv[]) {
     bool has_list_options = false;
     bool has_max_details = false;
     bool has_value_limit = false;
+    snt::dip::RecordQuery records;
+    bool has_record_options = false;
     for (int i = 1; i < argc; ++i) {
         const std::string option = argv[i];
         if (option == "--record-graph") {
@@ -98,6 +108,21 @@ int module_dip_semantic(int argc, char* argv[]) {
         } else if (option == "--query") {
             query = value;
             has_list_options = true;
+        } else if (option == "--collection") {
+            records.collection = value;
+            has_record_options = true;
+        } else if (option == "--field") {
+            records.fields.push_back(value);
+            has_record_options = true;
+        } else if (option == "--where-eq") {
+            const auto equal = value.find('=');
+            if (equal == std::string::npos || equal == 0)
+                throw std::invalid_argument("--where-eq requires FIELD=VALUE.");
+            records.filters.push_back({value.substr(0, equal), value.substr(equal + 1)});
+            has_record_options = true;
+        } else if (option == "--offset") {
+            records.offset = count(value, option);
+            has_record_options = true;
         } else if (option == "--tag-all") {
             tags.all.push_back(value);
             has_list_options = true;
@@ -109,7 +134,11 @@ int module_dip_semantic(int argc, char* argv[]) {
             has_list_options = true;
         } else if (option == "--limit") {
             limit = count(value, option);
-            has_list_options = true;
+            if (command == "records") {
+                records.limit = limit;
+                has_record_options = true;
+            } else
+                has_list_options = true;
         } else if (option == "--max-value-elements") {
             max_value_elements = count(value, option);
             has_value_limit = true;
@@ -136,6 +165,10 @@ int module_dip_semantic(int argc, char* argv[]) {
         throw std::invalid_argument("--path requires describe or override-contract.");
     if (has_list_options && command != "list")
         throw std::invalid_argument("List filters require list.");
+    if (has_record_options && command != "records")
+        throw std::invalid_argument("Record options require records.");
+    if (command == "records" && records.collection.empty())
+        throw std::invalid_argument("Records requires --collection.");
     if (has_max_details && command != "preview")
         throw std::invalid_argument("--max-details requires preview.");
     if (has_value_limit && command != "describe" && command != "list")
@@ -151,6 +184,8 @@ int module_dip_semantic(int argc, char* argv[]) {
         std::cout << semantic.sources_json() << '\n';
     else if (command == "list")
         std::cout << semantic.list_json(query, tags, limit, max_value_elements) << '\n';
+    else if (command == "records")
+        std::cout << semantic.records_json(records) << '\n';
     else
         std::cout << semantic.preview_json(overrides, max_details) << '\n';
     return 0;

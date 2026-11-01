@@ -114,6 +114,21 @@ class Integration(unittest.TestCase):
         self.assertEqual(json.loads(result["content"][0]["text"]), result["structuredContent"])
         return result["structuredContent"]
 
+    def test_records_query(self):
+        self.source.write_text(SOURCE + '''findings[first]
+  category str = "warning"
+  quote str = "check this"
+findings[second]
+  category str = "numerical"
+''', encoding="utf-8")
+        result = self.call("dipl_records", collection="findings",
+                           filters=[{"field": "category", "value": "warning"}],
+                           fields=["quote", "missing"], limit=1)
+        self.assertEqual(result["total"], 1)
+        self.assertEqual(result["items"][0]["id"], "first")
+        self.assertEqual(result["items"][0]["fields"]["quote"]["value"], "check this")
+        self.assertIsNone(result["items"][0]["fields"]["missing"])
+
     def test_discovery_and_semantic_workflow(self):
         discovered = self.client.request(message("server/discover"))["result"]
         self.assertIn(VERSION, discovered["supportedVersions"])

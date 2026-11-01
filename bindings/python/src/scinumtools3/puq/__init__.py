@@ -4,6 +4,8 @@ Quantity = _puq.Quantity
 Calculator = _puq.Calculator
 UnitSystem = _puq.UnitSystem
 sqrt = _puq.sqrt
+minimum = _puq.minimum
+maximum = _puq.maximum
 
 import sys
 

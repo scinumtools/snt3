@@ -4,6 +4,24 @@ from pathlib import Path
 from conftest import checked, fixture_path
 
 
+def test_records_query(cli, source_root, tmp_path):
+    source = source_root / "tests/dip/fixtures/schema_hierarchy.dip"
+    result = json.loads(checked(cli("dip", "records", "--input", source,
+                                    "--collection", "people", "--where-eq", "name=Alice",
+                                    "--field", "name", "--field", "missing", "--limit", "1")))
+    assert result["total"] == 1
+    assert result["items"][0]["id"] == "alice"
+    assert result["items"][0]["fields"]["name"]["value"] == "Alice"
+    assert result["items"][0]["fields"]["missing"] is None
+    snapshot = tmp_path / "people.diph5"
+    checked(cli("dip", "parse", "-i", "file", source, "--save", snapshot))
+    loaded = json.loads(checked(cli("dip", "records", "--input", snapshot,
+                                    "--collection", "people", "--where-eq", "name=Alice",
+                                    "--field", "age")))
+    assert loaded["total"] == 1
+    assert loaded["items"][0]["fields"]["age"]["value"] == 0
+
+
 def test_semantic_json_contract(cli, source_root, tmp_path):
     input_file = source_root / "tests/dip/fixtures/generated_parameters.dip"
     graph_input = source_root / "examples/dip/SemanticDescription/parameters.dip"

@@ -2,7 +2,22 @@ import math
 
 import pytest
 
-from scinumtools3.puq import Quantity
+from scinumtools3.puq import Quantity, maximum, minimum
+
+
+def test_min_max_nominal_selection_and_monte_carlo_crossover():
+    left = Quantity(0.0, 1.0, "m")
+    right = Quantity(0.0, 1.0, "m")
+    assert minimum(left, right).value() == 0.0
+    assert maximum(left, right).uncertainty() == pytest.approx(1.0)
+    for operation, sign in ((minimum, -1), (maximum, 1)):
+        result = Quantity.monte_carlo(
+            operation, [left, right], samples=100_000, seed=42,
+        )
+        assert result.quantity.value() == pytest.approx(sign / math.sqrt(math.pi), abs=0.015)
+        assert result.quantity.uncertainty() == pytest.approx(
+            math.sqrt(1 - 1 / math.pi), abs=0.015,
+        )
 
 
 def test_nonlinear_square_and_uniform_input():

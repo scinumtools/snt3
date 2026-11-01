@@ -3,10 +3,38 @@
 #include <algorithm>
 #include <cmath>
 #include <snt/puq/measurement.h>
+#include <snt/puq/math/max.h>
+#include <snt/puq/math/min.h>
 #include <snt/puq/monte_carlo.h>
 #include <snt/puq/quantity.h>
 
 using namespace snt;
+
+TEST(Uncertainty, MinMaxNominalSelectionAndMonteCarloCrossover) {
+    const puq::Quantity left(0.0, 1.0, "m");
+    const puq::Quantity right(0.0, 1.0, "m");
+    const auto ordinary_min = puq::math::min(left, right);
+    const auto ordinary_max = puq::math::max(left, right);
+    EXPECT_DOUBLE_EQ(val::ArrayValueFloat64(ordinary_min.measurement.result.estimate.get()).get_value(0), 0.0);
+    EXPECT_DOUBLE_EQ(val::ArrayValueFloat64(ordinary_max.measurement.result.estimate.get()).get_value(0), 0.0);
+    EXPECT_DOUBLE_EQ(val::ArrayValueFloat64(ordinary_min.measurement.result.uncertainty.get()).get_value(0), 1.0);
+    EXPECT_DOUBLE_EQ(val::ArrayValueFloat64(ordinary_max.measurement.result.uncertainty.get()).get_value(0), 1.0);
+
+    for (const auto minimum : {true, false}) {
+        const auto propagated = puq::monte_carlo(
+            {left, right}, {puq::InputDistribution::Normal, puq::InputDistribution::Normal},
+            [minimum](const std::vector<puq::Quantity>& inputs) {
+                return minimum ? puq::math::min(inputs[0], inputs[1]) : puq::math::max(inputs[0], inputs[1]);
+            },
+            100000, 42
+        );
+        const double mean = val::ArrayValueFloat64(propagated.quantity.measurement.result.estimate.get()).get_value(0);
+        const double sd = val::ArrayValueFloat64(propagated.quantity.measurement.result.uncertainty.get()).get_value(0);
+        const double pi = std::acos(-1.0);
+        EXPECT_NEAR(mean, (minimum ? -1.0 : 1.0) / std::sqrt(pi), 0.015);
+        EXPECT_NEAR(sd, std::sqrt(1.0 - 1.0 / pi), 0.015);
+    }
+}
 
 TEST(Uncertainty, MonteCarloNonlinearAndUniform) {
     const puq::Quantity square_input(0.5, 0.4, "m");

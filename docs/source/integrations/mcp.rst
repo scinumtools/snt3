@@ -63,6 +63,8 @@ Clients should discover tools at runtime because report support is optional.
      - Discover configured inputs, input kinds, and supported operations.
    * - ``dipl_list``
      - Search parameters by path and tags, with bounded values and continuation cursors.
+   * - ``dipl_records``
+     - Select fields of keyed collection items with structured string equality filters and bounded offsets.
    * - ``dipl_describe``
      - Inspect values, units, constraints, metadata, provenance, and recorded dependencies.
    * - ``dipl_schemas`` / ``dipl_sources``
@@ -92,6 +94,27 @@ Resources include ``snt://environments`` (the configured input catalogue),
 The artifact resource returns ``blob`` content and an ``_meta.next_uri`` when
 more bytes remain. Artifact identifiers are returned by tools rather than
 being added to the static resource catalogue.
+
+Query keyed collection records
+------------------------------
+
+``dipl_records`` uses the same evaluated record query as ``snt dip records``.
+For example, call it with:
+
+.. code-block:: json
+
+   {
+     "environment": "default",
+     "collection": "findings",
+     "filters": [{"field": "category", "value": "warning"}],
+     "fields": ["quote", "editorial_interest"],
+     "offset": 0,
+     "limit": 20
+   }
+
+Filters compare scalar string fields. A missing filter field does not match;
+a missing selected field is returned as ``null``. The result gives the total
+matching count, so the caller can advance ``offset`` until it has all pages.
 
 Validate and retain a candidate
 -------------------------------

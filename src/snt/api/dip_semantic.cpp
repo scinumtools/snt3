@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <iomanip>
 #include <snt/api/dip_semantic.h>
 #include <snt/dip/artifact.h>
@@ -468,6 +469,69 @@ namespace snt::api {
             if (i)
                 out << ',';
             description(out, result.items[i]);
+        }
+        out << "]}";
+        return out.str();
+    }
+
+    std::string DIPSemantic::records_json(const dip::RecordQuery& query) const {
+        const auto result = inspector().records(query);
+        std::ostringstream out;
+        out << "{\"schema_version\":\"1\",\"collection\":" << quote(query.collection)
+            << ",\"input\":" << quote(input_.generic_string()) << ",\"total\":" << result.total
+            << ",\"offset\":" << query.offset << ",\"truncated\":"
+            << (query.offset < result.total && result.items.size() < result.total - query.offset ? "true" : "false")
+            << ",\"items\":[";
+        for (std::size_t i = 0; i < result.items.size(); ++i) {
+            if (i)
+                out << ',';
+            const auto& item = result.items[i];
+            out << "{\"id\":" << quote(item.id) << ",\"path\":" << quote(item.path) << ",\"fields\":{";
+            for (std::size_t j = 0; j < item.fields.size(); ++j) {
+                if (j)
+                    out << ',';
+                const auto& field = item.fields[j];
+                out << quote(field.name) << ':';
+                if (!field.present)
+                    out << "null";
+                else {
+                    out << "{\"type\":" << quote(field.description.stored_type) << ",\"value\":";
+                    const auto& value = field.description;
+                    if (!value.value_text || !value.shape.empty())
+                        out << "null";
+                    else if (value.stored_type == "str")
+                        out << quote(inspector().cursor(value.path).as<std::string>());
+                    else if (value.stored_type == "bool")
+                        out << (inspector().cursor(value.path).as<bool>() ? "true" : "false");
+                    else if (value.stored_type.find("int") == 0 || value.stored_type.find("uint") == 0)
+                        out << *value.value_text;
+                    else if (value.stored_type.find("float") == 0) {
+                        try {
+                            const auto parsed = std::stold(*value.value_text);
+                            out << (std::isfinite(parsed) ? *value.value_text : "null");
+                        } catch (const std::exception&) {
+                            out << "null";
+                        }
+                    } else
+                        out << "null";
+                    out << ",\"dipl\":";
+                    if (value.value_text)
+                        out << quote(*value.value_text);
+                    else
+                        out << "null";
+                    out << ",\"units\":";
+                    if (field.description.units)
+                        out << quote(*field.description.units);
+                    else
+                        out << "null";
+                    out << ",\"provenance\":{\"declaration\":";
+                    location(out, field.description.declaration);
+                    out << ",\"override\":";
+                    location(out, field.description.override_location);
+                    out << "}}";
+                }
+            }
+            out << "}}";
         }
         out << "]}";
         return out.str();

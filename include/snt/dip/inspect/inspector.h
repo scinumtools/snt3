@@ -2,6 +2,7 @@
 #define SNT_DIP_INSPECTOR_H
 
 #include <snt/dip/inspect/inspection.h>
+#include <snt/dip/inspect/records.h>
 #include <snt/dip/inspect/semantic.h>
 
 namespace snt::dip {
@@ -66,6 +67,9 @@ namespace snt::dip {
             std::size_t limit = 100,
             std::size_t max_value_elements = 0
         ) const;
+
+        /** Query scalar fields of keyed collection items in declaration order. */
+        RecordResult records(const RecordQuery& query) const;
 
         /** Recorded evaluation events and effective dependency queries. Empty when capture was disabled. */
         const DependencyGraph& graph() const { return env_->dependency_graph_; }

@@ -29,6 +29,7 @@ namespace snt::api {
             std::size_t limit = 100,
             std::size_t max_value_elements = 0
         ) const;
+        std::string records_json(const dip::RecordQuery& query) const;
         std::string preview_json(
             const std::vector<dip::PreviewOverride>& overrides, std::size_t max_details = 50
         ) const;

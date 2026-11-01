@@ -33,6 +33,14 @@ namespace snt::mcp {
         Json strings() {
             return {{"type", "array"}, {"items", text()}, {"maxItems", 1000}, {"default", Json::array()}};
         }
+        Json record_filters() {
+            return {{"type", "array"},
+                    {"items", {{"type", "object"},
+                               {"properties", {{"field", text()}, {"value", text()}}},
+                               {"required", {"field", "value"}},
+                               {"additionalProperties", false}}},
+                    {"maxItems", 100}, {"default", Json::array()}};
+        }
         Json environment() {
             return {{"environment", text("default")}};
         }
@@ -51,6 +59,7 @@ namespace snt::mcp {
                                : type == "integer" ? value.is_number_integer()
                                : type == "boolean" ? value.is_boolean()
                                : type == "array"   ? value.is_array()
+                               : type == "object"  ? value.is_object()
                                                    : false;
             if (!valid)
                 throw std::invalid_argument(key + " must be " + type + ".");
@@ -75,6 +84,16 @@ namespace snt::mcp {
                     throw std::invalid_argument(key + " has too many items.");
                 for (const auto& item : value)
                     validate(item, schema.at("items"), key + "[]");
+            }
+            if (type == "object" && schema.contains("properties")) {
+                for (const auto& required : schema.value("required", Json::array()))
+                    if (!value.contains(required.get<std::string>()))
+                        throw std::invalid_argument("Missing argument: " + key + "." + required.get<std::string>());
+                for (auto it = value.begin(); it != value.end(); ++it) {
+                    if (!schema["properties"].contains(it.key()))
+                        throw std::invalid_argument("Unknown argument: " + key + "." + it.key());
+                    validate(it.value(), schema["properties"][it.key()], key + "." + it.key());
+                }
             }
         }
 
@@ -180,6 +199,24 @@ namespace snt::mcp {
                         )
                 );
                 return storage_->page(std::move(values), args["limit"], "");
+            });
+        auto records = environment();
+        records.update({{"collection", text()}, {"filters", record_filters()}, {"fields", strings()},
+                        {"offset", count(0)}, {"limit", count(100)}});
+        add("dipl_records",
+            "Query selected fields of keyed DIPL collection items. Filters compare scalar string values; "
+            "a missing field does not match. Use offset and limit for bounded results.",
+            records,
+            {"collection"},
+            [this](const Json& args) {
+                dip::RecordQuery query;
+                query.collection = args["collection"];
+                query.fields = args["fields"].get<std::vector<std::string>>();
+                query.offset = args["offset"];
+                query.limit = args["limit"];
+                for (const auto& filter : args["filters"])
+                    query.filters.push_back({filter["field"], filter["value"]});
+                return Json::parse(api::DIPSemantic(project(args)).records_json(query));
             });
         auto description = environment();
         description.update(

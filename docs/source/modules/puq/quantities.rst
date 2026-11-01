@@ -69,6 +69,22 @@ correlation, as in ``x * x``:
    print(result.quantity)  # Sample mean and standard uncertainty, in m²
    print(result.lower, result.upper)  # Central 95% coverage interval
 
+For ``minimum`` and ``maximum``, ordinary evaluation selects the input with the
+smaller or larger nominal value and retains its uncertainty sources. This is a
+local approximation when uncertain inputs overlap. To include the possibility
+that either input is the minimum or maximum, propagate the operation through
+the sampled inputs:
+
+.. code-block:: python
+
+   from scinumtools3.puq import Quantity, minimum, maximum
+
+   left = Quantity(0.0, 1.0, "m")
+   right = Quantity(0.0, 1.0, "m")
+   smaller = Quantity.monte_carlo(minimum, [left, right], seed=42)
+   larger = Quantity.monte_carlo(maximum, [left, right], seed=42)
+   print(smaller.quantity, larger.quantity)
+
 For several inputs, list the original quantities in the order expected by the
 callable. They are sampled independently unless they share an uncertainty
 source. Each sampled quantity retains its units, so ordinary PUQ arithmetic

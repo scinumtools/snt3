@@ -618,6 +618,18 @@ namespace snt::bind::python {
             py::arg("quantity"),
             "Return the unit-aware square root of a quantity."
         );
+        m.def(
+            "minimum",
+            [](const puq::Quantity& left, const puq::Quantity& right) { return puq::math::min(left, right); },
+            py::arg("left"), py::arg("right"),
+            "Select the smaller nominal quantity and retain its uncertainty sources."
+        );
+        m.def(
+            "maximum",
+            [](const puq::Quantity& left, const puq::Quantity& right) { return puq::math::max(left, right); },
+            py::arg("left"), py::arg("right"),
+            "Select the larger nominal quantity and retain its uncertainty sources."
+        );
     }
 
 } // namespace snt::bind::python

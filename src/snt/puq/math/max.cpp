@@ -10,9 +10,9 @@ namespace snt::puq::math {
     extern puq::Result max(const puq::Result& res1, const puq::Result& res2) {
         res1.ensure_source();
         res2.ensure_source();
-        // x ± Dx = max(x ± Dx, y ± Dy)  <- if x > y
-        // y ± Dy = max(x ± Dx, y ± Dy)  <- if y > x
-        // TODO: this implementation is fishy, need a check, or a Monte Carlo propagation
+        // Select by nominal value and retain the selected input's uncertainty sources.
+        // Near a crossover this is only a local approximation: use monte_carlo with
+        // math::max as its model to propagate the distribution of the maximum.
         val::BaseValue::PointerType estimate = res1.estimate->math_max(res2.estimate.get());
         if (res1.sources.empty() && res2.sources.empty())
             return puq::Result(std::move(estimate));
@@ -33,8 +33,6 @@ namespace snt::puq::math {
         add_selected(res2, false);
         output.refresh_uncertainty();
         return output;
-        // val::BaseValue::PointerType estimate = max(res1.estimate, res2.estimate);
-        // return puq::Result(estimate, (estimate == res1.estimate) ? res1.uncertainty : res2.uncertainty);
     }
 
     extern puq::Measurement max(const puq::Measurement& msr1, const puq::Measurement& msr2) {

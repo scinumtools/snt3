@@ -59,6 +59,41 @@ TEST(DIPSemantic, SchemaApplicationsResolveListIndices) {
     EXPECT_EQ(result.applications[2].path, "items[1]");
 }
 
+TEST(DIPSemantic, RecordsQueryUsesMapItemsAndEvaluatedStrings) {
+    snt::dip::DIP parser;
+    parser.add_string(
+        "findings[first]\n"
+        "  category str = \"warning\"\n"
+        "  quote str = \"first quote\"\n"
+        "findings[second]\n"
+        "  category str = \"numerical\"\n"
+        "  quote str = \"second quote\"\n"
+        "findings[third]\n"
+        "  category str = \"warning\"\n"
+    );
+    const auto env = parser.parse();
+    const snt::dip::Inspector inspector{env};
+    snt::dip::RecordQuery query;
+    query.collection = "findings";
+    query.filters.push_back({"category", "warning"});
+    query.fields = {"quote", "missing"};
+    query.limit = 1;
+    const auto result = inspector.records(query);
+    ASSERT_EQ(result.total, 2);
+    ASSERT_EQ(result.items.size(), 1);
+    EXPECT_EQ(result.items[0].id, "first");
+    EXPECT_EQ(result.items[0].fields[0].description.value_text, "\"first quote\"");
+    EXPECT_FALSE(result.items[0].fields[1].present);
+    query.offset = 1;
+    const auto next = inspector.records(query);
+    ASSERT_EQ(next.items.size(), 1);
+    EXPECT_EQ(next.items[0].id, "third");
+    EXPECT_FALSE(next.items[0].fields[0].present);
+    query.filters.push_back({"missing", "anything"});
+    const auto missing = inspector.records(query);
+    EXPECT_EQ(missing.total, 0);
+}
+
 TEST(DIPSemantic, SchemaApplicationsPreserveCompositionOrder) {
     snt::dip::DIP parser;
     parser.add_string("$schema first\n  one int = 1\n$schema second\n  two int = 2\nsettings : first, second\n");

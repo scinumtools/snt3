@@ -82,6 +82,14 @@ namespace snt::mcp {
                  {"next_cursor", nullable_string}},
                 {"schema_version", "total", "truncated", "items", "next_cursor"}
             );
+        else if (name == "dipl_records")
+            result = object(
+                {{"schema_version", string}, {"collection", string}, {"input", string},
+                 {"total", integer}, {"offset", integer}, {"truncated", boolean},
+                 {"items", array(object({{"id", string}, {"path", string}, {"fields", type("object")}},
+                                         {"id", "path", "fields"}))}},
+                {"schema_version", "collection", "input", "total", "offset", "truncated", "items"}
+            );
         else if (name == "dipl_describe")
             result = description_schema();
         else if (name == "dipl_sources")
@@ -204,6 +212,9 @@ namespace snt::mcp {
              "source files."},
             {"query", "DIPL selection: ? for all values, ?simulation. for a subtree, ?simulation.speed for one value."},
             {"path", "Exact DIPL parameter or group path, without the leading ?."},
+            {"collection", "Exact path of a keyed DIPL map collection."},
+            {"filters", "Scalar string equality filters; all must match an existing field."},
+            {"fields", "Relative field names to include in each matching record."},
             {"limit",
              "Maximum nodes in this page (0 gives counts); follow next_cursor with a positive limit for more."},
             {"cursor",
@@ -218,7 +229,7 @@ namespace snt::mcp {
             {"format", "Output format; generated content is also retrievable through the returned artifact."},
             {"source", "Inline DIPL declarations; use a configured project for relative multi-file inputs."},
             {"id", "Opaque artifact id returned by a tool; not a filesystem path."},
-            {"offset", "Zero-based byte offset in the artifact, normally the previous next_offset."},
+            {"offset", "Zero-based offset in the artifact or matching record list."},
             {"length", "Maximum bytes to read, 1..131072. Decode data as base64 and concatenate chunks."},
             {"tags_all", "Require all these explicit tags."},
             {"tags_any", "Require at least one of these explicit tags."},

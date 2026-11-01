@@ -66,7 +66,7 @@ def test_help_pages_have_consistent_sections(cli):
     pages = [
         ("--help",), ("puq",), ("puq", "--help"), ("dip",), ("dip", "--help"),
         *(('dip', sub, suffix) for sub in ('parse', 'compare', 'describe', 'schemas', 'sources',
-                                          'override-contract', 'list', 'preview', 'package')
+                                          'override-contract', 'list', 'records', 'preview', 'package')
           for suffix in ('', '--help')),
         ("hub", "--help"),
         *(('hub', sub, suffix) for sub in ('fetch', 'setup') for suffix in ('', '--help')),

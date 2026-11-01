@@ -252,6 +252,8 @@ one evaluated path, while ``list`` selects values by path and explicit tags:
    snt dip describe --project DIPfile --path simulation.steps --format json
    snt dip list --project DIPfile --query '?simulation.' --limit 50 --format json
    snt dip list --project DIPfile --tag-all runtime --format json
+   snt dip records --input findings.dip --collection findings \
+     --where-eq category=warning --field quote --field editorial_interest --limit 20
    snt dip override-contract --project DIPfile --path simulation.steps --format json
    snt dip schemas --project DIPfile --format json
 
@@ -263,6 +265,16 @@ reports whether its result was truncated. Missing defaults and dependency
 graphs are marked unavailable instead of being inferred. Add
 ``--record-graph`` to ``describe`` or ``list`` to capture dependencies while
 parsing a DIPfile or DIPL input. A DIPH5 snapshot uses its saved graph state.
+
+``records`` queries a keyed map collection in item order. Repeat ``--where-eq``
+to require multiple scalar string fields and ``--field`` to select output
+fields. Results include the item key, typed scalar values, original DIPL text, types,
+units, declaration locations, a total count, and an ``offset``. Missing
+selected fields are ``null``; missing filter fields do not match. Use
+``--offset`` with ``--limit`` for the next page. This command accepts one
+project, DIPL file, or DIPH5 snapshot per call. The same query is available
+through the C++ ``dip::Inspector::records`` API and the ``dipl_records`` MCP
+tool.
 
 ``schemas`` returns the ``snt-schema-hierarchy/1`` contract: reusable member
 trees, ordered application sites, and each evaluated value's applied and
