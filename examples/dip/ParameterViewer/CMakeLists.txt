@@ -19,7 +19,6 @@ add_custom_command(
     COMMAND $<TARGET_FILE:snt> dip parse
             --project "${CMAKE_CURRENT_SOURCE_DIR}/DIPfile"
             --record-graph
-            --relative-source-paths
             --save "${parameter_viewer_snapshot}"
     DEPENDS snt ${parameter_viewer_inputs}
     COMMENT "Updating the ParameterViewer DIPH5 snapshot"

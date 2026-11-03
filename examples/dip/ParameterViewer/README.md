@@ -35,7 +35,7 @@ The snapshot generation command is equivalent to:
 
 ```sh
 build/bin/snt dip parse --project examples/dip/ParameterViewer/DIPfile \
-  --record-graph --relative-source-paths \
+  --record-graph \
   --save examples/dip/ParameterViewer/parameters.diph5
 ```
 
@@ -123,10 +123,10 @@ Edit a value in a `.dip` file, then use **File → Reload** or **Ctrl+R**. The
 viewer keeps the last valid state if the edited project does not parse.
 Selecting another tree node closes the previous node's Source tab and shows
 only the Data and Graph tabs that apply to the new selection.
-Source-node browsing currently requires a live DIPL or DIPfile parse; a
-`.diph5` snapshot retains source identity but not source node values.
-Source viewing is also disabled for `.diph5` snapshots because they do not
-contain the complete source text. The Source tab highlights DIPL files and
+Source-node browsing currently requires a live DIPL or DIPfile parse. A
+`.diph5` v3 archive contains the complete source text, which the viewer can
+open, check, edit, and save back to a new v3 archive. This does not change the
+original project files. The Source tab highlights DIPL files and
 table headers, and shows table data rows and other raw sources as plain text.
 Live project sources can be edited, checked, formatted, and saved from the
 viewer.

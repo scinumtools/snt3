@@ -137,16 +137,16 @@ namespace snt::bind::python {
             "load",
             &dip::Environment::load,
             py::arg("file"),
-            "Load evaluated nodes from DIPH5. Schema descriptions and provenance are available in schema_manifest; "
-            "reusable definitions are not reconstructed.\n\n"
+            "Load a DIPH5 v3 archive with resolved nodes and archived source bytes. Schema descriptions and "
+            "provenance are available in schema_manifest; reusable definitions are not reconstructed.\n\n"
             "Args:\n    file: Path to the DIPH5 file."
         );
         env.def(
             "save",
             py::overload_cast<const std::filesystem::path&>(&dip::Environment::save, py::const_),
             py::arg("file"),
-            "Save evaluated nodes to DIPH5 with descriptive schema metadata and provenance, but not reusable "
-            "definitions.\n\n"
+            "Save a source-complete DIPH5 v3 archive with resolved nodes and provenance. Reusable schema "
+            "definitions are retained as source bytes, not reconstructed from the resolved tree.\n\n"
             "Args:\n    file: Output DIPH5 path; an existing file is overwritten."
         );
         env.def(
