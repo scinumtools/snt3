@@ -19,7 +19,7 @@ set(EXEC_NAME snt-dip)
 add_library(${EXEC_NAME} STATIC ${SOURCE_FILES})
 # snt-dip is static.  HDF5 must therefore propagate to every final binary
 # that consumes it, including the Python extension built for wheels.
-target_link_libraries(${EXEC_NAME} PUBLIC snt-puq HDF5::HDF5)
+target_link_libraries(${EXEC_NAME} PUBLIC snt-puq snt-core HDF5::HDF5)
 # Some environments report HDF5 as "Included by compiler wrappers" and
 # leave HDF5_LIBRARIES empty. Try to find the library in common package roots;
 # keep wrapper-only setups configurable when no standalone library is present.

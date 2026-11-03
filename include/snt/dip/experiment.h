@@ -2,6 +2,7 @@
 #define SNT_DIP_EXPERIMENT_H
 
 #include <filesystem>
+#include <snt/core/process.h>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -87,6 +88,10 @@ namespace snt::dip {
          *  @param environment_file Source archive. @param experiment_file New archive path. */
         static Experiment prepare_from_archive(const std::filesystem::path& environment_file,
                                                const std::filesystem::path& experiment_file);
+        /** Prepare, launch, and close a recorded experiment using observed process data. */
+        static core::ProcessResult run_from_archive(const std::filesystem::path& environment_file,
+                                                     const std::filesystem::path& experiment_file,
+                                                     ExperimentCommand command);
         /**
          * Open an existing experiment.
          * @param file Archive path.

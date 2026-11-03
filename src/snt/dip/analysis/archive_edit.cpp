@@ -1,6 +1,8 @@
 #include <snt/dip/archive_edit.h>
 
 #include <atomic>
+#include <algorithm>
+#include <iterator>
 #include <map>
 #include <snt/dip/comparison.h>
 #include <snt/dip/dip.h>
@@ -15,6 +17,16 @@
 #endif
 
 namespace snt::dip {
+    namespace {
+        ArchivedDocumentKind document_kind(const std::string& path) {
+            const std::filesystem::path file(path);
+            if (file.extension() == ".dipt") return ArchivedDocumentKind::Table;
+            if (path.empty() || file.filename() == "DIPfile" || file.extension() == ".dip" ||
+                file.extension() == ".dipl") return ArchivedDocumentKind::DIPL;
+            return ArchivedDocumentKind::Plain;
+        }
+    }
+
     ArchiveEditSession::ArchiveEditSession(std::filesystem::path archive)
         : archive_(std::filesystem::absolute(std::move(archive))) {
         baseline_.load(archive_);
@@ -22,6 +34,36 @@ namespace snt::dip {
             source_paths_.emplace(source.info.name, source.info.path);
         for (const auto& source : baseline_.applied_override_sources())
             source_paths_.emplace(source.name, source.path);
+    }
+
+    std::vector<ArchivedDocument> ArchiveEditSession::documents() const {
+        std::vector<ArchivedDocument> result;
+        for (const auto& source : baseline_.archived_sources())
+            if (source.role != "other")
+                result.push_back({source.info.name, source.source_id, source.info.path,
+                                  document_kind(source.info.path)});
+        for (const auto& source : baseline_.applied_override_sources())
+            result.push_back({source.name, source.source_name, source.path, ArchivedDocumentKind::Override});
+        return result;
+    }
+
+    std::optional<ArchivedDocument> ArchiveEditSession::document(const std::string& name) const {
+        for (const auto& entry : documents())
+            if (entry.name == name)
+                return entry;
+        // Table companion sources refer to the corresponding editable table file.
+        const auto companion = std::find_if(baseline_.archived_sources().begin(),
+                                            baseline_.archived_sources().end(), [&](const auto& source) {
+            return source.info.name == name && source.role == "other";
+        });
+        if (companion != baseline_.archived_sources().end() && name.size() > 6 &&
+            name.compare(name.size() - 6, 6, "_TABLE") == 0) {
+            const auto base = name.substr(0, name.size() - 6);
+            for (const auto& entry : documents())
+                if (entry.name == base)
+                    return entry;
+        }
+        return std::nullopt;
     }
 
     const std::string& ArchiveEditSession::document_text(const std::string& name) const {
@@ -102,7 +144,15 @@ namespace snt::dip {
         return result;
     }
 
-    void ArchiveEditSession::save_document(const std::string& name, const std::string& text) {
+    std::string ArchiveEditSession::save_document(const std::string& name, const std::string& text) {
+        const auto before = documents();
+        const auto selected = document(name);
+        if (!selected)
+            throw std::invalid_argument("Source is not archived: " + name);
+        const auto old = std::find_if(before.begin(), before.end(), [&](const auto& entry) {
+            return entry.name == selected->name;
+        });
+        const auto index = static_cast<std::size_t>(std::distance(before.begin(), old));
         {
             hdf5::detail::Id archive(H5Fopen(archive_.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose,
                                      "Unable to reopen DIPH5 archive before editing");
@@ -129,6 +179,17 @@ namespace snt::dip {
             throw;
         }
         baseline_.load(archive_);
+        const auto after = documents();
+        if (!selected->path.empty()) {
+            const auto same_path = std::find_if(after.begin(), after.end(), [&](const auto& entry) {
+                return entry.path == selected->path && entry.kind == selected->kind;
+            });
+            if (same_path != after.end())
+                return same_path->name;
+        }
+        if (index < after.size())
+            return after[index].name;
+        return selected->name;
     }
 
 } // namespace snt::dip
