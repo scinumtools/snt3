@@ -6,16 +6,6 @@
 
 namespace snt::dip::hdf5::schema {
 
-    inline constexpr std::string_view FORMAT = "SciNumTools3 Environment";
-    // DIPH5 2.9 adds value option labels; 2.10 adds explicit named-child order;
-    // 2.11 stores identity-preserving link targets.
-    inline constexpr uint64_t VERSION = 2;
-    inline constexpr uint64_t VERSION_MINOR = 11;
-    inline constexpr uint64_t FIRST_SUPPORTED_VERSION = 1;
-
-    inline constexpr std::string_view ATTR_FORMAT = "_DIPL_Format";
-    inline constexpr std::string_view ATTR_VERSION = "_DIPL_Schema_Version";
-    inline constexpr std::string_view ATTR_VERSION_MINOR = "_DIPL_Schema_Version_Minor";
     inline constexpr std::string_view ATTR_KIND = "_DIPL_Kind";
     inline constexpr std::string_view ATTR_KEY = "_DIPL_Key";
     inline constexpr std::string_view ATTR_INDEX = "_DIPL_Index";
@@ -48,13 +38,6 @@ namespace snt::dip::hdf5::schema {
     inline constexpr std::string_view ATTR_SOURCE = "_DIPL_Source";
     inline constexpr std::string_view ATTR_SOURCE_LINE = "_DIPL_Source_Line";
     inline constexpr std::string_view ATTR_SOURCE_CODE = "_DIPL_Source_Code";
-    inline constexpr std::string_view GROUP_SOURCES = "_DIPL_Sources";
-    inline constexpr std::string_view ATTR_SOURCE_NAME = "_DIPL_Source_Name";
-    inline constexpr std::string_view ATTR_SOURCE_PATH = "_DIPL_Source_Path";
-    inline constexpr std::string_view ATTR_SOURCE_PARENT = "_DIPL_Source_Parent";
-    inline constexpr std::string_view ATTR_SOURCE_PARENT_LINE = "_DIPL_Source_Parent_Line";
-    inline constexpr std::string_view ATTR_SOURCE_HASH_ALGORITHM = "_DIPL_Source_Hash_Algorithm";
-    inline constexpr std::string_view ATTR_SOURCE_HASH = "_DIPL_Source_Hash";
     inline constexpr std::string_view GROUP_TRACE = "_DIPL_Trace";
     inline constexpr std::string_view GROUP_UNITS = "_DIPL_Units";
     inline constexpr std::string_view GROUP_DEPENDENCIES = "_DIPL_Dependencies";

@@ -398,9 +398,10 @@ namespace snt::dip {
         if (!snapshot.empty()) {
             const fs::path file = stage.path / "new" / relative.back();
             fs::create_directories(file.parent_path());
-            SnapshotSaveOptions options;
-            options.output_plan = plan.mappings().empty() ? nullptr : &plan;
-            env.save(file, options);
+            if (plan.mappings().empty())
+                env.save(file);
+            else
+                env.save(file, plan);
         }
         if (sync) {
             fs::create_directories(stage.path / "new");

@@ -1,78 +1,51 @@
 #include "io.h"
+#include "io_private.h"
 
 #include "../nodes/metadata_fields.h"
+#include "../input/utf8.h"
 #include "schema.h"
 
 #include <algorithm>
+#include <array>
+#include <atomic>
+#include <chrono>
+#include <cmath>
 #include <cstdint>
+#include <ctime>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iomanip>
 #include <hdf5.h>
 #include <limits>
+#include <map>
+#include "../../../../external/nlohmann/json.hpp"
 #include <optional>
+#include <random>
 #include <set>
 #include <snt/dip/environment.h>
+#include <snt/dip/experiment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/inspect/inspector.h>
+#include <snt/sha256.h>
 #include <snt/val/values.h>
+#include <sstream>
 #include <string>
+#include <thread>
+#include <type_traits>
 #include <unordered_set>
 #include <vector>
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 
 namespace snt::dip::hdf5 {
+    using namespace detail;
     namespace {
         using namespace schema;
-
-        class Id {
-          public:
-            using Closer = herr_t (*)(hid_t);
-
-            Id() = default;
-            Id(hid_t value, Closer closer, const char* operation) : value_(value), closer_(closer) {
-                if (value_ < 0)
-                    throw Error(operation);
-            }
-            Id(const Id&) = delete;
-            Id& operator=(const Id&) = delete;
-            Id(Id&& other) noexcept : value_(other.value_), closer_(other.closer_) { other.value_ = H5I_INVALID_HID; }
-            Id& operator=(Id&& other) noexcept {
-                if (this != &other) {
-                    close();
-                    value_ = other.value_;
-                    closer_ = other.closer_;
-                    other.value_ = H5I_INVALID_HID;
-                }
-                return *this;
-            }
-            ~Id() { close(); }
-
-            operator hid_t() const { return value_; }
-
-          private:
-            void close() noexcept {
-                if (value_ >= 0 && closer_)
-                    closer_(value_);
-                value_ = H5I_INVALID_HID;
-            }
-
-            hid_t value_ = H5I_INVALID_HID;
-            Closer closer_ = nullptr;
-        };
-
-        void check(herr_t status, const char* operation) {
-            if (status < 0)
-                throw Error(operation);
-        }
-
-        size_t checked_size(uint64_t value, const char* field) {
-            if (value > static_cast<uint64_t>(std::numeric_limits<size_t>::max()))
-                throw Error(std::string("DIPH5 ") + field + " exceeds SIZE_MAX");
-            return static_cast<size_t>(value);
-        }
-
-        size_t checked_product(size_t count, size_t width, const char* field) {
-            if (width != 0 && count > std::numeric_limits<size_t>::max() / width)
-                throw Error(std::string("DIPH5 ") + field + " exceeds SIZE_MAX");
-            return count * width;
-        }
 
         class PersistedValueNode final : public ValueNode {
           private:
@@ -113,122 +86,6 @@ namespace snt::dip::hdf5 {
             }
         };
 
-        Id string_type(size_t size) {
-            Id type(H5Tcopy(H5T_C_S1), H5Tclose, "Unable to create an HDF5 string type");
-            check(H5Tset_size(type, std::max<size_t>(size + 1, 1)), "Unable to size an HDF5 string type");
-            check(H5Tset_cset(type, H5T_CSET_UTF8), "Unable to set HDF5 UTF-8 encoding");
-            check(H5Tset_strpad(type, H5T_STR_NULLTERM), "Unable to set HDF5 string padding");
-            return type;
-        }
-
-        bool has_attribute(hid_t object, std::string_view name) {
-            const htri_t result = H5Aexists(object, std::string(name).c_str());
-            if (result < 0)
-                throw Error("Unable to inspect an HDF5 attribute");
-            return result > 0;
-        }
-
-        void remove_attribute(hid_t object, std::string_view name) {
-            if (has_attribute(object, name))
-                check(H5Adelete(object, std::string(name).c_str()), "Unable to replace an HDF5 attribute");
-        }
-
-        void write_string(hid_t object, std::string_view name, const std::string& value) {
-            remove_attribute(object, name);
-            Id type = string_type(value.size());
-            Id space(H5Screate(H5S_SCALAR), H5Sclose, "Unable to create an HDF5 attribute dataspace");
-            Id attribute(
-                H5Acreate2(object, std::string(name).c_str(), type, space, H5P_DEFAULT, H5P_DEFAULT),
-                H5Aclose,
-                "Unable to create an HDF5 string attribute"
-            );
-            check(H5Awrite(attribute, type, value.c_str()), "Unable to write an HDF5 string attribute");
-        }
-
-        std::string read_string(hid_t object, std::string_view name, const std::string& fallback = {}) {
-            if (!has_attribute(object, name))
-                return fallback;
-            Id attribute(
-                H5Aopen(object, std::string(name).c_str(), H5P_DEFAULT), H5Aclose, "Unable to open an HDF5 attribute"
-            );
-            Id type(H5Aget_type(attribute), H5Tclose, "Unable to inspect an HDF5 string attribute");
-            const size_t width = H5Tget_size(type);
-            if (width == 0 || width == std::numeric_limits<size_t>::max())
-                throw Error("Invalid HDF5 string attribute");
-            std::vector<char> buffer(width + 1, '\0');
-            check(H5Aread(attribute, type, buffer.data()), "Unable to read an HDF5 string attribute");
-            return buffer.data();
-        }
-
-        template <typename T> void write_scalar(hid_t object, std::string_view name, hid_t type, const T& value) {
-            remove_attribute(object, name);
-            Id space(H5Screate(H5S_SCALAR), H5Sclose, "Unable to create an HDF5 attribute dataspace");
-            Id attribute(
-                H5Acreate2(object, std::string(name).c_str(), type, space, H5P_DEFAULT, H5P_DEFAULT),
-                H5Aclose,
-                "Unable to create an HDF5 scalar attribute"
-            );
-            check(H5Awrite(attribute, type, &value), "Unable to write an HDF5 scalar attribute");
-        }
-
-        template <typename T> T read_scalar(hid_t object, std::string_view name, hid_t type, T fallback = {}) {
-            if (!has_attribute(object, name))
-                return fallback;
-            Id attribute(
-                H5Aopen(object, std::string(name).c_str(), H5P_DEFAULT), H5Aclose, "Unable to open an HDF5 attribute"
-            );
-            T value{};
-            check(H5Aread(attribute, type, &value), "Unable to read an HDF5 scalar attribute");
-            return value;
-        }
-
-        void write_strings(hid_t object, std::string_view name, const std::vector<std::string>& values) {
-            if (values.empty())
-                return;
-            size_t width = 1;
-            for (const auto& value : values)
-                width = std::max(width, value.size() + 1);
-            std::vector<char> buffer(values.size() * width, '\0');
-            for (size_t i = 0; i < values.size(); ++i)
-                std::copy(values[i].begin(), values[i].end(), buffer.begin() + static_cast<ptrdiff_t>(i * width));
-            hsize_t count = values.size();
-            Id space(H5Screate_simple(1, &count, nullptr), H5Sclose, "Unable to create an HDF5 array dataspace");
-            Id type(H5Tcopy(H5T_C_S1), H5Tclose, "Unable to create an HDF5 string type");
-            check(H5Tset_size(type, width), "Unable to size an HDF5 string type");
-            check(H5Tset_cset(type, H5T_CSET_UTF8), "Unable to set HDF5 UTF-8 encoding");
-            check(H5Tset_strpad(type, H5T_STR_NULLTERM), "Unable to set HDF5 string padding");
-            remove_attribute(object, name);
-            Id attribute(
-                H5Acreate2(object, std::string(name).c_str(), type, space, H5P_DEFAULT, H5P_DEFAULT),
-                H5Aclose,
-                "Unable to create an HDF5 string-array attribute"
-            );
-            check(H5Awrite(attribute, type, buffer.data()), "Unable to write an HDF5 string-array attribute");
-        }
-
-        std::vector<std::string> read_strings(hid_t object, std::string_view name) {
-            if (!has_attribute(object, name))
-                return {};
-            Id attribute(
-                H5Aopen(object, std::string(name).c_str(), H5P_DEFAULT), H5Aclose, "Unable to open an HDF5 attribute"
-            );
-            Id space(H5Aget_space(attribute), H5Sclose, "Unable to inspect an HDF5 attribute dataspace");
-            hsize_t count = 0;
-            check(H5Sget_simple_extent_dims(space, &count, nullptr), "Unable to inspect an HDF5 attribute shape");
-            Id type(H5Aget_type(attribute), H5Tclose, "Unable to inspect an HDF5 string attribute");
-            const size_t width = H5Tget_size(type);
-            if (width == 0)
-                throw Error("Invalid HDF5 string-array attribute");
-            const size_t item_count = checked_size(count, "string-array count");
-            std::vector<char> buffer(checked_product(item_count, width, "string-array size"), '\0');
-            check(H5Aread(attribute, type, buffer.data()), "Unable to read an HDF5 string-array attribute");
-            std::vector<std::string> values;
-            values.reserve(item_count);
-            for (size_t i = 0; i < item_count; ++i)
-                values.emplace_back(buffer.data() + i * width);
-            return values;
-        }
-
         std::string data_type_name(core::DataType type) {
             auto it = core::DataTypeNames.find(type);
             if (it == core::DataTypeNames.end())
@@ -264,7 +121,7 @@ namespace snt::dip::hdf5 {
             for (const auto& [type, type_name] : NodeDtypeNames)
                 if (type_name == name)
                     return type;
-            return NodeDtype::None;
+            throw Error("Unsupported DIPH5 node type: " + name);
         }
 
         std::string path_kind_name(Path::Kind kind) {
@@ -282,6 +139,7 @@ namespace snt::dip::hdf5 {
             }
         }
 
+        // These sections share the small HDF5 helpers above; keep their boundaries explicit.
         Id ensure_group(hid_t file, const std::string& path, const std::string& kind) {
             const htri_t exists = H5Lexists(file, path.c_str(), H5P_DEFAULT);
             if (exists < 0)
@@ -476,6 +334,20 @@ namespace snt::dip::hdf5 {
                     __LINE__
                 );
             const std::vector<Stored> stored = value->get_values();
+            for (const auto item : stored) {
+                if constexpr (std::is_integral_v<Disk> && std::is_integral_v<Stored> && sizeof(Disk) < sizeof(Stored)) {
+                    if (item < static_cast<Stored>(std::numeric_limits<Disk>::lowest()) ||
+                        item > static_cast<Stored>(std::numeric_limits<Disk>::max()))
+                        throw Error("DIPH5 value exceeds its declared integer dtype");
+                }
+                if constexpr (std::is_floating_point_v<Disk> && std::is_floating_point_v<Stored> &&
+                              sizeof(Disk) < sizeof(Stored)) {
+                    if (std::isfinite(item) && std::abs(item) > std::numeric_limits<Disk>::max())
+                        throw Error("DIPH5 value exceeds its declared floating-point dtype");
+                }
+                if (node.value_dtype == core::DataType::Boolean && item != 0 && item != 1)
+                    throw Error("Invalid DIPH5 boolean value");
+            }
             std::vector<Disk> data(stored.begin(), stored.end());
             Id space = value_space(node);
             Id dataset(
@@ -540,15 +412,18 @@ namespace snt::dip::hdf5 {
                 break;
             case core::DataType::String: {
                 const auto* value = dynamic_cast<const val::ArrayValue<std::string>*>(node.value.get());
+                if (!value) throw Error("Invalid DIPH5 string value storage");
                 const auto values = value->get_values();
                 size_t width = 1;
-                for (const auto& item : values)
+                for (const auto& item : values) {
+                    if (!valid_utf8(item)) throw Error("Invalid UTF-8 in DIPH5 string value");
                     width = std::max(width, item.size() + 1);
+                }
                 Id type(H5Tcopy(H5T_C_S1), H5Tclose, "Unable to create an HDF5 string type");
                 check(H5Tset_size(type, width), "Unable to size an HDF5 string type");
                 check(H5Tset_cset(type, H5T_CSET_UTF8), "Unable to set HDF5 UTF-8 encoding");
                 check(H5Tset_strpad(type, H5T_STR_NULLTERM), "Unable to set HDF5 string padding");
-                std::vector<char> buffer(values.size() * width, '\0');
+                std::vector<char> buffer(checked_product(values.size(), width, "string dataset size"), '\0');
                 for (size_t i = 0; i < values.size(); ++i)
                     std::copy(values[i].begin(), values[i].end(), buffer.begin() + static_cast<ptrdiff_t>(i * width));
                 Id space = value_space(node);
@@ -768,12 +643,52 @@ namespace snt::dip::hdf5 {
             check(H5Sget_simple_extent_dims(space, dims.data(), nullptr), "Unable to inspect an HDF5 dataset shape");
             return dims;
         }
-
         size_t element_count(const val::Array::ShapeType& dims) {
             size_t count = 1;
             for (const size_t extent : dims)
                 count = checked_product(count, extent, "dataset element count");
+            if (count > 100000000)
+                throw Error("DIPH5 value exceeds the reader element limit");
             return count;
+        }
+
+        void validate_value_type(hid_t dataset, core::DataType dtype) {
+            Id type(H5Dget_type(dataset), H5Tclose, "Unable to inspect DIPH5 value type");
+            size_t width = 0;
+            H5T_class_t category = H5T_INTEGER;
+            H5T_sign_t sign = H5T_SGN_2;
+            switch (dtype) {
+            case core::DataType::Boolean: case core::DataType::Integer8_U: width = 1; sign = H5T_SGN_NONE; break;
+            case core::DataType::Character: case core::DataType::Integer8: width = 1; break;
+            case core::DataType::Integer16: width = 2; break;
+            case core::DataType::Integer32: width = 4; break;
+            case core::DataType::Integer64: width = 8; break;
+            case core::DataType::Integer16_U: width = 2; sign = H5T_SGN_NONE; break;
+            case core::DataType::Integer32_U: width = 4; sign = H5T_SGN_NONE; break;
+            case core::DataType::Integer64_U: width = 8; sign = H5T_SGN_NONE; break;
+            case core::DataType::Float32: width = 4; category = H5T_FLOAT; break;
+            case core::DataType::Float64: width = 8; category = H5T_FLOAT; break;
+            case core::DataType::Float128:
+                if (H5Tequal(type, H5T_NATIVE_LDOUBLE) <= 0)
+                    throw Error("DIPH5 float128 representation does not match native long double");
+                return;
+            case core::DataType::String:
+                if (H5Tget_class(type) != H5T_STRING || H5Tis_variable_str(type) != 0 ||
+                    H5Tget_size(type) == 0 || H5Tget_size(type) > 1024 * 1024)
+                    throw Error("Invalid DIPH5 fixed-width string type");
+                return;
+            default: throw Error("Unsupported non-null DIPH5 value type");
+            }
+            if (H5Tget_class(type) != category || H5Tget_size(type) != width ||
+                H5Tget_precision(type) != width * 8 ||
+                (category == H5T_INTEGER && H5Tget_sign(type) != sign))
+                throw Error("DIPH5 dataset type does not match its declared value type");
+            if (category == H5T_FLOAT) {
+                const auto little = width == 4 ? H5T_IEEE_F32LE : H5T_IEEE_F64LE;
+                const auto big = width == 4 ? H5T_IEEE_F32BE : H5T_IEEE_F64BE;
+                if (H5Tequal(type, little) <= 0 && H5Tequal(type, big) <= 0)
+                    throw Error("DIPH5 floating-point dataset is not IEEE binary32 or binary64");
+            }
         }
 
         template <typename Disk, typename Stored>
@@ -782,6 +697,9 @@ namespace snt::dip::hdf5 {
         ) {
             std::vector<Disk> disk(element_count(shape));
             check(H5Dread(dataset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, disk.data()), "Unable to read an HDF5 dataset");
+            if (dtype == core::DataType::Boolean)
+                for (const auto value : disk)
+                    if (value != 0 && value != 1) throw Error("Invalid DIPH5 boolean value");
             std::vector<Stored> stored(disk.begin(), disk.end());
             return std::make_unique<val::ArrayValue<Stored>>(stored, shape, dtype);
         }
@@ -790,6 +708,7 @@ namespace snt::dip::hdf5 {
             Id space(H5Dget_space(dataset), H5Sclose, "Unable to inspect an HDF5 dataset dataspace");
             if (H5Sget_simple_extent_type(space) == H5S_NULL)
                 return nullptr;
+            validate_value_type(dataset, dtype);
             const auto disk_dims = dimensions(dataset);
             val::Array::ShapeType shape;
             if (disk_dims.empty())
@@ -830,15 +749,22 @@ namespace snt::dip::hdf5 {
                 if (width == 0)
                     throw Error("Invalid HDF5 string dataset");
                 const size_t count = element_count(shape);
-                std::vector<char> buffer(checked_product(count, width, "string dataset size"), '\0');
+                const auto bytes = checked_product(count, width, "string dataset size");
+                if (bytes > 256ULL * 1024 * 1024) throw Error("DIPH5 string dataset exceeds reader limit");
+                std::vector<char> buffer(bytes, '\0');
                 check(
                     H5Dread(dataset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, buffer.data()),
                     "Unable to read an HDF5 string dataset"
                 );
                 std::vector<std::string> values;
                 values.reserve(count);
-                for (size_t i = 0; i < count; ++i)
-                    values.emplace_back(buffer.data() + i * width);
+                for (size_t i = 0; i < count; ++i) {
+                    const char* begin = buffer.data() + i * width;
+                    const char* end = std::find(begin, begin + width, '\0');
+                    if (end == begin + width) throw Error("Unterminated DIPH5 string value");
+                    values.emplace_back(begin, end);
+                    if (!valid_utf8(values.back())) throw Error("Invalid UTF-8 in DIPH5 string value");
+                }
                 return std::make_unique<val::ArrayValue<std::string>>(values, shape, dtype);
             }
             case core::DataType::None:
@@ -903,27 +829,35 @@ namespace snt::dip::hdf5 {
 
         void read_dataset(Environment& env, hid_t dataset) {
             if (read_string(dataset, ATTR_KIND) != "value")
-                return;
-            const std::string path = read_string(dataset, ATTR_PATH);
-            const core::DataType value_dtype = data_type(read_string(dataset, ATTR_VALUE_TYPE));
+                throw Error("Invalid DIPH5 value kind");
+            const std::string path = required_utf8(dataset, ATTR_PATH);
+            const core::DataType value_dtype = data_type(required_utf8(dataset, ATTR_VALUE_TYPE));
+            const auto array = required_scalar<uint8_t>(dataset, ATTR_ARRAY, H5T_NATIVE_UINT8);
+            if (array > 1) throw Error("Invalid DIPH5 array marker");
+            Id space(H5Dget_space(dataset), H5Sclose, "Unable to inspect DIPH5 value shape");
+            const auto shape_kind = H5Sget_simple_extent_type(space);
+            if (shape_kind != H5S_NULL && ((array == 0 && shape_kind != H5S_SCALAR) ||
+                                          (array == 1 && shape_kind != H5S_SIMPLE)))
+                throw Error("DIPH5 array marker does not match dataspace");
             val::BaseValue::PointerType value = read_value(dataset, value_dtype);
             std::optional<puq::Quantity> units;
             if (has_attribute(dataset, "units"))
                 units.emplace(read_string(dataset, "units"));
 
             ValueNode::PointerType node;
-            const NodeDtype dtype = node_type(read_string(dataset, ATTR_NODE_TYPE));
+            const NodeDtype dtype = node_type(required_utf8(dataset, ATTR_NODE_TYPE));
             if (value)
                 node = std::make_shared<PersistedValueNode>(Path(path), std::move(value), dtype, units);
             else
                 node = std::make_shared<PersistedValueNode>(Path(path), value_dtype, dtype);
-            if (node->value && has_attribute(dataset, ATTR_ARRAY) &&
-                read_scalar<uint8_t>(dataset, ATTR_ARRAY, H5T_NATIVE_UINT8)) {
+            if (node->value && array) {
                 node->dimension.clear();
                 for (const auto extent : node->value->get_shape())
                     node->dimension.push_back({extent, extent});
             }
-            node->constant = read_scalar<uint8_t>(dataset, ATTR_CONSTANT, H5T_NATIVE_UINT8) != 0;
+            const auto constant = required_scalar<uint8_t>(dataset, ATTR_CONSTANT, H5T_NATIVE_UINT8);
+            if (constant > 1) throw Error("Invalid DIPH5 constant marker");
+            node->constant = constant != 0;
             if (dtype == NodeDtype::Link) {
                 node->link_source = read_string(dataset, ATTR_LINK_SOURCE);
                 node->link_target = read_string(dataset, ATTR_LINK_TARGET);
@@ -935,6 +869,9 @@ namespace snt::dip::hdf5 {
             const auto option_values = read_strings(dataset, ATTR_OPTIONS);
             const auto option_units = read_strings(dataset, ATTR_OPTION_UNITS);
             const auto option_labels = read_strings(dataset, ATTR_OPTION_LABELS);
+            if ((has_attribute(dataset, ATTR_OPTION_UNITS) && option_units.size() != option_values.size()) ||
+                (has_attribute(dataset, ATTR_OPTION_LABELS) && option_labels.size() != option_values.size()))
+                throw Error("DIPH5 option metadata lengths disagree");
             if (has_attribute(dataset, ATTR_OPTION_LABELS))
                 node->option_labels = option_labels;
             for (size_t i = 0; i < option_values.size(); ++i) {
@@ -951,7 +888,9 @@ namespace snt::dip::hdf5 {
                 node->table_column_index = checked_size(
                     read_scalar<uint64_t>(dataset, ATTR_TABLE_COLUMN_INDEX, H5T_NATIVE_UINT64), "table column index"
                 );
-            node->override = read_scalar<uint8_t>(dataset, ATTR_OVERRIDE, H5T_NATIVE_UINT8) != 0;
+            const auto override_marker = required_scalar<uint8_t>(dataset, ATTR_OVERRIDE, H5T_NATIVE_UINT8);
+            if (override_marker > 1) throw Error("Invalid DIPH5 override marker");
+            node->override = override_marker != 0;
             if (node->override) {
                 node->override_line.source.name = read_string(dataset, ATTR_OVERRIDE_SOURCE);
                 node->override_line.source.line_number = checked_size(
@@ -994,8 +933,9 @@ namespace snt::dip::hdf5 {
                     __FILE__,
                     __LINE__
                 );
-            node->value_origin =
-                static_cast<ValueOrigin>(read_scalar<uint64_t>(dataset, ATTR_VALUE_ORIGIN, H5T_NATIVE_UINT64));
+            const auto origin = required_scalar<uint64_t>(dataset, ATTR_VALUE_ORIGIN, H5T_NATIVE_UINT64);
+            if (origin > static_cast<uint64_t>(ValueOrigin::Schema)) throw Error("Invalid DIPH5 value origin");
+            node->value_origin = static_cast<ValueOrigin>(origin);
             node->line.source.name = read_string(dataset, ATTR_SOURCE);
             node->line.source.line_number =
                 checked_size(read_scalar<uint64_t>(dataset, ATTR_SOURCE_LINE, H5T_NATIVE_UINT64), "source line number");
@@ -1004,25 +944,6 @@ namespace snt::dip::hdf5 {
             env.nodes.push_back(node);
             if (!env.hierarchy.has_collection(path))
                 env.hierarchy.set_collection(path, Path::Kind::Group, node->schemas);
-        }
-
-        hsize_t object_count(hid_t group) {
-            hsize_t count = 0;
-            check(H5Gget_num_objs(group, &count), "Unable to count objects in an HDF5 group");
-            return count;
-        }
-
-        std::string object_name(hid_t group, hsize_t index) {
-            const ssize_t size = H5Gget_objname_by_idx(group, index, nullptr, 0);
-            if (size < 0)
-                throw Error("Unable to inspect an HDF5 object name");
-            const size_t width = checked_size(static_cast<uint64_t>(size), "object name length");
-            if (width == std::numeric_limits<size_t>::max())
-                throw Error("DIPH5 object name length exceeds SIZE_MAX");
-            std::vector<char> name(width + 1, '\0');
-            if (H5Gget_objname_by_idx(group, index, name.data(), name.size()) < 0)
-                throw Error("Unable to read an HDF5 object name");
-            return name.data();
         }
 
         struct ChildObject {
@@ -1083,68 +1004,7 @@ namespace snt::dip::hdf5 {
             return children;
         }
 
-        void read_source_manifest(Environment& env, hid_t file) {
-            const std::string manifest_path = "/" + std::string(GROUP_SOURCES);
-            const htri_t exists = H5Lexists(file, manifest_path.c_str(), H5P_DEFAULT);
-            if (exists < 0)
-                throw Error("Unable to inspect the HDF5 source manifest");
-            if (exists == 0)
-                throw dip::IOException(
-                    "Invalid HDF5 source manifest",
-                    "A DIPH5 version 2 file does not contain its required source manifest.",
-                    "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
-                    __FILE__,
-                    __LINE__
-                );
-
-            Id manifest(
-                H5Gopen2(file, manifest_path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the HDF5 source manifest"
-            );
-            std::vector<SourceInfo> sources;
-            const hsize_t count = object_count(manifest);
-            sources.reserve(checked_size(count, "source-manifest count"));
-            for (hsize_t index = 0; index < count; ++index) {
-                const std::string entry_name = object_name(manifest, index);
-                if (H5Gget_objtype_by_idx(manifest, index) != H5G_GROUP)
-                    throw dip::IOException(
-                        "Invalid HDF5 source manifest",
-                        "A source-manifest entry is not an HDF5 group.",
-                        "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
-                        __FILE__,
-                        __LINE__
-                    );
-                Id entry(
-                    H5Gopen2(manifest, entry_name.c_str(), H5P_DEFAULT),
-                    H5Gclose,
-                    "Unable to open an HDF5 source-manifest entry"
-                );
-                SourceInfo source{
-                    read_string(entry, ATTR_SOURCE_NAME),
-                    read_string(entry, ATTR_SOURCE_PATH),
-                    read_string(entry, ATTR_SOURCE_PARENT),
-                    checked_size(
-                        read_scalar<uint64_t>(entry, ATTR_SOURCE_PARENT_LINE, H5T_NATIVE_UINT64),
-                        "source parent line number"
-                    ),
-                    read_string(entry, ATTR_SOURCE_HASH_ALGORITHM),
-                    read_string(entry, ATTR_SOURCE_HASH),
-                    {},
-                };
-                read_metadata(entry, source.metadata);
-                if (source.name.empty() || source.hash_algorithm.empty() || source.hash.empty())
-                    throw dip::IOException(
-                        "Invalid HDF5 source manifest",
-                        "A source-manifest entry is missing its identity or content fingerprint.",
-                        "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
-                        __FILE__,
-                        __LINE__
-                    );
-                sources.push_back(std::move(source));
-            }
-            env.set_source_manifest(std::move(sources));
-        }
-
-        void read_trace_manifest(Environment& env, hid_t file, uint64_t minor_version) {
+        void read_trace_manifest(Environment& env, hid_t file) {
             const std::string manifest_path = "/" + std::string(GROUP_TRACE);
             const htri_t exists = H5Lexists(file, manifest_path.c_str(), H5P_DEFAULT);
             if (exists < 0)
@@ -1152,7 +1012,7 @@ namespace snt::dip::hdf5 {
             if (exists == 0)
                 throw dip::IOException(
                     "Invalid HDF5 trace manifest",
-                    "A DIPH5 version 2.1 file does not contain its required trace manifest.",
+                    "The DIPH5 v3 resolved tree is missing its trace manifest.",
                     "Use a complete DIPH5 file written by a compatible SciNumTools3 version.",
                     __FILE__,
                     __LINE__
@@ -1197,7 +1057,7 @@ namespace snt::dip::hdf5 {
                     SchemaInfo info;
                     info.id = trace.id;
                     info.name = trace.name;
-                    if (minor_version >= 4) {
+                    {
                         info.source_name = read_string(entry, ATTR_SCHEMA_SOURCE);
                         info.source_line = checked_size(
                             read_scalar<uint64_t>(entry, ATTR_SCHEMA_SOURCE_LINE, H5T_NATIVE_UINT64),
@@ -1221,8 +1081,8 @@ namespace snt::dip::hdf5 {
             if (exists == 0)
                 throw dip::IOException(
                     "Invalid HDF5 unit manifest",
-                    "A DIPH5 version 2.3 file does not contain its required custom-unit manifest.",
-                    "Use a complete DIPH5 2.3 file written by a compatible SciNumTools3 version.",
+                    "The DIPH5 v3 resolved tree is missing its custom-unit manifest.",
+                    "Use a complete DIPH5 v3 archive.",
                     __FILE__,
                     __LINE__
                 );
@@ -1247,7 +1107,7 @@ namespace snt::dip::hdf5 {
                     throw dip::IOException(
                         "Invalid HDF5 unit manifest",
                         "A unit-manifest entry is not an HDF5 group.",
-                        "Use a complete DIPH5 2.3 file.",
+                        "Use a complete DIPH5 v3 archive.",
                         __FILE__,
                         __LINE__
                     );
@@ -1268,7 +1128,7 @@ namespace snt::dip::hdf5 {
                     throw dip::IOException(
                         "Invalid HDF5 unit manifest",
                         "A unit-manifest entry has missing or duplicate identity data.",
-                        "Use a complete DIPH5 2.3 file.",
+                        "Use a complete DIPH5 v3 archive.",
                         __FILE__,
                         __LINE__
                     );
@@ -1280,7 +1140,7 @@ namespace snt::dip::hdf5 {
                     throw dip::IOException(
                         "Invalid HDF5 unit manifest",
                         "A unit-manifest trace identifier does not match the trace manifest.",
-                        "Use a complete DIPH5 2.3 file.",
+                        "Use a complete DIPH5 v3 archive.",
                         __FILE__,
                         __LINE__
                     );
@@ -1317,17 +1177,13 @@ namespace snt::dip::hdf5 {
             Environment& env,
             hid_t group,
             bool root = false,
-            bool skip_value_payload = false,
-            bool skip_dependency_manifest = false,
-            bool skip_output_manifest = false
+            bool skip_value_payload = false
         ) {
             const auto children = ordered_children(group);
             for (const auto& child_object : children) {
                 const std::string& name = child_object.name;
-                if (root && (name == std::string(GROUP_SOURCES) || name == std::string(GROUP_TRACE) ||
-                             name == std::string(GROUP_UNITS) ||
-                             (skip_dependency_manifest && name == std::string(GROUP_DEPENDENCIES)) ||
-                             (skip_output_manifest && name == std::string(GROUP_OUTPUTS))))
+                if (root && (name == std::string(GROUP_TRACE) || name == std::string(GROUP_UNITS) ||
+                             name == std::string(GROUP_DEPENDENCIES) || name == std::string(GROUP_OUTPUTS)))
                     continue;
                 if (skip_value_payload && name == VALUE_PAYLOAD)
                     continue;
@@ -1359,7 +1215,7 @@ namespace snt::dip::hdf5 {
                             throw dip::IOException(
                                 "Invalid DIPH5 value group",
                                 "The value group at `" + path + "` does not contain its `_DIPL_Value` payload.",
-                                "Use a complete DIPH5 2.2 file written by a compatible SciNumTools3 version.",
+                                "Use a complete DIPH5 v3 archive.",
                                 __FILE__,
                                 __LINE__
                             );
@@ -1372,7 +1228,7 @@ namespace snt::dip::hdf5 {
                             throw dip::IOException(
                                 "Invalid DIPH5 value group",
                                 "The value-group payload does not describe its parent DIPL value path.",
-                                "Use a complete DIPH5 2.2 file written by a compatible SciNumTools3 version.",
+                                "Use a complete DIPH5 v3 archive.",
                                 __FILE__,
                                 __LINE__
                             );
@@ -1433,52 +1289,6 @@ namespace snt::dip::hdf5 {
                 }
             }
         }
-
-        void write_source_manifest(
-            hid_t file,
-            const Environment& env,
-            const std::filesystem::path& output_path,
-            const SnapshotSaveOptions& options
-        ) {
-            const std::string manifest_path = "/" + std::string(GROUP_SOURCES);
-            Id manifest(
-                H5Gcreate2(file, manifest_path.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
-                H5Gclose,
-                "Unable to create the HDF5 source manifest"
-            );
-            const auto sources = env.get_source_manifest();
-            for (size_t index = 0; index < sources.size(); ++index) {
-                const SourceInfo& source = sources[index];
-                const std::string entry_name = std::to_string(index);
-                Id entry(
-                    H5Gcreate2(manifest, entry_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
-                    H5Gclose,
-                    "Unable to create an HDF5 source-manifest entry"
-                );
-                write_string(entry, ATTR_SOURCE_NAME, source.name);
-                std::string stored_path = source.path;
-                if (!stored_path.empty() && options.source_paths == SourcePathPolicy::RelativeToSnapshot) {
-                    std::filesystem::path source_path(stored_path);
-                    if (source_path.is_relative()) {
-                        const auto base =
-                            env.source_path_base().empty() ? std::filesystem::current_path() : env.source_path_base();
-                        source_path = base / source_path;
-                    }
-                    const auto output_dir = std::filesystem::absolute(output_path).parent_path();
-                    const auto relative = source_path.lexically_normal().lexically_relative(output_dir);
-                    if (relative.empty())
-                        throw Error("Unable to make source path relative to the DIPH5 file: " + source.path);
-                    stored_path = relative.generic_string();
-                }
-                write_string(entry, ATTR_SOURCE_PATH, stored_path);
-                write_string(entry, ATTR_SOURCE_PARENT, source.parent_name);
-                write_scalar<uint64_t>(entry, ATTR_SOURCE_PARENT_LINE, H5T_NATIVE_UINT64, source.parent_line);
-                write_string(entry, ATTR_SOURCE_HASH_ALGORITHM, source.hash_algorithm);
-                write_string(entry, ATTR_SOURCE_HASH, source.hash);
-                write_metadata(entry, source.metadata);
-            }
-        }
-
         void write_trace_manifest(hid_t file, const Environment& env) {
             const std::string manifest_path = "/" + std::string(GROUP_TRACE);
             Id manifest(
@@ -1610,7 +1420,7 @@ namespace snt::dip::hdf5 {
         void read_dependency_graph(Environment& env, hid_t file) {
             const std::string path = "/" + std::string(GROUP_DEPENDENCIES);
             if (H5Lexists(file, path.c_str(), H5P_DEFAULT) <= 0)
-                throw Error("A DIPH5 2.7 file is missing its DIP dependency graph");
+                throw Error("The DIPH5 v3 resolved tree is missing its DIP dependency graph");
             Id root(H5Gopen2(file, path.c_str(), H5P_DEFAULT), H5Gclose, "Unable to open the DIP dependency graph");
             DependencyGraph graph;
             graph.recorded = read_scalar<uint8_t>(root, "recorded", H5T_NATIVE_UINT8, 1) != 0;
@@ -1764,11 +1574,9 @@ namespace snt::dip::hdf5 {
             plan.validate();
             env.set_output_plan(std::move(plan));
         }
-
         bool uses_reserved_path(const std::string& path) {
             for (const auto name :
-                 {std::string(GROUP_SOURCES),
-                  std::string(GROUP_TRACE),
+                 {std::string(GROUP_TRACE),
                   std::string(GROUP_UNITS),
                   std::string(GROUP_DEPENDENCIES),
                   std::string(GROUP_OUTPUTS)}) {
@@ -1785,18 +1593,174 @@ namespace snt::dip::hdf5 {
                     return true;
             return false;
         }
+
+        Id temporary_file() {
+            static std::atomic<unsigned long long> sequence{0};
+            Id access(H5Pcreate(H5P_FILE_ACCESS), H5Pclose, "Unable to create HDF5 memory access properties");
+            check(H5Pset_fapl_core(access, 64 * 1024, false), "Unable to configure HDF5 memory staging");
+            const auto name = "snt-diph5-v3-stage-" + std::to_string(sequence++) + ".h5";
+            return Id(H5Fcreate(name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, access), H5Fclose,
+                      "Unable to create an in-memory HDF5 staging file");
+        }
+
+        void write_bytes(hid_t group, const std::string& content) {
+            if (content.size() > 256ULL * 1024 * 1024)
+                throw Error("Archived source exceeds the 256 MiB archive limit");
+            const hsize_t length = content.size();
+            Id space(H5Screate_simple(1, &length, nullptr), H5Sclose, "Unable to create source byte space");
+            Id dataset(H5Dcreate2(group, "content", H5T_STD_U8LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                       H5Dclose, "Unable to create archived source content");
+            if (!content.empty())
+                check(H5Dwrite(dataset, H5T_NATIVE_UINT8, H5S_ALL, H5S_ALL, H5P_DEFAULT, content.data()),
+                      "Unable to write archived source content");
+        }
+
+        std::string read_bytes(hid_t group) {
+            Id dataset(H5Dopen2(group, "content", H5P_DEFAULT), H5Dclose, "Missing archived source content");
+            Id type(H5Dget_type(dataset), H5Tclose, "Unable to inspect archived content type");
+            Id space(H5Dget_space(dataset), H5Sclose, "Unable to inspect archived content shape");
+            if (H5Tget_class(type) != H5T_INTEGER || H5Tget_size(type) != 1 ||
+                H5Tget_sign(type) != H5T_SGN_NONE ||
+                H5Sget_simple_extent_ndims(space) != 1)
+                throw Error("Archived content must be a one-dimensional uint8 dataset");
+            hsize_t length = 0;
+            check(H5Sget_simple_extent_dims(space, &length, nullptr), "Unable to read archived content length");
+            if (length > 256 * 1024 * 1024)
+                throw Error("Archived source exceeds the 256 MiB reader limit");
+            std::string content(checked_size(length, "source byte count"), '\0');
+            if (!content.empty())
+                check(H5Dread(dataset, H5T_NATIVE_UINT8, H5S_ALL, H5S_ALL, H5P_DEFAULT, content.data()),
+                      "Unable to read archived source content");
+            return content;
+        }
+
+        void copy_object(hid_t source, const std::string& from, hid_t target, const std::string& to) {
+            check(H5Ocopy(source, from.c_str(), target, to.c_str(), H5P_DEFAULT, H5P_DEFAULT),
+                  "Unable to relocate DIPH5 object");
+        }
+
+        void validate_metadata_utf8(const ValueMetadata& metadata) {
+#define SNT_CHECK_METADATA_UTF8(TYPE, FIELD, NAME)                                                                     \
+    if (!valid_utf8(metadata.FIELD))                                                                                   \
+        throw Error("Invalid UTF-8 in DIPH5 v3 metadata: " NAME);
+            SNT_DIP_METADATA_SCALAR_FIELDS(SNT_CHECK_METADATA_UTF8)
+#undef SNT_CHECK_METADATA_UTF8
+#define SNT_CHECK_METADATA_LIST_UTF8(TYPE, FIELD, NAME)                                                                \
+    for (const auto& value : metadata.FIELD)                                                                           \
+        if (!valid_utf8(value))                                                                                         \
+            throw Error("Invalid UTF-8 in DIPH5 v3 metadata: " NAME);
+            SNT_DIP_METADATA_LIST_FIELDS(SNT_CHECK_METADATA_LIST_UTF8)
+#undef SNT_CHECK_METADATA_LIST_UTF8
+        }
+
+        void validate_node_order(hid_t group, size_t depth = 0) {
+            if (depth > 256) throw Error("DIPH5 resolved hierarchy exceeds depth limit");
+            const bool parent_is_list = read_string(group, ATTR_KIND) == "list";
+            std::vector<uint64_t> positions;
+            for (hsize_t index = 0; index < object_count(group); ++index) {
+                const auto name = object_name(group, index);
+                H5L_info_t link_info{};
+                check(H5Lget_info(group, name.c_str(), &link_info, H5P_DEFAULT), "Unable to inspect DIPH5 link");
+                if (link_info.type != H5L_TYPE_HARD)
+                    throw Error("DIPH5 resolved hierarchy must not contain HDF5 soft or external links");
+                if (name == VALUE_PAYLOAD) {
+                    if (read_string(group, ATTR_KIND) != KIND_VALUE_GROUP)
+                        throw Error("Unexpected DIPH5 value-group payload");
+                    continue;
+                }
+                Id child(H5Oopen(group, name.c_str(), H5P_DEFAULT), H5Oclose,
+                         "Unable to inspect a DIPH5 v3 resolved node");
+                if (!has_attribute(child, ATTR_PATH))
+                    throw Error("DIPH5 v3 resolved node has no logical path");
+                const auto logical = required_utf8(child, ATTR_PATH);
+                const auto expected_path = "/configuration/resolved" + hdf5_path(logical);
+                const auto length = H5Iget_name(child, nullptr, 0);
+                if (logical.empty() || length < 0) throw Error("Invalid DIPH5 resolved node path");
+                std::string actual(static_cast<size_t>(length) + 1, '\0');
+                if (H5Iget_name(child, actual.data(), actual.size()) != length)
+                    throw Error("Unable to inspect DIPH5 resolved node path");
+                actual.resize(static_cast<size_t>(length));
+                if (actual != expected_path) throw Error("DIPH5 logical and HDF5 paths disagree");
+                const bool list_item = parent_is_list && read_string(child, ATTR_KIND) == "list_item";
+                const auto field = list_item ? ATTR_INDEX : ATTR_ORDER;
+                if (!has_attribute(child, field))
+                    throw Error("DIPH5 v3 resolved node has no order");
+                positions.push_back(required_scalar<uint64_t>(child, field, H5T_NATIVE_UINT64));
+                if (H5Iget_type(child) == H5I_GROUP)
+                    validate_node_order(child, depth + 1);
+            }
+            std::sort(positions.begin(), positions.end());
+            for (size_t index = 0; index < positions.size(); ++index)
+                if (positions[index] != index)
+                    throw Error("DIPH5 v3 resolved node order is not contiguous");
+        }
+
+        void complete_resolved_order(hid_t group) {
+            const bool parent_is_list = read_string(group, ATTR_KIND) == "list";
+            const auto all_children = checked_size(object_count(group), "resolved child count");
+            size_t count = 0;
+            for (size_t index = 0; index < all_children; ++index)
+                count += object_name(group, index) != VALUE_PAYLOAD;
+            std::vector<Id> children;
+            std::vector<bool> used(count, false);
+            for (size_t index = 0; index < all_children; ++index) {
+                const auto name = object_name(group, index);
+                if (name == VALUE_PAYLOAD)
+                    continue;
+                Id child(H5Oopen(group, name.c_str(), H5P_DEFAULT), H5Oclose,
+                         "Unable to inspect a resolved node");
+                const bool list_item = parent_is_list && read_string(child, ATTR_KIND) == "list_item";
+                const auto field = list_item ? ATTR_INDEX : ATTR_ORDER;
+                if (has_attribute(child, field)) {
+                    const auto position = required_scalar<uint64_t>(child, field, H5T_NATIVE_UINT64);
+                    if (position >= count || used[position])
+                        throw Error("Invalid resolved node order while saving DIPH5 v3");
+                    used[position] = true;
+                } else {
+                    children.push_back(std::move(child));
+                }
+            }
+            size_t next = 0;
+            for (auto& child : children) {
+                while (next < used.size() && used[next])
+                    ++next;
+                write_scalar<uint64_t>(child, ATTR_ORDER, H5T_NATIVE_UINT64, next);
+                used[next++] = true;
+            }
+            for (size_t index = 0; index < all_children; ++index) {
+                const auto name = object_name(group, index);
+                if (name == VALUE_PAYLOAD)
+                    continue;
+                Id child(H5Oopen(group, name.c_str(), H5P_DEFAULT), H5Oclose,
+                         "Unable to inspect a resolved node");
+                if (H5Iget_type(child) == H5I_GROUP)
+                    complete_resolved_order(child);
+            }
+        }
+
+        void validate_source_references(const Environment& env,
+                                           const std::unordered_set<std::string>& source_names) {
+            auto known = source_names;
+            for (const auto& source : env.applied_override_sources())
+                known.insert(source.name);
+            for (const auto& node : env.nodes.get_nodes()) {
+                if (!node)
+                    continue;
+                const auto check_source = [&](const std::string& name) {
+                    if (!name.empty() && !known.count(name))
+                        throw Error("DIPH5 v3 node references an unarchived source: " + name);
+                };
+                check_source(node->line.source.name);
+                if (node->override)
+                    check_source(node->override_line.source.name);
+                for (const auto& change : node->modification_lines)
+                    check_source(change.source.name);
+            }
+        }
     } // namespace
 
-    void save(const Environment& env, const std::filesystem::path& file, const SnapshotSaveOptions& options) {
-        H5Eset_auto2(H5E_DEFAULT, nullptr, nullptr);
-        Id output(
-            H5Fcreate(file.string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT),
-            H5Fclose,
-            "Unable to create the HDF5 file"
-        );
-        write_string(output, ATTR_FORMAT, std::string(FORMAT));
-        write_scalar<uint64_t>(output, ATTR_VERSION, H5T_NATIVE_UINT64, VERSION);
-        write_scalar<uint64_t>(output, ATTR_VERSION_MINOR, H5T_NATIVE_UINT64, VERSION_MINOR);
+    namespace {
+    void write_resolved_contents(hid_t output, const Environment& env, const OutputPlan* output_plan) {
         for (const auto& node : env.nodes.get_nodes()) {
             if (node && uses_reserved_path(node->path.name))
                 throw dip::IOException(
@@ -1818,12 +1782,11 @@ namespace snt::dip::hdf5 {
                     __LINE__
                 );
         }
-        write_source_manifest(output, env, file, options);
         write_trace_manifest(output, env);
         write_unit_manifest(output, env);
         write_dependency_graph(output, Inspector{env}.graph());
-        if (options.output_plan)
-            write_output_plan(output, *options.output_plan);
+        if (output_plan)
+            write_output_plan(output, *output_plan);
         write_hierarchy_metadata(output, env);
         for (const auto& node : env.nodes.get_nodes())
             if (node)
@@ -1831,51 +1794,362 @@ namespace snt::dip::hdf5 {
         write_hierarchy_structure(output, env);
         check(H5Fflush(output, H5F_SCOPE_GLOBAL), "Unable to flush the HDF5 file");
     }
+    }
 
+    void save_staged(const Environment& env, const std::filesystem::path& file, const OutputPlan* output_plan) {
+        H5Eset_auto2(H5E_DEFAULT, nullptr, nullptr);
+        std::vector<ArchivedSource> model_sources;
+        if (env.is_loaded_snapshot()) {
+            // The archive already has the exact bytes. Reuse them when saving a copy;
+            // a resolved tree alone cannot tell us what the user originally wrote.
+            model_sources = env.archived_sources();
+        } else {
+            std::unordered_set<std::string> override_names;
+            for (const auto& source : env.applied_override_sources())
+                if (!source.source_name.empty())
+                    override_names.insert(source.source_name);
+            std::vector<std::string> source_names;
+            for (const auto& name : env.sources.registration_order()) {
+                const auto& source = env.sources.at(name);
+                const bool synthetic_root = source.code.empty() && source.path.empty() && source.parent.name.empty();
+                if (!override_names.count(name) && !synthetic_root)
+                    source_names.push_back(name);
+            }
+            for (const auto& name : source_names) {
+                const auto& source = env.sources.at(name);
+                // The parser's synthetic root is not an import in the archive.
+                const bool imported = std::find(source_names.begin(), source_names.end(),
+                                                source.parent.name) != source_names.end();
+                SourceInfo info{name, source.path, imported ? source.parent.name : "",
+                                imported ? source.parent.line_number : 0, "SHA-256", snt::sha256(source.code),
+                                source.metadata};
+                model_sources.push_back({name, std::move(info), source.code, imported ? "import" : "model"});
+            }
+        }
+
+        if (!env.is_loaded_snapshot()) {
+            // Table columns are parsed with a derived source name. They still came
+            // from the parent DIPL bytes, so archive that parent text under the
+            // derived identity instead of leaving dangling provenance references.
+            std::unordered_set<std::string> known;
+            for (const auto& source : model_sources)
+                known.insert(source.info.name);
+            for (const auto& node : env.nodes.get_nodes()) {
+                if (!node)
+                    continue;
+                const auto& name = node->line.source.name;
+                constexpr std::string_view suffix = "_TABLE";
+                if (known.count(name) || name.size() <= suffix.size() ||
+                    name.compare(name.size() - suffix.size(), suffix.size(), suffix) != 0)
+                    continue;
+                const auto parent_name = name.substr(0, name.size() - suffix.size());
+                const auto parent = std::find_if(model_sources.begin(), model_sources.end(), [&](const auto& source) {
+                    return source.info.name == parent_name;
+                });
+                if (parent == model_sources.end())
+                    continue;
+                auto info = parent->info;
+                info.name = name;
+                model_sources.push_back({name, std::move(info), parent->content, "other"});
+                known.insert(name);
+            }
+        }
+
+        std::vector<std::string> model_names;
+        for (const auto& source : model_sources)
+            model_names.push_back(source.info.name);
+        if (model_names.empty())
+            throw Error("DIPH5 v3 requires at least one base-model source");
+        if (model_names.size() > 100000 || env.applied_override_sources().size() > 100000)
+            throw Error("DIPH5 v3 source or override count exceeds the archive limit");
+        for (const auto& source : model_sources)
+            if (!valid_utf8(source.content))
+                throw Error("DIPH5 v3 cannot archive a source with invalid UTF-8 text");
+        for (const auto& source : env.applied_override_sources())
+            if (!valid_utf8(source.content))
+                throw Error("DIPH5 v3 cannot archive an override with invalid UTF-8 text");
+        validate_source_references(env, std::unordered_set<std::string>(model_names.begin(), model_names.end()));
+
+        Id output(H5Fcreate(file.string().c_str(), H5F_ACC_EXCL, H5P_DEFAULT, H5P_DEFAULT), H5Fclose,
+                  "Unable to create the DIPH5 v3 file");
+        write_string(output, "_DIPH5_Format", "SciNumTools3 DIPH5");
+        write_scalar<uint32_t>(output, "_DIPH5_Schema_Major", H5T_NATIVE_UINT32, 3);
+        write_scalar<uint32_t>(output, "_DIPH5_Schema_Minor", H5T_NATIVE_UINT32, 0);
+        write_scalar<uint32_t>(output, "_DIPH5_Schema_Patch", H5T_NATIVE_UINT32, 0);
+        write_string(output, "_DIPH5_Record_Id", uuid());
+        write_string(output, "_DIPH5_State", "prepared");
+        write_string(output, "_DIPH5_Created_At", utc_now());
+        write_string(output, "_DIPH5_Profile", "environment");
+
+        Id model(H5Gcreate2(output, "/model", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
+                 "Unable to create v3 model group");
+        Id manifest(H5Gcreate2(model, "manifest", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
+                    "Unable to create v3 model manifest");
+        Id sources(H5Gcreate2(model, "sources", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
+                   "Unable to create v3 source archive");
+        Id registrations(H5Gcreate2(model, "registrations", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose,
+                         "Unable to create v3 registrations");
+        // This manifest contains stable source facts only. File locations and timestamps
+        // are deliberately absent because moving an archive must not change its model hash.
+        nlohmann::json canonical = nlohmann::json::array();
+        for (size_t index = 0; index < model_sources.size(); ++index) {
+            const auto& source = model_sources[index];
+            const auto digest = snt::sha256(source.content);
+            const auto& parent = source.info.parent_name;
+            const auto& role = source.role;
+            Id entry(H5Gcreate2(sources, numbered(index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                     H5Gclose, "Unable to create v3 source entry");
+            write_bytes(entry, source.content);
+            write_string(entry, "source_id", source.source_id);
+            write_string(entry, "name", source.info.name);
+            write_string(entry, "original_path", source.info.path);
+            write_string(entry, "parent_source_id", parent);
+            write_scalar<uint64_t>(entry, "parent_line", H5T_NATIVE_UINT64,
+                                   source.info.parent_line);
+            write_string(entry, "sha256", digest);
+            write_string(entry, "role", role);
+            write_string(entry, "encoding", "utf-8");
+            validate_metadata_utf8(source.info.metadata);
+            write_metadata(entry, source.info.metadata);
+            canonical.push_back({{"source_id", source.source_id}, {"name", source.info.name},
+                                 {"parent_source_id", parent},
+                                 {"parent_line", source.info.parent_line},
+                                 {"role", role}, {"sha256", digest}});
+        }
+        const auto model_hash = snt::sha256(canonical.dump(-1, ' ', false, nlohmann::json::error_handler_t::strict));
+        write_string(manifest, "model_id", uuid());
+        write_scalar<uint64_t>(manifest, "source_count", H5T_NATIVE_UINT64, model_names.size());
+        write_string(manifest, "model_sha256", model_hash);
+        write_string(manifest, "dipl_language_version", "1.1.0");
+        write_string(manifest, "producer_name", "SciNumTools3");
+        write_string(manifest, "producer_version", CODE_VERSION);
+
+        Id configuration(H5Gcreate2(output, "/configuration", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                         H5Gclose, "Unable to create v3 configuration group");
+        Id overrides(H5Gcreate2(configuration, "overrides", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                     H5Gclose, "Unable to create v3 override archive");
+        for (size_t index = 0; index < env.applied_override_sources().size(); ++index) {
+            const auto& source = env.applied_override_sources()[index];
+            Id entry(H5Gcreate2(overrides, numbered(index).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                     H5Gclose, "Unable to create v3 override entry");
+            write_bytes(entry, source.content);
+            write_string(entry, "override_id", "override-" + numbered(index));
+            write_string(entry, "name", source.name);
+            write_string(entry, "origin", source.origin);
+            write_string(entry, "original_path", source.path);
+            write_scalar<uint64_t>(entry, "order", H5T_NATIVE_UINT64, index);
+            write_string(entry, "sha256", snt::sha256(source.content));
+            write_string(entry, "source_id", "");
+        }
+        Id resolved(H5Gcreate2(configuration, "resolved", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                    H5Gclose, "Unable to create v3 resolved hierarchy");
+        Id provenance(H5Gcreate2(configuration, "provenance", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT),
+                      H5Gclose, "Unable to create v3 provenance group");
+        // The resolved tree keeps the established node encoding. Its logical
+        // fingerprint is calculated after the tree has been relocated below.
+        write_string(provenance, "configuration_sha256", "");
+        write_string(provenance, "fingerprint_status", "unavailable");
+        write_string(provenance, "model_sha256", model_hash);
+        write_string(provenance, "prepared_at", utc_now());
+        write_string(provenance, "evaluator_name", "SciNumTools3");
+        write_string(provenance, "evaluator_version", CODE_VERSION);
+
+        // Reuse the tested v2.11 node codec in memory, then relocate its objects.
+        Id staging = temporary_file();
+        write_resolved_contents(staging, env, output_plan);
+        // Some programmatic node trees lack sibling-order metadata. The archive
+        // still needs a deterministic order so readers can validate the tree.
+        for (hsize_t index = 0; index < object_count(staging); ++index) {
+            const auto name = object_name(staging, index);
+            const std::string from = "/" + name;
+            if (name == GROUP_TRACE)
+                copy_object(staging, from, registrations, "trace");
+            else if (name == GROUP_UNITS)
+                copy_object(staging, from, registrations, "units");
+            else if (name == GROUP_DEPENDENCIES)
+                copy_object(staging, from, provenance, "dependencies");
+            else if (name == GROUP_OUTPUTS)
+                copy_object(staging, from, configuration, "adapter_outputs");
+            else
+                copy_object(staging, from, resolved, name);
+        }
+        complete_resolved_order(resolved);
+        if (const auto digest = configuration_fingerprint(output)) {
+            write_string(provenance, "configuration_sha256", *digest);
+            write_string(provenance, "fingerprint_status", "pass");
+        }
+        check(H5Fflush(output, H5F_SCOPE_GLOBAL), "Unable to flush the DIPH5 v3 file");
+    }
+
+    void save(const Environment& env, const std::filesystem::path& file, const OutputPlan* output_plan) {
+        const auto temporary = file.parent_path() / (".diph5-stage-" + uuid() + ".h5");
+        try {
+            save_staged(env, temporary, output_plan);
+#ifdef _WIN32
+            if (!MoveFileExW(temporary.c_str(), file.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+                throw Error("Unable to publish staged DIPH5 file: Windows error " + std::to_string(GetLastError()));
+#else
+            std::error_code error;
+            std::filesystem::rename(temporary, file, error);
+            if (error) throw Error("Unable to publish staged DIPH5 file: " + error.message());
+#endif
+        } catch (...) {
+            std::error_code ignored;
+            std::filesystem::remove(temporary, ignored);
+            throw;
+        }
+    }
+    namespace {
+        void load_archive(Environment& env, hid_t input, const std::filesystem::path& file) {
+            if (required_utf8(input, "_DIPH5_Format") != "SciNumTools3 DIPH5" ||
+                required_scalar<uint32_t>(input, "_DIPH5_Schema_Major", H5T_NATIVE_UINT32) != 3 ||
+                required_scalar<uint32_t>(input, "_DIPH5_Schema_Minor", H5T_NATIVE_UINT32) != 0 ||
+                required_scalar<uint32_t>(input, "_DIPH5_Schema_Patch", H5T_NATIVE_UINT32) != 0)
+                throw Error("Unsupported DIPH5 v3 schema version");
+            const auto profile = required_utf8(input, "_DIPH5_Profile");
+            if (profile == "environment") {
+                if (required_utf8(input, "_DIPH5_State") != "prepared" ||
+                    has_link(input, "/execution") || has_link(input, "/results"))
+                    throw Error("Invalid environment-profile DIPH5 v3 state or groups");
+            } else if (profile == "experiment") {
+                inspect_execution(input);
+                inspect_results(input);
+            } else {
+                throw Error("Unsupported DIPH5 v3 profile");
+            }
+            if (required_utf8(input, "_DIPH5_Record_Id").empty() ||
+                required_utf8(input, "_DIPH5_Created_At").empty())
+                throw Error("Missing DIPH5 v3 record identity");
+            Id model(H5Gopen2(input, "/model", H5P_DEFAULT), H5Gclose, "Missing v3 model group");
+            Id manifest(H5Gopen2(model, "manifest", H5P_DEFAULT), H5Gclose, "Missing v3 model manifest");
+            Id sources(H5Gopen2(model, "sources", H5P_DEFAULT), H5Gclose, "Missing v3 source archive");
+            Id registrations(H5Gopen2(model, "registrations", H5P_DEFAULT), H5Gclose,
+                             "Missing v3 registrations");
+            Id configuration(H5Gopen2(input, "/configuration", H5P_DEFAULT), H5Gclose,
+                             "Missing v3 configuration group");
+            Id overrides(H5Gopen2(configuration, "overrides", H5P_DEFAULT), H5Gclose,
+                         "Missing v3 override archive");
+            Id resolved(H5Gopen2(configuration, "resolved", H5P_DEFAULT), H5Gclose,
+                        "Missing v3 resolved hierarchy");
+            Id provenance(H5Gopen2(configuration, "provenance", H5P_DEFAULT), H5Gclose,
+                          "Missing v3 provenance group");
+            // v2 readers tolerate old files without order metadata; v3 requires it.
+            validate_node_order(resolved);
+            const auto fingerprint_status = required_utf8(provenance, "fingerprint_status");
+            const auto stored_fingerprint = required_utf8(provenance, "configuration_sha256");
+            if (fingerprint_status == "pass") {
+                const auto digest = configuration_fingerprint(input);
+                if (!digest || *digest != stored_fingerprint)
+                    throw IntegrityError("DIPH5 v3 configuration fingerprint mismatch");
+            } else if (fingerprint_status != "unavailable" || !stored_fingerprint.empty()) {
+                throw Error("Invalid DIPH5 v3 configuration fingerprint status");
+            }
+
+            const auto count = checked_size(object_count(sources), "v3 source count");
+            if (count == 0 || count > 100000 ||
+                count != required_scalar<uint64_t>(manifest, "source_count", H5T_NATIVE_UINT64))
+                throw Error("Invalid DIPH5 v3 source count");
+            nlohmann::json canonical = nlohmann::json::array();
+            std::vector<ArchivedSource> archived;
+            std::vector<SourceInfo> source_manifest;
+            std::unordered_set<std::string> identities;
+            std::unordered_set<std::string> names;
+            for (size_t index = 0; index < count; ++index) {
+                Id entry(H5Gopen2(sources, numbered(index).c_str(), H5P_DEFAULT), H5Gclose,
+                         "Invalid DIPH5 v3 source numbering");
+                const auto content = read_bytes(entry);
+                const auto id = required_utf8(entry, "source_id");
+                const auto name = required_utf8(entry, "name");
+                const auto parent = required_utf8(entry, "parent_source_id");
+                const auto parent_line = required_scalar<uint64_t>(entry, "parent_line", H5T_NATIVE_UINT64);
+                const auto digest = required_utf8(entry, "sha256");
+                const auto role = required_utf8(entry, "role");
+                if (id.empty() || name.empty() || !identities.insert(id).second || !names.insert(name).second ||
+                    !valid_utf8(content) || digest != snt::sha256(content) ||
+                    required_utf8(entry, "encoding") != "utf-8" ||
+                    (role != "model" && role != "import" && role != "units" && role != "schema" &&
+                     role != "function" && role != "other") ||
+                    (parent.empty() ? parent_line != 0 : parent_line == 0))
+                    throw Error("Invalid DIPH5 v3 source identity, parent, encoding, or SHA-256");
+                SourceInfo info{name, required_utf8(entry, "original_path"), parent,
+                                checked_size(parent_line, "source parent line"), "SHA-256", digest, {}};
+                read_metadata(entry, info.metadata);
+                validate_metadata_utf8(info.metadata);
+                archived.push_back({id, info, content, role});
+                source_manifest.push_back(info);
+                canonical.push_back({{"source_id", id}, {"name", name},
+                                     {"parent_source_id", parent}, {"parent_line", parent_line},
+                                     {"role", role}, {"sha256", digest}});
+            }
+            // Check parents after reading the full list; HDF5 does not promise iteration order.
+            for (const auto& source : archived)
+                if (!source.info.parent_name.empty() &&
+                    (!identities.count(source.info.parent_name) ||
+                     source.info.parent_name == source.source_id))
+                    throw Error("Invalid DIPH5 v3 source parent reference");
+            const auto model_hash = snt::sha256(canonical.dump(-1, ' ', false, nlohmann::json::error_handler_t::strict));
+            if (required_utf8(manifest, "model_sha256") != model_hash ||
+                required_utf8(provenance, "model_sha256") != model_hash)
+                throw Error("DIPH5 v3 model manifest SHA-256 mismatch");
+
+            const auto override_count = checked_size(object_count(overrides), "v3 override count");
+            if (override_count > 100000)
+                throw Error("DIPH5 v3 override count exceeds the reader limit");
+            for (size_t index = 0; index < override_count; ++index) {
+                Id entry(H5Gopen2(overrides, numbered(index).c_str(), H5P_DEFAULT), H5Gclose,
+                         "Invalid DIPH5 v3 override numbering");
+                const auto content = read_bytes(entry);
+                if (required_scalar<uint64_t>(entry, "order", H5T_NATIVE_UINT64) != index ||
+                    !valid_utf8(content) || required_utf8(entry, "sha256") != snt::sha256(content) ||
+                    required_utf8(entry, "override_id") != "override-" + numbered(index))
+                    throw Error("Invalid DIPH5 v3 override order or SHA-256");
+                const auto source_id = required_utf8(entry, "source_id");
+                if (!source_id.empty() && !identities.count(source_id))
+                    throw Error("Invalid DIPH5 v3 override source reference");
+                const auto origin = required_utf8(entry, "origin");
+                if (origin != "file" && origin != "inline" && origin != "generated" && origin != "api")
+                    throw Error("Invalid DIPH5 v3 override origin");
+                env.record_applied_override_source(
+                    {required_utf8(entry, "name"), required_utf8(entry, "original_path"), content,
+                     origin, source_id}
+                );
+                // Override text lives outside /model/sources, but its source
+                // identity must still resolve when a node reports provenance.
+                source_manifest.push_back({required_utf8(entry, "name"),
+                                           required_utf8(entry, "original_path"), "", 0,
+                                           "SHA-256", snt::sha256(content), {}});
+            }
+            env.set_archived_sources(std::move(archived));
+            env.set_source_manifest(std::move(source_manifest));
+
+            // The v3 layout moved the resolved-node codec but kept its encoding. Decode
+            // through an in-memory file so the node and provenance checks stay in one place.
+            Id staging = temporary_file();
+            copy_object(registrations, "trace", staging, std::string(GROUP_TRACE));
+            copy_object(registrations, "units", staging, std::string(GROUP_UNITS));
+            copy_object(provenance, "dependencies", staging, std::string(GROUP_DEPENDENCIES));
+            if (H5Lexists(configuration, "adapter_outputs", H5P_DEFAULT) > 0)
+                copy_object(configuration, "adapter_outputs", staging, std::string(GROUP_OUTPUTS));
+            for (hsize_t index = 0; index < object_count(resolved); ++index) {
+                const auto name = object_name(resolved, index);
+                copy_object(resolved, name, staging, name);
+            }
+            read_trace_manifest(env, staging);
+            read_unit_manifest(env, staging);
+            read_dependency_graph(env, staging);
+            read_group(env, staging, true);
+            read_output_plan(env, staging);
+            validate_source_references(env, names);
+        }
+    }
     void load(Environment& env, const std::filesystem::path& file) {
         H5Eset_auto2(H5E_DEFAULT, nullptr, nullptr);
         Id input(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose, "Unable to open the HDF5 file");
-        if (read_string(input, ATTR_FORMAT) != FORMAT)
-            throw dip::IOException(
-                "Invalid HDF5 environment",
-                "The file does not identify itself as a SciNumTools3 environment.",
-                "Load a file created by Environment::save().",
-                __FILE__,
-                __LINE__
-            );
-        const uint64_t version = read_scalar<uint64_t>(input, ATTR_VERSION, H5T_NATIVE_UINT64);
-        if (version < FIRST_SUPPORTED_VERSION || version > VERSION)
-            throw dip::IOException(
-                "Unsupported HDF5 environment version",
-                "The file schema version is not supported.",
-                "Use a compatible SciNumTools3 version.",
-                __FILE__,
-                __LINE__
-            );
-        const uint64_t minor_version = has_attribute(input, ATTR_VERSION_MINOR)
-                                           ? read_scalar<uint64_t>(input, ATTR_VERSION_MINOR, H5T_NATIVE_UINT64)
-                                           : 0;
-        if (version == VERSION && minor_version > VERSION_MINOR)
-            throw dip::IOException(
-                "Unsupported HDF5 environment version",
-                "The file schema minor version is newer than this SciNumTools3 version supports.",
-                "Use a compatible SciNumTools3 version.",
-                __FILE__,
-                __LINE__
-            );
-        if (version >= 2)
-            read_source_manifest(env, input);
-        if (version == VERSION && minor_version >= 1)
-            read_trace_manifest(env, input, minor_version);
-        if (version == VERSION && minor_version >= 3)
-            read_unit_manifest(env, input);
-        if (version == VERSION && minor_version >= 7)
-            read_dependency_graph(env, input);
-        read_group(
-            env, input, true, false, version == VERSION && minor_version >= 7, version == VERSION && minor_version >= 8
-        );
-        if (version == VERSION && minor_version >= 8)
-            read_output_plan(env, input);
+        if (!has_attribute(input, "_DIPH5_Format") ||
+            read_string(input, "_DIPH5_Format") != "SciNumTools3 DIPH5")
+            throw Error("Unsupported DIPH5 archive: only version 3 is supported");
+        load_archive(env, input, file);
     }
+
 
 } // namespace snt::dip::hdf5

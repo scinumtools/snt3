@@ -1,5 +1,6 @@
 #include "pch_tests.h"
 #include "test_environment_fixture.h"
+#include "../../src/snt/dip/hdf5/io_private.h"
 
 #include <chrono>
 #include <filesystem>
@@ -9,6 +10,7 @@
 #include <snt/dip/artifact.h>
 #include <snt/dip/cursor.h>
 #include <snt/dip/exceptions.h>
+#include <snt/dip/experiment.h>
 #include <snt/dip/inspect/inspector.h>
 #include <sstream>
 
@@ -47,6 +49,39 @@ namespace {
                 remove_order_attributes(object);
             if (H5Aexists(object, "_DIPL_Order") > 0)
                 ASSERT_GE(H5Adelete(object, "_DIPL_Order"), 0);
+        }
+    }
+
+    void replace_string_attribute(hid_t object, const char* name, const std::string& value) {
+        if (H5Aexists(object, name) > 0)
+            ASSERT_GE(H5Adelete(object, name), 0);
+        H5Handle type(H5Tcopy(H5T_C_S1), H5Tclose);
+        ASSERT_GE(H5Tset_size(type, value.size() + 1), 0);
+        ASSERT_GE(H5Tset_cset(type, H5T_CSET_UTF8), 0);
+        H5Handle space(H5Screate(H5S_SCALAR), H5Sclose);
+        H5Handle attribute(H5Acreate2(object, name, type, space, H5P_DEFAULT, H5P_DEFAULT), H5Aclose);
+        ASSERT_GE(H5Awrite(attribute, type, value.c_str()), 0);
+    }
+
+    void copy_fixed_attributes(hid_t source, hid_t destination) {
+        const int count = H5Aget_num_attrs(source);
+        ASSERT_GE(count, 0);
+        for (int i = 0; i < count; ++i) {
+            H5Handle attr(H5Aopen_idx(source, static_cast<unsigned>(i)), H5Aclose);
+            const auto length = H5Aget_name(attr, 0, nullptr);
+            ASSERT_GE(length, 0);
+            std::string name(static_cast<size_t>(length) + 1, '\0');
+            ASSERT_GE(H5Aget_name(attr, name.size(), name.data()), 0);
+            name.resize(static_cast<size_t>(length));
+            H5Handle type(H5Aget_type(attr), H5Tclose);
+            H5Handle space(H5Aget_space(attr), H5Sclose);
+            ASSERT_EQ(H5Tis_variable_str(type), 0);
+            const auto count_values = H5Sget_simple_extent_npoints(space);
+            ASSERT_GE(count_values, 0);
+            std::vector<char> buffer(static_cast<size_t>(count_values) * H5Tget_size(type));
+            H5Handle copy(H5Acreate2(destination, name.c_str(), type, space, H5P_DEFAULT, H5P_DEFAULT), H5Aclose);
+            ASSERT_GE(H5Aread(attr, type, buffer.data()), 0);
+            ASSERT_GE(H5Awrite(copy, type, buffer.data()), 0);
         }
     }
 } // namespace
@@ -115,25 +150,8 @@ TEST(Environment, CollectionOrderSurvivesHdf5RoundTrip) {
     EXPECT_EQ(reloaded.hierarchy.get_collection("catalog").items, loaded.hierarchy.get_collection("catalog").items);
     EXPECT_EQ(reloaded.hierarchy.get_collection("numbers").items, expected_indices);
 
-    const auto legacy_file = environment_file("collection-order-legacy");
-    std::filesystem::copy_file(file, legacy_file, std::filesystem::copy_options::overwrite_existing);
-    {
-        H5Handle legacy(H5Fopen(legacy_file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
-        remove_order_attributes(legacy);
-        H5Handle minor_attribute(H5Aopen(legacy, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
-        const uint64_t legacy_minor = 9;
-        ASSERT_GE(H5Awrite(minor_attribute, H5T_NATIVE_UINT64, &legacy_minor), 0);
-    }
-    dip::Environment legacy_loaded;
-    legacy_loaded.load(legacy_file);
-    EXPECT_EQ(legacy_loaded.hierarchy.root_children_order(), (std::vector<std::string>{"alpha", "catalog", "numbers", "zeta"}));
-    EXPECT_EQ(legacy_loaded.hierarchy.get_collection("zeta").children, (std::vector<std::string>{"first", "second"}));
-    EXPECT_EQ(legacy_loaded.hierarchy.get_collection("catalog").items, (std::vector<std::string>{"alpha", "zeta"}));
-    EXPECT_EQ(legacy_loaded.hierarchy.get_collection("numbers").items, expected_indices);
-
     std::filesystem::remove(file);
     std::filesystem::remove(round_trip);
-    std::filesystem::remove(legacy_file);
 }
 
 TEST(Environment, OptionLabelsSurviveHdf5RoundTrip) {
@@ -261,6 +279,7 @@ TEST(Environment, ExactNumericValuesSurviveHdf5RoundTrip) {
         "large_count uint64 = 9007199254740993\n"
         "maximum_count uint64 = 18446744073709551615\n"
         "minimum_offset int64 = -9223372036854775808\n"
+        "small_count int8 = -128\n"
         "gain float32 = 1.23456789\n"
         "matrix float64[2,2] = [[1.25, -2.5], [3.75, 4.5]]\n"
     );
@@ -269,11 +288,24 @@ TEST(Environment, ExactNumericValuesSurviveHdf5RoundTrip) {
     const auto file = std::filesystem::temp_directory_path() / ("snt-numeric-fidelity-" + suffix + ".diph5");
     original.save(file);
 
+    {
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
+        for (const auto& item : std::vector<std::pair<const char*, size_t>>{{"small_count", 1}, {"gain", 4}, {"matrix", 8},
+                                                                            {"large_count", 8}}) {
+            const auto path = std::string("/configuration/resolved/") + item.first;
+            H5Handle dataset(H5Dopen2(archive, path.c_str(), H5P_DEFAULT), H5Dclose);
+            H5Handle type(H5Dget_type(dataset), H5Tclose);
+            EXPECT_EQ(H5Tget_size(type), item.second) << item.first;
+        }
+    }
+
     dip::Environment loaded;
     loaded.load(file);
     EXPECT_EQ(loaded["large_count"].as<uint64_t>(), uint64_t{9007199254740993ULL});
     EXPECT_EQ(loaded["maximum_count"].as<uint64_t>(), std::numeric_limits<uint64_t>::max());
     EXPECT_EQ(loaded["minimum_offset"].as<int64_t>(), std::numeric_limits<int64_t>::min());
+    EXPECT_EQ(loaded["small_count"].as<int64_t>(), -128);
+    EXPECT_EQ(loaded["small_count"].get_node()->value->get_dtype(), core::DataType::Integer8);
     EXPECT_EQ(loaded["gain"].get_node()->value->get_dtype(), core::DataType::Float32);
     EXPECT_DOUBLE_EQ(loaded["gain"].as<double>(), static_cast<double>(static_cast<float>(1.23456789)));
     EXPECT_EQ(loaded["matrix"].get_shape(), (val::Array::ShapeType{2, 2}));
@@ -339,7 +371,7 @@ TEST(Environment, RejectsCorruptModificationHistoryWithoutReplacingEnvironment) 
         source.save(file);
         H5Handle h5file(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
         ASSERT_GE(static_cast<hid_t>(h5file), 0);
-        H5Handle dataset(H5Dopen2(h5file, "/answer", H5P_DEFAULT), H5Dclose);
+        H5Handle dataset(H5Dopen2(h5file, "/configuration/resolved/answer", H5P_DEFAULT), H5Dclose);
         ASSERT_GE(static_cast<hid_t>(dataset), 0);
         constexpr const char* lines_attribute = "_DIPL_Modification_Lines";
         if (remove_lines) {
@@ -352,6 +384,10 @@ TEST(Environment, RejectsCorruptModificationHistoryWithoutReplacingEnvironment) 
             const char invalid_line[] = "x";
             ASSERT_GE(H5Awrite(attribute, type, invalid_line), 0);
         }
+        // Keep this test focused on history validation, past the outer digest check.
+        H5Handle provenance(H5Gopen2(h5file, "/configuration/provenance", H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(provenance, "fingerprint_status", "unavailable");
+        replace_string_attribute(provenance, "configuration_sha256", "");
     };
 
     for (const bool remove_lines : {true, false}) {
@@ -378,7 +414,7 @@ TEST(Environment, ChecksModificationLineNumberAgainstSizeT) {
     {
         H5Handle h5file(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
         ASSERT_GE(static_cast<hid_t>(h5file), 0);
-        H5Handle dataset(H5Dopen2(h5file, "/answer", H5P_DEFAULT), H5Dclose);
+        H5Handle dataset(H5Dopen2(h5file, "/configuration/resolved/answer", H5P_DEFAULT), H5Dclose);
         ASSERT_GE(static_cast<hid_t>(dataset), 0);
         constexpr const char* name = "_DIPL_Modification_Lines";
         ASSERT_GE(H5Adelete(dataset, name), 0);
@@ -390,6 +426,9 @@ TEST(Environment, ChecksModificationLineNumberAgainstSizeT) {
         ASSERT_GE(static_cast<hid_t>(attribute), 0);
         const char text[11] = "4294967296";
         ASSERT_GE(H5Awrite(attribute, type, text), 0);
+        H5Handle provenance(H5Gopen2(h5file, "/configuration/provenance", H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(provenance, "fingerprint_status", "unavailable");
+        replace_string_attribute(provenance, "configuration_sha256", "");
     }
 
     dip::Environment loaded;
@@ -412,7 +451,7 @@ TEST(Environment, ChecksDependencyEventLineNumberAgainstSizeT) {
     {
         H5Handle h5file(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
         ASSERT_GE(static_cast<hid_t>(h5file), 0);
-        H5Handle event(H5Gopen2(h5file, "/_DIPL_Dependencies/0", H5P_DEFAULT), H5Gclose);
+        H5Handle event(H5Gopen2(h5file, "/configuration/provenance/dependencies/0", H5P_DEFAULT), H5Gclose);
         ASSERT_GE(static_cast<hid_t>(event), 0);
         H5Handle attribute(H5Aopen(event, "line", H5P_DEFAULT), H5Aclose);
         ASSERT_GE(static_cast<hid_t>(attribute), 0);
@@ -499,58 +538,8 @@ TEST(Environment, SourceManifestAndCursorProvenance) {
     EXPECT_EQ(loaded_provenance.source_line, parsed_provenance.source_line);
     EXPECT_EQ(loaded_provenance.source_code, parsed_provenance.source_code);
     EXPECT_EQ(loaded_provenance.source->hash, parsed_provenance.source->hash);
-    EXPECT_EQ(loaded.get_source_manifest().size(), source.get_source_manifest().size());
+    EXPECT_EQ(loaded.get_source_manifest().size(), loaded.archived_sources().size());
     std::filesystem::remove(file);
-}
-
-TEST(Environment, RelativeSourcePathsFollowSnapshotLocation) {
-    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
-    const auto root = std::filesystem::temp_directory_path() / ("snt-relative-sources-" + suffix);
-    const auto source_dir = root / "sources";
-    const auto snapshot_dir = root / "snapshots";
-    const auto copy_dir = root / "copies";
-    std::filesystem::create_directories(source_dir);
-    std::filesystem::create_directories(snapshot_dir);
-    std::filesystem::create_directories(copy_dir);
-    const auto source_file = source_dir / "values.dip";
-    {
-        std::ofstream stream(source_file);
-        stream << "value int = 1\n";
-    }
-    dip::DIP parser;
-    parser.add_file(source_file.string());
-    const auto parsed = parser.parse(true);
-    ASSERT_TRUE(dip::Inspector{parsed}.graph().recorded);
-
-    dip::SnapshotSaveOptions options;
-    options.source_paths = dip::SourcePathPolicy::RelativeToSnapshot;
-    const auto snapshot = snapshot_dir / "values.diph5";
-    parsed.save(snapshot, options);
-    dip::Environment loaded;
-    loaded.load(snapshot);
-    ASSERT_TRUE(dip::Inspector{loaded}.graph().recorded);
-    const auto manifest = loaded.get_source_manifest();
-    const auto source_it = std::find_if(manifest.begin(), manifest.end(), [&](const dip::SourceInfo& info) {
-        return std::filesystem::path(info.path).filename() == source_file.filename();
-    });
-    ASSERT_NE(source_it, manifest.end());
-    const auto& source = *source_it;
-    EXPECT_FALSE(std::filesystem::path(source.path).is_absolute());
-    EXPECT_EQ((snapshot_dir / source.path).lexically_normal(), source_file);
-
-    const auto copy = copy_dir / "values.diph5";
-    loaded.save(copy, options);
-    dip::Environment reloaded;
-    reloaded.load(copy);
-    const auto copied_manifest = reloaded.get_source_manifest();
-    const auto copied_it =
-        std::find_if(copied_manifest.begin(), copied_manifest.end(), [&](const dip::SourceInfo& info) {
-            return std::filesystem::path(info.path).filename() == source_file.filename();
-        });
-    ASSERT_NE(copied_it, copied_manifest.end());
-    const auto& copied_source = *copied_it;
-    EXPECT_EQ((copy_dir / copied_source.path).lexically_normal(), source_file);
-    std::filesystem::remove_all(root);
 }
 
 TEST(Environment, TraceManifestRoundTrip) {
@@ -674,25 +663,617 @@ TEST(Environment, OverrideProvenanceHdf5RoundTrip) {
     std::filesystem::remove(file);
 }
 
-TEST(Environment, LoadSchemaVersion1WithoutSourceManifest) {
-    const auto file = environment_file("load-version-1");
-    dip::Environment source = parsed_environment();
-    source.save(file);
+TEST(Environment, Diph5V3SourceArchiveRoundTripAndIntegrity) {
+    const std::string source = "$override\n  radius = 20 cm\nradius float = 10 cm\n";
+    dip::DIP parser;
+    parser.add_string(source);
+    const auto original = parser.parse();
+    const auto file = environment_file("v3-source-archive");
+    original.save(file);
     {
-        H5Handle hdf5_file(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
-        ASSERT_GE(hdf5_file, 0);
-        ASSERT_GE(H5Ldelete(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
-        H5Handle version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version", H5P_DEFAULT), H5Aclose);
-        ASSERT_GE(version_attribute, 0);
-        const uint64_t version = 1;
-        ASSERT_GE(H5Awrite(version_attribute, H5T_NATIVE_UINT64, &version), 0);
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
+        ASSERT_GE(static_cast<hid_t>(archive), 0);
+        EXPECT_GT(H5Lexists(archive, "/configuration/resolved/radius", H5P_DEFAULT), 0);
+        EXPECT_GT(H5Lexists(archive, "/model/sources/000000/content", H5P_DEFAULT), 0);
+        EXPECT_GT(H5Lexists(archive, "/configuration/overrides/000000/content", H5P_DEFAULT), 0);
+        EXPECT_EQ(H5Lexists(archive, "/execution", H5P_DEFAULT), 0);
     }
-
     dip::Environment loaded;
     loaded.load(file);
-    EXPECT_TRUE(loaded.get_source_manifest().empty());
-    EXPECT_FALSE(loaded["title"].get_provenance().source.has_value());
-    EXPECT_EQ(loaded["title"].get_provenance().source_name, source["title"].get_provenance().source_name);
+    EXPECT_EQ(loaded["radius"].as<double>(), 20);
+    ASSERT_EQ(loaded.archived_sources().size(), 1);
+    EXPECT_EQ(loaded.archived_sources()[0].content, source);
+    ASSERT_EQ(loaded.applied_override_sources().size(), 1);
+    EXPECT_EQ(loaded.applied_override_sources()[0].content, "$override\n  radius = 20 cm\n");
+
+    const auto directory = std::filesystem::temp_directory_path() / "scinumtools3-v3-extracted";
+    std::filesystem::create_directories(directory);
+    loaded.extract_sources(directory);
+    std::ifstream extracted(directory / "000000.dip", std::ios::binary);
+    EXPECT_EQ(std::string(std::istreambuf_iterator<char>(extracted), {}), source);
+    extracted.close();
+    std::filesystem::remove(directory / "000000.dip");
+    std::filesystem::remove(directory);
+
+    {
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        H5Handle bytes(H5Dopen2(archive, "/model/sources/000000/content", H5P_DEFAULT), H5Dclose);
+        H5Handle space(H5Dget_space(bytes), H5Sclose);
+        hsize_t start = 0, count = 1;
+        ASSERT_GE(H5Sselect_hyperslab(space, H5S_SELECT_SET, &start, nullptr, &count, nullptr), 0);
+        H5Handle memory(H5Screate_simple(1, &count, nullptr), H5Sclose);
+        const unsigned char replacement = 'X';
+        ASSERT_GE(H5Dwrite(bytes, H5T_NATIVE_UINT8, memory, space, H5P_DEFAULT, &replacement), 0);
+    }
+    dip::Environment corrupted;
+    EXPECT_THROW(corrupted.load(file), dip::IOException);
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, Diph5V3PreservesResolvedHierarchyAndOrderedOverrides) {
+    // The regular hierarchy fixture exercises collections, arrays, metadata, and units.
+    const auto hierarchy_file = environment_file("v3-hierarchy");
+    parsed_environment().save(hierarchy_file);
+    dip::Environment hierarchy;
+    hierarchy.load(hierarchy_file);
+    EXPECT_EQ(hierarchy["simulation.steps"].as<int64_t>(), 100);
+    EXPECT_EQ(hierarchy["samples[1].time"].as<double>(), 1.0);
+    EXPECT_EQ(hierarchy.get_node("title")->metadata.description, "Environment round-trip fixture");
+    std::filesystem::remove(hierarchy_file);
+
+    dip::DIP parser;
+    parser.add_string("first int = 1\nsecond int = 1\n");
+    parser.add_override_string("first = 2\n", "first_override");
+    parser.add_override_string("second = 3\n", "second_override");
+    const auto file = environment_file("v3-ordered-overrides");
+    parser.parse().save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_EQ(loaded["first"].as<int64_t>(), 2);
+    EXPECT_EQ(loaded["second"].as<int64_t>(), 3);
+    ASSERT_EQ(loaded.applied_override_sources().size(), 2);
+    EXPECT_EQ(loaded.applied_override_sources()[0].name, "first_override");
+    EXPECT_EQ(loaded.applied_override_sources()[0].content, "first = 2\n");
+    EXPECT_EQ(loaded.applied_override_sources()[1].name, "second_override");
+    EXPECT_EQ(loaded.applied_override_sources()[1].content, "second = 3\n");
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, Diph5V3RejectsMalformedArchiveEntries) {
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    parser.add_override_string("answer = 8\n", "answer_override");
+    const auto original = environment_file("v3-adversarial-base");
+    parser.parse().save(original);
+
+    const auto rejects = [&](const std::string& label, const auto& damage) {
+        const auto file = environment_file("v3-adversarial-" + label);
+        std::filesystem::copy_file(original, file, std::filesystem::copy_options::overwrite_existing);
+        {
+            H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+            ASSERT_GE(static_cast<hid_t>(archive), 0);
+            damage(archive);
+        }
+        dip::Environment loaded;
+        EXPECT_THROW(loaded.load(file), dip::IOException) << label;
+        std::filesystem::remove(file);
+    };
+
+    rejects("missing-version", [](hid_t archive) {
+        ASSERT_GE(H5Adelete(archive, "_DIPH5_Schema_Minor"), 0);
+    });
+    rejects("missing-resolved", [](hid_t archive) {
+        ASSERT_GE(H5Ldelete(archive, "/configuration/resolved", H5P_DEFAULT), 0);
+    });
+    rejects("missing-bytes", [](hid_t archive) {
+        ASSERT_GE(H5Ldelete(archive, "/model/sources/000000/content", H5P_DEFAULT), 0);
+    });
+    rejects("bad-digest", [](hid_t archive) {
+        H5Handle source(H5Gopen2(archive, "/model/sources/000000", H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(source, "sha256", std::string(64, '0'));
+    });
+    rejects("duplicate-id", [](hid_t archive) {
+        ASSERT_GE(H5Ocopy(archive, "/model/sources/000000", archive, "/model/sources/000001",
+                          H5P_DEFAULT, H5P_DEFAULT), 0);
+        H5Handle manifest(H5Gopen2(archive, "/model/manifest", H5P_DEFAULT), H5Gclose);
+        H5Handle count(H5Aopen(manifest, "source_count", H5P_DEFAULT), H5Aclose);
+        const uint64_t two = 2;
+        ASSERT_GE(H5Awrite(count, H5T_NATIVE_UINT64, &two), 0);
+    });
+    rejects("broken-parent", [](hid_t archive) {
+        H5Handle source(H5Gopen2(archive, "/model/sources/000000", H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(source, "parent_source_id", "missing-source");
+        H5Handle line(H5Aopen(source, "parent_line", H5P_DEFAULT), H5Aclose);
+        const uint64_t one = 1;
+        ASSERT_GE(H5Awrite(line, H5T_NATIVE_UINT64, &one), 0);
+    });
+    rejects("invalid-utf8", [](hid_t archive) {
+        H5Handle source(H5Gopen2(archive, "/model/sources/000000", H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(source, "name", std::string("bad\xff", 4));
+    });
+    rejects("invalid-metadata-utf8", [](hid_t archive) {
+        H5Handle source(H5Gopen2(archive, "/model/sources/000000", H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(source, "description", std::string("bad\xff", 4));
+    });
+    rejects("array-attribute", [](hid_t archive) {
+        H5Handle source(H5Gopen2(archive, "/model/sources/000000", H5P_DEFAULT), H5Gclose);
+        ASSERT_GE(H5Adelete(source, "name"), 0);
+        H5Handle type(H5Tcopy(H5T_C_S1), H5Tclose);
+        ASSERT_GE(H5Tset_size(type, 8), 0);
+        const hsize_t count = 2;
+        H5Handle space(H5Screate_simple(1, &count, nullptr), H5Sclose);
+        H5Handle attribute(H5Acreate2(source, "name", type, space, H5P_DEFAULT, H5P_DEFAULT), H5Aclose);
+        const char names[16] = "first\0second";
+        ASSERT_GE(H5Awrite(attribute, type, names), 0);
+    });
+    rejects("override-order", [](hid_t archive) {
+        H5Handle entry(H5Gopen2(archive, "/configuration/overrides/000000", H5P_DEFAULT), H5Gclose);
+        H5Handle order(H5Aopen(entry, "order", H5P_DEFAULT), H5Aclose);
+        const uint64_t one = 1;
+        ASSERT_GE(H5Awrite(order, H5T_NATIVE_UINT64, &one), 0);
+    });
+    rejects("override-reference", [](hid_t archive) {
+        H5Handle entry(H5Gopen2(archive, "/configuration/overrides/000000", H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(entry, "source_id", "missing-source");
+    });
+    rejects("node-order", [](hid_t archive) {
+        H5Handle node(H5Oopen(archive, "/configuration/resolved/answer", H5P_DEFAULT), H5Oclose);
+        H5Handle order(H5Aopen(node, "_DIPL_Order", H5P_DEFAULT), H5Aclose);
+        const uint64_t one = 1;
+        ASSERT_GE(H5Awrite(order, H5T_NATIVE_UINT64, &one), 0);
+    });
+    rejects("node-source-reference", [](hid_t archive) {
+        H5Handle node(H5Oopen(archive, "/configuration/resolved/answer", H5P_DEFAULT), H5Oclose);
+        replace_string_attribute(node, "_DIPL_Source", "missing-source");
+    });
+    rejects("node-path-mismatch", [](hid_t archive) {
+        H5Handle node(H5Oopen(archive, "/configuration/resolved/answer", H5P_DEFAULT), H5Oclose);
+        replace_string_attribute(node, "_DIPL_Path", "other");
+    });
+    rejects("node-dtype-mismatch", [](hid_t archive) {
+        H5Handle node(H5Oopen(archive, "/configuration/resolved/answer", H5P_DEFAULT), H5Oclose);
+        replace_string_attribute(node, "_DIPL_Value_Type", "int8");
+    });
+    rejects("node-invalid-kind", [](hid_t archive) {
+        H5Handle node(H5Oopen(archive, "/configuration/resolved/answer", H5P_DEFAULT), H5Oclose);
+        replace_string_attribute(node, "_DIPL_Kind", "invalid");
+    });
+    rejects("node-invalid-node-type", [](hid_t archive) {
+        H5Handle node(H5Oopen(archive, "/configuration/resolved/answer", H5P_DEFAULT), H5Oclose);
+        replace_string_attribute(node, "_DIPL_Node_Type", "invalid");
+    });
+    rejects("scalar-array-marker", [](hid_t archive) {
+        H5Handle node(H5Oopen(archive, "/configuration/resolved/answer", H5P_DEFAULT), H5Oclose);
+        H5Handle marker(H5Aopen(node, "_DIPL_Array", H5P_DEFAULT), H5Aclose);
+        const uint8_t one = 1;
+        ASSERT_GE(H5Awrite(marker, H5T_NATIVE_UINT8, &one), 0);
+    });
+    rejects("unexpected-execution", [](hid_t archive) {
+        H5Handle group(H5Gcreate2(archive, "/execution", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT), H5Gclose);
+        ASSERT_GE(static_cast<hid_t>(group), 0);
+    });
+    rejects("missing-unit-manifest", [](hid_t archive) {
+        ASSERT_GE(H5Ldelete(archive, "/model/registrations/units", H5P_DEFAULT), 0);
+    });
+    std::filesystem::remove(original);
+}
+
+TEST(Environment, Diph5V3ExtractionIgnoresOriginalPaths) {
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    const auto file = environment_file("v3-untrusted-path");
+    parser.parse().save(file);
+    {
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        H5Handle source(H5Gopen2(archive, "/model/sources/000000", H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(source, "original_path", "../../outside.dip");
+    }
+    dip::Environment loaded;
+    loaded.load(file);
+    const auto destination = environment_file("v3-extract-directory");
+    std::filesystem::create_directories(destination);
+    const auto safe_file = destination / "000000.dip";
+    loaded.extract_sources(destination);
+    EXPECT_TRUE(std::filesystem::is_regular_file(safe_file));
+    EXPECT_ANY_THROW(loaded.extract_sources(destination));
+    std::filesystem::remove(safe_file);
+    std::filesystem::remove(destination);
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, Diph5V3RejectsUnterminatedStringData) {
+    dip::DIP parser;
+    parser.add_string("label str = \"abc\"\n");
+    const auto file = environment_file("v3-unterminated-string");
+    parser.parse().save(file);
+    {
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        H5Handle dataset(H5Dopen2(archive, "/configuration/resolved/label", H5P_DEFAULT), H5Dclose);
+        H5Handle type(H5Dget_type(dataset), H5Tclose);
+        ASSERT_EQ(H5Tget_size(type), 4);
+        const char bytes[] = {'a', 'b', 'c', 'd'};
+        ASSERT_GE(H5Dwrite(dataset, type, H5S_ALL, H5S_ALL, H5P_DEFAULT, bytes), 0);
+    }
+    dip::Environment loaded;
+    EXPECT_THROW(loaded.load(file), dip::IOException);
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, Diph5V3ArchivesImportedSourceBytesInOrder) {
+    const auto directory = environment_file("v3-imports");
+    std::filesystem::create_directories(directory);
+    const std::string leaf = "value int = 42\n# keep this comment\n";
+    {
+        std::ofstream main(directory / "main.dip", std::ios::binary);
+        main << "$source left = \"left.dip\"\n"
+                "$source right = \"right.dip\"\n"
+                "answer int = {left?value}\n";
+        std::ofstream left(directory / "left.dip", std::ios::binary);
+        left << leaf;
+        std::ofstream right(directory / "right.dip", std::ios::binary);
+        right << leaf;
+    }
+    dip::DIP parser;
+    parser.add_file(directory / "main.dip");
+    const auto file = environment_file("v3-imports-archive");
+    parser.parse().save(file);
+    dip::Environment loaded;
+    loaded.load(file);
+    EXPECT_EQ(loaded["answer"].as<int64_t>(), 42);
+    ASSERT_EQ(loaded.archived_sources().size(), 3);
+    EXPECT_FALSE(loaded.archived_sources()[0].info.name.empty());
+    EXPECT_EQ(loaded.archived_sources()[1].info.name, "left");
+    EXPECT_EQ(loaded.archived_sources()[2].info.name, "right");
+    EXPECT_EQ(loaded.archived_sources()[1].content, leaf);
+    EXPECT_EQ(loaded.archived_sources()[2].content, leaf);
+    EXPECT_EQ(loaded.archived_sources()[1].info.parent_name, loaded.archived_sources()[0].source_id);
+    EXPECT_EQ(loaded.archived_sources()[2].info.parent_name, loaded.archived_sources()[0].source_id);
+    std::filesystem::remove(file);
+    std::filesystem::remove_all(directory);
+}
+
+TEST(Environment, Diph5V3ExperimentLifecycleAndImport) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    const auto archive = environment_file("v3-experiment-" + suffix);
+    auto experiment = dip::Experiment::prepare(parser.parse(), archive);
+    EXPECT_EQ(experiment.outcome().status, dip::ExperimentStatus::Prepared);
+    EXPECT_ANY_THROW(experiment.finish(dip::ExperimentStatus::Completed, 0));
+
+    dip::ExperimentCommand command;
+    command.argv = {"echo", "two words", "", "a\"b", "μ"};
+    command.launcher_argv = {"launcher", "--label", "a b"};
+    command.argv_redacted = true;
+    command.working_directory = std::filesystem::current_path();
+    experiment.start(command);
+    const auto running = dip::Experiment::open(archive).outcome();
+    EXPECT_EQ(running.status, dip::ExperimentStatus::Running);
+    ASSERT_TRUE(running.command.has_value());
+    EXPECT_EQ(running.command->argv, command.argv);
+    EXPECT_EQ(running.command->launcher_argv, command.launcher_argv);
+    EXPECT_TRUE(running.command->argv_redacted);
+    EXPECT_EQ(running.command->capture_origin, "launcher_observed");
+    EXPECT_ANY_THROW(experiment.start(command));
+    experiment.finish(dip::ExperimentStatus::Completed, 0);
+    const auto completed = experiment.outcome();
+    EXPECT_EQ(completed.status, dip::ExperimentStatus::Completed);
+    EXPECT_EQ(completed.exit_code, 0);
+    EXPECT_FALSE(completed.finished_at.empty());
+    EXPECT_ANY_THROW(experiment.finish(dip::ExperimentStatus::Failed, 1));
+    dip::Environment loaded;
+    loaded.load(archive);
+    EXPECT_EQ(loaded["answer"].as<int64_t>(), 7);
+    {
+        H5Handle file(H5Fopen(archive.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        replace_string_attribute(file, "_DIPH5_State", "running");
+    }
+    EXPECT_ANY_THROW(dip::Experiment::open(archive));
+    std::filesystem::remove(archive);
+
+    const auto environment_file_path = environment_file("v3-environment-for-import-" + suffix);
+    dip::DIP second;
+    second.add_string("answer int = 7\n");
+    second.parse().save(environment_file_path);
+    const auto host_file = environment_file("v3-host-experiment-" + suffix);
+    auto host = dip::Experiment::prepare_from_archive(environment_file_path, host_file);
+    command.capture_origin = "host_reported";
+    command.reported_executable_path = running.resolved_executable_path;
+    command.reported_executable_sha256 = running.executable_sha256;
+    command.reported_executable_size_bytes = running.executable_size_bytes;
+    host.start(command);
+    host.finish(dip::ExperimentStatus::Completed, 0);
+    const auto reported = host.outcome();
+    ASSERT_TRUE(reported.command.has_value());
+    EXPECT_EQ(reported.command->argv, running.command->argv);
+    EXPECT_EQ(reported.command->working_directory, running.command->working_directory);
+    EXPECT_EQ(reported.command->launcher_argv, running.command->launcher_argv);
+    EXPECT_EQ(reported.command->argv_redacted, running.command->argv_redacted);
+    EXPECT_EQ(reported.command->command_role, running.command->command_role);
+    EXPECT_EQ(reported.executable_sha256, running.executable_sha256);
+    EXPECT_EQ(reported.executable_size_bytes, running.executable_size_bytes);
+    EXPECT_EQ(reported.resolved_executable_path, running.resolved_executable_path);
+    EXPECT_EQ(reported.status, completed.status);
+    EXPECT_EQ(reported.exit_code, completed.exit_code);
+    EXPECT_EQ(reported.capture_origin, "host_reported");
+    EXPECT_TRUE(reported.system_os.empty());
+    EXPECT_TRUE(reported.system_architecture.empty());
+    EXPECT_TRUE(reported.started_at.empty());
+    EXPECT_TRUE(reported.finished_at.empty());
+    std::filesystem::remove(host_file);
+
+    const auto interrupted_file = environment_file("v3-interrupted-" + suffix);
+    auto interrupted = dip::Experiment::prepare_from_archive(environment_file_path, interrupted_file);
+    interrupted.start(command);
+    auto reopened = dip::Experiment::open(interrupted_file);
+    EXPECT_EQ(reopened.outcome().status, dip::ExperimentStatus::Running);
+    EXPECT_ANY_THROW(reopened.import(dip::ExperimentStatus::Completed, 0));
+    reopened.finish(dip::ExperimentStatus::Aborted, {}, "cancelled");
+    EXPECT_EQ(reopened.outcome().status, dip::ExperimentStatus::Aborted);
+    EXPECT_ANY_THROW(reopened.finish(dip::ExperimentStatus::Completed, 0));
+    std::filesystem::remove(interrupted_file);
+
+    const auto imported_file = environment_file("v3-imported-experiment-" + suffix);
+    auto imported = dip::Experiment::prepare_from_archive(environment_file_path, imported_file);
+    imported.import(dip::ExperimentStatus::Failed, 42, "External scheduler reported failure");
+    const auto outcome = imported.outcome();
+    EXPECT_EQ(outcome.status, dip::ExperimentStatus::Failed);
+    EXPECT_EQ(outcome.capture_origin, "imported");
+    EXPECT_TRUE(outcome.started_at.empty());
+    EXPECT_TRUE(outcome.finished_at.empty());
+    EXPECT_FALSE(outcome.command.has_value());
+    EXPECT_EQ(outcome.exit_code, 42);
+    EXPECT_ANY_THROW(imported.start(command));
+    std::filesystem::remove(imported_file);
+    const auto completed_file = environment_file("v3-imported-completed-" + suffix);
+    auto imported_completed = dip::Experiment::prepare_from_archive(environment_file_path, completed_file);
+    imported_completed.import(dip::ExperimentStatus::Completed, 0);
+    EXPECT_EQ(imported_completed.outcome().status, dip::ExperimentStatus::Completed);
+    EXPECT_TRUE(imported_completed.results().empty());
+    EXPECT_EQ(imported_completed.verify().integrity, "pass");
+    std::filesystem::remove(completed_file);
+    std::filesystem::remove(environment_file_path);
+}
+
+TEST(Environment, Diph5V3PrepareDoesNotReplaceExistingFile) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto input = environment_file("v3-prepare-input-" + suffix);
+    const auto output = environment_file("v3-prepare-existing-" + suffix);
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    const auto environment = parser.parse();
+    environment.save(input);
+    { std::ofstream marker(output, std::ios::binary); marker << "existing"; }
+    EXPECT_ANY_THROW(dip::Experiment::prepare(environment, output));
+    EXPECT_ANY_THROW(dip::Experiment::prepare_from_archive(input, output));
+    std::ifstream marker(output, std::ios::binary);
+    EXPECT_EQ(std::string(std::istreambuf_iterator<char>(marker), {}), "existing");
+    marker.close();
+    std::filesystem::remove(input);
+    std::filesystem::remove(output);
+}
+
+TEST(Environment, Diph5V3ResultsFinalizeVerifyAndPreserveFailure) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto archive = environment_file("v3-results-" + suffix);
+    const auto artifact = archive.parent_path() / ("result-" + suffix + ".nc");
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    auto experiment = dip::Experiment::prepare(parser.parse(), archive);
+    dip::ExperimentCommand command;
+    command.argv = {"simulation"};
+    command.working_directory = std::filesystem::current_path();
+    experiment.start(command);
+    const auto scalar = experiment.add_dataset("energy/J", {42.5}, {}, "J");
+    const auto array = experiment.add_dataset("spectrum", {1, 2, 3, 4}, {2, 2}, "m", {"row", "column"});
+    const auto diagnostic = experiment.add_diagnostic("NaN count", 0, "observed");
+    { std::ofstream out(artifact, std::ios::binary); out << "CDF\0data"; }
+    const auto attached = experiment.attach_artifact(artifact, "output.nc", "NetCDF");
+    const auto missing = experiment.attach_artifact(artifact.parent_path() / "absent-result.nc", "missing");
+    const auto results = experiment.results();
+    ASSERT_EQ(results.size(), 5);
+    EXPECT_NE(scalar, array);
+    EXPECT_NE(array, diagnostic);
+    EXPECT_NE(attached, missing);
+    const auto find_result = [&](const std::string& id) {
+        return std::find_if(results.begin(), results.end(), [&](const auto& item) { return item.result_id == id; });
+    };
+    EXPECT_EQ(find_result(scalar)->values, (std::vector<double>{42.5}));
+    EXPECT_EQ(find_result(array)->shape, (std::vector<uint64_t>{2, 2}));
+    // Calculated independently using Python hashlib and struct, from the published
+    // diph5-result-v1 byte encoding.
+    EXPECT_EQ(find_result(array)->sha256, "cccf3bbbfabfcd462a458786e248fb8c1dd44a9c4a429c0d73cb64038a9cca5a");
+    EXPECT_EQ(find_result(diagnostic)->verification, "observed");
+    EXPECT_EQ(experiment.verify().external_artifacts, "unavailable");
+    // Repack the data with chunking and compression. The digest covers logical
+    // values, not the physical HDF5 representation.
+    {
+        H5Handle file(H5Fopen(archive.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        const auto path = "/results/datasets/" + array + "/data";
+        ASSERT_GE(H5Ldelete(file, path.c_str(), H5P_DEFAULT), 0);
+        const hsize_t shape[] = {2, 2};
+        const hsize_t chunks[] = {1, 2};
+        H5Handle space(H5Screate_simple(2, shape, nullptr), H5Sclose);
+        H5Handle properties(H5Pcreate(H5P_DATASET_CREATE), H5Pclose);
+        ASSERT_GE(H5Pset_chunk(properties, 2, chunks), 0);
+        ASSERT_GE(H5Pset_deflate(properties, 1), 0);
+        H5Handle data(H5Dcreate2(file, path.c_str(), H5T_IEEE_F64LE, space, H5P_DEFAULT, properties, H5P_DEFAULT), H5Dclose);
+        const double values[] = {1, 2, 3, 4};
+        ASSERT_GE(H5Dwrite(data, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, values), 0);
+    }
+    EXPECT_EQ(experiment.verify().integrity, "pass");
+    experiment.finalize_results();
+    EXPECT_ANY_THROW(experiment.add_dataset("late", {1}, {}));
+    experiment.finish(dip::ExperimentStatus::Completed, 0);
+    EXPECT_EQ(experiment.verify().integrity, "pass");
+    EXPECT_EQ(dip::Experiment::open(archive).results().size(), 5);
+    { std::ofstream out(artifact, std::ios::binary | std::ios::trunc); out << "changed"; }
+    EXPECT_EQ(experiment.verify().external_artifacts, "fail");
+    {
+        H5Handle file(H5Fopen(archive.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        const auto dataset_path = "/results/datasets/" + scalar + "/data";
+        H5Handle data(H5Dopen2(file, dataset_path.c_str(), H5P_DEFAULT), H5Dclose);
+        const double damaged = 0;
+        ASSERT_GE(H5Dwrite(data, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &damaged), 0);
+    }
+    EXPECT_EQ(experiment.verify().structural, "pass");
+    EXPECT_EQ(experiment.verify().integrity, "fail");
+    std::filesystem::remove(artifact);
+    std::filesystem::remove(archive);
+
+    const auto failed_file = environment_file("v3-failed-results-" + suffix);
+    dip::DIP second;
+    second.add_string("answer int = 7\n");
+    auto failed = dip::Experiment::prepare(second.parse(), failed_file);
+    failed.start(command);
+    failed.add_dataset("partial", {1}, {});
+    failed.finish(dip::ExperimentStatus::Failed, 1);
+    EXPECT_EQ(failed.results().size(), 1);
+    EXPECT_EQ(failed.verify().integrity, "pass");
+    std::filesystem::remove(failed_file);
+}
+
+TEST(Environment, Diph5V3CannotSealOrCompleteChangedArtifact) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto archive = environment_file("v3-changing-result-" + suffix);
+    const auto artifact = archive.parent_path() / ("changing-result-" + suffix);
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    auto experiment = dip::Experiment::prepare(parser.parse(), archive);
+    dip::ExperimentCommand command;
+    command.argv = {"simulation"};
+    command.working_directory = std::filesystem::current_path();
+    experiment.start(command);
+    { std::ofstream out(artifact); out << "original"; }
+    experiment.attach_artifact(artifact, "output");
+    { std::ofstream out(artifact); out << "changed"; }
+    EXPECT_ANY_THROW(experiment.finalize_results());
+    EXPECT_EQ(experiment.outcome().status, dip::ExperimentStatus::Running);
+    { std::ofstream out(artifact); out << "original"; }
+    experiment.finalize_results();
+    { std::ofstream out(artifact); out << "changed"; }
+    EXPECT_ANY_THROW(experiment.finish(dip::ExperimentStatus::Completed, 0));
+    EXPECT_EQ(experiment.outcome().status, dip::ExperimentStatus::Running);
+    experiment.finish(dip::ExperimentStatus::Failed, 1);
+    std::filesystem::remove(artifact);
+    std::filesystem::remove(archive);
+}
+
+TEST(Environment, Diph5V3TypedResultStorageAndBounds) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto archive = environment_file("v3-typed-results-" + suffix);
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    auto experiment = dip::Experiment::prepare(parser.parse(), archive);
+    dip::ExperimentCommand command;
+    command.argv = {"simulation"};
+    command.working_directory = std::filesystem::current_path();
+    experiment.start(command);
+    for (const auto& dtype : {"int8", "int16", "int32", "int64", "char"})
+        experiment.add_typed_dataset(dtype, std::vector<int64_t>{-1, 42}, dtype, {2});
+    for (const auto& dtype : {"uint8", "uint16", "uint32", "uint64", "bool"})
+        experiment.add_typed_dataset(dtype, std::vector<uint64_t>{0, 1}, dtype, {2});
+    experiment.add_typed_dataset("maximum", std::vector<uint64_t>{UINT64_MAX}, "uint64", {});
+    experiment.add_typed_dataset("minimum", std::vector<int64_t>{INT64_MIN}, "int64", {});
+    for (const auto& dtype : {"float32", "float64"})
+        experiment.add_typed_dataset(dtype, std::vector<double>{1.5, -2.25}, dtype, {2});
+    EXPECT_ANY_THROW(experiment.add_typed_dataset("bad", std::vector<int64_t>{128}, "int8", {}));
+    EXPECT_ANY_THROW(experiment.add_typed_dataset("bad", std::vector<uint64_t>{256}, "uint8", {}));
+    EXPECT_ANY_THROW(experiment.add_typed_dataset("bad", std::vector<uint64_t>{2}, "bool", {}));
+    EXPECT_ANY_THROW(experiment.add_typed_dataset("bad", std::vector<double>{1}, "int64", {}));
+    EXPECT_ANY_THROW(experiment.add_typed_dataset("bad", std::vector<double>{1}, "float128", {}));
+    const auto results = experiment.results();
+    ASSERT_EQ(results.size(), 14);
+    for (const auto& item : results) {
+        if (item.name == "maximum") EXPECT_EQ(std::get<std::vector<uint64_t>>(item.typed_values)[0], UINT64_MAX);
+        if (item.name == "minimum") EXPECT_EQ(std::get<std::vector<int64_t>>(item.typed_values)[0], INT64_MIN);
+        if (item.name == "float32") EXPECT_EQ(item.logical_dtype, "float32");
+    }
+    experiment.finish(dip::ExperimentStatus::Completed, 0);
+    EXPECT_EQ(experiment.verify().integrity, "pass");
+    std::filesystem::remove(archive);
+}
+
+TEST(Environment, Diph5V3LargeResultRoundTripAndIntegrity) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto archive = environment_file("v3-large-result-" + suffix);
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    auto experiment = dip::Experiment::prepare(parser.parse(), archive);
+    dip::ExperimentCommand command;
+    command.argv = {"simulation"};
+    command.working_directory = std::filesystem::current_path();
+    experiment.start(command);
+    std::vector<double> values(1024 * 1024);
+    for (size_t index = 0; index < values.size(); ++index) values[index] = static_cast<double>(index) / 8;
+    experiment.add_dataset("large", values, {1024, 1024});
+    experiment.finish(dip::ExperimentStatus::Completed, 0);
+    const auto results = dip::Experiment::open(archive).results();
+    ASSERT_EQ(results.size(), 1);
+    EXPECT_EQ(results[0].shape, (std::vector<uint64_t>{1024, 1024}));
+    EXPECT_EQ(results[0].values, values);
+    EXPECT_EQ(experiment.verify().integrity, "pass");
+    std::filesystem::remove(archive);
+}
+
+TEST(Environment, Diph5V3RejectsCorruptResultInventory) {
+    const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    const auto original = environment_file("v3-result-adversarial-base-" + suffix);
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    auto experiment = dip::Experiment::prepare(parser.parse(), original);
+    dip::ExperimentCommand command;
+    command.argv = {"simulation"};
+    command.working_directory = std::filesystem::current_path();
+    experiment.start(command);
+    const auto id = experiment.add_typed_dataset("count", std::vector<int64_t>{12}, "int8", {});
+    experiment.finish(dip::ExperimentStatus::Completed, 0);
+    const auto result_path = "/results/datasets/" + id;
+    const auto rejects = [&](const std::string& label, const auto& damage) {
+        const auto file = environment_file("v3-result-adversarial-" + label + suffix);
+        std::filesystem::copy_file(original, file, std::filesystem::copy_options::overwrite_existing);
+        {
+            H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+            damage(archive);
+        }
+        EXPECT_ANY_THROW(dip::Experiment::open(file)) << label;
+        std::filesystem::remove(file);
+    };
+    rejects("missing-entry", [&](hid_t archive) {
+        const auto path = "/results/manifest/entries/" + id;
+        ASSERT_GE(H5Ldelete(archive, path.c_str(), H5P_DEFAULT), 0);
+    });
+    rejects("wrong-owner", [&](hid_t archive) {
+        H5Handle entry(H5Gopen2(archive, result_path.c_str(), H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(entry, "run_id", "different-run");
+    });
+    rejects("wrong-dtype", [&](hid_t archive) {
+        H5Handle entry(H5Gopen2(archive, result_path.c_str(), H5P_DEFAULT), H5Gclose);
+        replace_string_attribute(entry, "logical_dtype", "uint8");
+    });
+    rejects("unfinalized", [&](hid_t archive) {
+        H5Handle manifest(H5Gopen2(archive, "/results/manifest", H5P_DEFAULT), H5Gclose);
+        H5Handle attr(H5Aopen(manifest, "finalized", H5P_DEFAULT), H5Aclose);
+        const uint8_t no = 0;
+        ASSERT_GE(H5Awrite(attr, H5T_NATIVE_UINT8, &no), 0);
+    });
+    std::filesystem::remove(original);
+}
+
+TEST(Environment, RejectsDiph5Version2Archive) {
+    const auto file = environment_file("reject-version-2");
+    {
+        H5Handle archive(H5Fcreate(file.string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT), H5Fclose);
+        ASSERT_GE(static_cast<hid_t>(archive), 0);
+        replace_string_attribute(archive, "_DIPL_Format", "SciNumTools3 Environment");
+        const uint64_t version = 2;
+        H5Handle space(H5Screate(H5S_SCALAR), H5Sclose);
+        H5Handle attribute(H5Acreate2(archive, "_DIPL_Schema_Version", H5T_NATIVE_UINT64,
+                                     space, H5P_DEFAULT, H5P_DEFAULT), H5Aclose);
+        ASSERT_GE(H5Awrite(attribute, H5T_NATIVE_UINT64, &version), 0);
+    }
+    dip::Environment loaded;
+    EXPECT_THROW(loaded.load(file), dip::IOException);
     std::filesystem::remove(file);
 }
 
@@ -733,74 +1314,136 @@ TEST(Environment, Save) {
     std::filesystem::remove(file);
 }
 
+TEST(Environment, Diph5V3FailedSaveKeepsPreviousArchive) {
+    const auto file = environment_file("atomic-save");
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    auto environment = parser.parse();
+    environment.save(file);
+    environment.get_node("answer")->value_dtype = core::DataType::Boolean;
+    EXPECT_ANY_THROW(environment.save(file));
+    dip::Environment loaded;
+    ASSERT_NO_THROW(loaded.load(file));
+    EXPECT_EQ(loaded["answer"].as<int64_t>(), 7);
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, Diph5V3CandidateConfigurationFingerprintGoldenVector) {
+    const auto file = environment_file("candidate-fingerprint");
+    dip::DIP parser(dip::Source{"DIP0", 0});
+    parser.add_string("answer int = 7\n");
+    parser.parse().save(file);
+    std::string original;
+    {
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
+        const auto digest = dip::hdf5::detail::configuration_fingerprint(archive);
+        ASSERT_TRUE(digest.has_value());
+        original = *digest;
+        EXPECT_EQ(original, "b75c824d5e69cbbb6abed9f33adfc503cd0c347969087746044eb24dff64dcac");
+    }
+    {
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        H5Handle data(H5Dopen2(archive, "/configuration/resolved/answer", H5P_DEFAULT), H5Dclose);
+        replace_string_attribute(data, "_DIPL_Value_Type", "float128");
+        EXPECT_FALSE(dip::hdf5::detail::configuration_fingerprint(archive).has_value());
+        replace_string_attribute(data, "_DIPL_Value_Type", "int32");
+        replace_string_attribute(data, "created", "2026-01-01T00:00:00Z");
+        const auto timestamp_only = dip::hdf5::detail::configuration_fingerprint(archive);
+        ASSERT_TRUE(timestamp_only.has_value());
+        EXPECT_EQ(*timestamp_only, original);
+        replace_string_attribute(data, "description", "Changed metadata");
+        const auto changed_metadata = dip::hdf5::detail::configuration_fingerprint(archive);
+        ASSERT_TRUE(changed_metadata.has_value());
+        EXPECT_NE(*changed_metadata, original);
+        ASSERT_GE(H5Adelete(data, "description"), 0);
+        const int64_t changed = 8;
+        ASSERT_GE(H5Dwrite(data, H5T_NATIVE_INT64, H5S_ALL, H5S_ALL, H5P_DEFAULT, &changed), 0);
+        const auto digest = dip::hdf5::detail::configuration_fingerprint(archive);
+        ASSERT_TRUE(digest.has_value());
+        EXPECT_NE(*digest, original);
+    }
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, Diph5V3RejectsChangedResolvedValue) {
+    const auto file = environment_file("fingerprint-integrity");
+    dip::DIP parser;
+    parser.add_string("answer int = 7\n");
+    parser.parse().save(file);
+    {
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        H5Handle value(H5Dopen2(archive, "/configuration/resolved/answer", H5P_DEFAULT), H5Dclose);
+        const int64_t changed = 8;
+        ASSERT_GE(H5Dwrite(value, H5T_NATIVE_INT64, H5S_ALL, H5S_ALL, H5P_DEFAULT, &changed), 0);
+    }
+    dip::Environment loaded;
+    EXPECT_ANY_THROW(loaded.load(file));
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, Diph5V3CandidateConfigurationFingerprintRichVector) {
+    const auto file = environment_file("candidate-fingerprint-rich");
+    dip::DIP rich_parser(dip::Source{"DIP0", 0});
+    rich_parser.add_string("a int8[2] = [-128, 127]\nb float32 = -0.0\nc str = \"μ\"\n");
+    rich_parser.parse().save(file);
+    {
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        const auto digest = dip::hdf5::detail::configuration_fingerprint(archive);
+        ASSERT_TRUE(digest.has_value());
+        EXPECT_EQ(*digest, "a6fbef7eca599dacb5ae4aa9bb59269a2c1ed146fe409da84238573743d7bbff");
+        {
+            H5Handle group(H5Gopen2(archive, "/configuration/resolved", H5P_DEFAULT), H5Gclose);
+            H5Handle old(H5Dopen2(group, "a", H5P_DEFAULT), H5Dclose);
+            H5Handle space(H5Dget_space(old), H5Sclose);
+            H5Handle type(H5Dget_type(old), H5Tclose);
+            H5Handle properties(H5Pcreate(H5P_DATASET_CREATE), H5Pclose);
+            const hsize_t chunks[] = {1};
+            ASSERT_GE(H5Pset_chunk(properties, 1, chunks), 0);
+            ASSERT_GE(H5Pset_deflate(properties, 1), 0);
+            H5Handle packed(H5Dcreate2(group, "repacked", type, space, H5P_DEFAULT, properties, H5P_DEFAULT), H5Dclose);
+            int8_t values[2];
+            ASSERT_GE(H5Dread(old, H5T_NATIVE_INT8, H5S_ALL, H5S_ALL, H5P_DEFAULT, values), 0);
+            ASSERT_GE(H5Dwrite(packed, H5T_NATIVE_INT8, H5S_ALL, H5S_ALL, H5P_DEFAULT, values), 0);
+            copy_fixed_attributes(old, packed);
+            ASSERT_GE(H5Ldelete(group, "a", H5P_DEFAULT), 0);
+            ASSERT_GE(H5Lmove(group, "repacked", group, "a", H5P_DEFAULT, H5P_DEFAULT), 0);
+        }
+        const auto repacked_digest = dip::hdf5::detail::configuration_fingerprint(archive);
+        ASSERT_TRUE(repacked_digest.has_value());
+        EXPECT_EQ(*repacked_digest, *digest);
+    }
+    std::filesystem::remove(file);
+}
+
+TEST(Environment, Diph5V3CandidateConfigurationFingerprintHierarchyVector) {
+    const auto file = environment_file("candidate-fingerprint-hierarchy");
+    dip::DIP parser(dip::Source{"DIP0", 0});
+    parser.add_string("physics\n  radius float64 = 4 m\n  limit int16 = 6\n"
+                      "catalog map\ncatalog[alpha]\n  label str = \"x\"\n");
+    parser.parse().save(file);
+    {
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
+        const auto digest = dip::hdf5::detail::configuration_fingerprint(archive);
+        ASSERT_TRUE(digest.has_value());
+        EXPECT_EQ(*digest, "70e39d758705403cace4b6c6c7c4a36b1f46a4d548950b39ba23d526f65a4b5f");
+    }
+    std::filesystem::remove(file);
+}
+
 TEST(Environment, SaveHdf5Content) {
     const auto file = environment_file("save-content");
     parsed_environment().save(file);
     {
-        H5Handle hdf5_file(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
-        ASSERT_GE(hdf5_file, 0);
-        H5Handle format(H5Aopen(hdf5_file, "_DIPL_Format", H5P_DEFAULT), H5Aclose);
-        ASSERT_GE(format, 0);
-        H5Handle type(H5Aget_type(format), H5Tclose);
-        std::vector<char> text(H5Tget_size(type) + 1, '\0');
-        ASSERT_GE(H5Aread(format, type, text.data()), 0);
-        EXPECT_STREQ(text.data(), "SciNumTools3 Environment");
-        H5Handle version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version", H5P_DEFAULT), H5Aclose);
-        uint64_t version = 0;
-        ASSERT_GE(H5Aread(version_attribute, H5T_NATIVE_UINT64, &version), 0);
-        EXPECT_EQ(version, 2);
-        H5Handle minor_version_attribute(H5Aopen(hdf5_file, "_DIPL_Schema_Version_Minor", H5P_DEFAULT), H5Aclose);
-        uint64_t minor_version = 0;
-        ASSERT_GE(H5Aread(minor_version_attribute, H5T_NATIVE_UINT64, &minor_version), 0);
-        EXPECT_EQ(minor_version, 11);
-        ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), 0);
-        ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Trace", H5P_DEFAULT), 0);
-        ASSERT_GT(H5Lexists(hdf5_file, "/_DIPL_Dependencies", H5P_DEFAULT), 0);
-        H5Handle source_manifest(H5Gopen2(hdf5_file, "/_DIPL_Sources", H5P_DEFAULT), H5Gclose);
-        ASSERT_GE(source_manifest, 0);
-        H5Handle source_entry(H5Gopen2(source_manifest, "0", H5P_DEFAULT), H5Gclose);
-        ASSERT_GE(source_entry, 0);
-        EXPECT_GT(H5Aexists(source_entry, "_DIPL_Source_Name"), 0);
-        EXPECT_GT(H5Aexists(source_entry, "_DIPL_Source_Hash_Algorithm"), 0);
-        EXPECT_GT(H5Aexists(source_entry, "_DIPL_Source_Hash"), 0);
-        ASSERT_GT(H5Lexists(hdf5_file, "/simulation", H5P_DEFAULT), 0);
-        H5Handle simulation(H5Gopen2(hdf5_file, "/simulation", H5P_DEFAULT), H5Gclose);
-        EXPECT_GT(H5Aexists(simulation, "_DIPL_Kind"), 0);
-        EXPECT_GT(H5Aexists(simulation, "_DIPL_Path"), 0);
-        H5Handle steps(H5Dopen2(hdf5_file, "/simulation/steps", H5P_DEFAULT), H5Dclose);
-        H5Handle steps_space(H5Dget_space(steps), H5Sclose);
-        EXPECT_EQ(H5Sget_simple_extent_ndims(steps_space), 0);
-        H5Handle steps_type(H5Dget_type(steps), H5Tclose);
-        EXPECT_EQ(H5Tget_class(steps_type), H5T_INTEGER);
-        EXPECT_EQ(H5Tget_size(steps_type), sizeof(int32_t));
-        EXPECT_GT(H5Aexists(steps, "_DIPL_Path"), 0);
-        EXPECT_GT(H5Aexists(steps, "_DIPL_Value_Type"), 0);
-        H5Handle boundary(H5Gopen2(hdf5_file, "/boundary", H5P_DEFAULT), H5Gclose);
-        EXPECT_GT(H5Aexists(boundary, "_DIPL_Kind"), 0);
-        H5Handle inlet(H5Gopen2(hdf5_file, "/boundary/inlet", H5P_DEFAULT), H5Gclose);
-        EXPECT_GT(H5Aexists(inlet, "_DIPL_Key"), 0);
-        H5Handle velocity(H5Dopen2(hdf5_file, "/boundary/inlet/velocity", H5P_DEFAULT), H5Dclose);
-        ASSERT_GE(velocity, 0);
-        H5Handle space(H5Dget_space(velocity), H5Sclose);
-        hsize_t size = 0;
-        EXPECT_EQ(H5Sget_simple_extent_ndims(space), 1);
-        EXPECT_EQ(H5Sget_simple_extent_dims(space, &size, nullptr), 1);
-        EXPECT_EQ(size, 3);
-        H5Handle velocity_type(H5Dget_type(velocity), H5Tclose);
-        EXPECT_EQ(H5Tget_class(velocity_type), H5T_FLOAT);
-        EXPECT_EQ(H5Tget_size(velocity_type), sizeof(double));
-        EXPECT_GT(H5Aexists(velocity, "_DIPL_Array"), 0);
-        EXPECT_GT(H5Aexists(velocity, "units"), 0);
-        H5Handle samples(H5Gopen2(hdf5_file, "/samples", H5P_DEFAULT), H5Gclose);
-        EXPECT_GT(H5Aexists(samples, "_DIPL_Kind"), 0);
-        H5Handle sample_zero(H5Gopen2(hdf5_file, "/samples/0", H5P_DEFAULT), H5Gclose);
-        H5Handle sample_one(H5Gopen2(hdf5_file, "/samples/1", H5P_DEFAULT), H5Gclose);
-        EXPECT_GT(H5Aexists(sample_zero, "_DIPL_Kind"), 0);
-        EXPECT_GT(H5Aexists(sample_one, "_DIPL_Kind"), 0);
-        H5Handle title(H5Dopen2(hdf5_file, "/title", H5P_DEFAULT), H5Dclose);
-        EXPECT_GT(H5Aexists(title, "description"), 0);
-        EXPECT_GT(H5Aexists(title, "_DIPL_Tags"), 0);
-        EXPECT_GT(H5Aexists(title, "_DIPL_Options"), 0);
+        H5Handle archive(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
+        ASSERT_GE(static_cast<hid_t>(archive), 0);
+        EXPECT_GT(H5Aexists(archive, "_DIPH5_Format"), 0);
+        EXPECT_EQ(H5Aexists(archive, "_DIPL_Format"), 0);
+        H5Handle major(H5Aopen(archive, "_DIPH5_Schema_Major", H5P_DEFAULT), H5Aclose);
+        uint32_t version = 0;
+        ASSERT_GE(H5Aread(major, H5T_NATIVE_UINT32, &version), 0);
+        EXPECT_EQ(version, 3);
+        EXPECT_GT(H5Lexists(archive, "/model/sources/000000/content", H5P_DEFAULT), 0);
+        EXPECT_GT(H5Lexists(archive, "/configuration/resolved/simulation/steps", H5P_DEFAULT), 0);
     }
     std::filesystem::remove(file);
 }
@@ -819,7 +1462,7 @@ TEST(Environment, ValueNodeWithChildrenHdf5RoundTrip) {
     {
         H5Handle hdf5_file(H5Fopen(file.string().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT), H5Fclose);
         ASSERT_GE(hdf5_file, 0);
-        H5Handle feature(H5Gopen2(hdf5_file, "/feature", H5P_DEFAULT), H5Gclose);
+        H5Handle feature(H5Gopen2(hdf5_file, "/configuration/resolved/feature", H5P_DEFAULT), H5Gclose);
         ASSERT_GE(feature, 0);
         EXPECT_GT(H5Aexists(feature, "_DIPL_Kind"), 0);
         H5Handle payload(H5Dopen2(feature, "_DIPL_Value", H5P_DEFAULT), H5Dclose);
@@ -876,6 +1519,22 @@ TEST(Environment, CustomUnitsHdf5RoundTrip) {
     EXPECT_EQ(length.definition, "2*m");
     EXPECT_EQ(span.definition, "3*custom_length");
     EXPECT_LT(length.registration_order, span.registration_order);
+
+    const auto damaged = environment_file("custom-units-duplicate-order");
+    std::filesystem::copy_file(file, damaged, std::filesystem::copy_options::overwrite_existing);
+    {
+        H5Handle archive(H5Fopen(damaged.string().c_str(), H5F_ACC_RDWR, H5P_DEFAULT), H5Fclose);
+        H5Handle first(H5Gopen2(archive, "/model/registrations/units/0", H5P_DEFAULT), H5Gclose);
+        H5Handle second(H5Gopen2(archive, "/model/registrations/units/1", H5P_DEFAULT), H5Gclose);
+        H5Handle first_order(H5Aopen(first, "_DIPL_Unit_Order", H5P_DEFAULT), H5Aclose);
+        H5Handle second_order(H5Aopen(second, "_DIPL_Unit_Order", H5P_DEFAULT), H5Aclose);
+        uint64_t duplicate = 0;
+        ASSERT_GE(H5Aread(first_order, H5T_NATIVE_UINT64, &duplicate), 0);
+        ASSERT_GE(H5Awrite(second_order, H5T_NATIVE_UINT64, &duplicate), 0);
+    }
+    dip::Environment invalid;
+    EXPECT_THROW(invalid.load(damaged), dip::IOException);
+    std::filesystem::remove(damaged);
 
     const auto resaved = environment_file("custom-units-resaved");
     loaded.save(resaved);

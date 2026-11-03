@@ -10,34 +10,41 @@
 #include <snt/dip/nodes/node_value.h>
 #include <snt/dip/settings.h>
 #include <string>
+#include <vector>
 
 namespace snt::dip {
 
     class SourceList; // EnvSource needs a forward declaration
 
-    /** Named DIPL source text together with its parsed nodes. */
+    /**
+     * Named DIPL source text together with its parsed nodes.
+     */
     struct EnvSource {
-        std::string name;                  // source key
-        std::string path;                  // source path
-        std::string code;                  // source code
-        Source parent;                     // parent source
-        NodeList<ValueNode> nodes;         // parsed nodes
-        bool named_source = false;         // registered for source?path references
-        bool raw_text = false;             // content is read verbatim, not parsed as DIPL
-        bool table_text = false;           // raw content was parsed as a table
-        std::string table_path;             // resolved table populated by this raw source, when applicable
-        HierarchyList hierarchy;           // source-local hierarchy
-        SchemaList schemas;                 // schema definitions available to imported collections
-        ExplicitDeclarations declarations; // explicit source-local paths
-        bool embedded = false;             // code came from a string rather than the file at path
-        ValueMetadata metadata;            // metadata declared at indentation zero in this source
+        std::string name;                  ///< Source lookup key.
+        std::string path;                  ///< Original source path.
+        std::string code;                  ///< Exact source text.
+        Source parent;                     ///< Source that introduced this entry.
+        NodeList<ValueNode> nodes;         ///< Parsed source nodes.
+        bool named_source = false;         ///< Whether source?path references can use this entry.
+        bool raw_text = false;             ///< Whether content is kept verbatim instead of parsed as DIPL.
+        bool table_text = false;           ///< Whether raw content was parsed as a table.
+        std::string table_path;            ///< Resolved table populated by this raw source, if any.
+        HierarchyList hierarchy;           ///< Hierarchy local to this source.
+        SchemaList schemas;                ///< Schemas available to imported collections.
+        ExplicitDeclarations declarations; ///< Explicit source-local paths.
+        bool embedded = false;             ///< Whether code came from memory rather than path.
+        ValueMetadata metadata;            ///< Metadata declared at the source root.
                                            // std::shared_ptr<SourceList> sources;
     };
 
-    /** Collection of named DIPL sources. */
+    /**
+     * Collection of named DIPL sources.
+     */
     class SourceList {
       private:
-        std::map<std::string, EnvSource> sources;
+        std::map<std::string, EnvSource> sources; ///< Named entries keyed for lookup.
+        // The map supports named lookup; v3 archives also need parse-time order.
+        std::vector<std::string> registration_order_; ///< Source names in parse order.
 
       public:
         SourceList();
@@ -54,8 +61,14 @@ namespace snt::dip {
         EnvSource& at(const std::string& name);
         const EnvSource& at(const std::string& name) const;
 
-        /** Return all registered sources keyed by their DIPL source name. */
+        /**
+         * Return all registered sources keyed by their DIPL source name.
+         */
         const std::map<std::string, EnvSource>& entries() const;
+        /**
+         * Source names in the order they were registered during parsing.
+         */
+        const std::vector<std::string>& registration_order() const { return registration_order_; }
     };
 
 } // namespace snt::dip

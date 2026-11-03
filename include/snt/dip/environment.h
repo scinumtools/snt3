@@ -26,13 +26,17 @@ namespace snt::dip {
 
     class Cursor; ///< Forward declaring
 
-    /** Match explicitly assigned node tags; fields combine with AND. */
+    /**
+     * Match explicitly assigned node tags; fields combine with AND.
+     */
     struct TagFilter {
         std::vector<std::string> all;  ///< Require every listed tag.
         std::vector<std::string> any;  ///< Require at least one listed tag.
         std::vector<std::string> none; ///< Reject nodes with any listed tag.
 
-        /** Empty filter fields impose no restriction. */
+        /**
+         * Empty filter fields impose no restriction.
+         */
         bool matches(const std::vector<std::string>& tags) const;
     };
 
@@ -43,62 +47,79 @@ namespace snt::dip {
      * fingerprint, not embedded source content.
      */
     struct SourceInfo {
-        std::string name;
-        std::string path;
-        std::string parent_name;
-        size_t parent_line = 0;
-        std::string hash_algorithm;
-        std::string hash;
-        ValueMetadata metadata;
+        std::string name;            ///< Registered source identity.
+        std::string path;            ///< Original source path, if file backed.
+        std::string parent_name;     ///< Source that included this source.
+        size_t parent_line = 0;      ///< Include line in the parent source.
+        std::string hash_algorithm;  ///< Algorithm used for the source fingerprint.
+        std::string hash;            ///< Fingerprint of exact source bytes.
+        ValueMetadata metadata;      ///< Source-level descriptive metadata.
     };
 
-    /** How source paths are written into a DIPH5 source manifest. */
-    enum class SourcePathPolicy {
-        Preserve,          ///< Write source paths as recorded during parsing or loading.
-        RelativeToSnapshot ///< Write file paths relative to the output DIPH5 directory.
+    /** Exact applied override source, retained separately from resolved values.
+     * A v3 archive needs these bytes to explain how its effective values arose.
+     */
+    struct AppliedOverrideSource {
+        std::string name;        ///< Override name in the applied chain.
+        std::string path;        ///< Original file path, if available.
+        std::string content;     ///< Exact override source text.
+        std::string origin;      ///< How the override was supplied.
+        std::string source_name; ///< Source identity used by resolved nodes.
     };
 
-    struct SnapshotSaveOptions {
-        SourcePathPolicy source_paths = SourcePathPolicy::Preserve;
-        const OutputPlan* output_plan = nullptr; ///< Optional resolved adapter mappings.
+    struct ArchivedSource {
+        std::string source_id; ///< Stable archive source identifier.
+        SourceInfo info;       ///< Source identity and metadata.
+        std::string content;   ///< Exact archived source bytes.
+        std::string role;      ///< Model or other source role.
     };
 
-    /** Canonical location reached by following zero or more links. */
+    /**
+     * Canonical location reached by following zero or more links.
+     */
     struct ResolvedPath {
-        std::string source_name;
-        std::string path;
-        bool followed_link = false;
+        std::string source_name;    ///< Source containing the resolved target.
+        std::string path;           ///< Canonical target path.
+        bool followed_link = false; ///< Whether resolution traversed a link.
     };
 
-    /** Durable identity information for one registered DIPL construct. */
+    /**
+     * Durable identity information for one registered DIPL construct.
+     */
     struct TraceInfo {
         std::string id;   ///< Internal trace identifier, e.g. DIP0_UNIT0.
         std::string name; ///< Registered public name.
         std::string kind; ///< "unit", "schema", "function_value", or "function_nodes".
     };
 
-    /** Descriptive schema provenance; contains no reusable schema nodes. */
+    /**
+     * Descriptive schema provenance; contains no reusable schema nodes.
+     */
     struct SchemaInfo {
-        std::string id;
-        std::string name;
-        std::string source_name;
-        size_t source_line = 0;
-        ValueMetadata metadata;
+        std::string id;            ///< Stable schema trace identifier.
+        std::string name;          ///< Registered schema name.
+        std::string source_name;   ///< Source declaring the schema.
+        size_t source_line = 0;    ///< Declaration line in that source.
+        ValueMetadata metadata;    ///< Descriptive schema metadata.
         std::optional<SourceInfo> source; ///< Source identity and fingerprint when available.
     };
 
-    /** One schema relationship observed while evaluating a live input. */
+    /**
+     * One schema relationship observed while evaluating a live input.
+     */
     struct SchemaApplicationEvent {
-        std::string path;
-        std::string schema_name;
-        bool inherited_from_collection = false;
-        core::SourceLocation origin;
+        std::string path;                           ///< Node or collection where the schema applied.
+        std::string schema_name;                    ///< Registered schema name.
+        bool inherited_from_collection = false;    ///< Whether a collection supplied the schema.
+        core::SourceLocation origin;                ///< Source location of the application.
     };
 
-    /** One DIPfile registration, retained in manifest order for live inspection. */
+    /**
+     * One DIPfile registration, retained in manifest order for live inspection.
+     */
     struct ProjectEntry {
         enum class Kind { Unit, Source, Schema, Code, Override };
-        Kind kind;
+        Kind kind; ///< Registration category.
         std::string name;          ///< Public name, when the entry has one.
         std::string value;         ///< Declared unit, path, or inline text.
         std::string resolved_path; ///< Absolute file path for file entries; empty for inline entries.
@@ -107,7 +128,7 @@ namespace snt::dip {
     };
 
     /**
-     * Type of an environment request
+     * * Type of an environment request
      */
     enum class RequestType {
         Reference, ///< Search in the node list
@@ -115,7 +136,7 @@ namespace snt::dip {
     };
 
     /**
-     * List of available DIP generators that produce static parameter lists
+     * * List of available DIP generators that produce static parameter lists
      */
     enum class ExportFormat {
         CPP,
@@ -133,28 +154,31 @@ namespace snt::dip {
     class Inspector;
 
     /**
-     * Object of this class holds the whole DIP parsing environment
+     * * Object of this class holds the whole DIP parsing environment
      */
     class Environment {
         friend class Inspector;
 
       private:
-        ProjectFileReader project_file_reader_ = snt::dip::read_project_file;
-        std::vector<SourceInfo> source_manifest_;
-        std::vector<TraceInfo> trace_manifest_;
-        std::vector<SchemaInfo> schema_manifest_;
-        std::vector<ProjectEntry> project_entries_;
-        std::map<std::string, BlockInput> block_inputs_;
-        bool schema_manifest_loaded_ = false;
-        bool trace_manifest_loaded_ = false;
-        bool snapshot_loaded_ = false;
+        ProjectFileReader project_file_reader_ = snt::dip::read_project_file; ///< Reader for project files.
+        std::vector<SourceInfo> source_manifest_; ///< Durable source identities from parsing or an archive.
+        std::vector<TraceInfo> trace_manifest_; ///< Registered construct identities.
+        std::vector<SchemaInfo> schema_manifest_; ///< Schema descriptions retained for inspection.
+        std::vector<ProjectEntry> project_entries_; ///< Live DIPfile registrations in source order.
+        // Append when an override is accepted so archive order matches evaluation order.
+        std::vector<AppliedOverrideSource> applied_override_sources_; ///< Overrides in evaluation order.
+        std::vector<ArchivedSource> archived_sources_; ///< Exact source bytes loaded from DIPH5.
+        std::map<std::string, BlockInput> block_inputs_; ///< Live embedded source blocks.
+        bool schema_manifest_loaded_ = false; ///< Whether schema descriptions came from a snapshot.
+        bool trace_manifest_loaded_ = false; ///< Whether trace identities came from a snapshot.
+        bool snapshot_loaded_ = false; ///< Whether this environment came from DIPH5.
         std::filesystem::path source_path_base_; ///< Directory of a loaded snapshot for relative source paths.
-        bool dependency_recording_ = false;
-        bool block_input_recording_ = false;
-        mutable DependencyGraph dependency_graph_;
-        mutable std::optional<size_t> active_dependency_event_;
+        bool dependency_recording_ = false; ///< Capture effective dependency reads during evaluation.
+        bool block_input_recording_ = false; ///< Capture embedded source text during evaluation.
+        mutable DependencyGraph dependency_graph_; ///< Recorded value and condition reads.
+        mutable std::optional<size_t> active_dependency_event_; ///< Event currently receiving read edges.
         ExplicitDeclarations declarations_; ///< Live explicit path locations; absent from snapshots.
-        std::vector<SchemaApplicationEvent> schema_applications_;
+        std::vector<SchemaApplicationEvent> schema_applications_; ///< Live schema applications in evaluation order.
         std::optional<OutputPlan> output_plan_; ///< Resolved adapter mappings loaded from DIPH5.
 
         void record_dependency(
@@ -176,33 +200,41 @@ namespace snt::dip {
         FunctionList functions;    ///< List of functions
 
         /**
-         * Constructor of the Environment class
+         * * Constructor of the Environment class
          */
         Environment();
 
-        /** File access used by DIPfile registrations and $source nodes. */
+        /**
+         * File access used by DIPfile registrations and $source nodes.
+         */
         void set_project_file_reader(ProjectFileReader reader) { project_file_reader_ = std::move(reader); }
         const ProjectFileReader& project_file_reader() const { return project_file_reader_; }
         std::string read_project_file(const std::filesystem::path& path) const { return project_file_reader_(path); }
 
-        /** Enable graph capture for this parse. */
+        /**
+         * Enable graph capture for this parse.
+         */
         void set_dependency_recording(bool enabled) {
             dependency_recording_ = enabled;
             dependency_graph_ = DependencyGraph{};
             dependency_graph_.recorded = enabled;
             active_dependency_event_.reset();
         }
-        /** Restore a graph from a versioned snapshot. */
+        /**
+         * Restore a graph from a versioned snapshot.
+         */
         void set_dependency_graph(DependencyGraph graph) {
             dependency_recording_ = false;
             dependency_graph_ = std::move(graph);
             active_dependency_event_.reset();
         }
 
-        /** Scope one parser evaluation. Restores the previous context on exit. */
+        /**
+         * Scope one parser evaluation. Restores the previous context on exit.
+         */
         class DependencyScope {
-            Environment& env_;
-            std::optional<size_t> previous_;
+            Environment& env_;             ///< Environment whose dependency context is scoped.
+            std::optional<size_t> previous_; ///< Dependency event active before this scope.
 
           public:
             DependencyScope(
@@ -216,21 +248,29 @@ namespace snt::dip {
             DependencyScope& operator=(const DependencyScope&) = delete;
         };
 
-        /** Attach the operation tree produced by the numerical or logical solver. */
+        /**
+         * Attach the operation tree produced by the numerical or logical solver.
+         */
         exs::CompositionGraph* active_composition(const std::string& expression);
         void set_active_dependency_owner(std::string owner);
         void set_value_controls(const std::string& owner, const std::vector<size_t>& case_ids);
         void record_import_origin(const std::string& source_node_id);
 
-        /** Whether this environment was loaded from a DIPH5 snapshot. */
+        /**
+         * Whether this environment was loaded from a DIPH5 snapshot.
+         */
         bool is_loaded_snapshot() const { return snapshot_loaded_; }
         const std::optional<OutputPlan>& output_plan() const { return output_plan_; }
         void set_output_plan(OutputPlan plan) { output_plan_ = std::move(plan); }
 
-        /** Base directory for relative source paths in a loaded snapshot. */
+        /**
+         * Base directory for relative source paths in a loaded snapshot.
+         */
         const std::filesystem::path& source_path_base() const { return source_path_base_; }
 
-        /** Registrations from parsed DIPfiles. Snapshot loading does not restore these entries. */
+        /**
+         * Registrations from parsed DIPfiles. Snapshot loading does not restore these entries.
+         */
         const std::vector<ProjectEntry>& project_entries() const { return project_entries_; }
         void record_project_entry(ProjectEntry entry) {
             const auto after =
@@ -240,20 +280,28 @@ namespace snt::dip {
             project_entries_.insert(after, std::move(entry));
         }
 
-        /** String blocks from a live parse. Snapshots retain values, not source text. */
+        /**
+         * String blocks from a live parse. Snapshots retain values, not source text.
+         */
         const std::map<std::string, BlockInput>& block_inputs() const { return block_inputs_; }
         bool block_input_recording() const { return block_input_recording_; }
         void set_block_input_recording(bool enabled) { block_input_recording_ = enabled; }
-        /** Capture the effective source literal after successful evaluation. */
+        /**
+         * Capture the effective source literal after successful evaluation.
+         */
         void record_block_input(
             const BaseNode& declared, const BaseNode& input, const std::string& path, char delimiter = ' '
         );
         void erase_block_input(const std::string& path) { block_inputs_.erase(path); }
 
-        /** Explicit declarations in the evaluated scope. */
+        /**
+         * Explicit declarations in the evaluated scope.
+         */
         const ExplicitDeclarations& declarations() const { return declarations_; }
         void record_declaration(const std::string& path, const Line& line) { declarations_.record(path, line); }
-        /** Evaluation-order schema applications. Snapshots do not retain this history. */
+        /**
+         * Evaluation-order schema applications. Snapshots do not retain this history.
+         */
         const std::vector<SchemaApplicationEvent>& schema_applications() const { return schema_applications_; }
         void record_schema_application(std::string path, std::string schema_name, bool inherited, const Line& line) {
             schema_applications_.push_back(
@@ -265,20 +313,31 @@ namespace snt::dip {
         }
 
         /**
-         * Load evaluated DIP nodes from a DIPH5 file. Reusable schema definitions
-         * are not reconstructed; descriptive schema provenance is restored.
-         * @param file File name of the environment file
+         * Load a DIPH5 v3 archive, including its resolved values and source bytes.
+         * Reusable schema definitions are not reconstructed from the resolved tree.
+         * @param file Path to the v3 archive.
          */
         void load(const std::filesystem::path& file);
 
         /**
-         * Save evaluated DIP nodes to a DIPH5 file. The schema trace manifest is
-         * saved with schema descriptions and source provenance, but reusable definitions are not.
-         * @param file File name of the environment file
+         * Save a source-complete DIPH5 v3 archive with resolved values and provenance.
+         * @param file Destination archive path.
          */
         void save(const std::filesystem::path& file) const;
-        /** Save with an explicit policy for source paths in the DIPH5 manifest. */
-        void save(const std::filesystem::path& file, const SnapshotSaveOptions& options) const;
+        /** Save with a resolved adapter output plan.
+         *  @param file Destination archive. @param output_plan Plan to preserve in the archive. */
+        void save(const std::filesystem::path& file, const OutputPlan& output_plan) const;
+
+        const std::vector<AppliedOverrideSource>& applied_override_sources() const { return applied_override_sources_; }
+        void record_applied_override_source(AppliedOverrideSource source) {
+            applied_override_sources_.push_back(std::move(source));
+        }
+        const std::vector<ArchivedSource>& archived_sources() const { return archived_sources_; }
+        void set_archived_sources(std::vector<ArchivedSource> sources) { archived_sources_ = std::move(sources); }
+        /**
+         * Extract archived source bytes under destination using generated safe filenames.
+         */
+        void extract_sources(const std::filesystem::path& destination) const;
 
         /**
          * Generate static parameter lists from the environment nodes
@@ -295,7 +354,9 @@ namespace snt::dip {
          */
         std::vector<SourceInfo> get_source_manifest() const;
 
-        /** Return the durable identity of a named DIPL source, when available. */
+        /**
+         * Return the durable identity of a named DIPL source, when available.
+         */
         std::optional<SourceInfo> get_source_info(const std::string& name) const;
 
         /**
@@ -304,22 +365,34 @@ namespace snt::dip {
          */
         void set_source_manifest(std::vector<SourceInfo> manifest);
 
-        /** Return durable identities for registered units, schemas, and functions. */
+        /**
+         * Return durable identities for registered units, schemas, and functions.
+         */
         std::vector<TraceInfo> get_trace_manifest() const;
 
-        /** Replace persisted trace-registry information during environment loading. */
+        /**
+         * Replace persisted trace-registry information during environment loading.
+         */
         void set_trace_manifest(std::vector<TraceInfo> manifest);
 
-        /** Return schema descriptions and source provenance without executable definitions. */
+        /**
+         * Return schema descriptions and source provenance without executable definitions.
+         */
         std::vector<SchemaInfo> get_schema_manifest() const;
 
-        /** Replace persisted schema provenance during DIPH5 loading. */
+        /**
+         * Replace persisted schema provenance during DIPH5 loading.
+         */
         void set_schema_manifest(std::vector<SchemaInfo> manifest);
 
-        /** Return schemas applied along a value or collection path, in path order. */
+        /**
+         * Return schemas applied along a value or collection path, in path order.
+         */
         std::vector<SchemaInfo> get_applied_schemas(const std::string& path) const;
 
-        /** Return the schema that supplied a value node, if known. */
+        /**
+         * Return the schema that supplied a value node, if known.
+         */
         std::optional<SchemaInfo> get_contributing_schema(const std::string& path) const;
 
         /**
@@ -418,12 +491,18 @@ namespace snt::dip {
          */
         ValueNode::PointerType get_node(const std::string& path, const std::string& source_name = {}) const;
 
-        /** Resolve a local path through links while retaining named-source identity. */
+        /**
+         * Resolve a local path through links while retaining named-source identity.
+         */
         ResolvedPath resolve_link_path(const std::string& path, const std::string& source_name = {}) const;
-        /** Reject writes addressed through a link; callers must use its canonical target path. */
+        /**
+         * Reject writes addressed through a link; callers must use its canonical target path.
+         */
         void validate_write_path(const std::string& path) const;
 
-        /** Validate live link targets after all local and named sources are parsed. */
+        /**
+         * Validate live link targets after all local and named sources are parsed.
+         */
         void validate_links() const;
 
         /**

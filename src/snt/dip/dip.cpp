@@ -305,7 +305,8 @@ lint : snt_project_lint
         const std::string& source_code,
         const std::filesystem::path& source_file,
         const Source& parent,
-        std::string source_name
+        std::string source_name,
+        std::string origin
     ) {
         if (source_name.empty())
             source_name = source.name + "_OVERRIDE" + std::to_string(num_overrides);
@@ -317,6 +318,10 @@ lint : snt_project_lint
         auto overrides = env.overrides;
         overrides.append(nodes, 0);
         env.sources.append(source_name, source_file, source_code, parent);
+        // Keep the exact parsed text: evaluated nodes cannot reconstruct comments or whitespace.
+        env.record_applied_override_source(
+            {source_name, source_file.generic_string(), source_code, std::move(origin), source_name}
+        );
         env.overrides = std::move(overrides);
         ++num_overrides;
     }
@@ -326,7 +331,7 @@ lint : snt_project_lint
     }
 
     void DIP::add_override_file_input(const std::filesystem::path& source_file, const Source& parent) {
-        add_override_input(env.read_project_file(source_file), source_file, parent);
+        add_override_input(env.read_project_file(source_file), source_file, parent, {}, "file");
     }
 
     void DIP::add_project(const std::filesystem::path& project_file) {
@@ -872,6 +877,28 @@ lint : snt_project_lint
                 while (i + 1 < queue.size() &&
                        (queue.at(i + 1)->dtype == NodeDtype::Empty || queue.at(i + 1)->indent > current_node->indent))
                     body.push_back(queue.at(++i));
+                if (!body.empty()) {
+                    // Slice the original source by line rather than rebuilding the directive
+                    // from parsed nodes; that preserves the bytes actually supplied by the user.
+                    const auto& code = env.sources.at(current_node->line.source.name).code;
+                    const auto start_line = current_node->line.source.line_number;
+                    const auto last_line = body.back()->line.source.line_number;
+                    size_t begin = 0;
+                    for (size_t line = 1; line < start_line && begin < code.size(); ++line) {
+                        const auto newline = code.find('\n', begin);
+                        begin = newline == std::string::npos ? code.size() : newline + 1;
+                    }
+                    size_t end = begin;
+                    for (size_t line = start_line; line <= last_line && end < code.size(); ++line) {
+                        const auto newline = code.find('\n', end);
+                        end = newline == std::string::npos ? code.size() : newline + 1;
+                    }
+                    env.record_applied_override_source(
+                        {current_node->line.source.name + "_OVERRIDE_LINE" + std::to_string(start_line),
+                         env.sources.at(current_node->line.source.name).path,
+                         code.substr(begin, end - begin), "inline", {}}
+                    );
+                }
                 env.overrides.append(body, INDENT_STEP);
                 previous_node = nullptr;
             } else {

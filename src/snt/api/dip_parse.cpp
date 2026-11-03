@@ -101,10 +101,6 @@ namespace snt::api {
         record_dependency_graph_ = enabled;
     }
 
-    void DIPParse::argument_relative_source_paths(bool enabled) {
-        relative_source_paths_ = enabled;
-    }
-
     void DIPParse::argument_generate(const std::string& format, const std::string& file) {
         if (file.empty()) {
             throw api::ArgumentException(
@@ -180,15 +176,6 @@ namespace snt::api {
                 __LINE__
             );
         }
-        if (relative_source_paths_ && save_file.empty()) {
-            throw api::ArgumentException(
-                "Invalid source path option",
-                "Relative source paths require a DIPH5 output.",
-                "Configure a save file or disable relative source paths.",
-                __FILE__,
-                __LINE__
-            );
-        }
         dip::Environment env = evaluate(record_dependency_graph_);
 
         // request nodes
@@ -247,10 +234,7 @@ namespace snt::api {
             }
         }
         if (!save_file.empty()) {
-            dip::SnapshotSaveOptions options;
-            if (relative_source_paths_)
-                options.source_paths = dip::SourcePathPolicy::RelativeToSnapshot;
-            env.save(save_file, options);
+            env.save(save_file);
         }
         if (generate_format)
             env.generate(*generate_format, generate_file);

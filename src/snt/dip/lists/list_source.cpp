@@ -19,6 +19,7 @@ namespace snt::dip {
                 __LINE__
             );
         sources.insert({name, {name, path.string(), code, parent}});
+        registration_order_.push_back(name);
     }
 
     void SourceList::append(const std::string& name, const EnvSource& src) {
@@ -32,6 +33,7 @@ namespace snt::dip {
                 __LINE__
             );
         sources.insert({name, src});
+        registration_order_.push_back(name);
     }
 
     EnvSource& SourceList::at(const std::string& name) {

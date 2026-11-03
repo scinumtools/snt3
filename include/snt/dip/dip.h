@@ -13,25 +13,31 @@
 
 namespace snt::dip {
 
-    /** Find the nearest parent DIPfile for a source or project path. */
+    /**
+     * Find the nearest parent DIPfile for a source or project path.
+     */
     std::optional<std::filesystem::path> nearest_project_manifest(const std::filesystem::path& input);
 
-    /** Parse and validate a DIPfile without loading its referenced model files. */
+    /**
+     * Parse and validate a DIPfile without loading its referenced model files.
+     */
     Environment parse_project_manifest(
         const std::filesystem::path& project_file, ProjectFileReader reader = {}, std::string source_name = "DIPfile"
     );
 
     struct ProjectText {
-        std::string name;
-        std::string text;
+        std::string name; ///< Registration name or source identity.
+        std::string text; ///< Exact text supplied for that registration.
     };
 
-    /** Text-backed project registrations, processed in DIPfile phase order. */
+    /**
+     * Text-backed project registrations, processed in DIPfile phase order.
+     */
     struct ProjectInput {
-        std::vector<ProjectText> units;
-        std::vector<ProjectText> schemas;
-        std::vector<ProjectText> code;
-        std::vector<ProjectText> overrides;
+        std::vector<ProjectText> units;     ///< Unit definitions in declaration order.
+        std::vector<ProjectText> schemas;   ///< Schema definitions in declaration order.
+        std::vector<ProjectText> code;      ///< Model source texts in declaration order.
+        std::vector<ProjectText> overrides; ///< Applied override texts in declaration order.
     };
 
     class DIP {
@@ -70,7 +76,8 @@ namespace snt::dip {
             const std::string& source_code,
             const std::filesystem::path& source_file,
             const Source& parent,
-            std::string source_name = {}
+            std::string source_name = {},
+            std::string origin = "inline"
         );
         void add_override_file_input(const std::filesystem::path& source_file, const Source& parent);
 
@@ -103,7 +110,7 @@ namespace snt::dip {
 
       public:
         /**
-         * Empty class constructor
+         * * Empty class constructor
          */
         DIP();
 
@@ -118,7 +125,9 @@ namespace snt::dip {
          * @param source_code Text with a DIPL code
          */
         void add_string(const std::string& source_code);
-        /** Add in-memory DIPL code with a stable source name for diagnostics. */
+        /**
+         * Add in-memory DIPL code with a stable source name for diagnostics.
+         */
         void add_string(const std::string& source_code, const std::string& source_name);
 
         /**
@@ -128,14 +137,18 @@ namespace snt::dip {
          * The schema is available in the Environment::schemas registry after parse().
          */
         void add_schema_string(const std::string& name, const std::string& source_code);
-        /** Register a named schema body from a file, with the same rules as add_schema_string(). */
+        /**
+         * Register a named schema body from a file, with the same rules as add_schema_string().
+         */
         void add_schema_file(const std::string& name, const std::filesystem::path& source_file);
 
         /** Atomically register an unwrapped $override body.
          * Value paths resolve to existing targets; terminal collection item groups may create schema-backed items.
          * An empty or comment-only body makes no changes. */
         void add_override_string(const std::string& source_code);
-        /** Add an override body with a stable source name for diagnostics. */
+        /**
+         * Add an override body with a stable source name for diagnostics.
+         */
         void add_override_string(const std::string& source_code, const std::string& source_name);
         /** Register an unwrapped override body from a file, retaining its source path.
          * An empty or comment-only file makes no changes. */
@@ -176,9 +189,13 @@ namespace snt::dip {
          * @param project_file Path to the DIPfile manifest.
          */
         void add_project(const std::filesystem::path& project_file);
-        /** Evaluate a self-contained text bundle with the normal DIPfile rules. */
+        /**
+         * Evaluate a self-contained text bundle with the normal DIPfile rules.
+         */
         void add_project(const ProjectBundle& bundle);
-        /** Register a project entirely from memory, without filesystem access. */
+        /**
+         * Register a project entirely from memory, without filesystem access.
+         */
         void add_project(const ProjectInput& project);
         void set_project_file_reader(ProjectFileReader reader) { env.set_project_file_reader(std::move(reader)); }
 

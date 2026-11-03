@@ -102,24 +102,28 @@ namespace snt::dip {
 
     } // namespace detail
 
-    /** Read-only provenance associated with the value selected by a cursor. */
+    /**
+     * Read-only provenance associated with the value selected by a cursor.
+     */
     struct Provenance {
-        std::string source_name;
-        size_t source_line = 0;
-        std::string source_code;
-        ValueMetadata metadata;
-        std::optional<SourceInfo> source;
+        std::string source_name;      ///< Source identity of the declaration.
+        size_t source_line = 0;       ///< One-based declaration line, if known.
+        std::string source_code;      ///< Declaration text, if retained.
+        ValueMetadata metadata;       ///< Effective metadata on the selected value.
+        std::optional<SourceInfo> source; ///< Durable declaration source information.
         std::optional<SourceInfo> override_source; ///< Source of an applied override, if any.
-        size_t override_line = 0;
-        std::string override_code;
+        size_t override_line = 0;     ///< One-based override line, if known.
+        std::string override_code;    ///< Applied override text, if retained.
     };
 
-    /** Access a known environment path; the cursor must not outlive its environment. */
+    /**
+     * Access a known environment path; the cursor must not outlive its environment.
+     */
     class Cursor {
       protected:
-        const Environment* env_;
-        std::string path_;
-        Path::Kind kind;
+        const Environment* env_; ///< Environment that owns the selected node.
+        std::string path_;       ///< Selected logical DIPL path.
+        Path::Kind kind;         ///< Hierarchy kind of the selected path.
 
       public:
         explicit Cursor(const Environment* env, std::string_view path = "");
@@ -177,11 +181,13 @@ namespace snt::dip {
          * Return source and citation provenance for the value at this path.
          *
          * The source manifest entry is present when the environment has a
-         * registered source (after parsing) or a DIPH5 v2 source manifest.
+         * registered source (after parsing) or a DIPH5 v3 source archive.
          */
         Provenance get_provenance() const;
 
-        /** Return effective metadata on a value, explicit group, collection, or collection item. */
+        /**
+         * Return effective metadata on a value, explicit group, collection, or collection item.
+         */
         ValueMetadata get_metadata() const;
 
         /**
