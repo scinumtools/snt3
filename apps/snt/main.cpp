@@ -58,16 +58,11 @@ Modules:
     module("view", false, "Graphical parameter browser and editor");
 #endif
     module("hub", true, "Install and prepare pinned code examples");
-    module("init", true, "Initialize a DIP project in the current directory");
-    module("setup", true, "Create a validated DIPL override through guided prompts");
 #ifdef ENABLE_SNT_MCP
     module("mcp", true, "Expose DIPL and PUQ tools through Model Context Protocol");
 #else
     module("mcp", false, "Expose DIPL and PUQ tools through Model Context Protocol");
 #endif
-    module("format", true, "Format DIPL source files");
-    module("validate", true, "Validate DIPL files and DIPfile projects");
-    module("lint", true, "Check evaluated DIPL for advisory issues");
     module("completion", true, "Generate Bash and Zsh completion scripts");
     output << R"(
 Notes:
@@ -82,27 +77,27 @@ int main(int argc, char* argv[]) {
     if (argc > 1 && std::string(argv[1]) == "completion")
         return module_completion(argc - 1, argv + 1);
 
-    if (argc > 1 && (std::string(argv[1]) == "fmt" || std::string(argv[1]) == "format")) {
+    if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "format") {
         try {
-            return module_fmt(argc, argv);
+            return module_fmt(argc - 1, argv + 1);
         } catch (const std::exception& error) {
             std::cerr << error.what() << '\n';
             return 2;
         }
     }
 
-    if (argc > 1 && std::string(argv[1]) == "validate") {
+    if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "validate") {
         try {
-            return module_validate(argc, argv);
+            return module_validate(argc - 1, argv + 1);
         } catch (const std::exception& error) {
             std::cerr << error.what() << '\n';
             return 2;
         }
     }
 
-    if (argc > 1 && std::string(argv[1]) == "lint") {
+    if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "lint") {
         try {
-            return module_lint(argc, argv);
+            return module_lint(argc - 1, argv + 1);
         } catch (const std::exception& error) {
             std::cerr << error.what() << '\n';
             return 2;
@@ -146,17 +141,17 @@ int main(int argc, char* argv[]) {
     if (argc > 1 && std::string(argv[1]) == "hub") {
         return module_hub(argc, argv);
     }
-    if (argc > 1 && std::string(argv[1]) == "init") {
+    if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "init") {
         try {
-            return module_init(argc, argv);
+            return module_init(argc - 1, argv + 1);
         } catch (const std::exception& error) {
-            std::cerr << "snt init: " << error.what() << '\n';
+            std::cerr << "snt dip init: " << error.what() << '\n';
             return 2;
         }
     }
-    if (argc > 1 && std::string(argv[1]) == "setup") {
+    if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "setup") {
         try {
-            return module_setup(argc, argv);
+            return module_setup(argc - 1, argv + 1);
         } catch (const std::exception& error) {
             std::cerr << error.what() << '\n';
             return 2;
@@ -175,6 +170,14 @@ int main(int argc, char* argv[]) {
             return module_dip_package(argc - 2, argv + 2);
         } catch (const std::exception& error) {
             std::cerr << error.what() << '\n';
+            return 2;
+        }
+    }
+    if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "experiment") {
+        try {
+            return module_dip_experiment(argc, argv);
+        } catch (const std::exception& error) {
+            std::cerr << "snt dip experiment: " << error.what() << '\n';
             return 2;
         }
     }

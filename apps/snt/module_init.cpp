@@ -12,7 +12,7 @@ namespace {
 Command: init
 
 Usage:
-  snt init
+  snt dip init
 
 Description:
   Initialize a DIP project in the current directory. Create a DIPfile that
@@ -25,7 +25,7 @@ Options:
 Examples:
   mkdir my-project
   cd my-project
-  snt init
+  snt dip init
   snt dip parse --project DIPfile --print
 )");
     }
@@ -38,7 +38,7 @@ int module_init(int argc, char* argv[]) {
         return 0;
     }
     if (argc != 2) {
-        std::cerr << "Usage: snt init\n";
+        std::cerr << "Usage: snt dip init\n";
         return 2;
     }
 

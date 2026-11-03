@@ -1,8 +1,7 @@
 find_package(CURL REQUIRED)
 target_sources(snt PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/hub.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/process.cpp")
+  "${CMAKE_CURRENT_SOURCE_DIR}/hub.cpp")
 target_include_directories(snt PRIVATE "${PROJECT_SOURCE_DIR}/external")
 target_link_libraries(snt PRIVATE CURL::libcurl)
 

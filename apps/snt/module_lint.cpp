@@ -34,14 +34,14 @@ int module_lint(int argc, char* argv[]) {
     const auto print_help = [] {
         snt::cli::HelpPage page;
         page.command = "lint";
-        page.usage = "snt lint [--project] [--json] <file> [<file> ...]";
+        page.usage = "snt dip lint [--project] [--json] <file> [<file> ...]";
         page.description = "Validate, then check evaluated DIPL for advisory issues.";
         page.arguments = "<file>  One or more DIPL files, or DIPfile projects with --project.";
         page.options = R"(-h, --help  Show this help.
 --project    Treat each input as a DIPfile project.
 --json       Write machine-readable findings.
 --           Treat later arguments as file names.)";
-        page.examples = "snt lint parameters.dip\nsnt lint --project DIPfile\nsnt lint --json parameters.dip";
+        page.examples = "snt dip lint parameters.dip\nsnt dip lint --project DIPfile\nsnt dip lint --json parameters.dip";
         page.notes = "Exit status: 0 clean, 1 findings or invalid DIPL, 2 input or command error.";
         std::cout << snt::cli::render_help(page);
     };

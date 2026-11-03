@@ -48,10 +48,9 @@ def test_diph5_save_load_and_arguments(cli, tmp_path):
     manifest = project / "DIPfile"
     parse("--project", manifest, "--request", "answer", "--value", "--type", "integer", output=b"42\n")
     snapshot = project / "project.diph5"
-    parse("--project", manifest, "--record-graph", "--relative-source-paths", "--save", snapshot)
+    parse("--project", manifest, "--record-graph", "--save", snapshot)
     parse("--load", snapshot, "--request", "answer", "--value", "--type", "integer", output=b"42\n")
     fails("--load", snapshot, "--record-graph")
-    fails("--project", manifest, "--relative-source-paths")
     fails("--project", manifest, "--input", "string", "other int = 1")
     for args in [("--project", manifest, "--input", "override_string", "answer = 99"),
                  ("--input", "override_string", "answer = 99", "--project", manifest)]:

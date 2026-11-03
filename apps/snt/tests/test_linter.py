@@ -18,10 +18,10 @@ def test_lint_cli(cli, tmp_path):
     optin.mkdir()
     (optin / "DIPfile").write_text('lint\n  warn_broken_metadata_references = true\n  warn_unused_schemas = true\ncode[]\n  file = "optional.dip"\n')
     (optin / "optional.dip").write_text('$schema spare\n  value int = 1\nroot\n  child int = 1\ncurrent int = 2\n  ?requires "root.missing"\n')
-    assert "clean" in checked(cli("lint", clean))
+    assert "clean" in checked(cli("dip", "lint", clean))
 
     def lint_json(path):
-        return json.loads(checked(cli("lint", "--json", path), 1))
+        return json.loads(checked(cli("dip", "lint", "--json", path), 1))
 
     result = lint_json(advisory)
     assert result["valid"] is True and result["clean"] is False

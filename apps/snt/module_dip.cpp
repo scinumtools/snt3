@@ -22,6 +22,11 @@ Scientific Numerical Tools v3 (SNT)
 Module: Dimensional Input Parameters (DIP)
 
 Usage:
+  snt dip init
+  snt dip format [--check | --write] <file> [<file> ...]
+  snt dip validate [--project] [--json] <file> [<file> ...]
+  snt dip lint [--project] [--json] <file> [<file> ...]
+  snt dip setup <DIPfile> [--output FILE]
   snt dip parse [options]
   snt dip compare <before.diph5> <after.diph5> [options]
   snt dip describe --project DIPfile --path PATH [--format json]
@@ -32,11 +37,17 @@ Usage:
   snt dip records --input FILE --collection MAP [--where-eq FIELD=VALUE] [--field FIELD] [--limit N]
   snt dip preview --project DIPfile --override-file FILE [--format json]
   snt dip package --project DIPfile [--output project.bundle.json] [--include FILE ...]
+  snt dip experiment <command> [options]
 
 Description:
   Evaluate, inspect, compare, and package DIPL projects and DIPH5 snapshots.
 
 Commands:
+  init               Initialize a DIP project in the current directory.
+  format             Format DIPL source files.
+  validate           Validate DIPL files and DIPfile projects.
+  lint               Check evaluated DIPL for advisory issues.
+  setup              Create a validated override through guided prompts.
   parse              Evaluate input; print values, save DIPH5, or generate code.
   compare            Compare two saved DIPH5 environments.
   describe           Inspect one evaluated node as JSON.
@@ -47,6 +58,7 @@ Commands:
   records            Query selected fields of keyed collection items.
   preview            Validate proposed overrides and show their effect.
   package            Bundle project source files for browser use.
+  experiment         Record a DIPH5 v3 execution lifecycle.
 
 Options:
   The following options apply to parse. Run 'snt dip <command> --help'
@@ -70,8 +82,6 @@ Options:
       Request and tag filters affect printed output only.
   --record-graph
       Record evaluation dependencies for inspection and include them in --save output.
-  --relative-source-paths
-      Store source paths relative to the --save DIPH5 file.
   --generate <cpp|c|fortran|rust|julia|json|json-metadata|yaml> <file>
       Generate static parameters in the selected format, overwriting the file.
       json-metadata writes versioned value records with metadata and provenance.
@@ -100,6 +110,7 @@ Examples:
   snt dip records --input findings.dip --collection findings --where-eq category=warning --field quote
   snt dip preview --project DIPfile --override-file candidate.dip --format json
   snt dip package --project DIPfile --output project.bundle.json
+  snt dip experiment --help
 
   snt dip parse \
       -i file parameters.dip \
@@ -141,8 +152,6 @@ Options:
       Request and tag filters affect printed output only.
   --record-graph
       Record evaluation dependencies for inspection and include them in --save output.
-  --relative-source-paths
-      Store source paths relative to the --save DIPH5 file.
   --generate <cpp|c|fortran|rust|julia|json|json-metadata|yaml> <file>
       Generate static parameters in the selected format, overwriting the file.
       json-metadata writes versioned value records with metadata and provenance.
@@ -247,7 +256,6 @@ void module_dip(ArgParser& argpar) {
     std::string save_file;
     bool has_generate = false;
     bool record_graph = false;
-    bool relative_source_paths = false;
     bool has_request = false;
     bool print = false;
     bool value = false;
@@ -291,13 +299,10 @@ void module_dip(ArgParser& argpar) {
             save_file = values.front();
             cmd.argument_save(save_file);
             has_save = true;
-        } else if (key == "--record-graph" || key == "--relative-source-paths") {
+        } else if (key == "--record-graph") {
             if (!values.empty())
                 throw std::runtime_error(key + " does not take arguments.");
-            if (key == "--record-graph")
-                record_graph = true;
-            else
-                relative_source_paths = true;
+            record_graph = true;
         } else if (key == "--generate") {
             if (values.size() != 2 || has_generate)
                 throw std::runtime_error("Specify one export format and one output file with --generate.");
@@ -331,8 +336,6 @@ void module_dip(ArgParser& argpar) {
         throw std::runtime_error("Specify a DIP input with --input, --project, or --load.");
     if (record_graph && has_load)
         throw std::runtime_error("--record-graph requires DIPL input, not --load.");
-    if (relative_source_paths && !has_save)
-        throw std::runtime_error("--relative-source-paths requires --save.");
     if (print && value)
         throw std::runtime_error("Use either --print or --value.");
     if (!type.empty() && !value)
@@ -344,7 +347,6 @@ void module_dip(ArgParser& argpar) {
     if (value)
         cmd.argument_value(type);
     cmd.argument_record_dependency_graph(record_graph);
-    cmd.argument_relative_source_paths(relative_source_paths);
     const auto saved_path = has_save ? std::filesystem::absolute(save_file).lexically_normal() : std::filesystem::path{};
     const auto output = cmd.execute();
     std::cout << output;

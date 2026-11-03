@@ -41,6 +41,7 @@ int main() {
     const auto suffix = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
     const auto path = std::filesystem::temp_directory_path() / ("snt-view-model-" + suffix + ".dip");
     const auto snapshot_path = std::filesystem::temp_directory_path() / ("snt-view-model-" + suffix + ".diph5");
+    const auto inline_archive = std::filesystem::temp_directory_path() / ("snt-view-inline-archive-" + suffix + ".diph5");
     const auto inline_dir = std::filesystem::temp_directory_path() / ("snt-view-inline-" + suffix);
     try {
         const auto standalone_dir = inline_dir / "standalone";
@@ -705,11 +706,48 @@ int main() {
         check(
             snapshot.object("experiment.geometry.length") && !snapshot.object("@dipfile") &&
                 snapshot.environment().project_entries().empty() &&
-                snapshot.source_targets(*snapshot.object("experiment.geometry.length")).empty() &&
-                snapshot.object("@unit?sample_tick") &&
-                snapshot.source_targets(*snapshot.object("@unit?sample_tick")).empty(),
-            "Source browsing must remain disabled for .diph5 snapshots"
+                snapshot.object("@unit?sample_tick"),
+            "A v3 archive should retain resolved nodes without recreating the project manifest"
         );
+        const auto* title_node = snapshot.object("experiment.title");
+        check(title_node != nullptr, "Snapshot is missing the example title");
+        const auto title_sources = snapshot.source_targets(*title_node);
+        check(!title_sources.empty(), "A v3 snapshot should open archived source text");
+        const auto title_document = snapshot.editable_document_path(title_sources.front().file);
+        check(title_document.has_value(), "An archived source should be editable");
+        const auto original_title_source = snapshot.document_text(*title_document);
+        check(!snapshot.preview_document(*title_document, "experiment.title str = (\n").candidate_valid,
+              "An invalid archived source edit must fail its check");
+        auto changed_title_source = original_title_source;
+        const auto title_position = changed_title_source.find("Thermal flow demonstration");
+        check(title_position != std::string::npos, "The title declaration was not archived");
+        changed_title_source.replace(title_position, std::string("Thermal flow demonstration").size(),
+                                     "Edited thermal flow");
+        check(snapshot.preview_document(*title_document, changed_title_source).candidate_valid,
+              "The archived source edit should evaluate before saving");
+        check(snapshot.save_document(*title_document, changed_title_source),
+              "Saving an archived source should refresh the v3 snapshot");
+        check(snapshot.environment().get_node("experiment.title")->value->to_string() == "\"Edited thermal flow\"",
+              "The v3 resolved value did not follow the edited source");
+        const auto refreshed_title_sources = snapshot.source_targets(*snapshot.object("experiment.title"));
+        check(!refreshed_title_sources.empty(), "Saved source lost its resolved node link");
+        const auto refreshed_title_document = snapshot.editable_document_path(refreshed_title_sources.front().file);
+        check(refreshed_title_document &&
+                  snapshot.document_text(*refreshed_title_document).find("Edited thermal flow") != std::string::npos,
+              "Saved v3 source bytes were not reloaded");
+        {
+            snt::dip::DIP parser;
+            parser.add_string("answer int = 7\n");
+            parser.parse().save(inline_archive);
+        }
+        snt::view::ViewerModel inline_snapshot(inline_archive);
+        const auto inline_targets = inline_snapshot.source_targets(*inline_snapshot.object("answer"));
+        check(!inline_targets.empty(), "An inline v3 source should be browsable");
+        const auto inline_document = inline_snapshot.editable_document_path(inline_targets.front().file);
+        check(inline_document && inline_snapshot.preview_document(*inline_document, "answer int = 9\n").candidate_valid,
+              "An inline v3 source should be editable");
+        check(inline_snapshot.save_document(*inline_document, "answer int = 9\n"),
+              "An inline v3 source edit should save and reload");
         std::filesystem::create_directory(inline_dir);
         write(inline_dir / "DIPfile", "code[]\n  string = \"\"\"\nanswer int = 7\n\"\"\"\n");
         snt::view::ViewerModel inline_project(inline_dir / "DIPfile");
@@ -872,11 +910,13 @@ int main() {
               "A setup unit error should identify the input that caused it");
         std::filesystem::remove(path);
         std::filesystem::remove(snapshot_path);
+        std::filesystem::remove(inline_archive);
         std::filesystem::remove_all(inline_dir);
         return 0;
     } catch (...) {
         std::filesystem::remove(path);
         std::filesystem::remove(snapshot_path);
+        std::filesystem::remove(inline_archive);
         std::filesystem::remove_all(inline_dir);
         throw;
     }

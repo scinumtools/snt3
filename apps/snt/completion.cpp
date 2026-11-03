@@ -1,5 +1,6 @@
 #include "main.h"
 #include "help.h"
+#include "experiment_commands.h"
 
 #include <iostream>
 #include <map>
@@ -23,10 +24,10 @@ int module_completion(int argc, char* argv[]) {
     }
 
     // Keep this command metadata in sync with the native CLI dispatcher.
-    const std::map<std::string, std::string> candidates{
-        {"", "dip puq report format fmt validate lint dmap server view hub init setup mcp completion --help --version"},
-        {"dip", "parse compare describe schemas sources override-contract list preview package --help --version --input --project --load --save --record-graph --relative-source-paths --generate --request --print --value --type --path --query --tag-all --tag-any --tag-none --limit --max-value-elements --override --override-file --max-details --format"},
-        {"dip parse", "--help --input --project --load --save --record-graph --relative-source-paths --generate --request --print --value --type"},
+    std::map<std::string, std::string> candidates{
+        {"", "dip puq report dmap server view hub mcp completion --help --version"},
+        {"dip", "init format validate lint setup parse compare describe schemas sources override-contract list records preview package experiment --help --version --input --project --load --save --record-graph --generate --request --print --value --type --path --query --tag-all --tag-any --tag-none --limit --max-value-elements --override --override-file --max-details --format"},
+        {"dip parse", "--help --input --project --load --save --record-graph --generate --request --print --value --type"},
         {"dip compare", "--help --scope --max-details --max-array-examples"},
         {"dip describe", "--help --project --input --path --format --record-graph --max-value-elements"},
         {"dip schemas", "--help --project --input --format"},
@@ -39,20 +40,24 @@ int module_completion(int argc, char* argv[]) {
         {"dip --format", "json"},
         {"report", "--help --version --input --project --load --format --output --intro --title --author --date --report-version --tex-compiler"},
         {"report --format", "tex pdf md rst html typ txt json"},
-        {"format", "--help --check --write"},
-        {"fmt", "--help --check --write"},
-        {"validate", "--help --project --json"},
-        {"lint", "--help --project --json"},
+        {"dip init", "--help"},
+        {"dip format", "--help --check --write"},
+        {"dip validate", "--help --project --json"},
+        {"dip lint", "--help --project --json"},
+        {"dip setup", "--help --output"},
         {"puq", "info list eval convert --help --input-system --output-system --output-units --output-quantity -s -S -U -Q"},
         {"puq list", "prefix base deriv log temp const quant sys"},
         {"dmap", "--help"},
         {"server", "--help --host --port"},
         {"view", "--help"},
         {"hub", "--help fetch setup list"},
-        {"init", "--help"},
-        {"setup", "--help --output"},
         {"mcp", "--help --transport --host --port"},
     };
+    candidates["dip experiment"] = "--help";
+    for (const auto& command : snt::cli::experiment_commands) {
+        candidates["dip experiment"] += std::string(" ") + command.name;
+        candidates[std::string("dip experiment ") + command.name] = command.options;
+    }
 
     if (std::string(argv[1]) == "bash") {
         std::cout << R"(_snt() {

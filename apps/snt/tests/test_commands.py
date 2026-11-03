@@ -15,9 +15,9 @@ def test_command_help_and_module_status(cli):
 
     for args, fragment in [
         (("--help",), "server"), (("--help",), "view"), (("--help",), "dmap"),
-        (("dip", "--help"), "Commands:"), (("--help",), "Initialize a DIP project"),
-        (("init", "--help"), "Command: init"), (("dip", "--help"), "Inspect one evaluated node as JSON"),
-        (("dip", "--help"), "--relative-source-paths"), (("dip", "--help"), "Examples:"),
+        (("dip", "--help"), "Commands:"), (("dip", "--help"), "Initialize a DIP project"),
+        (("dip", "init", "--help"), "Command: init"), (("dip", "--help"), "Inspect one evaluated node as JSON"),
+        (("dip", "--help"), "Examples:"),
         (("dip", "--help"), "snt dip package --project DIPfile --output project.bundle.json"),
         (("dip", "parse", "--help"), "Command: parse"),
         (("dip", "compare", "--help"), "Compare two saved environments"),
@@ -37,6 +37,11 @@ def test_command_help_and_module_status(cli):
 
     unknown = cli("unknown-command")
     assert unknown.returncode == 1 and b"Unknown module" in unknown.stderr
+    for old_command in ("init", "format", "fmt", "validate", "lint", "setup"):
+        rejected = cli(old_command, "--help")
+        assert rejected.returncode != 0, old_command
+    for dip_command in ("init", "format", "validate", "lint", "setup"):
+        assert "Usage:" in output("dip", dip_command, "--help")
     for name, flag, title, disabled in [
         ("report", "REPORT_ENABLED", "Module: DIP Report", "ENABLE_SNT_REPORT=ON"),
         ("server", "SERVER_ENABLED", "Module: REST API server", "ENABLE_SNT_SERVER=ON"),
@@ -66,14 +71,15 @@ def test_help_pages_have_consistent_sections(cli):
     pages = [
         ("--help",), ("puq",), ("puq", "--help"), ("dip",), ("dip", "--help"),
         *(('dip', sub, suffix) for sub in ('parse', 'compare', 'describe', 'schemas', 'sources',
-                                          'override-contract', 'list', 'records', 'preview', 'package')
+                                          'override-contract', 'list', 'records', 'preview', 'package', 'experiment')
           for suffix in ('', '--help')),
         ("hub", "--help"),
         *(('hub', sub, suffix) for sub in ('fetch', 'setup') for suffix in ('', '--help')),
         *(("hub", sub, "--help") for sub in ('build', 'run')),
-        ("init", "--help"),
-        *((sub, suffix) for sub in ('setup', 'format', 'validate', 'lint', 'completion')
+        ("dip", "init", "--help"),
+        *(("dip", sub, suffix) for sub in ('setup', 'format', 'validate', 'lint')
           for suffix in ('', '--help')),
+        *(("completion", suffix) for suffix in ('', '--help')),
     ]
     for module, flag in [("report", "REPORT_ENABLED"), ("server", "SERVER_ENABLED"),
                          ("dmap", "DMAP_ENABLED"), ("view", "VIEW_ENABLED"),

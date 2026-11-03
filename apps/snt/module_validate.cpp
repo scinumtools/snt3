@@ -30,14 +30,14 @@ int module_validate(int argc, char* argv[]) {
     const auto print_help = [] {
         snt::cli::HelpPage page;
         page.command = "validate";
-        page.usage = "snt validate [--project] [--json] <file> [<file> ...]";
+        page.usage = "snt dip validate [--project] [--json] <file> [<file> ...]";
         page.description = "Validate DIPL files or DIPfile projects with the native parser.";
         page.arguments = "<file>  One or more DIPL files, or DIPfile projects with --project.";
         page.options = R"(-h, --help  Show this help.
 --project    Treat each input as a DIPfile project.
 --json       Write machine-readable diagnostics.
 --           Treat later arguments as file names.)";
-        page.examples = "snt validate parameters.dip\nsnt validate --project DIPfile\nsnt validate --json parameters.dip";
+        page.examples = "snt dip validate parameters.dip\nsnt dip validate --project DIPfile\nsnt dip validate --json parameters.dip";
         page.notes = "Exit status: 0 valid, 1 invalid DIPL, 2 input or command error.";
         std::cout << snt::cli::render_help(page);
     };

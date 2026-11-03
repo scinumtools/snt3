@@ -485,7 +485,9 @@ namespace snt::view {
         ImGui::SameLine();
         const auto edit_path = model.editable_document_path(source.file());
         ImGui::TextDisabled(":%zu  %s", source.source_line(),
-                            edit_path ? (model.can_export_diph5() ? "Project source" : "Source file") : "Read-only");
+                            edit_path ? (dip::detect_artifact(model.artifact()) == dip::ArtifactKind::DIPH5
+                                             ? "Archived source" : model.can_export_diph5() ? "Project source" : "Source file")
+                                      : "Read-only");
         if (source.dirty()) {
             ImGui::SameLine();
             ImGui::TextColored(ImVec4(1.0f, 0.72f, 0.25f, 1.0f), "Modified");
@@ -953,21 +955,16 @@ namespace snt::view {
             const bool selected_source = object->role == ObjectRole::Source || object->role == ObjectRole::CodeSource ||
                                          object->role == ObjectRole::BlockSource ||
                                          object->role == ObjectRole::DIPfileSource;
-            if (!selected_source && dip::detect_artifact(model.artifact()) == dip::ArtifactKind::DIPH5) {
-                ImGui::BeginDisabled();
-                ImGui::Button("Open source");
-                ImGui::EndDisabled();
-                if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
-                    ImGui::SetTooltip("Source text is not stored in .diph5 snapshots");
-            } else if (!selected_source) {
+            if (!selected_source) {
                 const auto& targets = cache.source_targets;
                 for (std::size_t index = 0; index < targets.size(); ++index) {
                     const auto& target = targets[index];
                     if (index)
                         ImGui::SameLine();
                     std::error_code error;
-                    const bool available =
-                        target.block_path.has_value() || std::filesystem::is_regular_file(target.file, error);
+                    const bool available = target.block_path.has_value() ||
+                        model.editable_document_path(target.file).has_value() ||
+                        std::filesystem::is_regular_file(target.file, error);
                     ImGui::BeginDisabled(!available);
                     const std::string label = targets.size() == 1 ? "Open source" : "Open " + target.label;
                     const bool clicked = ImGui::Button(label.c_str());

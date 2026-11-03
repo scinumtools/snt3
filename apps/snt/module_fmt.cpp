@@ -28,13 +28,13 @@ int module_fmt(int argc, char* argv[]) {
     const auto print_help = [] {
         snt::cli::HelpPage page;
         page.command = "format";
-        page.usage = "snt format [--check | --write] <file> [<file> ...]";
+        page.usage = "snt dip format [--check | --write] <file> [<file> ...]";
         page.description = "Format DIPL source. Output goes to stdout unless --check or --write is used.";
         page.arguments = "<file>  DIPL source file. Multiple files require --check or --write.";
         page.options = R"(-h, --help  Show this help.
 --check     Report files that need formatting; exit 1 if any do.
 --write     Format files in place.)";
-        page.examples = "snt format parameters.dip\nsnt format --check parameters.dip\nsnt format --write a.dip b.dip";
+        page.examples = "snt dip format parameters.dip\nsnt dip format --check parameters.dip\nsnt dip format --write a.dip b.dip";
         std::cout << snt::cli::render_help(page);
     };
     if (argc == 2) {

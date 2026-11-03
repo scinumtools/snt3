@@ -14,13 +14,13 @@ namespace {
     void print_help() {
         snt::cli::HelpPage page;
         page.command = "setup";
-        page.usage = "snt setup <DIPfile> [--output FILE]";
+        page.usage = "snt dip setup <DIPfile> [--output FILE]";
         page.description = R"(Guide through values marked with `!setup`, validate the answers with DIP, and
 write them as an unwrapped DIPL override file. The default output is
 setup-overrides.dip in the current directory. Existing files are not replaced.)";
         page.arguments = "<DIPfile>  Project manifest with !setup parameters.";
         page.options = "-h, --help       Show this help.\n--output FILE    Write answers to FILE instead of setup-overrides.dip.";
-        page.examples = "snt setup DIPfile\nsnt setup DIPfile --output run-overrides.dip";
+        page.examples = "snt dip setup DIPfile\nsnt dip setup DIPfile --output run-overrides.dip";
         std::cout << snt::cli::render_help(page);
     }
 
@@ -169,7 +169,7 @@ int module_setup(int argc, char* argv[]) {
                 throw std::invalid_argument("--output requires a file path.");
             output = argv[index];
         } else if (!argument.empty() && argument.front() == '-') {
-            throw std::invalid_argument("Unknown setup option: " + argument + ". Use 'snt setup --help'.");
+            throw std::invalid_argument("Unknown setup option: " + argument + ". Use 'snt dip setup --help'.");
         } else if (project.empty()) {
             project = argument;
         } else {

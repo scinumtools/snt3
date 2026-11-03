@@ -24,13 +24,13 @@ def test_validate_cli(cli, tmp_path):
     bad_settings.mkdir()
     (bad_settings / "DIPfile").write_text("validate\n  max_syntax_errors = 0\n")
 
-    assert "valid" in checked(cli("validate", valid))
-    assert "error [dip." in cli("validate", invalid).stderr.decode()
-    checked(cli("validate", manifest))
-    checked(cli("validate", "--project", renamed))
+    assert "valid" in checked(cli("dip", "validate", valid))
+    assert "error [dip." in cli("dip", "validate", invalid).stderr.decode()
+    checked(cli("dip", "validate", manifest))
+    checked(cli("dip", "validate", "--project", renamed))
 
     def validate_json(*args):
-        return json.loads(checked(cli("validate", "--json", *args), 1))
+        return json.loads(checked(cli("dip", "validate", "--json", *args), 1))
 
     result = validate_json(invalid)
     assert result["valid"] is False and result["diagnostics"][0]["code"].startswith("dip.")
@@ -47,10 +47,10 @@ def test_validate_cli(cli, tmp_path):
     assert result["diagnostics"][0]["location"]["line"] == 2
     assert normalize_path(result["diagnostics"][0]["location"]["source"]) == normalize_path(bad_settings / "DIPfile")
     assert "Invalid validation setting" in str(result)
-    combined = cli("validate", valid, invalid)
+    combined = cli("dip", "validate", valid, invalid)
     checked(combined, 1)
     assert b"valid" in combined.stdout and b"invalid" in combined.stderr
-    assert [item["valid"] for item in json.loads(checked(cli("validate", "--json", valid, invalid), 1))] == [True, False]
-    missing = cli("validate", tmp_path / "missing.dip")
+    assert [item["valid"] for item in json.loads(checked(cli("dip", "validate", "--json", valid, invalid), 1))] == [True, False]
+    missing = cli("dip", "validate", tmp_path / "missing.dip")
     checked(missing, 2)
     assert b"dip.io" in missing.stderr

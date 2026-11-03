@@ -1,7 +1,7 @@
 #include "hub.h"
 
 #include "../snt/help.h"
-#include "process.h"
+#include <snt/core/process.h>
 
 #include <algorithm>
 #include <array>
@@ -23,6 +23,7 @@
 #include <vector>
 
 namespace snt::hub {
+    using core::process;
     namespace {
         namespace fs = std::filesystem;
         using Json = nlohmann::json;

@@ -151,6 +151,8 @@ namespace snt::view {
         if (kind == dip::ArtifactKind::Project)
             setup_session_ = std::make_unique<dip::SetupSession>(artifact_);
         edit_session_ = open_edit_session(artifact_, error_);
+        if (kind == dip::ArtifactKind::DIPH5)
+            archive_edit_session_ = std::make_unique<dip::ArchiveEditSession>(artifact_);
         rebuild_objects();
         history_.push_back(selection_);
     }
@@ -191,6 +193,21 @@ namespace snt::view {
             source.source_kind = "code";
             objects_.emplace("@code?0", std::move(source));
             objects_.at("@local").children.push_back("@code?0");
+        }
+        if (dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPH5) {
+            objects_.emplace("@local", ObjectInfo{"@local", "Archived sources", "", {}, false,
+                                                    dip::Path::Kind::None, ObjectRole::LocalSources});
+            objects_.at("").children.push_back("@local");
+            for (const auto& source : archive_edit_session_->documents()) {
+                const auto id = "@archive?" + source.name;
+                ObjectInfo object{id, source.path.empty() ? source.name :
+                                      std::filesystem::path(source.path).filename().string(),
+                                  "@local", {}, false, dip::Path::Kind::None, ObjectRole::CodeSource};
+                object.source_name = source.name;
+                object.source_kind = source.kind == dip::ArchivedDocumentKind::Override ? "override" : "code";
+                objects_.emplace(id, std::move(object));
+                objects_.at("@local").children.push_back(id);
+            }
         }
         if (dip::detect_artifact(artifact_) == dip::ArtifactKind::Project) {
             objects_.emplace(
@@ -813,14 +830,18 @@ namespace snt::view {
         try {
             auto fresh = load_environment(artifact_);
             std::unique_ptr<dip::EditSession> fresh_session;
+            std::unique_ptr<dip::ArchiveEditSession> fresh_archive;
             std::unique_ptr<dip::SetupSession> fresh_setup;
             std::string edit_error;
             const auto kind = dip::detect_artifact(artifact_);
             if (kind == dip::ArtifactKind::Project)
                 fresh_setup = std::make_unique<dip::SetupSession>(artifact_);
             fresh_session = open_edit_session(artifact_, edit_error);
+            if (kind == dip::ArtifactKind::DIPH5)
+                fresh_archive = std::make_unique<dip::ArchiveEditSession>(artifact_);
             environment_ = std::move(fresh);
             edit_session_ = std::move(fresh_session);
+            archive_edit_session_ = std::move(fresh_archive);
             setup_session_ = std::move(fresh_setup);
             rebuild_objects();
             ++revision_;
@@ -900,8 +921,28 @@ namespace snt::view {
 
     std::vector<SourceTarget> ViewerModel::source_targets(const ObjectInfo& object) const {
         const dip::Inspector view{environment_};
-        if (dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPH5)
-            return {};
+        if (dip::detect_artifact(artifact_) == dip::ArtifactKind::DIPH5) {
+            std::string name = object.source_name;
+            std::size_t line = 1;
+            if (name.empty() && object.role == ObjectRole::Path) {
+                if (const auto node = value_node(object)) {
+                    name = node->line.source.name;
+                    line = node->line.source.line_number;
+                }
+            }
+            if (name.empty())
+                return {};
+            const auto document = archive_edit_session_->document(name);
+            if (!document)
+                return {};
+            name = document->name;
+            const auto file = artifact_.parent_path() / (artifact_.filename().string() + ".source-" + name);
+            const auto format = document->kind == dip::ArchivedDocumentKind::Table ? SourceFormat::Table
+                              : document->kind == dip::ArchivedDocumentKind::Plain ? SourceFormat::Plain
+                                                                                   : SourceFormat::DIPL;
+            return {{document->kind == dip::ArchivedDocumentKind::Override ? "Archived override" : "Archived source",
+                     file, line, name, format}};
+        }
         if (object.role == ObjectRole::ProjectFile && object.project_file_index &&
             *object.project_file_index < project_files_.size())
             return project_files_[*object.project_file_index].links;
@@ -1006,6 +1047,11 @@ namespace snt::view {
     }
 
     std::string ViewerModel::source_object_path(const SourceTarget& target) const {
+        if (archive_edit_session_ && !target.source_name.empty()) {
+            const auto path = "@archive?" + target.source_name;
+            if (object(path))
+                return path;
+        }
         if (target.block_path) {
             const std::string path = "@block?" + *target.block_path;
             if (object(path))
@@ -1057,6 +1103,15 @@ namespace snt::view {
     }
 
     std::optional<std::string> ViewerModel::editable_document_path(const std::filesystem::path& file) const {
+        if (archive_edit_session_) {
+            const auto prefix = artifact_.filename().string() + ".source-";
+            const auto filename = file.filename().string();
+            if (file.parent_path() == artifact_.parent_path() && filename.rfind(prefix, 0) == 0) {
+                const auto name = filename.substr(prefix.size());
+                if (archive_edit_session_->document(name))
+                    return name;
+            }
+        }
         if (!edit_session_ || file.empty())
             return std::nullopt;
         try {
@@ -1073,12 +1128,16 @@ namespace snt::view {
     }
 
     const std::string& ViewerModel::document_text(const std::string& path) const {
+        if (archive_edit_session_)
+            return archive_edit_session_->document_text(path);
         if (!edit_session_)
             throw std::logic_error("No editable project session is active.");
         return edit_session_->document_text(path);
     }
 
     dip::PreviewResult ViewerModel::preview_document(const std::string& path, const std::string& text) const {
+        if (archive_edit_session_)
+            return archive_edit_session_->preview_document(path, text);
         if (!edit_session_)
             throw std::logic_error("No editable project session is active.");
         return edit_session_->preview_document(path, text);
@@ -1091,6 +1150,19 @@ namespace snt::view {
     }
 
     bool ViewerModel::save_document(const std::string& path, const std::string& text) {
+        if (archive_edit_session_) {
+            try {
+                const auto selected_name = archive_edit_session_->save_document(path, text);
+                if (!reload())
+                    return false;
+                if (object("@archive?" + selected_name))
+                    select("@archive?" + selected_name);
+                return true;
+            } catch (const std::exception& error) {
+                error_ = error.what();
+                return false;
+            }
+        }
         if (!edit_session_) {
             error_ = "No editable project session is active.";
             return false;
