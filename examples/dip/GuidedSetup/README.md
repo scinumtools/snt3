@@ -3,7 +3,7 @@
 Try the interactive setup command from the repository root:
 
 ```sh
-build/bin/snt setup examples/dip/GuidedSetup/DIPfile --output /tmp/snt-guided-setup.dip
+build/bin/snt dip setup examples/dip/GuidedSetup/DIPfile --output /tmp/snt-guided-setup.dip
 ```
 
 The example marks user inputs with `!setup`. It demonstrates a boolean prompt,

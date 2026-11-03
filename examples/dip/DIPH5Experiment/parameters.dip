@@ -1,0 +1,8 @@
+# These are the effective inputs the simulator receives. The launcher reads
+# them back from environment.diph5, so it uses the saved configuration.
+experiment
+  steps int = 4
+    ?descr "Number of samples in the demonstration run"
+
+  gain float = 1.5
+    ?descr "Scale applied to each sample index"

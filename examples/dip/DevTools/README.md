@@ -1,6 +1,6 @@
 # DIPL developer tools
 
-This directory demonstrates `snt format`, `snt validate`, and `snt lint` with
+This directory demonstrates `snt dip format`, `snt dip validate`, and `snt dip lint` with
 no extra dependencies. `DIPfile` defines the tools' settings and includes only
 `parameters.dip` in the project. The invalid and lint example files are
 separate inputs, so the project itself remains valid.
@@ -9,9 +9,9 @@ From the repository root, after building `snt` (or replace `build/bin/snt`
 with an installed `snt`), run:
 
 ```sh
-build/bin/snt validate examples/dip/DevTools/DIPfile
-build/bin/snt format --check examples/dip/DevTools/parameters.dip
-build/bin/snt format examples/dip/DevTools/parameters.dip
+build/bin/snt dip validate examples/dip/DevTools/DIPfile
+build/bin/snt dip format --check examples/dip/DevTools/parameters.dip
+build/bin/snt dip format examples/dip/DevTools/parameters.dip
 ```
 
 The project validates successfully. The format check exits with status 1
@@ -22,8 +22,8 @@ on a copy if you want to try rewriting it:
 ```sh
 mkdir -p build/devtools-example
 cp examples/dip/DevTools/DIPfile examples/dip/DevTools/parameters.dip build/devtools-example/
-build/bin/snt format --write build/devtools-example/parameters.dip
-build/bin/snt format --check build/devtools-example/parameters.dip
+build/bin/snt dip format --write build/devtools-example/parameters.dip
+build/bin/snt dip format --check build/devtools-example/parameters.dip
 ```
 
 The final check exits with status 0.
@@ -31,9 +31,9 @@ The final check exits with status 0.
 To see validation diagnostics, run:
 
 ```sh
-build/bin/snt validate examples/dip/DevTools/invalid-syntax.dip
-build/bin/snt validate --json examples/dip/DevTools/invalid-syntax.dip
-build/bin/snt validate examples/dip/DevTools/invalid-semantic.dip
+build/bin/snt dip validate examples/dip/DevTools/invalid-syntax.dip
+build/bin/snt dip validate --json examples/dip/DevTools/invalid-syntax.dip
+build/bin/snt dip validate examples/dip/DevTools/invalid-semantic.dip
 ```
 
 Each invalid command exits with status 1. `invalid-syntax.dip` has three
@@ -45,9 +45,9 @@ all three. `invalid-semantic.dip` parses successfully, then fails because
 To see advisory lint findings on valid DIPL, run:
 
 ```sh
-build/bin/snt lint examples/dip/DevTools/lint-advisory.dip
-build/bin/snt lint --json examples/dip/DevTools/lint-advisory.dip
-build/bin/snt lint examples/dip/DevTools/DIPfile
+build/bin/snt dip lint examples/dip/DevTools/lint-advisory.dip
+build/bin/snt dip lint --json examples/dip/DevTools/lint-advisory.dip
+build/bin/snt dip lint examples/dip/DevTools/DIPfile
 ```
 
 The first two commands exit with status 1: `output` is explicitly public but
@@ -61,7 +61,7 @@ set `warn_broken_metadata_references` and `warn_unused_schemas` to `true`,
 then run:
 
 ```sh
-build/bin/snt lint examples/dip/DevTools/lint-optional.dip
+build/bin/snt dip lint examples/dip/DevTools/lint-optional.dip
 ```
 
 This reports the path-like `?requires` target that is absent from the evaluated

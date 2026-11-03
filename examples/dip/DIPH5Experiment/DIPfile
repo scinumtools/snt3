@@ -1,0 +1,4 @@
+# The manifest gives DIP a project entry point and keeps source paths relative
+# to this directory. DIPH5 will archive this file and parameters.dip together.
+code[]
+  file = "parameters.dip"
