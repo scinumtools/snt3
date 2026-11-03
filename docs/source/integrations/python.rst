@@ -162,21 +162,10 @@ Select returns value nodes with their values, units, tags, and metadata:
    ):
        print(node.name, node.value, node.units, node.tags, node.metadata.description)
 
-``tags_all`` requires every listed tag; ``tags_any`` requires at least one;
-and ``tags_none`` excludes nodes with any listed tag. The filters combine
-with AND. An omitted or empty filter imposes no restriction. Only tags
-assigned directly to a node match; parent tags are not inherited.
-
-``?`` selects every value node. ``?physics.`` selects a subtree, including a
-value-bearing root and collection members. ``?physics.speed`` selects one
-exact node. Results retain fully qualified paths and environment order, and
-each matching node appears once. If nothing matches, the result is an empty
-list.
-
-Selection does not modify the environment. A selected node is an independent
-snapshot, and its ``tags`` and ``metadata`` properties are read-only. Changing
-a returned tags list affects only that list. Metadata remains valid while its
-Python wrapper is alive.
+The three tag filters combine with AND. Queries such as ``?physics.`` select
+values in a subtree; selected values are independent snapshots. For the full
+query rules and the inspection model shared with C++, see
+:doc:`Inspecting environments <../modules/dip/inspection>`.
 
 Additional request helpers remain available in the
 :doc:`Python DIP API reference <../api/python_dip>`.
@@ -383,8 +372,8 @@ Source provenance
 -----------------
 
 Each value cursor has a read-only ``provenance`` object with the source name,
-line number, captured source text, and DIPL citation metadata. DIPH5 version
-2 also preserves a source manifest. Access it through
+line number, captured source text, and DIPL citation metadata. DIPH5 v3
+archives exact source bytes and retains source metadata. Access it through
 ``environment.source_manifest`` to inspect source paths and SHA-256 content
 fingerprints:
 

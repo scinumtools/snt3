@@ -6,15 +6,15 @@ useful when a DIPL input has already been parsed and evaluated and the
 resulting values need to be exchanged with another application, stored for a
 later calculation, or inspected by scientific software using HDF5.
 
-The persisted object is an evaluated environment, not the original DIPL
-program or the complete parser runtime. The format stores values, hierarchy,
-collections, units, node settings, and provenance; current round-trip
-limitations are listed below. Runtime function definitions,
-branching state, and complete parser registries are not reconstructed.
+DIPH5 v3 stores exact DIPL source bytes, ordered overrides, the resolved
+configuration, and optional experiment execution and results. Its root carries
+``_DIPH5_Format`` and ``_DIPH5_Schema_Major=3``. SNT3 0.10.0 reads and writes
+only v3 archives. DIPH5 v2 and lower are legacy, unsupported formats. The
+`historical v2.11 specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification-v2.11.md>`_
+remains available for interpretation or migration with an older reader.
 
-The recommended filename extension is ``.diph5``. The extension is only a
-naming convention; the file is identified normatively by its root
-``_DIPL_Format`` and ``_DIPL_Schema_Version`` attributes.
+The recommended filename extension is ``.diph5``; the root attributes identify
+the format, not the filename.
 
 Saving and loading
 ------------------
@@ -35,118 +35,116 @@ The C++ API saves and loads through :cpp:class:`snt::dip::Environment`:
 ``save()`` overwrites an existing destination file. ``load()`` replaces the
 current environment only after the file has been read successfully; a failed
 load leaves the existing environment unchanged.
+The saved archive includes exact contributing source bytes and ordered
+overrides. Source extraction uses generated filenames within the destination
+you choose; it does not write to paths supplied by the archive. See the
+`canonical DIPH5 v3 specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md>`_
+for the on-disk layout and validation rules.
+
+DIPH5 v3 experiments
+--------------------
+
+Experiment preparation creates a new file from a saved environment archive.
+It refuses an existing destination. Publishing requires hard-link support in
+the destination filesystem; lifecycle updates do not carry a durability
+guarantee after a system crash.
+
+An experiment adds one ``/execution`` record. The managed CLI path launches
+without a shell and records the exact argument array, working directory,
+available executable hash, basic system facts, and outcome:
+
+.. code-block:: console
+
+   snt dip parse -i file parameters.dip --save prepared.diph5
+   snt dip experiment run --input prepared.diph5 --output run.diph5 -- python simulate.py
+   snt dip experiment show --file run.diph5
+
+For an external scheduler, create the record first, then report the command
+and its outcome from the host:
+
+.. code-block:: console
+
+   snt dip experiment prepare --input prepared.diph5 --output run.diph5
+   snt dip experiment start --file run.diph5 --origin host_reported \
+       --role outer_launcher --cwd /work/run -- srun python simulate.py
+
+While a run is marked ``running``, results can be registered in the same
+archive. Embedded numbers use their DIPL dtype for storage: signed and unsigned
+integers of 8, 16, 32 or 64 bits, ``float32`` and ``float64``, plus ``bool``
+and ``char``. The default is ``float64``. Arrays' shapes and optional dimension
+names are checked against their values; out-of-range integer values are rejected.
+External artifacts remain in their original files and are recorded by path,
+size, and SHA-256. Diagnostics distinguish observed statistics from
+validation judgments.
+
+.. code-block:: console
+
+   snt dip experiment add --file run.diph5 --name energy --values 42.5 --unit J
+   snt dip experiment add --file run.diph5 --name spectrum \
+       --values 1,2,3,4 --shape 2,2 --dimensions row,column
+   snt dip experiment add --file run.diph5 --name count --dtype uint64 --values 9007199254740993
+   snt dip experiment diagnostic --file run.diph5 --name nan_count \
+       --values 0 --category observed
+   snt dip experiment attach --file run.diph5 --name output --artifact output.nc --format NetCDF
+   snt dip experiment results --file run.diph5
+   snt dip experiment finalize --file run.diph5
+   snt dip experiment finish --file run.diph5 --status completed --exit-code 0
+   snt dip experiment verify --file run.diph5
+
+``finish --status completed`` finalizes the inventory automatically if it has
+not yet been finalized. An empty inventory is allowed. A failed run retains
+its partial results. ``verify`` reports structural and checksum status
+separately from external artifact availability. It reads external files but
+does not extract or execute them. A missing artifact remains in the inventory
+and is reported as unavailable. Finalization and completion recheck reachable
+artifact hashes and reject a checksum mismatch. Absolute paths, remote URIs,
+and paths resolving outside the archive directory are reported as unavailable
+for automatic verification.
+The configuration fingerprint is checked separately. For supported values,
+the archive stores a canonical digest of the resolved configuration and
+``verify`` reports ``pass`` only when it matches. Unsupported values such as
+``float128`` leave this check ``unavailable``. The current encoder also marks a
+resolved dataset unavailable when its decoded payload exceeds 256 MiB.
+
+Use ``--executable-path``, ``--executable-sha256``, and ``--executable-size``
+with ``start`` when the host can report the remote executable's identity.
+SNT3 hashes an executable automatically only when it launches the command
+itself. With ``--role outer_launcher``, the scientific child's invocation is
+recorded as unknown unless the caller supplies a separate observed command.
+
+``import`` records a past terminal outcome when the invocation is unknown.
+Import and host-reported operations leave unknown execution timestamps unset;
+they record when SNT3 received the report separately. Terminal records cannot
+be changed through the normal API. The portable resolved-configuration
+fingerprint is verified when the resolved values have portable encodings.
+
+.. _dip-diph5-comparison:
+
+Comparing saved environments
+----------------------------
+
+Compare two DIPH5 environments with ``snt dip compare`` or the C++ and Python
+``compare_diph5`` functions. The default ``effective`` scope compares resolved
+paths, types, shapes, units, and values. The ``full`` scope also reports
+changes to tags, metadata, rules, provenance, and persisted source, schema,
+and trace manifests. For arrays, the result counts all changed elements and
+reports a bounded number of zero-based flat indices. The comparison reads
+both archives without modifying either one.
+
+.. code-block:: console
+
+   snt dip compare before.diph5 after.diph5 --scope full --max-array-examples 3
 
 Current limitations
 -------------------
 
-The current implementation does not yet preserve every detail on a save/load
-round trip:
+A v3 archive requires recoverable source bytes. A loaded v3 archive keeps
+those bytes and can be saved again. The portable resolved-configuration
+fingerprint is unavailable for unsupported value types.
 
-* Units associated with null values are not restored by the loader.
-* Groups and collections without value-node descendants are not written:
-  the writer constructs the hierarchy from the saved value paths.
+The resolved-node encoding inside ``/configuration/resolved`` follows the
+v2.11 node mapping. This internal encoding does not make v2 files readable by
+the 0.10.0 runtime.
 
-Source identifiers, line numbers, captured source lines, and citation metadata
-remain node-level provenance. DIPH5 version 2 stores a source manifest with
-each source's name, recorded path, parent relationship, and SHA-256 hash of
-the exact parsed content. Source paths can be saved relative to the DIPH5
-directory with ``SnapshotSaveOptions`` and
-``SourcePathPolicy::RelativeToSnapshot``. Relative paths in a loaded snapshot
-are interpreted from that snapshot's directory when it is saved again with
-the same policy. The default preserves the original path strings.
-Version 2.1 additionally preserves the trace IDs of registered units, schemas,
-and functions. Version 2.4 adds schema-level
-descriptions, citations, and source locations to those trace entries. In C++,
-``get_schema_manifest()`` returns these descriptive records and
-``get_applied_schemas(path)`` finds schemas applied along a value path.
-``get_contributing_schema(path)`` identifies the schema that supplied a value
-node, when known. Loading
-does not recreate complete source text, parsed source nodes, schema definitions,
-executable functions, or source-qualified lookups; a loaded schema cannot be
-instantiated from the snapshot.
-
-HDF5 mapping
-------------
-
-Fully qualified DIPL paths become HDF5 paths. Hierarchy and collection nodes
-are groups, while value nodes are datasets:
-
-.. code-block:: text
-
-   /simulation                         group   (_DIPL_Kind=group)
-   /simulation/steps                   dataset (_DIPL_Kind=value)
-   /boundary                           group   (_DIPL_Kind=map)
-   /boundary/inlet                     group   (_DIPL_Kind=map_item)
-   /boundary/inlet/velocity            dataset (_DIPL_Kind=value)
-   /samples                            group   (_DIPL_Kind=list)
-   /samples/0                          group   (_DIPL_Kind=list_item)
-   /samples/0/time                     dataset (_DIPL_Kind=value)
-
-The ``_DIPL_*`` attributes carry the DIPL meaning that cannot be inferred
-from HDF5 names alone. Value datasets use native HDF5 numeric datatypes,
-simple dataspaces for arrays, and null dataspaces for null values. Node
-settings and provenance are stored as dataset attributes.
-
-* `Source specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md>`_
-
-.. _dip-diph5-comparison:
-
-Comparing DIPH5 snapshots
--------------------------
-
-Construct a :cpp:class:`snt::dip::Comparison <snt::dip::snt::dip::Comparison>` with two DIPH5 snapshots. It
-loads and compares them once, then lets you inspect or render the result as
-often as needed. The result contains added, removed, and changed entries
-sorted by category and path. Each changed value lists the fields that differ. Arrays report the count
-of changed elements and a bounded sample of flat, zero-based indices. The
-plain-text renderer limits the number of entries while keeping the totals.
-
-.. code-block:: cpp
-
-   #include <snt/dip/comparison.h>
-
-   snt::dip::Comparison comparison{"before.diph5", "after.diph5"};
-   std::cout << comparison.render(50);
-
-The default ``Effective`` scope compares persisted value paths, declared and
-stored types, shapes, units, and element values. ``Full`` also compares tags,
-metadata, options, provenance, settings, and source, trace, and schema
-manifests. ``equal()`` means equal within the selected scope; it does not
-compare HDF5 bytes or layout. Numeric comparison is exact, with two NaNs
-treated as equal. Array examples are controlled by
-``ComparisonOptions::max_array_examples``.
-
-.. code-block:: cpp
-
-   snt::dip::ComparisonOptions options;
-   options.scope = snt::dip::ComparisonScope::Full;
-   options.max_array_examples = 5;
-   snt::dip::Comparison comparison{"before.diph5", "after.diph5", options};
-   if (!comparison.equal()) {
-       for (const auto& difference : comparison.result().differences) {
-           // Use the structured differences in your application.
-       }
-   }
-
-For applications using the command layer, :cpp:class:`snt::api::DIPCompare`
-provides the same comparison and text rendering. See also the
-:doc:`CLI <../../integrations/cli>`, :doc:`REST <../../integrations/rest>`,
-:doc:`Python <../../integrations/python>`, and :doc:`C <../../integrations/c>`
-interfaces.
-
-Full DIPH5 specification
-------------------------
-
-The complete format contract, including object kinds, value datatypes,
-attributes, compatibility rules, and DIPL-to-HDF5 examples, is provided in
-the standalone specification below.
-
-.. raw:: html
-
-   <iframe
-       src="../../_static/diph5-specification.pdf"
-       width="100%"
-       height="800px"
-       style="border: none;">
-   </iframe>
-   </br></br>
+* `DIPH5 v3 specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md>`_
+* `Historical DIPH5 v2.11 specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification-v2.11.md>`_

@@ -1,13 +1,18 @@
 ---
 title: "SciNumTools DIPH5"
-subtitle: "Environment HDF5 Format Specification"
+subtitle: "Legacy Environment HDF5 Format Specification"
 author: "Ondrej Pego Jaura [![ORCID iD](../source/_static/orcid-id.png)](https://orcid.org/0000-0002-5391-3714)"
 date: "Version 2.11"
 ---
 
 # Scope
 
-DIPH5 is the HDF5 interchange format used by SciNumTools to persist an
+> **Legacy format.** DIPH5 v2.11 and lower are unsupported by SNT3 0.10.0 and
+> later. This specification is retained for historical interpretation and
+> migration using an older reader. The [DIPH5 v3 specification](specification.md)
+> defines the canonical format.
+
+DIPH5 v2.11 was the HDF5 interchange format used by earlier SciNumTools releases to persist an
 *evaluated DIPL environment*. It stores evaluated value nodes together with
 their DIPL paths, collection structure, units, settings, and provenance. It
 also stores link nodes as source and target paths without copying linked data.

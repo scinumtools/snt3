@@ -3,7 +3,26 @@ DIP examples
 
 The DIP examples cover a minimal DIPL definition, developer tools, CMake
 configuration, inspection and dependency graphs, application adapters, and
-report generation.
+report generation. The DIPH5 experiment example follows a model through
+execution, result registration, and verification.
+
+DIPH5 Experiment
+----------------
+
+The `DIPH5Experiment directory
+<https://github.com/scinumtools/snt3/tree/main/examples/dip/DIPH5Experiment>`_
+contains a small DIP project, a Python simulation, and a launcher script. From
+the repository root:
+
+.. code-block:: console
+
+   bash examples/dip/DIPH5Experiment/run.sh
+
+The script saves the evaluated model as DIPH5 v3, prepares an experiment,
+records the simulation invocation, registers an embedded numeric array and an
+external CSV artifact, then finalizes and verifies the experiment. It prints
+the output directory. The example README explains each file and lifecycle
+step.
 
 Quick Example
 -------------
@@ -38,9 +57,9 @@ and limits syntax reporting to two errors. From the repository root:
 
 .. code-block:: console
 
-   build/bin/snt validate examples/dip/DevTools/DIPfile
-   build/bin/snt format --check examples/dip/DevTools/parameters.dip
-   build/bin/snt validate --json examples/dip/DevTools/invalid-syntax.dip
+   build/bin/snt dip validate examples/dip/DevTools/DIPfile
+   build/bin/snt dip format --check examples/dip/DevTools/parameters.dip
+   build/bin/snt dip validate --json examples/dip/DevTools/invalid-syntax.dip
 
 The project passes; the format check and invalid-file validation exit with
 status 1. The `example README
@@ -164,8 +183,9 @@ are browsable under ``Block value sources``. Raw file inputs have their own
 ``Raw named sources`` branch.
 The ``table_samples`` source supplies ``experiment.reference_readings`` and
 shows its column header with DIPL highlighting above the raw data rows.
-Source browsing requires a live
-project parse; source nodes are not yet stored in ``.diph5`` snapshots. The
+Named source node browsing requires a live project parse. DIPH5 v3 archives
+contain source bytes that the viewer can open and edit without changing the
+original project files. The
 `example README
 <https://github.com/scinumtools/snt3/blob/main/examples/dip/ParameterViewer/README.md>`_
 provides a longer guided tour and a command-line parse check.
@@ -177,7 +197,7 @@ Guided Setup
 
 The `GuidedSetup source directory
 <https://github.com/scinumtools/snt3/tree/main/examples/dip/GuidedSetup>`_
-demonstrates DIPL-driven prompts with ``snt setup``. It includes a boolean,
+demonstrates DIPL-driven prompts with ``snt dip setup``. It includes a boolean,
 labelled options, constrained integer and unit-bearing number, formatted text,
 an array expression, a required value without a default, and a derived value
 that is not prompted.
@@ -186,7 +206,7 @@ From the repository root, run:
 
 .. code-block:: bash
 
-   build/bin/snt setup examples/dip/GuidedSetup/DIPfile --output build/run-settings.dip
+   build/bin/snt dip setup examples/dip/GuidedSetup/DIPfile --output build/run-settings.dip
    build/bin/snt dip parse --project examples/dip/GuidedSetup/DIPfile \
        --input override_file build/run-settings.dip --print
 

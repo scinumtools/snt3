@@ -266,11 +266,11 @@ definition, modification, or override must use its canonical path. A link to a
 group, map, list, or collection item exposes its descendants and collection
 items through the alias path. A link itself has no scalar value.
 
-DIPH5 stores the link's source name and target path without copying target
-data. Since a DIPH5 snapshot does not restore executable named sources, loading
-a snapshot with a remote link succeeds but following that link reports it as
-unresolved. Local links continue to resolve from the nodes stored in the
-snapshot.
+DIPH5 v3 stores the link's source name and target path, as well as the exact
+source bytes. Loading an archive restores the evaluated nodes, but does not
+reparse its named sources into executable source environments. Following a
+remote link therefore reports it as unresolved; local links continue to
+resolve from the stored nodes.
 
 ### Array and String Slicing
 

@@ -77,7 +77,7 @@ lists can be traversed using ``items()`` and ``elements()``.
 
 ``env["path.to.value"].get_provenance()`` returns the source name, line,
 captured source line, and citation metadata for a resolved value. When the
-environment was parsed directly or loaded from a DIPH5 version 2 or later file, the
+environment was parsed directly or loaded from a DIPH5 v3 file, the
 result also includes the matching source-manifest entry with its recorded path
 and SHA-256 content fingerprint.
 
@@ -96,52 +96,21 @@ environment.
 Select: discover and inspect nodes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use ``Inspector::select()`` to find value nodes and inspect their tags and
-metadata directly:
+Use ``Inspector::select()`` when the path is not known in advance. It accepts
+path queries and tag filters and returns independent value snapshots:
 
 .. code-block:: cpp
 
    #include <snt/dip/inspect/inspector.h>
 
-   snt::dip::DIP dip;
-   dip.add_string(
-       "physics\n"
-       "  speed float = 2 m/s\n"
-       "    !tags [\"export\", \"runtime\", \"hydro\"]\n"
-       "    ?descr \"Flow speed\"\n"
-   );
-   auto env = dip.parse();
-   snt::dip::TagFilter filter;
-   filter.all = {"export", "runtime"};
-   filter.any = {"hydro", "gravity"};
-   filter.none = {"internal", "deprecated"};
    snt::dip::Inspector view{env};
-   for (const auto& node : view.select("?physics.", filter)) {
-       std::cout << node->path.name << ": " << node->to_string()
-                 << " — " << node->metadata.description << '\n';
-       for (const auto& tag : node->tags)
-           std::cout << "  " << tag << '\n';
-   }
+   snt::dip::TagFilter filter;
+   filter.all = {"export"};
+   for (const auto& node : view.select("?physics.", filter))
+       std::cout << node->path.name << ": " << node->to_string() << "\n";
 
-``all`` requires every listed tag, ``any`` requires at least one, and ``none``
-excludes nodes with any listed tag. The three filters combine with AND; empty
-fields impose no restriction. Tags match explicit assignments without
-parent-tag inheritance.
-
-Keep tags as classification labels. Put structured settings in typed nodes and
-schemas, and descriptive information in metadata; see :ref:`dipl-tag-design`.
-
-``?`` selects all value nodes, ``?physics.`` selects a subtree including its
-value-bearing root and collection members, and ``?physics.speed`` selects an
-exact node. Source-qualified queries such as ``shared?scale`` are also supported.
-Results retain the original paths within the selected environment, in environment
-order, with each matching node returned once. No matches returns an empty list.
-
-Selection does not modify the environment. Each returned node is an independent
-snapshot: changes to it do not affect the environment, and later environment
-changes do not update the snapshot. In Python, the same filters are keyword
-arguments named ``tags_all``, ``tags_any``, and ``tags_none``; see the
-:doc:`Python guide <../../integrations/python>` for examples.
+For query syntax, tag matching, provenance, array and table inspection,
+preview, and dependency graphs, see :doc:`Inspecting environments <inspection>`.
 
 Additional APIs
 ~~~~~~~~~~~~~~~

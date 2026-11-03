@@ -7,7 +7,7 @@ validator, and linter with the :ref:`dip-devtools-example`.
 Formatter
 ---------
 
-``snt format`` formats DIPL source files with the native C++ formatter. It puts
+``snt dip format`` formats DIPL source files with the native C++ formatter. It puts
 one blank line between sibling node blocks, keeps ``?`` metadata and ``!``
 directives with their node, spaces assignments and inline array commas, and
 ends the file with a newline. It preserves values, comments, strings, array
@@ -16,10 +16,10 @@ at two spaces per level by DIPL and is not a style setting.
 
 .. code-block:: bash
 
-   snt format parameters.dip             # print formatted source
-   snt format --check parameters.dip     # exit 1 if formatting is needed
-   snt format --write parameters.dip     # update the file
-   snt format --check a.dip b.dip        # check several files
+   snt dip format parameters.dip             # print formatted source
+   snt dip format --check parameters.dip     # exit 1 if formatting is needed
+   snt dip format --write parameters.dip     # update the file
+   snt dip format --check a.dip b.dip        # check several files
 
 ``--check`` exits 0 when all inputs match and 2 for an error. ``--write``
 accepts several files. The formatter reads source text directly; it does not
@@ -50,7 +50,7 @@ The C++ entry points are ``snt::dip::tools::format(source, options)`` in
 Validator
 ---------
 
-``snt validate`` uses the native C++ DIPL parser and evaluator to check a
+``snt dip validate`` uses the native C++ DIPL parser and evaluator to check a
 source file or a DIPfile project. A file named ``DIPfile`` is recognized as a
 project automatically; ``--project`` also accepts a manifest with another
 filename. Validation reads project dependencies but does not write output
@@ -58,11 +58,11 @@ files.
 
 .. code-block:: bash
 
-   snt validate parameters.dip
-   snt validate DIPfile
-   snt validate --project experiment.manifest
-   snt validate --json parameters.dip
-   snt validate a.dip b.dip
+   snt dip validate parameters.dip
+   snt dip validate DIPfile
+   snt dip validate --project experiment.manifest
+   snt dip validate --json parameters.dip
+   snt dip validate a.dip b.dip
 
 Exit status is 0 for valid input, 1 for invalid DIPL, and 2 for a missing or
 unreadable input or command error. The validator continues across separate
@@ -103,7 +103,7 @@ the same limit through ``ValidationOptions``.
 Linter
 ------
 
-``snt lint`` first validates and evaluates DIPL, then reports advisory issues
+``snt dip lint`` first validates and evaluates DIPL, then reports advisory issues
 with source locations. Invalid input reports validation errors only. The
 default rules warn when an explicitly public value or schema lacks ``?descr``,
 when an evaluated value carries ``?deprecated``, when ``!options`` contains
@@ -120,10 +120,10 @@ reported. Unused schemas can be intentional in a reusable schema library.
 
 .. code-block:: bash
 
-   snt lint parameters.dip
-   snt lint DIPfile
-   snt lint --project experiment.manifest
-   snt lint --json parameters.dip
+   snt dip lint parameters.dip
+   snt dip lint DIPfile
+   snt dip lint --project experiment.manifest
+   snt dip lint --json parameters.dip
 
 Exit status is 0 when clean, 1 for lint findings or invalid DIPL, and 2 for an
 unreadable input or command error. JSON contains ``valid`` for input validity,

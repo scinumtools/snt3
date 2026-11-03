@@ -1,43 +1,16 @@
 Scientific Numerical Tools v3
 =============================
 
-SciNumTools (SNT) is a scientific software framework for defining,
-processing, and exchanging numerical and physical input data. It provides
-a common foundation for values, expressions, physical quantities, units,
-and dimensional input parameters, with the goal of keeping scientific data
-consistent and meaningful throughout an application.
+`SciNumTools v3 <https://github.com/scinumtools/snt3>`_ provides a modular C++
+core for physical quantities and structured scientific parameters. PUEL
+describes quantities and units; DIPL defines typed parameters, constraints,
+and relationships. The same definitions are available through Python, the
+command line, CMake, and service interfaces. DIP can also save evaluated
+configurations and experiment records as DIPH5.
 
-At the core of SNT are two domain-specific languages: PUEL (Physical Units
-Expression Language) for describing physical quantities and unit
-expressions, and DIPL (Dimensional Input Parameter Language) for defining
-structured scientific input parameters. Together, they provide a compact
-and machine-readable way to describe not only values, but also their units,
-types, constraints, relationships, and dependencies.
-
-`SciNumTools v3 <https://github.com/scinumtools/snt3>`_ is built
-around a modular C++ core with Python bindings and
-interfaces for command-line tools, CMake, and REST services. The same
-scientific definitions can therefore be used across different languages,
-applications, and interfaces without duplicating the underlying logic.
-This documentation introduces the concepts, languages, modules, and APIs
-that make up the SciNumTools framework.
-
-DIP environments can be persisted in the DIPH5 HDF5 format for exchange and
-later reuse, or exported as native C++, C, Fortran, Rust, or Julia parameters,
-as well as JSON and YAML data files.
-
-For AI-assisted scientific setup, DIPL provides explicit rules against which
-proposed settings can be checked. A project-specific adapter can validate
-additional requirements, including references to initial-condition files,
-before producing the code's native input. See :doc:`initiative` for this
-approach and its path toward deeper integration. Today, scripts and agents
-can :ref:`discover and describe evaluated parameters and preview candidate
-overrides <cli-semantic-interface>` through versioned CLI JSON. The
-:doc:`inspection and preview workflow <agent-workflow>` shows the full
-review cycle. The native :doc:`MCP integration <integrations/mcp>` lets AI
-clients discover these operations, validate overrides, retain immutable
-candidates, compare them, and retrieve exports and reports. Try the runnable
-Python client in ``examples/dip/UsingMCP``; the MCP server itself is C++.
+Start with the :doc:`quickstart` or :doc:`introduction`. For scientific-code
+integration, see the :doc:`initiative`; for checked parameter changes by
+agents, see the :doc:`agent-workflow` and :doc:`MCP guide <integrations/mcp>`.
 
 The official SNT3 benchmarking project is
 `scinumtools/snt-bench <https://github.com/scinumtools/snt-bench>`_.
@@ -84,6 +57,7 @@ For measured results and the changes behind them, see
    integrations/web
    integrations/cli
    integrations/devtools
+   integrations/hub
    integrations/viewer
    integrations/cmake
    integrations/rest
@@ -95,28 +69,13 @@ For measured results and the changes behind them, see
    :caption: Resources
 
    examples/index
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Performance
-
    performance/optimisation-progress
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Reference
-
    api/index
 
 Previous version
 ----------------
 
-Compared with `SciNumTools v2 <https://github.com/scinumtools/snt2>`_, which was a Python-native framework integrating expression evaluation, physical units, material properties, and validated dimensional input parameters, SciNumTools v3 represents a substantial architectural evolution. The core functionality is being rebuilt in modern C++ as a compiled, modular foundation, removing the dependency on Python for the fundamental parameter and unit-processing pipeline. This makes the framework suitable not only for Python workflows but also for performance-critical applications, HPC environments, and direct integration with C++ and other languages.
-
-The `v3` development also moves beyond simply porting the `v2` functionality. The concepts are being reorganized around a more explicit language and data model, with `PUEL` (Physical Units Expression Language) providing the foundation for unit-aware expressions and `DIPL` (Dimensional Input Parameter Language) providing structured, validated scientific parameters. The project now includes a C++ core, command-line tooling, Python interfaces, CMake integration, documentation, examples, and testing infrastructure, establishing a foundation on which the higher-level functionality of `v2` can be rebuilt in a more general and extensible form.
-
-In short, `v2` established the scientific concepts and Python implementation; `v3` is turning those concepts into a language-independent, compiled scientific infrastructure. This makes `v3` less of a conventional successor package and more of a redesign of the underlying architecture, with the aim of allowing the same scientific parameter definitions and semantics to be used consistently across C++, Python, command-line tools, simulations, and HPC applications.
-
-Documentation for the original Python implementation, `SciNumTools2`, is available here:
-
-* `SciNumTools2 Documentation <https://scinumtools.github.io/snt2/>`_
+SciNumTools v2 established the Python implementation. Version 3 moves its
+scientific concepts into a modular C++ foundation for use across languages and
+applications. The original `SciNumTools2 documentation
+<https://scinumtools.github.io/snt2/>`_ remains available.

@@ -54,10 +54,10 @@ records with an ``id``, public ``name``, and ``kind``. The current kinds are
 DIPH5 persistence
 -----------------
 
-DIPH5 2.1 stores source records in ``/_DIPL_Sources`` and registered-construct
-records in ``/_DIPL_Trace``. The latter preserves trace IDs, names, and kinds;
-it does not recreate custom-unit definitions, schema nodes, or executable host
-functions when an environment is loaded. See :doc:`Environment persistence
+DIPH5 v3 stores exact source bytes in ``/model/sources`` and registration
+records in ``/model/registrations``. The registration records preserve trace
+IDs, names, and kinds; they do not recreate executable host functions when an
+environment is loaded. See :doc:`Environment persistence
 <persistence>` and the `full DIPH5 specification
 <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md>`_
 for the complete on-disk contract.

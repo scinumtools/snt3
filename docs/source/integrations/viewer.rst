@@ -205,10 +205,13 @@ browser object; use **Open source** to switch to a different document.
 Snapshot limits
 ---------------
 
-A ``.diph5`` snapshot stores evaluated values and selected provenance, but
-does not retain complete source text or the live DIPfile manifest. Source
-opening and browsing named source nodes are therefore available only for live
-inputs. Standalone ``.dipt`` opening and scalable access to large numerical
+A DIPH5 v3 archive stores evaluated values, provenance, and complete source
+bytes. The viewer lists the archived sources and opens them in the same editor
+as live project sources. **Check** evaluates a proposed edit against archived
+inputs; **Save** writes a new v3 archive and refreshes the resolved nodes.
+The original project files are not modified. Completed experiment records
+cannot be rewritten through this editor. Named source nodes are still
+browsed through a live project parse. Standalone ``.dipt`` opening and scalable access to large numerical
 datasets are not yet available.
 
 For the C++ inspection functions behind these views, see

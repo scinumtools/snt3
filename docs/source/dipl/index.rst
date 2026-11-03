@@ -180,7 +180,7 @@ definition may also be declared without a value and completed by a later
 compatible modification; compatible units are converted to the definition's
 unit.
 
-The opt-in ``!setup`` directive marks a value for the guided ``snt setup``
+The opt-in ``!setup`` directive marks a value for the guided ``snt dip setup``
 questionnaire. It does not change parsing or evaluation. The command uses the
 DIPL type to choose a prompt, renders ``!options`` with matching ``!labels``,
 and checks each answer immediately through the normal parser. Invalid input is

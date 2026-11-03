@@ -491,10 +491,9 @@ with operands, operators, and groups. Direct references and string templates
 have reads without an EXS tree. Units stay on inspected values; their internal
 expressions are not expanded into this graph.
 
-Graph data persists in DIPH5 2.7 snapshots when it was recorded. Loading a
-snapshot uses the saved graph state regardless of the recording option passed
-to ``open_artifact`` or ``reload_artifact``. Older snapshots have no recorded
-graph. Function callbacks contribute links only for DIP values requested
+Graph data persists in DIPH5 v3 archives when it was recorded. Loading an
+archive uses the saved graph state regardless of the recording option passed
+to ``open_artifact`` or ``reload_artifact``. Function callbacks contribute links only for DIP values requested
 through the environment. A read means "read during evaluation," not
 "necessary for the final result."
 

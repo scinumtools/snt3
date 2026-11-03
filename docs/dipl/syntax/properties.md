@@ -91,7 +91,7 @@ energy float = 25 erg
 
 **Used by:** ``int``, ``float``, ``str``, ``bool``
 
-The valueless ``!setup`` directive marks a value for guided input by ``snt setup``.
+The valueless ``!setup`` directive marks a value for guided input by ``snt dip setup``.
 The command infers a yes/no prompt for booleans, a choice list from ``!options``
 (displaying ``!labels`` when supplied), text input for strings, and a DIPL value
 expression for numeric and array values. Existing values are offered as defaults.

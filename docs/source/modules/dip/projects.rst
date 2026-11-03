@@ -10,7 +10,7 @@ file with the standard DIP parser.
 Start a project
 ---------------
 
-Run ``snt init`` in an empty directory to create a ``DIPfile`` that loads
+Run ``snt dip init`` in an empty directory to create a ``DIPfile`` that loads
 ``main.dip``. Replace the example parameter in ``main.dip`` with your own. The command refuses
 to overwrite either file if it already exists.
 
@@ -18,7 +18,7 @@ to overwrite either file if it already exists.
 
    $ mkdir my-project
    $ cd my-project
-   $ snt init
+   $ snt dip init
    $ snt dip parse --project DIPfile --print
 
 Project format
