@@ -108,7 +108,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install numpy pytest pytest-cmake pytest-benchmark
+          pip install numpy h5py pytest pytest-cmake pytest-benchmark
           #pip install ".[test]"
           
       - name: Linux dependencies
@@ -172,6 +172,8 @@ jobs:
 
       - name: Test (Linux/macOS)
         if: runner.os != 'Windows'
+        env:
+          SNT_REQUIRE_H5PY: "1"
         run: ./setup.sh -t
 
       - name: Test native MCP over HTTP (Linux/macOS)
@@ -183,6 +185,8 @@ jobs:
 
       - name: Test (Windows)
         if: runner.os == 'Windows'
+        env:
+          SNT_REQUIRE_H5PY: "1"
         shell: bash
         run: ./setup.sh -t
 
