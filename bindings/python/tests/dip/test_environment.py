@@ -39,6 +39,19 @@ def test_load(env, tmp_path):
     assert len(loaded["samples"].elements()) == 2
 
 
+def test_add_file_rejects_dipfile_and_points_to_add_project(tmp_path):
+    manifest = tmp_path / "DIPfile"
+    manifest.write_text('code[]\n  file = "main.dip"\n')
+    (tmp_path / "main.dip").write_text('answer int = 42\n')
+
+    parser = DIP()
+    with pytest.raises(RuntimeError, match=r"add_project\(\) instead"):
+        parser.add_file(manifest)
+    parser.add_project(manifest)
+    environment = parser.parse()
+    assert environment["answer"].value == 42
+
+
 def test_save(env, tmp_path):
     file = tmp_path / "environment.diph5"
 

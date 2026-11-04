@@ -42,6 +42,10 @@ namespace snt::dip {
 
     class DIP {
       private:
+        friend Environment parse_project_manifest(
+            const std::filesystem::path& project_file, ProjectFileReader reader, std::string source_name
+        );
+
         static int num_instances; ///< counter of DIP class instances
         int instance_number;      ///< instance number of the current class object
         Environment env;          ///< node environment object
@@ -155,7 +159,7 @@ namespace snt::dip {
         void add_override_file(const std::filesystem::path& source_file);
 
         /**
-         * Add DIPL code from a file
+         * Add DIPL code from a file. Use add_project() for a DIPfile manifest.
          * @param source_file File name of a DIPL code file
          * @param source_name Specific source name of the nodes
          * @param absolute

@@ -190,7 +190,11 @@ lint : snt_project_lint
         if (reader)
             manifest.set_project_file_reader(std::move(reader));
         manifest.add_string(std::string(project_preamble));
-        manifest.add_file(std::filesystem::absolute(project_file), std::move(source_name), true);
+        // The manifest gets a backstage pass: its schema is already in place here.
+        manifest.add_file_input(
+            std::filesystem::absolute(project_file), std::move(source_name), true,
+            {manifest.source.name, manifest.source.line_number}
+        );
         Environment project = manifest.parse();
         validate_project_manifest(project);
         const int max_syntax_errors = project["validate.max_syntax_errors"].as<int>();
@@ -228,7 +232,16 @@ lint : snt_project_lint
     }
 
     void DIP::add_file(const std::filesystem::path& source_file, std::string source_name, bool absolute) {
-
+        // A DIPfile is the guest list, not another guest in the code queue.
+        if (source_file.filename() == "DIPfile")
+            throw dip::ParserException(
+                "DIPfile passed as code input",
+                "The file `" + source_file.string() +
+                    "` is a project manifest. add_file() registers only one DIPL source and does not load its "
+                    "schemas, units, sources, or overrides.",
+                "Use add_project() instead. In the CLI, use `snt dip parse --project DIPfile`.",
+                __FILE__, __LINE__
+            );
         add_file_input(source_file, std::move(source_name), absolute, {source.name, source.line_number});
     }
 

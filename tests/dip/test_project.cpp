@@ -52,6 +52,28 @@ TEST(Project, InitializeCreatesParseableStarterProject) {
     EXPECT_EQ(parser.parse()["example"].as<int>(), 1);
 }
 
+TEST(Project, AddFileRejectsProjectManifestWithActionableError) {
+    ProjectDirectory project("add-file-manifest");
+    project.write(
+        "DIPfile",
+        "schemas[]\n  name = \"settings_schema\"\n  file = \"schema.dip\"\n"
+        "code[]\n  file = \"main.dip\"\n"
+    );
+    project.write("schema.dip", "value int = 7\n");
+    project.write("main.dip", "settings : settings_schema\n");
+
+    dip::DIP parser;
+    try {
+        parser.add_file(project.path() / "DIPfile");
+        FAIL() << "Expected a DIPfile usage error";
+    } catch (const dip::ParserException& error) {
+        EXPECT_EQ(error.info().message, "DIPfile passed as code input");
+        EXPECT_NE(error.info().suggestion.find("add_project()"), std::string::npos);
+    }
+    parser.add_project(project.path() / "DIPfile");
+    EXPECT_EQ(parser.parse()["settings.value"].as<int>(), 7);
+}
+
 TEST(Project, InitializePreservesExistingProjectFiles) {
     ProjectDirectory project("initialize-existing");
     project.write("main.dip", "existing int = 7\n");

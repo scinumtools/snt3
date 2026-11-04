@@ -100,7 +100,7 @@ Args:
             py::arg("source_file"),
             py::arg("source_name") = "",
             py::arg("absolute") = true,
-            R"doc(Add a DIPL source file to the parser.
+            R"doc(Add a DIPL source file to the parser. Use add_project() for a DIPfile manifest.
 
 Args:
     source_file: Path to the DIPL file.

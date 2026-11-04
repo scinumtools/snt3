@@ -46,6 +46,10 @@ def test_diph5_save_load_and_arguments(cli, tmp_path):
     (project / "parameters.dip").write_text("answer int = 42\n")
     (project / "DIPfile").write_text('code[]\n  file = "parameters.dip"\n')
     manifest = project / "DIPfile"
+    wrong_input = cli("dip", "parse", "--input", "file", manifest, "--print")
+    assert wrong_input.returncode != 0
+    assert b"add_project() instead" in wrong_input.stderr
+    assert b"--project DIPfile" in wrong_input.stderr
     parse("--project", manifest, "--request", "answer", "--value", "--type", "integer", output=b"42\n")
     snapshot = project / "project.diph5"
     parse("--project", manifest, "--record-graph", "--save", snapshot)
