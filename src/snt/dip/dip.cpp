@@ -9,6 +9,7 @@
 #include <set>
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
+#include <snt/dip/artifact.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_case.h>
 #include <snt/dip/nodes/node_property.h>
@@ -209,6 +210,12 @@ lint : snt_project_lint
     }
 
     int DIP::num_instances = 0;
+
+    Environment DIP::load(
+        const std::filesystem::path& path, bool record_dependency_graph, bool retain_block_inputs
+    ) {
+        return open_artifact(path, record_dependency_graph, retain_block_inputs);
+    }
 
     DIP::DIP() : DIP(Source{"DIP" + std::to_string(num_instances), 0}) {}
 

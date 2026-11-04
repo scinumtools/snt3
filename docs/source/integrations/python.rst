@@ -46,6 +46,13 @@ Add the file to a parser, then evaluate it into an environment:
    dip.add_file(Path("parameters.dip"))
    env = dip.parse()
 
+For one existing artifact, ``DIP.load`` is the shorter form. It accepts a
+``.dip`` or ``.dipl`` source, a ``DIPfile`` project, or a ``.diph5`` snapshot:
+
+.. code-block:: python
+
+   env = DIP.load("parameters.dip")
+
 For a DIPfile project, ``add_project`` registers its files, sources, and units
 from the manifest:
 
@@ -54,6 +61,8 @@ from the manifest:
    dip = DIP()
    dip.add_project("DIPfile")
    env = dip.parse()
+
+The same one-line form loads the complete project: ``env = DIP.load("DIPfile")``.
 
 See :doc:`DIPfile projects <../modules/dip/projects>` for the manifest format.
 

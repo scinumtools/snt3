@@ -55,6 +55,16 @@ instead of registering its units, sources, and code inputs individually:
    dip.add_project("DIPfile");
    snt::dip::Environment env = dip.parse();
 
+For a single existing artifact, ``DIP::load`` chooses the appropriate loader
+from its filename. It accepts ``.dip``, ``.dipl``, ``DIPfile``, and ``.diph5``:
+
+.. code-block:: cpp
+
+   auto env = snt::dip::DIP::load("DIPfile");
+
+Use the explicit parser above when combining inputs or registering custom
+units, schemas, and overrides before evaluation.
+
 Environment
 -----------
 

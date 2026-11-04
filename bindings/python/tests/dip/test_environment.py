@@ -52,6 +52,28 @@ def test_add_file_rejects_dipfile_and_points_to_add_project(tmp_path):
     assert environment["answer"].value == 42
 
 
+def test_dip_static_load_accepts_source_project_and_snapshot(tmp_path):
+    dip_source = tmp_path / "model.dip"
+    dipl_source = tmp_path / "other.dipl"
+    manifest = tmp_path / "DIPfile"
+    snapshot = tmp_path / "result.diph5"
+    dip_source.write_text("answer int = 42\n")
+    dipl_source.write_text("other int = 7\n")
+    manifest.write_text('code[]\n  file = "model.dip"\n')
+
+    dip_env = DIP.load(dip_source)
+    assert dip_env["answer"].value == 42
+    dipl_env = DIP.load(dipl_source)
+    assert dipl_env["other"].value == 7
+    project_env = DIP.load(manifest)
+    assert project_env["answer"].value == 42
+    project_env.save(snapshot)
+    restored = DIP.load(snapshot)
+    assert restored["answer"].value == 42
+    with pytest.raises(ValueError, match="Unknown DIP artifact"):
+        DIP.load(tmp_path / "unsupported.txt")
+
+
 def test_save(env, tmp_path):
     file = tmp_path / "environment.diph5"
 

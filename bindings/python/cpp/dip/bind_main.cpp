@@ -48,6 +48,23 @@ namespace snt::bind::python {
 
         auto dip = py::class_<dip::DIP>(m, "DIP", "Parser and evaluator for DIPL source definitions.");
         dip.def(py::init<>(), "Create an empty DIPL parser.");
+        dip.def_static(
+            "load",
+            &dip::DIP::load,
+            py::arg("path"),
+            py::arg("record_dependency_graph") = false,
+            py::arg("retain_block_inputs") = false,
+            R"doc(Load a .dip/.dipl source, DIPfile project, or .diph5 snapshot in one call.
+
+Args:
+    path: Input artifact to load.
+    record_dependency_graph: Record dependencies while parsing source input.
+    retain_block_inputs: Keep parsed string blocks for a live source input.
+
+Returns:
+    An evaluated or restored Environment.
+)doc"
+        );
         dip.def(
             "add_string",
             py::overload_cast<const std::string&>(&dip::DIP::add_string),

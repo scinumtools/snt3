@@ -74,6 +74,23 @@ TEST(Project, AddFileRejectsProjectManifestWithActionableError) {
     EXPECT_EQ(parser.parse()["settings.value"].as<int>(), 7);
 }
 
+TEST(Project, StaticLoadAcceptsSourceProjectAndSnapshot) {
+    ProjectDirectory project("static-artifact-load");
+    project.write("model.dip", "answer int = 42\n");
+    project.write("model.dipl", "other int = 7\n");
+    project.write("DIPfile", "code[]\n  file = \"model.dip\"\n");
+
+    EXPECT_EQ(dip::DIP::load(project.path() / "model.dip")["answer"].as<int>(), 42);
+    EXPECT_EQ(dip::DIP::load(project.path() / "model.dipl")["other"].as<int>(), 7);
+    const auto environment = dip::DIP::load(project.path() / "DIPfile");
+    EXPECT_EQ(environment["answer"].as<int>(), 42);
+    environment.save(project.path() / "result.diph5");
+    const auto restored = dip::DIP::load(project.path() / "result.diph5");
+    EXPECT_TRUE(restored.is_loaded_snapshot());
+    EXPECT_EQ(restored["answer"].as<int>(), 42);
+    EXPECT_THROW(dip::DIP::load(project.path() / "unsupported.txt"), std::invalid_argument);
+}
+
 TEST(Project, InitializePreservesExistingProjectFiles) {
     ProjectDirectory project("initialize-existing");
     project.write("main.dip", "existing int = 7\n");

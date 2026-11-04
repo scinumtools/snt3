@@ -114,6 +114,25 @@ namespace snt::dip {
 
       public:
         /**
+         * Load one DIPL file, DIPfile project, or DIPH5 snapshot into a new environment.
+         *
+         * The filename selects the input kind: .dip/.dipl are parsed as source,
+         * DIPfile loads its project registrations, and .diph5 restores a snapshot.
+         * The optional flags apply to source and project parsing; snapshots keep
+         * the graph state saved in the file.
+         *
+         * @param path Path to the input artifact.
+         * @param record_dependency_graph Record evaluation dependencies when parsing source.
+         * @param retain_block_inputs Retain parsed string blocks in a live environment.
+         * @return The evaluated or restored environment.
+         */
+        static Environment load(
+            const std::filesystem::path& path,
+            bool record_dependency_graph = false,
+            bool retain_block_inputs = false
+        );
+
+        /**
          * * Empty class constructor
          */
         DIP();
