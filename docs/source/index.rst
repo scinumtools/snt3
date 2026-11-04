@@ -4,9 +4,9 @@ Scientific Numerical Tools v3
 `SciNumTools v3 <https://github.com/scinumtools/snt3>`_ provides a modular C++
 core for physical quantities and structured scientific parameters. PUEL
 describes quantities and units; DIPL defines typed parameters, constraints,
-and relationships. The same definitions are available through Python, the
-command line, CMake, and service interfaces. DIP can also save evaluated
-configurations and experiment records as DIPH5.
+and relationships. DIPH5 preserves an evaluated configuration as a scientific
+contract and can record its execution and results. These concepts are available
+through Python, the command line, CMake, and service interfaces.
 
 Start with the :doc:`quickstart` or :doc:`introduction`. For scientific-code
 integration, see the :doc:`initiative`; for checked parameter changes by
@@ -34,6 +34,7 @@ For measured results and the changes behind them, see
    
    puel/index
    dipl/index
+   diph5/index
 
 .. toctree::
    :maxdepth: 2

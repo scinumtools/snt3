@@ -26,7 +26,8 @@ int module_completion(int argc, char* argv[]) {
     // Keep this command metadata in sync with the native CLI dispatcher.
     std::map<std::string, std::string> candidates{
         {"", "dip puq report dmap server view hub mcp completion --help --version"},
-        {"dip", "init format validate lint setup parse compare describe schemas sources override-contract list entries records preview package experiment --help --version --input --project --load --save --record-graph --generate --request --print --value --type --path --query --tag-all --tag-any --tag-none --limit --max-value-elements --override --override-file --max-details --format"},
+        {"dip", "init docs format validate lint setup parse compare describe schemas sources override-contract list entries records preview package experiment --help --version --input --project --load --save --record-graph --generate --request --print --value --type --path --query --tag-all --tag-any --tag-none --limit --max-value-elements --override --override-file --max-details --format"},
+        {"dip docs", "--help --list"},
         {"dip parse", "--help --input --project --load --save --record-graph --generate --request --print --value --type"},
         {"dip compare", "--help --scope --max-details --max-array-examples"},
         {"dip describe", "--help --project --input --path --format --record-graph --max-value-elements"},

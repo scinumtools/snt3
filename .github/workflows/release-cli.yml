@@ -82,6 +82,7 @@ jobs:
               ninja-build \
               libhdf5-dev \
               libcurl4-openssl-dev \
+              libssl-dev \
               libaec-dev \
               zlib1g-dev \
               libwayland-dev \
@@ -90,6 +91,34 @@ jobs:
               libegl1-mesa-dev \
               xorg-dev \
               xvfb xauth libgl1-mesa-dri gdb
+
+      - name: Build unversioned libcurl for Linux linking
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Only use this library at link time. The release still uses the host's libcurl.so.4.
+          curl_version=7.81.0
+          curl_sha256=a067b688d1645183febc31309ec1f3cdce9213d02136b6a6de3d50f69c95a7d3
+          curl_archive="$RUNNER_TEMP/curl-$curl_version.tar.xz"
+          curl_prefix="$RUNNER_TEMP/curl-unversioned"
+          curl -fsSLo "$curl_archive" "https://curl.se/download/curl-$curl_version.tar.xz"
+          printf '%s  %s\n' "$curl_sha256" "$curl_archive" | sha256sum --check
+          tar -C "$RUNNER_TEMP" -xf "$curl_archive"
+          mkdir "$RUNNER_TEMP/curl-build"
+          cd "$RUNNER_TEMP/curl-build"
+          "$RUNNER_TEMP/curl-$curl_version/configure" \
+            --prefix="$curl_prefix" \
+            --libdir="$curl_prefix/lib" \
+            --with-openssl \
+            --disable-static \
+            --disable-versioned-symbols
+          make -j4
+          make install
+          if readelf -V "$curl_prefix/lib/libcurl.so.4" | grep 'CURL_' >/dev/null; then
+            echo 'Link-time libcurl unexpectedly has versioned symbols' >&2
+            exit 1
+          fi
+          echo "SNT_UNVERSIONED_CURL_PREFIX=$curl_prefix" >> "$GITHUB_ENV"
       
       - name: Install macOS dependencies
         if: runner.os == 'macOS'
@@ -116,6 +145,14 @@ jobs:
               -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
               -DVCPKG_TARGET_TRIPLET=x64-windows-static
               -DHDF5_ROOT=C:/vcpkg/installed/x64-windows-static
+            )
+          fi
+          if [ "${{ runner.os }}" = Linux ]; then
+            extra+=(
+              -DCURL_NO_CURL_CMAKE=ON
+              "-DCURL_LIBRARY=$SNT_UNVERSIONED_CURL_PREFIX/lib/libcurl.so"
+              "-DCURL_INCLUDE_DIR=$SNT_UNVERSIONED_CURL_PREFIX/include"
+              -DCMAKE_SKIP_BUILD_RPATH=ON
             )
           fi
           cmake -S . -B build-release -G Ninja \
@@ -146,9 +183,39 @@ jobs:
           executable=build-release/bin/snt
           if [ "${{ runner.os }}" = Windows ]; then executable="$executable.exe"; fi
           test -f "$executable"
+          if [ "${{ runner.os }}" = Linux ]; then
+            if readelf -V "$executable" | grep 'CURL_' >/dev/null; then
+              echo 'Linux CLI must not require versioned libcurl symbols' >&2
+              exit 1
+            fi
+            if readelf -d "$executable" | grep -Eq '\((RPATH|RUNPATH)\)'; then
+              echo 'Linux CLI must load system libraries at runtime' >&2
+              exit 1
+            fi
+            ldd "$executable" | grep -E 'libcurl\.so\.4 => /(lib|usr/lib)'
+          fi
           test "$("$executable" --version)" = "${RELEASE_TAG#v}"
           "$executable" puq convert '35*eV' J
           "$executable" view --help | grep -F 'Module: Parameter viewer'
+
+      - name: Verify Linux CLI on openSUSE Leap 16.0
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          docker run --rm \
+            -e RELEASE_TAG \
+            -v "$PWD/build-release/bin/snt:/tmp/snt:ro" \
+            registry.opensuse.org/opensuse/leap:16.0 \
+            sh -euc '
+              zypper --non-interactive --gpg-auto-import-keys install libcurl4 libsz2 Mesa-libGL1
+              test "$(/tmp/snt --version 2>/tmp/snt-version.err)" = "${RELEASE_TAG#v}"
+              test ! -s /tmp/snt-version.err
+              printf '\''{"schema_version":1,"hub_repository":"https://example.invalid/hub.git","hub_revision":"%040d","projects":[]}'\'' 0 > /tmp/catalog.json
+              SNT_HUB_LOCAL_FIXTURE=1 SNT_HUB_CATALOG_URL=file:///tmp/catalog.json \
+                /tmp/snt hub list > /tmp/snt-hub.out 2> /tmp/snt-hub.err
+              grep -F "ID  Project  Revision" /tmp/snt-hub.out
+              test ! -s /tmp/snt-hub.err
+            '
 
       - name: Package Linux and macOS CLI
         if: runner.os != 'Windows'

@@ -1438,9 +1438,9 @@ TEST(Environment, SaveHdf5Content) {
         ASSERT_GE(static_cast<hid_t>(archive), 0);
         EXPECT_GT(H5Aexists(archive, "_DIPH5_Format"), 0);
         EXPECT_EQ(H5Aexists(archive, "_DIPL_Format"), 0);
-        H5Handle major(H5Aopen(archive, "_DIPH5_Schema_Major", H5P_DEFAULT), H5Aclose);
+        H5Handle major_attribute(H5Aopen(archive, "_DIPH5_Schema_Major", H5P_DEFAULT), H5Aclose);
         uint32_t version = 0;
-        ASSERT_GE(H5Aread(major, H5T_NATIVE_UINT32, &version), 0);
+        ASSERT_GE(H5Aread(major_attribute, H5T_NATIVE_UINT32, &version), 0);
         EXPECT_EQ(version, 3);
         EXPECT_GT(H5Lexists(archive, "/model/sources/000000/content", H5P_DEFAULT), 0);
         EXPECT_GT(H5Lexists(archive, "/configuration/resolved/simulation/steps", H5P_DEFAULT), 0);

@@ -6,6 +6,23 @@ if(NOT ENABLE_SNT_REPORT)
   list(FILTER EXEC_FILES EXCLUDE REGEX "/module_report\\.cpp$")
 endif()
 add_executable(${EXEC_NAME} ${EXEC_FILES} )
+
+# Generate CLI documentation from the same Markdown chapters used for the DIPL PDF.
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+file(GLOB_RECURSE SNT_DIPL_DOC_FILES CONFIGURE_DEPENDS
+  "${PROJECT_SOURCE_DIR}/docs/dipl/*.md"
+  "${PROJECT_SOURCE_DIR}/docs/dipl/*.ebnf")
+set(SNT_DIPL_DOC_HEADER "${CMAKE_CURRENT_BINARY_DIR}/dip_docs_generated.inc")
+add_custom_command(
+  OUTPUT "${SNT_DIPL_DOC_HEADER}"
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/generate_dip_docs.py"
+    --root "${PROJECT_SOURCE_DIR}" --output "${SNT_DIPL_DOC_HEADER}"
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/generate_dip_docs.py"
+    "${PROJECT_SOURCE_DIR}/docs/dipl/pandoc.yaml" ${SNT_DIPL_DOC_FILES}
+  VERBATIM)
+target_sources(${EXEC_NAME} PRIVATE "${SNT_DIPL_DOC_HEADER}")
+target_include_directories(${EXEC_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
 add_subdirectory(../snt-hub ${CMAKE_CURRENT_BINARY_DIR}/hub)
 if(ENABLE_SNT_MCP)
   target_compile_definitions(snt PRIVATE ENABLE_SNT_MCP)
@@ -56,6 +73,9 @@ install(EXPORT SNTExecutables
 
 if(ENABLE_UNIT_TESTS)
   find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  add_test(NAME cli.docs
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/docs.py"
+      "$<TARGET_FILE:snt>" "${PROJECT_SOURCE_DIR}")
   set(GENERATED_PARAMETERS_DIR "${CMAKE_CURRENT_BINARY_DIR}/tests/generated-parameters")
   set(GENERATED_CPP_HEADER "${GENERATED_PARAMETERS_DIR}/parameters.hpp")
   set(GENERATED_C_HEADER "${GENERATED_PARAMETERS_DIR}/parameters.h")

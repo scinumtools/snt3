@@ -23,6 +23,7 @@ Module: Dimensional Input Parameters (DIP)
 
 Usage:
   snt dip init
+  snt dip docs [--list | CHAPTER [--list] | CHAPTER#HEADING]
   snt dip format [--check | --write] <file> [<file> ...]
   snt dip validate [--project] [--json] <file> [<file> ...]
   snt dip lint [--project] [--json] <file> [<file> ...]
@@ -45,6 +46,7 @@ Description:
 
 Commands:
   init               Initialize a DIP project in the current directory.
+  docs               Read the embedded DIPL specification and syntax chapters.
   format             Format DIPL source files.
   validate           Validate DIPL files and DIPfile projects.
   lint               Check evaluated DIPL for advisory issues.
@@ -100,6 +102,8 @@ Options:
 
 Examples:
   snt dip parse -i file parameters.dip --print
+
+  snt dip docs expressions#templates
 
   snt dip parse --project DIPfile --print
 

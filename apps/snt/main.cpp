@@ -3,6 +3,7 @@
 #include "argparser.h"
 #include "help.h"
 
+#include <algorithm>
 #include <deque>
 #include <iomanip>
 #include <iostream>
@@ -10,6 +11,7 @@
 #include <map>
 #include <sstream>
 #include <stdexcept>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -38,11 +40,15 @@ Options:
       Show version information.
 
 Modules:
-  Command     Built  Description
 )";
-    const auto module = [&output](const char* name, bool built, const char* description) {
-        output << "  " << std::left << std::setw(12) << name << (built ? "+      " : "-      ")
-               << description << '\n';
+    struct ModuleRow {
+        const char* name;
+        bool built;
+        const char* description;
+    };
+    std::vector<ModuleRow> modules;
+    const auto module = [&modules](const char* name, bool built, const char* description) {
+        modules.push_back({name, built, description});
     };
     module("puq", true, "Physical Units & Quantities");
     module("dip", true, "Dimensional Input Parameters");
@@ -73,6 +79,21 @@ Modules:
     module("mcp", false, "Expose DIPL and PUQ tools through Model Context Protocol");
 #endif
     module("completion", true, "Generate Bash and Zsh completion scripts");
+    constexpr std::string_view command_header = "Command";
+    constexpr std::string_view built_header = "Built";
+    constexpr std::string_view description_header = "Description";
+    std::size_t command_width = command_header.size();
+    for (const auto& item : modules)
+        command_width = (std::max)(command_width, std::string_view(item.name).size());
+    const auto row = [&](std::string_view name, std::string_view built, std::string_view description) {
+        output << "  " << std::left << std::setw(static_cast<int>(command_width)) << name << "  "
+               << std::setw(static_cast<int>(built_header.size())) << built << "  " << description << '\n';
+    };
+    row(command_header, built_header, description_header);
+    row(std::string(command_width, '-'), std::string(built_header.size(), '-'),
+        std::string(description_header.size(), '-'));
+    for (const auto& item : modules)
+        row(item.name, item.built ? "+" : "-", item.description);
     output << R"(
 Notes:
   + included in this build; - unavailable in this build.
@@ -85,6 +106,9 @@ static int run_main(int argc, char* argv[]) {
 
     if (argc > 1 && std::string(argv[1]) == "completion")
         return module_completion(argc - 1, argv + 1);
+
+    if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "docs")
+        return module_dip_docs(argc - 2, argv + 2);
 
     if (argc > 2 && std::string(argv[1]) == "dip" && std::string(argv[2]) == "format") {
         try {

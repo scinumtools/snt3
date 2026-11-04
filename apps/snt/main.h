@@ -50,6 +50,8 @@ int module_lint(int argc, char* argv[]);
  * Print the generated Bash or Zsh shell completion script.
  */
 int module_completion(int argc, char* argv[]);
+/** Print DIPL chapters and headings embedded from docs/dipl at build time. */
+int module_dip_docs(int argc, char* argv[]);
 
 /**
  * Execute a DIP parse command using parsed CLI arguments.
