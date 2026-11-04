@@ -5,6 +5,7 @@ number-sections: true
 resource-path: [docs/diph5]
 
 variables:
+  monofont: DejaVuSansMono.ttf
   geometry:
     - a4paper
     - margin=20mm

@@ -10,7 +10,7 @@ DIPH5 v3 stores exact DIPL source bytes, ordered overrides, the resolved
 configuration, and optional experiment execution and results. Its root carries
 ``_DIPH5_Format`` and ``_DIPH5_Schema_Major=3``. SNT3 0.10.0 reads and writes
 only v3 archives. DIPH5 v2 and lower are legacy, unsupported formats. The
-`historical v2.11 specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification-v2.11.md>`_
+`historical v2.11 appendix <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md#appendix-legacy-diph5-specification>`_
 remains available for interpretation or migration with an older reader.
 
 The recommended filename extension is ``.diph5``; the root attributes identify
@@ -146,5 +146,21 @@ The resolved-node encoding inside ``/configuration/resolved`` follows the
 v2.11 node mapping. This internal encoding does not make v2 files readable by
 the 0.10.0 runtime.
 
-* `DIPH5 v3 specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md>`_
-* `Historical DIPH5 v2.11 specification <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification-v2.11.md>`_
+Specification
+-------------
+
+The PDF contains the canonical v3 specification and the historical v2.11
+appendix. You can `open the PDF separately <../../_static/diph5-specification.pdf>`_
+or read it below.
+
+* `DIPH5 specification source <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md>`_
+* `Historical v2.11 appendix <https://github.com/scinumtools/snt3/blob/main/docs/diph5/specification.md#appendix-legacy-diph5-specification>`_
+
+.. raw:: html
+
+   <iframe
+       src="../../_static/diph5-specification.pdf"
+       width="100%"
+       height="800px"
+       style="border: none;">
+   </iframe>

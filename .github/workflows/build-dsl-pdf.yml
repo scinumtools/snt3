@@ -21,6 +21,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             pandoc \
+            fonts-dejavu-core \
             texlive-xetex \
             texlive-latex-extra \
             texlive-fonts-recommended

@@ -359,7 +359,8 @@ destination is not written.
 ``--record-graph`` records evaluation dependencies while parsing DIPL input;
 the graph is stored by ``--save``. It cannot be used with ``--load``.
 SNT3 0.10.0 reads and writes only DIPH5 v3. The older v2.11 specification
-remains available for migration with a pre-0.10.0 release.
+is preserved as an appendix to the current specification for migration with a
+pre-0.10.0 release.
 
 To inspect many values without evaluating the original DIPL project for each
 query, save one evaluated snapshot and list from it:

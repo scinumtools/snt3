@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from scinumtools3.dip import DIP, Environment
@@ -170,13 +172,13 @@ def test_override_file_errors_and_provenance(tmp_path):
     parser.add_string('value int = 1')
     env = parser.parse()
     assert env['value'].value == 4
-    assert str(env['value'].provenance.override_source.path) == str(file)
+    assert Path(env['value'].provenance.override_source.path) == file
     # Loading an evaluated snapshot must still identify the originating override file.
     snapshot = tmp_path / 'snapshot.diph5'
     env.save(snapshot)
     loaded = Environment()
     loaded.load(snapshot)
-    assert str(loaded['value'].provenance.override_source.path) == str(file)
+    assert Path(loaded['value'].provenance.override_source.path) == file
 
 
 def test_empty_override_inputs_are_noops(tmp_path):
