@@ -31,8 +31,9 @@ def test_independent_candidate_configuration_vector(cli, tmp_path):
         assert (status.decode() if isinstance(status, bytes) else status) == "pass"
         assert (digest.decode() if isinstance(digest, bytes) else digest) == independent_configuration_digest(archive)
     rich = tmp_path / "rich.diph5"
-    checked(cli("dip", "parse", "-i", "string",
-                'a int8[2] = [-128, 127]\nb float32 = -0.0\nc str = "μ"\n', "--save", rich))
+    rich_source = 'a int8[2] = [-128, 127]\nb float32 = -0.0\nc str = "μ"\n'
+    checked(cli("dip", "parse", "-i", "string", rich_source, "--save", rich))
+    assert read_archive(rich)["sources"] == [rich_source.encode("utf-8")]
     expected = "a6fbef7eca599dacb5ae4aa9bb59269a2c1ed146fe409da84238573743d7bbff"
     assert independent_configuration_digest(rich) == expected
     tree = tmp_path / "tree.diph5"

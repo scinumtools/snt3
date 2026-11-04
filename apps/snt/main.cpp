@@ -10,6 +10,15 @@
 #include <map>
 #include <sstream>
 #include <stdexcept>
+#include <utility>
+#include <vector>
+
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 
 std::string help() {
     std::ostringstream output;
@@ -72,7 +81,7 @@ Run 'snt <module> --help' for module-specific commands.
     return snt::cli::format_help(output.str());
 }
 
-int main(int argc, char* argv[]) {
+static int run_main(int argc, char* argv[]) {
 
     if (argc > 1 && std::string(argv[1]) == "completion")
         return module_completion(argc - 1, argv + 1);
@@ -227,4 +236,38 @@ int main(int argc, char* argv[]) {
         std::cerr << e.what() << '\n';
         return 1;
     }
+    return 0;
 }
+
+#ifdef _WIN32
+int wmain(int argc, wchar_t* wide_argv[]) {
+    std::vector<std::string> arguments;
+    arguments.reserve(static_cast<std::size_t>(argc));
+    for (int index = 0; index < argc; ++index) {
+        // Keep DIPL text as UTF-8 before the Windows code page can touch it.
+        const int size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wide_argv[index], -1,
+                                            nullptr, 0, nullptr, nullptr);
+        if (size == 0) {
+            std::cerr << "Unable to decode a command-line argument as UTF-8.\n";
+            return 2;
+        }
+        std::string value(static_cast<std::size_t>(size), '\0');
+        if (WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wide_argv[index], -1,
+                                value.data(), size, nullptr, nullptr) == 0) {
+            std::cerr << "Unable to decode a command-line argument as UTF-8.\n";
+            return 2;
+        }
+        value.resize(static_cast<std::size_t>(size - 1));
+        arguments.push_back(std::move(value));
+    }
+    std::vector<char*> argv;
+    argv.reserve(arguments.size());
+    for (auto& argument : arguments)
+        argv.push_back(argument.data());
+    return run_main(argc, argv.data());
+}
+#else
+int main(int argc, char* argv[]) {
+    return run_main(argc, argv);
+}
+#endif
