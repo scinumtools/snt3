@@ -2,7 +2,6 @@
 """Embed the existing DIPL specification chapters in the snt executable."""
 
 import argparse
-import hashlib
 import json
 import re
 from pathlib import Path
@@ -16,11 +15,12 @@ def quoted(value):
     return json.dumps(value, ensure_ascii=False)
 
 
-def raw(value):
-    marker = "D" + hashlib.sha256(value.encode("utf-8")).hexdigest()[:12]
-    while ")" + marker + '"' in value:
-        marker = "D" + hashlib.sha256(marker.encode()).hexdigest()[:12]
-    return f'R"{marker}({value}){marker}"'
+def byte_array(value):
+    data = value.encode("utf-8") + b"\0"
+    lines = []
+    for offset in range(0, len(data), 20):
+        lines.append("    " + ", ".join(f"0x{byte:02x}" for byte in data[offset:offset + 20]) + ",\n")
+    return "{\n" + "".join(lines) + "}"
 
 
 def chapters(manifest, root):
@@ -97,10 +97,10 @@ def generate(manifest, root):
         found = headings(content)
         if not found:
             raise ValueError(f"No Markdown heading in {source}")
-        # Keep each chapter in its own object. MSVC rejects the large combined
-        # initializer when every chapter's text lives directly inside kDocs.
+        # These are bytes rather than C++ string literals. MSVC rejects the
+        # longer chapters as oversized literals, even when kept separate.
         name = f"kDocText{index}"
-        lines.append(f"static const char {name}[] = {raw(content)};\n")
+        lines.append(f"static const unsigned char {name}[] = {byte_array(content)};\n")
         entries.append(f"    {{{quoted(key)}, {quoted(found[0][1])}, {quoted(source)}, {name}}},\n")
         all_headings.extend((key, *heading) for heading in found)
     lines.append("\nstatic const Doc kDocs[] = {\n")

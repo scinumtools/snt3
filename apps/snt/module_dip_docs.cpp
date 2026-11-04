@@ -12,7 +12,7 @@ struct Doc {
     const char* key;
     const char* title;
     const char* source;
-    const char* text;
+    const unsigned char* text;
 };
 
 struct Heading {
@@ -36,7 +36,7 @@ const Doc* find_doc(std::string_view key) {
 }
 
 void print_text(const Doc& doc, const Heading* heading = nullptr) {
-    const std::string_view content(doc.text);
+    const std::string_view content(reinterpret_cast<const char*>(doc.text));
     const auto start = heading ? heading->start : 0;
     const auto end = heading ? heading->end : content.size();
     std::cout.write(content.data() + start, static_cast<std::streamsize>(end - start));
