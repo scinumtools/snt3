@@ -2,6 +2,7 @@
 #include <snt/dip/cursor.h>
 #include <snt/dip/dip.h>
 #include <snt/dip/inspect/diagnostic.h>
+#include <snt/dip/project_bundle.h>
 #include <snt/dip/tools/validator.h>
 #include <stdexcept>
 #include <utility>
@@ -45,7 +46,7 @@ namespace snt::dip::tools {
                 // Check the manifest before add_project() evaluates it. This
                 // also lets us report several syntax mistakes in the DIPfile.
                 DIP manifest;
-                manifest.add_file(absolute, absolute.string(), true);
+                manifest.add_string(read_project_file(absolute), absolute.string());
                 result.diagnostics = manifest.collect_syntax_diagnostics();
                 if (!result.valid())
                     return;

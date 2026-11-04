@@ -63,8 +63,10 @@ between a scientific model's assumptions and its implementation.
   with constraints, expressions, dependencies, and metadata.
 - **Reviewable changes:** [Inspect provenance, preview overrides, and compare](https://scinumtools.github.io/snt3/modules/dip/inspection.html)
   evaluated environments before accepting new settings.
-- **Portable results:** Save [DIPH5 snapshots](https://scinumtools.github.io/snt3/modules/dip/persistence.html)
-  with source-content hashes, or [generate files](https://scinumtools.github.io/snt3/modules/dip/generation.html)
+- **Guided setup:** Mark parameters with `!setup` to build a
+  [CLI questionnaire](https://scinumtools.github.io/snt3/integrations/cli.html) or a form in the viewer.
+- **Portable results:** Save [DIPH5 v3 archives](https://scinumtools.github.io/snt3/modules/dip/persistence.html)
+  with source bytes, evaluated parameters, and optional experiment results, or [generate files](https://scinumtools.github.io/snt3/modules/dip/generation.html)
   for C++, C, Fortran, Rust, Julia, JSON, and YAML.
 - **Readable reports:** [Generate reports](https://scinumtools.github.io/snt3/modules/dip/report.html)
   with effective values, units, overrides, provenance, schemas, and references
@@ -80,8 +82,8 @@ between a scientific model's assumptions and its implementation.
   using opaque handles.
 - **WebAssembly and JavaScript:** [Browser-side tools](https://scinumtools.github.io/snt3/integrations/web.html)
   for DIPL inspection and PUQ conversion.
-- **Command line:** [PUQ, DIPL, guided setup, export, and report commands](https://scinumtools.github.io/snt3/integrations/cli.html),
-  plus [formatting, validation, and linting](docs/source/integrations/devtools.rst).
+- **Command line:** [PUQ, DIPL, guided setup, record queries, export, and report commands](https://scinumtools.github.io/snt3/integrations/cli.html),
+  plus [formatting, validation, and linting](https://scinumtools.github.io/snt3/integrations/devtools.html).
 - **Parameter Viewer:** [Graphical browser and source editor](https://scinumtools.github.io/snt3/integrations/viewer.html)
   for DIPL projects and DIPH5 snapshots, with dependency and provenance views;
   edit project sources with check, format, and find/replace tools.
@@ -89,7 +91,7 @@ between a scientific model's assumptions and its implementation.
   during configuration.
 - **REST API server:** [Local HTTP service](https://scinumtools.github.io/snt3/integrations/rest.html)
   for the command-oriented PUQ and DIP API.
-- **MCP for AI agents:** Native [`snt mcp` server](docs/source/integrations/mcp.rst)
+- **MCP for AI agents:** Native [`snt mcp` server](https://scinumtools.github.io/snt3/integrations/mcp.html)
   with DIPL and PUQ tools over stdio or Streamable HTTP.
 - **Docker:** [Images](packaging/docker/README.md)
   for Python, development, REST, and MCP.
@@ -134,9 +136,7 @@ int main() {
   snt::puq::Quantity length("3.048*m");
   std::cout << length.convert("US_ft").to_string() << "\n";
 
-  snt::dip::DIP dip;
-  dip.add_file("parameters.dip");
-  auto env = dip.parse();
+  auto env = snt::dip::DIP::load("parameters.dip");
 
   std::cout << env["simulation.fluid.density"].as<double>() << "\n";
   std::cout << env["simulation.time.steps"].as<int64_t>() << "\n";
@@ -152,13 +152,15 @@ from scinumtools3.dip import DIP
 length = Quantity(3.048, "m").convert("US_ft")
 print(length.to_string())
 
-dip = DIP()
-dip.add_file("parameters.dip")
-env = dip.parse()
+env = DIP.load("parameters.dip")
 
 print(env["simulation.fluid.density"].value)
 print(env["simulation.time.steps"].value)
 ```
+
+The one-line loader also accepts `.dipl` files, a `DIPfile` project manifest,
+and `.diph5` archives. Use a `DIP` parser when combining inputs or adding
+custom units, schemas, and overrides before evaluation.
 
 The command-line interface can consume the same definitions:
 
@@ -273,7 +275,7 @@ parameters, then preview proposed overrides as JSON.
 The same operations are available through the [C++ inspection API](https://scinumtools.github.io/snt3/modules/dip/inspection.html#cpp-semantic-interface)
 and [Python bindings](https://scinumtools.github.io/snt3/integrations/python.html#python-semantic-interface).
 
-The native [`snt mcp` interface](docs/source/integrations/mcp.rst)
+The native [`snt mcp` interface](https://scinumtools.github.io/snt3/integrations/mcp.html)
 lets AI agents validate, compare, and export DIPL candidates.
 Try the runnable [UsingMCP example](examples/dip/UsingMCP).
 
@@ -284,7 +286,7 @@ nuclear-isotope database and decay-chain calculator built with SciNumTools3.
 It uses DIPL for validated nuclide data, scenarios, provenance, and CMake build
 configuration.
 
-See [more applications and examples](docs/source/examples/index.rst).
+See [more applications and examples](https://scinumtools.github.io/snt3/examples/index.html).
 
 ## Development
 

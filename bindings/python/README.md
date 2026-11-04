@@ -11,7 +11,7 @@ and load typed parameters whose units and constraints are checked at runtime.
 The package includes:
 
 - `scinumtools3.puq` for quantities, uncertainties, unit systems, and conversions
-- `scinumtools3.dip` for typed, validated configuration files
+- `scinumtools3.dip` for typed, validated configuration files and DIPH5 archives
 - `scinumtools3.api` for formatted, command-style evaluation
 - NumPy interoperability for array values
 
@@ -91,19 +91,17 @@ simulation
   duration float = ( {?simulation.timestep} * {?simulation.steps} ) fs
 ```
 
-Parse it into an environment:
+Load it into an environment:
 
 ```python
-from pathlib import Path
 from scinumtools3.dip import DIP
 
-dip = DIP()
-dip.add_file(Path("parameters.dip"))
-env = dip.parse()
-
+env = DIP.load("parameters.dip")
 ```
 
-You can also add definitions directly:
+`DIP.load` also accepts `.dipl` files, a `DIPfile` project manifest, and
+`.diph5` archives. Use a `DIP` parser when combining inputs or adding
+definitions, units, schemas, and overrides before evaluation:
 
 ```python
 dip = DIP()
@@ -126,8 +124,10 @@ cursor = env["length"]
 print(cursor.value, cursor.units, cursor.metadata.description)
 ```
 
-A cursor accesses a path in the environment. Use `cursor.elements()` to traverse
-list elements and `cursor.items()` to traverse named items in a map.
+A cursor accesses a path in the environment. Use `cursor.entries()` to traverse
+direct group children, list elements, or map items in order, and
+`cursor.entry_names()` when you need only their names or indices as strings.
+`children()`, `elements()`, and `items()` remain available for specific container types.
 Cursor values are ordinary Python values: `bool`, `int`, `float`, `str`, or nested
 lists. Use `cursor.to_numpy()` to obtain a NumPy array. A cursor also exposes its
 `units`, `shape`, and child traversal methods. To convert a unit-bearing DIPL result,
