@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/path.h>
@@ -18,6 +19,8 @@
 #include <vector>
 
 namespace snt::dip {
+
+    struct CursorEntry;
 
     namespace detail {
 
@@ -145,6 +148,27 @@ namespace snt::dip {
         std::unordered_map<std::string, Cursor> items() const;
 
         /**
+         * Return immediate group children, list elements, or map items.
+         *
+         * Named entries have a name; list elements have a zero-based index. Each
+         * entry holds a cursor into this cursor's environment. Recorded children
+         * retain declaration order; unrecorded implied-group children are sorted.
+         *
+         * @return Direct entries, or an empty vector for a leaf.
+         */
+        std::vector<CursorEntry> entries() const;
+
+        /**
+         * Return just the direct entry names in the same order as entries().
+         *
+         * Group children and map items use their names; list elements use
+         * their zero-based indices as decimal strings.
+         *
+         * @return Direct entry names, or an empty vector for a leaf.
+         */
+        std::vector<std::string> entry_names() const;
+
+        /**
          * Test if keyed item exists for the current path
          *
          * @return true if item exists, false if not
@@ -248,6 +272,13 @@ namespace snt::dip {
          * @return Item cursor at the given index
          */
         Cursor operator[](size_t index) const;
+    };
+
+    /** One direct hierarchy entry and its name or list index. */
+    struct CursorEntry {
+        std::string name;            ///< Group child name or map key; empty for list elements.
+        std::optional<size_t> index; ///< Zero-based index for list elements; absent otherwise.
+        Cursor cursor;               ///< Cursor pointing at this entry.
     };
 
 } // namespace snt::dip

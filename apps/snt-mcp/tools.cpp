@@ -200,6 +200,16 @@ namespace snt::mcp {
                 );
                 return storage_->page(std::move(values), args["limit"], "");
             });
+        auto entries = environment();
+        entries["path"] = text();
+        add("dipl_entries",
+            "List direct group child names, map keys, or list indices at one evaluated path.",
+            entries,
+            {"path"},
+            [this](const Json& args) {
+                return Json{{"path", args["path"]},
+                            {"names", api::DIPSemantic(project(args)).entry_names(args["path"])}};
+            });
         auto records = environment();
         records.update({{"collection", text()}, {"filters", record_filters()}, {"fields", strings()},
                         {"offset", count(0)}, {"limit", count(100)}});

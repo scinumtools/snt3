@@ -82,6 +82,8 @@ namespace snt::mcp {
                  {"next_cursor", nullable_string}},
                 {"schema_version", "total", "truncated", "items", "next_cursor"}
             );
+        else if (name == "dipl_entries")
+            result = object({{"path", string}, {"names", array(string)}}, {"path", "names"});
         else if (name == "dipl_records")
             result = object(
                 {{"schema_version", string}, {"collection", string}, {"input", string},

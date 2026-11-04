@@ -152,6 +152,10 @@ findings[second]
         self.assertEqual([item["path"] for item in selected["items"]], ["simulation.speed"])
         self.assertTrue(self.call("dipl_list", limit=1)["truncated"])
         self.assertEqual(self.call("dipl_list", query="?missing")["total"], 0)
+        self.assertEqual(self.call("dipl_entries", path="simulation"),
+                         {"path": "simulation", "names": ["distance", "duration", "speed"]})
+        self.assertEqual(self.call("dipl_entries", path="records"),
+                         {"path": "records", "names": ["0"]})
         self.assertIn("record", json.dumps(self.call("dipl_schemas")))
         self.assertIn("parameters.dip", json.dumps(self.call("dipl_sources")))
         self.assertEqual(self.call("dipl_override_contract", path="simulation.distance")["kind"], "existing_value")

@@ -125,9 +125,29 @@ Cursor: inspect a known path
    print(area.value, area.units)  # 0.01 m2
    print(area.metadata.description)
 
-A cursor points to a path in the environment. Use ``cursor.elements()`` to
-traverse a list and ``cursor.items()`` to traverse named map items. Cursors
-also expose ``shape``, ``metadata``, ``provenance``, and ``to_numpy()``.
+A cursor points to a path in the environment. ``entries()`` traverses the
+immediate entries of a group, list, or map in recorded order. Each entry has
+``cursor`` and either ``name`` (group child or map key) or ``index`` (list
+element). A leaf returns an empty list:
+
+.. code-block:: python
+
+   for entry in env["settings"].entries():
+       label = entry.name if entry.index is None else entry.index
+       print(label, entry.cursor.path)
+
+When you only need names or map keys, ``entry_names()`` returns strings without
+the child cursors. For lists it returns indices as strings (``"0"``, ``"1"``, ...).
+
+.. code-block:: python
+
+   for key in env["materials"].entry_names():
+       print(key)
+
+For collection-specific access, ``children()`` returns a dictionary for
+groups, ``elements()`` returns list cursors, and ``items()`` returns map
+key/cursor pairs. Cursors also expose ``shape``, ``metadata``,
+``provenance``, and ``to_numpy()``.
 
 For a unitless scalar such as ``count int = 42``, read
 ``env["count"].value``. For a value with units, a cursor exposes both ``value``

@@ -63,6 +63,8 @@ Clients should discover tools at runtime because report support is optional.
      - Discover configured inputs, input kinds, and supported operations.
    * - ``dipl_list``
      - Search parameters by path and tags, with bounded values and continuation cursors.
+   * - ``dipl_entries``
+     - Return direct group child names, map keys, or list indices at one path.
    * - ``dipl_records``
      - Select fields of keyed collection items with structured string equality filters and bounded offsets.
    * - ``dipl_describe``

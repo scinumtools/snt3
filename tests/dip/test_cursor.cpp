@@ -157,6 +157,59 @@ TEST_F(Cursor, TraverseChildrenGroups) {
     EXPECT_THROW(env["samples"].children(), dip::EnvironmentException);
 }
 
+TEST_F(Cursor, EntriesTraverseEveryCollectionKind) {
+    dip::DIP parser;
+    parser.add_string(
+        "later int = 1\n"
+        "settings\n"
+        "  zeta int = 2\n"
+        "  alpha int = 3\n"
+        "materials[gold]\n"
+        "  density int = 4\n"
+        "materials[silver]\n"
+        "  density int = 5\n"
+        "samples[]\n"
+        "  mass int = 6\n"
+        "samples[]\n"
+        "  mass int = 7\n"
+    );
+    const auto environment = parser.parse();
+
+    const auto root = environment[""].entries();
+    ASSERT_EQ(root.size(), 4);
+    EXPECT_EQ(root[0].name, "later");
+    EXPECT_EQ(root[1].name, "settings");
+    EXPECT_EQ(root[2].name, "materials");
+    EXPECT_EQ(root[3].name, "samples");
+    EXPECT_FALSE(root[0].index.has_value());
+    EXPECT_EQ(root[1].cursor.get_path(), "settings");
+    EXPECT_EQ(environment[""].entry_names(), (std::vector<std::string>{"later", "settings", "materials", "samples"}));
+
+    const auto group = environment["settings"].entries();
+    ASSERT_EQ(group.size(), 2);
+    EXPECT_EQ(group[0].name, "zeta");
+    EXPECT_EQ(group[1].name, "alpha");
+    EXPECT_EQ(environment["settings"].entry_names(), (std::vector<std::string>{"zeta", "alpha"}));
+    EXPECT_TRUE(environment["later"].entries().empty());
+    EXPECT_TRUE(environment["later"].entry_names().empty());
+
+    const auto map = environment["materials"].entries();
+    ASSERT_EQ(map.size(), 2);
+    EXPECT_EQ(map[0].name, "gold");
+    EXPECT_EQ(map[1].name, "silver");
+    EXPECT_FALSE(map[0].index.has_value());
+    EXPECT_EQ(map[1].cursor["density"].as<int64_t>(), 5);
+    EXPECT_EQ(environment["materials"].entry_names(), (std::vector<std::string>{"gold", "silver"}));
+
+    const auto list = environment["samples"].entries();
+    ASSERT_EQ(list.size(), 2);
+    EXPECT_TRUE(list[0].name.empty());
+    EXPECT_EQ(list[0].index, 0);
+    EXPECT_EQ(list[1].index, 1);
+    EXPECT_EQ(list[1].cursor["mass"].as<int64_t>(), 7);
+    EXPECT_EQ(environment["samples"].entry_names(), (std::vector<std::string>{"0", "1"}));
+}
+
 TEST_F(Cursor, ValuesFullPath) {
 
     EXPECT_EQ(env.nodes.size(), 8);

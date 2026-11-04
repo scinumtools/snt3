@@ -2,6 +2,7 @@
 #include <snt/dip/environment.h>
 #include <snt/dip/exceptions.h>
 #include <snt/dip/nodes/node_value.h>
+#include <unordered_set>
 
 namespace snt::dip {
 
@@ -138,6 +139,83 @@ namespace snt::dip {
             );
         }
         return map;
+    }
+
+    std::vector<CursorEntry> Cursor::entries() const {
+        std::vector<CursorEntry> result;
+        if (kind == Path::Kind::List || kind == Path::Kind::Map) {
+            const auto target = cursor_target(*env_, path_);
+            const auto& collection = target.hierarchy->get_collection(target.path);
+            result.reserve(collection.items.size());
+            for (size_t index = 0; index < collection.items.size(); ++index) {
+                const auto& key = collection.items[index];
+                result.push_back({
+                    kind == Path::Kind::Map ? key : "",
+                    kind == Path::Kind::List ? std::optional<size_t>(index) : std::nullopt,
+                    Cursor(env_, path_ + "[" + key + "]")
+                });
+            }
+            return result;
+        }
+
+        const auto names = entry_names();
+        const std::string prefix = path_.empty() ? "" : path_ + ".";
+        result.reserve(names.size());
+        for (const auto& name : names)
+            result.push_back({name, std::nullopt, Cursor(env_, prefix + name)});
+        return result;
+    }
+
+    std::vector<std::string> Cursor::entry_names() const {
+        if (kind == Path::Kind::List || kind == Path::Kind::Map) {
+            const auto target = cursor_target(*env_, path_);
+            const auto& items = target.hierarchy->get_collection(target.path).items;
+            if (kind == Path::Kind::Map)
+                return items;
+            std::vector<std::string> indices;
+            indices.reserve(items.size());
+            for (size_t index = 0; index < items.size(); ++index)
+                indices.push_back(std::to_string(index));
+            return indices;
+        }
+        if (kind != Path::Kind::Empty && kind != Path::Kind::Group && kind != Path::Kind::Item)
+            throw dip::EnvironmentException(
+                "Wrong collection kind",
+                "The path `" + path_ + "` must correspond to a group or collection item, but it refers to a " +
+                    Path::KindNames.at(kind) + " collection.",
+                "Use entry_names() on a group, list, map, or item.", __FILE__, __LINE__
+            );
+
+        const auto target = cursor_target(*env_, path_);
+        const std::string prefix = target.path.empty() ? "" : target.path + ".";
+        std::unordered_set<std::string> found_names;
+        for (const auto& [candidate, collection] : target.hierarchy->get_collections()) {
+            (void)collection;
+            if (candidate.size() <= prefix.size() || candidate.compare(0, prefix.size(), prefix) != 0)
+                continue;
+            const std::string remainder = candidate.substr(prefix.size());
+            const auto end = remainder.find_first_of(".[");
+            if (end != 0)
+                found_names.insert(remainder.substr(0, end));
+        }
+
+        // The hierarchy records declaration order when possible. An implied
+        // group without its own record gets a stable alphabetical fallback.
+        const std::vector<std::string>* order = nullptr;
+        if (target.path.empty())
+            order = &target.hierarchy->root_children_order();
+        else if (target.hierarchy->has_collection(target.path))
+            order = &target.hierarchy->get_collection(target.path).children;
+        std::vector<std::string> names;
+        names.reserve(found_names.size());
+        if (order)
+            for (const auto& name : *order)
+                if (found_names.erase(name))
+                    names.push_back(name);
+        std::vector<std::string> remaining(found_names.begin(), found_names.end());
+        std::sort(remaining.begin(), remaining.end());
+        names.insert(names.end(), remaining.begin(), remaining.end());
+        return names;
     }
 
     bool Cursor::has_item(const std::string& item) const {

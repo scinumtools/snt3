@@ -2,6 +2,7 @@ from .._snt import dip as _dip
 
 Environment = _dip.Environment
 Cursor = _dip.Cursor
+CursorEntry = _dip.CursorEntry
 DIP = _dip.DIP
 ValueNode = _dip.ValueNode
 ValueNodeData = _dip.ValueNodeData

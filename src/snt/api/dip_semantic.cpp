@@ -458,6 +458,16 @@ namespace snt::api {
         return out.str();
     }
 
+    std::vector<std::string> DIPSemantic::entry_names(const std::string& path) const {
+        return inspector().cursor(path).entry_names();
+    }
+
+    std::string DIPSemantic::entry_names_json(const std::string& path) const {
+        std::ostringstream out;
+        strings(out, entry_names(path));
+        return out.str();
+    }
+
     std::string DIPSemantic::list_json(
         const std::string& query, const dip::TagFilter& tags, std::size_t limit, std::size_t max_value_elements
     ) const {

@@ -67,6 +67,37 @@ def test_cursor_children():
         root['materials'].children()
 
 
+def test_cursor_entries_cover_groups_maps_and_lists():
+    dip = DIP()
+    dip.add_string(
+        'settings\n'
+        '  zeta int = 2\n'
+        '  alpha int = 3\n'
+        'materials[gold]\n'
+        '  density int = 4\n'
+        'materials[silver]\n'
+        '  density int = 5\n'
+        'samples[]\n'
+        '  mass int = 6\n'
+        'samples[]\n'
+        '  mass int = 7\n'
+    )
+    env = dip.parse()
+
+    assert [entry.name for entry in env[''].entries()] == ['settings', 'materials', 'samples']
+    assert env[''].entry_names() == ['settings', 'materials', 'samples']
+    assert [entry.name for entry in env['settings'].entries()] == ['zeta', 'alpha']
+    assert [entry.name for entry in env['materials'].entries()] == ['gold', 'silver']
+    assert env['materials'].entry_names() == ['gold', 'silver']
+    assert env['materials'].entries()[1].cursor['density'].value == 5
+    assert [entry.index for entry in env['samples'].entries()] == [0, 1]
+    assert env['samples'].entry_names() == ['0', '1']
+    assert all(entry.name == '' for entry in env['samples'].entries())
+    assert env['samples'].entries()[1].cursor['mass'].value == 7
+    assert env['settings']['zeta'].entries() == []
+    assert env['settings']['zeta'].entry_names() == []
+
+
 def test_cursor_print():
     
     # prepare node collections

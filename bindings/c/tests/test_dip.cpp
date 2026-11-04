@@ -75,6 +75,15 @@ TEST(DIP, TypedNodeTraversal) {
     size_t size = 0;
     ASSERT_EQ(snt_dip_node_get_size(group, &size, &error), 0);
     EXPECT_EQ(size, 4);
+    size_t entry_name_size = 0;
+    ASSERT_EQ(snt_dip_node_get_entry(group, 0, nullptr, 0, &entry_name_size, nullptr, &error), 0);
+    std::vector<char> entry_name(entry_name_size);
+    snt_dip_node* first_entry = nullptr;
+    ASSERT_EQ(snt_dip_node_get_entry(
+        group, 0, entry_name.data(), entry_name.size(), &entry_name_size, &first_entry, &error
+    ), 0) << error.message;
+    EXPECT_STREQ(entry_name.data(), "enabled");
+    snt_dip_node_free(first_entry);
 
     snt_dip_node* steps = nullptr;
     ASSERT_EQ(snt_dip_node_get_child(group, "steps", &steps, &error), 0) << error.message;
@@ -147,6 +156,13 @@ TEST(DIP, TypedNodeTraversal) {
     ASSERT_EQ(snt_dip_environment_get_node(dip, "items", &sequence, &error), 0);
     ASSERT_EQ(snt_dip_node_get_size(sequence, &size, &error), 0);
     EXPECT_EQ(size, 2);
+    ASSERT_EQ(snt_dip_node_get_entry(sequence, 1, nullptr, 0, &entry_name_size, nullptr, &error), 0);
+    entry_name.resize(entry_name_size);
+    ASSERT_EQ(snt_dip_node_get_entry(
+        sequence, 1, entry_name.data(), entry_name.size(), &entry_name_size, &first_entry, &error
+    ), 0) << error.message;
+    EXPECT_STREQ(entry_name.data(), "");
+    snt_dip_node_free(first_entry);
     snt_dip_node* element = nullptr;
     ASSERT_EQ(snt_dip_node_get_element(sequence, 1, &element, &error), 0) << error.message;
     snt_dip_node* list_value = nullptr;
@@ -157,6 +173,13 @@ TEST(DIP, TypedNodeTraversal) {
     ASSERT_EQ(snt_dip_environment_get_node(dip, "edges", &mapping, &error), 0);
     ASSERT_EQ(snt_dip_node_get_size(mapping, &size, &error), 0);
     EXPECT_EQ(size, 1);
+    ASSERT_EQ(snt_dip_node_get_entry(mapping, 0, nullptr, 0, &entry_name_size, nullptr, &error), 0);
+    entry_name.resize(entry_name_size);
+    ASSERT_EQ(snt_dip_node_get_entry(
+        mapping, 0, entry_name.data(), entry_name.size(), &entry_name_size, &first_entry, &error
+    ), 0) << error.message;
+    EXPECT_STREQ(entry_name.data(), "first");
+    snt_dip_node_free(first_entry);
     size_t key_size = 0;
     ASSERT_EQ(snt_dip_node_get_key(mapping, 0, nullptr, 0, &key_size, &error), 0);
     std::vector<char> key(key_size);

@@ -22,6 +22,7 @@ def test_command_help_and_module_status(cli):
         (("dip", "parse", "--help"), "Command: parse"),
         (("dip", "compare", "--help"), "Compare two saved environments"),
         (("dip", "list", "--help"), "Select evaluated nodes by path query and tags"),
+        (("dip", "entries", "--help"), "Print the direct child names"),
         (("dip", "preview", "--help"), "--override-file FILE"),
         (("hub", "--help"), "pinned code examples in a local SNT Hub workspace"),
         (("hub", "setup", "--help"), "override-file"),
@@ -71,7 +72,7 @@ def test_help_pages_have_consistent_sections(cli):
     pages = [
         ("--help",), ("puq",), ("puq", "--help"), ("dip",), ("dip", "--help"),
         *(('dip', sub, suffix) for sub in ('parse', 'compare', 'describe', 'schemas', 'sources',
-                                          'override-contract', 'list', 'records', 'preview', 'package', 'experiment')
+                                          'override-contract', 'list', 'entries', 'records', 'preview', 'package', 'experiment')
           for suffix in ('', '--help')),
         ("hub", "--help"),
         *(('hub', sub, suffix) for sub in ('fetch', 'setup') for suffix in ('', '--help')),

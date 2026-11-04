@@ -22,6 +22,35 @@ def test_records_query(cli, source_root, tmp_path):
     assert loaded["items"][0]["fields"]["age"]["value"] == 0
 
 
+def test_entries_names_for_shell_and_json(cli, tmp_path):
+    source = tmp_path / "entries.dip"
+    source.write_text(
+        "settings\n"
+        "  zeta int = 2\n"
+        "  alpha int = 3\n"
+        "materials[gold]\n"
+        "  density int = 4\n"
+        "materials[silver]\n"
+        "  density int = 5\n"
+        "samples[]\n"
+        "  mass int = 6\n"
+        "samples[]\n"
+        "  mass int = 7\n"
+    )
+    names = lambda path, *options: checked(cli("dip", "entries", "--input", source, "--path", path, *options))
+    assert names("settings") == "zeta\nalpha\n"
+    assert names("materials") == "gold\nsilver\n"
+    assert names("samples") == "0\n1\n"
+    assert names("settings.zeta") == ""
+    assert json.loads(names("materials", "--format", "json")) == ["gold", "silver"]
+    assert json.loads(names("", "--format", "json")) == ["settings", "materials", "samples"]
+
+    snapshot = tmp_path / "entries.diph5"
+    checked(cli("dip", "parse", "--input", "file", source, "--save", snapshot))
+    assert checked(cli("dip", "entries", "--input", snapshot, "--path", "materials")) == "gold\nsilver\n"
+    assert cli("dip", "entries", "--input", source, "--path", "missing").returncode != 0
+
+
 def test_semantic_json_contract(cli, source_root, tmp_path):
     input_file = source_root / "tests/dip/fixtures/generated_parameters.dip"
     graph_input = source_root / "examples/dip/SemanticDescription/parameters.dip"

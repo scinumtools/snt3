@@ -161,6 +161,18 @@ int snt_dip_node_get_item(const snt_dip_node* node, const char* key, snt_dip_nod
 /** Copy a map key by zero-based position in sorted key order. */
 int snt_dip_node_get_key(const snt_dip_node* node, size_t index, char* buffer, size_t capacity, size_t* required, snt_dip_error* error);
 int snt_dip_node_get_element(const snt_dip_node* node, size_t index, snt_dip_node** result, snt_dip_error* error);
+/**
+ * Return a direct group child, map item, or list element by hierarchy position.
+ * Group and map entries have a name; list elements return an empty name and use
+ * the requested position as their index. Recorded entries retain declaration
+ * order; unrecorded implied-group children are sorted by name. Query
+ * name_required with name=NULL/0.
+ * The caller owns a non-NULL result and frees it with snt_dip_node_free().
+ */
+int snt_dip_node_get_entry(
+    const snt_dip_node* node, size_t index, char* name, size_t name_capacity,
+    size_t* name_required, snt_dip_node** result, snt_dip_error* error
+);
 /** Return direct child, map item, or list element count. */
 int snt_dip_node_get_size(const snt_dip_node* node, size_t* result, snt_dip_error* error);
 int snt_dip_node_get_type(const snt_dip_node* node, snt_dip_value_type* result, snt_dip_error* error);

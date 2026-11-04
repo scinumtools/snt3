@@ -23,6 +23,10 @@ namespace snt::api {
         std::string override_contract_json(const std::string& path) const;
         std::string schemas_json() const;
         std::string sources_json() const;
+        /** Return immediate child names or list indices at an evaluated path. */
+        std::vector<std::string> entry_names(const std::string& path) const;
+        /** Serialize entry_names() as a JSON string array. */
+        std::string entry_names_json(const std::string& path) const;
         std::string list_json(
             const std::string& query = "?",
             const dip::TagFilter& tags = {},

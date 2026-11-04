@@ -54,6 +54,13 @@ namespace snt::bind::python {
         k.value("List", dip::Path::Kind::List);
         k.value("Item", dip::Path::Kind::Item);
 
+        auto entry = py::class_<dip::CursorEntry>(
+            m, "CursorEntry", "A direct hierarchy entry with its name or list index and cursor."
+        );
+        entry.def_readonly("name", &dip::CursorEntry::name, "Group child name or map key; empty for a list element.");
+        entry.def_readonly("index", &dip::CursorEntry::index, "Zero-based list index, or None for named entries.");
+        entry.def_readonly("cursor", &dip::CursorEntry::cursor, "Cursor pointing at this entry.");
+
         auto val = py::class_<dip::Cursor, std::shared_ptr<dip::Cursor>>(
             m, "Cursor", "Cursor for traversing and querying evaluated DIPL nodes."
         );
@@ -88,6 +95,9 @@ namespace snt::bind::python {
         );
 
         val.def("children", &dip::Cursor::children, "Return direct named children as a dictionary of cursors.");
+
+        val.def("entries", &dip::Cursor::entries, "Return direct group, list, or map entries in recorded order.");
+        val.def("entry_names", &dip::Cursor::entry_names, "Return direct entry names or list indices as strings.");
 
         val.def("elements", &dip::Cursor::elements, "Return child elements.");
 

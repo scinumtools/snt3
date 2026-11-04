@@ -26,7 +26,7 @@ int module_completion(int argc, char* argv[]) {
     // Keep this command metadata in sync with the native CLI dispatcher.
     std::map<std::string, std::string> candidates{
         {"", "dip puq report dmap server view hub mcp completion --help --version"},
-        {"dip", "init format validate lint setup parse compare describe schemas sources override-contract list records preview package experiment --help --version --input --project --load --save --record-graph --generate --request --print --value --type --path --query --tag-all --tag-any --tag-none --limit --max-value-elements --override --override-file --max-details --format"},
+        {"dip", "init format validate lint setup parse compare describe schemas sources override-contract list entries records preview package experiment --help --version --input --project --load --save --record-graph --generate --request --print --value --type --path --query --tag-all --tag-any --tag-none --limit --max-value-elements --override --override-file --max-details --format"},
         {"dip parse", "--help --input --project --load --save --record-graph --generate --request --print --value --type"},
         {"dip compare", "--help --scope --max-details --max-array-examples"},
         {"dip describe", "--help --project --input --path --format --record-graph --max-value-elements"},
@@ -34,6 +34,7 @@ int module_completion(int argc, char* argv[]) {
         {"dip sources", "--help --project --input --format"},
         {"dip override-contract", "--help --project --input --path --format"},
         {"dip list", "--help --project --input --query --tag-all --tag-any --tag-none --limit --max-value-elements --format"},
+        {"dip entries", "--help --project --input --path --format"},
         {"dip preview", "--help --project --input --override --override-file --max-details --format"},
         {"dip package", "--help --project --output --include"},
         {"dip compare --scope", "effective full"},

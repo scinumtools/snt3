@@ -77,6 +77,14 @@ To load a DIPfile manifest, replace the individual input calls with
 ``snt_dip_parser_add_project(dip, "DIPfile", &error)`` before parsing. See
 :doc:`DIPfile projects <../modules/dip/projects>` for the format.
 
+For uniform hierarchy traversal, call ``snt_dip_node_get_size`` and then
+``snt_dip_node_get_entry`` for each zero-based position. It returns a node
+handle and its name for group children or map items. List elements return an
+empty name; their position is their index. Recorded entries follow declaration
+order; unrecorded implied-group children are sorted by name.
+Query the name buffer size with ``NULL`` and capacity zero, then free each
+returned node with ``snt_dip_node_free``.
+
 Registering schemas
 -------------------
 

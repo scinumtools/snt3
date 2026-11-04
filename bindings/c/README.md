@@ -18,7 +18,10 @@ returns an owned, read-only node handle. Free every node handle with
 resolve it against the parser's current environment.
 
 Use `snt_dip_node_get_kind` and `snt_dip_node_get_size` to inspect the tree.
-Groups expose named children, maps expose sorted keys and keyed items, and lists
+`snt_dip_node_get_entry` traverses groups, maps, and lists in recorded order;
+it returns a child handle and a name for groups and maps, or an empty name for
+list elements. Pass a null result pointer to request only a name. Groups also
+expose named children, maps expose sorted keys and keyed items, and lists
 expose indexed elements. `snt_dip_node_get_type` and the typed getters read
 primitive values and flattened array elements. `snt_dip_node_get_value_size`
 returns the scalar/array element count; typed `_at` getters read an element by

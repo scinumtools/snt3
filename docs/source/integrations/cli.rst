@@ -253,6 +253,19 @@ one evaluated path, while ``list`` selects values by path and explicit tags:
    snt dip describe --project DIPfile --path simulation.steps --format json
    snt dip list --project DIPfile --query '?simulation.' --limit 50 --format json
    snt dip list --project DIPfile --tag-all runtime --format json
+
+Use ``dip entries`` to print only the direct names of a group or map, one per
+line. List elements are printed as zero-based indices. This is useful for a
+shell loop; use ``--format json`` when names need machine-safe quoting:
+
+.. code-block:: bash
+
+   snt dip entries --project DIPfile --path materials
+   snt dip entries --input parameters.diph5 --path materials --format json
+
+   while IFS= read -r key; do
+       printf 'Material: %s\n' "$key"
+   done < <(snt dip entries --project DIPfile --path materials)
    snt dip records --input findings.dip --collection findings \
      --where-eq category=warning --field quote --field editorial_interest --limit 20
    snt dip override-contract --project DIPfile --path simulation.steps --format json

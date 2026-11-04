@@ -134,6 +134,19 @@ extern "C" int snt_dip_node_get_element(
     });
 }
 
+extern "C" int snt_dip_node_get_entry(
+    const snt_dip_node* node, size_t index, char* name, size_t name_capacity,
+    size_t* name_required, snt_dip_node** result, snt_dip_error* error
+) {
+    return node_call(error, [&] {
+        const auto entries = cursor(node).entries();
+        if (index >= entries.size()) throw std::out_of_range("entry index is out of range");
+        copy_string(entries[index].name, name, name_capacity, name_required, error);
+        if (result)
+            *result = new snt_dip_node{node->owner, entries[index].cursor.get_path()};
+    });
+}
+
 extern "C" int snt_dip_node_get_key(
     const snt_dip_node* node, size_t index, char* buffer, size_t capacity, size_t* required, snt_dip_error* error
 ) {
