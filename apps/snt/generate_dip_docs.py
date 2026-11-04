@@ -90,15 +90,21 @@ def generate(manifest, root):
     names = [key for key, _, _ in docs]
     if len(names) != len(set(names)):
         raise ValueError("DIPL chapter keys must be unique")
-    lines = ["// Generated from docs/dipl by generate_dip_docs.py. Do not edit.\n",
-             "static const Doc kDocs[] = {\n"]
+    lines = ["// Generated from docs/dipl by generate_dip_docs.py. Do not edit.\n"]
+    entries = []
     all_headings = []
-    for key, source, content in docs:
+    for index, (key, source, content) in enumerate(docs):
         found = headings(content)
         if not found:
             raise ValueError(f"No Markdown heading in {source}")
-        lines.append(f"    {{{quoted(key)}, {quoted(found[0][1])}, {quoted(source)}, {raw(content)}}},\n")
+        # Keep each chapter in its own object. MSVC rejects the large combined
+        # initializer when every chapter's text lives directly inside kDocs.
+        name = f"kDocText{index}"
+        lines.append(f"static const char {name}[] = {raw(content)};\n")
+        entries.append(f"    {{{quoted(key)}, {quoted(found[0][1])}, {quoted(source)}, {name}}},\n")
         all_headings.extend((key, *heading) for heading in found)
+    lines.append("\nstatic const Doc kDocs[] = {\n")
+    lines.extend(entries)
     lines.append("};\n\nstatic const Heading kHeadings[] = {\n")
     for key, name, title, _, start, end in all_headings:
         lines.append(f"    {{{quoted(key)}, {quoted(name)}, {quoted(title)}, {start}, {end}}},\n")
