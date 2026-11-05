@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing published release tag, for example v0.10.1
+        description: Published release tag whose version to assign to crates built from main
         required: true
         type: string
 
@@ -38,21 +38,40 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ github.event_name == 'workflow_dispatch' && 'main' || github.event.release.tag_name }}
           persist-credentials: false
 
       - name: Check release and set crate versions
         run: |
-          version=$(sed -n 's/^CODE_VERSION=//p' settings.env)
-          test "$RELEASE_TAG" = "v$version" || {
-            echo "Release tag $RELEASE_TAG does not match SNT3 version $version" >&2
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a release tag such as v0.10.0, got $RELEASE_TAG" >&2
             exit 1
-          }
-          test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_TAG" || {
-            echo "The checked-out commit is not tagged $RELEASE_TAG" >&2
+          fi
+          version="${RELEASE_TAG#v}"
+          native_version=$(sed -n 's/^CODE_VERSION=//p' settings.env)
+          if [ "$GITHUB_EVENT_NAME" = release ]; then
+            test "$version" = "$native_version" || {
+              echo "Release tag $RELEASE_TAG does not match SNT3 version $native_version" >&2
+              exit 1
+            }
+            test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_TAG" || {
+              echo "The checked-out commit is not tagged $RELEASE_TAG" >&2
+              exit 1
+            }
+          fi
+          if [ ! -f bindings/rust/sync_version.py ] ||
+             [ ! -f bindings/rust/Cargo.toml ]; then
+            echo "Selected source commit lacks bindings/rust." >&2
             exit 1
-          }
-          python3 bindings/rust/sync_version.py --write
+          fi
+          python3 bindings/rust/sync_version.py --write --version "$version"
+          echo "Building native SNT3 $native_version from $(git rev-parse --short HEAD)"
+          echo "Publishing Rust crates $version for release $RELEASE_TAG"
+          {
+            echo "Source commit: $(git rev-parse HEAD)"
+            echo "Native SNT3 version: $native_version"
+            echo "Rust crate version: $version"
+          } >> "$GITHUB_STEP_SUMMARY"
           echo "CRATE_VERSION=$version" >> "$GITHUB_ENV"
           echo "SNT3_PREFIX=$RUNNER_TEMP/snt3-rust" >> "$GITHUB_ENV"
 

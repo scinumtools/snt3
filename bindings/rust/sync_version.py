@@ -1,4 +1,4 @@
-"""Keep Cargo crate versions aligned with settings.env."""
+"""Set Cargo crate versions from settings.env or an explicit release version."""
 
 import argparse
 from pathlib import Path
@@ -63,14 +63,21 @@ def check(version: str) -> None:
             f"Rust versions do not match SNT3 {version}; "
             "run python3 bindings/rust/sync_version.py --write"
         )
-    print(f"Rust crates and SNT3 are both {version}")
+    print(f"Rust crates are version {version}; source CODE_VERSION is {source_version()}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--write", action="store_true", help="update Cargo versions")
+    parser.add_argument("--version", help="crate version to use instead of CODE_VERSION")
     args = parser.parse_args()
-    version = source_version()
+    version = args.version or source_version()
+    if not re.fullmatch(
+        r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+        r"(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?",
+        version,
+    ):
+        raise SystemExit(f"Invalid Cargo version: {version}")
     if args.write:
         sync(version)
     check(version)
