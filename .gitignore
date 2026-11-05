@@ -8,8 +8,10 @@ docs/build/*
 docs/doxy/*
 docs/banners/*
 dist/*
+/build-rust/
 bindings/web/dist/
 docs/source/_static/web/
+.cdx/*
 PROPOSALS/*
 bindings/python/.pytest_cache/*
 **/__pycache__/*

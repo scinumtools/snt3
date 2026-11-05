@@ -55,6 +55,7 @@ For measured results and the changes behind them, see
 
    integrations/python
    integrations/c
+   integrations/rust
    integrations/web
    integrations/cli
    integrations/devtools

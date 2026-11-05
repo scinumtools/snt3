@@ -2,6 +2,7 @@
 #include "../../../src/snt/dip/nodes/metadata_fields.h"
 
 #include <algorithm>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -42,6 +43,15 @@ template <typename T> T array_element(const snt_dip_node* node, size_t index) {
     const auto values = cursor(node).as<std::vector<T>>();
     if (index >= values.size()) throw std::out_of_range("value index is out of range");
     return values[index];
+}
+
+template <typename T, typename U> void copy_array(const snt_dip_node* node, U* output, size_t capacity, size_t* required) {
+    if (!required) throw std::invalid_argument("required-size output is required");
+    const auto values = cursor(node).as<std::vector<T>>();
+    *required = values.size();
+    if (!output && capacity == 0) return;
+    if (!output || capacity < values.size()) throw std::invalid_argument("array buffer is too small");
+    for (size_t i = 0; i < values.size(); ++i) output[i] = static_cast<U>(values[i]);
 }
 } // namespace
 
@@ -243,6 +253,47 @@ extern "C" int snt_dip_node_get_string_at(
     const snt_dip_node* node, size_t index, char* buffer, size_t capacity, size_t* required, snt_dip_error* error
 ) {
     return node_call(error, [&] { copy_string(array_element<std::string>(node, index), buffer, capacity, required, error); });
+}
+
+extern "C" int snt_dip_node_copy_bool_array(const snt_dip_node* node, int* output, size_t capacity, size_t* required, snt_dip_error* error) {
+    return node_call(error, [&] { copy_array<bool>(node, output, capacity, required); });
+}
+extern "C" int snt_dip_node_copy_int64_array(const snt_dip_node* node, int64_t* output, size_t capacity, size_t* required, snt_dip_error* error) {
+    return node_call(error, [&] { copy_array<int64_t>(node, output, capacity, required); });
+}
+extern "C" int snt_dip_node_copy_uint64_array(const snt_dip_node* node, uint64_t* output, size_t capacity, size_t* required, snt_dip_error* error) {
+    return node_call(error, [&] { copy_array<uint64_t>(node, output, capacity, required); });
+}
+extern "C" int snt_dip_node_copy_double_array(const snt_dip_node* node, double* output, size_t capacity, size_t* required, snt_dip_error* error) {
+    return node_call(error, [&] { copy_array<double>(node, output, capacity, required); });
+}
+extern "C" int snt_dip_node_copy_string_array(
+    const snt_dip_node* node, size_t* offsets, size_t offsets_capacity,
+    char* bytes, size_t bytes_capacity, size_t* count, size_t* bytes_required,
+    snt_dip_error* error
+) {
+    return node_call(error, [&] {
+        if (!count || !bytes_required) throw std::invalid_argument("array size outputs are required");
+        const auto values = cursor(node).as<std::vector<std::string>>();
+        *count = values.size();
+        *bytes_required = 0;
+        for (const auto& value : values) {
+            if (value.size() > std::numeric_limits<size_t>::max() - *bytes_required)
+                throw std::overflow_error("string array byte count overflows size_t");
+            *bytes_required += value.size();
+        }
+        if (!offsets && !bytes && offsets_capacity == 0 && bytes_capacity == 0) return;
+        if (!offsets || offsets_capacity < values.size() + 1 ||
+            (bytes_capacity < *bytes_required) || (!bytes && *bytes_required > 0))
+            throw std::invalid_argument("string array buffer is too small");
+        size_t position = 0;
+        offsets[0] = 0;
+        for (size_t i = 0; i < values.size(); ++i) {
+            if (!values[i].empty()) std::memcpy(bytes + position, values[i].data(), values[i].size());
+            position += values[i].size();
+            offsets[i + 1] = position;
+        }
+    });
 }
 
 extern "C" int snt_dip_node_get_provenance(

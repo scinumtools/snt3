@@ -1,0 +1,11 @@
+[package]
+name = "scinumtools3"
+version.workspace = true
+edition = "2021"
+license = "MIT"
+description = "Safe Rust API for SciNumTools3 DIPL projects and DIPH5 archives"
+repository = "https://github.com/scinumtools/snt3"
+readme = "README.md"
+
+[dependencies]
+scinumtools3-sys.workspace = true

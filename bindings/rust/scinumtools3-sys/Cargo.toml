@@ -1,0 +1,13 @@
+[package]
+name = "scinumtools3-sys"
+version.workspace = true
+edition = "2021"
+license = "MIT"
+description = "Raw C ABI bindings for SciNumTools3"
+repository = "https://github.com/scinumtools/snt3"
+links = "snt_c"
+build = "build.rs"
+readme = "README.md"
+
+[lib]
+path = "src/lib.rs"

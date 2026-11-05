@@ -84,6 +84,8 @@ between a scientific model's assumptions and its implementation.
   for PUQ, DIP, and API, including NumPy arrays.
 - **C binding:** Experimental [PUQ and DIPL interfaces](https://scinumtools.github.io/snt3/integrations/c.html)
   using opaque handles.
+- **Rust:** [Safe DIPL and DIPH5 bindings](https://scinumtools.github.io/snt3/integrations/rust.html)
+  over the C ABI for loading projects and reading values.
 - **WebAssembly and JavaScript:** [Browser-side tools](https://scinumtools.github.io/snt3/integrations/web.html)
   for DIPL inspection and PUQ conversion.
 - **Command line:** [PUQ, DIPL, guided setup, record queries, export, and report commands](https://scinumtools.github.io/snt3/integrations/cli.html),

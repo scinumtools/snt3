@@ -185,6 +185,17 @@ int snt_dip_node_get_int64_at(const snt_dip_node* node, size_t index, int64_t* r
 int snt_dip_node_get_uint64_at(const snt_dip_node* node, size_t index, uint64_t* result, snt_dip_error* error);
 int snt_dip_node_get_double_at(const snt_dip_node* node, size_t index, double* result, snt_dip_error* error);
 int snt_dip_node_get_string_at(const snt_dip_node* node, size_t index, char* buffer, size_t capacity, size_t* required, snt_dip_error* error);
+/** Copy a flattened numerical array in one call. Query required elements with NULL/0. */
+int snt_dip_node_copy_bool_array(const snt_dip_node* node, int* values, size_t capacity, size_t* required, snt_dip_error* error);
+int snt_dip_node_copy_int64_array(const snt_dip_node* node, int64_t* values, size_t capacity, size_t* required, snt_dip_error* error);
+int snt_dip_node_copy_uint64_array(const snt_dip_node* node, uint64_t* values, size_t capacity, size_t* required, snt_dip_error* error);
+int snt_dip_node_copy_double_array(const snt_dip_node* node, double* values, size_t capacity, size_t* required, snt_dip_error* error);
+/** Copy UTF-8 string array bytes with count+1 offsets. Query sizes with NULL/0. */
+int snt_dip_node_copy_string_array(
+    const snt_dip_node* node, size_t* offsets, size_t offsets_capacity,
+    char* bytes, size_t bytes_capacity, size_t* count, size_t* bytes_required,
+    snt_dip_error* error
+);
 /** Copy provenance text fields; source_name and override_source_name may be empty. */
 int snt_dip_node_get_provenance(const snt_dip_node* node, char* source_name, size_t source_name_capacity, size_t* source_name_required,
     size_t* source_line, char* source_code, size_t source_code_capacity, size_t* source_code_required,

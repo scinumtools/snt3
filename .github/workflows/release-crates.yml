@@ -1,0 +1,123 @@
+name: Release Rust crates
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing published release tag, for example v0.10.1
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-crates-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      SNT3_PREFIX: ${{ runner.temp }}/snt3-rust
+    steps:
+      - name: Check selected release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        run: |
+          test -n "$RELEASE_TAG"
+          draft=$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)
+          test "$draft" = false || { echo "Release $RELEASE_TAG is still a draft" >&2; exit 1; }
+          test -n "$CRATES_IO_TOKEN" || {
+            echo "Configure the CRATES_IO_TOKEN repository secret before publishing" >&2
+            exit 1
+          }
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          persist-credentials: false
+
+      - name: Check release and set crate versions
+        run: |
+          version=$(sed -n 's/^CODE_VERSION=//p' settings.env)
+          test "$RELEASE_TAG" = "v$version" || {
+            echo "Release tag $RELEASE_TAG does not match SNT3 version $version" >&2
+            exit 1
+          }
+          test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_TAG" || {
+            echo "The checked-out commit is not tagged $RELEASE_TAG" >&2
+            exit 1
+          }
+          python3 bindings/rust/sync_version.py --write
+          echo "CRATE_VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libhdf5-dev pkg-config
+
+      - name: Build SNT3 C ABI
+        run: |
+          cmake -S . -B build-rust -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$SNT3_PREFIX" \
+            -DENABLE_BINDING_C=ON \
+            -DENABLE_BINDING_PYTHON=OFF \
+            -DENABLE_UNIT_TESTS=OFF \
+            -DENABLE_EXEC_APPS=OFF \
+            -DENABLE_EXEC_EXAMPLES=OFF \
+            -DENABLE_EXEC_BENCHMARKS=OFF \
+            -DENABLE_SNT_REPORT=OFF \
+            -DENABLE_MAT=OFF \
+            -DENABLE_API=OFF
+          cmake --build build-rust --target snt-c --parallel 4
+          cmake --install build-rust
+
+      - name: Test Rust crates
+        run: cargo test --manifest-path bindings/rust/Cargo.toml --workspace --locked
+
+      - name: Publish scinumtools3-sys
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        run: |
+          status=$(curl -sS -o /dev/null -w '%{http_code}' \
+            "https://crates.io/api/v1/crates/scinumtools3-sys/$CRATE_VERSION")
+          case "$status" in
+            200) echo "scinumtools3-sys $CRATE_VERSION is already published" ;;
+            404) cargo publish --manifest-path bindings/rust/Cargo.toml \
+                   -p scinumtools3-sys --locked --allow-dirty ;;
+            *) echo "Could not check scinumtools3-sys: HTTP $status" >&2; exit 1 ;;
+          esac
+
+      - name: Wait for the sys crate in the registry
+        run: |
+          for attempt in {1..30}; do
+            status=$(curl -sS -o /dev/null -w '%{http_code}' \
+              "https://crates.io/api/v1/crates/scinumtools3-sys/$CRATE_VERSION")
+            if [ "$status" = 200 ]; then exit 0; fi
+            if [ "$status" != 404 ]; then
+              echo "Could not check scinumtools3-sys: HTTP $status" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "scinumtools3-sys $CRATE_VERSION did not appear in crates.io" >&2
+          exit 1
+
+      - name: Publish scinumtools3
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        run: |
+          status=$(curl -sS -o /dev/null -w '%{http_code}' \
+            "https://crates.io/api/v1/crates/scinumtools3/$CRATE_VERSION")
+          case "$status" in
+            200) echo "scinumtools3 $CRATE_VERSION is already published" ;;
+            404) cargo publish --manifest-path bindings/rust/Cargo.toml \
+                   -p scinumtools3 --locked --allow-dirty ;;
+            *) echo "Could not check scinumtools3: HTTP $status" >&2; exit 1 ;;
+          esac
