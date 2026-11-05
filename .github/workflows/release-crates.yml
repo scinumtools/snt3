@@ -22,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
-      SNT3_PREFIX: ${{ runner.temp }}/snt3-rust
     steps:
       - name: Check selected release
         env:
@@ -55,6 +54,7 @@ jobs:
           }
           python3 bindings/rust/sync_version.py --write
           echo "CRATE_VERSION=$version" >> "$GITHUB_ENV"
+          echo "SNT3_PREFIX=$RUNNER_TEMP/snt3-rust" >> "$GITHUB_ENV"
 
       - name: Install native build dependencies
         run: |
