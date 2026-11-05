@@ -8,6 +8,7 @@ repository = "https://github.com/scinumtools/snt3"
 links = "snt_c"
 build = "build.rs"
 readme = "README.md"
+include = ["build.rs", "src/**", "README.md", "vendor/snt3/**"]
 
 [lib]
 path = "src/lib.rs"

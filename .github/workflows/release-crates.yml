@@ -101,6 +101,12 @@ jobs:
       - name: Test Rust crates
         run: cargo test --manifest-path bindings/rust/Cargo.toml --workspace --locked
 
+      - name: Package and verify bundled native source
+        run: |
+          python3 bindings/rust/scinumtools3-sys/prepare_vendor.py
+          env -u SNT3_PREFIX -u SNT3_BUILD_DIR cargo package --manifest-path bindings/rust/Cargo.toml \
+            -p scinumtools3-sys --locked --allow-dirty
+
       - name: Publish scinumtools3-sys
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}

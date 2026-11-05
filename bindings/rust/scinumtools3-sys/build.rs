@@ -1,5 +1,67 @@
 use std::{env, path::PathBuf, process::Command};
 
+fn run(command: &mut Command) {
+    let status = command
+        .status()
+        .expect("Failed to run CMake; install CMake to build SNT3");
+    assert!(status.success(), "Native SNT3 build failed with {status}");
+}
+
+fn build_native() -> PathBuf {
+    let package = PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").unwrap());
+    let bundled = package.join("vendor/snt3");
+    let checkout = package.ancestors().nth(3).unwrap().to_path_buf();
+    // In the repo, use live sources. A downloaded crate uses its bundled snapshot.
+    let (source, build_name) = if checkout.join("CMakeLists.txt").is_file() {
+        (checkout, "snt3-checkout-build")
+    } else if bundled.join("CMakeLists.txt").is_file() {
+        (bundled, "snt3-bundled-build")
+    } else {
+        panic!("SNT3 source is missing from the crate; set SNT3_PREFIX or SNT3_BUILD_DIR");
+    };
+    if env::var("HOST").ok() != env::var("TARGET").ok() {
+        panic!("Cross-compiling bundled SNT3 requires SNT3_PREFIX or SNT3_BUILD_DIR");
+    }
+    // Watch source inputs, not the whole checkout: Cargo's own target/ lives there.
+    for relative in [
+        "CMakeLists.txt",
+        "settings.env",
+        "cmake",
+        "src",
+        "include",
+        "bindings/c",
+        "external/nlohmann",
+    ] {
+        println!("cargo:rerun-if-changed={}", source.join(relative).display());
+    }
+    let build = PathBuf::from(env::var_os("OUT_DIR").unwrap()).join(build_name);
+    run(Command::new("cmake")
+        .arg("-S")
+        .arg(&source)
+        .arg("-B")
+        .arg(&build)
+        .arg("-DCMAKE_BUILD_TYPE=Release")
+        .arg("-DENABLE_BINDING_C=ON")
+        .arg("-DENABLE_BINDING_PYTHON=OFF")
+        .arg("-DENABLE_UNIT_TESTS=OFF")
+        .arg("-DENABLE_EXEC_APPS=OFF")
+        .arg("-DENABLE_EXEC_EXAMPLES=OFF")
+        .arg("-DENABLE_EXEC_BENCHMARKS=OFF")
+        .arg("-DENABLE_SNT_REPORT=OFF")
+        .arg("-DENABLE_MAT=OFF")
+        .arg("-DENABLE_API=OFF"));
+    run(Command::new("cmake")
+        .arg("--build")
+        .arg(&build)
+        .arg("--config")
+        .arg("Release")
+        .arg("--target")
+        .arg("snt-c")
+        .arg("--parallel")
+        .arg(env::var("NUM_JOBS").unwrap_or_else(|_| "1".into())));
+    build
+}
+
 fn main() {
     for name in [
         "SNT3_PREFIX",
@@ -13,19 +75,28 @@ fn main() {
         return;
     }
 
-    if let Some(build) = env::var_os("SNT3_BUILD_DIR") {
-        let build = PathBuf::from(build);
+    if env::var_os("SNT3_BUILD_DIR").is_some() || env::var_os("SNT3_PREFIX").is_none() {
+        let build = env::var_os("SNT3_BUILD_DIR")
+            .map(PathBuf::from)
+            .unwrap_or_else(build_native);
         println!(
             "cargo:rustc-link-search=native={}",
             build.join("bindings/c").display()
         );
         println!(
             "cargo:rustc-link-search=native={}",
+            build.join("bindings/c/Release").display()
+        );
+        println!(
+            "cargo:rustc-link-search=native={}",
             build.join("lib").display()
         );
+        println!(
+            "cargo:rustc-link-search=native={}",
+            build.join("lib/Release").display()
+        );
     } else {
-        let prefix = env::var_os("SNT3_PREFIX")
-            .expect("Set SNT3_PREFIX to an installed SNT3, or SNT3_BUILD_DIR to a CMake build");
+        let prefix = env::var_os("SNT3_PREFIX").unwrap();
         let prefix = PathBuf::from(prefix);
         let lib = if prefix.join("lib").is_dir() {
             prefix.join("lib")

@@ -16,8 +16,10 @@ cmake --build build-rust --target snt-c
 SNT3_BUILD_DIR="$PWD/build-rust" cargo test --manifest-path bindings/rust/Cargo.toml
 ```
 
-An installed build can use `SNT3_PREFIX` instead. HDF5 is a native
-dependency. The sys crate README documents its discovery settings.
+Starting with the next release, the crate bundles the SNT3 native source, so
+Cargo builds it when neither `SNT3_PREFIX` nor `SNT3_BUILD_DIR` is set. CMake, a C++17
+compiler, and HDF5 development libraries are still required. The sys crate
+README documents HDF5 discovery settings.
 
 When a GitHub release is published, the release workflow checks out its tag,
 checks the tag against `CODE_VERSION` in `settings.env`, and publishes the
@@ -27,7 +29,9 @@ the current `main` branch, then assigns the entered tag's version to both
 crates. This permits publishing a crate for an earlier release tag from newer
 source. In either mode, it updates both Cargo versions and the lockfile in its
 checkout, runs the Rust tests, and publishes `scinumtools3-sys` before
-`scinumtools3`.
+`scinumtools3`. Before publishing, it snapshots the native source
+into the sys crate and verifies that the packaged crate builds without an
+external SNT3 installation.
 Configure the repository secret
 `CRATES_IO_TOKEN` with a crates.io API token authorized to publish both
 crates. For an initial publication, use a token that can create the crates;

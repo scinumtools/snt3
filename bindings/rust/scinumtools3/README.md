@@ -19,7 +19,9 @@ registered sources, use `Project::new`, `add_source`/`add_file`/`add_project`,
 and `parse`. The C binding currently remains experimental, so the Rust crate
 has the same 0.x compatibility expectations.
 
-The native SNT3 libraries must be installed with `ENABLE_BINDING_C=ON`.
-Set `SNT3_PREFIX` to their installation prefix, or `SNT3_BUILD_DIR` to a
-CMake build directory. HDF5 must also be installed. See the sys crate README
-for the linking environment variables.
+Starting with the next crate release, Cargo builds the bundled SNT3 native
+libraries automatically. Install a C++17 compiler, CMake, and HDF5 development
+libraries; a separate SNT3 installation is not needed. To reuse an existing
+SNT3 build, set `SNT3_PREFIX` to its
+installation prefix or `SNT3_BUILD_DIR` to its CMake build directory.
+See the sys crate README for HDF5 linking settings.

@@ -6,10 +6,13 @@ validation, DIPH5 I/O, and value conversion remain in the C++ core. The
 ``scinumtools3-sys`` crate contains raw declarations; ``scinumtools3`` owns
 the native handles and exposes ``Result``-returning methods.
 
-Build SNT3 with ``ENABLE_BINDING_C=ON`` and install it. Set ``SNT3_PREFIX`` to
-the installation prefix before using Cargo. In a source checkout, set
-``SNT3_BUILD_DIR`` to the CMake build directory instead. HDF5 must be
-available through ``pkg-config`` or the environment variables described in
+Starting with the next crate release, the Rust crate builds the bundled SNT3
+C++ source automatically. Users need a C++17 compiler, CMake, and HDF5
+development libraries, but do not need a separate SNT3 installation. To reuse
+a native installation, set
+``SNT3_PREFIX`` to its prefix. In a source checkout, set
+``SNT3_BUILD_DIR`` to an existing CMake build directory. HDF5 is linked
+through ``pkg-config`` or the environment variables described in
 ``bindings/rust/scinumtools3-sys/README.md``.
 
 .. code-block:: console
