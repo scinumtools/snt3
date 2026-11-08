@@ -13,6 +13,14 @@ To reuse an existing native installation, set `SNT3_PREFIX` to its install
 prefix. For a source checkout, `SNT3_BUILD_DIR` can point to a CMake
 build directory containing `lib/libsnt-*.a` and
 `bindings/c/libsnt-c.a`. These settings skip the bundled build.
+On Linux, the CMake build records whether the native libraries use
+`libstdc++` or `libc++` and where the compiler finds that runtime. Cargo
+uses the same linker settings. For an older installation without this
+metadata, set `SNT3_CXX_STDLIB=stdc++` or `SNT3_CXX_STDLIB=c++` to match its
+compiler. If the runtime is outside standard library paths, also set
+`SNT3_CXX_LIB_DIR` to its directory.
+The bundled CMake build uses two compiler jobs by default; set
+`SNT3_BUILD_JOBS` to change that limit.
 
 Use a native SNT3 build that includes the bulk array C ABI functions in
 `snt/c/dip.h`; earlier 0.10.0 binaries lack these symbols.
