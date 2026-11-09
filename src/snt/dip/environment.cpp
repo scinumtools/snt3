@@ -702,6 +702,11 @@ namespace snt::dip {
     }
 
     void Environment::validate_write_path(const std::string& path) const {
+        // A declaration without a target can receive its one initial assignment.
+        // Descendant writes still pass through resolve_link_path and are rejected.
+        for (const auto& node : nodes.get_nodes())
+            if (node && node->dtype == NodeDtype::Link && node->path.name == path && node->link_target.empty())
+                return;
         const auto resolved = resolve_link_path(path);
         if (!resolved.followed_link)
             return;
@@ -755,6 +760,12 @@ namespace snt::dip {
 
     void Environment::validate_links() const {
         const auto validate_pool = [&](const NodeList<ValueNode>& pool, const std::string& owner) {
+            for (const auto& node : pool.get_nodes())
+                if (node && node->dtype == NodeDtype::Link && node->link_target.empty())
+                    throw dip::EnvironmentException(
+                        "Unassigned link", "The link `" + owner + node->path.name + "` has no target.",
+                        "Assign one absolute node reference before evaluation ends.", __FILE__, __LINE__, node->line
+                    );
             for (const auto& node : pool.get_nodes()) {
                 if (!node || node->dtype != NodeDtype::Link)
                     continue;

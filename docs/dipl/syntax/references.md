@@ -255,13 +255,28 @@ featured map
 featured[body] link = {?ontology.concepts[body]}
 ```
 
+A link may also be declared without a target and assigned later. This is useful
+for schema members whose target differs between instances:
+
+```DIPL
+$schema relation
+  target link
+
+relations map : relation
+relations[first]
+  target = {?ontology.concepts[body]}
+```
+
+Every instantiated link must have a target by the end of evaluation. Its
+target can be assigned only once, using an absolute node reference.
+
 The link may target a local node with `{?path}` or a named source with
 `{source?path}`. Targets must identify one node, without a trailing dot. A
 missing target or a chain of links that forms a cycle is an error in a live
 DIPL evaluation. Remote links resolve when the named source is loaded; a
 missing source or target is an error.
 
-Links are read-only aliases. A value reached through a link may be read, but a
+After assignment, links are read-only aliases. A value reached through a link may be read, but a
 definition, modification, or override must use its canonical path. A link to a
 group, map, list, or collection item exposes its descendants and collection
 items through the alias path. A link itself has no scalar value.

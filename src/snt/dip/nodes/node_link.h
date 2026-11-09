@@ -15,6 +15,7 @@ namespace snt::dip {
         }
         static ValueNode::PointerType is_node(Parser& parser);
         BaseNode::ListType parse(Environment& env) override;
+        void modify_value(const BaseNode::PointerType& node, Environment& env) override;
         BaseNode::PointerType clone(const Path& path, std::optional<size_t> indent = std::nullopt) const override;
     };
 

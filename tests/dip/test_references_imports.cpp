@@ -307,6 +307,63 @@ TEST(ReferencesLinks, LocalLinkTraversesCanonicalNodeWithoutCopyingIt) {
     std::filesystem::remove(snapshot_file);
 }
 
+TEST(ReferencesLinks, SchemaLinksCanReceiveTargetsAfterInstantiation) {
+    dip::DIP d;
+    d.add_string("$schema relation\n  target link\n");
+    d.add_string("relations map : relation\n"
+                 "relations[first]\n  target = {?nodes[one]}\n"
+                 "relations[second]\n  target = {?nodes[two]}\n");
+    d.add_string("nodes map\n"
+                 "nodes[one]\n  name str = \"one\"\n"
+                 "nodes[two]\n  name str = \"two\"\n");
+
+    const dip::Environment env = d.parse();
+    EXPECT_EQ(env.get_node("relations[first].target")->link_target, "nodes[one]");
+    EXPECT_EQ(env.get_node("relations[second].target")->link_target, "nodes[two]");
+    EXPECT_EQ(env["relations[first].target.name"].get_value()->to_string(), "\"one\"");
+    EXPECT_EQ(env["relations[second].target.name"].get_value()->to_string(), "\"two\"");
+
+    const auto snapshot_file = std::filesystem::temp_directory_path() / "snt_schema_links.diph5";
+    env.save(snapshot_file);
+    dip::Environment loaded;
+    ASSERT_NO_THROW(loaded.load(snapshot_file));
+    EXPECT_EQ(loaded["relations[first].target.name"].get_value()->to_string(), "\"one\"");
+    std::filesystem::remove(snapshot_file);
+}
+
+TEST(ReferencesLinks, UnassignedLinksAreRejectedAndAssignedLinksStayReadOnly) {
+    {
+        dip::DIP d;
+        d.add_string("$schema relation\n  target link\nrelations[first] : relation\n");
+        try {
+            (void)d.parse();
+            FAIL() << "an instantiated link must receive a target";
+        } catch (const dip::EnvironmentException& error) {
+            EXPECT_EQ(error.info().message, "Unassigned link");
+        }
+    }
+    {
+        dip::DIP d;
+        d.add_string("alias link\nnode str = \"value\"\nalias = {?node}\nalias = {?node}\n");
+        try {
+            (void)d.parse();
+            FAIL() << "a link target may be assigned only once";
+        } catch (const dip::SyntaxException& error) {
+            EXPECT_EQ(error.info().message, "Read-only link");
+        }
+    }
+    {
+        dip::DIP d;
+        d.add_string("alias link\nalias = \"not a reference\"\n");
+        try {
+            (void)d.parse();
+            FAIL() << "a link target must be an absolute node reference";
+        } catch (const dip::SyntaxException& error) {
+            EXPECT_EQ(error.info().message, "Invalid link target");
+        }
+    }
+}
+
 TEST(ReferencesLinks, MissingTargetsAndCyclesAreRejected) {
     {
         dip::DIP d;
