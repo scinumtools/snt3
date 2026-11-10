@@ -196,6 +196,48 @@ extern "C" int snt_dip_environment_save(snt_dip* dip, const char* path, snt_dip_
     }
 }
 
+extern "C" int snt_dip_environment_get_source_count(const snt_dip* dip, size_t* result, snt_dip_error* error) {
+    try {
+        if (!dip || !dip->parsed || !result)
+            throw std::invalid_argument("parsed DIP and result pointer are required");
+        *result = dip->env.get_source_manifest().size();
+        ok(error);
+        return 0;
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
+extern "C" int snt_dip_environment_get_source_path(
+    const snt_dip* dip, size_t index, char* buffer, size_t capacity, size_t* required, snt_dip_error* error
+) {
+    try {
+        if (!dip || !dip->parsed)
+            throw std::invalid_argument("parsed DIP is required");
+        const auto manifest = dip->env.get_source_manifest();
+        if (index >= manifest.size())
+            throw std::out_of_range("source index out of range");
+        return copy_string(manifest[index].path, buffer, capacity, required, error);
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
+extern "C" int snt_dip_environment_get_source_name(
+    const snt_dip* dip, size_t index, char* buffer, size_t capacity, size_t* required, snt_dip_error* error
+) {
+    try {
+        if (!dip || !dip->parsed)
+            throw std::invalid_argument("parsed DIP is required");
+        const auto manifest = dip->env.get_source_manifest();
+        if (index >= manifest.size())
+            throw std::out_of_range("source index out of range");
+        return copy_string(manifest[index].name, buffer, capacity, required, error);
+    } catch (const std::exception& exception) {
+        return fail(error, exception);
+    }
+}
+
 extern "C" int snt_dip_environment_generate(
     snt_dip* dip, snt_dip_export_format format, const char* path, snt_dip_error* error
 ) {

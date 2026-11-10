@@ -1,0 +1,11 @@
+[package]
+name = "scinumtools3-build"
+version.workspace = true
+edition = "2021"
+license = "MIT"
+description = "Compile-time DIPL evaluation and Rust struct initializer generation"
+repository = "https://github.com/scinumtools/snt3"
+readme = "README.md"
+
+[dependencies]
+scinumtools3 = { workspace = true }

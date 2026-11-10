@@ -1,5 +1,5 @@
 [workspace]
-members = ["scinumtools3-sys", "scinumtools3"]
+members = ["scinumtools3-sys", "scinumtools3", "scinumtools3-build"]
 resolver = "2"
 
 [workspace.package]
@@ -7,3 +7,5 @@ version = "0.10.0"
 
 [workspace.dependencies]
 scinumtools3-sys = { version = "=0.10.0", path = "scinumtools3-sys" }
+scinumtools3 = { version = "=0.10.0", path = "scinumtools3" }
+scinumtools3-build = { version = "=0.10.0", path = "scinumtools3-build" }

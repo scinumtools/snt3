@@ -90,6 +90,27 @@ extern "C" {
         path: *const c_char,
         error: *mut snt_dip_error,
     ) -> c_int;
+    pub fn snt_dip_environment_get_source_count(
+        dip: *const snt_dip,
+        result: *mut usize,
+        error: *mut snt_dip_error,
+    ) -> c_int;
+    pub fn snt_dip_environment_get_source_path(
+        dip: *const snt_dip,
+        index: usize,
+        buffer: *mut c_char,
+        capacity: usize,
+        required: *mut usize,
+        error: *mut snt_dip_error,
+    ) -> c_int;
+    pub fn snt_dip_environment_get_source_name(
+        dip: *const snt_dip,
+        index: usize,
+        buffer: *mut c_char,
+        capacity: usize,
+        required: *mut usize,
+        error: *mut snt_dip_error,
+    ) -> c_int;
     pub fn snt_dip_environment_get_node(
         dip: *const snt_dip,
         path: *const c_char,

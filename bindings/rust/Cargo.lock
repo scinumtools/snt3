@@ -10,5 +10,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "scinumtools3-build"
+version = "0.10.0"
+dependencies = [
+ "scinumtools3",
+]
+
+[[package]]
 name = "scinumtools3-sys"
 version = "0.10.0"

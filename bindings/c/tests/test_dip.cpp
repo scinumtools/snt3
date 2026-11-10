@@ -344,6 +344,16 @@ TEST(DIP, ParseProject) {
     EXPECT_EQ(snt_dip_parser_get(dip, "answer", output.data(), output.size(), &error), 0);
     EXPECT_EQ(std::string(output.data()), "42");
 
+    size_t source_count = 0;
+    ASSERT_EQ(snt_dip_environment_get_source_count(dip, &source_count, &error), 0);
+    EXPECT_GE(source_count, 1u);
+    size_t path_req = 0;
+    ASSERT_EQ(snt_dip_environment_get_source_path(dip, 0, nullptr, 0, &path_req, &error), 0);
+    EXPECT_GT(path_req, 1u);
+    std::string source_path(path_req - 1, '\0');
+    ASSERT_EQ(snt_dip_environment_get_source_path(dip, 0, source_path.data(), path_req, &path_req, &error), 0);
+    EXPECT_FALSE(source_path.empty());
+
     snt_dip_parser_free(dip);
     std::filesystem::remove_all(directory);
 }

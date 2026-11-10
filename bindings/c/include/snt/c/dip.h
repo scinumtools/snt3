@@ -231,6 +231,16 @@ int snt_dip_parser_is_overridden(const snt_dip* dip, const char* path, int* resu
 int snt_dip_environment_load(snt_dip* dip, const char* path, snt_dip_error* error);
 /** Save the environment to an HDF5 file. */
 int snt_dip_environment_save(snt_dip* dip, const char* path, snt_dip_error* error);
+/** Return the number of registered/imported sources in the parsed or loaded environment. */
+int snt_dip_environment_get_source_count(const snt_dip* dip, size_t* result, snt_dip_error* error);
+/** Copy the file path of a source by index. Query required bytes with NULL/0. */
+int snt_dip_environment_get_source_path(
+    const snt_dip* dip, size_t index, char* buffer, size_t capacity, size_t* required, snt_dip_error* error
+);
+/** Copy the registered name of a source by index. Query required bytes with NULL/0. */
+int snt_dip_environment_get_source_name(
+    const snt_dip* dip, size_t index, char* buffer, size_t capacity, size_t* required, snt_dip_error* error
+);
 /** Generate a static parameter list from the environment. */
 int snt_dip_environment_generate(
     snt_dip* dip, snt_dip_export_format format, const char* path, snt_dip_error* error

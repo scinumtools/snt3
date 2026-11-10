@@ -164,6 +164,9 @@ fn load_dipfile_project_and_reject_invalid_input() {
     fs::write(directory.join("main.dip"), "answer int = 7\n").unwrap();
     let project = Project::load(&directory).unwrap();
     assert_eq!(project.node("answer").unwrap().as_i64().unwrap(), 7);
+    let sources = project.source_files().unwrap();
+    assert!(!sources.is_empty());
+    assert!(sources.iter().any(|p| p.ends_with("main.dip")));
     assert!(Project::load(directory.join("missing.txt")).is_err());
     fs::remove_dir_all(directory).unwrap();
 }

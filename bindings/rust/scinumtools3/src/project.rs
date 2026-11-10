@@ -161,6 +161,29 @@ impl Project {
             error,
         )
     }
+    /// Return the paths of all file-backed sources contributing to the evaluated environment.
+    /// This includes the root DIPfile, imported .dip files, and schema files.
+    pub fn source_files(&self) -> Result<Vec<std::path::PathBuf>> {
+        self.ensure_ready()?;
+        let mut count = 0;
+        let mut error = ffi::snt_dip_error::default();
+        check(
+            unsafe {
+                ffi::snt_dip_environment_get_source_count(self.raw.as_ptr(), &mut count, &mut error)
+            },
+            error,
+        )?;
+        let mut files = Vec::new();
+        for index in 0..count {
+            let path_str = crate::shared::read_string(|b, n, r, e| unsafe {
+                ffi::snt_dip_environment_get_source_path(self.raw.as_ptr(), index, b, n, r, e)
+            })?;
+            if !path_str.is_empty() {
+                files.push(std::path::PathBuf::from(path_str));
+            }
+        }
+        Ok(files)
+    }
     pub fn node(&self, path: &str) -> Result<Node<'_>> {
         self.ensure_ready()?;
         let path = text(path)?;
