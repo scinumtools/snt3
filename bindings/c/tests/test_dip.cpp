@@ -347,12 +347,16 @@ TEST(DIP, ParseProject) {
     size_t source_count = 0;
     ASSERT_EQ(snt_dip_environment_get_source_count(dip, &source_count, &error), 0);
     EXPECT_GE(source_count, 1u);
-    size_t path_req = 0;
-    ASSERT_EQ(snt_dip_environment_get_source_path(dip, 0, nullptr, 0, &path_req, &error), 0);
-    EXPECT_GT(path_req, 1u);
-    std::string source_path(path_req - 1, '\0');
-    ASSERT_EQ(snt_dip_environment_get_source_path(dip, 0, source_path.data(), path_req, &path_req, &error), 0);
-    EXPECT_FALSE(source_path.empty());
+    bool found_parameters = false;
+    for (size_t index = 0; index < source_count; ++index) {
+        size_t path_req = 0;
+        ASSERT_EQ(snt_dip_environment_get_source_path(dip, index, nullptr, 0, &path_req, &error), 0);
+        ASSERT_GE(path_req, 1u);
+        std::vector<char> source_path(path_req);
+        ASSERT_EQ(snt_dip_environment_get_source_path(dip, index, source_path.data(), source_path.size(), &path_req, &error), 0);
+        found_parameters |= std::filesystem::path(source_path.data()) == directory / "parameters.dip";
+    }
+    EXPECT_TRUE(found_parameters);
 
     snt_dip_parser_free(dip);
     std::filesystem::remove_all(directory);
