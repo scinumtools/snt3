@@ -30,15 +30,16 @@ def replace_one(text: str, pattern: str, version: str) -> str:
 def sync(version: str) -> None:
     manifest = MANIFEST.read_text()
     manifest = replace_one(manifest, r'(?m)^(version = ")[^"]+("\n)', version)
-    manifest = replace_one(
-        manifest,
-        r'(?m)^(scinumtools3-sys = \{ version = "=)[^"]+("[^\n]*\n)',
-        version,
-    )
+    for crate in ("scinumtools3-sys", "scinumtools3", "scinumtools3-build"):
+        manifest = replace_one(
+            manifest,
+            rf'(?m)^({crate} = \{{ version = "=)[^"]+("[^\n]*\n)',
+            version,
+        )
     MANIFEST.write_text(manifest)
 
     lock = LOCK.read_text()
-    for crate in ("scinumtools3", "scinumtools3-sys"):
+    for crate in ("scinumtools3", "scinumtools3-sys", "scinumtools3-build"):
         lock = replace_one(
             lock, rf'(?m)^(name = "{crate}"\nversion = ")[^"]+("\n)', version
         )
@@ -49,16 +50,18 @@ def check(version: str) -> None:
     manifest = tomllib.loads(MANIFEST.read_text())
     lock = tomllib.loads(LOCK.read_text())
     actual = manifest["workspace"]["package"]["version"]
-    dependency = manifest["workspace"]["dependencies"]["scinumtools3-sys"]["version"]
+    dependencies = manifest["workspace"]["dependencies"]
+    crates = ("scinumtools3-sys", "scinumtools3", "scinumtools3-build")
     locked = {
         package["name"]: package["version"]
         for package in lock["package"]
-        if package["name"] in {"scinumtools3", "scinumtools3-sys"}
+        if package["name"] in crates
     }
-    if actual != version or dependency != f"={version}" or locked != {
-        "scinumtools3": version,
-        "scinumtools3-sys": version,
-    }:
+    if (
+        actual != version
+        or any(dependencies[crate]["version"] != f"={version}" for crate in crates)
+        or locked != {crate: version for crate in crates}
+    ):
         raise SystemExit(
             f"Rust versions do not match SNT3 {version}; "
             "run python3 bindings/rust/sync_version.py --write"

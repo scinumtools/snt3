@@ -25,15 +25,15 @@ When a GitHub release is published, the release workflow checks out its tag,
 checks the tag against `CODE_VERSION` in `settings.env`, and publishes the
 crates with that version. For a manual run, enter an existing published release
 tag in Actions. The workflow builds the Rust binding and native libraries from
-the current `main` branch, then assigns the entered tag's version to both
-crates. This permits publishing a crate for an earlier release tag from newer
-source. In either mode, it updates both Cargo versions and the lockfile in its
-checkout, runs the Rust tests, and publishes `scinumtools3-sys` before
-`scinumtools3`. Before publishing, it snapshots the native source
-into the sys crate and verifies that the packaged crate builds without an
-external SNT3 installation.
+the current `main` branch, then assigns the entered tag's version to all three
+crates. This permits publishing crates for an earlier release tag from newer
+source. In either mode, it updates the Cargo versions and lockfile in its
+checkout, runs the Rust tests, and publishes `scinumtools3-sys`,
+`scinumtools3`, then `scinumtools3-build` in dependency order. Before
+publishing, it snapshots the native source into the sys crate and verifies
+that the packaged crate builds without an external SNT3 installation.
 Configure the repository secret
-`CRATES_IO_TOKEN` with a crates.io API token authorized to publish both
+`CRATES_IO_TOKEN` with a crates.io API token authorized to publish all three
 crates. For an initial publication, use a token that can create the crates;
 later tokens may be scoped to the existing crates.
 

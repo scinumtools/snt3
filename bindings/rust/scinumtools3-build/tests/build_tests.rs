@@ -283,7 +283,7 @@ pub struct Test {{
     pub text: &'static str,
 }}
 
-include!("{}");
+include!({:?});
 
 fn main() {{
     assert!(TEST.text.contains("Line 1\nLine 2"));
@@ -292,11 +292,11 @@ fn main() {{
     assert!(TEST.text.contains("Unicode: äöü 🚀"));
 }}
 "#,
-        out_file.display()
+        out_file.to_string_lossy()
     );
     fs::write(&test_rs, test_source).unwrap();
 
-    let bin = dir.join("test_escape_bin");
+    let bin = dir.join(format!("test_escape_bin{}", std::env::consts::EXE_SUFFIX));
     let compile_status = Command::new("rustc")
         .arg(&test_rs)
         .arg("-o")
@@ -409,7 +409,7 @@ pub mod settings {{
 }}
 
 mod compiled_settings {{
-    include!("{}");
+    include!({:?});
 }}
 
 fn main() {{
@@ -422,11 +422,11 @@ fn main() {{
     println!("SUCCESS");
 }}
 "#,
-        generated_rs.display()
+        generated_rs.to_string_lossy()
     );
     fs::write(&main_rs, main_source).unwrap();
 
-    let bin_path = dir.join("test_bin");
+    let bin_path = dir.join(format!("test_bin{}", std::env::consts::EXE_SUFFIX));
     let compile_status = Command::new("rustc")
         .arg(&main_rs)
         .arg("-o")
@@ -467,22 +467,27 @@ pub struct Settings {{
     pub val: f32,
 }}
 
-include!("{}");
+include!({:?});
 
 fn main() {{}}
 "#,
-        generated_rs.display()
+        generated_rs.to_string_lossy()
     );
     fs::write(&main_rs, main_source).unwrap();
 
-    let compile_status = Command::new("rustc")
+    let compile_output = Command::new("rustc")
         .arg(&main_rs)
         .arg("-o")
         .arg(dir.join("should_fail_bin"))
-        .status()
+        .output()
         .expect("failed to invoke rustc");
 
-    assert!(!compile_status.success(), "rustc must reject type mismatch between struct and initializer");
+    assert!(
+        !compile_output.status.success()
+            && String::from_utf8_lossy(&compile_output.stderr).contains("error[E0308]"),
+        "rustc must reject the field type: {}",
+        String::from_utf8_lossy(&compile_output.stderr)
+    );
 
     fs::remove_dir_all(dir).unwrap();
 }
@@ -532,22 +537,27 @@ pub struct Settings {{
     pub width: f32,
 }}
 
-include!("{}");
+include!({:?});
 
 fn main() {{}}
 "#,
-        generated_rs.display()
+        generated_rs.to_string_lossy()
     );
     fs::write(&main_rs, main_source).unwrap();
 
-    let compile_status = Command::new("rustc")
+    let compile_output = Command::new("rustc")
         .arg(&main_rs)
         .arg("-o")
         .arg(dir.join("should_fail_bin"))
-        .status()
+        .output()
         .expect("failed to invoke rustc");
 
-    assert!(!compile_status.success(), "rustc must fail when consumer struct renames a field");
+    assert!(
+        !compile_output.status.success()
+            && String::from_utf8_lossy(&compile_output.stderr).contains("error[E0560]"),
+        "rustc must reject the missing field: {}",
+        String::from_utf8_lossy(&compile_output.stderr)
+    );
 
     fs::remove_dir_all(dir).unwrap();
 }
@@ -583,22 +593,27 @@ pub struct Settings {{
     pub colormap: Colormap,
 }}
 
-include!("{}");
+include!({:?});
 
 fn main() {{}}
 "#,
-        generated_rs.display()
+        generated_rs.to_string_lossy()
     );
     fs::write(&main_rs, main_source).unwrap();
 
-    let compile_status = Command::new("rustc")
+    let compile_output = Command::new("rustc")
         .arg(&main_rs)
         .arg("-o")
         .arg(dir.join("should_fail_bin"))
-        .status()
+        .output()
         .expect("failed to invoke rustc");
 
-    assert!(!compile_status.success(), "rustc must fail when consumer deletes an enum variant");
+    assert!(
+        !compile_output.status.success()
+            && String::from_utf8_lossy(&compile_output.stderr).contains("error[E0599]"),
+        "rustc must reject the missing enum variant: {}",
+        String::from_utf8_lossy(&compile_output.stderr)
+    );
 
     fs::remove_dir_all(dir).unwrap();
 }
