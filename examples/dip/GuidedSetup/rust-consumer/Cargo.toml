@@ -1,0 +1,10 @@
+[package]
+name = "snt-guided-setup-rust-consumer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+scinumtools3 = { path = "../../../../bindings/rust/scinumtools3" }
+
+[build-dependencies]
+scinumtools3-build = { path = "../../../../bindings/rust/scinumtools3-build" }

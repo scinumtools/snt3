@@ -1,11 +1,7 @@
-code[]
-  file = "settings.dip"
-
-
-
-
-
-
+diplfile[]
+  file = "build/DIPfile"
+diplfile[]
+  file = "runtime/DIPfile"
 
 overrides[]
   file = "setup-overrides.dip"

@@ -118,7 +118,7 @@ namespace snt::dip {
      * One DIPfile registration, retained in manifest order for live inspection.
      */
     struct ProjectEntry {
-        enum class Kind { Unit, Source, Schema, Code, Override };
+        enum class Kind { Unit, Source, Schema, Code, Override, Include };
         Kind kind; ///< Registration category.
         std::string name;          ///< Public name, when the entry has one.
         std::string value;         ///< Declared unit, path, or inline text.

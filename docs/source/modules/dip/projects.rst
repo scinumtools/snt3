@@ -1,10 +1,10 @@
 DIPfile projects
 ================
 
-A ``DIPfile`` gathers the units, named sources, reusable schemas, override
-files, DIPL files, and inline DIPL definitions used by one parameter
+A ``DIPfile`` gathers other DIPfiles, units, named sources, reusable schemas,
+override files, DIPL files, and inline DIPL definitions used by one parameter
 environment. It is itself ordinary DIPL: the project loader supplies the
-schemas for its five lists and its optional ``format`` group, then parses the
+schemas for its six lists and its optional ``format`` group, then parses the
 file with the standard DIP parser.
 
 Start a project
@@ -24,7 +24,7 @@ to overwrite either file if it already exists.
 Project format
 --------------
 
-Each project contains ``units[]``, ``sources[]``, ``schemas[]``,
+Each project contains ``diplfile[]``, ``units[]``, ``sources[]``, ``schemas[]``,
 ``overrides[]``, and ``code[]`` items, plus an optional ``format`` group for
 :doc:`the DIPL developer tools <../../integrations/devtools>`. A schema item
 has a ``name`` and exactly one of ``file`` or ``string``. Its file or string is
@@ -35,6 +35,27 @@ modifications without a ``$override`` wrapper. Schemas and overrides are
 registered before model evaluation, regardless of where their entries appear
 in the manifest; ``code[]`` items retain their declared order. Each code item
 has exactly one of ``file`` or ``string``.
+
+Each ``diplfile[]`` item names another DIPfile in its ``file`` field. Included
+manifests are loaded in list order before the including manifest's own units,
+sources, schemas, overrides, and code. Includes may be nested. Paths in each
+manifest are relative to that manifest's directory; recursive includes are an
+error. ``diplfile[]`` composes project manifests; DIPL references such as
+``{?path}`` still refer to nodes within an evaluated model. All included code
+contributes to one evaluated environment, so a build script can compile
+selected settings while an application reads the same collective model at
+runtime.
+
+For example, a root ``DIPfile`` can combine separate manifests:
+
+.. code-block:: dipl
+
+   diplfile[]
+     file = "build/DIPfile"
+   diplfile[]
+     file = "runtime/DIPfile"
+   code[]
+     file = "shared.dip"
 
 .. code-block:: dipl
 

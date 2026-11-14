@@ -76,6 +76,8 @@ $schema snt_project_code
   string str = none
 $schema snt_project_override
   file str
+$schema snt_project_diplfile
+  file str
 $schema snt_project_format
   blank_lines_between_nodes int = 1
   final_newline bool = true
@@ -89,6 +91,7 @@ $schema snt_project_lint
   warn_broken_metadata_references bool = false
   warn_unused_schemas bool = false
 units list : snt_project_unit
+diplfile list : snt_project_diplfile
 sources list : snt_project_source
 schemas list : snt_project_schema
 code list : snt_project_code
@@ -104,8 +107,9 @@ lint : snt_project_lint
         }
 
         void validate_project_manifest(const Environment& manifest) {
-            const std::set<std::string> collections = {"units", "sources", "schemas", "code", "overrides"};
+            const std::set<std::string> collections = {"diplfile", "units", "sources", "schemas", "code", "overrides"};
             const std::map<std::string, std::set<std::string>> fields = {
+                {"diplfile", {"file"}},
                 {"units", {"name", "unit"}},
                 {"sources", {"name", "filepath"}},
                 {"schemas", {"name", "file", "string"}},
@@ -355,16 +359,55 @@ lint : snt_project_lint
     }
 
     void DIP::add_project(const std::filesystem::path& project_file) {
-        const std::filesystem::path absolute_project = std::filesystem::absolute(project_file);
+        std::vector<std::filesystem::path> include_stack;
+        add_project_file(project_file, include_stack, {source.name, source.line_number});
+    }
+
+    void DIP::add_project_file(
+        const std::filesystem::path& project_file, std::vector<std::filesystem::path>& include_stack,
+        const Source& parent
+    ) {
+        const std::filesystem::path absolute_project = std::filesystem::absolute(project_file).lexically_normal();
+        std::error_code path_error;
+        const auto canonical_project = std::filesystem::weakly_canonical(absolute_project, path_error);
+        const auto identity = path_error ? absolute_project : canonical_project;
+        if (std::find(include_stack.begin(), include_stack.end(), identity) != include_stack.end()) {
+            throw SyntaxException(
+                "Cyclic DIPfile include",
+                "The project includes `" + absolute_project.string() + "` more than once in one include chain.",
+                "Remove the recursive diplfile[] entry.", __FILE__, __LINE__, Line{"", parent}
+            );
+        }
+        include_stack.push_back(identity);
         const std::string project_source = source.name + "_project" + std::to_string(num_projects++);
 
         const Environment project = parse_project_manifest(absolute_project, env.project_file_reader(), project_source);
 
         const EnvSource& project_definition = project.sources.at(project_source);
         env.sources.append(
-            project_source, absolute_project, project_definition.code, {source.name, source.line_number}
+            project_source, absolute_project, project_definition.code, parent
         );
         const std::filesystem::path project_directory = absolute_project.parent_path();
+
+        if (project.hierarchy.has_collection("diplfile")) {
+            const Collection& collection = project.hierarchy.get_collection("diplfile");
+            for (const std::string& index : collection.items) {
+                const std::string item = "diplfile[" + index + "]";
+                const auto node = project.get_node(item + ".file");
+                const auto declared_file = project[item + ".file"].as<std::string>();
+                if (declared_file.empty())
+                    throw SyntaxException(
+                        "Invalid DIPfile entry", "A diplfile[] item needs a nonempty file path.",
+                        "Set file to a DIPfile path relative to this manifest.", __FILE__, __LINE__, project_field_line(node)
+                    );
+                const auto included_file = project_path(project_directory, declared_file).lexically_normal();
+                const auto include_line = project_field_line(node).source.line_number;
+                env.record_project_entry(
+                    {ProjectEntry::Kind::Include, {}, declared_file, included_file.string(), project_source, include_line}
+                );
+                add_project_file(included_file, include_stack, {project_source, include_line});
+            }
+        }
 
         if (project.hierarchy.has_collection("units")) {
             const Collection& collection = project.hierarchy.get_collection("units");
@@ -504,6 +547,7 @@ lint : snt_project_lint
                 );
             }
         }
+        include_stack.pop_back();
     }
 
     void DIP::add_project(const ProjectInput& project) {

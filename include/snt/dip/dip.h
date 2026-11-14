@@ -69,6 +69,11 @@ namespace snt::dip {
         size_t num_projects = 0;  ///< number of project manifests added to this parser
         size_t num_overrides = 0; ///< number of host-provided override sources
 
+        void add_project_file(
+            const std::filesystem::path& project_file, std::vector<std::filesystem::path>& include_stack,
+            const Source& parent
+        );
+
         void register_code_source(
             const std::string& source_code,
             const std::filesystem::path& source_file,
@@ -202,9 +207,10 @@ namespace snt::dip {
         /**
          * Add a DIP project manifest.
          *
-         * The manifest is ordinary DIPL containing units[], sources[], schemas[],
-         * overrides[], and ordered code[] records. Each schemas[] item has a name
-         * and exactly one file or string body, without a $schema wrapper. Each
+         * The manifest is ordinary DIPL containing diplfile[], units[], sources[], schemas[],
+         * overrides[], and ordered code[] records. Included DIPfiles are loaded first
+         * in declaration order, with paths relative to the including manifest.
+         * Each schemas[] item has a name and exactly one file or string body, without a $schema wrapper. Each
          * overrides[] item has a file containing an unwrapped $override body.
          * Schemas and overrides are registered before model evaluation. Relative
          * paths are resolved from the manifest's directory.

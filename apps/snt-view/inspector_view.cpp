@@ -1031,6 +1031,8 @@ namespace snt::view {
             const auto& entry = model.environment().project_entries().at(*object->manifest_index);
             std::string target;
             switch (entry.kind) {
+            case dip::ProjectEntry::Kind::Include:
+                break;
             case dip::ProjectEntry::Kind::Unit:
                 target = "@unit?" + entry.name;
                 break;

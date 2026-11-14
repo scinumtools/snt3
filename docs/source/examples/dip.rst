@@ -200,7 +200,9 @@ The `GuidedSetup source directory
 demonstrates DIPL-driven prompts with ``snt dip setup``. It includes a boolean,
 labelled options, constrained integer and unit-bearing number, formatted text,
 an array expression, a required value without a default, and a derived value
-that is not prompted.
+that is not prompted. Its root ``DIPfile`` combines separate build and runtime
+manifests with ``diplfile[]``; the included Rust consumer compiles build values
+while loading runtime values from the same project.
 
 From the repository root, run:
 

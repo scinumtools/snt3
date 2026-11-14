@@ -1,0 +1,6 @@
+build
+  max_threads int = 4
+    ?descr "Worker count selected when compiling the application"
+    !condition ({.} > 0)
+  trace bool = false
+    ?descr "Compile the application with tracing enabled"

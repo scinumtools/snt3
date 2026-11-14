@@ -899,6 +899,12 @@ int main() {
                   !registered_setup.environment().get_node("count")->value,
               "Setup removal should use the visible project registration even without a generated-file header");
         const auto guided_example = std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "examples/dip/GuidedSetup/DIPfile";
+        snt::view::ViewerModel composed_project(guided_example);
+        const auto* included_manifests = composed_project.object("@dipfile?DIPfiles");
+        check(included_manifests && included_manifests->children.size() == 2 &&
+                  composed_project.environment()["build.max_threads"].as<int64_t>() == 4 &&
+                  composed_project.environment()["simulation.steps"].as<int64_t>() == 500,
+              "Included DIPfiles should appear in the project viewer and share one environment");
         const auto guided_copy = inline_dir / "guided";
         std::filesystem::create_directory(guided_copy);
         write(guided_copy / "DIPfile", "code[]\n  file = \"settings.dip\"\n");

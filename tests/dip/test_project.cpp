@@ -52,6 +52,76 @@ TEST(Project, InitializeCreatesParseableStarterProject) {
     EXPECT_EQ(parser.parse()["example"].as<int>(), 1);
 }
 
+TEST(Project, IncludesNestedDIPfilesInOneEnvironment) {
+    ProjectDirectory project("nested-includes");
+    std::filesystem::create_directories(project.path() / "runtime");
+    std::filesystem::create_directories(project.path() / "build");
+    std::filesystem::create_directories(project.path() / "shared");
+    project.write("DIPfile",
+                  "code[]\n  string = \"combined int = ({?build.threads} + {?runtime.steps})\"\n"
+                  "diplfile[]\n  file = \"build/DIPfile\"\n"
+                  "diplfile[]\n  file = \"runtime/DIPfile\"\n"
+    );
+    project.write("build/DIPfile",
+                  "diplfile[]\n  file = \"../shared/DIPfile\"\n"
+                  "code[]\n  string = \"build : thread_settings\"\n");
+    project.write("shared/DIPfile",
+                  "schemas[]\n  name = \"thread_settings\"\n  string = \"threads int = 4\"\n");
+    project.write("runtime/DIPfile",
+                  "code[]\n  file = \"settings.dip\"\n");
+    project.write("runtime/settings.dip", "runtime\n  steps int = 8\n");
+
+    dip::DIP parser;
+    parser.add_project(project.path() / "DIPfile");
+    const auto env = parser.parse();
+    EXPECT_EQ(env["build.threads"].as<int64_t>(), 4);
+    EXPECT_EQ(env["runtime.steps"].as<int64_t>(), 8);
+    EXPECT_EQ(env["combined"].as<int64_t>(), 12);
+    ASSERT_GE(env.project_entries().size(), 7u);
+    const auto included_build = std::find_if(
+        env.project_entries().begin(), env.project_entries().end(), [&](const dip::ProjectEntry& entry) {
+            return entry.resolved_path == (project.path() / "build/DIPfile").string();
+        });
+    ASSERT_NE(included_build, env.project_entries().end());
+    EXPECT_EQ(included_build->kind, dip::ProjectEntry::Kind::Include);
+    const auto sources = env.get_source_manifest();
+    const auto has_source = [&](const std::filesystem::path& path) {
+        return std::any_of(sources.begin(), sources.end(), [&](const dip::SourceInfo& source) {
+            return source.path == path.string();
+        });
+    };
+    EXPECT_TRUE(has_source(project.path() / "shared/DIPfile"));
+    EXPECT_TRUE(has_source(project.path() / "runtime/settings.dip"));
+
+    const auto bundle = dip::package_project(project.path() / "DIPfile");
+    dip::DIP bundled;
+    bundled.add_project(bundle);
+    EXPECT_EQ(bundled.parse()["combined"].as<int64_t>(), 12);
+}
+
+TEST(Project, RejectsCyclicDIPfileIncludes) {
+    ProjectDirectory project("cyclic-includes");
+    std::filesystem::create_directories(project.path() / "nested");
+    project.write("DIPfile", "diplfile[]\n  file = \"nested/DIPfile\"\n");
+    project.write("nested/DIPfile", "diplfile[]\n  file = \"../DIPfile\"\n");
+
+    dip::DIP parser;
+    try {
+        parser.add_project(project.path() / "DIPfile");
+        FAIL() << "Expected a cyclic include error";
+    } catch (const dip::SyntaxException& error) {
+        EXPECT_EQ(error.info().message, "Cyclic DIPfile include");
+    }
+}
+
+TEST(Project, RejectsMissingIncludedDIPfile) {
+    ProjectDirectory project("missing-include");
+    project.write("DIPfile", "diplfile[]\n  file = \"missing/DIPfile\"\n");
+
+    dip::DIP parser;
+    EXPECT_THROW(parser.add_project(project.path() / "DIPfile"), dip::IOException);
+}
+
 TEST(Project, AddFileRejectsProjectManifestWithActionableError) {
     ProjectDirectory project("add-file-manifest");
     project.write(
@@ -606,4 +676,15 @@ TEST(Project, ParameterViewerExampleStaysBrowsable) {
     const auto registration = locations(dip::SourceEntityKind::ProjectEntry, {}, {}, 1);
     ASSERT_EQ(registration.size(), 1);
     EXPECT_EQ(registration.front().line, 7);
+}
+
+TEST(Project, GuidedSetupExampleCombinesBuildAndRuntimeSettings) {
+    const auto project = std::filesystem::path(PROJECT_SOURCE_ROOT_DIR) / "examples/dip/GuidedSetup/DIPfile";
+    dip::DIP parser;
+    parser.add_project(project);
+    const auto env = parser.parse();
+    EXPECT_EQ(env["build.max_threads"].as<int64_t>(), 4);
+    EXPECT_FALSE(env["build.trace"].as<bool>());
+    EXPECT_EQ(env["simulation.steps"].as<int64_t>(), 500);
+    EXPECT_EQ(env["simulation.random_seed"].as<int64_t>(), 234);
 }

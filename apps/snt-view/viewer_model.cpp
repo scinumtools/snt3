@@ -228,6 +228,9 @@ namespace snt::view {
                 const auto& entry = environment_.project_entries()[index];
                 const char* category = nullptr;
                 switch (entry.kind) {
+                case dip::ProjectEntry::Kind::Include:
+                    category = "DIPfiles";
+                    break;
                 case dip::ProjectEntry::Kind::Unit:
                     category = "Units";
                     break;
