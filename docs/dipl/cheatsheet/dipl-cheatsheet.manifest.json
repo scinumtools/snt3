@@ -1,0 +1,10 @@
+{
+  "versions": {
+    "dipl": "1.1.0",
+    "puel": "0.1.0",
+    "diph5": "3.0.0",
+    "snt3": "0.10.2"
+  },
+  "git_commit": "c971cfefe1ee",
+  "pdf_sha256": "e184796892ea0456c8fe9536c52e96d95cf51159c6a1229e9e9e3aa4eb2fd1f3"
+}

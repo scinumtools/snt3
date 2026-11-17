@@ -113,12 +113,27 @@ namespace snt::dip::report {
             throw std::runtime_error("Cannot write report output: " + path.string());
     }
 
-    void compile_pdf(const std::string& contents, const std::filesystem::path& output, const std::string& compiler) {
+    void compile_pdf(const std::string& contents, const std::filesystem::path& output, const std::string& compiler,
+                     const std::filesystem::path& appendix_pdf) {
         TemporaryDirectory temporary;
         const auto tex = temporary.path / "report.tex";
         const auto pdf = temporary.path / "report.pdf";
         const auto log = temporary.path / "compiler.log";
-        write_file(tex, contents);
+        std::string source = contents;
+        if (!appendix_pdf.empty()) {
+            if (!std::filesystem::is_regular_file(appendix_pdf))
+                throw std::runtime_error("Cannot read DIPL cheat sheet PDF: " + appendix_pdf.string());
+            std::filesystem::copy_file(appendix_pdf, temporary.path / "appendix.pdf");
+            const auto begin = source.find("\\begin{document}");
+            const auto end = source.rfind("\\end{document}");
+            if (begin == std::string::npos || end == std::string::npos || end <= begin)
+                throw std::runtime_error("Cannot append the cheat sheet to the generated TeX report.");
+            source.insert(end,
+                "\\clearpage\n"
+                "\\includepdf[pages=-,pagecommand={},addtotoc={1,section,1,DIPL and PUEL quick reference,dipl-cheatsheet}]{appendix.pdf}\n");
+            source.insert(begin, "\\usepackage{pdfpages}\n");
+        }
+        write_file(tex, source);
         for (int pass = 0; pass < 2; ++pass) {
             const int status = run_compiler(compiler, tex, temporary.path, log);
             if (status == 127 || status == -1)

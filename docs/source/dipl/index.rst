@@ -331,6 +331,8 @@ Specification
 
 * Specification: `<https://github.com/scinumtools/snt3/blob/main/docs/dipl/specification.md>`_
 * Grammar: `<https://github.com/scinumtools/snt3/blob/main/docs/dipl/grammar.ebnf>`_
+* `Download the DIPL & PUEL quick reference (PDF) <../dipl-cheatsheet.pdf>`_
+* `Download the full DIPL specification (PDF) <../_static/dipl-specification.pdf>`_
 
 .. raw:: html
 

@@ -15,32 +15,40 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
       - name: Install Pandoc and LaTeX
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             pandoc \
+            ghostscript \
+            doxygen \
+            libhdf5-dev \
             fonts-dejavu-core \
+            fonts-texgyre \
             texlive-xetex \
+            texlive-luatex \
             texlive-latex-extra \
             texlive-fonts-recommended
 
+      - name: Install SNT3 parser for example verification
+        run: python -m pip install .
+
       - name: Build PDF
         run: |
-          mkdir -p build
-
-          pandoc \
-            --defaults=docs/dipl/pandoc.yaml \
-            --output=build/dipl-specification.pdf
-
-          pandoc \
-            --defaults=docs/puel/pandoc.yaml \
-            --output=build/puel-specification.pdf
-
-          pandoc \
-            --defaults=docs/diph5/pandoc.yaml \
-            --output=build/diph5-specification.pdf
+          make -C docs pdf-reference
+          python -m pip install 'sphinx>=7,<9' sphinx-rtd-theme 'breathe>=4.36,<5'
+          make -C docs doxygen
+          python -m sphinx -b html docs/source build/sphinx-html
+          test -s build/sphinx-html/dipl-cheatsheet.pdf
+          python docs/dipl/cheatsheet/check_outputs.py build/sphinx-html
             
       - name: Determine release tag
         id: release
@@ -67,6 +75,7 @@ jobs:
           tag_name: ${{ steps.release.outputs.tag }}
           files: |
             build/dipl-specification.pdf
+            docs/dipl/cheatsheet/dipl-cheatsheet.pdf
             build/puel-specification.pdf
             build/diph5-specification.pdf
           generate_release_notes: false

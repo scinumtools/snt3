@@ -38,6 +38,8 @@ namespace snt::dip::report {
             throw std::invalid_argument("A report output path is required.");
         if (!options.introduction_file.empty() && format != ReportFormat::Tex && format != ReportFormat::Pdf)
             throw std::invalid_argument("A LaTeX introduction is supported only for TeX and PDF reports.");
+        if (!options.cheatsheet_pdf.empty() && format != ReportFormat::Pdf)
+            throw std::invalid_argument("The DIPL cheat sheet can be appended only to PDF reports.");
         std::string introduction;
         if (!options.introduction_file.empty()) {
             if (!std::filesystem::is_regular_file(options.introduction_file))
@@ -71,7 +73,8 @@ namespace snt::dip::report {
             write_file(output, render_document(document, format));
             break;
         case ReportFormat::Pdf:
-            compile_pdf(render_document(document, ReportFormat::Tex), output, options.tex_compiler);
+            compile_pdf(render_document(document, ReportFormat::Tex), output, options.tex_compiler,
+                        options.cheatsheet_pdf);
             break;
         default:
             throw std::invalid_argument("Unknown report format.");

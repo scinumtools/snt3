@@ -3,6 +3,8 @@ pdf-engine: xelatex
 toc: true
 number-sections: true
 resource-path: [docs/dipl]
+include-in-header:
+  - docs/dipl/cheatsheet/pdfpages.tex
 
 variables:
   geometry:
@@ -24,6 +26,7 @@ input-files:
   - docs/dipl/syntax/overrides.md
   - docs/dipl/appendix/grammar.md
   - docs/dipl/appendix/highlighting.md
+  - docs/dipl/cheatsheet/appendix.md
 
 syntax-definitions:
   - docs/dipl/highlight/skylight/dipl.xml

@@ -21,6 +21,7 @@ namespace snt::dip::report {
         std::string date;                           ///< Report date; empty uses the generation date.
         std::string version;                        ///< Report version; empty uses the SNT version.
         std::filesystem::path source_root;          ///< Show source paths relative to this directory when possible.
+        std::filesystem::path cheatsheet_pdf;       ///< Optional prebuilt DIPL/PUEL PDF appended to PDF reports.
     };
 
     /** Generate a report from an already evaluated environment.

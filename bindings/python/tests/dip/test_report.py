@@ -1,5 +1,8 @@
 from pathlib import Path
 import json
+import shutil
+import subprocess
+from importlib import resources
 
 import pytest
 
@@ -107,3 +110,31 @@ def test_report_schema_and_recorded_dependencies_survive_snapshot(tmp_path: Path
     loaded.generate_report(ReportFormat.TEXT, saved_report)
     assert "Reads during evaluation | ?physics.speed" in saved_report.read_text()
     assert "Supplied parameters | physics.speed" in saved_report.read_text()
+
+
+@pytest.mark.skipif(not shutil.which("pdflatex") or not shutil.which("gs"),
+                    reason="PDF integration needs pdflatex and Ghostscript")
+def test_pdf_report_appends_packaged_cheatsheet(tmp_path: Path):
+    packaged = resources.files("scinumtools3").joinpath("resources").joinpath("dipl-cheatsheet.pdf")
+    assert packaged.is_file()
+
+    parser = DIP()
+    parser.add_string("speed float = 3 m/s")
+    env = parser.parse()
+    plain = tmp_path / "plain.pdf"
+    combined = tmp_path / "combined.pdf"
+    env.generate_report(ReportFormat.PDF, plain)
+    env.generate_report(ReportFormat.PDF, combined, include_cheatsheet=True)
+
+    def pages(path: Path) -> int:
+        expression = f"({path}) (r) file runpdfbegin pdfpagecount == quit"
+        result = subprocess.run(["gs", "-q", "-dNOSAFER", "-dNODISPLAY", "-c", expression],
+                                check=True, capture_output=True, text=True)
+        return int(result.stdout.strip())
+
+    assert pages(combined) == pages(plain) + pages(Path(str(packaged)))
+    text = subprocess.run(["gs", "-q", "-sDEVICE=txtwrite", "-o", "-", str(combined)],
+                          check=True, capture_output=True, text=True).stdout
+    assert text.index("speed") < text.index("DIPL&PUELquickreference")
+    with pytest.raises((ValueError, RuntimeError), match="only to PDF"):
+        env.generate_report(ReportFormat.HTML, tmp_path / "bad.html", include_cheatsheet=True)

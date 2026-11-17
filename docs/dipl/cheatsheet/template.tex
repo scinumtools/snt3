@@ -1,0 +1,76 @@
+\documentclass[a4paper,8pt]{extarticle}
+\usepackage[top=8mm,bottom=9mm,left=8mm,right=8mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Heros}
+\setmonofont{DejaVu Sans Mono}[Scale=0.76]
+\usepackage{microtype}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\providecommand{\passthrough}[1]{#1}
+\definecolor{sntblue}{HTML}{164B77}
+\definecolor{sntline}{HTML}{A9C4D7}
+\definecolor{sntcode}{HTML}{F2F7FA}
+\hypersetup{colorlinks=true,linkcolor=sntblue,urlcolor=sntblue,
+  pdftitle={DIPL and PUEL quick reference},
+  pdfauthor={SciNumTools3},
+  pdfsubject={$pdf_subject$},
+  pdfkeywords={DIPL,PUEL,DIPH5,SNT3,git $git_commit$}}
+\setlength{\columnsep}{5mm}
+\setlength{\columnseprule}{0.2pt}
+\def\columnseprulecolor{\color{sntline}}
+\setlength{\parindent}{0pt}
+\setcounter{secnumdepth}{0}
+\setlength{\parskip}{2pt}
+\setlist{nosep,leftmargin=1.2em}
+\titlespacing*{\section}{0pt}{7pt}{4pt}
+\titleformat{\section}{\color{sntblue}\bfseries\fontsize{10}{11}\selectfont}{}{0pt}{}[\vspace{-2pt}\color{sntline}\titlerule]
+\lstset{
+  basicstyle=\ttfamily\fontsize{7.4}{8.8}\selectfont,
+  backgroundcolor=\color{sntcode},
+  frame=single,
+  rulecolor=\color{sntline},
+  framesep=3pt,
+  xleftmargin=3.5pt,
+  xrightmargin=3.5pt,
+  aboveskip=6pt,
+  belowskip=3pt,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  keywordstyle=\color{sntblue}\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{black}
+}
+\lstdefinelanguage{DIPL}{morekeywords={bool,int,uint,float,str,true,false,none},
+  morecomment=[l]{\#},morestring=[b]"}
+\lstdefinelanguage{PUEL}{}
+\lstdefinelanguage{dipl}{morekeywords={bool,int,uint,float,str,true,false,none},
+  morecomment=[l]{\#},morestring=[b]"}
+\lstdefinelanguage{puel}{}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\color{sntblue}\fontsize{6.6}{8}\selectfont $versions$ \quad | \quad git $git_commit$}
+\fancyfoot[R]{\color{sntblue}\fontsize{6.6}{8}\selectfont \thepage}
+\setlength{\footskip}{7mm}
+\begin{document}
+\begin{tcolorbox}[colback=sntcode,colframe=sntline,boxrule=0.35pt,arc=1.2mm,
+  left=2.5mm,right=2.5mm,top=1mm,bottom=1mm]
+{\color{sntblue}\bfseries\fontsize{15}{17}\selectfont DIPL \& PUEL quick reference}\hfill
+{\color{sntblue}\fontsize{7.5}{9}\selectfont Scientific Numerical Tools v3}
+\end{tcolorbox}
+\vspace{1mm}
+\begin{multicols*}{2}
+\raggedcolumns
+\fontsize{8.5}{10}\selectfont
+$body$
+\end{multicols*}
+\end{document}

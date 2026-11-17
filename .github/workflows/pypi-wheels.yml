@@ -31,6 +31,9 @@ jobs:
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
+      - name: Verify packaged DIPL reference
+        run: python docs/dipl/cheatsheet/check_resource.py
+
       # -----------------------------------------------------------------------
       # macOS dependencies
       # -----------------------------------------------------------------------
@@ -154,7 +157,7 @@ jobs:
           # -------------------------------------------------------------------
 
           CIBW_TEST_COMMAND: >-
-            python -c "import scinumtools3; print('Success!')"
+            python -c "import scinumtools3; from importlib.resources import files; assert files('scinumtools3').joinpath('resources').joinpath('dipl-cheatsheet.pdf').is_file(); print('Success!')"
 
       # -----------------------------------------------------------------------
       # Upload
@@ -181,6 +184,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Verify packaged DIPL reference
+        run: python docs/dipl/cheatsheet/check_resource.py
 
       - name: Build source distribution
         run: |

@@ -298,6 +298,9 @@ install(EXPORT TargetsSNT
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${MODULE_NAME}"
 )
 
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/docs/dipl/cheatsheet/dipl-cheatsheet.pdf"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/snt3")
+
 # running ctest
 ###############
 

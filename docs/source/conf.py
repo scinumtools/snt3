@@ -70,6 +70,7 @@ exclude_patterns = []
 html_theme = 'sphinx_rtd_theme'
 html_logo = '_static/snt-logo-dark.png'
 html_static_path = ['_static']
+html_extra_path = ['../dipl/cheatsheet/dipl-cheatsheet.pdf']
 html_css_files = ['dipl.css', 'puq-converter.css']
 html_js_files = [
     ('puq-converter.js', {'type': 'module'}),

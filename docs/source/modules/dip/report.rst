@@ -59,6 +59,21 @@ to resolve contents links and page numbers:
 compiler, such as ``lualatex`` for Unicode text, when needed. An unavailable
 or failing compiler raises an error; the generator does not install one.
 
+To append the generic DIPL & PUEL reference after the model-specific pages,
+set ``options.cheatsheet_pdf`` to the installed
+``share/snt3/dipl-cheatsheet.pdf`` resource. The prebuilt PDF is included
+directly; no language reference is generated at report time. In Python, use
+the packaged resource automatically:
+
+.. code-block:: python
+
+   from scinumtools3.dip import ReportFormat
+
+   env.generate_report(ReportFormat.PDF, "report.pdf", include_cheatsheet=True)
+
+The option defaults to ``False``. It works offline and does not change the
+existing TeX requirement for rendering the model-specific PDF pages.
+
 Other formats use Brief++ renderers directly and need no external program:
 
 .. code-block:: cpp

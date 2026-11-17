@@ -51,6 +51,11 @@ file(COPY
     ${CMAKE_SOURCE_DIR}/bindings/python/src/scinumtools3
     DESTINATION ${CMAKE_BINARY_DIR}/python
 )
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/python/scinumtools3/resources)
+configure_file(
+    ${CMAKE_SOURCE_DIR}/docs/dipl/cheatsheet/dipl-cheatsheet.pdf
+    ${CMAKE_BINARY_DIR}/python/scinumtools3/resources/dipl-cheatsheet.pdf COPYONLY
+)
 
 # copy _snt library from 'Release' or 'Debug' directory to the main directory
 add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
@@ -159,5 +164,7 @@ endif()
 # install python module
 install(TARGETS ${MODULE_NAME}
         LIBRARY DESTINATION scinumtools3)
+install(FILES ${CMAKE_SOURCE_DIR}/docs/dipl/cheatsheet/dipl-cheatsheet.pdf
+        DESTINATION scinumtools3/resources)
 
 enable_coverage(${MODULE_NAME})

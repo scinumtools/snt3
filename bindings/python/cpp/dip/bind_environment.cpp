@@ -169,7 +169,8 @@ namespace snt::bind::python {
                const std::string& title,
                const std::string& author,
                const std::string& date,
-               const std::string& version) {
+               const std::string& version,
+               bool include_cheatsheet) {
                 dip::report::ReportOptions options;
                 options.input_label = input_label;
                 if (intro_file)
@@ -179,6 +180,12 @@ namespace snt::bind::python {
                 options.author = author;
                 options.date = date;
                 options.version = version;
+                if (include_cheatsheet) {
+                    auto resources = py::module_::import("importlib.resources");
+                    auto pdf = resources.attr("files")("scinumtools3")
+                                   .attr("joinpath")("resources").attr("joinpath")("dipl-cheatsheet.pdf");
+                    options.cheatsheet_pdf = py::str(pdf).cast<std::string>();
+                }
                 dip::report::generate(e, format, file, options);
             },
             py::arg("format"),
@@ -191,7 +198,9 @@ namespace snt::bind::python {
             py::arg("author") = "",
             py::arg("date") = "",
             py::arg("version") = "",
-            "Write a report from this evaluated environment. PDF requires a local TeX compiler."
+            py::arg("include_cheatsheet") = false,
+            "Write a report from this evaluated environment. Set include_cheatsheet=True to append the "
+            "packaged DIPL/PUEL reference to a PDF report. PDF requires a local TeX compiler."
         );
 #endif
 

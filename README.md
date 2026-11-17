@@ -47,6 +47,8 @@ between a scientific model's assumptions and its implementation.
   values with units, uncertainties, arrays, prefixes, and unit systems.
 - **Validated parameter models:** Define [typed DIPL hierarchies](https://scinumtools.github.io/snt3/modules/dip/basic-usage.html)
   with constraints, expressions, dependencies, and metadata.
+  Keep the [DIPL & PUEL quick reference](docs/dipl/cheatsheet/dipl-cheatsheet.pdf)
+  beside the [full DIPL specification](docs/dipl/dipl-specification.pdf).
 - **Reviewable changes:** [Inspect provenance, preview overrides, and compare](https://scinumtools.github.io/snt3/modules/dip/inspection.html)
   evaluated environments before accepting new settings.
 - **Guided setup:** Mark parameters with `!setup` to build a

@@ -6,7 +6,8 @@
 
 namespace snt::dip::report {
     void write_file(const std::filesystem::path& path, const std::string& contents);
-    void compile_pdf(const std::string& contents, const std::filesystem::path& output, const std::string& compiler);
+    void compile_pdf(const std::string& contents, const std::filesystem::path& output, const std::string& compiler,
+                     const std::filesystem::path& appendix_pdf = {});
 } // namespace snt::dip::report
 
 #endif
