@@ -5,7 +5,6 @@
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-00897B.svg?logo=c%2B%2B&logoColor=white)
 ![Compilers](https://img.shields.io/badge/Compilers-GCC%2011%2B%20%7C%20Clang%2015%2B%20%7C%20MSVC%202022-00897B)
 [![Documentation](https://img.shields.io/badge/docs-online-blue)](https://scinumtools.github.io/snt3/)
-[![SNT3: DIPL](https://img.shields.io/badge/SNT3-DIPL-2980b9)](https://scinumtools.github.io/snt3/initiative.html)
 
 # Scientific Numerical Tools v3 `{?SNT3}`
 
