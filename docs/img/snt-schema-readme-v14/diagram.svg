@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1840" height="855" viewBox="0 0 1840 855" role="img" aria-labelledby="title desc">
+  <title id="title">DIPL architecture</title>
+  <desc id="desc">Scientific parameters with physical units, hierarchies, references, constraints, and provenance flow through a C++ core that validates, evaluates, and supports a DIPH5 experiment contract. Interfaces include C, Rust, Python, WebAssembly, command line, CMake, REST, MCP, and a parameter viewer.</desc>
+  <defs>
+    <linearGradient id="navy" x2="0" y2="1"><stop stop-color="#064e8f"/><stop offset="1" stop-color="#032854"/></linearGradient>
+    <linearGradient id="core" x2="0" y2="1"><stop stop-color="#064b85"/><stop offset=".38" stop-color="#06366b"/><stop offset="1" stop-color="#042852"/></linearGradient>
+    <linearGradient id="row" x2="0" y2="1"><stop stop-color="#0d4b85"/><stop offset="1" stop-color="#073765"/></linearGradient>
+    <linearGradient id="brand" x2="0" y2="1"><stop stop-color="#24b6ff"/><stop offset="1" stop-color="#0755e7"/></linearGradient>
+    <linearGradient id="blue" x2="0" y2="1"><stop stop-color="#0875ed"/><stop offset="1" stop-color="#0754d4"/></linearGradient>
+    <linearGradient id="purple" x2="0" y2="1"><stop stop-color="#6928db"/><stop offset="1" stop-color="#4b14ab"/></linearGradient>
+    <linearGradient id="green" x2="0" y2="1"><stop stop-color="#11936d"/><stop offset="1" stop-color="#06714e"/></linearGradient>
+    <linearGradient id="orange" x2="0" y2="1"><stop stop-color="#fc8716"/><stop offset="1" stop-color="#e45c09"/></linearGradient>
+    <linearGradient id="red" x2="0" y2="1"><stop stop-color="#d92248"/><stop offset="1" stop-color="#b5092c"/></linearGradient>
+    <linearGradient id="teal" x2="0" y2="1"><stop stop-color="#11a6b7"/><stop offset="1" stop-color="#087c93"/></linearGradient>
+    <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#edb800"/><stop offset="1" stop-color="#c79300"/></linearGradient>
+    
+    <symbol id="ruler" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-45 32 32)"><rect x="10" y="23" width="44" height="18" rx="2"/><path d="M19 24v8m8-8v5m8-5v8m8-8v5"/></g></symbol>
+    <symbol id="hierarchy" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M32 17v20M16 37h32M16 37v9m16-9v9m16-9v9"/><circle cx="32" cy="13" r="6" fill="currentColor"/><circle cx="16" cy="50" r="6" fill="currentColor"/><circle cx="32" cy="50" r="6" fill="currentColor"/><circle cx="48" cy="50" r="6" fill="currentColor"/></g></symbol>
+    <symbol id="link" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M26 22l5-5a13 13 0 0 1 18 18l-7 7a13 13 0 0 1-18 0"/><path d="M38 42l-5 5a13 13 0 0 1-18-18l7-7a13 13 0 0 1 18 0"/><path d="M24 40l16-16"/></g></symbol>
+    <symbol id="document" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6h26l10 10v42H14z"/><path d="M40 6v12h10M22 29h20M22 38h20M22 47h12"/></g></symbol>
+    <symbol id="database" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"><ellipse cx="32" cy="14" rx="21" ry="8"/><path d="M11 14v36c0 5 9 9 21 9s21-4 21-9V14M11 27c0 5 9 9 21 9s21-4 21-9M11 40c0 5 9 9 21 9s21-4 21-9"/></g></symbol>
+    <symbol id="gear" viewBox="0 0 64 64"><g fill="currentColor"><path d="M28 4h8l2 7 6 3 7-3 6 7-4 6 2 7 7 3v8l-7 2-3 6 3 7-7 6-6-4-7 2-3 7h-8l-2-7-6-3-7 3-6-7 4-6-2-7-7-3v-8l7-2 3-6-3-7 7-6 6 4 7-2z" transform="translate(3 -3) scale(.9)"/><circle cx="32" cy="32" r="11" fill="#0a447e"/></g></symbol>
+    <symbol id="monitor" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="9" width="48" height="34" rx="3"/><path d="M32 43v11M21 55h22"/></g></symbol>
+    <symbol id="cloud" viewBox="0 0 64 64"><path fill="currentColor" d="M16 51h35a10 10 0 0 0 1-20 17 17 0 0 0-33-5A13 13 0 0 0 16 51z"/></symbol>
+    <symbol id="robot" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M32 6v8M18 18h28a7 7 0 0 1 7 7v22a7 7 0 0 1-7 7H18a7 7 0 0 1-7-7V25a7 7 0 0 1 7-7zM11 31H6m47 0h5M23 45h18"/><circle cx="24" cy="32" r="3" fill="currentColor"/><circle cx="40" cy="32" r="3" fill="currentColor"/></g></symbol>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; }
+      .navyText { fill:#062967; }
+      .whiteText { fill:#fff; }
+      .leftLabel { fill:#082c78; font-size:25px; font-weight:700; }
+      .coreLabel { fill:#fff; font-size:28px; font-weight:600; }
+      .rightLabel { fill:#fff; font-size:27px; font-weight:600; }
+      .leftBadge { fill:#e1f2ff; }
+      .rowStroke { fill:none; stroke:#a8d1ed; stroke-width:1.5; }
+      .rightStroke { fill:none; stroke:#c6e2f4; stroke-width:1.4; }
+    </style>
+  </defs>
+  <rect width="1840" height="855" fill="#fff"/>
+  <image x="0" y="-27" width="1840" height="614" href="mountains.png"/>
+  <text x="41" y="151" class="navyText" font-size="151" font-weight="800" letter-spacing="-7">DIPL</text>
+  <text x="45" y="201" class="navyText" font-size="51" font-weight="700">Dimensional Input Parameter Language</text>
+  <text x="47" y="244" fill="#0872dc" font-size="30" letter-spacing="2.5">One language. Physical meaning. One validated environment.</text>
+
+  <rect x="36" y="274" width="543" height="499" rx="22" fill="#fff" stroke="#83baf0" stroke-width="2"/>
+  <rect x="45" y="282" width="525" height="62" rx="13" fill="url(#navy)"/>
+  <text x="70" y="326" class="whiteText" font-size="42" font-weight="700">Scientific parameters</text>
+  <g class="navyText">
+    <circle cx="111" cy="389" r="42" class="leftBadge"/>
+    <circle cx="111" cy="472" r="42" class="leftBadge"/>
+    <circle cx="111" cy="555" r="42" class="leftBadge"/>
+    <circle cx="111" cy="638" r="42" class="leftBadge"/>
+    <circle cx="111" cy="721" r="42" class="leftBadge"/>
+  </g>
+  <image x="84" y="362" width="54" height="54" href="icons/ruler-navy.png"/>
+  <image x="84" y="445" width="54" height="54" href="icons/network-navy.png"/>
+  <image x="84" y="528" width="54" height="54" href="icons/link-navy.png"/>
+  <image x="84" y="611" width="54" height="54" href="icons/file-check-navy.png"/>
+  <image x="84" y="694" width="54" height="54" href="icons/database-navy.png"/>
+  <text x="190" y="399" class="leftLabel">Physical units and data types</text>
+  <text x="190" y="482" class="leftLabel">Hierarchical parameters</text>
+  <text x="190" y="565" class="leftLabel">References and expressions</text>
+  <text x="190" y="648" class="leftLabel">Constraints and dependencies</text>
+  <text x="190" y="731" class="leftLabel">Sources and provenance</text>
+
+  <path d="M584 473h37v-30l40 58-40 58v-30h-37z" fill="#0878ed"/>
+  <path d="M1183 473h39v-30l39 58-39 58v-30h-39z" fill="#0878ed"/>
+  <rect x="661" y="277" width="520" height="449" rx="22" fill="url(#core)"/>
+  <rect x="697" y="293" width="118" height="132" rx="25" fill="#e9f4ff"/>
+  <image x="705" y="302" width="102" height="114" href="icons/cplusplus.png"/>
+  <text x="847" y="383" class="whiteText" font-size="65" font-weight="700">C++ Core</text>
+  <rect x="687" y="440" width="471" height="77" rx="14" fill="url(#row)"/><rect x="687" y="440" width="471" height="77" rx="14" class="rowStroke"/>
+  <rect x="687" y="529" width="471" height="77" rx="14" fill="url(#row)"/><rect x="687" y="529" width="471" height="77" rx="14" class="rowStroke"/>
+  <rect x="687" y="618" width="471" height="77" rx="14" fill="url(#row)"/><rect x="687" y="618" width="471" height="77" rx="14" class="rowStroke"/>
+  <image x="708" y="451" width="54" height="54" href="icons/file-text-white.png"/>
+  <image x="707" y="540" width="54" height="54" href="icons/settings-white.png"/>
+  <image x="707" y="629" width="54" height="54" href="icons/database-white.png"/>
+  <text x="798" y="489" class="coreLabel">Parse and validate</text>
+  <text x="798" y="578" class="coreLabel">Evaluate expressions</text>
+  <text x="798" y="667" class="whiteText" font-size="26" font-weight="600">DIPH5 experiment contract</text>
+
+  <rect x="1262" y="194" width="548" height="580" rx="21" fill="url(#navy)"/>
+  <text x="1293" y="243" class="whiteText" font-size="35" font-weight="700">Use DIPL across your tools</text>
+  <g>
+    <rect x="1279" y="267" width="518" height="91" rx="13" fill="url(#blue)"/><rect x="1279" y="267" width="518" height="91" rx="13" class="rightStroke"/>
+    <rect x="1279" y="367" width="518" height="54" rx="12" fill="url(#purple)"/><rect x="1279" y="367" width="518" height="54" rx="12" class="rightStroke"/>
+    <rect x="1279" y="429" width="518" height="54" rx="12" fill="url(#green)"/><rect x="1279" y="429" width="518" height="54" rx="12" class="rightStroke"/>
+    <rect x="1279" y="491" width="518" height="54" rx="12" fill="url(#orange)"/><rect x="1279" y="491" width="518" height="54" rx="12" class="rightStroke"/>
+    <rect x="1279" y="553" width="518" height="54" rx="12" fill="url(#red)"/><rect x="1279" y="553" width="518" height="54" rx="12" class="rightStroke"/>
+    <rect x="1279" y="615" width="518" height="54" rx="12" fill="url(#teal)"/><rect x="1279" y="615" width="518" height="54" rx="12" class="rightStroke"/>
+    <rect x="1279" y="677" width="518" height="54" rx="12" fill="url(#gold)"/><rect x="1279" y="677" width="518" height="54" rx="12" class="rightStroke"/>
+  </g>
+  <circle cx="1310" cy="312" r="25" fill="#0b99ef"/><image x="1292" y="294" width="36" height="36" href="icons/c.png"/>
+  <circle cx="1370" cy="312" r="25" fill="#fff"/><image x="1351" y="293" width="38" height="38" href="icons/rust.png"/>
+  <circle cx="1430" cy="312" r="25" fill="#fff"/><image x="1411" y="293" width="38" height="38" href="icons/python.png"/>
+  <path d="M1470 284v56" stroke="#c9e7ff" stroke-width="1.5"/>
+  <text x="1492" y="322" class="whiteText" font-size="28" font-weight="700">C / Rust / Python</text>
+  <image x="1307" y="375" width="45" height="39" href="icons/webassembly.png"/>
+  <image x="1307" y="435" width="45" height="45" href="icons/terminal-white.png"/>
+  <circle cx="1329" cy="518" r="23" fill="#fff"/><image x="1307" y="496" width="44" height="44" href="icons/cmake.png"/>
+  <image x="1307" y="559" width="45" height="42" href="icons/cloud-white.png"/>
+  <image x="1307" y="621" width="45" height="42" href="icons/bot-white.png"/>
+  <image x="1307" y="683" width="45" height="42" href="icons/monitor-white.png"/>
+  <text x="1390" y="403" class="rightLabel">WebAssembly / JavaScript</text>
+  <text x="1390" y="465" class="rightLabel">Command-line interface</text>
+  <text x="1390" y="527" class="rightLabel">CMake integration</text>
+  <text x="1390" y="589" class="rightLabel">REST API server</text>
+  <text x="1390" y="651" class="rightLabel">MCP for AI agents</text>
+  <text x="1390" y="713" class="rightLabel">Parameter Viewer</text>
+
+  <path d="M43 807h300M1495 807h302" stroke="#1384ed" stroke-width="2"/>
+  <text x="919" y="821" class="navyText" text-anchor="middle" font-size="32" font-weight="700">One validated parameter environment across applications and tools</text>
+</svg>
