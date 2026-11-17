@@ -145,7 +145,7 @@ namespace snt::view {
     } // namespace
 
     ViewerModel::ViewerModel(std::filesystem::path artifact)
-        : input_path_(artifact.string()), artifact_(std::filesystem::absolute(std::move(artifact))) {
+        : input_path_(artifact.string()), artifact_(std::filesystem::absolute(std::move(artifact)).lexically_normal()) {
         environment_ = load_environment(artifact_);
         const auto kind = dip::detect_artifact(artifact_);
         if (kind == dip::ArtifactKind::Project)

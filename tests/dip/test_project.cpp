@@ -13,6 +13,7 @@
 #include <snt/dip/project_init.h>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <utility>
 
 using namespace snt;
@@ -78,16 +79,23 @@ TEST(Project, IncludesNestedDIPfilesInOneEnvironment) {
     EXPECT_EQ(env["runtime.steps"].as<int64_t>(), 8);
     EXPECT_EQ(env["combined"].as<int64_t>(), 12);
     ASSERT_GE(env.project_entries().size(), 7u);
+    const auto same_file = [](const std::string& actual, const std::filesystem::path& expected) {
+        if (actual.empty())
+            return false;
+        std::error_code error;
+        return std::filesystem::equivalent(std::filesystem::path(actual), expected, error) && !error;
+    };
     const auto included_build = std::find_if(
         env.project_entries().begin(), env.project_entries().end(), [&](const dip::ProjectEntry& entry) {
-            return entry.resolved_path == (project.path() / "build/DIPfile").string();
+            return entry.kind == dip::ProjectEntry::Kind::Include &&
+                   same_file(entry.resolved_path, project.path() / "build/DIPfile");
         });
     ASSERT_NE(included_build, env.project_entries().end());
     EXPECT_EQ(included_build->kind, dip::ProjectEntry::Kind::Include);
     const auto sources = env.get_source_manifest();
     const auto has_source = [&](const std::filesystem::path& path) {
         return std::any_of(sources.begin(), sources.end(), [&](const dip::SourceInfo& source) {
-            return source.path == path.string();
+            return same_file(source.path, path);
         });
     };
     EXPECT_TRUE(has_source(project.path() / "shared/DIPfile"));

@@ -398,7 +398,7 @@ int main() {
         );
         check(
             project.input_path() == relative_example.string() &&
-                project.artifact() == std::filesystem::absolute(relative_example),
+                project.artifact() == std::filesystem::absolute(relative_example).lexically_normal(),
             "Relative input path was expanded for display"
         );
         const auto provenance = project.environment()["experiment.geometry.length"].get_provenance();
