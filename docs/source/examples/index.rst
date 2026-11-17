@@ -20,6 +20,10 @@ Applications using DIPL
 nuclear-isotope database and decay-chain calculator. It uses DIPL for validated
 nuclide records and scenarios, provenance, and CMake build configuration.
 
+`H5Jive <https://github.com/vrtulka23/h5jive>`_ is a Rust desktop explorer for
+HDF5 and NetCDF data. It uses SNT3's Rust bindings and DIPL for dataset source
+catalogs, runtime settings, and compiled resource limits.
+
 `Ad Imaginem <https://github.com/vrtulka23/adimaginem>`_ is a cross-domain
 example: an interactive atlas of Thomistic philosophy and Catholic theology.
 It uses DIPL to define ontology concepts, citations, and graph parameters.
