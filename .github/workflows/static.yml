@@ -48,7 +48,10 @@ jobs:
       - name: Build documentation
         run: |
           sudo apt-get update
-          sudo apt-get install -y doxygen graphviz libhdf5-dev emscripten ninja-build
+          sudo apt-get install -y \
+            doxygen graphviz libhdf5-dev emscripten ninja-build \
+            pandoc ghostscript fonts-dejavu-core fonts-texgyre \
+            texlive-xetex texlive-luatex texlive-latex-extra texlive-fonts-recommended
           python -m pip install --upgrade pip
           pip install ".[docs]"
           ./setup.sh -d
