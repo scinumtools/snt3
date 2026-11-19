@@ -7,6 +7,25 @@ fn run(command: &mut Command) {
     assert!(status.success(), "Native SNT3 build failed with {status}");
 }
 
+fn native_build_jobs() -> String {
+    if let Ok(value) = env::var("SNT3_BUILD_JOBS") {
+        let jobs = value
+            .parse::<usize>()
+            .expect("SNT3_BUILD_JOBS must be a positive integer");
+        assert!(jobs > 0, "SNT3_BUILD_JOBS must be a positive integer");
+        return jobs.to_string();
+    }
+    // Cargo supplies NUM_JOBS; cap the independent CMake build to avoid
+    // exhausting memory while other Cargo jobs are active.
+    env::var("NUM_JOBS")
+        .ok()
+        .and_then(|value| value.parse::<usize>().ok())
+        .filter(|jobs| *jobs > 0)
+        .unwrap_or(2)
+        .min(4)
+        .to_string()
+}
+
 fn build_native() -> PathBuf {
     let package = PathBuf::from(env::var_os("CARGO_MANIFEST_DIR").unwrap());
     let bundled = package.join("vendor/snt3");
@@ -58,7 +77,7 @@ fn build_native() -> PathBuf {
         .arg("--target")
         .arg("snt-c")
         .arg("--parallel")
-        .arg(env::var("SNT3_BUILD_JOBS").unwrap_or_else(|_| "2".into())));
+        .arg(native_build_jobs()));
     build
 }
 

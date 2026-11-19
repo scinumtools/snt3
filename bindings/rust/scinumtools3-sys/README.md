@@ -19,8 +19,10 @@ uses the same linker settings. For an older installation without this
 metadata, set `SNT3_CXX_STDLIB=stdc++` or `SNT3_CXX_STDLIB=c++` to match its
 compiler. If the runtime is outside standard library paths, also set
 `SNT3_CXX_LIB_DIR` to its directory.
-The bundled CMake build uses two compiler jobs by default; set
-`SNT3_BUILD_JOBS` to change that limit.
+The bundled CMake build uses Cargo's requested parallelism, capped at four
+compiler jobs to limit memory use. Set `SNT3_BUILD_JOBS` to a positive integer
+to override the cap. Reusing an installed native library with `SNT3_PREFIX`
+still avoids the native build entirely.
 
 Use a native SNT3 build that includes the bulk array C ABI functions in
 `snt/c/dip.h`; earlier 0.10.0 binaries lack these symbols.
