@@ -467,6 +467,7 @@ cover. To regenerate the bundled :ref:`CreateReport example
        --intro examples/dip/CreateReport/introduction.tex \
        --title "Mock Heat Flow Study" --author "Example Research Team" \
        --date "2026-09-28" --report-version "1.0 demo" \
+       --cheatsheet-pdf docs/dipl/cheatsheet/dipl-cheatsheet.pdf \
        --format pdf --output examples/dip/CreateReport/report.pdf
 
 The default cover title is ``DIP parameter report``; an empty author appears

@@ -1,3 +1,6 @@
+?title "Experiment settings"
+?descr "Run values, sampling choices, and the inputs used in the derived flow distance."
+
 experiment
   title str = "Heat & Flow_demo"
     ?descr "A small mock experiment for the generated report."
@@ -7,6 +10,9 @@ experiment
     ?doi "10.1234/example.heat-flow"
   duration float = 12 h
     ?descr "Length of one run"
+    ?category "Run setup"
+    ?visibility "basic"
+    !setup
   sample_count int = 48
     ?descr "Number of readings in the sample set"
   interval float = 1 sample_period
@@ -15,6 +21,9 @@ experiment
     ?descr "Length expressed in the custom project unit"
   flow_speed float = 2 m/s
     ?descr "Nominal inlet speed, replaced for this run"
+    ?category "Run setup"
+    ?visibility "basic"
+    !setup
   flow_distance float = ({?experiment.flow_speed} * {?experiment.duration}) km
     ?descr "Distance implied by effective flow speed and run duration"
   inlet_temperature float = 295 K

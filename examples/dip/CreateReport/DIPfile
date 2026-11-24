@@ -7,15 +7,20 @@ units[]
 
 schemas[]
   name = "sensor"
-  file = "sensor.dipl"
+  file = "schemas/sensor.dipl"
 schemas[]
   name = "analysis"
-  file = "analysis.dipl"
+  file = "schemas/analysis.dipl"
+schemas[]
+  name = "instrument"
+  file = "schemas/instrument.dipl"
 
 overrides[]
   file = "overrides.dip"
 
 code[]
-  file = "parameters.dip"
+  file = "settings/parameters.dip"
 code[]
-  file = "environment.dip"
+  file = "settings/environment.dip"
+code[]
+  file = "catalog/instruments.dip"

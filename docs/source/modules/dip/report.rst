@@ -1,6 +1,59 @@
 Report generation
 =================
 
+Project documentation
+---------------------
+
+Use ``snt report docs`` to publish a directory-oriented reference for one or
+more DIPfile projects. The command follows registered files, includes each
+directory's ``README.md``, and creates pages for schemas and evaluated values.
+Schema pages show declared defaults, options, validation, examples, and guided
+setup fields. Value pages show effective settings, source locations, schema
+links, and copyable override examples where the project registers overrides.
+
+.. code-block:: console
+
+   snt report docs --root settings --output-dir build/settings-docs
+   snt report docs --root settings --output-dir build/settings-md --format md
+   snt report docs --root settings --output-dir build/settings-docs --format all
+   snt report docs --root settings --output-dir build/settings-docs --format all \
+       --cheatsheet-pdf share/snt3/dipl-cheatsheet.pdf
+
+The default HTML output requires ``pandoc`` on ``PATH``. Markdown output needs
+no external renderer. The output directory must be outside the source tree.
+``--format pdf`` produces a typeset ``settings-reference.pdf`` handbook with
+chapters following the directory tree, source descriptions, named collection
+entries, settings overviews, and a linked contents page. Small source files
+list every setting in their overview; larger files identify the selection rule
+and link to the complete reference. ``--pdf-detail full`` adds
+every evaluated field and schema member to the PDF. The HTML reference always
+contains those details. ``--format all`` produces both the HTML site and PDF;
+``--pdf`` adds the PDF to the selected HTML or Markdown output. PDF output
+requires Pandoc and a local TeX engine, ``xelatex`` by default. Use
+``--pdf-engine lualatex`` to choose another engine. Pass
+``--cheatsheet-pdf path/to/dipl-cheatsheet.pdf`` to append the prebuilt DIPL
+quick reference after either PDF variant. The combined
+``settings-reference.md`` manuscript and LaTeX style header are retained beside
+the PDF for review and customization.
+The generator discovers each ``DIPfile`` independently; files that merely
+exist on disk are not treated as active settings. Registered local override
+files are read as empty during generation, so the published values describe
+the project defaults. README links to regular files in the containing project
+are copied into ``_project/``. A warning identifies links the generator cannot
+resolve.
+
+The HTML site has a setting index that searches paths and descriptions, with
+filters for guided setup, values in projects with registered overrides,
+collection entries, schemas, and other sources. Existing ``?category`` and
+``?visibility`` metadata are searchable; ``?visibility "basic"`` helps select
+settings for large-file overviews. README links supply the landing-page
+navigation when present. Otherwise, described guided fields appear as clearly
+labeled examples. Technical provenance can be expanded on each value page.
+Override syntax based on a current scalar value is labeled as such; string
+values that may depend on the reader's environment receive guidance instead
+of a ready-to-copy assignment. All pages remain navigable through ordinary
+links when scripting is disabled.
+
 Configure with ``-DENABLE_SNT_REPORT=ON`` to build report generation (the
 default when DIP is enabled). ``-DENABLE_SNT_REPORT=OFF`` removes the Brief++
 dependency. In a report-disabled build, the C++ and C report entry points

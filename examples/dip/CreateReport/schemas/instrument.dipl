@@ -1,0 +1,9 @@
+?title "Instrument record"
+?descr "Reusable shape for the example instrument catalog."
+
+name str
+  ?descr "Human-readable instrument name"
+accuracy float = 0.2 K
+  ?descr "Temperature accuracy used to interpret a reading"
+location str
+  ?descr "Where the instrument is used in the mock laboratory"

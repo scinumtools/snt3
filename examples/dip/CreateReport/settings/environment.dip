@@ -1,3 +1,6 @@
+?title "Laboratory environment"
+?descr "Ambient conditions and the final sample-count adjustment for the mock run."
+
 lab
   room_temperature float = 293 K
     ?descr "Ambient laboratory temperature"

@@ -126,6 +126,8 @@ namespace snt::dip {
         std::string kind;
         std::string type;
         std::string units;
+        std::string default_value; ///< Declared schema default, if present.
+        bool setup = false;        ///< Included in guided setup.
         val::Array::RangeType dimensions;
         std::vector<std::string> schema_refs;
         std::vector<std::string> options;

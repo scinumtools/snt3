@@ -188,6 +188,8 @@ namespace snt::dip {
                         if (value->value_dtype != core::DataType::None)
                             member.type = type_name(value->value_dtype);
                         member.units = value->units_raw;
+                        if (!value->value_raw.empty()) member.default_value = value->value_raw.front();
+                        member.setup = value->setup;
                         member.dimensions = value->dimension;
                         member.condition = value->condition;
                         for (const auto& option : value->options) {

@@ -6,5 +6,7 @@
 
 model str = "T100"
   ?descr "Sensor model identifier"
+  ?visibility "basic"
+  !setup
 accuracy float = 0.2 K
   ?descr "Stated temperature accuracy"

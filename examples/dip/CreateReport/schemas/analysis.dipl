@@ -5,5 +5,7 @@
 
 method str = "mean"
   ?descr "Method used to summarize the mock sensor readings"
+  ?visibility "basic"
+  !setup
 window int = 8
   ?descr "Number of readings in a summary window"

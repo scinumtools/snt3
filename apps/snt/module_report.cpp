@@ -6,6 +6,7 @@
 #include <iostream>
 #include <snt/api/dip_parse.h>
 #include <snt/api/dip_report.h>
+#include <snt/dip/report/docs.h>
 #include <stdexcept>
 
 namespace {
@@ -39,6 +40,7 @@ Module: DIP Report
 
 Usage:
   snt report [options] [arguments]
+  snt report docs --root <directory> --output-dir <directory> [--format html|md|pdf|all]
 
 Description:
   Generate a parameter reference from an evaluated DIP environment using Brief++.
@@ -78,8 +80,11 @@ Options:
       Use this TeX compiler for PDF output (default: pdflatex).
       A compiler must be installed locally; snt report installs nothing.
       Use lualatex for Unicode text unsupported by pdflatex.
+  --cheatsheet-pdf <file.pdf>
+      Append the prebuilt DIPL/PUEL quick reference to PDF output.
 
 Examples:
+  snt report docs --root settings --output-dir build/settings-docs --format all
   snt report --project DIPfile --output report.tex
   snt report --project DIPfile --format html --output report.html
   snt report --project DIPfile --format md --output report.md
@@ -93,6 +98,54 @@ Examples:
 } // namespace
 
 void module_report(ArgParser& argpar) {
+    if (argpar.numPositional() == 2 && argpar.getPositionalValue(1) == "docs") {
+        if (argpar.hasKeyword("-h") || argpar.hasKeyword("--help")) {
+            std::cout << "Usage: snt report docs --root <directory> --output-dir <directory> "
+                         "[--format html|md|pdf|all] [--pdf] [--pdf-engine <engine>] "
+                         "[--pdf-detail summary|full] [--cheatsheet-pdf <file.pdf>] [--title <text>]\n"
+                         "HTML requires pandoc; PDF also requires a TeX engine (default: xelatex). "
+                         "Local overrides are excluded.\n";
+            return;
+        }
+        snt::dip::report::DocsOptions options;
+        for (const auto& argument : argpar.getAllKeywords()) {
+            if (argument.key == "--pdf") {
+                if (!argument.values.empty()) throw std::runtime_error("--pdf takes no value.");
+                options.pdf = true;
+                continue;
+            }
+            if (argument.values.size() != 1)
+                throw std::runtime_error(argument.key + " requires exactly one value.");
+            if (argument.key == "--root") options.root = argument.values.front();
+            else if (argument.key == "--output-dir") options.output_dir = argument.values.front();
+            else if (argument.key == "--title") options.title = argument.values.front();
+            else if (argument.key == "--pdf-engine") options.pdf_engine = argument.values.front();
+            else if (argument.key == "--pdf-detail") {
+                if (argument.values.front() == "full") options.pdf_full_reference = true;
+                else if (argument.values.front() != "summary")
+                    throw std::runtime_error("--pdf-detail must be summary or full.");
+            }
+            else if (argument.key == "--cheatsheet-pdf") options.cheatsheet_pdf = argument.values.front();
+            else if (argument.key == "--format") {
+                if (argument.values.front() == "md") options.html = false;
+                else if (argument.values.front() == "html") options.html = true;
+                else if (argument.values.front() == "pdf") { options.html = false; options.pdf = true; }
+                else if (argument.values.front() == "all") { options.html = true; options.pdf = true; }
+                else throw std::runtime_error("Documentation format must be html, md, pdf, or all.");
+            } else throw std::runtime_error("Unknown documentation option: " + argument.key);
+        }
+        if (!options.cheatsheet_pdf.empty() && !options.pdf)
+            throw std::runtime_error("--cheatsheet-pdf requires PDF output.");
+        if (options.pdf_full_reference && !options.pdf)
+            throw std::runtime_error("--pdf-detail full requires PDF output.");
+        const auto result = snt::dip::report::generate_docs(options);
+        std::cout << "Generated " << result.pages << " pages from " << result.projects << " projects in "
+                  << options.output_dir << "\n";
+        if (options.pdf) std::cout << "PDF: " << (options.output_dir / "settings-reference.pdf") << "\n";
+        for (const auto& warning : result.warnings)
+            std::cerr << "Documentation warning: " << warning << "\n";
+        return;
+    }
     if (argpar.hasKeyword("-h") || argpar.hasKeyword("--help") ||
         (argpar.numPositional() == 1 && !argpar.hasKeywords())) {
         std::cout << help_report();
@@ -104,7 +157,7 @@ void module_report(ArgParser& argpar) {
     snt::api::DIPParse command;
     bool has_input = false, has_project = false, has_load = false;
     std::string format = "tex", output, intro, compiler = "pdflatex", input_label;
-    std::string title, author, date, report_version;
+    std::string title, author, date, report_version, cheatsheet_pdf;
     std::filesystem::path source_root;
     bool has_format = false, has_output = false, has_intro = false, has_compiler = false;
 
@@ -148,7 +201,7 @@ void module_report(ArgParser& argpar) {
             input_label = values.front();
         } else if (
             key == "--format" || key == "--output" || key == "--intro" || key == "--tex-compiler" || key == "--title" ||
-            key == "--author" || key == "--date" || key == "--report-version"
+            key == "--author" || key == "--date" || key == "--report-version" || key == "--cheatsheet-pdf"
         ) {
             if (values.size() != 1)
                 throw std::runtime_error(key + " requires exactly one value.");
@@ -178,6 +231,8 @@ void module_report(ArgParser& argpar) {
                 author = values.front();
             } else if (key == "--date") {
                 date = values.front();
+            } else if (key == "--cheatsheet-pdf") {
+                cheatsheet_pdf = values.front();
             } else {
                 report_version = values.front();
             }
@@ -195,6 +250,8 @@ void module_report(ArgParser& argpar) {
         throw std::runtime_error("--tex-compiler requires --format pdf.");
     if (has_intro && format != "tex" && format != "pdf")
         throw std::runtime_error("--intro requires --format tex or pdf.");
+    if (!cheatsheet_pdf.empty() && format != "pdf")
+        throw std::runtime_error("--cheatsheet-pdf requires --format pdf.");
 
     snt::dip::report::ReportOptions options;
     options.input_label = input_label;
@@ -207,5 +264,6 @@ void module_report(ArgParser& argpar) {
     options.date = date;
     options.version = report_version;
     options.source_root = source_root;
+    options.cheatsheet_pdf = cheatsheet_pdf;
     snt::api::generate_dip_report(command.evaluate(true), selected_format, output, options);
 }

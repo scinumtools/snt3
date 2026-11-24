@@ -12,7 +12,7 @@ file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "./*.cpp" "./**/*.cpp")
 if(ENABLE_SNT_REPORT)
   list(FILTER SOURCE_FILES EXCLUDE REGEX "/report/disabled\\.cpp$")
 else()
-  list(FILTER SOURCE_FILES EXCLUDE REGEX "/report/(compiler|model|renderer|report)\\.cpp$")
+  list(FILTER SOURCE_FILES EXCLUDE REGEX "/report/(compiler|docs|model|renderer|report)\\.cpp$")
 endif()
 set(EXEC_NAME snt-dip)
 

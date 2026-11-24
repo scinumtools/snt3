@@ -23,11 +23,13 @@ namespace snt::dip::report {
         std::vector<std::string> applied_schemas;
         std::string contributing_schema;
         bool overridden = false;
+        bool setup = false;
         Origin declaration, replacement;
         std::vector<Origin> modifications;
         Publication publication;
         std::vector<std::string> reads, used_by, selected_by;
         std::string expression, condition;
+        std::string link_source, link_target;
     };
 
     struct TableColumn {

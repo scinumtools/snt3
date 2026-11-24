@@ -101,6 +101,9 @@ namespace snt::dip::report {
             }
             item.publication = publication_of(node->metadata);
             item.overridden = node->override;
+            item.setup = node->setup;
+            item.link_source = node->link_source;
+            item.link_target = node->link_target;
             item.declaration = origin_of(
                 node->line.source.name,
                 node->line.source.line_number,

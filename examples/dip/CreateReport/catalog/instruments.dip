@@ -1,0 +1,14 @@
+?title "Instrument catalog"
+?descr "Two illustrative instrument records. These are reference data for the example, not run overrides."
+
+instruments[probe_a] : instrument
+  ?descr "Primary temperature probe used at the inlet."
+  name = "Inlet probe"
+  accuracy = 0.2 K
+  location = "Inlet"
+
+instruments[probe_b] : instrument
+  ?descr "Secondary temperature probe used at the outlet."
+  name = "Outlet probe"
+  accuracy = 0.3 K
+  location = "Outlet"

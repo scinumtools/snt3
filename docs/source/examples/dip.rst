@@ -244,11 +244,33 @@ Create Report
 -------------
 
 The `CreateReport source directory <https://github.com/scinumtools/snt3/tree/main/examples/dip/CreateReport>`_
-contains a DIPfile project with two schemas, two custom units, multiple
-source files, and an override. Its LaTeX introduction and cover fields show
-how to add context to the generated report. The
-:download:`example PDF <../../../examples/dip/CreateReport/report.pdf>` is
-included in the repository for immediate viewing.
+contains a DIPfile project with three schemas, two custom units, a small
+instrument catalog, and an override. It demonstrates both an evaluated run
+report and documentation generated from the settings tree. Open the bundled
+:download:`run report <../../../examples/dip/CreateReport/report.pdf>` or
+:download:`settings handbook <../../../examples/dip/CreateReport/settings-handbook.pdf>`
+to inspect the two PDF layouts.
+
+The root and section ``README.md`` files give readers task-based navigation.
+Source-level ``?title`` and ``?descr`` introduce the files, while ``!setup``
+and ``?visibility "basic"`` identify notable settings in larger overviews.
+The catalog has two named entries with descriptions. The HTML guide keeps the
+complete field reference, search, units, and provenance; the default PDF is
+the shorter handbook. Generate both from the repository root:
+
+.. code-block:: bash
+
+   build/bin/snt report docs --root examples/dip/CreateReport \
+       --output-dir build/create-report-docs --format all \
+       --cheatsheet-pdf docs/dipl/cheatsheet/dipl-cheatsheet.pdf
+
+Open ``build/create-report-docs/index.html`` and
+``build/create-report-docs/settings-reference.pdf``. Add ``--pdf-detail full``
+to include every field in the PDF. Documentation generation excludes the
+registered local override, so it describes the project defaults.
+
+The separate evaluated report applies that override. Its LaTeX introduction
+and cover fields show how to add context to one run.
 
 The PDF contents page links to an ``Override example`` subsection. The
 Parameter guide links effective values to their full entries. The Parameters
